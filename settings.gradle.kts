@@ -13,4 +13,5 @@ include(":lib:core")
 include(":lib:ui")
 include(":lib:plugins:markdown")
 include(":examples:helloworld")
+include(":examples:helloworld-runner")
 
