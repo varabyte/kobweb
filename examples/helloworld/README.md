@@ -1,0 +1,1 @@
+A very minimal example of a Nekt site, with a single page announcing "Hello World".

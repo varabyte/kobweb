@@ -1,0 +1,5 @@
+[versions]
+kotlinx-cli = "0.3.2"
+
+[libraries]
+kotlinx-cli = { module = "org.jetbrains.kotlinx:kotlinx-cli", version.ref = "kotlinx-cli" }
