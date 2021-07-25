@@ -5,14 +5,14 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun TestComposable() {
+fun TestComposable(name: String = "World") {
     Div({
         style {
             backgroundColor(Color.red)
         }
     }
     ) {
-        Text("HELLO ")
-        Text("WORLD")
+        Text("Hello ")
+        Text(name)
     }
 }
