@@ -11,11 +11,9 @@ import androidx.compose.runtime.Composable
  *   It will be a runtime error if multiple index pages are found for the same slug part.
  */
 abstract class Page(slug: Slug? = null, val isIndex: Boolean = false) {
-    // TODO: Handle nested slugs via reflection, e.g. "pages.posts.SomePostPage" -> "posts/somepost"
+    // TODO: Handle nested slugs via reflection?, e.g. "pages.posts.SomePostPage" -> "posts/somepost"
     val slug = slug ?: Slug(this::class.js.name.removeSuffix("Page").lowercase())
 
     @Composable
     abstract fun render()
-
-    open fun getTheme(): Theme = App.getInstance().getTheme()
 }

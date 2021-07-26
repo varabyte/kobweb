@@ -1,6 +1,6 @@
 package helloworld.pages
 
-import TestComposable
+import helloworld.components.TestComposable
 import androidx.compose.runtime.Composable
 import nekt.core.Page
 
