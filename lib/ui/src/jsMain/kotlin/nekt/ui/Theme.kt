@@ -4,6 +4,10 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.CSSColorValue
 import org.jetbrains.compose.web.css.Color
 
+data class Config(
+    var initialColorMode: ColorMode = ColorMode.LIGHT
+)
+
 data class Palette(
     val primary: CSSColorValue,
     val background: CSSColorValue,
@@ -27,17 +31,18 @@ private val DEFAULT_COLORS = Colors(
 )
 
 object Theme {
-    internal var _colors = DEFAULT_COLORS
-    val colors: Colors get() = _colors
+    val config: Config = Config()
+    var colors: Colors = DEFAULT_COLORS
+        internal set
 }
 
 @Composable
 fun Theme(colors: Colors = Theme.colors, content: @Composable () -> Unit) {
     val prevColors = Theme.colors
-    Theme._colors = colors
+    Theme.colors = colors
 
     content()
 
-    Theme._colors = prevColors
+    Theme.colors = prevColors
 }
 

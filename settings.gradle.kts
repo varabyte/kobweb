@@ -11,6 +11,7 @@ rootProject.name = "nekt"
 include(":bin:nekt")
 include(":lib:core")
 include(":lib:ui")
+include(":lib:compose-ext")
 include(":lib:plugins:markdown")
 include(":examples:helloworld")
 include(":examples:helloworld-runner")
