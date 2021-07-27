@@ -1,4 +1,4 @@
-package nekt.ui
+package nekt.ui.config
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf

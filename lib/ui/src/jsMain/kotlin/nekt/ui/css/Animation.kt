@@ -1,4 +1,4 @@
-package nekt.ui
+package nekt.ui.css
 
 import nekt.compose.css.TransitionProperty
 import nekt.compose.css.transitionDuration
