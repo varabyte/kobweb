@@ -4,30 +4,10 @@ import helloworld.pages.HomePage
 import nekt.compose.css.Cursor
 import nekt.compose.css.cursor
 import nekt.core.Router
+import nekt.ui.config.Theme
+import nekt.ui.css.withTransitionDefaults
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.renderComposable
-
-object GlobalStylesheet : StyleSheet() {
-    init {
-        "html, body" style {
-            padding(0.px)
-            margin(0.px)
-        }
-
-        "a" style {
-            color(Color.blue)
-            textDecoration("underline")
-        }
-
-        "a:hover" style {
-            cursor(Cursor.POINTER)
-        }
-
-        "*" style {
-           boxSizing("border-box")
-        }
-    }
-}
 
 fun main() {
     val app = MyApp()
@@ -36,7 +16,7 @@ fun main() {
     Router.navigateTo("/")
 
     renderComposable(rootElementId = "root") {
-        Style(GlobalStylesheet)
+        Style(app.globalStyles)
         app.render {
             Router.getActivePage().render()
         }

@@ -1,8 +1,17 @@
 package nekt.ui.config
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.Color
+import nekt.ui.css.withTransitionDefaults
+import org.jetbrains.compose.web.css.*
+
+private class ThemeStyleSheet(colorMode: ColorMode) : StyleSheet() {
+    init {
+        "a" style {
+            color(Theme.colors.getPalette(colorMode).link)
+            withTransitionDefaults()
+        }
+    }
+}
 
 data class Config(
     var initialColorMode: ColorMode = ColorMode.LIGHT
@@ -18,13 +27,15 @@ data class Colors(
     val light: Palette,
     val dark: Palette,
 ) {
-    @Composable
-    fun getActivePalette(): Palette {
-        return when (getColorMode()) {
+    fun getPalette(colorMode: ColorMode): Palette {
+        return when (colorMode) {
             ColorMode.LIGHT -> light
             ColorMode.DARK -> dark
         }
     }
+
+    @Composable
+    fun getActivePalette(): Palette = getPalette(getColorMode())
 }
 
 private val DEFAULT_COLORS = Colors(
@@ -51,6 +62,7 @@ fun Theme(colors: Colors = Theme.colors, content: @Composable () -> Unit) {
     val prevColors = Theme.colors
     Theme.colors = colors
 
+    Style(ThemeStyleSheet(getColorMode()))
     content()
 
     Theme.colors = prevColors
