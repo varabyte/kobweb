@@ -7,7 +7,7 @@ import nekt.ui.css.withTransitionDefaults
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 
-class MyApp : App() {
+class MyApp : App {
     @Composable
     override fun render(content: @Composable () -> Unit) {
         val palette = Theme.colors.getActivePalette()

@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
-class HomePage : Page() {
+class HomePage : Page {
     @Composable
     override fun render() {
         Div {

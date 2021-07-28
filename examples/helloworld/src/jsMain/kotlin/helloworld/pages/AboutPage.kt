@@ -6,7 +6,7 @@ import nekt.ui.components.Link
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
-class AboutPage : Page() {
+class AboutPage : Page {
     @Composable
     override fun render() {
         Div {

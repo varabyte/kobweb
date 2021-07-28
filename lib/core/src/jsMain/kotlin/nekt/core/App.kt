@@ -2,12 +2,14 @@ package nekt.core
 
 import androidx.compose.runtime.Composable
 
-abstract class App {
-    private val plugins = mutableListOf<Plugin>()
-    fun extendWith(plugin: Plugin) { plugins.add(plugin) }
-
+interface App {
     @Composable
-    open fun render(content: @Composable () -> Unit) {
+    fun render(content: @Composable () -> Unit)
+}
+
+object DefaultApp : App {
+    @Composable
+    override fun render(content: @Composable () -> Unit) {
         content()
     }
 }

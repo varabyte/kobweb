@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
-private class ErrorPage(private val errorCode: Int) : Page() {
+private class ErrorPage(private val errorCode: Int) : Page {
     @Composable
     override fun render() {
         Div {

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 /**
  * Wraps a composable which is used to render an interactive, responsive html page.
  */
-abstract class Page {
+interface Page {
     @Composable
-    abstract fun render()
+    fun render()
 }
