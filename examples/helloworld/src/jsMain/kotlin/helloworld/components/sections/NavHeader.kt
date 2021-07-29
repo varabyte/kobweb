@@ -1,7 +1,8 @@
 package helloworld.components.sections
 
 import androidx.compose.runtime.Composable
-import nekt.core.components.Link
+import nekt.core.components.PageLink
+import nekt.core.components.PageLinkParams
 import nekt.ui.components.layout.*
 import nekt.ui.config.NektTheme
 import nekt.ui.config.toggleColorMode
@@ -34,8 +35,8 @@ fun NavHeader() {
             }
         }
 
-        Link("/", navLinkStyles) { Text("HOME") }
-        Link("/about", navLinkStyles) { Text("ABOUT") }
+        PageLink(PageLinkParams("/"), navLinkStyles) { Text("HOME") }
+        PageLink(PageLinkParams("/about"), navLinkStyles) { Text("ABOUT") }
         Spacer()
         Button(
             attrs = {
