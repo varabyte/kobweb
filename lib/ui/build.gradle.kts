@@ -19,7 +19,6 @@ kotlin {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
 
-                implementation(project(":lib:core"))
                 implementation(project(":lib:compose-ext"))
             }
         }
