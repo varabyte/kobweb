@@ -6,9 +6,16 @@ import org.jetbrains.compose.web.css.*
 
 private class ThemeStyleSheet(colorMode: ColorMode) : StyleSheet() {
     init {
+        val palette = NektTheme.colors.getPalette(colorMode)
+
+        "#root" {
+            backgroundColor(palette.bg)
+            color(palette.fg)
+            withTransitionDefaults("background-color", "color")
+        }
         "a" style {
-            color(Theme.colors.getPalette(colorMode).link)
-            withTransitionDefaults()
+            color(palette.link)
+            withTransitionDefaults("color")
         }
     }
 }
@@ -51,20 +58,20 @@ private val DEFAULT_COLORS = Colors(
     )
 )
 
-object Theme {
+object NektTheme {
     val config: Config = Config()
     var colors: Colors = DEFAULT_COLORS
         internal set
 }
 
 @Composable
-fun Theme(colors: Colors = Theme.colors, content: @Composable () -> Unit) {
-    val prevColors = Theme.colors
-    Theme.colors = colors
+fun NektTheme(colors: Colors = NektTheme.colors, content: @Composable () -> Unit) {
+    val prevColors = NektTheme.colors
+    NektTheme.colors = colors
 
     Style(ThemeStyleSheet(getColorMode()))
     content()
 
-    Theme.colors = prevColors
+    NektTheme.colors = prevColors
 }
 

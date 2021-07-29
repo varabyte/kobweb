@@ -1,35 +1,29 @@
 package helloworld.pages
 
 import androidx.compose.runtime.Composable
-import helloworld.components.TestComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import helloworld.components.layouts.Layout
 import nekt.core.Page
-import nekt.core.components.Link
-import nekt.ui.config.toggleColorMode
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.dom.Input
+import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
 
 class HomePage : Page {
     @Composable
     override fun render() {
-        Div {
-            TestComposable("Test")
-        }
-        Div {
-            Button(
+        Layout("Welcome to Nekt!") {
+            Text("Please enter your name")
+            var name by remember { mutableStateOf("") }
+            Input(
+                InputType.Text,
                 attrs = {
-                    onClick {
-                        toggleColorMode()
-                    }
+                    onInput { e -> name = e.value }
                 }
-            ) {
-                Text("Toggle Color Mode")
-            }
-        }
-        Div {
-            Link("/about") {
-                Text("ABOUT")
-            }
+            )
+            P()
+            Text("Hello ${name.takeIf { it.isNotBlank() } ?: "World"}!")
         }
     }
 }

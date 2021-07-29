@@ -6,37 +6,36 @@ import nekt.compose.css.cursor
 import org.jetbrains.compose.web.css.*
 
 interface App {
-    val globalStyles: StyleSheet
-
     @Composable
     fun render(content: @Composable () -> Unit)
 }
 
-object DefaultApp : App {
-    override val globalStyles = object : StyleSheet() {
-        init {
-            "html, body" style {
-                padding(0.px)
-                margin(0.px)
-            }
+object DefaultStyleSheet : StyleSheet() {
+    init {
+        "html, body" style {
+            padding(0.px)
+            margin(0.px)
+        }
 
-            "a" style {
-                color(Color.blue)
-                textDecoration("underline")
-            }
+        "a" style {
+            color(Color.blue)
+            textDecoration("underline")
+        }
 
-            "a:hover" style {
-                cursor(Cursor.POINTER)
-            }
+        "a:hover" style {
+            cursor(Cursor.POINTER)
+        }
 
-            "*" style {
-                boxSizing("border-box")
-            }
+        "*" style {
+            boxSizing("border-box")
         }
     }
+}
 
+object DefaultApp : App {
     @Composable
     override fun render(content: @Composable () -> Unit) {
+        Style(DefaultStyleSheet)
         content()
     }
 }

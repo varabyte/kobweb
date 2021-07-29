@@ -1,21 +1,15 @@
 package helloworld.pages
 
 import androidx.compose.runtime.Composable
+import helloworld.components.layouts.Layout
 import nekt.core.Page
-import nekt.core.components.Link
-import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
 class AboutPage : Page {
     @Composable
     override fun render() {
-        Div {
-            Text("ABOUT")
-        }
-        Div {
-            Link("/") {
-                Text("GO BACK")
-            }
+        Layout("ABOUT") {
+            Text("This is a skeleton app used to showcase a basic site made using Nekt")
         }
     }
 }

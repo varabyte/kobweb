@@ -15,7 +15,7 @@ enum class ColorMode {
     }
 }
 
-private val colorModeState by lazy { mutableStateOf(Theme.config.initialColorMode) }
+private val colorModeState by lazy { mutableStateOf(NektTheme.config.initialColorMode) }
 
 @Composable
 fun getColorMode(): ColorMode = colorModeState.value
