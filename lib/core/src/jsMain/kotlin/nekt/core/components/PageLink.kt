@@ -35,7 +35,7 @@ data class PageLinkParams(
  *
  * As this is relatively common to do, a helper [PageLink] method is provided as well which does this for you.
  */
-fun <E : Element> AttrsBuilder<E>.makePageLink(params: PageLinkParams) {
+fun <E : Element> AttrsBuilder<E>.setAsPageLink(params: PageLinkParams) {
     onClick { e ->
         e.preventDefault()
         Router.navigateTo(params.path)
@@ -59,7 +59,7 @@ fun PageLink(
             if (attrs != null) {
                 attrs()
             }
-            makePageLink(params)
+            setAsPageLink(params)
         },
         content
     )

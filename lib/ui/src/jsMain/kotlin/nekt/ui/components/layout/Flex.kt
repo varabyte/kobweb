@@ -46,7 +46,7 @@ data class FlexItemParams(
  *
  * As this is relatively common to do, a helper [Flex] method is provided as well which does this for you.
  */
-fun <E : Element> AttrsBuilder<E>.makeFlexContainer(params: FlexParams = FlexParams()) {
+fun <E : Element> AttrsBuilder<E>.setAsFlexContainer(params: FlexParams = FlexParams()) {
     style {
         display(DisplayStyle.Flex)
         flexDirection(params.direction)
@@ -78,7 +78,7 @@ fun <E : Element> AttrsBuilder<E>.makeFlexContainer(params: FlexParams = FlexPar
  *
  * As this is relatively common to do, a helper [Flex] method is provided as well which does this for you.
  */
-fun <E : Element> AttrsBuilder<E>.makeFlexItem(params: FlexItemParams = FlexItemParams()) {
+fun <E : Element> AttrsBuilder<E>.setAsFlexItem(params: FlexItemParams = FlexItemParams()) {
     style {
         order(params.order)
         flexGrow(params.grow)
@@ -104,7 +104,7 @@ fun Flex(
             if (attrs != null) {
                 attrs()
             }
-            makeFlexContainer(params)
+            setAsFlexContainer(params)
         },
         content
     )
@@ -117,7 +117,7 @@ fun Flex(
 fun Spacer() {
     Div(
         attrs = {
-            makeFlexItem(FlexItemParams(grow = 1))
+            setAsFlexItem(FlexItemParams(grow = 1))
         }
     )
 }

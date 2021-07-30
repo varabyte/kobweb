@@ -23,7 +23,7 @@ fun NavHeader() {
                 padding(10.px)
                 // Intentionally invert the header colors
                 backgroundColor(palette.fg)
-                makeFlexItem(FlexItemParams(alignSelf = AlignSelf.Stretch))
+                setAsFlexItem(FlexItemParams(alignSelf = AlignSelf.Stretch))
             }
         }
     ) {
