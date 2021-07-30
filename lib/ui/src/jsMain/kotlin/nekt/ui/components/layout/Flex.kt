@@ -112,6 +112,8 @@ fun Flex(
 
 /**
  * A convenience element which grows to consume all remaining space in a flex row or column.
+ *
+ * Semantically a `<div>`
  */
 @Composable
 fun Spacer() {
