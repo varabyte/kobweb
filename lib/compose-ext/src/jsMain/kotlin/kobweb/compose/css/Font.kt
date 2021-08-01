@@ -6,27 +6,35 @@ fun StyleBuilder.fontFamily(value: String) {
     property("font-family", value)
 }
 
-enum class FontStyle(val value: String) {
-    NORMAL("normal"),
-    ITALIC("italic"),
+class FontStyle(val value: String) {
+    companion object {
+        val Normal get() = FontStyle("normal")
+        val Italic get() = FontStyle("italic")
+    }
 }
 
 fun StyleBuilder.fontStyle(style: FontStyle) {
     property("font-style", style.value)
 }
 
-enum class FontWeight(val value: String) {
-    NORMAL("normal"),
-    BOLD("bold"),
-    LIGHTER("lighter"),
-    BOLDER("bolder"),
+sealed interface FontWeight {
+    companion object {
+        val Normal get() = StringFontWeight("normal")
+        val Bold get() = StringFontWeight("bold")
+        val Lighter get() = StringFontWeight("lighter")
+        val Bolder get() = StringFontWeight("bolder")
+    }
 }
+
+class StringFontWeight(val value: String) : FontWeight
+class IntFontWeight(val value: Int) : FontWeight
 
 fun StyleBuilder.fontWeight(weight: FontWeight) {
-    property("font-weight", weight.value)
-}
-
-fun StyleBuilder.fontWeight(value: Int) {
-    require(value in 1..1000) { "Font weight must be between 1 and 1000. Got: $value" }
-    property("font-weight", value)
+    when (weight) {
+        is StringFontWeight -> property("font-weight", weight.value)
+        is IntFontWeight -> {
+            require(weight.value in 1..1000) { "Font weight must be between 1 and 1000. Got: ${weight.value}" }
+            property("font-weight", weight.value)
+        }
+    }
 }

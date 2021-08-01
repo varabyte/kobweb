@@ -12,16 +12,18 @@ import org.jetbrains.compose.web.css.StyleBuilder
  * Special values for Transition Property. You can also pass in string values directly using
  * the relaxed version of [transitionProperty]
  */
-enum class TransitionProperty(val value: String) {
-    // Keywords
-    NONE("none"),
-    ALL("all"),
+class TransitionProperty(val value: String) {
+    companion object {
+        // Keywords
+        val None get() = TransitionProperty("none")
+        val All get() = TransitionProperty("all")
 
-    // Global values
-    INHERIT("inherit"),
-    INITIAL("initial"),
-    REVERT("revert"),
-    UNSET("unset"),
+        // Global values
+        val Inherit get() = TransitionProperty("inherit")
+        val Initial get() = TransitionProperty("initial")
+        val Revert get() = TransitionProperty("revert")
+        val Unset get() = TransitionProperty("unset")
+    }
 }
 
 fun StyleBuilder.transitionProperty(property: TransitionProperty) {

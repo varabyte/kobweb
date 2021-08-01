@@ -23,7 +23,7 @@ object DefaultStyleSheet : StyleSheet() {
         }
 
         "a:hover" style {
-            cursor(Cursor.POINTER)
+            cursor(Cursor.Pointer)
         }
 
         "*" style {

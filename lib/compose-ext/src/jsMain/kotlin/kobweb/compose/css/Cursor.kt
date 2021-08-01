@@ -3,54 +3,56 @@ package kobweb.compose.css
 import org.jetbrains.compose.web.css.StyleBuilder
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-enum class Cursor(val value: String) {
-    // General
-    AUTO("auto"),
-    DEFAULT("default"),
-    NONE("none"),
+class Cursor(val value: String) {
+    companion object {
+        // General
+        val Auto get() = Cursor("auto")
+        val Default get() = Cursor("default")
+        val None get() = Cursor("none")
 
-    // Links and status
-    CONTEXT_MENU("context-menu"),
-    HELP("help"),
-    POINTER("pointer"),
-    PROGRESS("progress"),
-    WAIT("wait"),
+        // Links and status
+        val ContextMenu get() = Cursor("context-menu")
+        val Help get() = Cursor("help")
+        val Pointer get() = Cursor("pointer")
+        val Progress get() = Cursor("progress")
+        val Wait get() = Cursor("wait")
 
-    // Selection
-    CELL("cell"),
-    CROSSHAIR("crosshair"),
-    TEXT("text"),
-    VERTICAL_TEXT("vertical-text"),
+        // Selection
+        val Cell get() = Cursor("cell")
+        val Crosshair get() = Cursor("crosshair")
+        val Text get() = Cursor("text")
+        val VerticalText get() = Cursor("vertical-text")
 
-    // Drag and drop
-    ALIAS("alias"),
-    COPY("copy"),
-    MOVE("move"),
-    NO_DROP("no-drop"),
-    NOT_ALLOWED("not-allowed"),
-    GRAB("grab"),
-    GRABBING("grabbing"),
+        // Drag and drop
+        val Alias get() = Cursor("alias")
+        val Copy get() = Cursor("copy")
+        val Move get() = Cursor("move")
+        val NoDrop get() = Cursor("no-drop")
+        val NotAllowed get() = Cursor("not-allowed")
+        val Grab get() = Cursor("grab")
+        val Grabbing get() = Cursor("grabbing")
 
-    // Resizing and scrolling
-    ALL_SCROLL("all-scroll"),
-    COLUMN_RESIZE("col-resize"),
-    ROW_RESIZE("row-resize"),
-    N_RESIZE("n-resize"),
-    NE_RESIZE("ne-resize"),
-    E_RESIZE("e-resize"),
-    SE_RESIZE("se-resize"),
-    S_RESIZE("s-resize"),
-    SW_RESIZE("sw-resize"),
-    W_RESIZE("w-resize"),
-    NW_RESIZE("nw-resize"),
-    EW_RESIZE("ew-resize"),
-    NS_RESIZE("ns-resize"),
-    NESW_RESIZE("nesw-resize"),
-    NWSE_RESIZE("nwse-resize"),
+        // Resizing and scrolling
+        val AllScroll get() = Cursor("all-scroll")
+        val ColumnResize get() = Cursor("col-resize")
+        val RowResize get() = Cursor("row-resize")
+        val NResize get() = Cursor("n-resize")
+        val NeResize get() = Cursor("ne-resize")
+        val EResize get() = Cursor("e-resize")
+        val SeResize get() = Cursor("se-resize")
+        val SResize get() = Cursor("s-resize")
+        val SwResize get() = Cursor("sw-resize")
+        val WResize get() = Cursor("w-resize")
+        val NwResize get() = Cursor("nw-resize")
+        val EwResize get() = Cursor("ew-resize")
+        val NsResize get() = Cursor("ns-resize")
+        val NeswResize get() = Cursor("nesw-resize")
+        val NwseResize get() = Cursor("nwse-resize")
 
-    // Zoom
-    ZOOM_IN("zoom-in"),
-    ZOOM_OUT("zoom-out"),
+        // Zoom
+        val ZoomIn get() = Cursor("zoom-in")
+        val ZoomOut get() = Cursor("zoom-out")
+    }
 }
 
 fun StyleBuilder.cursor(cursor: Cursor) {

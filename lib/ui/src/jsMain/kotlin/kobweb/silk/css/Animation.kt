@@ -8,7 +8,7 @@ import org.jetbrains.compose.web.css.ms
 
 fun StyleBuilder.withTransitionDefaults(vararg properties: String) {
     if (properties.isEmpty()) {
-        transitionProperty(TransitionProperty.ALL)
+        transitionProperty(TransitionProperty.All)
     }
     else {
         transitionProperty(*properties)

@@ -2,7 +2,7 @@ import org.jetbrains.compose.web.css.CSSNumeric
 import org.jetbrains.compose.web.css.StyleBuilder
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
-sealed class FlexBasis {
+sealed interface FlexBasis {
     companion object {
         val Fill get() = StringFlexBasis("fill")
         val MaxContent get() = StringFlexBasis("max-content")
@@ -19,8 +19,8 @@ sealed class FlexBasis {
     }
 }
 
-class StringFlexBasis(val value: String) : FlexBasis()
-class NumericFlexBasis(val value: CSSNumeric) : FlexBasis()
+class StringFlexBasis(val value: String) : FlexBasis
+class NumericFlexBasis(val value: CSSNumeric) : FlexBasis
 
 fun StyleBuilder.flexBasis(flexBasis: FlexBasis) {
     when (flexBasis) {

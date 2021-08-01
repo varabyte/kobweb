@@ -2,15 +2,17 @@ package kobweb.compose.css
 
 import org.jetbrains.compose.web.css.StyleBuilder
 
-enum class TextAlign(val value: String) {
-    LEFT("left"),
-    RIGHT("right"),
-    CENTER("center"),
-    JUSTIFY("justify"),
-    JUSTIFY_ALL("justify-all"),
-    START("start"),
-    END("end"),
-    MATCH_PARENT("match-parent"),
+class TextAlign(val value: String) {
+    companion object {
+        val Left get() = TextAlign("left")
+        val Right get() = TextAlign("right")
+        val Center get() = TextAlign("center")
+        val Justify get() = TextAlign("justify")
+        val JustifyAll get() = TextAlign("justify-all")
+        val Start get() = TextAlign("start")
+        val End get() = TextAlign("end")
+        val MatchParent get() = TextAlign("match-parent")
+    }
 }
 
 fun StyleBuilder.textAlign(textAlign: TextAlign) {
