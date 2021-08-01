@@ -1,11 +1,11 @@
 package helloworld.components.sections
 
 import androidx.compose.runtime.Composable
-import nekt.core.components.PageLink
-import nekt.core.components.PageLinkParams
-import nekt.ui.components.layout.*
-import nekt.ui.config.NektTheme
-import nekt.ui.config.toggleColorMode
+import kobweb.core.components.PageLink
+import kobweb.core.components.PageLinkParams
+import kobweb.silk.components.layout.*
+import kobweb.silk.config.SilkTheme
+import kobweb.silk.config.toggleColorMode
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.Button
@@ -14,7 +14,7 @@ import org.w3c.dom.HTMLAnchorElement
 
 @Composable
 fun NavHeader() {
-    val palette = NektTheme.colors.getActivePalette()
+    val palette = SilkTheme.colors.getActivePalette()
     Flex(
         FlexParams(alignItems = AlignItems.Center, justifyContent = JustifyContent.FlexStart),
         attrs = {

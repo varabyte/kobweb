@@ -1,12 +1,12 @@
-package nekt.ui.config
+package kobweb.silk.config
 
 import androidx.compose.runtime.Composable
-import nekt.ui.css.withTransitionDefaults
+import kobweb.silk.css.withTransitionDefaults
 import org.jetbrains.compose.web.css.*
 
 private class ThemeStyleSheet(colorMode: ColorMode) : StyleSheet() {
     init {
-        val palette = NektTheme.colors.getPalette(colorMode)
+        val palette = SilkTheme.colors.getPalette(colorMode)
 
         "#root" {
             backgroundColor(palette.bg)
@@ -58,20 +58,20 @@ private val DEFAULT_COLORS = Colors(
     )
 )
 
-object NektTheme {
+object SilkTheme {
     val config: Config = Config()
     var colors: Colors = DEFAULT_COLORS
         internal set
 }
 
 @Composable
-fun NektTheme(colors: Colors = NektTheme.colors, content: @Composable () -> Unit) {
-    val prevColors = NektTheme.colors
-    NektTheme.colors = colors
+fun SilkTheme(colors: Colors = SilkTheme.colors, content: @Composable () -> Unit) {
+    val prevColors = SilkTheme.colors
+    SilkTheme.colors = colors
 
     Style(ThemeStyleSheet(getColorMode()))
     content()
 
-    NektTheme.colors = prevColors
+    SilkTheme.colors = prevColors
 }
 

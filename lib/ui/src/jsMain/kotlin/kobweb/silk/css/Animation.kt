@@ -1,8 +1,8 @@
-package nekt.ui.css
+package kobweb.silk.css
 
-import nekt.compose.css.TransitionProperty
-import nekt.compose.css.transitionDuration
-import nekt.compose.css.transitionProperty
+import kobweb.compose.css.TransitionProperty
+import kobweb.compose.css.transitionDuration
+import kobweb.compose.css.transitionProperty
 import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.css.ms
 

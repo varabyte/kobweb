@@ -2,10 +2,9 @@ package helloworld.components.layouts
 
 import androidx.compose.runtime.Composable
 import helloworld.components.sections.NavHeader
-import nekt.ui.components.layout.Flex
-import nekt.ui.components.layout.FlexParams
+import kobweb.silk.components.layout.Flex
+import kobweb.silk.components.layout.FlexParams
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Text
 

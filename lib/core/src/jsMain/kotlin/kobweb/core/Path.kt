@@ -1,4 +1,4 @@
-package nekt.core
+package kobweb.core
 
 private const val HEX_REGEX = "[0-9A-F]"
 private val PATH_REGEX = Regex("""^/(([a-z0-9]|%${HEX_REGEX}${HEX_REGEX})+/?)*$""")

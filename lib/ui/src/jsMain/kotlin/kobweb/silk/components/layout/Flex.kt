@@ -1,4 +1,4 @@
-package nekt.ui.components.layout
+package kobweb.silk.components.layout
 
 import FlexBasis
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package nekt.ui.config
+package kobweb.silk.config
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +15,7 @@ enum class ColorMode {
     }
 }
 
-private val colorModeState by lazy { mutableStateOf(NektTheme.config.initialColorMode) }
+private val colorModeState by lazy { mutableStateOf(SilkTheme.config.initialColorMode) }
 
 @Composable
 fun getColorMode(): ColorMode = colorModeState.value

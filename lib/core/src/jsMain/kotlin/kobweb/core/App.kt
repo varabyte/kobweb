@@ -1,8 +1,8 @@
-package nekt.core
+package kobweb.core
 
 import androidx.compose.runtime.Composable
-import nekt.compose.css.Cursor
-import nekt.compose.css.cursor
+import kobweb.compose.css.Cursor
+import kobweb.compose.css.cursor
 import org.jetbrains.compose.web.css.*
 
 interface App {

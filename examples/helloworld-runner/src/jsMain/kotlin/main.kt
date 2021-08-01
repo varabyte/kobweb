@@ -1,7 +1,7 @@
 import helloworld.MyApp
 import helloworld.pages.AboutPage
 import helloworld.pages.HomePage
-import nekt.core.Router
+import kobweb.core.Router
 import org.jetbrains.compose.web.renderComposable
 
 fun main() {

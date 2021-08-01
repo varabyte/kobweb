@@ -1,6 +1,6 @@
-Core classes in the Nekt framework.
+Core classes in the Kobweb framework.
 
-Nekt sites will be required to use classes from this library, as the `nekt` binary will use reflection to search for
+Kobweb sites will be required to use classes from this library, as the `kobweb` binary will use reflection to search for
 them in order to set up a bare minimum web server.
 
 For example, `Page` is the base class for composable logic that will be converted into `.html` files, while `App` is a

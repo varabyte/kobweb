@@ -1,18 +1,17 @@
 package helloworld
 
 import androidx.compose.runtime.Composable
-import nekt.core.App
-import nekt.core.DefaultApp
-import nekt.ui.config.NektTheme
+import kobweb.core.App
+import kobweb.core.DefaultApp
+import kobweb.silk.config.SilkTheme
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.className
 import org.jetbrains.compose.web.dom.Div
 
 class MyApp : App by DefaultApp {
     @Composable
     override fun render(content: @Composable () -> Unit) {
         DefaultApp.render {
-            NektTheme {
+            SilkTheme {
                 Div({
                     style {
                         minHeight(100.vh)

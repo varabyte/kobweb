@@ -1,7 +1,7 @@
-package nekt.core.components
+package kobweb.core.components
 
 import androidx.compose.runtime.Composable
-import nekt.core.Router
+import kobweb.core.Router
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.AttrBuilderContext

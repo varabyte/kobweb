@@ -1,1 +1,1 @@
-Support for loading Nekt-aware Markdown resources and creating pages that way.
+Support for loading Markdown resources and creating pages from them.

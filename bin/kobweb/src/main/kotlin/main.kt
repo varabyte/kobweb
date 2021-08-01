@@ -7,9 +7,9 @@ enum class RunEnvironment {
 
 @ExperimentalCli
 fun main(args: Array<String>) {
-    val parser = ArgParser("nekt")
+    val parser = ArgParser("kobweb")
 
-    class Create : Subcommand("create", "Create a Nekt site") {
+    class Create : Subcommand("create", "Create a Kobweb app / site") {
         val withMarkdown by option(ArgType.Boolean, "with-markdown").default(false)
 
         override fun execute() {
@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    class Run : Subcommand("run", "Run a Nekt webserver") {
+    class Run : Subcommand("run", "Run a Kobweb server") {
         val env by option(ArgType.Choice<RunEnvironment>(), "env").default(RunEnvironment.DEV)
 
         override fun execute() {

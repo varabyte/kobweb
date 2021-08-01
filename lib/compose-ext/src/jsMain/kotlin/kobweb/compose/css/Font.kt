@@ -1,4 +1,4 @@
-package nekt.compose.css
+package kobweb.compose.css
 
 import org.jetbrains.compose.web.css.StyleBuilder
 

@@ -6,9 +6,9 @@ pluginManagement {
 }
 enableFeaturePreview("VERSION_CATALOGS")
 
-rootProject.name = "nekt"
+rootProject.name = "kobweb"
 
-include(":bin:nekt")
+include(":bin:kobweb")
 include(":lib:core")
 include(":lib:ui")
 include(":lib:compose-ext")
