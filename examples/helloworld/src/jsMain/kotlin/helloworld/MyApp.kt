@@ -3,7 +3,8 @@ package helloworld
 import androidx.compose.runtime.Composable
 import kobweb.core.App
 import kobweb.core.DefaultApp
-import kobweb.silk.config.SilkTheme
+import kobweb.silk.components.layout.Surface
+import kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 
@@ -14,12 +15,13 @@ class MyApp : App by DefaultApp {
             SilkTheme {
                 Div({
                     style {
-                        minHeight(100.vh)
-                        minWidth(100.vw)
-                        lineHeight(15.px)
+                        height(100.vh)
+                        width(100.vw)
                     }
                 }) {
-                    content()
+                    Surface {
+                        content()
+                    }
                 }
             }
         }

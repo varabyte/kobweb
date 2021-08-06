@@ -1,52 +1,66 @@
 package helloworld.components.sections
 
 import androidx.compose.runtime.Composable
-import kobweb.core.components.PageLink
-import kobweb.core.components.PageLinkParams
-import kobweb.silk.components.layout.*
-import kobweb.silk.config.SilkTheme
-import kobweb.silk.config.toggleColorMode
-import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.AttrBuilderContext
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import kobweb.compose.css.TextDecorationLine
+import kobweb.compose.foundation.layout.Row
+import kobweb.compose.foundation.layout.Spacer
+import kobweb.compose.ui.height
+import kobweb.compose.ui.padding
+import kobweb.silk.components.navigation.Link
+import kobweb.silk.components.text.Text
+import kobweb.silk.theme.SilkTheme
+import kobweb.silk.theme.rememberColorMode
+import org.jetbrains.compose.common.core.graphics.Color
+import org.jetbrains.compose.common.foundation.layout.Box
+import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
+import org.jetbrains.compose.common.ui.Alignment
+import org.jetbrains.compose.common.ui.Modifier
+import org.jetbrains.compose.common.ui.background
+import org.jetbrains.compose.common.ui.padding
+import org.jetbrains.compose.common.ui.unit.dp
 import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Text
-import org.w3c.dom.HTMLAnchorElement
+
+@Composable
+private fun NavLink(path: String, text: String) {
+    val linkModifiers = Modifier
+        .padding(5.dp, 15.dp)
+
+    Link(
+        path,
+        text,
+        linkModifiers,
+        color = SilkTheme.colors.getActivePalette().bg,
+        decorationLine = TextDecorationLine.None
+    )
+}
 
 @Composable
 fun NavHeader() {
+    var colorMode by rememberColorMode()
     val palette = SilkTheme.colors.getActivePalette()
-    Flex(
-        FlexParams(alignItems = AlignItems.Center, justifyContent = JustifyContent.FlexStart),
-        attrs = {
-            style {
-                height(50.px)
-                padding(10.px)
-                // Intentionally invert the header colors
-                backgroundColor(palette.fg)
-                setAsFlexItem(FlexItemParams(alignSelf = AlignSelf.Stretch))
-            }
-        }
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            // Intentionally invert the header colors
+            .background(palette.fg)
     ) {
-        val navLinkStyles: AttrBuilderContext<HTMLAnchorElement> = {
-            style {
-                color(palette.bg)
-                textDecoration("initial")
-                margin(5.px, 15.px)
-            }
-        }
-
-        PageLink(PageLinkParams("/"), navLinkStyles) { Text("HOME") }
-        PageLink(PageLinkParams("/about"), navLinkStyles) { Text("ABOUT") }
-        Spacer()
-        Button(
-            attrs = {
-                onClick {
-                    toggleColorMode()
-                }
-            }
+        Row(
+            Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Toggle Color Mode")
+            NavLink("/", "HOME")
+            NavLink("/about", "ABOUT")
+            Spacer()
+            Button(
+                attrs = {
+                    onClick { colorMode = colorMode.opposite() }
+                }
+            ) {
+                Text("Toggle Color Mode", color = Color.Black)
+            }
         }
-
     }
 }

@@ -3,17 +3,17 @@ package helloworld.pages
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.*
-import helloworld.components.layouts.Layout
+import helloworld.components.layouts.PageLayout
 import kobweb.core.Page
+import kobweb.silk.components.text.Text
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.P
-import org.jetbrains.compose.web.dom.Text
 
 class HomePage : Page {
     @Composable
     override fun render() {
-        Layout("Welcome to Kobweb!") {
+        PageLayout("Welcome to Kobweb!") {
             Text("Please enter your name")
             var name by remember { mutableStateOf("") }
             Input(

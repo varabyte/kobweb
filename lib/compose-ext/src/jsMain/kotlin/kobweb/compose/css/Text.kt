@@ -18,3 +18,20 @@ class TextAlign(val value: String) {
 fun StyleBuilder.textAlign(textAlign: TextAlign) {
     property("text-align", textAlign.value)
 }
+
+class TextDecorationLine(val value: String) {
+    companion object {
+        val Underline get() = TextDecorationLine("underline")
+        val Overline get() = TextDecorationLine("overline")
+        val None get() = TextDecorationLine("none")
+
+        val Inherit get() = TextDecorationLine("inherit")
+        val Initial get() = TextDecorationLine("initial")
+        val Revert get() = TextDecorationLine("revert")
+        val Unset get() = TextDecorationLine("unset")
+    }
+}
+
+fun StyleBuilder.textDecorationLine(textDecorationLine: TextDecorationLine) {
+    property("text-decoration-line", textDecorationLine.value)
+}

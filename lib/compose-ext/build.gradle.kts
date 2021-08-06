@@ -16,8 +16,9 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
                 implementation(compose.runtime)
+                implementation(compose.web.core)
+                implementation(compose.web.widgets)
             }
         }
     }
