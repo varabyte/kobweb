@@ -38,9 +38,11 @@ fun Text(
                 if (cursor != null) {
                     style { cursor(cursor) }
                 }
-                style {
-                    // Prevent spaces in text from being collapsed
-                    whiteSpace("pre-wrap")
+                if (text.startsWith(' ') || text.endsWith(' ')) {
+                    style {
+                        // Prevent spaces in text from being collapsed
+                        whiteSpace("pre-wrap")
+                    }
                 }
             }
     ) {
