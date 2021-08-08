@@ -11,7 +11,7 @@ import kobweb.compose.ui.padding
 import kobweb.silk.components.navigation.Link
 import kobweb.silk.components.text.Text
 import kobweb.silk.theme.SilkTheme
-import kobweb.silk.theme.rememberColorMode
+import kobweb.silk.theme.colors.rememberColorMode
 import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.layout.Box
 import org.jetbrains.compose.common.foundation.layout.fillMaxWidth

@@ -9,6 +9,12 @@ import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.unit.Dp
 import org.jetbrains.compose.web.css.*
 
+fun Modifier.borderRadius(size: Dp): Modifier = castOrCreate().apply {
+    add {
+        borderRadius(size.value.px)
+    }
+}
+
 fun Modifier.color(color: Color) = castOrCreate().apply {
     add {
         color(color.toCssColor())

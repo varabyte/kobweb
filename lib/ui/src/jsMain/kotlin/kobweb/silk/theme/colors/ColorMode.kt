@@ -1,8 +1,9 @@
-package kobweb.silk.theme
+package kobweb.silk.theme.colors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import kobweb.silk.theme.SilkConfig
 
 enum class ColorMode {
     LIGHT,
