@@ -29,7 +29,8 @@ sealed class Path {
     protected fun Pair<Any, Any>.toPercentStr() = "${first}% ${second}%"
 }
 
-class CirclePath(private val radiusPercent: Float = 50f, private val centerPercent: Pair<Float, Float> = 50f to 50f) : Path() {
+class CirclePath(private val radiusPercent: Float = 50f, private val centerPercent: Pair<Float, Float> = 50f to 50f) :
+    Path() {
     override fun toPathStr() = "circle(${radiusPercent.toPercentStr()} at ${centerPercent.toPercentStr()})"
 }
 
@@ -39,13 +40,14 @@ class PolygonPath(private vararg val pointPercents: Pair<Float, Float>) : Path()
 
 // Right and bottom insets are actually calculated from the right and bottom of the parent. So 90% from the top left
 // of the page would be 10% from the bottom right.
+private fun Pair<Int, Int>.from100() = (100 - first) to (100 - second)
 private fun Pair<Float, Float>.from100() = (100f - first) to (100f - second)
 private fun Pair<Int, Int>.toFloatPair() = first.toFloat() to second.toFloat()
 class InsetPath(
     private val topLeft: Pair<Float, Float>,
     botRight: Pair<Float, Float>,
     private val roundness: Dp,
-    ) : Path() {
+) : Path() {
     private val botRight = botRight.from100()
 
     override fun toPathStr(): String {
@@ -80,7 +82,7 @@ interface Shape {
  * - `Rect(10 to 15, 20 to 25)` means a rectangle with the top left corner at (10% x 15%) and bottom right corner at (20% x 25%)
  * - `Rect(20.dp)` means a full sized rectangle with corners that have a 20.dp radius
  */
-class Rect(
+class RectF(
     val topLeftPercent: Pair<Float, Float>,
     val botRightPercent: Pair<Float, Float>,
     val cornerRadius: Dp = 0.dp,
@@ -100,25 +102,6 @@ class Rect(
         cornerRadius
     )
 
-    constructor(topLeftPercent: Pair<Int, Int>, botRightPercent: Pair<Int, Int>, cornerRadius: Dp = 0.dp):
-            this(topLeftPercent.toFloatPair(), botRightPercent.toFloatPair(), cornerRadius)
-
-    constructor(
-        topBottomPercent: Int,
-        leftRightPercent: Int,
-        cornerRadius: Dp = 0.dp
-    ) : this(
-        leftRightPercent.toFloat() to topBottomPercent.toFloat(),
-        (leftRightPercent.toFloat() to topBottomPercent.toFloat()).from100(),
-        cornerRadius
-    )
-
-    constructor(sidePercent: Int, cornerRadius: Dp = 0.dp) : this(
-        sidePercent.toFloat() to sidePercent.toFloat(),
-        (sidePercent.toFloat() to sidePercent.toFloat()).from100(),
-        cornerRadius
-    )
-
     override val path: Path?
         get() = if (topLeftPercent.first != 0f || topLeftPercent.second != 0f
             || botRightPercent.first != 100f || botRightPercent.second != 100f
@@ -130,16 +113,44 @@ class Rect(
         }
 }
 
-class Circle(val radiusPercent: Float = 50f) : Shape {
-    constructor(radiusPercent: Int): this(radiusPercent.toFloat())
+class Rect(
+    val topLeftPercent: Pair<Int, Int>,
+    val botRightPercent: Pair<Int, Int>,
+    val cornerRadius: Dp = 0.dp,
+) : Shape by RectF(topLeftPercent.toFloatPair(), botRightPercent.toFloatPair(), cornerRadius) {
+    constructor() : this(0.dp)
+    constructor(cornerRadius: Dp) : this(0 to 0, 100 to 100, cornerRadius)
 
-    override val path: Path
-        get() = CirclePath(radiusPercent)
+    constructor(
+        topBottomPercent: Int,
+        leftRightPercent: Int,
+        cornerRadius: Dp = 0.dp
+    ) : this(
+        leftRightPercent to topBottomPercent,
+        (leftRightPercent to topBottomPercent).from100(),
+        cornerRadius
+    )
+
+    constructor(sidePercent: Int, cornerRadius: Dp = 0.dp) : this(
+        sidePercent to sidePercent,
+        (sidePercent to sidePercent).from100(),
+        cornerRadius
+    )
+
 }
 
-class Polygon(vararg val pointPercents: Pair<Float, Float>) : Shape {
-    constructor(vararg pointPercents: Pair<Int, Int>): this(*pointPercents.map { it.toFloatPair() }.toTypedArray())
+class CircleF(val radiusPercent: Float = 50f, val centerPercent: Pair<Float, Float> = 50f to 50f) : Shape {
+    override val path: Path
+        get() = CirclePath(radiusPercent, centerPercent)
+}
 
+class Circle(val radiusPercent: Int = 50, val centerPercent: Pair<Int, Int> = 50 to 50) :
+    Shape by CircleF(radiusPercent.toFloat(), centerPercent.toFloatPair())
+
+class PolygonF(vararg val pointPercents: Pair<Float, Float>) : Shape {
     override val path: Path?
         get() = PolygonPath(*pointPercents)
 }
+
+class Polygon(vararg val pointPercents: Pair<Int, Int>) :
+    Shape by PolygonF(*pointPercents.map { it.toFloatPair() }.toTypedArray())
