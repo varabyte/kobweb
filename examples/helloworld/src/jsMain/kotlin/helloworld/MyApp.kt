@@ -5,6 +5,7 @@ import kobweb.core.App
 import kobweb.core.DefaultApp
 import kobweb.silk.components.layout.Surface
 import kobweb.silk.theme.SilkTheme
+import kobweb.silk.theme.shapes.Circle
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 

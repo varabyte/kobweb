@@ -6,8 +6,8 @@ import kobweb.compose.css.TextDecorationLine
 import kobweb.compose.css.cursor
 import kobweb.compose.css.textDecorationLine
 import kobweb.compose.ui.color
+import kobweb.compose.ui.graphics.Color
 import kobweb.silk.theme.SilkTheme
-import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
 import org.jetbrains.compose.web.css.whiteSpace

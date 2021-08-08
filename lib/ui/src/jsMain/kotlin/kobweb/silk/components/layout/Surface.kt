@@ -2,10 +2,11 @@ package kobweb.silk.components.layout
 
 import androidx.compose.runtime.Composable
 import kobweb.compose.ui.fillMaxSize
+import kobweb.compose.ui.graphics.Color
+import kobweb.compose.ui.graphics.toJbColor
 import kobweb.silk.theme.SilkTheme
 import kobweb.silk.theme.shapes.Shape
 import kobweb.silk.theme.shapes.clip
-import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.layout.Box
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.background
@@ -22,7 +23,7 @@ fun Surface(
 ) {
     Box(
         modifier
-            .background(color)
+            .background(color.toJbColor())
             .clip(shape),
         content
     )

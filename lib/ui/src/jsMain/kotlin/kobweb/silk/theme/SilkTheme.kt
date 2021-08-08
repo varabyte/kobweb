@@ -3,12 +3,12 @@ package kobweb.silk.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import kobweb.compose.ui.graphics.Color
 import kobweb.silk.theme.colors.ColorMode
 import kobweb.silk.theme.colors.Colors
 import kobweb.silk.theme.colors.Palette
 import kobweb.silk.theme.shapes.Rect
 import kobweb.silk.theme.shapes.Shapes
-import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.ui.unit.dp
 
 data class Config(

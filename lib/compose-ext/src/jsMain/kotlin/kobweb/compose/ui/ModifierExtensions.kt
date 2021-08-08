@@ -1,7 +1,7 @@
 package kobweb.compose.ui
 
+import kobweb.compose.ui.graphics.Color as SilkColor
 import kobweb.compose.ui.graphics.toCssColor
-import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.layout.fillMaxHeight
 import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
 import org.jetbrains.compose.common.internal.castOrCreate
@@ -15,7 +15,13 @@ fun Modifier.borderRadius(size: Dp): Modifier = castOrCreate().apply {
     }
 }
 
-fun Modifier.color(color: Color) = castOrCreate().apply {
+fun Modifier.background(color: SilkColor): Modifier = castOrCreate().apply {
+    add {
+        backgroundColor(rgb(color.red, color.green, color.blue))
+    }
+}
+
+fun Modifier.color(color: SilkColor) = castOrCreate().apply {
     add {
         color(color.toCssColor())
     }

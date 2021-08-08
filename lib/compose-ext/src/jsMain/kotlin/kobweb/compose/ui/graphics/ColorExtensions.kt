@@ -1,9 +1,13 @@
 package kobweb.compose.ui.graphics
 
-import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.web.css.CSSColorValue
 import org.jetbrains.compose.web.css.rgb
+import org.jetbrains.compose.web.css.rgba
 
 fun Color.toCssColor(): CSSColorValue {
-    return rgb(this.red, this.green, this.blue)
+    return if (this.alpha == 0xFF) {
+        rgb(this.red, this.green, this.blue)
+    } else {
+        rgba(this.red, this.green, this.blue, this.alpha)
+    }
 }
