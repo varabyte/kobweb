@@ -35,3 +35,20 @@ class TextDecorationLine(val value: String) {
 fun StyleBuilder.textDecorationLine(textDecorationLine: TextDecorationLine) {
     property("text-decoration-line", textDecorationLine.value)
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
+class UserSelect(val value: String) {
+    companion object {
+        val None get() = UserSelect("none")
+        val Auto get() = UserSelect("auto")
+
+        val Inherit get() = UserSelect("inherit")
+        val Initial get() = UserSelect("initial")
+        val Revert get() = UserSelect("revert")
+        val Unset get() = UserSelect("unset")
+    }
+}
+
+fun StyleBuilder.userSelect(userSelect: UserSelect) {
+    property("user-select", userSelect.value)
+}

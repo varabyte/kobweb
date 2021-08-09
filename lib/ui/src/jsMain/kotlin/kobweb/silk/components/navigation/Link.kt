@@ -6,7 +6,7 @@ import kobweb.compose.css.TextDecorationLine
 import kobweb.compose.ui.graphics.Color
 import kobweb.core.Router
 import kobweb.silk.components.text.Text
-import kobweb.silk.theme.SilkTheme
+import kobweb.silk.theme.SilkPallete
 import org.jetbrains.compose.common.foundation.clickable
 import org.jetbrains.compose.common.ui.Modifier
 
@@ -21,7 +21,7 @@ fun Link(
     path: String,
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = SilkTheme.colors.getActivePalette().link,
+    color: Color = SilkPallete.current.secondary,
     decorationLine: TextDecorationLine? = TextDecorationLine.Underline,
     cursor: Cursor? = Cursor.Pointer,
 ) {

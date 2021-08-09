@@ -2,7 +2,7 @@ package kobweb.compose.ui.graphics
 
 import org.jetbrains.compose.common.core.graphics.Color as JbColor
 
-fun JbColor.toSilkColor() = Color(red, green, blue)
+fun JbColor.toKobwebColor() = Color(red, green, blue)
 fun Color.toJbColor() = JbColor(red, green, blue)
 
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
@@ -13,9 +13,12 @@ private val DARKENING_AMOUNT = 0.7f
 /**
  * A color which, unlike the current color class provided by JB compose, also supports alpha.
  *
+ * This constructor cannot be called directly as it's ambiguous if 0xFFFFFF represents opaque white (0xFFFFFFFF) or
+ * transparent white (0x00FFFFFF). Use [rgb] or [rgba] instead.
+ *
  * @param value A 32-bit encoding of this color: AARRGGBB
  */
-class Color(val value: Int) {
+class Color private constructor(val value: Int) {
     constructor(r: Int, g: Int, b: Int): this(r, g, b, 0xFF)
     constructor(r: Int, g: Int, b: Int, a: Int): this(
         r.and(0xFF).shl(16)
@@ -45,7 +48,14 @@ class Color(val value: Int) {
     fun copy(red: Int = this.red, green: Int = this.green, blue: Int = this.blue, alpha: Int = this.alpha) = Color(red, green, blue, alpha)
     fun copyf(red: Float = redf, green: Float = this.greenf, blue: Float = this.bluef, alpha: Float = this.alphaf) = Color(red, green, blue, alpha)
 
+    override fun toString(): String {
+        return if (alpha == 0xFF)  "Color(r=$red g=$green b=$blue)" else "rgba(r=$red g=$green b=$blue a=$alpha)"
+    }
+
     companion object {
+        fun rgb(value: Int) = Color(0xFF.shl(24).or(value))
+        fun rgba(value: Int) = Color(value)
+
         val Transparent = Color(0, 0, 0, 0)
         val Black = Color(0, 0, 0)
         val DarkGray = Color(0x44, 0x44, 0x44)

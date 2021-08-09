@@ -1,12 +1,10 @@
 package kobweb.silk.components.text
 
 import androidx.compose.runtime.Composable
-import kobweb.compose.css.Cursor
-import kobweb.compose.css.TextDecorationLine
-import kobweb.compose.css.cursor
-import kobweb.compose.css.textDecorationLine
+import kobweb.compose.css.*
 import kobweb.compose.ui.color
 import kobweb.compose.ui.graphics.Color
+import kobweb.silk.theme.SilkPallete
 import kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
@@ -24,7 +22,7 @@ import org.jetbrains.compose.web.dom.Text
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = SilkTheme.colors.getActivePalette().fg,
+    color: Color = SilkPallete.current.onPrimary,
     decorationLine: TextDecorationLine? = null,
     cursor: Cursor? = null,
 ) {
@@ -36,7 +34,12 @@ fun Text(
                     style { textDecorationLine(decorationLine) }
                 }
                 if (cursor != null) {
-                    style { cursor(cursor) }
+                    style {
+                        cursor(cursor)
+                        if (cursor != Cursor.Text) {
+                            userSelect(UserSelect.None)
+                        }
+                    }
                 }
                 if (text.startsWith(' ') || text.endsWith(' ')) {
                     style {

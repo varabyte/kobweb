@@ -3,16 +3,17 @@ package helloworld.components.sections
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import kobweb.compose.css.Cursor
 import kobweb.compose.css.TextDecorationLine
 import kobweb.compose.foundation.layout.Row
 import kobweb.compose.foundation.layout.Spacer
 import kobweb.compose.ui.background
-import kobweb.compose.ui.graphics.Color
 import kobweb.compose.ui.height
 import kobweb.compose.ui.padding
+import kobweb.silk.components.forms.Button
 import kobweb.silk.components.navigation.Link
 import kobweb.silk.components.text.Text
-import kobweb.silk.theme.SilkTheme
+import kobweb.silk.theme.SilkPallete
 import kobweb.silk.theme.colors.rememberColorMode
 import org.jetbrains.compose.common.foundation.layout.Box
 import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
@@ -20,7 +21,6 @@ import org.jetbrains.compose.common.ui.Alignment
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.padding
 import org.jetbrains.compose.common.ui.unit.dp
-import org.jetbrains.compose.web.dom.Button
 
 @Composable
 private fun NavLink(path: String, text: String) {
@@ -31,7 +31,7 @@ private fun NavLink(path: String, text: String) {
         path,
         text,
         linkModifiers,
-        color = SilkTheme.colors.getActivePalette().bg,
+        color = SilkPallete.current.primary,
         decorationLine = TextDecorationLine.None
     )
 }
@@ -39,13 +39,13 @@ private fun NavLink(path: String, text: String) {
 @Composable
 fun NavHeader() {
     var colorMode by rememberColorMode()
-    val palette = SilkTheme.colors.getActivePalette()
+    val palette = SilkPallete.current
     Box(
         Modifier
             .fillMaxWidth()
             .height(50.dp)
             // Intentionally invert the header colors
-            .background(palette.fg)
+            .background(palette.onPrimary)
     ) {
         Row(
             Modifier.padding(10.dp),
@@ -55,11 +55,9 @@ fun NavHeader() {
             NavLink("/about", "ABOUT")
             Spacer()
             Button(
-                attrs = {
-                    onClick { colorMode = colorMode.opposite() }
-                }
+                onClick = { colorMode = colorMode.opposite() }
             ) {
-                Text("Toggle Color Mode", color = Color.Black)
+                Text("Toggle Color Mode")
             }
         }
     }
