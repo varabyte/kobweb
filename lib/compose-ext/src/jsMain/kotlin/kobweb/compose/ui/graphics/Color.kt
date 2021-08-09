@@ -8,6 +8,8 @@ fun Color.toJbColor() = JbColor(red, green, blue)
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
 
+private val DARKENING_AMOUNT = 0.7f
+
 /**
  * A color which, unlike the current color class provided by JB compose, also supports alpha.
  *
@@ -35,6 +37,13 @@ class Color(val value: Int) {
     val greenf: Float get() = green.toColorFloat()
     val bluef: Float get() = blue.toColorFloat()
     val alphaf: Float get() = alpha.toColorFloat()
+
+    fun invert() = Color(255 - red, 255 - green, 255 - blue, alpha)
+    fun darker() = Color(redf * DARKENING_AMOUNT, greenf * DARKENING_AMOUNT, bluef * DARKENING_AMOUNT, alphaf)
+    fun lighter() = invert().darker().invert()
+
+    fun copy(red: Int = this.red, green: Int = this.green, blue: Int = this.blue, alpha: Int = this.alpha) = Color(red, green, blue, alpha)
+    fun copyf(red: Float = redf, green: Float = this.greenf, blue: Float = this.bluef, alpha: Float = this.alphaf) = Color(red, green, blue, alpha)
 
     companion object {
         val Transparent = Color(0, 0, 0, 0)
