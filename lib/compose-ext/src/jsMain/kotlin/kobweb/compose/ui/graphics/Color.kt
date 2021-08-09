@@ -38,9 +38,9 @@ class Color(val value: Int) {
     val bluef: Float get() = blue.toColorFloat()
     val alphaf: Float get() = alpha.toColorFloat()
 
-    fun invert() = Color(255 - red, 255 - green, 255 - blue, alpha)
-    fun darker() = Color(redf * DARKENING_AMOUNT, greenf * DARKENING_AMOUNT, bluef * DARKENING_AMOUNT, alphaf)
-    fun lighter() = invert().darker().invert()
+    fun inverted() = Color(255 - red, 255 - green, 255 - blue, alpha)
+    fun darkened() = Color(redf * DARKENING_AMOUNT, greenf * DARKENING_AMOUNT, bluef * DARKENING_AMOUNT, alphaf)
+    fun lightened() = inverted().darkened().inverted()
 
     fun copy(red: Int = this.red, green: Int = this.green, blue: Int = this.blue, alpha: Int = this.alpha) = Color(red, green, blue, alpha)
     fun copyf(red: Float = redf, green: Float = this.greenf, blue: Float = this.bluef, alpha: Float = this.alphaf) = Color(red, green, blue, alpha)
