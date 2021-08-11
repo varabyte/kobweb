@@ -145,6 +145,17 @@ fun Modifier.padding(top: Dp, right: Dp, bottom: Dp, left: Dp): Modifier = castO
     }
 }
 
+fun Modifier.then(other: Modifier): Modifier {
+    if (this === other) return this
+
+    val actualBase = this.castOrCreate()
+    val actualOther = other.castOrCreate()
+    actualBase.styleHandlers.addAll(actualOther.styleHandlers)
+    actualBase.attrHandlers.addAll(actualOther.attrHandlers)
+
+    return actualBase
+}
+
 fun Modifier.userSelect(userSelect: UserSelect): Modifier = castOrCreate().apply {
     add {
         this.userSelect(userSelect)

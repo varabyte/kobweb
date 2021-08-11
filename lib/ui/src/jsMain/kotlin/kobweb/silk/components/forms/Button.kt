@@ -88,10 +88,13 @@ fun Button(
     content: @Composable () -> Unit
 ) {
     var state by remember { mutableStateOf(ButtonState.DEFAULT) }
+    val baseStyleModifier = Modifier.castOrCreate().apply {
+        SilkComponentStyles.current.modify(ButtonKey, this, state)
+    }
+
     Box(
-        modifier.castOrCreate().apply {
-            SilkComponentStyles.current.modify(ButtonKey, this, state)
-        }
+        baseStyleModifier
+            .then(modifier)
             // Text shouldn't be selectable
             .userSelect(UserSelect.None)
             .onMouseEnter {

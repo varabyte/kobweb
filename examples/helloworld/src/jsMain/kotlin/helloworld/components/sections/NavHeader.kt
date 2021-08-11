@@ -12,10 +12,15 @@ import kobweb.compose.ui.fillMaxSize
 import kobweb.compose.ui.height
 import kobweb.compose.ui.padding
 import kobweb.silk.components.forms.Button
+import kobweb.silk.components.icons.fa.FaMoon
+import kobweb.silk.components.icons.fa.FaSun
 import kobweb.silk.components.navigation.Link
 import kobweb.silk.components.text.Text
 import kobweb.silk.theme.SilkPallete
+import kobweb.silk.theme.colors.ColorMode
 import kobweb.silk.theme.colors.rememberColorMode
+import kobweb.silk.theme.shapes.Circle
+import kobweb.silk.theme.shapes.clip
 import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
 import org.jetbrains.compose.common.ui.Alignment
 import org.jetbrains.compose.common.ui.Modifier
@@ -55,9 +60,14 @@ fun NavHeader() {
             Spacer()
             Button(
                 onClick = { colorMode = colorMode.opposite() },
-                NAV_ITEM_MODIFIER
+                NAV_ITEM_MODIFIER.clip(Circle())
             ) {
-                Text("Toggle Color Mode", Modifier.padding(4.dp))
+                Box(Modifier.padding(4.dp)) {
+                    when (colorMode) {
+                        ColorMode.LIGHT -> FaSun()
+                        ColorMode.DARK -> FaMoon()
+                    }
+                }
             }
         }
     }

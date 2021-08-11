@@ -11,6 +11,7 @@ rootProject.name = "kobweb"
 include(":bin:kobweb")
 include(":lib:core")
 include(":lib:ui")
+include(":lib:ui-icons-fa")
 include(":lib:compose-ext")
 include(":lib:plugins:markdown")
 include(":examples:helloworld")

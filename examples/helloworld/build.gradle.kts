@@ -21,6 +21,7 @@ kotlin {
 
                 implementation(project(":lib:core"))
                 implementation(project(":lib:ui"))
+                implementation(project(":lib:ui-icons-fa"))
             }
         }
     }
