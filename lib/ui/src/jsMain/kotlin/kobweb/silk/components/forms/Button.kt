@@ -1,21 +1,16 @@
 package kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
-import kobweb.compose.css.Cursor
 import kobweb.compose.css.UserSelect
 import kobweb.compose.ui.*
 import kobweb.compose.ui.graphics.Color
 import kobweb.silk.components.*
 import kobweb.silk.theme.SilkPallete
-import kobweb.silk.theme.colors.getColorMode
 import kobweb.silk.theme.colors.shifted
 import kobweb.silk.theme.shapes.Rect
 import kobweb.silk.theme.shapes.Shape
 import kobweb.silk.theme.shapes.clip
-import org.jetbrains.compose.common.foundation.clickable
 import org.jetbrains.compose.common.foundation.layout.Box
-import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
-import org.jetbrains.compose.common.foundation.layout.width
 import org.jetbrains.compose.common.internal.ActualModifier
 import org.jetbrains.compose.common.internal.castOrCreate
 import org.jetbrains.compose.common.ui.Modifier
@@ -83,6 +78,12 @@ class BaseButtonStyle : ButtonStyle() {
 
 interface ButtonVariant : ComponentVariant<ButtonState, ButtonStyle>
 
+object Buttons {
+    const val LEFT = 0.toShort()
+    const val MIDDLE = 1.toShort()
+    const val RIGHT = 2.toShort()
+}
+
 /**
  * An area which provides a SilkTheme-aware background color.
  */
@@ -103,19 +104,19 @@ fun Button(
         modifier
             // Text shouldn't be selectable
             .userSelect(UserSelect.None)
-            .onMouseEnter { evt ->
+            .onMouseEnter {
                 state = ButtonState.HOVER
             }
             .onMouseLeave {
                 state = ButtonState.DEFAULT
             }
             .onMouseDown { evt ->
-                if (evt.button == 0.toShort()) {
+                if (evt.button == Buttons.LEFT) {
                     state = ButtonState.PRESSED
                 }
             }
             .onMouseUp { evt ->
-                if (evt.button == 0.toShort() && state == ButtonState.PRESSED) {
+                if (evt.button == Buttons.LEFT && state == ButtonState.PRESSED) {
                     onClick()
                     state = ButtonState.DEFAULT
                 }
