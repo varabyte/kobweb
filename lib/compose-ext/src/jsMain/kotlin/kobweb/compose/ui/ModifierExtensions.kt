@@ -43,9 +43,35 @@ fun Modifier.fillMaxSize(): Modifier = castOrCreate().apply {
     fillMaxHeight(1.0f)
 }
 
+fun Modifier.size(size: CSSPercentageValue): Modifier = castOrCreate().apply {
+    add {
+        this.width(size)
+        this.height(size)
+    }
+}
+
+
+fun Modifier.width(size: Dp): Modifier = castOrCreate().apply {
+    add {
+        this.width(size.value.px)
+    }
+}
+
+fun Modifier.width(size: CSSPercentageValue): Modifier = castOrCreate().apply {
+    add {
+        this.width(size)
+    }
+}
+
 fun Modifier.height(size: Dp): Modifier = castOrCreate().apply {
     add {
         this.height(size.value.px)
+    }
+}
+
+fun Modifier.height(size: CSSPercentageValue): Modifier = castOrCreate().apply {
+    add {
+        this.height(size)
     }
 }
 
@@ -55,9 +81,21 @@ fun Modifier.minWidth(size: Dp): Modifier = castOrCreate().apply {
     }
 }
 
+fun Modifier.minWidth(size: CSSPercentageValue): Modifier = castOrCreate().apply {
+    add {
+        this.minWidth(size)
+    }
+}
+
 fun Modifier.minHeight(size: Dp): Modifier = castOrCreate().apply {
     add {
         this.minHeight(size.value.px)
+    }
+}
+
+fun Modifier.minHeight(size: CSSPercentageValue): Modifier = castOrCreate().apply {
+    add {
+        this.minHeight(size)
     }
 }
 
@@ -91,15 +129,23 @@ fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = castOrCreate(
     }
 }
 
-fun Modifier.padding(width: Dp, height: Dp): Modifier = castOrCreate().apply {
-    // yes, it's not a typo, what Modifier.padding does is actually adding margin
+fun Modifier.padding(topBottom: Dp, leftRight: Dp): Modifier = castOrCreate().apply {
     add {
-        this.margin(width.value.px, height.value.px)
+        // Compose padding is the same thing as CSS margin, confusingly... (it puts space around the current composable,
+        // as opposed to doing anything with its children)
+        this.margin(topBottom.value.px, leftRight.value.px)
+    }
+}
+
+fun Modifier.padding(top: Dp, right: Dp, bottom: Dp, left: Dp): Modifier = castOrCreate().apply {
+    add {
+        // Compose padding is the same thing as CSS margin, confusingly... (it puts space around the current composable,
+        // as opposed to doing anything with its children)
+        this.margin(top.value.px, right.value.px, bottom.value.px, left.value.px)
     }
 }
 
 fun Modifier.userSelect(userSelect: UserSelect): Modifier = castOrCreate().apply {
-    // yes, it's not a typo, what Modifier.padding does is actually adding margin
     add {
         this.userSelect(userSelect)
     }

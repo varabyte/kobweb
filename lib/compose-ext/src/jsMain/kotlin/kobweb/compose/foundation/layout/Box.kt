@@ -1,0 +1,65 @@
+package kobweb.compose.foundation.layout
+
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.common.foundation.layout.Arrangement
+import org.jetbrains.compose.common.internal.castOrCreate
+import org.jetbrains.compose.common.ui.Alignment
+import org.jetbrains.compose.common.ui.Modifier
+import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
+import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.Div
+
+@Composable
+fun Box(
+    modifier: Modifier = Modifier,
+    contentAlignment: Alignment = Alignment.Center,
+    content: @Composable () -> Unit
+) {
+    Div(attrs = modifier.castOrCreate().apply {
+        add {
+            display(DisplayStyle.Flex)
+            flexDirection(FlexDirection.Column)
+
+            when {
+                contentAlignment === Alignment.TopStart -> {
+                    justifyContent(JustifyContent.FlexStart)
+                    alignItems(AlignItems.FlexStart)
+                }
+                contentAlignment === Alignment.TopCenter -> {
+                    justifyContent(JustifyContent.FlexStart)
+                    alignItems(AlignItems.Center)
+                }
+                contentAlignment === Alignment.TopEnd -> {
+                    justifyContent(JustifyContent.FlexStart)
+                    alignItems(AlignItems.FlexEnd)
+                }
+                contentAlignment === Alignment.CenterStart -> {
+                    justifyContent(JustifyContent.Center)
+                    alignItems(AlignItems.FlexStart)
+                }
+                contentAlignment === Alignment.Center -> {
+                    justifyContent(JustifyContent.Center)
+                    alignItems(AlignItems.Center)
+                }
+                contentAlignment === Alignment.CenterEnd -> {
+                    justifyContent(JustifyContent.Center)
+                    alignItems(AlignItems.FlexEnd)
+                }
+                contentAlignment === Alignment.BoottomStart -> {
+                    justifyContent(JustifyContent.FlexEnd)
+                    alignItems(AlignItems.FlexStart)
+                }
+                contentAlignment === Alignment.BoottomCenter -> {
+                    justifyContent(JustifyContent.FlexEnd)
+                    alignItems(AlignItems.Center)
+                }
+                contentAlignment === Alignment.BoottomEnd -> {
+                    justifyContent(JustifyContent.FlexEnd)
+                    alignItems(AlignItems.FlexEnd)
+                }
+            }
+        }
+    }.asAttributeBuilderApplier()) {
+        content()
+    }
+}

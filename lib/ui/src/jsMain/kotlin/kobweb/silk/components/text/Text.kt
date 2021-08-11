@@ -5,11 +5,10 @@ import kobweb.compose.css.*
 import kobweb.compose.ui.color
 import kobweb.compose.ui.graphics.Color
 import kobweb.silk.theme.SilkPallete
-import kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
 import org.jetbrains.compose.web.css.whiteSpace
-import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
 /**
@@ -26,7 +25,7 @@ fun Text(
     decorationLine: TextDecorationLine? = null,
     cursor: Cursor? = null,
 ) {
-    Span(
+    Div(
         attrs = modifier
             .color(color)
             .asAttributeBuilderApplier {
