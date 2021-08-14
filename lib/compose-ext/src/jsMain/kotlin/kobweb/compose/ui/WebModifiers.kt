@@ -60,7 +60,6 @@ fun Modifier.size(size: CSSPercentageValue): Modifier = webModifier {
     }
 }
 
-
 fun Modifier.width(size: Dp): Modifier = webModifier {
     style {
         width(size.value.px)
@@ -110,40 +109,28 @@ fun Modifier.minHeight(size: CSSPercentageValue): Modifier = webModifier {
 }
 
 fun Modifier.clickable(onClick: () -> Unit): Modifier = webModifier {
-    attr {
-        onClick { onClick() }
-    }
+    onClick { onClick() }
 }
 
 
 fun Modifier.onMouseDown(onMouseDown: (SyntheticMouseEvent) -> Unit) = webModifier {
-    attr {
-        onMouseDown { evt -> onMouseDown(evt) }
-    }
+    onMouseDown { evt -> onMouseDown(evt) }
 }
 
 fun Modifier.onMouseEnter(onMouseEnter: (SyntheticMouseEvent) -> Unit) = webModifier {
-    attr {
-        onMouseEnter { evt -> onMouseEnter(evt) }
-    }
+    onMouseEnter { evt -> onMouseEnter(evt) }
 }
 
 fun Modifier.onMouseLeave(onMouseLeave: (SyntheticMouseEvent) -> Unit) = webModifier {
-    attr {
-        onMouseLeave { evt -> onMouseLeave(evt) }
-    }
+    onMouseLeave { evt -> onMouseLeave(evt) }
 }
 
 fun Modifier.onMouseMove(onMouseMove: (SyntheticMouseEvent) -> Unit) = webModifier {
-    attr {
-        onMouseMove { evt -> onMouseMove(evt) }
-    }
+    onMouseMove { evt -> onMouseMove(evt) }
 }
 
 fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = webModifier {
-    attr {
-        onMouseUp { evt -> onMouseUp(evt) }
-    }
+    onMouseUp { evt -> onMouseUp(evt) }
 }
 
 fun Modifier.padding(all: Dp): Modifier = webModifier {

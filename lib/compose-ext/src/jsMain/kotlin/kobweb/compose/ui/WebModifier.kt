@@ -1,26 +1,12 @@
 package kobweb.compose.ui
 
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.css.StyleBuilder
 
 /**
  * A modifier element which works by setting CSS styles and/or attributes when it is applied.
  */
-class WebModifier : Modifier.Element {
-    internal val styleBuilders = mutableListOf<StyleBuilder.() -> Unit>()
-    internal val attrBuilders = mutableListOf<AttrsBuilder<*>.() -> Unit>()
-
-    fun style(builder: StyleBuilder.() -> Unit) {
-        styleBuilders.add(builder)
-    }
-
-    fun attr(builder: AttrsBuilder<*>.() -> Unit) {
-        attrBuilders.add(builder)
-    }
-}
-
-fun webModifier(init: WebModifier.() -> Unit) = WebModifier().apply(init)
-fun Modifier.webModifier(init: WebModifier.() -> Unit) = this then WebModifier().apply(init)
+class WebModifier(internal val attrs: (AttrsBuilder<*>.() -> Unit)? = null) : Modifier.Element
+fun Modifier.webModifier(attrs: (AttrsBuilder<*>.() -> Unit)? = null) = this then WebModifier(attrs)
 
 /**
  * Convert a [Modifier] into something consumable by Web Compose's normal css API, for example:
@@ -38,10 +24,7 @@ fun Modifier.asAttributeBuilder(finalHandler: (AttrsBuilder<*>.() -> Unit)? = nu
     return {
         firstModifier.fold(Unit) { _, element ->
             if (element is WebModifier) {
-                element.attrBuilders.forEach { it.invoke(this) }
-                style {
-                    element.styleBuilders.forEach { it.invoke(this) }
-                }
+                element.attrs?.invoke(this)
             }
         }
 

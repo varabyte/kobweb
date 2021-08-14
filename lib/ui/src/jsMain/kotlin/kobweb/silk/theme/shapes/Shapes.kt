@@ -7,7 +7,7 @@ import kobweb.compose.ui.webModifier
 import org.jetbrains.compose.web.css.px
 
 fun Modifier.clip(shape: Shape): Modifier = shape.path?.let { path ->
-    this then webModifier {
+    webModifier {
         style {
             property("clip-path", path.toPathStr())
         }
