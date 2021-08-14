@@ -2,11 +2,11 @@ package kobweb.silk.components.text
 
 import androidx.compose.runtime.Composable
 import kobweb.compose.css.*
+import kobweb.compose.ui.Modifier
+import kobweb.compose.ui.asAttributeBuilder
 import kobweb.compose.ui.color
 import kobweb.compose.ui.graphics.Color
 import kobweb.silk.theme.SilkPallete
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -28,7 +28,7 @@ fun Text(
     Div(
         attrs = modifier
             .color(color)
-            .asAttributeBuilderApplier {
+            .asAttributeBuilder {
                 if (decorationLine != null) {
                     style { textDecorationLine(decorationLine) }
                 }

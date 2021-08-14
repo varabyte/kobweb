@@ -1,11 +1,10 @@
 package kobweb.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.common.foundation.layout.Arrangement
-import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.common.ui.Alignment
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
+import kobweb.compose.ui.Alignment
+import kobweb.compose.ui.Modifier
+import kobweb.compose.ui.asAttributeBuilder
+import kobweb.compose.ui.webModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 
@@ -16,8 +15,8 @@ fun Row(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: @Composable () -> Unit
 ) {
-    Div(attrs = modifier.castOrCreate().apply {
-        add {
+    Div(attrs = modifier.asAttributeBuilder {
+        style {
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Row)
 
@@ -32,7 +31,7 @@ fun Row(
                 verticalAlignment === Alignment.Bottom -> alignItems(AlignItems.FlexEnd)
             }
         }
-    }.asAttributeBuilderApplier()) {
+    }) {
         content()
     }
 }

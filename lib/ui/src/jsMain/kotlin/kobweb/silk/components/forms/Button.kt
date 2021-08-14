@@ -5,16 +5,13 @@ import kobweb.compose.css.UserSelect
 import kobweb.compose.foundation.layout.Box
 import kobweb.compose.ui.*
 import kobweb.compose.ui.graphics.Color
+import kobweb.compose.ui.unit.dp
 import kobweb.silk.components.*
 import kobweb.silk.theme.SilkPallete
 import kobweb.silk.theme.colors.shifted
 import kobweb.silk.theme.shapes.Rect
 import kobweb.silk.theme.shapes.Shape
 import kobweb.silk.theme.shapes.clip
-import org.jetbrains.compose.common.internal.ActualModifier
-import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.unit.dp
 
 enum class ButtonState : ComponentState {
     DEFAULT,
@@ -40,14 +37,17 @@ abstract class ButtonStyle : ComponentStyle<ButtonState> {
         get() = null
 
     @Composable
-    override fun modify(modifier: ActualModifier, state: ButtonState) {
-        when (state) {
-            ButtonState.DEFAULT -> color?.let { modifier.background(it) }
-            ButtonState.HOVER -> hoverColor?.let { modifier.background(it) }
-            ButtonState.PRESSED -> pressedColor?.let { modifier.background(it) }
-        }
+    override fun toModifier(state: ButtonState): Modifier {
+        var modifier: Modifier = Modifier
 
-        shape?.let { modifier.clip(it) }
+        when (state) {
+            ButtonState.DEFAULT -> color
+            ButtonState.HOVER -> hoverColor
+            ButtonState.PRESSED -> pressedColor
+        }?.let { color -> modifier = modifier.background(color) }
+
+        shape?.let { modifier = modifier.clip(it) }
+        return modifier
     }
 }
 
@@ -88,20 +88,19 @@ fun Button(
     content: @Composable () -> Unit
 ) {
     var state by remember { mutableStateOf(ButtonState.DEFAULT) }
-    val baseStyleModifier = Modifier.castOrCreate().apply {
-        SilkComponentStyles.current.modify(ButtonKey, this, state)
-    }
-
+    var inButton by remember { mutableStateOf(false) }
     Box(
-        baseStyleModifier
+        SilkComponentStyles.current.toModifier(ButtonKey, state)
             .then(modifier)
             // Text shouldn't be selectable
             .userSelect(UserSelect.None)
             .onMouseEnter {
                 state = ButtonState.HOVER
+                inButton = true
             }
             .onMouseLeave {
                 state = ButtonState.DEFAULT
+                inButton = false
             }
             .onMouseDown { evt ->
                 if (evt.button == Buttons.LEFT) {
@@ -111,7 +110,7 @@ fun Button(
             .onMouseUp { evt ->
                 if (evt.button == Buttons.LEFT && state == ButtonState.PRESSED) {
                     onClick()
-                    state = ButtonState.DEFAULT
+                    state = if (inButton) { ButtonState.HOVER } else { ButtonState.DEFAULT }
                 }
             }
     ) {

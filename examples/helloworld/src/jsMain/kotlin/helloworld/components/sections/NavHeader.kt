@@ -7,25 +7,17 @@ import kobweb.compose.css.TextDecorationLine
 import kobweb.compose.foundation.layout.Box
 import kobweb.compose.foundation.layout.Row
 import kobweb.compose.foundation.layout.Spacer
-import kobweb.compose.ui.background
-import kobweb.compose.ui.fillMaxSize
-import kobweb.compose.ui.height
-import kobweb.compose.ui.padding
+import kobweb.compose.ui.*
+import kobweb.compose.ui.unit.dp
 import kobweb.silk.components.forms.Button
 import kobweb.silk.components.icons.fa.FaMoon
 import kobweb.silk.components.icons.fa.FaSun
 import kobweb.silk.components.navigation.Link
-import kobweb.silk.components.text.Text
 import kobweb.silk.theme.SilkPallete
 import kobweb.silk.theme.colors.ColorMode
 import kobweb.silk.theme.colors.rememberColorMode
 import kobweb.silk.theme.shapes.Circle
 import kobweb.silk.theme.shapes.clip
-import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
-import org.jetbrains.compose.common.ui.Alignment
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.padding
-import org.jetbrains.compose.common.ui.unit.dp
 
 private val NAV_ITEM_MODIFIER get() = Modifier.padding(0.dp, 15.dp)
 

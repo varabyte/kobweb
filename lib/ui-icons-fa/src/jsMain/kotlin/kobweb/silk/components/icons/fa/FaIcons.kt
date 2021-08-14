@@ -10,12 +10,11 @@ package kobweb.silk.components.icons.fa
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import kobweb.compose.ui.Modifier
+import kobweb.compose.ui.asAttributeBuilder
 import kobweb.compose.ui.color
 import kobweb.compose.ui.graphics.Color
 import kobweb.silk.theme.SilkPallete
-import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
 import org.jetbrains.compose.web.dom.Div
 
 enum class IconCategory(internal val className: String) {
@@ -42,7 +41,7 @@ fun FaIcon(
     color: Color = defaultColor
 ) {
     Div(
-        attrs = modifier.color(color).castOrCreate().asAttributeBuilderApplier {
+        attrs = modifier.color(color).asAttributeBuilder {
             classes(style.className, "fa-$name")
         }
     )

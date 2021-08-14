@@ -2,9 +2,10 @@ package kobweb.silk.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import kobweb.compose.ui.Modifier
+import kobweb.compose.ui.WebModifier
 import kobweb.silk.components.forms.BaseButtonStyle
 import kobweb.silk.components.forms.ButtonKey
-import org.jetbrains.compose.common.internal.ActualModifier
 
 /**
  * Marker interface for a key used to fetch a configuration for a component.
@@ -51,7 +52,7 @@ object EmptyState : ComponentState
  */
 interface ComponentStyle<T: ComponentState> {
     @Composable
-    fun modify(modifier: ActualModifier, state: T)
+    fun toModifier(state: T): Modifier
 }
 
 /**
@@ -78,12 +79,11 @@ class ComponentStyles {
     }
 
     @Composable
-    fun <T: ComponentState, S: ComponentStyle<T>> modify(key: ComponentKey<S>, modifier: ActualModifier, state: T, variant: ComponentVariant<T, S>? = null) {
+    fun <T: ComponentState, S: ComponentStyle<T>> toModifier(key: ComponentKey<S>, state: T, variant: ComponentVariant<T, S>? = null): Modifier {
         @Suppress("UNCHECKED_CAST") // We control register, so we know the cast is good
-        (baseStyles[key] as? ComponentStyle<T>)?.let { baseStyle  ->
-            baseStyle.modify(modifier, state)
-            variant?.style?.modify(modifier, state)
-        }
+        return (baseStyles[key] as? ComponentStyle<T>)?.let { baseStyle  ->
+            baseStyle.toModifier(state) then (variant?.style?.toModifier(state) ?: Modifier)
+        } ?: Modifier
     }
 
     fun copy(): ComponentStyles {

@@ -1,14 +1,14 @@
 package kobweb.silk.theme.shapes
 
-import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.unit.Dp
-import org.jetbrains.compose.common.ui.unit.dp
+import kobweb.compose.ui.Modifier
+import kobweb.compose.ui.unit.Dp
+import kobweb.compose.ui.unit.dp
+import kobweb.compose.ui.webModifier
 import org.jetbrains.compose.web.css.px
 
 fun Modifier.clip(shape: Shape): Modifier = shape.path?.let { path ->
-    castOrCreate().apply {
-        add {
+    this then webModifier {
+        style {
             property("clip-path", path.toPathStr())
         }
     }

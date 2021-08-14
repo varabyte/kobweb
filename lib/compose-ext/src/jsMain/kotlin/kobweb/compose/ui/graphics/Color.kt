@@ -1,10 +1,5 @@
 package kobweb.compose.ui.graphics
 
-import org.jetbrains.compose.common.core.graphics.Color as JbColor
-
-fun JbColor.toKobwebColor() = Color(red, green, blue)
-fun Color.toJbColor() = JbColor(red, green, blue)
-
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
 
