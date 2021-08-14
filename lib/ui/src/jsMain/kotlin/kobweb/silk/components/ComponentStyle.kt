@@ -3,7 +3,6 @@ package kobweb.silk.components
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import kobweb.compose.ui.Modifier
-import kobweb.compose.ui.WebModifier
 import kobweb.silk.components.forms.BaseButtonStyle
 import kobweb.silk.components.forms.ButtonKey
 

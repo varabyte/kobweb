@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import kobweb.compose.ui.Alignment
 import kobweb.compose.ui.Modifier
 import kobweb.compose.ui.asAttributeBuilder
-import kobweb.compose.ui.webModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 

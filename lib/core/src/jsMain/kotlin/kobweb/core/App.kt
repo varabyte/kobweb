@@ -1,8 +1,6 @@
 package kobweb.core
 
 import androidx.compose.runtime.Composable
-import kobweb.compose.css.Cursor
-import kobweb.compose.css.cursor
 import kobweb.compose.css.transitionDuration
 import kobweb.compose.css.transitionProperty
 import org.jetbrains.compose.web.css.*
