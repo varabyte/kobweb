@@ -3,21 +3,21 @@ package helloworld.components.sections
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import kobweb.compose.css.TextDecorationLine
-import kobweb.compose.foundation.layout.Box
-import kobweb.compose.foundation.layout.Row
-import kobweb.compose.foundation.layout.Spacer
-import kobweb.compose.ui.*
-import kobweb.compose.ui.unit.dp
-import kobweb.silk.components.forms.Button
-import kobweb.silk.components.icons.fa.FaMoon
-import kobweb.silk.components.icons.fa.FaSun
-import kobweb.silk.components.navigation.Link
-import kobweb.silk.theme.SilkPallete
-import kobweb.silk.theme.colors.ColorMode
-import kobweb.silk.theme.colors.rememberColorMode
-import kobweb.silk.theme.shapes.Circle
-import kobweb.silk.theme.shapes.clip
+import com.varabyte.kobweb.compose.css.TextDecorationLine
+import com.varabyte.kobweb.compose.foundation.layout.Box
+import com.varabyte.kobweb.compose.foundation.layout.Row
+import com.varabyte.kobweb.compose.foundation.layout.Spacer
+import com.varabyte.kobweb.compose.ui.*
+import com.varabyte.kobweb.compose.ui.unit.dp
+import com.varabyte.kobweb.silk.components.forms.Button
+import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
+import com.varabyte.kobweb.silk.components.icons.fa.FaSun
+import com.varabyte.kobweb.silk.components.navigation.Link
+import com.varabyte.kobweb.silk.theme.SilkPallete
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
+import com.varabyte.kobweb.silk.theme.shapes.Circle
+import com.varabyte.kobweb.silk.theme.shapes.clip
 
 private val NAV_ITEM_MODIFIER get() = Modifier.padding(0.dp, 15.dp)
 

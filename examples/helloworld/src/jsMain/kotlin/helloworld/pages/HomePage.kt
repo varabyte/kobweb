@@ -1,9 +1,9 @@
 package helloworld.pages
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.silk.components.text.Text
 import helloworld.components.layouts.PageLayout
-import kobweb.core.Page
-import kobweb.silk.components.text.Text
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.P

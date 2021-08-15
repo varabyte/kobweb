@@ -2,12 +2,12 @@ package helloworld
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import kobweb.core.App
-import kobweb.core.DefaultApp
-import kobweb.silk.components.layout.Surface
-import kobweb.silk.theme.DEFAULT_COLORS
-import kobweb.silk.theme.SilkTheme
-import kobweb.silk.theme.colors.rememberColorMode
+import com.varabyte.kobweb.core.App
+import com.varabyte.kobweb.core.DefaultApp
+import com.varabyte.kobweb.silk.components.layout.Surface
+import com.varabyte.kobweb.silk.theme.DEFAULT_COLORS
+import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vw

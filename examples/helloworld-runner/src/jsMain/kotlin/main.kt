@@ -1,7 +1,7 @@
+import com.varabyte.kobweb.core.Router
 import helloworld.MyApp
 import helloworld.pages.AboutPage
 import helloworld.pages.HomePage
-import kobweb.core.Router
 import org.jetbrains.compose.web.renderComposable
 
 fun main() {

@@ -1,12 +1,12 @@
 package helloworld.components.layouts
 
 import androidx.compose.runtime.Composable
+import com.varabyte.kobweb.compose.foundation.layout.Column
+import com.varabyte.kobweb.compose.ui.Alignment
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.fillMaxSize
+import com.varabyte.kobweb.silk.components.text.Text
 import helloworld.components.sections.NavHeader
-import kobweb.compose.foundation.layout.Column
-import kobweb.compose.ui.Alignment
-import kobweb.compose.ui.Modifier
-import kobweb.compose.ui.fillMaxSize
-import kobweb.silk.components.text.Text
 import org.jetbrains.compose.web.dom.H1
 
 @Composable
