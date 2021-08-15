@@ -2,21 +2,22 @@ package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.silk.components.ComponentStyles
 import com.varabyte.kobweb.silk.components.SilkComponentStyles
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.Colors
+import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.Palette
-import com.varabyte.kobweb.silk.theme.colors.SilkColors
+import com.varabyte.kobweb.silk.theme.colors.Palettes
 
-val DEFAULT_COLORS = Colors(
+val DEFAULT_PALETTES = Palettes(
     light = Palette(
         background = Color.White,
         surface = Color.White,
-        primary = SilkColors.White._900,
-        secondary = SilkColors.Blue._800,
+        primary = ColorSchemes.White._900,
+        secondary = ColorSchemes.Blue._800,
         warning = Color.Yellow,
         error = Color.Red,
         onBackground = Color.Black,
@@ -29,8 +30,8 @@ val DEFAULT_COLORS = Colors(
     dark = Palette(
         background = Color.Black,
         surface = Color.Black,
-        primary = SilkColors.Black._900,
-        secondary = SilkColors.Blue._100,
+        primary = ColorSchemes.Black._900,
+        secondary = ColorSchemes.Blue._100,
         warning = Color.Yellow,
         error = Color.Red,
         onBackground = Color.White,
@@ -46,18 +47,30 @@ object SilkConfig {
     var initialColorMode: ColorMode = ColorMode.LIGHT
 }
 
-val SilkPallete = compositionLocalOf {
-    DEFAULT_COLORS.getPalette(SilkConfig.initialColorMode)
+val SilkPalette = compositionLocalOf {
+    DEFAULT_PALETTES[SilkConfig.initialColorMode]
+}
+
+object SilkTheme {
+    val palette: Palette
+        @Composable
+        @ReadOnlyComposable
+        get() = SilkPalette.current
+
+    val componentStyles: ComponentStyles
+        @Composable
+        @ReadOnlyComposable
+        get() = SilkComponentStyles.current
 }
 
 @Composable
 fun SilkTheme(
-    palette: Palette = SilkPallete.current,
-    componentStyles: ComponentStyles = SilkComponentStyles.current,
+    palette: Palette = SilkTheme.palette,
+    componentStyles: ComponentStyles = SilkTheme.componentStyles,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
-        SilkPallete provides palette,
+        SilkPalette provides palette,
         SilkComponentStyles provides componentStyles,
     ) {
         content()

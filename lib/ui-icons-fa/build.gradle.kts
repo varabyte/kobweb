@@ -120,7 +120,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.silk.theme.SilkPallete
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.dom.Div
 
 enum class IconCategory(internal val className: String) {
@@ -137,7 +137,7 @@ enum class IconStyle(internal val category: IconCategory) {
 private val defaultColor: Color
     @Composable
     @ReadOnlyComposable
-    get() = SilkPallete.current.onPrimary
+    get() = SilkTheme.palette.onPrimary
 
 @Composable
 fun FaIcon(

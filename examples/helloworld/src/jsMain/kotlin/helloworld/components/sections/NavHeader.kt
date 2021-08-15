@@ -13,7 +13,7 @@ import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
 import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.theme.SilkPallete
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.shapes.Circle
@@ -27,7 +27,7 @@ private fun NavLink(path: String, text: String) {
         path,
         text,
         NAV_ITEM_MODIFIER,
-        color = SilkPallete.current.primary,
+        color = SilkTheme.palette.primary,
         decorationLine = TextDecorationLine.None
     )
 }
@@ -35,7 +35,7 @@ private fun NavLink(path: String, text: String) {
 @Composable
 fun NavHeader() {
     var colorMode by rememberColorMode()
-    val palette = SilkPallete.current
+    val palette = SilkTheme.palette
     Box(
         Modifier
             .fillMaxWidth()

@@ -6,8 +6,11 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.unit.dp
-import com.varabyte.kobweb.silk.components.*
-import com.varabyte.kobweb.silk.theme.SilkPallete
+import com.varabyte.kobweb.silk.components.ComponentKey
+import com.varabyte.kobweb.silk.components.ComponentState
+import com.varabyte.kobweb.silk.components.ComponentStyle
+import com.varabyte.kobweb.silk.components.ComponentVariant
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.shifted
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.Shape
@@ -55,7 +58,7 @@ object ButtonKey : ComponentKey<ButtonStyle>
 class BaseButtonStyle : ButtonStyle() {
     override val color: Color
         @Composable
-        get() = SilkPallete.current.primary
+        get() = SilkTheme.palette.primary
 
     override val hoverColor: Color
         @Composable
@@ -90,7 +93,7 @@ fun Button(
     var state by remember { mutableStateOf(ButtonState.DEFAULT) }
     var inButton by remember { mutableStateOf(false) }
     Box(
-        SilkComponentStyles.current.toModifier(ButtonKey, state)
+        SilkTheme.componentStyles[ButtonKey].toModifier(state)
             .then(modifier)
             // Text shouldn't be selectable
             .userSelect(UserSelect.None)

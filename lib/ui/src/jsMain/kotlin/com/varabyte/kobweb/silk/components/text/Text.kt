@@ -6,7 +6,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.silk.theme.SilkPallete
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -21,7 +21,7 @@ import org.jetbrains.compose.web.dom.Text
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = SilkPallete.current.onPrimary,
+    color: Color = SilkTheme.palette.onPrimary,
     decorationLine: TextDecorationLine? = null,
     cursor: Cursor? = null,
 ) {

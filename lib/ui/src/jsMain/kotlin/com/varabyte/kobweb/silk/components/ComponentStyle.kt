@@ -55,6 +55,14 @@ interface ComponentStyle<T: ComponentState> {
 }
 
 /**
+ * Extension function to create a modifier that merges the base style with an (optional) target variant.
+ */
+@Composable
+fun <T: ComponentState, S: ComponentStyle<T>> S.toModifier(state: T, variant: ComponentVariant<T, S>? = null): Modifier {
+    return this.toModifier(state) then (variant?.style?.toModifier(state) ?: Modifier)
+}
+
+/**
  * An interface which can be used for modifying a base style based on variants.
  *
  * For example, links might do something like:
@@ -73,17 +81,19 @@ interface ComponentVariant<T: ComponentState, S: ComponentStyle<T>> {
 
 class ComponentStyles {
     private val baseStyles = mutableMapOf<ComponentKey<*>, ComponentStyle<*>>()
+
     fun <T: ComponentState, S: ComponentStyle<T>> register(key: ComponentKey<S>, baseStyle: S) {
         baseStyles[key] = baseStyle
     }
 
-    @Composable
-    fun <T: ComponentState, S: ComponentStyle<T>> toModifier(key: ComponentKey<S>, state: T, variant: ComponentVariant<T, S>? = null): Modifier {
-        @Suppress("UNCHECKED_CAST") // We control register, so we know the cast is good
-        return (baseStyles[key] as? ComponentStyle<T>)?.let { baseStyle  ->
-            baseStyle.toModifier(state) then (variant?.style?.toModifier(state) ?: Modifier)
-        } ?: Modifier
-    }
+    /**
+     * Fetch a style registered by [register].
+     *
+     * This method will throw an exception if no style was previously registered with the target key.
+     */
+    @Suppress("UNCHECKED_CAST") // This should always be a valid cast thanks to register
+    operator fun <T: ComponentState, S: ComponentStyle<T>> get(key: ComponentKey<S>): S = (baseStyles[key] as? S) ?:
+        error("No style registered with key $key")
 
     fun copy(): ComponentStyles {
         val other = ComponentStyles()

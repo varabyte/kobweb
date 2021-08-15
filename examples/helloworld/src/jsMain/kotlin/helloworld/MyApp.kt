@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.core.DefaultApp
 import com.varabyte.kobweb.silk.components.layout.Surface
-import com.varabyte.kobweb.silk.theme.DEFAULT_COLORS
+import com.varabyte.kobweb.silk.theme.DEFAULT_PALETTES
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import org.jetbrains.compose.web.css.height
@@ -19,7 +19,7 @@ class MyApp : App by DefaultApp {
     override fun render(content: @Composable () -> Unit) {
         DefaultApp.render {
             val colorMode by rememberColorMode()
-            SilkTheme(DEFAULT_COLORS.getPalette(colorMode)) {
+            SilkTheme(DEFAULT_PALETTES[colorMode]) {
                 Div({
                     style {
                         height(100.vh)

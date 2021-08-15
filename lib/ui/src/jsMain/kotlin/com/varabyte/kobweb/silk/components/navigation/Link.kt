@@ -8,7 +8,7 @@ import com.varabyte.kobweb.compose.ui.clickable
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.core.Router
 import com.varabyte.kobweb.silk.components.text.Text
-import com.varabyte.kobweb.silk.theme.SilkPallete
+import com.varabyte.kobweb.silk.theme.SilkTheme
 
 /**
  * Linkable text which, when clicked, navigates to the target [path].
@@ -21,7 +21,7 @@ fun Link(
     path: String,
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = SilkPallete.current.secondary,
+    color: Color = SilkTheme.palette.secondary,
     decorationLine: TextDecorationLine? = TextDecorationLine.Underline,
     cursor: Cursor? = Cursor.Pointer,
 ) {
