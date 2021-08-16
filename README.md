@@ -2,9 +2,9 @@
 
 Hello! If you've landed here, you're a bit early. This is a placeholder README.
 
-Our (very small) team is experimenting with a Kotlin framework for building websites inspired by Next.js, Chakra UI, and
-other similar approaches. If you're reading this, it means it is early days yet, and we are still uncertain about
-upcoming questions we have about the feasibility of this approach and the shape of the API.
+Our (very small) team is experimenting with a Kotlin framework for building websites that is inspired by Next.js, Chakra
+UI, and other similar approaches. If you're reading this, it means it is early days yet, and we are still uncertain 
+about upcoming questions we have about the feasibility of this approach and the shape of the API.
 
 Hopefully, if we can satisfy all of our concerns, we'll have more to announce by end of 2021, if not earlier.
 
