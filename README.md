@@ -1,4 +1,4 @@
-# Kobweb
+# K🕸️bweb
 
 Hello! If you've landed here, you're a bit early. This is a placeholder README.
 
