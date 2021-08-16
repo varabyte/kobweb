@@ -13,6 +13,17 @@ community, [feel free to reach out to me](mailto:bitspittle@gmail.com), and I'll
 **Note: I am just an individual person, but I promise not to harvest, distribute, or in any way use any emails I
 receive except to 1) respond to any questions asked or 2) ping when the status of this project changes.**
 
+# Running
+
+This section will be fleshed out more in the future. For now, to see what we have so far, run:
+
+```bash
+$ ./gradlew :examples:helloworld-runner:jsBrowserRun
+```
+
+This demo on its own undersells the experience, which is more about incrementally developing a Kotlin web app with a
+nice library and hot reloading, but hey, it's a start.
+
 # Templates
 
 Kobweb provides its templates in a separate git repository, which is referenced within this project as a submodule for
