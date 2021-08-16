@@ -12,3 +12,18 @@ If you've somehow found this README and would like to be updated when the code i
 community, [feel free to reach out to me](mailto:bitspittle@gmail.com), and I'll add you to a list of people to notify.
 **Note: I am just an individual person, but I promise not to harvest, distribute, or in any way use any emails I
 receive except to 1) respond to any questions asked or 2) ping when the status of this project changes.**
+
+# Templates
+
+Kobweb provides its templates in a separate git repository, which is referenced within this project as a submodule for
+convenience. To pull down everything, run:
+
+```bash
+/path/to/my/src
+$ git clone --recurse-submodules https://github.com/varabyte/kobweb
+
+# or, if you've already previously cloned kobweb...
+/path/to/my/src/kobweb
+$ git submodule update --init
+```
+
