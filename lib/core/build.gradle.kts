@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-group = "com.github.bitspittle"
+group = "com.varabyte"
 version = "1.0-SNAPSHOT"
 
 // Enable JS(IR) target and add dependencies

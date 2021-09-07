@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "com.github.bitspittle"
+group = "com.varabyte"
 version = "1.0-SNAPSHOT"
 
 repositories {
