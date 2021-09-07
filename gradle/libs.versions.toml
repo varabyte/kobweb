@@ -1,5 +1,7 @@
 [versions]
 kotlinx-cli = "0.3.2"
+konsole = "0.9.0"
 
 [libraries]
 kotlinx-cli = { module = "org.jetbrains.kotlinx:kotlinx-cli", version.ref = "kotlinx-cli" }
+konsole = { module = "com.varabyte:konsole", version.ref = "konsole" }
