@@ -1,3 +1,4 @@
+import com.varabyte.kobweb.cli.create.runCreateFlow
 import kotlinx.cli.*
 
 enum class RunEnvironment {
@@ -10,11 +11,10 @@ fun main(args: Array<String>) {
     val parser = ArgParser("kobweb")
 
     class Create : Subcommand("create", "Create a Kobweb app / site") {
-        val withMarkdown by option(ArgType.Boolean, "with-markdown").default(false)
+        val template by argument(ArgType.String, "template", "The name of the template to start from, e.g. 'site'")
 
         override fun execute() {
-            // TODO: Implement
-            println("User asked to create a site. With markdown? $withMarkdown")
+            runCreateFlow(template)
         }
     }
 
