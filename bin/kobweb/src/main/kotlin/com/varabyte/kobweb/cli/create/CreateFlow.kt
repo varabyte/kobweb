@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.cli.create
 
+import com.varabyte.kobweb.cli.common.PathUtils
 import com.varabyte.kobweb.cli.common.Validations
 import com.varabyte.kobweb.cli.common.processing
 import com.varabyte.kobweb.cli.common.queryUser
@@ -8,7 +9,6 @@ import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.textLine
 import org.eclipse.jgit.api.Git
 import java.nio.file.Files
-import kotlin.system.exitProcess
 
 fun runCreateFlow(template: String) = konsoleApp {
     val repo = "https://github.com/varabyte/kobweb-templates"
@@ -37,16 +37,7 @@ fun runCreateFlow(template: String) = konsoleApp {
 
 
     val projectName = queryUser("What is your project named?", "My Project")
-    val defaultFolderName = run {
-        val nameBase = projectName.lowercase().filter { it.isLetterOrDigit() }
-        var finalName = nameBase
-        var i = 2
-        while (Validations.emptyPath(finalName) != null) {
-            finalName = "$nameBase$i"
-            i++
-        }
-        finalName
-    }
+    val defaultFolderName = PathUtils.generateEmptyPathName(projectName.lowercase().filter { it.isLetterOrDigit() })
     val projectFolder = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
         Validations.folderName(answer) ?: Validations.emptyPath(answer)
     }
