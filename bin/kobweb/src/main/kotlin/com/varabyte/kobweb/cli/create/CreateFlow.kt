@@ -39,7 +39,9 @@ fun runCreateFlow(template: String) = konsoleApp {
 
     val projectName = queryUser("What is your project named?", "My Project")
 
-    val defaultFolderName = PathUtils.generateEmptyPathName(projectName.lowercase().filter { it.isLetterOrDigit() })
+    val defaultFolderName = PathUtils.generateEmptyPathName(
+        projectName.lowercase().filter { it.isLetterOrDigit() }.takeIf { it.isNotEmpty() } ?: "myproject"
+    )
     val projectFolder = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
         Validations.folderName(answer) ?: Validations.emptyPath(answer)
     }
