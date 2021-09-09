@@ -16,6 +16,8 @@ dependencies {
     implementation(libs.kotlinx.cli)
     implementation(libs.konsole)
     implementation(libs.jgit)
+    implementation(libs.freemarker)
+    implementation(libs.kaml)
 }
 
 application {

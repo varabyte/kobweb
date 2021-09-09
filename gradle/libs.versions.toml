@@ -1,9 +1,13 @@
 [versions]
+freemarker = "2.3.31"
 jgit = "5.12.0.202106070339-r"
+kaml = "0.35.3"
 konsole = "0.9.0"
 kotlinx-cli = "0.3.2"
 
 [libraries]
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker"}
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 konsole = { module = "com.varabyte:konsole", version.ref = "konsole" }
 kotlinx-cli = { module = "org.jetbrains.kotlinx:kotlinx-cli", version.ref = "kotlinx-cli" }
