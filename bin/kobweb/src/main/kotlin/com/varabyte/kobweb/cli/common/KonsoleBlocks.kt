@@ -36,6 +36,7 @@ fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
             blockingWork()
             ProcessingState.SUCCEEDED
         } catch (ex: Exception) {
+            ex.printStackTrace()
             ProcessingState.FAILED
         }
     }

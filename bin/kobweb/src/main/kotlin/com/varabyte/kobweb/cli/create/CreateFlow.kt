@@ -1,9 +1,6 @@
 package com.varabyte.kobweb.cli.create
 
-import com.varabyte.kobweb.cli.common.PathUtils
-import com.varabyte.kobweb.cli.common.Validations
-import com.varabyte.kobweb.cli.common.processing
-import com.varabyte.kobweb.cli.common.queryUser
+import com.varabyte.kobweb.cli.common.*
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.textLine
@@ -13,6 +10,7 @@ import com.varabyte.konsole.runtime.concurrent.createKey
 import org.eclipse.jgit.api.Git
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
@@ -26,7 +24,6 @@ fun runCreateFlow(template: String) = konsoleApp {
                 .setDirectory(tempDir)
                 .call()
         }) {
-        konsole { textLine() }.run()
     } else {
         konsole {
             red {
@@ -35,6 +32,27 @@ fun runCreateFlow(template: String) = konsoleApp {
         }.run()
 
         return@konsoleApp
+    }
+    konsole { textLine() }.run()
+
+    val templateFile = run {
+        val tempPath = tempDir.toPath()
+        val subPaths = listOf("$template/default", template)
+        subPaths
+            .asSequence()
+            .map { subPath -> tempPath.resolve(subPath) }
+            .mapNotNull { currPath -> KobwebUtils.getTemplateFileIn(currPath) }
+            .firstOrNull()
+
+            ?: run {
+                konsole {
+                    red {
+                        textLine("Unable to find a template named \"$template\". Please check the repository.")
+                    }
+                }.run()
+
+                return@konsoleApp
+            }
     }
 
     val projectName = queryUser("What is your project named?", "My Project")
