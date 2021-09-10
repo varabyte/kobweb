@@ -30,7 +30,7 @@ fun runCreateFlow(template: String) = konsoleApp {
             }
         }.run()
 
-        return@konsoleApp
+        throw KobwebException("Unable to fetch templates")
     }
     konsole { textLine() }.run()
 
@@ -50,7 +50,7 @@ fun runCreateFlow(template: String) = konsoleApp {
                     }
                 }.run()
 
-                return@konsoleApp
+                throw KobwebException("Unable to find matching template")
             }
     }
 
