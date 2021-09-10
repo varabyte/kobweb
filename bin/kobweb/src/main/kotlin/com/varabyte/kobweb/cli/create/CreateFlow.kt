@@ -1,16 +1,15 @@
 package com.varabyte.kobweb.cli.create
 
+import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.*
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.runtime.KonsoleApp
-import com.varabyte.konsole.runtime.concurrent.ConcurrentScopedData
 import com.varabyte.konsole.runtime.concurrent.createKey
 import org.eclipse.jgit.api.Git
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
@@ -54,6 +53,8 @@ fun runCreateFlow(template: String) = konsoleApp {
                 return@konsoleApp
             }
     }
+
+    val result = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
 
     val projectName = queryUser("What is your project named?", "My Project")
 
