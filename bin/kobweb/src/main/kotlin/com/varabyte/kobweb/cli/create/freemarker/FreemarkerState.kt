@@ -2,6 +2,7 @@ package com.varabyte.kobweb.cli.create.freemarker
 
 import com.varabyte.kobweb.cli.common.queryUser
 import com.varabyte.kobweb.cli.create.Instruction
+import com.varabyte.kobweb.cli.create.freemarker.methods.*
 import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.runtime.KonsoleApp
 import freemarker.cache.NullCacheStorage
@@ -20,12 +21,15 @@ private fun String.process(cfg: Configuration, model: Map<String, Any>): String 
     return writer.buffer.toString()
 }
 
-class FreemarkerState(src: Path, dest: Path, projectName: String, projectFolder: String) {
+class FreemarkerState(src: Path, dest: Path, projectFolder: String) {
     private val model = mutableMapOf<String, Any>(
-        "projectName" to projectName,
         "projectFolder" to projectFolder,
 
+        "isNotEmpty" to IsNotEmptyMethod(),
         "isPackage" to IsPackageMethod(),
+
+        "fileToName" to FileToNameMethod(),
+        "fileToPackage" to FileToPackageMethod(),
         "packageToPath" to PackageToPathMethod(),
     )
 

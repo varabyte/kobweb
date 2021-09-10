@@ -61,20 +61,16 @@ fun runCreateFlow(template: String) = konsoleApp {
 //    val result = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
 
 
-    val projectName = queryUser("What is your project named?", "My Project")
-
-    val defaultFolderName = PathUtils.generateEmptyPathName(
-        projectName.lowercase().filter { it.isLetterOrDigit() }.takeIf { it.isNotEmpty() } ?: "myproject"
-    )
+    val defaultFolderName = PathUtils.generateEmptyPathName("my-project")
     val projectFolder = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
-        Validations.folderName(answer) ?: Validations.emptyPath(answer)
+        Validations.isFileName(answer) ?: Validations.isEmptyPath(answer)
     }
 
     val srcPath = templateFile.parent
     val dstPath = Path.of(projectFolder).also { if (it.notExists()) { it.createDirectory() } }
 
     val template = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
-    val state = FreemarkerState(srcPath, dstPath, projectName, projectFolder)
+    val state = FreemarkerState(srcPath, dstPath, projectFolder)
 
     state.execute(this, template.instructions)
 }

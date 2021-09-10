@@ -7,22 +7,22 @@ private const val PACKAGE_PART = """[\w]([\w\d_]*)"""
 private val PACKAGE_REGEX = Regex("""^${PACKAGE_PART}(\.${PACKAGE_PART})*${"$"}""")
 
 object Validations {
-    fun notEmpty(value: String): String? {
+    fun isNotEmpty(value: String): String? {
         return when {
             value.isBlank() -> "The value must not be blank"
             else -> null
         }
     }
 
-    fun folderName(name: String): String? {
+    fun isFileName(name: String): String? {
         return when {
-            name != "." && !name.all { it.isLetterOrDigit() || it == '-' || it == '_' } ->
-                "Invalid folder name. Can only contain: letters, digits, dash, underscore"
+            name != "." && !name.all { it.isLetterOrDigit() || it == '-' || it == '_' || it == '.' } ->
+                "Invalid name. Can only contain: letters, digits, dash, dots, and underscore"
             else -> null
         }
     }
 
-    fun emptyPath(pathStr: String): String? {
+    fun isEmptyPath(pathStr: String): String? {
         Path.of(pathStr).let { path ->
             return when {
                 Files.exists(path) -> {
@@ -37,7 +37,7 @@ object Validations {
         }
     }
 
-    fun validPackage(value: String): String? {
+    fun isValidPackage(value: String): String? {
         return when {
             !PACKAGE_REGEX.matches(value) ->
                 "Package should be letters, numbers, and underscores, optionally separated by dots"

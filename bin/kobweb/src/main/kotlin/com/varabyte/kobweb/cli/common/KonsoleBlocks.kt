@@ -52,7 +52,7 @@ fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
 fun KonsoleApp.queryUser(
     query: String,
     defaultAnswer: String?,
-    validateAnswer: (String) -> String? = Validations::notEmpty
+    validateAnswer: (String) -> String? = Validations::isNotEmpty
 ): String {
     var answer by konsoleVarOf("")
     var error by konsoleVarOf<String?>(null)
