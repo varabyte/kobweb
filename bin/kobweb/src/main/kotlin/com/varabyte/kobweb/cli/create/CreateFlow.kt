@@ -2,6 +2,7 @@ package com.varabyte.kobweb.cli.create
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.*
+import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.textLine
@@ -10,6 +11,9 @@ import com.varabyte.konsole.runtime.concurrent.createKey
 import org.eclipse.jgit.api.Git
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.createDirectory
+import kotlin.io.path.notExists
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
@@ -54,7 +58,8 @@ fun runCreateFlow(template: String) = konsoleApp {
             }
     }
 
-    val result = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
+//    val result = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
+
 
     val projectName = queryUser("What is your project named?", "My Project")
 
@@ -64,4 +69,12 @@ fun runCreateFlow(template: String) = konsoleApp {
     val projectFolder = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
         Validations.folderName(answer) ?: Validations.emptyPath(answer)
     }
+
+    val srcPath = templateFile.parent
+    val dstPath = Path.of(projectFolder).also { if (it.notExists()) { it.createDirectory() } }
+
+    val template = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
+    val state = FreemarkerState(srcPath, dstPath, projectName, projectFolder)
+
+    state.execute(this, template.instructions)
 }
