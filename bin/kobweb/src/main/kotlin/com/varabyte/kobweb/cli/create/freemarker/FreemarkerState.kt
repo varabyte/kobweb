@@ -1,18 +1,26 @@
 package com.varabyte.kobweb.cli.create.freemarker
 
+import com.varabyte.kobweb.cli.common.KobwebException
+import com.varabyte.kobweb.cli.common.processing
 import com.varabyte.kobweb.cli.common.queryUser
+import com.varabyte.kobweb.cli.common.wildcardToRegex
 import com.varabyte.kobweb.cli.create.Instruction
 import com.varabyte.kobweb.cli.create.freemarker.methods.*
-import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.runtime.KonsoleApp
 import freemarker.cache.NullCacheStorage
 import freemarker.template.Configuration
 import freemarker.template.Template
 import freemarker.template.TemplateExceptionHandler
 import freemarker.template.TemplateMethodModelEx
+import java.io.File
+import java.io.FileWriter
 import java.io.StringReader
 import java.io.StringWriter
+import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.notExists
 
 private fun String.process(cfg: Configuration, model: Map<String, Any>): String {
     val reader = StringReader(this)
@@ -21,7 +29,7 @@ private fun String.process(cfg: Configuration, model: Map<String, Any>): String 
     return writer.buffer.toString()
 }
 
-class FreemarkerState(src: Path, dest: Path, projectFolder: String) {
+class FreemarkerState(private val src: Path, private val dest: Path, projectFolder: String) {
     private val model = mutableMapOf<String, Any>(
         "projectFolder" to projectFolder,
 
@@ -46,43 +54,98 @@ class FreemarkerState(src: Path, dest: Path, projectFolder: String) {
     }
 
     fun execute(app: KonsoleApp, instructions: List<Instruction>) {
-        for (inst in instructions) {
-            when (inst) {
-                is Instruction.DefineVar -> {
-                    model[inst.name] = inst.value.process(cfg, model)
-                    app.apply {
-                        konsole {
-                            textLine("DefineVar: ${inst.name} = ${model[inst.name]}")
-                        }.run()
+        app.apply {
+            for (inst in instructions) {
+                val useInstruction = inst.condition?.process(cfg, model)?.toBoolean() ?: true
+                if (!useInstruction) continue
+
+                when (inst) {
+                    is Instruction.QueryVar -> {
+                        val default = inst.default?.process(cfg, model)
+                        val answer = queryUser(inst.prompt, default, validateAnswer = { value ->
+                            (model[inst.validation] as? TemplateMethodModelEx)?.exec(listOf(value))?.toString()
+                        })
+                        model[inst.name] = answer
                     }
-                }
-                is Instruction.Keep -> app.apply {
-                    konsole {
-                        textLine("Keep")
-                    }.run()
-                }
 
-                is Instruction.Move -> app.apply {
-                    konsole {
-                        textLine("Move")
-                    }.run()
-                }
+                    is Instruction.DefineVar -> {
+                        model[inst.name] = inst.value.process(cfg, model)
+                    }
 
-                is Instruction.ProcessFreemarker -> app.apply {
-                    konsole {
-                        textLine("ProcessFreemarker")
-                    }.run()
-                }
+                    is Instruction.ProcessFreemarker -> {
+                        processing("Processing templates") {
+                            val srcFile = src.toFile()
+                            val filesToProcess = mutableListOf<File>()
+                            srcFile.walkBottomUp().forEach { file ->
+                                if (file.extension == "ftl") {
+                                    filesToProcess.add(file)
+                                }
+                            }
+                            filesToProcess.forEach { templateFile ->
+                                val template = cfg.getTemplate(templateFile.toRelativeString(srcFile))
+                                FileWriter(templateFile.path.removeSuffix(".ftl")).use { writer ->
+                                    template.process(model, writer)
+                                }
+                                templateFile.delete()
+                            }
+                        }
+                    }
 
-                is Instruction.QueryVar -> app.apply {
-                    val default = inst.default?.process(cfg, model)
-                    val answer = queryUser(inst.prompt, default, validateAnswer = { value ->
-                        (model[inst.validation] as? TemplateMethodModelEx)?.exec(listOf(value))?.toString()
-                    })
-                    model[inst.name] = answer
-                    konsole {
-                        textLine("QueryVar: ${inst.name} = ${model[inst.name]}")
-                    }.run()
+                    is Instruction.Move -> {
+                        val to = inst.to.process(cfg, model)
+                        processing(inst.description ?: "Moving \"${inst.from}\" to \"$to\"") {
+                            val matcher = inst.from.wildcardToRegex()
+                            val srcFile = src.toFile()
+                            val filesToMove = mutableListOf<File>()
+                            srcFile.walkBottomUp().forEach { file ->
+                                if (matcher.matches(file.toRelativeString(srcFile))) {
+                                    filesToMove.add(file)
+                                }
+                            }
+                            val destRoot = src.resolve(to)
+                            if (destRoot.isRegularFile()) {
+                                throw KobwebException("Cannot move files into target that isn't a directory")
+                            }
+                            filesToMove.forEach { fileToMove ->
+                                val subPath = fileToMove.parentFile.toRelativeString(srcFile)
+                                val destPath = destRoot.resolve(subPath)
+                                if (destPath.notExists()) {
+                                    destPath.createDirectories()
+                                }
+
+                                Files.move(fileToMove.toPath(), destPath.resolve(fileToMove.name))
+                            }
+                        }
+                    }
+
+                    is Instruction.Keep -> {
+                        processing(inst.description ?: "Populating to final project") {
+                            val keepMatcher = inst.files.wildcardToRegex()
+                            val excludeMatcher = inst.exclude?.wildcardToRegex()
+
+                            val srcFile = src.toFile()
+                            val filesToKeep = mutableListOf<File>()
+                            srcFile.walkBottomUp().forEach { file ->
+                                if (file.isFile) {
+                                    val relativePath = file.toRelativeString(srcFile)
+                                    if (keepMatcher.matches(relativePath)) {
+                                        if (excludeMatcher == null || !excludeMatcher.matches(relativePath)) {
+                                            filesToKeep.add(file)
+                                        }
+                                    }
+                                }
+                            }
+                            filesToKeep.forEach { fileToKeep ->
+                                val subPath = fileToKeep.parentFile.toRelativeString(srcFile)
+                                val destPath = dest.resolve(subPath)
+                                if (destPath.notExists()) {
+                                    destPath.createDirectories()
+                                }
+
+                                Files.copy(fileToKeep.toPath(), destPath.resolve(fileToKeep.name))
+                            }
+                        }
+                    }
                 }
             }
         }
