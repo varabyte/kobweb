@@ -1,3 +1,7 @@
+<a href="https://discord.gg/bCdxPr7aTV">
+  <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
+</a>
+
 # K🕸️bweb
 
 Hello! If you've landed here, you're a bit early. This is a placeholder README.
