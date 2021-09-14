@@ -9,5 +9,5 @@ kotlinx-cli = "0.3.2"
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker"}
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
-konsole = { module = "com.varabyte:konsole", version.ref = "konsole" }
+konsole = { module = "com.varabyte.konsole:konsole", version.ref = "konsole" }
 kotlinx-cli = { module = "org.jetbrains.kotlinx:kotlinx-cli", version.ref = "kotlinx-cli" }
