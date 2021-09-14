@@ -23,6 +23,17 @@ sealed class Instruction(
     val condition: String? = null,
 ) {
     /**
+     * Inform the user about something.
+     *
+     * @param message The message to show to the user. This value will be processed by freemarker and can be dynamic!
+     */
+    @Serializable
+    @SerialName("Inform")
+    class Inform(
+        val message: String,
+    ) : Instruction()
+
+    /**
      * Prompt the user to specify a value for a variable.
      *
      * @param name The name of this variable, which can be referenced in freemarker expressions later.

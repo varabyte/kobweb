@@ -44,6 +44,13 @@ fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
     return state == ProcessingState.SUCCEEDED
 }
 
+fun KonsoleApp.informUser(message: String) {
+    konsole {
+        yellow { text('!') }
+        text(' ')
+        textLine(message)
+    }.run()
+}
 
 /**
  * @param validateAnswer Take a string (representing a user's answer), returning a new string which represents an error

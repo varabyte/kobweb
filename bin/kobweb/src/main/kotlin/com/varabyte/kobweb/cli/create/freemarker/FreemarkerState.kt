@@ -1,9 +1,6 @@
 package com.varabyte.kobweb.cli.create.freemarker
 
-import com.varabyte.kobweb.cli.common.KobwebException
-import com.varabyte.kobweb.cli.common.processing
-import com.varabyte.kobweb.cli.common.queryUser
-import com.varabyte.kobweb.cli.common.wildcardToRegex
+import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.yaml.Instruction
 import com.varabyte.kobweb.cli.create.freemarker.methods.*
 import com.varabyte.konsole.runtime.KonsoleApp
@@ -60,6 +57,11 @@ class FreemarkerState(private val src: Path, private val dest: Path, projectFold
                 if (!useInstruction) continue
 
                 when (inst) {
+                    is Instruction.Inform -> {
+                        val message = inst.message.process(cfg, model)
+                        informUser(message)
+                    }
+
                     is Instruction.QueryVar -> {
                         val default = inst.default?.process(cfg, model)
                         val answer = queryUser(inst.prompt, default, validateAnswer = { value ->
