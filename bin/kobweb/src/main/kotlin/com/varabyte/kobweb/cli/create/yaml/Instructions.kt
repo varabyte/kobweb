@@ -1,14 +1,8 @@
-package com.varabyte.kobweb.cli.create
+package com.varabyte.kobweb.cli.create.yaml
 
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-@Serializable
-class Metadata(
-    val description: String? = null,
-)
-
 
 /**
  * Disable directory dot operations, e.g. "test/../../../../system"
@@ -107,9 +101,3 @@ sealed class Instruction(
         }
     }
 }
-
-@Serializable
-class KobwebTemplate(
-    val metadata: Metadata,
-    val instructions: List<Instruction>,
-)

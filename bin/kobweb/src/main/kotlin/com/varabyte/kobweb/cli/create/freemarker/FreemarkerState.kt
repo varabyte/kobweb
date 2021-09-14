@@ -4,7 +4,7 @@ import com.varabyte.kobweb.cli.common.KobwebException
 import com.varabyte.kobweb.cli.common.processing
 import com.varabyte.kobweb.cli.common.queryUser
 import com.varabyte.kobweb.cli.common.wildcardToRegex
-import com.varabyte.kobweb.cli.create.Instruction
+import com.varabyte.kobweb.cli.create.yaml.Instruction
 import com.varabyte.kobweb.cli.create.freemarker.methods.*
 import com.varabyte.konsole.runtime.KonsoleApp
 import freemarker.cache.NullCacheStorage

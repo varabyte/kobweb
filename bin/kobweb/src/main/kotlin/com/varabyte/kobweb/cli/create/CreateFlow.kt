@@ -3,6 +3,7 @@ package com.varabyte.kobweb.cli.create
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
+import com.varabyte.kobweb.cli.create.yaml.KobwebTemplate
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.textLine
