@@ -4,7 +4,7 @@ plugins {
     application
 }
 
-group = "com.varabyte"
+group = "com.varabyte.kobweb"
 version = "1.0-SNAPSHOT"
 
 repositories {

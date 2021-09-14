@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-group = "com.varabyte"
+group = "com.varabyte.kobweb"
 version = "1.0-SNAPSHOT"
 
 // Enable JS(IR) target and add dependencies
