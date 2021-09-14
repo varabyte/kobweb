@@ -5,14 +5,14 @@ import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.cli.create.yaml.KobwebTemplate
 import com.varabyte.konsole.foundation.konsoleApp
-import com.varabyte.konsole.foundation.text.red
-import com.varabyte.konsole.foundation.text.textLine
+import com.varabyte.konsole.foundation.text.*
 import com.varabyte.konsole.runtime.KonsoleApp
 import com.varabyte.konsole.runtime.concurrent.createKey
 import org.eclipse.jgit.api.Git
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectory
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.notExists
@@ -83,4 +83,15 @@ fun runCreateFlow(template: String) = konsoleApp {
 
     val state = FreemarkerState(srcPath, dstPath, projectFolder)
     state.execute(this, kobwebTemplate.instructions)
+
+    konsole {
+        textLine()
+        green { text("Success! ") }
+        textLine("Created $projectFolder at ${Path.of(projectFolder).absolutePathString()}")
+        textLine()
+        textLine("We suggest that you begin by typing:")
+        textLine()
+        text("  "); cyan { text("cd") }; textLine(" $projectFolder")
+        text("  "); cyan { textLine("kobweb run --dev") }
+    }.run()
 }
