@@ -118,34 +118,41 @@ class FreemarkerState(private val src: Path, private val dest: Path, projectFold
                         }
                     }
 
-                    is Instruction.Keep -> {
-                        processing(inst.description ?: "Populating to final project") {
-                            val keepMatcher = inst.files.wildcardToRegex()
-                            val excludeMatcher = inst.exclude?.wildcardToRegex()
+                    is Instruction.Delete -> {
+                        processing(inst.description ?: "Deleting \"${inst.files}\"") {
+                            val deleteMatcher = inst.files.wildcardToRegex()
 
                             val srcFile = src.toFile()
-                            val filesToKeep = mutableListOf<File>()
+                            val filesToDelete = mutableListOf<File>()
                             srcFile.walkBottomUp().forEach { file ->
-                                if (file.isFile) {
-                                    val relativePath = file.toRelativeString(srcFile)
-                                    if (keepMatcher.matches(relativePath)) {
-                                        if (excludeMatcher == null || !excludeMatcher.matches(relativePath)) {
-                                            filesToKeep.add(file)
-                                        }
-                                    }
+                                val relativePath = file.toRelativeString(srcFile)
+                                if (deleteMatcher.matches(relativePath)) {
+                                    filesToDelete.add(file)
                                 }
                             }
-                            filesToKeep.forEach { fileToKeep ->
-                                val subPath = fileToKeep.parentFile.toRelativeString(srcFile)
-                                val destPath = dest.resolve(subPath)
-                                if (destPath.notExists()) {
-                                    destPath.createDirectories()
-                                }
-
-                                Files.copy(fileToKeep.toPath(), destPath.resolve(fileToKeep.name))
-                            }
+                            filesToDelete.forEach { fileToDelete -> fileToDelete.deleteRecursively() }
                         }
                     }
+                }
+            }
+
+            processing("Nearly finished. Populating final project") {
+                val srcFile = src.toFile()
+                val files = mutableListOf<File>()
+                srcFile.walkBottomUp().forEach { file ->
+                    if (file.isFile) {
+                        files.add(file)
+                    }
+                }
+
+                files.forEach { file ->
+                    val subPath = file.parentFile.toRelativeString(srcFile)
+                    val destPath = dest.resolve(subPath)
+                    if (destPath.notExists()) {
+                        destPath.createDirectories()
+                    }
+
+                    Files.copy(file.toPath(), destPath.resolve(file.name))
                 }
             }
         }

@@ -91,24 +91,19 @@ sealed class Instruction(
     }
 
     /**
-     * Mark files as those that should be kept, i.e. copied out of the source template into the final destination
-     * project. By default, this keeps everything except the kobweb.template.yaml file itself.
+     * Specify files for deletion. Directories will be deleted recursively.
      *
      * @param files The list of files to keep
-     * @param exclude Exceptions to the list of files to keep
-     * @param description An optional description to show to users, if set, instead of the default message, which
-     *   may be too detailed.
+     * @param description An optional description to show to users, if set, instead of the default message.
      */
     @Serializable
-    @SerialName("Keep")
-    class Keep(
-        val files: String = "**",
-        val exclude: String? = "kobweb.template.yaml",
+    @SerialName("Delete")
+    class Delete(
+        val files: String,
         val description: String? = null,
     ) : Instruction() {
         init {
             files.requireNoDirectoryDots()
-            exclude?.requireNoDirectoryDots()
         }
     }
 }

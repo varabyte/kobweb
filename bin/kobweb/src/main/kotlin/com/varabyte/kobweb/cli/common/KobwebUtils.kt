@@ -4,8 +4,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
 
-private val TEMPLATE_FILE = "kobweb.template.yaml"
+private val KOBWEB_TEMPLATE_FILENAME = "kobweb.template.yaml"
 
 object KobwebUtils {
-    fun getTemplateFileIn(path: Path) = Paths.get(path.toString(), TEMPLATE_FILE).takeIf { it.exists() }
+    fun getTemplateFileIn(path: Path) = Paths.get(path.toString(), KOBWEB_TEMPLATE_FILENAME).takeIf { it.exists() }
+    fun isTemplateFileIn(path: Path) = getTemplateFileIn(path) != null
 }
