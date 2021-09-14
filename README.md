@@ -41,4 +41,3 @@ $ git clone --recurse-submodules https://github.com/varabyte/kobweb
 /path/to/my/src/kobweb
 $ git submodule update --init
 ```
-
