@@ -34,7 +34,7 @@ publishing {
     addVarabyteArtifact(
         project,
         "kobweb",
-        "An opinionated framework making it easy to build web apps leveraging Kotlin and Compose",
+        "An opinionated framework making it easy to build web apps, leveraging Kotlin and Compose",
     )
 }
 
