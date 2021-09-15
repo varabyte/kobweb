@@ -12,10 +12,7 @@ import org.eclipse.jgit.api.Git
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.createDirectory
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.notExists
+import kotlin.io.path.*
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
@@ -63,6 +60,14 @@ fun runCreateFlow(template: String) = konsoleApp {
     val defaultFolderName = PathUtils.generateEmptyPathName("my-project")
     val projectFolder = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
         Validations.isFileName(answer) ?: Validations.isEmptyPath(answer)
+    }.let { answer ->
+        if (answer != ".") {
+            answer
+        }
+        else {
+            // Really wordy way to get the current directory name, phew (https://stackoverflow.com/a/15954821)
+            Path.of(".").toAbsolutePath().parent.name
+        }
     }
 
     val srcPath = templateFile.parent
