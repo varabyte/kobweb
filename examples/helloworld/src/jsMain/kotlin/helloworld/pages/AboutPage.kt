@@ -7,13 +7,12 @@ import com.varabyte.kobweb.silk.components.text.Text
 import helloworld.components.layouts.PageLayout
 import org.jetbrains.compose.web.dom.P
 
-class AboutPage : Page {
-    @Composable
-    override fun render() {
-        PageLayout("ABOUT") {
-            Text("This is a skeleton app used to showcase a basic site made using Kobweb")
-            P()
-            Link("/", "Go Home")
-        }
+@Page
+@Composable
+fun AboutPage() {
+    PageLayout("ABOUT") {
+        Text("This is a skeleton app used to showcase a basic site made using Kobweb")
+        P()
+        Link("/", "Go Home")
     }
 }

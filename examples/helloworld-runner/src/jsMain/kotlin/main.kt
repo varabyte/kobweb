@@ -6,13 +6,13 @@ import org.jetbrains.compose.web.renderComposable
 
 fun main() {
     val app = MyApp()
-    Router.register("/", HomePage())
-    Router.register("/about", AboutPage())
+    Router.register("/") { HomePage() }
+    Router.register("/about") { AboutPage() }
     Router.navigateTo("/")
 
     renderComposable(rootElementId = "root") {
         app.render {
-            Router.getActivePage().render()
+            Router.renderActivePage()
         }
     }
 }
