@@ -1,7 +1,12 @@
+import kobweb.publish.addVarabyteArtifact
+import kobweb.publish.shouldSign
+
 // Add compose gradle plugin
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    `maven-publish`
+    signing
 }
 
 group = "com.varabyte.kobweb"
@@ -19,11 +24,27 @@ kotlin {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
 
-                implementation(project(":lib:core"))
-                implementation(project(":lib:compose-ext"))
-                implementation(project(":lib:ui"))
+                implementation(project(":lib:web-compose-ext"))
+                implementation(project(":lib:kobweb"))
+                implementation(project(":lib:kobweb-silk"))
             }
         }
+    }
+}
+
+publishing {
+    addVarabyteArtifact(
+        project,
+        "kobweb-silk-icons-fa",
+        "A collection of Kobweb Silk components that directly wrap Font Awesome icons",
+    )
+}
+
+if (shouldSign()) {
+    signing {
+        // Signing requires following steps at https://docs.gradle.org/current/userguide/signing_plugin.html#sec:signatory_credentials
+        // and adding singatory properties somewhere reachable, e.g. ~/.gradle/gradle.properties
+        sign(publishing.publications)
     }
 }
 

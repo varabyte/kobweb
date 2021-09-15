@@ -9,11 +9,10 @@ enableFeaturePreview("VERSION_CATALOGS")
 rootProject.name = "kobweb"
 
 include(":bin:kobweb")
-include(":lib:core")
-include(":lib:ui")
-include(":lib:ui-icons-fa")
-include(":lib:compose-ext")
+include(":lib:kobweb")
+include(":lib:kobweb-silk")
+include(":lib:kobweb-silk-icons-fa")
+include(":lib:web-compose-ext")
 include(":lib:plugins:markdown")
 include(":examples:helloworld")
 include(":examples:helloworld-runner")
-

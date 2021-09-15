@@ -18,9 +18,10 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
 
-                implementation(project(":lib:core"))
-                implementation(project(":lib:ui"))
-                implementation(project(":lib:ui-icons-fa"))
+                implementation(project(":lib:web-compose-ext"))
+                implementation(project(":lib:kobweb"))
+                implementation(project(":lib:kobweb-silk"))
+                implementation(project(":lib:kobweb-silk-icons-fa"))
             }
         }
     }
