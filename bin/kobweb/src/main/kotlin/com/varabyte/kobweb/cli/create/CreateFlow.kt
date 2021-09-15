@@ -12,7 +12,9 @@ import org.eclipse.jgit.api.Git
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.name
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
@@ -58,20 +60,12 @@ fun runCreateFlow(template: String) = konsoleApp {
     }
 
     val defaultFolderName = PathUtils.generateEmptyPathName("my-project")
-    val projectFolder = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
+    val dstPath = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
         Validations.isFileName(answer) ?: Validations.isEmptyPath(answer)
     }.let { answer ->
-        if (answer != ".") {
-            answer
-        }
-        else {
-            // Really wordy way to get the current directory name, phew (https://stackoverflow.com/a/15954821)
-            Path.of(".").toAbsolutePath().parent.name
-        }
+        Path.of(if (answer != ".") answer else "").toAbsolutePath()
     }
-
     val srcPath = templateFile.parent
-    val dstPath = Path.of(projectFolder).also { if (it.notExists()) { it.createDirectory() } }
 
     val kobwebTemplate = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
     // Template almost ready to be processed - remove all files that should NEVER end up in the final project
@@ -86,17 +80,20 @@ fun runCreateFlow(template: String) = konsoleApp {
         subTemplates.forEach { subTemplate -> subTemplate.deleteRecursively() }
     }
 
-    val state = FreemarkerState(srcPath, dstPath, projectFolder)
+    val state = FreemarkerState(srcPath, dstPath)
     state.execute(this, kobwebTemplate.instructions)
 
     konsole {
+        val projectFolder = dstPath.name
         textLine()
         green { text("Success! ") }
-        textLine("Created $projectFolder at ${Path.of(projectFolder).absolutePathString()}")
+        textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
         textLine()
         textLine("We suggest that you begin by typing:")
         textLine()
-        text("  "); cyan { text("cd") }; textLine(" $projectFolder")
+        if (dstPath != Path.of("").toAbsolutePath()) {
+            text("  "); cyan { text("cd") }; textLine(" $projectFolder")
+        }
         text("  "); cyan { textLine("kobweb run --dev") }
     }.run()
 }

@@ -17,6 +17,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.name
 import kotlin.io.path.notExists
 
 private fun String.process(cfg: Configuration, model: Map<String, Any>): String {
@@ -26,9 +27,9 @@ private fun String.process(cfg: Configuration, model: Map<String, Any>): String 
     return writer.buffer.toString()
 }
 
-class FreemarkerState(private val src: Path, private val dest: Path, projectFolder: String) {
-    private val model = mutableMapOf<String, Any>(
-        "projectFolder" to projectFolder,
+class FreemarkerState(private val src: Path, private val dest: Path) {
+    private val model = mutableMapOf(
+        "projectFolder" to dest.name,
 
         "isNotEmpty" to IsNotEmptyMethod(),
         "isPackage" to IsPackageMethod(),
