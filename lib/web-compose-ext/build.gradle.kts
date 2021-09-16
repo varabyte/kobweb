@@ -1,5 +1,5 @@
-import kobweb.publish.addVarabyteArtifact
-import kobweb.publish.shouldSign
+import com.varabyte.kobweb.plugins.publish.addVarabyteArtifact
+import com.varabyte.kobweb.plugins.publish.shouldSign
 
 // Add compose gradle plugin
 plugins {
