@@ -23,6 +23,14 @@ fun MavenArtifactRepository.gcloudAuth(project: Project) {
     }
 }
 
+private fun artifactSuffix(name: String): String {
+    return when(name) {
+        // For multiplatform targets, append them, so e.g. "kobweb" becomes "kobweb-js"
+        "js", "jvm" -> "-${name}"
+        else -> ""
+    }
+}
+
 fun PublishingExtension.addVarabyteArtifact(
     project: Project,
     artifactId: String,
@@ -36,8 +44,7 @@ fun PublishingExtension.addVarabyteArtifact(
     }
 
     publications.withType(MavenPublication::class.java) {
-        // name is something like "jvm" or "js", and "kotlinMultiplatform" for common code
-        this.artifactId = artifactId + if (name != "kotlinMultiplatform") "-${name}" else ""
+        this.artifactId = artifactId + artifactSuffix(name)
         pom {
             this.description.set(description)
             url.set(site)
