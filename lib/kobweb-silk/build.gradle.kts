@@ -1,12 +1,8 @@
-import com.varabyte.kobweb.plugins.publish.addVarabyteArtifact
-import com.varabyte.kobweb.plugins.publish.shouldSign
-
 // Add compose gradle plugin
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
-    `maven-publish`
-    signing
+    id("com.varabyte.kobweb.publish")
 }
 
 group = "com.varabyte.kobweb"
@@ -31,18 +27,7 @@ kotlin {
     }
 }
 
-publishing {
-    addVarabyteArtifact(
-        project,
-        "kobweb-silk",
-        "A set of rich UI components built on top of Kobweb and inspired by the best parts of Compose and Chakra UI",
-    )
-}
-
-if (shouldSign()) {
-    signing {
-        // Signing requires following steps at https://docs.gradle.org/current/userguide/signing_plugin.html#sec:signatory_credentials
-        // and adding singatory properties somewhere reachable, e.g. ~/.gradle/gradle.properties
-        sign(publishing.publications)
-    }
+kobwebPublication {
+    artifactId.set("kobweb-silk")
+    description.set("A set of rich UI components built on top of Kobweb and inspired by the best parts of Compose and Chakra UI")
 }

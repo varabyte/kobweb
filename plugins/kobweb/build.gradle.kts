@@ -1,12 +1,8 @@
-import com.varabyte.kobweb.plugins.publish.addVarabyteArtifact
-import com.varabyte.kobweb.plugins.publish.shouldSign
-
 plugins {
     id("com.google.devtools.ksp")
     kotlin("jvm")
+    id("com.varabyte.kobweb.publish")
     `java-gradle-plugin`
-    `maven-publish`
-    signing
 }
 
 group = "com.varabyte.kobweb.gradle"
@@ -36,22 +32,10 @@ gradlePlugin {
     }
 }
 
-publishing {
-    addVarabyteArtifact(
-        project,
-        "kobweb",
-        DESCRIPTION,
-    )
+kobwebPublication {
+    artifactId.set("kobweb")
+    description.set(DESCRIPTION)
 }
-
-if (shouldSign()) {
-    signing {
-        // Signing requires following steps at https://docs.gradle.org/current/userguide/signing_plugin.html#sec:signatory_credentials
-        // and adding singatory properties somewhere reachable, e.g. ~/.gradle/gradle.properties
-        sign(publishing.publications)
-    }
-}
-
 
 inline val PluginDependenciesSpec.`kobweb-plugin`: PluginDependencySpec
     get() = id("com.varabyte.kobweb")

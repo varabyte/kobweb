@@ -1,18 +1,21 @@
 package com.varabyte.kobweb.plugins.publish
 
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.http.BasicAuthentication
+import org.gradle.plugins.signing.SigningExtension
 
-fun Project.shouldSign() = (findProperty("kobweb.sign") as? String).toBoolean()
-fun Project.shouldPublishToGCloud(): Boolean {
+internal fun Project.shouldSign() = (findProperty("kobweb.sign") as? String).toBoolean()
+internal fun Project.shouldPublishToGCloud(): Boolean {
     return (findProperty("kobweb.gcloud.publish") as? String).toBoolean()
             && findProperty("gcloud.artifact.registry.secret") != null
 }
 
-fun MavenArtifactRepository.gcloudAuth(project: Project) {
+internal fun MavenArtifactRepository.gcloudAuth(project: Project) {
     url = project.uri("https://us-central1-maven.pkg.dev/varabyte-repos/public")
     credentials {
         username = "_json_key_base64"
@@ -31,13 +34,13 @@ private fun artifactSuffix(name: String): String {
     }
 }
 
-fun PublishingExtension.addVarabyteArtifact(
+internal fun PublishingExtension.addVarabyteArtifact(
     project: Project,
     artifactId: String,
     description: String,
-    site: String = "https://github.com/varabyte/kobweb",
+    site: String,
 ) {
-    if (project.shouldPublishToGCloud()) {
+    if (project.shouldSign() && project.shouldPublishToGCloud()) {
         repositories {
             maven { gcloudAuth(project) }
         }
@@ -54,6 +57,34 @@ fun PublishingExtension.addVarabyteArtifact(
                     url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
                 }
             }
+        }
+    }
+}
+
+private val Project.publishing: PublishingExtension get() =
+    (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
+
+private fun Project.publishing(configure: Action<PublishingExtension>): Unit =
+    (this as ExtensionAware).extensions.configure("publishing", configure)
+
+private fun Project.signing(configure: Action<SigningExtension>): Unit =
+    (this as ExtensionAware).extensions.configure("signing", configure)
+
+internal fun Project.configurePublishing(extension: KobwebPublicationExtension) {
+    publishing {
+        addVarabyteArtifact(
+            project,
+            extension.artifactId.get(),
+            extension.description.get(),
+            extension.site.get(),
+        )
+    }
+
+    if (shouldSign()) {
+        signing {
+            // Signing requires following steps at https://docs.gradle.org/current/userguide/signing_plugin.html#sec:signatory_credentials
+            // and adding singatory properties somewhere reachable, e.g. ~/.gradle/gradle.properties
+            sign(publishing.publications)
         }
     }
 }
