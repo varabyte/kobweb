@@ -1,10 +1,13 @@
 plugins {
     val kotlinVersion = "1.5.30"
     val composeVersion = "1.0.0-alpha4-build331"
+    val kspVersion = "1.5.30-1.0.0"
     kotlin("multiplatform") version kotlinVersion apply false
     kotlin("jvm") version kotlinVersion apply false
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("org.jetbrains.compose") version composeVersion apply false
+    id("com.google.devtools.ksp") version kspVersion apply false
+
 }
 
 subprojects {
