@@ -5,9 +5,35 @@ import com.varabyte.kobweb.compose.css.transitionDuration
 import com.varabyte.kobweb.compose.css.transitionProperty
 import org.jetbrains.compose.web.css.*
 
-interface App {
-    @Composable
-    fun render(content: @Composable () -> Unit)
+/**
+ * An annotation which identifies a [Composable] function as one which will be used as the root skeleton for every
+ * page.
+ *
+ * The method should take a `content: @Composable () -> Unit` parameter.
+ *
+ * If no method is annotated `@App` then [DefaultApp] will be used. Of course, your own custom app method can compose
+ * that function if it wishes:
+ *
+ * ```
+ * @App
+ * @Composable
+ * fun MyApp(content: @Composable () -> Unit) {
+ *   DefaultApp {
+ *     // My own extra initialization
+ *     content()
+ *   }
+ * }
+ * ```
+ *
+ * Finally, there must either be no methods or just a single method marked with this annotation. If Kobweb encounters
+ * more than one App annotation, it will log an error and discard duplicates arbitrarily.
+ */
+annotation class App
+
+@Composable
+fun DefaultApp(content: @Composable () -> Unit) {
+    Style(DefaultStyleSheet)
+    content()
 }
 
 object DefaultStyleSheet : StyleSheet() {
@@ -26,13 +52,5 @@ object DefaultStyleSheet : StyleSheet() {
             transitionProperty("background-color", "color")
             transitionDuration(200.ms)
         }
-    }
-}
-
-object DefaultApp : App {
-    @Composable
-    override fun render(content: @Composable () -> Unit) {
-        Style(DefaultStyleSheet)
-        content()
     }
 }

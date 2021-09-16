@@ -14,21 +14,21 @@ import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 
-class MyApp : App by DefaultApp {
-    @Composable
-    override fun render(content: @Composable () -> Unit) {
-        DefaultApp.render {
-            val colorMode by rememberColorMode()
-            SilkTheme(DEFAULT_PALETTES[colorMode]) {
-                Div({
-                    style {
-                        height(100.vh)
-                        width(100.vw)
-                    }
-                }) {
-                    Surface {
-                        content()
-                    }
+
+@App
+@Composable
+fun MyApp(content: @Composable () -> Unit) {
+    DefaultApp {
+        val colorMode by rememberColorMode()
+        SilkTheme(DEFAULT_PALETTES[colorMode]) {
+            Div({
+                style {
+                    height(100.vh)
+                    width(100.vw)
+                }
+            }) {
+                Surface {
+                    content()
                 }
             }
         }
