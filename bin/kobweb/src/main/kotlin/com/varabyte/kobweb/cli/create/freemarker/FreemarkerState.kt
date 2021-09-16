@@ -105,17 +105,13 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
                                     filesToMove.add(file)
                                 }
                             }
-                            val destRoot = src.resolve(to)
-                            if (destRoot.isRegularFile()) {
+                            val destPath = src.resolve(to)
+                            if (destPath.notExists()) {
+                                destPath.createDirectories()
+                            } else if (destPath.isRegularFile()) {
                                 throw KobwebException("Cannot move files into target that isn't a directory")
                             }
                             filesToMove.forEach { fileToMove ->
-                                val subPath = fileToMove.parentFile.toRelativeString(srcFile)
-                                val destPath = destRoot.resolve(subPath)
-                                if (destPath.notExists()) {
-                                    destPath.createDirectories()
-                                }
-
                                 Files.move(fileToMove.toPath(), destPath.resolve(fileToMove.name))
                             }
                         }
