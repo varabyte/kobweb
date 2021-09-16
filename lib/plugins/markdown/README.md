@@ -1,1 +1,0 @@
-Support for loading Markdown resources and creating pages from them.
