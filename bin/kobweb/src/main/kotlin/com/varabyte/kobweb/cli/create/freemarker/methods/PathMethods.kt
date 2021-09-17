@@ -3,7 +3,7 @@ package com.varabyte.kobweb.cli.create.freemarker.methods
 import com.varabyte.kobweb.cli.common.Validations
 import java.util.*
 
-class FileToNameMethod : SingleArgMethodModel() {
+class FileToTitleMethod : SingleArgMethodModel() {
     override fun handleArgument(value: String): String {
         return value
             .split(Regex("""[^\w]"""))

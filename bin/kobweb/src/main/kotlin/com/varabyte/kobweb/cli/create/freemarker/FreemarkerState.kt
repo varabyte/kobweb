@@ -31,10 +31,12 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
     private val model = mutableMapOf(
         "projectFolder" to dest.name,
 
+        // region Validators
         "isNotEmpty" to IsNotEmptyMethod(),
         "isPackage" to IsPackageMethod(),
+        // endregion
 
-        "fileToName" to FileToNameMethod(),
+        "fileToTitle" to FileToTitleMethod(),
         "fileToPackage" to FileToPackageMethod(),
         "packageToPath" to PackageToPathMethod(),
     )

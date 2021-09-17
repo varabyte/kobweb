@@ -40,7 +40,8 @@ sealed class Instruction(
      * @param prompt The prompt to show the user.
      * @param default The default value to use if nothing is typed. This value will be processed by freemarker and can
      *   be dynamic!
-     * @param validation One of a set of built in Kobweb validators. See [FreemarkerState.model] for the list.
+     * @param validation One of a set of built in Kobweb validators. See the "Validators" region inside
+     *   [FreemarkerState.model] for the list.
      */
     @Serializable
     @SerialName("QueryVar")
