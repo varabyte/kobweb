@@ -1,3 +1,5 @@
+// Plugins declared here instead of settings.gradle.kts because otherwise I get an error saying the kotlin plugin was
+// applied multiple times.
 plugins {
     val kotlinVersion = "1.5.30"
     val composeVersion = "1.0.0-alpha4-build331"
@@ -7,7 +9,6 @@ plugins {
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("org.jetbrains.compose") version composeVersion apply false
     id("com.google.devtools.ksp") version kspVersion apply false
-
 }
 
 subprojects {
