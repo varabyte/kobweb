@@ -12,12 +12,16 @@ import java.io.File
 @Suppress("unused")
 class KobwebPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.tasks.register("kobwebGen", KobwebGenerateTask::class.java) {
+        val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java) {
             configFile.set(File(project.projectDir, "kobweb.conf.yaml"))
             genDir.set(File(project.projectDir, GENERATED_ROOT))
         }
 
         project.afterEvaluate {
+            project.tasks.named("compileKotlinJs") {
+                dependsOn(kobwebGenTask)
+            }
+
             project.kotlin {
                 sourceSets {
                     @Suppress("UNUSED_VARIABLE") // jsMain name is necessary for "getting"

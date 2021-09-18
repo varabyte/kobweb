@@ -57,7 +57,7 @@ private class PageEntry(
     val route: String,
 )
 
-abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb webserver code for the current project") {
+abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb code and resources") {
     @get:InputFile
     abstract val configFile: Property<File>
 
