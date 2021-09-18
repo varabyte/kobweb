@@ -66,7 +66,8 @@ fun KonsoleApp.queryUser(
     konsole {
         cyan { text('?') }
         text(' ')
-        bold { text("$query ") }
+        bold { textLine("$query ") }
+        text("> ")
         if (answer.isNotEmpty()) {
             textLine(answer)
         }
@@ -81,6 +82,7 @@ fun KonsoleApp.queryUser(
                 }
             }
         }
+        textLine()
     }.runUntilInputEntered {
         lateinit var possibleAnswer: String
         fun validateInput(input: String) {
