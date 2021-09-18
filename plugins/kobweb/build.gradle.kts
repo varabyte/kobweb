@@ -1,7 +1,8 @@
 plugins {
-    id("com.google.devtools.ksp")
+    `kotlin-dsl`
     kotlin("jvm")
     id("com.varabyte.kobweb.publish")
+    kotlin("plugin.serialization")
     `java-gradle-plugin`
 }
 
@@ -14,8 +15,10 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    // For processing the user's project
-    implementation(libs.ksp)
+    // Get access to Kotlin multiplatform source sets
+    implementation(kotlin("gradle-plugin"))
+    // For parsing code. Instead, use KSP someday? See also: Bug #4
+    implementation(kotlin("compiler-embeddable"))
     // For kobweb.conf.yaml
     implementation(libs.kaml)
 }

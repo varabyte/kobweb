@@ -1,0 +1,5 @@
+site:
+  title: "Hello World"
+
+server:
+  port: 8080
