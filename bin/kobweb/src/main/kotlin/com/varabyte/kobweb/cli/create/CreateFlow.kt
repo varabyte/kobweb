@@ -95,5 +95,6 @@ fun runCreateFlow(template: String) = konsoleApp {
             text("  "); cyan { text("cd") }; textLine(" $projectFolder")
         }
         text("  "); cyan { textLine("kobweb run --dev") }
+        textLine()
     }.run()
 }
