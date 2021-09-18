@@ -36,9 +36,9 @@ private val kotlinProject by lazy {
     ).project
 }
 
-private fun PsiElement.visitAllChildren(indent: String = "", visit: (PsiElement, String) -> Unit) {
-    visit(this, indent)
-    children.forEach { it.visitAllChildren("$indent  ", visit) }
+private fun PsiElement.visitAllChildren(visit: (PsiElement) -> Unit) {
+    visit(this)
+    children.forEach { it.visitAllChildren(visit) }
 }
 
 private fun File.isDescendantOf(maybeAncestor: File): Boolean {
@@ -109,7 +109,7 @@ abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb webserver code f
             var currPackage = ""
             var pageSimpleName = PAGE_SIMPLE_NAME
             var appSimpleName = APP_SIMPLE_NAME
-            ktFile.visitAllChildren { element, indent ->
+            ktFile.visitAllChildren { element->
                 when (element) {
                     is KtPackageDirective -> {
                         currPackage = element.fqName.asString()
