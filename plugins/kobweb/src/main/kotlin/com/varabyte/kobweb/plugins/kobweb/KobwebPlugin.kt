@@ -21,6 +21,9 @@ class KobwebPlugin : Plugin<Project> {
             project.tasks.named("compileKotlinJs") {
                 dependsOn(kobwebGenTask)
             }
+            project.tasks.named("jsProcessResources") {
+                dependsOn(kobwebGenTask)
+            }
 
             project.kotlin {
                 sourceSets {
