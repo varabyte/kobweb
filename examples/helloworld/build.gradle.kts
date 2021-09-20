@@ -1,7 +1,15 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven("https://us-central1-maven.pkg.dev/varabyte-repos/public")
+    }
+}
+
 // Add compose gradle plugin
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("com.varabyte.kobweb")
 }
 
 group = "helloworld"
