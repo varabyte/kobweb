@@ -65,7 +65,7 @@ fun runCreate(template: String) = konsoleApp {
     }.let { answer ->
         Path.of(if (answer != ".") answer else "").toAbsolutePath()
     }
-    val srcPath = templateFile.parent
+    val srcPath = KobwebUtils.getTemplateRoot(templateFile)
 
     val kobwebTemplate = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
     // Template almost ready to be processed - remove all files that should NEVER end up in the final project

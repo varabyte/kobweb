@@ -13,7 +13,7 @@ import java.io.File
 class KobwebPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java) {
-            configFile.set(File(project.projectDir, "kobweb.conf.yaml"))
+            configFile.set(File(project.projectDir, ".kobweb/conf.yaml"))
             genDir.set(File(project.projectDir, GENERATED_ROOT))
         }
 
