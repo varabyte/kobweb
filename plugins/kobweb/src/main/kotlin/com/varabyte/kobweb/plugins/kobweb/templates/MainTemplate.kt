@@ -4,6 +4,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, de
     val imports = mutableListOf(
         "com.varabyte.kobweb.core.Router",
         "org.jetbrains.compose.web.renderComposable",
+        "kotlinx.browser.document",
     )
     imports.add(appFqcn ?: "com.varabyte.kobweb.core.DefaultApp")
     imports.addAll(pageFqcnRoutes.keys)
@@ -25,6 +26,14 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, de
             }
         }
             Router.navigateTo("$defaultRoute")
+
+            // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them the first
+            // time we render this page with their composable, dynamic versions. Think of this as poor man's
+            // hydration :) See also: https://en.wikipedia.org/wiki/Hydration_(web_development)
+            val root = document.getElementById("root")!!
+            while (root.firstChild != null) {
+                root.removeChild(root.firstChild!!)
+            }
 
             renderComposable(rootElementId = "root") {
                 ${appFqcn?.let { appFqcn.substringAfterLast('.') } ?: "DefaultApp"} {
