@@ -22,5 +22,6 @@ dependencies {
 }
 
 application {
+    applicationDefaultJvmArgs = listOf("-Dkobweb.version=${version}")
     mainClass.set("MainKt")
 }

@@ -1,4 +1,5 @@
 import com.varabyte.kobweb.cli.create.runCreateFlow
+import com.varabyte.kobweb.cli.version.runVersion
 import kotlinx.cli.*
 
 enum class RunEnvironment {
@@ -9,6 +10,12 @@ enum class RunEnvironment {
 @ExperimentalCli
 fun main(args: Array<String>) {
     val parser = ArgParser("kobweb")
+
+    class Version : Subcommand("version", "Print the version of this binary") {
+        override fun execute() {
+            runVersion()
+        }
+    }
 
     class Create : Subcommand("create", "Create a Kobweb app / site") {
         val template by argument(ArgType.String, "template", "The name of the template to start from, e.g. 'site'")
@@ -27,6 +34,6 @@ fun main(args: Array<String>) {
         }
     }
 
-    parser.subcommands(Create(), Run())
+    parser.subcommands(Version(), Create(), Run())
     parser.parse(args.takeIf { it.isNotEmpty() } ?: arrayOf("-h"))
 }
