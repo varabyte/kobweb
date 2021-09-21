@@ -89,6 +89,40 @@ abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb code and resourc
     @InputFiles
     fun getResourceFiles(): List<File> = getFiles { sourceSet -> sourceSet.resources }.toList()
 
+    /**
+     * The root package of all pages.
+     *
+     * Any composable function not under this root will be ignored, even if annotated by @Page.
+     *
+     * An initial '.' means this should be prefixed by the project group, e.g. ".pages" -> "com.example.pages"
+     */
+    @get:Input
+    abstract val pagesPackage: Property<String>
+
+    /**
+     * The path of public resources inside the project's resources folder, e.g. "public" ->
+     * "src/jsMain/resources/public"
+     */
+    @get:Input
+    abstract val publicPath: Property<String>
+
+    init {
+        pagesPackage.convention(".pages")
+        publicPath.convention("public")
+    }
+
+    private fun getPagesPackage(projectGroup: String): String {
+        return pagesPackage.get().let { pages ->
+            when {
+                pages.startsWith('.') -> "$projectGroup$pages"
+                else -> pages
+            }
+        }
+    }
+
+    private fun getPublicPath(resourcesDir: File) = resourcesDir.resolve(publicPath.get())
+
+
     @TaskAction
     fun execute() {
         val configFile = configFile.get()
@@ -140,7 +174,7 @@ abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb code and resourc
                                     }
                                 }
                                 pageSimpleName -> {
-                                    val pagesPackage = conf.locations.getPagesPackage(project.group.toString())
+                                    val pagesPackage = getPagesPackage(project.group.toString())
                                     if (currPackage.startsWith(pagesPackage)) {
                                         // e.g. com.example.pages.blog -> blog
                                         val slugPrefix = currPackage
