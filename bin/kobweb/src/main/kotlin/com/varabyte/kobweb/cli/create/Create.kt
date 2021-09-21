@@ -94,7 +94,7 @@ fun runCreate(template: String) = konsoleApp {
         if (dstPath != Path.of("").toAbsolutePath()) {
             text("  "); cyan { text("cd") }; textLine(" $projectFolder")
         }
-        text("  "); cyan { textLine("kobweb run --dev") }
+        text("  "); cyan { textLine("./gradlew jsRun --continuous") }
         textLine()
     }.run()
 }
