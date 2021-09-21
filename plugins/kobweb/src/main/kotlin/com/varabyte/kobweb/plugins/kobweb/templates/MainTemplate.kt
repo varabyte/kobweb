@@ -1,10 +1,11 @@
 package com.varabyte.kobweb.plugins.kobweb.templates
 
-fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, defaultRoute: String): String {
+fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): String {
     val imports = mutableListOf(
         "com.varabyte.kobweb.core.Router",
         "org.jetbrains.compose.web.renderComposable",
         "kotlinx.browser.document",
+        "kotlinx.browser.window",
     )
     imports.add(appFqcn ?: "com.varabyte.kobweb.core.DefaultApp")
     imports.addAll(pageFqcnRoutes.keys)
@@ -25,7 +26,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, de
                 """Router.register("$route") { ${pageFqcn.substringAfterLast('.')}() }"""
             }
         }
-            Router.navigateTo("$defaultRoute")
+            Router.navigateTo(window.location.pathname)
 
             // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them the first
             // time we render this page with their composable, dynamic versions. Think of this as poor man's

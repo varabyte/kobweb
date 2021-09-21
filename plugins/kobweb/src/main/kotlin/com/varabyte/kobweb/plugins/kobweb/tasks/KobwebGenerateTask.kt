@@ -209,8 +209,7 @@ abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb code and resourc
                     .associate { it.fqcn to it.route }
                     .toList()
                     .sortedBy { (_, route) -> route }
-                    .toMap(),
-                "/"
+                    .toMap()
             )
         )
 
