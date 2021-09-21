@@ -1,4 +1,4 @@
-import com.varabyte.kobweb.cli.create.runCreateFlow
+import com.varabyte.kobweb.cli.create.runCreate
 import com.varabyte.kobweb.cli.version.runVersion
 import kotlinx.cli.*
 
@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
         val template by argument(ArgType.String, "template", "The name of the template to start from, e.g. 'site'")
 
         override fun execute() {
-            runCreateFlow(template)
+            runCreate(template)
         }
     }
 
