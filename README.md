@@ -22,7 +22,7 @@ receive except to 1) respond to any questions asked or 2) ping when the status o
 This section will be fleshed out more in the future. For now, to see what we have so far, run:
 
 ```bash
-$ ./gradlew :examples:helloworld-runner:jsBrowserRun
+$ ./gradlew :examples:helloworld:jsBrowserRun
 ```
 
 This demo on its own undersells the experience, which is more about incrementally developing a Kotlin web app with a
