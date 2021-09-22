@@ -2,20 +2,18 @@ package com.varabyte.kobweb.plugins.kobweb
 
 import com.varabyte.kobweb.plugins.kobweb.kmp.kotlin
 import com.varabyte.kobweb.plugins.kobweb.kmp.sourceSets
+import com.varabyte.kobweb.plugins.kobweb.extensions.KobwebConfig
 import com.varabyte.kobweb.plugins.kobweb.tasks.KobwebGenerateTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
-import java.io.File
 
 @Suppress("unused")
 class KobwebPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java) {
-            configFile.set(File(project.projectDir, ".kobweb/conf.yaml"))
-            genDir.set(File(project.projectDir, GENERATED_ROOT))
-        }
+        val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
+        val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
 
         project.afterEvaluate {
             project.tasks.named("compileKotlinJs") {

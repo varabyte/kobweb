@@ -1,14 +1,16 @@
+@file:Suppress("LeakingThis") // Following official Gradle guidance
+
 package com.varabyte.kobweb.plugins.kobweb.tasks
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.plugins.kobweb.*
 import com.varabyte.kobweb.plugins.kobweb.conf.KobwebConf
-import com.varabyte.kobweb.plugins.kobweb.kmp.kotlin
+import com.varabyte.kobweb.plugins.kobweb.extensions.KobwebConfig
 import com.varabyte.kobweb.plugins.kobweb.templates.createHtmlFile
 import com.varabyte.kobweb.plugins.kobweb.templates.createMainFunction
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
@@ -18,13 +20,13 @@ import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
 import java.io.File
+import javax.inject.Inject
 
 // Note to be confused with a Gradle project, this is an IntelliJ project which will allow us to scan a parsed file's
 // contents.
@@ -41,53 +43,23 @@ private fun PsiElement.visitAllChildren(visit: (PsiElement) -> Unit) {
     children.forEach { it.visitAllChildren(visit) }
 }
 
-private fun File.isDescendantOf(maybeAncestor: File): Boolean {
-    var curr: File? = this
-    while (curr != null) {
-        if (curr == maybeAncestor) {
-            return true
-        }
-        curr = curr.parentFile
-    }
-    return false
-}
-
 private class PageEntry(
     val fqcn: String,
     val route: String,
 )
 
-abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb code and resources") {
+abstract class KobwebGenerateTask @Inject constructor(private val config: KobwebConfig) : KobwebTask("Generate Kobweb code and resources") {
     @get:InputFile
-    abstract val configFile: Property<File>
+    abstract val confFile: RegularFileProperty
 
     @get:OutputDirectory
     abstract val genDir: DirectoryProperty
 
-    private fun getFiles(rootDirProducer: (KotlinSourceSet) -> FileCollection): Sequence<File> {
-        val genDirFile = genDir.get().asFile
-
-        return project.kotlin.sourceSets.asSequence()
-            .filter { sourceSet -> sourceSet.name == "jsMain" }
-            .flatMap { sourceSet ->
-                rootDirProducer(sourceSet)
-                    .filter { rootDir -> !rootDir.isDescendantOf(genDirFile) }
-                    .flatMap { rootDir ->
-                        rootDir.walkBottomUp().filter { it.isFile }
-                    }
-            }
-
-    }
+    @InputFiles
+    fun getSourceFiles() = config.getSourceFiles(project)
 
     @InputFiles
-    fun getSourceFiles(): List<File> {
-        return getFiles { sourceSet -> sourceSet.kotlin.sourceDirectories }
-            .filter { it.extension == "kt" }
-            .toList()
-    }
-
-    @InputFiles
-    fun getResourceFiles(): List<File> = getFiles { sourceSet -> sourceSet.resources }.toList()
+    fun getResourceFiles(): List<File> = config.getResourceFiles(project)
 
     /**
      * The root package of all pages.
@@ -107,6 +79,8 @@ abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb code and resourc
     abstract val publicPath: Property<String>
 
     init {
+        confFile.convention(project.layout.projectDirectory.file(config.confFile.get()))
+        genDir.convention(project.layout.buildDirectory.dir(config.genDir.get()))
         pagesPackage.convention(".pages")
         publicPath.convention("public")
     }
@@ -125,12 +99,12 @@ abstract class KobwebGenerateTask : KobwebTask("Generate Kobweb code and resourc
 
     @TaskAction
     fun execute() {
-        val configFile = configFile.get()
-        if (!configFile.exists()) {
-            throw GradleException("A Kobweb project must have a \"${configFile.name}\" file in its root directory")
+        val confFile = confFile.get().asFile
+        if (!confFile.exists()) {
+            throw GradleException("A Kobweb project must have a \"${confFile.name}\" file in its root directory")
         }
 
-        val conf = Yaml.default.decodeFromString(KobwebConf.serializer(), configFile.readText())
+        val conf = Yaml.default.decodeFromString(KobwebConf.serializer(), confFile.readText())
 
         // For now, we're directly parsing Kotlin code using the embedded Kotlin compiler. This is a temporary approach.
         // In the future, this should use KSP to navigate through source files. See also: Bug #4
