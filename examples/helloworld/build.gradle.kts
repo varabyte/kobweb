@@ -1,19 +1,16 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        maven("https://us-central1-maven.pkg.dev/varabyte-repos/public")
-    }
-}
-
-// Add compose gradle plugin
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    kotlin("multiplatform") version "1.5.30"
+    id("org.jetbrains.compose") version "1.0.0-alpha4-build331"
     id("com.varabyte.kobweb.application")
 }
 
 group = "helloworld"
 version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
 
 // Enable JS(IR) target and add dependencies
 kotlin {
@@ -26,10 +23,10 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
 
-                implementation(project(":lib:web-compose-ext"))
-                implementation(project(":lib:kobweb"))
-                implementation(project(":lib:kobweb-silk"))
-                implementation(project(":lib:kobweb-silk-icons-fa"))
+                implementation("com.varabyte.kobweb:web-compose-ext")
+                implementation("com.varabyte.kobweb:kobweb")
+                implementation("com.varabyte.kobweb:kobweb-silk")
+                implementation("com.varabyte.kobweb:kobweb-silk-icons-fa")
             }
         }
     }

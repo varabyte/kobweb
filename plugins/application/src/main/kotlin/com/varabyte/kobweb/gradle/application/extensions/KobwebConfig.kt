@@ -57,7 +57,7 @@ abstract class KobwebConfig {
     }
 
     private fun getFiles(project: Project, rootDirProducer: (KotlinSourceSet) -> FileCollection): Sequence<File> {
-        val genDirFile = project.projectDir.resolve(genDir.get())
+        val genDirFile = project.layout.buildDirectory.asFile.get().resolve(genDir.get())
 
         return project.kotlin.sourceSets.asSequence()
             .filter { sourceSet -> sourceSet.name == "jsMain" }

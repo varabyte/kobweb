@@ -28,8 +28,8 @@ class KobwebApplicationPlugin : Plugin<Project> {
                 sourceSets {
                     @Suppress("UNUSED_VARIABLE") // jsMain name is necessary for "getting"
                     val jsMain by getting {
-                        kotlin.srcDir("$GENERATED_ROOT$SRC_SUFFIX")
-                        resources.srcDir("$GENERATED_ROOT$RESOURCE_SUFFIX")
+                        kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$SRC_SUFFIX"))
+                        resources.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$RESOURCE_SUFFIX"))
                     }
                 }
             }
