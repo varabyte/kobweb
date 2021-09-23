@@ -22,13 +22,12 @@ fun runCreate(template: String) = konsoleApp {
     val repo = "https://github.com/varabyte/kobweb-templates"
     val tempDir = Files.createTempDirectory("kobweb").toFile()
     data.set(TempDirKey, tempDir, dispose = { tempDir.deleteRecursively() })
-    if (processing("Cloning \"$repo\"") {
+    if (!processing("Cloning \"$repo\"") {
             Git.cloneRepository()
                 .setURI(repo)
                 .setDirectory(tempDir)
                 .call()
         }) {
-    } else {
         konsole {
             red {
                 textLine("We were unable to fetch templates. Please check the repository path and your internet connection.")
