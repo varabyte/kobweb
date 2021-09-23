@@ -3,6 +3,9 @@ plugins {
     `java-gradle-plugin`
 }
 
+group = "com.varabyte.kobweb.gradle"
+version = "1.0.0-SNAPSHOT"
+
 repositories {
     mavenCentral()
 }
@@ -10,8 +13,8 @@ repositories {
 gradlePlugin {
     plugins {
         create("publishKobwebArtifact") {
-            id = "com.varabyte.kobweb.publish"
-            implementationClass = "com.varabyte.kobweb.plugins.publish.KobwebPublishPlugin"
+            id = "com.varabyte.kobweb.internal.publish"
+            implementationClass = "com.varabyte.kobweb.gradle.publish.KobwebPublishPlugin"
         }
     }
 }

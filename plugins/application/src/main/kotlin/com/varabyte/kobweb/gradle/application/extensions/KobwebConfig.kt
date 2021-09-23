@@ -1,9 +1,9 @@
 @file:Suppress("LeakingThis") // Following official Gradle guidance
 
-package com.varabyte.kobweb.plugins.kobweb.extensions
+package com.varabyte.kobweb.gradle.application.extensions
 
-import com.varabyte.kobweb.plugins.kobweb.GENERATED_ROOT
-import com.varabyte.kobweb.plugins.kobweb.kmp.kotlin
+import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
+import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property

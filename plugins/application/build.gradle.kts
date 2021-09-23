@@ -1,13 +1,13 @@
 plugins {
     `kotlin-dsl`
     kotlin("jvm")
-    id("com.varabyte.kobweb.publish")
+    id("com.varabyte.kobweb.internal.publish")
     kotlin("plugin.serialization")
     `java-gradle-plugin`
 }
 
 group = "com.varabyte.kobweb.gradle"
-version = "0.1.0-SNAPSHOT"
+version = "0.3.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -23,22 +23,20 @@ dependencies {
     implementation(libs.kaml)
 }
 
-val DESCRIPTION = "A Gradle plugin enabling a user to generate additional code on top of their Kobweb web app source"
+val DESCRIPTION = "A Gradle plugin that completes a user's Kobweb app"
 gradlePlugin {
     plugins {
-        create("kobwebPlugin") {
-            id = "com.varabyte.kobweb"
-            displayName = "Kobweb Plugin"
+        create("kobwebApplication") {
+            id = "com.varabyte.kobweb.application"
+            displayName = "Kobweb Application Plugin"
             description = DESCRIPTION
-            implementationClass = "com.varabyte.kobweb.plugins.kobweb.KobwebPlugin"
+            implementationClass = "com.varabyte.kobweb.gradle.application.KobwebApplicationPlugin"
         }
     }
 }
 
 kobwebPublication {
-    artifactId.set("kobweb")
+    // Leave artifactId blank. It will be set to the name of this module, and then the gradlePlugin step does some
+    // additional tweaking that we don't want to interfere with.
     description.set(DESCRIPTION)
 }
-
-inline val PluginDependenciesSpec.`kobweb-plugin`: PluginDependencySpec
-    get() = id("com.varabyte.kobweb")

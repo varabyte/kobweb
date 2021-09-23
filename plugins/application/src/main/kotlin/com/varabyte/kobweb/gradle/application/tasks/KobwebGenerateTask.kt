@@ -1,13 +1,13 @@
 @file:Suppress("LeakingThis") // Following official Gradle guidance
 
-package com.varabyte.kobweb.plugins.kobweb.tasks
+package com.varabyte.kobweb.gradle.application.tasks
 
 import com.charleskorn.kaml.Yaml
-import com.varabyte.kobweb.plugins.kobweb.*
-import com.varabyte.kobweb.plugins.kobweb.conf.KobwebConf
-import com.varabyte.kobweb.plugins.kobweb.extensions.KobwebConfig
-import com.varabyte.kobweb.plugins.kobweb.templates.createHtmlFile
-import com.varabyte.kobweb.plugins.kobweb.templates.createMainFunction
+import com.varabyte.kobweb.gradle.application.*
+import com.varabyte.kobweb.gradle.application.conf.KobwebConf
+import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
+import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty

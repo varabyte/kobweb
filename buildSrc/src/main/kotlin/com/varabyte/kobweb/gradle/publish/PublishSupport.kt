@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.plugins.publish
+package com.varabyte.kobweb.gradle.publish
 
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -34,11 +34,16 @@ private fun artifactSuffix(name: String): String {
     }
 }
 
+/**
+ * @param artifactId Can be null if we want to let the system use the default value for this project.
+ *   This is particularly useful for publishing Gradle plugins, which does some of its own magic that we don't want
+ *   to fight with.
+ */
 internal fun PublishingExtension.addVarabyteArtifact(
     project: Project,
-    artifactId: String,
-    description: String,
-    site: String,
+    artifactId: String?,
+    description: String?,
+    site: String?,
 ) {
     if (project.shouldSign() && project.shouldPublishToGCloud()) {
         repositories {
@@ -47,10 +52,12 @@ internal fun PublishingExtension.addVarabyteArtifact(
     }
 
     publications.withType(MavenPublication::class.java) {
-        this.artifactId = artifactId + artifactSuffix(name)
+        if (artifactId != null) {
+            this.artifactId = artifactId + artifactSuffix(name)
+        }
         pom {
-            this.description.set(description)
-            url.set(site)
+            description?.let { this.description.set(it) }
+            url.set(site ?: "https://github.com/varabyte/kobweb")
             licenses {
                 license {
                     name.set("The Apache License, Version 2.0")
@@ -74,9 +81,9 @@ internal fun Project.configurePublishing(extension: KobwebPublicationExtension) 
     publishing {
         addVarabyteArtifact(
             project,
-            extension.artifactId.get(),
-            extension.description.get(),
-            extension.site.get(),
+            extension.artifactId.orNull,
+            extension.description.orNull,
+            extension.site.orNull,
         )
     }
 

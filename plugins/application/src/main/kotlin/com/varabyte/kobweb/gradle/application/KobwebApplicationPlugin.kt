@@ -1,16 +1,17 @@
-package com.varabyte.kobweb.plugins.kobweb
+package com.varabyte.kobweb.gradle.application
 
-import com.varabyte.kobweb.plugins.kobweb.kmp.kotlin
-import com.varabyte.kobweb.plugins.kobweb.kmp.sourceSets
-import com.varabyte.kobweb.plugins.kobweb.extensions.KobwebConfig
-import com.varabyte.kobweb.plugins.kobweb.tasks.KobwebGenerateTask
+import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
+import com.varabyte.kobweb.gradle.application.kmp.kotlin
+import com.varabyte.kobweb.gradle.application.kmp.sourceSets
+import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 
 @Suppress("unused")
-class KobwebPlugin : Plugin<Project> {
+class KobwebApplicationPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)

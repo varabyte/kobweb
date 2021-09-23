@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.plugins.kobweb.tasks
+package com.varabyte.kobweb.gradle.application.tasks
 
 import org.gradle.api.DefaultTask
 

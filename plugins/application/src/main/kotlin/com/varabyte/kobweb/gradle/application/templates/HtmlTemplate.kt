@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.plugins.kobweb.templates
+package com.varabyte.kobweb.gradle.application.templates
 
 fun createHtmlFile(title: String, links: List<String>, src: String): String = """
     <!DOCTYPE html>

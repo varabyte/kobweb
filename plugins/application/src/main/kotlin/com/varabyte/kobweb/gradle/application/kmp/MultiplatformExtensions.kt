@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package com.varabyte.kobweb.plugins.kobweb.kmp
+package com.varabyte.kobweb.gradle.application.kmp
 
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer

@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.plugins.kobweb.conf
+package com.varabyte.kobweb.gradle.application.conf
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.plugins.kobweb.templates
+package com.varabyte.kobweb.gradle.application.templates
 
 fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): String {
     val imports = mutableListOf(

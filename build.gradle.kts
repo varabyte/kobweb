@@ -9,7 +9,7 @@ plugins {
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("org.jetbrains.compose") version composeVersion apply false
     id("com.google.devtools.ksp") version kspVersion apply false
-    id("com.varabyte.kobweb") version "0.1.0-SNAPSHOT" apply false
+    id("com.varabyte.kobweb.application") version "0.3.0-SNAPSHOT" apply false
 }
 
 subprojects {

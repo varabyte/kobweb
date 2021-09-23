@@ -2,7 +2,7 @@
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
-    id("com.varabyte.kobweb.publish")
+    id("com.varabyte.kobweb.internal.publish")
 }
 
 group = "com.varabyte.kobweb"

@@ -1,22 +1,14 @@
-package com.varabyte.kobweb.plugins.publish
+package com.varabyte.kobweb.gradle.publish
 
-import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
-import org.gradle.api.publish.PublishingExtension
 import org.gradle.kotlin.dsl.create
-import org.gradle.plugins.signing.SigningExtension
 
 abstract class KobwebPublicationExtension {
     abstract val artifactId: Property<String>
     abstract val description: Property<String>
     abstract val site: Property<String>
-
-    init {
-        site.convention("https://github.com/varabyte/kobweb")
-    }
 }
 
 /**
@@ -37,6 +29,7 @@ class KobwebPublishPlugin : Plugin<Project> {
 
         val extension = project.extensions.create<KobwebPublicationExtension>("kobwebPublication")
         project.afterEvaluate {
+            // Configure after evaluating to allow the user to set extension values first
             configurePublishing(extension)
         }
     }
