@@ -8,9 +8,9 @@ enableFeaturePreview("VERSION_CATALOGS")
 
 rootProject.name = "kobweb"
 
-include(":bin:kobweb")
-include(":lib:kobweb")
-include(":lib:kobweb-silk")
-include(":lib:kobweb-silk-icons-fa")
-include(":lib:web-compose-ext")
-include(":plugins:application")
+include(":cli:kobweb")
+include(":frontend:kobweb")
+include(":frontend:kobweb-silk")
+include(":frontend:kobweb-silk-icons-fa")
+include(":frontend:web-compose-ext")
+include(":frontend:gradle:application")

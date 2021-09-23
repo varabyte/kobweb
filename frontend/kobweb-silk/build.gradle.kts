@@ -20,8 +20,8 @@ kotlin {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
 
-                implementation(project(":lib:web-compose-ext"))
-                implementation(project(":lib:kobweb"))
+                implementation(project(":frontend:web-compose-ext"))
+                implementation(project(":frontend:kobweb"))
             }
         }
     }
