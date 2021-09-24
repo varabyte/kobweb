@@ -44,7 +44,7 @@ fun runCreate(template: String) = konsoleApp {
         subPaths
             .asSequence()
             .map { subPath -> tempPath.resolve(subPath) }
-            .mapNotNull { currPath -> KobwebUtils.getTemplateFileIn(currPath) }
+            .mapNotNull { currPath -> KobwebUtils.getKobwebFileIn(currPath, "template.yaml") }
             .firstOrNull()
 
             ?: run {
@@ -64,17 +64,20 @@ fun runCreate(template: String) = konsoleApp {
     }.let { answer ->
         Path.of(if (answer != ".") answer else "").toAbsolutePath()
     }
-    val srcPath = KobwebUtils.getTemplateRoot(templateFile)
+    val srcPath = KobwebUtils.getKobwebProjectFor(templateFile)!!
 
     val kobwebTemplate = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
     // Template almost ready to be processed - remove all files that should NEVER end up in the final project
     templateFile.deleteIfExists()
     run {
         val subTemplates = mutableListOf<File>()
-        srcPath.toFile().walkBottomUp().forEach { file ->
-            if (file.isDirectory && KobwebUtils.isTemplateFileIn(file.toPath())) {
-                subTemplates.add(file)
-            }
+        val root = srcPath.toFile()
+        root.walkBottomUp()
+            .filter { file -> file != root }
+            .forEach { file ->
+                if (file.isDirectory && KobwebUtils.isKobwebProject(file.toPath())) {
+                    subTemplates.add(file)
+                }
         }
         subTemplates.forEach { subTemplate -> subTemplate.deleteRecursively() }
     }
