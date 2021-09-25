@@ -7,11 +7,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.gradle"
-version = "0.3.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
+version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(kotlin("stdlib"))

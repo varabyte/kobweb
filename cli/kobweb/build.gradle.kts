@@ -5,12 +5,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.cli"
-version = "0.3.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-    maven { url = uri("https://us-central1-maven.pkg.dev/varabyte-repos/public") }
-}
+version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(kotlin("stdlib"))
@@ -19,9 +14,15 @@ dependencies {
     implementation(libs.jgit)
     implementation(libs.freemarker)
     implementation(libs.kaml)
+    implementation(project(":common:kobweb"))
 }
 
 application {
     applicationDefaultJvmArgs = listOf("-Dkobweb.version=${version}")
     mainClass.set("MainKt")
+}
+
+// Avoid ambiguity / add clarity in generated artifacts
+tasks.jar {
+    archiveFileName.set("kobweb-cli.jar")
 }
