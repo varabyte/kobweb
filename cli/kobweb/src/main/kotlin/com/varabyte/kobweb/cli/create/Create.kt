@@ -4,6 +4,7 @@ import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.cli.create.yaml.KobwebTemplate
+import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.*
 import com.varabyte.konsole.runtime.KonsoleApp
@@ -44,7 +45,8 @@ fun runCreate(template: String) = konsoleApp {
         subPaths
             .asSequence()
             .map { subPath -> tempPath.resolve(subPath) }
-            .mapNotNull { currPath -> KobwebUtils.getKobwebFileIn(currPath, "template.yaml") }
+            .mapNotNull { currPath -> KobwebFolder.inPath(currPath) }
+            .mapNotNull { folder -> folder.resolve("template.yaml") }
             .firstOrNull()
 
             ?: run {
@@ -64,7 +66,7 @@ fun runCreate(template: String) = konsoleApp {
     }.let { answer ->
         Path.of(if (answer != ".") answer else "").toAbsolutePath()
     }
-    val srcPath = KobwebUtils.getKobwebProjectFor(templateFile)!!
+    val srcPath = KobwebFolder.fromChildPath(templateFile)!!.getProjectPath()
 
     val kobwebTemplate = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
     // Template almost ready to be processed - remove all files that should NEVER end up in the final project
@@ -75,7 +77,7 @@ fun runCreate(template: String) = konsoleApp {
         root.walkBottomUp()
             .filter { file -> file != root }
             .forEach { file ->
-                if (file.isDirectory && KobwebUtils.isKobwebProject(file.toPath())) {
+                if (file.isDirectory && KobwebFolder.isKobwebProject(file.toPath())) {
                     subTemplates.add(file)
                 }
         }
