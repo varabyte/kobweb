@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
 }
 
 group = "com.varabyte.kobweb.server"
@@ -7,6 +8,8 @@ version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation(libs.kaml)
+    implementation(project(":common:kobweb"))
 }
 
 // Avoid ambiguity / add clarity in generated artifacts
