@@ -2,10 +2,10 @@
 freemarker = "2.3.31"
 jgit = "5.12.0.202106070339-r"
 kaml = "0.35.3"
+kobweb = "0.3.0-SNAPSHOT"
 konsole = "0.9.0-SNAPSHOT"
 kotlinx-cli = "0.3.2"
 ksp = "1.5.30-1.0.0"
-kobweb = "0.3.0-SNAPSHOT"
 
 [libraries]
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker"}
