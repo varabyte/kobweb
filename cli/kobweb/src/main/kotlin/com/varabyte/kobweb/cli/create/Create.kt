@@ -45,8 +45,7 @@ fun runCreate(template: String) = konsoleApp {
         subPaths
             .asSequence()
             .map { subPath -> tempPath.resolve(subPath) }
-            .mapNotNull { currPath -> KobwebFolder.inPath(currPath) }
-            .mapNotNull { folder -> folder.resolve("template.yaml") }
+            .mapNotNull { currPath -> KobwebFolder.inPath(currPath)?.resolve("template.yaml") }
             .firstOrNull()
 
             ?: run {

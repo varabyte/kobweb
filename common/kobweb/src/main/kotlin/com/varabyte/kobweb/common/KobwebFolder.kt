@@ -52,9 +52,9 @@ class KobwebFolder private constructor(private val path: Path) {
     }
 
     /**
-     * Return a child file that lives within the Kobweb folder.
+     * Return a child file that lives (or will live) within the Kobweb folder.
      */
-    fun resolve(child: String): Path? = path.resolve(child).takeIf { Files.exists(it) }
+    fun resolve(child: String): Path = path.resolve(child)
 
     /**
      * Return the parent project folder which owns this Kobweb configuration folder.
