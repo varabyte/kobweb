@@ -49,6 +49,12 @@ class KobwebFolder private constructor(private val path: Path) {
             }
             return null
         }
+
+        /**
+         * Helper function for giving the name of a path inside a Kobweb folder (necessary as we don't expose the
+         * value of [KOBWEB_FOLDER]).
+         */
+        fun pathNameTo(child: String): String = "$KOBWEB_FOLDER/$child"
     }
 
     /**

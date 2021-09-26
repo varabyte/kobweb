@@ -2,6 +2,8 @@ package com.varabyte.kobweb.server.api
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.common.io.KobwebReadableFile
+import com.varabyte.kobweb.common.io.KobwebWritableFile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -39,33 +41,24 @@ class ServerRequests(
     val requests: List<ServerRequest>
 )
 
-// TODO(Bug #12): Use safer file logic here to protect against multiple writers etc.
-class ServerRequestsFile(kobwebFolder: KobwebFolder) {
-    private val filePath = kobwebFolder.resolve("server/requests.yaml")
+class ServerRequestsFile(kobwebFolder: KobwebFolder) : KobwebWritableFile<ServerRequests>(
+    kobwebFolder,
+    "server/requests.yaml",
+    serialize = { requests -> Yaml.default.encodeToString(ServerRequests.serializer(), requests) },
+    deserialize = { text -> Yaml.default.decodeFromString(ServerRequests.serializer(), text) }
+) {
+    fun enqueueRequest(request: ServerRequest) {
+        val currRequests = wrapped
+        wrapped = ServerRequests((currRequests?.requests ?: emptyList()) + request)
+    }
 
-    var lastModified = 0L
-    lateinit var _serverRequests: ServerRequests
-    val serverRequests: ServerRequests?
-        get() {
-            return filePath
-                .takeIf { it.exists() }
-                ?.let {
-                    val lastModified = filePath.getLastModifiedTime()
-                    if (this.lastModified != lastModified.toMillis()) {
-                        this.lastModified = lastModified.toMillis()
-                        _serverRequests = Yaml.default.decodeFromString(ServerRequests.serializer(), filePath.toFile().readText())
-                    }
-
-                    _serverRequests
-                }
+    fun dequeueRequest(): ServerRequest? {
+        val currRequests = wrapped
+        val nextRequest = currRequests?.requests?.firstOrNull()
+        if (nextRequest != null) {
+            wrapped = ServerRequests(currRequests.requests.drop(1))
         }
 
-    fun addRequest(request: ServerRequest) {
-        if (!filePath.parent.exists()) {
-            filePath.parent.createDirectories()
-        }
-        val currRequests = serverRequests
-        val newRequests = ServerRequests((currRequests?.requests ?: emptyList()) + request)
-        filePath.toFile().writeText(Yaml.default.encodeToString(ServerRequests.serializer(), newRequests))
+        return nextRequest
     }
 }

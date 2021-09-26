@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.extensions
 
+import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import org.gradle.api.Project
@@ -49,7 +50,7 @@ abstract class KobwebConfig {
     abstract val publicPath: Property<String>
 
     init {
-        confFile.convention(".kobweb/conf.yaml")
+        confFile.convention(KobwebFolder.pathNameTo("conf.yaml"))
         genDir.convention(GENERATED_ROOT)
 
         pagesPackage.convention(".pages")

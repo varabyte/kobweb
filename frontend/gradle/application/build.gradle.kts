@@ -2,7 +2,6 @@ plugins {
     `kotlin-dsl`
     kotlin("jvm")
     id("com.varabyte.kobweb.internal.publish")
-    kotlin("plugin.serialization")
     `java-gradle-plugin`
 }
 
@@ -15,8 +14,8 @@ dependencies {
     implementation(kotlin("gradle-plugin"))
     // For parsing code. Instead, use KSP someday? See also: Bug #4
     implementation(kotlin("compiler-embeddable"))
-    // For kobweb.conf.yaml
-    implementation(libs.kaml)
+
+    implementation(project(":common:kobweb"))
 }
 
 val DESCRIPTION = "A Gradle plugin that completes a user's Kobweb app"

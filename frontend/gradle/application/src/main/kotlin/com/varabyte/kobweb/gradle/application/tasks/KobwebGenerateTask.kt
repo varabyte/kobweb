@@ -2,9 +2,9 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.charleskorn.kaml.Yaml
+import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.common.conf.KobwebConfFile
 import com.varabyte.kobweb.gradle.application.*
-import com.varabyte.kobweb.gradle.application.conf.KobwebConf
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
@@ -104,7 +104,11 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
             throw GradleException("A Kobweb project must have a \"${confFile.name}\" file in its root directory")
         }
 
-        val conf = Yaml.default.decodeFromString(KobwebConf.serializer(), confFile.readText())
+        // It's a little roundabout, but we get the kobweb folder from the conf file and then get the parsed conf
+        // information back again using it.
+        val conf = KobwebFolder.fromChildPath(confFile.toPath())!!.let { kobwebFolder ->
+            KobwebConfFile(kobwebFolder).wrapped!!
+        }
 
         // For now, we're directly parsing Kotlin code using the embedded Kotlin compiler. This is a temporary approach.
         // In the future, this should use KSP to navigate through source files. See also: Bug #4
