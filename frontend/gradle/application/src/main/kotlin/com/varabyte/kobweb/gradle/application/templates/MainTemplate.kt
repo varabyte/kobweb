@@ -18,10 +18,10 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
 
         // This hook is provided so that a Kobweb server can insert in live reloading logic when run in development
         // mode. Of course, in production, it's a no-op.
-        fun kobwebDevHook() {}
+        fun kobwebHook() {}
 
         fun main() {
-            kobwebDevHook()
+            kobwebHook()
 
             ${
             // Generates lines like: Router.register("/about") { AboutPage() }
