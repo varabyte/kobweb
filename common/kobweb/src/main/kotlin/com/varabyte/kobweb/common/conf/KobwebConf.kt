@@ -1,3 +1,5 @@
+@file:Suppress("unused") // Used by serializer
+
 package com.varabyte.kobweb.common.conf
 
 import com.charleskorn.kaml.Yaml
@@ -9,12 +11,43 @@ import kotlinx.serialization.Serializable
 class Site(val title: String)
 
 @Serializable
-class Server(val port: Int = 8080)
+class Server(
+    val locations: Locations,
+    val port: Int = 8080
+) {
+    @Serializable
+    class Locations(
+        val dev: Dev,
+        val prod: Prod = Prod(),
+    ) {
+        /**
+         * The dev server only serves a single html file that represents the whole project.
+         */
+        @Serializable
+        class Dev(
+            /** The path to serve content from, which includes the Kobweb index.html file. */
+            val content: String,
+            /** The path to the final JavaScript file generated from the user's Kotlin code. */
+            val script: String,
+        )
+
+        /**
+         * The prod server serves static files but needs a fallback in case one is missing.
+         */
+        @Serializable
+        class Prod(
+            /** The path to the root of where the static site lives */
+            val siteRoot: String = KobwebFolder.pathNameTo("site"),
+            /** The path to serve content from. If not set, defaults to the value set in `dev.content` */
+            val content: String? = null,
+        )
+    }
+}
 
 @Serializable
 class KobwebConf(
     val site: Site,
-    val server: Server = Server(),
+    val server: Server,
 )
 
 class KobwebConfFile(kobwebFolder: KobwebFolder) : KobwebReadableFile<KobwebConf>(
