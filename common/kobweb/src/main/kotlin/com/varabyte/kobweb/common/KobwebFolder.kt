@@ -25,6 +25,11 @@ class KobwebFolder private constructor(private val path: Path) {
         }
 
         /**
+         * Convenience method for looking for a Kobweb folder in the current directory.
+         */
+        fun inWorkingDirectory(): KobwebFolder? = inPath(Path.of(""))
+
+        /**
          * Return true if the current path represents a Kobweb project (that is, a project with a Kobweb folder in its
          * root).
          */

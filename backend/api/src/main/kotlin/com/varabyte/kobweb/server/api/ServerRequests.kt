@@ -2,14 +2,9 @@ package com.varabyte.kobweb.server.api
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.common.KobwebFolder
-import com.varabyte.kobweb.common.io.KobwebReadableFile
 import com.varabyte.kobweb.common.io.KobwebWritableFile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlin.io.path.createDirectories
-import kotlin.io.path.exists
-import kotlin.io.path.getLastModifiedTime
 
 /*
 @Serializable
@@ -33,7 +28,7 @@ sealed class Instruction(
 sealed class ServerRequest {
     @Serializable
     @SerialName("Stop")
-    class Stop
+    class Stop : ServerRequest()
 }
 
 @Serializable
@@ -48,15 +43,15 @@ class ServerRequestsFile(kobwebFolder: KobwebFolder) : KobwebWritableFile<Server
     deserialize = { text -> Yaml.default.decodeFromString(ServerRequests.serializer(), text) }
 ) {
     fun enqueueRequest(request: ServerRequest) {
-        val currRequests = wrapped
-        wrapped = ServerRequests((currRequests?.requests ?: emptyList()) + request)
+        val currRequests = content
+        content = ServerRequests((currRequests?.requests ?: emptyList()) + request)
     }
 
     fun dequeueRequest(): ServerRequest? {
-        val currRequests = wrapped
+        val currRequests = content
         val nextRequest = currRequests?.requests?.firstOrNull()
         if (nextRequest != null) {
-            wrapped = ServerRequests(currRequests.requests.drop(1))
+            content = ServerRequests(currRequests.requests.drop(1))
         }
 
         return nextRequest

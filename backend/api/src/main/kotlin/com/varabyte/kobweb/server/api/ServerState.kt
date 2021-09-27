@@ -5,20 +5,14 @@ import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.kobweb.common.io.KobwebReadableFile
 import kotlinx.serialization.Serializable
 
-enum class ServerStatus {
-    STOPPED,
-    RUNNING,
-}
-
 @Serializable
 data class ServerState(
-    val status: ServerStatus,
     val port: Int,
-    val pid: Int,
+    val pid: Long,
 )
 
-class ServerStateFile(kobwebFolder: KobwebFolder) : KobwebReadableFile<ServerRequests>(
+class ServerStateFile(kobwebFolder: KobwebFolder) : KobwebReadableFile<ServerState>(
     kobwebFolder,
     "server/state.yaml",
-    deserialize = { text -> Yaml.default.decodeFromString(ServerRequests.serializer(), text) }
+    deserialize = { text -> Yaml.default.decodeFromString(ServerState.serializer(), text) }
 )

@@ -3,6 +3,7 @@ package com.varabyte.kobweb.cli.create.freemarker
 import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.template.Instruction
 import com.varabyte.kobweb.cli.create.freemarker.methods.*
+import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.konsole.runtime.KonsoleApp
 import freemarker.cache.NullCacheStorage
 import freemarker.template.Configuration
