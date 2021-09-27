@@ -10,23 +10,23 @@ open class KobwebReadableFile<T: Any>(
     name: String,
     private val deserialize: (String) -> (T),
 ) {
-    internal val filePath = kobwebFolder.resolve(name)
+    val path = kobwebFolder.resolve(name)
 
     private var lastModified = 0L
-    private lateinit var _wrapped: T
+    private lateinit var _content: T
 
-    val wrapped: T?
+    val content: T?
         get() {
-            return filePath
+            return path
                 .takeIf { it.exists() }
                 ?.let {
-                    val lastModified = filePath.getLastModifiedTime()
+                    val lastModified = path.getLastModifiedTime()
                     if (this.lastModified != lastModified.toMillis()) {
                         this.lastModified = lastModified.toMillis()
-                        _wrapped = deserialize(filePath.readText())
+                        _content = deserialize(path.readText())
                     }
 
-                    _wrapped
+                    _content
                 }
         }
 }
@@ -38,11 +38,12 @@ open class KobwebWritableFile<T: Any>(
     deserialize: (String) -> (T),
 ) {
     private val readableDelegate = KobwebReadableFile(kobwebFolder, name, deserialize)
+    val path = readableDelegate.path
 
-    var wrapped: T?
-        get() = readableDelegate.wrapped
+    var content: T?
+        get() = readableDelegate.content
         set(value) {
-            val filePath = readableDelegate.filePath
+            val filePath = readableDelegate.path
             if (!filePath.parent.exists()) {
                 filePath.parent.createDirectories()
             }
@@ -50,7 +51,7 @@ open class KobwebWritableFile<T: Any>(
                 filePath.writeText(serialize(value))
             }
             else {
-                filePath.deleteExisting()
+                filePath.deleteIfExists()
             }
         }
 }

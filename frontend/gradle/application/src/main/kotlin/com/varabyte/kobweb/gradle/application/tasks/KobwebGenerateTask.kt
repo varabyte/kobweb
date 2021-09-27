@@ -107,7 +107,7 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
         // It's a little roundabout, but we get the kobweb folder from the conf file and then get the parsed conf
         // information back again using it.
         val conf = KobwebFolder.fromChildPath(confFile.toPath())!!.let { kobwebFolder ->
-            KobwebConfFile(kobwebFolder).wrapped!!
+            KobwebConfFile(kobwebFolder).content!!
         }
 
         // For now, we're directly parsing Kotlin code using the embedded Kotlin compiler. This is a temporary approach.
