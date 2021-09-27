@@ -105,6 +105,5 @@ fun runCreate(template: String) = konsoleApp {
             indent(); cmd("cd"); textLine(" $projectFolder")
         }
         indent(); cmd("./gradlew"); textLine(" jsRun --continuous")
-        textLine()
     }.run()
 }
