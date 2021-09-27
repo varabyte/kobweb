@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.cli.create.freemarker
 
 import com.varabyte.kobweb.cli.common.*
-import com.varabyte.kobweb.cli.create.yaml.Instruction
+import com.varabyte.kobweb.cli.create.template.Instruction
 import com.varabyte.kobweb.cli.create.freemarker.methods.*
 import com.varabyte.konsole.runtime.KonsoleApp
 import freemarker.cache.NullCacheStorage

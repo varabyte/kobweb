@@ -3,9 +3,7 @@ package com.varabyte.kobweb.cli.create
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
-import com.varabyte.kobweb.cli.create.freemarker.methods.IsNotEmptyMethod
-import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
-import com.varabyte.kobweb.cli.create.yaml.KobwebTemplate
+import com.varabyte.kobweb.cli.create.template.KobwebTemplate
 import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.*

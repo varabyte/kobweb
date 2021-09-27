@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.cli.create.yaml
+package com.varabyte.kobweb.cli.create.template
 
 import kotlinx.serialization.Serializable
 
