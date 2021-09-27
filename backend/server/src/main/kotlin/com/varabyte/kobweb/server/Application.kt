@@ -14,6 +14,7 @@ import java.io.IOException
 import java.net.BindException
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.deleteIfExists
 
 private fun isPortInUse(port: Int): Boolean {
@@ -48,8 +49,9 @@ fun main() = runBlocking {
         ++port
     }
 
+    val env = ServerEnvironment.get()
     val engine = embeddedServer(Netty, port) {
-        configureRouting()
+        configureRouting(env, conf)
         configureSerialization()
         configureHTTP()
         configureSecurity()
@@ -71,11 +73,16 @@ fun main() = runBlocking {
         while (true) {
             val request = requestsFile.dequeueRequest() ?: break
             when (request) {
-                is ServerRequest.Stop -> shouldStop = true
+                is ServerRequest.Stop -> {
+                    shouldStop = true
+                    // Received request to shutdown
+                }
             }
         }
         delay(300)
     }
 
+    engine.stop(1, 5, TimeUnit.SECONDS)
+    requestsFile.path.deleteIfExists()
     stateFile.content = null
 }

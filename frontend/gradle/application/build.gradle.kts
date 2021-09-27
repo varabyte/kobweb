@@ -16,6 +16,7 @@ dependencies {
     implementation(kotlin("compiler-embeddable"))
 
     implementation(project(":common:kobweb"))
+    implementation(project(":backend:api"))
 }
 
 val DESCRIPTION = "A Gradle plugin that completes a user's Kobweb app"
@@ -35,3 +36,23 @@ kobwebPublication {
     // additional tweaking that we don't want to interfere with.
     description.set(DESCRIPTION)
 }
+
+/**
+ * Embed a copy of the latest Kobweb server, naming it server.jar and putting it into the project's resources/ dir, so
+ * we can run it from the plugin at runtime.
+ */
+tasks.register<Copy>("copyServerJar") {
+    dependsOn(":backend:server:shadowJar")
+
+    val serverJarName = "server-${libs.versions.kobweb.get()}-all.jar"
+    val serverJarFile = file("${project(":backend:server").buildDir}/libs/$serverJarName")
+
+    if (!serverJarFile.exists()) {
+        throw GradleException("Could not find server fat jar at $serverJarFile")
+    }
+
+    from(file(serverJarFile))
+    into(file("$projectDir/build/resources/main"))
+    rename(serverJarName, "server.jar")
+}
+project.tasks.getByPath("processResources").dependsOn("copyServerJar")

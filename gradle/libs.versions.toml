@@ -11,6 +11,7 @@ ksp = "1.5.30-1.0.0"
 ktor = "1.6.3"
 logback = "1.2.3"
 truthish = "0.6.0"
+shadow = "6.1.0"
 
 [libraries]
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker"}
@@ -37,3 +38,4 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

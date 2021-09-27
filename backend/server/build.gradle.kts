@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     application
+    alias(libs.plugins.shadow)
 }
 
 group = "com.varabyte.kobweb.server"
@@ -24,6 +25,8 @@ tasks.jar {
     archiveFileName.set("kobweb-server.jar")
 }
 
+val applicationClass = "com.varabyte.kobweb.server.ApplicationKt"
+project.setProperty("mainClassName", applicationClass)
 application {
-    mainClass.set("com.varabyte.kobweb.server.ApplicationKt")
+    mainClass.set(applicationClass)
 }

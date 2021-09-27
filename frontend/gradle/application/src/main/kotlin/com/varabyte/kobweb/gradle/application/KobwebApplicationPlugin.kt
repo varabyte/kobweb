@@ -6,27 +6,32 @@ import com.varabyte.kobweb.gradle.application.kmp.sourceSets
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
-import com.varabyte.kobweb.gradle.application.tasks.ServerEnvironment
+import com.varabyte.kobweb.server.api.ServerEnvironment
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 
-@Suppress("unused")
+@Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebApplicationPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
-        val kobwebStartDevTask = project.tasks.register("kobwebStartDev", KobwebStartTask::class.java, kobwebConfig, ServerEnvironment.DEV)
-        val kobwebStartProdTask = project.tasks.register("kobwebStartProd", KobwebStartTask::class.java, kobwebConfig, ServerEnvironment.PROD)
-        val kobwebStopTask = project.tasks.register("kobwebStop", KobwebStopTask::class.java, kobwebConfig)
+        project.tasks.register("kobwebStartDev", KobwebStartTask::class.java, ServerEnvironment.DEV)
+        project.tasks.register("kobwebStartProd", KobwebStartTask::class.java, ServerEnvironment.PROD)
+        val kobwebStopTask = project.tasks.register("kobwebStop", KobwebStopTask::class.java)
 
         project.afterEvaluate {
-            project.tasks.named("compileKotlinJs") {
+            val sourcesTask = project.tasks.named("compileKotlinJs") {
                 dependsOn(kobwebGenTask)
             }
-            project.tasks.named("jsProcessResources") {
+            val resourcesTask = project.tasks.named("jsProcessResources") {
                 dependsOn(kobwebGenTask)
+            }
+            project.tasks.withType(KobwebStartTask::class.java) {
+                dependsOn(kobwebStopTask)
+                dependsOn(sourcesTask)
+                dependsOn(resourcesTask)
             }
 
             project.kotlin {
