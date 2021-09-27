@@ -26,7 +26,7 @@ class Server(
         @Serializable
         class Dev(
             /** The path to serve content from, which includes the Kobweb index.html file. */
-            val content: String,
+            val contentRoot: String,
             /** The path to the final JavaScript file generated from the user's Kotlin code. */
             val script: String,
         )
@@ -38,8 +38,8 @@ class Server(
         class Prod(
             /** The path to the root of where the static site lives */
             val siteRoot: String = KobwebFolder.pathNameTo("site"),
-            /** The path to serve content from. If not set, defaults to the value set in `dev.content` */
-            val content: String? = null,
+            /** The path to serve content from. If not set, defaults to the value set in [Dev.contentRoot] */
+            val contentRoot: String? = null,
         )
     }
 }
