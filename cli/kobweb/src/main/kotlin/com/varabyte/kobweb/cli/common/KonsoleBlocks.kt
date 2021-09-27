@@ -102,3 +102,10 @@ fun KonsoleApp.queryUser(
     }
     return answer
 }
+
+/**
+ * Convenience method for adding a single line, useful to do before or after queries or information messages.
+*/
+fun KonsoleApp.newline() {
+    konsole { textLine() }.run()
+}

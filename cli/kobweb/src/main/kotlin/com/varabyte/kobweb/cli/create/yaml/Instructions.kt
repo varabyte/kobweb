@@ -42,6 +42,9 @@ sealed class Instruction(
      *   be dynamic!
      * @param validation One of a set of built in Kobweb validators. See the "Validators" region inside
      *   [FreemarkerState.model] for the list.
+     * @param transform Logic to convert a user's answer before assigning it to a variable, e.g. "Yes" -> "true".
+     *   An automatic variable called "value" will be provided for the scope of this function. See the "Converters"
+     *   region inside [FreemarkerState.model] for the list.
      */
     @Serializable
     @SerialName("QueryVar")
@@ -50,6 +53,7 @@ sealed class Instruction(
         val prompt: String,
         val default: String? = null,
         val validation: String? = null,
+        val transform: String? = null,
     ) : Instruction()
 
     /**

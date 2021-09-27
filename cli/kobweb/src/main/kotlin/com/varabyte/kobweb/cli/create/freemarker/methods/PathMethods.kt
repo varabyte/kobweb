@@ -4,7 +4,7 @@ import com.varabyte.kobweb.cli.common.Validations
 import java.util.*
 
 class FileToTitleMethod : SingleArgMethodModel() {
-    override fun handleArgument(value: String): String {
+    override fun exec(value: String): String {
         return value
             .split(Regex("""[^\w]"""))
             .filter { it.isNotBlank() }
@@ -15,19 +15,19 @@ class FileToTitleMethod : SingleArgMethodModel() {
 }
 
 class FileToPackageMethod : SingleArgMethodModel() {
-    override fun handleArgument(value: String): String {
+    override fun exec(value: String): String {
         return value.lowercase().replace(Regex("""[^\w_]"""), "")
     }
 }
 
 class IsPackageMethod : SingleArgMethodModel() {
-    override fun handleArgument(value: String): String? {
+    override fun exec(value: String): String? {
         return Validations.isValidPackage(value)
     }
 }
 
 class PackageToPathMethod : SingleArgMethodModel() {
-    override fun handleArgument(value: String): String? {
+    override fun exec(value: String): String {
         return value.replace(".", "/")
     }
 }

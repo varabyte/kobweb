@@ -3,6 +3,8 @@ package com.varabyte.kobweb.cli.create
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
+import com.varabyte.kobweb.cli.create.freemarker.methods.IsNotEmptyMethod
+import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
 import com.varabyte.kobweb.cli.create.yaml.KobwebTemplate
 import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.konsole.foundation.konsoleApp
@@ -86,18 +88,57 @@ fun runCreate(template: String) = konsoleApp {
     val state = FreemarkerState(srcPath, dstPath)
     state.execute(this, kobwebTemplate.instructions)
 
+    val projectFolder = dstPath.name
+
+    newline()
+    var gitInitialized = false
+    queryUser("Would you like to initialize git for this project?", "yes").let { initializeAnswer ->
+        val yesNoToBool = YesNoToBoolMethod()
+        val isNotEmpty = IsNotEmptyMethod()
+
+        val shouldInitialize = yesNoToBool.exec(initializeAnswer).toBoolean()
+        if (shouldInitialize) {
+            val git = Git.init().setDirectory(dstPath.toFile()).call()
+            // It would have been nice to create an initial commit for the user, but as far as I can tell, JGit doesn't
+            // do a good job finding the global config and uses garbage usernames and emails, at least on my system
+            // (which uses ~/.config/git/config). Oh well, we'll just ask the user to do it.
+//            val commitAnswer = queryUser("Would you like to create an initial commit?", "yes")
+//            val shouldCommit = yesNoToBool.exec(commitAnswer).toBoolean()
+//
+//            if (shouldCommit) {
+//                val message = queryUser(
+//                    "Commit message:",
+//                    "Initial commit",
+//                    validateAnswer = { answer -> isNotEmpty.exec(answer) }
+//                ).trim()
+//
+//                git.add().addFilepattern(".").call()
+//                git.commit().setMessage(message).call()
+//            }
+            gitInitialized = true
+        }
+    }
+
     konsole {
-        val projectFolder = dstPath.name
-        textLine()
+        fun indent() {
+            text("  ")
+        }
+        fun cmd(name: String) {
+            cyan { text(name) }
+        }
         green { text("Success! ") }
         textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
         textLine()
         textLine("We suggest that you begin by typing:")
         textLine()
         if (dstPath != Path.of("").toAbsolutePath()) {
-            text("  "); cyan { text("cd") }; textLine(" $projectFolder")
+            indent(); cmd("cd"); textLine(" $projectFolder")
         }
-        text("  "); cyan { textLine("./gradlew jsRun --continuous") }
+        if (gitInitialized) {
+            indent(); cmd("git"); text(" add . && "); cmd("git"); text(" commit -m \"Initial Commit\"")
+            textLine()
+        }
+        indent(); cmd("./gradlew"); textLine(" jsRun --continuous")
         textLine()
     }.run()
 }

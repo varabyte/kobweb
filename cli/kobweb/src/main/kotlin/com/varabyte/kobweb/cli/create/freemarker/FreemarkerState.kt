@@ -34,11 +34,15 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
         // region Validators
         "isNotEmpty" to IsNotEmptyMethod(),
         "isPackage" to IsPackageMethod(),
+        "isYesNo" to IsYesNoMethod(),
         // endregion
 
+        // region Converters
         "fileToTitle" to FileToTitleMethod(),
         "fileToPackage" to FileToPackageMethod(),
         "packageToPath" to PackageToPathMethod(),
+        "yesNoToBool" to YesNoToBoolMethod(),
+        // endregion
     )
 
     // See also: https://freemarker.apache.org/docs/pgui_quickstart_all.html
@@ -70,6 +74,11 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
                         val answer = queryUser(inst.prompt, default, validateAnswer = { value ->
                             (model[inst.validation] as? TemplateMethodModelEx)?.exec(listOf(value))?.toString()
                         })
+                        val finalAnswer = inst.transform?.let { transform ->
+                            val modelWithValue = model.toMutableMap()
+                            modelWithValue["value"] = answer
+                            transform.process(cfg, modelWithValue)
+                        } ?: answer
                         model[inst.name] = answer
                     }
 
