@@ -1,4 +1,5 @@
 [versions]
+compose = "1.0.0-alpha4-build331"
 freemarker = "2.3.31"
 jgit = "5.12.0.202106070339-r"
 kaml = "0.35.3"
@@ -30,3 +31,9 @@ truthish = { module = "com.varabyte.truthish:truthish", version.ref = "truthish"
 
 [bundles]
 ktor = ["ktor-server-core", "ktor-serialization", "ktor-auth", "ktor-server-host-common", "ktor-server-netty", "logback"]
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
