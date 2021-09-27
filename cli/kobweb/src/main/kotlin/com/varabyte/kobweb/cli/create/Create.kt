@@ -90,35 +90,6 @@ fun runCreate(template: String) = konsoleApp {
 
     val projectFolder = dstPath.name
 
-    newline()
-    var gitInitialized = false
-    queryUser("Would you like to initialize git for this project?", "yes").let { initializeAnswer ->
-        val yesNoToBool = YesNoToBoolMethod()
-        val isNotEmpty = IsNotEmptyMethod()
-
-        val shouldInitialize = yesNoToBool.exec(initializeAnswer).toBoolean()
-        if (shouldInitialize) {
-            val git = Git.init().setDirectory(dstPath.toFile()).call()
-            // It would have been nice to create an initial commit for the user, but as far as I can tell, JGit doesn't
-            // do a good job finding the global config and uses garbage usernames and emails, at least on my system
-            // (which uses ~/.config/git/config). Oh well, we'll just ask the user to do it.
-//            val commitAnswer = queryUser("Would you like to create an initial commit?", "yes")
-//            val shouldCommit = yesNoToBool.exec(commitAnswer).toBoolean()
-//
-//            if (shouldCommit) {
-//                val message = queryUser(
-//                    "Commit message:",
-//                    "Initial commit",
-//                    validateAnswer = { answer -> isNotEmpty.exec(answer) }
-//                ).trim()
-//
-//                git.add().addFilepattern(".").call()
-//                git.commit().setMessage(message).call()
-//            }
-            gitInitialized = true
-        }
-    }
-
     konsole {
         fun indent() {
             text("  ")
@@ -126,6 +97,7 @@ fun runCreate(template: String) = konsoleApp {
         fun cmd(name: String) {
             cyan { text(name) }
         }
+        textLine()
         green { text("Success! ") }
         textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
         textLine()
@@ -133,10 +105,6 @@ fun runCreate(template: String) = konsoleApp {
         textLine()
         if (dstPath != Path.of("").toAbsolutePath()) {
             indent(); cmd("cd"); textLine(" $projectFolder")
-        }
-        if (gitInitialized) {
-            indent(); cmd("git"); text(" add . && "); cmd("git"); text(" commit -m \"Initial Commit\"")
-            textLine()
         }
         indent(); cmd("./gradlew"); textLine(" jsRun --continuous")
         textLine()
