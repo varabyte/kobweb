@@ -4,11 +4,16 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.ServerState
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
+
+private fun ServerState.toDisplayText(): String {
+    return "http://0.0.0.0:$port (PID = $pid)"
+}
 
 /**
  * Start a Kobweb web server.
@@ -26,8 +31,11 @@ abstract class KobwebStartTask @Inject constructor(private val env: ServerEnviro
             ?: throw GradleException("This project is missing a Kobweb root folder")
 
         val stateFile = ServerStateFile(kobwebFolder)
-        if (stateFile.content?.isRunning() == true) {
-            return
+        stateFile.content?.let { serverState ->
+            if (serverState.isRunning()) {
+                println("A Kobweb server is already running at ${serverState.toDisplayText()}")
+                return
+            }
         }
 
         val javaHome = System.getProperty("java.home")!!
@@ -45,8 +53,8 @@ abstract class KobwebStartTask @Inject constructor(private val env: ServerEnviro
         while (stateFile.content == null && process.isAlive) {
             Thread.sleep(300)
         }
-        if (stateFile.content == null) {
-            throw GradleException("Unable to start the Kobweb server")
-        }
+        stateFile.content?.let { serverState ->
+            println("A Kobweb server is now running at ${serverState.toDisplayText()}")
+        } ?: throw GradleException("Unable to start the Kobweb server")
     }
 }
