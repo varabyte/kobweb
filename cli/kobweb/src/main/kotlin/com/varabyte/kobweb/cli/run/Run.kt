@@ -83,7 +83,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
                 yellow { textLine("Exiting. It seems like the server was stopped or restarted by a separate process.") }
             }
             RunState.STOPPING_VIA_INTERRUPT -> {
-                yellow { textLine("CTRL-C received. Kicking off a request to stop the server but we have to exit NOW.") }
+                yellow { textLine("CTRL-C received. Kicked off a request to stop the server but we have to exit NOW.") }
             }
         }
     }.runUntilSignal {
