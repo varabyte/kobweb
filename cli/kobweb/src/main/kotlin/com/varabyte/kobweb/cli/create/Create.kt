@@ -100,11 +100,15 @@ fun handleCreate(template: String) = konsoleApp {
         green { text("Success! ") }
         textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
         textLine()
+        text("Consider downloading "); magenta { textLine("IntelliJ IDEA Community Edition") };
+        textLine("through https://www.jetbrains.com/toolbox-app/")
+        textLine()
         textLine("We suggest that you begin by typing:")
         textLine()
         if (dstPath != Path.of("").toAbsolutePath()) {
             indent(); cmd("cd"); textLine(" $projectFolder")
         }
         indent(); cmd("kobweb"); textLine(" run")
+        textLine()
     }.run()
 }
