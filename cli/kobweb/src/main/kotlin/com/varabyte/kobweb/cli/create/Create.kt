@@ -109,6 +109,5 @@ fun handleCreate(template: String) = konsoleApp {
             indent(); cmd("cd"); textLine(" $projectFolder")
         }
         indent(); cmd("kobweb"); textLine(" run")
-        textLine()
     }.run()
 }
