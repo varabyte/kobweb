@@ -17,12 +17,12 @@ class KobwebApplicationPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
-        project.tasks.register("kobwebStartDev", KobwebStartTask::class.java, ServerEnvironment.DEV)
-        project.tasks.register("kobwebStartProd", KobwebStartTask::class.java, ServerEnvironment.PROD)
+        val kobwebStartDevTask = project.tasks.register("kobwebStartDev", KobwebStartTask::class.java, ServerEnvironment.DEV)
+        val kobwebStartProdTask = project.tasks.register("kobwebStartProd", KobwebStartTask::class.java, ServerEnvironment.PROD)
         val kobwebStopTask = project.tasks.register("kobwebStop", KobwebStopTask::class.java)
 
         project.afterEvaluate {
-            val sourcesTask = project.tasks.named("compileKotlinJs") {
+            project.tasks.named("compileKotlinJs") {
                 dependsOn(kobwebGenTask)
             }
             val resourcesTask = project.tasks.named("jsProcessResources") {
@@ -30,8 +30,16 @@ class KobwebApplicationPlugin : Plugin<Project> {
             }
             project.tasks.withType(KobwebStartTask::class.java) {
                 dependsOn(kobwebStopTask)
-                dependsOn(sourcesTask)
                 dependsOn(resourcesTask)
+            }
+
+            val composeDevExecutableTask = project.tasks.named("compileDevelopmentExecutableKotlinJs")
+            kobwebStartDevTask.configure {
+                dependsOn(composeDevExecutableTask)
+            }
+            val composeProdExecutableTask = project.tasks.named("compileProductionExecutableKotlinJs")
+            kobwebStartProdTask.configure {
+                dependsOn(composeProdExecutableTask)
             }
 
             project.kotlin {

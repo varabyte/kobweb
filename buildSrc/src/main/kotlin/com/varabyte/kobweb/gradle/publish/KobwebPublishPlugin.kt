@@ -3,6 +3,8 @@ package com.varabyte.kobweb.gradle.publish
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 
 abstract class KobwebPublicationExtension {

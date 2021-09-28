@@ -82,7 +82,7 @@ fun main() = runBlocking {
         delay(300)
     }
 
-    engine.stop(1, 5, TimeUnit.SECONDS)
+    engine.stop(200, 500, TimeUnit.MILLISECONDS)
     requestsFile.path.deleteIfExists()
     stateFile.content = null
 }

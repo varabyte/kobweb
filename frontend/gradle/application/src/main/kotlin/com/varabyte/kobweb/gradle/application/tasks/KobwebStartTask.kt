@@ -41,8 +41,8 @@ abstract class KobwebStartTask @Inject constructor(private val env: ServerEnviro
         while (stateFile.content == null && process.isAlive) {
             Thread.sleep(300)
         }
-        stateFile.content?.let { serverState ->
-            println("\t${serverState.port} @ ${serverState.pid}")
-        } ?: throw GradleException("Unable to start the Kobweb server")
+        if (stateFile.content == null) {
+            throw GradleException("Unable to start the Kobweb server")
+        }
     }
 }

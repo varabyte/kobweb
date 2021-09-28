@@ -1,7 +1,10 @@
+import org.jetbrains.kotlin.cli.jvm.main
+
 plugins {
     `kotlin-dsl`
     kotlin("jvm")
     id("com.varabyte.kobweb.internal.publish")
+    `java-library`
     `java-gradle-plugin`
 }
 
@@ -15,8 +18,20 @@ dependencies {
     // For parsing code. Instead, use KSP someday? See also: Bug #4
     implementation(kotlin("compiler-embeddable"))
 
-    implementation(project(":common:kobweb"))
-    implementation(project(":backend:api"))
+    // Note: These are compileOnly because we embed the classes directly into this plugin by modifying the jar class
+    // below. We do this so that we don't have to publish these internal artifacts in our maven repository - they are
+    // implementation details and shouldn't leak as public artifacts.
+    compileOnly(project(":common:kobweb"))
+    compileOnly(project(":backend:api"))
+    // We need to add this dependency manually  so that the above two dependencies will work, since we don't add their
+    // transitive dependencies into our jar (partly because that's complicated, we'd have to filter out kotlin
+    // dependencies, and partly because I'm not a Gradle expert, so it's possible there's a better way).
+    runtimeOnly(libs.kaml)
+}
+tasks.withType<Jar> {
+    from(configurations.compileClasspath.get()
+        .filter { it.isFile && it.absolutePath.startsWith(project.rootProject.projectDir.absolutePath) }
+        .map { zipTree(it) })
 }
 
 val DESCRIPTION = "A Gradle plugin that completes a user's Kobweb app"
@@ -55,4 +70,6 @@ tasks.register<Copy>("copyServerJar") {
     into(file("$projectDir/build/resources/main"))
     rename(serverJarName, "server.jar")
 }
-project.tasks.getByPath("processResources").dependsOn("copyServerJar")
+project.tasks.named("processResources") {
+    dependsOn("copyServerJar")
+}

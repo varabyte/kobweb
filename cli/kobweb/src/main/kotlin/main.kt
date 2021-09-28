@@ -5,7 +5,7 @@ import kotlinx.cli.*
 
 enum class RunEnvironment {
     DEV,
-    PROD,
+    PROD;
 }
 
 @ExperimentalCli

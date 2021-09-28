@@ -105,6 +105,6 @@ fun handleCreate(template: String) = konsoleApp {
         if (dstPath != Path.of("").toAbsolutePath()) {
             indent(); cmd("cd"); textLine(" $projectFolder")
         }
-        indent(); cmd("./gradlew"); textLine(" jsRun --continuous")
+        indent(); cmd("kobweb"); textLine(" run")
     }.run()
 }
