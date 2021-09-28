@@ -6,6 +6,8 @@ import com.varabyte.kobweb.cli.common.informError
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.cli.common.textError
 import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.server.api.ServerRequest
+import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerState
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.konsole.foundation.anim.konsoleAnimOf
@@ -80,7 +82,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
                 textLine("Server stopped gracefully.")
             }
             RunState.CHANGED_EXTERNALLY -> {
-                yellow { textLine("Exiting. It seems like the server was stopped or restarted by a separate process.") }
+                yellow { textLine("Exiting. It seems like the server was stopped by a separate process.") }
             }
             RunState.STOPPING_VIA_INTERRUPT -> {
                 yellow { textLine("CTRL-C received. Kicked off a request to stop the server but we have to exit NOW.") }
@@ -154,9 +156,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
             if (runState == RunState.RUNNING) {
                 runState = RunState.STOPPING_VIA_INTERRUPT
 
-                val process = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
-                process.waitFor()
-
+                ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
                 signal()
             }
         })
