@@ -16,18 +16,21 @@ import com.varabyte.konsole.foundation.konsoleVarOf
 import com.varabyte.konsole.foundation.render.aside
 import com.varabyte.konsole.foundation.runUntilSignal
 import com.varabyte.konsole.foundation.text.*
+import com.varabyte.konsole.foundation.timer.addTimer
 import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.time.Duration
 
-sealed interface RunState {
-    object STARTING : RunState
-    object FAILED_TO_START : RunState
-    class RUNNING(val serverState: ServerState) : RunState
-    object STOPPING_GRACEFULLY : RunState
-    object STOPPING_VIA_INTERRUPT : RunState
-    object STOPPED : RunState
+enum class RunState {
+    STARTING,
+    FAILED_TO_START,
+    RUNNING,
+    STOPPING_GRACEFULLY,
+    STOPPING_VIA_INTERRUPT,
+    CHANGED_EXTERNALLY,
+    STOPPED,
 }
 
 fun handleRun(env: RunEnvironment) = konsoleApp {
@@ -45,19 +48,23 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
         RunEnvironment.DEV -> "development"
         RunEnvironment.PROD -> "production"
     }
+    lateinit var serverState: ServerState // Set if RunState ever hits RunState.RUNNING; otherwise, don't use!
     val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
-    var runState by konsoleVarOf<RunState>(RunState.STARTING)
+    var runState by konsoleVarOf(RunState.STARTING)
+    var addOutputSeparator by konsoleVarOf(false) // Separate active block from Gradle output above if any
     konsole {
-        textLine()
+        if (addOutputSeparator) {
+            textLine()
+        }
+
         when (runState) {
-            is RunState.STARTING -> {
+            RunState.STARTING -> {
                 textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
             }
-            is RunState.FAILED_TO_START -> {
+            RunState.FAILED_TO_START -> {
                 textError("Kobweb server failed to start")
             }
-            is RunState.RUNNING -> {
-                val serverState = (runState as RunState.RUNNING).serverState
+            RunState.RUNNING -> {
                 green {
                     text("Kobweb server ($envName) is running at ")
                     cyan { text("http://0.0.0.0:${serverState.port}") }
@@ -66,13 +73,16 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
                 textLine()
                 textLine("Press Q anytime to stop it.")
             }
-            is RunState.STOPPING_GRACEFULLY -> {
+            RunState.STOPPING_GRACEFULLY -> {
                 textLine("Server is stopping$ellipsisAnim")
             }
-            is RunState.STOPPED -> {
+            RunState.STOPPED -> {
                 textLine("Server stopped gracefully.")
             }
-            is RunState.STOPPING_VIA_INTERRUPT -> {
+            RunState.CHANGED_EXTERNALLY -> {
+                yellow { textLine("Exiting. It seems like the server was stopped or restarted by a separate process.") }
+            }
+            RunState.STOPPING_VIA_INTERRUPT -> {
                 yellow { textLine("CTRL-C received. Kicking off a request to stop the server but we have to exit NOW.") }
             }
         }
@@ -82,6 +92,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
             val br = BufferedReader(isr)
             lateinit var line: String
             while (br.readLine().also { line = it } != null) {
+                addOutputSeparator = true
                 aside {
                     black(isBright = true) {
                         textLine(line)
@@ -101,17 +112,31 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
             process.waitFor()
         }
 
-        val serverState = serverStateFile.content
-        if (serverState != null) {
-            runState = RunState.RUNNING(serverState)
-        }
-        else {
-            runState = RunState.FAILED_TO_START
-            signal()
+        serverStateFile.content.let { content ->
+            if (content != null) {
+                serverState = content
+                runState = RunState.RUNNING
+
+                addTimer(Duration.ofMillis(500), repeat = true) {
+                    if (runState == RunState.RUNNING) {
+                        if (serverStateFile.content != content) {
+                            runState = RunState.CHANGED_EXTERNALLY
+                            signal()
+                        }
+                    }
+                    else {
+                        repeat = false
+                    }
+                }
+
+            } else {
+                runState = RunState.FAILED_TO_START
+                signal()
+            }
         }
 
         onKeyPressed {
-            if (key == Keys.Q && runState is RunState.RUNNING) {
+            if (key == Keys.Q && runState == RunState.RUNNING) {
                 runState = RunState.STOPPING_GRACEFULLY
                 CoroutineScope(Dispatchers.IO).launch {
                     val process = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
@@ -126,7 +151,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
         }
 
         Runtime.getRuntime().addShutdownHook(Thread {
-            if (runState is RunState.RUNNING) {
+            if (runState == RunState.RUNNING) {
                 runState = RunState.STOPPING_VIA_INTERRUPT
 
                 val process = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
