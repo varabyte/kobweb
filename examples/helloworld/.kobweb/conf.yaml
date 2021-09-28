@@ -2,7 +2,7 @@ site:
   title: "Hello World"
 
 server:
-  locations:
+  files:
     dev:
       contentRoot: "build/processedResources/js/main"
       script: "build/js/packages/helloworld/kotlin/helloworld.js"

@@ -18,8 +18,8 @@ fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf) {
 
 private fun Application.configureDevRouting(conf: KobwebConf) {
     // TODO: Create our own in-memory copy of the script with the kobweb hook updated so we show a loading spinner
-    val script = Path(conf.server.locations.dev.script)
-    val contentRoot = Path(conf.server.locations.dev.contentRoot)
+    val script = Path(conf.server.files.dev.script)
+    val contentRoot = Path(conf.server.files.dev.contentRoot)
 
     routing {
         get("/${script.name}") {

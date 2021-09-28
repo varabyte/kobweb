@@ -12,11 +12,11 @@ class Site(val title: String)
 
 @Serializable
 class Server(
-    val locations: Locations,
+    val files: Files,
     val port: Int = 8080
 ) {
     @Serializable
-    class Locations(
+    class Files(
         val dev: Dev,
         val prod: Prod = Prod(),
     ) {
