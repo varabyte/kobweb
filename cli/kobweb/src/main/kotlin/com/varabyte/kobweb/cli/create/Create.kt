@@ -97,11 +97,13 @@ fun handleCreate(template: String) = konsoleApp {
             cyan { text(name) }
         }
         textLine()
-        green { text("Success! ") }
-        textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
+        bold {
+            green { text("Success! ") }
+            textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
+        }
         textLine()
-        text("Consider downloading "); magenta { textLine("IntelliJ IDEA Community Edition") };
-        textLine("through https://www.jetbrains.com/toolbox-app/")
+        text("Consider downloading "); magenta(isBright = true) { textLine("IntelliJ IDEA Community Edition") };
+        text("using "); blue(isBright = true) { textLine("https://www.jetbrains.com/toolbox-app/") }
         textLine()
         textLine("We suggest that you begin by typing:")
         textLine()
