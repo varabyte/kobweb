@@ -9,7 +9,9 @@ import kotlinx.serialization.Serializable
 data class ServerState(
     val port: Int,
     val pid: Long,
-)
+) {
+    fun isRunning() = ProcessHandle.of(pid).isPresent
+}
 
 class ServerStateFile(kobwebFolder: KobwebFolder) : KobwebReadableFile<ServerState>(
     kobwebFolder,

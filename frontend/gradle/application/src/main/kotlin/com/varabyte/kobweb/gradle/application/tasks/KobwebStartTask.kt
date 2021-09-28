@@ -25,6 +25,11 @@ abstract class KobwebStartTask @Inject constructor(private val env: ServerEnviro
         val kobwebFolder = KobwebFolder.inWorkingDirectory()
             ?: throw GradleException("This project is missing a Kobweb root folder")
 
+        val stateFile = ServerStateFile(kobwebFolder)
+        if (stateFile.content?.isRunning() == true) {
+            return
+        }
+
         val javaHome = System.getProperty("java.home")!!
 
         val serverJar = KobwebStartTask::class.java.getResourceAsStream("/server.jar")!!.let { stream ->
@@ -37,7 +42,6 @@ abstract class KobwebStartTask @Inject constructor(private val env: ServerEnviro
         val process = Runtime.getRuntime()
             .exec(arrayOf("$javaHome/bin/java", env.toSystemPropertyParam(), "-jar", serverJar.absolutePath))
 
-        val stateFile = ServerStateFile(kobwebFolder)
         while (stateFile.content == null && process.isAlive) {
             Thread.sleep(300)
         }

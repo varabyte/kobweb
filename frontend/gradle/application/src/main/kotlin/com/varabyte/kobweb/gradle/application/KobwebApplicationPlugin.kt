@@ -19,18 +19,14 @@ class KobwebApplicationPlugin : Plugin<Project> {
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
         val kobwebStartDevTask = project.tasks.register("kobwebStartDev", KobwebStartTask::class.java, ServerEnvironment.DEV)
         val kobwebStartProdTask = project.tasks.register("kobwebStartProd", KobwebStartTask::class.java, ServerEnvironment.PROD)
-        val kobwebStopTask = project.tasks.register("kobwebStop", KobwebStopTask::class.java)
+        project.tasks.register("kobwebStop", KobwebStopTask::class.java)
 
         project.afterEvaluate {
             project.tasks.named("compileKotlinJs") {
                 dependsOn(kobwebGenTask)
             }
-            val resourcesTask = project.tasks.named("jsProcessResources") {
+            project.tasks.named("jsProcessResources") {
                 dependsOn(kobwebGenTask)
-            }
-            project.tasks.withType(KobwebStartTask::class.java) {
-                dependsOn(kobwebStopTask)
-                dependsOn(resourcesTask)
             }
 
             val composeDevExecutableTask = project.tasks.named("compileDevelopmentExecutableKotlinJs")
