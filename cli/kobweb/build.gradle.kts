@@ -10,11 +10,13 @@ version = libs.versions.kobweb.get()
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.kotlinx.cli)
+    implementation(libs.kotlinx.coroutines)
     implementation(libs.konsole)
     implementation(libs.jgit)
     implementation(libs.freemarker)
     implementation(libs.kaml)
     implementation(project(":common:kobweb"))
+    implementation(project(":backend:api"))
 }
 
 application {

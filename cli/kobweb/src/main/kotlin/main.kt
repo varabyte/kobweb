@@ -1,5 +1,6 @@
-import com.varabyte.kobweb.cli.create.runCreate
-import com.varabyte.kobweb.cli.version.runVersion
+import com.varabyte.kobweb.cli.create.handleCreate
+import com.varabyte.kobweb.cli.run.handleRun
+import com.varabyte.kobweb.cli.version.handleVersion
 import kotlinx.cli.*
 
 enum class RunEnvironment {
@@ -13,7 +14,7 @@ fun main(args: Array<String>) {
 
     class Version : Subcommand("version", "Print the version of this binary") {
         override fun execute() {
-            runVersion()
+            handleVersion()
         }
     }
 
@@ -21,7 +22,7 @@ fun main(args: Array<String>) {
         val template by argument(ArgType.String, "template", "The name of the template to start from, e.g. 'site'")
 
         override fun execute() {
-            runCreate(template)
+            handleCreate(template)
         }
     }
 
@@ -29,8 +30,7 @@ fun main(args: Array<String>) {
         val env by option(ArgType.Choice<RunEnvironment>(), "env").default(RunEnvironment.DEV)
 
         override fun execute() {
-            // TODO: Implement
-            println("User asked to run a webserver. Environment: $env")
+            handleRun(env)
         }
     }
 

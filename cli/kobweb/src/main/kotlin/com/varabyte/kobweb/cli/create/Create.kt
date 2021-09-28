@@ -20,7 +20,7 @@ import kotlin.io.path.name
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
-fun runCreate(template: String) = konsoleApp {
+fun handleCreate(template: String) = konsoleApp {
     val repo = "https://github.com/varabyte/kobweb-templates"
     val tempDir = Files.createTempDirectory("kobweb").toFile()
     data.set(TempDirKey, tempDir, dispose = { tempDir.deleteRecursively() })

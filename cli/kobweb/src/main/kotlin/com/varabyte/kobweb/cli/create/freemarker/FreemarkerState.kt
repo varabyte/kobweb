@@ -67,7 +67,7 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
                 when (inst) {
                     is Instruction.Inform -> {
                         val message = inst.message.process(cfg, model)
-                        informUser(message)
+                        informInfo(message)
                     }
 
                     is Instruction.QueryVar -> {

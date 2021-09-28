@@ -5,11 +5,18 @@ import com.varabyte.konsole.foundation.input.*
 import com.varabyte.konsole.foundation.konsoleVarOf
 import com.varabyte.konsole.foundation.text.*
 import com.varabyte.konsole.runtime.KonsoleApp
+import com.varabyte.konsole.runtime.render.RenderScope
 
 private enum class ProcessingState {
     IN_PROGRESS,
     FAILED,
     SUCCEEDED
+}
+
+fun RenderScope.textError(text: String) {
+    red { text("✗") }
+    text(' ')
+    textLine(text)
 }
 
 fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
@@ -44,7 +51,13 @@ fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
     return state == ProcessingState.SUCCEEDED
 }
 
-fun KonsoleApp.informUser(message: String) {
+fun KonsoleApp.informError(message: String) {
+    konsole {
+        textError(message)
+    }.run()
+}
+
+fun KonsoleApp.informInfo(message: String) {
     konsole {
         yellow { text('!') }
         text(' ')

@@ -5,7 +5,7 @@ import com.varabyte.konsole.foundation.text.text
 import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.foundation.text.yellow
 
-fun runVersion() = konsoleApp {
+fun handleVersion() = konsoleApp {
     konsole {
         textLine("kobweb ${System.getProperty("kobweb.version")}")
     }.run()
