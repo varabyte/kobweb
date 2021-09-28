@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
@@ -29,4 +31,8 @@ val applicationClass = "com.varabyte.kobweb.server.ApplicationKt"
 project.setProperty("mainClassName", applicationClass)
 application {
     mainClass.set(applicationClass)
+}
+
+tasks.withType<ShadowJar> {
+    minimize()
 }
