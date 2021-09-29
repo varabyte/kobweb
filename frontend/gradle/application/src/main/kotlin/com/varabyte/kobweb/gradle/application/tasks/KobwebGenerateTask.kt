@@ -81,7 +81,7 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
     init {
         confFile.convention(project.layout.projectDirectory.file(config.confFile.get()))
         genDir.convention(project.layout.buildDirectory.dir(config.genDir.get()))
-        pagesPackage.convention(".pages")
+        pagesPackage.convention(config.pagesPackage.get())
         publicPath.convention("public")
     }
 
@@ -191,13 +191,16 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
             )
         )
 
-        File(genDirResRoot, "index.html").writeText(
-            createHtmlFile(
-                conf.site.title,
-                // TODO(Bug #7): Only specify font-awesome link if necessary
-                listOf("""<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />"""),
-                conf.server.files.dev.script.substringAfterLast("/")
+        File(genDirResRoot, "public").let { publicRoot ->
+            publicRoot.mkdirs()
+            File(publicRoot, "index.html").writeText(
+                createHtmlFile(
+                    conf.site.title,
+                    // TODO(Bug #7): Only specify font-awesome link if necessary
+                    listOf("""<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />"""),
+                    conf.server.files.dev.script.substringAfterLast("/")
+                )
             )
-        )
+        }
     }
 }
