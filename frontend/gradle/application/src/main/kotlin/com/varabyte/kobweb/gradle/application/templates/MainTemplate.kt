@@ -11,6 +11,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
     imports.addAll(pageFqcnRoutes.keys)
     imports.sort()
 
+    // TODO(Bug #13): Move the kobwebHook logic into the server
     return """
         ${
             imports.joinToString("\n        ") { fcqn -> "import $fcqn" }
@@ -18,7 +19,27 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
 
         // This hook is provided so that a Kobweb server can insert in live reloading logic when run in development
         // mode. Of course, in production, it's a no-op.
-        fun kobwebHook() {}
+        fun kobwebHook() {
+            var lastVersion: Int? = null
+            var checkVersionInterval = 0
+            checkVersionInterval = window.setInterval(
+                handler = {
+                    window.fetch("${'$'}{window.location.protocol}//${'$'}{window.location.host}/api/kobweb/version").then {
+                        it.text().then { text ->
+                            val version = text.toInt()
+                            if (lastVersion != null && lastVersion != version) {
+                                window.location.reload()
+                            }
+                            lastVersion = version
+                        }
+                    }.catch {
+                        // The server was probably taken down, so stop checking.
+                        window.clearInterval(checkVersionInterval)
+                    }
+                },
+                timeout = 250,
+            )
+        }
 
         fun main() {
             kobwebHook()
