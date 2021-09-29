@@ -37,7 +37,7 @@ fun main() = runBlocking {
     val stateFile = ServerStateFile(folder)
     stateFile.content?.let { serverState ->
         if (ProcessHandle.of(serverState.pid).isPresent) {
-            throw KobwebException("Server cannot start as one is already running at http://0.0.0.0:${serverState.port} with PID ${serverState.pid}")
+            throw KobwebException("Server cannot start as one is already running at http://localhost:${serverState.port} with PID ${serverState.pid}")
         }
         stateFile.content = null
     }

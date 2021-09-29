@@ -64,7 +64,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
             RunState.RUNNING -> {
                 green {
                     text("Kobweb server ($envName) is running at ")
-                    cyan { text("http://0.0.0.0:${serverState.port}") }
+                    cyan { text("http://localhost:${serverState.port}") }
                 }
                 textLine(" (PID = ${serverState.pid})")
                 textLine()

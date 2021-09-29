@@ -12,7 +12,7 @@ import java.io.File
 import javax.inject.Inject
 
 private fun ServerState.toDisplayText(): String {
-    return "http://0.0.0.0:$port (PID = $pid)"
+    return "http://localhost:$port (PID = $pid)"
 }
 
 /**
