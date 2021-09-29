@@ -1,0 +1,1 @@
+A Kobweb extension for parsing local markdown files and automatically creating pages for them.
