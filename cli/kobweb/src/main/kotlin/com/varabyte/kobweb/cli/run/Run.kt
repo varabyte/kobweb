@@ -116,7 +116,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
 
         coroutineScope {
             while (true) {
-                serverStateFile.content?.let {
+                serverStateFile.content?.takeIf { it.isRunning() }?.let {
                     serverState = it
                     return@coroutineScope
                 }
@@ -128,7 +128,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
 
         addTimer(Duration.ofMillis(500), repeat = true) {
             if (runState == RunState.RUNNING) {
-                if (serverStateFile.content != serverState) {
+                if (!serverState.isRunning() || serverStateFile.content != serverState) {
                     runState = RunState.CHANGED_EXTERNALLY
                     signal()
                 }
