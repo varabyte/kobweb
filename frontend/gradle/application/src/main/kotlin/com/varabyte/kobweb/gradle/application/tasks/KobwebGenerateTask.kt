@@ -191,7 +191,7 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
             )
         )
 
-        File(genDirResRoot, "public").let { publicRoot ->
+        File(genDirResRoot, publicPath.get()).let { publicRoot ->
             publicRoot.mkdirs()
             File(publicRoot, "index.html").writeText(
                 createHtmlFile(
