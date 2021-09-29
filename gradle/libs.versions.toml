@@ -1,4 +1,5 @@
 [versions]
+commonmark = "0.18.0"
 compose = "1.0.0-alpha4-build331"
 freemarker = "2.3.31"
 jgit = "5.12.0.202106070339-r"
@@ -15,6 +16,11 @@ truthish = "0.6.0"
 shadow = "7.0.0"
 
 [libraries]
+commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
+commonmark-autolink = { module = "org.commonmark:commonmark-ext-autolink", version.ref = "commonmark" }
+commonmark-frontmatter = { module = "org.commonmark:commonmark-ext-yaml-front-matter", version.ref = "commonmark" }
+commonmark-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark" }
+commonmark-tasklist = { module = "org.commonmark:commonmark-ext-task-list-items", version.ref = "commonmark" }
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker"}
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
@@ -33,6 +39,7 @@ logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 truthish = { module = "com.varabyte.truthish:truthish", version.ref = "truthish" }
 
 [bundles]
+commonmark = ["commonmark-core", "commonmark-autolink", "commonmark-frontmatter","commonmark-tables","commonmark-tasklist"]
 ktor = ["ktor-server-core", "ktor-serialization", "ktor-auth", "ktor-server-host-common", "ktor-server-netty", "logback"]
 
 [plugins]

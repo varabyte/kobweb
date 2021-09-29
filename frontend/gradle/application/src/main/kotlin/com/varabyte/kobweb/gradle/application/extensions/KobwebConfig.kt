@@ -4,6 +4,8 @@ package com.varabyte.kobweb.gradle.application.extensions
 
 import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
+import com.varabyte.kobweb.gradle.application.RESOURCE_SUFFIX
+import com.varabyte.kobweb.gradle.application.SRC_SUFFIX
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
@@ -11,17 +13,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFiles
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
-
-private fun File.isDescendantOf(maybeAncestor: File): Boolean {
-    var curr: File? = this
-    while (curr != null) {
-        if (curr == maybeAncestor) {
-            return true
-        }
-        curr = curr.parentFile
-    }
-    return false
-}
 
 abstract class KobwebConfig {
     /**
@@ -57,28 +48,11 @@ abstract class KobwebConfig {
         publicPath.convention("public")
     }
 
-    private fun getFiles(project: Project, rootDirProducer: (KotlinSourceSet) -> FileCollection): Sequence<File> {
-        val genDirFile = project.layout.buildDirectory.asFile.get().resolve(genDir.get())
+    fun getGenSrcRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$SRC_SUFFIX").get().asFile
+    fun getGenResRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$RESOURCE_SUFFIX").get().asFile
 
-        return project.kotlin.sourceSets.asSequence()
-            .filter { sourceSet -> sourceSet.name == "jsMain" }
-            .flatMap { sourceSet ->
-                rootDirProducer(sourceSet)
-                    .filter { rootDir -> !rootDir.isDescendantOf(genDirFile) }
-                    .flatMap { rootDir ->
-                        rootDir.walkBottomUp().filter { it.isFile }
-                    }
-            }
-
-    }
-
-    @InputFiles
-    fun getSourceFiles(project: Project): List<File> {
-        return getFiles(project) { sourceSet -> sourceSet.kotlin.sourceDirectories }
-            .filter { it.extension == "kt" }
-            .toList()
-    }
-
-    @InputFiles
-    fun getResourceFiles(project: Project): List<File> = getFiles(project) { sourceSet -> sourceSet.resources }.toList()
+    /**
+     * Given a [project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"
+     */
+    fun getPagesPackage(project: Project): String = project.getQualifiedPackage(pagesPackage.get())
 }

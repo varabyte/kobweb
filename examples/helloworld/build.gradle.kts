@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform") version "1.5.30"
     id("org.jetbrains.compose") version "1.0.0-alpha4-build331"
     id("com.varabyte.kobweb.application")
+    id("com.varabyte.kobwebx.markdown")
 }
 
 group = "helloworld"

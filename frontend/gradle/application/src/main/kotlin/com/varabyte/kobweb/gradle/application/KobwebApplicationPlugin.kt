@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import com.varabyte.kobweb.gradle.application.kmp.sourceSets
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateTask
@@ -18,15 +19,18 @@ import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.tasks.TaskState
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
-import java.nio.file.Path
+
+val Project.kobwebFolder: KobwebFolder
+    get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
+        ?: throw GradleException("This project is not a Kobweb project but is applying the Kobweb plugin.")
 
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebApplicationPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val kobwebFolder = KobwebFolder.fromChildPath(Path.of(""))
-            ?: throw GradleException("This project is not a Kobweb project but is applying the Kobweb plugin.")
-
+        val kobwebFolder = project.kobwebFolder
         val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
+        project.extensions.create("kobwebx", KobwebxBlock::class.java)
+
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
         val kobwebStartDevTask = project.tasks.register("kobwebStartDev", KobwebStartTask::class.java, ServerEnvironment.DEV)
         val kobwebStartProdTask = project.tasks.register("kobwebStartProd", KobwebStartTask::class.java, ServerEnvironment.PROD)

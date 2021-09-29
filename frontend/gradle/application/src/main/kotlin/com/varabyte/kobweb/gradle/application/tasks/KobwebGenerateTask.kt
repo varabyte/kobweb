@@ -4,14 +4,17 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.kobweb.common.conf.KobwebConfFile
-import com.varabyte.kobweb.gradle.application.*
+import com.varabyte.kobweb.gradle.application.APP_FQCN
+import com.varabyte.kobweb.gradle.application.APP_SIMPLE_NAME
+import com.varabyte.kobweb.gradle.application.PAGE_FQCN
+import com.varabyte.kobweb.gradle.application.PAGE_SIMPLE_NAME
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
+import com.varabyte.kobweb.gradle.application.extensions.getResourceFiles
+import com.varabyte.kobweb.gradle.application.extensions.getSourceFiles
 import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import org.gradle.api.GradleException
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -49,17 +52,17 @@ private class PageEntry(
 )
 
 abstract class KobwebGenerateTask @Inject constructor(private val config: KobwebConfig) : KobwebTask("Generate Kobweb code and resources") {
-    @get:InputFile
-    abstract val confFile: RegularFileProperty
+    @InputFile
+    fun getConfFile(): File = project.layout.projectDirectory.file(config.confFile.get()).asFile
 
-    @get:OutputDirectory
-    abstract val genDir: DirectoryProperty
-
-    @InputFiles
-    fun getSourceFiles() = config.getSourceFiles(project)
+    @OutputDirectory
+    fun getGenDir(): File = project.layout.buildDirectory.dir(config.genDir.get()).get().asFile
 
     @InputFiles
-    fun getResourceFiles(): List<File> = config.getResourceFiles(project)
+    fun getSourceFiles(): List<File> = project.getSourceFiles(TargetPlatform.JS).toList()
+
+    @InputFiles
+    fun getResourceFiles(): List<File> = project.getResourceFiles(TargetPlatform.JS).toList()
 
     /**
      * The root package of all pages.
@@ -68,38 +71,19 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
      *
      * An initial '.' means this should be prefixed by the project group, e.g. ".pages" -> "com.example.pages"
      */
-    @get:Input
-    abstract val pagesPackage: Property<String>
+    @Input
+    fun getPagesPackage(): String = config.pagesPackage.get()
 
     /**
      * The path of public resources inside the project's resources folder, e.g. "public" ->
      * "src/jsMain/resources/public"
      */
-    @get:Input
-    abstract val publicPath: Property<String>
-
-    init {
-        confFile.convention(project.layout.projectDirectory.file(config.confFile.get()))
-        genDir.convention(project.layout.buildDirectory.dir(config.genDir.get()))
-        pagesPackage.convention(config.pagesPackage.get())
-        publicPath.convention("public")
-    }
-
-    private fun getPagesPackage(projectGroup: String): String {
-        return pagesPackage.get().let { pages ->
-            when {
-                pages.startsWith('.') -> "$projectGroup$pages"
-                else -> pages
-            }
-        }
-    }
-
-    private fun getPublicPath(resourcesDir: File) = resourcesDir.resolve(publicPath.get())
-
+    @Input
+    fun getPublicPath(): String = config.publicPath.get()
 
     @TaskAction
     fun execute() {
-        val confFile = confFile.get().asFile
+        val confFile = getConfFile()
         if (!confFile.exists()) {
             throw GradleException("A Kobweb project must have a \"${confFile.name}\" file in its root directory")
         }
@@ -152,7 +136,7 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
                                     }
                                 }
                                 pageSimpleName -> {
-                                    val pagesPackage = getPagesPackage(project.group.toString())
+                                    val pagesPackage = config.getPagesPackage(project)
                                     if (currPackage.startsWith(pagesPackage)) {
                                         // e.g. com.example.pages.blog -> blog
                                         val slugPrefix = currPackage
@@ -175,9 +159,8 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
             }
         }
 
-        val genDirFile = genDir.get().asFile
-        val genDirSrcRoot = File(genDirFile, SRC_SUFFIX).also { it.mkdirs() }
-        val genDirResRoot = File(genDirFile, RESOURCE_SUFFIX).also { it.mkdirs() }
+        val genDirSrcRoot = config.getGenSrcRoot(project)
+        val genDirResRoot = config.getGenResRoot(project)
 
         File(genDirSrcRoot, "main.kt").writeText(
             createMainFunction(
@@ -191,7 +174,7 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
             )
         )
 
-        File(genDirResRoot, publicPath.get()).let { publicRoot ->
+        File(genDirResRoot, getPublicPath()).let { publicRoot ->
             publicRoot.mkdirs()
             File(publicRoot, "index.html").writeText(
                 createHtmlFile(
