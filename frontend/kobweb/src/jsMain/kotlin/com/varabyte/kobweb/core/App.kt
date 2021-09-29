@@ -49,7 +49,7 @@ object DefaultStyleSheet : StyleSheet() {
             boxSizing("border-box")
 
             // The following transition settings make changing the color mode look good
-            transitionProperty("background-color", "color")
+            transitionProperty("background-color", "color", "opacity")
             transitionDuration(200.ms)
         }
     }
