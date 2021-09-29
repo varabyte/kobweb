@@ -6,29 +6,25 @@ import com.varabyte.kobweb.common.io.KobwebWritableFile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/*
-@Serializable
-sealed class Instruction(
-    val condition: String? = null,
-) {
-    /**
-     * Inform the user about something.
-     *
-     * @param message The message to show to the user. This value will be processed by freemarker and can be dynamic!
-     */
-    @Serializable
-    @SerialName("Inform")
-    class Inform(
-        val message: String,
-    ) : Instruction()
-
- */
-
+// Keep all children classes even if they can be objects; we may update them later
+@Suppress("CanSealedSubClassBeObject")
 @Serializable
 sealed class ServerRequest {
     @Serializable
     @SerialName("Stop")
     class Stop : ServerRequest()
+
+    @Serializable
+    @SerialName("IncrementVersion")
+    class IncrementVersion : ServerRequest()
+
+    @Serializable
+    @SerialName("SetStatus")
+    class SetStatus(val message: String, val timeoutMs: Long = Long.MAX_VALUE) : ServerRequest()
+
+    @Serializable
+    @SerialName("ClearStatus")
+    class ClearStatus : ServerRequest()
 }
 
 @Serializable
@@ -47,13 +43,7 @@ class ServerRequestsFile(kobwebFolder: KobwebFolder) : KobwebWritableFile<Server
         content = ServerRequests((currRequests?.requests ?: emptyList()) + request)
     }
 
-    fun dequeueRequest(): ServerRequest? {
-        val currRequests = content
-        val nextRequest = currRequests?.requests?.firstOrNull()
-        if (nextRequest != null) {
-            content = ServerRequests(currRequests.requests.drop(1))
-        }
-
-        return nextRequest
+    fun removeRequests(): List<ServerRequest> {
+        return content?.requests.also { content = null } ?: emptyList()
     }
 }

@@ -11,9 +11,7 @@ import com.varabyte.kobweb.server.plugins.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
-import java.net.BindException
 import java.net.ServerSocket
-import java.net.Socket
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.deleteIfExists
 
@@ -49,9 +47,10 @@ fun main() = runBlocking {
         ++port
     }
 
+    val globals = ServerGlobals()
     val env = ServerEnvironment.get()
     val engine = embeddedServer(Netty, port) {
-        configureRouting(env, conf)
+        configureRouting(env, conf, globals)
         configureSerialization()
         configureHTTP()
         configureSecurity()
@@ -70,19 +69,18 @@ fun main() = runBlocking {
 
     var shouldStop = false
     while (!shouldStop) {
-        while (true) {
-            val request = requestsFile.dequeueRequest() ?: break
+        requestsFile.removeRequests().forEach { request ->
             when (request) {
-                is ServerRequest.Stop -> {
-                    shouldStop = true
-                    // Received request to shutdown
-                }
+                is ServerRequest.Stop -> shouldStop = true
+                is ServerRequest.IncrementVersion -> globals.version++
+                is ServerRequest.SetStatus -> globals.status = request.message
+                is ServerRequest.ClearStatus -> globals.status = null
             }
         }
         delay(300)
     }
 
-    engine.stop(200, 500, TimeUnit.MILLISECONDS)
+    engine.stop(1, 5, TimeUnit.MILLISECONDS)
     requestsFile.path.deleteIfExists()
     stateFile.content = null
 }
