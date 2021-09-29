@@ -4,7 +4,7 @@ plugins {
     id("com.varabyte.kobweb.internal.publish")
 }
 
-group = "com.varabyte.kobweb.common"
+group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.get()
 
 dependencies {
@@ -12,11 +12,7 @@ dependencies {
     implementation(libs.kaml)
 }
 
-// Avoid ambiguity / add clarity in generated artifacts
-tasks.jar {
-    archiveFileName.set("kobweb-common.jar")
-}
-
 kobwebPublication {
-    description.set("A collection of common Kobweb-related utility classes used by multiple modules")
+    artifactId.set("kobweb-project")
+    description.set("A collection of utility classes for identifying and working with files in a Kobweb project.")
 }

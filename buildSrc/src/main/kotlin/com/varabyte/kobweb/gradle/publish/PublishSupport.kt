@@ -51,6 +51,20 @@ internal fun PublishingExtension.addVarabyteArtifact(
         }
     }
 
+    // kotlin("jvm") projects don't automatically declare a maven publication
+    if (publications.none { it is MavenPublication }) {
+        val javaComponent = project.components.findByName("java")
+        if (javaComponent != null) {
+            publications.create("maven", MavenPublication::class.java) {
+                groupId = project.group.toString()
+                this.artifactId = artifactId
+                version = project.version.toString()
+
+                from(javaComponent)
+            }
+        }
+    }
+
     publications.withType(MavenPublication::class.java) {
         if (artifactId != null) {
             this.artifactId = artifactId + artifactSuffix(name)

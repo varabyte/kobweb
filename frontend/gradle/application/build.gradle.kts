@@ -18,16 +18,13 @@ dependencies {
     // For parsing code. Instead, use KSP someday? See also: Bug #4
     implementation(kotlin("compiler-embeddable"))
 
-    // Note: These are compileOnly because we embed the classes directly into this plugin by modifying the jar class
-    // below. We do this so that we don't have to publish these internal artifacts in our maven repository - they are
-    // implementation details and shouldn't leak as public artifacts.
-    compileOnly(project(":common:kobweb"))
+    implementation(project(":common:kobweb-project"))
+    // Note: compileOnly because we embed the classes directly into this plugin by modifying the jar task below. We do
+    // this so that we don't have to publish these internal artifacts in our maven repository - they are implementation
+    // details and shouldn't leak as public artifacts.
     compileOnly(project(":backend:api"))
-    // We need to add this dependency manually  so that the above two dependencies will work, since we don't add their
-    // transitive dependencies into our jar (partly because that's complicated, we'd have to filter out kotlin
-    // dependencies, and partly because I'm not a Gradle expert, so it's possible there's a better way).
-    runtimeOnly(libs.kaml)
 }
+
 tasks.withType<Jar> {
     from(configurations.compileClasspath.get()
         .filter { it.isFile && it.absolutePath.startsWith(project.rootProject.projectDir.absolutePath) }

@@ -9,7 +9,7 @@ version = libs.versions.kobweb.get()
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.kaml)
-    implementation(project(":common:kobweb"))
+    implementation(project(":common:kobweb-project"))
 }
 
 // Avoid ambiguity / add clarity in generated artifacts
