@@ -39,7 +39,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @OutputDirectory
     fun getGenDir(): File =
-        kobwebConfig.getGenSrcRoot(project).resolve(kobwebConfig.getPagesPackage(project).replace(".", "/"))
+        kobwebConfig.getGenSrcRoot(project).resolve(kobwebConfig.getQualfiedPagesPackage(project).replace(".", "/"))
 
     @TaskAction
     fun execute() {
@@ -72,13 +72,13 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     val dirParts = parts.subList(0, parts.lastIndex)
 
                     val mdPackage =
-                        kobwebConfig.getPagesPackage(project) + if (dirParts.isNotEmpty()) ".${dirParts.joinToString(".")}" else ""
+                        kobwebConfig.pagesPackage.get() + if (dirParts.isNotEmpty()) ".${dirParts.joinToString(".")}" else ""
                     val funName = mdFileRel.nameWithoutExtension.suffixIfNot("Page")
 
                     File(getGenDir(), "${dirParts.joinToString("/")}/$funName.kt").let { outputFile ->
                         outputFile.parentFile.mkdirs()
 
-                        val ktRenderer = KotlinRenderer(markdownComponents, mdPackage, funName)
+                        val ktRenderer = KotlinRenderer(project, markdownComponents, mdPackage, funName)
                         outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
                     }
                 }

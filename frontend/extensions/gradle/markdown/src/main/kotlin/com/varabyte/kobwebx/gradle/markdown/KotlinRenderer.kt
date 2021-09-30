@@ -1,12 +1,18 @@
 package com.varabyte.kobwebx.gradle.markdown
 
+import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
+import org.commonmark.ext.front.matter.YamlFrontMatterBlock
+import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.*
 import org.commonmark.renderer.Renderer
+import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import java.util.*
 
 class KotlinRenderer(
+    private val project: Project,
     private val components: MarkdownComponents,
-    private val fqPackage: String,
+    private val relativePackage: String,
     private val funName: String,
 ) : Renderer {
 
@@ -16,7 +22,7 @@ class KotlinRenderer(
     override fun render(node: Node, output: Appendable) {
         output.appendLine(
             """
-            package $fqPackage
+            package ${project.prefixQualifiedPackage(relativePackage)}
 
             import androidx.compose.runtime.*
             import com.varabyte.kobweb.core.*
@@ -28,14 +34,14 @@ class KotlinRenderer(
         )
 
         indentCount++
-        node.accept(RenderVisitor(output))
+        RenderVisitor(output).visitAndFinish(node)
         indentCount--
 
         assert(indentCount == 0)
         output.appendLine(
             """
-            }
-        """.trimIndent()
+                }
+            """.trimIndent()
         )
     }
 
@@ -45,7 +51,17 @@ class KotlinRenderer(
         }
     }
 
+    private fun RenderVisitor.visitAndFinish(node: Node) {
+        node.accept(this)
+        finish()
+    }
+
     private inner class RenderVisitor(private val output: Appendable) : AbstractVisitor() {
+        private val onFinish = Stack<() -> Unit>()
+        fun finish() {
+            onFinish.forEach { action -> action() }
+        }
+
         private fun doVisit(node: Node, composable: Provider<String>, vararg args: String) {
             output.append("$indent${composable.get()}")
             if (args.isNotEmpty() || node.firstChild == null) {
@@ -58,8 +74,7 @@ class KotlinRenderer(
                 visitChildren(node)
                 --indentCount
                 output.appendLine("$indent}")
-            }
-            else {
+            } else {
                 output.appendLine()
             }
         }
@@ -86,7 +101,6 @@ class KotlinRenderer(
 
         override fun visit(hardLineBreak: HardLineBreak) {
             doVisit(hardLineBreak, components.p)
-            println("Visiting hardLineBreak")
             visitChildren(hardLineBreak)
         }
 
@@ -147,18 +161,22 @@ class KotlinRenderer(
         }
 
         // TODO: Support custom nodes, like front matter and tables
-//        override fun visit(customBlock: CustomBlock) {
-//            if (customBlock is YamlFrontMatterBlock) {
-//                val yamlVisitor = YamlFrontMatterVisitor()
-//                customBlock.accept(yamlVisitor)
-//                println("Visited YAML")
-//                yamlVisitor.data.forEach { (k, v) ->
-//                    println("$k -> ${v.joinToString { "\"$it\"" }}")
-//                }
-//            } else {
-//                println("Visiting customBlock (${customBlock::class.java})")
-//                visitChildren(customBlock)
-//            }
-//        }
+        override fun visit(customBlock: CustomBlock) {
+            if (customBlock is YamlFrontMatterBlock) {
+                val yamlVisitor = YamlFrontMatterVisitor()
+                customBlock.accept(yamlVisitor)
+                // TODO: Put `yamlVisitor.data` into a MdContext object?
+                // If "root" is set in the YAML block, that represents a top level composable which should wrap
+                // everything else.
+                yamlVisitor.data["root"]?.single()?.let { root ->
+                    output.appendLine("$indent${project.prefixQualifiedPackage(root)} {")
+                    ++indentCount
+                }
+                onFinish += {
+                    --indentCount
+                    output.appendLine("$indent}")
+                }
+            }
+        }
     }
 }

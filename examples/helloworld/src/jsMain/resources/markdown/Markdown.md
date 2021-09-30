@@ -1,9 +1,8 @@
 ---
-root: .components.layouts.MdLayout
-title: MARKDOWN
+root: .components.layouts.PageLayout("MARKDOWN")
 ---
 
-# Markdown Example
+## Markdown Example
 
 This site is generated from markdown.
 

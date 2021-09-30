@@ -6,12 +6,8 @@ import com.varabyte.kobweb.common.KobwebFolder
 import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
 import com.varabyte.kobweb.gradle.application.RESOURCE_SUFFIX
 import com.varabyte.kobweb.gradle.application.SRC_SUFFIX
-import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.InputFiles
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
 
 abstract class KobwebConfig {
@@ -54,5 +50,5 @@ abstract class KobwebConfig {
     /**
      * Given a [project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"
      */
-    fun getPagesPackage(project: Project): String = project.getQualifiedPackage(pagesPackage.get())
+    fun getQualfiedPagesPackage(project: Project): String = project.prefixQualifiedPackage(pagesPackage.get())
 }

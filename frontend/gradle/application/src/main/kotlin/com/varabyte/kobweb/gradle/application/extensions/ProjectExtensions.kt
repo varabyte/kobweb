@@ -70,7 +70,7 @@ fun Project.getResourceFiles(platform: TargetPlatform): Sequence<File> {
 /**
  * Using a [Project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"
  */
-fun Project.getQualifiedPackage(pkg: String): String {
+fun Project.prefixQualifiedPackage(pkg: String): String {
     return when {
         pkg.startsWith('.') -> "${project.group}$pkg"
         else -> pkg

@@ -136,7 +136,7 @@ abstract class KobwebGenerateTask @Inject constructor(private val config: Kobweb
                                     }
                                 }
                                 pageSimpleName -> {
-                                    val pagesPackage = config.getPagesPackage(project)
+                                    val pagesPackage = config.getQualfiedPagesPackage(project)
                                     if (currPackage.startsWith(pagesPackage)) {
                                         // e.g. com.example.pages.blog -> blog
                                         val slugPrefix = currPackage
