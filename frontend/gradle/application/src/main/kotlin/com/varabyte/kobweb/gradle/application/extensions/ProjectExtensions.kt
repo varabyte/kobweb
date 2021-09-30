@@ -34,22 +34,38 @@ fun Project.getSourceRoots(platform: TargetPlatform): Sequence<File> {
 fun Project.getResourceRoots(platform: TargetPlatform): Sequence<File> =
     project.getRoots(platform) { sourceSet -> sourceSet.resources }
 
-private fun Project.getFiles(
+class RootAndFile(val root: File, val file: File) {
+    val relativeFile get() = file.relativeTo(root)
+}
+
+private fun Project.getFilesWithRoots(
     platform: TargetPlatform,
     sourceSetToDirSet: (KotlinSourceSet) -> SourceDirectorySet
-): Sequence<File> {
+): Sequence<RootAndFile> {
     return project.getRoots(platform, sourceSetToDirSet)
-        .flatMap { root -> root.walkBottomUp() }
-        .filter { it.isFile }
+        .flatMap { root ->
+            root.walkBottomUp()
+                .filter { it.isFile && it.startsWith(root) }
+                .map { file -> RootAndFile(root, file) }
+        }
+}
+
+fun Project.getSourceFilesWithRoots(platform: TargetPlatform): Sequence<RootAndFile> {
+    return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.kotlin }
+        .filter { it.file.extension == "kt" }
+}
+
+fun Project.getResourceFilesWithRoots(platform: TargetPlatform): Sequence<RootAndFile> {
+    return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.resources }
 }
 
 fun Project.getSourceFiles(platform: TargetPlatform): Sequence<File> {
-    return project.getFiles(platform) { sourceSet -> sourceSet.kotlin }
-        .filter { it.extension == "kt" }
+    return project.getSourceFilesWithRoots(platform).map { it.file }
 }
 
-fun Project.getResourceFiles(platform: TargetPlatform): Sequence<File> =
-    project.getFiles(platform) { sourceSet -> sourceSet.resources }
+fun Project.getResourceFiles(platform: TargetPlatform): Sequence<File> {
+    return project.getResourceFilesWithRoots(platform).map { it.file }
+}
 
 /**
  * Using a [Project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"

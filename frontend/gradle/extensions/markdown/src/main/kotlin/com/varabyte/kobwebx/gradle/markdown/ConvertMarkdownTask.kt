@@ -2,7 +2,7 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
-import com.varabyte.kobweb.gradle.application.extensions.getResourceFiles
+import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.application.extensions.getResourceRoots
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
@@ -31,11 +31,9 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @InputFiles
     fun getMarkdownFiles(): List<File> {
-        val potentialMarkdownRoots = getMarkdownRoots()
-
-        return project.getResourceFiles(TargetPlatform.JS)
-            .filter { file -> file.isFile && file.extension == "md" }
-            .filter { file -> potentialMarkdownRoots.any { root -> file.startsWith(root) } }
+        return project.getResourceFilesWithRoots(TargetPlatform.JS)
+            .filter { rootAndFile -> rootAndFile.file.extension == "md" }
+            .map { it.file }
             .toList()
     }
 
