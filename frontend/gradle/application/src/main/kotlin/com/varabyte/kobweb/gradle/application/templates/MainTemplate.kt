@@ -10,7 +10,6 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
         "org.w3c.dom.css.ElementCSSInlineStyle",
     )
     imports.add(appFqcn ?: "com.varabyte.kobweb.core.DefaultApp")
-    imports.addAll(pageFqcnRoutes.keys)
     imports.sort()
 
     // TODO(Bug #13): Move the kobwebHook logic into the server
@@ -77,7 +76,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
                 val pageFqcn = entry.key
                 val route = entry.value
 
-                """Router.register("$route") { ${pageFqcn.substringAfterLast('.')}() }"""
+                """Router.register("$route") { $pageFqcn() }"""
             }
         }
             Router.navigateTo(window.location.pathname)
