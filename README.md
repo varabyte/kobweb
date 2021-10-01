@@ -32,24 +32,24 @@ Once the code stabilizes a bit, we will host an artifact for downloading, but it
 now.
 
 ```bash
-cd /path/to/src/root
-git clone https://github.com/varabyte/kobweb.git
-cd kobweb
-./gradlew :cli:kobweb:installDist
+$ cd /path/to/src/root
+$ git clone --recurse-submodules https://github.com/varabyte/kobweb
+$ cd kobweb
+$ ./gradlew :cli:kobweb:installDist
 ```
 
 I recommend putting Kobweb in your path:
 
 ```bash
-PATH=$PATH:/path/to/src/root/kobweb/cli/kobweb/build/install/kobweb/bin
-kobweb version
+$ PATH=$PATH:/path/to/src/root/kobweb/cli/kobweb/build/install/kobweb/bin
+$ kobweb version
 ```
 
 ## Create your Kobweb Site
 
 ```bash
-cd /path/to/projects/root
-kobweb create site
+$ cd /path/to/projects/root
+$ kobweb create site
 ```
 
 You'll be asked a bunch of questions required for setting up the project. When finished, you'll have a basic project
@@ -85,8 +85,8 @@ Which brings us to the next section...
 ## Run your Kobweb site
 
 ```bash
-cd /path/to/projects/root/your-project
-kobweb run
+$ cd /path/to/projects/root/your-project
+$ kobweb run
 ```
 
 This spins up a webserver at http://localhost:8080. If you want to configure the port, you can do so by editing your
