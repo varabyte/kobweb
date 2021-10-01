@@ -5,6 +5,31 @@
 
 # K🕸️bweb
 
+```kotlin
+@Page
+@Composable
+fun HomePage() {
+  Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    H1 {
+      Text("Welcome to Kobweb!")
+    }
+    P()
+    Row {
+      Text("Create rich, dynamic web apps with ease, leveraging ")
+      Link("https://kotlinlang.org/", "Kotlin")
+      Text(" and ")
+      Link("https://compose-web.ui.pages.jetbrains.team/", "Web Compose")
+    }
+  }
+}
+```
+
+<p align="center">
+<img src="https://github.com/varabyte/media/raw/main/kobweb/images/readme/kobweb-welcome.png" />
+</p>
+
+---
+
 Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by Next.js and Chakra UI. 
 
 **It is currently in technology preview**. While it is not ready for use in a serious project at this point, please
