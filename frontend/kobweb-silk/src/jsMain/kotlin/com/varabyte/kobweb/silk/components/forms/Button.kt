@@ -115,7 +115,8 @@ fun Button(
                     onClick()
                     state = if (inButton) { ButtonState.HOVER } else { ButtonState.DEFAULT }
                 }
-            }
+            },
+        contentAlignment = Alignment.Center
     ) {
         content()
     }

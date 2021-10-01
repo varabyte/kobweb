@@ -10,7 +10,7 @@ import org.jetbrains.compose.web.dom.Div
 @Composable
 fun Box(
     modifier: Modifier = Modifier,
-    contentAlignment: Alignment = Alignment.Center,
+    contentAlignment: Alignment = Alignment.TopStart,
     content: @Composable () -> Unit
 ) {
     Div(attrs = modifier.asAttributeBuilder {
@@ -61,4 +61,3 @@ fun Box(
         content()
     }
 }
-
