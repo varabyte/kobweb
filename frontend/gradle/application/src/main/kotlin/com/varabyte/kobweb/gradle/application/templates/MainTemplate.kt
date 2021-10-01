@@ -26,7 +26,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
                 var checkVersionInterval = 0
                 checkVersionInterval = window.setInterval(
                     handler = {
-                        window.fetch("${'$'}{window.location.protocol}//${'$'}{window.location.host}/api/kobweb/version").then {
+                        window.fetch("${'$'}{window.location.origin}/api/kobweb/version").then {
                             it.text().then { text ->
                                 val version = text.toInt()
                                 if (lastVersion != null && lastVersion != version) {
@@ -48,7 +48,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
                 var checkStatusInterval = 0
                 checkStatusInterval = window.setInterval(
                     handler = {
-                        window.fetch("${'$'}{window.location.protocol}//${'$'}{window.location.host}/api/kobweb/status").then {
+                        window.fetch("${'$'}{window.location.origin}/api/kobweb/status").then {
                             it.text().then { text ->
                                 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
                                 (root as ElementCSSInlineStyle).style.opacity = if (text.isNotBlank()) {
@@ -71,14 +71,14 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
             kobwebHook()
 
             ${
-            // Generates lines like: Router.register("/about") { AboutPage() }
-            pageFqcnRoutes.entries.joinToString("\n            ") { entry ->
-                val pageFqcn = entry.key
-                val route = entry.value
+                // Generates lines like: Router.register("/about") { AboutPage() }
+                pageFqcnRoutes.entries.joinToString("\n            ") { entry ->
+                    val pageFqcn = entry.key
+                    val route = entry.value
 
-                """Router.register("$route") { $pageFqcn() }"""
+                    """Router.register("$route") { $pageFqcn() }"""
+                }
             }
-        }
             Router.navigateTo(window.location.pathname)
 
             // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them the first

@@ -2,6 +2,7 @@ package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
@@ -21,41 +22,40 @@ private typealias PageMethod = @Composable () -> Unit
 object Router {
     private val activePageMethod = mutableStateOf<PageMethod?>(null)
     private val pages = mutableMapOf<String, PageMethod>()
-    private val backHistory = mutableListOf<PageMethod>()
-    private val forwardHistory = mutableListOf<PageMethod>()
 
+    @Suppress("unused") // Called by generated code
     @Composable
     fun renderActivePage() {
         activePageMethod.value?.invoke()
             ?: throw IllegalStateException("Call 'navigateTo' at least once before calling 'getActivePage'")
     }
 
+    @Suppress("unused") // Called by generated code
     fun register(path: String, page: PageMethod) {
-        Path.check(path)
-        pages[path] = page
+        if (Path.isLocal(path)) {
+            pages[path] = page
+        }
     }
 
-    fun navigateTo(path: String) {
-        Path.check(path)
+    /**
+     * @param allowExternalPaths If true, this method should handle
+     */
+    fun navigateTo(path: String, allowExternalPaths: Boolean = true) {
+        if (!Path.isLocal(path)) {
+            require(allowExternalPaths) { "Navigation to \"$path\" not expected by callee" }
+            window.location.assign(path)
+            return
+        }
 
         val page = pages[path] ?: { ErrorPage(404) }
-        forwardHistory.clear()
-        activePageMethod.value?.let { activePage -> backHistory.add(activePage) }
         activePageMethod.value = page
-        // TODO: Set the URL bar with the updated path
-    }
 
-    fun goBack(): Boolean {
-        if (backHistory.isEmpty()) return false
-
-        forwardHistory.add(0, backHistory.removeLast())
-        return true
-    }
-
-    fun goForward(): Boolean {
-        if (forwardHistory.isEmpty()) return false
-
-        backHistory.add(forwardHistory.removeAt(0))
-        return true
+        // Update URL to match page we navigated to
+        // TODO: Support query params
+        "${window.location.origin}$path".let { url ->
+            if (window.location.href != url.removeSuffix("/") ) {
+                window.history.replaceState(window.history.state, "", url)
+            }
+        }
     }
 }

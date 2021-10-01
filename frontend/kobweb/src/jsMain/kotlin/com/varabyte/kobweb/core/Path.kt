@@ -5,7 +5,8 @@ private val PATH_REGEX = Regex("""^/(([a-z0-9]|%${HEX_REGEX}${HEX_REGEX})+/?)*$"
 
 class Path(value: String) {
     companion object {
-        fun check(path: String) = Path(path)
+        fun isLocal(path: String) = tryCreate(path) != null
+        fun tryCreate(path: String) = try { Path(path) } catch (ex: IllegalArgumentException) { null }
     }
 
     init {
