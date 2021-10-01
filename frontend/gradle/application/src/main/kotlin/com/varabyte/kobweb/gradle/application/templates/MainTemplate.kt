@@ -22,31 +22,10 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
         // mode. Of course, in production, it's a no-op.
         fun kobwebHook() {
             run {
-                var lastVersion: Int? = null
-                var checkVersionInterval = 0
-                checkVersionInterval = window.setInterval(
-                    handler = {
-                        window.fetch("${'$'}{window.location.origin}/api/kobweb/version").then {
-                            it.text().then { text ->
-                                val version = text.toInt()
-                                if (lastVersion != null && lastVersion != version) {
-                                    window.location.reload()
-                                }
-                                lastVersion = version
-                            }
-                        }.catch {
-                            // The server was probably taken down, so stop checking.
-                            window.clearInterval(checkVersionInterval)
-                        }
-                    },
-                    timeout = 250,
-                )
-            }
-
-            run {
                 val root = document.getElementById("root")!!
-                var checkStatusInterval = 0
-                checkStatusInterval = window.setInterval(
+                var lastVersion: Int? = null
+                var checkInterval = 0
+                checkInterval = window.setInterval(
                     handler = {
                         window.fetch("${'$'}{window.location.origin}/api/kobweb/status").then {
                             it.text().then { text ->
@@ -59,7 +38,23 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
                             }
                         }.catch {
                             // The server was probably taken down, so stop checking.
-                            window.clearInterval(checkStatusInterval)
+                            window.clearInterval(checkInterval)
+                        }
+                        window.fetch("${'$'}{window.location.origin}/api/kobweb/version").then {
+                            it.text().then { text ->
+                                val version = text.toInt()
+                                if (lastVersion == null) {
+                                    lastVersion = version
+                                }
+                                if (lastVersion != version) {
+                                    lastVersion = version
+                                    window.stop()
+                                    window.location.reload()
+                                }
+                            }
+                        }.catch {
+                            // The server was probably taken down, so stop checking.
+                            window.clearInterval(checkInterval)
                         }
                     },
                     timeout = 250,
