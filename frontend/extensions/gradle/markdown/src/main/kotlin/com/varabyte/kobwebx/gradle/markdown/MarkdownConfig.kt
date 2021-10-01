@@ -2,6 +2,8 @@
 
 package com.varabyte.kobwebx.gradle.markdown
 
+import org.commonmark.ext.gfm.tables.*
+import org.commonmark.node.*
 import org.gradle.api.provider.Property
 
 abstract class MarkdownConfig {
@@ -87,53 +89,57 @@ abstract class MarkdownFeatures {
  * ```
  */
 abstract class MarkdownComponents {
-    abstract val text: Property<String>
-    abstract val img: Property<String>
-    abstract val h1: Property<String>
-    abstract val h2: Property<String>
-    abstract val h3: Property<String>
-    abstract val p: Property<String>
-    abstract val br: Property<String>
-    abstract val a: Property<String>
-    abstract val em: Property<String>
-    abstract val b: Property<String>
-    abstract val i: Property<String>
-    abstract val hr: Property<String>
-    abstract val ul: Property<String>
-    abstract val ol: Property<String>
-    abstract val li: Property<String>
-    abstract val code: Property<String>
-    abstract val inlineCode: Property<String>
-    abstract val table: Property<String>
-    abstract val thead: Property<String>
-    abstract val tbody: Property<String>
-    abstract val tr: Property<String>
-    abstract val td: Property<String>
-    abstract val th: Property<String>
+    abstract val text: Property<(Text) -> String>
+    abstract val img: Property<(Image) -> String>
+    abstract val h1: Property<(Heading) -> String>
+    abstract val h2: Property<(Heading) -> String>
+    abstract val h3: Property<(Heading) -> String>
+    abstract val h4: Property<(Heading) -> String>
+    abstract val h5: Property<(Heading) -> String>
+    abstract val h6: Property<(Heading) -> String>
+    abstract val p: Property<(Paragraph) -> String>
+    abstract val br: Property<(HardLineBreak) -> String>
+    abstract val a: Property<(Link) -> String>
+    abstract val em: Property<(Emphasis) -> String>
+    abstract val strong: Property<(StrongEmphasis) -> String>
+    abstract val hr: Property<(ThematicBreak) -> String>
+    abstract val ul: Property<(BulletList) -> String>
+    abstract val ol: Property<(OrderedList) -> String>
+    abstract val li: Property<(ListItem) -> String>
+    abstract val code: Property<(FencedCodeBlock) -> String>
+    abstract val inlineCode: Property<(Code) -> String>
+    abstract val table: Property<(TableBlock) -> String>
+    abstract val thead: Property<(TableHead) -> String>
+    abstract val tbody: Property<(TableBody) -> String>
+    abstract val tr: Property<(TableRow) -> String>
+    abstract val td: Property<(TableCell) -> String>
+    abstract val th: Property<(TableCell) -> String>
 
     init {
-        text.convention("org.jetbrains.compose.web.dom.Text")
-        img.convention("org.jetbrains.compose.web.dom.Img")
-        h1.convention("org.jetbrains.compose.web.dom.H1")
-        h2.convention("org.jetbrains.compose.web.dom.H2")
-        h3.convention("org.jetbrains.compose.web.dom.H3")
-        p.convention("org.jetbrains.compose.web.dom.P")
-        br.convention("org.jetbrains.compose.web.dom.Br")
-        a.convention("org.jetbrains.compose.web.dom.A")
-        em.convention("org.jetbrains.compose.web.dom.Em")
-        b.convention("org.jetbrains.compose.web.dom.B")
-        i.convention("org.jetbrains.compose.web.dom.I")
-        hr.convention("org.jetbrains.compose.web.dom.Hr")
-        ul.convention("org.jetbrains.compose.web.dom.Ul")
-        ol.convention("org.jetbrains.compose.web.dom.Ol")
-        li.convention("org.jetbrains.compose.web.dom.Li")
-        code.convention("org.jetbrains.compose.web.dom.Code")
-        inlineCode.convention("org.jetbrains.compose.web.dom.Code")
-        table.convention("org.jetbrains.compose.web.dom.Table")
-        thead.convention("org.jetbrains.compose.web.dom.Thead")
-        tbody.convention("org.jetbrains.compose.web.dom.Tbody")
-        tr.convention("org.jetbrains.compose.web.dom.Tr")
-        td.convention("org.jetbrains.compose.web.dom.Td")
-        th.convention("org.jetbrains.compose.web.dom.Th")
+        text.convention { text -> "org.jetbrains.compose.web.dom.Text(\"${text.literal}\")" }
+        img.convention{ "org.jetbrains.compose.web.dom.Img" }
+        h1.convention{ "org.jetbrains.compose.web.dom.H1" }
+        h2.convention{ "org.jetbrains.compose.web.dom.H2" }
+        h3.convention{ "org.jetbrains.compose.web.dom.H3" }
+        h4.convention{ "org.jetbrains.compose.web.dom.H4" }
+        h5.convention{ "org.jetbrains.compose.web.dom.H5" }
+        h6.convention{ "org.jetbrains.compose.web.dom.H6" }
+        p.convention{ "org.jetbrains.compose.web.dom.P" }
+        br.convention{ "org.jetbrains.compose.web.dom.Br" }
+        a.convention { link -> "org.jetbrains.compose.web.dom.A(\"${link.destination}\")" }
+        em.convention{ "org.jetbrains.compose.web.dom.Em" }
+        strong.convention{ "org.jetbrains.compose.web.dom.B" }
+        hr.convention{ "org.jetbrains.compose.web.dom.Hr" }
+        ul.convention{ "org.jetbrains.compose.web.dom.Ul" }
+        ol.convention{ "org.jetbrains.compose.web.dom.Ol" }
+        li.convention{ "org.jetbrains.compose.web.dom.Li" }
+        code.convention{ "org.jetbrains.compose.web.dom.Code()" }
+        inlineCode.convention{ code -> "org.jetbrains.compose.web.dom.Code { ${text.get().invoke(Text(code.literal))} }" }
+        table.convention{ "org.jetbrains.compose.web.dom.Table" }
+        thead.convention{ "org.jetbrains.compose.web.dom.Thead" }
+        tbody.convention{ "org.jetbrains.compose.web.dom.Tbody" }
+        tr.convention{ "org.jetbrains.compose.web.dom.Tr" }
+        td.convention{ "org.jetbrains.compose.web.dom.Td" }
+        th.convention{ "org.jetbrains.compose.web.dom.Th" }
     }
 }

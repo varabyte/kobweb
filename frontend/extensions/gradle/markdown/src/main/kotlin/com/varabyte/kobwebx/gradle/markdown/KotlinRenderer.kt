@@ -62,10 +62,17 @@ class KotlinRenderer(
             onFinish.forEach { action -> action() }
         }
 
-        private fun doVisit(node: Node, composable: Provider<String>, vararg args: String) {
-            output.append("$indent${composable.get()}")
-            if (args.isNotEmpty() || node.firstChild == null) {
-                output.append("(${args.joinToString(",")})")
+        private fun <N: Node> doVisit(node: N, composableCall: Provider<(N) -> String>) {
+            doVisit(node, composableCall.get().invoke(node))
+        }
+
+        private fun doVisit(node: Node, composableCall: String) {
+            output.append("$indent$composableCall")
+            // If this is a single line call (no children), we need to explicitly add the "()" parens if not already
+            // done by the caller. Otherwise, we'll do "composableCall { ... }", which is really calling a function with
+            // a lambda.
+            if (composableCall.last().isLetterOrDigit() && node.firstChild == null) {
+                output.append("()")
             }
 
             if (node.firstChild != null) {
@@ -88,7 +95,7 @@ class KotlinRenderer(
         }
 
         override fun visit(code: Code) {
-            doVisit(code, components.code)
+            doVisit(code, components.inlineCode)
         }
 
         override fun visit(emphasis: Emphasis) {
@@ -100,8 +107,7 @@ class KotlinRenderer(
         }
 
         override fun visit(hardLineBreak: HardLineBreak) {
-            doVisit(hardLineBreak, components.p)
-            visitChildren(hardLineBreak)
+            doVisit(hardLineBreak, components.br)
         }
 
         override fun visit(heading: Heading) {
@@ -129,7 +135,7 @@ class KotlinRenderer(
         }
 
         override fun visit(indentedCodeBlock: IndentedCodeBlock) {
-            doVisit(indentedCodeBlock, components.code)
+            unsupported("Indenting code blocks")
         }
 
         override fun visit(link: Link) {
@@ -140,6 +146,10 @@ class KotlinRenderer(
             doVisit(listItem, components.li)
         }
 
+        override fun visit(bulletList: BulletList) {
+            doVisit(bulletList, components.ul)
+        }
+
         override fun visit(orderedList: OrderedList) {
             doVisit(orderedList, components.ol)
         }
@@ -148,16 +158,12 @@ class KotlinRenderer(
             doVisit(paragraph, components.p)
         }
 
-        override fun visit(softLineBreak: SoftLineBreak) {
-            doVisit(softLineBreak, components.br)
-        }
-
         override fun visit(strongEmphasis: StrongEmphasis) {
-            doVisit(strongEmphasis, components.b)
+            doVisit(strongEmphasis, components.strong)
         }
 
         override fun visit(text: Text) {
-            doVisit(text, components.text, "\"${text.literal}\"")
+            doVisit(text, components.text)
         }
 
         // TODO: Support custom nodes, like front matter and tables
