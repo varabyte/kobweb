@@ -25,7 +25,7 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 
 # Trying it out yourself
 
-## Build the kobweb binary
+## Build the Kobweb binary
 
 Once the code stabilizes a bit, we will host an artifact for downloading, but it's easy enough to build your own for
 now.
@@ -81,7 +81,7 @@ my-project
 Note that there's no index.html or routing logic anywhere! We generate that for you automatically when you run Kobweb.
 Which brings us to the next section...
 
-## Run your Kobweb Site
+## Run your Kobweb site
 
 ```bash
 cd /path/to/projects/root/your-project
@@ -123,3 +123,12 @@ If you'd like to be kept in the loop on updates to this project, there are a few
 receive except to 1) respond to any questions asked or 2) ping when the status of this project changes.**
 
 Thank you for your interest!
+
+# Filing issues and leaving feedback
+
+It is still early days and while we believe we've proven the feasibility of this approach at this point, there's still
+plenty of work to do to get to a 1.0 launch! We are hungry for the community's feedback, so please don't hesitate to:
+
+* [Open an issue](https://github.com/varabyte/kobweb/issues)
+* Contact us (using any of the ways mentioned above) telling us what features you want
+* Ask us for guidance, especially as there are no tutorials yet (your questions can help us know what to write first!)
