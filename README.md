@@ -7,9 +7,10 @@
 
 Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by Next.js and Chakra UI. 
 
-**It is currently in technology preview**. 
+**It is currently in technology preview**. While it is not ready for use in a serious project at this point, please
+considering starring the project to indicate interest.
 
-Its goal is to provide:
+Our goal is to provide:
 
 * an intuitive structure for organizing your website or web app
 * automatic handling of routing between pages
@@ -122,8 +123,6 @@ If you'd like to be kept in the loop on updates to this project, there are a few
   * **Note: I am just an individual person, but I promise not to harvest, distribute, or in any way use any emails I
 receive except to 1) respond to any questions asked or 2) ping when the status of this project changes.**
 
-Thank you for your interest!
-
 # Filing issues and leaving feedback
 
 It is still early days and while we believe we've proven the feasibility of this approach at this point, there's still
@@ -132,3 +131,7 @@ plenty of work to do to get to a 1.0 launch! We are hungry for the community's f
 * [Open an issue](https://github.com/varabyte/kobweb/issues)
 * Contact us (using any of the ways mentioned above) telling us what features you want
 * Ask us for guidance, especially as there are no tutorials yet (your questions can help us know what to write first!)
+
+And, finally, please considering starring the project to indicate interest. We are trying to understand if this is
+something that the community wants, and your support in this way would mean a lot to us as well as encourage us to keep
+moving forward.
