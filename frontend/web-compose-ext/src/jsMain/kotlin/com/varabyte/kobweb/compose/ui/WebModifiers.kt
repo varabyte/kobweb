@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.css.cursor
 import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.unit.Dp
+import com.varabyte.kobweb.compose.ui.unit.dp
 import org.jetbrains.compose.web.css.*
 import com.varabyte.kobweb.compose.css.Cursor as KobwebCursor
 import com.varabyte.kobweb.compose.ui.graphics.Color as KobwebColor
@@ -148,7 +149,7 @@ fun Modifier.padding(topBottom: Dp, leftRight: Dp): Modifier = webModifier {
     }
 }
 
-fun Modifier.padding(top: Dp, right: Dp, bottom: Dp, left: Dp): Modifier = webModifier {
+fun Modifier.padding(top: Dp = 0.dp, right: Dp = 0.dp, bottom: Dp = 0.dp, left: Dp = 0.dp): Modifier = webModifier {
     style {
         // See: Modifier.padding(all) comment
         margin(top.value.px, right.value.px, bottom.value.px, left.value.px)
@@ -160,4 +161,3 @@ fun Modifier.userSelect(userSelect: UserSelect): Modifier = webModifier {
         userSelect(userSelect)
     }
 }
-
