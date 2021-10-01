@@ -10,7 +10,7 @@ fun createHtmlFile(title: String, links: List<String>, src: String): String = ""
     </head>
     <body>
         <div id="root"></div>
-        <script src="/$src"></script>
+        <script src="$src"></script>
     </body>
     </html>
 """.trimIndent()
