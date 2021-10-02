@@ -51,6 +51,15 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 
 # Trying it out yourself
 
+**Note:** In order to build Kobweb, you need to use JDK11 or newer. All the ways you can do this it outside the scope of
+this document, but the easiest way is to [download the JDK](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
+and updating the JAVA_HOME variable to point at its bin directory.
+
+```bash
+JAVA_HOME=/path/to/jdks/corretto-11.0.12
+# ... or whatever version or path you chose
+```
+
 ## Build the Kobweb binary
 
 Once the code stabilizes a bit, we will host an artifact for downloading, but it's easy enough to build your own for
