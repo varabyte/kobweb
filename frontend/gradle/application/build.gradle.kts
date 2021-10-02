@@ -59,10 +59,6 @@ tasks.register<Copy>("copyServerJar") {
     val serverJarName = "server-${libs.versions.kobweb.get()}-all.jar"
     val serverJarFile = file("${project(":backend:server").buildDir}/libs/$serverJarName")
 
-    if (!serverJarFile.exists()) {
-        throw GradleException("Could not find server fat jar at $serverJarFile")
-    }
-
     from(file(serverJarFile))
     into(file("$projectDir/build/resources/main"))
     rename(serverJarName, "server.jar")
