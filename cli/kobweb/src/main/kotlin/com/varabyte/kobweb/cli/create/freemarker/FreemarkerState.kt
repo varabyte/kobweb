@@ -80,7 +80,7 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
                             modelWithValue["value"] = answer
                             transform.process(cfg, modelWithValue)
                         } ?: answer
-                        model[inst.name] = answer
+                        model[inst.name] = finalAnswer
                     }
 
                     is Instruction.DefineVar -> {
