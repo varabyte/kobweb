@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb"
-version = "1.0-SNAPSHOT"
+version = libs.versions.kobweb.get()
 
 // Enable JS(IR) target and add dependencies
 kotlin {
