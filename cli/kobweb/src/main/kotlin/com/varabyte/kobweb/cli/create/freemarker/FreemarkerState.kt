@@ -58,95 +58,103 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
         fallbackOnNullLoopVariable = false
     }
 
-    fun execute(app: KonsoleApp, instructions: List<Instruction>) {
-        app.apply {
-            for (inst in instructions) {
-                val useInstruction = inst.condition?.process(cfg, model)?.toBoolean() ?: true
-                if (!useInstruction) continue
+    private fun KonsoleApp.process(instructions: Iterable<Instruction>) {
+        for (inst in instructions) {
+            val useInstruction = inst.condition?.process(cfg, model)?.toBoolean() ?: true
+            if (!useInstruction) continue
 
-                when (inst) {
-                    is Instruction.Inform -> {
-                        val message = inst.message.process(cfg, model)
-                        informInfo(message)
-                    }
+            when (inst) {
+                is Instruction.Group -> {
+                    process(inst.instructions)
+                }
 
-                    is Instruction.QueryVar -> {
-                        val default = inst.default?.process(cfg, model)
-                        val answer = queryUser(inst.prompt, default, validateAnswer = { value ->
-                            (model[inst.validation] as? TemplateMethodModelEx)?.exec(listOf(value))?.toString()
-                        })
-                        val finalAnswer = inst.transform?.let { transform ->
-                            val modelWithValue = model.toMutableMap()
-                            modelWithValue["value"] = answer
-                            transform.process(cfg, modelWithValue)
-                        } ?: answer
-                        model[inst.name] = finalAnswer
-                    }
+                is Instruction.Inform -> {
+                    val message = inst.message.process(cfg, model)
+                    informInfo(message)
+                }
 
-                    is Instruction.DefineVar -> {
-                        model[inst.name] = inst.value.process(cfg, model)
-                    }
+                is Instruction.QueryVar -> {
+                    val default = inst.default?.process(cfg, model)
+                    val answer = queryUser(inst.prompt, default, validateAnswer = { value ->
+                        (model[inst.validation] as? TemplateMethodModelEx)?.exec(listOf(value))?.toString()
+                    })
+                    val finalAnswer = inst.transform?.let { transform ->
+                        val modelWithValue = model.toMutableMap()
+                        modelWithValue["value"] = answer
+                        transform.process(cfg, modelWithValue)
+                    } ?: answer
+                    model[inst.name] = finalAnswer
+                }
 
-                    is Instruction.ProcessFreemarker -> {
-                        processing("Processing templates") {
-                            val srcFile = src.toFile()
-                            val filesToProcess = mutableListOf<File>()
-                            srcFile.walkBottomUp().forEach { file ->
-                                if (file.extension == "ftl") {
-                                    filesToProcess.add(file)
-                                }
-                            }
-                            filesToProcess.forEach { templateFile ->
-                                val template = cfg.getTemplate(templateFile.toRelativeString(srcFile))
-                                FileWriter(templateFile.path.removeSuffix(".ftl")).use { writer ->
-                                    template.process(model, writer)
-                                }
-                                templateFile.delete()
+                is Instruction.DefineVar -> {
+                    model[inst.name] = inst.value.process(cfg, model)
+                }
+
+                is Instruction.ProcessFreemarker -> {
+                    processing("Processing templates") {
+                        val srcFile = src.toFile()
+                        val filesToProcess = mutableListOf<File>()
+                        srcFile.walkBottomUp().forEach { file ->
+                            if (file.extension == "ftl") {
+                                filesToProcess.add(file)
                             }
                         }
-                    }
-
-                    is Instruction.Move -> {
-                        val to = inst.to.process(cfg, model)
-                        processing(inst.description ?: "Moving \"${inst.from}\" to \"$to\"") {
-                            val matcher = inst.from.wildcardToRegex()
-                            val srcFile = src.toFile()
-                            val filesToMove = mutableListOf<File>()
-                            srcFile.walkBottomUp().forEach { file ->
-                                if (matcher.matches(file.toRelativeString(srcFile))) {
-                                    filesToMove.add(file)
-                                }
+                        filesToProcess.forEach { templateFile ->
+                            val template = cfg.getTemplate(templateFile.toRelativeString(srcFile))
+                            FileWriter(templateFile.path.removeSuffix(".ftl")).use { writer ->
+                                template.process(model, writer)
                             }
-                            val destPath = src.resolve(to)
-                            if (destPath.notExists()) {
-                                destPath.createDirectories()
-                            } else if (destPath.isRegularFile()) {
-                                throw KobwebException("Cannot move files into target that isn't a directory")
-                            }
-                            filesToMove.forEach { fileToMove ->
-                                Files.move(fileToMove.toPath(), destPath.resolve(fileToMove.name))
-                            }
-                        }
-                    }
-
-                    is Instruction.Delete -> {
-                        processing(inst.description ?: "Deleting \"${inst.files}\"") {
-                            val deleteMatcher = inst.files.wildcardToRegex()
-
-                            val srcFile = src.toFile()
-                            val filesToDelete = mutableListOf<File>()
-                            srcFile.walkBottomUp().forEach { file ->
-                                val relativePath = file.toRelativeString(srcFile)
-                                if (deleteMatcher.matches(relativePath)) {
-                                    filesToDelete.add(file)
-                                }
-                            }
-                            filesToDelete.forEach { fileToDelete -> fileToDelete.deleteRecursively() }
+                            templateFile.delete()
                         }
                     }
                 }
-            }
 
+                is Instruction.Move -> {
+                    val to = inst.to.process(cfg, model)
+                    processing(inst.description ?: "Moving \"${inst.from}\" to \"$to\"") {
+                        val matcher = inst.from.wildcardToRegex()
+                        val srcFile = src.toFile()
+                        val filesToMove = mutableListOf<File>()
+                        srcFile.walkBottomUp().forEach { file ->
+                            if (matcher.matches(file.toRelativeString(srcFile))) {
+                                filesToMove.add(file)
+                            }
+                        }
+                        val destPath = src.resolve(to)
+                        if (destPath.notExists()) {
+                            destPath.createDirectories()
+                        } else if (destPath.isRegularFile()) {
+                            throw KobwebException("Cannot move files into target that isn't a directory")
+                        }
+                        filesToMove.forEach { fileToMove ->
+                            Files.move(fileToMove.toPath(), destPath.resolve(fileToMove.name))
+                        }
+                    }
+                }
+
+                is Instruction.Delete -> {
+                    processing(inst.description ?: "Deleting \"${inst.files}\"") {
+                        val deleteMatcher = inst.files.wildcardToRegex()
+
+                        val srcFile = src.toFile()
+                        val filesToDelete = mutableListOf<File>()
+                        srcFile.walkBottomUp().forEach { file ->
+                            val relativePath = file.toRelativeString(srcFile)
+                            if (deleteMatcher.matches(relativePath)) {
+                                filesToDelete.add(file)
+                            }
+                        }
+                        filesToDelete.forEach { fileToDelete -> fileToDelete.deleteRecursively() }
+                    }
+                }
+            }
+        }
+
+    }
+
+    fun execute(app: KonsoleApp, instructions: List<Instruction>) {
+        app.apply {
+            process(instructions)
             processing("Nearly finished. Populating final project") {
                 val srcFile = src.toFile()
                 val files = mutableListOf<File>()

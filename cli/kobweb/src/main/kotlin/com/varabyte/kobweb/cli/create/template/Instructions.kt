@@ -23,6 +23,16 @@ sealed class Instruction(
     val condition: String? = null,
 ) {
     /**
+     * A collection of related instructions, useful for example when a single condition applies to two or more
+     * instructions.
+     */
+    @Serializable
+    @SerialName("Group")
+    class Group(
+        val instructions: List<Instruction>
+    ) : Instruction()
+
+    /**
      * Inform the user about something.
      *
      * @param message The message to show to the user. This value will be processed by freemarker and can be dynamic!
