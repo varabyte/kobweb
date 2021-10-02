@@ -33,34 +33,35 @@ fun HomePage() {
 Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by Next.js and Chakra UI. 
 
 **It is currently in technology preview**. While it is not ready for use in a serious project at this point, please
-considering starring the project to indicate interest.
+consider starring the project to indicate interest (so we know we're on the right track!).
 
 Our goal is to provide:
 
-* an intuitive structure for organizing your website or web app
+* an intuitive structure for organizing your Kotlin website or web app
 * automatic handling of routing between pages
 * a collection of useful _batteries included_ widgets built on top of Web Compose
 * an environment built from the ground up around live reloading
+* out-of-the-box Markdown support
 * an open source foundation that the community can extend
 * and much, much more!
 
-Here's a demo where we create a Web Compose website from scratch with Markdown support and live reloading, in under a
-minute:
+Here's a demo where we create a Web Compose website from scratch with Markdown support and live reloading, in under 10
+seconds:
 
 https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-aac0-88f8992145ef.mp4
 
 # Trying it out yourself
 
-**Note:** In order to build Kobweb, you need to use JDK11 or newer. All the ways you can do this it outside the scope of
-this document, but the easiest way is to [download the JDK](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
-and updating the JAVA_HOME variable to point at its bin directory.
+## Build the Kobweb binary
+
+**Note:** Building Kobweb requires JDK11 or newer. If you don't already have this set up, the easiest way is to
+[download a JDK](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html), unzip it somewhere,
+and update your JAVA_HOME variable to point at it.
 
 ```bash
 JAVA_HOME=/path/to/jdks/corretto-11.0.12
 # ... or whatever version or path you chose
 ```
-
-## Build the Kobweb binary
 
 Once the code stabilizes a bit, we will host an artifact for downloading, but it's easy enough to build your own for
 now.
@@ -129,9 +130,10 @@ project's `.kobweb/conf.yaml` file.
 You can open your project in IntelliJ and start editing it. While Kobweb is running, it will detect changes and deploy
 updates to your site automatically.
 
-## Built on Web Compose
+## Layered upon Web Compose
 
-To learn more about Web Compose, please visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started).
+While Kobweb includes its own UI layer (called Silk), you can also use Web Compose methods as well. To learn more about
+Web Compose, please visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started).
 
 # Templates
 
