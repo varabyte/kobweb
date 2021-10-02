@@ -19,7 +19,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 @Composable
 fun Link(
     path: String,
-    text: String = path,
+    text: String,
     modifier: Modifier = Modifier,
     color: Color = SilkTheme.palette.secondary,
     decorationLine: TextDecorationLine? = TextDecorationLine.Underline,
