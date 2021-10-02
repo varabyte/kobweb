@@ -31,6 +31,8 @@ enum class RunState {
     STOPPING_VIA_INTERRUPT,
     CHANGED_EXTERNALLY,
     STOPPED,
+    CANCELLED,
+    CANCELLED_VIA_INTERRUPT,
 }
 
 fun handleRun(env: RunEnvironment) = konsoleApp {
@@ -44,7 +46,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
 
     val serverStateFile = ServerStateFile(kobwebFolder)
 
-    val envName = when(env) {
+    val envName = when (env) {
         RunEnvironment.DEV -> "development"
         RunEnvironment.PROD -> "production"
     }
@@ -60,6 +62,8 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
         when (runState) {
             RunState.STARTING -> {
                 textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
+                textLine()
+                textLine("Press Q anytime to stop it.")
             }
             RunState.RUNNING -> {
                 green {
@@ -82,13 +86,19 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
             RunState.STOPPING_VIA_INTERRUPT -> {
                 yellow { textLine("CTRL-C received. Kicked off a request to stop the server but we have to exit NOW.") }
             }
+            RunState.CANCELLED -> {
+                textLine("Server startup cancelled.")
+            }
+            RunState.CANCELLED_VIA_INTERRUPT -> {
+                yellow { textLine("CTRL-C received. Server startup cancelled.") }
+            }
         }
     }.runUntilSignal {
         fun consumeStream(stream: InputStream) {
             val isr = InputStreamReader(stream)
             val br = BufferedReader(isr)
-            lateinit var line: String
-            while (br.readLine().also { line = it } != null) {
+            while (true) {
+                val line = br.readLine() ?: break
                 addOutputSeparator = true
                 aside {
                     black(isBright = true) {
@@ -106,51 +116,66 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
         CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.errorStream) }
 
         Runtime.getRuntime().addShutdownHook(Thread {
-            if (runState == RunState.RUNNING) {
+            if (runState == RunState.RUNNING || runState == RunState.STOPPING_GRACEFULLY) {
                 runState = RunState.STOPPING_VIA_INTERRUPT
 
                 ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
-                signal()
             }
+            else {
+                runState = RunState.CANCELLED_VIA_INTERRUPT
+            }
+            signal()
         })
 
+        onKeyPressed {
+            if (key == Keys.Q) {
+                if (runState == RunState.STARTING) {
+                    runState = RunState.STOPPING_GRACEFULLY
+                    CoroutineScope(Dispatchers.IO).launch {
+                        startServerProcess.destroy()
+                        startServerProcess.waitFor()
+
+                        runState = RunState.CANCELLED
+                        signal()
+                    }
+                } else if (runState == RunState.RUNNING) {
+                    runState = RunState.STOPPING_GRACEFULLY
+                    CoroutineScope(Dispatchers.IO).launch {
+                        startServerProcess.destroy()
+                        startServerProcess.waitFor()
+
+                        val stopServerProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
+                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.inputStream) }
+                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.errorStream) }
+                        stopServerProcess.waitFor()
+
+                        runState = RunState.STOPPED
+                        signal()
+                    }
+                }
+            }
+        }
+
         coroutineScope {
-            while (true) {
+            while (runState == RunState.STARTING) {
                 serverStateFile.content?.takeIf { it.isRunning() }?.let {
                     serverState = it
+                    runState = RunState.RUNNING
                     return@coroutineScope
                 }
                 delay(300)
             }
         }
 
-        runState = RunState.RUNNING
-
-        addTimer(Duration.ofMillis(500), repeat = true) {
-            if (runState == RunState.RUNNING) {
-                if (!serverState.isRunning() || serverStateFile.content != serverState) {
-                    runState = RunState.CHANGED_EXTERNALLY
-                    signal()
-                }
-            } else {
-                repeat = false
-            }
-        }
-
-        onKeyPressed {
-            if (key == Keys.Q && runState == RunState.RUNNING) {
-                runState = RunState.STOPPING_GRACEFULLY
-                CoroutineScope(Dispatchers.IO).launch {
-                    startServerProcess.destroy()
-                    startServerProcess.waitFor()
-
-                    val stopServerProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
-                    CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.inputStream) }
-                    CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.errorStream) }
-                    stopServerProcess.waitFor()
-
-                    runState = RunState.STOPPED
-                    signal()
+        if (runState == RunState.RUNNING) {
+            addTimer(Duration.ofMillis(500), repeat = true) {
+                if (runState == RunState.RUNNING) {
+                    if (!serverState.isRunning() || serverStateFile.content != serverState) {
+                        runState = RunState.CHANGED_EXTERNALLY
+                        signal()
+                    }
+                } else {
+                    repeat = false
                 }
             }
         }
