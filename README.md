@@ -33,7 +33,8 @@ fun HomePage() {
 Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by Next.js and Chakra UI. 
 
 **It is currently in technology preview**. While it is not ready for use in a serious project at this point, please
-consider starring the project to indicate interest (so we know we're on the right track!).
+consider starring the project to indicate interest. (See also: The
+[work in progress](https://github.com/varabyte/kobweb#work-in-progress--known-issues) section below).
 
 Our goal is to provide:
 
@@ -41,6 +42,7 @@ Our goal is to provide:
 * automatic handling of routing between pages
 * a collection of useful _batteries included_ widgets built on top of Web Compose
 * an environment built from the ground up around live reloading
+* static site exports for improved SEO
 * out-of-the-box Markdown support
 * an open source foundation that the community can extend
 * and much, much more!
@@ -134,6 +136,90 @@ updates to your site automatically.
 
 While Kobweb includes its own UI layer (called Silk), you can also use Web Compose methods as well. To learn more about
 Web Compose, please visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started).
+
+# Basics
+
+Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
+Web Compose website - namely routing and setting up default CSS styles - plus exposing a handful of annotations and
+utility methods to further help with this. These work in conjunction with our Gradle plugin
+(`com.varabyte.kobweb.application`) that handles code and resource generation for you.
+
+Kobweb is also a CLI binary of the same name which helps users execute commands to handle the parts of building a
+Web Compose app that are less glamorous. We want to get that stuff out of the way, so you can enjoy working on the more
+interesting parts!
+
+## Create a page
+
+Creating a page is easy! It's just a normal `@Composable` method with just a small bit of runtime magic. To upgrade your
+composable to a page, all you need to do is:
+
+1. Define your composable somewhere under the `pages` package
+1. Annotate it with `@Page`
+
+From that, Kobweb will create a site entry for you automatically.
+
+For example, if I create the following file:
+
+```kotlin
+// com/example/mysite/pages/settings/AdminPage.kt
+
+@Page
+@Composable
+fun AdminPage() {
+    /* ... */
+}
+```
+
+this will create a page that I can then visit by going to `mysite.com/settings/admin`. By default, the path comes
+from the file name (with the suffix `Page` removed, if present), although there will be ways to override this behavior
+on a case-by-case basis (* *coming soon*).
+
+The file name `Index.kt` is special. If a page is defined inside such a file, it will be visited when the user visits
+the URL without specifying the path's child, so `.../pages/settings/Index.kt` will be visited if the user visits
+`mysite.com/settings`.
+
+## Silk
+
+Silk is a UI layer built on top of Kobweb and Web Compose. While Web Compose forces you to understand underlying
+html / css , Silk attempts to abstract a lot of that away, providing a UI more akin to what you might experience
+developing a Compose app on Android or Desktop. Less "div, span, and flexbox" and more "Rows, Columns, and Boxes" in
+other words.
+
+We consider Silk a pretty important part of the Kobweb experience, but it's worth pointing out that it's designed as an
+optional component. You can absolutely use Kobweb without Silk. You can also interleave Silk and Web Compose without
+issue (as Silk, itself, is just composing Web Compose methods).
+
+## Components: Layouts, Sections, and Widgets
+
+Outside of pages, it is common to create reusable composable parts. While Kobweb doesn't enforce any particular rule
+here, we recommend a convention which, if followed, may make it easier to allow new readers of your codebase to get
+around. 
+
+First, create a root folder called **components**. Within it, add:
+
+* **layouts** - High-level composables that provide reusable page layouts. Most (all?) of your `@Page` pages will start 
+  by calling a page layout function immediately. 
+* **sections** - Medium-level composables that represent areas inside your pages, themselves delegating to many children
+  composables. If you have multiple layouts, it's likely that would share these sections. Nav headers and footers are
+  great candidates for this subfolder. 
+* **widgets** - Low-level composables. One-off pieces that are extremely flexible to re-use all around your site. A
+  visitor counter component would be a good candidate for this subfolder. 
+
+# Work in progress / known issues
+
+The following items are on our radar but not yet done:
+
+* Markdown + Silk integrations are fragile
+* `kobweb export` - Generate a static version of your site
+  * and add `kobweb run --env prod` which can serve that static site
+* Dynamic routes - Allow people to visit `mysite.com/blog/1234` which gets redirected to some page with "1234" passed in
+  as a parameter.
+* API routes - Functions you can define, like pages, which will get triggered when the user visits an associated URL
+  (like `mysite.com/api/hello`)
+* Breakpoints - An intuitive way to have Silk composables behave differently based on the size of the page (inspired
+  by [Chakra UI's feature of the same name](https://chakra-ui.com/docs/features/responsive-styles). 
+
+They are coming! Thank you for your patience.
 
 # Templates
 
