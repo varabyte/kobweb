@@ -130,7 +130,7 @@ abstract class MarkdownComponents {
     abstract val th: Property<NodeScope.(TableCell) -> String>
 
     init {
-        useSilk.convention(true)
+        useSilk.convention(false) // TODO(Bug #23): Set to true after testing Markdown + Silk thoroughly
 
         text.convention { text ->
             if (useSilk.get()) {
