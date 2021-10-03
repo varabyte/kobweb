@@ -63,7 +63,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
             RunState.STARTING -> {
                 textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
                 textLine()
-                textLine("Press Ctrl-D anytime to cancel.")
+                textLine("Press Q anytime to cancel.")
             }
             RunState.RUNNING -> {
                 green {
@@ -72,7 +72,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
                 }
                 textLine(" (PID = ${serverState.pid})")
                 textLine()
-                textLine("Press Ctrl-D anytime to stop it.")
+                textLine("Press Q anytime to stop it.")
             }
             RunState.STOPPING_GRACEFULLY -> {
                 textLine("Server is stopping$ellipsisAnim")
@@ -128,7 +128,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
         })
 
         onKeyPressed {
-            if (key == Keys.EOF) {
+            if (key in listOf(Keys.EOF, Keys.Q)) {
                 if (runState == RunState.STARTING) {
                     runState = RunState.STOPPING_GRACEFULLY
                     CoroutineScope(Dispatchers.IO).launch {
