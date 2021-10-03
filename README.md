@@ -30,7 +30,8 @@ fun HomePage() {
 
 ---
 
-Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by Next.js and Chakra UI. 
+Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by [Next.js](https://nextjs.org)
+and [Chakra UI](https://chakra-ui.com).
 
 **It is currently in technology preview**. While it is not ready for use in a serious project at this point, please
 consider starring the project to indicate interest. (See also: The
@@ -58,7 +59,7 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 
 **Note:** Building Kobweb requires JDK11 or newer. If you don't already have this set up, the easiest way is to
 [download a JDK](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html), unzip it somewhere,
-and update your JAVA_HOME variable to point at it.
+and update your `JAVA_HOME` variable to point at it.
 
 ```bash
 JAVA_HOME=/path/to/jdks/corretto-11.0.12
@@ -89,7 +90,7 @@ $ cd /path/to/projects/root
 $ kobweb create site
 ```
 
-You'll be asked a bunch of questions required for setting up the project. When finished, you'll have a basic project
+You'll be asked a bunch of questions required for setting up your project. When finished, you'll have a basic project
 with three pages - a home page, an about page, and a markdown page - and some components (which are collections of
 reusable, composable pieces). Your own directory structure should look something like:
 
@@ -126,64 +127,62 @@ $ cd /path/to/projects/root/your-project
 $ kobweb run
 ```
 
-This spins up a webserver at http://localhost:8080. If you want to configure the port, you can do so by editing your
-project's `.kobweb/conf.yaml` file.
+This command spins up a webserver at http://localhost:8080. If you want to configure the port, you can do so by editing
+your project's `.kobweb/conf.yaml` file.
 
-You can open your project in IntelliJ and start editing it. While Kobweb is running, it will detect changes and deploy
-updates to your site automatically.
-
-## Layered upon Web Compose
-
-While Kobweb includes its own UI layer (called Silk), you can also use Web Compose methods as well. To learn more about
-Web Compose, please visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started).
+You can open your project in IntelliJ and start editing it. While Kobweb is running, it will detect changes, recompile,
+and deploy updates to your site automatically.
 
 # Basics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
-Web Compose website - namely routing and setting up default CSS styles - plus exposing a handful of annotations and
-utility methods to further help with this. These work in conjunction with our Gradle plugin
-(`com.varabyte.kobweb.application`) that handles code and resource generation for you.
+Web Compose app, such as routing and setting up default CSS styles. It exposes a handful of annotations and utility
+methods which your app can use to communicate intent with the framework. These annotations work in conjunction with our
+Gradle plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
 
-Kobweb is also a CLI binary of the same name which helps users execute commands to handle the parts of building a
-Web Compose app that are less glamorous. We want to get that stuff out of the way, so you can enjoy working on the more
-interesting parts!
+Kobweb is also a CLI binary of the same name which provides commands to handle the parts of building a Web Compose app
+that are less glamorous. We want to get that stuff out of the way, so you can enjoy focusing on the more interesting
+work!
 
 ## Create a page
 
-Creating a page is easy! It's just a normal `@Composable` method with just a small bit of runtime magic. To upgrade your
-composable to a page, all you need to do is:
+Creating a page is easy! It's just a normal `@Composable` method. To upgrade your composable to a page, all you need to
+do is:
 
-1. Define your composable somewhere under the `pages` package
+1. Define your composable in a file somewhere under the `pages` package
 1. Annotate it with `@Page`
 
-From that, Kobweb will create a site entry for you automatically.
+Just from that, Kobweb will create a site entry for you automatically.
 
 For example, if I create the following file:
 
 ```kotlin
-// com/example/mysite/pages/settings/AdminPage.kt
+// com/example/mysite/pages/admin/SettingsPage.kt
 
 @Page
 @Composable
-fun AdminPage() {
+fun SettingsPage() {
     /* ... */
 }
 ```
 
-this will create a page that I can then visit by going to `mysite.com/settings/admin`. By default, the path comes
-from the file name (with the suffix `Page` removed, if present), although there will be ways to override this behavior
-on a case-by-case basis (* *coming soon*).
+this will create a page that I can then visit by going to `mysite.com/admin/settings`.
 
-The file name `Index.kt` is special. If a page is defined inside such a file, it will be visited when the user visits
-the URL without specifying the path's child, so `.../pages/settings/Index.kt` will be visited if the user visits
-`mysite.com/settings`.
+By default, the path comes from the file name (with the suffix `Page` removed, if present), although there will be ways
+to override this behavior on a case-by-case basis (* *coming soon*).
+
+The file name `Index.kt` is special. If a page is defined inside such a file, it will be treated as the default page
+under that URL. For example, a page defined in `.../pages/admin/Index.kt` will be visited if the user visits
+`mysite.com/admin`.
 
 ## Silk
 
-Silk is a UI layer built on top of Kobweb and Web Compose. While Web Compose forces you to understand underlying
-html / css , Silk attempts to abstract a lot of that away, providing a UI more akin to what you might experience
-developing a Compose app on Android or Desktop. Less "div, span, and flexbox" and more "Rows, Columns, and Boxes" in
-other words.
+Silk is a UI layer built on top of Kobweb and Web Compose. (To learn more about Web Compose, please visit
+[the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started)).
+
+While Web Compose forces you to understand underlying html / css concepts, Silk attempts to abstract a lot of that away,
+providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
+"div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
 
 We consider Silk a pretty important part of the Kobweb experience, but it's worth pointing out that it's designed as an
 optional component. You can absolutely use Kobweb without Silk. You can also interleave Silk and Web Compose without
@@ -195,31 +194,33 @@ Outside of pages, it is common to create reusable composable parts. While Kobweb
 here, we recommend a convention which, if followed, may make it easier to allow new readers of your codebase to get
 around. 
 
-First, create a root folder called **components**. Within it, add:
+First, as a sibling to pages, create a folder called **components**. Within it, add:
 
-* **layouts** - High-level composables that provide reusable page layouts. Most (all?) of your `@Page` pages will start 
-  by calling a page layout function immediately. 
-* **sections** - Medium-level composables that represent areas inside your pages, themselves delegating to many children
-  composables. If you have multiple layouts, it's likely that would share these sections. Nav headers and footers are
-  great candidates for this subfolder. 
-* **widgets** - Low-level composables. One-off pieces that are extremely flexible to re-use all around your site. A
-  visitor counter component would be a good candidate for this subfolder. 
+* **layouts** - High-level composables that provide entire page layouts. Most (all?) of your `@Page` pages will start 
+  by calling a page layout function first. You may only have a single layout for your entire site.
+* **sections** - Medium-level composables that represent compound areas inside your pages, organizing a collection of
+  many children composables. If you have multiple layouts, it's likely sections would be shared across them. For
+  example, nav headers and footers are great candidates for this subfolder. 
+* **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
+  a stylized visitor counter would be a good candidate for this subfolder. 
 
-# Work in progress / known issues
+# Work in progress
+
+Current ETA to MVP: Mid-November 2021 (or even sooner 🤞)
 
 The following items are on our radar but not yet done:
 
-* Markdown + Silk integrations are fragile
 * `kobweb export` - Generate a static version of your site
   * and add `kobweb run --env prod` which can serve that static site
-* Dynamic routes - Allow people to visit `mysite.com/blog/1234` which gets redirected to some page with "1234" passed in
-  as a parameter.
-* API routes - Functions you can define, like pages, which will get triggered when the user visits an associated URL
-  (like `mysite.com/api/hello`)
+* Dynamic routes - Allow people to visit `mysite.com/blog/1234` which gets redirected to some page registered at
+  `pages/blog/{id}` with "1234" passed in as a parameter.
+* API routes - Serverless functions which you can define (and annotate, like `@Page`s), which will get triggered when the
+  user visits an associated URL (like `mysite.com/api/hello`)
 * Breakpoints - An intuitive way to have Silk composables behave differently based on the size of the page (inspired
   by [Chakra UI's feature of the same name](https://chakra-ui.com/docs/features/responsive-styles). 
-
-They are coming! Thank you for your patience.
+* The Silk API is still undergoing late-stage design and needs to be finalized and polished
+* Persistence APIs (or at least guidance using existing Web Compose APIs)
+* An example website using Kobweb
 
 # Templates
 
@@ -239,7 +240,7 @@ $ git submodule update --init
 
 If you'd like to be kept in the loop on updates to this project, there are a few ways:
 
-* [Join our Discord!](https://discord.gg/bCdxPr7aTV)
+* [Join our Discord!](https://discord.gg/5NZ2GKV5Cs)
 * Follow me on Twitter: [@bitspittle](https://twitter.com/bitspittle)
 * [Send me an email](mailto:bitspittle@gmail.com)
   * **Note: I am just an individual person, but I promise not to harvest, distribute, or in any way use any emails I
@@ -247,7 +248,7 @@ receive except to 1) respond to any questions asked or 2) ping when the status o
 
 # Filing issues and leaving feedback
 
-It is still early days and while we believe we've proven the feasibility of this approach at this point, there's still
+It is still early days, and while we believe we've proven the feasibility of this approach at this point, there's still
 plenty of work to do to get to a 1.0 launch! We are hungry for the community's feedback, so please don't hesitate to:
 
 * [Open an issue](https://github.com/varabyte/kobweb/issues)
