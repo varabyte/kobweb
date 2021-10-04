@@ -61,6 +61,13 @@ fun Modifier.size(size: CSSPercentageValue): Modifier = webModifier {
     }
 }
 
+fun Modifier.size(size: Dp): Modifier = webModifier {
+    style {
+        width(size.value.px)
+        height(size.value.px)
+    }
+}
+
 fun Modifier.width(size: Dp): Modifier = webModifier {
     style {
         width(size.value.px)
