@@ -35,7 +35,7 @@ and [Chakra UI](https://chakra-ui.com).
 
 **It is currently in technology preview**. While it is not ready for use in a serious project at this point, please
 consider starring the project to indicate interest. (See also: The
-[work in progress](https://github.com/varabyte/kobweb#work-in-progress--known-issues) section below).
+[work in progress](https://github.com/varabyte/kobweb#work-in-progress) section below).
 
 Our goal is to provide:
 
@@ -177,10 +177,10 @@ under that URL. For example, a page defined in `.../pages/admin/Index.kt` will b
 
 ## Silk
 
-Silk is a UI layer built on top of Kobweb and Web Compose. (To learn more about Web Compose, please visit
+Silk is a UI layer included with Kobweb and built upon Web Compose. (To learn more about Web Compose, please visit
 [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started)).
 
-While Web Compose forces you to understand underlying html / css concepts, Silk attempts to abstract a lot of that away,
+While Web Compose requires you to understand underlying html / css concepts, Silk attempts to abstract a lot of that away,
 providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
 "div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
 
