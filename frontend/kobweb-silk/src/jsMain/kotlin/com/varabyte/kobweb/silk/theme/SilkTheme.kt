@@ -1,18 +1,16 @@
 package com.varabyte.kobweb.silk.theme
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.silk.components.ComponentStyles
 import com.varabyte.kobweb.silk.components.SilkComponentStyles
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
-import com.varabyte.kobweb.silk.theme.colors.Palette
-import com.varabyte.kobweb.silk.theme.colors.Palettes
+import com.varabyte.kobweb.silk.theme.colors.*
 
-val DEFAULT_PALETTES = Palettes(
+/**
+ * The default palletes provided by Silk, exposed publicly in case sites want to tweak them using
+ * [SystemPalettes.copy] instead of providing their own from scratch.
+ */
+val SYSTEM_PALLETES = SystemPalettes(
     light = Palette(
         background = Color.White,
         surface = Color.White,
@@ -47,15 +45,18 @@ object SilkConfig {
     var initialColorMode: ColorMode = ColorMode.LIGHT
 }
 
-val SilkPalette = compositionLocalOf {
-    DEFAULT_PALETTES[SilkConfig.initialColorMode]
-}
+val SilkPalettes: ProvidableCompositionLocal<Palettes> = compositionLocalOf { SYSTEM_PALLETES }
 
 object SilkTheme {
+    val palettes: Palettes
+        @Composable
+        @ReadOnlyComposable
+        get() = SilkPalettes.current
+
     val palette: Palette
         @Composable
         @ReadOnlyComposable
-        get() = SilkPalette.current
+        get() = palettes.getActivePalette()
 
     val componentStyles: ComponentStyles
         @Composable
@@ -65,12 +66,12 @@ object SilkTheme {
 
 @Composable
 fun SilkTheme(
-    palette: Palette = SilkTheme.palette,
+    palettes: Palettes = SilkTheme.palettes,
     componentStyles: ComponentStyles = SilkTheme.componentStyles,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
-        SilkPalette provides palette,
+        SilkPalettes provides palettes,
         SilkComponentStyles provides componentStyles,
     ) {
         content()

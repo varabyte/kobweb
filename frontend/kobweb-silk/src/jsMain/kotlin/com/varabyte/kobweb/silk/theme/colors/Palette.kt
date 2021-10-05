@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import com.varabyte.kobweb.compose.ui.graphics.Color
 
 data class Palette(
@@ -30,10 +31,16 @@ data class Palette(
     val onError: Color,
 )
 
-data class Palettes(
+interface Palettes {
+    @Composable
+    @ReadOnlyComposable
+    fun getActivePalette(): Palette
+}
+
+data class SystemPalettes(
     val light: Palette,
     val dark: Palette,
-) {
+): Palettes {
     operator fun get(colorMode: ColorMode): Palette {
         return when (colorMode) {
             ColorMode.LIGHT -> light
@@ -42,5 +49,5 @@ data class Palettes(
     }
 
     @Composable
-    fun getActivePalette(): Palette = this[getColorMode()]
+    override fun getActivePalette(): Palette = this[getColorMode()]
 }
