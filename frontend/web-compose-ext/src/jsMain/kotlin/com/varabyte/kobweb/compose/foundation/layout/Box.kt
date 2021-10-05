@@ -4,14 +4,61 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.webModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
+
+class BoxScope() {
+    fun Modifier.align(alignment: Alignment) = webModifier {
+        style {
+            when (alignment) {
+                // justify in grid means "row" while align means "col"
+                Alignment.TopStart -> {
+                    alignSelf(AlignSelf.Start)
+                    justifySelf(AlignSelf.Start.value)
+                }
+                Alignment.TopCenter -> {
+                    alignSelf(AlignSelf.Start)
+                    justifySelf(AlignSelf.Center.value)
+                }
+                Alignment.TopEnd -> {
+                    alignSelf(AlignSelf.Start)
+                    justifySelf(AlignSelf.End.value)
+                }
+                Alignment.CenterStart -> {
+                    alignSelf(AlignSelf.Center)
+                    justifySelf(AlignSelf.Start.value)
+                }
+                Alignment.Center -> {
+                    alignSelf(AlignSelf.Center)
+                    justifySelf(AlignSelf.Center.value)
+                }
+                Alignment.CenterEnd -> {
+                    justifySelf(AlignSelf.End.value)
+                    alignSelf(AlignSelf.Center)
+                }
+                Alignment.BoottomStart -> {
+                    justifySelf(AlignSelf.Start.value)
+                    alignSelf(AlignSelf.End)
+                }
+                Alignment.BoottomCenter -> {
+                    justifySelf(AlignSelf.Center.value)
+                    alignSelf(AlignSelf.End)
+                }
+                Alignment.BoottomEnd -> {
+                    justifySelf(AlignSelf.End.value)
+                    alignSelf(AlignSelf.End)
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun Box(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    content: @Composable () -> Unit = {}
+    content: @Composable BoxScope.() -> Unit = {}
 ) {
     Div(attrs = modifier.asAttributeBuilder {
         style {
@@ -21,47 +68,47 @@ fun Box(
             gridTemplateColumns("1fr")
             gridTemplateRows("1fr")
 
-            when {
+            when (contentAlignment) {
                 // justify in grid means "row" while align means "col"
-                contentAlignment === Alignment.TopStart -> {
+                Alignment.TopStart -> {
                     alignItems(AlignItems.Start)
                     justifyItems(AlignItems.Start.value)
                 }
-                contentAlignment === Alignment.TopCenter -> {
+                Alignment.TopCenter -> {
                     alignItems(AlignItems.Start)
                     justifyItems(AlignItems.Center.value)
                 }
-                contentAlignment === Alignment.TopEnd -> {
+                Alignment.TopEnd -> {
                     alignItems(AlignItems.Start)
                     justifyItems(AlignItems.End.value)
                 }
-                contentAlignment === Alignment.CenterStart -> {
+                Alignment.CenterStart -> {
                     alignItems(AlignItems.Center)
                     justifyItems(AlignItems.Start.value)
                 }
-                contentAlignment === Alignment.Center -> {
+                Alignment.Center -> {
                     alignItems(AlignItems.Center)
                     justifyItems(AlignItems.Center.value)
                 }
-                contentAlignment === Alignment.CenterEnd -> {
+                Alignment.CenterEnd -> {
                     justifyItems(AlignItems.End.value)
                     alignItems(AlignItems.Center)
                 }
-                contentAlignment === Alignment.BoottomStart -> {
+                Alignment.BoottomStart -> {
                     justifyItems(AlignItems.Start.value)
                     alignItems(AlignItems.End)
                 }
-                contentAlignment === Alignment.BoottomCenter -> {
+                Alignment.BoottomCenter -> {
                     justifyItems(AlignItems.Center.value)
                     alignItems(AlignItems.End)
                 }
-                contentAlignment === Alignment.BoottomEnd -> {
+                Alignment.BoottomEnd -> {
                     justifyItems(AlignItems.End.value)
                     alignItems(AlignItems.End)
                 }
             }
         }
     }) {
-        content()
+        BoxScope().content()
     }
 }

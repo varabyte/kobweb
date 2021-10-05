@@ -25,6 +25,7 @@ fun Surface(
         modifier
             .background(color)
             .clip(shape),
-        content = content
-    )
+    ) {
+        content()
+    }
 }
