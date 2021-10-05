@@ -11,7 +11,7 @@
 @Composable
 fun HomePage() {
   Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+    Row(Modifier.align(Alignment.End)) {
       var colorMode by rememberColorMode()
       Button(
         onClick = { colorMode = colorMode.opposite() },

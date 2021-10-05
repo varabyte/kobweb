@@ -4,15 +4,28 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.webModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
+
+class ColumnScope {
+    fun Modifier.align(alignment: Alignment.Horizontal) = webModifier {
+        style {
+            when (alignment) {
+                Alignment.Start -> alignSelf(AlignSelf.FlexStart)
+                Alignment.CenterHorizontally -> alignSelf(AlignSelf.Center)
+                Alignment.End -> alignSelf(AlignSelf.FlexEnd)
+            }
+        }
+    }
+}
 
 @Composable
 fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Div(attrs = modifier.asAttributeBuilder {
         style {
@@ -31,6 +44,6 @@ fun Column(
             }
         }
     }) {
-        content()
+        ColumnScope().content()
     }
 }
