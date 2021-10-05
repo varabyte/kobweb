@@ -47,10 +47,6 @@ object DefaultStyleSheet : StyleSheet() {
         "*" style {
             // See also: https://css-tricks.com/box-sizing
             boxSizing("border-box")
-
-            // The following transition settings make changing the color mode look good
-            transitionProperty("background-color", "color", "opacity")
-            transitionDuration(200.ms)
         }
     }
 }
