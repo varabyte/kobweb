@@ -11,10 +11,20 @@
 @Composable
 fun HomePage() {
   Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+      var colorMode by rememberColorMode()
+      Button(
+        onClick = { colorMode = colorMode.opposite() },
+        Modifier.clip(Circle())
+      ) {
+        Box(Modifier.padding(4.dp)) {
+          if (colorMode.isLight()) FaSun() else FaMoon()
+        }
+      }
+    }
     H1 {
       Text("Welcome to Kobweb!")
     }
-    P()
     Row {
       Text("Create rich, dynamic web apps with ease, leveraging ")
       Link("https://kotlinlang.org/", "Kotlin")
@@ -26,7 +36,7 @@ fun HomePage() {
 ```
 
 <p align="center">
-<img src="https://github.com/varabyte/media/raw/main/kobweb/images/readme/kobweb-welcome.png" />
+<img src="https://github.com/varabyte/media/raw/main/kobweb/screencasts/kobweb-welcome.gif" />
 </p>
 
 ---
