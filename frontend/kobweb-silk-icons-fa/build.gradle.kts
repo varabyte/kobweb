@@ -94,16 +94,16 @@ tasks.register("regenerateIcons") {
 
             when {
                 categories.size == 2 -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, style.category, color)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE) = FaIcon(\"$rawName\", modifier, style.category)"
                 }
                 categories.contains(IconCategory.SOLID) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID, color)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID)"
                 }
                 categories.contains(IconCategory.REGULAR) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR, color)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR)"
                 }
                 categories.contains(IconCategory.BRAND) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND, color)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND)"
                 }
                 else -> GradleException("Unhandled icon entry: $entry")
             }
@@ -151,10 +151,9 @@ fun FaIcon(
     name: String,
     modifier: Modifier,
     style: IconCategory = IconCategory.REGULAR,
-    color: Color = defaultColor
 ) {
     Div(
-        attrs = modifier.color(color).asAttributeBuilder {
+        attrs = Modifier.color(defaultColor).then(modifier).asAttributeBuilder {
             classes(style.className, "fa-${'$'}name")
         }
     )

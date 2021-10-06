@@ -1,6 +1,7 @@
 package helloworld.components.sections
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.TextDecorationLine
@@ -19,7 +20,10 @@ import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.shapes.Circle
 import com.varabyte.kobweb.silk.theme.shapes.clip
 
-private val NAV_ITEM_MODIFIER get() = Modifier.padding(0.dp, 15.dp)
+private val NAV_ITEM_MODIFIER
+    @Composable
+    @ReadOnlyComposable
+    get() = Modifier.padding(0.dp, 15.dp).color(SilkTheme.palette.primary)
 
 @Composable
 private fun NavLink(path: String, text: String) {
@@ -27,7 +31,6 @@ private fun NavLink(path: String, text: String) {
         path,
         text,
         NAV_ITEM_MODIFIER,
-        color = SilkTheme.palette.primary,
         decorationLine = TextDecorationLine.None
     )
 }

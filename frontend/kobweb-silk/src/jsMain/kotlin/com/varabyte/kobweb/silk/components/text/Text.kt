@@ -21,13 +21,13 @@ import org.jetbrains.compose.web.dom.Text
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = SilkTheme.palette.onPrimary,
     decorationLine: TextDecorationLine? = null,
     cursor: Cursor? = null,
 ) {
     Div(
-        attrs = modifier
-            .color(color)
+        attrs = Modifier
+            .color(SilkTheme.palette.onPrimary) // Default if no one sets any color
+            .then(modifier)
             .asAttributeBuilder {
                 if (decorationLine != null) {
                     style { textDecorationLine(decorationLine) }

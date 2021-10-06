@@ -5,7 +5,7 @@ import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.TextDecorationLine
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.clickable
-import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.core.Router
 import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -21,14 +21,15 @@ fun Link(
     path: String,
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = SilkTheme.palette.secondary,
     decorationLine: TextDecorationLine? = TextDecorationLine.Underline,
     cursor: Cursor? = Cursor.Pointer,
 ) {
     Text(
         text,
-        modifier.clickable { Router.navigateTo(path) },
-        color,
+        Modifier
+            .color(SilkTheme.palette.secondary)
+            .then(modifier)
+            .clickable { Router.navigateTo(path) },
         decorationLine,
         cursor
     )

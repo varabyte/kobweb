@@ -5,7 +5,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.background
 import com.varabyte.kobweb.compose.ui.fillMaxSize
-import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.Shape
@@ -17,13 +16,13 @@ import com.varabyte.kobweb.silk.theme.shapes.clip
 @Composable
 fun Surface(
     modifier: Modifier = Modifier.fillMaxSize(),
-    color: Color = SilkTheme.palette.surface,
     shape: Shape = Rect(),
     content: @Composable () -> Unit
 ) {
     Box(
-        modifier
-            .background(color)
+        Modifier
+            .background(SilkTheme.palette.surface)
+            .then(modifier)
             .clip(shape),
     ) {
         content()
