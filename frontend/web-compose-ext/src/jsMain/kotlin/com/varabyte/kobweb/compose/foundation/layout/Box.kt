@@ -37,15 +37,15 @@ class BoxScope() {
                     justifySelf(AlignSelf.End.value)
                     alignSelf(AlignSelf.Center)
                 }
-                Alignment.BoottomStart -> {
+                Alignment.BottomStart -> {
                     justifySelf(AlignSelf.Start.value)
                     alignSelf(AlignSelf.End)
                 }
-                Alignment.BoottomCenter -> {
+                Alignment.BottomCenter -> {
                     justifySelf(AlignSelf.Center.value)
                     alignSelf(AlignSelf.End)
                 }
-                Alignment.BoottomEnd -> {
+                Alignment.BottomEnd -> {
                     justifySelf(AlignSelf.End.value)
                     alignSelf(AlignSelf.End)
                 }
@@ -94,15 +94,15 @@ fun Box(
                     justifyItems(AlignItems.End.value)
                     alignItems(AlignItems.Center)
                 }
-                Alignment.BoottomStart -> {
+                Alignment.BottomStart -> {
                     justifyItems(AlignItems.Start.value)
                     alignItems(AlignItems.End)
                 }
-                Alignment.BoottomCenter -> {
+                Alignment.BottomCenter -> {
                     justifyItems(AlignItems.Center.value)
                     alignItems(AlignItems.End)
                 }
-                Alignment.BoottomEnd -> {
+                Alignment.BottomEnd -> {
                     justifyItems(AlignItems.End.value)
                     alignItems(AlignItems.End)
                 }
