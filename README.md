@@ -263,7 +263,7 @@ If you'd like to be kept in the loop on updates to this project, there are a few
 It is still early days, and while we believe we've proven the feasibility of this approach at this point, there's still
 plenty of work to do to get to a 1.0 launch! We are hungry for the community's feedback, so please don't hesitate to:
 
-* [Open an issue](https://github.com/varabyte/kobweb/issues)
+* [Open an issue](https://github.com/varabyte/kobweb/issues/new/choose)
 * Contact us (using any of the ways mentioned above) telling us what features you want
 * Ask us for guidance, especially as there are no tutorials yet (your questions can help us know what to write first!)
 
