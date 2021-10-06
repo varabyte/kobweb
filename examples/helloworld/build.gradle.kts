@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform") version "1.5.30"
-    id("org.jetbrains.compose") version "1.0.0-alpha4-build331"
+    kotlin("multiplatform") version "1.5.31"
+    id("org.jetbrains.compose") version "1.0.0-alpha4-build385"
     id("com.varabyte.kobweb.application")
     id("com.varabyte.kobwebx.markdown")
 }
