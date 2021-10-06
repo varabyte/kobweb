@@ -255,7 +255,8 @@ If you'd like to be kept in the loop on updates to this project, there are a few
 * Follow me on Twitter: [@bitspittle](https://twitter.com/bitspittle)
 * [Send me an email](mailto:bitspittle@gmail.com)
   * **Note: I am just an individual person, but I promise not to harvest, distribute, or in any way use any emails I
-receive except to 1) respond to any questions asked or 2) ping when the status of this project changes.**
+  receive except to 1) respond to any questions asked or 2) ping when the status of this project changes
+  (if requested).**
 
 # Filing issues and leaving feedback
 
