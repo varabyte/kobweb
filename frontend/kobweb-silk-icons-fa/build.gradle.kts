@@ -39,9 +39,15 @@ enum class IconCategory {
     BRAND,
 }
 
-tasks.register("regenerateIcons") {
+val regenerateIconsTask = tasks.register("regenerateIcons") {
+    val srcFile = layout.projectDirectory.file("fa-icon-list.txt")
+    val dstFile = layout.projectDirectory.file("src/jsMain/kotlin/com/varabyte/kobweb/silk/components/icons/fa/FaIcons.kt")
+
+    inputs.file(srcFile)
+    outputs.file(dstFile)
+
     // {SOLID=[ad, address-book, address-card, ...], REGULAR=[address-book, address-card, angry, ...], ... }
-    val iconRawNames = project.file("fa-icon-list.txt")
+    val iconRawNames = srcFile.asFile
         .readLines().asSequence()
         .filter { line -> !line.startsWith("#") }
         .map { line ->
@@ -162,5 +168,9 @@ fun FaIcon(
 ${iconMethodEntries.joinToString("\n")}
     """.trimIndent()
 
-    println(project.file("src/jsMain/kotlin/com/varabyte/kobweb/silk/components/icons/fa/FaIcons.kt").writeText(iconsCode))
+    println(dstFile.asFile.writeText(iconsCode))
+}
+
+tasks.named("compileKotlinJs") {
+    dependsOn(regenerateIconsTask)
 }
