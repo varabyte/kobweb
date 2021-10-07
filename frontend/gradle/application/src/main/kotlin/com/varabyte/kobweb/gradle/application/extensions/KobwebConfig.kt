@@ -12,11 +12,6 @@ import java.io.File
 
 abstract class KobwebConfig {
     /**
-     * The string path to the Kobweb conf.yaml file, relative to the project root.
-     */
-    abstract val confFile: Property<String>
-
-    /**
      * The string path to the root where generated code will be written to, relative to the project root.
      */
     abstract val genDir: Property<String>
@@ -37,7 +32,6 @@ abstract class KobwebConfig {
     abstract val publicPath: Property<String>
 
     init {
-        confFile.convention(KobwebFolder.pathNameTo("conf.yaml"))
         genDir.convention(GENERATED_ROOT)
 
         pagesPackage.convention(".pages")

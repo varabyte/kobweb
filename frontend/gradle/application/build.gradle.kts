@@ -15,8 +15,6 @@ dependencies {
     implementation(kotlin("stdlib"))
     // Get access to Kotlin multiplatform source sets
     implementation(kotlin("gradle-plugin"))
-    // For parsing code. Instead, use KSP someday? See also: Bug #4
-    implementation(kotlin("compiler-embeddable"))
 
     implementation(project(":common:kobweb-project"))
     // Note: compileOnly because we embed the classes directly into this plugin by modifying the jar task below. We do

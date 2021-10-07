@@ -10,6 +10,9 @@ version = libs.versions.kobweb.get()
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.kaml)
+
+    // For parsing code. Instead, use KSP someday? See also: Bug #4
+    implementation(kotlin("compiler-embeddable"))
 }
 
 kobwebPublication {
