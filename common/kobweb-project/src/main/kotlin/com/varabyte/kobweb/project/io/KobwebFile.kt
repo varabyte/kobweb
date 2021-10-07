@@ -1,6 +1,6 @@
-package com.varabyte.kobweb.common.io
+package com.varabyte.kobweb.project.io
 
-import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.project.KobwebFolder
 import kotlin.io.path.*
 
 // TODO(Bug #12): Use safer file logic here to protect against multiple writers etc.

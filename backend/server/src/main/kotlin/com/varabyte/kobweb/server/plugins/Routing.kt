@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.server.plugins
 
-import com.varabyte.kobweb.common.conf.KobwebConf
+import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment

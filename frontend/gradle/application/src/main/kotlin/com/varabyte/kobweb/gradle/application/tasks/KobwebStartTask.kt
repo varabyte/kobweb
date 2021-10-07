@@ -2,7 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerState
 import com.varabyte.kobweb.server.api.ServerStateFile

@@ -4,7 +4,7 @@ import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.cli.create.template.KobwebTemplate
-import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.*

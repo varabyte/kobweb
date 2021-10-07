@@ -4,7 +4,7 @@ import RunEnvironment
 import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.informError
 import com.varabyte.kobweb.cli.common.newline
-import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerState

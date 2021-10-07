@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.common
+package com.varabyte.kobweb.project
 
 import java.nio.file.Files
 import java.nio.file.Path

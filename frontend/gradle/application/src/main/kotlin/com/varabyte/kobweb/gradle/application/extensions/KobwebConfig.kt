@@ -2,7 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.extensions
 
-import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
 import com.varabyte.kobweb.gradle.application.RESOURCE_SUFFIX
 import com.varabyte.kobweb.gradle.application.SRC_SUFFIX

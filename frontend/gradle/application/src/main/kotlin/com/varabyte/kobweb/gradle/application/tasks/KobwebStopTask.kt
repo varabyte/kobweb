@@ -2,16 +2,13 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.KobwebFolder
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import java.nio.file.Files
-import javax.inject.Inject
 
 /**
  * Stop a Kobweb web server started by the [KobwebStartTask].

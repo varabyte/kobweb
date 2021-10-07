@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.server
 
-import com.varabyte.kobweb.common.KobwebFolder
-import com.varabyte.kobweb.common.conf.KobwebConfFile
+import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.server.io.ServerStateFile
 import com.varabyte.kobweb.server.api.*

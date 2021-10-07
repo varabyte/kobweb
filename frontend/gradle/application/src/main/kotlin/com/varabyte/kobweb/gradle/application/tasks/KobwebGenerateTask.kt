@@ -2,8 +2,8 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.KobwebFolder
-import com.varabyte.kobweb.common.conf.KobwebConfFile
+import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.gradle.application.APP_FQCN
 import com.varabyte.kobweb.gradle.application.APP_SIMPLE_NAME
 import com.varabyte.kobweb.gradle.application.PAGE_FQCN

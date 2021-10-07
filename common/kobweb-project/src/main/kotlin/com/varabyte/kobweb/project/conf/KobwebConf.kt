@@ -1,10 +1,10 @@
 @file:Suppress("unused") // Used by serializer
 
-package com.varabyte.kobweb.common.conf
+package com.varabyte.kobweb.project.conf
 
 import com.charleskorn.kaml.Yaml
-import com.varabyte.kobweb.common.KobwebFolder
-import com.varabyte.kobweb.common.io.KobwebReadableFile
+import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.project.io.KobwebReadableFile
 import kotlinx.serialization.Serializable
 
 @Serializable

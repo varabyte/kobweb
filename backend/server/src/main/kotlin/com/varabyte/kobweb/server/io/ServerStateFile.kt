@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.server.io
 
 import com.charleskorn.kaml.Yaml
-import com.varabyte.kobweb.common.KobwebFolder
-import com.varabyte.kobweb.common.io.KobwebWritableFile
+import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.project.io.KobwebWritableFile
 import com.varabyte.kobweb.server.api.ServerState
 
 // Note: Unlike the version of this class in the API module, this one is writable.

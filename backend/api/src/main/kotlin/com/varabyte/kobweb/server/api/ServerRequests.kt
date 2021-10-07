@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.server.api
 
 import com.charleskorn.kaml.Yaml
-import com.varabyte.kobweb.common.KobwebFolder
-import com.varabyte.kobweb.common.io.KobwebWritableFile
+import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.project.io.KobwebWritableFile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

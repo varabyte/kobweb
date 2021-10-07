@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application
 
-import com.varabyte.kobweb.common.KobwebFolder
+import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
