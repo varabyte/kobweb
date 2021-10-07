@@ -19,14 +19,14 @@ import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.shapes.Circle
 import com.varabyte.kobweb.silk.theme.shapes.clip
 
-private val NAV_ITEM_MODIFIER = Modifier.padding(0.dp, 15.dp)
+private val NAV_ITEM_PADDING = Modifier.padding(0.dp, 15.dp)
 
 @Composable
 private fun NavLink(path: String, text: String) {
     Link(
         path,
         text,
-        NAV_ITEM_MODIFIER,
+        NAV_ITEM_PADDING,
         // Intentionally invert the header colors (here, "primary" instead of "onPrimary")
         color = SilkTheme.palette.primary,
         decorationLine = TextDecorationLine.None
@@ -54,7 +54,7 @@ fun NavHeader() {
             Spacer()
             Button(
                 onClick = { colorMode = colorMode.opposite() },
-                NAV_ITEM_MODIFIER.clip(Circle())
+                NAV_ITEM_PADDING.clip(Circle())
             ) {
                 Box(Modifier.padding(4.dp)) {
                     when (colorMode) {
