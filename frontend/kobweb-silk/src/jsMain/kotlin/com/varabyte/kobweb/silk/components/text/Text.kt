@@ -4,9 +4,10 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.silk.theme.SilkTheme
+import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -21,14 +22,16 @@ import org.jetbrains.compose.web.dom.Text
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
+    color: Color = SilkTheme.palette.onPrimary,
     decorationLine: TextDecorationLine? = null,
     cursor: Cursor? = null,
 ) {
     Div(
-        attrs = Modifier
-            .color(SilkTheme.palette.onPrimary) // Default if no one sets any color
-            .then(modifier)
+        attrs = modifier
             .asAttributeBuilder {
+                style {
+                    this.color(color.toCssColor())
+                }
                 if (decorationLine != null) {
                     style { textDecorationLine(decorationLine) }
                 }

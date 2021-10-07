@@ -43,7 +43,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
     val srcFile = layout.projectDirectory.file("fa-icon-list.txt")
     val dstFile = layout.projectDirectory.file("src/jsMain/kotlin/com/varabyte/kobweb/silk/components/icons/fa/FaIcons.kt")
 
-    inputs.file(srcFile)
+    inputs.files(srcFile, layout.projectDirectory.file("build.gradle.kts"))
     outputs.file(dstFile)
 
     // {SOLID=[ad, address-book, address-card, ...], REGULAR=[address-book, address-card, angry, ...], ... }
@@ -100,16 +100,16 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
 
             when {
                 categories.size == 2 -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE) = FaIcon(\"$rawName\", modifier, style.category)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, style.category, color)"
                 }
                 categories.contains(IconCategory.SOLID) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID, color)"
                 }
                 categories.contains(IconCategory.REGULAR) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR, color)"
                 }
                 categories.contains(IconCategory.BRAND) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, color: Color = defaultColor) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND, color)"
                 }
                 else -> GradleException("Unhandled icon entry: $entry")
             }
@@ -131,9 +131,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.silk.theme.SilkTheme
+import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.dom.Div
 
 enum class IconCategory(internal val className: String) {
@@ -157,10 +158,14 @@ fun FaIcon(
     name: String,
     modifier: Modifier,
     style: IconCategory = IconCategory.REGULAR,
+    color: Color = defaultColor,
 ) {
     Div(
-        attrs = Modifier.color(defaultColor).then(modifier).asAttributeBuilder {
+        attrs = modifier.asAttributeBuilder {
             classes(style.className, "fa-${'$'}name")
+            style {
+                this.color(color.toCssColor())
+            }
         }
     )
 }

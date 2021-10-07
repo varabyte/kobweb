@@ -23,12 +23,6 @@ fun Modifier.background(color: KobwebColor) = webModifier {
     }
 }
 
-fun Modifier.color(color: KobwebColor) = webModifier {
-    style {
-        color(color.toCssColor())
-    }
-}
-
 fun Modifier.cursor(cursor: KobwebCursor) = webModifier {
     style {
         cursor(cursor)
