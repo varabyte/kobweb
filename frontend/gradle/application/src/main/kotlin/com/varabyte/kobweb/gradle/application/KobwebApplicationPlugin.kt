@@ -32,8 +32,8 @@ class KobwebApplicationPlugin : Plugin<Project> {
         project.extensions.create("kobwebx", KobwebxBlock::class.java)
 
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
-        val kobwebStartDevTask = project.tasks.register("kobwebStartDev", KobwebStartTask::class.java, ServerEnvironment.DEV)
-        val kobwebStartProdTask = project.tasks.register("kobwebStartProd", KobwebStartTask::class.java, ServerEnvironment.PROD)
+        val env = project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
+        val kobwebStartTask = project.tasks.register("kobwebStart", KobwebStartTask::class.java, env)
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
 
         project.afterEvaluate {
@@ -44,13 +44,12 @@ class KobwebApplicationPlugin : Plugin<Project> {
                 dependsOn(kobwebGenTask)
             }
 
-            val compileDevExecutableTask = project.tasks.named("jsDevelopmentExecutableCompileSync")
-            kobwebStartDevTask.configure {
-                dependsOn(compileDevExecutableTask)
+            val compileExecutableTask = when(env) {
+                ServerEnvironment.DEV -> project.tasks.named("jsDevelopmentExecutableCompileSync")
+                ServerEnvironment.PROD -> project.tasks.named("jsProductionExecutableCompileSync")
             }
-            val compileProdExecutableTask = project.tasks.named("jsProductionExecutableCompileSync")
-            kobwebStartProdTask.configure {
-                dependsOn(compileProdExecutableTask)
+            kobwebStartTask.configure {
+                dependsOn(compileExecutableTask)
             }
 
             project.kotlin {
@@ -70,7 +69,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
                     }
                 }
                 override fun afterExecute(task: Task, state: TaskState) {
-                    if (task.name in listOf(compileDevExecutableTask, compileProdExecutableTask).map { it.name }) {
+                    if (task.name == compileExecutableTask.name) {
                         if (state.failure == null) {
                             ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.ClearStatus())
                             ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.IncrementVersion())

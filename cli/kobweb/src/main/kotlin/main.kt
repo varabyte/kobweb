@@ -1,12 +1,8 @@
 import com.varabyte.kobweb.cli.create.handleCreate
 import com.varabyte.kobweb.cli.run.handleRun
 import com.varabyte.kobweb.cli.version.handleVersion
+import com.varabyte.kobweb.server.api.ServerEnvironment
 import kotlinx.cli.*
-
-enum class RunEnvironment {
-    DEV,
-    PROD;
-}
 
 @ExperimentalCli
 fun main(args: Array<String>) {
@@ -27,7 +23,7 @@ fun main(args: Array<String>) {
     }
 
     class Run : Subcommand("run", "Run a Kobweb server") {
-        val env by option(ArgType.Choice<RunEnvironment>(), "env").default(RunEnvironment.DEV)
+        val env by option(ArgType.Choice<ServerEnvironment>(), "env").default(ServerEnvironment.DEV)
 
         override fun execute() {
             handleRun(env)

@@ -1,14 +1,9 @@
 package com.varabyte.kobweb.cli.run
 
-import RunEnvironment
 import com.varabyte.kobweb.cli.common.Anims
-import com.varabyte.kobweb.cli.common.informError
+import com.varabyte.kobweb.cli.common.kobwebFolder
 import com.varabyte.kobweb.cli.common.newline
-import com.varabyte.kobweb.project.KobwebFolder
-import com.varabyte.kobweb.server.api.ServerRequest
-import com.varabyte.kobweb.server.api.ServerRequestsFile
-import com.varabyte.kobweb.server.api.ServerState
-import com.varabyte.kobweb.server.api.ServerStateFile
+import com.varabyte.kobweb.server.api.*
 import com.varabyte.konsole.foundation.anim.konsoleAnimOf
 import com.varabyte.konsole.foundation.input.Keys
 import com.varabyte.konsole.foundation.input.onKeyPressed
@@ -24,7 +19,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.time.Duration
 
-enum class RunState {
+private enum class RunState {
     STARTING,
     RUNNING,
     STOPPING_GRACEFULLY,
@@ -35,20 +30,16 @@ enum class RunState {
     CANCELLED_VIA_INTERRUPT,
 }
 
-fun handleRun(env: RunEnvironment) = konsoleApp {
-    val kobwebFolder = KobwebFolder.inWorkingDirectory()
-        ?: run {
-            informError("This command must be called in the root of a Kobweb project.")
-            return@konsoleApp
-        }
+fun handleRun(env: ServerEnvironment) = konsoleApp {
+    val kobwebFolder = kobwebFolder ?: return@konsoleApp
 
-    newline() // Put space above first line of Gradle output
+    newline() // Put space between user prompt and eventual first line of Gradle output
 
     val serverStateFile = ServerStateFile(kobwebFolder)
 
     val envName = when (env) {
-        RunEnvironment.DEV -> "development"
-        RunEnvironment.PROD -> "production"
+        ServerEnvironment.DEV -> "development"
+        ServerEnvironment.PROD -> "production"
     }
     lateinit var serverState: ServerState // Set if RunState ever hits RunState.RUNNING; otherwise, don't use!
     val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
@@ -98,7 +89,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
             val isr = InputStreamReader(stream)
             val br = BufferedReader(isr)
             while (true) {
-                val line = br.readLine() ?: break
+                val line = br. readLine() ?: break
                 addOutputSeparator = true
                 aside {
                     black(isBright = true) {
@@ -110,7 +101,7 @@ fun handleRun(env: RunEnvironment) = konsoleApp {
 
         @Suppress("BlockingMethodInNonBlockingContext")
         val startServerProcess = Runtime.getRuntime()
-            .exec(arrayOf("./gradlew", if (env == RunEnvironment.DEV) "kobwebStartDev" else "kobwebStartProd", "-t"))
+            .exec(arrayOf("./gradlew", "-PkobwebEnv=$env", "kobwebStart", "-t"))
 
         CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.inputStream) }
         CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.errorStream) }
