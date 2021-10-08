@@ -22,12 +22,10 @@ import java.time.Duration
 private enum class RunState {
     STARTING,
     RUNNING,
-    STOPPING_GRACEFULLY,
-    STOPPING_VIA_INTERRUPT,
-    CHANGED_EXTERNALLY,
+    STOPPING,
     STOPPED,
+    CANCELLING,
     CANCELLED,
-    CANCELLED_VIA_INTERRUPT,
 }
 
 fun handleRun(env: ServerEnvironment) = konsoleApp {
@@ -44,6 +42,7 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
     lateinit var serverState: ServerState // Set if RunState ever hits RunState.RUNNING; otherwise, don't use!
     val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
     var runState by konsoleVarOf(RunState.STARTING)
+    var cancelReason by konsoleVarOf("")
     var addOutputSeparator by konsoleVarOf(false) // Separate active block from Gradle output above if any
     konsole {
         if (addOutputSeparator) {
@@ -65,23 +64,18 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
                 textLine()
                 textLine("Press Q anytime to stop it.")
             }
-            RunState.STOPPING_GRACEFULLY -> {
+            RunState.STOPPING -> {
                 textLine("Server is stopping$ellipsisAnim")
             }
             RunState.STOPPED -> {
                 textLine("Server stopped gracefully.")
             }
-            RunState.CHANGED_EXTERNALLY -> {
-                yellow { textLine("Exiting. It seems like the server was stopped by a separate process.") }
-            }
-            RunState.STOPPING_VIA_INTERRUPT -> {
-                yellow { textLine("CTRL-C received. Kicked off a request to stop the server but we have to exit NOW.") }
+            RunState.CANCELLING -> {
+                check(cancelReason.isNotBlank())
+                yellow { textLine("Server startup cancelling: $cancelReason$ellipsisAnim") }
             }
             RunState.CANCELLED -> {
-                textLine("Server startup cancelled.")
-            }
-            RunState.CANCELLED_VIA_INTERRUPT -> {
-                yellow { textLine("CTRL-C received. Server startup cancelled.") }
+                yellow { textLine("Server startup cancelled: $cancelReason") }
             }
         }
     }.runUntilSignal {
@@ -107,13 +101,15 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.errorStream) }
 
         Runtime.getRuntime().addShutdownHook(Thread {
-            if (runState == RunState.RUNNING || runState == RunState.STOPPING_GRACEFULLY) {
-                runState = RunState.STOPPING_VIA_INTERRUPT
+            if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
+                cancelReason = "CTRL-C received. Kicked off a request to stop the server but we have to exit NOW."
+                runState = RunState.CANCELLED
 
                 ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
             }
             else {
-                runState = RunState.CANCELLED_VIA_INTERRUPT
+                cancelReason = "CTRL-C received. Server startup cancelled."
+                runState = RunState.CANCELLED
             }
             signal()
         })
@@ -121,16 +117,17 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         onKeyPressed {
             if (key in listOf(Keys.EOF, Keys.Q)) {
                 if (runState == RunState.STARTING) {
-                    runState = RunState.STOPPING_GRACEFULLY
+                    runState = RunState.STOPPING
                     CoroutineScope(Dispatchers.IO).launch {
                         startServerProcess.destroy()
                         startServerProcess.waitFor()
 
+                        cancelReason = "User quit before server could finish starting up"
                         runState = RunState.CANCELLED
                         signal()
                     }
                 } else if (runState == RunState.RUNNING) {
-                    runState = RunState.STOPPING_GRACEFULLY
+                    runState = RunState.STOPPING
                     CoroutineScope(Dispatchers.IO).launch {
                         startServerProcess.destroy()
                         startServerProcess.waitFor()
@@ -150,8 +147,15 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         coroutineScope {
             while (runState == RunState.STARTING) {
                 serverStateFile.content?.takeIf { it.isRunning() }?.let {
-                    serverState = it
-                    runState = RunState.RUNNING
+                    if (it.env != env) {
+                        cancelReason = "A server is already running using a different environment configuration (want = $env, current = ${it.env})"
+                        runState = RunState.CANCELLED
+                        signal()
+                    }
+                    else {
+                        serverState = it
+                        runState = RunState.RUNNING
+                    }
                     return@coroutineScope
                 }
                 delay(300)
@@ -162,7 +166,8 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
             addTimer(Duration.ofMillis(500), repeat = true) {
                 if (runState == RunState.RUNNING) {
                     if (!serverState.isRunning() || serverStateFile.content != serverState) {
-                        runState = RunState.CHANGED_EXTERNALLY
+                        cancelReason = "It seems like the server was stopped by a separate process."
+                        runState = RunState.CANCELLED
                         signal()
                     }
                 } else {

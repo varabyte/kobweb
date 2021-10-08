@@ -62,6 +62,7 @@ fun main() = runBlocking {
     requestsFile.path.deleteIfExists()
 
     val serverState = ServerState(
+        env,
         port,
         ProcessHandle.current().pid()
     )

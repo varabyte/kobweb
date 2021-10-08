@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ServerState(
+    val env: ServerEnvironment,
     val port: Int,
     val pid: Long,
 ) {
