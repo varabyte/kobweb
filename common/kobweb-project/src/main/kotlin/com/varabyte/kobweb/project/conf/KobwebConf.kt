@@ -18,7 +18,7 @@ class Server(
     @Serializable
     class Files(
         val dev: Dev,
-        val prod: Prod = Prod(),
+        val prod: Prod,
     ) {
         /**
          * The dev server only serves a single html file that represents the whole project.
@@ -37,9 +37,7 @@ class Server(
         @Serializable
         class Prod(
             /** The path to the root of where the static site lives */
-            val siteRoot: String = KobwebFolder.pathNameTo("site"),
-            /** The path to serve content from. If not set, defaults to the value set in [Dev.contentRoot] */
-            val contentRoot: String? = null,
+            val siteRoot: String,
         )
     }
 }

@@ -4,6 +4,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -15,7 +16,10 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
     : KobwebProjectTask(config, "Export the Kobweb project into a static site") {
 
     @OutputDirectory
-    fun getSiteDir(): File = project.layout.projectDirectory.dir(config.siteDir.get()).asFile
+    fun getSiteDir(): File {
+        val conf = KobwebConfFile(kobwebProject.kobwebFolder).content!!
+        return project.layout.projectDirectory.dir(conf.server.files.prod.siteRoot).asFile
+    }
 
     @TaskAction
     fun execute() {

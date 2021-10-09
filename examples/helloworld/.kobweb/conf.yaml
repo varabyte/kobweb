@@ -6,5 +6,7 @@ server:
     dev:
       contentRoot: "build/processedResources/js/main/public"
       script: "build/js/packages/helloworld/kotlin/helloworld.js"
+    prod:
+      siteRoot: ".kobweb/site"
 
   port: 8080
