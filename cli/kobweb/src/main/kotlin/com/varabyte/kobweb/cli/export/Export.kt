@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.cli.export
 
 import com.varabyte.kobweb.cli.common.Anims
+import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.kobwebProject
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.server.api.ServerState
@@ -9,18 +10,9 @@ import com.varabyte.konsole.foundation.input.Keys
 import com.varabyte.konsole.foundation.input.onKeyPressed
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.konsoleVarOf
-import com.varabyte.konsole.foundation.render.aside
-import com.varabyte.konsole.foundation.text.black
-import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.foundation.text.yellow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
 
 private enum class ExportState {
     EXPORTING,
@@ -32,7 +24,7 @@ private enum class ExportState {
 
 @Suppress("BlockingMethodInNonBlockingContext")
 fun handleExport() = konsoleApp {
-    val kobwebProject = kobwebProject ?: return@konsoleApp
+    kobwebProject ?: return@konsoleApp
 
     newline() // Put space between user prompt and eventual first line of Gradle output
 
@@ -53,24 +45,9 @@ fun handleExport() = konsoleApp {
             ExportState.CANCELLED -> yellow { textLine("Export cancelled: $cancelReason") }
         }
     }.run {
-        fun consumeStream(stream: InputStream, isError: Boolean) {
-            val isr = InputStreamReader(stream)
-            val br = BufferedReader(isr)
-            while (true) {
-                val line = br.readLine() ?: break
-                shouldAddNewline = true
-                aside {
-                    if (isError) red() else black(isBright = true)
-                    textLine(line)
-                }
-            }
-        }
-
         val exportProcess = Runtime.getRuntime()
             .exec(arrayOf("./gradlew", "-PkobwebReuseServer=false", "kobwebExport"))
-
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(exportProcess.inputStream, isError = false) }
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(exportProcess.errorStream, isError = true) }
+        consumeProcessOutput(exportProcess) { shouldAddNewline = true }
 
         onKeyPressed {
             if (exportState == ExportState.EXPORTING && key == Keys.Q) {
@@ -98,8 +75,7 @@ fun handleExport() = konsoleApp {
         check(exportState in listOf(ExportState.FINISHING, ExportState.CANCELLING))
 
         val stopProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopProcess.inputStream, isError = false) }
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopProcess.errorStream, isError = true) }
+        consumeProcessOutput(exportProcess) { shouldAddNewline = true }
         stopProcess.waitFor()
 
         exportState = if (exportState == ExportState.FINISHING) ExportState.FINISHED else ExportState.CANCELLED

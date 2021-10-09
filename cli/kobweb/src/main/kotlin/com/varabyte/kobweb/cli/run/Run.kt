@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.cli.run
 
 import com.varabyte.kobweb.cli.common.Anims
+import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.kobwebFolder
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.server.api.*
@@ -9,14 +10,10 @@ import com.varabyte.konsole.foundation.input.Keys
 import com.varabyte.konsole.foundation.input.onKeyPressed
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.konsoleVarOf
-import com.varabyte.konsole.foundation.render.aside
 import com.varabyte.konsole.foundation.runUntilSignal
 import com.varabyte.konsole.foundation.text.*
 import com.varabyte.konsole.foundation.timer.addTimer
 import kotlinx.coroutines.*
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.time.Duration
 
 private enum class RunState {
@@ -79,25 +76,10 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
             }
         }
     }.runUntilSignal {
-        fun consumeStream(stream: InputStream, isError: Boolean) {
-            val isr = InputStreamReader(stream)
-            val br = BufferedReader(isr)
-            while (true) {
-                val line = br. readLine() ?: break
-                addOutputSeparator = true
-                aside {
-                    if (isError) red() else black(isBright = true)
-                    textLine(line)
-                }
-            }
-        }
-
         @Suppress("BlockingMethodInNonBlockingContext")
         val startServerProcess = Runtime.getRuntime()
             .exec(arrayOf("./gradlew", "-PkobwebEnv=$env", "kobwebStart", "-t"))
-
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.inputStream, isError = false) }
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.errorStream, isError = true) }
+        consumeProcessOutput(startServerProcess) { addOutputSeparator = true }
 
         Runtime.getRuntime().addShutdownHook(Thread {
             if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
@@ -132,8 +114,7 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
                         startServerProcess.waitFor()
 
                         val stopServerProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
-                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.inputStream, isError = false) }
-                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.errorStream, isError = true) }
+                        consumeProcessOutput(stopServerProcess) { addOutputSeparator = true }
                         stopServerProcess.waitFor()
 
                         runState = RunState.STOPPED

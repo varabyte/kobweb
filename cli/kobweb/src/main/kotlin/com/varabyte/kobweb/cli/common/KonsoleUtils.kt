@@ -3,9 +3,18 @@ package com.varabyte.kobweb.cli.common
 import com.varabyte.konsole.foundation.anim.konsoleAnimOf
 import com.varabyte.konsole.foundation.input.*
 import com.varabyte.konsole.foundation.konsoleVarOf
+import com.varabyte.konsole.foundation.render.aside
 import com.varabyte.konsole.foundation.text.*
 import com.varabyte.konsole.runtime.KonsoleApp
+import com.varabyte.konsole.runtime.KonsoleBlock
+import com.varabyte.konsole.runtime.KonsoleBlock.RunScope
 import com.varabyte.konsole.runtime.render.RenderScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 
 private enum class ProcessingState {
     IN_PROGRESS,
@@ -121,4 +130,22 @@ fun KonsoleApp.queryUser(
 */
 fun KonsoleApp.newline() {
     konsole { textLine() }.run()
+}
+
+fun RunScope.consumeStream(stream: InputStream, isError: Boolean, onLineRead: () -> Unit) {
+    val isr = InputStreamReader(stream)
+    val br = BufferedReader(isr)
+    while (true) {
+        val line = br.readLine() ?: break
+        onLineRead()
+        aside {
+            if (isError) red() else black(isBright = true)
+            textLine(line)
+        }
+    }
+}
+
+fun RunScope.consumeProcessOutput(process: Process, onLineRead: () -> Unit = {}) {
+    CoroutineScope(Dispatchers.IO).launch { consumeStream(process.inputStream, isError = false, onLineRead) }
+    CoroutineScope(Dispatchers.IO).launch { consumeStream(process.errorStream, isError = true, onLineRead) }
 }
