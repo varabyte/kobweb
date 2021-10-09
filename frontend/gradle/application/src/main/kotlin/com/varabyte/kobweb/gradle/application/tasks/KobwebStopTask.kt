@@ -16,7 +16,6 @@ import java.nio.file.Files
  * This task will block until it can confirm the server is no longer running.
  */
 abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is running") {
-
     @TaskAction
     fun execute() {
         val kobwebFolder = KobwebFolder.inWorkingDirectory()
@@ -30,6 +29,7 @@ abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is runni
                 while (stateFile.content != null) {
                     Thread.sleep(300)
                 }
+                println("A Kobweb server running at ${serverState.toDisplayText()} was stopped")
             }
             else {
                 Files.delete(stateFile.path)

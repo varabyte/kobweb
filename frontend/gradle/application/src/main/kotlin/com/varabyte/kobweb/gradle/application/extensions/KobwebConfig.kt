@@ -2,8 +2,8 @@
 
 package com.varabyte.kobweb.gradle.application.extensions
 
-import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
+import com.varabyte.kobweb.gradle.application.SITE_ROOT
 import com.varabyte.kobweb.gradle.application.RESOURCE_SUFFIX
 import com.varabyte.kobweb.gradle.application.SRC_SUFFIX
 import org.gradle.api.Project
@@ -15,6 +15,11 @@ abstract class KobwebConfig {
      * The string path to the root where generated code will be written to, relative to the project root.
      */
     abstract val genDir: Property<String>
+
+    /**
+     * The string path to the root where exported site will be created under, relative to the project root.
+     */
+    abstract val siteDir: Property<String>
 
     /**
      * The root package of all pages.
@@ -33,7 +38,7 @@ abstract class KobwebConfig {
 
     init {
         genDir.convention(GENERATED_ROOT)
-
+        siteDir.convention(SITE_ROOT)
         pagesPackage.convention(".pages")
         publicPath.convention("public")
     }

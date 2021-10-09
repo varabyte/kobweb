@@ -16,6 +16,10 @@ dependencies {
     // Get access to Kotlin multiplatform source sets
     implementation(kotlin("gradle-plugin"))
 
+    // Export
+    implementation(libs.cdt) // Run ChromeLauncher during export
+    implementation(libs.jsoup) // Pretty-print html
+
     implementation(project(":common:kobweb-project"))
     // Note: compileOnly because we embed the classes directly into this plugin by modifying the jar task below. We do
     // this so that we don't have to publish these internal artifacts in our maven repository - they are implementation

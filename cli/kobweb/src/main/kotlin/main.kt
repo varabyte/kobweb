@@ -1,4 +1,5 @@
 import com.varabyte.kobweb.cli.create.handleCreate
+import com.varabyte.kobweb.cli.export.handleExport
 import com.varabyte.kobweb.cli.run.handleRun
 import com.varabyte.kobweb.cli.version.handleVersion
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -22,6 +23,12 @@ fun main(args: Array<String>) {
         }
     }
 
+    class Export : Subcommand("export", "Generate a static version of a Kobweb app / site") {
+        override fun execute() {
+            handleExport()
+        }
+    }
+
     class Run : Subcommand("run", "Run a Kobweb server") {
         val env by option(ArgType.Choice<ServerEnvironment>(), "env").default(ServerEnvironment.DEV)
 
@@ -30,6 +37,6 @@ fun main(args: Array<String>) {
         }
     }
 
-    parser.subcommands(Version(), Create(), Run())
+    parser.subcommands(Version(), Create(), Export(), Run())
     parser.parse(args.takeIf { it.isNotEmpty() } ?: arrayOf("-h"))
 }

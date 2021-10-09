@@ -5,6 +5,7 @@ import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import com.varabyte.kobweb.gradle.application.kmp.sourceSets
+import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
@@ -33,8 +34,12 @@ class KobwebApplicationPlugin : Plugin<Project> {
 
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
         val env = project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
-        val kobwebStartTask = project.tasks.register("kobwebStart", KobwebStartTask::class.java, env)
+        val kobwebStartTask = run {
+            val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
+            project.tasks.register("kobwebStart", KobwebStartTask::class.java, env, reuseServer)
+        }
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
+        val kobwebExportTask = project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConfig)
 
         project.afterEvaluate {
             project.tasks.named("compileKotlinJs") {
@@ -50,6 +55,9 @@ class KobwebApplicationPlugin : Plugin<Project> {
             }
             kobwebStartTask.configure {
                 dependsOn(compileExecutableTask)
+            }
+            kobwebExportTask.configure {
+                dependsOn(kobwebStartTask)
             }
 
             project.kotlin {

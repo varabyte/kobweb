@@ -1,8 +1,10 @@
 [versions]
+cdt="4.0.0" # chrome-developer-toolkit
 commonmark = "0.18.0"
 compose = "1.0.0-alpha4-build385"
 freemarker = "2.3.31"
 jgit = "5.12.0.202106070339-r"
+jsoup = "1.14.3"
 kaml = "0.35.3"
 kobweb = "0.3.0-SNAPSHOT"
 konsole = "0.9.0"
@@ -16,6 +18,7 @@ truthish = "0.6.0"
 shadow = "7.0.0"
 
 [libraries]
+cdt = { module = "com.github.kklisura.cdt:cdt-java-client", version.ref = "cdt" }
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
 commonmark-autolink = { module = "org.commonmark:commonmark-ext-autolink", version.ref = "commonmark" }
 commonmark-frontmatter = { module = "org.commonmark:commonmark-ext-yaml-front-matter", version.ref = "commonmark" }
@@ -23,6 +26,7 @@ commonmark-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", versi
 commonmark-tasklist = { module = "org.commonmark:commonmark-ext-task-list-items", version.ref = "commonmark" }
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker"}
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 konsole = { module = "com.varabyte.konsole:konsole", version.ref = "konsole" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
