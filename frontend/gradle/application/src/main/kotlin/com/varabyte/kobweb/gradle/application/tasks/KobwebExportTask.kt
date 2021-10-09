@@ -32,7 +32,7 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
                 val devToolsService = chromeService.createDevToolsService(tab)
                 val page = devToolsService.page
                 val runtime = devToolsService.runtime
-                page.onLoadEventFired { event ->
+                page.onLoadEventFired { _ ->
                     val evaluation = runtime.evaluate("document.documentElement.outerHTML")
                     val filePath = pageEntry.route.substringBeforeLast('/') + "/" +
                             (pageEntry.route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
