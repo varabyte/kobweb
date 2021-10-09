@@ -83,7 +83,7 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
 
         Runtime.getRuntime().addShutdownHook(Thread {
             if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
-                cancelReason = "CTRL-C received. Kicked off a request to stop the server but we have to exit NOW."
+                cancelReason = "CTRL-C received. We already kicked off a request to stop the server but we have to exit NOW."
                 runState = RunState.CANCELLED
 
                 ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
