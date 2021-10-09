@@ -79,16 +79,15 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
             }
         }
     }.runUntilSignal {
-        fun consumeStream(stream: InputStream) {
+        fun consumeStream(stream: InputStream, isError: Boolean) {
             val isr = InputStreamReader(stream)
             val br = BufferedReader(isr)
             while (true) {
                 val line = br. readLine() ?: break
                 addOutputSeparator = true
                 aside {
-                    black(isBright = true) {
-                        textLine(line)
-                    }
+                    if (isError) red() else black(isBright = true)
+                    textLine(line)
                 }
             }
         }
@@ -97,8 +96,8 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         val startServerProcess = Runtime.getRuntime()
             .exec(arrayOf("./gradlew", "-PkobwebEnv=$env", "kobwebStart", "-t"))
 
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.inputStream) }
-        CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.errorStream) }
+        CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.inputStream, isError = false) }
+        CoroutineScope(Dispatchers.IO).launch { consumeStream(startServerProcess.errorStream, isError = true) }
 
         Runtime.getRuntime().addShutdownHook(Thread {
             if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
@@ -133,8 +132,8 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
                         startServerProcess.waitFor()
 
                         val stopServerProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
-                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.inputStream) }
-                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.errorStream) }
+                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.inputStream, isError = false) }
+                        CoroutineScope(Dispatchers.IO).launch { consumeStream(stopServerProcess.errorStream, isError = true) }
                         stopServerProcess.waitFor()
 
                         runState = RunState.STOPPED
