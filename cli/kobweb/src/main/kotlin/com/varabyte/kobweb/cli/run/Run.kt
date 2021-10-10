@@ -77,8 +77,11 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         }
     }.runUntilSignal {
         @Suppress("BlockingMethodInNonBlockingContext")
-        val startServerProcess = Runtime.getRuntime()
-            .exec(arrayOf("./gradlew", "-PkobwebEnv=$env", "kobwebStart", "-t"))
+        val args = mutableListOf("./gradlew", "-PkobwebEnv=$env", "kobwebStart")
+        if (env == ServerEnvironment.DEV) {
+            args.add("-t") // Enable live reloading only while in dev mode
+        }
+        val startServerProcess = Runtime.getRuntime().exec(args.toTypedArray())
         consumeProcessOutput(startServerProcess) { addOutputSeparator = true }
 
         Runtime.getRuntime().addShutdownHook(Thread {

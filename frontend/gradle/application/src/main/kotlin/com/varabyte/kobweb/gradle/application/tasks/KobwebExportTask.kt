@@ -63,7 +63,15 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
         }
 
         val scriptFile = project.layout.projectDirectory.file(kobwebConf.server.files.dev.script).asFile
-        val destFile = File(getSiteDir(), "system/${scriptFile.name}")
-        scriptFile.copyTo(destFile, overwrite = true)
+        run {
+            val destFile = File(getSiteDir(), "system/${scriptFile.name}")
+            scriptFile.copyTo(destFile, overwrite = true)
+        }
+
+        val scriptMapFile = File("${scriptFile}.map")
+        run {
+            val destFile = File(getSiteDir(), "system/${scriptMapFile.name}")
+            scriptMapFile.copyTo(destFile, overwrite = true)
+        }
     }
 }

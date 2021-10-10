@@ -45,6 +45,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
         val kobwebExportTask = project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConfig)
 
         project.afterEvaluate {
+            val cleanTask = project.tasks.named("clean")
             project.tasks.named("compileKotlinJs") {
                 dependsOn(kobwebGenTask)
             }
@@ -56,10 +57,13 @@ class KobwebApplicationPlugin : Plugin<Project> {
                 BuildTarget.DEBUG -> project.tasks.named("jsDevelopmentExecutableCompileSync")
                 BuildTarget.RELEASE -> project.tasks.named("jsProductionExecutableCompileSync")
             }
-            kobwebStartTask.configure {
-                dependsOn(compileExecutableTask)
+            if (env == ServerEnvironment.DEV) {
+                kobwebStartTask.configure {
+                    dependsOn(compileExecutableTask)
+                }
             }
             kobwebExportTask.configure {
+                dependsOn(cleanTask)
                 dependsOn(kobwebStartTask)
             }
 
