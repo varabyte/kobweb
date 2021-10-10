@@ -32,8 +32,11 @@ class KobwebApplicationPlugin : Plugin<Project> {
         val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
         project.extensions.create("kobwebx", KobwebxBlock::class.java)
 
-        val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig)
         val env = project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
+        val buildTarget = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
+            ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
+        val kobwebGenTask = project.tasks.register("kobwebGen", KobwebGenerateTask::class.java, kobwebConfig, buildTarget)
+
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
             project.tasks.register("kobwebStart", KobwebStartTask::class.java, env, reuseServer)
@@ -49,9 +52,9 @@ class KobwebApplicationPlugin : Plugin<Project> {
                 dependsOn(kobwebGenTask)
             }
 
-            val compileExecutableTask = when(env) {
-                ServerEnvironment.DEV -> project.tasks.named("jsDevelopmentExecutableCompileSync")
-                ServerEnvironment.PROD -> project.tasks.named("jsProductionExecutableCompileSync")
+            val compileExecutableTask = when(buildTarget) {
+                BuildTarget.DEBUG -> project.tasks.named("jsDevelopmentExecutableCompileSync")
+                BuildTarget.RELEASE -> project.tasks.named("jsProductionExecutableCompileSync")
             }
             kobwebStartTask.configure {
                 dependsOn(compileExecutableTask)

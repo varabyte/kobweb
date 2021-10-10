@@ -15,10 +15,11 @@ import javax.inject.Inject
 abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
     : KobwebProjectTask(config, "Export the Kobweb project into a static site") {
 
+    private val kobwebConf get() = KobwebConfFile(kobwebProject.kobwebFolder).content!!
+
     @OutputDirectory
     fun getSiteDir(): File {
-        val conf = KobwebConfFile(kobwebProject.kobwebFolder).content!!
-        return project.layout.projectDirectory.dir(conf.server.files.prod.siteRoot).asFile
+        return project.layout.projectDirectory.dir(kobwebConf.server.files.prod.siteRoot).asFile
     }
 
     @TaskAction
@@ -53,5 +54,16 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
                 devToolsService.waitUntilClosed()
             }
         }
+
+        getResourceFilesWithRoots().forEach { rootAndFile ->
+            val relativePath = rootAndFile.relativeFile.toString().substringAfter(getPublicPath())
+            // The auto-generated "/index.html" file should be used as a fallback if the user visits an invalid path
+            val destFile = File(getSiteDir(), if (relativePath != "/index.html") "resources$relativePath" else "system$relativePath")
+            rootAndFile.file.copyTo(destFile, overwrite = true)
+        }
+
+        val scriptFile = project.layout.projectDirectory.file(kobwebConf.server.files.dev.script).asFile
+        val destFile = File(getSiteDir(), "system/${scriptFile.name}")
+        scriptFile.copyTo(destFile, overwrite = true)
     }
 }

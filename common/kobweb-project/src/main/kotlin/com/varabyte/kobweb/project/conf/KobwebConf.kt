@@ -15,6 +15,9 @@ class Server(
     val files: Files,
     val port: Int = 8080
 ) {
+    /**
+     * A collection of files and paths needed by the Kobweb server to serve its files.
+     */
     @Serializable
     class Files(
         val dev: Dev,
@@ -22,21 +25,23 @@ class Server(
     ) {
         /**
          * The dev server only serves a single html file that represents the whole project.
+         *
+         * @param contentRoot The path to serve content from, which includes the Kobweb index.html file.
+         * @param script The path to the final JavaScript file generated from the user's Kotlin code.
          */
         @Serializable
         class Dev(
-            /** The path to serve content from, which includes the Kobweb index.html file. */
             val contentRoot: String,
-            /** The path to the final JavaScript file generated from the user's Kotlin code. */
             val script: String,
         )
 
         /**
          * The prod server serves static files but needs a fallback in case one is missing.
+         *
+         * @param siteRoot The path to the root of where the static site lives
          */
         @Serializable
         class Prod(
-            /** The path to the root of where the static site lives */
             val siteRoot: String,
         )
     }

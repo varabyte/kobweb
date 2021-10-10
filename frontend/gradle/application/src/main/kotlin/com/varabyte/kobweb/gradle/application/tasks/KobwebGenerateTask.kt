@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
@@ -12,7 +13,7 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig)
+abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig, private val buildTarget: BuildTarget)
     : KobwebProjectTask(config, "Generate Kobweb code and resources") {
 
     @OutputDirectory
@@ -36,7 +37,8 @@ abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig)
                         .associate { it.fqcn to it.route }
                         .toList()
                         .sortedBy { (_, route) -> route }
-                        .toMap()
+                        .toMap(),
+                    buildTarget
                 )
             )
         }

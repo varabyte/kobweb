@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.gradle.application.templates
 
-fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): String {
+import com.varabyte.kobweb.gradle.application.BuildTarget
+
+fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, target: BuildTarget): String {
     val imports = mutableListOf(
         "com.varabyte.kobweb.core.Router",
         "kotlinx.browser.document",
@@ -63,7 +65,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>): S
         }
 
         fun main() {
-            kobwebHook()
+            ${if (target == BuildTarget.DEBUG) "kobwebHook()" else "" }
 
             ${
                 // Generates lines like: Router.register("/about") { AboutPage() }

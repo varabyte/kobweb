@@ -2,10 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
-import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
-import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
-import com.varabyte.kobweb.gradle.application.extensions.getSourceFiles
+import com.varabyte.kobweb.gradle.application.extensions.*
 import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.project.KobwebProject
@@ -33,11 +30,12 @@ abstract class KobwebProjectTask(@get:Internal val config: KobwebConfig, desc: S
     @InputFiles
     fun getSourceFiles(): List<File> = project.getSourceFiles(TargetPlatform.JS).toList()
 
-    @InputFiles
-    fun getResourceFiles(): List<File> = project.getResourceFilesWithRoots(TargetPlatform.JS)
+    @Internal
+    fun getResourceFilesWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(TargetPlatform.JS)
         .filter { rootAndFile -> rootAndFile.relativeFile.path.startsWith("${getPublicPath()}/") }
-        .map { it.file }
-        .toList()
+
+    @InputFiles
+    fun getResourceFiles(): List<File> = getResourceFilesWithRoots().map { it.file }.toList()
 
     /**
      * The root package of all pages.

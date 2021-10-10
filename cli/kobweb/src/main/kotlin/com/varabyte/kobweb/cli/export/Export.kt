@@ -31,7 +31,6 @@ fun handleExport() = konsoleApp {
     // Useful to add space below output Gradle text and our main block
     var shouldAddNewline by konsoleVarOf(false)
     var exportState by konsoleVarOf(ExportState.EXPORTING)
-    lateinit var serverState: ServerState // Set if ExportState ever hits ExportState.EXPORTING; otherwise, don't use!
 
     var cancelReason by konsoleVarOf("")
     val ellipsis = konsoleAnimOf(Anims.ELLIPSIS)
@@ -46,7 +45,7 @@ fun handleExport() = konsoleApp {
         }
     }.run {
         val exportProcess = Runtime.getRuntime()
-            .exec(arrayOf("./gradlew", "-PkobwebReuseServer=false", "kobwebExport"))
+            .exec(arrayOf("./gradlew", "-PkobwebReuseServer=false", "-PkobwebBuildTarget=RELEASE", "kobwebExport"))
         consumeProcessOutput(exportProcess) { shouldAddNewline = true }
 
         onKeyPressed {
@@ -75,7 +74,7 @@ fun handleExport() = konsoleApp {
         check(exportState in listOf(ExportState.FINISHING, ExportState.CANCELLING))
 
         val stopProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
-        consumeProcessOutput(exportProcess) { shouldAddNewline = true }
+        consumeProcessOutput(stopProcess) { shouldAddNewline = true }
         stopProcess.waitFor()
 
         exportState = if (exportState == ExportState.FINISHING) ExportState.FINISHED else ExportState.CANCELLED
