@@ -27,7 +27,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
             call.respondText(globals.version.toString())
         }
         get("/api/kobweb/status") {
-            call.respondText(globals.status.orEmpty())
+            call.respond(mapOf("text" to globals.status.orEmpty(), "isError" to globals.isStatusError.toString()))
         }
         val contentRootFile = contentRoot.toFile()
         contentRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->

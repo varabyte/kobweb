@@ -15,7 +15,7 @@ fun createHtmlFile(title: String, links: List<String>, src: String, buildTarget:
 ${
     if (buildTarget == BuildTarget.DEBUG) {
         """
-        |        <div id="status"><span id="spinner">🕸️</span> <span id="status_text"></span>
+        |        <div id="status"><span id="warning">❌</span><span id="spinner">🕸️</span> <span id="text"></span>
         |            <style>
         |                @keyframes kobweb-spin {
         |                    from { transform: rotate(0deg); }
@@ -33,6 +33,13 @@ ${
         |                    visibility: hidden;
         |                    opacity: 0;
         |                }
+        |                body > #status > .hidden {
+        |                   display: none;
+        |                }
+        |                body > #status > .visible {
+        |                    display: inline-block;
+        |                }
+        |
         |                body > #status.fade-in {
         |                    visibility: visible;
         |                    opacity: 1;
@@ -44,8 +51,7 @@ ${
         |                   transition: visibility 0s 1s, opacity 1s;
         |                }
         |                body > #status > #spinner {
-        |                    display: inline-block;
-        |                    animation: kobweb-spin 2s linear infinite;
+        |                    animation: kobweb-spin 1.5s linear infinite;
         |                }
         |            </style>
         |        </div>

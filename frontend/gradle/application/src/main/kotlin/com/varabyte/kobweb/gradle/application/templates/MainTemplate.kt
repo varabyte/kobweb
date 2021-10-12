@@ -15,6 +15,8 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         imports.add("kotlinx.dom.removeClass")
         imports.add("com.varabyte.kobweb.compose.css.*")
         imports.add("org.jetbrains.compose.web.css.*")
+        imports.add("org.w3c.dom.Element")
+        imports.add("org.w3c.dom.get")
     }
 
     imports.add(appFqcn ?: "com.varabyte.kobweb.core.DefaultApp")
@@ -34,10 +36,14 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         private fun pollServerStatus() {
             run {
                 val status = document.getElementById("status")!!
-                val statusText = document.getElementById("status_text")!!
-                var lastStatus: String = ""
                 var lastVersion: Int? = null
                 var shouldReload = false
+
+                val warningIcon = status.children[0]!!
+                val spinnerIcon = status.children[1]!!
+                val statusText = status.children[2]!!
+
+                var lastStatusResponse = ""
 
                 status.addEventListener("transitionend", {
                     if (status.hasClass("fade-out")) {
@@ -52,15 +58,22 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                 checkInterval = window.setInterval(
                     handler = {
                         window.fetch("${'$'}{window.location.origin}/api/kobweb/status").then {
-                            it.text().then { text ->
-                                if (lastStatus != text) {
-                                    lastStatus = text
+                            it.text().then { response ->
+                                if (response != lastStatusResponse) {
+                                    lastStatusResponse = response
+                                    val values: dynamic = JSON.parse<Any>(response)
+                                    val text = values.text as String
+                                    val isError = (values.isError as String).toBoolean()
                                     if (text.isNotBlank()) {
+                                        warningIcon.className = if (isError) "visible" else "hidden"
+                                        spinnerIcon.className = if (isError) "hidden" else "visible"
                                         statusText.innerHTML = "<i>${'$'}text</i>"
                                         status.className = "fade-in"
                                     }
                                     else {
-                                        status.className = "fade-out"
+                                        if (status.className == "fade-in") {
+                                            status.className = "fade-out"
+                                        }
                                     }
                                 }
                             }
@@ -68,9 +81,10 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                             // The server was probably taken down, so stop checking.
                             window.clearInterval(checkInterval)
                         }
+
                         window.fetch("${'$'}{window.location.origin}/api/kobweb/version").then {
-                            it.text().then { text ->
-                                val version = text.toInt()
+                            it.text().then { response ->
+                                val version = response.toInt()
                                 if (lastVersion == null) {
                                     lastVersion = version
                                 }

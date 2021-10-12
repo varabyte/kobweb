@@ -20,7 +20,7 @@ sealed class ServerRequest {
 
     @Serializable
     @SerialName("SetStatus")
-    class SetStatus(val message: String, val timeoutMs: Long = Long.MAX_VALUE) : ServerRequest()
+    class SetStatus(val message: String, val isError: Boolean = false, var timeoutMs: Long? = null) : ServerRequest()
 
     @Serializable
     @SerialName("ClearStatus")

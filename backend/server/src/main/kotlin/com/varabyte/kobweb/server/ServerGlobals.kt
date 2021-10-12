@@ -8,4 +8,6 @@ import com.varabyte.kobweb.server.api.ServerRequest
 class ServerGlobals {
     var version: Int = 0
     var status: String? = null
+    var isStatusError: Boolean = false
+    var timeout = Long.MAX_VALUE
 }

@@ -80,7 +80,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
             project.gradle.taskGraph.addTaskExecutionListener(object : TaskExecutionListener {
                 override fun beforeExecute(task: Task) {
                     if (task.name == kobwebGenTask.name) {
-                        ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Rebuilding project"))
+                        ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Rebuilding project..."))
                     }
                 }
                 override fun afterExecute(task: Task, state: TaskState) {
@@ -92,9 +92,13 @@ class KobwebApplicationPlugin : Plugin<Project> {
                     }
 
                     if (state.failure != null) {
-                        // TODO: Update to "Build Failed" status message when timeout is supported
-//                        ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Build failed", 5000))
-                        ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.ClearStatus())
+                        ServerRequestsFile(kobwebFolder).enqueueRequest(
+                            ServerRequest.SetStatus(
+                                "Build failed. Aborting reload.",
+                                isError = true,
+                                5000
+                            )
+                        )
                     }
                 }
             })

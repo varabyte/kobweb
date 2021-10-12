@@ -74,10 +74,22 @@ fun main() = runBlocking {
             when (request) {
                 is ServerRequest.Stop -> shouldStop = true
                 is ServerRequest.IncrementVersion -> globals.version++
-                is ServerRequest.SetStatus -> globals.status = request.message
-                is ServerRequest.ClearStatus -> globals.status = null
+                is ServerRequest.SetStatus -> {
+                    globals.status = request.message
+                    globals.isStatusError = request.isError
+                    globals.timeout = request.timeoutMs?.let { System.currentTimeMillis() + it } ?: Long.MAX_VALUE
+                }
+                is ServerRequest.ClearStatus -> {
+                    globals.status = null
+                    globals.isStatusError = false
+                    globals.timeout = Long.MAX_VALUE
+                }
             }
         }
+        if (globals.status != null && System.currentTimeMillis() > globals.timeout) {
+            requestsFile.enqueueRequest(ServerRequest.ClearStatus())
+        }
+
         delay(300)
     }
 
