@@ -8,34 +8,60 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         "kotlinx.browser.document",
         "kotlinx.browser.window",
         "org.jetbrains.compose.web.renderComposable",
-        // TODO(Bug #13): Move the kobwebHook logic into the server
-        "org.w3c.dom.css.ElementCSSInlineStyle",
     )
+
+    if (target == BuildTarget.DEBUG) {
+        imports.add("kotlinx.dom.hasClass")
+        imports.add("kotlinx.dom.removeClass")
+        imports.add("com.varabyte.kobweb.compose.css.*")
+        imports.add("org.jetbrains.compose.web.css.*")
+    }
+
     imports.add(appFqcn ?: "com.varabyte.kobweb.core.DefaultApp")
     imports.sort()
 
-    // TODO(Bug #13): Move the kobwebHook logic into the server
     return """
         ${
             imports.joinToString("\n        ") { fcqn -> "import $fcqn" }
         }
 
-        // This hook is provided so that a Kobweb server can insert in live reloading logic when run in development
-        // mode. Of course, in production, it's a no-op.
-        fun kobwebHook() {
+        private fun forceReloadNow() {
+            window.stop()
+            window.location.reload()
+        }
+
+        // In production, this will not be called and will get stripped out of the final javascript
+        private fun pollServerStatus() {
             run {
-                val root = document.getElementById("root")!!
+                val status = document.getElementById("status")!!
+                val statusText = document.getElementById("status_text")!!
+                var lastStatus: String = ""
                 var lastVersion: Int? = null
+                var shouldReload = false
+
+                status.addEventListener("transitionend", {
+                    if (status.hasClass("fade-out")) {
+                        status.removeClass("fade-out")
+                        if (shouldReload) {
+                            forceReloadNow()
+                        }
+                    }
+                })
+
                 var checkInterval = 0
                 checkInterval = window.setInterval(
                     handler = {
                         window.fetch("${'$'}{window.location.origin}/api/kobweb/status").then {
                             it.text().then { text ->
-                                @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-                                (root as ElementCSSInlineStyle).style.opacity = if (text.isNotBlank()) {
-                                    "0.3"
-                                } else {
-                                    "1.0"
+                                if (lastStatus != text) {
+                                    lastStatus = text
+                                    if (text.isNotBlank()) {
+                                        statusText.innerHTML = "<i>${'$'}text</i>"
+                                        status.className = "fade-in"
+                                    }
+                                    else {
+                                        status.className = "fade-out"
+                                    }
                                 }
                             }
                         }.catch {
@@ -50,8 +76,11 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                                 }
                                 if (lastVersion != version) {
                                     lastVersion = version
-                                    window.stop()
-                                    window.location.reload()
+                                    if (status.hasClass("fade-out")) {
+                                        shouldReload = true
+                                    } else {
+                                        forceReloadNow()
+                                    }
                                 }
                             }
                         }.catch {
@@ -65,7 +94,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         }
 
         fun main() {
-            ${if (target == BuildTarget.DEBUG) "kobwebHook()" else "" }
+            ${if (target == BuildTarget.DEBUG) "pollServerStatus()" else "" }
 
             ${
                 // Generates lines like: Router.register("/about") { AboutPage() }

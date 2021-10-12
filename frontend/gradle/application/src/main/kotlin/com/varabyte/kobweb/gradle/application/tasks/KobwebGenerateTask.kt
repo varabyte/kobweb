@@ -50,7 +50,8 @@ abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig, priv
                     conf.site.title,
                     // TODO(Bug #7): Only specify font-awesome link if necessary
                     listOf("""<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />"""),
-                    conf.server.files.dev.script.substringAfterLast("/")
+                    conf.server.files.dev.script.substringAfterLast("/"),
+                    buildTarget
                 )
             )
         }

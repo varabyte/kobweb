@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.css.transitionDuration
-import com.varabyte.kobweb.compose.css.transitionProperty
 import org.jetbrains.compose.web.css.*
 
 /**
