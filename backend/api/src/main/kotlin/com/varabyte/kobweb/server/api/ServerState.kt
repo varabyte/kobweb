@@ -2,7 +2,7 @@ package com.varabyte.kobweb.server.api
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.project.KobwebFolder
-import com.varabyte.kobweb.project.io.KobwebReadableFile
+import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,7 +14,7 @@ data class ServerState(
     fun isRunning() = ProcessHandle.of(pid).isPresent
 }
 
-class ServerStateFile(kobwebFolder: KobwebFolder) : KobwebReadableFile<ServerState>(
+class ServerStateFile(kobwebFolder: KobwebFolder) : KobwebReadableTextFile<ServerState>(
     kobwebFolder,
     "server/state.yaml",
     deserialize = { text -> Yaml.default.decodeFromString(ServerState.serializer(), text) }

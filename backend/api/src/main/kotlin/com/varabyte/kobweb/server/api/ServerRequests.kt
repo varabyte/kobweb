@@ -2,7 +2,7 @@ package com.varabyte.kobweb.server.api
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.project.KobwebFolder
-import com.varabyte.kobweb.project.io.KobwebWritableFile
+import com.varabyte.kobweb.project.io.KobwebWritableTextFile
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -32,7 +32,7 @@ class ServerRequests(
     val requests: List<ServerRequest>
 )
 
-class ServerRequestsFile(kobwebFolder: KobwebFolder) : KobwebWritableFile<ServerRequests>(
+class ServerRequestsFile(kobwebFolder: KobwebFolder) : KobwebWritableTextFile<ServerRequests>(
     kobwebFolder,
     "server/requests.yaml",
     serialize = { requests -> Yaml.default.encodeToString(ServerRequests.serializer(), requests) },
