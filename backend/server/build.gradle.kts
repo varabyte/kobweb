@@ -17,6 +17,7 @@ dependencies {
 
     implementation(project(":backend:api"))
     implementation(project(":common:kobweb-project"))
+    implementation(project(":frontend:kobweb")) // For access to JVM API-related classes
 
     testImplementation(libs.truthish)
     testImplementation(libs.ktor.server.tests)

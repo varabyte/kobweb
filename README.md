@@ -55,6 +55,7 @@ Our goal is to provide:
 * a collection of useful _batteries included_ widgets built on top of Web Compose
 * an environment built from the ground up around live reloading
 * static site exports for improved SEO
+* shared, rich types between client and server
 * out-of-the-box Markdown support
 * an open source foundation that the community can extend
 * and much, much more!
