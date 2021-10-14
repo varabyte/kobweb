@@ -179,3 +179,11 @@ ${iconMethodEntries.joinToString("\n")}
 tasks.named("compileKotlinJs") {
     dependsOn(regenerateIconsTask)
 }
+
+tasks.named("sourcesJar") {
+    dependsOn(regenerateIconsTask)
+}
+
+tasks.named("jsSourcesJar") {
+    dependsOn(regenerateIconsTask)
+}
