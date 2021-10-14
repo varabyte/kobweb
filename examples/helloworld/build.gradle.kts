@@ -15,19 +15,32 @@ repositories {
 
 // Enable JS(IR) target and add dependencies
 kotlin {
+    jvm() {
+        tasks.named("jvmJar", Jar::class.java).configure {
+            archiveFileName.set("helloworld.jar")
+        }
+    }
     js(IR) {
         browser()
         binaries.executable()
     }
     sourceSets {
-        val jsMain by getting {
+        val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-
+            }
+        }
+        val jsMain by getting {
+            dependencies {
                 implementation("com.varabyte.kobweb:web-compose-ext")
                 implementation("com.varabyte.kobweb:kobweb")
                 implementation("com.varabyte.kobweb:kobweb-silk")
                 implementation("com.varabyte.kobweb:kobweb-silk-icons-fa")
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation("com.varabyte.kobweb:kobweb-api")
             }
         }
     }

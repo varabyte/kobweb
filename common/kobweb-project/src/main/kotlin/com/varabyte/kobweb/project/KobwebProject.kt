@@ -2,7 +2,6 @@ package com.varabyte.kobweb.project
 
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.structure.ProjectData
-import com.varabyte.kobweb.project.structure.collectData
 import java.io.File
 import java.nio.file.Path
 
@@ -38,10 +37,14 @@ class KobwebProject(
      * @param group The group of this project, e.g. "com.example.mysite"
      * @param pagesPackage The (possibly relative) path to the pages package, under which `@Page` annotations are searched
      *   for. A relative path like ".pages" will be prefixed based on the [group], i.e. `com.example.mysite.pages`
+     * @param siteSources List of (Kotlin/JS) sources for the website client
+     * @param apiSources List of (Kotlin/JVM) sources that define API handlers
      */
     fun parseData(
         group: String,
         pagesPackage: String,
-        sources: List<File>
-    ): ProjectData = collectData(group, pagesPackage, sources)
+        siteSources: List<File>,
+        apiPackage: String,
+        apiSources: List<File>,
+    ) = ProjectData.from(group, pagesPackage, siteSources, apiPackage, apiSources)
 }

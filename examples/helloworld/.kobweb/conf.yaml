@@ -6,6 +6,7 @@ server:
     dev:
       contentRoot: "build/processedResources/js/main/public"
       script: "build/js/packages/helloworld/kotlin/helloworld.js"
+      api: "build/libs/helloworld.jar"
     prod:
       siteRoot: ".kobweb/site"
 

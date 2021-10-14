@@ -28,7 +28,10 @@ abstract class KobwebProjectTask(@get:Internal val config: KobwebConfig, desc: S
     fun getConfFile(): File = project.layout.projectDirectory.file(kobwebProject.kobwebFolder.resolve("conf.yaml").toString()).asFile
 
     @InputFiles
-    fun getSourceFiles(): List<File> = project.getSourceFiles(TargetPlatform.JS).toList()
+    fun getSourceFilesJs(): List<File> = project.getSourceFiles(TargetPlatform.JS).toList()
+
+    @InputFiles
+    fun getSourceFilesJvm(): List<File> = project.getSourceFiles(TargetPlatform.JVM).toList()
 
     @Internal
     fun getResourceFilesWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(TargetPlatform.JS)
@@ -46,6 +49,16 @@ abstract class KobwebProjectTask(@get:Internal val config: KobwebConfig, desc: S
      */
     @Input
     fun getPagesPackage(): String = config.pagesPackage.get()
+
+    /**
+     * The root package of all API handlers.
+     *
+     * Any handler not under this root will be ignored, even if annotated by @Api.
+     *
+     * An initial '.' means this should be prefixed by the project group, e.g. ".api" -> "com.example.api"
+     */
+    @Input
+    fun getApiPackage(): String = config.apiPackage.get()
 
     /**
      * The path of public resources inside the project's resources folder, e.g. "public" ->

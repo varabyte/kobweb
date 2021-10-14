@@ -3,8 +3,9 @@
 package com.varabyte.kobweb.gradle.application.extensions
 
 import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
-import com.varabyte.kobweb.gradle.application.RESOURCE_SUFFIX
-import com.varabyte.kobweb.gradle.application.SRC_SUFFIX
+import com.varabyte.kobweb.gradle.application.JS_RESOURCE_SUFFIX
+import com.varabyte.kobweb.gradle.application.JS_SRC_SUFFIX
+import com.varabyte.kobweb.gradle.application.JVM_SRC_SUFFIX
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import java.io.File
@@ -25,6 +26,15 @@ abstract class KobwebConfig {
     abstract val pagesPackage: Property<String>
 
     /**
+     * The root package of all apis.
+     *
+     * Any function not under this root will be ignored, even if annotated by @Api.
+     *
+     * An initial '.' means this should be prefixed by the project group, e.g. ".api" -> "com.example.api"
+     */
+    abstract val apiPackage: Property<String>
+
+    /**
      * The path of public resources inside the project's resources folder, e.g. "public" ->
      * "src/jsMain/resources/public"
      */
@@ -33,14 +43,11 @@ abstract class KobwebConfig {
     init {
         genDir.convention(GENERATED_ROOT)
         pagesPackage.convention(".pages")
+        apiPackage.convention(".api")
         publicPath.convention("public")
     }
 
-    fun getGenSrcRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$SRC_SUFFIX").get().asFile
-    fun getGenResRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$RESOURCE_SUFFIX").get().asFile
-
-    /**
-     * Given a [project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"
-     */
-    fun getQualfiedPagesPackage(project: Project): String = project.prefixQualifiedPackage(pagesPackage.get())
+    fun getGenJsSrcRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$JS_SRC_SUFFIX").get().asFile
+    fun getGenJsResRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$JS_RESOURCE_SUFFIX").get().asFile
+    fun getGenJvmSrcRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$JVM_SRC_SUFFIX").get().asFile
 }

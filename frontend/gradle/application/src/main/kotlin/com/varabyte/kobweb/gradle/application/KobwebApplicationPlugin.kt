@@ -52,13 +52,18 @@ class KobwebApplicationPlugin : Plugin<Project> {
             project.tasks.named("jsProcessResources") {
                 dependsOn(kobwebGenTask)
             }
+            // Not always available, but if so, it means this project exports an API jar
+            val jarTask = project.tasks.named("jvmJar") {
+                dependsOn(kobwebGenTask)
+            }
 
             val compileExecutableTask = when(buildTarget) {
                 BuildTarget.DEBUG -> project.tasks.named("jsDevelopmentExecutableCompileSync")
                 BuildTarget.RELEASE -> project.tasks.named("jsProductionExecutableCompileSync")
             }
-            if (env == ServerEnvironment.DEV) {
-                kobwebStartTask.configure {
+            kobwebStartTask.configure {
+                dependsOn(jarTask)
+                if (env == ServerEnvironment.DEV) {
                     dependsOn(compileExecutableTask)
                 }
             }
@@ -71,8 +76,12 @@ class KobwebApplicationPlugin : Plugin<Project> {
                 sourceSets {
                     @Suppress("UNUSED_VARIABLE") // jsMain name is necessary for "getting"
                     val jsMain by getting {
-                        kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$SRC_SUFFIX"))
-                        resources.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$RESOURCE_SUFFIX"))
+                        kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$JS_SRC_SUFFIX"))
+                        resources.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$JS_RESOURCE_SUFFIX"))
+                    }
+                    @Suppress("UNUSED_VARIABLE") // jvmMain name is necessary for "getting"
+                    val jvmMain by getting {
+                        kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$JVM_SRC_SUFFIX"))
                     }
                 }
             }

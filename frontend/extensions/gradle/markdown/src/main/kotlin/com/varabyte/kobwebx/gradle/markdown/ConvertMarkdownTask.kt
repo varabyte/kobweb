@@ -1,9 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown
 
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
-import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
-import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
-import com.varabyte.kobweb.gradle.application.extensions.getResourceRoots
+import com.varabyte.kobweb.gradle.application.extensions.*
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension
@@ -39,7 +36,9 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @OutputDirectory
     fun getGenDir(): File =
-        kobwebConfig.getGenSrcRoot(project).resolve(kobwebConfig.getQualfiedPagesPackage(project).replace(".", "/"))
+        kobwebConfig.getGenJsSrcRoot(project).resolve(
+            project.prefixQualifiedPackage(kobwebConfig.pagesPackage.get()).replace(".", "/")
+        )
 
     @TaskAction
     fun execute() {

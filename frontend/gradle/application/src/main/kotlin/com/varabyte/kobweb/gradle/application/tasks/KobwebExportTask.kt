@@ -27,7 +27,7 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebProject.kobwebFolder).content!!.port
 
-        val projectData = kobwebProject.parseData(project.group.toString(), getPagesPackage(), getSourceFiles())
+        val projectData = kobwebProject.parseData(project.group.toString(), getPagesPackage(), getSourceFilesJs(), getApiPackage(), getSourceFilesJvm())
         projectData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
             val launcher = ChromeLauncher()
             val chromeService = launcher.launch(true)
@@ -72,6 +72,12 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
         run {
             val destFile = File(getSiteDir(), "system/${scriptMapFile.name}")
             scriptMapFile.copyTo(destFile, overwrite = true)
+        }
+
+        val apiJarFile = project.layout.projectDirectory.file(kobwebConf.server.files.dev.api).asFile
+        run {
+            val destFile = File(getSiteDir(), "system/${apiJarFile.name}")
+            apiJarFile.copyTo(destFile, overwrite = true)
         }
     }
 }

@@ -4,6 +4,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.project.conf.KobwebConfFile
@@ -25,11 +26,13 @@ abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig, priv
             content ?: throw GradleException("Could not find configuration file: ${this.path}")
         }
 
-        val genDirSrcRoot = config.getGenSrcRoot(project)
-        val genDirResRoot = config.getGenResRoot(project)
+        val genDirJsSrcRoot = config.getGenJsSrcRoot(project)
+        val genDirJsResRoot = config.getGenJsResRoot(project)
+        val genDirJvmSrcRoot = config.getGenJvmSrcRoot(project)
 
-        with(kobwebProject.parseData(project.group.toString(), config.pagesPackage.get(), getSourceFiles())) {
-            File(genDirSrcRoot, "main.kt").writeText(
+        with(kobwebProject.parseData(project.group.toString(), config.pagesPackage.get(), getSourceFilesJs(), config.apiPackage.get(), getSourceFilesJvm())) {
+            genDirJsResRoot.mkdirs()
+            File(genDirJsSrcRoot, "main.kt").writeText(
                 createMainFunction(
                     app?.fqcn,
                     // Sort by route as it makes the generated registration logic easier to follow
@@ -41,9 +44,21 @@ abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig, priv
                     buildTarget
                 )
             )
+
+            genDirJvmSrcRoot.mkdirs()
+            File(genDirJvmSrcRoot, "ApisFactoryImpl.kt").writeText(
+                createApisFactoryImpl(
+                    // Sort by route as it makes the generated registration logic easier to follow
+                    apiMethods
+                        .associate { it.fqcn to it.route }
+                        .toList()
+                        .sortedBy { (_, route) -> route }
+                        .toMap()
+                )
+            )
         }
 
-        File(genDirResRoot, getPublicPath()).let { publicRoot ->
+        File(genDirJsResRoot, getPublicPath()).let { publicRoot ->
             publicRoot.mkdirs()
             File(publicRoot, "index.html").writeText(
                 createHtmlFile(

@@ -11,18 +11,11 @@ class Apis {
         handlers[path] = handler
     }
 
-    /**
-     * Convenience method for converting non-suspend methods into suspend methods
-     */
-    fun register(path: String, handler: (ApiContext) -> Unit) {
-        handlers[path] = { ctx -> handler(ctx) }
-    }
-
-    suspend fun handle(path: String): Boolean {
+    suspend fun handle(path: String): Response? {
         return handlers[path]?.let { handler ->
             val ctx = ApiContext()
             handler.invoke(ctx)
-            true
-        } ?: false
+            ctx.res
+        }
     }
 }

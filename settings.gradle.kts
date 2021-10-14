@@ -11,6 +11,7 @@ rootProject.name = "kobweb"
 include(":cli:kobweb")
 include(":common:kobweb-project")
 include(":frontend:kobweb")
+include(":frontend:kobweb-api")
 include(":frontend:kobweb-silk")
 include(":frontend:kobweb-silk-icons-fa")
 include(":frontend:web-compose-ext")
