@@ -13,7 +13,6 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
-// Enable JS(IR) target and add dependencies
 kotlin {
     jvm() {
         tasks.named("jvmJar", Jar::class.java).configure {

@@ -1,4 +1,3 @@
-// Add compose gradle plugin
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
@@ -8,7 +7,6 @@ plugins {
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.get()
 
-// Enable JS(IR) target and add dependencies
 kotlin {
     jvm()
     js(IR) {

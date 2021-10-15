@@ -1,4 +1,3 @@
-// Add compose gradle plugin
 plugins {
     kotlin("jvm")
     id("com.varabyte.kobweb.internal.publish")
@@ -7,7 +6,6 @@ plugins {
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.get()
 
-// Enable JS(IR) target and add dependencies
 java {
     withJavadocJar()
     withSourcesJar()
