@@ -53,16 +53,17 @@ class KobwebApplicationPlugin : Plugin<Project> {
                 dependsOn(kobwebGenTask)
             }
             // Not always available, but if so, it means this project exports an API jar
-            val jarTask = project.tasks.named("jvmJar") {
-                dependsOn(kobwebGenTask)
-            }
+            val jarTask = project.tasks.findByName("jvmJar")
+            jarTask?.dependsOn(kobwebGenTask)
 
             val compileExecutableTask = when(buildTarget) {
                 BuildTarget.DEBUG -> project.tasks.named("jsDevelopmentExecutableCompileSync")
                 BuildTarget.RELEASE -> project.tasks.named("jsProductionExecutableCompileSync")
             }
             kobwebStartTask.configure {
-                dependsOn(jarTask)
+                if (jarTask != null) {
+                    dependsOn(jarTask)
+                }
                 if (env == ServerEnvironment.DEV) {
                     dependsOn(compileExecutableTask)
                 }
