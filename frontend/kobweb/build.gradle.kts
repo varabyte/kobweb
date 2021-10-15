@@ -8,19 +8,14 @@ group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.get()
 
 kotlin {
-    jvm()
     js(IR) {
         browser()
         binaries.executable()
     }
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-            }
-        }
         val jsMain by getting {
             dependencies {
+                implementation(compose.runtime)
                 implementation(compose.web.core)
 
                 implementation(project(":frontend:web-compose-ext"))
