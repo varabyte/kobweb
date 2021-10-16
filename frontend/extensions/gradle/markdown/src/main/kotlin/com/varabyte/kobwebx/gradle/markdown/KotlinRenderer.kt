@@ -63,24 +63,32 @@ class KotlinRenderer(
         }
 
         private fun <N: Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
-            val scope = NodeScope(indentCount)
+            val scope = NodeScope()
             val code = composableCall.get().invoke(scope, node)
-            doVisit(node, code, skipChildren = scope.childrenHandled)
+            doVisit(node, code, scope.childrenOverride)
         }
 
-        private fun doVisit(node: Node, code: String, skipChildren: Boolean) {
+        private fun doVisit(node: Node, code: String, childrenOverride: List<Node>? = null) {
+            val children = childrenOverride ?: sequence<Node> {
+                var curr: Node? = node.firstChild
+                while (curr != null) {
+                    yield(curr)
+                    curr = curr.next
+                }
+            }.toList()
+
             output.append("$indent$code")
             // If this is a single line call (no children), we need to explicitly add the "()" parens if not already
             // done by the caller. Otherwise, we'll do "composableCall { ... }", which is really calling a function with
             // a lambda.
-            if (code.last().isLetterOrDigit() && node.firstChild == null) {
+            if (code.last().isLetterOrDigit() && children.isEmpty()) {
                 output.append("()")
             }
 
-            if (node.firstChild != null && !skipChildren) {
+            if (children.isNotEmpty()) {
                 output.appendLine(" {")
                 ++indentCount
-                visitChildren(node)
+                children.forEach { child -> child.accept(this) }
                 --indentCount
                 output.appendLine("$indent}")
             } else {

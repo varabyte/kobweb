@@ -78,8 +78,9 @@ abstract class MarkdownFeatures {
 private const val JB_DOM = "org.jetbrains.compose.web.dom"
 private const val SILK = "com.varabyte.kobweb.silk.components"
 
-class NodeScope(val indentCount: Int) {
-    var childrenHandled = false
+class NodeScope {
+    /** If set, will cause the Markdown visit to visit these nodes instead of the node's original children. */
+    var childrenOverride: List<Node>? = null
 }
 
 /**
@@ -130,7 +131,7 @@ abstract class MarkdownComponents {
     abstract val th: Property<NodeScope.(TableCell) -> String>
 
     init {
-        useSilk.convention(false) // TODO(Bug #23): Set to true after testing Markdown + Silk thoroughly
+        useSilk.convention(true)
 
         text.convention { text ->
             if (useSilk.get()) {
@@ -150,8 +151,8 @@ abstract class MarkdownComponents {
         br.convention{ "$JB_DOM.Br" }
         a.convention { link ->
             if (useSilk.get()) {
-                childrenHandled = true
                 val linkText = link.children().filterIsInstance<Text>().firstOrNull()?.literal.orEmpty()
+                childrenOverride = listOf() // We "consumed" the children, no more need to visit them
                 "$SILK.navigation.Link(\"${link.destination}\", \"$linkText\")"
             } else {
                 "$JB_DOM.A(\"${link.destination}\")"
@@ -163,8 +164,15 @@ abstract class MarkdownComponents {
         ul.convention{ "$JB_DOM.Ul" }
         ol.convention{ "$JB_DOM.Ol" }
         li.convention{ "$JB_DOM.Li" }
-        code.convention{ "$JB_DOM.Code()" }
-        inlineCode.convention{ code -> "$JB_DOM.Code { ${text.get().invoke(this, Text(code.literal))} }" }
+        code.convention { codeBlock ->
+            childrenOverride = codeBlock.literal.trim().split("\n").map { line -> Text("$line\\n") }
+            // See also: https://stackoverflow.com/a/31775545/1299302
+            "$JB_DOM.Code(attrs = { style { property(\"display\", \"block\"); property(\"white-space\", \"pre-wrap\") } })"
+        }
+        inlineCode.convention{ code ->
+            childrenOverride = listOf(Text(code.literal))
+            "$JB_DOM.Code"
+        }
         table.convention{ "$JB_DOM.Table" }
         thead.convention{ "$JB_DOM.Thead" }
         tbody.convention{ "$JB_DOM.Tbody" }
