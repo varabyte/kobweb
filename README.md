@@ -222,16 +222,10 @@ Current ETA to MVP: Mid-November 2021 (or even sooner 🤞)
 
 The following items are on our radar but not yet done:
 
-* `kobweb export` - Generate a static version of your site
-  * and add `kobweb run --env prod` which can serve that static site
 * Dynamic routes - Allow people to visit `mysite.com/blog/1234` which gets redirected to some page registered at
   `pages/blog/{id}` with "1234" passed in as a parameter.
-* API routes - Serverless functions which you can define (and annotate, like `@Page`s), which will get triggered when the
-  user visits an associated URL (like `mysite.com/api/hello`)
 * Breakpoints - An intuitive way to have Silk composables behave differently based on the size of the page (inspired
   by [Chakra UI's feature of the same name](https://chakra-ui.com/docs/features/responsive-styles). 
-* The Silk API is still undergoing late-stage design and needs to be finalized and polished
-* Persistence APIs (or at least guidance using existing Web Compose APIs)
 * An example website using Kobweb
 
 # Templates
