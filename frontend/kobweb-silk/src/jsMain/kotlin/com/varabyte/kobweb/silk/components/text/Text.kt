@@ -7,7 +7,9 @@ import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.silk.theme.SilkTheme
+import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.color
+import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -30,6 +32,7 @@ fun Text(
         attrs = modifier
             .asAttributeBuilder {
                 style {
+                    display(DisplayStyle.Inline)
                     this.color(color.toCssColor())
                 }
                 if (decorationLine != null) {
