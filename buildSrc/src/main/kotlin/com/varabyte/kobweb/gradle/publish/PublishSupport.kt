@@ -26,14 +26,6 @@ internal fun MavenArtifactRepository.gcloudAuth(project: Project) {
     }
 }
 
-private fun artifactSuffix(name: String): String {
-    return when(name) {
-        // For multiplatform targets, append them, so e.g. "kobweb" becomes "kobweb-js"
-        "js", "jvm" -> "-${name}"
-        else -> ""
-    }
-}
-
 /**
  * @param artifactId Can be null if we want to let the system use the default value for this project.
  *   This is particularly useful for publishing Gradle plugins, which does some of its own magic that we don't want
@@ -67,7 +59,7 @@ internal fun PublishingExtension.addVarabyteArtifact(
 
     publications.withType(MavenPublication::class.java) {
         if (artifactId != null) {
-            this.artifactId = artifactId + artifactSuffix(name)
+            this.artifactId = artifactId
         }
         pom {
             description?.let { this.description.set(it) }
@@ -91,13 +83,13 @@ private fun Project.publishing(configure: Action<PublishingExtension>): Unit =
 private fun Project.signing(configure: Action<SigningExtension>): Unit =
     (this as ExtensionAware).extensions.configure("signing", configure)
 
-internal fun Project.configurePublishing(extension: KobwebPublicationExtension) {
+internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
     publishing {
         addVarabyteArtifact(
             project,
-            extension.artifactId.orNull,
-            extension.description.orNull,
-            extension.site.orNull,
+            config.artifactId.orNull,
+            config.description.orNull,
+            config.site.orNull,
         )
     }
 
