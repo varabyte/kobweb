@@ -31,6 +31,7 @@ fun Row(
         style {
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Row)
+            flexWrap(FlexWrap.Wrap)
 
             when {
                 horizontalArrangement === Arrangement.Start -> justifyContent(JustifyContent.FlexStart)
