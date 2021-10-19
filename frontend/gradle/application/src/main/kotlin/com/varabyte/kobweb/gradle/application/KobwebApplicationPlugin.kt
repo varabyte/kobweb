@@ -98,12 +98,12 @@ class KobwebApplicationPlugin : Plugin<Project> {
 
             project.gradle.taskGraph.addTaskExecutionListener(object : TaskExecutionListener {
                 override fun beforeExecute(task: Task) {
-                    if (task.name == kobwebGenTask.name) {
+                    if (task.name in listOf(kobwebGenSiteTask, kobwebGenApiTask).map { it.name }) {
                         ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Rebuilding project..."))
                     }
                 }
                 override fun afterExecute(task: Task, state: TaskState) {
-                    if (task.name == compileExecutableTask.name) {
+                    if (task.name == kobwebStartTask.name) {
                         if (state.failure == null) {
                             ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.ClearStatus())
                             ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.IncrementVersion())

@@ -91,7 +91,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                                 }
                                 if (lastVersion != version) {
                                     lastVersion = version
-                                    if (status.hasClass("fade-out")) {
+                                    if (status.className.isNotEmpty()) {
                                         shouldReload = true
                                     } else {
                                         forceReloadNow()
