@@ -25,8 +25,9 @@ ${
         |                    position: fixed;
         |                    font-size: 24px;
         |                    background: whitesmoke;
-        |                    bottom: 20px;
-        |                    right: 20px;
+        |                    top: 20px;
+        |                    left: 50%;
+        |                    transform: translateX(-50%);
         |                    padding: 10px;
         |                    border: 1px solid;
         |                    border-radius: 10px;
