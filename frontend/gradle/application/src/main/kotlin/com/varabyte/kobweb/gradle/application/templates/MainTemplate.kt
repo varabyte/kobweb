@@ -58,7 +58,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                 var checkInterval = 0
                 checkInterval = window.setInterval(
                     handler = {
-                        window.fetch("${'$'}{window.location.origin}/api/kobweb/status").then {
+                        window.fetch("/api/kobweb/status").then {
                             it.text().then { response ->
                                 if (response != lastStatusResponse) {
                                     lastStatusResponse = response
@@ -83,7 +83,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                             window.clearInterval(checkInterval)
                         }
 
-                        window.fetch("${'$'}{window.location.origin}/api/kobweb/version").then {
+                        window.fetch("/api/kobweb/version").then {
                             it.text().then { response ->
                                 val version = response.toInt()
                                 if (lastVersion == null) {
