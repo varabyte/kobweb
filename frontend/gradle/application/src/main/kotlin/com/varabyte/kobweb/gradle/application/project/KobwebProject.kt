@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.project
+package com.varabyte.kobweb.gradle.application.project
 
 import com.varabyte.kobweb.common.error.KobwebException
 import java.nio.file.Path
@@ -13,6 +13,16 @@ import java.nio.file.Path
 class KobwebProject(
     val path: Path = Path.of("")
 ) {
-    val kobwebFolder = KobwebFolder.inPath(path)
-        ?: throw KobwebException("Not a valid path to a Kobweb project (no .kobweb folder found): $path")
+    companion object {
+        /**
+         * Given a value that is potentially a package shortcut (e.g. ".pages"), get its fully qualified name,
+         * e.g. ".pages" -> "org.example.pages"
+         */
+        fun prefixQualifiedPackage(group: String, pkg: String): String {
+            return when {
+                pkg.startsWith('.') -> "$group$pkg"
+                else -> pkg
+            }
+        }
+    }
 }

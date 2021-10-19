@@ -4,6 +4,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.project.SiteData
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.tasks.OutputDirectory
@@ -27,8 +28,8 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebProject.kobwebFolder).content!!.port
 
-        val projectData = kobwebProject.parseData(project.group.toString(), getPagesPackage(), getSourceFilesJs(), getApiPackage(), getSourceFilesJvm())
-        projectData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
+        val siteData = SiteData.from(project.group.toString(), getPagesPackage(), getSourceFilesJs())
+        siteData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
             val launcher = ChromeLauncher()
             val chromeService = launcher.launch(true)
 

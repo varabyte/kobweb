@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.project.structure
+package com.varabyte.kobweb.gradle.application.project
 
 const val PAGE_SIMPLE_NAME = "Page"
 const val PAGE_FQCN = "$KOBWEB_CORE_FQCN_PREFIX$PAGE_SIMPLE_NAME"

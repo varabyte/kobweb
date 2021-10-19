@@ -4,6 +4,8 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.project.ApiData
+import com.varabyte.kobweb.gradle.application.project.SiteData
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
@@ -30,7 +32,7 @@ abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig, priv
         val genDirJsResRoot = config.getGenJsResRoot(project)
         val genDirJvmSrcRoot = config.getGenJvmSrcRoot(project)
 
-        with(kobwebProject.parseData(project.group.toString(), config.pagesPackage.get(), getSourceFilesJs(), config.apiPackage.get(), getSourceFilesJvm())) {
+        with(SiteData.from(project.group.toString(), config.pagesPackage.get(), getSourceFilesJs())) {
             genDirJsResRoot.mkdirs()
             File(genDirJsSrcRoot, "main.kt").writeText(
                 createMainFunction(
@@ -44,7 +46,9 @@ abstract class KobwebGenerateTask @Inject constructor(config: KobwebConfig, priv
                     buildTarget
                 )
             )
+        }
 
+        with(ApiData.from(project.group.toString(), config.apiPackage.get(), getSourceFilesJvm())) {
             genDirJvmSrcRoot.mkdirs()
             File(genDirJvmSrcRoot, "ApisFactoryImpl.kt").writeText(
                 createApisFactoryImpl(

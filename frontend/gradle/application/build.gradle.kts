@@ -16,6 +16,9 @@ dependencies {
     // Get access to Kotlin multiplatform source sets
     implementation(kotlin("gradle-plugin"))
 
+    // For parsing code. Instead, use KSP someday? See also: Bug #4
+    implementation(kotlin("compiler-embeddable"))
+
     // Export
     implementation(libs.cdt) // Run ChromeLauncher during export
     implementation(libs.jsoup) // Pretty-print html
