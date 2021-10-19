@@ -125,7 +125,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         appendLine()
         appendLine(
             """
-                Router.navigateTo(window.location.pathname)
+                Router.navigateTo(window.location.pathname + window.location.search)
 
                 // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them the first
                 // time we render this page with their composable, dynamic versions. Think of this as poor man's

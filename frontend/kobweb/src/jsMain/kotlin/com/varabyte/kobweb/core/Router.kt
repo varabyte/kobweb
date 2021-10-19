@@ -16,18 +16,27 @@ fun ErrorPage(errorCode: Int) {
 
 private typealias PageMethod = @Composable () -> Unit
 
+private class PageData(
+    val pageMethod: PageMethod,
+    val pageContext: PageContext,
+)
+
 /**
  * The class responsible for navigating to different pages in a user's app.
  */
 object Router {
-    private val activePageMethod = mutableStateOf<PageMethod?>(null)
+    private val activePageData = mutableStateOf<PageData?>(null)
     private val pages = mutableMapOf<String, PageMethod>()
 
     @Suppress("unused") // Called by generated code
     @Composable
     fun renderActivePage() {
-        activePageMethod.value?.invoke()
-            ?: throw IllegalStateException("Call 'navigateTo' at least once before calling 'getActivePage'")
+        val data = activePageData.value
+            ?: error("Call 'navigateTo' at least once before calling 'renderActivePage'")
+
+        PageContext.active = data.pageContext
+        data.pageMethod.invoke()
+        PageContext.active = null
     }
 
     @Suppress("unused") // Called by generated code
@@ -38,22 +47,33 @@ object Router {
     }
 
     /**
-     * @param allowExternalPaths If true, this method should handle
+     * @param pathAndQuery The path to a page, including (optional) search params, e.g. "/example/path?arg=1234"
+     * @param allowExternalPaths If true, the path passed in can be for URLs pointing at a totally different site.
      */
-    fun navigateTo(path: String, allowExternalPaths: Boolean = true) {
+    fun navigateTo(pathAndQuery: String, allowExternalPaths: Boolean = true) {
+        val pathParts = pathAndQuery.split('?', limit = 2)
+        val path = pathParts[0]
+
         if (!Path.isLocal(path)) {
-            require(allowExternalPaths) { "Navigation to \"$path\" not expected by callee" }
-            window.location.assign(path)
+            require(allowExternalPaths) { "Navigation to \"$pathAndQuery\" not expected by callee" }
+            window.location.assign(pathAndQuery)
             return
         }
 
-        val page = pages[path] ?: { ErrorPage(404) }
-        activePageMethod.value = page
+        val pageMethod = pages[path] ?: { ErrorPage(404) }
+        val ctx = PageContext()
+        if (pathParts.size == 2) {
+            pathParts[1].split("&").forEach { param ->
+                val (key, value) = param.split('=', limit = 2)
+                ctx.mutableParams[key] = value
+            }
+        }
+
+        activePageData.value = PageData(pageMethod, ctx)
 
         // Update URL to match page we navigated to
-        // TODO: Support query params
-        "${window.location.origin}$path".let { url ->
-            if (window.location.href != url.removeSuffix("/") ) {
+        "${window.location.origin}$pathAndQuery".let { url ->
+            if (window.location.href != url) {
                 window.history.replaceState(window.history.state, "", url)
             }
         }
