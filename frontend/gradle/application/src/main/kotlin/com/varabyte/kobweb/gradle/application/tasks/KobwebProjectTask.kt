@@ -3,15 +3,12 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.*
-import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
-import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.project.KobwebProject
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerState
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.*
 import java.io.File
-import javax.inject.Inject
 
 fun ServerState.toDisplayText(): String {
     return "http://localhost:$port (PID = $pid)"
@@ -24,21 +21,27 @@ fun ServerState.toDisplayText(): String {
 abstract class KobwebProjectTask(@get:Internal val config: KobwebConfig, desc: String) : KobwebTask(desc) {
     @get:Internal val kobwebProject = KobwebProject()
 
+    @get:Internal
+    protected val kobwebConfFile = KobwebConfFile(kobwebProject.kobwebFolder)
+
+    @get:Internal
+    protected val kobwebConf = kobwebConfFile.content ?: throw GradleException("Could not find configuration file: ${this.path}")
+
     @InputFile
-    fun getConfFile(): File = project.layout.projectDirectory.file(kobwebProject.kobwebFolder.resolve("conf.yaml").toString()).asFile
-
-    @InputFiles
-    fun getSourceFilesJs(): List<File> = project.getSourceFiles(TargetPlatform.JS).toList()
-
-    @InputFiles
-    fun getSourceFilesJvm(): List<File> = project.getSourceFiles(TargetPlatform.JVM).toList()
+    fun getConfFile(): File = kobwebConfFile.path.toFile()
 
     @Internal
-    fun getResourceFilesWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(TargetPlatform.JS)
+    protected fun getSourceFilesJs(): List<File> = project.getSourceFiles(TargetPlatform.JS).toList()
+
+    @Internal
+    protected fun getSourceFilesJvm(): List<File> = project.getSourceFiles(TargetPlatform.JVM).toList()
+
+    @Internal
+    fun getResourceFilesJsWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(TargetPlatform.JS)
         .filter { rootAndFile -> rootAndFile.relativeFile.path.startsWith("${getPublicPath()}/") }
 
-    @InputFiles
-    fun getResourceFiles(): List<File> = getResourceFilesWithRoots().map { it.file }.toList()
+    @Internal
+    protected fun getResourceFilesJs(): List<File> = getResourceFilesJsWithRoots().map { it.file }.toList()
 
     /**
      * The root package of all pages.

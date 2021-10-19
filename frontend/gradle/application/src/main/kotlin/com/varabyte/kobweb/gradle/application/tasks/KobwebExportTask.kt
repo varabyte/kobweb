@@ -5,8 +5,8 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.project.SiteData
-import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerStateFile
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
@@ -16,11 +16,9 @@ import javax.inject.Inject
 abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
     : KobwebProjectTask(config, "Export the Kobweb project into a static site") {
 
-    private val kobwebConf get() = KobwebConfFile(kobwebProject.kobwebFolder).content!!
-
     @OutputDirectory
     fun getSiteDir(): File {
-        return project.layout.projectDirectory.dir(kobwebConf.server.files.prod.siteRoot).asFile
+        return project.layout.projectDirectory.dir(kobwebConfFile.content!!.server.files.prod.siteRoot).asFile
     }
 
     @TaskAction
@@ -56,7 +54,7 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
             }
         }
 
-        getResourceFilesWithRoots().forEach { rootAndFile ->
+        getResourceFilesJsWithRoots().forEach { rootAndFile ->
             val relativePath = rootAndFile.relativeFile.toString().substringAfter(getPublicPath())
             // The auto-generated "/index.html" file should be used as a fallback if the user visits an invalid path
             val destFile = File(getSiteDir(), if (relativePath != "/index.html") "resources$relativePath" else "system$relativePath")

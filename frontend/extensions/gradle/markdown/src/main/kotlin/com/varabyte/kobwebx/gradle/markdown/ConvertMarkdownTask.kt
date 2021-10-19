@@ -26,12 +26,20 @@ abstract class ConvertMarkdownTask @Inject constructor(
     private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(TargetPlatform.JS)
         .map { root -> File(root, markdownConfig.markdownPath.get()) }
 
-    @InputFiles
-    fun getMarkdownFiles(): List<File> {
+    private fun getMarkdownFilesWithRoots(): List<RootAndFile> {
+        val mdRoots = getMarkdownRoots()
         return project.getResourceFilesWithRoots(TargetPlatform.JS)
             .filter { rootAndFile -> rootAndFile.file.extension == "md" }
-            .map { it.file }
+            .mapNotNull { rootAndFile ->
+                mdRoots.find { mdRoot -> rootAndFile.file.startsWith(mdRoot) }
+                    ?.let { mdRoot -> RootAndFile(mdRoot, rootAndFile.file) }
+            }
             .toList()
+    }
+
+    @InputFiles
+    fun getMarkdownFiles(): List<File> {
+        return getMarkdownFilesWithRoots().map { it.file }
     }
 
     @OutputDirectory
@@ -42,45 +50,42 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        for (mdFile in getMarkdownFiles()) {
-            for (root in getMarkdownRoots()) {
-                if (mdFile.startsWith(root)) {
-                    val mdFileRel = mdFile.relativeTo(root)
+        getMarkdownFilesWithRoots().forEach { rootAndFile ->
+            val mdFile = rootAndFile.file
+            val mdFileRel = rootAndFile.relativeFile
 
-                    val extensions = mutableListOf<Extension>()
-                    markdownFeatures.run {
-                        if (autolink.get()) {
-                            extensions.add(AutolinkExtension.create())
-                        }
-                        if (tables.get()) {
-                            extensions.add(TablesExtension.create())
-                        }
-                        if (frontMatter.get()) {
-                            extensions.add(YamlFrontMatterExtension.create())
-                        }
-                        if (taskList.get()) {
-                            extensions.add(TaskListItemsExtension.create())
-                        }
-                    }
-
-                    val parser = Parser.builder()
-                        .extensions(extensions)
-                        .build()
-
-                    val parts = mdFileRel.path.split("/")
-                    val dirParts = parts.subList(0, parts.lastIndex)
-
-                    val mdPackage =
-                        kobwebConfig.pagesPackage.get() + if (dirParts.isNotEmpty()) ".${dirParts.joinToString(".")}" else ""
-                    val funName = mdFileRel.nameWithoutExtension.suffixIfNot("Page")
-
-                    File(getGenDir(), "${dirParts.joinToString("/")}/$funName.kt").let { outputFile ->
-                        outputFile.parentFile.mkdirs()
-
-                        val ktRenderer = KotlinRenderer(project, markdownComponents, mdPackage, funName)
-                        outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
-                    }
+            val extensions = mutableListOf<Extension>()
+            markdownFeatures.run {
+                if (autolink.get()) {
+                    extensions.add(AutolinkExtension.create())
                 }
+                if (tables.get()) {
+                    extensions.add(TablesExtension.create())
+                }
+                if (frontMatter.get()) {
+                    extensions.add(YamlFrontMatterExtension.create())
+                }
+                if (taskList.get()) {
+                    extensions.add(TaskListItemsExtension.create())
+                }
+            }
+
+            val parser = Parser.builder()
+                .extensions(extensions)
+                .build()
+
+            val parts = mdFileRel.path.split("/")
+            val dirParts = parts.subList(0, parts.lastIndex)
+
+            val mdPackage =
+                kobwebConfig.pagesPackage.get() + if (dirParts.isNotEmpty()) ".${dirParts.joinToString(".")}" else ""
+            val funName = mdFileRel.nameWithoutExtension.suffixIfNot("Page")
+
+            File(getGenDir(), "${dirParts.joinToString("/")}/$funName.kt").let { outputFile ->
+                outputFile.parentFile.mkdirs()
+
+                val ktRenderer = KotlinRenderer(project, markdownComponents, mdPackage, funName)
+                outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }
         }
     }

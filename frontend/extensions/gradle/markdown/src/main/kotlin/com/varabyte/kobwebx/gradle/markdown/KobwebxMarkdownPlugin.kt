@@ -28,7 +28,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         )
 
         project.afterEvaluate {
-            project.tasks.named("kobwebGen") {
+            project.tasks.named("kobwebGenSite") {
                 dependsOn(convertTask)
             }
         }
