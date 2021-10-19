@@ -12,11 +12,13 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.io.path.writeBytes
 
-
 /**
  * Wrapper around a Kobweb API jar, which is expected (in dev mode at least) to occasionally be reloaded on the fly.
+ *
+ * @param path The path to the api.jar itself
+ * @param dataRoot A path to a folder that the server can use to store data in if desired.
  */
-class ApiJarFile(path: Path) {
+class ApiJarFile(path: Path, private val dataRoot: Path) {
     private class DynamicClassLoader(private val content: ByteArray) : ClassLoader(ApiJarFile::class.java.classLoader) {
         private val zipFile: ZipFile = run {
             val path = Files.createTempFile("KobwebApiJar", ".jar").also { it.toFile().deleteOnExit() }
@@ -51,11 +53,11 @@ class ApiJarFile(path: Path) {
         }
     }
 
-    private class Cache(val content: ByteArray) {
+    private class Cache(val content: ByteArray, dataRoot: Path) {
         val apis: Apis = run {
             val classLoader = DynamicClassLoader(content)
             val factory = classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
-            factory.create()
+            factory.create(dataRoot)
         }
     }
 
@@ -67,7 +69,7 @@ class ApiJarFile(path: Path) {
 
         var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
         if (cache == null || cache.content !== delegateFile.content) {
-            cache = Cache(currContent)
+            cache = Cache(currContent, dataRoot)
             this.cache = cache
         }
 

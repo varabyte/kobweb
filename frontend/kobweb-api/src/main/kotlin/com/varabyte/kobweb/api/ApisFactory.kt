@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.api
 
+import java.nio.file.Path
+
 /**
  * A interface for creating an [Apis] instance.
  *
@@ -8,5 +10,5 @@ package com.varabyte.kobweb.api
  */
 @Suppress("unused") // Called by reflection
 interface ApisFactory {
-    fun create(): Apis
+    fun create(dataRoot: Path): Apis
 }

@@ -8,6 +8,7 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.name
@@ -66,7 +67,11 @@ private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
 private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
-    val apiJar = conf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { ApiJarFile(Path(it)) }
+    val dataRoot = conf.server.files.dev.dataRoot
+        .takeIf { it.isNotBlank() }
+        ?.let { Path(it).also { path -> path.toFile().mkdirs() } }
+        ?: Files.createTempDirectory("kobweb-server-data").also { it.toFile().deleteOnExit() }
+    val apiJar = conf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { ApiJarFile(Path(it), dataRoot) }
 
     routing {
         get("/api/kobweb/version") {
@@ -95,12 +100,13 @@ private fun Application.configureProdRouting(conf: KobwebConf) {
     val systemRoot = siteRoot.resolve("system")
     val resourcesRoot = siteRoot.resolve("resources")
     val pagesRoot = siteRoot.resolve("pages")
+    val dataRoot = siteRoot.resolve("data")
 
     val script = systemRoot.resolve(conf.server.files.dev.script.substringAfterLast("/"))
     val fallbackIndex = systemRoot.resolve("index.html")
     val apiJar = conf.server.files.dev.api.substringAfterLast("/")
         .takeIf { it.isNotBlank() }
-        ?.let { ApiJarFile(systemRoot.resolve(it)) }
+        ?.let { ApiJarFile(systemRoot.resolve(it), dataRoot) }
 
     routing {
         if (apiJar != null) {

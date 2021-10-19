@@ -1,10 +1,12 @@
 package com.varabyte.kobweb.api
 
+import java.nio.file.Path
+
 /**
  * The class which manages all API paths and handlers within a Kobweb project.
  */
 @Suppress("unused") // Called by generated code
-class Apis {
+class Apis(val dataRoot: Path) {
     private val handlers = mutableMapOf<String, suspend (ApiContext) -> Unit>()
 
     fun register(path: String, handler: suspend (ApiContext) -> Unit) {
@@ -13,7 +15,7 @@ class Apis {
 
     suspend fun handle(path: String): Response? {
         return handlers[path]?.let { handler ->
-            val ctx = ApiContext()
+            val ctx = ApiContext(dataRoot)
             handler.invoke(ctx)
             ctx.res
         }
