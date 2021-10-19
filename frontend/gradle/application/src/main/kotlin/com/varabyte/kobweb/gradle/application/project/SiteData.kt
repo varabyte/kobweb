@@ -30,8 +30,8 @@ class SiteData {
                     .findFile(LightVirtualFile(file.name, KotlinFileType.INSTANCE, file.readText())) as KtFile
 
                 var currPackage = ""
-                var pageSimpleName = ""
-                var appSimpleName = ""
+                var pageSimpleName = PAGE_SIMPLE_NAME
+                var appSimpleName = APP_SIMPLE_NAME
                 ktFile.visitAllChildren { element ->
                     when (element) {
                         is KtPackageDirective -> {
@@ -44,12 +44,12 @@ class SiteData {
                                 APP_FQCN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { appSimpleName = it }
-                                    } ?: run { appSimpleName = APP_SIMPLE_NAME }
+                                    }
                                 }
                                 PAGE_FQCN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { pageSimpleName = it }
-                                    } ?: run { pageSimpleName = PAGE_SIMPLE_NAME }
+                                    }
                                 }
                             }
                         }

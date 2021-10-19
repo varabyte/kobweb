@@ -28,7 +28,7 @@ class ApiData {
                     .findFile(LightVirtualFile(file.name, KotlinFileType.INSTANCE, file.readText())) as KtFile
 
                 var currPackage = ""
-                var apiSimpleName = ""
+                var apiSimpleName = API_SIMPLE_NAME
                 ktFile.visitAllChildren { element ->
                     when (element) {
                         is KtPackageDirective -> {
@@ -41,7 +41,7 @@ class ApiData {
                                 API_FQCN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { apiSimpleName = it }
-                                    } ?: run { apiSimpleName = API_SIMPLE_NAME }
+                                    }
                                 }
                             }
                         }
