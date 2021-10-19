@@ -2,15 +2,12 @@ package com.varabyte.kobweb.server.io
 
 import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.ApisFactory
-import com.varabyte.kobweb.project.io.ReadableFile
+import com.varabyte.kobweb.project.io.LiveFile
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.io.path.writeBytes
@@ -62,7 +59,7 @@ class ApiJarFile(path: Path) {
         }
     }
 
-    private val delegateFile = ReadableFile(path)
+    private val delegateFile = LiveFile(path)
     private var cache: Cache? = null
 
     val apis: Apis get() {

@@ -10,7 +10,7 @@ import kotlin.io.path.*
  * Base class for a file which may get updated behind the scenes, at which point, [content] will be lazily loaded with
  * the latest value.
  */
-open class ReadableFile(val path: Path) {
+open class LiveFile(val path: Path) {
     private var lastModified = 0L
     private lateinit var _contentBytes: ByteArray
 
@@ -36,15 +36,15 @@ open class KobwebReadableTextFile<T : Any>(
     name: String,
     private val deserialize: (String) -> (T),
 ) {
-    private val readableDelegate = ReadableFile(kobwebFolder.resolve(name))
+    private val delegateFile = LiveFile(kobwebFolder.resolve(name))
 
-    val path = readableDelegate.path
+    val path = delegateFile.path
 
     private var lastBytes: ByteArray? = null
     private lateinit var _content: T
     val content: T?
         get() {
-            return readableDelegate.content
+            return delegateFile.content
                 ?.let { bytes ->
                     if (lastBytes == null || bytes !== lastBytes) {
                         lastBytes = bytes
@@ -61,13 +61,13 @@ open class KobwebWritableTextFile<T : Any>(
     private val serialize: (T) -> String,
     deserialize: (String) -> (T),
 ) {
-    private val readableDelegate = KobwebReadableTextFile(kobwebFolder, name, deserialize)
-    val path = readableDelegate.path
+    private val delegateFile = KobwebReadableTextFile(kobwebFolder, name, deserialize)
+    val path = delegateFile.path
 
     var content: T?
-        get() = readableDelegate.content
+        get() = delegateFile.content
         set(value) {
-            val filePath = readableDelegate.path
+            val filePath = delegateFile.path
             if (!filePath.parent.exists()) {
                 filePath.parent.createDirectories()
             }
