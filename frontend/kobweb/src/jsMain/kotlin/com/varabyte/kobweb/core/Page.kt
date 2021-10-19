@@ -14,7 +14,17 @@ import androidx.compose.runtime.Composable
  *
  * Finally, there must not be any duplicate page names given a directory scope. If Kobweb encounters this, it will log
  * an error and discard duplicates arbitrarily.
+ *
+ * @param slug If set, will be used as the path for this page instead of the file path. If the value starts with a
+ *   slash, then it means the value represents the full slug path; otherwise, it will be appended onto a root extracted
+ *   from the current filename, e.g.
+ *   `"pages/account/Utilities.kt" + "Page("admin/settings") = "pages/account/admin/settings"`
+ *   This parameter is provided for flexibility, but it is recommended to use it only as a last resort, as most people
+ *   will expect a `@Page` to be tied to the current layout.
+ * @param useMethodName If [slug] is not set and this value is true, then the method name (instead of the file name)
+ *   will be used to generate the final slug.
  */
 annotation class Page(
-    val slug: String = ""
+    val slug: String = "",
+    val useMethodName: Boolean = false,
 )
