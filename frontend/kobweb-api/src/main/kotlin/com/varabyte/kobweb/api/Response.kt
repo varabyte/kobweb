@@ -1,5 +1,20 @@
 package com.varabyte.kobweb.api
 
+/**
+ * Data to send back to the client after it makes a request to an API endpoint.
+ *
+ * An empty response is automatically created and passed into an API via an [ApiContext]. Developers implementing an API
+ * endpoint should modify this response with code like the following:
+ *
+ * ```
+ * @Api
+ * fun demo(ctx: ApiContext) {
+ *   ctx.res.payload = "This is how you send text back to the client".toByteArray()
+ * }
+ * ```
+ *
+ * See also: [Request]
+ */
 class Response {
     /** See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status */
     var status = 200

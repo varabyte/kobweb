@@ -11,7 +11,12 @@ import java.nio.file.Path
  *   servers are configured to be stateless, in that is there's no guarantee if you're hitting the same server or a
  *   brand new one with each request, but this path is still included for simpler server configurations or if you know
  *   what you're doing!
+ *
+ * @param req Request information sent from the client.
  */
-class ApiContext(val dataRoot: Path) {
+class ApiContext(
+    val dataRoot: Path,
+    val req: Request,
+) {
     val res = Response()
 }

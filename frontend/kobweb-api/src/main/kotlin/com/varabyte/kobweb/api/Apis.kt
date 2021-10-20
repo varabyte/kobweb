@@ -13,9 +13,9 @@ class Apis(val dataRoot: Path) {
         handlers[path] = handler
     }
 
-    suspend fun handle(path: String): Response? {
+    suspend fun handle(path: String, query: Map<String, String>): Response? {
         return handlers[path]?.let { handler ->
-            val ctx = ApiContext(dataRoot)
+            val ctx = ApiContext(dataRoot, Request(query))
             handler.invoke(ctx)
             ctx.res
         }

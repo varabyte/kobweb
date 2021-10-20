@@ -8,10 +8,14 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.util.*
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.name
+
+/** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose. */
+private const val KOBWEB_PARAMS = "kobweb-params"
 
 fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf, globals: ServerGlobals) {
     when (env) {
@@ -21,9 +25,14 @@ fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf, globa
 }
 
 private fun Routing.configureApiRouting(apiJar: ApiJarFile) {
-    get("/api/{params...}") {
-        call.parameters["params"]?.takeIf { it.isNotBlank() }?.let { pathStr ->
-            val response = apiJar.apis.handle("/$pathStr")
+    get("/api/{$KOBWEB_PARAMS...}") {
+        call.parameters[KOBWEB_PARAMS]?.takeIf { it.isNotBlank() }?.let { pathStr ->
+            val query = call.parameters
+                .filter { key, _ -> key != KOBWEB_PARAMS }
+                .flattenEntries()
+                .toMap()
+
+            val response = apiJar.apis.handle("/$pathStr", query)
             if (response != null) {
                 call.respondBytes(
                     response.payload,
@@ -41,9 +50,9 @@ private fun Routing.configureApiRouting(apiJar: ApiJarFile) {
 // Note: This should be defined LAST in the routing { ... } block.
 private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
     val scriptMap = Path("$script.map")
-    get("{params...}") {
+    get("{$KOBWEB_PARAMS...}") {
         var handled = false
-        call.parameters["params"]?.let {
+        call.parameters[KOBWEB_PARAMS]?.let {
             val path = it.split("/")
             if (path.isNotEmpty()) {
                 handled = true
