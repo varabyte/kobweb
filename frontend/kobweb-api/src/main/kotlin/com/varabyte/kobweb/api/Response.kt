@@ -1,5 +1,10 @@
 package com.varabyte.kobweb.api
 
+import java.nio.charset.Charset
+
+/** A convenience value you can use if you want to express intention that your payload should be empty */
+val EMPTY_PAYLOAD = ByteArray(0)
+
 /**
  * Data to send back to the client after it makes a request to an API endpoint.
  *
@@ -9,7 +14,7 @@ package com.varabyte.kobweb.api
  * ```
  * @Api
  * fun demo(ctx: ApiContext) {
- *   ctx.res.payload = "This is how you send text back to the client".toByteArray()
+ *   ctx.res.setPayloadText("This is how you send text back to the client")
  * }
  * ```
  *
@@ -19,8 +24,8 @@ class Response {
     /** See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status */
     var status = 200
 
-    /** The text payload to send back */
-    var payload: ByteArray = ByteArray(0)
+    /** The payload to send back */
+    var payload: ByteArray? = null
 
     /**
      * The content type of the [payload], e.g. "image/jpeg" or "application/json". Can include parameters.
@@ -28,4 +33,11 @@ class Response {
      * See also: https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
      */
     var contentType: String? = null
+}
+
+/**
+ * Convenience method for setting the payload to a text value.
+ */
+fun Response.setPayloadText(text: String, charset: Charset = Charsets.UTF_8) {
+    payload = text.toByteArray(charset)
 }

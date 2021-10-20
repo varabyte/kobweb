@@ -1,20 +1,27 @@
 package com.varabyte.kobweb.server.plugins
 
+import com.varabyte.kobweb.api.EMPTY_PAYLOAD
+import com.varabyte.kobweb.api.HttpMethod
+import com.varabyte.kobweb.api.Request
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.io.ApiJarFile
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
+import io.ktor.util.pipeline.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.name
 
-/** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose. */
+/** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
 
 fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf, globals: ServerGlobals) {
@@ -24,25 +31,49 @@ fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf, globa
     }
 }
 
-private fun Routing.configureApiRouting(apiJar: ApiJarFile) {
-    get("/api/{$KOBWEB_PARAMS...}") {
-        call.parameters[KOBWEB_PARAMS]?.takeIf { it.isNotBlank() }?.let { pathStr ->
-            val query = call.parameters
-                .filter { key, _ -> key != KOBWEB_PARAMS }
-                .flattenEntries()
-                .toMap()
+private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
+    apiJar: ApiJarFile,
+    httpMethod: HttpMethod,
+) {
+    call.parameters[KOBWEB_PARAMS]?.takeIf { it.isNotBlank() }?.let { pathStr ->
+        val body: ByteArray? = when(httpMethod) {
+            HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT -> {
+                withContext(Dispatchers.IO) { call.receiveStream().readAllBytes() }.takeIf { it.isNotEmpty() }
+            }
+            else -> null
+        }
+        val bodyContentType = if (body != null) call.request.contentType().toString() else null
 
-            val response = apiJar.apis.handle("/$pathStr", query)
-            if (response != null) {
-                call.respondBytes(
-                    response.payload,
-                    status = HttpStatusCode.fromValue(response.status),
-                    contentType = response.contentType?.let { ContentType.parse(it) }
-                )
-            }
-            else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+        val query = call.request.queryParameters
+            .flattenEntries()
+            .toMap()
+
+        val request = Request(httpMethod, query, body, bodyContentType)
+        val response = apiJar.apis.handle("/$pathStr", request)
+        if (response != null) {
+            call.respondBytes(
+                response.payload ?: EMPTY_PAYLOAD,
+                status = HttpStatusCode.fromValue(response.status),
+                contentType = response.contentType?.let { ContentType.parse(it) }
+            )
+        } else {
+            call.respond(HttpStatusCode.NotFound)
+        }
+    }
+}
+
+
+private fun Routing.configureApiRouting(apiJar: ApiJarFile) {
+    val path = "/api/{$KOBWEB_PARAMS...}"
+    HttpMethod.values().forEach { httpMethod ->
+        when (httpMethod) {
+            HttpMethod.DELETE -> delete(path) { handleApiCall(apiJar, httpMethod) }
+            HttpMethod.GET -> get(path) { handleApiCall(apiJar, httpMethod) }
+            HttpMethod.HEAD -> head(path) { handleApiCall(apiJar, httpMethod) }
+            HttpMethod.OPTIONS -> options(path) { handleApiCall(apiJar, httpMethod) }
+            HttpMethod.PATCH -> patch(path) { handleApiCall(apiJar, httpMethod) }
+            HttpMethod.POST -> post(path) { handleApiCall(apiJar, httpMethod) }
+            HttpMethod.PUT -> put(path) { handleApiCall(apiJar, httpMethod) }
         }
     }
 }
