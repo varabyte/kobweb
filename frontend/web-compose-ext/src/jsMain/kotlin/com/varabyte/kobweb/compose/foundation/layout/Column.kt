@@ -34,6 +34,7 @@ fun Column(
 
             when {
                 verticalArrangement === Arrangement.Top -> justifyContent(JustifyContent.FlexStart)
+                verticalArrangement === Arrangement.Center -> justifyContent(JustifyContent.Center)
                 verticalArrangement === Arrangement.Bottom -> justifyContent(JustifyContent.FlexEnd)
             }
 

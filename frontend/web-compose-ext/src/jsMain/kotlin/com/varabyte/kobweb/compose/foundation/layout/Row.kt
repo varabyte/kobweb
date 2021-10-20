@@ -35,6 +35,7 @@ fun Row(
 
             when {
                 horizontalArrangement === Arrangement.Start -> justifyContent(JustifyContent.FlexStart)
+                horizontalArrangement === Arrangement.Center -> justifyContent(JustifyContent.Center)
                 horizontalArrangement === Arrangement.End -> justifyContent(JustifyContent.FlexEnd)
             }
 
