@@ -53,7 +53,6 @@ fun main() = runBlocking {
         configureRouting(env, conf, globals)
         configureSerialization()
         configureHTTP()
-        configureSecurity()
     }
 
     engine.start()
