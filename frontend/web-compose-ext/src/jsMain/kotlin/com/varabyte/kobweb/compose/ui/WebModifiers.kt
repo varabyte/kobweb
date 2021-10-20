@@ -48,7 +48,7 @@ fun Modifier.fillMaxSize(percent: CSSPercentageValue = 100.percent): Modifier = 
     }
 }
 
-fun Modifier.size(size: CSSPercentageValue): Modifier = webModifier {
+fun Modifier.size(size: CSSNumeric): Modifier = webModifier {
     style {
         width(size)
         height(size)
@@ -68,7 +68,7 @@ fun Modifier.width(size: Dp): Modifier = webModifier {
     }
 }
 
-fun Modifier.width(size: CSSPercentageValue): Modifier = webModifier {
+fun Modifier.width(size: CSSNumeric): Modifier = webModifier {
     style {
         width(size)
     }
@@ -80,7 +80,7 @@ fun Modifier.height(size: Dp): Modifier = webModifier {
     }
 }
 
-fun Modifier.height(size: CSSPercentageValue): Modifier = webModifier {
+fun Modifier.height(size: CSSNumeric): Modifier = webModifier {
     style {
         height(size)
     }
@@ -92,7 +92,7 @@ fun Modifier.minWidth(size: Dp): Modifier = webModifier {
     }
 }
 
-fun Modifier.minWidth(size: CSSPercentageValue): Modifier = webModifier {
+fun Modifier.minWidth(size: CSSNumeric): Modifier = webModifier {
     style {
         minWidth(size)
     }
@@ -104,7 +104,7 @@ fun Modifier.minHeight(size: Dp): Modifier = webModifier {
     }
 }
 
-fun Modifier.minHeight(size: CSSPercentageValue): Modifier = webModifier {
+fun Modifier.minHeight(size: CSSNumeric): Modifier = webModifier {
     style {
         minHeight(size)
     }
