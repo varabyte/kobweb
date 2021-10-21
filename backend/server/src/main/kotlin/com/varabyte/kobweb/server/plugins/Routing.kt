@@ -83,14 +83,24 @@ private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
     val scriptMap = Path("$script.map")
     get("{$KOBWEB_PARAMS...}") {
         var handled = false
-        call.parameters[KOBWEB_PARAMS]?.let {
-            val path = it.split("/")
-            if (path.isNotEmpty()) {
+        call.parameters[KOBWEB_PARAMS]?.let { path ->
+            val pathParts = path.split("/")
+            if (pathParts.isNotEmpty()) {
                 handled = true
-                when (path.last()) {
+                when (val filename = pathParts.last()) {
                     script.name -> call.respondFile(script.toFile())
                     scriptMap.name -> call.respondFile(scriptMap.toFile())
-                    else -> handled = false
+                    else -> {
+                        // Abort early on resources, so we don't serve giant html pages simply because a favicon.ico
+                        // file is missing, for example.
+                        val ext = filename.substringAfterLast(".", "").takeIf { it.isNotEmpty() }
+                        if (ext != null && ext != "html") {
+                            call.respond(HttpStatusCode.NotFound)
+                        }
+                        else {
+                            handled = false
+                        }
+                    }
                 }
             }
         }
