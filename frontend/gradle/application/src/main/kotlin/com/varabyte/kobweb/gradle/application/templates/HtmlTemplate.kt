@@ -2,13 +2,15 @@ package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 
-fun createHtmlFile(title: String, links: List<String>, src: String, buildTarget: BuildTarget): String = """
+fun createHtmlFile(title: String, headElements: List<String>, src: String, buildTarget: BuildTarget): String = """
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="description" content="Generaged by Kobweb" />
         <title>$title</title>
-        ${links.joinToString("\n        ")}
+        <link rel="icon" href="/favicon.ico" />
+        ${headElements.joinToString("\n        ")}
     </head>
     <body>
         <div id="root"></div>
