@@ -2,12 +2,18 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.extensions.*
+import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
+import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
+import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
+import com.varabyte.kobweb.gradle.application.extensions.getSourceFiles
 import com.varabyte.kobweb.project.KobwebProject
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerState
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import java.io.File
 
 fun ServerState.toDisplayText(): String {

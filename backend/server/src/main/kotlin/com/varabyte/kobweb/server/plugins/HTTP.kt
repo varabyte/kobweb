@@ -1,11 +1,9 @@
 package com.varabyte.kobweb.server.plugins
 
+import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.request.*
 
 fun Application.configureHTTP() {
     install(DefaultHeaders) {

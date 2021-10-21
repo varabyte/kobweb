@@ -6,7 +6,6 @@ import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.project.SiteData
 import com.varabyte.kobweb.server.api.ServerStateFile
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup

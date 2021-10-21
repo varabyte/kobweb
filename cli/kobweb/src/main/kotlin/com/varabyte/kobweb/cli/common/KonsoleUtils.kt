@@ -1,12 +1,23 @@
 package com.varabyte.kobweb.cli.common
 
 import com.varabyte.konsole.foundation.anim.konsoleAnimOf
-import com.varabyte.konsole.foundation.input.*
+import com.varabyte.konsole.foundation.input.Completions
+import com.varabyte.konsole.foundation.input.input
+import com.varabyte.konsole.foundation.input.onInputChanged
+import com.varabyte.konsole.foundation.input.onInputEntered
+import com.varabyte.konsole.foundation.input.runUntilInputEntered
 import com.varabyte.konsole.foundation.konsoleVarOf
 import com.varabyte.konsole.foundation.render.aside
-import com.varabyte.konsole.foundation.text.*
+import com.varabyte.konsole.foundation.text.black
+import com.varabyte.konsole.foundation.text.bold
+import com.varabyte.konsole.foundation.text.cyan
+import com.varabyte.konsole.foundation.text.green
+import com.varabyte.konsole.foundation.text.invert
+import com.varabyte.konsole.foundation.text.red
+import com.varabyte.konsole.foundation.text.text
+import com.varabyte.konsole.foundation.text.textLine
+import com.varabyte.konsole.foundation.text.yellow
 import com.varabyte.konsole.runtime.KonsoleApp
-import com.varabyte.konsole.runtime.KonsoleBlock
 import com.varabyte.konsole.runtime.KonsoleBlock.RunScope
 import com.varabyte.konsole.runtime.render.RenderScope
 import kotlinx.coroutines.CoroutineScope

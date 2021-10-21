@@ -1,13 +1,23 @@
 package com.varabyte.kobweb.cli.create
 
 import com.charleskorn.kaml.Yaml
-import com.varabyte.kobweb.cli.common.*
+import com.varabyte.kobweb.cli.common.PathUtils
+import com.varabyte.kobweb.cli.common.Validations
+import com.varabyte.kobweb.cli.common.processing
+import com.varabyte.kobweb.cli.common.queryUser
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.cli.create.template.KobwebTemplate
-import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.common.error.KobwebException
+import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.konsole.foundation.konsoleApp
-import com.varabyte.konsole.foundation.text.*
+import com.varabyte.konsole.foundation.text.blue
+import com.varabyte.konsole.foundation.text.bold
+import com.varabyte.konsole.foundation.text.cyan
+import com.varabyte.konsole.foundation.text.green
+import com.varabyte.konsole.foundation.text.magenta
+import com.varabyte.konsole.foundation.text.red
+import com.varabyte.konsole.foundation.text.text
+import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.runtime.KonsoleApp
 import com.varabyte.konsole.runtime.concurrent.createKey
 import org.eclipse.jgit.api.Git

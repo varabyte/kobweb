@@ -1,7 +1,12 @@
 package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.Style
+import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.boxSizing
+import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.px
 
 /**
  * An annotation which identifies a [Composable] function as one which will be used as the root skeleton for every

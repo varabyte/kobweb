@@ -1,6 +1,11 @@
 package com.varabyte.kobwebx.gradle.markdown
 
-import com.varabyte.kobweb.gradle.application.extensions.*
+import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
+import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
+import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
+import com.varabyte.kobweb.gradle.application.extensions.getResourceRoots
+import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension

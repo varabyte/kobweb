@@ -1,7 +1,12 @@
 package com.varabyte.kobweb.silk.components.text
 
 import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.TextDecorationLine
+import com.varabyte.kobweb.compose.css.UserSelect
+import com.varabyte.kobweb.compose.css.cursor
+import com.varabyte.kobweb.compose.css.textDecorationLine
+import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.graphics.Color

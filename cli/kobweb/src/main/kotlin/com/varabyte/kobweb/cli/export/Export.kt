@@ -4,7 +4,6 @@ import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.kobwebProject
 import com.varabyte.kobweb.cli.common.newline
-import com.varabyte.kobweb.server.api.ServerState
 import com.varabyte.konsole.foundation.anim.konsoleAnimOf
 import com.varabyte.konsole.foundation.input.Keys
 import com.varabyte.konsole.foundation.input.onKeyPressed

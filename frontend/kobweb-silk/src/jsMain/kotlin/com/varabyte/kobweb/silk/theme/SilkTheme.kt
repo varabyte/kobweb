@@ -1,10 +1,18 @@
 package com.varabyte.kobweb.silk.theme
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.compositionLocalOf
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.silk.components.ComponentStyles
 import com.varabyte.kobweb.silk.components.SilkComponentStyles
-import com.varabyte.kobweb.silk.theme.colors.*
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
+import com.varabyte.kobweb.silk.theme.colors.Palette
+import com.varabyte.kobweb.silk.theme.colors.Palettes
+import com.varabyte.kobweb.silk.theme.colors.SystemPalettes
 
 /**
  * The default palletes provided by Silk, exposed publicly in case sites want to tweak them using

@@ -7,7 +7,17 @@ import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.unit.Dp
 import com.varabyte.kobweb.compose.ui.unit.dp
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.CSSNumeric
+import org.jetbrains.compose.web.css.CSSPercentageValue
+import org.jetbrains.compose.web.css.backgroundColor
+import org.jetbrains.compose.web.css.borderRadius
+import org.jetbrains.compose.web.css.height
+import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.minHeight
+import org.jetbrains.compose.web.css.minWidth
+import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.width
 import com.varabyte.kobweb.compose.css.Cursor as KobwebCursor
 import com.varabyte.kobweb.compose.ui.graphics.Color as KobwebColor
 
