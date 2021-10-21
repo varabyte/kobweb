@@ -1,7 +1,9 @@
-package com.varabyte.kobweb.core
+package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.core.PageContext
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text

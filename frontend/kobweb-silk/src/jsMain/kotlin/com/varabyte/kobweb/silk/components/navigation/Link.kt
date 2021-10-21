@@ -6,7 +6,7 @@ import com.varabyte.kobweb.compose.css.TextDecorationLine
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.clickable
 import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.core.Router
+import com.varabyte.kobweb.navigation.Router
 import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.SilkTheme
 

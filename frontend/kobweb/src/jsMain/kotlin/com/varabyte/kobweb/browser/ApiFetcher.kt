@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.core
+package com.varabyte.kobweb.browser
 
 import androidx.compose.runtime.NoLiveLiterals
 import kotlinx.browser.window

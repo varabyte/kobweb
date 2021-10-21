@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.core
+package com.varabyte.kobweb.navigation
 
 private const val HEX_REGEX = "[0-9A-F]"
 // Matches: "/example/path", "/example/path/"

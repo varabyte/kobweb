@@ -4,7 +4,7 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 
 fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, target: BuildTarget): String {
     val imports = mutableListOf(
-        "com.varabyte.kobweb.core.Router",
+        "com.varabyte.kobweb.navigation.Router",
         "kotlinx.browser.document",
         "kotlinx.browser.window",
         "org.jetbrains.compose.web.renderComposable",
