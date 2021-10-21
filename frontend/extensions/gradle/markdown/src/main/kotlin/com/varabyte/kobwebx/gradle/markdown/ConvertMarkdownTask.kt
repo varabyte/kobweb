@@ -12,7 +12,6 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.kotlin.util.suffixIfNot
 import java.io.File
 import javax.inject.Inject
 
@@ -79,7 +78,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
             val mdPackage =
                 kobwebConfig.pagesPackage.get() + if (dirParts.isNotEmpty()) ".${dirParts.joinToString(".")}" else ""
-            val funName = mdFileRel.nameWithoutExtension.suffixIfNot("Page")
+            val funName = mdFileRel.nameWithoutExtension
 
             File(getGenDir(), "${dirParts.joinToString("/")}/$funName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()

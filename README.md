@@ -121,7 +121,7 @@ my-project
         │               │     └── NavHeader.kt
         │               ├── MyApp.kt
         │               └── pages
-        │                   ├── AboutPage.kt
+        │                   ├── About.kt
         │                   └── Index.kt
         └── resources
             └── markdown
@@ -169,7 +169,7 @@ Just from that, Kobweb will create a site entry for you automatically.
 For example, if I create the following file:
 
 ```kotlin
-// com/example/mysite/pages/admin/SettingsPage.kt
+// com/example/mysite/pages/admin/Settings.kt
 
 @Page
 @Composable
@@ -180,8 +180,8 @@ fun SettingsPage() {
 
 this will create a page that I can then visit by going to `mysite.com/admin/settings`.
 
-By default, the path comes from the file name (with the suffix `Page` removed, if present), although there will be ways
-to override this behavior on a case-by-case basis (* *coming soon*).
+By default, the path comes from the file name, although there will be ways to override this behavior on a
+case-by-case basis (* *coming soon*).
 
 The file name `Index.kt` is special. If a page is defined inside such a file, it will be treated as the default page
 under that URL. For example, a page defined in `.../pages/admin/Index.kt` will be visited if the user visits

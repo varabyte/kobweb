@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.gradle.application.project
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
-import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.idea.KotlinFileType
@@ -72,7 +71,7 @@ class SiteData {
                                                 .replace('.', '/')
 
                                             val slug = when (val maybeSlug =
-                                                file.nameWithoutExtension.removeSuffix("Page").toLowerCase()) {
+                                                file.nameWithoutExtension.toLowerCase()) {
                                                 "index" -> ""
                                                 else -> maybeSlug
                                             }
