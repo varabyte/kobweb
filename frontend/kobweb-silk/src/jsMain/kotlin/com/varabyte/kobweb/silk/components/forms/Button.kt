@@ -1,15 +1,27 @@
 package com.varabyte.kobweb.silk.components.forms
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.foundation.layout.Box
-import com.varabyte.kobweb.compose.ui.*
+import com.varabyte.kobweb.compose.ui.Alignment
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.background
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.onMouseDown
+import com.varabyte.kobweb.compose.ui.onMouseEnter
+import com.varabyte.kobweb.compose.ui.onMouseLeave
+import com.varabyte.kobweb.compose.ui.onMouseUp
 import com.varabyte.kobweb.compose.ui.unit.dp
+import com.varabyte.kobweb.compose.ui.userSelect
 import com.varabyte.kobweb.silk.components.ComponentKey
 import com.varabyte.kobweb.silk.components.ComponentState
 import com.varabyte.kobweb.silk.components.ComponentStyle
 import com.varabyte.kobweb.silk.components.ComponentVariant
+import com.varabyte.kobweb.silk.components.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.shifted
 import com.varabyte.kobweb.silk.theme.shapes.Rect
@@ -88,14 +100,15 @@ object Buttons {
 fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    variant: ButtonVariant? = null,
     content: @Composable () -> Unit
 ) {
     var state by remember { mutableStateOf(ButtonState.DEFAULT) }
     var inButton by remember { mutableStateOf(false) }
     Box(
-        SilkTheme.componentStyles[ButtonKey].toModifier(state)
+        SilkTheme.componentStyles[ButtonKey].toModifier(state, variant)
             .then(modifier)
-            // Text shouldn't be selectable
+            // Button text shouldn't be selectable
             .userSelect(UserSelect.None)
             .onMouseEnter {
                 state = ButtonState.HOVER
