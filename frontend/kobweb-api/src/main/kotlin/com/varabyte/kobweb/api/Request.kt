@@ -1,7 +1,5 @@
 package com.varabyte.kobweb.api
 
-import java.nio.charset.Charset
-
 /**
  * Information passed into an API endpoint from the client.
  *
@@ -37,6 +35,6 @@ class Request(
     val contentType: String?,
 )
 
-fun Request.readBodyText(charset: Charset = Charsets.UTF_8): String? {
-    return body?.toString(charset)
+fun Request.readBodyText(): String? {
+    return body?.toString(Charsets.UTF_8)
 }

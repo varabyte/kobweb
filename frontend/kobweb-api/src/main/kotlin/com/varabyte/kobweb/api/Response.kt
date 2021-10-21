@@ -1,7 +1,5 @@
 package com.varabyte.kobweb.api
 
-import java.nio.charset.Charset
-
 /** A convenience value you can use if you want to express intention that your payload should be empty */
 val EMPTY_PAYLOAD = ByteArray(0)
 
@@ -38,6 +36,6 @@ class Response {
 /**
  * Convenience method for setting the payload to a text value.
  */
-fun Response.setPayloadText(text: String, charset: Charset = Charsets.UTF_8) {
-    payload = text.toByteArray(charset)
+fun Response.setPayloadText(text: String) {
+    payload = text.toByteArray(Charsets.UTF_8)
 }
