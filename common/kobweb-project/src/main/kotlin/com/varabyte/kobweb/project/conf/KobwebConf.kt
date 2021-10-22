@@ -39,8 +39,6 @@ class Server(
         )
 
         /**
-         * The prod server serves static files but needs a fallback in case one is missing.
-         *
          * @param siteRoot The path to the root of where the static site lives
          */
         @Serializable
