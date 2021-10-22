@@ -35,5 +35,8 @@ application {
 }
 
 tasks.withType<ShadowJar> {
-    minimize()
+    minimize {
+        // Code may end up getting referenced via reflection
+        exclude(project(":backend:kobweb-api"))
+    }
 }
