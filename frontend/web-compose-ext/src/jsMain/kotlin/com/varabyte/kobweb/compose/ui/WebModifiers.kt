@@ -5,13 +5,12 @@ import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.css.cursor
 import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
-import com.varabyte.kobweb.compose.ui.unit.Dp
-import com.varabyte.kobweb.compose.ui.unit.dp
 import org.jetbrains.compose.web.css.CSSNumeric
 import org.jetbrains.compose.web.css.CSSPercentageValue
 import org.jetbrains.compose.web.css.backgroundColor
-import org.jetbrains.compose.web.css.borderRadius
+import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.height
+import org.jetbrains.compose.web.css.lineHeight
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.minHeight
 import org.jetbrains.compose.web.css.minWidth
@@ -20,12 +19,6 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.width
 import com.varabyte.kobweb.compose.css.Cursor as KobwebCursor
 import com.varabyte.kobweb.compose.ui.graphics.Color as KobwebColor
-
-fun Modifier.borderRadius(size: Dp) = webModifier {
-    style {
-        borderRadius(size.value.px)
-    }
-}
 
 fun Modifier.background(color: KobwebColor) = webModifier {
     style {
@@ -42,6 +35,24 @@ fun Modifier.classNames(vararg classes: String) = webModifier {
 fun Modifier.cursor(cursor: KobwebCursor) = webModifier {
     style {
         cursor(cursor)
+    }
+}
+
+fun Modifier.fontSize(value: CSSNumeric): Modifier = webModifier {
+    style {
+        fontSize(value)
+    }
+}
+
+fun Modifier.lineHeight(value: CSSNumeric): Modifier = webModifier {
+    style {
+        lineHeight(value)
+    }
+}
+
+fun Modifier.lineHeight(value: Double): Modifier = webModifier {
+    style {
+        lineHeight(value.toString())
     }
 }
 
@@ -71,28 +82,9 @@ fun Modifier.size(size: CSSNumeric): Modifier = webModifier {
     }
 }
 
-fun Modifier.size(size: Dp): Modifier = webModifier {
-    style {
-        width(size.value.px)
-        height(size.value.px)
-    }
-}
-
-fun Modifier.width(size: Dp): Modifier = webModifier {
-    style {
-        width(size.value.px)
-    }
-}
-
 fun Modifier.width(size: CSSNumeric): Modifier = webModifier {
     style {
         width(size)
-    }
-}
-
-fun Modifier.height(size: Dp): Modifier = webModifier {
-    style {
-        height(size.value.px)
     }
 }
 
@@ -102,21 +94,9 @@ fun Modifier.height(size: CSSNumeric): Modifier = webModifier {
     }
 }
 
-fun Modifier.minWidth(size: Dp): Modifier = webModifier {
-    style {
-        minWidth(size.value.px)
-    }
-}
-
 fun Modifier.minWidth(size: CSSNumeric): Modifier = webModifier {
     style {
         minWidth(size)
-    }
-}
-
-fun Modifier.minHeight(size: Dp): Modifier = webModifier {
-    style {
-        minHeight(size.value.px)
     }
 }
 
@@ -151,25 +131,25 @@ fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = webModifier {
     onMouseUp { evt -> onMouseUp(evt) }
 }
 
-fun Modifier.padding(all: Dp): Modifier = webModifier {
+fun Modifier.padding(all: CSSNumeric): Modifier = webModifier {
     style {
         // Compose padding is the same thing as CSS margin, confusingly... (it puts space around the current composable,
         // as opposed to doing anything with its children)
-        margin(all.value.px)
+        margin(all)
     }
 }
 
-fun Modifier.padding(topBottom: Dp, leftRight: Dp): Modifier = webModifier {
+fun Modifier.padding(topBottom: CSSNumeric, leftRight: CSSNumeric): Modifier = webModifier {
     style {
         // See: Modifier.padding(all) comment
-        margin(topBottom.value.px, leftRight.value.px)
+        margin(topBottom, leftRight)
     }
 }
 
-fun Modifier.padding(top: Dp = 0.dp, right: Dp = 0.dp, bottom: Dp = 0.dp, left: Dp = 0.dp): Modifier = webModifier {
+fun Modifier.padding(top: CSSNumeric = 0.px, right: CSSNumeric = 0.px, bottom: CSSNumeric = 0.px, left: CSSNumeric = 0.px): Modifier = webModifier {
     style {
         // See: Modifier.padding(all) comment
-        margin(top.value.px, right.value.px, bottom.value.px, left.value.px)
+        margin(top, right, bottom, left)
     }
 }
 

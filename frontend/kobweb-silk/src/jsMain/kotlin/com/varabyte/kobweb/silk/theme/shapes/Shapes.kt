@@ -1,10 +1,10 @@
 package com.varabyte.kobweb.silk.theme.shapes
 
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.unit.Dp
-import com.varabyte.kobweb.compose.ui.unit.dp
 import com.varabyte.kobweb.compose.ui.webModifier
+import org.jetbrains.compose.web.css.CSSNumeric
 import org.jetbrains.compose.web.css.px
+import org.w3c.dom.css.CSS
 
 fun Modifier.clip(shape: Shape): Modifier = shape.path?.let { path ->
     webModifier {
@@ -37,12 +37,12 @@ private fun Pair<Int, Int>.toFloatPair() = first.toFloat() to second.toFloat()
 class InsetPath(
     private val topLeft: Pair<Float, Float>,
     botRight: Pair<Float, Float>,
-    private val roundness: Dp,
+    private val roundness: CSSNumeric = 0.px,
 ) : Path() {
     private val botRight = botRight.from100()
 
     override fun toPathStr(): String {
-        val roundnessPart = roundness.value.takeIf { it > 0 }?.let { roundness -> "round ${roundness.px}" } ?: ""
+        val roundnessPart = roundness.takeIf { it != 0.px }?.let { "round $it" } ?: ""
 
         // Valid inset strings are: (top right bottom left), (topBottom leftRight), (all)
         // So (10% 20% 10% 20%) == (10% 20%), and (10% 10% 10% 10%) == (10%)
@@ -76,18 +76,18 @@ interface Shape {
 class RectF(
     val topLeft: Pair<Float, Float>,
     val botRight: Pair<Float, Float>,
-    val cornerRadius: Dp = 0.dp,
+    val cornerRadius: CSSNumeric = 0.px,
 ) : Shape {
-    constructor() : this(0.dp)
-    constructor(cornerRadius: Dp) : this(0f to 0f, 100f to 100f, cornerRadius)
+    constructor() : this(0.px)
+    constructor(cornerRadius: CSSNumeric) : this(0f to 0f, 100f to 100f, cornerRadius)
 
     constructor(
         topBottom: Float,
         leftRight: Float,
-        cornerRadius: Dp = 0.dp
+        cornerRadius: CSSNumeric = 0.px,
     ) : this(leftRight to topBottom, (leftRight to topBottom).from100(), cornerRadius)
 
-    constructor(side: Float, cornerRadius: Dp = 0.dp) : this(
+    constructor(side: Float, cornerRadius: CSSNumeric = 0.px) : this(
         side to side,
         (side to side).from100(),
         cornerRadius
@@ -96,7 +96,7 @@ class RectF(
     override val path: Path?
         get() = if (topLeft.first != 0f || topLeft.second != 0f
             || botRight.first != 100f || botRight.second != 100f
-            || cornerRadius.value != 0f
+            || cornerRadius != 0.px
         ) {
             InsetPath(topLeft, botRight, cornerRadius)
         } else {
@@ -107,22 +107,22 @@ class RectF(
 class Rect(
     val topLeft: Pair<Int, Int>,
     val botRight: Pair<Int, Int>,
-    val cornerRadius: Dp = 0.dp,
+    val cornerRadius: CSSNumeric = 0.px,
 ) : Shape by RectF(topLeft.toFloatPair(), botRight.toFloatPair(), cornerRadius) {
-    constructor() : this(0.dp)
-    constructor(cornerRadius: Dp) : this(0 to 0, 100 to 100, cornerRadius)
+    constructor() : this(0.px)
+    constructor(cornerRadius: CSSNumeric) : this(0 to 0, 100 to 100, cornerRadius)
 
     constructor(
         topBottom: Int,
         leftRight: Int,
-        cornerRadius: Dp = 0.dp
+        cornerRadius: CSSNumeric = 0.px
     ) : this(
         leftRight to topBottom,
         (leftRight to topBottom).from100(),
         cornerRadius
     )
 
-    constructor(side: Int, cornerRadius: Dp = 0.dp) : this(
+    constructor(side: Int, cornerRadius: CSSNumeric = 0.px) : this(
         side to side,
         (side to side).from100(),
         cornerRadius

@@ -15,7 +15,6 @@ import com.varabyte.kobweb.compose.ui.onMouseDown
 import com.varabyte.kobweb.compose.ui.onMouseEnter
 import com.varabyte.kobweb.compose.ui.onMouseLeave
 import com.varabyte.kobweb.compose.ui.onMouseUp
-import com.varabyte.kobweb.compose.ui.unit.dp
 import com.varabyte.kobweb.compose.ui.userSelect
 import com.varabyte.kobweb.silk.components.ComponentKey
 import com.varabyte.kobweb.silk.components.ComponentState
@@ -27,6 +26,7 @@ import com.varabyte.kobweb.silk.theme.colors.shifted
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.Shape
 import com.varabyte.kobweb.silk.theme.shapes.clip
+import org.jetbrains.compose.web.css.px
 
 enum class ButtonState : ComponentState {
     DEFAULT,
@@ -82,7 +82,7 @@ class BaseButtonStyle : ButtonStyle() {
 
     override val shape: Shape
         @Composable
-        get() = Rect(4.dp)
+        get() = Rect(4.px)
 }
 
 interface ButtonVariant : ComponentVariant<ButtonState, ButtonStyle>
