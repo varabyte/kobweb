@@ -18,7 +18,10 @@ import com.varabyte.kobweb.silk.components.forms.ButtonKey
 interface ComponentKey<S: ComponentStyle<*>>
 
 interface ComponentState
-/** Conveneince class for components that don't depend on any state */
+
+/**
+ * Convenience class when defining component styles that don't change depending on any state
+ */
 object EmptyState : ComponentState
 
 /**
