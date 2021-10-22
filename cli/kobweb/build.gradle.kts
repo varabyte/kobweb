@@ -16,7 +16,7 @@ dependencies {
     implementation(libs.freemarker)
     implementation(libs.kaml)
     implementation(project(":common:kobweb-project"))
-    implementation(project(":backend:api"))
+    implementation(project(":backend:server-api"))
 }
 
 application {
