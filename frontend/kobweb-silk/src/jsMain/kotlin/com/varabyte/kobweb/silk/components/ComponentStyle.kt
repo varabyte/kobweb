@@ -96,9 +96,9 @@ class ComponentStyles {
         error("No style registered with key $key")
 
     fun copy(): ComponentStyles {
-        val other = ComponentStyles()
-        other.baseStyles.putAll(baseStyles)
-        return other
+        val clone = ComponentStyles()
+        clone.baseStyles.putAll(baseStyles)
+        return clone
     }
 }
 
