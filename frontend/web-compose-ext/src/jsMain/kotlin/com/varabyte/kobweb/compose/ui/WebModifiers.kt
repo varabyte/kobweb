@@ -33,6 +33,12 @@ fun Modifier.background(color: KobwebColor) = webModifier {
     }
 }
 
+fun Modifier.classNames(vararg classes: String) = webModifier {
+    style {
+        classes(*classes)
+    }
+}
+
 fun Modifier.cursor(cursor: KobwebCursor) = webModifier {
     style {
         cursor(cursor)
