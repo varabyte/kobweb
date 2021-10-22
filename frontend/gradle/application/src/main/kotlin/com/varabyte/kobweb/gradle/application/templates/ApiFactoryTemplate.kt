@@ -5,7 +5,6 @@ fun createApisFactoryImpl(apiFqcnRoutes: Map<String, String>, apiInitMethods: Li
         import com.varabyte.kobweb.api.Apis
         import com.varabyte.kobweb.api.ApiInitContext
         import com.varabyte.kobweb.api.ApisFactory
-        import com.varabyte.kobweb.api.data.Data
         import com.varabyte.kobweb.api.data.MutableData
         import com.varabyte.kobweb.api.log.Logger
 
