@@ -117,9 +117,9 @@ class KobwebApplicationPlugin : Plugin<Project> {
                     if (state.failure != null) {
                         ServerRequestsFile(kobwebFolder).enqueueRequest(
                             ServerRequest.SetStatus(
-                                "Build failed. Aborting reload.",
+                                "Failed.",
                                 isError = true,
-                                5000
+                                500
                             )
                         )
                     }
