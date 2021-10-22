@@ -1,8 +1,9 @@
 package com.varabyte.kobweb.server.plugins
 
-import com.varabyte.kobweb.api.EMPTY_PAYLOAD
-import com.varabyte.kobweb.api.HttpMethod
-import com.varabyte.kobweb.api.Request
+import com.varabyte.kobweb.api.http.EMPTY_PAYLOAD
+import com.varabyte.kobweb.api.http.HttpMethod
+import com.varabyte.kobweb.api.http.Request
+import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -16,7 +17,6 @@ import io.ktor.util.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.name
@@ -25,9 +25,17 @@ import kotlin.io.path.name
 private const val KOBWEB_PARAMS = "kobweb-params"
 
 fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf, globals: ServerGlobals) {
+    val logger = object : Logger {
+        override fun trace(message: String) = log.trace(message)
+        override fun debug(message: String) = log.debug(message)
+        override fun info(message: String) = log.info(message)
+        override fun warn(message: String) = log.warn(message)
+        override fun error(message: String) = log.error(message)
+    }
+
     when (env) {
-        ServerEnvironment.DEV -> configureDevRouting(conf, globals)
-        ServerEnvironment.PROD -> configureProdRouting(conf)
+        ServerEnvironment.DEV -> configureDevRouting(conf, globals, logger)
+        ServerEnvironment.PROD -> configureProdRouting(conf, logger)
     }
 }
 
@@ -114,14 +122,10 @@ private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
 
 }
 
-private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals) {
+private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, logger: Logger) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
-    val dataRoot = conf.server.files.dev.dataRoot
-        .takeIf { it.isNotBlank() }
-        ?.let { Path(it).also { path -> path.toFile().mkdirs() } }
-        ?: Files.createTempDirectory("kobweb-server-data").also { it.toFile().deleteOnExit() }
-    val apiJar = conf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { ApiJarFile(Path(it), dataRoot) }
+    val apiJar = conf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { ApiJarFile(Path(it), logger) }
 
     routing {
         get("/api/kobweb/version") {
@@ -145,18 +149,17 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     }
 }
 
-private fun Application.configureProdRouting(conf: KobwebConf) {
+private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
     val systemRoot = siteRoot.resolve("system")
     val resourcesRoot = siteRoot.resolve("resources")
     val pagesRoot = siteRoot.resolve("pages")
-    val dataRoot = siteRoot.resolve("data")
 
     val script = systemRoot.resolve(conf.server.files.dev.script.substringAfterLast("/"))
     val fallbackIndex = systemRoot.resolve("index.html")
     val apiJar = conf.server.files.dev.api.substringAfterLast("/")
         .takeIf { it.isNotBlank() }
-        ?.let { ApiJarFile(systemRoot.resolve(it), dataRoot) }
+        ?.let { ApiJarFile(systemRoot.resolve(it), logger) }
 
     routing {
         if (apiJar != null) {

@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.api
+package com.varabyte.kobweb.api.http
 
 /**
  * Information passed into an API endpoint from the client.

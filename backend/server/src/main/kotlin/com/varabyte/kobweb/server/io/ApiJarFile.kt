@@ -2,6 +2,7 @@ package com.varabyte.kobweb.server.io
 
 import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.ApisFactory
+import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -16,9 +17,8 @@ import kotlin.io.path.writeBytes
  * Wrapper around a Kobweb API jar, which is expected (in dev mode at least) to occasionally be reloaded on the fly.
  *
  * @param path The path to the api.jar itself
- * @param dataRoot A path to a folder that the server can use to store data in if desired.
  */
-class ApiJarFile(path: Path, private val dataRoot: Path) {
+class ApiJarFile(path: Path, private val logger: Logger) {
     private class DynamicClassLoader(private val content: ByteArray) : ClassLoader(ApiJarFile::class.java.classLoader) {
         private val zipFile: ZipFile = run {
             val path = Files.createTempFile("KobwebApiJar", ".jar").also { it.toFile().deleteOnExit() }
@@ -53,11 +53,11 @@ class ApiJarFile(path: Path, private val dataRoot: Path) {
         }
     }
 
-    private class Cache(val content: ByteArray, dataRoot: Path) {
+    private class Cache(val content: ByteArray, logger: Logger) {
         val apis: Apis = run {
             val classLoader = DynamicClassLoader(content)
             val factory = classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
-            factory.create(dataRoot)
+            factory.create(logger)
         }
     }
 
@@ -69,7 +69,7 @@ class ApiJarFile(path: Path, private val dataRoot: Path) {
 
         var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
         if (cache == null || cache.content !== delegateFile.content) {
-            cache = Cache(currContent, dataRoot)
+            cache = Cache(currContent, logger)
             this.cache = cache
         }
 

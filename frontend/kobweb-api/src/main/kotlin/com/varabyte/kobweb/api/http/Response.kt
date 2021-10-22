@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.api
+package com.varabyte.kobweb.api.http
 
 /** A convenience value you can use if you want to express intention that your payload should be empty */
 val EMPTY_PAYLOAD = ByteArray(0)
@@ -6,8 +6,8 @@ val EMPTY_PAYLOAD = ByteArray(0)
 /**
  * Data to send back to the client after it makes a request to an API endpoint.
  *
- * An empty response is automatically created and passed into an API via an [ApiContext]. Developers implementing an API
- * endpoint should modify this response with code like the following:
+ * An empty successful response is automatically created and passed into an API via an [ApiContext]. Developers
+ * implementing an API endpoint should modify this response with code like the following:
  *
  * ```
  * @Api
