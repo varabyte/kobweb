@@ -4,29 +4,16 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.webModifier
-import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.AlignSelf
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.FlexDirection
-import org.jetbrains.compose.web.css.FlexWrap
-import org.jetbrains.compose.web.css.JustifyContent
-import org.jetbrains.compose.web.css.alignItems
-import org.jetbrains.compose.web.css.alignSelf
-import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.flexDirection
-import org.jetbrains.compose.web.css.flexWrap
-import org.jetbrains.compose.web.css.justifyContent
+import com.varabyte.kobweb.compose.ui.styleModifier
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 
 class RowScope {
-    fun Modifier.align(alignment: Alignment.Vertical) = webModifier {
-        style {
-            when (alignment) {
-                Alignment.Top -> alignSelf(AlignSelf.FlexStart)
-                Alignment.CenterVertically -> alignSelf(AlignSelf.Center)
-                Alignment.Bottom -> alignSelf(AlignSelf.FlexEnd)
-            }
+    fun Modifier.align(alignment: Alignment.Vertical) = styleModifier {
+        when (alignment) {
+            Alignment.Top -> alignSelf(AlignSelf.FlexStart)
+            Alignment.CenterVertically -> alignSelf(AlignSelf.Center)
+            Alignment.Bottom -> alignSelf(AlignSelf.FlexEnd)
         }
     }
 }

@@ -1,16 +1,13 @@
 package com.varabyte.kobweb.silk.theme.shapes
 
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.webModifier
+import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.CSSNumeric
 import org.jetbrains.compose.web.css.px
-import org.w3c.dom.css.CSS
 
 fun Modifier.clip(shape: Shape): Modifier = shape.path?.let { path ->
-    webModifier {
-        style {
-            property("clip-path", path.toPathStr())
-        }
+    styleModifier {
+        property("clip-path", path.toPathStr())
     }
 } ?: this
 

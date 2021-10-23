@@ -1,10 +1,7 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.ui.Alignment
-import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.webModifier
+import com.varabyte.kobweb.compose.ui.*
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -18,47 +15,45 @@ import org.jetbrains.compose.web.css.justifySelf
 import org.jetbrains.compose.web.css.value
 import org.jetbrains.compose.web.dom.Div
 
-class BoxScope() {
-    fun Modifier.align(alignment: Alignment) = webModifier {
-        style {
-            when (alignment) {
-                // justify in grid means "row" while align means "col"
-                Alignment.TopStart -> {
-                    alignSelf(AlignSelf.Start)
-                    justifySelf(AlignSelf.Start.value)
-                }
-                Alignment.TopCenter -> {
-                    alignSelf(AlignSelf.Start)
-                    justifySelf(AlignSelf.Center.value)
-                }
-                Alignment.TopEnd -> {
-                    alignSelf(AlignSelf.Start)
-                    justifySelf(AlignSelf.End.value)
-                }
-                Alignment.CenterStart -> {
-                    alignSelf(AlignSelf.Center)
-                    justifySelf(AlignSelf.Start.value)
-                }
-                Alignment.Center -> {
-                    alignSelf(AlignSelf.Center)
-                    justifySelf(AlignSelf.Center.value)
-                }
-                Alignment.CenterEnd -> {
-                    justifySelf(AlignSelf.End.value)
-                    alignSelf(AlignSelf.Center)
-                }
-                Alignment.BottomStart -> {
-                    justifySelf(AlignSelf.Start.value)
-                    alignSelf(AlignSelf.End)
-                }
-                Alignment.BottomCenter -> {
-                    justifySelf(AlignSelf.Center.value)
-                    alignSelf(AlignSelf.End)
-                }
-                Alignment.BottomEnd -> {
-                    justifySelf(AlignSelf.End.value)
-                    alignSelf(AlignSelf.End)
-                }
+class BoxScope {
+    fun Modifier.align(alignment: Alignment) = styleModifier {
+        when (alignment) {
+            // justify in grid means "row" while align means "col"
+            Alignment.TopStart -> {
+                alignSelf(AlignSelf.Start)
+                justifySelf(AlignSelf.Start.value)
+            }
+            Alignment.TopCenter -> {
+                alignSelf(AlignSelf.Start)
+                justifySelf(AlignSelf.Center.value)
+            }
+            Alignment.TopEnd -> {
+                alignSelf(AlignSelf.Start)
+                justifySelf(AlignSelf.End.value)
+            }
+            Alignment.CenterStart -> {
+                alignSelf(AlignSelf.Center)
+                justifySelf(AlignSelf.Start.value)
+            }
+            Alignment.Center -> {
+                alignSelf(AlignSelf.Center)
+                justifySelf(AlignSelf.Center.value)
+            }
+            Alignment.CenterEnd -> {
+                justifySelf(AlignSelf.End.value)
+                alignSelf(AlignSelf.Center)
+            }
+            Alignment.BottomStart -> {
+                justifySelf(AlignSelf.Start.value)
+                alignSelf(AlignSelf.End)
+            }
+            Alignment.BottomCenter -> {
+                justifySelf(AlignSelf.Center.value)
+                alignSelf(AlignSelf.End)
+            }
+            Alignment.BottomEnd -> {
+                justifySelf(AlignSelf.End.value)
+                alignSelf(AlignSelf.End)
             }
         }
     }
