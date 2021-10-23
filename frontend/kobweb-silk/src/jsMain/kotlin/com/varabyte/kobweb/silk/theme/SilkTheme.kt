@@ -1,13 +1,8 @@
 package com.varabyte.kobweb.silk.theme
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ProvidableCompositionLocal
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.silk.components.ComponentStyles
-import com.varabyte.kobweb.silk.components.SilkComponentStyles
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.Palette
@@ -66,21 +61,16 @@ object SilkTheme {
         @ReadOnlyComposable
         get() = palettes.getActivePalette()
 
-    val componentStyles: ComponentStyles
-        @Composable
-        @ReadOnlyComposable
-        get() = SilkComponentStyles.current
+    val componentStyles = ComponentStyles()
 }
 
 @Composable
 fun SilkTheme(
     palettes: Palettes = SilkTheme.palettes,
-    componentStyles: ComponentStyles = SilkTheme.componentStyles,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
         SilkPalettes provides palettes,
-        SilkComponentStyles provides componentStyles,
     ) {
         content()
     }

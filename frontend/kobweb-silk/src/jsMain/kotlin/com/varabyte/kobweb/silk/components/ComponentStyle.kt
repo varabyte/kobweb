@@ -1,11 +1,7 @@
 package com.varabyte.kobweb.silk.components
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.components.forms.BaseButtonStyle
-import com.varabyte.kobweb.silk.components.forms.ButtonKey
 
 /**
  * Marker interface for a key used to fetch a configuration for a component.
@@ -24,6 +20,18 @@ interface ComponentState
  * Convenience class when defining component styles that don't change depending on any state
  */
 object EmptyState : ComponentState
+
+/**
+ * Class useful for components that change their state depending on interactions with the cursor.
+ */
+enum class CursorState : ComponentState {
+    /** The cursor is not over the component */
+    DEFAULT,
+    /** The cursor is over the component */
+    HOVER,
+    /** The cursor is pressing down on the component */
+    PRESSED,
+}
 
 /**
  * An interface for something that represents a collection of properties that makes up the full style for a component.
@@ -87,8 +95,11 @@ interface ComponentVariant<T: ComponentState, S: ComponentStyle<T>> {
 
 class ComponentStyles {
     private val baseStyles = mutableMapOf<ComponentKey<*>, ComponentStyle<*>>()
+    var frozen = false
+        private set
 
-    fun <T: ComponentState, S: ComponentStyle<T>> register(key: ComponentKey<S>, baseStyle: S) {
+    operator fun <T: ComponentState, S: ComponentStyle<T>> set(key: ComponentKey<S>, baseStyle: S) {
+        check(!frozen) { "Cannot update styles after page has rendered for the first time." }
         baseStyles[key] = baseStyle
     }
 
@@ -101,15 +112,7 @@ class ComponentStyles {
     operator fun <T: ComponentState, S: ComponentStyle<T>> get(key: ComponentKey<S>): S = (baseStyles[key] as? S) ?:
         error("No style registered with key $key")
 
-    fun copy(): ComponentStyles {
-        val clone = ComponentStyles()
-        clone.baseStyles.putAll(baseStyles)
-        return clone
-    }
-}
-
-val SilkComponentStyles = compositionLocalOf {
-    ComponentStyles().apply {
-        register(ButtonKey, BaseButtonStyle())
+    fun freeze() {
+        frozen = true
     }
 }
