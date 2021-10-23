@@ -1,10 +1,6 @@
 package com.varabyte.kobweb.silk.components.forms
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -37,21 +33,26 @@ enum class ButtonState : ComponentState {
 abstract class ButtonStyle : ComponentStyle<ButtonState> {
     open val color: Color?
         @Composable
+        @ReadOnlyComposable
         get() = null
 
     open val hoverColor: Color?
         @Composable
+        @ReadOnlyComposable
         get() = null
 
     open val pressedColor: Color?
         @Composable
+        @ReadOnlyComposable
         get() = null
 
     open val shape: Shape?
         @Composable
+        @ReadOnlyComposable
         get() = null
 
     @Composable
+    @ReadOnlyComposable
     override fun toModifier(state: ButtonState): Modifier {
         var modifier: Modifier = Modifier
 
@@ -70,18 +71,22 @@ object ButtonKey : ComponentKey<ButtonStyle>
 class BaseButtonStyle : ButtonStyle() {
     override val color: Color
         @Composable
+        @ReadOnlyComposable
         get() = SilkTheme.palette.primary
 
     override val hoverColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = color.shifted()
 
     override val pressedColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = color.shifted().shifted()
 
     override val shape: Shape
         @Composable
+        @ReadOnlyComposable
         get() = Rect(4.px)
 }
 

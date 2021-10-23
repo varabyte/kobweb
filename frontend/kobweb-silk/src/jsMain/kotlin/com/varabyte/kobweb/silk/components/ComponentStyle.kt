@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.forms.BaseButtonStyle
@@ -54,6 +55,7 @@ object EmptyState : ComponentState
  */
 interface ComponentStyle<T: ComponentState> {
     @Composable
+    @ReadOnlyComposable
     fun toModifier(state: T): Modifier
 }
 
@@ -61,6 +63,7 @@ interface ComponentStyle<T: ComponentState> {
  * Extension function to create a modifier that merges the base style with an (optional) target variant.
  */
 @Composable
+@ReadOnlyComposable
 fun <T: ComponentState, S: ComponentStyle<T>> S.toModifier(state: T, variant: ComponentVariant<T, S>? = null): Modifier {
     return this.toModifier(state) then (variant?.style?.toModifier(state) ?: Modifier)
 }

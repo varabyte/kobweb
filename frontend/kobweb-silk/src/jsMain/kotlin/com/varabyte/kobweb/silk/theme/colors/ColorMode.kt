@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.varabyte.kobweb.compose.ui.graphics.Color
@@ -25,7 +26,9 @@ enum class ColorMode {
  * doing nothing if you try to consistently lighten or darken ignoring the color mode.
  */
 fun Color.shifted(colorMode: ColorMode) = if (colorMode == ColorMode.DARK) this.lightened() else this.darkened()
+
 @Composable
+@ReadOnlyComposable
 fun Color.shifted() = shifted(getColorMode())
 
 private val colorModeState by lazy { mutableStateOf(SilkConfig.initialColorMode) }
@@ -34,4 +37,5 @@ private val colorModeState by lazy { mutableStateOf(SilkConfig.initialColorMode)
 fun rememberColorMode() = remember { colorModeState }
 
 @Composable
+@ReadOnlyComposable
 fun getColorMode(): ColorMode = colorModeState.value

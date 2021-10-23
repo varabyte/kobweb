@@ -49,5 +49,6 @@ data class SystemPalettes(
     }
 
     @Composable
+    @ReadOnlyComposable
     override fun getActivePalette(): Palette = this[getColorMode()]
 }
