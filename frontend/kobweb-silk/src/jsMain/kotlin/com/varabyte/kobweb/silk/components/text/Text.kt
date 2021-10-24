@@ -1,23 +1,30 @@
 package com.varabyte.kobweb.silk.components.text
 
-import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.css.Cursor
-import com.varabyte.kobweb.compose.css.TextDecorationLine
-import com.varabyte.kobweb.compose.css.UserSelect
-import com.varabyte.kobweb.compose.css.cursor
-import com.varabyte.kobweb.compose.css.textDecorationLine
-import com.varabyte.kobweb.compose.css.userSelect
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
+import com.varabyte.kobweb.compose.ui.color
+import com.varabyte.kobweb.silk.components.ComponentKey
+import com.varabyte.kobweb.silk.components.ComponentStyle
+import com.varabyte.kobweb.silk.components.ComponentVariant
+import com.varabyte.kobweb.silk.components.EmptyState
+import com.varabyte.kobweb.silk.components.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.color
-import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.whiteSpace
-import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
+
+interface TextStyle : ComponentStyle<EmptyState>
+class DefaultTextStyle : TextStyle {
+    @Composable
+    @ReadOnlyComposable
+    override fun toModifier(state: EmptyState): Modifier {
+        return Modifier.color(SilkTheme.palette.onPrimary)
+    }
+}
+
+object TextKey : ComponentKey<TextStyle>
+interface TextVariant : ComponentVariant<EmptyState, TextStyle>
 
 /**
  * A span of text.
@@ -29,28 +36,12 @@ import org.jetbrains.compose.web.dom.Text
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = SilkTheme.palette.onPrimary,
-    decorationLine: TextDecorationLine? = null,
-    cursor: Cursor? = null,
+    variant: TextVariant? = null
 ) {
-    Div(
-        attrs = modifier
+    Span(
+        attrs = SilkTheme.componentStyles[TextKey].toModifier(variant)
+            .then(modifier)
             .asAttributeBuilder {
-                style {
-                    display(DisplayStyle.Inline)
-                    this.color(color.toCssColor())
-                }
-                if (decorationLine != null) {
-                    style { textDecorationLine(decorationLine) }
-                }
-                if (cursor != null) {
-                    style {
-                        cursor(cursor)
-                        if (cursor != Cursor.Text) {
-                            userSelect(UserSelect.None)
-                        }
-                    }
-                }
                 if (text.startsWith(' ') || text.endsWith(' ')) {
                     style {
                         // Prevent spaces in text from being collapsed

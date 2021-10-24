@@ -92,10 +92,9 @@ fun Modifier.minHeight(size: CSSNumeric): Modifier = styleModifier {
     minHeight(size)
 }
 
-fun Modifier.clickable(onClick: () -> Unit): Modifier = attrModifier {
-    onClick { onClick() }
+fun Modifier.clickable(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrModifier {
+    onClick { evt -> onClick(evt) }
 }
-
 
 fun Modifier.onMouseDown(onMouseDown: (SyntheticMouseEvent) -> Unit) = attrModifier {
     onMouseDown { evt -> onMouseDown(evt) }

@@ -1,9 +1,6 @@
 package helloworld.components.sections
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import com.varabyte.kobweb.compose.css.TextDecorationLine
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.Spacer
@@ -12,6 +9,7 @@ import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
 import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
+import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
@@ -26,10 +24,9 @@ private fun NavLink(path: String, text: String) {
     Link(
         path,
         text,
-        NAV_ITEM_PADDING,
         // Intentionally invert the header colors (here, "primary" instead of "onPrimary")
-        color = SilkTheme.palette.primary,
-        decorationLine = TextDecorationLine.None
+        NAV_ITEM_PADDING.color(SilkTheme.palette.primary),
+        UndecoratedLinkVariant,
     )
 }
 

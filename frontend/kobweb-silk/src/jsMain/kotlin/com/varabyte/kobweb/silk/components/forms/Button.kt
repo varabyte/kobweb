@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.UserSelect
+import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -10,6 +11,7 @@ import com.varabyte.kobweb.compose.ui.onMouseDown
 import com.varabyte.kobweb.compose.ui.onMouseEnter
 import com.varabyte.kobweb.compose.ui.onMouseLeave
 import com.varabyte.kobweb.compose.ui.onMouseUp
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.userSelect
 import com.varabyte.kobweb.silk.components.ComponentKey
 import com.varabyte.kobweb.silk.components.ComponentStyle
@@ -35,7 +37,12 @@ class DefaultButtonStyle : ButtonStyle {
             CursorState.PRESSED -> SilkTheme.palette.primary.shifted().shifted()
         }.let { color -> modifier = modifier.background(color) }
 
-        modifier = modifier.clip(Rect(4.px))
+        modifier = modifier
+                .clip(Rect(4.px))
+                .styleModifier {
+                    // No selecting text within buttons
+                    userSelect(UserSelect.None)
+                }
         return modifier
     }
 }

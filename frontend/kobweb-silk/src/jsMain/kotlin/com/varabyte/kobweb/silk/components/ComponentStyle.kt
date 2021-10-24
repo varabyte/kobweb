@@ -77,6 +77,15 @@ fun <T: ComponentState, S: ComponentStyle<T>> S.toModifier(state: T, variant: Co
 }
 
 /**
+ * Convenience shortcut for component styles that use the [EmptyState] (so the state that gets passed in will always be
+ * the same.)
+ */
+@Composable
+@ReadOnlyComposable
+fun <S: ComponentStyle<EmptyState>> S.toModifier(variant: ComponentVariant<EmptyState, S>? = null) =
+    toModifier(EmptyState, variant)
+
+/**
  * An interface which can be used for modifying a base style based on variants.
  *
  * For example, links might do something like:
