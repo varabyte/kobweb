@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.api.data
 
 import com.varabyte.kobweb.api.Api
-import com.varabyte.kobweb.api.ApiInit
+import com.varabyte.kobweb.api.Init
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -22,7 +22,7 @@ inline fun <reified T: Any> Data.getValue(): T = getValue(T::class.java)
  * A thread-safe in-memory data store providing access to values using the
  * [Service Locator pattern](https://en.wikipedia.org/wiki/Service_locator_pattern)
  *
- * It is provided so methods annotated with [ApiInit] can store values which can later be retrieved by normal API
+ * It is provided so methods annotated with [Init] can store values which can later be retrieved by normal API
  * methods (annotated with [Api])
  */
 @Suppress("UNCHECKED_CAST")

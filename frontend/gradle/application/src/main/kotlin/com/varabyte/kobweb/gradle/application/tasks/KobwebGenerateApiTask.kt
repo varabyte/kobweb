@@ -34,7 +34,7 @@ abstract class KobwebGenerateApiTask @Inject constructor(config: KobwebConfig)
                         .toList()
                         .sortedBy { (_, route) -> route }
                         .toMap(),
-                    apiInitMethods
+                    initMethods
                         .map { it.fqcn }
                         .sorted(),
                 )

@@ -11,8 +11,8 @@ import org.jetbrains.kotlin.psi.KtPackageDirective
 import java.io.File
 
 class ApiData {
-    private val _apiInitMethods = mutableListOf<ApiInitEntry>()
-    val apiInitMethods: List<ApiInitEntry> = _apiInitMethods
+    private val _initMethods = mutableListOf<InitEntry>()
+    val initMethods: List<InitEntry> = _initMethods
 
     private val _apiMethods = mutableListOf<ApiEntry>()
     val apiMethods: List<ApiEntry> = _apiMethods
@@ -30,7 +30,7 @@ class ApiData {
                     .findFile(LightVirtualFile(file.name, KotlinFileType.INSTANCE, file.readText())) as KtFile
 
                 var currPackage = ""
-                var apiInitSimpleName = API_INIT_SIMPLE_NAME
+                var initSimpleName = INIT_SIMPLE_NAME
                 var apiSimpleName = API_SIMPLE_NAME
                 ktFile.visitAllChildren { element ->
                     when (element) {
@@ -41,9 +41,9 @@ class ApiData {
                             // It's unlikely this will happen but catch the "import as" case,
                             // e.g. `import com.varabyte.kobweb.api.Api as MyApi`
                             when (element.importPath?.fqName?.asString()) {
-                                API_INIT_FQCN -> {
+                                INIT_FQCN -> {
                                     element.alias?.let { alias ->
-                                        alias.name?.let { apiInitSimpleName = it }
+                                        alias.name?.let { initSimpleName = it }
                                     }
                                 }
                                 API_FQCN -> {
@@ -56,8 +56,8 @@ class ApiData {
                         is KtNamedFunction -> {
                             element.annotationEntries.forEach { entry ->
                                 when (entry.shortName?.asString()) {
-                                    apiInitSimpleName -> {
-                                        apiData._apiInitMethods.add(ApiInitEntry("$currPackage.${element.name}"))
+                                    initSimpleName -> {
+                                        apiData._initMethods.add(InitEntry("$currPackage.${element.name}"))
                                     }
                                     apiSimpleName -> {
                                         val qualifiedApiPackage = KobwebProject.prefixQualifiedPackage(group, apiPackage)

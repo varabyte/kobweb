@@ -1,10 +1,10 @@
 package com.varabyte.kobweb.gradle.application.templates
 
-fun createApisFactoryImpl(apiFqcnRoutes: Map<String, String>, apiInitMethods: List<String>): String {
+fun createApisFactoryImpl(apiFqcnRoutes: Map<String, String>, initMethods: List<String>): String {
     return """
         import com.varabyte.kobweb.api.Apis
-        import com.varabyte.kobweb.api.ApiInitContext
         import com.varabyte.kobweb.api.ApisFactory
+        import com.varabyte.kobweb.api.InitContext
         import com.varabyte.kobweb.api.data.MutableData
         import com.varabyte.kobweb.api.log.Logger
 
@@ -15,24 +15,24 @@ fun createApisFactoryImpl(apiFqcnRoutes: Map<String, String>, apiInitMethods: Li
                 ${
                     // Generates lines like: apis.register("/path/to/api") { ctx -> path.to.api.method(ctx)  }
                     apiFqcnRoutes.entries.joinToString("\n                ") { entry ->
-                        val apiFcqn = entry.key
+                        val apiFqcn = entry.key
                         val route = entry.value
                         
-                        """apis.register("$route") { ctx -> $apiFcqn(ctx) }"""
+                        """apis.register("$route") { ctx -> $apiFqcn(ctx) }"""
                     }
                 }
 
                 ${
-                    if (apiInitMethods.isNotEmpty()) {
-                        "val initCtx = ApiInitContext(apis, data, logger)"
+                    if (initMethods.isNotEmpty()) {
+                        "val initCtx = InitContext(apis, data, logger)"
                     }
                     else {
                         ""
                     }
                 }
                 ${
-                    apiInitMethods.joinToString("\n                ") { apiInitFcqn ->
-                        """$apiInitFcqn(initCtx)"""
+                    initMethods.joinToString("\n                ") { initFqcn ->
+                        """$initFqcn(initCtx)"""
                     }
                 }
                 return apis
