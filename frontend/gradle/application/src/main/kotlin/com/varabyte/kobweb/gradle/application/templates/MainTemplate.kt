@@ -16,6 +16,9 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         imports.add("com.varabyte.kobweb.compose.css.*")
         imports.add("org.jetbrains.compose.web.css.*")
         imports.add("org.w3c.dom.Element")
+        imports.add("org.w3c.dom.EventSource")
+        imports.add("org.w3c.dom.EventSourceInit")
+        imports.add("org.w3c.dom.MessageEvent")
         imports.add("org.w3c.dom.get")
     }
 
@@ -35,7 +38,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                 window.location.reload()
             }
 
-            private fun pollServerStatus() {
+            private fun handleServerStatusEvents() {
                 val status = document.getElementById("status")!!
                 var lastVersion: Int? = null
                 var shouldReload = false
@@ -43,8 +46,6 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                 val warningIcon = status.children[0]!!
                 val spinnerIcon = status.children[1]!!
                 val statusText = status.children[2]!!
-
-                var lastStatusResponse = ""
 
                 status.addEventListener("transitionend", {
                     if (status.hasClass("fade-out")) {
@@ -55,56 +56,41 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                     }
                 })
 
-                var checkInterval = 0
-                checkInterval = window.setInterval(
-                    handler = {
-                        window.fetch("/api/kobweb/status").then {
-                            it.text().then { response ->
-                                if (response != lastStatusResponse) {
-                                    lastStatusResponse = response
-                                    val values: dynamic = JSON.parse<Any>(response)
-                                    val text = values.text as String
-                                    val isError = (values.isError as String).toBoolean()
-                                    if (text.isNotBlank()) {
-                                        warningIcon.className = if (isError) "visible" else "hidden"
-                                        spinnerIcon.className = if (isError) "hidden" else "visible"
-                                        statusText.innerHTML = "<i>${'$'}text</i>"
-                                        status.className = "fade-in"
-                                    }
-                                    else {
-                                        if (status.className == "fade-in") {
-                                            status.className = "fade-out"
-                                        }
-                                    }
-                                }
-                            }
-                        }.catch {
-                            // The server was probably taken down, so stop checking.
-                            window.clearInterval(checkInterval)
+                val eventSource = EventSource("/api/kobweb-status", EventSourceInit(true))
+                eventSource.addEventListener("version", { evt ->
+                    val version = (evt as MessageEvent).data.toString().toInt()
+                    if (lastVersion == null) {
+                        lastVersion = version
+                    }
+                    if (lastVersion != version) {
+                        lastVersion = version
+                        if (status.className.isNotEmpty()) {
+                            shouldReload = true
+                        } else {
+                            // Not sure if we can get here but if we can't rely on the status transition to reload
+                            // we should do it ourselves.
+                            forceReloadNow()
                         }
+                    }
+                })
 
-                        window.fetch("/api/kobweb/version").then {
-                            it.text().then { response ->
-                                val version = response.toInt()
-                                if (lastVersion == null) {
-                                    lastVersion = version
-                                }
-                                if (lastVersion != version) {
-                                    lastVersion = version
-                                    if (status.className.isNotEmpty()) {
-                                        shouldReload = true
-                                    } else {
-                                        forceReloadNow()
-                                    }
-                                }
-                            }
-                        }.catch {
-                            // The server was probably taken down, so stop checking.
-                            window.clearInterval(checkInterval)
+                eventSource.addEventListener("status", { evt ->
+                    val values: dynamic = JSON.parse<Any>((evt as MessageEvent).data.toString())
+                    val text = values.text as String
+                    val isError = (values.isError as String).toBoolean()
+                    if (text.isNotBlank()) {
+                        warningIcon.className = if (isError) "visible" else "hidden"
+                        spinnerIcon.className = if (isError) "hidden" else "visible"
+                        statusText.innerHTML = "<i>${'$'}text</i>"
+                        status.className = "fade-in"
+                    } else {
+                        if (status.className == "fade-in") {
+                            status.className = "fade-out"
                         }
-                    },
-                    timeout = 250,
-                )
+                    }
+                })
+
+                eventSource.onerror = { eventSource.close() }
             }
                 """.trimIndent()
             )
@@ -113,7 +99,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
 
         appendLine("fun main() {")
         if (target == BuildTarget.DEBUG) {
-            appendLine("    pollServerStatus()")
+            appendLine("    handleServerStatusEvents()")
         }
         pageFqcnRoutes.entries.forEach { entry ->
             val pageFqcn = entry.key

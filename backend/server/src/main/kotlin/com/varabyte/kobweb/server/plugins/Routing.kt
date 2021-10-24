@@ -14,9 +14,13 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
+import io.ktor.util.cio.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.name
@@ -128,12 +132,46 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     val apiJar = conf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { ApiJarFile(Path(it), logger) }
 
     routing {
-        get("/api/kobweb/version") {
-            call.respondText(globals.version.toString())
+        // Set up SSE (server-sent events) for the client to hear about the state of our server
+        get("/api/kobweb-status") {
+            call.response.cacheControl(CacheControl.NoCache(null))
+            call.respondTextWriter(contentType = ContentType.Text.EventStream) {
+                var lastVersion: Int? = null
+                var lastStatus: String? = null
+                try {
+                    while (true) {
+                        write(": keepalive\n")
+                        write("\n")
+
+                        if (lastVersion != globals.version) {
+                            lastVersion = globals.version
+                            write("event: version\n")
+                            write("data: $lastVersion\n")
+                            write("\n")
+                        }
+
+                        if (lastStatus != globals.status) {
+                            lastStatus = globals.status
+                            val statusData = mapOf(
+                                "text" to globals.status.orEmpty(),
+                                "isError" to globals.isStatusError.toString(),
+                            )
+                            write("event: status\n")
+                            write("data: ${Json.encodeToString(statusData)}\n")
+                            write("\n")
+                        }
+
+                        flush()
+                        delay(300)
+                    }
+                }
+                catch (ex: ChannelWriteException) {
+                    println("Closing socket because client disconnected")
+                    // Expected eventually - client connection closed
+                }
+            }
         }
-        get("/api/kobweb/status") {
-            call.respond(mapOf("text" to globals.status.orEmpty(), "isError" to globals.isStatusError.toString()))
-        }
+
         if (apiJar != null) {
             configureApiRouting(apiJar)
         }

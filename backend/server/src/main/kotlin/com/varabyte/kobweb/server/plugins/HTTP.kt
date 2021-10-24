@@ -4,6 +4,7 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.request.*
 
 fun Application.configureHTTP() {
     install(DefaultHeaders) {
@@ -15,17 +16,25 @@ fun Application.configureHTTP() {
         method(HttpMethod.Delete)
         method(HttpMethod.Patch)
         header(HttpHeaders.Authorization)
-        header("MyCustomHeader")
         allowCredentials = true
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
     install(Compression) {
+        excludeContentType(
+            ContentType.Video.Any,
+            ContentType.Image.JPEG,
+            ContentType.Image.PNG,
+            ContentType.Audio.Any,
+            ContentType.MultiPart.Any,
+            ContentType.Text.EventStream
+        )
+        minimumSize(1024)
+
         gzip {
             priority = 1.0
         }
         deflate {
             priority = 10.0
-            minimumSize(1024) // condition
         }
     }
     install(CachingHeaders) {
