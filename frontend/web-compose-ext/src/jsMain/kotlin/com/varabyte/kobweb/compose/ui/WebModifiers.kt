@@ -1,8 +1,12 @@
 package com.varabyte.kobweb.compose.ui
 
 import androidx.compose.web.events.SyntheticMouseEvent
+import com.varabyte.kobweb.compose.css.FontStyle
+import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.css.cursor
+import com.varabyte.kobweb.compose.css.fontStyle
+import com.varabyte.kobweb.compose.css.fontWeight
 import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import org.jetbrains.compose.web.css.CSSColorValue
@@ -48,6 +52,14 @@ fun Modifier.cursor(cursor: KobwebCursor) = styleModifier {
 
 fun Modifier.fontSize(value: CSSNumeric): Modifier = styleModifier {
     fontSize(value)
+}
+
+fun Modifier.fontStyle(value: FontStyle): Modifier = styleModifier {
+    fontStyle(value)
+}
+
+fun Modifier.fontWeight(value: FontWeight): Modifier = styleModifier {
+    fontWeight(value)
 }
 
 fun Modifier.lineHeight(value: CSSNumeric): Modifier = styleModifier {
