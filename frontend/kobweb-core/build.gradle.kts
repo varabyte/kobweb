@@ -25,6 +25,6 @@ kotlin {
 }
 
 kobwebPublication {
-    artifactId.set("kobweb")
+    artifactId.set("kobweb-core")
     description.set("An opinionated framework making it easy to build web apps, leveraging Kotlin and Compose")
 }

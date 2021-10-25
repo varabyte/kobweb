@@ -32,7 +32,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation("com.varabyte.kobweb:web-compose-ext")
-                implementation("com.varabyte.kobweb:kobweb")
+                implementation("com.varabyte.kobweb:kobweb-core")
                 implementation("com.varabyte.kobweb:kobweb-silk")
                 implementation("com.varabyte.kobweb:kobweb-silk-icons-fa")
             }
