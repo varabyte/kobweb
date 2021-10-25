@@ -18,6 +18,8 @@ import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.lineHeight
 import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.maxHeight
+import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.minHeight
 import org.jetbrains.compose.web.css.minWidth
 import org.jetbrains.compose.web.css.percent
@@ -100,8 +102,16 @@ fun Modifier.minWidth(size: CSSNumeric): Modifier = styleModifier {
     minWidth(size)
 }
 
+fun Modifier.maxWidth(size: CSSNumeric): Modifier = styleModifier {
+    maxWidth(size)
+}
+
 fun Modifier.minHeight(size: CSSNumeric): Modifier = styleModifier {
     minHeight(size)
+}
+
+fun Modifier.maxHeight(size: CSSNumeric): Modifier = styleModifier {
+    maxHeight(size)
 }
 
 fun Modifier.clickable(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrModifier {
