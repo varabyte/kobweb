@@ -56,7 +56,7 @@ object UndecoratedLinkVariant : LinkVariant {
 @Composable
 fun Link(
     path: String,
-    text: String,
+    text: String? = null,
     modifier: Modifier = Modifier,
     variant: LinkVariant? = null,
 ) {
@@ -70,6 +70,6 @@ fun Link(
             .then(modifier)
             .asAttributeBuilder()
     ) {
-        Text(text)
+        Text(text ?: path)
     }
 }
