@@ -74,7 +74,7 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
                 textLine("Press Q anytime to stop it.")
             }
             RunState.STOPPING -> {
-                textLine("Server is stopping$ellipsisAnim")
+                textLine("Server is stopping (PID = ${serverState.pid})$ellipsisAnim")
             }
             RunState.STOPPED -> {
                 textLine("Server stopped gracefully.")
