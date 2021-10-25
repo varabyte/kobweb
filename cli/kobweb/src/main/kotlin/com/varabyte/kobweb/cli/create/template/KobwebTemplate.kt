@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class Metadata(
-    val description: String? = null,
+    val description: String,
 )
 
 @Serializable
 class KobwebTemplate(
     val metadata: Metadata,
-    val instructions: List<Instruction>,
+    val instructions: List<Instruction> = emptyList(),
 )
