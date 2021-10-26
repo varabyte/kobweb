@@ -376,7 +376,7 @@ could be a great approach for people who want to write and host their own blogs,
 
 # Can We Kobweb Yet
 
-Current state: **Functional but early**
+Current state: **Functional but early (and broken on Windows)**
 
 Kobweb has some pretty big pieces working already. It is easy to set up a new project and get things running quickly.
 The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it. It supports
@@ -385,15 +385,15 @@ you can export static pages which will get hydrated on load.
 
 However, there's still a lot to do. The API surface is a bit lean in some areas right now, especially around Silk UI
 components, plus filling in holes in the APIs that interact with Web Compose. There are probably quite a few sharp
-corners. And while the code is decently documented, higher level documentation is missing. Windows support needs
-love.
+corners. And while the code is decently documented, higher level documentation is missing. Windows support needs love.
 
 So, should you use Kobweb at this point? If you are...
 
-* a Kotlin tinkerer who is excited to play around with new tech, wants to have a voice in the direction of this project,
-  and who isn't afraid of creating toy projects atop some APIs which may shift underfoot:
+* a Kotlin tinkerer who is excited to play around with new tech and isn't afraid of creating toy projects atop APIs
+  which may shift underfoot:
   * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
-  below, we'd definitely love to hear from you.
+  below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
+  this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
   * ***Maybe***, but now is probably a bit too early.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
@@ -420,6 +420,8 @@ $ git submodule update --init
 * `kobweb run` sometimes gets stuck when Gradle (running behind it) gets stuck.
   * Quit kobweb, run `./gradlew --stop`, and then try again
   * Run `./gradlew kobwebRun` with various Gradle debug options to see what's going on under the hood
+* `kobweb run` is broken on Windows
+  * This is our highest priority to fix right now. Keep an eye out for v0.6.1!
 
 Solutions didn't work? Or you're encountering issues not listed here? Please consider
 [leaving feedback ▼](https://github.com/varabyte/kobweb#filing-issues-and-leaving-feedback)!
