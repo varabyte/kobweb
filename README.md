@@ -108,6 +108,8 @@ JAVA_HOME=/path/to/jdks/corretto-11.0.12
 # ... or whatever version or path you chose
 ```
 
+With `JAVA_HOME` set up, building is just a single Gradle command:
+
 ```bash
 $ cd /path/to/src/root
 $ git clone --recurse-submodules https://github.com/varabyte/kobweb
@@ -115,7 +117,7 @@ $ cd kobweb
 $ ./gradlew :cli:kobweb:installDist
 ```
 
-Updating your PATH:
+Finally, update your PATH:
 
 ```bash
 $ PATH=$PATH:/path/to/src/root/kobweb/cli/kobweb/build/install/kobweb/bin
