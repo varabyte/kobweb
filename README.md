@@ -122,16 +122,16 @@ $ PATH=$PATH:/path/to/src/root/kobweb/cli/kobweb/build/install/kobweb/bin
 $ kobweb version # to check it's working
 ```
 
-## Create your Kobweb Site
+## Create your Kobweb site
 
 ```bash
 $ cd /path/to/projects/root
 $ kobweb create site
 ```
 
-You'll be asked a bunch of questions required for setting up your project. When finished, you'll have a basic project
-with three pages - a home page, an about page, and a markdown page - and some components (which are collections of
-reusable, composable pieces). Your own directory structure should look something like:
+You'll be asked a few questions required for setting up your project. When finished, you'll have a basic project with
+three pages - a home page, an about page, and a markdown page - and some components (which are collections of reusable,
+composable pieces). Your own directory structure should look something like:
 
 ```
 my-project
