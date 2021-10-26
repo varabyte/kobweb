@@ -62,6 +62,8 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
             RunState.STARTING -> {
                 textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
                 textLine()
+                textLine("Note: This may take a while on first run, as it is downloading dependencies.")
+                textLine()
                 textLine("Press Q anytime to cancel.")
             }
             RunState.RUNNING -> {
