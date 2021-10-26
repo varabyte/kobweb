@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
 import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.application.extensions.getResourceRoots
 import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
+import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallExtension
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension
@@ -63,11 +64,14 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 if (autolink.get()) {
                     extensions.add(AutolinkExtension.create())
                 }
-                if (tables.get()) {
-                    extensions.add(TablesExtension.create())
-                }
                 if (frontMatter.get()) {
                     extensions.add(YamlFrontMatterExtension.create())
+                }
+                if (kobwebCall.get()) {
+                    extensions.add(KobwebCallExtension.create(kobwebCallDelimiters.get()))
+                }
+                if (tables.get()) {
+                    extensions.add(TablesExtension.create())
                 }
                 if (taskList.get()) {
                     extensions.add(TaskListItemsExtension.create())

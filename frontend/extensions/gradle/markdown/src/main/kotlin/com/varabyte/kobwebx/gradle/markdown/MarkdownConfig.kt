@@ -66,6 +66,23 @@ abstract class MarkdownFeatures {
     abstract val frontMatter: Property<Boolean>
 
     /**
+     * If true, support a syntax for inserting a composable call into the final generated Kotlin source:
+     *
+     * ```
+     * {{ .components.widgets.VisitorCounter }}
+     * ```
+     *
+     * becomes:
+     *
+     * ```
+     * org.example.myproject.components.widgets.VisitorCounter()
+     * ```
+     */
+    abstract val kobwebCall: Property<Boolean>
+
+    abstract val kobwebCallDelimiters: Property<Pair<String, String>>
+
+    /**
      * If true, support creating tables via pipe syntax.
      *
      * See also: https://github.com/commonmark/commonmark-java#tables
@@ -88,6 +105,8 @@ abstract class MarkdownFeatures {
     init {
         autolink.convention(true)
         frontMatter.convention(true)
+        kobwebCall.convention(true)
+        kobwebCallDelimiters.convention("{{" to "}}")
         tables.convention(true)
         taskList.convention(true)
     }

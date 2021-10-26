@@ -1,6 +1,8 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
+import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
+import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
@@ -38,6 +40,24 @@ class KotlinRenderer(
 
     private var indentCount = 0
     private val indent get() = "    ".repeat(indentCount)
+
+    /**
+     * Convert raw text into a method call, additionally prefixing the project's package it begins with a period.
+     *
+     * Examples:
+     * * `test` -> `test()`
+     * * `.test` -> `org.example.myproject.test()`
+     * * `test()` -> `test()`
+     */
+    private fun String.intoMethodCall(): String {
+        val self = this
+        return buildString {
+            append(project.prefixQualifiedPackage(self))
+            if (self.last().isLetterOrDigit()) {
+                append("()")
+            }
+        }
+    }
 
     override fun render(node: Node, output: Appendable) {
         output.appendLine(
@@ -196,22 +216,25 @@ class KotlinRenderer(
             doVisit(text, components.text)
         }
 
-        // TODO: Support custom nodes, like front matter and tables
         override fun visit(customBlock: CustomBlock) {
             if (customBlock is YamlFrontMatterBlock) {
                 val yamlVisitor = YamlFrontMatterVisitor()
                 customBlock.accept(yamlVisitor)
-                // TODO: Put `yamlVisitor.data` into a MdContext object?
+                // TODO (Bug #19): Put `yamlVisitor.data` into a MdContext object?
                 // If "root" is set in the YAML block, that represents a top level composable which should wrap
                 // everything else.
                 yamlVisitor.data["root"]?.single()?.let { root ->
-                    output.appendLine("$indent${project.prefixQualifiedPackage(root)} {")
+                    output.appendLine("$indent${root.intoMethodCall()} {")
                     ++indentCount
                 }
                 onFinish += {
                     --indentCount
                     output.appendLine("$indent}")
                 }
+            } else if (customBlock is KobwebCallBlock) {
+                val visitor = KobwebCallVisitor()
+                customBlock.accept(visitor)
+                output.append(visitor.text.intoMethodCall())
             }
         }
     }

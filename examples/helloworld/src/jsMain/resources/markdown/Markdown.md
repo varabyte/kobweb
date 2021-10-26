@@ -17,4 +17,4 @@ code blocks
 
 and `inline` code as well.
 
-[Go Home](/)
+{{ .components.widgets.GoHomeLink }}
