@@ -68,7 +68,36 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 
 # Trying it out yourself
 
+The first step is to grab the Kobweb binary. You can download it or build it, so we'll include instructions for both
+approaches.
+
+## Download the Kobweb binary
+
+Our binary artifact is currently hosted on github. To download latest:
+
+```bash
+$ cd /path/to/applications/kobweb
+$ wget https://github.com/varabyte/kobweb/releases/download/v0.6.0/kobweb-0.6.0.zip
+$ unzip kobweb-0.6.0.zip  
+```
+
+and I recommend adding it to your path, either directly:
+
+```bash
+$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.6.0/bin
+$ kobweb version # to check it's working
+```
+
+or via symbolic link:
+
+```
+$ cd /path/to/binaries # some folder you've created that's in your PATH
+$ ln -s /path/to/applications/kobweb/kobweb-0.6.0/bin/kobweb kobweb
+```
+
 ## Build the Kobweb binary
+
+Although we host Kobweb artifacts on github, it's easy enough to build your own.
 
 **Note:** Building Kobweb requires JDK11 or newer. If you don't already have this set up, the easiest way is to
 [download a JDK](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html), unzip it somewhere,
@@ -79,9 +108,6 @@ JAVA_HOME=/path/to/jdks/corretto-11.0.12
 # ... or whatever version or path you chose
 ```
 
-Once the code stabilizes a bit, we will host an artifact for downloading, but it's easy enough to build your own for
-now.
-
 ```bash
 $ cd /path/to/src/root
 $ git clone --recurse-submodules https://github.com/varabyte/kobweb
@@ -89,11 +115,11 @@ $ cd kobweb
 $ ./gradlew :cli:kobweb:installDist
 ```
 
-I recommend putting Kobweb in your path:
+Updating your PATH:
 
 ```bash
 $ PATH=$PATH:/path/to/src/root/kobweb/cli/kobweb/build/install/kobweb/bin
-$ kobweb version
+$ kobweb version # to check it's working
 ```
 
 ## Create your Kobweb Site
@@ -147,6 +173,21 @@ your project's `.kobweb/conf.yaml` file.
 
 You can open your project in IntelliJ and start editing it. While Kobweb is running, it will detect changes, recompile,
 and deploy updates to your site automatically.
+
+## Examples
+
+Kobweb will provide a growing collection of samples for you to learn from. To see what's available, run:
+
+```bash
+$ kobweb list
+
+You can create the following Kobweb projects by typing `kobweb create ...`
+
+• site: A template for a minimal site that demonstrates the basic features of Kobweb
+• examples/todo: An example TODO app, showcasing client / server interactions
+```
+
+For example, `kobweb create examples/todo` will instantiate a simple TODO app that you can learn from.
 
 # Basics
 
@@ -243,22 +284,6 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
   example, nav headers and footers are great candidates for this subfolder. 
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder. 
-
-## Examples
-
-Kobweb will provide a growing collection of samples for you to learn from. To see them all, run:
-
-```bash
-$ kobweb list
-
-You can create the following Kobweb projects by typing `kobweb create ...`
-
-• site: A template for a minimal site that demonstrates the basic features of Kobweb
-• examples/todo: An example TODO app, showcasing client / server interactions
-```
-
-All examples will live in the projects that start with the name "examples/". For example, `kobweb create examples/todo`
-will instantiate a simple TODO app with a simple client and server setup that you can learn from.
 
 # Can We Kobweb Yet
 
