@@ -205,7 +205,7 @@ work!
 Creating a page is easy! It's just a normal `@Composable` method. To upgrade your composable to a page, all you need to
 do is:
 
-1. Define your composable in a file somewhere under the `pages` package
+1. Define your composable in a file somewhere under the `pages` package in your `jsMain` source directory.
 1. Annotate it with `@Page`
 
 Just from that, Kobweb will create a site entry for you automatically.
@@ -284,6 +284,51 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
   example, nav headers and footers are great candidates for this subfolder.
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder.
+
+## Define API routes
+
+You can define and annotate methods which will generate server endpoints you can interact with. To add one:
+
+1. Define your method (optionally `suspend`able) in a file somewhere under the `api` package your `jvmMain` source
+directory.
+1. The method should take exactly one argument, an `ApiContext`. 
+1. Annotate it with `@Api`
+
+For example, here's a simple method that echoes back an argument passed into it:
+
+```kotlin
+// com/example/mysite/api/Echo.kt
+
+@Api
+fun echo(ctx: ApiContext) {
+    val msg = ctx.req.query["message"] ?: ""
+    ctx.res.setBodyText(msg)
+  
+    // You could also do something like: `ctx.res.body = ctx.req.body`
+    // but using query parameters makes for a more interesting demo
+}
+```
+
+After running your project, you can test the endpoint by visiting `mysite.com/api/echo?message=hello`
+
+You can also trigger the endpoint in your frontend code by using the extension `api` property added to the
+`kotlinx.browser.window` class:
+
+```kotlin
+@Page
+@Composable
+fun ApiDemoPage() {
+  val coroutineScope = rememberCoroutineScope()
+
+  Button(Modifier.clickable {
+    coroutineScope.launch {
+      println("Echoed: " + window.api.get("echo?message=hello")!!.decodeToString())
+    }
+  })
+}
+```
+
+All the HTTP methods are supported (`post`, `put`, etc.). Of course, you can also use `window.fetch(...)` directly.
 
 ## Markdown
 
