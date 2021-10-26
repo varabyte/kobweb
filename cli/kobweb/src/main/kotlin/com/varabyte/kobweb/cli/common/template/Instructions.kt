@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.cli.create.template
+package com.varabyte.kobweb.cli.common.template
 
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import kotlinx.serialization.SerialName

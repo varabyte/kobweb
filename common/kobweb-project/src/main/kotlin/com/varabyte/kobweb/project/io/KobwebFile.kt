@@ -37,7 +37,7 @@ open class LiveFile(val path: Path) {
 
 
 open class KobwebReadableTextFile<T : Any>(
-    kobwebFolder: KobwebFolder,
+    val kobwebFolder: KobwebFolder,
     name: String,
     private val deserialize: (String) -> (T),
 ) {
@@ -61,7 +61,7 @@ open class KobwebReadableTextFile<T : Any>(
 }
 
 open class KobwebWritableTextFile<T : Any>(
-    kobwebFolder: KobwebFolder,
+    val kobwebFolder: KobwebFolder,
     name: String,
     private val serialize: (T) -> String,
     deserialize: (String) -> (T),
