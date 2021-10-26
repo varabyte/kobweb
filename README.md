@@ -1,4 +1,4 @@
-![version: 0.3.0](https://img.shields.io/badge/kobweb-v0.3.0-yellow)
+![version: 0.6.0](https://img.shields.io/badge/kobweb-v0.6.0-yellow)
 <a href="https://discord.gg/5NZ2GKV5Cs">
   <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
@@ -44,9 +44,10 @@ fun HomePage() {
 Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by [Next.js](https://nextjs.org)
 and [Chakra UI](https://chakra-ui.com).
 
-**It is currently in technology preview**. While it is not ready for use in a serious project at this point, please
-consider starring the project to indicate interest. (See also: The
-[work in progress](https://github.com/varabyte/kobweb#work-in-progress) section below).
+**It is currently in technology preview**. Please consider starring the project to indicate interest, so we know we're
+creating something the community wants. [How ready is it?](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
+
+
 
 Our goal is to provide:
 
@@ -117,8 +118,10 @@ my-project
         │               ├── components
         │               │  ├── layouts
         │               │  │  └── PageLayout.kt
-        │               │  └── sections
-        │               │     └── NavHeader.kt
+        │               │  ├── sections
+        │               │  │  └── NavHeader.kt
+        │               │  └── widgets
+        │               │     └── GoHomeLink.kt
         │               ├── MyApp.kt
         │               └── pages
         │                   ├── About.kt
@@ -216,18 +219,49 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder. 
 
-# Work in progress
+## Examples
 
-Current ETA to MVP: Mid-November 2021 (or even sooner 🤞)
+Kobweb will provide a growing collection of samples for you to learn from. To see them all, run:
 
-The following items are on our radar but not yet done:
+```bash
+$ kobweb list
 
-* Dynamic routes - Allow people to visit `mysite.com/blog/1234` which gets redirected to some page registered at
-  `pages/blog/{id}` with "1234" passed in as a parameter.
-* Breakpoints - An intuitive way to have Silk composables behave differently based on the size of the page (inspired
-  by [Chakra UI's feature of the same name](https://chakra-ui.com/docs/features/responsive-styles). 
-* An example website using Kobweb
+You can create the following Kobweb projects by typing `kobweb create ...`
 
+• site: A template for a minimal site that demonstrates the basic features of Kobweb
+• examples/todo: An example TODO app, showcasing client / server interactions
+```
+
+All examples will live in the projects that start with the name "examples/". For example, `kobweb create examples/todo`
+will instantiate a simple TODO app with a simple client and server setup that you can learn from.
+
+# Can We Kobweb Yet
+
+Current state: **Functional but early**
+
+Kobweb has some pretty big pieces working already. It is easy to set up a new project and get things running quickly.
+The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it. It supports
+generating pages from Markdown that can reference your Composable code. And while it's not quite server-side rendering,
+you can export static pages which will get hydrated on load.
+
+However, there's still a lot to do. The API surface is a bit lean in some areas right now, especially around Silk UI
+components, plus filling in holes in the APIs that interact with Web Compose. There are probably quite a few sharp
+corners. And while the code is decently documented, higher level documentation is missing. Windows support needs
+love.
+
+So, should you use Kobweb at this point? If you are...
+
+* a Kotlin tinkerer who is excited to play around with new tech, would like to have a voice in the direction of this
+  new and upcoming project, and who isn't afraid of creating toy projects while understanding APIs may shift around: 
+  * **YES!!!** Please see the [connecting with us](https://github.com/varabyte/kobweb#connecting-with-us) section below,
+  we'd definitely love to hear from you.
+* a Kotlin developer who wants to write a small web app or create a new blog from scratch:
+  * ***Maybe***, but now is probably too early.
+* someone who already has an existing project in progress and wants to integrate Kobweb into it:
+  * **No**
+* a company:
+  * **NOOOOOO**
+ 
 # Templates
 
 Kobweb provides its templates in a separate git repository, which is referenced within this project as a submodule for
@@ -242,16 +276,19 @@ $ git clone --recurse-submodules https://github.com/varabyte/kobweb
 $ git submodule update --init
 ```
 
-# Connecting with us
+# Known Issues
 
-If you'd like to be kept in the loop on updates to this project, there are a few ways:
+* `kobweb run` sometimes gets stuck when Gradle (running behind it) gets stuck.
+  * Quit kobweb, run `./gradlew --stop`, and then try again
+  * Run `./gradlew kobwebRun` with various Gradle debug options to see what's going on under the hood
+
+Solutions didn't work? Or you're encountering issues not listed here? Please consider
+[filing a bug](https://github.com/varabyte/kobweb/issues/new/choose)!
+
+# Connecting with us
 
 * [Join our Discord!](https://discord.gg/5NZ2GKV5Cs)
 * Follow me on Twitter: [@bitspittle](https://twitter.com/bitspittle)
-* [Send me an email](mailto:bitspittle@gmail.com)
-  * **Note: I am just an individual person, but I promise not to harvest, distribute, or in any way use any emails I
-  receive except to 1) respond to any questions asked or 2) ping when the status of this project changes
-  (if requested).**
 
 # Filing issues and leaving feedback
 
@@ -262,6 +299,4 @@ plenty of work to do to get to a 1.0 launch! We are hungry for the community's f
 * Contact us (using any of the ways mentioned above) telling us what features you want
 * Ask us for guidance, especially as there are no tutorials yet (your questions can help us know what to write first!)
 
-And, finally, please considering starring the project to indicate interest. We are trying to understand if this is
-something that the community wants, and your support in this way would mean a lot to us as well as encourage us to keep
-moving forward.
+Thank you for your support and interest in Kobweb!
