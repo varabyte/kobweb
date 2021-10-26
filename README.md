@@ -213,7 +213,7 @@ Just from that, Kobweb will create a site entry for you automatically.
 For example, if I create the following file:
 
 ```kotlin
-// com/example/mysite/pages/admin/Settings.kt
+// jsMain/kotlin/com/example/mysite/pages/admin/Settings.kt
 
 @Page
 @Composable
@@ -297,7 +297,7 @@ directory.
 For example, here's a simple method that echoes back an argument passed into it:
 
 ```kotlin
-// com/example/mysite/api/Echo.kt
+// jvmMain/kotlin/com/example/mysite/api/Echo.kt
 
 @Api
 fun echo(ctx: ApiContext) {
@@ -338,7 +338,7 @@ you at build time, using the filename as its path.
 For example, if I create the following file:
 
 ```markdown
-// resources/markdown/docs/tutorial/Kobweb.kt
+// jsMain/resources/markdown/docs/tutorial/Kobweb.kt
 
 # Kobweb Tutorial
 
