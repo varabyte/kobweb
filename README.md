@@ -203,6 +203,31 @@ We consider Silk a pretty important part of the Kobweb experience, but it's wort
 optional component. You can absolutely use Kobweb without Silk. You can also interleave Silk and Web Compose without
 issue (as Silk, itself, is just composing Web Compose methods).
 
+### What about Multiplatform Widgets?
+
+Jetbrains is working on an experimental project called "multiplatform widgets" which is supposed to bring the Desktop /
+Android API to the web. And it may seem like the Kobweb + Silk approach is competing with it.
+
+However, I've found there is a fundamental distance between Desktop / Android Compose and Web Compose. Specifically,
+Desktop / Android targets render to their own surface, while Web modifies a parallel html / css DOM tree and leaves it
+to do the final rendering.
+
+This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
+modifiers matters, while in Web, this action simply sets html style properties under the hood, where order does not
+matter.
+
+One approach would be to own the entire rendering pipeline, ditching html / css entirely and targeting a full page
+canvas or something. However, this limits the ability for robots to crawl and index your site, which is a major
+drawback. It also means that debugging in a browser would be a rough experience, as the browser's developer tools would
+be limited in the insights it could provide to your site. It would also prevent a developer from making use of the rich
+ecosystem of Javascript libraries out there that modify the DOM tree themselves.
+
+For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a
+rich UI library of widgets that hopefully makes it relatively rare for the developer to worry about it. For example,
+flexbox is a very powerful component, but you'll find it's much easier to compose Rows and Columns together than trying
+to remember if you should be justifying your items or aligning your content, even if Rows and Columns are just creating
+the correct html / css for you behind the scenes anyways.
+
 ## Components: Layouts, Sections, and Widgets
 
 Outside of pages, it is common to create reusable composable parts. While Kobweb doesn't enforce any particular rule
