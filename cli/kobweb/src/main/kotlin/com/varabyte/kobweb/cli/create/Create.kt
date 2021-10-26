@@ -3,19 +3,18 @@ package com.varabyte.kobweb.cli.create
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.cli.common.PathUtils
 import com.varabyte.kobweb.cli.common.Validations
+import com.varabyte.kobweb.cli.common.cmd
 import com.varabyte.kobweb.cli.common.processing
 import com.varabyte.kobweb.cli.common.queryUser
+import com.varabyte.kobweb.cli.common.textError
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.cli.create.template.KobwebTemplate
-import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.text.blue
 import com.varabyte.konsole.foundation.text.bold
-import com.varabyte.konsole.foundation.text.cyan
 import com.varabyte.konsole.foundation.text.green
 import com.varabyte.konsole.foundation.text.magenta
-import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.text
 import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.runtime.KonsoleApp
@@ -25,7 +24,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.deleteIfExists
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.name
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
@@ -41,12 +40,10 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
                 .call()
         }) {
         konsole {
-            red {
-                textLine("We were unable to fetch templates. Please check the repository path and your internet connection.")
-            }
+            textError("We were unable to fetch templates. Check the repository path and your internet connection.")
         }.run()
 
-        throw KobwebException("Unable to fetch templates")
+        return@konsoleApp
     }
     konsole { textLine() }.run()
 
@@ -61,12 +58,12 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
 
             ?: run {
                 konsole {
-                    red {
-                        textLine("Unable to find a template named \"$template\". Please check the repository.")
-                    }
+                    textError("Unable to locate a template named \"$template\"")
+                    textLine()
+                    text("Consider running `"); cmd("kobweb list"); text("` for a list of choices.")
                 }.run()
 
-                throw KobwebException("Unable to find matching template")
+                return@konsoleApp
             }
     }
 
@@ -80,7 +77,7 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
 
     val kobwebTemplate = Yaml.default.decodeFromString(KobwebTemplate.serializer(), templateFile.toFile().readText())
     // Template almost ready to be processed - remove all files that should NEVER end up in the final project
-    templateFile.deleteIfExists()
+    templateFile.deleteExisting()
     run {
         val subTemplates = mutableListOf<File>()
         val root = srcPath.toFile()
@@ -103,23 +100,20 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
         fun indent() {
             text("  ")
         }
-        fun cmd(name: String) {
-            cyan { text(name) }
-        }
         textLine()
         bold {
             green { text("Success! ") }
             textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
         }
         textLine()
-        text("Consider downloading "); magenta(isBright = true) { textLine("IntelliJ IDEA Community Edition") };
+        text("Consider downloading "); magenta(isBright = true) { textLine("IntelliJ IDEA Community Edition") }
         text("using "); blue(isBright = true) { textLine("https://www.jetbrains.com/toolbox-app/") }
         textLine()
         textLine("We suggest that you begin by typing:")
         textLine()
         if (dstPath != Path.of("").toAbsolutePath()) {
-            indent(); cmd("cd"); textLine(" $projectFolder")
+            indent(); cmd("cd $projectFolder"); textLine()
         }
-        indent(); cmd("kobweb"); textLine(" run")
+        indent(); cmd("kobweb run"); textLine()
     }.run()
 }

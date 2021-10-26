@@ -39,6 +39,20 @@ fun RenderScope.textError(text: String) {
     textLine(text)
 }
 
+fun RenderScope.cmd(name: String) {
+    val parts = name.split(' ')
+    parts.forEachIndexed { i, part ->
+        if (i == 0) {
+            cyan { text(part) }
+        } else {
+            text(part)
+        }
+        if (i < parts.lastIndex) {
+            text(' ')
+        }
+    }
+}
+
 fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
     val spinner = konsoleAnimOf(Anims.SPINNER)
     val ellipsis = konsoleAnimOf(Anims.ELLIPSIS)
