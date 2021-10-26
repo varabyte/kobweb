@@ -78,7 +78,7 @@ Our binary artifact is hosted on github. To download latest:
 ```bash
 $ cd /path/to/applications/kobweb
 $ wget https://github.com/varabyte/kobweb/releases/download/v0.6.0/kobweb-0.6.0.zip
-$ unzip kobweb-0.6.0.zip  
+$ unzip kobweb-0.6.0.zip
 ```
 
 and I recommend adding it to your path, either directly:
@@ -273,17 +273,106 @@ the correct html / css for you behind the scenes anyways.
 
 Outside of pages, it is common to create reusable composable parts. While Kobweb doesn't enforce any particular rule
 here, we recommend a convention which, if followed, may make it easier to allow new readers of your codebase to get
-around. 
+around.
 
 First, as a sibling to pages, create a folder called **components**. Within it, add:
 
-* **layouts** - High-level composables that provide entire page layouts. Most (all?) of your `@Page` pages will start 
+* **layouts** - High-level composables that provide entire page layouts. Most (all?) of your `@Page` pages will start
   by calling a page layout function first. You may only have a single layout for your entire site.
 * **sections** - Medium-level composables that represent compound areas inside your pages, organizing a collection of
   many children composables. If you have multiple layouts, it's likely sections would be shared across them. For
-  example, nav headers and footers are great candidates for this subfolder. 
+  example, nav headers and footers are great candidates for this subfolder.
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
-  a stylized visitor counter would be a good candidate for this subfolder. 
+  a stylized visitor counter would be a good candidate for this subfolder.
+
+## Markdown
+
+If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for
+you at build time, using the filename as its path.
+
+For example, if I create the following file:
+
+```markdown
+// resources/markdown/docs/tutorial/Kobweb.kt
+
+# Kobweb Tutorial
+
+...
+```
+
+this will create a page that I can then visit by going to `mysite.com/docs/tutorial/kobweb`
+
+The power of Kotlin + Web Compose is composable interactive components though, not static text! That's why Kobweb
+Markdown support enables extensions to allow this out of the box.
+
+### Front Matter
+
+Front Matter is metadata that you can specify at the beginning of your document, like so:
+
+```markdown
+---
+title: Tutorial
+author: bitspittle
+---
+```
+
+and these key / value pairs can be referenced in your Kotlin `@Composable` code (* *coming soon*).
+
+However, there's a special value which, if set, will be used to render a root `@Composable` that wraps the code your
+markdown file would otherwise create. This is useful for specifying a layout for example:
+
+```markdown
+---
+root: .components.layout.DocsLayout
+---
+
+# Kobweb Tutorial
+```
+
+This will generate code like the following:
+
+```kotlin
+import com.mysite.components.layout.DocsLayout
+
+@Composable
+@Page
+fun KobwebPage() {
+    DocsLayout {
+        H1 {
+            Text("Kobweb Tutorial")
+        }
+    }
+}
+```
+
+### Kobweb Call
+
+A markdown extension built just for Kobweb, you can surround a path to a `@Composable` method with double-curly braces
+to call it:
+
+```markdown
+# Kobweb Tutorial
+
+...
+
+{{ .components.widgets.VisitorCounter }}
+```
+
+which will generate code for you like the following:
+
+```kotlin
+import com.mysite.components.widgets.VisitorCounter
+
+@Composable
+@Page
+fun KobwebPage() {
+    /* ... */
+    VisitorCounter()
+}
+```
+
+In this way, you can write pages that are mostly static text punctuated with beautiful, interactive components. This
+could be a great approach for people who want to write and host their own blogs, for example.
 
 # Can We Kobweb Yet
 
@@ -311,7 +400,7 @@ So, should you use Kobweb at this point? If you are...
   * **No**
 * a company:
   * **NOOOOOO** (someday, we hope, but not yet)
- 
+
 # Templates
 
 Kobweb provides its templates in a separate git repository, which is referenced within this project as a submodule for
