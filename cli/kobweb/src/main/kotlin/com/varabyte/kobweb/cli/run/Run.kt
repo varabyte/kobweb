@@ -48,7 +48,7 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         ServerEnvironment.DEV -> "development"
         ServerEnvironment.PROD -> "production"
     }
-    lateinit var serverState: ServerState // Set if RunState ever hits RunState.RUNNING; otherwise, don't use!
+    var serverState: ServerState? = null // Set if RunState ever hits RunState.RUNNING
     val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
     var runState by konsoleVarOf(RunState.STARTING)
     var cancelReason by konsoleVarOf("")
@@ -67,16 +67,22 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
                 textLine("Press Q anytime to cancel.")
             }
             RunState.RUNNING -> {
-                green {
-                    text("Kobweb server ($envName) is running at ")
-                    cyan { text("http://localhost:${serverState.port}") }
+                serverState!!.let { serverState ->
+                    green {
+                        text("Kobweb server ($envName) is running at ")
+                        cyan { text("http://localhost:${serverState.port}") }
+                    }
+                    textLine(" (PID = ${serverState.pid})")
+                    textLine()
+                    textLine("Press Q anytime to stop it.")
                 }
-                textLine(" (PID = ${serverState.pid})")
-                textLine()
-                textLine("Press Q anytime to stop it.")
             }
             RunState.STOPPING -> {
-                textLine("Server is stopping (PID = ${serverState.pid})$ellipsisAnim")
+                text("Server is stopping")
+                serverState?.let { serverState ->
+                    text(" (PID = ${serverState.pid}")
+                }
+                textLine(ellipsisAnim)
             }
             RunState.STOPPED -> {
                 textLine("Server stopped gracefully.")
@@ -162,10 +168,12 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         if (runState == RunState.RUNNING) {
             addTimer(Duration.ofMillis(500), repeat = true) {
                 if (runState == RunState.RUNNING) {
-                    if (!serverState.isRunning() || serverStateFile.content != serverState) {
-                        cancelReason = "It seems like the server was stopped by a separate process."
-                        runState = RunState.CANCELLED
-                        signal()
+                    serverState!!.let { serverState ->
+                        if (!serverState.isRunning() || serverStateFile.content != serverState) {
+                            cancelReason = "It seems like the server was stopped by a separate process."
+                            runState = RunState.CANCELLED
+                            signal()
+                        }
                     }
                 } else {
                     repeat = false
