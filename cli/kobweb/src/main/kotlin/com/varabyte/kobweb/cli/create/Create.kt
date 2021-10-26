@@ -30,13 +30,13 @@ import kotlin.io.path.name
 
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
-fun handleCreate(template: String) = konsoleApp {
-    val repo = "https://github.com/varabyte/kobweb-templates"
+fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
     val tempDir = Files.createTempDirectory("kobweb").toFile()
     data.set(TempDirKey, tempDir, dispose = { tempDir.deleteRecursively() })
     if (!processing("Cloning \"$repo\"") {
             Git.cloneRepository()
                 .setURI(repo)
+                .setBranch(branch)
                 .setDirectory(tempDir)
                 .call()
         }) {

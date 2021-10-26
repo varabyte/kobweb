@@ -21,9 +21,13 @@ fun main(args: Array<String>) {
 
     class Create : Subcommand("create", "Create a Kobweb app / site") {
         val template by argument(ArgType.String, "template", "The name of the template to start from, e.g. 'site'")
+        val repo by option(ArgType.String, "repo", "The repository that hosts Kobweb templates")
+            .default("https://github.com/varabyte/kobweb-templates")
+        val branch by option(ArgType.String, "branch", "The branch in the repository to use")
+            .default("main")
 
         override fun execute() {
-            handleCreate(template)
+            handleCreate(repo, branch, template)
         }
     }
 
