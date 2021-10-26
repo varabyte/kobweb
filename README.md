@@ -68,12 +68,12 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 
 # Trying it out yourself
 
-The first step is to grab the Kobweb binary. You can download it or build it, so we'll include instructions for both
+The first step is to get the Kobweb binary. You can download it or build it, so we'll include instructions for both
 approaches.
 
 ## Download the Kobweb binary
 
-Our binary artifact is currently hosted on github. To download latest:
+Our binary artifact is hosted on github. To download latest:
 
 ```bash
 $ cd /path/to/applications/kobweb
@@ -90,8 +90,8 @@ $ kobweb version # to check it's working
 
 or via symbolic link:
 
-```
-$ cd /path/to/binaries # some folder you've created that's in your PATH
+```base
+$ cd /path/to/bin # some folder you've created that's in your PATH
 $ ln -s /path/to/applications/kobweb/kobweb-0.6.0/bin/kobweb kobweb
 ```
 
@@ -187,7 +187,7 @@ You can create the following Kobweb projects by typing `kobweb create ...`
 • examples/todo: An example TODO app, showcasing client / server interactions
 ```
 
-For example, `kobweb create examples/todo` will instantiate a simple TODO app that you can learn from.
+For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 
 # Basics
 
@@ -260,7 +260,7 @@ matter.
 One approach would be to own the entire rendering pipeline, ditching html / css entirely and targeting a full page
 canvas or something. However, this limits the ability for robots to crawl and index your site, which is a major
 drawback. It also means that debugging in a browser would be a rough experience, as the browser's developer tools would
-be limited in the insights it could provide to your site. It would also prevent a developer from making use of the rich
+be limited in the insights it could provide for your site. It would also prevent a developer from making use of the rich
 ecosystem of Javascript libraries out there that modify the DOM tree themselves.
 
 For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a
