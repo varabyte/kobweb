@@ -5,5 +5,5 @@ import com.varabyte.kobweb.api.ApiContext
 
 @Api
 fun hello(ctx: ApiContext) {
-    ctx.res.payload = "hello world".toByteArray()
+    ctx.res.body = "hello world".toByteArray()
 }

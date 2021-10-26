@@ -11,11 +11,11 @@ package com.varabyte.kobweb.api.http
  * fun echo(ctx: ApiContext) {
  *   val msg = ctx.req.query["msg"]
  *   if (msg != null) {
- *     ctx.res.setPayloadText("Received message: $msg")
+ *     ctx.res.setBodyText("Received message: $msg")
  *   }
  *   else {
  *     ctx.res.status = 400
- *     ctx.res.setPayloadText("Missing: required parameter 'msg'")
+ *     ctx.res.setBodyText("Missing: required parameter 'msg'")
  *   }
  * }
  * ```

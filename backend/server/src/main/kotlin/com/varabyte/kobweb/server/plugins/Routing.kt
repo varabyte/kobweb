@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.server.plugins
 
-import com.varabyte.kobweb.api.http.EMPTY_PAYLOAD
+import com.varabyte.kobweb.api.http.EMPTY_BODY
 import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
@@ -64,7 +64,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
         val response = apiJar.apis.handle("/$pathStr", request)
         if (response != null) {
             call.respondBytes(
-                response.payload?.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_PAYLOAD,
+                response.body?.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
                 status = HttpStatusCode.fromValue(response.status),
                 contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }?.let { ContentType.parse(it) }
             )

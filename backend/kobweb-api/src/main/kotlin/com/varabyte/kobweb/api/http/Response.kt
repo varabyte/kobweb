@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.api.http
 
-/** A convenience value you can use if you want to express intention that your payload should be empty */
-val EMPTY_PAYLOAD = ByteArray(0)
+/** A convenience value you can use if you want to express intention that your body should be empty */
+val EMPTY_BODY = ByteArray(0)
 
 /**
  * Data to send back to the client after it makes a request to an API endpoint.
@@ -12,7 +12,7 @@ val EMPTY_PAYLOAD = ByteArray(0)
  * ```
  * @Api
  * fun demo(ctx: ApiContext) {
- *   ctx.res.setPayloadText("This is how you send text back to the client")
+ *   ctx.res.setBodyText("This is how you send text back to the client")
  * }
  * ```
  *
@@ -22,11 +22,11 @@ class Response {
     /** See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status */
     var status = 200
 
-    /** The payload to send back */
-    var payload: ByteArray? = null
+    /** The body payload to send back */
+    var body: ByteArray? = null
 
     /**
-     * The content type of the [payload], e.g. "image/jpeg" or "application/json". Can include parameters.
+     * The content type of the [body], e.g. "image/jpeg" or "application/json". Can include parameters.
      *
      * See also: https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
      */
@@ -34,8 +34,8 @@ class Response {
 }
 
 /**
- * Convenience method for setting the payload to a text value.
+ * Convenience method for setting the body to a text value.
  */
-fun Response.setPayloadText(text: String) {
-    payload = text.toByteArray(Charsets.UTF_8)
+fun Response.setBodyText(text: String) {
+    body = text.toByteArray(Charsets.UTF_8)
 }
