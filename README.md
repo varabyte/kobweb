@@ -45,7 +45,7 @@ Kobweb is an opinionated Kotlin framework for building websites and web apps, in
 and [Chakra UI](https://chakra-ui.com).
 
 **It is currently in technology preview**. Please consider starring the project to indicate interest, so we know we're
-creating something the community wants. [How ready is it?](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
+creating something the community wants. [How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
 
 Our goal is to provide:
 
@@ -392,8 +392,8 @@ So, should you use Kobweb at this point? If you are...
 
 * a Kotlin tinkerer who is excited to play around with new tech, wants to have a voice in the direction of this project,
   and who isn't afraid of creating toy projects atop some APIs which may shift underfoot:
-  * **YES!!!** Please see the [connecting with us](https://github.com/varabyte/kobweb#connecting-with-us) section below,
-  we'd definitely love to hear from you.
+  * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
+  below, we'd definitely love to hear from you.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
   * ***Maybe***, but now is probably a bit too early.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
@@ -422,7 +422,7 @@ $ git submodule update --init
   * Run `./gradlew kobwebRun` with various Gradle debug options to see what's going on under the hood
 
 Solutions didn't work? Or you're encountering issues not listed here? Please consider
-[filing a bug](https://github.com/varabyte/kobweb/issues/new/choose)!
+[leaving feedback ▼](https://github.com/varabyte/kobweb#filing-issues-and-leaving-feedback)!
 
 # Connecting with us
 
