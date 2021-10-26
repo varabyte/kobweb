@@ -276,16 +276,16 @@ love.
 
 So, should you use Kobweb at this point? If you are...
 
-* a Kotlin tinkerer who is excited to play around with new tech, would like to have a voice in the direction of this
-  new and upcoming project, and who isn't afraid of creating toy projects while understanding APIs may shift around: 
+* a Kotlin tinkerer who is excited to play around with new tech, wants to have a voice in the direction of this project,
+  and who isn't afraid of creating toy projects atop some APIs which may shift underfoot:
   * **YES!!!** Please see the [connecting with us](https://github.com/varabyte/kobweb#connecting-with-us) section below,
   we'd definitely love to hear from you.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
-  * ***Maybe***, but now is probably too early.
+  * ***Maybe***, but now is probably a bit too early.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
   * **No**
 * a company:
-  * **NOOOOOO**
+  * **NOOOOOO** (someday, we hope, but not yet)
  
 # Templates
 
