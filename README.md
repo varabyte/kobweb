@@ -183,8 +183,8 @@ $ kobweb list
 
 You can create the following Kobweb projects by typing `kobweb create ...`
 
-• site: A template for a minimal site that demonstrates the basic features of Kobweb
 • examples/todo: An example TODO app, showcasing client / server interactions
+• site: A template for a minimal site that demonstrates the basic features of Kobweb
 ```
 
 For example, `kobweb create examples/todo` will instantiate a TODO app locally.

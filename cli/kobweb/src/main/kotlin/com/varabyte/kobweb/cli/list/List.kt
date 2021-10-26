@@ -15,8 +15,9 @@ fun handleList(repo: String, branch: String) = konsoleApp {
 
     val templates = tempDir.walkBottomUp()
         .filter { it.isDirectory }
-        .mapNotNull { dir -> KobwebFolder.inPath(dir.toPath())
-            ?.let { kobwebFolder -> KobwebTemplateFile(kobwebFolder) }
+        .mapNotNull { dir ->
+            KobwebFolder.inPath(dir.toPath())
+                ?.let { kobwebFolder -> KobwebTemplateFile(kobwebFolder) }
         }
         .filter { templateFile -> templateFile.content != null }
         .toList()
@@ -29,14 +30,16 @@ fun handleList(repo: String, branch: String) = konsoleApp {
             textLine()
 
             val tempPath = tempDir.toPath()
-            templates.forEach { template ->
-                val templatePath = template.kobwebFolder.getProjectPath().relativeTo(tempPath).toString()
-                val description = template.content!!.metadata.description
+            templates
+                .sortedBy { template -> template.kobwebFolder.getProjectPath() }
+                .forEach { template ->
+                    val templatePath = template.kobwebFolder.getProjectPath().relativeTo(tempPath).toString()
+                    val description = template.content!!.metadata.description
 
-                text("• ")
-                cyan { text(templatePath) }
-                textLine(": $description")
-            }
+                    text("• ")
+                    cyan { text(templatePath) }
+                    textLine(": $description")
+                }
         } else {
             textError("No templates were found in the specified repository.")
         }
