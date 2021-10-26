@@ -22,18 +22,6 @@ interface ComponentState
 object EmptyState : ComponentState
 
 /**
- * Class useful for components that change their state depending on interactions with the cursor.
- */
-enum class CursorState : ComponentState {
-    /** The cursor is not over the component */
-    DEFAULT,
-    /** The cursor is over the component */
-    HOVER,
-    /** The cursor is pressing down on the component */
-    PRESSED,
-}
-
-/**
  * An interface for something that represents a collection of properties that makes up the full style for a component.
  *
  * By convention, all properties should be nullable, so that styles can be partially modified by variants.
