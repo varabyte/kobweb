@@ -4,6 +4,7 @@ import com.varabyte.kobweb.cli.common.PathUtils
 import com.varabyte.kobweb.cli.common.Validations
 import com.varabyte.kobweb.cli.common.cmd
 import com.varabyte.kobweb.cli.common.handleFetch
+import com.varabyte.kobweb.cli.common.informInfo
 import com.varabyte.kobweb.cli.common.queryUser
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
@@ -47,6 +48,8 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
     }
 
     val defaultFolderName = PathUtils.generateEmptyPathName("my-project")
+    informInfo("The folder you choose here will be created under your current path.")
+    informInfo("You can enter `.` if you want to use the current directory.")
     val dstPath = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->
         Validations.isFileName(answer) ?: Validations.isEmptyPath(answer)
     }.let { answer ->
