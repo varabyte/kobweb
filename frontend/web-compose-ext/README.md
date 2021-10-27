@@ -1,6 +1,14 @@
-Code to extend Web Compose
+A thin layer of code on top of Web Compose
 
-Web Compose occasionally feels incomplete, especially with CSS properties. This module will act as a home for any
-feature I feel is missing from the core library.
+This module introduces the Jetpack Compose concept of `Modifier` but with an implementation designed to work well with
+Web Compose specifically (by delegating to the Web Compose concept of `AttrBuilder`s and `StyleBuilder`s). It also
+introduces a handful of foundation classes that use it, porting (a subset of) Jetpack Compose's foundation layer.
 
-Perhaps, hopefully, the Web Compose API will implement these missing bits eventually, and we can delete this module.
+Note that, unlike the approach that Jetbrains is taking with their Multiplatform Widgets approach, this `Modifier`
+class and its extension methods are _not_ trying to be 100% compatible with Android / Desktop compose. See the main
+README's [What about Multiplatform Widgets](https://github.com/varabyte/kobweb#what-about-multiplatform-widgets) section
+for more details on why.
+
+And finally, Web Compose occasionally feels incomplete, especially with CSS properties. This module will act as a home
+for any feature I feel is (temporarily) missing from the core library, with the hopes that they will be replaced with
+upstream versions over time.
