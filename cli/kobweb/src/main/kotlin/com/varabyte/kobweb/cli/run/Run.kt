@@ -80,7 +80,7 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
             RunState.STOPPING -> {
                 text("Server is stopping")
                 serverState?.let { serverState ->
-                    text(" (PID = ${serverState.pid}")
+                    text(" (PID = ${serverState.pid})")
                 }
                 textLine(ellipsisAnim)
             }
