@@ -323,7 +323,7 @@ You can also trigger the endpoint in your frontend code by using the extension `
 fun ApiDemoPage() {
   val coroutineScope = rememberCoroutineScope()
 
-  Button(Modifier.clickable {
+  Button(onClick = {
     coroutineScope.launch {
       println("Echoed: " + window.api.get("echo?message=hello")!!.decodeToString())
     }
