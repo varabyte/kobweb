@@ -2,6 +2,7 @@ package com.varabyte.kobweb.cli.run
 
 import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
+import com.varabyte.kobweb.cli.common.gradlew
 import com.varabyte.kobweb.cli.common.kobwebFolder
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -97,11 +98,11 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
         }
     }.runUntilSignal {
         @Suppress("BlockingMethodInNonBlockingContext")
-        val args = mutableListOf("./gradlew", "-PkobwebEnv=$env", "kobwebStart")
+        val args = mutableListOf("-PkobwebEnv=$env", "kobwebStart")
         if (env == ServerEnvironment.DEV) {
             args.add("-t") // Enable live reloading only while in dev mode
         }
-        val startServerProcess = Runtime.getRuntime().exec(args.toTypedArray())
+        val startServerProcess = Runtime.getRuntime().gradlew(*args.toTypedArray())
         consumeProcessOutput(startServerProcess) { addOutputSeparator = true }
 
         Runtime.getRuntime().addShutdownHook(Thread {
@@ -136,7 +137,7 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
                         startServerProcess.destroy()
                         startServerProcess.waitFor()
 
-                        val stopServerProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
+                        val stopServerProcess = Runtime.getRuntime().gradlew("kobwebStop")
                         consumeProcessOutput(stopServerProcess) { addOutputSeparator = true }
                         stopServerProcess.waitFor()
 

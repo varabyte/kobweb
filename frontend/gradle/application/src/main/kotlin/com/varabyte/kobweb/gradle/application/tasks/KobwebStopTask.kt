@@ -18,9 +18,7 @@ import java.nio.file.Files
 abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is running") {
     @TaskAction
     fun execute() {
-        val kobwebFolder = KobwebFolder.inWorkingDirectory()
-            ?: throw GradleException("This project is missing a Kobweb root folder")
-
+        val kobwebFolder = kobwebProject.kobwebFolder
         val stateFile = ServerStateFile(kobwebFolder)
         stateFile.content?.let { serverState ->
             if (ProcessHandle.of(serverState.pid).isPresent) {

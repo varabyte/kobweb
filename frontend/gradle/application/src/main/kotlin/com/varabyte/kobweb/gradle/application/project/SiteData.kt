@@ -1,10 +1,6 @@
 package com.varabyte.kobweb.gradle.application.project
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
-import org.jetbrains.kotlin.com.intellij.psi.PsiManager
-import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.idea.KotlinFileType
-import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
@@ -23,10 +19,9 @@ class SiteData {
             siteSources: List<File>,
         ): SiteData {
             val siteData = SiteData()
-            val kotlinProject = createKotlinProject()
+            val kotlinProject = PsiUtils.createKotlinProject()
             siteSources.forEach { file ->
-                val ktFile = PsiManager.getInstance(kotlinProject)
-                    .findFile(LightVirtualFile(file.name, KotlinFileType.INSTANCE, file.readText())) as KtFile
+                val ktFile = kotlinProject.parseKotlinFile(file)
 
                 var currPackage = ""
                 var pageSimpleName = PAGE_SIMPLE_NAME

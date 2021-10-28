@@ -2,6 +2,7 @@ package com.varabyte.kobweb.cli.export
 
 import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
+import com.varabyte.kobweb.cli.common.gradlew
 import com.varabyte.kobweb.cli.common.kobwebProject
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.konsole.foundation.anim.konsoleAnimOf
@@ -43,8 +44,8 @@ fun handleExport() = konsoleApp {
             ExportState.CANCELLED -> yellow { textLine("Export cancelled: $cancelReason") }
         }
     }.run {
-        val exportProcess = Runtime.getRuntime()
-            .exec(arrayOf("./gradlew", "-PkobwebReuseServer=false", "-PkobwebBuildTarget=RELEASE", "kobwebExport"))
+        val exportProcess =
+            Runtime.getRuntime().gradlew("-PkobwebReuseServer=false", "-PkobwebBuildTarget=RELEASE", "kobwebExport")
         consumeProcessOutput(exportProcess) { shouldAddNewline = true }
 
         onKeyPressed {
@@ -72,7 +73,7 @@ fun handleExport() = konsoleApp {
         }
         check(exportState in listOf(ExportState.FINISHING, ExportState.CANCELLING))
 
-        val stopProcess = Runtime.getRuntime().exec(arrayOf("./gradlew", "kobwebStop"))
+        val stopProcess = Runtime.getRuntime().gradlew("kobwebStop")
         consumeProcessOutput(stopProcess) { shouldAddNewline = true }
         stopProcess.waitFor()
 

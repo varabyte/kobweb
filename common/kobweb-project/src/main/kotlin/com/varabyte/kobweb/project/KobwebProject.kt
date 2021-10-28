@@ -14,5 +14,5 @@ class KobwebProject(
     val path: Path = Path.of("")
 ) {
     val kobwebFolder = KobwebFolder.inPath(path)
-        ?: throw KobwebException("Not a valid path to a Kobweb project (no .kobweb folder found): $path")
+        ?: throw KobwebException("Not a valid path to a Kobweb project (no .kobweb folder found): ${path.toAbsolutePath()}")
 }

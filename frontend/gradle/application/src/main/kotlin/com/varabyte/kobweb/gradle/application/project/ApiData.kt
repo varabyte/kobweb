@@ -1,10 +1,6 @@
 package com.varabyte.kobweb.gradle.application.project
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
-import org.jetbrains.kotlin.com.intellij.psi.PsiManager
-import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.idea.KotlinFileType
-import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
@@ -23,11 +19,10 @@ class ApiData {
             apiPackage: String,
             apiSources: List<File>
         ): ApiData {
-            val kotlinProject = createKotlinProject()
+            val kotlinProject = PsiUtils.createKotlinProject()
             val apiData = ApiData()
             apiSources.forEach { file ->
-                val ktFile = PsiManager.getInstance(kotlinProject)
-                    .findFile(LightVirtualFile(file.name, KotlinFileType.INSTANCE, file.readText())) as KtFile
+                val ktFile = kotlinProject.parseKotlinFile(file)
 
                 var currPackage = ""
                 var initSimpleName = INIT_SIMPLE_NAME

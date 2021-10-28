@@ -25,8 +25,6 @@ fun ServerState.toDisplayText(): String {
  * project.
  */
 abstract class KobwebProjectTask(@get:Internal val config: KobwebConfig, desc: String) : KobwebTask(desc) {
-    @get:Internal val kobwebProject = KobwebProject()
-
     @get:Internal
     protected val kobwebConfFile = KobwebConfFile(kobwebProject.kobwebFolder)
 
