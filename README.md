@@ -467,7 +467,8 @@ $ git submodule update --init
 
 * `kobweb run` sometimes gets stuck when Gradle (running behind it) gets stuck.
   * Quit kobweb, run `./gradlew --stop`, and then try again
-  * Run `./gradlew kobwebRun` with various Gradle debug options to see what's going on under the hood
+  * Run `./gradlew kobwebGen` or `./gradlew kobwebStart` with various Gradle debug options to see what's going on under
+  the hood (e.g. `./gradlew kobwebStart --stacktrace`)
 
 Solutions didn't work? Or you're encountering issues not listed here? Please consider
 [leaving feedback ▼](https://github.com/varabyte/kobweb#filing-issues-and-leaving-feedback)!
