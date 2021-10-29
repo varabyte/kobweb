@@ -21,7 +21,7 @@ dependencies {
     implementation(project(":common:kobweb-project"))
 
     // Compile only - the plugin itself should exist at runtime
-    compileOnly(project(":frontend:gradle:application"))
+    compileOnly(project(":gradle-plugins:application"))
 }
 
 val DESCRIPTION = "A Gradle plugin that adds markdown support to a Kobweb project"
