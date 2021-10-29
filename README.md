@@ -1,4 +1,4 @@
-![version: 0.6.0](https://img.shields.io/badge/kobweb-v0.6.0-yellow)
+![version: 0.6.1](https://img.shields.io/badge/kobweb-v0.6.1-yellow)
 <a href="https://discord.gg/5NZ2GKV5Cs">
   <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
@@ -75,14 +75,14 @@ Our binary artifact is hosted on github. To download latest:
 
 ```bash
 $ cd /path/to/applications/kobweb
-$ wget https://github.com/varabyte/kobweb/releases/download/v0.6.0/kobweb-0.6.0.zip
-$ unzip kobweb-0.6.0.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/v0.6.1/kobweb-0.6.1.zip
+$ unzip kobweb-0.6.1.zip
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.6.0/bin
+$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.6.1/bin
 $ kobweb version # to check it's working
 ```
 
@@ -90,7 +90,7 @@ or via symbolic link:
 
 ```base
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb/kobweb-0.6.0/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb/kobweb-0.6.1/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
@@ -424,7 +424,7 @@ could be a great approach for people who want to write and host their own blogs,
 
 # Can We Kobweb Yet
 
-Current state: **Functional but early (and broken on Windows)**
+Current state: **Functional but early**
 
 Kobweb has some pretty big pieces working already. It is easy to set up a new project and get things running quickly.
 The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it. It supports
@@ -468,8 +468,6 @@ $ git submodule update --init
 * `kobweb run` sometimes gets stuck when Gradle (running behind it) gets stuck.
   * Quit kobweb, run `./gradlew --stop`, and then try again
   * Run `./gradlew kobwebRun` with various Gradle debug options to see what's going on under the hood
-* `kobweb run` is broken on Windows
-  * This is our highest priority to fix right now. Keep an eye out for v0.6.1!
 
 Solutions didn't work? Or you're encountering issues not listed here? Please consider
 [leaving feedback ▼](https://github.com/varabyte/kobweb#filing-issues-and-leaving-feedback)!
