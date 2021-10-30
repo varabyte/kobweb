@@ -3,6 +3,14 @@ package com.varabyte.kobweb.silk.theme
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.silk.components.ComponentStyles
+import com.varabyte.kobweb.silk.components.KeyedStyle
+import com.varabyte.kobweb.silk.components.MutableComponentStyles
+import com.varabyte.kobweb.silk.components.forms.ButtonKey
+import com.varabyte.kobweb.silk.components.forms.DefaultButtonStyle
+import com.varabyte.kobweb.silk.components.navigation.DefaultLinkStyle
+import com.varabyte.kobweb.silk.components.navigation.LinkKey
+import com.varabyte.kobweb.silk.components.text.DefaultTextStyle
+import com.varabyte.kobweb.silk.components.text.TextKey
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.Palette
@@ -48,7 +56,14 @@ object SilkConfig {
     var initialColorMode: ColorMode = ColorMode.LIGHT
 }
 
-val SilkPalettes: ProvidableCompositionLocal<Palettes> = compositionLocalOf { SYSTEM_PALLETES }
+internal val SilkPalettes: ProvidableCompositionLocal<Palettes> = compositionLocalOf { SYSTEM_PALLETES }
+internal val ComponentStyles: ProvidableCompositionLocal<MutableComponentStyles> = compositionLocalOf {
+    MutableComponentStyles(null).apply {
+        this[ButtonKey] = DefaultButtonStyle
+        this[LinkKey] = DefaultLinkStyle
+        this[TextKey] = DefaultTextStyle
+    }
+}
 
 object SilkTheme {
     val palettes: Palettes
@@ -61,16 +76,29 @@ object SilkTheme {
         @ReadOnlyComposable
         get() = palettes.getActivePalette()
 
-    val componentStyles = ComponentStyles()
+    val componentStyles: ComponentStyles
+        @Composable
+        @ReadOnlyComposable
+        get() = ComponentStyles.current
 }
 
 @Composable
 fun SilkTheme(
     palettes: Palettes = SilkTheme.palettes,
+    componentStyles: List<KeyedStyle<*, *>> = emptyList(),
     content: @Composable () -> Unit
 ) {
+    val finalComponentStyles = if (componentStyles.isEmpty()) {
+        ComponentStyles.current
+    } else {
+        MutableComponentStyles(ComponentStyles.current).apply {
+            componentStyles.forEach { it.setOn(this) }
+        }
+    }
+
     CompositionLocalProvider(
         SilkPalettes provides palettes,
+        ComponentStyles provides finalComponentStyles
     ) {
         content()
     }

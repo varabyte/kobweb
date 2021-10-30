@@ -28,7 +28,7 @@ enum class LinkState : ComponentState {
 }
 
 interface LinkStyle : ComponentStyle<LinkState>
-class DefaultLinkStyle : LinkStyle {
+object DefaultLinkStyle : LinkStyle {
     @Composable
     @ReadOnlyComposable
     override fun toModifier(state: LinkState): Modifier {

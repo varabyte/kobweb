@@ -78,7 +78,7 @@ fun HomePage() {
 
         Row(Styles.Title, horizontalArrangement = Arrangement.Center) {
             SilkText("TODO App with ")
-            Link("https://github.com/varabyte/kobweb", "Kobweb!", variant = UnderCursorLinkVariant)
+            Link("https://github.com/varabyte/kobweb", "Kobweb!")
         }
 
         Column(Modifier.fillMaxSize()) {
@@ -118,7 +118,6 @@ fun HomePage() {
                     Link(
                         "https://blog.upstash.com/nextjs-todo",
                         "Upstash's Next.js TODO App",
-                        variant = UnderCursorLinkVariant
                     )
                 }
             }

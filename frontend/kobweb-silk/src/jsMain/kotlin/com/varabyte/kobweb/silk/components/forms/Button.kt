@@ -34,7 +34,7 @@ enum class ButtonState : ComponentState {
 }
 
 interface ButtonStyle : ComponentStyle<ButtonState>
-class DefaultButtonStyle : ButtonStyle {
+object DefaultButtonStyle : ButtonStyle {
     @Composable
     @ReadOnlyComposable
     override fun toModifier(state: ButtonState): Modifier {

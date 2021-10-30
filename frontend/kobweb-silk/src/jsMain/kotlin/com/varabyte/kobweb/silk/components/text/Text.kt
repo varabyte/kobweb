@@ -15,7 +15,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 interface TextStyle : ComponentStyle<EmptyState>
-class DefaultTextStyle : TextStyle {
+object DefaultTextStyle : TextStyle {
     @Composable
     @ReadOnlyComposable
     override fun toModifier(state: EmptyState): Modifier {

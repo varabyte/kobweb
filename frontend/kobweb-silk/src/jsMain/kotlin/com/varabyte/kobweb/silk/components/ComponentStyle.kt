@@ -1,7 +1,9 @@
 package com.varabyte.kobweb.silk.components
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.silk.theme.SilkTheme
 
 /**
  * Marker interface for a key used to fetch a configuration for a component.
@@ -12,7 +14,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
  * object ButtonKey = object : ComponentKey<ButtonStyle>
  * ```
  */
-interface ComponentKey<S: ComponentStyle<*>>
+interface ComponentKey<S : ComponentStyle<*>>
 
 interface ComponentState
 
@@ -49,7 +51,7 @@ object EmptyState : ComponentState
  * }
  * ```
  */
-interface ComponentStyle<T: ComponentState> {
+interface ComponentStyle<T : ComponentState> {
     @Composable
     @ReadOnlyComposable
     fun toModifier(state: T): Modifier
@@ -60,7 +62,10 @@ interface ComponentStyle<T: ComponentState> {
  */
 @Composable
 @ReadOnlyComposable
-fun <T: ComponentState, S: ComponentStyle<T>> S.toModifier(state: T, variant: ComponentVariant<T, S>? = null): Modifier {
+fun <T : ComponentState, S : ComponentStyle<T>> S.toModifier(
+    state: T,
+    variant: ComponentVariant<T, S>? = null
+): Modifier {
     return this.toModifier(state) then (variant?.style?.toModifier(state) ?: Modifier)
 }
 
@@ -70,7 +75,7 @@ fun <T: ComponentState, S: ComponentStyle<T>> S.toModifier(state: T, variant: Co
  */
 @Composable
 @ReadOnlyComposable
-fun <S: ComponentStyle<EmptyState>> S.toModifier(variant: ComponentVariant<EmptyState, S>? = null) =
+fun <S : ComponentStyle<EmptyState>> S.toModifier(variant: ComponentVariant<EmptyState, S>? = null) =
     toModifier(EmptyState, variant)
 
 /**
@@ -86,30 +91,37 @@ fun <S: ComponentStyle<EmptyState>> S.toModifier(variant: ComponentVariant<Empty
  *
  * At this point, users can add their own variants in their own code and register them.
  */
-interface ComponentVariant<T: ComponentState, S: ComponentStyle<T>> {
+interface ComponentVariant<T : ComponentState, S : ComponentStyle<T>> {
     val style: S
 }
 
-class ComponentStyles {
-    private val baseStyles = mutableMapOf<ComponentKey<*>, ComponentStyle<*>>()
-    var frozen = false
-        private set
-
-    operator fun <T: ComponentState, S: ComponentStyle<T>> set(key: ComponentKey<S>, baseStyle: S) {
-        check(!frozen) { "Cannot update styles after page has rendered for the first time." }
-        baseStyles[key] = baseStyle
-    }
-
+interface ComponentStyles {
     /**
-     * Fetch a style registered by [register].
+     * Fetch a style by its [ComponentKey].
+     *
+     * Styles can be overridden and additional styles can be registered using the [SilkTheme] composable.
      *
      * This method will throw an exception if no style was previously registered with the target key.
      */
-    @Suppress("UNCHECKED_CAST") // This should always be a valid cast thanks to register
-    operator fun <T: ComponentState, S: ComponentStyle<T>> get(key: ComponentKey<S>): S = (baseStyles[key] as? S) ?:
-        error("No style registered with key $key")
+    operator fun <T : ComponentState, S : ComponentStyle<T>> get(key: ComponentKey<S>): S
+}
 
-    fun freeze() {
-        frozen = true
+class KeyedStyle<T : ComponentState, S : ComponentStyle<T>>(val key: ComponentKey<S>, val style: S) {
+    internal fun setOn(styles: MutableComponentStyles) {
+        styles[key] = style
     }
+}
+infix fun <T : ComponentState, S : ComponentStyle<T>> ComponentKey<S>.to(style: S) = KeyedStyle(this, style)
+
+internal class MutableComponentStyles(private val parent: ComponentStyles? = null) : ComponentStyles {
+    private val baseStyles = mutableMapOf<ComponentKey<*>, ComponentStyle<*>>()
+
+    operator fun <T : ComponentState, S : ComponentStyle<T>> set(key: ComponentKey<S>, baseStyle: S) {
+        baseStyles[key] = baseStyle
+    }
+
+    @Suppress("UNCHECKED_CAST") // This should always be a valid cast thanks to register
+    override operator fun <T : ComponentState, S : ComponentStyle<T>> get(key: ComponentKey<S>): S =
+        (baseStyles[key] as? S)
+            ?: if (parent != null) parent[key] else { error("No style registered with key $key") }
 }
