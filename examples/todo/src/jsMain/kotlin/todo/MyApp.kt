@@ -18,10 +18,12 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.width
 import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.SilkApp
+import com.varabyte.kobweb.silk.components.ComponentModifier
 import com.varabyte.kobweb.silk.components.layout.Surface
+import com.varabyte.kobweb.silk.components.navigation.DefaultLinkModifier
 import com.varabyte.kobweb.silk.components.navigation.LinkKey
 import com.varabyte.kobweb.silk.components.navigation.UnderCursorLinkVariant
-import com.varabyte.kobweb.silk.components.to
+import com.varabyte.kobweb.silk.components.then
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -135,13 +137,20 @@ object Styles {
         }
 }
 
+object TodoLinkModifier : ComponentModifier {
+    @Composable
+    override fun toModifier(data: Any?): Modifier {
+        return DefaultLinkModifier.then(UnderCursorLinkVariant).toModifier(data)
+    }
+}
+
 @App
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
     Style(TodoStyleSheet)
     SilkApp {
         // You can override base styles by passing them into SilkTheme
-        SilkTheme(componentStyles = listOf(LinkKey to UnderCursorLinkVariant.style)) {
+        SilkTheme(componentModifiers = listOf(LinkKey to TodoLinkModifier)) {
             Surface(Modifier.width(100.vw).height(100.vh)) {
                 content()
             }

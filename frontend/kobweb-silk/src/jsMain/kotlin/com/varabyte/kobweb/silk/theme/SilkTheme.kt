@@ -2,14 +2,15 @@ package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.silk.components.ComponentStyles
-import com.varabyte.kobweb.silk.components.KeyedStyle
-import com.varabyte.kobweb.silk.components.MutableComponentStyles
+import com.varabyte.kobweb.silk.components.ComponentKey
+import com.varabyte.kobweb.silk.components.ComponentModifier
+import com.varabyte.kobweb.silk.components.ComponentModifiers
+import com.varabyte.kobweb.silk.components.MutableComponentModifiers
 import com.varabyte.kobweb.silk.components.forms.ButtonKey
-import com.varabyte.kobweb.silk.components.forms.DefaultButtonStyle
-import com.varabyte.kobweb.silk.components.navigation.DefaultLinkStyle
+import com.varabyte.kobweb.silk.components.forms.DefaultButtonModifier
+import com.varabyte.kobweb.silk.components.navigation.DefaultLinkModifier
 import com.varabyte.kobweb.silk.components.navigation.LinkKey
-import com.varabyte.kobweb.silk.components.text.DefaultTextStyle
+import com.varabyte.kobweb.silk.components.text.DefaultTextModifier
 import com.varabyte.kobweb.silk.components.text.TextKey
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
@@ -57,11 +58,11 @@ object SilkConfig {
 }
 
 internal val SilkPalettes: ProvidableCompositionLocal<Palettes> = compositionLocalOf { SYSTEM_PALLETES }
-internal val ComponentStyles: ProvidableCompositionLocal<MutableComponentStyles> = compositionLocalOf {
-    MutableComponentStyles(null).apply {
-        this[ButtonKey] = DefaultButtonStyle
-        this[LinkKey] = DefaultLinkStyle
-        this[TextKey] = DefaultTextStyle
+internal val ComponentModifiers: ProvidableCompositionLocal<MutableComponentModifiers> = compositionLocalOf {
+    MutableComponentModifiers(null).apply {
+        this[ButtonKey] = DefaultButtonModifier
+        this[LinkKey] = DefaultLinkModifier
+        this[TextKey] = DefaultTextModifier
     }
 }
 
@@ -76,29 +77,31 @@ object SilkTheme {
         @ReadOnlyComposable
         get() = palettes.getActivePalette()
 
-    val componentStyles: ComponentStyles
+    val componentModifiers: ComponentModifiers
         @Composable
         @ReadOnlyComposable
-        get() = ComponentStyles.current
+        get() = ComponentModifiers.current
 }
 
 @Composable
 fun SilkTheme(
     palettes: Palettes = SilkTheme.palettes,
-    componentStyles: List<KeyedStyle<*, *>> = emptyList(),
+    componentModifiers: List<Pair<ComponentKey, ComponentModifier>> = emptyList(),
     content: @Composable () -> Unit
 ) {
-    val finalComponentStyles = if (componentStyles.isEmpty()) {
-        ComponentStyles.current
+    val finalModifiers = if (componentModifiers.isEmpty()) {
+        ComponentModifiers.current
     } else {
-        MutableComponentStyles(ComponentStyles.current).apply {
-            componentStyles.forEach { it.setOn(this) }
+        MutableComponentModifiers(ComponentModifiers.current).apply {
+            componentModifiers.forEach { pair ->
+                this[pair.first] = pair.second
+            }
         }
     }
 
     CompositionLocalProvider(
         SilkPalettes provides palettes,
-        ComponentStyles provides finalComponentStyles
+        ComponentModifiers provides finalModifiers
     ) {
         content()
     }

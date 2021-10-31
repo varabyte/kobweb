@@ -12,56 +12,47 @@ import com.varabyte.kobweb.compose.ui.onMouseLeave
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.navigation.Router
 import com.varabyte.kobweb.silk.components.ComponentKey
-import com.varabyte.kobweb.silk.components.ComponentState
-import com.varabyte.kobweb.silk.components.ComponentStyle
-import com.varabyte.kobweb.silk.components.ComponentVariant
-import com.varabyte.kobweb.silk.components.toModifier
+import com.varabyte.kobweb.silk.components.ComponentModifier
+import com.varabyte.kobweb.silk.components.then
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
 
-enum class LinkState : ComponentState {
-    /** The cursor is not over the component */
-    DEFAULT,
-    /** The cursor is over the component */
-    HOVER,
-}
+val LinkKey = ComponentKey("link")
 
-interface LinkStyle : ComponentStyle<LinkState>
-object DefaultLinkStyle : LinkStyle {
+object DefaultLinkModifier : ComponentModifier {
     @Composable
-    @ReadOnlyComposable
-    override fun toModifier(state: LinkState): Modifier {
+    override fun toModifier(data: Any?): Modifier {
         return Modifier.color(SilkTheme.palette.secondary)
     }
 }
 
-object LinkKey : ComponentKey<LinkStyle>
-interface LinkVariant : ComponentVariant<LinkState, LinkStyle>
-
-/** A link which doesn't show any underline at all. */
-object UndecoratedLinkVariant : LinkVariant {
-    override val style: LinkStyle = object : LinkStyle {
-        @Composable
-        @ReadOnlyComposable
-        override fun toModifier(state: LinkState): Modifier {
-            return Modifier.styleModifier {
-                textDecorationLine(TextDecorationLine.None)
-            }
+object UndecoratedLinkVariant : ComponentModifier {
+    @Composable
+    override fun toModifier(data: Any?): Modifier {
+        return Modifier.styleModifier {
+            textDecorationLine(TextDecorationLine.None)
         }
     }
 }
 
 /** A link which shows an underline only when the cursor is hovering over it. */
-object UnderCursorLinkVariant : LinkVariant {
-    override val style: LinkStyle = object : LinkStyle {
-        @Composable
-        @ReadOnlyComposable
-        override fun toModifier(state: LinkState): Modifier {
-            return if (state == LinkState.DEFAULT) {
-                Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
-            } else Modifier
-        }
+object UnderCursorLinkVariant : ComponentModifier {
+    @Composable
+    override fun toModifier(data: Any?): Modifier {
+        var isHovering by remember { mutableStateOf(false) }
+
+        val modifier = Modifier
+            .onMouseEnter {
+                isHovering = true
+            }
+            .onMouseLeave {
+                isHovering = false
+            }
+
+        return if (!isHovering) {
+            modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
+        } else modifier
     }
 }
 
@@ -76,22 +67,15 @@ fun Link(
     path: String,
     text: String? = null,
     modifier: Modifier = Modifier,
-    variant: LinkVariant? = null,
+    variant: ComponentModifier? = null
 ) {
-    var state by remember { mutableStateOf(LinkState.DEFAULT) }
     A(
         href = path,
-        attrs = SilkTheme.componentStyles[LinkKey].toModifier(state, variant)
+        attrs = SilkTheme.componentModifiers[LinkKey].then(variant).toModifier(null)
             .then(modifier)
             .clickable { evt ->
                 evt.preventDefault()
                 Router.navigateTo(path)
-            }
-            .onMouseEnter {
-                state = LinkState.HOVER
-            }
-            .onMouseLeave {
-                state = LinkState.DEFAULT
             }
             .asAttributeBuilder()
     ) {

@@ -5,26 +5,21 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.silk.components.ComponentKey
-import com.varabyte.kobweb.silk.components.ComponentStyle
-import com.varabyte.kobweb.silk.components.ComponentVariant
-import com.varabyte.kobweb.silk.components.EmptyState
-import com.varabyte.kobweb.silk.components.toModifier
+import com.varabyte.kobweb.silk.components.ComponentModifier
+import com.varabyte.kobweb.silk.components.then
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-interface TextStyle : ComponentStyle<EmptyState>
-object DefaultTextStyle : TextStyle {
+val TextKey = ComponentKey("text")
+object DefaultTextModifier : ComponentModifier {
     @Composable
-    @ReadOnlyComposable
-    override fun toModifier(state: EmptyState): Modifier {
+    override fun toModifier(data: Any?): Modifier {
         return Modifier.color(SilkTheme.palette.onPrimary)
     }
 }
 
-object TextKey : ComponentKey<TextStyle>
-interface TextVariant : ComponentVariant<EmptyState, TextStyle>
 
 /**
  * A span of text.
@@ -36,10 +31,10 @@ interface TextVariant : ComponentVariant<EmptyState, TextStyle>
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
-    variant: TextVariant? = null
+    variant: ComponentModifier? = null
 ) {
     Span(
-        attrs = SilkTheme.componentStyles[TextKey].toModifier(variant)
+        attrs = SilkTheme.componentModifiers[TextKey].then(variant).toModifier(null)
             .then(modifier)
             .asAttributeBuilder {
                 if (text.startsWith(' ') || text.endsWith(' ')) {
