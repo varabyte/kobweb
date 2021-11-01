@@ -47,7 +47,17 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
  * }
  * ```
  */
-class ComponentKey(val name: String)
+class ComponentKey(val name: String) {
+    companion object {
+        private val usedNames = mutableSetOf<String>()
+    }
+
+    init {
+        if (!usedNames.add(name)) {
+            error("Attempt to create a new ComponentKey with a name that's already used: $name")
+        }
+    }
+}
 
 /**
  * An interface that provides styling for some target component.
