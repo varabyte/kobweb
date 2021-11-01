@@ -26,13 +26,10 @@ object DefaultSurfaceModifier : ComponentModifier {
 @Composable
 fun Surface(
     modifier: Modifier = Modifier.fillMaxSize(),
-    shape: Shape = Rect(),
     content: @Composable () -> Unit
 ) {
     Box(
-        SilkTheme.componentModifiers[SurfaceKey].toModifier(null)
-            .then(modifier)
-            .clip(shape),
+        SilkTheme.componentModifiers[SurfaceKey].toModifier(null).then(modifier)
     ) {
         content()
     }
