@@ -20,7 +20,6 @@ object DefaultTextModifier : ComponentModifier {
     }
 }
 
-
 /**
  * A span of text.
  *
