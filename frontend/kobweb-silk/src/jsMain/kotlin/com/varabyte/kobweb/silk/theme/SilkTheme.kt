@@ -6,8 +6,10 @@ import com.varabyte.kobweb.silk.components.ComponentKey
 import com.varabyte.kobweb.silk.components.ComponentModifier
 import com.varabyte.kobweb.silk.components.ComponentModifiers
 import com.varabyte.kobweb.silk.components.MutableComponentModifiers
+import com.varabyte.kobweb.silk.components.NoOpComponentModifier
 import com.varabyte.kobweb.silk.components.forms.ButtonKey
 import com.varabyte.kobweb.silk.components.forms.DefaultButtonModifier
+import com.varabyte.kobweb.silk.components.graphics.CanvasKey
 import com.varabyte.kobweb.silk.components.navigation.DefaultLinkModifier
 import com.varabyte.kobweb.silk.components.navigation.LinkKey
 import com.varabyte.kobweb.silk.components.text.DefaultTextModifier
@@ -61,6 +63,7 @@ internal val SilkPalettes: ProvidableCompositionLocal<Palettes> = compositionLoc
 internal val ComponentModifiers: ProvidableCompositionLocal<MutableComponentModifiers> = compositionLocalOf {
     MutableComponentModifiers(null).apply {
         this[ButtonKey] = DefaultButtonModifier
+        this[CanvasKey] = NoOpComponentModifier
         this[LinkKey] = DefaultLinkModifier
         this[TextKey] = DefaultTextModifier
     }
