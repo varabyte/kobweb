@@ -1,10 +1,10 @@
-package com.varabyte.kobweb.example.todo.api
+package todo.api
 
 import com.varabyte.kobweb.api.Api
 import com.varabyte.kobweb.api.ApiContext
 import com.varabyte.kobweb.api.data.getValue
 import com.varabyte.kobweb.api.http.setBodyText
-import com.varabyte.kobweb.example.todo.model.TodoStore
+import todo.model.TodoStore
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

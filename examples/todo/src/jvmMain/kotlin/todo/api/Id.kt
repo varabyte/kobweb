@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.example.todo.api
+package todo.api
 
 import com.varabyte.kobweb.api.Api
 import com.varabyte.kobweb.api.ApiContext

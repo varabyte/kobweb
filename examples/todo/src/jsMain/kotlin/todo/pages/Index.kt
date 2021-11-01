@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.example.todo.pages
+package todo.pages
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.*
@@ -16,11 +16,6 @@ import com.varabyte.kobweb.compose.ui.maxWidth
 import com.varabyte.kobweb.compose.ui.minWidth
 import com.varabyte.kobweb.compose.ui.padding
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.example.todo.Styles
-import com.varabyte.kobweb.example.todo.components.widgets.LoadingSpinner
-import com.varabyte.kobweb.example.todo.components.widgets.TodoCard
-import com.varabyte.kobweb.example.todo.components.widgets.TodoForm
-import com.varabyte.kobweb.example.todo.model.TodoItem
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.navigation.UnderCursorLinkVariant
 import kotlinx.browser.window
@@ -31,6 +26,11 @@ import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Footer
 import org.jetbrains.compose.web.dom.Text
+import todo.Styles
+import todo.components.widgets.LoadingSpinner
+import todo.components.widgets.TodoCard
+import todo.components.widgets.TodoForm
+import todo.model.TodoItem
 import com.varabyte.kobweb.silk.components.text.Text as SilkText
 
 private suspend fun loadAndReplaceTodos(id: String, todos: SnapshotStateList<TodoItem>) {

@@ -11,7 +11,7 @@ repositories {
     google()
 }
 
-group = "com.varabyte.kobweb.example.todo"
+group = "todo"
 version = "1.0-SNAPSHOT"
 
 kotlin {

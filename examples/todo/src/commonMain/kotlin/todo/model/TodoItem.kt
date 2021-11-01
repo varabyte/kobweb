@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.example.todo.model
+package todo.model
 
 import kotlinx.serialization.Serializable
 

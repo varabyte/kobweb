@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.example.todo
+package todo
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.Cursor

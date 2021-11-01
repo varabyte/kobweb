@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.example.todo.model
+package todo.model
 
 import com.varabyte.kobweb.api.Init
 import com.varabyte.kobweb.api.InitContext
