@@ -24,7 +24,7 @@ import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.Date
 import kotlin.math.min
 
-val CanvasKey = ComponentKey("canvas")
+val CanvasKey = ComponentKey("silk-canvas")
 
 /**
  * Arguments passed to the user's `render` callback.

@@ -18,7 +18,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
 
-val LinkKey = ComponentKey("link")
+val LinkKey = ComponentKey("silk-link")
 
 object DefaultLinkModifier : ComponentModifier {
     @Composable

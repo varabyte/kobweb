@@ -37,7 +37,7 @@ object Buttons {
     const val RIGHT = 2.toShort()
 }
 
-val ButtonKey = ComponentKey("button")
+val ButtonKey = ComponentKey("silk-button")
 object DefaultButtonModifier : ComponentModifier {
     @Composable
     override fun toModifier(data: Any?): Modifier {

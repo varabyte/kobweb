@@ -12,7 +12,7 @@ import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-val TextKey = ComponentKey("text")
+val TextKey = ComponentKey("silk-text")
 object DefaultTextModifier : ComponentModifier {
     @Composable
     override fun toModifier(data: Any?): Modifier {

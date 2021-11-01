@@ -11,7 +11,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
  * For example,
  *
  * ```
- * val ButtonKey = object : ComponentKey { name = "button" }
+ * val ButtonKey = ComponentKey("silk-button")
  *
  * // Later, to fetch
  * SilkTheme.componentModifiers[ButtonKey].toModifier()
@@ -72,15 +72,16 @@ object NoOpComponentModifier : ComponentModifier {
 }
 
 /**
- * A modifier which will tag the current element with `"silk-$name"` as a classname.
+ * A modifier which will tag the current element with the name as its classname.
  *
- * This is useful as a minimum styling that ALL components are guaranteed to be applied with (even if you replace the
- * current modifier for some key with a [NoOpComponentModifier].
+ * We will ALWAYS apply this modifier ourselves, so that any styled component is guaranteed to have a classname enabling
+ * users to add static css styles for it if that's their preferred method. In other words, this will be included in the
+ * modifier chain even if you replace the current modifier for some key with a [NoOpComponentModifier].
  */
-class ClassNameComponentModifier(private val name: String) : ComponentModifier {
+private class ClassNameComponentModifier(private val name: String) : ComponentModifier {
     @Composable
     override fun toModifier(data: Any?): Modifier {
-        return Modifier.classNames("silk-$name")
+        return Modifier.classNames(name)
     }
 }
 
