@@ -17,7 +17,7 @@ fun HomePage() {
         onClick = { colorMode = colorMode.opposite() },
         Modifier.clip(Circle())
       ) {
-        Box(Modifier.padding(4.dp)) {
+        Box(Modifier.padding(4.px)) {
           if (colorMode.isLight()) FaSun() else FaMoon()
         }
       }
