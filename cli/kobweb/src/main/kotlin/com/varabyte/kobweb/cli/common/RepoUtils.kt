@@ -28,7 +28,7 @@ fun KonsoleApp.handleFetch(repo: String, branch: String): File? {
                 .call()
         }) {
         konsole {
-            textError("We were unable to fetch templates. Confirm the specified repository and try again.")
+            textError("We were unable to fetch templates. Confirm the specified repository/branch and try again.")
         }.run()
 
         return null
