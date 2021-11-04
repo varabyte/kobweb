@@ -3,7 +3,6 @@ jetbrains-compose = "1.0.0-beta1"
 kotlin = "1.5.31"
 
 [libraries]
-kobweb-api = { module = "com.varabyte.kobweb:kobweb-api" }
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core" }
 kobweb-silk-core = { module = "com.varabyte.kobweb:kobweb-silk" }
 kobweb-silk-icons-fa = { module = "com.varabyte.kobweb:kobweb-silk-icons-fa" }
