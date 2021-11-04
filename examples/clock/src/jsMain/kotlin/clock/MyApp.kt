@@ -50,9 +50,21 @@ import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vw
 import org.jetbrains.compose.web.css.width
 
+object MyStyleSheet : StyleSheet() {
+    init {
+        "body" style {
+            fontFamily(
+                "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+                "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "sans-serif"
+            )
+        }
+    }
+}
+
 @App
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
+    Style(MyStyleSheet)
     SilkApp {
         // You can override base styles by passing them into SilkTheme
         SilkTheme {

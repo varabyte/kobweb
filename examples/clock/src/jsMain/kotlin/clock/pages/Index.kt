@@ -1,6 +1,7 @@
 package clock.pages
 
 import androidx.compose.runtime.*
+import clock.components.layout.PageLayout
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -140,20 +141,22 @@ private fun BoxScope.Clock() {
 @Page
 @Composable
 fun ClockPage() {
-    Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            var colorMode by rememberColorMode()
-            Button(
-                onClick = { colorMode = colorMode.opposite() },
-                Modifier.padding(10.px).clip(Circle()).fontSize(24.px)
-            ) {
-                Box(Modifier.padding(4.px)) {
-                    if (colorMode.isLight()) FaSun() else FaMoon()
+    PageLayout {
+        Column(Modifier.fillMaxSize()) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                var colorMode by rememberColorMode()
+                Button(
+                    onClick = { colorMode = colorMode.opposite() },
+                    Modifier.padding(10.px).clip(Circle()).fontSize(24.px)
+                ) {
+                    Box(Modifier.padding(4.px)) {
+                        if (colorMode.isLight()) FaSun() else FaMoon()
+                    }
                 }
             }
-        }
-        Box(Modifier.fillMaxSize()) {
-            Clock()
+            Box(Modifier.fillMaxSize()) {
+                Clock()
+            }
         }
     }
 }
