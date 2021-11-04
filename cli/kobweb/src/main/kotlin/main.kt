@@ -1,3 +1,5 @@
+import com.varabyte.kobweb.cli.common.DEFAULT_BRANCH
+import com.varabyte.kobweb.cli.common.DEFAULT_REPO
 import com.varabyte.kobweb.cli.create.handleCreate
 import com.varabyte.kobweb.cli.export.handleExport
 import com.varabyte.kobweb.cli.list.handleList
@@ -9,9 +11,6 @@ import kotlinx.cli.ArgType
 import kotlinx.cli.ExperimentalCli
 import kotlinx.cli.Subcommand
 import kotlinx.cli.default
-
-private const val DEFAULT_REPO = "https://github.com/varabyte/kobweb-templates"
-private const val DEFAULT_BRANCH = "main"
 
 @ExperimentalCli
 fun main(args: Array<String>) {

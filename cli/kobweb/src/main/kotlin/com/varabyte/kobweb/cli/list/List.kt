@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.cli.list
 
+import com.varabyte.kobweb.cli.common.DEFAULT_BRANCH
+import com.varabyte.kobweb.cli.common.DEFAULT_REPO
 import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
@@ -26,6 +28,12 @@ fun handleList(repo: String, branch: String) = konsoleApp {
         if (templates.isNotEmpty()) {
             text("You can create the following Kobweb projects by typing `kobweb create ")
             cyan { text("...") }
+            if (repo != DEFAULT_REPO) {
+                text(" --repo $repo")
+            }
+            if (branch != DEFAULT_BRANCH) {
+                text(" --branch $branch")
+            }
             textLine("`")
             textLine()
 

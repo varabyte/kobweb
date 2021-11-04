@@ -7,6 +7,9 @@ import org.eclipse.jgit.api.Git
 import java.io.File
 import java.nio.file.Files
 
+const val DEFAULT_REPO = "https://github.com/varabyte/kobweb-templates"
+const val DEFAULT_BRANCH = "main"
+
 private val TempDirKey = KonsoleApp.Lifecycle.createKey<File>()
 
 /**
