@@ -23,26 +23,10 @@ val LinkKey = ComponentKey("silk-link")
 object DefaultLinkModifier : ComponentModifier {
     @Composable
     override fun toModifier(data: Any?): Modifier {
-        return Modifier.color(SilkTheme.palette.secondary)
-    }
-}
-
-object UndecoratedLinkVariant : ComponentModifier {
-    @Composable
-    override fun toModifier(data: Any?): Modifier {
-        return Modifier.styleModifier {
-            textDecorationLine(TextDecorationLine.None)
-        }
-    }
-}
-
-/** A link which shows an underline only when the cursor is hovering over it. */
-object UnderCursorLinkVariant : ComponentModifier {
-    @Composable
-    override fun toModifier(data: Any?): Modifier {
         var isHovering by remember { mutableStateOf(false) }
 
         val modifier = Modifier
+            .color(SilkTheme.palette.secondary)
             .onMouseEnter {
                 isHovering = true
             }
@@ -53,6 +37,15 @@ object UnderCursorLinkVariant : ComponentModifier {
         return if (!isHovering) {
             modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
         } else modifier
+    }
+}
+
+object UndecoratedLinkVariant : ComponentModifier {
+    @Composable
+    override fun toModifier(data: Any?): Modifier {
+        return Modifier.styleModifier {
+            textDecorationLine(TextDecorationLine.None)
+        }
     }
 }
 

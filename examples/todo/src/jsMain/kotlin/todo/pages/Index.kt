@@ -17,7 +17,6 @@ import com.varabyte.kobweb.compose.ui.minWidth
 import com.varabyte.kobweb.compose.ui.padding
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.components.navigation.UnderCursorLinkVariant
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
