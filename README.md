@@ -21,6 +21,7 @@ fun HomePage() {
         Modifier.clip(Circle())
       ) {
         Box(Modifier.padding(4.px)) {
+          // Includes support for Font Awesome icons
           if (colorMode.isLight()) FaSun() else FaMoon()
         }
       }
