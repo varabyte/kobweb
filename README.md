@@ -6,7 +6,8 @@
 
 # K🕸️bweb
 
-Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by [Next.js](https://nextjs.org)
+Kobweb is an opinionated Kotlin framework for creating websites and web apps, built on top of
+[Web Compose](https://compose-web.ui.pages.jetbrains.team) and inspired by [Next.js](https://nextjs.org)
 and [Chakra UI](https://chakra-ui.com).
 
 ```kotlin
