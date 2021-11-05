@@ -6,6 +6,9 @@
 
 # K🕸️bweb
 
+Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by [Next.js](https://nextjs.org)
+and [Chakra UI](https://chakra-ui.com).
+
 ```kotlin
 @Page
 @Composable
@@ -41,10 +44,7 @@ fun HomePage() {
 
 ---
 
-Kobweb is an opinionated Kotlin framework for building websites and web apps, inspired by [Next.js](https://nextjs.org)
-and [Chakra UI](https://chakra-ui.com).
-
-**It is currently in technology preview**. Please consider starring the project to indicate interest, so we know we're
+**Kobweb is currently in technology preview**. Please consider starring the project to indicate interest, so we know we're
 creating something the community wants. [How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
 
 Our goal is to provide:
