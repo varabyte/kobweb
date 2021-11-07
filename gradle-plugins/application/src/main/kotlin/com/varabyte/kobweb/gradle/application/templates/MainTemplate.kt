@@ -22,7 +22,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         imports.add("org.w3c.dom.get")
     }
 
-    imports.add(appFqcn ?: "com.varabyte.kobweb.core.DefaultApp")
+    imports.add(appFqcn ?: "com.varabyte.kobweb.core.KobwebApp")
     imports.sort()
 
     return buildString {
@@ -122,7 +122,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                 }
 
                 renderComposable(rootElementId = "root") {
-                    ${appFqcn?.let { appFqcn.substringAfterLast('.') } ?: "DefaultApp"} {
+                    ${appFqcn?.let { appFqcn.substringAfterLast('.') } ?: "KobwebApp"} {
                         Router.renderActivePage()
                     }
                 }

@@ -14,14 +14,14 @@ import org.jetbrains.compose.web.css.px
  *
  * The method should take a `content: @Composable () -> Unit` parameter.
  *
- * If no method is annotated `@App` then [DefaultApp] will be used. Of course, your own custom app method can compose
+ * If no method is annotated `@App` then [KobwebApp] will be used. Of course, your own custom app method can compose
  * that function if it wishes:
  *
  * ```
  * @App
  * @Composable
  * fun MyApp(content: @Composable () -> Unit) {
- *   DefaultApp {
+ *   KobwebApp {
  *     // My own extra initialization
  *     content()
  *   }
@@ -34,7 +34,7 @@ import org.jetbrains.compose.web.css.px
 annotation class App
 
 @Composable
-fun DefaultApp(content: @Composable () -> Unit) {
+fun KobwebApp(content: @Composable () -> Unit) {
     Style(DefaultStyleSheet)
     content()
 }

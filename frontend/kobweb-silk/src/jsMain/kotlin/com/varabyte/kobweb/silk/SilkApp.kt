@@ -1,9 +1,9 @@
 package com.varabyte.kobweb.silk
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.transitionDuration
 import com.varabyte.kobweb.compose.css.transitionProperty
-import com.varabyte.kobweb.core.DefaultApp
+import com.varabyte.kobweb.core.KobwebApp
 import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.ms
@@ -20,7 +20,7 @@ object SilkStyleSheet : StyleSheet() {
 
 @Composable
 fun SilkApp(content: @Composable () -> Unit) {
-    DefaultApp {
+    KobwebApp {
         Style(SilkStyleSheet)
         content()
     }
