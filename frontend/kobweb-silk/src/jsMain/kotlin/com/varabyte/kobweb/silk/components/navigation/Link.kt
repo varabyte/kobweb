@@ -10,7 +10,7 @@ import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.compose.ui.onMouseEnter
 import com.varabyte.kobweb.compose.ui.onMouseLeave
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.navigation.Router
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.ComponentKey
 import com.varabyte.kobweb.silk.components.ComponentModifier
 import com.varabyte.kobweb.silk.components.then
@@ -62,13 +62,15 @@ fun Link(
     modifier: Modifier = Modifier,
     variant: ComponentModifier? = null
 ) {
+    val ctx = rememberPageContext()
+
     A(
         href = path,
         attrs = SilkTheme.componentModifiers[LinkKey].then(variant).toModifier(null)
             .then(modifier)
             .clickable { evt ->
                 evt.preventDefault()
-                Router.navigateTo(path)
+                ctx.router.navigateTo(path)
             }
             .asAttributeBuilder()
     ) {

@@ -100,18 +100,20 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         appendLine("fun main() {")
         if (target == BuildTarget.DEBUG) {
             appendLine("    handleServerStatusEvents()")
+            appendLine()
         }
+        appendLine("    val router = Router()")
         pageFqcnRoutes.entries.forEach { entry ->
             val pageFqcn = entry.key
             val route = entry.value
 
-            appendLine("""    Router.register("$route") { $pageFqcn() }""")
+            appendLine("""    router.register("$route") { $pageFqcn() }""")
         }
 
         appendLine()
         appendLine(
             """
-                Router.navigateTo(window.location.pathname + window.location.search)
+                router.navigateTo(window.location.pathname + window.location.search)
 
                 // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them the first
                 // time we render this page with their composable, dynamic versions. Think of this as poor man's
@@ -123,7 +125,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
 
                 renderComposable(rootElementId = "root") {
                     ${appFqcn?.let { appFqcn.substringAfterLast('.') } ?: "KobwebApp"} {
-                        Router.renderActivePage()
+                        router.renderActivePage()
                     }
                 }
             }

@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.core
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import com.varabyte.kobweb.navigation.Router
 
 /**
  * Various contextual information useful for a page.
@@ -17,9 +17,9 @@ import androidx.compose.runtime.remember
  *    ...
  * }
  */
-class PageContext {
+class PageContext(val router: Router) {
     companion object {
-        internal var active: PageContext? = null
+        internal val active by lazy { mutableStateOf<PageContext?>(null) }
     }
     internal val mutableParams = mutableMapOf<String, String>()
     val params: Map<String, String> = mutableParams
@@ -27,6 +27,6 @@ class PageContext {
 
 @Composable
 fun rememberPageContext(): PageContext = remember {
-    return PageContext.active
+    PageContext.active.value
         ?: error("rememberPageContext is only valid to call inside a @Page composable, as it is cleared elsewhere.")
 }

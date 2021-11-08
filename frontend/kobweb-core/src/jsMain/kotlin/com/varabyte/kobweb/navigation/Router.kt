@@ -26,7 +26,7 @@ private class PageData(
 /**
  * The class responsible for navigating to different pages in a user's app.
  */
-object Router {
+class Router {
     private val activePageData = mutableStateOf<PageData?>(null)
     private val pages = mutableMapOf<String, PageMethod>()
 
@@ -36,9 +36,9 @@ object Router {
         val data = activePageData.value
             ?: error("Call 'navigateTo' at least once before calling 'renderActivePage'")
 
-        PageContext.active = data.pageContext
+        PageContext.active.value = data.pageContext
         data.pageMethod.invoke()
-        PageContext.active = null
+        PageContext.active.value = null
     }
 
     @Suppress("unused") // Called by generated code
@@ -63,7 +63,7 @@ object Router {
         }
 
         val pageMethod = pages[path] ?: { ErrorPage(404) }
-        val ctx = PageContext()
+        val ctx = PageContext(this)
         if (pathParts.size == 2) {
             pathParts[1].split("&").forEach { param ->
                 val (key, value) = param.split('=', limit = 2)
