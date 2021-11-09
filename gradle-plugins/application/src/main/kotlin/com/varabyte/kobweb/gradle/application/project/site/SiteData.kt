@@ -1,6 +1,9 @@
-package com.varabyte.kobweb.gradle.application.project
+package com.varabyte.kobweb.gradle.application.project.site
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
+import com.varabyte.kobweb.gradle.application.project.KobwebProject
+import com.varabyte.kobweb.gradle.application.project.PsiUtils
+import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
@@ -9,8 +12,12 @@ import java.io.File
 class SiteData {
     var app: AppEntry? = null
         internal set
+
     private val _pages = mutableListOf<PageEntry>()
     val pages: List<PageEntry> = _pages
+
+    private val _inits = mutableListOf<InitEntry>()
+    val inits: List<InitEntry> = _inits
 
     companion object {
         fun from(
@@ -24,8 +31,9 @@ class SiteData {
                 val ktFile = kotlinProject.parseKotlinFile(file)
 
                 var currPackage = ""
-                var pageSimpleName = PAGE_SIMPLE_NAME
                 var appSimpleName = APP_SIMPLE_NAME
+                var pageSimpleName = PAGE_SIMPLE_NAME
+                var initSimpleName = INIT_SIMPLE_NAME
                 ktFile.visitAllChildren { element ->
                     when (element) {
                         is KtPackageDirective -> {
@@ -35,14 +43,19 @@ class SiteData {
                             // It's unlikely this will happen but catch the "import as" case,
                             // e.g. `import com.varabyte.kobweb.core.Page as MyPage`
                             when (element.importPath?.fqName?.asString()) {
-                                APP_FQCN -> {
+                                APP_FQN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { appSimpleName = it }
                                     }
                                 }
-                                PAGE_FQCN -> {
+                                PAGE_FQN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { pageSimpleName = it }
+                                    }
+                                }
+                                INIT_FQN -> {
+                                    element.alias?.let { alias ->
+                                        alias.name?.let { initSimpleName = it }
                                     }
                                 }
                             }
@@ -51,14 +64,15 @@ class SiteData {
                             element.annotationEntries.forEach { entry ->
                                 when (entry.shortName?.asString()) {
                                     appSimpleName -> {
-                                        val customAppFqcn = when {
+                                        val appFqn = when {
                                             currPackage.isNotEmpty() -> "$currPackage.${element.name}"
                                             else -> element.name
                                         }
-                                        customAppFqcn?.let { siteData.app = AppEntry(it) }
+                                        appFqn?.let { siteData.app = AppEntry(it) }
                                     }
                                     pageSimpleName -> {
-                                        val qualifiedPackagesPackage = KobwebProject.prefixQualifiedPackage(group, pagesPackage)
+                                        val qualifiedPackagesPackage =
+                                            KobwebProject.prefixQualifiedPackage(group, pagesPackage)
                                         if (currPackage.startsWith(qualifiedPackagesPackage)) {
                                             // e.g. com.example.pages.blog -> blog
                                             val slugPrefix = currPackage
@@ -78,6 +92,18 @@ class SiteData {
                                                 )
                                             )
                                         }
+                                    }
+                                    initSimpleName -> {
+                                        val initFqn = when {
+                                            currPackage.isNotEmpty() -> "$currPackage.${element.name}"
+                                            else -> element.name
+                                        }
+                                        initFqn?.let { siteData._inits.add(
+                                            InitEntry(
+                                                initFqn,
+                                                acceptsContext = element.valueParameters.size == 1
+                                            )
+                                        ) }
                                     }
                                 }
                             }

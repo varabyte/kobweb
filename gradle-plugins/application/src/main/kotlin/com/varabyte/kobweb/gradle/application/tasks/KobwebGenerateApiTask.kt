@@ -3,7 +3,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
-import com.varabyte.kobweb.gradle.application.project.ApiData
+import com.varabyte.kobweb.gradle.application.project.api.ApiData
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -30,12 +30,12 @@ abstract class KobwebGenerateApiTask @Inject constructor(config: KobwebConfig)
                 // Sort values as it makes the generated registration logic easier to follow
                 createApisFactoryImpl(
                     apiMethods
-                        .associate { it.fqcn to it.route }
+                        .associate { it.fqn to it.route }
                         .toList()
                         .sortedBy { (_, route) -> route }
                         .toMap(),
                     initMethods
-                        .map { it.fqcn }
+                        .map { it.fqn }
                         .sorted(),
                 )
             )

@@ -1,6 +1,9 @@
-package com.varabyte.kobweb.gradle.application.project
+package com.varabyte.kobweb.gradle.application.project.api
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
+import com.varabyte.kobweb.gradle.application.project.KobwebProject
+import com.varabyte.kobweb.gradle.application.project.PsiUtils
+import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
@@ -36,12 +39,12 @@ class ApiData {
                             // It's unlikely this will happen but catch the "import as" case,
                             // e.g. `import com.varabyte.kobweb.api.Api as MyApi`
                             when (element.importPath?.fqName?.asString()) {
-                                INIT_FQCN -> {
+                                INIT_FQN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { initSimpleName = it }
                                     }
                                 }
-                                API_FQCN -> {
+                                API_FQN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { apiSimpleName = it }
                                     }
@@ -55,7 +58,8 @@ class ApiData {
                                         apiData._initMethods.add(InitEntry("$currPackage.${element.name}"))
                                     }
                                     apiSimpleName -> {
-                                        val qualifiedApiPackage = KobwebProject.prefixQualifiedPackage(group, apiPackage)
+                                        val qualifiedApiPackage =
+                                            KobwebProject.prefixQualifiedPackage(group, apiPackage)
                                         if (currPackage.startsWith(qualifiedApiPackage)) {
                                             // e.g. com.example.pages.blog -> blog
                                             val slugPrefix = currPackage

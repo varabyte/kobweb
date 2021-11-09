@@ -1,8 +1,16 @@
 package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
+import com.varabyte.kobweb.gradle.application.project.site.AppEntry
+import com.varabyte.kobweb.gradle.application.project.site.InitEntry
+import com.varabyte.kobweb.gradle.application.project.site.PageEntry
 
-fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, target: BuildTarget): String {
+fun createMainFunction(
+    appEntry: AppEntry?,
+    pageEntries: List<PageEntry>,
+    initEntries: List<InitEntry>,
+    target: BuildTarget
+): String {
     val imports = mutableListOf(
         "com.varabyte.kobweb.navigation.Router",
         "kotlinx.browser.document",
@@ -22,7 +30,10 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
         imports.add("org.w3c.dom.get")
     }
 
-    imports.add(appFqcn ?: "com.varabyte.kobweb.core.KobwebApp")
+    if (initEntries.any { it.acceptsContext }) {
+        imports.add("com.varabyte.kobweb.core.InitContext")
+    }
+
     imports.sort()
 
     return buildString {
@@ -103,14 +114,22 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
             appendLine()
         }
         appendLine("    val router = Router()")
-        pageFqcnRoutes.entries.forEach { entry ->
-            val pageFqcn = entry.key
-            val route = entry.value
+        pageEntries.forEach { entry ->
+            appendLine("""    router.register("${entry.route}") { ${entry.fqn}() }""")
+        }
+        appendLine()
 
-            appendLine("""    router.register("$route") { $pageFqcn() }""")
+        if (initEntries.isNotEmpty()) {
+            if (initEntries.any { entry -> entry.acceptsContext }) {
+                appendLine("    val ctx = InitContext(router)")
+            }
+            initEntries.forEach { entry ->
+                val ctx = if (entry.acceptsContext) "ctx" else ""
+                appendLine("    ${entry.fqn}($ctx)")
+            }
+            appendLine()
         }
 
-        appendLine()
         appendLine(
             """
                 router.navigateTo(window.location.pathname + window.location.search)
@@ -124,7 +143,7 @@ fun createMainFunction(appFqcn: String?, pageFqcnRoutes: Map<String, String>, ta
                 }
 
                 renderComposable(rootElementId = "root") {
-                    ${appFqcn?.let { appFqcn.substringAfterLast('.') } ?: "KobwebApp"} {
+                    ${appEntry?.fqn ?: "com.varabyte.kobweb.core.KobwebApp"} {
                         router.renderActivePage()
                     }
                 }

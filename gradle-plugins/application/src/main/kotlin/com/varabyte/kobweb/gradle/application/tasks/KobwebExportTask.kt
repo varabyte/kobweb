@@ -4,7 +4,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
-import com.varabyte.kobweb.gradle.application.project.SiteData
+import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction

@@ -4,7 +4,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
-import com.varabyte.kobweb.gradle.application.project.SiteData
+import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import org.gradle.api.tasks.InputFiles
@@ -37,14 +37,11 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, 
             genResRoot.mkdirs()
             File(genSrcRoot, "main.kt").writeText(
                 createMainFunction(
-                    app?.fqcn,
+                    app,
                     // Sort by route as it makes the generated registration logic easier to follow
-                    pages
-                        .associate { it.fqcn to it.route }
-                        .toList()
-                        .sortedBy { (_, route) -> route }
-                        .toMap(),
-                    buildTarget
+                    pages.sortedBy { it.route },
+                    inits,
+                    buildTarget,
                 )
             )
         }
