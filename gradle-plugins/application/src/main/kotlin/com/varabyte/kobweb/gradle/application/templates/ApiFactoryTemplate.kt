@@ -4,7 +4,7 @@ fun createApisFactoryImpl(apiFqcnRoutes: Map<String, String>, initMethods: List<
     return """
         import com.varabyte.kobweb.api.Apis
         import com.varabyte.kobweb.api.ApisFactory
-        import com.varabyte.kobweb.api.InitContext
+        import com.varabyte.kobweb.api.InitApiContext
         import com.varabyte.kobweb.api.data.MutableData
         import com.varabyte.kobweb.api.log.Logger
 
@@ -24,7 +24,7 @@ fun createApisFactoryImpl(apiFqcnRoutes: Map<String, String>, initMethods: List<
 
                 ${
                     if (initMethods.isNotEmpty()) {
-                        "val initCtx = InitContext(apis, data, logger)"
+                        "val initCtx = InitApiContext(apis, data, logger)"
                     }
                     else {
                         ""

@@ -1,7 +1,7 @@
 package todo.model
 
-import com.varabyte.kobweb.api.Init
-import com.varabyte.kobweb.api.InitContext
+import com.varabyte.kobweb.api.InitApi
+import com.varabyte.kobweb.api.InitApiContext
 import com.varabyte.kobweb.api.data.add
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -11,8 +11,8 @@ import kotlin.concurrent.withLock
 // reloaded). However, in a production app, you should use a real database instead, maybe a redis backend, or possibly
 // even something that lives on a different server which you access via network calls.
 
-@Init
-fun initTodoStore(ctx: InitContext) {
+@InitApi
+fun initTodoStore(ctx: InitApiContext) {
     ctx.data.add(TodoStore())
 }
 

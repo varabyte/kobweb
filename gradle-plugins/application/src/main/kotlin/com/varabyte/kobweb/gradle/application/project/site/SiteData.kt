@@ -16,8 +16,8 @@ class SiteData {
     private val _pages = mutableListOf<PageEntry>()
     val pages: List<PageEntry> = _pages
 
-    private val _inits = mutableListOf<InitEntry>()
-    val inits: List<InitEntry> = _inits
+    private val _inits = mutableListOf<InitKobwebEntry>()
+    val inits: List<InitKobwebEntry> = _inits
 
     companion object {
         fun from(
@@ -99,7 +99,7 @@ class SiteData {
                                             else -> element.name
                                         }
                                         initFqn?.let { siteData._inits.add(
-                                            InitEntry(
+                                            InitKobwebEntry(
                                                 initFqn,
                                                 acceptsContext = element.valueParameters.size == 1
                                             )

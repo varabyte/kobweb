@@ -9,4 +9,4 @@ import com.varabyte.kobweb.api.log.Logger
  * @param apis The parent [Apis] object, in case this method wants to register any additional API routes dynamically.
  *   This will be called AFTER methods annotated with [Api] have already been registered.
  */
-class InitContext(val apis: Apis, val data: MutableData, val logger: Logger)
+class InitApiContext(val apis: Apis, val data: MutableData, val logger: Logger)

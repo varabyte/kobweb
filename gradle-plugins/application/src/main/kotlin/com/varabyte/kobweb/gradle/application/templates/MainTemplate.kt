@@ -2,13 +2,13 @@ package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.project.site.AppEntry
-import com.varabyte.kobweb.gradle.application.project.site.InitEntry
+import com.varabyte.kobweb.gradle.application.project.site.InitKobwebEntry
 import com.varabyte.kobweb.gradle.application.project.site.PageEntry
 
 fun createMainFunction(
     appEntry: AppEntry?,
     pageEntries: List<PageEntry>,
-    initEntries: List<InitEntry>,
+    initEntries: List<InitKobwebEntry>,
     target: BuildTarget
 ): String {
     val imports = mutableListOf(
@@ -31,7 +31,7 @@ fun createMainFunction(
     }
 
     if (initEntries.any { it.acceptsContext }) {
-        imports.add("com.varabyte.kobweb.core.InitContext")
+        imports.add("com.varabyte.kobweb.core.InitKobwebContext")
     }
 
     imports.sort()

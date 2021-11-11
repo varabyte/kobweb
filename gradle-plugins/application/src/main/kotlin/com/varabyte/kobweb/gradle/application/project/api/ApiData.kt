@@ -10,8 +10,8 @@ import org.jetbrains.kotlin.psi.KtPackageDirective
 import java.io.File
 
 class ApiData {
-    private val _initMethods = mutableListOf<InitEntry>()
-    val initMethods: List<InitEntry> = _initMethods
+    private val _initMethods = mutableListOf<InitApiEntry>()
+    val initMethods: List<InitApiEntry> = _initMethods
 
     private val _apiMethods = mutableListOf<ApiEntry>()
     val apiMethods: List<ApiEntry> = _apiMethods
@@ -55,7 +55,7 @@ class ApiData {
                             element.annotationEntries.forEach { entry ->
                                 when (entry.shortName?.asString()) {
                                     initSimpleName -> {
-                                        apiData._initMethods.add(InitEntry("$currPackage.${element.name}"))
+                                        apiData._initMethods.add(InitApiEntry("$currPackage.${element.name}"))
                                     }
                                     apiSimpleName -> {
                                         val qualifiedApiPackage =

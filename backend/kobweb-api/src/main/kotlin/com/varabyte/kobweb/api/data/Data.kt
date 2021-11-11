@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.api.data
 
 import com.varabyte.kobweb.api.Api
-import com.varabyte.kobweb.api.Init
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
