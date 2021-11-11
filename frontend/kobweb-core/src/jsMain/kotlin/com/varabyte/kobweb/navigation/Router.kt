@@ -38,7 +38,6 @@ class Router {
 
         PageContext.active.value = data.pageContext
         data.pageMethod.invoke()
-        PageContext.active.value = null
     }
 
     @Suppress("unused") // Called by generated code

@@ -26,7 +26,4 @@ class PageContext(val router: Router) {
 }
 
 @Composable
-fun rememberPageContext(): PageContext = remember {
-    PageContext.active.value
-        ?: error("rememberPageContext is only valid to call inside a @Page composable, as it is cleared elsewhere.")
-}
+fun rememberPageContext(): PageContext = remember { PageContext.active.value!! }
