@@ -29,14 +29,8 @@ abstract class KobwebGenerateApiTask @Inject constructor(config: KobwebConfig)
             File(getSrcRoot, "ApisFactoryImpl.kt").writeText(
                 // Sort values as it makes the generated registration logic easier to follow
                 createApisFactoryImpl(
-                    apiMethods
-                        .associate { it.fqn to it.route }
-                        .toList()
-                        .sortedBy { (_, route) -> route }
-                        .toMap(),
-                    initMethods
-                        .map { it.fqn }
-                        .sorted(),
+                    apiMethods.sortedBy { entry -> entry.route },
+                    initMethods,
                 )
             )
         }
