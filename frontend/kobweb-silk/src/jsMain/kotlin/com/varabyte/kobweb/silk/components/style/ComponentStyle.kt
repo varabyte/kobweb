@@ -34,7 +34,8 @@ private class SimpleStyleBuilder : StyleBuilder {
 }
 
 /**
- * Class used as the receiver to a callback, allowing the user to define various state-dependent styles.
+ * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
+ * [Modifier]s).
  */
 class ComponentModifiers {
     /** Base styles for this component, will always be applied first. */
@@ -62,7 +63,7 @@ class ComponentModifiers {
     var hover: Modifier? = null
 
     /**
-     * Styles to apply to components when a cursor is interactiving with them.
+     * Styles to apply to components when a cursor is interacting with them.
      *
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:active
      */

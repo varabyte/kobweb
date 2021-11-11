@@ -18,9 +18,7 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.width
 import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.SilkApp
-import com.varabyte.kobweb.silk.components.ComponentModifier
 import com.varabyte.kobweb.silk.components.layout.Surface
-import com.varabyte.kobweb.silk.components.then
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
