@@ -110,8 +110,6 @@ private sealed interface StyleGroup {
     }
 }
 
-class ComponentVariant(internal val style: ComponentStyleBuilder)
-
 class ComponentStyleBuilder internal constructor(
     val name: String,
     private val init: ComponentModifiers.(ColorMode) -> Unit,
@@ -119,13 +117,13 @@ class ComponentStyleBuilder internal constructor(
     internal val variants = mutableListOf<ComponentVariant>()
 
     fun addVariant(name: String, init: ComponentModifiers.(ColorMode) -> Unit): ComponentVariant {
-        return ComponentVariant(ComponentStyleBuilder("${this.name}-$name", init)).also {
+        return ComponentVariant(ComponentStyleBuilder("${this.name}-$name", init), baseStyle = this).also {
             variants.add(it)
         }
     }
 
-    private fun StyleSheet.addStyles(name: String, pseudoClass: String?, styles: SimpleStyleBuilder) {
-        val classSelector = if (pseudoClass != null) ".$name:$pseudoClass" else ".$name"
+    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, styles: SimpleStyleBuilder) {
+        val classSelector = if (pseudoClass != null) "$selectorName:$pseudoClass" else selectorName
         this.apply {
             classSelector style {
                 styles.properties.forEach { entry -> property(entry.key, entry.value) }
@@ -134,39 +132,54 @@ class ComponentStyleBuilder internal constructor(
         }
     }
 
-    private fun StyleSheet.addStyles(name: String, pseudoClass: String?, group: StyleGroup) {
+    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, group: StyleGroup) {
         when (group) {
-            is StyleGroup.Light -> addStyles("$name-light", pseudoClass, group.styles)
-            is StyleGroup.Dark -> addStyles("$name-dark", pseudoClass, group.styles)
-            is StyleGroup.ColorAgnostic -> addStyles(name, pseudoClass, group.styles)
+            is StyleGroup.Light -> addStyles("$selectorName-light", pseudoClass, group.styles)
+            is StyleGroup.Dark -> addStyles("$selectorName-dark", pseudoClass, group.styles)
+            is StyleGroup.ColorAgnostic -> addStyles(selectorName, pseudoClass, group.styles)
             is StyleGroup.ColorAware -> {
-                addStyles("$name-light", pseudoClass, group.lightStyles)
-                addStyles("$name-dark", pseudoClass, group.darkStyles)
+                addStyles("$selectorName-light", pseudoClass, group.lightStyles)
+                addStyles("$selectorName-dark", pseudoClass, group.darkStyles)
             }
         }
     }
 
-    internal fun addStyles(styleSheet: StyleSheet) {
+    internal fun addStyles(styleSheet: StyleSheet, selectorName: String) {
         val lightModifiers = ComponentModifiers().apply { init(ColorMode.LIGHT) }
         val darkModifiers = ComponentModifiers().apply { init(ColorMode.DARK) }
 
         StyleGroup.from(lightModifiers.base, darkModifiers.base)?.let { group ->
-            styleSheet.addStyles(name, null, group)
+            styleSheet.addStyles(selectorName, null, group)
         }
         StyleGroup.from(lightModifiers.link, darkModifiers.link)?.let { group ->
-            styleSheet.addStyles(name, "link", group)
+            styleSheet.addStyles(selectorName, "link", group)
         }
         StyleGroup.from(lightModifiers.visited, darkModifiers.visited)?.let { group ->
-            styleSheet.addStyles(name, "visited", group)
+            styleSheet.addStyles(selectorName, "visited", group)
         }
         StyleGroup.from(lightModifiers.hover, darkModifiers.hover)?.let { group ->
-            styleSheet.addStyles(name, "hover", group)
+            styleSheet.addStyles(selectorName, "hover", group)
         }
         StyleGroup.from(lightModifiers.active, darkModifiers.active)?.let { group ->
-            styleSheet.addStyles(name, "active", group)
+            styleSheet.addStyles(selectorName, "active", group)
         }
     }
+
+    internal fun addStyles(styleSheet: StyleSheet) {
+        addStyles(styleSheet, ".$name")
+    }
 }
+
+class ComponentVariant(internal val style: ComponentStyleBuilder, private val baseStyle: ComponentStyleBuilder) {
+    fun addStyles(styleSheet: StyleSheet) {
+        // If you are using a variant, require it be associated with a tag already associated with the base style
+        // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
+        // a link (so this would be registered as ".silk-link.silk-link-undecorated").
+        // To put it another way, if you use a link variant with a surface widget, it won't be applied.
+        style.addStyles(styleSheet, ".${baseStyle.name}.${style.name}")
+    }
+}
+
 
 @Composable
 fun ComponentStyleBuilder.toModifier(variant: ComponentVariant? = null): Modifier {

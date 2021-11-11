@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.theme
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentStyleBuilder
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
 import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
@@ -17,14 +18,13 @@ object SilkConfig {
 
 class MutableSilkTheme {
     internal val componentStyles = LinkedHashMap<String, ComponentStyleBuilder>() // Preserve insertion order
+    internal val componentVariants = LinkedHashMap<String, ComponentVariant>() // Preserve insertion order
 
     var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
 
     fun registerComponentStyle(style: ComponentStyleBuilder) {
         componentStyles[style.name] = style
-        style.variants.forEach { variant ->
-            componentStyles[variant.style.name] = variant.style
-        }
+        style.variants.forEach { variant -> componentVariants[style.name] = variant }
     }
 }
 
@@ -44,6 +44,11 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         mutableSilkTheme.componentStyles.values.forEach { styleBuilder ->
             styleBuilder.addStyles(componentStyleSheet)
             _componentStyles[styleBuilder.name] = ComponentStyle(styleBuilder.name)
+        }
+        // Variants should be defined after base styles to make sure they take priority if used
+        mutableSilkTheme.componentVariants.values.forEach { variant ->
+            variant.addStyles(componentStyleSheet)
+            _componentStyles[variant.style.name] = ComponentStyle(variant.style.name)
         }
     }
 }
