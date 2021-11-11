@@ -20,8 +20,6 @@ import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.SilkApp
 import com.varabyte.kobweb.silk.components.ComponentModifier
 import com.varabyte.kobweb.silk.components.layout.Surface
-import com.varabyte.kobweb.silk.components.navigation.DefaultLinkModifier
-import com.varabyte.kobweb.silk.components.navigation.LinkKey
 import com.varabyte.kobweb.silk.components.then
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.AlignItems
@@ -141,10 +139,8 @@ object Styles {
 fun MyApp(content: @Composable () -> Unit) {
     Style(TodoStyleSheet)
     SilkApp {
-        SilkTheme {
-            Surface(Modifier.width(100.vw).height(100.vh)) {
-                content()
-            }
+        Surface(Modifier.width(100.vw).height(100.vh)) {
+            content()
         }
     }
 }

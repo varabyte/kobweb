@@ -27,11 +27,9 @@ object CssGlobalsStyleSheet : StyleSheet() {
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
     SilkApp {
-        SilkTheme {
-            Style(CssGlobalsStyleSheet)
-            Surface(Modifier.width(100.vw).height(100.vh)) {
-                content()
-            }
+        Style(CssGlobalsStyleSheet)
+        Surface(Modifier.width(100.vw).height(100.vh)) {
+            content()
         }
     }
 }

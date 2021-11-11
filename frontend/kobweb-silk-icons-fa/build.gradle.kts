@@ -149,7 +149,7 @@ enum class IconStyle(internal val category: IconCategory) {
 private val defaultColor: Color
     @Composable
     @ReadOnlyComposable
-    get() = SilkTheme.palette.onPrimary
+    get() = SilkTheme.palette.color
 
 @Composable
 fun FaIcon(

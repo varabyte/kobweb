@@ -1,23 +1,17 @@
 package com.varabyte.kobweb.silk.components.layout
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.background
 import com.varabyte.kobweb.compose.ui.fillMaxSize
-import com.varabyte.kobweb.silk.components.ComponentKey
-import com.varabyte.kobweb.silk.components.ComponentModifier
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
-import com.varabyte.kobweb.silk.theme.shapes.Rect
-import com.varabyte.kobweb.silk.theme.shapes.Shape
-import com.varabyte.kobweb.silk.theme.shapes.clip
 
-val SurfaceKey = ComponentKey("silk-surface")
-object DefaultSurfaceModifier : ComponentModifier {
-    @Composable
-    override fun toModifier(data: Any?): Modifier {
-        return Modifier.background(SilkTheme.palette.surface)
-    }
+val SurfaceStyle = ComponentStyle("silk-surface") { colorMode ->
+    base = Modifier.background(SilkTheme.palettes[colorMode].background)
 }
 
 /**
@@ -26,10 +20,11 @@ object DefaultSurfaceModifier : ComponentModifier {
 @Composable
 fun Surface(
     modifier: Modifier = Modifier.fillMaxSize(),
+    variant: ComponentVariant? = null,
     content: @Composable () -> Unit
 ) {
     Box(
-        SilkTheme.componentModifiers[SurfaceKey].toModifier(null).then(modifier)
+        SurfaceStyle.toModifier(variant).then(modifier)
     ) {
         content()
     }

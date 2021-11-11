@@ -1,114 +1,52 @@
 package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.silk.components.ComponentKey
-import com.varabyte.kobweb.silk.components.ComponentModifier
-import com.varabyte.kobweb.silk.components.ComponentModifiers
-import com.varabyte.kobweb.silk.components.MutableComponentModifiers
-import com.varabyte.kobweb.silk.components.NoOpComponentModifier
-import com.varabyte.kobweb.silk.components.forms.ButtonKey
-import com.varabyte.kobweb.silk.components.forms.DefaultButtonModifier
-import com.varabyte.kobweb.silk.components.graphics.CanvasKey
-import com.varabyte.kobweb.silk.components.layout.DefaultSurfaceModifier
-import com.varabyte.kobweb.silk.components.layout.SurfaceKey
-import com.varabyte.kobweb.silk.components.navigation.DefaultLinkModifier
-import com.varabyte.kobweb.silk.components.navigation.LinkKey
-import com.varabyte.kobweb.silk.components.text.DefaultTextModifier
-import com.varabyte.kobweb.silk.components.text.TextKey
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentStyleBuilder
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
-import com.varabyte.kobweb.silk.theme.colors.Palette
-import com.varabyte.kobweb.silk.theme.colors.Palettes
-import com.varabyte.kobweb.silk.theme.colors.SystemPalettes
-
-/**
- * The default palletes provided by Silk, exposed publicly in case sites want to tweak them using
- * [SystemPalettes.copy] instead of providing their own from scratch.
- */
-val SYSTEM_PALLETES = SystemPalettes(
-    light = Palette(
-        background = Color.White,
-        surface = Color.White,
-        primary = ColorSchemes.White._900,
-        secondary = ColorSchemes.Blue._800,
-        warning = Color.Yellow,
-        error = Color.Red,
-        onBackground = Color.Black,
-        onSurface = Color.Black,
-        onPrimary = Color.Black,
-        onSecondary = Color.Black,
-        onWarning = Color.Black,
-        onError = Color.White,
-    ),
-    dark = Palette(
-        background = Color.Black,
-        surface = Color.Black,
-        primary = ColorSchemes.Black._900,
-        secondary = ColorSchemes.Blue._100,
-        warning = Color.Yellow,
-        error = Color.Red,
-        onBackground = Color.White,
-        onSurface = Color.White,
-        onPrimary = Color.White,
-        onSecondary = Color.White,
-        onWarning = Color.Black,
-        onError = Color.White,
-    ),
-)
+import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.SilkPalette
+import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
+import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import org.jetbrains.compose.web.css.StyleSheet
 
 object SilkConfig {
     var initialColorMode: ColorMode = ColorMode.LIGHT
 }
 
-internal val SilkPalettes: ProvidableCompositionLocal<Palettes> = compositionLocalOf { SYSTEM_PALLETES }
-internal val ComponentModifiers: ProvidableCompositionLocal<MutableComponentModifiers> = compositionLocalOf {
-    MutableComponentModifiers(null).apply {
-        this[ButtonKey] = DefaultButtonModifier
-        this[CanvasKey] = NoOpComponentModifier
-        this[LinkKey] = DefaultLinkModifier
-        this[SurfaceKey] = DefaultSurfaceModifier
-        this[TextKey] = DefaultTextModifier
-    }
-}
+class MutableSilkTheme {
+    internal val componentStyles = LinkedHashMap<String, ComponentStyleBuilder>() // Preserve insertion order
 
-object SilkTheme {
-    val palettes: Palettes
-        @Composable
-        @ReadOnlyComposable
-        get() = SilkPalettes.current
+    var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
 
-    val palette: Palette
-        @Composable
-        @ReadOnlyComposable
-        get() = palettes.getActivePalette()
-
-    val componentModifiers: ComponentModifiers
-        @Composable
-        @ReadOnlyComposable
-        get() = ComponentModifiers.current
-}
-
-@Composable
-fun SilkTheme(
-    palettes: Palettes = SilkTheme.palettes,
-    componentModifiers: List<Pair<ComponentKey, ComponentModifier>> = emptyList(),
-    content: @Composable () -> Unit
-) {
-    val finalModifiers = if (componentModifiers.isEmpty()) {
-        ComponentModifiers.current
-    } else {
-        MutableComponentModifiers(ComponentModifiers.current).apply {
-            componentModifiers.forEach { pair ->
-                this[pair.first] = pair.second
-            }
+    fun registerComponentStyle(style: ComponentStyleBuilder) {
+        componentStyles[style.name] = style
+        style.variants.forEach { variant ->
+            componentStyles[variant.style.name] = variant.style
         }
     }
+}
 
-    CompositionLocalProvider(
-        SilkPalettes provides palettes,
-        ComponentModifiers provides finalModifiers
-    ) {
-        content()
+class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
+    val palettes = mutableSilkTheme.palettes
+
+    val palette: SilkPalette
+        @Composable
+        @ReadOnlyComposable
+        get() = palettes[getColorMode()]
+
+    private val _componentStyles = mutableMapOf<String, ComponentStyle>()
+    val componentStyles: Map<String, ComponentStyle> = _componentStyles
+
+    internal fun registerStyles(componentStyleSheet: StyleSheet) {
+        check(::SilkTheme.isInitialized) // Call only after SilkTheme is set
+        mutableSilkTheme.componentStyles.values.forEach { styleBuilder ->
+            styleBuilder.addStyles(componentStyleSheet)
+            _componentStyles[styleBuilder.name] = ComponentStyle(styleBuilder.name)
+        }
     }
 }
+
+lateinit var SilkTheme: ImmutableSilkTheme
+    internal set

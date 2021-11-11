@@ -7,29 +7,15 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.background
-import com.varabyte.kobweb.compose.ui.onMouseDown
-import com.varabyte.kobweb.compose.ui.onMouseEnter
-import com.varabyte.kobweb.compose.ui.onMouseLeave
-import com.varabyte.kobweb.compose.ui.onMouseUp
+import com.varabyte.kobweb.compose.ui.clickable
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.compose.ui.userSelect
-import com.varabyte.kobweb.silk.components.ComponentKey
-import com.varabyte.kobweb.silk.components.ComponentModifier
-import com.varabyte.kobweb.silk.components.then
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
-import com.varabyte.kobweb.silk.theme.colors.shifted
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import org.jetbrains.compose.web.css.px
-
-enum class ButtonState {
-    /** The cursor is not over the component */
-    DEFAULT,
-    /** The cursor is over the component */
-    HOVER,
-    /** The cursor is pressing down on the component */
-    PRESSED,
-}
 
 object Buttons {
     const val LEFT = 0.toShort()
@@ -37,26 +23,15 @@ object Buttons {
     const val RIGHT = 2.toShort()
 }
 
-val ButtonKey = ComponentKey("silk-button")
-object DefaultButtonModifier : ComponentModifier {
-    @Composable
-    override fun toModifier(data: Any?): Modifier {
-        val state = data as ButtonState
+val ButtonStyle = ComponentStyle("silk-button") { colorMode ->
+    val buttonColors = SilkTheme.palettes[colorMode].button
 
-        val modifier =
-        when (state) {
-            ButtonState.DEFAULT -> SilkTheme.palette.primary
-            ButtonState.HOVER -> SilkTheme.palette.primary.shifted()
-            ButtonState.PRESSED -> SilkTheme.palette.primary.shifted().shifted()
-        }.let { color -> Modifier.background(color) }
-
-        return modifier
-            .clip(Rect(4.px))
-            .styleModifier {
-                // No selecting text within buttons
-                userSelect(UserSelect.None)
-            }
+    base = Modifier.background(buttonColors.default).clip(Rect(4.px)).styleModifier {
+        // No selecting text within buttons
+        userSelect(UserSelect.None)
     }
+    hover = Modifier.background(buttonColors.hover)
+    active = Modifier.background(buttonColors.pressed)
 }
 
 /**
@@ -66,36 +41,13 @@ object DefaultButtonModifier : ComponentModifier {
 fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentModifier? = null,
+    variant: ComponentVariant? = null,
     content: @Composable () -> Unit
 ) {
-    var inButton by remember { mutableStateOf(false) }
-    var state by remember { mutableStateOf(ButtonState.DEFAULT) }
-
     Box(
-        SilkTheme.componentModifiers[ButtonKey].then(variant).toModifier(state)
+        ButtonStyle.toModifier(variant)
             .then(modifier)
-            // Button text shouldn't be selectable
-            .userSelect(UserSelect.None)
-            .onMouseEnter {
-                state = ButtonState.HOVER
-                inButton = true
-            }
-            .onMouseLeave {
-                state = ButtonState.DEFAULT
-                inButton = false
-            }
-            .onMouseDown { evt ->
-                if (evt.button == Buttons.LEFT) {
-                    state = ButtonState.PRESSED
-                }
-            }
-            .onMouseUp { evt ->
-                if (evt.button == Buttons.LEFT && state == ButtonState.PRESSED) {
-                    onClick()
-                    state = if (inButton) { ButtonState.HOVER } else { ButtonState.DEFAULT }
-                }
-            },
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         content()

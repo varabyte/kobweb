@@ -25,8 +25,8 @@ private fun NavLink(path: String, text: String) {
     Link(
         path,
         text,
-        // Intentionally invert the header colors (here, "primary" instead of "onPrimary")
-        NAV_ITEM_PADDING.color(SilkTheme.palette.primary),
+        // Intentionally invert the header colors
+        NAV_ITEM_PADDING.color(SilkTheme.palette.background),
         UndecoratedLinkVariant,
     )
 }
@@ -39,8 +39,8 @@ fun NavHeader() {
         Modifier
             .fillMaxWidth()
             .height(50.px)
-            // Intentionally invert the header colors (here, setting the background to "onPrimary" instead of "primary")
-            .background(palette.onPrimary),
+            // Intentionally invert the header colors
+            .background(palette.color),
     ) {
         Row(
             Modifier.fillMaxSize(),

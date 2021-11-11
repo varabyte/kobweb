@@ -30,11 +30,8 @@ object MyStyleSheet : StyleSheet() {
 fun MyApp(content: @Composable () -> Unit) {
     Style(MyStyleSheet)
     SilkApp {
-        // You can override base styles by passing them into SilkTheme
-        SilkTheme {
-            Surface(Modifier.width(100.vw).height(100.vh)) {
-                content()
-            }
+        Surface(Modifier.width(100.vw).height(100.vh)) {
+            content()
         }
     }
 }

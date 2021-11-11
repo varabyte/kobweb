@@ -63,5 +63,7 @@ class Color private constructor(val value: Int) {
         val Yellow = Color(0xFF, 0xFF, 0x00)
         val Cyan = Color(0, 0xFF, 0xFF)
         val Magenta = Color(0xFF, 0, 0xFF)
+
+        val Purple = Color(0x88, 0x00, 0x88)
     }
 }

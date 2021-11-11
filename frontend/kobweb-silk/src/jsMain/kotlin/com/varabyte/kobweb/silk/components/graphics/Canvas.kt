@@ -1,19 +1,15 @@
 package com.varabyte.kobweb.silk.components.graphics
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.height
 import com.varabyte.kobweb.compose.ui.width
-import com.varabyte.kobweb.silk.components.ComponentKey
-import com.varabyte.kobweb.silk.components.ComponentModifier
-import com.varabyte.kobweb.silk.components.then
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
-import com.varabyte.kobweb.silk.theme.colors.Palette
+import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.px
@@ -24,7 +20,7 @@ import org.w3c.dom.HTMLCanvasElement
 import kotlin.js.Date
 import kotlin.math.min
 
-val CanvasKey = ComponentKey("silk-canvas")
+val CanvasStyle = ComponentStyle("silk-canvas") {}
 
 /**
  * Arguments passed to the user's `render` callback.
@@ -39,7 +35,7 @@ class RenderScope(
     val ctx: CanvasRenderingContext2D,
     val width: Int,
     val height: Int,
-    val palette: Palette,
+    val palette: SilkPalette,
     val elapsedMs: Double,
 )
 
@@ -66,7 +62,7 @@ private class RenderCallback(
     private val minDeltaMs = minDeltaMs.toDouble()
     private val maxDeltaMs = maxDeltaMs.toDouble()
 
-    fun step(palette: Palette) {
+    fun step(palette: SilkPalette) {
         val firstRender = lastTimestamp == 0.0
         val now = Date.now()
         val deltaMs = now - lastTimestamp
@@ -96,7 +92,7 @@ fun Canvas(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: ComponentModifier? = null,
+    variant: ComponentVariant? = null,
     minDeltaMs: Number = 0f,
     maxDeltaMs: Number = 500f,
     render: RenderScope.() -> Unit,
@@ -104,7 +100,8 @@ fun Canvas(
     val builder = remember { CanvasElementBuilder() }
     TagElement(
         builder,
-        SilkTheme.componentModifiers[CanvasKey].then(variant).toModifier(null).width(width.px).height(height.px)
+        CanvasStyle.toModifier(variant)
+            .width(width.px).height(height.px)
             .then(modifier).asAttributeBuilder {
                 attr("width", width.toString())
                 attr("height", height.toString())

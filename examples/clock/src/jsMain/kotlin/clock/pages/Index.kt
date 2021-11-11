@@ -47,8 +47,8 @@ private fun BoxScope.Clock() {
         val r = 200.0
 
         ctx.save {
-            ctx.strokeStyle = palette.onPrimary.toCssColor()
-            ctx.fillStyle = palette.primary.toCssColor()
+            ctx.strokeStyle = palette.color.toCssColor()
+            ctx.fillStyle = palette.background.toCssColor()
 
             ctx.clearRect(0.0, 0.0, width.toDouble(), height.toDouble())
             ctx.translate(r, r)
@@ -107,9 +107,10 @@ private fun BoxScope.Clock() {
 
             // Write seconds
             ctx.save {
+                // Render the seconds hand in a different color for an accent
+                ctx.strokeStyle = palette.link.default.toCssColor()
+                ctx.fillStyle = palette.link.default.toCssColor()
                 ctx.rotate(sec * PI / 30)
-                ctx.strokeStyle = palette.onSecondary.toCssColor()
-                ctx.fillStyle = palette.onSecondary.toCssColor()
                 ctx.lineWidth = 6.0
                 ctx.beginPath()
                 ctx.moveTo(-30.0, 0.0)
@@ -131,7 +132,7 @@ private fun BoxScope.Clock() {
             // The outer circle that frames the clock
             ctx.beginPath()
             ctx.lineWidth = 14.0
-            ctx.strokeStyle = palette.onSecondary.toCssColor()
+            ctx.strokeStyle = palette.color.toCssColor()
             ctx.arc(0.0, 0.0, 142.0, 0.0, PI * 2, true)
             ctx.stroke()
         }

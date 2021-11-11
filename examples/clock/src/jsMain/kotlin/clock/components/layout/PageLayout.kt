@@ -26,7 +26,7 @@ fun PageLayout(content: @Composable () -> Unit) {
     ) {
         content()
 
-        val borderColor = SilkTheme.palette.onPrimary.toCssColor()
+        val borderColor = SilkTheme.palette.color.toCssColor()
         Spacer()
         Box(
             Modifier.fillMaxWidth().styleModifier {
