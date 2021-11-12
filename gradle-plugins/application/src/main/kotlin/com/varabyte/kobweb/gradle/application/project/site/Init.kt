@@ -1,9 +1,18 @@
 package com.varabyte.kobweb.gradle.application.project.site
 
 import com.varabyte.kobweb.gradle.application.project.KOBWEB_CORE_FQN_PREFIX
+import com.varabyte.kobweb.gradle.application.project.KOBWEB_SILK_FQN_PREFIX
 
-const val INIT_SIMPLE_NAME = "InitKobweb"
-const val INIT_FQN = "$KOBWEB_CORE_FQN_PREFIX${com.varabyte.kobweb.gradle.application.project.api.INIT_SIMPLE_NAME}"
+const val INIT_KOBWEB_SIMPLE_NAME = "InitKobweb"
+const val INIT_KOBWEB_FQN = "$KOBWEB_CORE_FQN_PREFIX$INIT_KOBWEB_SIMPLE_NAME"
+
+const val INIT_SILK_SIMPLE_NAME = "InitSilk"
+const val INIT_SILK_FQN = "$KOBWEB_SILK_FQN_PREFIX$INIT_SILK_SIMPLE_NAME"
+
+class InitSilkEntry(
+    val fqn: String,
+)
+
 
 /**
  * Information about a method in the user's code targeted by an `@InitKobweb` annotation.

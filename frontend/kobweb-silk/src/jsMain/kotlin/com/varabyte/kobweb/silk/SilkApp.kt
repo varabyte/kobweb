@@ -28,9 +28,6 @@ object SilkStyleSheet : StyleSheet() {
 
 object ComponentStyleSheet : StyleSheet()
 
-class SilkInitContext(val theme: MutableSilkTheme)
-var silkInitHook: (SilkInitContext) -> Unit = {}
-
 @Composable
 fun SilkApp(content: @Composable () -> Unit) {
     remember {
@@ -41,7 +38,7 @@ fun SilkApp(content: @Composable () -> Unit) {
         mutableTheme.registerComponentStyle(SurfaceStyle)
         mutableTheme.registerComponentStyle(TextStyle)
         mutableTheme.registerComponentStyle(LinkStyle)
-        silkInitHook(SilkInitContext(mutableTheme))
+        initSilkHook(InitSilkContext(mutableTheme))
 
         SilkTheme = ImmutableSilkTheme(mutableTheme)
         SilkTheme.registerStyles(ComponentStyleSheet)

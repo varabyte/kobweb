@@ -16,8 +16,11 @@ class SiteData {
     private val _pages = mutableListOf<PageEntry>()
     val pages: List<PageEntry> = _pages
 
-    private val _inits = mutableListOf<InitKobwebEntry>()
-    val inits: List<InitKobwebEntry> = _inits
+    private val _kobwebInits = mutableListOf<InitKobwebEntry>()
+    val kobwebInits: List<InitKobwebEntry> = _kobwebInits
+
+    private val _silkInits = mutableListOf<InitSilkEntry>()
+    val silkInits: List<InitSilkEntry> = _silkInits
 
     companion object {
         /**
@@ -40,7 +43,8 @@ class SiteData {
                 var currPackage = ""
                 var appSimpleName = APP_SIMPLE_NAME
                 var pageSimpleName = PAGE_SIMPLE_NAME
-                var initSimpleName = INIT_SIMPLE_NAME
+                var initKobwebSimpleName = INIT_KOBWEB_SIMPLE_NAME
+                var initSilkSimpleName = INIT_SILK_SIMPLE_NAME
                 ktFile.visitAllChildren { element ->
                     when (element) {
                         is KtPackageDirective -> {
@@ -60,9 +64,14 @@ class SiteData {
                                         alias.name?.let { pageSimpleName = it }
                                     }
                                 }
-                                INIT_FQN -> {
+                                INIT_KOBWEB_FQN -> {
                                     element.alias?.let { alias ->
-                                        alias.name?.let { initSimpleName = it }
+                                        alias.name?.let { initKobwebSimpleName = it }
+                                    }
+                                }
+                                INIT_SILK_FQN -> {
+                                    element.alias?.let { alias ->
+                                        alias.name?.let { initSilkSimpleName = it }
                                     }
                                 }
                             }
@@ -100,17 +109,20 @@ class SiteData {
                                             )
                                         }
                                     }
-                                    initSimpleName -> {
+                                    initKobwebSimpleName -> {
                                         val initFqn = when {
                                             currPackage.isNotEmpty() -> "$currPackage.${element.name}"
                                             else -> element.name
                                         }
-                                        initFqn?.let { siteData._inits.add(
+                                        initFqn?.let { siteData._kobwebInits.add(
                                             InitKobwebEntry(
                                                 initFqn,
                                                 acceptsContext = element.valueParameters.size == 1
                                             )
                                         ) }
+                                    }
+                                    initSilkSimpleName -> {
+                                        siteData._silkInits.add(InitSilkEntry("$currPackage.${element.name}"))
                                     }
                                 }
                             }

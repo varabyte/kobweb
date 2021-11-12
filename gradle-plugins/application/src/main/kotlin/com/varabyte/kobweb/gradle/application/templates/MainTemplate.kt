@@ -3,12 +3,14 @@ package com.varabyte.kobweb.gradle.application.templates
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.project.site.AppEntry
 import com.varabyte.kobweb.gradle.application.project.site.InitKobwebEntry
+import com.varabyte.kobweb.gradle.application.project.site.InitSilkEntry
 import com.varabyte.kobweb.gradle.application.project.site.PageEntry
 
 fun createMainFunction(
     appEntry: AppEntry?,
     pageEntries: List<PageEntry>,
-    initEntries: List<InitKobwebEntry>,
+    initKobwebEntries: List<InitKobwebEntry>,
+    initSilkEntries: List<InitSilkEntry>,
     target: BuildTarget
 ): String {
     val imports = mutableListOf(
@@ -30,7 +32,7 @@ fun createMainFunction(
         imports.add("org.w3c.dom.get")
     }
 
-    if (initEntries.any { it.acceptsContext }) {
+    if (initKobwebEntries.any { it.acceptsContext }) {
         imports.add("com.varabyte.kobweb.core.InitKobwebContext")
     }
 
@@ -119,14 +121,23 @@ fun createMainFunction(
         }
         appendLine()
 
-        if (initEntries.isNotEmpty()) {
-            if (initEntries.any { entry -> entry.acceptsContext }) {
+        if (initKobwebEntries.isNotEmpty()) {
+            if (initKobwebEntries.any { entry -> entry.acceptsContext }) {
                 appendLine("    val ctx = InitContext(router)")
             }
-            initEntries.forEach { entry ->
+            initKobwebEntries.forEach { entry ->
                 val ctx = if (entry.acceptsContext) "ctx" else ""
                 appendLine("    ${entry.fqn}($ctx)")
             }
+            appendLine()
+        }
+
+        if (initSilkEntries.isNotEmpty()) {
+            appendLine("    com.varabyte.kobweb.silk.initSilkHook = { ctx ->")
+            initSilkEntries.forEach { entry ->
+                appendLine("        ${entry.fqn}(ctx)")
+            }
+            appendLine("    }")
             appendLine()
         }
 

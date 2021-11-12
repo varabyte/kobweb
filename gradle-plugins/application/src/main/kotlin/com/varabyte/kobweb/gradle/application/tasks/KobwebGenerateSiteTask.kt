@@ -30,24 +30,23 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, 
 
     @TaskAction
     fun execute() {
-        val genSrcRoot = getGenSrcDir()
-        val genResRoot = getGenResDir()
+        val genSrcRoot = getGenSrcDir().also { it.mkdirs() }
+        val genResRoot = getGenResDir().also { it.mkdirs() }
 
         with(SiteData.from(project.group.toString(), config.pagesPackage.get(), getSourceFiles())) {
-            genResRoot.mkdirs()
             File(genSrcRoot, "main.kt").writeText(
                 createMainFunction(
                     app,
                     // Sort by route as it makes the generated registration logic easier to follow
                     pages.sortedBy { it.route },
-                    inits,
+                    kobwebInits,
+                    silkInits,
                     buildTarget,
                 )
             )
         }
 
         File(genResRoot, getPublicPath()).let { publicRoot ->
-            publicRoot.mkdirs()
             File(publicRoot, "index.html").writeText(
                 createHtmlFile(
                     kobwebConf.site.title,
