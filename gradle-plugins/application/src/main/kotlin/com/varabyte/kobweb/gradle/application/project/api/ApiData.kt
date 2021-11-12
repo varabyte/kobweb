@@ -17,6 +17,13 @@ class ApiData {
     val apiMethods: List<ApiEntry> = _apiMethods
 
     companion object {
+        /**
+         * @param group The group of this project, e.g. "org.example.mysite", required for prefixing relative package
+         *   names (e.g. ".blog" -> "org.example.mysite.blog")
+         * @param apiPackage The relative package path that represents the root of the user's API methods, e.g. ".api".
+         *   Annotated methods in source files not under this package will be ignored.
+         * @param apiSources Kotlin jvmMain source files that drive this site's backend.
+         */
         fun from(
             group: String,
             apiPackage: String,

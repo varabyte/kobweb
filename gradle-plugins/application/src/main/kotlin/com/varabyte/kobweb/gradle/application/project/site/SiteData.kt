@@ -20,6 +20,13 @@ class SiteData {
     val inits: List<InitKobwebEntry> = _inits
 
     companion object {
+        /**
+         * @param group The group of this project, e.g. "org.example.mysite", required for prefixing relative package
+         *   names (e.g. ".blog" -> "org.example.mysite.blog")
+         * @param pagesPackage The relative package path that represents the root of the user's pages, e.g. ".pages"
+         *   Annotated methods in source files not under this package will be ignored.
+         * @param siteSources Kotlin jsMain source files that drive this site's frontend.
+         */
         fun from(
             group: String,
             pagesPackage: String,
