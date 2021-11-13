@@ -5,7 +5,7 @@
 [![Follow @bitspittle](https://img.shields.io/twitter/follow/bitspittle.svg?style=social)](https://twitter.com/intent/follow?screen_name=bitspittle)
 
 # K🕸️bweb
-
+S
 Kobweb is an opinionated Kotlin framework for creating websites and web apps, built on top of
 [Web Compose](https://compose-web.ui.pages.jetbrains.team) and inspired by [Next.js](https://nextjs.org)
 and [Chakra UI](https://chakra-ui.com).

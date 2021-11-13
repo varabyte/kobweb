@@ -13,6 +13,6 @@ dependencies {
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-project")
-    description.set("A collection of utility classes for identifying and working with files in a Kobweb project.")
+    artifactId.set("kobweb-common")
+    description.set("A collection of utility classes for interacting with a Kobweb project needed by both frontend and backend codebases.")
 }

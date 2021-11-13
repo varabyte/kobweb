@@ -23,17 +23,7 @@ dependencies {
     implementation(libs.cdt) // Run ChromeLauncher during export
     implementation(libs.jsoup) // Pretty-print html
 
-    // Note: compileOnly because we embed the classes directly into this plugin by modifying the jar task below. We do
-    // this so that we don't have to publish these internal artifacts in our maven repository - they are implementation
-    // details and shouldn't leak as public artifacts.
-    compileOnly(project(":backend:server-api"))
-    compileOnly(project(":common:kobweb-project"))
-}
-
-tasks.withType<Jar> {
-    from(configurations.compileClasspath.get()
-        .filter { it.isFile && it.absolutePath.startsWith(project.rootProject.projectDir.absolutePath) }
-        .map { zipTree(it) })
+    implementation(project(":common:kobweb-common"))
 }
 
 val DESCRIPTION = "A Gradle plugin that completes a user's Kobweb app"

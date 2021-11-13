@@ -1,1 +1,0 @@
-A collection of classes and functions allowing other processes to communicate with the kobweb server.

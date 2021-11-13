@@ -18,7 +18,7 @@ dependencies {
 
     implementation(libs.bundles.commonmark)
 
-    implementation(project(":common:kobweb-project"))
+    implementation(project(":common:kobweb-common"))
 
     // Compile only - the plugin itself should exist at runtime
     compileOnly(project(":gradle-plugins:application"))
