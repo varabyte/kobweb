@@ -12,6 +12,7 @@ import com.varabyte.kobweb.cli.create.freemarker.methods.IsYesNoMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.PackageToPathMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
 import com.varabyte.kobweb.cli.common.template.Instruction
+import com.varabyte.kobweb.cli.common.toUnixSeparators
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.konsole.runtime.KonsoleApp
 import freemarker.cache.NullCacheStorage
@@ -125,7 +126,8 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
                         val srcFile = src.toFile()
                         val filesToMove = mutableListOf<File>()
                         srcFile.walkBottomUp().forEach { file ->
-                            if (matcher.matches(file.toRelativeString(srcFile))) {
+                            // Matcher expects *nix paths; make sure this check works on Windows
+                            if (matcher.matches(file.toRelativeString(srcFile).toUnixSeparators())) {
                                 filesToMove.add(file)
                             }
                         }
@@ -148,7 +150,8 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
                         val srcFile = src.toFile()
                         val filesToDelete = mutableListOf<File>()
                         srcFile.walkBottomUp().forEach { file ->
-                            val relativePath = file.toRelativeString(srcFile)
+                            // Matcher expects *nix paths; make sure this check works on Windows
+                            val relativePath = file.toRelativeString(srcFile).toUnixSeparators()
                             if (deleteMatcher.matches(relativePath)) {
                                 filesToDelete.add(file)
                             }
