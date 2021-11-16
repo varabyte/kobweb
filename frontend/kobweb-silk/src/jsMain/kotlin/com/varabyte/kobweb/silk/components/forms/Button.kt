@@ -1,7 +1,9 @@
 package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.UserSelect
+import com.varabyte.kobweb.compose.css.cursor
 import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -30,7 +32,9 @@ val ButtonStyle = ComponentStyle("silk-button") { colorMode ->
         // No selecting text within buttons
         userSelect(UserSelect.None)
     }
-    hover = Modifier.background(buttonColors.hover)
+    hover = Modifier.background(buttonColors.hover).styleModifier {
+        cursor(Cursor.Pointer)
+    }
     active = Modifier.background(buttonColors.pressed)
 }
 
