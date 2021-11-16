@@ -12,8 +12,12 @@ import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import org.jetbrains.compose.web.css.StyleSheet
 
-object SilkConfig {
-    var initialColorMode: ColorMode = ColorMode.LIGHT
+interface SilkConfig {
+    var initialColorMode: ColorMode
+}
+
+internal object SilkConfigInstance : SilkConfig {
+    override var initialColorMode = ColorMode.LIGHT
 }
 
 class MutableSilkTheme {

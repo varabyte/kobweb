@@ -5,7 +5,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.silk.theme.SilkConfig
+import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 
 enum class ColorMode {
     LIGHT,
@@ -31,7 +31,7 @@ fun Color.shifted(colorMode: ColorMode) = if (colorMode == ColorMode.DARK) this.
 @ReadOnlyComposable
 fun Color.shifted() = shifted(getColorMode())
 
-private val colorModeState by lazy { mutableStateOf(SilkConfig.initialColorMode) }
+private val colorModeState by lazy { mutableStateOf(SilkConfigInstance.initialColorMode) }
 
 @Composable
 fun rememberColorMode() = remember { colorModeState }

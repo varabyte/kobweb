@@ -11,6 +11,7 @@ import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.text.TextStyle
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
+import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.css.StyleSheet
@@ -38,7 +39,7 @@ fun SilkApp(content: @Composable () -> Unit) {
         mutableTheme.registerComponentStyle(SurfaceStyle)
         mutableTheme.registerComponentStyle(TextStyle)
         mutableTheme.registerComponentStyle(LinkStyle)
-        initSilkHook(InitSilkContext(mutableTheme))
+        initSilkHook(InitSilkContext(SilkConfigInstance, mutableTheme))
 
         SilkTheme = ImmutableSilkTheme(mutableTheme)
         SilkTheme.registerStyles(ComponentStyleSheet)
