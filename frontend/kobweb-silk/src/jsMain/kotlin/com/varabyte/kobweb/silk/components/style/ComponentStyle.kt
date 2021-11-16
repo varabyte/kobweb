@@ -70,6 +70,13 @@ class ComponentModifiers {
     var active: Modifier? = null
 }
 
+/**
+ * A class which allows a user to define styles that get added to the page's stylesheet, instead of just using
+ * inline styles.
+ *
+ * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
+ * media queries, and psuedo classes.
+ */
 class ComponentStyle internal constructor(private val name: String) {
     companion object {
         operator fun invoke(name: String, init: ComponentModifiers.(ColorMode) -> Unit) =

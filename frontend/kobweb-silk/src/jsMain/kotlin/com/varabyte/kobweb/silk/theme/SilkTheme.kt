@@ -26,9 +26,61 @@ class MutableSilkTheme {
 
     var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
 
+    /**
+     * Register a new component style with this theme.
+     *
+     * If this style has defined additional variants, they will also be registered automatically at this time.
+     *
+     * Once a style is registered, you can reference it in your Composable widget via the following code:
+     *
+     * ```
+     * val CustomStyle = ComponentStyle("my-style") { ... }
+     *
+     * @InitSilk
+     * fun initCustomStyle(ctx: InitSilkContext) {
+     *   ctx.theme.registerComponentStyle(CustomStyle)
+     * }
+     *
+     * @Composable
+     * fun CustomWidget(..., variant: ComponentVariant? = null, ...) {
+     *   val modifier = CustomStyle.toModifier(variant).then(...)
+     *   // ^ This modifier is now set with your registered styles.
+     * }
+     * ```
+     */
     fun registerComponentStyle(style: ComponentStyleBuilder) {
         componentStyles[style.name] = style
-        style.variants.forEach { variant -> componentVariants[style.name] = variant }
+        registerComponentVariants(*style.variants.toTypedArray())
+    }
+
+    /**
+     * Register variants associated with a base style.
+     *
+     * **NOTE:** Most of the time, you don't have to call this yourself, as if you create a custom style with a bunch of
+     * variants on it, calling [registerComponentStyle] will automatically register them for you.
+     *
+     * However, if you are defining variants on top of base Silk styles, e.g. maybe some new button variants, then they
+     * would normally be missed so you'll have to register them yourself in that case:
+     *
+     * ```
+     * package not.in.silk
+     * import silk.ButtonStyle
+     *
+     * val MyButtonVariant = ButtonStyle.addVariant(...)
+     *
+     * @InitSilk
+     * fun initCustomStyle(ctx: InitSilkContext) {
+     *   ctx.theme.registerComponentVariants(MyButtonVariant)
+     * }
+     *
+     * @Composable
+     * fun CustomWidget(...) {
+     *   Button(..., variant = MyButtonVariant, ...)
+     * }
+     * ```
+     */
+    fun registerComponentVariants(vararg variants: ComponentVariant) {
+        variants.forEach { variant -> componentVariants[variant.style.name] = variant }
     }
 }
 
