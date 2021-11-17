@@ -21,7 +21,7 @@ object SilkStyleSheet : StyleSheet() {
     init {
         "*" style {
             // The following transition settings make changing the color mode look good
-            transitionProperty("background-color", "color", "opacity")
+            transitionProperty("background-color")
             transitionDuration(200.ms)
         }
     }
