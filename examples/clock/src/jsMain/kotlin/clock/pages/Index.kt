@@ -46,8 +46,15 @@ private fun BoxScope.Clock() {
         val date = Date()
         val r = 200.0
 
+        // Just choose various colors from the palette for quick color-mode aware visual difference
+        val colorBorder = palette.button.pressed
+        val colorTicks = palette.color
+        val colorHourHand = palette.link.default
+        val colorMinuteHand = palette.link.default
+        val colorSecondHand = palette.link.visited
+
         ctx.save {
-            ctx.strokeStyle = palette.color.toCssColor()
+            ctx.strokeStyle = colorTicks.toCssColor()
             ctx.fillStyle = palette.background.toCssColor()
 
             ctx.clearRect(0.0, 0.0, width.toDouble(), height.toDouble())
@@ -87,6 +94,7 @@ private fun BoxScope.Clock() {
 
             // Hour hand
             ctx.save {
+                ctx.strokeStyle = colorHourHand.toCssColor()
                 ctx.rotate(hr * (PI / 6) + (PI / 360) * min + (PI / 21600) * sec)
                 ctx.lineWidth = 14.0
                 ctx.beginPath()
@@ -97,6 +105,7 @@ private fun BoxScope.Clock() {
 
             // write Minutes
             ctx.save {
+                ctx.strokeStyle = colorMinuteHand.toCssColor()
                 ctx.rotate((PI / 30) * min + (PI / 1800) * sec)
                 ctx.lineWidth = 10.0
                 ctx.beginPath()
@@ -107,10 +116,9 @@ private fun BoxScope.Clock() {
 
             // Write seconds
             ctx.save {
-                // Render the seconds hand in a different color for an accent
-                ctx.strokeStyle = palette.link.default.toCssColor()
-                ctx.fillStyle = palette.link.default.toCssColor()
                 ctx.rotate(sec * PI / 30)
+                ctx.strokeStyle = colorSecondHand.toCssColor()
+                ctx.fillStyle = colorSecondHand.toCssColor()
                 ctx.lineWidth = 6.0
                 ctx.beginPath()
                 ctx.moveTo(-30.0, 0.0)
@@ -132,7 +140,7 @@ private fun BoxScope.Clock() {
             // The outer circle that frames the clock
             ctx.beginPath()
             ctx.lineWidth = 14.0
-            ctx.strokeStyle = palette.color.toCssColor()
+            ctx.strokeStyle = colorBorder.toCssColor()
             ctx.arc(0.0, 0.0, 142.0, 0.0, PI * 2, true)
             ctx.stroke()
         }
