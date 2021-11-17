@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.graphics.lightened
 
 data class SilkPalette(
     val colorMode: ColorMode,

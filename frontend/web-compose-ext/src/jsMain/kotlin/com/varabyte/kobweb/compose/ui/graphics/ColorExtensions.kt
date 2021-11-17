@@ -5,9 +5,13 @@ import org.jetbrains.compose.web.css.rgb
 import org.jetbrains.compose.web.css.rgba
 
 fun Color.toCssColor(): CSSColorValue {
-    return if (this.alpha == 0xFF) {
-        rgb(this.red, this.green, this.blue)
-    } else {
-        rgba(this.red, this.green, this.blue, this.alpha)
+    return when (this) {
+        is Color.Rgb -> {
+            if (this.alpha == 0xFF) {
+                rgb(this.red, this.green, this.blue)
+            } else {
+                rgba(this.red, this.green, this.blue, this.alpha)
+            }
+        }
     }
 }
