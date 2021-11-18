@@ -9,9 +9,11 @@ import com.varabyte.kobweb.compose.ui.background
 import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.compose.ui.fillMaxSize
 import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.ms
 
@@ -25,10 +27,16 @@ val SurfaceStyle = ComponentStyle("silk-surface") { colorMode ->
             transitionProperty("background-color", "color")
             transitionDuration(200.ms)
         }
+    link = Modifier.color(SilkTheme.palettes[colorMode].link.default)
+    visited = Modifier.color(SilkTheme.palettes[colorMode].link.visited)
 }
 
 /**
- * An area which provides a SilkTheme-aware colored area, usually for largish UI areas.
+ * An area which defines a SilkTheme-aware area.
+ *
+ * This should be somewhere at the root silk widgets [Link] and [Text] as it defines their colors for them. Their colors
+ * are defined here instead of on the widgets themselves because it allows users to create intermediate parent divs to
+ * override colors for all their children in localized areas as necessary.
  */
 @Composable
 fun Surface(
