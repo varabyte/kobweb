@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.silk
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.transitionDuration
-import com.varabyte.kobweb.compose.css.transitionProperty
 import com.varabyte.kobweb.core.KobwebApp
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
@@ -15,17 +13,6 @@ import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.ms
-
-object SilkStyleSheet : StyleSheet() {
-    init {
-        "*" style {
-            // The following transition settings make changing the color mode look good
-            transitionProperty("background-color")
-            transitionDuration(200.ms)
-        }
-    }
-}
 
 object ComponentStyleSheet : StyleSheet()
 
@@ -46,7 +33,6 @@ fun SilkApp(content: @Composable () -> Unit) {
     }
 
     KobwebApp {
-        Style(SilkStyleSheet)
         Style(ComponentStyleSheet)
         content()
     }
