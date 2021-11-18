@@ -5,16 +5,14 @@ import com.varabyte.kobweb.compose.css.TextDecorationLine
 import com.varabyte.kobweb.compose.css.textDecorationLine
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.clickable
 import com.varabyte.kobweb.compose.ui.color
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
-import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
+import com.varabyte.kobweb.navigation.Link as KobwebLink
 
 val LinkStyle = ComponentStyle("silk-link") { colorMode ->
     base = Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
@@ -40,17 +38,9 @@ fun Link(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null
 ) {
-    val ctx = rememberPageContext()
-
-    A(
+    KobwebLink(
         href = path,
-        attrs = LinkStyle.toModifier(variant)
-            .then(modifier)
-            .clickable { evt ->
-                evt.preventDefault()
-                ctx.router.navigateTo(path)
-            }
-            .asAttributeBuilder()
+        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributeBuilder()
     ) {
         Text(text ?: path)
     }
