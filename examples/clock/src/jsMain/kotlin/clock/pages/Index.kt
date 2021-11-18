@@ -13,6 +13,7 @@ import com.varabyte.kobweb.compose.ui.fillMaxSize
 import com.varabyte.kobweb.compose.ui.fillMaxWidth
 import com.varabyte.kobweb.compose.ui.fontSize
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.padding
 import com.varabyte.kobweb.core.Page
@@ -132,7 +133,7 @@ private fun BoxScope.Clock() {
                 ctx.beginPath()
                 ctx.arc(95.0, 0.0, 10.0, 0.0, PI * 2, true)
                 ctx.stroke()
-                ctx.fillStyle = Color.Transparent.toCssColor()
+                ctx.fillStyle = Colors.Transparent.toCssColor()
                 ctx.arc(0.0, 0.0, 3.0, 0.0, PI * 2, true)
                 ctx.fill()
             }

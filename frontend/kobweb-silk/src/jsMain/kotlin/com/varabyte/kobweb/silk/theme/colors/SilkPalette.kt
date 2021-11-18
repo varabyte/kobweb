@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 
 data class SilkPalette(
@@ -36,11 +37,11 @@ val LightSilkPalette = run {
     val buttonBase = ColorSchemes.White._900
     SilkPalette(
         ColorMode.LIGHT,
-        background = Color.White,
-        color = Color.Black,
+        background = Colors.White,
+        color = Colors.Black,
         link = SilkPalette.Link(
-            default = Color.Blue,
-            visited = Color.Purple,
+            default = Colors.Blue,
+            visited = Colors.Purple,
         ),
         button = SilkPalette.Button(
             default = buttonBase,
@@ -54,11 +55,11 @@ val DarkSilkPalette = run {
     val buttonBase = ColorSchemes.Black._900
     SilkPalette(
         ColorMode.DARK,
-        background = Color.Black,
-        color = Color.White,
+        background = Colors.Black,
+        color = Colors.White,
         link = SilkPalette.Link(
-            default = Color.Blue.lightened(),
-            visited = Color.Purple.lightened(),
+            default = Colors.Blue.lightened(),
+            visited = Colors.Purple.lightened(),
         ),
         button = SilkPalette.Button(
             default = buttonBase,
