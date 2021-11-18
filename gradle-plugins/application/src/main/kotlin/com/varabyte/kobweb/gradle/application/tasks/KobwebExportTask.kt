@@ -72,8 +72,9 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
             scriptMapFile.copyTo(destFile, overwrite = true)
         }
 
+        // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
         val apiJarFile = project.layout.projectDirectory.file(kobwebConf.server.files.dev.api).asFile
-        run {
+        if (apiJarFile.exists()) {
             val destFile = File(getSiteDir(), "system/${apiJarFile.name}")
             apiJarFile.copyTo(destFile, overwrite = true)
         }
