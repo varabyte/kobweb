@@ -55,4 +55,3 @@ private class ChainedModifier(
         return next.fold(current.fold(initial, operation), operation)
     }
 }
-
