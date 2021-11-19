@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.components.style
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asStyleBuilder
-import com.varabyte.kobweb.compose.ui.classNames
+import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode

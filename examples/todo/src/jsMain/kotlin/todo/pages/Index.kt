@@ -10,11 +10,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.fillMaxSize
-import com.varabyte.kobweb.compose.ui.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.maxWidth
-import com.varabyte.kobweb.compose.ui.minWidth
-import com.varabyte.kobweb.compose.ui.padding
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.navigation.Link
 import kotlinx.browser.window

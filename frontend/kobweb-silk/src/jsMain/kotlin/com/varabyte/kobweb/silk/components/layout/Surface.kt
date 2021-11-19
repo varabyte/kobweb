@@ -5,9 +5,9 @@ import com.varabyte.kobweb.compose.css.transitionDuration
 import com.varabyte.kobweb.compose.css.transitionProperty
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.background
-import com.varabyte.kobweb.compose.ui.color
-import com.varabyte.kobweb.compose.ui.fillMaxSize
+import com.varabyte.kobweb.compose.ui.modifiers.background
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.style.ComponentStyle

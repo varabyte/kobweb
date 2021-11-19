@@ -10,12 +10,8 @@ import com.varabyte.kobweb.compose.css.fontStyle
 import com.varabyte.kobweb.compose.css.fontWeight
 import com.varabyte.kobweb.compose.css.textAlign
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.fontSize
-import com.varabyte.kobweb.compose.ui.height
-import com.varabyte.kobweb.compose.ui.lineHeight
-import com.varabyte.kobweb.compose.ui.padding
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.compose.ui.width
 import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.SilkApp
 import com.varabyte.kobweb.silk.components.layout.Surface

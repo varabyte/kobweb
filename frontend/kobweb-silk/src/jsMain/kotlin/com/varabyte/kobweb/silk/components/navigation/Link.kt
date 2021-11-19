@@ -12,7 +12,7 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.dom.Text
 import com.varabyte.kobweb.navigation.Link as KobwebLink
 
-val LinkStyle = ComponentStyle("silk-link") { colorMode ->
+val LinkStyle = ComponentStyle("silk-link") {
     base = Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
     hover = Modifier.styleModifier { textDecorationLine(TextDecorationLine.Underline) }
 }
