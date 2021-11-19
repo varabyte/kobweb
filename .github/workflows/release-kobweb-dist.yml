@@ -5,7 +5,8 @@ name: release-kobweb-dist
 
 on:
   release:
-    published
+    types:
+      - published
 
 jobs:
   distzip:
