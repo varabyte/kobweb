@@ -177,15 +177,15 @@ abstract class MarkdownComponents {
                 "$JB_DOM.Text(\"${text.literal}\")"
             }
         }
-        img.convention{ "$JB_DOM.Img" }
-        h1.convention{ "$JB_DOM.H1" }
-        h2.convention{ "$JB_DOM.H2" }
-        h3.convention{ "$JB_DOM.H3" }
-        h4.convention{ "$JB_DOM.H4" }
-        h5.convention{ "$JB_DOM.H5" }
-        h6.convention{ "$JB_DOM.H6" }
-        p.convention{ "$JB_DOM.P" }
-        br.convention{ "$JB_DOM.Br" }
+        img.convention { "$JB_DOM.Img" }
+        h1.convention { "$JB_DOM.H1" }
+        h2.convention { "$JB_DOM.H2" }
+        h3.convention { "$JB_DOM.H3" }
+        h4.convention { "$JB_DOM.H4" }
+        h5.convention { "$JB_DOM.H5" }
+        h6.convention { "$JB_DOM.H6" }
+        p.convention { "$JB_DOM.P" }
+        br.convention { "$JB_DOM.Br" }
         a.convention { link ->
             if (useSilk.get()) {
                 val linkText = link.children().filterIsInstance<Text>().firstOrNull()?.literal.orEmpty()
@@ -195,26 +195,26 @@ abstract class MarkdownComponents {
                 "$JB_DOM.A(\"${link.destination}\")"
             }
         }
-        em.convention{ "$JB_DOM.Em" }
-        strong.convention{ "$JB_DOM.B" }
-        hr.convention{ "$JB_DOM.Hr" }
-        ul.convention{ "$JB_DOM.Ul" }
-        ol.convention{ "$JB_DOM.Ol" }
-        li.convention{ "$JB_DOM.Li" }
+        em.convention { "$JB_DOM.Em" }
+        strong.convention { "$JB_DOM.B" }
+        hr.convention { "$JB_DOM.Hr" }
+        ul.convention { "$JB_DOM.Ul" }
+        ol.convention { "$JB_DOM.Ol" }
+        li.convention { "$JB_DOM.Li" }
         code.convention { codeBlock ->
             childrenOverride = codeBlock.literal.trim().split("\n").map { line -> Text("$line\\n") }
             // See also: https://stackoverflow.com/a/31775545/1299302
             "$JB_DOM.Code(attrs = { style { property(\"display\", \"block\"); property(\"white-space\", \"pre-wrap\") } })"
         }
-        inlineCode.convention{ code ->
+        inlineCode.convention { code ->
             childrenOverride = listOf(Text(code.literal))
             "$JB_DOM.Code"
         }
-        table.convention{ "$JB_DOM.Table" }
-        thead.convention{ "$JB_DOM.Thead" }
-        tbody.convention{ "$JB_DOM.Tbody" }
-        tr.convention{ "$JB_DOM.Tr" }
-        td.convention{ "$JB_DOM.Td" }
-        th.convention{ "$JB_DOM.Th" }
+        table.convention { "$JB_DOM.Table" }
+        thead.convention { "$JB_DOM.Thead" }
+        tbody.convention { "$JB_DOM.Tbody" }
+        tr.convention { "$JB_DOM.Tr" }
+        td.convention { "$JB_DOM.Td" }
+        th.convention { "$JB_DOM.Th" }
     }
 }

@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.silk
 
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
-import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.SilkConfig
+import com.varabyte.kobweb.silk.theme.SilkTheme
 
 /**
  * An annotation which identifies a function as one which will be called when the page opens before DOM nodes are

@@ -25,8 +25,10 @@ abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebConfig: KobwebConfig,
     private val markdownConfig: MarkdownConfig,
 ) : DefaultTask() {
-    private val markdownComponents = (markdownConfig as ExtensionAware).extensions.getByName("components") as MarkdownComponents
-    private val markdownFeatures = (markdownConfig as ExtensionAware).extensions.getByName("features") as MarkdownFeatures
+    private val markdownComponents =
+        (markdownConfig as ExtensionAware).extensions.getByName("components") as MarkdownComponents
+    private val markdownFeatures =
+        (markdownConfig as ExtensionAware).extensions.getByName("features") as MarkdownFeatures
 
     private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(TargetPlatform.JS)
         .map { root -> File(root, markdownConfig.markdownPath.get()) }

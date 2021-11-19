@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.cli.jvm.main
-
 plugins {
     `kotlin-dsl`
     kotlin("jvm")

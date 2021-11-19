@@ -12,8 +12,8 @@ import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
-    : KobwebProjectTask(config, "Export the Kobweb project into a static site") {
+abstract class KobwebExportTask @Inject constructor(config: KobwebConfig) :
+    KobwebProjectTask(config, "Export the Kobweb project into a static site") {
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -38,8 +38,8 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
                 page.onLoadEventFired { _ ->
                     val evaluation = runtime.evaluate("document.documentElement.outerHTML")
                     val filePath = pageEntry.route.substringBeforeLast('/') + "/" +
-                            (pageEntry.route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
-                            ".html"
+                        (pageEntry.route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
+                        ".html"
                     val prettyHtml = Jsoup.parse(evaluation.result.value.toString()).toString()
                     File(getSiteDir(), "pages$filePath").run {
                         parentFile.mkdirs()
@@ -56,7 +56,10 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig)
         getResourceFilesJsWithRoots().forEach { rootAndFile ->
             val relativePath = rootAndFile.relativeFile.toString().substringAfter(getPublicPath())
             // The auto-generated "/index.html" file should be used as a fallback if the user visits an invalid path
-            val destFile = File(getSiteDir(), if (relativePath != "/index.html") "resources$relativePath" else "system$relativePath")
+            val destFile = File(
+                getSiteDir(),
+                if (relativePath != "/index.html") "resources$relativePath" else "system$relativePath"
+            )
             rootAndFile.file.copyTo(destFile, overwrite = true)
         }
 

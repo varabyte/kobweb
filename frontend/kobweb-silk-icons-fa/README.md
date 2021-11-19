@@ -10,8 +10,8 @@ to the `<head>` block in your document template.
 
 Note that this directory contains a file called `fa-icon-list`, which is parsed and used to generate code used in this
 project. This list was populated using instructions from [Stack Overflow](https://stackoverflow.com/a/33794368/1299302).
-For example, visit [the Font Awesome Solid icons cheatsheet](https://fontawesome.com/v5/cheatsheet/free/solid) and,
-in the developer console, run
+For example, visit [the Font Awesome Solid icons cheatsheet](https://fontawesome.com/v5/cheatsheet/free/solid) and, in
+the developer console, run
 
 ```js
 var names = new Set();

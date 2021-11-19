@@ -47,7 +47,12 @@ abstract class KobwebConfig {
         publicPath.convention("public")
     }
 
-    fun getGenJsSrcRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$JS_SRC_SUFFIX").get().asFile
-    fun getGenJsResRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$JS_RESOURCE_SUFFIX").get().asFile
-    fun getGenJvmSrcRoot(project: Project): File = project.layout.buildDirectory.dir("${genDir.get()}$JVM_SRC_SUFFIX").get().asFile
+    fun getGenJsSrcRoot(project: Project): File =
+        project.layout.buildDirectory.dir("${genDir.get()}$JS_SRC_SUFFIX").get().asFile
+
+    fun getGenJsResRoot(project: Project): File =
+        project.layout.buildDirectory.dir("${genDir.get()}$JS_RESOURCE_SUFFIX").get().asFile
+
+    fun getGenJvmSrcRoot(project: Project): File =
+        project.layout.buildDirectory.dir("${genDir.get()}$JVM_SRC_SUFFIX").get().asFile
 }

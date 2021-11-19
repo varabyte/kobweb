@@ -69,7 +69,7 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
                 if (file.isDirectory && KobwebFolder.isKobwebProject(file.toPath())) {
                     subTemplates.add(file)
                 }
-        }
+            }
         subTemplates.forEach { subTemplate -> subTemplate.deleteRecursively() }
     }
 

@@ -107,12 +107,12 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
 
         Runtime.getRuntime().addShutdownHook(Thread {
             if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
-                cancelReason = "CTRL-C received. We already kicked off a request to stop the server but we have to exit NOW."
+                cancelReason =
+                    "CTRL-C received. We already kicked off a request to stop the server but we have to exit NOW."
                 runState = RunState.CANCELLED
 
                 ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
-            }
-            else {
+            } else {
                 cancelReason = "CTRL-C received. Server startup cancelled."
                 runState = RunState.CANCELLED
             }
@@ -152,11 +152,11 @@ fun handleRun(env: ServerEnvironment) = konsoleApp {
             while (runState == RunState.STARTING) {
                 serverStateFile.content?.takeIf { it.isRunning() }?.let {
                     if (it.env != env) {
-                        cancelReason = "A server is already running using a different environment configuration (want = $env, current = ${it.env})"
+                        cancelReason =
+                            "A server is already running using a different environment configuration (want = $env, current = ${it.env})"
                         runState = RunState.CANCELLED
                         signal()
-                    }
-                    else {
+                    } else {
                         serverState = it
                         runState = RunState.RUNNING
                     }

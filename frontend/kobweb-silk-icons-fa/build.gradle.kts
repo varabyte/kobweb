@@ -39,7 +39,8 @@ enum class IconCategory {
 
 val regenerateIconsTask = tasks.register("regenerateIcons") {
     val srcFile = layout.projectDirectory.file("fa-icon-list.txt")
-    val dstFile = layout.projectDirectory.file("src/jsMain/kotlin/com/varabyte/kobweb/silk/components/icons/fa/FaIcons.kt")
+    val dstFile =
+        layout.projectDirectory.file("src/jsMain/kotlin/com/varabyte/kobweb/silk/components/icons/fa/FaIcons.kt")
 
     inputs.files(srcFile, layout.projectDirectory.file("build.gradle.kts"))
     outputs.file(dstFile)
@@ -80,7 +81,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
         .filterNot { entry ->
             val categories = entry.value
             categories.size == 1 ||
-                    (categories.size == 2 && categories.contains(IconCategory.SOLID) && categories.contains(IconCategory.REGULAR))
+                (categories.size == 2 && categories.contains(IconCategory.SOLID) && categories.contains(IconCategory.REGULAR))
         }
         .let { invalidGroupings ->
             if (invalidGroupings.isNotEmpty()) {

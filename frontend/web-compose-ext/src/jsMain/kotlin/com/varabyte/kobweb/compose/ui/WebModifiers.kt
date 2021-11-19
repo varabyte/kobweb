@@ -149,7 +149,12 @@ fun Modifier.padding(topBottom: CSSNumeric, leftRight: CSSNumeric): Modifier = s
     margin(topBottom, leftRight)
 }
 
-fun Modifier.padding(top: CSSNumeric = 0.px, right: CSSNumeric = 0.px, bottom: CSSNumeric = 0.px, left: CSSNumeric = 0.px): Modifier = styleModifier {
+fun Modifier.padding(
+    top: CSSNumeric = 0.px,
+    right: CSSNumeric = 0.px,
+    bottom: CSSNumeric = 0.px,
+    left: CSSNumeric = 0.px
+): Modifier = styleModifier {
     // See: Modifier.padding(all) comment
     margin(top, right, bottom, left)
 }

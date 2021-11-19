@@ -13,8 +13,8 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, private val buildTarget: BuildTarget)
-    : KobwebProjectTask(config, "Generate Kobweb code and resources for the frontend site") {
+abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, private val buildTarget: BuildTarget) :
+    KobwebProjectTask(config, "Generate Kobweb code and resources for the frontend site") {
 
     @InputFiles
     fun getSourceFiles() = getSourceFilesJs()

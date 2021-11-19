@@ -2,11 +2,9 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 
@@ -28,8 +26,7 @@ abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is runni
                     Thread.sleep(300)
                 }
                 println("A Kobweb server running at ${serverState.toDisplayText()} was stopped")
-            }
-            else {
+            } else {
                 Files.delete(stateFile.path)
             }
         }

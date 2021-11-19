@@ -1,6 +1,6 @@
 ![version: 0.6.3](https://img.shields.io/badge/kobweb-v0.6.3-yellow)
 <a href="https://discord.gg/5NZ2GKV5Cs">
-  <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
+<img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
 [![Follow @bitspittle](https://img.shields.io/twitter/follow/bitspittle.svg?style=social)](https://twitter.com/intent/follow?screen_name=bitspittle)
 
@@ -46,8 +46,8 @@ fun HomePage() {
 
 ---
 
-**Kobweb is currently in technology preview**. Please consider starring the project to indicate interest, so we know we're
-creating something the community wants. [How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
+**Kobweb is currently in technology preview**. Please consider starring the project to indicate interest, so we know
+we're creating something the community wants. [How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
 
 Our goal is to provide:
 
@@ -196,10 +196,10 @@ For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 
 # Basics
 
-Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
-Web Compose app, such as routing and setting up default CSS styles. It exposes a handful of annotations and utility
-methods which your app can use to communicate intent with the framework. These annotations work in conjunction with our
-Gradle plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
+Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a Web
+Compose app, such as routing and setting up default CSS styles. It exposes a handful of annotations and utility methods
+which your app can use to communicate intent with the framework. These annotations work in conjunction with our Gradle
+plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
 
 Kobweb is also a CLI binary of the same name which provides commands to handle the parts of building a Web Compose app
 that are less glamorous. We want to get that stuff out of the way, so you can enjoy focusing on the more interesting
@@ -229,8 +229,8 @@ fun SettingsPage() {
 
 this will create a page that I can then visit by going to `mysite.com/admin/settings`.
 
-By default, the path comes from the file name, although there will be ways to override this behavior on a
-case-by-case basis (* *coming soon*).
+By default, the path comes from the file name, although there will be ways to override this behavior on a case-by-case
+basis (* *coming soon*).
 
 The file name `Index.kt` is special. If a page is defined inside such a file, it will be treated as the default page
 under that URL. For example, a page defined in `.../pages/admin/Index.kt` will be visited if the user visits
@@ -241,8 +241,8 @@ under that URL. For example, a page defined in `.../pages/admin/Index.kt` will b
 Silk is a UI layer included with Kobweb and built upon Web Compose. (To learn more about Web Compose, please visit
 [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started)).
 
-While Web Compose requires you to understand underlying html / css concepts, Silk attempts to abstract a lot of that away,
-providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
+While Web Compose requires you to understand underlying html / css concepts, Silk attempts to abstract a lot of that
+away, providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
 "div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
 
 We consider Silk a pretty important part of the Kobweb experience, but it's worth pointing out that it's designed as an
@@ -268,11 +268,11 @@ drawback. It also means that debugging in a browser would be a rough experience,
 be limited in the insights it could provide for your site. It would also prevent a developer from making use of the rich
 ecosystem of Javascript libraries out there that modify the DOM tree themselves.
 
-For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a
-rich UI library of widgets that hopefully makes it relatively rare for the developer to worry about it. For example,
-flexbox is a very powerful component, but you'll find it's much easier to compose Rows and Columns together than trying
-to remember if you should be justifying your items or aligning your content, even if Rows and Columns are just creating
-the correct html / css for you behind the scenes anyways.
+For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a rich
+UI library of widgets that hopefully makes it relatively rare for the developer to worry about it. For example, flexbox
+is a very powerful component, but you'll find it's much easier to compose Rows and Columns together than trying to
+remember if you should be justifying your items or aligning your content, even if Rows and Columns are just creating the
+correct html / css for you behind the scenes anyways.
 
 ## Components: Layouts, Sections, and Widgets
 
@@ -282,8 +282,8 @@ around.
 
 First, as a sibling to pages, create a folder called **components**. Within it, add:
 
-* **layouts** - High-level composables that provide entire page layouts. Most (all?) of your `@Page` pages will start
-  by calling a page layout function first. You may only have a single layout for your entire site.
+* **layouts** - High-level composables that provide entire page layouts. Most (all?) of your `@Page` pages will start by
+  calling a page layout function first. You may only have a single layout for your entire site.
 * **sections** - Medium-level composables that represent compound areas inside your pages, organizing a collection of
   many children composables. If you have multiple layouts, it's likely sections would be shared across them. For
   example, nav headers and footers are great candidates for this subfolder.
@@ -295,8 +295,8 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
 You can define and annotate methods which will generate server endpoints you can interact with. To add one:
 
 1. Define your method (optionally `suspend`able) in a file somewhere under the `api` package your `jvmMain` source
-directory.
-1. The method should take exactly one argument, an `ApiContext`. 
+   directory.
+1. The method should take exactly one argument, an `ApiContext`.
 1. Annotate it with `@Api`
 
 For example, here's a simple method that echoes back an argument passed into it:
@@ -340,8 +340,8 @@ All the HTTP methods are supported (`post`, `put`, etc.). Of course, you can als
 
 ## Markdown
 
-If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for
-you at build time, using the filename as its path.
+If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for you
+at build time, using the filename as its path.
 
 For example, if I create the following file:
 
@@ -444,15 +444,15 @@ So, should you use Kobweb at this point? If you are...
 
 * a Kotlin tinkerer who is excited to play around with new tech and isn't afraid of creating toy projects atop APIs
   which may shift underfoot:
-  * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
-  below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
-  this project.
+    * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
+      below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
+      this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
-  * ***Maybe***, but now is probably a bit too early.
+    * ***Maybe***, but now is probably a bit too early.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
-  * **No**
+    * **No**
 * a company:
-  * **NOOOOOO** (someday, we hope, but not yet)
+    * **NOOOOOO** (someday, we hope, but not yet)
 
 # Templates
 
@@ -471,9 +471,9 @@ $ git submodule update --init
 # Known Issues
 
 * `kobweb run` sometimes gets stuck when Gradle (running behind it) gets stuck.
-  * Quit kobweb, run `./gradlew --stop`, and then try again
-  * Run `./gradlew kobwebGen` or `./gradlew kobwebStart` with various Gradle debug options to see what's going on under
-  the hood (e.g. `./gradlew kobwebStart --stacktrace`)
+    * Quit kobweb, run `./gradlew --stop`, and then try again
+    * Run `./gradlew kobwebGen` or `./gradlew kobwebStart` with various Gradle debug options to see what's going on
+      under the hood (e.g. `./gradlew kobwebStart --stacktrace`)
 
 Solutions didn't work? Or you're encountering issues not listed here? Please consider
 [leaving feedback ▼](https://github.com/varabyte/kobweb#filing-issues-and-leaving-feedback)!

@@ -18,7 +18,8 @@ import org.w3c.dom.HTMLAnchorElement
 fun Link(
     href: String,
     attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
-    content: ContentBuilder<HTMLAnchorElement>? = null) {
+    content: ContentBuilder<HTMLAnchorElement>? = null
+) {
     val ctx = rememberPageContext()
     A(
         href,

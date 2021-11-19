@@ -114,12 +114,14 @@ class SiteData {
                                             currPackage.isNotEmpty() -> "$currPackage.${element.name}"
                                             else -> element.name
                                         }
-                                        initFqn?.let { siteData._kobwebInits.add(
-                                            InitKobwebEntry(
-                                                initFqn,
-                                                acceptsContext = element.valueParameters.size == 1
+                                        initFqn?.let {
+                                            siteData._kobwebInits.add(
+                                                InitKobwebEntry(
+                                                    initFqn,
+                                                    acceptsContext = element.valueParameters.size == 1
+                                                )
                                             )
-                                        ) }
+                                        }
                                     }
                                     initSilkSimpleName -> {
                                         siteData._silkInits.add(InitSilkEntry("$currPackage.${element.name}"))

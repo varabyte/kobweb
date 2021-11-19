@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
 import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
 import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.application.extensions.getSourceFiles
-import com.varabyte.kobweb.project.KobwebProject
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerState
 import org.gradle.api.GradleException
@@ -29,7 +28,8 @@ abstract class KobwebProjectTask(@get:Internal val config: KobwebConfig, desc: S
     protected val kobwebConfFile = KobwebConfFile(kobwebProject.kobwebFolder)
 
     @get:Internal
-    protected val kobwebConf = kobwebConfFile.content ?: throw GradleException("Could not find configuration file: ${this.path}")
+    protected val kobwebConf =
+        kobwebConfFile.content ?: throw GradleException("Could not find configuration file: ${this.path}")
 
     @InputFile
     fun getConfFile(): File = kobwebConfFile.path.toFile()

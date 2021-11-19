@@ -4,8 +4,8 @@ projects won't need them.
 
 Any code included in these projects will live in the `kobwebx` namespace.
 
-Extensions are expected to extend the Gradle `kobwebx` block with their own
-configuration subblocks, e.g. what the Markdown plugin does:
+Extensions are expected to extend the Gradle `kobwebx` block with their own configuration subblocks, e.g. what the
+Markdown plugin does:
 
 ```groovy
 kobwebx {

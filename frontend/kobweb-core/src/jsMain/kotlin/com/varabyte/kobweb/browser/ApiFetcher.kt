@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.browser
 
-import androidx.compose.runtime.NoLiveLiterals
+import androidx.compose.runtime.*
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
 import org.khronos.webgl.Int8Array
@@ -41,7 +41,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-     suspend fun delete(apiPath: String): ByteArray? = fetch("DELETE", apiPath)
+    suspend fun delete(apiPath: String): ByteArray? = fetch("DELETE", apiPath)
 
     /**
      * Call GET on a target API path.

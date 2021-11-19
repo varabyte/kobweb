@@ -48,7 +48,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
     httpMethod: HttpMethod,
 ) {
     call.parameters[KOBWEB_PARAMS]?.takeIf { it.isNotBlank() }?.let { pathStr ->
-        val body: ByteArray? = when(httpMethod) {
+        val body: ByteArray? = when (httpMethod) {
             HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT -> {
                 withContext(Dispatchers.IO) { call.receiveStream().readAllBytes() }.takeIf { it.isNotEmpty() }
             }
@@ -66,7 +66,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
             call.respondBytes(
                 response.body?.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
                 status = HttpStatusCode.fromValue(response.status),
-                contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }?.let { ContentType.parse(it) }
+                contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }
+                    ?.let { ContentType.parse(it) }
             )
         } else {
             call.respond(HttpStatusCode.NotFound)
@@ -108,8 +109,7 @@ private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
                         val ext = filename.substringAfterLast(".", "").takeIf { it.isNotEmpty() }
                         if (ext != null && ext != "html") {
                             call.respond(HttpStatusCode.NotFound)
-                        }
-                        else {
+                        } else {
                             handled = false
                         }
                     }
@@ -164,8 +164,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
                         flush()
                         delay(300)
                     }
-                }
-                catch (ex: ChannelWriteException) {
+                } catch (ex: ChannelWriteException) {
                     println("Closing socket because client disconnected")
                     // Expected eventually - client connection closed
                 }
@@ -219,8 +218,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
                     get("/${relativeFile.parent}/$name") {
                         call.respondFile(file)
                     }
-                }
-                else {
+                } else {
                     get("/${relativeFile.parent}") {
                         call.respondFile(file)
                     }

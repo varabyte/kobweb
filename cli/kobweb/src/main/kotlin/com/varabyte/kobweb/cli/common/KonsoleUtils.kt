@@ -117,8 +117,7 @@ fun KonsoleApp.queryUser(
         text("> ")
         if (answer.isNotEmpty()) {
             textLine(answer)
-        }
-        else {
+        } else {
             input(defaultAnswer?.let { Completions(it) })
             textLine()
             error?.let { error ->
@@ -141,8 +140,7 @@ fun KonsoleApp.queryUser(
         onInputEntered {
             if (error == null) {
                 answer = possibleAnswer
-            }
-            else {
+            } else {
                 rejectInput()
             }
         }
@@ -152,7 +150,7 @@ fun KonsoleApp.queryUser(
 
 /**
  * Convenience method for adding a single line, useful to do before or after queries or information messages.
-*/
+ */
 fun KonsoleApp.newline() {
     konsole { textLine() }.run()
 }

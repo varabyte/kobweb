@@ -10,12 +10,14 @@ interface WebModifier : Modifier.Element
  * A modifier element which works by setting CSS styles and/or attributes when it is applied.
  */
 class AttrModifier(internal val attrs: (AttrsBuilder<*>.() -> Unit)) : WebModifier
+
 fun Modifier.attrModifier(attrs: (AttrsBuilder<*>.() -> Unit)) = this then AttrModifier(attrs)
 
 /**
  * A modifier element that works by CSS styles when it is applied.
  */
 class StyleModifier(internal val styles: (StyleBuilder.() -> Unit)) : WebModifier
+
 fun Modifier.styleModifier(styles: (StyleBuilder.() -> Unit)) = this then StyleModifier(styles)
 
 /**
@@ -34,8 +36,7 @@ fun Modifier.asAttributeBuilder(finalHandler: (AttrsBuilder<*>.() -> Unit)? = nu
         firstModifier.fold(Unit) { _, element ->
             if (element is AttrModifier) {
                 element.attrs.invoke(this)
-            }
-            else if (element is StyleModifier) {
+            } else if (element is StyleModifier) {
                 style {
                     element.styles.invoke(this)
                 }

@@ -1,7 +1,10 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
-import androidx.compose.runtime.Composable
-import com.varabyte.kobweb.compose.ui.*
+import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.ui.Alignment
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
 import org.jetbrains.compose.web.css.DisplayStyle

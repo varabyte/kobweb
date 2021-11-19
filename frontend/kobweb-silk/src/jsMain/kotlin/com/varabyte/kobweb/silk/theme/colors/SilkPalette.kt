@@ -16,7 +16,8 @@ data class SilkPalette(
         val default: Color,
         val visited: Color,
     )
-    data class Button (
+
+    data class Button(
         val default: Color,
         val hover: Color,
         val pressed: Color,
@@ -27,7 +28,7 @@ data class SilkPalettes(
     val light: SilkPalette,
     val dark: SilkPalette,
 ) {
-    operator fun get(colorMode: ColorMode) = when(colorMode) {
+    operator fun get(colorMode: ColorMode) = when (colorMode) {
         ColorMode.LIGHT -> light
         ColorMode.DARK -> dark
     }

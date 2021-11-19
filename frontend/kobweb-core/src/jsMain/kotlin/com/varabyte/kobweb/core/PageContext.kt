@@ -21,6 +21,7 @@ class PageContext(val router: Router) {
     companion object {
         internal val active by lazy { mutableStateOf<PageContext?>(null) }
     }
+
     internal val mutableParams = mutableMapOf<String, String>()
     val params: Map<String, String> = mutableParams
 }

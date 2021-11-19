@@ -12,7 +12,7 @@ import org.gradle.plugins.signing.SigningExtension
 internal fun Project.shouldSign() = (findProperty("kobweb.sign") as? String).toBoolean()
 internal fun Project.shouldPublishToGCloud(): Boolean {
     return (findProperty("kobweb.gcloud.publish") as? String).toBoolean()
-            && findProperty("gcloud.artifact.registry.secret") != null
+        && findProperty("gcloud.artifact.registry.secret") != null
 }
 
 internal fun MavenArtifactRepository.gcloudAuth(project: Project) {

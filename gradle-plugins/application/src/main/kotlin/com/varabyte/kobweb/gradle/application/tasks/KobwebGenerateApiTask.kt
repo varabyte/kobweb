@@ -11,8 +11,8 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateApiTask @Inject constructor(config: KobwebConfig)
-    : KobwebProjectTask(config, "Generate Kobweb code for the server") {
+abstract class KobwebGenerateApiTask @Inject constructor(config: KobwebConfig) :
+    KobwebProjectTask(config, "Generate Kobweb code for the server") {
 
     @InputFiles
     fun getSourceFiles() = getSourceFilesJvm()

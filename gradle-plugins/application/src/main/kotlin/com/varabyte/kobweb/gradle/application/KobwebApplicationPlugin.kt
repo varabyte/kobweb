@@ -33,11 +33,13 @@ class KobwebApplicationPlugin : Plugin<Project> {
         val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
         project.extensions.create("kobwebx", KobwebxBlock::class.java)
 
-        val env = project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
+        val env =
+            project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
         val buildTarget = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
             ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
 
-        val kobwebGenSiteTask = project.tasks.register("kobwebGenSite", KobwebGenerateSiteTask::class.java, kobwebConfig, buildTarget)
+        val kobwebGenSiteTask =
+            project.tasks.register("kobwebGenSite", KobwebGenerateSiteTask::class.java, kobwebConfig, buildTarget)
         val kobwebGenApiTask = project.tasks.register("kobwebGenApi", KobwebGenerateApiTask::class.java, kobwebConfig)
         // Umbrella task for all other gen tasks
         val kobwebGenTask = project.tasks.register("kobwebGen")
@@ -68,7 +70,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
             val jarTask = project.tasks.findByName("jvmJar")
             jarTask?.dependsOn(kobwebGenApiTask)
 
-            val compileExecutableTask = when(buildTarget) {
+            val compileExecutableTask = when (buildTarget) {
                 BuildTarget.DEBUG -> project.tasks.named("jsDevelopmentExecutableCompileSync")
                 BuildTarget.RELEASE -> project.tasks.named("jsProductionExecutableCompileSync")
             }
@@ -108,6 +110,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
                         ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Building..."))
                     }
                 }
+
                 override fun afterExecute(task: Task, state: TaskState) {
                     if (task.name == kobwebStartTask.name) {
                         if (state.failure == null) {

@@ -64,15 +64,16 @@ class ApiJarFile(path: Path, private val logger: Logger) {
     private val delegateFile = LiveFile(path)
     private var cache: Cache? = null
 
-    val apis: Apis get() {
-        val currContent = delegateFile.content ?: error { "No API jar found at: ${delegateFile.path}" }
+    val apis: Apis
+        get() {
+            val currContent = delegateFile.content ?: error { "No API jar found at: ${delegateFile.path}" }
 
-        var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
-        if (cache == null || cache.content !== delegateFile.content) {
-            cache = Cache(currContent, logger)
-            this.cache = cache
+            var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
+            if (cache == null || cache.content !== delegateFile.content) {
+                cache = Cache(currContent, logger)
+                this.cache = cache
+            }
+
+            return cache.apis
         }
-
-        return cache.apis
-    }
 }

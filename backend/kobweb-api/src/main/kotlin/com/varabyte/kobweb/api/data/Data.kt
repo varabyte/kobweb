@@ -10,12 +10,12 @@ import kotlin.concurrent.withLock
  * See the header comment for that class for more information.
  */
 interface Data {
-    operator fun <T: Any> get(key: Class<T>): T?
+    operator fun <T : Any> get(key: Class<T>): T?
 }
 
-fun <T: Any> Data.getValue(key: Class<T>): T = this[key]!!
-inline fun <reified T: Any> Data.get(): T? = this[T::class.java]
-inline fun <reified T: Any> Data.getValue(): T = getValue(T::class.java)
+fun <T : Any> Data.getValue(key: Class<T>): T = this[key]!!
+inline fun <reified T : Any> Data.get(): T? = this[T::class.java]
+inline fun <reified T : Any> Data.getValue(): T = getValue(T::class.java)
 
 /**
  * A thread-safe in-memory data store providing access to values using the
@@ -29,11 +29,11 @@ class MutableData : Data {
     private val lock = ReentrantLock()
     private val cache = mutableMapOf<Class<*>, Any>()
 
-    operator fun <T: Any> set(key: Class<T>, value: T) {
+    operator fun <T : Any> set(key: Class<T>, value: T) {
         lock.withLock { cache[key] = value }
     }
 
-    override operator fun <T: Any> get(key: Class<T>): T? {
+    override operator fun <T : Any> get(key: Class<T>): T? {
         return lock.withLock { cache[key] as? T }
     }
 }

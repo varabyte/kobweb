@@ -102,7 +102,7 @@ class KotlinRenderer(
             onFinish.forEach { action -> action() }
         }
 
-        private fun <N: Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
+        private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
             val scope = NodeScope()
             val code = composableCall.get().invoke(scope, node)
             doVisit(node, code, scope.childrenOverride)

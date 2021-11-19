@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.core
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 
 /**
  * An annotation which identifies a [Composable] function as one which will be used to render a page.

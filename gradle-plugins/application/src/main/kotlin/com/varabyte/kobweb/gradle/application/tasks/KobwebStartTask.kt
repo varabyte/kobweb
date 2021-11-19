@@ -31,13 +31,12 @@ abstract class KobwebStartTask @Inject constructor(
             if (serverState.isRunning()) {
                 if (!reuseServer) {
                     throw GradleException("$alreadyRunningMessage and cannot be reused for this task.")
-                }
-                else if (serverState.env != env) {
+                } else if (serverState.env != env) {
                     throw GradleException(
                         alreadyRunningMessage
-                                + " but can't be reused because it is using a different environment (want=$env, current=${serverState.env})")
-                }
-                else {
+                            + " but can't be reused because it is using a different environment (want=$env, current=${serverState.env})"
+                    )
+                } else {
                     println(alreadyRunningMessage)
                 }
                 return

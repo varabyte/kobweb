@@ -1,9 +1,6 @@
 package com.varabyte.kobweb.silk.theme.colors
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.silk.theme.SilkConfigInstance
