@@ -31,6 +31,7 @@ val ButtonStyle = ComponentStyle("silk-button") { colorMode ->
     base = Modifier.background(buttonColors.default).clip(Rect(4.px)).styleModifier {
         // No selecting text within buttons
         userSelect(UserSelect.None)
+        property("role", "button")
     }
     hover = Modifier.background(buttonColors.hover).styleModifier {
         cursor(Cursor.Pointer)
