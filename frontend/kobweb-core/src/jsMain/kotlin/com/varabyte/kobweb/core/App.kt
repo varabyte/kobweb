@@ -31,6 +31,7 @@ import org.jetbrains.compose.web.css.px
  * Finally, there must either be no methods or just a single method marked with this annotation. If Kobweb encounters
  * more than one App annotation, it will log an error and discard duplicates arbitrarily.
  */
+@Target(AnnotationTarget.FUNCTION)
 annotation class App
 
 @Composable

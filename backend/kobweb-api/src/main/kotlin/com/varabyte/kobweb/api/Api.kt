@@ -7,4 +7,5 @@ package com.varabyte.kobweb.api
  * By default, the method's filename will be used to generate its slug, e.g. "api/user/Fetch.kt" ->
  * "/api/user/fetch", but you can provide a specific override if necessary.
  */
+@Target(AnnotationTarget.FUNCTION)
 annotation class Api

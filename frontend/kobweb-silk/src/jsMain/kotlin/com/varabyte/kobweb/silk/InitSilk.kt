@@ -8,6 +8,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
  * An annotation which identifies a function as one which will be called when the page opens before DOM nodes are
  * composed. The function should take an [InitSilkContext] as its only parameter.
  */
+@Target(AnnotationTarget.FUNCTION)
 annotation class InitSilk
 
 /**

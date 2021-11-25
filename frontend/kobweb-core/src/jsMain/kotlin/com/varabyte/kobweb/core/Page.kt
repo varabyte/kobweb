@@ -11,4 +11,5 @@ import androidx.compose.runtime.*
  * The name "index" is special, and if encountered, it will be understood that this is a default page given the current
  * URL. For example, "pages/blog/Index.kt" will be rendered when the user visits "/blog".
  */
+@Target(AnnotationTarget.FUNCTION)
 annotation class Page
