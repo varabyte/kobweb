@@ -1,7 +1,7 @@
 package clock.pages
 
 import androidx.compose.runtime.*
-import clock.components.layout.PageLayout
+import clock.components.layouts.PageLayout
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
