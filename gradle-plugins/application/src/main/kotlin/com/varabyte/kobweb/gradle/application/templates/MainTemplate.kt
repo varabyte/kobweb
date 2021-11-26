@@ -1,18 +1,9 @@
 package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
-import com.varabyte.kobweb.gradle.application.project.site.AppEntry
-import com.varabyte.kobweb.gradle.application.project.site.InitKobwebEntry
-import com.varabyte.kobweb.gradle.application.project.site.InitSilkEntry
-import com.varabyte.kobweb.gradle.application.project.site.PageEntry
+import com.varabyte.kobweb.gradle.application.project.site.SiteData
 
-fun createMainFunction(
-    appEntry: AppEntry?,
-    pageEntries: List<PageEntry>,
-    initKobwebEntries: List<InitKobwebEntry>,
-    initSilkEntries: List<InitSilkEntry>,
-    target: BuildTarget
-): String {
+fun createMainFunction(siteData: SiteData, target: BuildTarget): String {
     val imports = mutableListOf(
         "com.varabyte.kobweb.navigation.Router",
         "kotlinx.browser.document",
@@ -32,7 +23,7 @@ fun createMainFunction(
         imports.add("org.w3c.dom.get")
     }
 
-    if (initKobwebEntries.any { it.acceptsContext }) {
+    if (siteData.kobwebInits.any { it.acceptsContext }) {
         imports.add("com.varabyte.kobweb.core.InitKobwebContext")
     }
 
@@ -116,27 +107,35 @@ fun createMainFunction(
             appendLine()
         }
         appendLine("    val router = Router()")
-        pageEntries.forEach { entry ->
+        // Sort by route as it makes the generated registration logic easier to follow
+        siteData.pages.sortedBy { it.route }.forEach { entry ->
             appendLine("""    router.register("${entry.route}") { ${entry.fqn}() }""")
         }
         appendLine()
 
-        if (initKobwebEntries.isNotEmpty()) {
-            if (initKobwebEntries.any { entry -> entry.acceptsContext }) {
+        if (siteData.kobwebInits.isNotEmpty()) {
+            if (siteData.kobwebInits.any { entry -> entry.acceptsContext }) {
                 appendLine("    val ctx = InitContext(router)")
             }
-            initKobwebEntries.forEach { entry ->
+            siteData.kobwebInits.forEach { entry ->
                 val ctx = if (entry.acceptsContext) "ctx" else ""
                 appendLine("    ${entry.fqn}($ctx)")
             }
             appendLine()
         }
 
-        if (initSilkEntries.isNotEmpty()) {
+        if (siteData.silkInits.isNotEmpty() || siteData.silkStyleFqcns.isNotEmpty() || siteData.silkVariantFqcns.isNotEmpty()) {
             appendLine("    com.varabyte.kobweb.silk.initSilkHook = { ctx ->")
-            initSilkEntries.forEach { entry ->
+            siteData.silkStyleFqcns.forEach { fqcn ->
+                appendLine("        ctx.theme.registerComponentStyle($fqcn)")
+            }
+            siteData.silkVariantFqcns.forEach { fqcn ->
+                appendLine("        ctx.theme.registerComponentVariants($fqcn)")
+            }
+            siteData.silkInits.forEach { entry ->
                 appendLine("        ${entry.fqn}(ctx)")
             }
+
             appendLine("    }")
             appendLine()
         }
@@ -154,7 +153,7 @@ fun createMainFunction(
                 }
 
                 renderComposable(rootElementId = "root") {
-                    ${appEntry?.fqn ?: "com.varabyte.kobweb.core.KobwebApp"} {
+                    ${siteData.app?.fqn ?: "com.varabyte.kobweb.core.KobwebApp"} {
                         router.renderActivePage()
                     }
                 }

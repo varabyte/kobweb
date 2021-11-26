@@ -4,9 +4,13 @@ import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
 import com.varabyte.kobweb.gradle.application.project.KobwebProject
 import com.varabyte.kobweb.gradle.application.project.PsiUtils
 import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
+import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
+import org.jetbrains.kotlin.psi.KtProperty
 import java.io.File
 
 class SiteData {
@@ -14,15 +18,49 @@ class SiteData {
         internal set
 
     private val _pages = mutableListOf<PageEntry>()
+    /** A collection of methods annotated with `@Page` and relevant metadata */
     val pages: List<PageEntry> = _pages
 
     private val _kobwebInits = mutableListOf<InitKobwebEntry>()
+    /** A collection of methods annotated with `@InitKobweb` and relevant metadata */
     val kobwebInits: List<InitKobwebEntry> = _kobwebInits
 
     private val _silkInits = mutableListOf<InitSilkEntry>()
+    /** A collection of methods annotated with `@InitSilk` and relevant metadata */
     val silkInits: List<InitSilkEntry> = _silkInits
 
+    private val _silkStyleFqcns = mutableListOf<String>()
+    /** The fully-qualified names of properties assigned to `ComponentStyle`s */
+    val silkStyleFqcns: List<String> = _silkStyleFqcns
+
+    private val _silkVariantFqcns = mutableListOf<String>()
+    /** The fully-qualified names of properties assigned to `ComponentVariant`s */
+    val silkVariantFqcns: List<String> = _silkVariantFqcns
+
     companion object {
+        /** Process a line like `val CustomStyle = ComponentStyle("custom") { ... }` */
+        private fun processComponentStyle(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
+            val property = element.parent as? KtProperty ?: return false
+            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
+            if (property.parent !is KtFile) return false
+            val propertyName = property.name ?: return false
+
+            siteData._silkStyleFqcns.add("$filePackage.$propertyName")
+            return true
+        }
+
+        /** Process a line like `val CustomVariant = CustomStyle.addVariant("variant") { ... }` */
+        private fun processComponentVariant(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
+            val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
+            val property = qualifiedExpression.parent as? KtProperty ?: return false
+            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
+            if (property.parent !is KtFile) return false
+            val propertyName = property.name ?: return false
+
+            siteData._silkVariantFqcns.add("$filePackage.$propertyName")
+            return true
+        }
+
         /**
          * @param group The group of this project, e.g. "org.example.mysite", required for prefixing relative package
          *   names (e.g. ".blog" -> "org.example.mysite.blog")
@@ -127,6 +165,12 @@ class SiteData {
                                         siteData._silkInits.add(InitSilkEntry("$currPackage.${element.name}"))
                                     }
                                 }
+                            }
+                        }
+                        is KtCallExpression -> {
+                            when (element.calleeExpression?.text) {
+                                "ComponentStyle" -> processComponentStyle(currPackage, element, siteData)
+                                "addVariant" -> processComponentVariant(currPackage, element, siteData)
                             }
                         }
                     }

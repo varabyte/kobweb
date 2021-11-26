@@ -35,16 +35,7 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, 
 
         with(SiteData.from(project.group.toString(), config.pagesPackage.get(), getSourceFiles())) {
             genSrcRoot.mkdirs()
-            File(genSrcRoot, "main.kt").writeText(
-                createMainFunction(
-                    app,
-                    // Sort by route as it makes the generated registration logic easier to follow
-                    pages.sortedBy { it.route },
-                    kobwebInits,
-                    silkInits,
-                    buildTarget,
-                )
-            )
+            File(genSrcRoot, "main.kt").writeText(createMainFunction(this, buildTarget))
         }
 
         File(genResRoot, getPublicPath()).let { publicRoot ->
