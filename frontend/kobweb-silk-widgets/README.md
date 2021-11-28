@@ -4,21 +4,21 @@ Although Silk UI is considered a major benefit of the Kobweb package, it's quite
 use just the widgets -- for example, maybe they have their own existing Web Compose project which can't be easily
 ported to Kobweb, but they still want to use our fancy color mode support or widgest like SimpleGrid.
 
-When using this widget library on its own, you must initialize it yourself, since you probably won't be using the
-Kobweb plugin. To do that, be sure to call `initSilk` before your Web Compose entry point and then
-`Style(SilkStyleSheet)` within it!
+When using this widget library on its own, you must initialize it yourself, since that's normally something the Kobweb
+plugin does for you. To do that, call `initSilk` before your Web Compose entry point and then `Style(SilkStyleSheet)`
+within it!
 
 ```kotlin
 fun main() {
-    initSilk()
+    initSilk() // <-- MUST DO #1
     renderComposable(rootElementId = "root") {
-        Style(SilkStyleSheet)
+        Style(SilkStyleSheet) // <-- MUST DO #2
         /* ... */
     }
 }
 ```
 
-You can optinally tweak Silk configurations a bit using a passed-in callback:
+You can optionally tweak Silk configurations (such as palette colors) by using a passed-in callback:
 
 ```kotlin
 fun main() {
@@ -30,14 +30,14 @@ fun main() {
 }
 ```
 
-If you add any of your own custom widgets and want to take advantage of Silk's powerful `ComponentStyle` support, you'll
-have to remember to register them explicitly:
+If you write your own custom widgets and want to take advantage of Silk's powerful `ComponentStyle` support, you'll
+have to remember to register them explicitly (another thing the Kobweb plugin normally does for you):
 
 ```kotlin
 // File: CustomWidget.kt
 
 val CustomStyle = ComponentStyle("custom-widget") {
-    ...
+    hover = Modifier.background(...)
 }
 
 @Composable
