@@ -18,14 +18,13 @@ kotlin {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
 
-                api(project(":frontend:kobweb-silk-widgets"))
-                implementation(project(":frontend:kobweb-core"))
+                api(project(":frontend:web-compose-ext"))
             }
         }
     }
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-silk")
-    description.set("A set of rich UI components built on top of Kobweb and inspired by the best parts of Compose and Chakra UI")
+    artifactId.set("kobweb-silk-widgets")
+    description.set("The subset of Silk that doesn't depend on Kobweb at all, extracted into its own library in case projects want to use it without Kobweb")
 }
