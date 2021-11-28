@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentStyleBuilder
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -10,16 +12,44 @@ import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.cssRem
 
+/**
+ * Configuration values which are frozen at initialization time and accessed globally within Silk after that point.
+ */
 interface SilkConfig {
     var initialColorMode: ColorMode
+
+    fun registerBreakpoints(values: BreakpointValues<CSSUnitValue>)
 }
 
 internal object SilkConfigInstance : SilkConfig {
     override var initialColorMode = ColorMode.LIGHT
+
+    val breakpoints: MutableMap<Breakpoint, CSSUnitValue> = mutableMapOf(
+        Breakpoint.SM to 30.cssRem,
+        Breakpoint.MD to 48.cssRem,
+        Breakpoint.LG to 62.cssRem,
+        Breakpoint.XL to 80.cssRem,
+        Breakpoint.XXL to 96.cssRem,
+    )
+
+    override fun registerBreakpoints(values: BreakpointValues<CSSUnitValue>) {
+        breakpoints[Breakpoint.SM] = values.sm
+        breakpoints[Breakpoint.MD] = values.md
+        breakpoints[Breakpoint.LG] = values.lg
+        breakpoints[Breakpoint.XL] = values.xl
+        breakpoints[Breakpoint.XXL] = values.xxl
+    }
 }
 
+/**
+ * Theme values that will get frozen at initialization time.
+ *
+ * Unlike [SilkConfig] values, theme values are expected to be accessible in user projects via the [SilkTheme] object.
+ */
 class MutableSilkTheme {
     internal val componentStyles = LinkedHashMap<String, ComponentStyleBuilder>() // Preserve insertion order
     internal val componentVariants = LinkedHashMap<String, ComponentVariant>() // Preserve insertion order

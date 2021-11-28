@@ -4,12 +4,16 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asStyleBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.media
+import org.jetbrains.compose.web.css.mediaMinWidth
 
 // We need our own implementation of StyleBuilder, so we can both test equality and pull values out of it later
 private class SimpleStyleBuilder : StyleBuilder {
@@ -68,6 +72,13 @@ class ComponentModifiers {
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:active
      */
     var active: Modifier? = null
+
+    /**
+     * Register layout styles which are dependent on the current window width
+     *
+     * Breakpoints will be applied in order from smallest to largest.
+     */
+    val breakpoints = mutableMapOf<Breakpoint, Modifier>()
 }
 
 /**
@@ -140,15 +151,40 @@ class ComponentStyleBuilder internal constructor(
         }
     }
 
-    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, group: StyleGroup) {
+    /**
+     * Shared logic for using an initial selector name and triggering a callback with the final selector name and
+     * CSS styles to be associated with it.
+     */
+    private fun withFinalSelectorName(selectorBaseName: String, group: StyleGroup, handler: (String, SimpleStyleBuilder) -> Unit) {
         when (group) {
-            is StyleGroup.Light -> addStyles("$selectorName-light", pseudoClass, group.styles)
-            is StyleGroup.Dark -> addStyles("$selectorName-dark", pseudoClass, group.styles)
-            is StyleGroup.ColorAgnostic -> addStyles(selectorName, pseudoClass, group.styles)
+            is StyleGroup.Light -> handler("$selectorBaseName-light", group.styles)
+            is StyleGroup.Dark -> handler("$selectorBaseName-dark", group.styles)
+            is StyleGroup.ColorAgnostic -> handler(selectorBaseName, group.styles)
             is StyleGroup.ColorAware -> {
-                addStyles("$selectorName-light", pseudoClass, group.lightStyles)
-                addStyles("$selectorName-dark", pseudoClass, group.darkStyles)
+                handler("$selectorBaseName-light", group.lightStyles)
+                handler("$selectorBaseName-dark", group.darkStyles)
             }
+        }
+    }
+
+    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, group: StyleGroup) {
+        withFinalSelectorName(selectorName, group) { name, styles ->
+            addStyles(name, pseudoClass, styles)
+        }
+    }
+
+    private fun StyleSheet.addStyles(selectorName: String, breakpoint: Breakpoint, styles: SimpleStyleBuilder) {
+        media(mediaMinWidth(SilkConfigInstance.breakpoints.getValue(breakpoint))) {
+            selectorName style {
+                styles.properties.forEach { entry -> property(entry.key, entry.value) }
+                styles.variables.forEach { entry -> variable(entry.key, entry.value) }
+            }
+        }
+    }
+
+    private fun StyleSheet.addStyles(selectorName: String, breakpoint: Breakpoint, group: StyleGroup) {
+        withFinalSelectorName(selectorName, group) { name, styles ->
+            addStyles(name, breakpoint, styles)
         }
     }
 
@@ -170,6 +206,12 @@ class ComponentStyleBuilder internal constructor(
         }
         StyleGroup.from(lightModifiers.active, darkModifiers.active)?.let { group ->
             styleSheet.addStyles(selectorName, "active", group)
+        }
+
+        for (breakpoint in Breakpoint.values()) {
+            StyleGroup.from(lightModifiers.breakpoints[breakpoint], darkModifiers.breakpoints[breakpoint])?.let { group ->
+                styleSheet.addStyles(selectorName, breakpoint, group)
+            }
         }
     }
 
