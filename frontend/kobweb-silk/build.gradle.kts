@@ -18,7 +18,7 @@ kotlin {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
 
-                implementation(project(":frontend:web-compose-ext"))
+                api(project(":frontend:web-compose-ext"))
                 implementation(project(":frontend:kobweb-core"))
             }
         }
