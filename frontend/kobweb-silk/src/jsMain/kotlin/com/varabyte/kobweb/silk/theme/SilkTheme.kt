@@ -59,24 +59,11 @@ class MutableSilkTheme {
     /**
      * Register a new component style with this theme.
      *
+     * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
+     *
      * If this style has defined additional variants, they will also be registered automatically at this time.
      *
      * Once a style is registered, you can reference it in your Composable widget via the following code:
-     *
-     * ```
-     * val CustomStyle = ComponentStyle("my-style") { ... }
-     *
-     * @InitSilk
-     * fun initCustomStyle(ctx: InitSilkContext) {
-     *   ctx.theme.registerComponentStyle(CustomStyle)
-     * }
-     *
-     * @Composable
-     * fun CustomWidget(..., variant: ComponentVariant? = null, ...) {
-     *   val modifier = CustomStyle.toModifier(variant).then(...)
-     *   // ^ This modifier is now set with your registered styles.
-     * }
-     * ```
      */
     fun registerComponentStyle(style: ComponentStyleBuilder) {
         componentStyles[style.name] = style
@@ -86,8 +73,9 @@ class MutableSilkTheme {
     /**
      * Register variants associated with a base style.
      *
-     * **NOTE:** Most of the time, you don't have to call this yourself, as if you create a custom style with a bunch of
-     * variants on it, calling [registerComponentStyle] will automatically register them for you.
+     * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
+     * Additionally, any variants created by [ComponentStyleBuilder.addVariant] will be automatically registered when
+     * [registerComponentStyle] is called (in which case, calling this is essentially a no-op).
      *
      * However, if you are defining variants on top of base Silk styles, e.g. maybe some new button variants, then they
      * would normally be missed so you'll have to register them yourself in that case:

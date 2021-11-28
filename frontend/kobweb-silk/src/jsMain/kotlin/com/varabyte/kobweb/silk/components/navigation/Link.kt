@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.dom.Text
 import com.varabyte.kobweb.navigation.Link as KobwebLink

@@ -46,39 +46,46 @@ class ComponentModifiers {
     var base: Modifier? = null
 
     /**
-     * Styles to apply to components that represent navigation links which have not yet been visited.
+     * Register styles associated with pseudo classes like "first-child".
      *
-     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:link
+     * You can either add a pseudo class modifier to this map directly or use one of the various convenience properties
+     * provided which will do it for you.
+     *
+     * Pseudo classes will be applied in the order inserted. Be aware that you should use the LVHA order if using link,
+     * visited, hover, and/or active pseudo classes.
      */
-    var link: Modifier? = null
+    val pseudoClasses = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
 
     /**
-     * Styles to apply to components that represent navigation links which have previously been visited.
-     *
-     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:visited
-     */
-    var visited: Modifier? = null
-
-    /**
-     * Styles to apply to components when a cursor is pointing at them.
-     *
-     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:hover
-     */
-    var hover: Modifier? = null
-
-    /**
-     * Styles to apply to components when a cursor is interacting with them.
-     *
-     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:active
-     */
-    var active: Modifier? = null
-
-    /**
-     * Register layout styles which are dependent on the current window width
+     * Register layout styles which are dependent on the current window width.
      *
      * Breakpoints will be applied in order from smallest to largest.
      */
     val breakpoints = mutableMapOf<Breakpoint, Modifier>()
+
+    /**
+     * An alternate way to add [pseudoClasses] entries, mostly provided for supporting extension properties.
+     */
+    fun setPseudoClassModifier(pseudoClass: String, modifier: Modifier?) {
+        if (modifier != null) {
+            pseudoClasses[pseudoClass] = modifier
+        }
+        else {
+            pseudoClasses.remove(pseudoClass)
+        }
+    }
+
+    /**
+     * An alternate way to add [breakpoints] entries, mostly provided for supporting extension properties.
+     */
+    fun setBreakpointModifier(breakpoint: Breakpoint, modifier: Modifier?) {
+        if (modifier != null) {
+            breakpoints[breakpoint] = modifier
+        }
+        else {
+            breakpoints.remove(breakpoint)
+        }
+    }
 }
 
 /**
@@ -87,6 +94,18 @@ class ComponentModifiers {
  *
  * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
  * media queries, and psuedo classes.
+ *
+ * If defining a style for a custom widget, you should call the [toModifier] method to apply it:
+ *
+ * ```
+ * val CustomStyle = ComponentStyle("my-style") { ... }
+ *
+ * @Composable
+ * fun CustomWidget(..., variant: ComponentVariant? = null, ...) {
+ *   val modifier = CustomStyle.toModifier(variant).then(...)
+ *   // ^ This modifier is now set with your registered styles.
+ * }
+ * ```
  */
 class ComponentStyle internal constructor(private val name: String) {
     companion object {
@@ -195,17 +214,12 @@ class ComponentStyleBuilder internal constructor(
         StyleGroup.from(lightModifiers.base, darkModifiers.base)?.let { group ->
             styleSheet.addStyles(selectorName, null, group)
         }
-        StyleGroup.from(lightModifiers.link, darkModifiers.link)?.let { group ->
-            styleSheet.addStyles(selectorName, "link", group)
-        }
-        StyleGroup.from(lightModifiers.visited, darkModifiers.visited)?.let { group ->
-            styleSheet.addStyles(selectorName, "visited", group)
-        }
-        StyleGroup.from(lightModifiers.hover, darkModifiers.hover)?.let { group ->
-            styleSheet.addStyles(selectorName, "hover", group)
-        }
-        StyleGroup.from(lightModifiers.active, darkModifiers.active)?.let { group ->
-            styleSheet.addStyles(selectorName, "active", group)
+
+        val allPseudoClasses = lightModifiers.pseudoClasses.keys + darkModifiers.pseudoClasses.keys
+        for (pseudoClass in allPseudoClasses) {
+            StyleGroup.from(lightModifiers.pseudoClasses[pseudoClass], darkModifiers.pseudoClasses[pseudoClass])?.let { group ->
+                styleSheet.addStyles(selectorName, pseudoClass, group)
+            }
         }
 
         for (breakpoint in Breakpoint.values()) {
