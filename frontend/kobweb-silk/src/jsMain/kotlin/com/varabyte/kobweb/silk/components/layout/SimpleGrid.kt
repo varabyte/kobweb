@@ -32,7 +32,6 @@ private val SimpleGridColumnVariants: Map<Breakpoint?, Map<Int, ComponentVariant
                     val gridModifier = Modifier.styleModifier {
                         gridTemplateColumns("repeat($numColumns, 1fr)")
                     }
-                    println("ADDING $name-$numColumns")
                     numColumns to SimpleGridStyle.addVariant("$name-$numColumns") {
                         if (breakpoint == null) {
                             base = gridModifier
