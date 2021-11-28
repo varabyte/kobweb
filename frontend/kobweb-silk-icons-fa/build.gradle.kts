@@ -17,6 +17,8 @@ kotlin {
             dependencies {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
+
+                api(project(":frontend:web-compose-ext"))
             }
         }
     }
@@ -128,7 +130,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
-import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.dom.Div
 
