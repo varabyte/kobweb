@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.gradle.application.project.api
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
-import com.varabyte.kobweb.gradle.application.project.KobwebProject
+import com.varabyte.kobweb.gradle.application.project.PackageUtils.resolvePackageShortcut
 import com.varabyte.kobweb.gradle.application.project.PsiUtils
 import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtImportDirective
@@ -65,8 +65,7 @@ class ApiData {
                                         apiData._initMethods.add(InitApiEntry("$currPackage.${element.name}"))
                                     }
                                     apiSimpleName -> {
-                                        val qualifiedApiPackage =
-                                            KobwebProject.prefixQualifiedPackage(group, apiPackage)
+                                        val qualifiedApiPackage = resolvePackageShortcut(group, apiPackage)
                                         if (currPackage.startsWith(qualifiedApiPackage)) {
                                             // e.g. com.example.pages.blog -> blog
                                             val slugPrefix = currPackage
@@ -75,6 +74,8 @@ class ApiData {
 
                                             val slug = file.nameWithoutExtension.removeSuffix("Api").toLowerCase()
 
+                                            // This file should be somewhere underneath the api package
+                                            check(currPackage.isNotEmpty())
                                             apiData._apiMethods.add(
                                                 ApiEntry(
                                                     "$currPackage.${element.name}",

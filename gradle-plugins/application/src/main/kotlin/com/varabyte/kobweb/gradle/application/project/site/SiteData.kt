@@ -1,7 +1,8 @@
 package com.varabyte.kobweb.gradle.application.project.site
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
-import com.varabyte.kobweb.gradle.application.project.KobwebProject
+import com.varabyte.kobweb.gradle.application.project.PackageUtils.prefixQualifiedPath
+import com.varabyte.kobweb.gradle.application.project.PackageUtils.resolvePackageShortcut
 import com.varabyte.kobweb.gradle.application.project.PsiUtils
 import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -45,7 +46,7 @@ class SiteData {
             if (property.parent !is KtFile) return false
             val propertyName = property.name ?: return false
 
-            siteData._silkStyleFqcns.add("$filePackage.$propertyName")
+            siteData._silkStyleFqcns.add(prefixQualifiedPath(filePackage, propertyName))
             return true
         }
 
@@ -57,7 +58,7 @@ class SiteData {
             if (property.parent !is KtFile) return false
             val propertyName = property.name ?: return false
 
-            siteData._silkVariantFqcns.add("$filePackage.$propertyName")
+            siteData._silkVariantFqcns.add(prefixQualifiedPath(filePackage, propertyName))
             return true
         }
 
@@ -125,12 +126,11 @@ class SiteData {
                                         appFqn?.let { siteData.app = AppEntry(it) }
                                     }
                                     pageSimpleName -> {
-                                        val qualifiedPackagesPackage =
-                                            KobwebProject.prefixQualifiedPackage(group, pagesPackage)
-                                        if (currPackage.startsWith(qualifiedPackagesPackage)) {
+                                        val qualifiedPagesPackage = resolvePackageShortcut(group, pagesPackage)
+                                        if (currPackage.startsWith(qualifiedPagesPackage)) {
                                             // e.g. com.example.pages.blog -> blog
                                             val slugPrefix = currPackage
-                                                .removePrefix(qualifiedPackagesPackage)
+                                                .removePrefix(qualifiedPagesPackage)
                                                 .replace('.', '/')
 
                                             val slug = when (val maybeSlug =
@@ -139,6 +139,8 @@ class SiteData {
                                                 else -> maybeSlug
                                             }
 
+                                            // This file should be somewhere underneath the pages package
+                                            check(currPackage.isNotEmpty())
                                             siteData._pages.add(
                                                 PageEntry(
                                                     "$currPackage.${element.name}",
@@ -148,21 +150,21 @@ class SiteData {
                                         }
                                     }
                                     initKobwebSimpleName -> {
-                                        val initFqn = when {
-                                            currPackage.isNotEmpty() -> "$currPackage.${element.name}"
-                                            else -> element.name
-                                        }
-                                        initFqn?.let {
-                                            siteData._kobwebInits.add(
-                                                InitKobwebEntry(
-                                                    initFqn,
-                                                    acceptsContext = element.valueParameters.size == 1
+                                        element.name
+                                            ?.let { name -> prefixQualifiedPath(currPackage, name) }
+                                            ?.let { initFqn ->
+                                                siteData._kobwebInits.add(
+                                                    InitKobwebEntry(
+                                                        initFqn,
+                                                        acceptsContext = element.valueParameters.size == 1
+                                                    )
                                                 )
-                                            )
-                                        }
+                                            }
                                     }
                                     initSilkSimpleName -> {
-                                        siteData._silkInits.add(InitSilkEntry("$currPackage.${element.name}"))
+                                        element.name
+                                            ?.let { name -> prefixQualifiedPath(currPackage, name) }
+                                            ?.let { initFqn -> siteData._silkInits.add(InitSilkEntry(initFqn)) }
                                     }
                                 }
                             }
