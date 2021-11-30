@@ -1,14 +1,16 @@
 package com.varabyte.kobweb.server.plugins
 
+import com.varabyte.kobweb.project.conf.KobwebConf
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 
-fun Application.configureHTTP() {
+fun Application.configureHTTP(conf: KobwebConf) {
     install(DefaultHeaders) {
         header("X-Engine", "Ktor") // will send this header with each response
     }
+
     install(CORS) {
         method(HttpMethod.Options)
         method(HttpMethod.Put)
@@ -16,8 +18,10 @@ fun Application.configureHTTP() {
         method(HttpMethod.Patch)
         header(HttpHeaders.Authorization)
         allowCredentials = true
-        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+
+        conf.server.cors.hosts.forEach { host -> host(host.name, host.schemes, host.subDomains) }
     }
+
     install(Compression) {
         excludeContentType(
             ContentType.Video.Any,
@@ -36,6 +40,7 @@ fun Application.configureHTTP() {
             priority = 10.0
         }
     }
+
     install(CachingHeaders) {
         options { outgoingContent ->
             when (outgoingContent.contentType?.withoutParameters()) {
@@ -44,5 +49,4 @@ fun Application.configureHTTP() {
             }
         }
     }
-
 }

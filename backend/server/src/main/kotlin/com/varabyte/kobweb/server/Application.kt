@@ -57,7 +57,7 @@ fun main() = runBlocking {
     val engine = embeddedServer(Netty, port) {
         configureRouting(env, conf, globals)
         configureSerialization()
-        configureHTTP()
+        configureHTTP(conf)
     }
 
     engine.start()

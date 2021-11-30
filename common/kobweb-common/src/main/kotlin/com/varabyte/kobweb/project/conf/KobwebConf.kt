@@ -13,7 +13,8 @@ class Site(val title: String)
 @Serializable
 class Server(
     val files: Files,
-    val port: Int = 8080
+    val port: Int = 8080,
+    val cors: Cors = Cors()
 ) {
     /**
      * A collection of files and paths needed by the Kobweb server to serve its files.
@@ -45,6 +46,41 @@ class Server(
         class Prod(
             val siteRoot: String,
         )
+    }
+
+    /**
+     * Configuration for CORS.
+     *
+     * See also: https://ktor.io/docs/cors.html
+     * See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+     */
+    @Serializable
+    class Cors(
+        val hosts: List<Host> = listOf(),
+    )
+
+    /**
+     * A collection of host values that can be used to configure CORS.
+     *
+     * See also: https://ktor.io/docs/cors.html#hosts
+     *
+     * @param name The hostname (and optional port), e.g. "somesite.com:1234". Do *not* put the scheme in the hostname,
+     *   like "http://badexample.com". That should be mentioned separately. "*" is a special value which would mean
+     *   allow any host to send a request to this site, but this should be avoided in production.
+     * @param schemes Support HTTP schemes for this cross-site request, e.g. "http"
+     * @param subDomains Subdomains for the site, e.g. "media" if you wanted to allow "media.varabyte.com"
+     */
+    @Serializable
+    class Host(
+        val name: String,
+        val schemes: List<String> = listOf("http", "https"),
+        val subDomains: List<String> = emptyList(),
+    ) {
+        init {
+            require(name == "*" || schemes.isNotEmpty()) {
+                "Invalid host configuration values. Either the hostname should be '*' or at least one scheme should be specified."
+            }
+        }
     }
 }
 
