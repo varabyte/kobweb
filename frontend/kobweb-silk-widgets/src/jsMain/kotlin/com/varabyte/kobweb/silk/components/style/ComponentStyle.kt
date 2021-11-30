@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asStyleBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
+import com.varabyte.kobweb.silk.SilkStyleSheet.style
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -49,20 +50,34 @@ class ComponentModifiers(val colorMode: ColorMode) {
     var base: Modifier? = null
 
     /**
-     * Register styles associated with pseudo classes like "first-child".
+     * Register styles associated with pseudo classes like "hover".
      *
      * You can either add a pseudo class modifier to this map directly or use one of the various convenience properties
      * provided which will do it for you.
      *
      * Pseudo classes will be applied in the order inserted. Be aware that you should use the LVHA order if using link,
      * visited, hover, and/or active pseudo classes.
+     *
+     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
      */
     val pseudoClasses = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
 
     /**
+     * Register styles associated with pseudo elements like "after".
+     *
+     * You can either add a pseudo element modifier to this map directly or use one of the various convenience properties
+     * provided which will do it for you.
+     *
+     * Pseudo-elements will be applied in the order inserted, and after all pseudo classes.
+     *
+     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
+     */
+    val pseudoElements = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
+
+    /**
      * Register layout styles which are dependent on the current window width.
      *
-     * Breakpoints will be applied in order from smallest to largest.
+     * Breakpoints will be applied in order from smallest to largest, and after all pseudo classes and pseudo-elements.
      */
     val breakpoints = mutableMapOf<Breakpoint, Modifier>()
 
@@ -75,6 +90,18 @@ class ComponentModifiers(val colorMode: ColorMode) {
         }
         else {
             pseudoClasses.remove(pseudoClass)
+        }
+    }
+
+   /**
+     * An alternate way to add [pseudoElements] entries, mostly provided for supporting extension properties.
+     */
+    fun setPseudoElementModifier(pseudoElement: String, modifier: Modifier?) {
+        if (modifier != null) {
+            pseudoElements[pseudoElement] = modifier
+        }
+        else {
+            pseudoElements.remove(pseudoElement)
         }
     }
 
@@ -163,13 +190,13 @@ class ComponentStyleBuilder internal constructor(
         }
     }
 
-    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, styles: ComparableStyleBuilder) {
-        val classSelector = if (pseudoClass != null) "$selectorName:$pseudoClass" else selectorName
-        this.apply {
-            classSelector style {
-                styles.properties.forEach { entry -> property(entry.key, entry.value) }
-                styles.variables.forEach { entry -> variable(entry.key, entry.value) }
-            }
+    /**
+     * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
+     */
+    private fun addStyles(cssRule: String, styles: ComparableStyleBuilder) {
+        cssRule style {
+            styles.properties.forEach { entry -> property(entry.key, entry.value) }
+            styles.variables.forEach { entry -> variable(entry.key, entry.value) }
         }
     }
 
@@ -189,13 +216,23 @@ class ComponentStyleBuilder internal constructor(
         }
     }
 
-    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, group: StyleGroup) {
+    /**
+     * Add a css rule that is part selector and part (optional) pseudoSuffix.
+     *
+     * Note: The name and suffix are separated intentionally, since we may tweak the base name based on the color mode.
+     */
+    private fun addStyles(selectorName: String, pseudoSuffix: String?, group: StyleGroup) {
         withFinalSelectorName(selectorName, group) { name, styles ->
-            addStyles(name, pseudoClass, styles)
+            val cssRule = "$name${pseudoSuffix.orEmpty()}"
+            addStyles(cssRule, styles)
         }
     }
 
-    private fun StyleSheet.addStyles(selectorName: String, breakpoint: Breakpoint, styles: ComparableStyleBuilder) {
+    /**
+     * Add styles which will only be applied based on the width of the screen, associated with the passed in
+     * [breakpoint].
+     */
+    private fun StyleSheet.addResponsiveStyles(selectorName: String, breakpoint: Breakpoint, styles: ComparableStyleBuilder) {
         media(mediaMinWidth(SilkConfigInstance.breakpoints.getValue(breakpoint))) {
             selectorName style {
                 styles.properties.forEach { entry -> property(entry.key, entry.value) }
@@ -204,9 +241,9 @@ class ComponentStyleBuilder internal constructor(
         }
     }
 
-    private fun StyleSheet.addStyles(selectorName: String, breakpoint: Breakpoint, group: StyleGroup) {
+    private fun StyleSheet.addResponsiveStyles(selectorName: String, breakpoint: Breakpoint, group: StyleGroup) {
         withFinalSelectorName(selectorName, group) { name, styles ->
-            addStyles(name, breakpoint, styles)
+            addResponsiveStyles(name, breakpoint, styles)
         }
     }
 
@@ -215,24 +252,35 @@ class ComponentStyleBuilder internal constructor(
         val darkModifiers = ComponentModifiers(ColorMode.DARK).apply(init)
 
         StyleGroup.from(lightModifiers.base, darkModifiers.base)?.let { group ->
-            styleSheet.addStyles(selectorName, null, group)
+            addStyles(selectorName, null, group)
         }
 
         val allPseudoClasses = lightModifiers.pseudoClasses.keys + darkModifiers.pseudoClasses.keys
         for (pseudoClass in allPseudoClasses) {
             StyleGroup.from(lightModifiers.pseudoClasses[pseudoClass], darkModifiers.pseudoClasses[pseudoClass])?.let { group ->
-                styleSheet.addStyles(selectorName, pseudoClass, group)
+                addStyles(selectorName, ":$pseudoClass", group)
+            }
+        }
+
+        val allPseudoElements = lightModifiers.pseudoElements.keys + darkModifiers.pseudoElements.keys
+        for (pseudoElement in allPseudoElements) {
+            StyleGroup.from(lightModifiers.pseudoElements[pseudoElement], darkModifiers.pseudoElements[pseudoElement])?.let { group ->
+                addStyles(selectorName, "::$pseudoElement", group)
             }
         }
 
         for (breakpoint in Breakpoint.values()) {
             StyleGroup.from(lightModifiers.breakpoints[breakpoint], darkModifiers.breakpoints[breakpoint])?.let { group ->
-                styleSheet.addStyles(selectorName, breakpoint, group)
+                styleSheet.addResponsiveStyles(selectorName, breakpoint, group)
             }
         }
     }
 
+    /**
+     * Add this [ComponentStyle]'s styles to the target [StyleSheet]
+     */
     internal fun addStyles(styleSheet: StyleSheet) {
+        // Register styles associated with this style's classname
         addStyles(styleSheet, ".$name")
     }
 }

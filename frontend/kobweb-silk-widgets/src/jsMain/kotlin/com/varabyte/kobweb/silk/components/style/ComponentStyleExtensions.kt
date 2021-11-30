@@ -3,6 +3,8 @@ package com.varabyte.kobweb.silk.components.style
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 
+//region Pseudo classes
+
 /**
  * Styles to apply to components that represent navigation links which have not yet been visited.
  *
@@ -48,6 +50,60 @@ var ComponentModifiers.active: Modifier?
     get() = pseudoClasses["active"]
     set(value) = setPseudoClassModifier("active", value)
 
+//endregion
+
+
+//region Pseudo elements
+
+/**
+ * Styles to apply to a virtual element that is created before the first element in some container.
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::before
+ */
+var ComponentModifiers.before: Modifier?
+    get() = pseudoElements["before"]
+    set(value) = setPseudoElementModifier("before", value)
+
+/**
+ * Styles to apply to a virtual element that is created after the last element in some container.
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::after
+ */
+var ComponentModifiers.after: Modifier?
+    get() = pseudoElements["after"]
+    set(value) = setPseudoElementModifier("after", value)
+
+/**
+ * Styles to apply to the selected part of a document
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::selection
+ */
+var ComponentModifiers.selection: Modifier?
+    get() = pseudoElements["selection"]
+    set(value) = setPseudoElementModifier("selection", value)
+
+/**
+ * Styles to apply to the first letter in a block of text
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter
+ */
+var ComponentModifiers.firstLetter: Modifier?
+    get() = pseudoElements["first-letter"]
+    set(value) = setPseudoElementModifier("first-letter", value)
+
+/**
+ * Styles to apply to the first line in a block of text
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line
+ */
+var ComponentModifiers.firstLine: Modifier?
+    get() = pseudoElements["first-line"]
+    set(value) = setPseudoElementModifier("first-line", value)
+
+//endregion
+
+//region Breakpoints
+
 /** Convenience property for adding a small [Breakpoint] */
 var ComponentModifiers.sm: Modifier?
     get() = breakpoints[Breakpoint.SM]
@@ -72,3 +128,5 @@ var ComponentModifiers.xl: Modifier?
 var ComponentModifiers.xxl: Modifier?
     get() = breakpoints[Breakpoint.XXL]
     set(value) = setBreakpointModifier(Breakpoint.XXL, value)
+
+//endregion
