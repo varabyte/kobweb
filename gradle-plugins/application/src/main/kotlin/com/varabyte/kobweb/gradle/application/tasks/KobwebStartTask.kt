@@ -53,7 +53,16 @@ abstract class KobwebStartTask @Inject constructor(
         }
 
         val process = Runtime.getRuntime()
-            .exec(arrayOf("$javaHome/bin/java", env.toSystemPropertyParam(), "-jar", serverJar.absolutePath))
+            .exec(
+                arrayOf(
+                    "$javaHome/bin/java",
+                    env.toSystemPropertyParam(),
+                    // See: https://ktor.io/docs/development-mode.html#system-property
+                    "-Dio.ktor.development=${env == ServerEnvironment.DEV}",
+                    "-jar",
+                    serverJar.absolutePath,
+                )
+            )
 
         while (stateFile.content == null && process.isAlive) {
             Thread.sleep(300)
