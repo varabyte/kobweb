@@ -27,7 +27,7 @@ object Buttons {
     const val RIGHT = 2.toShort()
 }
 
-val ButtonStyle = ComponentStyle("silk-button") { colorMode ->
+val ButtonStyle = ComponentStyle("silk-button") {
     val buttonColors = SilkTheme.palettes[colorMode].button
 
     base = Modifier.background(buttonColors.default).clip(Rect(4.px)).styleModifier {

@@ -17,7 +17,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
 
-val LinkStyle = ComponentStyle("silk-link") { colorMode ->
+val LinkStyle = ComponentStyle("silk-link") {
     base = Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
 
     link = Modifier.color(SilkTheme.palettes[colorMode].link.default)

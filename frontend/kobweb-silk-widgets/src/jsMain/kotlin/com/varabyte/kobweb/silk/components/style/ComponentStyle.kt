@@ -40,8 +40,11 @@ private class ComparableStyleBuilder : StyleBuilder {
 /**
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
  * [Modifier]s).
+ *
+ * @param colorMode What color mode these modifiers should be designed around. This is passed in so users defining
+ *   a component style can use it if relevant.
  */
-class ComponentModifiers {
+class ComponentModifiers(val colorMode: ColorMode) {
     /** Base styles for this component, will always be applied first. */
     var base: Modifier? = null
 
@@ -109,7 +112,7 @@ class ComponentModifiers {
  */
 class ComponentStyle internal constructor(private val name: String) {
     companion object {
-        operator fun invoke(name: String, init: ComponentModifiers.(ColorMode) -> Unit) =
+        operator fun invoke(name: String, init: ComponentModifiers.() -> Unit) =
             ComponentStyleBuilder(name, init)
     }
 
@@ -208,8 +211,8 @@ class ComponentStyleBuilder internal constructor(
     }
 
     internal fun addStyles(styleSheet: StyleSheet, selectorName: String) {
-        val lightModifiers = ComponentModifiers().apply { init(ColorMode.LIGHT) }
-        val darkModifiers = ComponentModifiers().apply { init(ColorMode.DARK) }
+        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).apply(init)
+        val darkModifiers = ComponentModifiers(ColorMode.DARK).apply(init)
 
         StyleGroup.from(lightModifiers.base, darkModifiers.base)?.let { group ->
             styleSheet.addStyles(selectorName, null, group)
