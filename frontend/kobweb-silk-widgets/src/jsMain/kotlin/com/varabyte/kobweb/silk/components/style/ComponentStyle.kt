@@ -16,7 +16,7 @@ import org.jetbrains.compose.web.css.media
 import org.jetbrains.compose.web.css.mediaMinWidth
 
 // We need our own implementation of StyleBuilder, so we can both test equality and pull values out of it later
-private class SimpleStyleBuilder : StyleBuilder {
+private class ComparableStyleBuilder : StyleBuilder {
     val properties = LinkedHashMap<String, String>() // Preserve insertion order
     val variables = LinkedHashMap<String, String>() // Preserve insertion order
 
@@ -29,7 +29,7 @@ private class SimpleStyleBuilder : StyleBuilder {
     }
 
     override fun equals(other: Any?): Boolean {
-        return (other is SimpleStyleBuilder) && properties == other.properties && variables == other.variables
+        return (other is ComparableStyleBuilder) && properties == other.properties && variables == other.variables
     }
 
     override fun hashCode(): Int {
@@ -120,19 +120,19 @@ class ComponentStyle internal constructor(private val name: String) {
 }
 
 private sealed interface StyleGroup {
-    class Light(val styles: SimpleStyleBuilder) : StyleGroup
-    class Dark(val styles: SimpleStyleBuilder) : StyleGroup
-    class ColorAgnostic(val styles: SimpleStyleBuilder) : StyleGroup
-    class ColorAware(val lightStyles: SimpleStyleBuilder, val darkStyles: SimpleStyleBuilder) : StyleGroup
+    class Light(val styles: ComparableStyleBuilder) : StyleGroup
+    class Dark(val styles: ComparableStyleBuilder) : StyleGroup
+    class ColorAgnostic(val styles: ComparableStyleBuilder) : StyleGroup
+    class ColorAware(val lightStyles: ComparableStyleBuilder, val darkStyles: ComparableStyleBuilder) : StyleGroup
 
     companion object {
         @Suppress("NAME_SHADOWING") // Shadowing used to turn nullable into non-null
         fun from(lightModifiers: Modifier?, darkModifiers: Modifier?): StyleGroup? {
             val lightStyles = lightModifiers?.let { lightModifiers ->
-                SimpleStyleBuilder().apply { lightModifiers.asStyleBuilder().invoke(this) }
+                ComparableStyleBuilder().apply { lightModifiers.asStyleBuilder().invoke(this) }
             }
             val darkStyles = darkModifiers?.let { darkModifiers ->
-                SimpleStyleBuilder().apply { darkModifiers.asStyleBuilder().invoke(this) }
+                ComparableStyleBuilder().apply { darkModifiers.asStyleBuilder().invoke(this) }
             }
 
             if (lightStyles == null && darkStyles == null) return null
@@ -150,17 +150,17 @@ private sealed interface StyleGroup {
 
 class ComponentStyleBuilder internal constructor(
     val name: String,
-    private val init: ComponentModifiers.(ColorMode) -> Unit,
+    private val init: ComponentModifiers.() -> Unit,
 ) {
     internal val variants = mutableListOf<ComponentVariant>()
 
-    fun addVariant(name: String, init: ComponentModifiers.(ColorMode) -> Unit): ComponentVariant {
+    fun addVariant(name: String, init: ComponentModifiers.() -> Unit): ComponentVariant {
         return ComponentVariant(ComponentStyleBuilder("${this.name}-$name", init), baseStyle = this).also {
             variants.add(it)
         }
     }
 
-    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, styles: SimpleStyleBuilder) {
+    private fun StyleSheet.addStyles(selectorName: String, pseudoClass: String?, styles: ComparableStyleBuilder) {
         val classSelector = if (pseudoClass != null) "$selectorName:$pseudoClass" else selectorName
         this.apply {
             classSelector style {
@@ -174,7 +174,7 @@ class ComponentStyleBuilder internal constructor(
      * Shared logic for using an initial selector name and triggering a callback with the final selector name and
      * CSS styles to be associated with it.
      */
-    private fun withFinalSelectorName(selectorBaseName: String, group: StyleGroup, handler: (String, SimpleStyleBuilder) -> Unit) {
+    private fun withFinalSelectorName(selectorBaseName: String, group: StyleGroup, handler: (String, ComparableStyleBuilder) -> Unit) {
         when (group) {
             is StyleGroup.Light -> handler("$selectorBaseName-light", group.styles)
             is StyleGroup.Dark -> handler("$selectorBaseName-dark", group.styles)
@@ -192,7 +192,7 @@ class ComponentStyleBuilder internal constructor(
         }
     }
 
-    private fun StyleSheet.addStyles(selectorName: String, breakpoint: Breakpoint, styles: SimpleStyleBuilder) {
+    private fun StyleSheet.addStyles(selectorName: String, breakpoint: Breakpoint, styles: ComparableStyleBuilder) {
         media(mediaMinWidth(SilkConfigInstance.breakpoints.getValue(breakpoint))) {
             selectorName style {
                 styles.properties.forEach { entry -> property(entry.key, entry.value) }
