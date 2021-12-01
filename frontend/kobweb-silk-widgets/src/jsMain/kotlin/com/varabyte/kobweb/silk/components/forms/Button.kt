@@ -30,15 +30,23 @@ object Buttons {
 val ButtonStyle = ComponentStyle("silk-button") {
     val buttonColors = SilkTheme.palettes[colorMode].button
 
-    base = Modifier.background(buttonColors.default).clip(Rect(4.px)).styleModifier {
-        // No selecting text within buttons
-        userSelect(UserSelect.None)
-        property("role", "button")
+    base {
+        Modifier.background(buttonColors.default).clip(Rect(4.px)).styleModifier {
+            // No selecting text within buttons
+            userSelect(UserSelect.None)
+            property("role", "button")
+        }
     }
-    hover = Modifier.background(buttonColors.hover).styleModifier {
-        cursor(Cursor.Pointer)
+
+    hover {
+        Modifier.background(buttonColors.hover).styleModifier {
+            cursor(Cursor.Pointer)
+        }
     }
-    active = Modifier.background(buttonColors.pressed)
+
+    active {
+        Modifier.background(buttonColors.pressed)
+    }
 }
 
 /**

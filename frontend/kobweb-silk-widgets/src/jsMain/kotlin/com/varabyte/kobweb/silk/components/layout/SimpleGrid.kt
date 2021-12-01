@@ -17,8 +17,10 @@ import org.jetbrains.compose.web.dom.Div
 private const val MAX_COLUMN_COUNT = 4
 
 val SimpleGridStyle = ComponentStyle("silk-simple-grid") {
-    base = Modifier.styleModifier {
-        display(DisplayStyle.Grid)
+    base {
+        Modifier.styleModifier {
+            display(DisplayStyle.Grid)
+        }
     }
 }
 
@@ -34,9 +36,9 @@ private val SimpleGridColumnVariants: Map<Breakpoint?, Map<Int, ComponentVariant
                     }
                     numColumns to SimpleGridStyle.addVariant("$name-$numColumns") {
                         if (breakpoint == null) {
-                            base = gridModifier
+                            base { gridModifier }
                         } else {
-                            breakpoints[breakpoint] = gridModifier
+                            breakpoint { gridModifier }
                         }
                     }
                 }

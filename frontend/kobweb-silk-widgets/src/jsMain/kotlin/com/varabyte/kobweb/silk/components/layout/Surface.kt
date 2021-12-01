@@ -19,14 +19,16 @@ import org.jetbrains.compose.web.css.ms
 
 val SurfaceStyle = ComponentStyle("silk-surface") {
     val palette = SilkTheme.palettes[colorMode]
-    base = Modifier
-        .background(palette.background)
-        .color(palette.color)
-        .styleModifier {
-            // Toggling color mode looks much more engaging if it animates instead of being instant
-            transitionProperty("background-color", "color")
-            transitionDuration(200.ms)
-        }
+    base {
+        Modifier
+            .background(palette.background)
+            .color(palette.color)
+            .styleModifier {
+                // Toggling color mode looks much more engaging if it animates instead of being instant
+                transitionProperty("background-color", "color")
+                transitionDuration(200.ms)
+            }
+    }
 }
 
 /**

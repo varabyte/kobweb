@@ -116,8 +116,10 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     // Note: We separate this function out from the SilkTheme constructor so we can construct it first and then call
     // this later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
     //  val TextStyle = ComponentStyle("silk-text") {
-    //    base = Modifier.color(SilkTheme.palettes[colorMode].color)
-    //                          ^^^^^^^^^
+    //    base {
+    //      Modifier.color(SilkTheme.palettes[colorMode].color)
+    //                     ^^^^^^^^^
+    //     }
     //  }
     // Silk must make sure to set the SilkTheme lateinit var (below) and then call this method right after
     internal fun registerStyles(componentStyleSheet: StyleSheet) {

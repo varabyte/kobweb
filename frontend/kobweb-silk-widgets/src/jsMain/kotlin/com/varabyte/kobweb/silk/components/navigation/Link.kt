@@ -18,16 +18,25 @@ import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
 
 val LinkStyle = ComponentStyle("silk-link") {
-    base = Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
+    base {
+        Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
+    }
 
-    link = Modifier.color(SilkTheme.palettes[colorMode].link.default)
-    visited = Modifier.color(SilkTheme.palettes[colorMode].link.visited)
-
-    hover = Modifier.styleModifier { textDecorationLine(TextDecorationLine.Underline) }
+    link {
+        Modifier.color(SilkTheme.palettes[colorMode].link.default)
+    }
+    visited {
+        Modifier.color(SilkTheme.palettes[colorMode].link.visited)
+    }
+    hover {
+        Modifier.styleModifier { textDecorationLine(TextDecorationLine.Underline) }
+    }
 }
 
 val UndecoratedLinkVariant = LinkStyle.addVariant("undecorated") {
-    hover = Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
+    hover {
+        Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
+    }
 }
 
 /**

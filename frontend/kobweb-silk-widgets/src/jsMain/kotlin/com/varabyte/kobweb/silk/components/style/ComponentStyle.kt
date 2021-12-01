@@ -46,76 +46,70 @@ private class ComparableStyleBuilder : StyleBuilder {
  *   a component style can use it if relevant.
  */
 class ComponentModifiers(val colorMode: ColorMode) {
-    /** Base styles for this component, will always be applied first. */
-    var base: Modifier? = null
+    internal var base: Modifier? = null
+
+    internal val pseudoClasses = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
+
+    internal val pseudoElements = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
+
+    internal val breakpoints = mutableMapOf<Breakpoint, Modifier>()
+
+    /** Define base styles for this component, will always be applied first. */
+    fun base(createModifier: () -> Modifier) {
+        base = createModifier()
+    }
 
     /**
      * Register styles associated with pseudo classes like "hover".
-     *
-     * You can either add a pseudo class modifier to this map directly or use one of the various convenience properties
-     * provided which will do it for you.
      *
      * Pseudo classes will be applied in the order inserted. Be aware that you should use the LVHA order if using link,
      * visited, hover, and/or active pseudo classes.
      *
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
      */
-    val pseudoClasses = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
+    fun pseudoClass(name: String, createModifier: () -> Modifier) {
+        pseudoClasses[name] = createModifier()
+    }
 
     /**
      * Register styles associated with pseudo elements like "after".
      *
-     * You can either add a pseudo element modifier to this map directly or use one of the various convenience properties
-     * provided which will do it for you.
-     *
-     * Pseudo-elements will be applied in the order inserted, and after all pseudo classes.
+     * Pseudo-elements will be applied in the order registered, and after all pseudo classes.
      *
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
      */
-    val pseudoElements = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
+    fun pseudoElement(name: String, createModifier: () -> Modifier) {
+        pseudoElements[name] = createModifier()
+    }
 
     /**
      * Register layout styles which are dependent on the current window width.
      *
      * Breakpoints will be applied in order from smallest to largest, and after all pseudo classes and pseudo-elements.
      */
-    val breakpoints = mutableMapOf<Breakpoint, Modifier>()
-
-    /**
-     * An alternate way to add [pseudoClasses] entries, mostly provided for supporting extension properties.
-     */
-    fun setPseudoClassModifier(pseudoClass: String, modifier: Modifier?) {
-        if (modifier != null) {
-            pseudoClasses[pseudoClass] = modifier
-        }
-        else {
-            pseudoClasses.remove(pseudoClass)
-        }
-    }
-
-   /**
-     * An alternate way to add [pseudoElements] entries, mostly provided for supporting extension properties.
-     */
-    fun setPseudoElementModifier(pseudoElement: String, modifier: Modifier?) {
-        if (modifier != null) {
-            pseudoElements[pseudoElement] = modifier
-        }
-        else {
-            pseudoElements.remove(pseudoElement)
-        }
+    fun breakpoint(breakpoint: Breakpoint, createModifier: () -> Modifier) {
+        breakpoints[breakpoint] = createModifier()
     }
 
     /**
-     * An alternate way to add [breakpoints] entries, mostly provided for supporting extension properties.
+     * Convenience function for associating a modifier directly against a breakpoint enum.
+     *
+     * For example, you can call
+     *
+     * ```
+     * Breakpoint.MD { Modifier.color(...) }
+     * ```
+     *
+     * which is identical to
+     *
+     * ```
+     * breakpoint(Breakpoint.MD) { Modifier.color(...) }
+     * ```
      */
-    fun setBreakpointModifier(breakpoint: Breakpoint, modifier: Modifier?) {
-        if (modifier != null) {
-            breakpoints[breakpoint] = modifier
-        }
-        else {
-            breakpoints.remove(breakpoint)
-        }
+    operator fun Breakpoint.invoke(createModifier: () -> Modifier) {
+        breakpoints[this] = createModifier()
     }
+
 }
 
 /**
