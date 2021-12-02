@@ -15,34 +15,9 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.SilkApp
 import com.varabyte.kobweb.silk.components.layout.Surface
-import com.varabyte.kobweb.silk.theme.SilkTheme
-import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.JustifyContent
-import org.jetbrains.compose.web.css.Style
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.alignItems
-import org.jetbrains.compose.web.css.background
-import org.jetbrains.compose.web.css.border
-import org.jetbrains.compose.web.css.borderRadius
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.em
-import org.jetbrains.compose.web.css.fontFamily
-import org.jetbrains.compose.web.css.fontSize
-import org.jetbrains.compose.web.css.height
-import org.jetbrains.compose.web.css.justifyContent
-import org.jetbrains.compose.web.css.margin
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.textDecoration
-import org.jetbrains.compose.web.css.vh
-import org.jetbrains.compose.web.css.vw
-import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.css.*
 
 const val BORDER_COLOR = "#eaeaea"
-const val INTERACT_COLOR = "#0070f3"
 
 // The standard Web Compose way of defining styles
 // Note: It is hoped as Kobweb improves this section will be less and less necessary
@@ -53,51 +28,6 @@ object TodoStyleSheet : StyleSheet() {
                 "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
                 "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "sans-serif"
             )
-        }
-
-        // Common styles for all todo widgets
-        ".todo" style {
-            width(85.percent)
-            height(5.cssRem)
-            property("border", "1px solid $BORDER_COLOR")
-            borderRadius(10.px)
-            property("transition", "color 0.15s ease, border-color 0.15s ease")
-            textDecoration("none")
-        }
-
-        // Styles for the bordered, outer container (the form component has an inner and outer layer)
-        ".todoContainer" style {
-            display(DisplayStyle.Flex)
-            textAlign(TextAlign.Left)
-            alignItems(AlignItems.Center)
-            margin(0.5.cssRem)
-            property("border", "1px solid $BORDER_COLOR")
-        }
-
-        // Styles for text parts of todo widgets
-        ".todoText" style {
-            // We use "A" tags for accessibility, but we want our colors to come from our container
-            property("color", "inherit")
-            padding(1.5.cssRem)
-            fontSize(1.25.cssRem)
-        }
-
-        // Styles for the input tag which handles user input
-        ".todoInput" style {
-            border(0.px)
-            background("transparent") // So the input doesn't render over its parent container's border
-            width(100.percent)
-        }
-
-        ".todoInput::placeholder" style {
-            fontStyle(FontStyle.Italic)
-        }
-
-        ".todoClickable:hover" style {
-            property("color", INTERACT_COLOR)
-            property("border-color", INTERACT_COLOR)
-            textDecoration("line-through")
-            cursor(Cursor.Pointer)
         }
 
         "footer" style {
