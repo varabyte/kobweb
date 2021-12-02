@@ -289,10 +289,31 @@ class ComponentVariant(internal val style: ComponentStyleBuilder, private val ba
     }
 }
 
-
+/**
+ * Convert a user's component style into a [Modifier].
+ *
+ * This can then be passed into Silk widgets directly, or to Web Compose widgets
+ * by calling `attrs = style.toModifier.asAttributeBuilder()`
+ */
 @Composable
 fun ComponentStyleBuilder.toModifier(variant: ComponentVariant? = null): Modifier {
     return SilkTheme.componentStyles.getValue(name).toModifier().then(
         variant?.style?.toModifier() ?: Modifier
     )
+}
+
+/**
+ * A convenience method for converting a collection of styles into a single modifier.
+ *
+ * This can be useful as sometimes you might break up many css rules across multiple styles for re-usability, and it's
+ * much easier to type `listOf(Style1, Style2, Style3).toModifier()` than
+ * `Style1.toModifier().then(Style2.toModifier())...`
+ */
+@Composable
+fun Iterable<ComponentStyleBuilder>.toModifier(): Modifier {
+    var finalModifier: Modifier = Modifier
+    for (style in this) {
+        finalModifier = finalModifier.then(style.toModifier())
+    }
+    return finalModifier
 }
