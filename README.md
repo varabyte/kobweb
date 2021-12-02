@@ -1,4 +1,4 @@
-![version: 0.7.0](https://img.shields.io/badge/kobweb-v0.7.0-yellow)
+![version: 0.7.1](https://img.shields.io/badge/kobweb-v0.7.1-yellow)
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
@@ -21,7 +21,7 @@ fun HomePage() {
         onClick = { colorMode = colorMode.opposite() },
         Modifier.clip(Circle())
       ) {
-        Box(Modifier.padding(4.px)) {
+        Box(Modifier.margin(4.px)) {
           // Includes support for Font Awesome icons
           if (colorMode.isLight()) FaSun() else FaMoon()
         }
@@ -77,14 +77,14 @@ Our binary artifact is hosted on github. To download latest:
 
 ```bash
 $ cd /path/to/applications/kobweb
-$ wget https://github.com/varabyte/kobweb/releases/download/v0.7.0/kobweb-0.7.0.zip
-$ unzip kobweb-0.7.0.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/v0.7.1/kobweb-0.7.1.zip
+$ unzip kobweb-0.7.1.zip
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.7.0/bin
+$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.7.1/bin
 $ kobweb version # to check it's working
 ```
 
@@ -92,7 +92,7 @@ or via symbolic link:
 
 ```base
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb/kobweb-0.7.0/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb/kobweb-0.7.1/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
