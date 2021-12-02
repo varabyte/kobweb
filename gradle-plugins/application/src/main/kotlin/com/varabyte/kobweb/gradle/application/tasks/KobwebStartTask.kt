@@ -69,6 +69,8 @@ abstract class KobwebStartTask @Inject constructor(
         }
         stateFile.content?.let { serverState ->
             println("A Kobweb server is now running at ${serverState.toDisplayText()}")
+            println()
+            println("Run `gradlew kobwebStop` when you're ready to shut it down.")
         } ?: throw GradleException("Unable to start the Kobweb server")
     }
 }

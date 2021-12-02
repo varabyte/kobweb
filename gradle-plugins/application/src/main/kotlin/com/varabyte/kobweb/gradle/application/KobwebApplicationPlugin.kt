@@ -109,6 +109,13 @@ class KobwebApplicationPlugin : Plugin<Project> {
                     if (task.name in listOf(kobwebGenSiteTask, kobwebGenApiTask).map { it.name }) {
                         ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Building..."))
                     }
+
+                    // Users should be using Kobweb commands instead of the standard Web Compose commands, but they
+                    // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
+                    // the Kobweb commands instead.
+                    if (task.name in listOf("jsBrowserDevelopmentRun", "jsBrowserProductionRun")) {
+                        logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
+                    }
                 }
 
                 override fun afterExecute(task: Task, state: TaskState) {
