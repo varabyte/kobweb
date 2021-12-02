@@ -2,6 +2,7 @@ package com.varabyte.kobweb.compose.ui
 
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.css.StyleBuilder
+import org.w3c.dom.Element
 
 // Just a marker interface to express intention
 interface WebModifier : Modifier.Element
@@ -30,7 +31,7 @@ fun Modifier.styleModifier(styles: (StyleBuilder.() -> Unit)) = this then StyleM
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
  *   be useful to occasionally avoid the creation of an unnecessary [AttrModifier] to append at the tail.
  */
-fun Modifier.asAttributeBuilder(finalHandler: (AttrsBuilder<*>.() -> Unit)? = null): AttrsBuilder<*>.() -> Unit {
+fun <T: Element, A: AttrsBuilder<T>> Modifier.asAttributeBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->
