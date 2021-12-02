@@ -4,12 +4,13 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asStyleBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
-import com.varabyte.kobweb.silk.SilkStyleSheet.style
+import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.StyleSheet
@@ -39,6 +40,28 @@ private class ComparableStyleBuilder : StyleBuilder {
 }
 
 /**
+ * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
+ */
+internal class CssModifier(
+    val modifier: Modifier,
+    val breakpoint: Breakpoint? = null,
+    val suffix: String? = null,
+) {
+    companion object {
+        val BaseKey = Key(null, null)
+    }
+    data class Key(val breakpoint: Breakpoint?, val suffix: String?)
+    /**
+     * A key useful for storing this entry into a map.
+     *
+     * If two [CssModifier] instances have the same key, that means they would evaluate to the same CSS rule. This
+     * can indicate if a css rule was applied redundantly (where the latter would overrule the former) or allow us to
+     * compare modifiers across dark and light color modes.
+     */
+    val key get() = Key(breakpoint, suffix)
+}
+
+/**
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
  * [Modifier]s).
  *
@@ -46,49 +69,33 @@ private class ComparableStyleBuilder : StyleBuilder {
  *   a component style can use it if relevant.
  */
 class ComponentModifiers(val colorMode: ColorMode) {
-    internal var base: Modifier? = null
+    private val _cssModifiers = mutableListOf<CssModifier>()
+    internal val cssModifiers: List<CssModifier> = _cssModifiers
 
-    internal val pseudoClasses = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
-
-    internal val pseudoElements = LinkedHashMap<String, Modifier>() // LinkedHashMap preserves insertion order
-
-    internal val breakpoints = mutableMapOf<Breakpoint, Modifier>()
-
-    /** Define base styles for this component, will always be applied first. */
+    /** Define base styles for this component. This will always be applied first. */
     fun base(createModifier: () -> Modifier) {
-        base = createModifier()
+        _cssModifiers.add(CssModifier(createModifier()))
     }
 
     /**
-     * Register styles associated with pseudo classes like "hover".
+     * Add a CSS rule that is applied to this component class, passing in a [suffix] (which represents a pseudo-class
+     * or pseudo-element) and a [breakpoint] if the style should only apply to a web window of a certain size.
      *
-     * Pseudo classes will be applied in the order inserted. Be aware that you should use the LVHA order if using link,
-     * visited, hover, and/or active pseudo classes.
+     * CSS rules will always be applied in the order they were registered in.
      *
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
-     */
-    fun pseudoClass(name: String, createModifier: () -> Modifier) {
-        pseudoClasses[name] = createModifier()
-    }
-
-    /**
-     * Register styles associated with pseudo elements like "after".
-     *
-     * Pseudo-elements will be applied in the order registered, and after all pseudo classes.
-     *
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
      */
-    fun pseudoElement(name: String, createModifier: () -> Modifier) {
-        pseudoElements[name] = createModifier()
+    fun cssRule(breakpoint: Breakpoint, suffix: String, createModifier: () -> Modifier) {
+        _cssModifiers.add(CssModifier(createModifier(), breakpoint, suffix))
     }
 
-    /**
-     * Register layout styles which are dependent on the current window width.
-     *
-     * Breakpoints will be applied in order from smallest to largest, and after all pseudo classes and pseudo-elements.
-     */
-    fun breakpoint(breakpoint: Breakpoint, createModifier: () -> Modifier) {
-        breakpoints[breakpoint] = createModifier()
+    fun cssRule(suffix: String, createModifier: () -> Modifier) {
+        _cssModifiers.add(CssModifier(createModifier(), null, suffix))
+    }
+
+    fun cssRule(breakpoint: Breakpoint, createModifier: () -> Modifier) {
+        _cssModifiers.add(CssModifier(createModifier(), breakpoint))
     }
 
     /**
@@ -100,16 +107,18 @@ class ComponentModifiers(val colorMode: ColorMode) {
      * Breakpoint.MD { Modifier.color(...) }
      * ```
      *
-     * which is identical to
+     * which is identical to:
      *
      * ```
-     * breakpoint(Breakpoint.MD) { Modifier.color(...) }
+     * cssRule(Breakpoint.MD) { Modifier.color(...) }
      * ```
+     *
+     * Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
+     * (here, we'd need to access both "Breakpoint" and "ComponentModifiers"
      */
     operator fun Breakpoint.invoke(createModifier: () -> Modifier) {
-        breakpoints[this] = createModifier()
+        cssRule(this, createModifier)
     }
-
 }
 
 /**
@@ -187,7 +196,7 @@ class ComponentStyleBuilder internal constructor(
     /**
      * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
      */
-    private fun addStyles(cssRule: String, styles: ComparableStyleBuilder) {
+    private fun <T: StyleBuilder> GenericStyleSheetBuilder<T>.addStyles(cssRule: String, styles: ComparableStyleBuilder) {
         cssRule style {
             styles.properties.forEach { entry -> property(entry.key, entry.value) }
             styles.variables.forEach { entry -> variable(entry.key, entry.value) }
@@ -210,62 +219,31 @@ class ComponentStyleBuilder internal constructor(
         }
     }
 
-    /**
-     * Add a css rule that is part selector and part (optional) pseudoSuffix.
-     *
-     * Note: The name and suffix are separated intentionally, since we may tweak the base name based on the color mode.
-     */
-    private fun addStyles(selectorName: String, pseudoSuffix: String?, group: StyleGroup) {
-        withFinalSelectorName(selectorName, group) { name, styles ->
-            val cssRule = "$name${pseudoSuffix.orEmpty()}"
-            addStyles(cssRule, styles)
-        }
-    }
-
-    /**
-     * Add styles which will only be applied based on the width of the screen, associated with the passed in
-     * [breakpoint].
-     */
-    private fun StyleSheet.addResponsiveStyles(selectorName: String, breakpoint: Breakpoint, styles: ComparableStyleBuilder) {
-        media(mediaMinWidth(SilkConfigInstance.breakpoints.getValue(breakpoint))) {
-            selectorName style {
-                styles.properties.forEach { entry -> property(entry.key, entry.value) }
-                styles.variables.forEach { entry -> variable(entry.key, entry.value) }
-            }
-        }
-    }
-
-    private fun StyleSheet.addResponsiveStyles(selectorName: String, breakpoint: Breakpoint, group: StyleGroup) {
-        withFinalSelectorName(selectorName, group) { name, styles ->
-            addResponsiveStyles(name, breakpoint, styles)
-        }
-    }
-
     internal fun addStyles(styleSheet: StyleSheet, selectorName: String) {
-        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).apply(init)
-        val darkModifiers = ComponentModifiers(ColorMode.DARK).apply(init)
+        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).apply(init).cssModifiers.associateBy { it.key }
+        val darkModifiers = ComponentModifiers(ColorMode.DARK).apply(init).cssModifiers.associateBy { it.key }
 
-        StyleGroup.from(lightModifiers.base, darkModifiers.base)?.let { group ->
-            addStyles(selectorName, null, group)
-        }
-
-        val allPseudoClasses = lightModifiers.pseudoClasses.keys + darkModifiers.pseudoClasses.keys
-        for (pseudoClass in allPseudoClasses) {
-            StyleGroup.from(lightModifiers.pseudoClasses[pseudoClass], darkModifiers.pseudoClasses[pseudoClass])?.let { group ->
-                addStyles(selectorName, ":$pseudoClass", group)
+        StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
+            withFinalSelectorName(selectorName, group) { name, styles ->
+                styleSheet.addStyles(name, styles)
             }
         }
 
-        val allPseudoElements = lightModifiers.pseudoElements.keys + darkModifiers.pseudoElements.keys
-        for (pseudoElement in allPseudoElements) {
-            StyleGroup.from(lightModifiers.pseudoElements[pseudoElement], darkModifiers.pseudoElements[pseudoElement])?.let { group ->
-                addStyles(selectorName, "::$pseudoElement", group)
-            }
-        }
-
-        for (breakpoint in Breakpoint.values()) {
-            StyleGroup.from(lightModifiers.breakpoints[breakpoint], darkModifiers.breakpoints[breakpoint])?.let { group ->
-                styleSheet.addResponsiveStyles(selectorName, breakpoint, group)
+        val allCssRuleKeys = (lightModifiers.keys + darkModifiers.keys).filter { it != BaseKey }
+        for (cssRuleKey in allCssRuleKeys) {
+            StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)?.let { group ->
+                withFinalSelectorName(selectorName, group) { name, styles ->
+                    val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
+                    if (cssRuleKey.breakpoint != null) {
+                        styleSheet.apply {
+                            media(mediaMinWidth(SilkConfigInstance.breakpoints.getValue(cssRuleKey.breakpoint))) {
+                                addStyles(cssRule, styles)
+                            }
+                        }
+                    } else {
+                        styleSheet.addStyles(cssRule, styles)
+                    }
+                }
             }
         }
     }

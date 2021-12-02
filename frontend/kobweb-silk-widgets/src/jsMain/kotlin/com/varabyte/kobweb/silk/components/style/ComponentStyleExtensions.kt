@@ -13,7 +13,7 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:any-link
  */
 fun ComponentModifiers.anyLink(createModifier: () -> Modifier) {
-    pseudoClass("any-link", createModifier)
+    cssRule(":any-link", createModifier)
 }
 
 /**
@@ -24,7 +24,7 @@ fun ComponentModifiers.anyLink(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:link
  */
 fun ComponentModifiers.link(createModifier: () -> Modifier) {
-    pseudoClass("link", createModifier)
+    cssRule(":link", createModifier)
 }
 
 /**
@@ -33,7 +33,7 @@ fun ComponentModifiers.link(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:target
  */
 fun ComponentModifiers.target(createModifier: () -> Modifier) {
-    pseudoClass("target", createModifier)
+    cssRule(":target", createModifier)
 }
 
 /**
@@ -44,7 +44,7 @@ fun ComponentModifiers.target(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:visited
  */
 fun ComponentModifiers.visited(createModifier: () -> Modifier) {
-    pseudoClass("visited", createModifier)
+    cssRule(":visited", createModifier)
 }
 
 //endregion
@@ -59,7 +59,7 @@ fun ComponentModifiers.visited(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:hover
  */
 fun ComponentModifiers.hover(createModifier: () -> Modifier) {
-    pseudoClass("hover", createModifier)
+    cssRule(":hover", createModifier)
 }
 
 /**
@@ -70,7 +70,7 @@ fun ComponentModifiers.hover(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:active
  */
 fun ComponentModifiers.active(createModifier: () -> Modifier) {
-    pseudoClass("active", createModifier)
+    cssRule(":active", createModifier)
 }
 
 
@@ -80,7 +80,7 @@ fun ComponentModifiers.active(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:focus
  */
 fun ComponentModifiers.focus(createModifier: () -> Modifier) {
-    pseudoClass("focus", createModifier)
+    cssRule(":focus", createModifier)
 }
 
 //endregion
@@ -93,7 +93,7 @@ fun ComponentModifiers.focus(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill
  */
 fun ComponentModifiers.autofill(createModifier: () -> Modifier) {
-    pseudoClass("autofill", createModifier)
+    cssRule(":autofill", createModifier)
 }
 
 /**
@@ -102,7 +102,7 @@ fun ComponentModifiers.autofill(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled
  */
 fun ComponentModifiers.enabled(createModifier: () -> Modifier) {
-    pseudoClass("enabled", createModifier)
+    cssRule(":enabled", createModifier)
 }
 
 /**
@@ -111,7 +111,7 @@ fun ComponentModifiers.enabled(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled
  */
 fun ComponentModifiers.disabled(createModifier: () -> Modifier) {
-    pseudoClass("disabled", createModifier)
+    cssRule(":disabled", createModifier)
 }
 
 /**
@@ -120,7 +120,7 @@ fun ComponentModifiers.disabled(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only
  */
 fun ComponentModifiers.readOnly(createModifier: () -> Modifier) {
-    pseudoClass("read-only", createModifier)
+    cssRule(":read-only", createModifier)
 }
 
 /**
@@ -129,7 +129,7 @@ fun ComponentModifiers.readOnly(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write
  */
 fun ComponentModifiers.readWrite(createModifier: () -> Modifier) {
-    pseudoClass("read-write", createModifier)
+    cssRule(":read-write", createModifier)
 }
 
 /**
@@ -138,7 +138,7 @@ fun ComponentModifiers.readWrite(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown
  */
 fun ComponentModifiers.placeholderShown(createModifier: () -> Modifier) {
-    pseudoClass("placeholder-shown", createModifier)
+    cssRule(":placeholder-shown", createModifier)
 }
 
 /**
@@ -147,7 +147,7 @@ fun ComponentModifiers.placeholderShown(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:default
  */
 fun ComponentModifiers.default(createModifier: () -> Modifier) {
-    pseudoClass("default", createModifier)
+    cssRule(":default", createModifier)
 }
 
 /**
@@ -156,7 +156,7 @@ fun ComponentModifiers.default(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:checked
  */
 fun ComponentModifiers.checked(createModifier: () -> Modifier) {
-    pseudoClass("checked", createModifier)
+    cssRule(":checked", createModifier)
 }
 
 /**
@@ -165,7 +165,7 @@ fun ComponentModifiers.checked(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate
  */
 fun ComponentModifiers.indeterminate(createModifier: () -> Modifier) {
-    pseudoClass("indeterminate", createModifier)
+    cssRule(":indeterminate", createModifier)
 }
 
 /**
@@ -174,7 +174,7 @@ fun ComponentModifiers.indeterminate(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:valid
  */
 fun ComponentModifiers.valid(createModifier: () -> Modifier) {
-    pseudoClass("valid", createModifier)
+    cssRule(":valid", createModifier)
 }
 
 /**
@@ -183,7 +183,7 @@ fun ComponentModifiers.valid(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid
  */
 fun ComponentModifiers.invalid(createModifier: () -> Modifier) {
-    pseudoClass("invalid", createModifier)
+    cssRule(":invalid", createModifier)
 }
 
 /**
@@ -192,7 +192,7 @@ fun ComponentModifiers.invalid(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range
  */
 fun ComponentModifiers.inRange(createModifier: () -> Modifier) {
-    pseudoClass("in-range", createModifier)
+    cssRule(":in-range", createModifier)
 }
 
 /**
@@ -202,7 +202,7 @@ fun ComponentModifiers.inRange(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range
  */
 fun ComponentModifiers.outOfRange(createModifier: () -> Modifier) {
-    pseudoClass("out-of-range", createModifier)
+    cssRule(":out-of-range", createModifier)
 }
 
 /**
@@ -211,7 +211,7 @@ fun ComponentModifiers.outOfRange(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:required
  */
 fun ComponentModifiers.required(createModifier: () -> Modifier) {
-    pseudoClass("required", createModifier)
+    cssRule(":required", createModifier)
 }
 
 /**
@@ -220,7 +220,7 @@ fun ComponentModifiers.required(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:optional
  */
 fun ComponentModifiers.optional(createModifier: () -> Modifier) {
-    pseudoClass("optional", createModifier)
+    cssRule(":optional", createModifier)
 }
 
 /**
@@ -229,7 +229,7 @@ fun ComponentModifiers.optional(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid
  */
 fun ComponentModifiers.userInvalid(createModifier: () -> Modifier) {
-    pseudoClass("user-invalid", createModifier)
+    cssRule(":user-invalid", createModifier)
 }
 
 //endregion
@@ -242,7 +242,7 @@ fun ComponentModifiers.userInvalid(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:root
  */
 fun ComponentModifiers.root(createModifier: () -> Modifier) {
-    pseudoClass("root", createModifier)
+    cssRule(":root", createModifier)
 }
 
 /**
@@ -251,7 +251,7 @@ fun ComponentModifiers.root(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:empty
  */
 fun ComponentModifiers.empty(createModifier: () -> Modifier) {
-    pseudoClass("empty", createModifier)
+    cssRule(":empty", createModifier)
 }
 
 /**
@@ -260,7 +260,7 @@ fun ComponentModifiers.empty(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child
  */
 fun ComponentModifiers.firstChild(createModifier: () -> Modifier) {
-    pseudoClass("first-child", createModifier)
+    cssRule(":first-child", createModifier)
 }
 
 /**
@@ -269,7 +269,7 @@ fun ComponentModifiers.firstChild(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child
  */
 fun ComponentModifiers.lastChild(createModifier: () -> Modifier) {
-    pseudoClass("last-child", createModifier)
+    cssRule(":last-child", createModifier)
 }
 
 /**
@@ -278,7 +278,7 @@ fun ComponentModifiers.lastChild(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child
  */
 fun ComponentModifiers.onlyChild(createModifier: () -> Modifier) {
-    pseudoClass("only-child", createModifier)
+    cssRule(":only-child", createModifier)
 }
 
 /**
@@ -287,7 +287,7 @@ fun ComponentModifiers.onlyChild(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type
  */
 fun ComponentModifiers.firstOfType(createModifier: () -> Modifier) {
-    pseudoClass("first-of-type", createModifier)
+    cssRule(":first-of-type", createModifier)
 }
 
 /**
@@ -296,7 +296,7 @@ fun ComponentModifiers.firstOfType(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type
  */
 fun ComponentModifiers.lastOfType(createModifier: () -> Modifier) {
-    pseudoClass("last-of-type", createModifier)
+    cssRule(":last-of-type", createModifier)
 }
 
 /**
@@ -305,7 +305,7 @@ fun ComponentModifiers.lastOfType(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type
  */
 fun ComponentModifiers.onlyOfType(createModifier: () -> Modifier) {
-    pseudoClass("only-of-type", createModifier)
+    cssRule(":only-of-type", createModifier)
 }
 
 //endregion
@@ -320,7 +320,7 @@ fun ComponentModifiers.onlyOfType(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::before
  */
 fun ComponentModifiers.before(createModifier: () -> Modifier) {
-    pseudoElement("before", createModifier)
+    cssRule("::before", createModifier)
 }
 
 /**
@@ -329,7 +329,7 @@ fun ComponentModifiers.before(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::after
  */
 fun ComponentModifiers.after(createModifier: () -> Modifier) {
-    pseudoElement("after", createModifier)
+    cssRule("::after", createModifier)
 }
 
 /**
@@ -338,7 +338,7 @@ fun ComponentModifiers.after(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::selection
  */
 fun ComponentModifiers.selection(createModifier: () -> Modifier) {
-    pseudoElement("selection", createModifier)
+    cssRule("::selection", createModifier)
 }
 
 /**
@@ -347,7 +347,7 @@ fun ComponentModifiers.selection(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter
  */
 fun ComponentModifiers.firstLetter(createModifier: () -> Modifier) {
-    pseudoElement("first-letter", createModifier)
+    cssRule("::first-letter", createModifier)
 }
 
 /**
@@ -356,7 +356,7 @@ fun ComponentModifiers.firstLetter(createModifier: () -> Modifier) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line
  */
 fun ComponentModifiers.firstLine(createModifier: () -> Modifier) {
-    pseudoElement("first-line", createModifier)
+    cssRule("::first-line", createModifier)
 }
 
 //endregion
