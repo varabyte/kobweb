@@ -33,7 +33,7 @@ fun PageLayout(content: @Composable () -> Unit) {
             },
             Alignment.Center
         ) {
-            Row(Modifier.padding(topBottom = 1.cssRem, leftRight = 0.cssRem)) {
+            Row(Modifier.margin(topBottom = 1.cssRem, leftRight = 0.cssRem)) {
                 Text("This project is built using ")
                 Link(
                     "https://github.com/varabyte/kobweb",

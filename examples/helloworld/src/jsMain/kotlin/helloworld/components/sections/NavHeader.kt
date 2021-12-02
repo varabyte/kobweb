@@ -19,7 +19,7 @@ import com.varabyte.kobweb.silk.theme.shapes.Circle
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import org.jetbrains.compose.web.css.px
 
-private val NAV_ITEM_PADDING = Modifier.padding(0.px, 15.px)
+private val NAV_ITEM_PADDING = Modifier.margin(0.px, 15.px)
 
 @Composable
 private fun NavLink(path: String, text: String) {
@@ -55,7 +55,7 @@ fun NavHeader() {
                 onClick = { colorMode = colorMode.opposite() },
                 NAV_ITEM_PADDING.clip(Circle())
             ) {
-                Box(Modifier.padding(4.px)) {
+                Box(Modifier.margin(4.px)) {
                     when (colorMode) {
                         ColorMode.LIGHT -> FaSun()
                         ColorMode.DARK -> FaMoon()

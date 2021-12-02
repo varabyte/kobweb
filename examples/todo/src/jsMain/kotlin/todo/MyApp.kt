@@ -122,7 +122,7 @@ object Styles {
     val Title = Modifier
         .lineHeight(1.15)
         .fontSize(4.cssRem)
-        .padding(top = 0.4.em, bottom = 0.6.em)
+        .margin(top = 0.4.em, bottom = 0.6.em)
         .styleModifier {
             fontWeight(FontWeight.Bold)
         }

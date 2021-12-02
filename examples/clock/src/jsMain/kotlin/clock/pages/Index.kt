@@ -154,9 +154,9 @@ fun ClockPage() {
                 var colorMode by rememberColorMode()
                 Button(
                     onClick = { colorMode = colorMode.opposite() },
-                    Modifier.padding(10.px).clip(Circle()).fontSize(24.px)
+                    Modifier.margin(10.px).clip(Circle()).fontSize(24.px)
                 ) {
-                    Box(Modifier.padding(4.px)) {
+                    Box(Modifier.margin(4.px)) {
                         if (colorMode.isLight()) FaSun() else FaMoon()
                     }
                 }

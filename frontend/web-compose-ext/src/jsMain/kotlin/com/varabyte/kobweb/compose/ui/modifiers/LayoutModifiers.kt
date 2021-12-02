@@ -65,15 +65,28 @@ fun Modifier.maxHeight(size: CSSNumeric): Modifier = styleModifier {
     maxHeight(size)
 }
 
-fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
-    // Compose padding is the same thing as CSS margin, confusingly... (it puts space around the current composable,
-    // as opposed to doing anything with its children)
+fun Modifier.margin(all: CSSNumeric): Modifier = styleModifier {
     margin(all)
 }
 
-fun Modifier.padding(topBottom: CSSNumeric, leftRight: CSSNumeric): Modifier = styleModifier {
-    // See: Modifier.padding(all) comment
+fun Modifier.margin(topBottom: CSSNumeric, leftRight: CSSNumeric): Modifier = styleModifier {
     margin(topBottom, leftRight)
+}
+
+fun Modifier.margin(
+    top: CSSNumeric = 0.px,
+    right: CSSNumeric = 0.px,
+    bottom: CSSNumeric = 0.px,
+    left: CSSNumeric = 0.px
+): Modifier = styleModifier {
+    margin(top, right, bottom, left)
+}
+fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
+    padding(all)
+}
+
+fun Modifier.padding(topBottom: CSSNumeric, leftRight: CSSNumeric): Modifier = styleModifier {
+    padding(topBottom, leftRight)
 }
 
 fun Modifier.padding(
@@ -82,6 +95,5 @@ fun Modifier.padding(
     bottom: CSSNumeric = 0.px,
     left: CSSNumeric = 0.px
 ): Modifier = styleModifier {
-    // See: Modifier.padding(all) comment
-    margin(top, right, bottom, left)
+    padding(top, right, bottom, left)
 }

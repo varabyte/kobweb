@@ -65,7 +65,7 @@ fun HomePage() {
         verticalArrangement = Arrangement.Top,
     ) {
         if (!ready) {
-            Box(Modifier.fillMaxWidth().padding(top = 2.cssRem), contentAlignment = Alignment.TopCenter) {
+            Box(Modifier.fillMaxWidth().margin(top = 2.cssRem), contentAlignment = Alignment.TopCenter) {
                 LoadingSpinner()
             }
             return@Column
