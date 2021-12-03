@@ -4,6 +4,7 @@ import com.varabyte.kobweb.cli.create.handleCreate
 import com.varabyte.kobweb.cli.export.handleExport
 import com.varabyte.kobweb.cli.list.handleList
 import com.varabyte.kobweb.cli.run.handleRun
+import com.varabyte.kobweb.cli.stop.handleStop
 import com.varabyte.kobweb.cli.version.handleVersion
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import kotlinx.cli.ArgParser
@@ -68,6 +69,12 @@ fun main(args: Array<String>) {
         }
     }
 
-    parser.subcommands(Version(), List(), Create(), Export(), Run())
+    class Stop : Subcommand("stop", "Stop a Kobweb server if one is running") {
+        override fun execute() {
+            handleStop()
+        }
+    }
+
+    parser.subcommands(Version(), List(), Create(), Export(), Run(), Stop())
     parser.parse(args.takeIf { it.isNotEmpty() } ?: arrayOf("-h"))
 }
