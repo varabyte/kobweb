@@ -142,13 +142,50 @@ class ComponentModifiers(val colorMode: ColorMode) {
  */
 class ComponentStyle internal constructor(private val name: String) {
     companion object {
+        /**
+         * A set of all classnames we have styles registered against.
+         *
+         * This lets us avoid applying unnecessary classnames, which really helps cut down on the number of class tags
+         * we use, making it easier to debug CSS issues in the browser.
+         *
+         * An example can help clarify here. Let's say you define a color-aware style:
+         *
+         * ```
+         * ComponentStyle("custom") { colorMode ->
+         *   base {
+         *     Modifier.color(if (colorMode.isLight()) Colors.Red else Colors.Pink)
+         *   }
+         * }
+         * ```
+         *
+         * For this, you only need the class name "custom-dark" (in dark mode) and "custom-light"; if instead it was
+         * color-agnostic, we would only need "custom". Before, we were applying all color modes because we weren't sure
+         * what was defined and what wasn't.
+         *
+         * In some cases, we have empty styles too, as hooks that user's can optionally replace if they want to.
+         * Now, as long as the style remains empty, we won't add any tagging at all to the user's elements.
+         */
+        private val registeredClasses = mutableSetOf<String>()
+
+        /**
+         * Handle being notified of a selector name, e.g. ".someStyle" or ".someStyle.someVariant"
+         */
+        // Note: This is kind of a hack, but since we can't currently query the StyleSheet for selector names, what we
+        // do instead is update our internal list as we run through all ComponentStyles.
+        internal fun notifySelectorName(selectorName: String) {
+            selectorName.split('.').filter { it.isNotEmpty() }.forEach { registeredClasses.add(it) }
+        }
+
         operator fun invoke(name: String, init: ComponentModifiers.() -> Unit) =
             ComponentStyleBuilder(name, init)
     }
 
     @Composable
     fun toModifier(): Modifier {
-        return Modifier.classNames(name, "$name-${getColorMode().name.lowercase()}")
+        val classNames = listOf(name, "$name-${getColorMode().name.lowercase()}")
+            .filter { name -> registeredClasses.contains(name) }
+
+        return Modifier.classNames(*classNames.toTypedArray())
     }
 }
 
@@ -225,6 +262,7 @@ class ComponentStyleBuilder internal constructor(
 
         StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
             withFinalSelectorName(selectorName, group) { name, styles ->
+                ComponentStyle.notifySelectorName(name)
                 styleSheet.addStyles(name, styles)
             }
         }
@@ -233,6 +271,8 @@ class ComponentStyleBuilder internal constructor(
         for (cssRuleKey in allCssRuleKeys) {
             StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)?.let { group ->
                 withFinalSelectorName(selectorName, group) { name, styles ->
+                    ComponentStyle.notifySelectorName(name)
+
                     val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
                     if (cssRuleKey.breakpoint != null) {
                         styleSheet.apply {
