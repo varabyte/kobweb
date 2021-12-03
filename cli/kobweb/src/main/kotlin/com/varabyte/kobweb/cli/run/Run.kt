@@ -1,9 +1,11 @@
 package com.varabyte.kobweb.cli.run
 
 import com.varabyte.kobweb.cli.common.Anims
+import com.varabyte.kobweb.cli.common.KobwebGradle
+import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
-import com.varabyte.kobweb.cli.common.gradlew
-import com.varabyte.kobweb.cli.common.kobwebFolder
+import com.varabyte.kobweb.cli.common.findKobwebProject
+import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
@@ -38,148 +40,146 @@ private enum class RunState {
     CANCELLED,
 }
 
-fun handleRun(env: ServerEnvironment) = konsoleApp {
-    val kobwebFolder = kobwebFolder ?: return@konsoleApp
+fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
+    if (isInteractive) konsoleApp {
+        val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@konsoleApp
 
-    newline() // Put space between user prompt and eventual first line of Gradle output
+        newline() // Put space between user prompt and eventual first line of Gradle output
 
-    val serverStateFile = ServerStateFile(kobwebFolder)
+        val serverStateFile = ServerStateFile(kobwebFolder)
 
-    val envName = when (env) {
-        ServerEnvironment.DEV -> "development"
-        ServerEnvironment.PROD -> "production"
-    }
-    var serverState: ServerState? = null // Set if RunState ever hits RunState.RUNNING
-    val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
-    var runState by konsoleVarOf(RunState.STARTING)
-    var cancelReason by konsoleVarOf("")
-    var addOutputSeparator by konsoleVarOf(false) // Separate active block from Gradle output above if any
-    konsole {
-        if (addOutputSeparator) {
-            textLine()
+        val envName = when (env) {
+            ServerEnvironment.DEV -> "development"
+            ServerEnvironment.PROD -> "production"
         }
+        var serverState: ServerState? = null // Set if RunState ever hits RunState.RUNNING
+        val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
+        var runState by konsoleVarOf(RunState.STARTING)
+        var cancelReason by konsoleVarOf("")
+        konsole {
+            textLine() // Add text line between this block and Gradle output above
 
-        when (runState) {
-            RunState.STARTING -> {
-                textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
-                textLine()
-                yellow { textLine("This may take a while if it needs to download dependencies.") }
-                textLine()
-                textLine("Press Q anytime to cancel.")
-            }
-            RunState.RUNNING -> {
-                serverState!!.let { serverState ->
-                    green {
-                        text("Kobweb server ($envName) is running at ")
-                        cyan { text("http://localhost:${serverState.port}") }
-                    }
-                    textLine(" (PID = ${serverState.pid})")
+            when (runState) {
+                RunState.STARTING -> {
+                    textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
                     textLine()
-                    textLine("Press Q anytime to stop it.")
+                    yellow { textLine("This may take a while if it needs to download dependencies.") }
+                    textLine()
+                    textLine("Press Q anytime to cancel.")
                 }
-            }
-            RunState.STOPPING -> {
-                text("Server is stopping")
-                serverState?.let { serverState ->
-                    text(" (PID = ${serverState.pid})")
-                }
-                textLine(ellipsisAnim)
-            }
-            RunState.STOPPED -> {
-                textLine("Server stopped gracefully.")
-            }
-            RunState.CANCELLING -> {
-                check(cancelReason.isNotBlank())
-                yellow { textLine("Server startup cancelling: $cancelReason$ellipsisAnim") }
-            }
-            RunState.CANCELLED -> {
-                yellow { textLine("Server startup cancelled: $cancelReason") }
-            }
-        }
-    }.runUntilSignal {
-        @Suppress("BlockingMethodInNonBlockingContext")
-        val args = mutableListOf("-PkobwebEnv=$env", "kobwebStart")
-        if (env == ServerEnvironment.DEV) {
-            args.add("-t") // Enable live reloading only while in dev mode
-        }
-        val startServerProcess = Runtime.getRuntime().gradlew(*args.toTypedArray())
-        consumeProcessOutput(startServerProcess) { addOutputSeparator = true }
-
-        Runtime.getRuntime().addShutdownHook(Thread {
-            if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
-                cancelReason =
-                    "CTRL-C received. We already kicked off a request to stop the server but we have to exit NOW."
-                runState = RunState.CANCELLED
-
-                ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
-            } else {
-                cancelReason = "CTRL-C received. Server startup cancelled."
-                runState = RunState.CANCELLED
-            }
-            signal()
-        })
-
-        onKeyPressed {
-            if (key in listOf(Keys.EOF, Keys.Q)) {
-                if (runState == RunState.STARTING) {
-                    runState = RunState.STOPPING
-                    CoroutineScope(Dispatchers.IO).launch {
-                        startServerProcess.destroy()
-                        startServerProcess.waitFor()
-
-                        cancelReason = "User quit before server could finish starting up"
-                        runState = RunState.CANCELLED
-                        signal()
-                    }
-                } else if (runState == RunState.RUNNING) {
-                    runState = RunState.STOPPING
-                    CoroutineScope(Dispatchers.IO).launch {
-                        startServerProcess.destroy()
-                        startServerProcess.waitFor()
-
-                        val stopServerProcess = Runtime.getRuntime().gradlew("kobwebStop")
-                        consumeProcessOutput(stopServerProcess) { addOutputSeparator = true }
-                        stopServerProcess.waitFor()
-
-                        runState = RunState.STOPPED
-                        signal()
-                    }
-                }
-            }
-        }
-
-        coroutineScope {
-            while (runState == RunState.STARTING) {
-                serverStateFile.content?.takeIf { it.isRunning() }?.let {
-                    if (it.env != env) {
-                        cancelReason =
-                            "A server is already running using a different environment configuration (want = $env, current = ${it.env})"
-                        runState = RunState.CANCELLED
-                        signal()
-                    } else {
-                        serverState = it
-                        runState = RunState.RUNNING
-                    }
-                    return@coroutineScope
-                }
-                delay(300)
-            }
-        }
-
-        if (runState == RunState.RUNNING) {
-            addTimer(Duration.ofMillis(500), repeat = true) {
-                if (runState == RunState.RUNNING) {
+                RunState.RUNNING -> {
                     serverState!!.let { serverState ->
-                        if (!serverState.isRunning() || serverStateFile.content != serverState) {
-                            cancelReason = "It seems like the server was stopped by a separate process."
+                        green {
+                            text("Kobweb server ($envName) is running at ")
+                            cyan { text("http://localhost:${serverState.port}") }
+                        }
+                        textLine(" (PID = ${serverState.pid})")
+                        textLine()
+                        textLine("Press Q anytime to stop it.")
+                    }
+                }
+                RunState.STOPPING -> {
+                    text("Server is stopping")
+                    serverState?.let { serverState ->
+                        text(" (PID = ${serverState.pid})")
+                    }
+                    textLine(ellipsisAnim)
+                }
+                RunState.STOPPED -> {
+                    textLine("Server stopped gracefully.")
+                }
+                RunState.CANCELLING -> {
+                    check(cancelReason.isNotBlank())
+                    yellow { textLine("Server startup cancelling: $cancelReason$ellipsisAnim") }
+                }
+                RunState.CANCELLED -> {
+                    yellow { textLine("Server startup cancelled: $cancelReason") }
+                }
+            }
+        }.runUntilSignal {
+            val startServerProcess = KobwebGradle.startServer(env)
+            startServerProcess.consumeProcessOutput(::handleConsoleOutput)
+
+            Runtime.getRuntime().addShutdownHook(Thread {
+                if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
+                    cancelReason =
+                        "CTRL-C received. We already kicked off a request to stop the server but we have to exit NOW."
+                    runState = RunState.CANCELLED
+
+                    ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
+                } else {
+                    cancelReason = "CTRL-C received. Server startup cancelled."
+                    runState = RunState.CANCELLED
+                }
+                signal()
+            })
+
+            onKeyPressed {
+                if (key in listOf(Keys.EOF, Keys.Q)) {
+                    if (runState == RunState.STARTING) {
+                        runState = RunState.STOPPING
+                        CoroutineScope(Dispatchers.IO).launch {
+                            startServerProcess.destroy()
+                            startServerProcess.waitFor()
+
+                            cancelReason = "User quit before server could finish starting up"
                             runState = RunState.CANCELLED
                             signal()
                         }
+                    } else if (runState == RunState.RUNNING) {
+                        runState = RunState.STOPPING
+                        CoroutineScope(Dispatchers.IO).launch {
+                            startServerProcess.destroy()
+                            startServerProcess.waitFor()
+
+                            val stopServerProcess = KobwebGradle.stopServer()
+                            stopServerProcess.consumeProcessOutput(::handleConsoleOutput)
+                            stopServerProcess.waitFor()
+
+                            runState = RunState.STOPPED
+                            signal()
+                        }
                     }
-                } else {
-                    repeat = false
+                }
+            }
+
+            coroutineScope {
+                while (runState == RunState.STARTING) {
+                    serverStateFile.content?.takeIf { it.isRunning() }?.let {
+                        if (it.env != env) {
+                            cancelReason =
+                                "A server is already running using a different environment configuration (want = $env, current = ${it.env})"
+                            runState = RunState.CANCELLED
+                            signal()
+                        } else {
+                            serverState = it
+                            runState = RunState.RUNNING
+                        }
+                        return@coroutineScope
+                    }
+                    delay(300)
+                }
+            }
+
+            if (runState == RunState.RUNNING) {
+                addTimer(Duration.ofMillis(500), repeat = true) {
+                    if (runState == RunState.RUNNING) {
+                        serverState!!.let { serverState ->
+                            if (!serverState.isRunning() || serverStateFile.content != serverState) {
+                                cancelReason = "It seems like the server was stopped by a separate process."
+                                runState = RunState.CANCELLED
+                                signal()
+                            }
+                        }
+                    } else {
+                        repeat = false
+                    }
                 }
             }
         }
+    } else {
+        assert(!isInteractive)
+        assertKobwebProject()
+        KobwebGradle.startServer(env, enableLiveReloading = false).also { it.consumeProcessOutput(); it.waitFor() }
     }
 }

@@ -12,6 +12,12 @@ import kotlinx.cli.ExperimentalCli
 import kotlinx.cli.Subcommand
 import kotlinx.cli.default
 
+private fun ArgParser.headlessOption() = option(
+    ArgType.Boolean,
+    fullName = "headless",
+    description = "If true, allow user interaction / use colors and animations. Else, restrict to simple console logging",
+).default(false)
+
 @ExperimentalCli
 fun main(args: Array<String>) {
     val parser = ArgParser("kobweb")
@@ -46,16 +52,19 @@ fun main(args: Array<String>) {
     }
 
     class Export : Subcommand("export", "Generate a static version of a Kobweb app / site") {
+        val isHeadless by headlessOption()
+
         override fun execute() {
-            handleExport()
+            handleExport(!isHeadless)
         }
     }
 
     class Run : Subcommand("run", "Run a Kobweb server") {
         val env by option(ArgType.Choice<ServerEnvironment>(), "env").default(ServerEnvironment.DEV)
+        val isHeadless by headlessOption()
 
         override fun execute() {
-            handleRun(env)
+            handleRun(env, !isHeadless)
         }
     }
 

@@ -155,20 +155,9 @@ fun KonsoleApp.newline() {
     konsole { textLine() }.run()
 }
 
-fun RunScope.consumeStream(stream: InputStream, isError: Boolean, onLineRead: () -> Unit) {
-    val isr = InputStreamReader(stream)
-    val br = BufferedReader(isr)
-    while (true) {
-        val line = br.readLine() ?: break
-        onLineRead()
-        aside {
-            if (isError) red() else black(isBright = true)
-            textLine(line)
-        }
+fun RunScope.handleConsoleOutput(line: String, isError: Boolean) {
+    aside {
+        if (isError) red() else black(isBright = true)
+        textLine(line)
     }
-}
-
-fun RunScope.consumeProcessOutput(process: Process, onLineRead: () -> Unit = {}) {
-    CoroutineScope(Dispatchers.IO).launch { consumeStream(process.inputStream, isError = false, onLineRead) }
-    CoroutineScope(Dispatchers.IO).launch { consumeStream(process.errorStream, isError = true, onLineRead) }
 }
