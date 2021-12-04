@@ -1,70 +1,111 @@
 package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
+import kotlinx.html.BODY
+import kotlinx.html.body
+import kotlinx.html.div
+import kotlinx.html.dom.append
+import kotlinx.html.dom.document
+import kotlinx.html.dom.serialize
+import kotlinx.html.head
+import kotlinx.html.html
+import kotlinx.html.id
+import kotlinx.html.lang
+import kotlinx.html.link
+import kotlinx.html.meta
+import kotlinx.html.script
+import kotlinx.html.title
+import kotlinx.html.unsafe
 
-fun createHtmlFile(title: String, headElements: List<String>, src: String, buildTarget: BuildTarget): String = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="description" content="Generaged by Kobweb" />
-        <title>$title</title>
-        <link rel="icon" href="/favicon.ico" />
-        ${headElements.joinToString("\n        ")}
-    </head>
-    <body>
-        <div id="root"></div>
-${
-    if (buildTarget == BuildTarget.DEBUG) {
-        """
-        |        <div id="status"><span id="warning">❌</span><span id="spinner">🕸️</span> <span id="text"></span>
-        |            <style>
-        |                @keyframes kobweb-spin {
-        |                    from { transform: rotate(0deg); }
-        |                    to { transform: rotate(359deg); }
-        |                }
-        |                body > #status {
-        |                    position: fixed;
-        |                    font-size: 24px;
-        |                    background: whitesmoke;
-        |                    top: 20px;
-        |                    left: 50%;
-        |                    transform: translateX(-50%);
-        |                    padding: 10px;
-        |                    border: 1px solid;
-        |                    border-radius: 10px;
-        |                    visibility: hidden;
-        |                    opacity: 0;
-        |                }
-        |                body > #status > .hidden {
-        |                   display: none;
-        |                }
-        |                body > #status > .visible {
-        |                    display: inline-block;
-        |                }
-        |
-        |                body > #status.fade-in {
-        |                    visibility: visible;
-        |                    opacity: 1;
-        |                    transition: opacity 1s;
-        |                }
-        |                body > #status.fade-out {
-        |                   visibility: hidden;
-        |                   opacity: 0;
-        |                   transition: visibility 0s 1s, opacity 1s;
-        |                }
-        |                body > #status > #spinner {
-        |                    animation: kobweb-spin 1.5s linear infinite;
-        |                }
-        |            </style>
-        |        </div>
-    """.trimMargin("|")
-    } else {
-        ""
+private fun BODY.buildIndicator() {
+    unsafe {
+        raw(
+            """
+                <!-- Encoded spinner character is aa cobweb -->
+                <div id="status"><span id="warning">❌</span><span id="spinner">🕸️</span> <span id="text"></span>
+                    <style>
+                        @keyframes kobweb-spin {
+                            from { transform: rotate(0deg); }
+                            to { transform: rotate(359deg); }
+                        }
+                        body > #status {
+                            position: fixed;
+                            font-size: 24px;
+                            background: whitesmoke;
+                            top: 20px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            padding: 10px;
+                            border: 1px solid;
+                            border-radius: 10px;
+                            visibility: hidden;
+                            opacity: 0;
+                        }
+                        body > #status > .hidden {
+                           display: none;
+                        }
+                        body > #status > .visible {
+                            display: inline-block;
+                        }
+                        body > #status.fade-in {
+                            visibility: visible;
+                            opacity: 1;
+                            transition: opacity 1s;
+                        }
+                        body > #status.fade-out {
+                           visibility: hidden;
+                           opacity: 0;
+                           transition: visibility 0s 1s, opacity 1s;
+                        }
+                        body > #status > #spinner {
+                            animation: kobweb-spin 1.5s linear infinite;
+                        }
+                    </style>
+                </div>
+            """.trimIndent()
+        )
     }
 }
 
-        <script src="$src"></script>
-    </body>
-    </html>
-""".trimIndent()
+fun createHtmlFile(title: String, headElements: List<String>, src: String, buildTarget: BuildTarget): String {
+    return document {
+        append {
+            html {
+                lang = "en"
+
+                head {
+                    meta {
+                        charset = "UTF-8"
+                    }
+                    meta {
+                        name = "description"
+                        content = "Generated by Kobweb"
+                    }
+                    this.title = title
+                    link {
+                        rel = "icon"
+                        href = "/favicon.ico"
+                    }
+
+                    headElements.forEach { element ->
+                        unsafe { raw(element) }
+                    }
+                }
+
+                body {
+                    div {
+                        id = "root"
+                    }
+
+                    if (buildTarget == BuildTarget.DEBUG) {
+                        buildIndicator()
+                    }
+
+                    script {
+                        this.src = src
+                    }
+                }
+            }
+        }
+    }.serialize()
+}

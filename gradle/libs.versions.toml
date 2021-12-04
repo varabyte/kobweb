@@ -12,6 +12,7 @@ kotlin = "1.5.31"
 kotlinpoet = "1.10.2"
 kotlinx-coroutines = "1.5.2"
 kotlinx-cli = "0.3.2"
+kotlinx-html = "0.7.3"
 ksp = "1.5.30-1.0.0"
 ktor = "1.6.3"
 logback = "1.2.3"
@@ -34,6 +35,7 @@ kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-cli = { module = "org.jetbrains.kotlinx:kotlinx-cli", version.ref = "kotlinx-cli" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html", version.ref = "kotlinx-html" }
 ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 ktor-auth = { module = "io.ktor:ktor-auth", version.ref = "ktor"}
 ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor"}

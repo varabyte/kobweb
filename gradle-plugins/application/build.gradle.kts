@@ -17,12 +17,13 @@ dependencies {
     // For parsing code. Instead, use KSP someday? See also: Bug #4
     implementation(kotlin("compiler-embeddable"))
 
-    // For generating code
+    // For generating code / html
     implementation(libs.kotlinpoet)
+    implementation(libs.kotlinx.html)
 
     // Export
     implementation(libs.cdt) // Run ChromeLauncher during export
-    implementation(libs.jsoup) // Pretty-print html
+    implementation(libs.jsoup)
 
     implementation(project(":common:kobweb-common"))
 }
