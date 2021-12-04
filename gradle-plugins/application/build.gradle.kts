@@ -17,6 +17,9 @@ dependencies {
     // For parsing code. Instead, use KSP someday? See also: Bug #4
     implementation(kotlin("compiler-embeddable"))
 
+    // For generating code
+    implementation(libs.kotlinpoet)
+
     // Export
     implementation(libs.cdt) // Run ChromeLauncher during export
     implementation(libs.jsoup) // Pretty-print html
