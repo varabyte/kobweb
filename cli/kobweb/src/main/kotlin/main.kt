@@ -13,11 +13,20 @@ import kotlinx.cli.ExperimentalCli
 import kotlinx.cli.Subcommand
 import kotlinx.cli.default
 
-private fun ArgParser.headlessOption() = option(
-    ArgType.Boolean,
-    fullName = "headless",
-    description = "If true, allow user interaction / use colors and animations. Else, restrict to simple console logging",
-).default(false)
+private enum class Mode {
+    /** Expect a user at an ANSI-enabled terminal interacting with the command */
+    INTERACTIVE,
+
+    /** Expect the command to run in a constrained environment, e.g. a server, without user interaction */
+    DUMB
+}
+
+private fun ArgParser.mode() = option(
+    ArgType.Choice<Mode>(),
+    fullName = "mode",
+    shortName = "m",
+    description = "If interactive, runs in an ANSI-enabled terminal expecting user input. If dumb, command only outputs, using simple console logging",
+).default(Mode.INTERACTIVE)
 
 @ExperimentalCli
 fun main(args: Array<String>) {
@@ -53,19 +62,19 @@ fun main(args: Array<String>) {
     }
 
     class Export : Subcommand("export", "Generate a static version of a Kobweb app / site") {
-        val isHeadless by headlessOption()
+        val mode by mode()
 
         override fun execute() {
-            handleExport(!isHeadless)
+            handleExport(mode == Mode.INTERACTIVE)
         }
     }
 
     class Run : Subcommand("run", "Run a Kobweb server") {
         val env by option(ArgType.Choice<ServerEnvironment>(), "env").default(ServerEnvironment.DEV)
-        val isHeadless by headlessOption()
+        val mode by mode()
 
         override fun execute() {
-            handleRun(env, !isHeadless)
+            handleRun(env, mode == Mode.INTERACTIVE)
         }
     }
 
