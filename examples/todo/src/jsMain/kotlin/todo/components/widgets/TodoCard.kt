@@ -4,10 +4,6 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.dom.A
-import todo.components.styles.TodoClickableStyle
-import todo.components.styles.TodoContainerStyle
-import todo.components.styles.TodoStyle
-import todo.components.styles.TodoTextStyle
 
 @Composable
 fun TodoCard(onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {

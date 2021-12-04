@@ -1,4 +1,4 @@
-package todo.components.styles
+package todo.components.widgets
 
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.FontStyle

@@ -9,10 +9,6 @@ import org.jetbrains.compose.web.attributes.onSubmit
 import org.jetbrains.compose.web.attributes.placeholder
 import org.jetbrains.compose.web.dom.Form
 import org.jetbrains.compose.web.dom.Input
-import todo.components.styles.TodoContainerStyle
-import todo.components.styles.TodoInputStyle
-import todo.components.styles.TodoStyle
-import todo.components.styles.TodoTextStyle
 
 @Composable
 fun TodoForm(placeholder: String, loading: Boolean, submitTodo: (String) -> Unit) {
