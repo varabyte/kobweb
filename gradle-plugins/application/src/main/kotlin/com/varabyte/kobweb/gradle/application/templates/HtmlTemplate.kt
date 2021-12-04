@@ -21,7 +21,7 @@ private fun BODY.buildIndicator() {
     unsafe {
         raw(
             """
-                <!-- Encoded spinner character is aa cobweb -->
+                <!-- Encoded spinner character is a cobweb -->
                 <div id="status"><span id="warning">❌</span><span id="spinner">🕸️</span> <span id="text"></span>
                     <style>
                         @keyframes kobweb-spin {
