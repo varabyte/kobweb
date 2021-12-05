@@ -132,7 +132,7 @@ $ kobweb create site
 ```
 
 You'll be asked a few questions required for setting up your project. When prompted for a folder name, it will create
-the folder _within_ your current directory, so you don't have to worry about it overwriting any files.
+the folder _within_ your current directory, so you don't have to worry about it exploding files everywhere.
 
 When finished, you'll have a basic project with three pages - a home page, an about page, and a markdown page - and some
 components (which are collections of reusable, composable pieces). Your own directory structure should look something
@@ -249,30 +249,238 @@ We consider Silk a pretty important part of the Kobweb experience, but it's wort
 optional component. You can absolutely use Kobweb without Silk. You can also interleave Silk and Web Compose without
 issue (as Silk, itself, is just composing Web Compose methods).
 
-### What about Multiplatform Widgets?
+### Inline vs StyleSheet
 
-Jetbrains is working on an experimental project called "multiplatform widgets" which is supposed to bring the Desktop /
-Android API to the web. And it may seem like the Kobweb + Silk approach is competing with it.
+Before continuing, for those new to the web, it's worth understanding that there are two ways to set styles on your HTML
+elements: inline and stylesheet.
 
-However, I've found there is a fundamental distance between Desktop / Android Compose and Web Compose. Specifically,
-Desktop / Android targets render to their own surface, while Web modifies a parallel html / css DOM tree and leaves it
-to do the final rendering.
+Inline styles are defined on the element tag itself, and might look like:
 
-This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
-modifiers matters, while in Web, this action simply sets html style properties under the hood, where order does not
-matter.
+```html
+<div style="background-color:black">
+```
 
-One approach would be to own the entire rendering pipeline, ditching html / css entirely and targeting a full page
-canvas or something. However, this limits the ability for robots to crawl and index your site, which is a major
-drawback. It also means that debugging in a browser would be a rough experience, as the browser's developer tools would
-be limited in the insights it could provide for your site. It would also prevent a developer from making use of the rich
-ecosystem of Javascript libraries out there that modify the DOM tree themselves.
+Meanwhile, any given html page can reference a list of stylesheets which can define a bunch of styles, where each style
+is tied to a selector (which _selects_ what elements those styles apply to).
 
-For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a rich
-UI library of widgets that hopefully makes it relatively rare for the developer to worry about it. For example, flexbox
-is a very powerful component, but you'll find it's much easier to compose Rows and Columns together than trying to
-remember if you should be justifying your items or aligning your content, even if Rows and Columns are just creating the
-correct html / css for you behind the scenes anyways.
+A concrete example stylesheet can help the discussion here:
+
+```css
+body {
+  background-color: black;
+  color: magenta
+}
+#title {
+  color: yellow
+}
+```
+
+And that stylesheet could style the following document:
+
+```html
+<body>
+  <!-- Div get background-color from "body" and foreground color from "#title" -->
+  <div id="title">
+      Yellow on green
+  </div>
+</body>
+```
+
+There's no hard and fast rule, but in general, when writing html / css by hand, stylesheets are often preferred over
+inline styles as it better maintains a separation of concerns. That is, the html should represent the content of your
+site, while the css controls the look and feel.
+
+Of course, sometimes, you need to define the style of a single, specific element only. You can do that by giving it an
+ID and then targeting it via an ID selector in your stylesheet (like "#title" in the example above), or you can just
+set inline styles on it, which may be far easier.
+
+We're not writing html / css by hand, however -- we're using Web Compose! So the distinctions discussed up until now are
+less important here.
+
+However, there are times when you have to use stylesheets, because without them you can't define styles for advanced
+behaviors (particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes),
+[pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and 
+[media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries), the discussion of
+which are outside the scope of this README). So in those cases, it's good to understand the distinction.
+
+In general, when you pass styles defined on the fly into a composable widget in Silk, those will result in inline
+styles, whereas if you use `ComponentStyle` to define the styles, that will get embedded into the site's stylesheet.
+We'll talk more about these approaches in the following sections.
+
+One last note: debugging your page with browser tools may be easier if you lean on stylesheets over inline styles,
+because it makes your DOM tree easier to look through without all that extra noise.
+
+### Modifier
+
+Silk introduces the `Modifier` class, in order to provide an experience similar to what you find in Jetpack Compose.
+In the world of Web Compose, you can think of a `Modifier` as a layer on top of CSS styles. So this:
+
+```kotlin
+Modifier.background(Colors.Red).color(Colors.Green).padding(200.px)
+```
+
+if passed into a widget composable, like `Box`:
+
+```kotlin
+Box(Modifier.background(Colors.Red).color(Colors.Green).padding(200.px)) {
+    Text("Green on red")
+}
+```
+
+would generate an HTML tag with a style property like: `<div style="background:red;color:green;padding:200px">`
+
+#### attrModifier and styleModifier
+
+There are a bunch of modifier extensions (and they're growing) provided by Kobweb, like `background`, `color`, and
+`padding` above. But there are also two escape hatches int web compose anytime you run into something that's missing:
+`attrModifier` and `styleModifier`.
+
+Using them looks like this:
+
+```kotlin
+// Modify attributes of an element tag
+// e.g. the "a", "b", and "c" in <tag a="..." b="..." c="..." />
+Modifier.attrModifier {
+    onMouseDown { /* ... */ }
+}
+
+// Modify styles of an element tag
+// e.g. the "a", "b", and "c" in `<tag style="a:...;b:...;c:..." />
+Modifier.styleModifier {
+    width(100.percent)
+    height(50.percent)
+}
+
+// Note: Because "style" itself is an attribute, you can define styles in an attrModifier:
+Modifier.attrModifier {
+    style {
+        width(100.percent)
+        height(50.percent)
+    }
+}
+// ... but in the above case, you should use a styleModifier for simplicitly
+```
+
+### ComponentStyle and ComponentVariant
+
+With Silk, you can define a style like so:
+
+```kotlin
+val CustomStyle = ComponentStyle("custom") {
+    base {
+        Modifier.backgroud(Colors.Red)
+    }
+}
+```
+
+and convert it to a modifier by typing `CustomStyle.toModifier()`. At this point, you can pass it into any composable
+which takes a `Modifier` parameter:
+
+```kotlin
+// Approach #1 (uses inline styles)
+Box(Modifier.background(Colors.Red)) { /* ... */ }
+
+// Appraoch #2 (uses stylesheets)
+Box(CustomStyle.toModifier()) { /* ... */}
+```
+
+With a style, you can also create a variant of that style (that is, additional modifications that are always applied
+_after_ the style is), like so:
+
+```kotlin
+val CustomVariant = CustomStyle.addVariant("example-variant") {
+    base {
+        Modifier.background(Colors.Green)
+    }
+}
+```
+
+#### Defining a custom widget
+
+Variants can be particularly useful if you're defining a custom widget that has default styles, but you want to give
+callers an easy way to deviate from it in special cases.
+
+For example, maybe you define a button widget (perhaps you're not happy with the one provided by Silk):
+
+```kotlin
+val ButtonStyle = ComponentStyle("my-button") { /* ... */ }
+
+// Note: Creates a style called "my-button-outline"
+val OutlineButtonVariant = ButtonStyle.addVariant("outline") { /* ... */ }
+
+// Note: Creates a style called "my-button-invert"
+val InvertButtonVariant = ButtonStyle.addVariant("invert") { /* ... */ }
+```
+
+This wasn't mentioned earlier, but you can pass variants into the `ComponentStyle.toModifier(...)` method. If done, it
+will apply both of them.
+
+***Note:** Using a variant that was created from a different style will have no effect. We tried to use generics as a
+fancy way to enforce this at compile time but ran into limitations with the Compose compiler (see
+[Web Comopse bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later if resolved.*
+
+So bringing it all together, you should write code that looks something like this:
+
+```kotlin
+@Composable
+fun Button(
+    modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
+    @Composable content: () -> Unit
+) {
+    val finalModifier = ButtonStyle.toModifier(variant).then(modifier)
+    Box(finalModifier, content)
+}
+```
+
+In other words, apply the modifiers in order of base style, then variant, then final user overrides.
+
+A caller might call your method one of several ways:
+
+```kotlin
+// Approach #1: Use default styling
+Button { /* ... */ }
+
+// Approach #1: Tweak default styles with a button variant
+Button(variant = OutlineButtonVariant) { /* ... */ }
+
+// Approach #3: Tweak default styles with a inline styles
+Button(Modifier.background(Colors.Blue)) { /* ... */ }
+```
+
+### Font Awesome
+
+Kobweb provides the `kobweb-silk-icons-fa` artifact which you can use in your project if you want access to all the free
+Font Awesome icons which you can call in a Kobweb+Silk manner.
+
+Using it is easy! Search the [Font Awesome gallery](https://fontawesome.com/v5.15/icons?d=gallery&p=2&m=free), choose an
+icon, and then apply it using the associated Font Awesome icon composable.
+
+For example, if I wanted to add the Kobweb-themed
+[spider icon](https://fontawesome.com/v5.15/icons/spider?style=solid), what I could do is call this in my Kobweb code:
+
+```kotlin
+FaSpider()
+```
+
+That's it!
+
+Some icons have a choice between solid and outline versions, such as "Square"
+([outline](https://fontawesome.com/v5.15/icons/square?style=regular) and
+[filled](https://fontawesome.com/v5.15/icons/square?style=solid)). In that case, the default choice will be outline mode,
+but you can pass in a style enum to control this:
+
+```kotlin
+FaSquare(style = IconStyle.FILLED)
+```
+
+All Font Awesome composables accept a modifier parameter, so you can tweak it further:
+
+```kotlin
+FaSpider(Modifier.color(Colors.Red))
+```
+
+***Note**: When you create a project using our `site` template, Font Awesome icons are included.*
 
 ## Components: Layouts, Sections, and Widgets
 
@@ -427,6 +635,22 @@ fun KobwebPage() {
 In this way, you can write pages that are mostly static text punctuated with beautiful, interactive components. This
 could be a great approach for people who want to write and host their own blogs, for example.
 
+## Version Catalogs
+
+The project templates created by Kobweb all embrace Gradle version catalogs, which are (at the time of writing this
+README) a relatively new feature, so users may not be aware of it.
+
+There is a file called `libs.versions.toml` that exists inside your project's root "gradle" folder. If you find yourself
+wanting to tweak or add new versions to projects you originally created via `kobweb create`, that's where you'll find
+them.
+
+For example, here's the
+[libs.versions.toml](https://github.com/varabyte/kobweb-site/blob/main/gradle/libs.versions.toml) we use for our own
+landing site.
+
+To read more about the feature, please check out the
+[official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
+
 # Can We Kobweb Yet
 
 Current state: **Functional but early**
@@ -454,7 +678,9 @@ So, should you use Kobweb at this point? If you are...
 * a company:
     * **NOOOOOO** (someday, we hope, but not yet)
 
-# Templates
+# Advanced
+
+## Templates
 
 Kobweb provides its templates in a separate git repository, which is referenced within this project as a submodule for
 convenience. To pull down everything, run:
@@ -467,6 +693,31 @@ $ git clone --recurse-submodules https://github.com/varabyte/kobweb
 /path/to/src/root/kobweb
 $ git submodule update --init
 ```
+
+## What about Multiplatform Widgets?
+
+Jetbrains is working on an experimental project called "multiplatform widgets" which is supposed to bring the Desktop /
+Android API to the web. And it may seem like the Kobweb + Silk approach is competing with it.
+
+However, I've found there is a fundamental distance between Desktop / Android Compose and Web Compose. Specifically,
+Desktop / Android targets render to their own surface, while Web modifies a parallel html / css DOM tree and leaves it
+to do the final rendering.
+
+This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
+modifiers matters, while in Web, this action simply sets html style properties under the hood, where order does not
+matter.
+
+One approach would be to own the entire rendering pipeline, ditching html / css entirely and targeting a full page
+canvas or something. However, this limits the ability for robots to crawl and index your site, which is a major
+drawback. It also means that debugging in a browser would be a rough experience, as the browser's developer tools would
+be limited in the insights it could provide for your site. It would also prevent a developer from making use of the rich
+ecosystem of Javascript libraries out there that modify the DOM tree themselves.
+
+For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a rich
+UI library of widgets that hopefully makes it relatively rare for the developer to worry about it. For example, flexbox
+is a very powerful component, but you'll find it's much easier to compose Rows and Columns together than trying to
+remember if you should be justifying your items or aligning your content, even if Rows and Columns are just creating the
+correct html / css for you behind the scenes anyways.
 
 # Known Issues
 
