@@ -131,8 +131,10 @@ $ cd /path/to/projects/
 $ kobweb create site
 ```
 
-You'll be asked a few questions required for setting up your project. When prompted for a folder name, it will create
-the folder _within_ your current directory, so you don't have to worry about it exploding files everywhere.
+You'll be asked a few questions required for setting up your project.
+
+You don't need to create a root folder for your project ahead of time - the setup process will prompt you for one to
+create.
 
 When finished, you'll have a basic project with three pages - a home page, an about page, and a markdown page - and some
 components (which are collections of reusable, composable pieces). Your own directory structure should look something
