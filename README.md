@@ -346,7 +346,7 @@ would generate an HTML tag with a style property like: `<div style="background:r
 #### attrModifier and styleModifier
 
 There are a bunch of modifier extensions (and they're growing) provided by Kobweb, like `background`, `color`, and
-`padding` above. But there are also two escape hatches int web compose anytime you run into something that's missing:
+`padding` above. But there are also two escape hatches into web compose anytime you run into something that's missing:
 `attrModifier` and `styleModifier`.
 
 Using them looks like this:
@@ -372,7 +372,7 @@ Modifier.attrModifier {
         height(50.percent)
     }
 }
-// ... but in the above case, you should use a styleModifier for simplicitly
+// ... but in the above case, you should use a styleModifier for simplicity
 ```
 
 ### ComponentStyle
@@ -387,7 +387,7 @@ val CustomStyle = ComponentStyle("custom") {
 }
 ```
 
-and convert it to a modifier by typing `CustomStyle.toModifier()`. At this point, you can pass it into any composable
+and convert it to a modifier by using `CustomStyle.toModifier()`. At this point, you can pass it into any composable
 which takes a `Modifier` parameter:
 
 ```kotlin
@@ -421,8 +421,9 @@ val CustomStyle = ComponentStyle("custom") {
 ```
 
 Kobweb provides a bunch of these state blocks for you for convenience, but for those who are CSS-savvy, you can always
-define the CSS rule directly to enable more complex combinations or reference states that perhaps Kobweb hasn't added
-yet. For example, you could have defined the above as:
+define the CSS rule directly to enable more complex combinations or reference states that Kobweb hasn't added yet.
+
+For example, this is identical to the above style definition:
 
 ```kotlin
 val CustomStyle = ComponentStyle("custom") {
@@ -468,9 +469,10 @@ fun initializeBreakpoints(ctx: InitSilkContext) {
 }
 ```
 
-although in practice it is often good enough to define base styles and occasional "md" styles.
+Despite the flexible potential of multiple sizes, many projects will be able to get away just using base styles and occasional
+"md" styles.
 
-To reference a breakpoint in a style:
+To reference a breakpoint in a `ComponentStyle`, just invoke it:
 
 ```kotlin
 val CustomStyle = ComponentStyle("custom") {
@@ -486,13 +488,12 @@ val CustomStyle = ComponentStyle("custom") {
 
 #### Color-mode aware
 
-When you define a `ComponentStyle`, an optional field is passed in called `colorMode` that you can access:
+When you define a `ComponentStyle`, an optional field is available for you to use called `colorMode`:
 
 ```kotlin
 val CustomStyle = ComponentStyle("custom") {
     base {
-        val color = if (colorMode.isLight()) Colors.Red else Colors.Pink
-        Modifier.color(color)
+        Modifier.color(if (colorMode.isLight()) Colors.Red else Colors.Pink)
     }
 }
 ```
@@ -508,9 +509,8 @@ val CustomStyle = ComponentStyle("custom") {
 }
 ```
 
-or, create your own theme colors in your own app and reference them in your styles. That works too!
-
-`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in an "init silk" method:
+`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in an "init silk" method,
+perhaps to something that is more brand aware:
 
 ```kotlin
 @InitSilk
@@ -529,7 +529,7 @@ fun overrideSilkTheme(ctx: InitSilkContext) {
 #### ComponentVariant
 
 With a style, you can also create a variant of that style (that is, additional modifications that are always applied
-_after_ the style is), like so:
+_after_ the base style is). Here's an example:
 
 ```kotlin
 val CustomVariant = CustomStyle.addVariant("example-variant") {
@@ -538,11 +538,6 @@ val CustomVariant = CustomStyle.addVariant("example-variant") {
     }
 }
 ```
-
-The way you define a variant block is otherwise identical to a `ComponentStyle`. What you are actually doing is defining
-an additional style which will only be applied on top of the base style.
-
-#### Defining a custom widget
 
 Variants can be particularly useful if you're defining a custom widget that has default styles, but you want to give
 callers an easy way to deviate from it in special cases.
@@ -580,9 +575,9 @@ fun Button(
 }
 ```
 
-In other words, apply the modifiers in order of base style, then variant, then final user overrides.
+In other words, apply the modifiers in order of base style, then variant, then finally user overrides.
 
-A caller might call your method one of several ways:
+A caller might call your widget one of several ways:
 
 ```kotlin
 // Approach #1: Use default styling
@@ -598,10 +593,10 @@ Button(Modifier.background(Colors.Blue)) { /* ... */ }
 ### Font Awesome
 
 Kobweb provides the `kobweb-silk-icons-fa` artifact which you can use in your project if you want access to all the free
-Font Awesome icons which you can call in a Kobweb+Silk manner.
+Font Awesome icons.
 
 Using it is easy! Search the [Font Awesome gallery](https://fontawesome.com/v5.15/icons?d=gallery&p=2&m=free), choose an
-icon, and then apply it using the associated Font Awesome icon composable.
+icon, and then call it using the associated Font Awesome icon composable.
 
 For example, if I wanted to add the Kobweb-themed
 [spider icon](https://fontawesome.com/v5.15/icons/spider?style=solid), what I could do is call this in my Kobweb code:
@@ -787,7 +782,7 @@ could be a great approach for people who want to write and host their own blogs,
 The project templates created by Kobweb all embrace Gradle version catalogs, which are (at the time of writing this
 README) a relatively new feature, so users may not be aware of it.
 
-There is a file called `libs.versions.toml` that exists inside your project's root "gradle" folder. If you find yourself
+There is a file called `libs.versions.toml` that exists inside your project's root `gradle` folder. If you find yourself
 wanting to tweak or add new versions to projects you originally created via `kobweb create`, that's where you'll find
 them.
 
@@ -819,7 +814,7 @@ So, should you use Kobweb at this point? If you are...
       below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
       this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
-    * ***Maybe***, but now is probably a bit too early.
+    * ***Maybe***, but now is probably a bit too early. It's getting close!
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
     * **No**
 * a company:
