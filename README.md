@@ -256,7 +256,7 @@ issue (as Silk, itself, is just composing Web Compose methods).
 Before continuing, for those new to the web, it's worth understanding that there are two ways to set styles on your HTML
 elements: inline and stylesheet.
 
-Inline styles are defined on the element tag itself, and might look like:
+Inline styles are defined on the element tag itself, and in raw HTML might look like:
 
 ```html
 <div style="background-color:black">
@@ -265,7 +265,7 @@ Inline styles are defined on the element tag itself, and might look like:
 Meanwhile, any given html page can reference a list of stylesheets which can define a bunch of styles, where each style
 is tied to a selector (which _selects_ what elements those styles apply to).
 
-A concrete example stylesheet can help the discussion here:
+A concrete example stylesheet can help here:
 
 ```css
 body {
@@ -277,7 +277,7 @@ body {
 }
 ```
 
-And that stylesheet could style the following document:
+And you could use that stylesheet to style the following document:
 
 ```html
 <body>
@@ -303,11 +303,23 @@ However, there are times when you have to use stylesheets, because without them 
 behaviors (particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes),
 [pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and
 [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries), the discussion of
-which are outside the scope of this README). So in those cases, it's good to understand the distinction.
+which are outside the scope of this README). So in those cases, it's good to understand that there's an occasional
+and fundamental difference.
 
 In general, when you pass styles defined on the fly into a composable widget in Silk, those will result in inline
 styles, whereas if you use `ComponentStyle` to define the styles, that will get embedded into the site's stylesheet.
 We'll talk more about these approaches in the following sections.
+
+```kotlin
+// Uses inline styles
+Box(Modifier.color(Colors.Red)) { ... }
+
+// Uses a stylesheet
+val MyBoxStyle = ComponentStyle("my-box") {
+    base { Modifier.Color(Colors.Red) }
+}
+Box(MyBoxStyle.toModifier())
+```
 
 One last note: debugging your page with browser tools may be easier if you lean on stylesheets over inline styles,
 because it makes your DOM tree easier to look through without all that extra noise.
