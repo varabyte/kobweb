@@ -281,7 +281,7 @@ And you could use that stylesheet to style the following document:
 
 ```html
 <body>
-  <!-- Div get background-color from "body" and foreground color from "#title" -->
+  <!-- Div gets background-color from "body" and foreground color from "#title" -->
   <div id="title">
       Yellow on green
   </div>
@@ -318,7 +318,7 @@ Box(Modifier.color(Colors.Red)) { ... }
 val MyBoxStyle = ComponentStyle("my-box") {
     base { Modifier.Color(Colors.Red) }
 }
-Box(MyBoxStyle.toModifier())
+Box(MyBoxStyle.toModifier()) { ... }
 ```
 
 One last note: debugging your page with browser tools may be easier if you lean on stylesheets over inline styles,
@@ -402,9 +402,9 @@ Box(CustomStyle.toModifier()) { /* ... */}
 
 So, what's up with the `base` block?
 
-You can additionally define various other styles that take effect conditionally. The base style will always apply first,
-but then additional styles can be applied based on what state the element is in. (If multiple states are applicable at
-the same time, they will be applied in the order specified.)
+True, it looks a bit verbose on its own. However, you can define additional styles that take effect conditionally. The
+base style will always apply first, but then additional styles can be applied based on what state the element is in. (If
+multiple states are applicable at the same time, they will be applied in the order specified.)
 
 Here, we create a style which is red by default, but green when the mouse hovers over it:
 
@@ -554,12 +554,15 @@ val OutlineButtonVariant = ButtonStyle.addVariant("outline") { /* ... */ }
 val InvertButtonVariant = ButtonStyle.addVariant("invert") { /* ... */ }
 ```
 
-This wasn't mentioned earlier, but you can pass variants into the `ComponentStyle.toModifier(...)` method. If done, it
-will apply both of them.
+The `ComponentStyle.toModifier(...)` method, mentioned earlier, optionally takes a variant parameter. When passed in,
+both styles will be applied. For example, `ButtonStyle.toModifier(OutlineButtonVariant)` will create a modifier for
+styling your element with both the button base style and outline style combined.
 
-***Note:** Using a variant that was created from a different style will have no effect. We tried to use generics as a
-fancy way to enforce this at compile time but ran into limitations with the Compose compiler (see
-[Web Comopse bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later if resolved.*
+***Note:** Using a variant that was created from a different style will have no effect. In other words,
+`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button style. We tried to use generics as a fancy way to
+enforce this at compile time but ran into limitations with the Compose compiler (see
+[Web Comopse bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later if
+resolved, but until then, don't do that!*
 
 So bringing it all together, you should write code that looks something like this:
 
@@ -586,8 +589,11 @@ Button { /* ... */ }
 // Approach #1: Tweak default styles with a button variant
 Button(variant = OutlineButtonVariant) { /* ... */ }
 
-// Approach #3: Tweak default styles with a inline styles
+// Approach #3: Tweak default styles with inline styles
 Button(Modifier.background(Colors.Blue)) { /* ... */ }
+
+// Approach #4: Tweak variant styles with inline styles
+Button(Modifier.background(Colors.Blue), variant = OutlineButtonVariant) { /* ... */ }
 ```
 
 ### Font Awesome
