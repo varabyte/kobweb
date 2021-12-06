@@ -20,6 +20,7 @@ import com.varabyte.konsole.foundation.konsoleVarOf
 import com.varabyte.konsole.foundation.runUntilSignal
 import com.varabyte.konsole.foundation.text.cyan
 import com.varabyte.konsole.foundation.text.green
+import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.text
 import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.foundation.text.yellow
@@ -38,6 +39,7 @@ private enum class RunState {
     STOPPED,
     CANCELLING,
     CANCELLED,
+    INTERRUPTED,
 }
 
 fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
@@ -52,10 +54,11 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
             ServerEnvironment.DEV -> "development"
             ServerEnvironment.PROD -> "production"
         }
-        var serverState: ServerState? = null // Set if RunState ever hits RunState.RUNNING
+        var serverState: ServerState? = null // Set on and after RunState.RUNNING
         val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
         var runState by konsoleVarOf(RunState.STARTING)
         var cancelReason by konsoleVarOf("")
+        var exception by konsoleVarOf<Exception?>(null) // Set if RunState.INTERRUPTED
         konsole {
             textLine() // Add text line between this block and Gradle output above
 
@@ -95,9 +98,21 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
                 RunState.CANCELLED -> {
                     yellow { textLine("Server startup cancelled: $cancelReason") }
                 }
+                RunState.INTERRUPTED -> {
+                    red { textLine("Interrupted by exception:") }
+                    textLine()
+                    textLine(exception!!.stackTraceToString())
+                }
             }
         }.runUntilSignal {
-            val startServerProcess = KobwebGradle.startServer(env)
+            val startServerProcess = try {
+                KobwebGradle.startServer(env)
+            }
+            catch (ex: Exception) {
+                exception = ex
+                runState = RunState.INTERRUPTED
+                return@runUntilSignal
+            }
             startServerProcess.consumeProcessOutput(::handleConsoleOutput)
 
             Runtime.getRuntime().addShutdownHook(Thread {

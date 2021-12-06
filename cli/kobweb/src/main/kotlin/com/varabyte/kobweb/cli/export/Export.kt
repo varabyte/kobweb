@@ -12,6 +12,7 @@ import com.varabyte.konsole.foundation.input.Keys
 import com.varabyte.konsole.foundation.input.onKeyPressed
 import com.varabyte.konsole.foundation.konsoleApp
 import com.varabyte.konsole.foundation.konsoleVarOf
+import com.varabyte.konsole.foundation.text.red
 import com.varabyte.konsole.foundation.text.textLine
 import com.varabyte.konsole.foundation.text.yellow
 import kotlinx.coroutines.delay
@@ -22,6 +23,7 @@ private enum class ExportState {
     FINISHED,
     CANCELLING,
     CANCELLED,
+    INTERRUPTED,
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -35,6 +37,7 @@ fun handleExport(isInteractive: Boolean) {
 
         var cancelReason by konsoleVarOf("")
         val ellipsis = konsoleAnimOf(Anims.ELLIPSIS)
+        var exception by konsoleVarOf<Exception?>(null) // Set if ExportState.INTERRUPTED
         konsole {
             textLine() // Add space between this block and Gradle text which will appear above
             when (exportState) {
@@ -43,9 +46,21 @@ fun handleExport(isInteractive: Boolean) {
                 ExportState.FINISHED -> textLine("Export finished successfully")
                 ExportState.CANCELLING -> yellow { textLine("Cancelling export: $cancelReason$ellipsis") }
                 ExportState.CANCELLED -> yellow { textLine("Export cancelled: $cancelReason") }
+                ExportState.INTERRUPTED -> {
+                    red { textLine("Interrupted by exception:") }
+                    textLine()
+                    textLine(exception!!.stackTraceToString())
+                }
             }
         }.run {
-            val exportProcess = KobwebGradle.export()
+            val exportProcess = try {
+                KobwebGradle.export()
+            }
+            catch (ex: Exception) {
+                exception = ex
+                exportState = ExportState.INTERRUPTED
+                return@run
+            }
             exportProcess.consumeProcessOutput(::handleConsoleOutput)
 
             onKeyPressed {
