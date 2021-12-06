@@ -301,7 +301,7 @@ less important here.
 
 However, there are times when you have to use stylesheets, because without them you can't define styles for advanced
 behaviors (particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes),
-[pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and 
+[pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and
 [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries), the discussion of
 which are outside the scope of this README). So in those cases, it's good to understand the distinction.
 
@@ -363,9 +363,9 @@ Modifier.attrModifier {
 // ... but in the above case, you should use a styleModifier for simplicitly
 ```
 
-### ComponentStyle and ComponentVariant
+### ComponentStyle
 
-With Silk, you can define a style like so:
+With Silk, you can define a style like so, using the `base` block:
 
 ```kotlin
 val CustomStyle = ComponentStyle("custom") {
@@ -386,6 +386,136 @@ Box(Modifier.background(Colors.Red)) { /* ... */ }
 Box(CustomStyle.toModifier()) { /* ... */}
 ```
 
+#### Additional states
+
+So, what's up with the `base` block?
+
+You can additionally define various other styles that take effect conditionally. The base style will always apply first,
+but then additional styles can be applied based on what state the element is in. (If multiple states are applicable at
+the same time, they will be applied in the order specified.)
+
+Here, we create a style which is red by default, but green when the mouse hovers over it:
+
+```kotlin
+val CustomStyle = ComponentStyle("custom") {
+    base {
+        Modifier.color(Colors.Red)
+    }
+
+    hover {
+        Modifier.color(Colors.Green)
+    }
+}
+```
+
+Kobweb provides a bunch of these state blocks for you for convenience, but for those who are CSS-savvy, you can always
+define the CSS rule directly to enable more complex combinations or reference states that perhaps Kobweb hasn't added
+yet. For example, you could have defined the above as:
+
+```kotlin
+val CustomStyle = ComponentStyle("custom") {
+    base {
+        Modifier.color(Colors.Red)
+    }
+
+    cssRule(":hover") {
+        Modifier.color(Colors.Green)
+    }
+}
+```
+
+#### Breakpoints
+
+There's a feature in the world of responsive html / css design called breakpoints, which confusingly have nothing to do
+with debugging breakpoints, but rather specifying size boundaries where styles change. This is how sites often present
+content differently on mobile vs. tablet vs. desktop.
+
+Kobweb provides five breakpoints for your use, named after sizes: "sm", "md", "lg", "xl". They are initialized with
+reasonable values, but you can override them if you want to decide what they mean for your app.
+
+By default, it can be useful to think of:
+
+* no breakpoint - mobile (more specifically, the style will appear the same on mobile as any other device)
+* sm - tablets (and larger)
+* md - desktops (and larger)
+* lg - widescreen (and larger)
+* xl - ultra widescreen
+
+You can change the default values by adding an "init silk" block to your code:
+
+```kotlin
+@InitSilk
+fun initializeBreakpoints(ctx: InitSilkContext) {
+    ctx.config.registerBreakpoints(
+        BreakpointSizes(
+            sm = ...,
+            md = ...,
+            lg = ...,
+        )
+    )
+}
+```
+
+although in practice it is often good enough to define base styles and occasional "md" styles.
+
+To reference a breakpoint in a style:
+
+```kotlin
+val CustomStyle = ComponentStyle("custom") {
+    base {
+        Modifier.fontSize(24.px)
+    }
+
+    Breakpoint.MD {
+        Modifier.fontSize(32.px)
+    }
+}
+```
+
+#### Color-mode aware
+
+When you define a `ComponentStyle`, an optional field is passed in called `colorMode` that you can access:
+
+```kotlin
+val CustomStyle = ComponentStyle("custom") {
+    base {
+        val color = if (colorMode.isLight()) Colors.Red else Colors.Pink
+        Modifier.color(color)
+    }
+}
+```
+
+Note that Silk provides a `SilkTheme` object you can reference in styles. For example, if you want to set your element's
+color to match the color that we use for links, you can reference the `SilkTheme.palettes[colorMode]` object to do so:
+
+```kotlin
+val CustomStyle = ComponentStyle("custom") {
+    base {
+        Modifier.color(SilkTheme.palettes[colorMode].link.default)
+    }
+}
+```
+
+or, create your own theme colors in your own app and reference them in your styles. That works too!
+
+`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in an "init silk" method:
+
+```kotlin
+@InitSilk
+fun overrideSilkTheme(ctx: InitSilkContext) {
+    ctx.theme.palettes = SilkTheme.palettes.copy(
+        light = SilkTheme.palettes.light.copy(
+            /* Specify light colors to override */
+        ),
+        dark = SilkTheme.palettes.light.copy(
+            /* Specify dark colors to override */
+        )
+    )
+}
+```
+
+#### ComponentVariant
+
 With a style, you can also create a variant of that style (that is, additional modifications that are always applied
 _after_ the style is), like so:
 
@@ -396,6 +526,9 @@ val CustomVariant = CustomStyle.addVariant("example-variant") {
     }
 }
 ```
+
+The way you define a variant block is otherwise identical to a `ComponentStyle`. What you are actually doing is defining
+an additional style which will only be applied on top of the base style.
 
 #### Defining a custom widget
 
@@ -521,7 +654,7 @@ fun echo(ctx: ApiContext) {
     // Queries are parsed from the URL, e.g. here "/echo?message=..."
     val msg = ctx.req.query["message"] ?: ""
     ctx.res.setBodyText(msg)
-  
+
     // You could also do something like: `ctx.res.body = ctx.req.body`
     // but using query parameters makes for an easier demo
 }
