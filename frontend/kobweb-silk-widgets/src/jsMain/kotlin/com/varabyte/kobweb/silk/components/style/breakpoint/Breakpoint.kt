@@ -11,8 +11,8 @@ import org.jetbrains.compose.web.css.cssRem
  * wider than your standard browser session. (In many cases, it's probably fine to just define base styles and [MD]
  * styles, if you even need to use breakpoints at all).
  *
- * [XL] and [XXL] are provided for ultra-wide scenarios as well as additional flexibility in case the user wants to
- * override what these size means in their own web app.
+ * [XL] is provided for ultra-wide scenarios as well as additional flexibility in case the user wants to override what
+ * these size means in their own web app.
  *
  * By default, you can think about base styles (without breakpoints) applying to mobile. In other words, if you never
  * add any breakpoints, then the page you get will be styled the same on your phone as well as the widest-screen
@@ -27,6 +27,5 @@ enum class Breakpoint {
     SM,
     MD,
     LG,
-    XL,
-    XXL;
+    XL;
 }

@@ -58,8 +58,8 @@ private class SimpleGridScopeImpl : SimpleGridScope {
     }
 }
 
-fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = lg, xxl: Int = xl) =
-    ResponsiveValues(base, sm, md, lg, xl, xxl)
+fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = lg) =
+    ResponsiveValues(base, sm, md, lg, xl)
 
 /**
  * A widget making it easy to create a common case of responsive grids, specifically one where you simply specify the
@@ -107,9 +107,6 @@ fun SimpleGrid(
             }
             if (numColumns.xl != numColumns.lg) {
                 classes(SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).style.name)
-            }
-            if (numColumns.xxl != numColumns.xl) {
-                classes(SimpleGridColumnVariants.getValue(Breakpoint.XXL).getValue(numColumns.xxl).style.name)
             }
         }
     ) {

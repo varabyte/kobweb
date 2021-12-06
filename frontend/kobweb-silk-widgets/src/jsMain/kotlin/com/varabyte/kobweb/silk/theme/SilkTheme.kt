@@ -33,7 +33,6 @@ internal object SilkConfigInstance : SilkConfig {
         Breakpoint.MD to 48.cssRem,
         Breakpoint.LG to 62.cssRem,
         Breakpoint.XL to 80.cssRem,
-        Breakpoint.XXL to 96.cssRem,
     )
 
     override fun registerBreakpoints(values: BreakpointValues<CSSUnitValue>) {
@@ -41,7 +40,6 @@ internal object SilkConfigInstance : SilkConfig {
         breakpoints[Breakpoint.MD] = values.md
         breakpoints[Breakpoint.LG] = values.lg
         breakpoints[Breakpoint.XL] = values.xl
-        breakpoints[Breakpoint.XXL] = values.xxl
     }
 }
 

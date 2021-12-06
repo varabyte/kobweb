@@ -11,7 +11,6 @@ class BreakpointValues<T>(
     val md: T,
     val lg: T,
     val xl: T,
-    val xxl: T,
 )
 
 /**
@@ -22,5 +21,4 @@ fun BreakpointSizes(
   md: CSSUnitValue = sm,
   lg: CSSUnitValue = md,
   xl: CSSUnitValue = lg,
-  xxl: CSSUnitValue = xl
-) = BreakpointValues(sm, md, lg, xl, xxl)
+) = BreakpointValues(sm, md, lg, xl)
