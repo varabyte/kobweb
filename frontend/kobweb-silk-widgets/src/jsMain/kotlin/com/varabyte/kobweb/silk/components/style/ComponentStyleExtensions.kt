@@ -12,9 +12,7 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:any-link
  */
-fun ComponentModifiers.anyLink(createModifier: () -> Modifier) {
-    cssRule(":any-link", createModifier)
-}
+val ComponentModifiers.anyLink get() = CssRule.OfPseudoClass(this, "any-link")
 
 /**
  * Styles to apply to components that represent navigation links which have not yet been visited.
@@ -23,18 +21,14 @@ fun ComponentModifiers.anyLink(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:link
  */
-fun ComponentModifiers.link(createModifier: () -> Modifier) {
-    cssRule(":link", createModifier)
-}
+val ComponentModifiers.link get() = CssRule.OfPseudoClass(this, "link")
 
 /**
  * Styles to apply to elements that are targets of links in the same document
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:target
  */
-fun ComponentModifiers.target(createModifier: () -> Modifier) {
-    cssRule(":target", createModifier)
-}
+val ComponentModifiers.target get() = CssRule.OfPseudoClass(this, "target")
 
 /**
  * Styles to apply to components that represent navigation links which have previously been visited.
@@ -43,9 +37,7 @@ fun ComponentModifiers.target(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:visited
  */
-fun ComponentModifiers.visited(createModifier: () -> Modifier) {
-    cssRule(":visited", createModifier)
-}
+val ComponentModifiers.visited get() = CssRule.OfPseudoClass(this, "visited")
 
 //endregion
 
@@ -58,9 +50,7 @@ fun ComponentModifiers.visited(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:hover
  */
-fun ComponentModifiers.hover(createModifier: () -> Modifier) {
-    cssRule(":hover", createModifier)
-}
+val ComponentModifiers.hover get() = CssRule.OfPseudoClass(this, "hover")
 
 /**
  * Styles to apply to components when a cursor is interacting with them.
@@ -69,9 +59,7 @@ fun ComponentModifiers.hover(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:active
  */
-fun ComponentModifiers.active(createModifier: () -> Modifier) {
-    cssRule(":active", createModifier)
-}
+val ComponentModifiers.active get() = CssRule.OfPseudoClass(this, "active")
 
 
 /**
@@ -79,9 +67,7 @@ fun ComponentModifiers.active(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:focus
  */
-fun ComponentModifiers.focus(createModifier: () -> Modifier) {
-    cssRule(":focus", createModifier)
-}
+val ComponentModifiers.focus get() = CssRule.OfPseudoClass(this, "focus")
 
 //endregion
 
@@ -92,108 +78,84 @@ fun ComponentModifiers.focus(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill
  */
-fun ComponentModifiers.autofill(createModifier: () -> Modifier) {
-    cssRule(":autofill", createModifier)
-}
+val ComponentModifiers.autofill get() = CssRule.OfPseudoClass(this, "autofill")
 
 /**
  * Represents a user interface element that is in an enabled state.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled
  */
-fun ComponentModifiers.enabled(createModifier: () -> Modifier) {
-    cssRule(":enabled", createModifier)
-}
+val ComponentModifiers.enabled get() = CssRule.OfPseudoClass(this, "enabled")
 
 /**
  * Represents a user interface element that is in a disabled state.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled
  */
-fun ComponentModifiers.disabled(createModifier: () -> Modifier) {
-    cssRule(":disabled", createModifier)
-}
+val ComponentModifiers.disabled get() = CssRule.OfPseudoClass(this, "disabled")
 
 /**
  * Represents any element that cannot be changed by the user.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only
  */
-fun ComponentModifiers.readOnly(createModifier: () -> Modifier) {
-    cssRule(":read-only", createModifier)
-}
+val ComponentModifiers.readOnly get() = CssRule.OfPseudoClass(this, "read-only")
 
 /**
  * Represents any element that is user-editable.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write
  */
-fun ComponentModifiers.readWrite(createModifier: () -> Modifier) {
-    cssRule(":read-write", createModifier)
-}
+val ComponentModifiers.readWrite get() = CssRule.OfPseudoClass(this, "read-write")
 
 /**
  * Matches an input element that is displaying placeholder text, for example from the HTML5 placeholder attribute.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown
  */
-fun ComponentModifiers.placeholderShown(createModifier: () -> Modifier) {
-    cssRule(":placeholder-shown", createModifier)
-}
+val ComponentModifiers.placeholderShown get() = CssRule.OfPseudoClass(this, "placeholder-shown")
 
 /**
  * Matches one or more UI elements that are the default among a set of elements.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:default
  */
-fun ComponentModifiers.default(createModifier: () -> Modifier) {
-    cssRule(":default", createModifier)
-}
+val ComponentModifiers.default get() = CssRule.OfPseudoClass(this, "default")
 
 /**
  *
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:checked
  */
-fun ComponentModifiers.checked(createModifier: () -> Modifier) {
-    cssRule(":checked", createModifier)
-}
+val ComponentModifiers.checked get() = CssRule.OfPseudoClass(this, "checked")
 
 /**
  * Matches when elements such as checkboxes and radiobuttons are toggled on.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate
  */
-fun ComponentModifiers.indeterminate(createModifier: () -> Modifier) {
-    cssRule(":indeterminate", createModifier)
-}
+val ComponentModifiers.indeterminate get() = CssRule.OfPseudoClass(this, "indeterminate")
 
 /**
  * Matches an element with valid contents. For example an input element with type 'email' which contains a validly formed email address.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:valid
  */
-fun ComponentModifiers.valid(createModifier: () -> Modifier) {
-    cssRule(":valid", createModifier)
-}
+val ComponentModifiers.valid get() = CssRule.OfPseudoClass(this, "valid")
 
 /**
  * Matches an element with invalid contents. For example an input element with type 'email' with a name entered.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid
  */
-fun ComponentModifiers.invalid(createModifier: () -> Modifier) {
-    cssRule(":invalid", createModifier)
-}
+val ComponentModifiers.invalid get() = CssRule.OfPseudoClass(this, "invalid")
 
 /**
  * Applies to elements with range limitations, for example a slider control, when the selected value is in the allowed range.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range
  */
-fun ComponentModifiers.inRange(createModifier: () -> Modifier) {
-    cssRule(":in-range", createModifier)
-}
+val ComponentModifiers.inRange get() = CssRule.OfPseudoClass(this, "in-range")
 
 /**
  * Applies to elements with range limitations, for example a slider control, when the selected value is outside the
@@ -201,36 +163,28 @@ fun ComponentModifiers.inRange(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range
  */
-fun ComponentModifiers.outOfRange(createModifier: () -> Modifier) {
-    cssRule(":out-of-range", createModifier)
-}
+val ComponentModifiers.outOfRange get() = CssRule.OfPseudoClass(this, "out-of-range")
 
 /**
  * Matches when a form element is required.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:required
  */
-fun ComponentModifiers.required(createModifier: () -> Modifier) {
-    cssRule(":required", createModifier)
-}
+val ComponentModifiers.required get() = CssRule.OfPseudoClass(this, "required")
 
 /**
  * Matches when a form element is optional.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:optional
  */
-fun ComponentModifiers.optional(createModifier: () -> Modifier) {
-    cssRule(":optional", createModifier)
-}
+val ComponentModifiers.optional get() = CssRule.OfPseudoClass(this, "optional")
 
 /**
  * Represents an element with incorrect input, but only when the user has interacted with it.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid
  */
-fun ComponentModifiers.userInvalid(createModifier: () -> Modifier) {
-    cssRule(":user-invalid", createModifier)
-}
+val ComponentModifiers.userInvalid get() = CssRule.OfPseudoClass(this, "user-invalid")
 
 //endregion
 
@@ -241,72 +195,56 @@ fun ComponentModifiers.userInvalid(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:root
  */
-fun ComponentModifiers.root(createModifier: () -> Modifier) {
-    cssRule(":root", createModifier)
-}
+val ComponentModifiers.root get() = CssRule.OfPseudoClass(this, "root")
 
 /**
  * Represents an element with no children other than white-space characters.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:empty
  */
-fun ComponentModifiers.empty(createModifier: () -> Modifier) {
-    cssRule(":empty", createModifier)
-}
+val ComponentModifiers.empty get() = CssRule.OfPseudoClass(this, "empty")
 
 /**
  * Matches an element that is the first of its siblings.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child
  */
-fun ComponentModifiers.firstChild(createModifier: () -> Modifier) {
-    cssRule(":first-child", createModifier)
-}
+val ComponentModifiers.firstChild get() = CssRule.OfPseudoClass(this, "first-child")
 
 /**
  * Matches an element that is the last of its siblings.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child
  */
-fun ComponentModifiers.lastChild(createModifier: () -> Modifier) {
-    cssRule(":last-child", createModifier)
-}
+val ComponentModifiers.lastChild get() = CssRule.OfPseudoClass(this, "last-child")
 
 /**
  * Matches an element that has no siblings. For example a list item with no other list items in that list.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child
  */
-fun ComponentModifiers.onlyChild(createModifier: () -> Modifier) {
-    cssRule(":only-child", createModifier)
-}
+val ComponentModifiers.onlyChild get() = CssRule.OfPseudoClass(this, "only-child")
 
 /**
  * Matches an element that is the first of its siblings, and also matches a certain type selector.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type
  */
-fun ComponentModifiers.firstOfType(createModifier: () -> Modifier) {
-    cssRule(":first-of-type", createModifier)
-}
+val ComponentModifiers.firstOfType get() = CssRule.OfPseudoClass(this, "first-of-type")
 
 /**
  * Matches an element that is the last of its siblings, and also matches a certain type selector.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type
  */
-fun ComponentModifiers.lastOfType(createModifier: () -> Modifier) {
-    cssRule(":last-of-type", createModifier)
-}
+val ComponentModifiers.lastOfType get() = CssRule.OfPseudoClass(this, "last-of-type")
 
 /**
  * Matches an element that has no siblings of the chosen type selector.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type
  */
-fun ComponentModifiers.onlyOfType(createModifier: () -> Modifier) {
-    cssRule(":only-of-type", createModifier)
-}
+val ComponentModifiers.onlyOfType get() = CssRule.OfPseudoClass(this, "only-of-type")
 
 //endregion
 
@@ -319,44 +257,34 @@ fun ComponentModifiers.onlyOfType(createModifier: () -> Modifier) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::before
  */
-fun ComponentModifiers.before(createModifier: () -> Modifier) {
-    cssRule("::before", createModifier)
-}
+val ComponentModifiers.before get() = CssRule.OfPseudoElement(this, "before")
 
 /**
  * Styles to apply to a virtual element that is created after the last element in some container.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::after
  */
-fun ComponentModifiers.after(createModifier: () -> Modifier) {
-    cssRule("::after", createModifier)
-}
+val ComponentModifiers.after get() = CssRule.OfPseudoElement(this, "after")
 
 /**
  * Styles to apply to the selected part of a document
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::selection
  */
-fun ComponentModifiers.selection(createModifier: () -> Modifier) {
-    cssRule("::selection", createModifier)
-}
+val ComponentModifiers.selection get() = CssRule.OfPseudoElement(this, "selection")
 
 /**
  * Styles to apply to the first letter in a block of text
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter
  */
-fun ComponentModifiers.firstLetter(createModifier: () -> Modifier) {
-    cssRule("::first-letter", createModifier)
-}
+val ComponentModifiers.firstLetter get() = CssRule.OfPseudoElement(this, "first-letter")
 
 /**
  * Styles to apply to the first line in a block of text
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line
  */
-fun ComponentModifiers.firstLine(createModifier: () -> Modifier) {
-    cssRule("::first-line", createModifier)
-}
+val ComponentModifiers.firstLine get() = CssRule.OfPseudoElement(this, "first-line")
 
 //endregion

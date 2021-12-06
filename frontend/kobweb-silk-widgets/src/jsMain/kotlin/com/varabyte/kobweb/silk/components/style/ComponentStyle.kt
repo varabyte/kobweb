@@ -62,6 +62,117 @@ internal class CssModifier(
 }
 
 /**
+ * A class which can be used to set CSS rules on a target [ComponentModifiers] instance using types to prevent
+ * invalid combinations.
+ *
+ * A CSS rule can consist of an optional breakpoint, zero or more pseudo classes, and an optional trailing pseudo
+ * element.
+ *
+ * For example, this class enables:
+ *
+ * ```
+ * ComponentStyle("css-rule-example") {
+ *   hover { ... } // Creates CssRule(this, ":hover") under the hood
+ *   (hover + after) { ... } // Creates CssRule(this, ":hover::after)
+ *   (Breakpoint.MD + hover) { ... } // Creates ":hover" style within a medium-sized media query
+ * }
+ * ```
+ *
+ * It's not expected for an end user to use this class directly. It's provided for libraries that want to provide
+ * additional extension properties to the [ComponentModifiers] class (like `hover` and `after`)
+ */
+sealed class CssRule(val target: ComponentModifiers) {
+    abstract operator fun invoke(createModifier: () -> Modifier)
+
+    protected fun addCssRule(
+        breakpoint: Breakpoint?,
+        pseudoClasses: List<String>,
+        pseudoElement: String?,
+        createModifier: () -> Modifier
+    ) {
+        val suffix = buildString {
+            pseudoClasses.forEach { append(":$it") }
+            if (pseudoElement != null) {
+                append("::$pseudoElement")
+            }
+        }
+
+        if (breakpoint != null) {
+            target.cssRule(breakpoint, suffix, createModifier)
+        }
+        else {
+            target.cssRule(suffix, createModifier)
+        }
+    }
+
+    /** A simple CSS rule that represents only setting a single breakpoint */
+    class OfBreakpoint(target: ComponentModifiers, val breakpoint: Breakpoint) : CssRule(target) {
+        override fun invoke(createModifier: () -> Modifier) {
+            addCssRule(breakpoint, emptyList(), null, createModifier)
+        }
+
+        operator fun plus(other: OfPseudoClass) =
+            CompositeOpen(target, breakpoint, listOf(other.pseudoClass))
+
+        operator fun plus(other: OfPseudoElement) =
+            CompositeClosed(target, breakpoint, emptyList(), other.pseudoElement)
+    }
+
+    class OfPseudoClass(target: ComponentModifiers, val pseudoClass: String) : CssRule(target) {
+        override fun invoke(createModifier: () -> Modifier) {
+            addCssRule(null, listOf(pseudoClass), null, createModifier)
+        }
+
+        operator fun plus(other: OfPseudoClass) =
+            CompositeOpen(target, null, listOf(pseudoClass, other.pseudoClass))
+
+        operator fun plus(other: OfPseudoElement) =
+            CompositeClosed(target, null, listOf(pseudoClass), other.pseudoElement)
+    }
+
+    class OfPseudoElement(target: ComponentModifiers, val pseudoElement: String) : CssRule(target) {
+        override fun invoke(createModifier: () -> Modifier) {
+            addCssRule(null, emptyList(), pseudoElement, createModifier)
+        }
+    }
+
+    /**
+     * A composite CSS rule that is a chain of subparts and still open to accepting more pseudo classes and/or a
+     * pseudo element.
+     */
+    class CompositeOpen(target: ComponentModifiers, val breakpoint: Breakpoint?, val pseudoClasses: List<String>) : CssRule(target) {
+        override fun invoke(createModifier: () -> Modifier) {
+            addCssRule(breakpoint, pseudoClasses, null, createModifier)
+        }
+
+        operator fun plus(other: OfPseudoClass) =
+            CompositeOpen(target, null, pseudoClasses + other.pseudoClass)
+
+        operator fun plus(other: OfPseudoElement) =
+            CompositeClosed(target, null, pseudoClasses, other.pseudoElement)
+    }
+
+    /**
+     * A composite CSS rule that is a chain of subparts which is terminated - it cannot grow any further but can only
+     * be invoked at this point
+     */
+    class CompositeClosed(
+        target: ComponentModifiers,
+        private val breakpoint: Breakpoint?,
+        private val pseudoClasses: List<String>,
+        private val pseudoElement: String
+    ) : CssRule(target) {
+        override fun invoke(createModifier: () -> Modifier) {
+            addCssRule(breakpoint, pseudoClasses, pseudoElement, createModifier)
+        }
+    }
+}
+
+// Breakpoint extensions to allow adding styles to normal breakpoint values, e.g. "Breakpoint.MD + hover"
+operator fun Breakpoint.plus(other: CssRule.OfPseudoClass) = CssRule.OfBreakpoint(other.target, this) + other
+operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) = CssRule.OfBreakpoint(other.target, this) + other
+
+/**
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
  * [Modifier]s).
  *
@@ -86,7 +197,7 @@ class ComponentModifiers(val colorMode: ColorMode) {
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
      */
-    fun cssRule(breakpoint: Breakpoint, suffix: String, createModifier: () -> Modifier) {
+    fun cssRule(breakpoint: Breakpoint?, suffix: String?, createModifier: () -> Modifier) {
         _cssModifiers.add(CssModifier(createModifier(), breakpoint, suffix))
     }
 
