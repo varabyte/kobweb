@@ -95,14 +95,9 @@ sealed class CssRule(val target: ComponentModifiers) {
             if (pseudoElement != null) {
                 append("::$pseudoElement")
             }
-        }
+        }.takeIf { it.isNotEmpty() }
 
-        if (breakpoint != null) {
-            target.cssRule(breakpoint, suffix, createModifier)
-        }
-        else {
-            target.cssRule(suffix, createModifier)
-        }
+        target.cssRule(breakpoint, suffix, createModifier)
     }
 
     /** A simple CSS rule that represents only setting a single breakpoint */
