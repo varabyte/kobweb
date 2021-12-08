@@ -181,6 +181,28 @@ your project's `.kobweb/conf.yaml` file.
 You can open your project in IntelliJ and start editing it. While Kobweb is running, it will detect changes, recompile,
 and deploy updates to your site automatically.
 
+### Using IntelliJ
+
+If you don't want to keep a separate terminal window open besides your IDE window, you may prefer these solutions:
+
+#### Terminal tool window
+
+Use the [IntelliJ terminal tool window](https://www.jetbrains.com/help/idea/terminal-emulator.html).
+
+You can run `kobweb` within it, and if you run into a compile error, the stack trace lines will get decorated with
+links, making it easy to navigate to the relevant source.
+
+#### Gradle commands
+
+`kobweb` delegates to Gradle, but nothing is stopping you from calling the commands yourself.
+
+To start a Kobweb server, execute the `kobwebStart -t` command, and to stop it later, use the `kobwebStop` command. The
+`-t` command (also, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
+
+You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html), but in
+general you should create two run configurations, one for `kobwebStart -t` and one for `kobwebStop`, by following
+[these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
+
 ## Examples
 
 Kobweb will provide a growing collection of samples for you to learn from. To see what's available, run:
