@@ -4,8 +4,9 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
-import com.varabyte.kobweb.gradle.application.templates.createHtmlFile
+import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -41,10 +42,9 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, 
         File(genResRoot, getPublicPath()).let { publicRoot ->
             publicRoot.mkdirs()
             File(publicRoot, "index.html").writeText(
-                createHtmlFile(
+                createIndexFile(
                     kobwebConf.site.title,
-                    // TODO(Bug #7): Only specify font-awesome link if necessary
-                    listOf("""<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />"""),
+                    config.index.head.get(),
                     kobwebConf.server.files.dev.script.substringAfterLast("/"),
                     buildTarget
                 )

@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
+import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import com.varabyte.kobweb.gradle.application.kmp.sourceSets
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
@@ -13,6 +14,7 @@ import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
+import kotlinx.html.link
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -56,6 +58,20 @@ class KobwebApplicationPlugin : Plugin<Project> {
         val kobwebExportTask = project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConfig)
 
         project.afterEvaluate {
+            project.configurations.asSequence()
+                .flatMap { config -> config.dependencies }
+                .any { dependency -> dependency.name == "kobweb-silk-icons-fa" }
+                .let { dependsOnSilkIcons ->
+                    if (dependsOnSilkIcons) {
+                        kobwebConfig.index.head.add {
+                            link {
+                                rel = "stylesheet"
+                                href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+                            }
+                        }
+                    }
+                }
+
             val cleanTask = project.tasks.named("clean")
             project.tasks.named("compileKotlinJs") {
                 dependsOn(kobwebGenSiteTask)

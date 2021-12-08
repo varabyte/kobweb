@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import kotlinx.html.BODY
+import kotlinx.html.HEAD
 import kotlinx.html.body
 import kotlinx.html.div
 import kotlinx.html.dom.append
@@ -67,7 +68,7 @@ private fun BODY.buildIndicator() {
     }
 }
 
-fun createHtmlFile(title: String, headElements: List<String>, src: String, buildTarget: BuildTarget): String {
+fun createIndexFile(title: String, headElements: Iterable<HEAD.() -> Unit>, src: String, buildTarget: BuildTarget): String {
     return document {
         append {
             html {
@@ -87,9 +88,7 @@ fun createHtmlFile(title: String, headElements: List<String>, src: String, build
                         href = "/favicon.ico"
                     }
 
-                    headElements.forEach { element ->
-                        unsafe { raw(element) }
-                    }
+                    headElements.forEach { element -> this.element() }
                 }
 
                 body {
