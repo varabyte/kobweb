@@ -203,7 +203,7 @@ You can read all about [IntelliJ's Gradle integration here](https://www.jetbrain
 general you should create two run configurations, one for `kobwebStart -t` and one for `kobwebStop`, by following
 [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
 
-## Examples
+## Running examples
 
 Kobweb will provide a growing collection of samples for you to learn from. To see what's available, run:
 
@@ -212,6 +212,7 @@ $ kobweb list
 
 You can create the following Kobweb projects by typing `kobweb create ...`
 
+• examples/jb/counter: A very minimal site with just a counter (based on the Jetbrains tutorial)
 • examples/todo: An example TODO app, showcasing client / server interactions
 • site: A template for a minimal site that demonstrates the basic features of Kobweb
 ```
