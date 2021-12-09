@@ -10,6 +10,7 @@ import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import com.varabyte.kobweb.silk.theme.toSize
 import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.css.StylePropertyValue
@@ -382,7 +383,7 @@ class ComponentStyleBuilder internal constructor(
                     val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
                     if (cssRuleKey.breakpoint != null) {
                         styleSheet.apply {
-                            media(mediaMinWidth(SilkConfigInstance.breakpoints.getValue(cssRuleKey.breakpoint))) {
+                            media(mediaMinWidth(cssRuleKey.breakpoint.toSize())) {
                                 addStyles(cssRule, styles)
                             }
                         }

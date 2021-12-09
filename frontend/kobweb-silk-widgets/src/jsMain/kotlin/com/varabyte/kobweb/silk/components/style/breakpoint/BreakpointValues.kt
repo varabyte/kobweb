@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.css.cssRem
 /**
  * A class used for storing generic values associated with breakpoints.
  */
-class BreakpointValues<T>(
+data class BreakpointValues<T>(
     val sm: T,
     val md: T,
     val lg: T,

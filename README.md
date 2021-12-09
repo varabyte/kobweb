@@ -482,12 +482,10 @@ You can change the default values by adding an "init silk" block to your code:
 ```kotlin
 @InitSilk
 fun initializeBreakpoints(ctx: InitSilkContext) {
-    ctx.config.registerBreakpoints(
-        BreakpointSizes(
-            sm = ...,
-            md = ...,
-            lg = ...,
-        )
+    ctx.theme.breakpoints = BreakpointSizes(
+        sm = ...,
+        md = ...,
+        lg = ...,
     )
 }
 ```
@@ -538,14 +536,7 @@ perhaps to something that is more brand aware:
 ```kotlin
 @InitSilk
 fun overrideSilkTheme(ctx: InitSilkContext) {
-    ctx.theme.palettes = SilkTheme.palettes.copy(
-        light = SilkTheme.palettes.light.copy(
-            /* Specify light colors to override */
-        ),
-        dark = SilkTheme.palettes.light.copy(
-            /* Specify dark colors to override */
-        )
-    )
+    ctx.theme.palettes = SilkPalettes(...)
 }
 ```
 

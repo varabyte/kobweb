@@ -11,6 +11,7 @@ import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkConfig
 import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.theme._SilkTheme
 
 /**
  * Various classes passed to the user in a method annotated by `@InitSilk` which they can use to for initializing Silk
@@ -32,6 +33,6 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(LinkStyle)
     additionalInit(InitSilkContext(SilkConfigInstance, mutableTheme))
 
-    SilkTheme = ImmutableSilkTheme(mutableTheme)
+    _SilkTheme = ImmutableSilkTheme(mutableTheme)
     SilkTheme.registerStyles(SilkStyleSheet)
 }

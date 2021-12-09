@@ -6,12 +6,15 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentStyleBuilder
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
 import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import org.jetbrains.compose.web.css.CSSSizeValue
+import org.jetbrains.compose.web.css.CSSUnit
 import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.cssRem
@@ -21,26 +24,10 @@ import org.jetbrains.compose.web.css.cssRem
  */
 interface SilkConfig {
     var initialColorMode: ColorMode
-
-    fun registerBreakpoints(values: BreakpointValues<CSSUnitValue>)
 }
 
 internal object SilkConfigInstance : SilkConfig {
     override var initialColorMode = ColorMode.LIGHT
-
-    val breakpoints: MutableMap<Breakpoint, CSSUnitValue> = mutableMapOf(
-        Breakpoint.SM to 30.cssRem,
-        Breakpoint.MD to 48.cssRem,
-        Breakpoint.LG to 62.cssRem,
-        Breakpoint.XL to 80.cssRem,
-    )
-
-    override fun registerBreakpoints(values: BreakpointValues<CSSUnitValue>) {
-        breakpoints[Breakpoint.SM] = values.sm
-        breakpoints[Breakpoint.MD] = values.md
-        breakpoints[Breakpoint.LG] = values.lg
-        breakpoints[Breakpoint.XL] = values.xl
-    }
 }
 
 /**
@@ -53,6 +40,13 @@ class MutableSilkTheme {
     internal val componentVariants = LinkedHashMap<String, ComponentVariant>() // Preserve insertion order
 
     var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
+
+    var breakpoints = BreakpointSizes(
+        30.cssRem,
+        48.cssRem,
+        62.cssRem,
+        80.cssRem,
+    )
 
     /**
      * Register a new component style with this theme.
@@ -108,6 +102,8 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         @ReadOnlyComposable
         get() = palettes[getColorMode()]
 
+    val breakpoints = mutableSilkTheme.breakpoints
+
     private val _componentStyles = mutableMapOf<String, ComponentStyle>()
     val componentStyles: Map<String, ComponentStyle> = _componentStyles
 
@@ -121,7 +117,9 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     //  }
     // Silk must make sure to set the SilkTheme lateinit var (below) and then call this method right after
     internal fun registerStyles(componentStyleSheet: StyleSheet) {
-        check(::SilkTheme.isInitialized)
+        // We shouldn't have called this if we didn't set _SilkTheme already. This being true means ComponentStyle
+        // initialization blocks can reference `SilkTheme`.
+        check(_SilkTheme != null)
         mutableSilkTheme.componentStyles.values.forEach { styleBuilder ->
             styleBuilder.addStyles(componentStyleSheet)
             _componentStyles[styleBuilder.name] = ComponentStyle(styleBuilder.name)
@@ -134,5 +132,18 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     }
 }
 
-lateinit var SilkTheme: ImmutableSilkTheme
-    internal set
+internal var _SilkTheme: ImmutableSilkTheme? = null
+val SilkTheme: ImmutableSilkTheme
+    get() { return _SilkTheme ?: error("You can't access SilkTheme before first calling SilkApp") }
+
+/**
+ * Convenience method for fetching the associated `SilkTheme.breakpoints` value for the current [Breakpoint] value.
+ */
+fun Breakpoint.toSize(): CSSUnitValue {
+    return when (this) {
+        Breakpoint.SM -> SilkTheme.breakpoints.sm
+        Breakpoint.MD -> SilkTheme.breakpoints.md
+        Breakpoint.LG -> SilkTheme.breakpoints.lg
+        Breakpoint.XL -> SilkTheme.breakpoints.xl
+    }
+}
