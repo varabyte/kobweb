@@ -292,7 +292,7 @@ class ComponentStyle internal constructor(private val name: String) {
         val classNames = listOf(name, "$name-${getColorMode().name.lowercase()}")
             .filter { name -> registeredClasses.contains(name) }
 
-        return Modifier.classNames(*classNames.toTypedArray())
+        return if (classNames.isNotEmpty()) Modifier.classNames(*classNames.toTypedArray()) else Modifier
     }
 }
 
