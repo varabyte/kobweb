@@ -183,7 +183,7 @@ and deploy updates to your site automatically.
 
 ### Using IntelliJ
 
-If you don't want to keep a separate terminal window open besides your IDE window, you may prefer these solutions:
+If you don't want to keep a separate terminal window open beside your IDE window, you may prefer alternate solutions.
 
 #### Terminal tool window
 
@@ -194,14 +194,15 @@ links, making it easy to navigate to the relevant source.
 
 #### Gradle commands
 
-`kobweb` delegates to Gradle, but nothing is stopping you from calling the commands yourself.
+Run gradle commands directly. `kobweb` itself delegates to Gradle, but nothing is stopping you from calling the commands
+yourself.
 
 To start a Kobweb server, execute the `kobwebStart -t` command, and to stop it later, use the `kobwebStop` command. The
-`-t` command (also, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
+`-t` command (or, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
 
 You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html), but in
-general you should create two run configurations, one for `kobwebStart -t` and one for `kobwebStop`, by following
-[these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
+general, you should create two run configurations: one for `kobwebStart -t` and one for `kobwebStop`. To do this, start
+from [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
 
 ## Running examples
 
@@ -222,12 +223,12 @@ For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 # Basics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a Web
-Compose app, such as routing and setting up default CSS styles. It exposes a handful of annotations and utility methods
+Compose app, such as routing and configuring basic CSS styles. It exposes a handful of annotations and utility methods
 which your app can use to communicate intent with the framework. These annotations work in conjunction with our Gradle
 plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
 
-Kobweb is also a CLI binary of the same name which provides commands to handle the parts of building a Web Compose app
-that are less glamorous. We want to get that stuff out of the way, so you can enjoy focusing on the more interesting
+Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and / or
+running a Web Compose app. We want to get that stuff out of the way, so you can enjoy focusing on the more interesting
 work!
 
 ## Create a page
