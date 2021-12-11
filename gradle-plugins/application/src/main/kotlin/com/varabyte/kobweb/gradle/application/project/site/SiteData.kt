@@ -50,8 +50,33 @@ class SiteData {
             return true
         }
 
+        /** Process a line like `val CustomStyle = ComponentStyle.base("custom") { ... }` */
+        private fun processComponentBaseStyle(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
+            val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
+            if (qualifiedExpression.receiverExpression.text != "ComponentStyle") return false
+            val property = qualifiedExpression.parent as? KtProperty ?: return false
+            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
+            if (property.parent !is KtFile) return false
+            val propertyName = property.name ?: return false
+
+            siteData._silkStyleFqcns.add(prefixQualifiedPath(filePackage, propertyName))
+            return true
+        }
+
         /** Process a line like `val CustomVariant = CustomStyle.addVariant("variant") { ... }` */
         private fun processComponentVariant(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
+            val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
+            val property = qualifiedExpression.parent as? KtProperty ?: return false
+            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
+            if (property.parent !is KtFile) return false
+            val propertyName = property.name ?: return false
+
+            siteData._silkVariantFqcns.add(prefixQualifiedPath(filePackage, propertyName))
+            return true
+        }
+
+        /** Process a line like `val CustomVariant = CustomStyle.addBaseVariant("variant") { ... }` */
+        private fun processComponentBaseVariant(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
             val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
             val property = qualifiedExpression.parent as? KtProperty ?: return false
             // Only top-level properties are allowed for now, so getting the fully qualified path is easy
@@ -172,7 +197,9 @@ class SiteData {
                         is KtCallExpression -> {
                             when (element.calleeExpression?.text) {
                                 "ComponentStyle" -> processComponentStyle(currPackage, element, siteData)
+                                "base" -> processComponentBaseStyle(currPackage, element, siteData)
                                 "addVariant" -> processComponentVariant(currPackage, element, siteData)
+                                "addBaseVariant" -> processComponentBaseVariant(currPackage, element, siteData)
                             }
                         }
                     }

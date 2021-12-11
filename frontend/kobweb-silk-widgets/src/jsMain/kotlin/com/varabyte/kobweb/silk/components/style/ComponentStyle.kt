@@ -6,7 +6,6 @@ import com.varabyte.kobweb.compose.ui.asStyleBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.theme.SilkConfigInstance
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
@@ -175,6 +174,7 @@ operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) = CssRule.OfBreakpo
  * @param colorMode What color mode these modifiers should be designed around. This is passed in so users defining
  *   a component style can use it if relevant.
  */
+// Note: If you change this class's constructor, you should update the `ComponentStyleState` constructor to match
 class ComponentModifiers(val colorMode: ColorMode) {
     private val _cssModifiers = mutableListOf<CssModifier>()
     internal val cssModifiers: List<CssModifier> = _cssModifiers
@@ -227,6 +227,12 @@ class ComponentModifiers(val colorMode: ColorMode) {
         cssRule(this, createModifier)
     }
 }
+
+/**
+ * Class provided for cases where you only generate a single style (e.g. base), unlike [ComponentModifiers] where you
+ * can define a collection of styles.
+ */
+class ComponentStyleState(val colorMode: ColorMode)
 
 /**
  * A class which allows a user to define styles that get added to the page's stylesheet, instead of just using
@@ -295,6 +301,39 @@ class ComponentStyle internal constructor(private val name: String) {
         return if (classNames.isNotEmpty()) Modifier.classNames(*classNames.toTypedArray()) else Modifier
     }
 }
+
+/**
+ * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
+ *
+ * So this:
+ *
+ * ```
+ * ComponentStyle.base("custom-widget") {
+ *   Modifier.fontSize(48.px)
+ * }
+ * ```
+ *
+ * replaces this:
+ *
+ * ```
+ * ComponentStyle("custom-widget") {
+ *   base {
+ *     Modifier.fontSize(48.px)
+ *   }
+ * }
+ * ```
+ *
+ * You may still wish to use [ComponentStyle.Companion.invoke] instead if you expect that at some point in the future
+ * you'll want to add additional, non-base styles.
+ */
+fun ComponentStyle.Companion.base(className: String, init: ComponentStyleState.() -> Modifier): ComponentStyleBuilder {
+    return this.invoke(className) {
+        base {
+            ComponentStyleState(colorMode).let(init)
+        }
+    }
+}
+
 
 private sealed interface StyleGroup {
     class Light(val styles: ComparableStyleBuilder) : StyleGroup
@@ -401,6 +440,20 @@ class ComponentStyleBuilder internal constructor(
     internal fun addStyles(styleSheet: StyleSheet) {
         // Register styles associated with this style's classname
         addStyles(styleSheet, ".$name")
+    }
+}
+
+/**
+ * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
+ *
+ * You may still wish to use [ComponentStyleBuilder.addVariant] instead if you expect that at some point in the future
+ * you'll want to add additional, non-base styles.
+ */
+fun ComponentStyleBuilder.addBaseVariant(name: String, init: ComponentStyleState.() -> Modifier): ComponentVariant {
+    return addVariant(name) {
+        base {
+            ComponentStyleState(colorMode).let(init)
+        }
     }
 }
 

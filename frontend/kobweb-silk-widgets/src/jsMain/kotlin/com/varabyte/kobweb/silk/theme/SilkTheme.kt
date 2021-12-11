@@ -1,10 +1,12 @@
 package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifiers
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentStyleBuilder
+import com.varabyte.kobweb.silk.components.style.ComponentStyleState
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
@@ -13,8 +15,6 @@ import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
-import org.jetbrains.compose.web.css.CSSSizeValue
-import org.jetbrains.compose.web.css.CSSUnit
 import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.cssRem
@@ -72,6 +72,38 @@ interface SilkConfig {
      * ```
      */
     fun registerStyle(className: String, init: ComponentModifiers.() -> Unit)
+}
+
+/**
+ * Convenience method when you only care about registering the base method, which can help avoid a few extra lines.
+ *
+ * So this:
+ *
+ * ```
+ * config.registerBaseStyle("*") {
+ *   Modifier.fontSize(48.px)
+ * }
+ * ```
+ *
+ * replaces this:
+ *
+ * ```
+ * config.registerStyle("*") {
+ *   base {
+ *     Modifier.fontSize(48.px)
+ *   }
+ * }
+ * ```
+ *
+ * You may still wish to use [SilkConfig.registerStyle] instead if you expect that at some point in the future
+ * you'll want to add additional, non-base styles.
+ */
+fun SilkConfig.registerBaseStyle(className: String, init: ComponentStyleState.() -> Modifier) {
+    registerStyle(className) {
+        base {
+            ComponentStyleState(colorMode).let(init)
+        }
+    }
 }
 
 internal object SilkConfigInstance : SilkConfig {

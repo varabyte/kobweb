@@ -11,6 +11,7 @@ import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.placeholderShown
 import org.jetbrains.compose.web.css.AlignItems
@@ -30,45 +31,39 @@ import todo.BORDER_COLOR
 private val INTERACT_COLOR = Color.rgb(0x00, 0x70, 0xf3)
 
 /** Common styles for all todo widgets */
-val TodoStyle = ComponentStyle("todo") {
-    base {
-        Modifier
-            .width(85.percent)
-            .height(5.cssRem)
-            .styleModifier {
-                property("border", "1px solid $BORDER_COLOR")
-                borderRadius(10.px)
-                property("transition", "color 0.15s ease, border-color 0.15s ease")
-                textDecoration("none")
-            }
-    }
+val TodoStyle = ComponentStyle.base("todo") {
+    Modifier
+        .width(85.percent)
+        .height(5.cssRem)
+        .styleModifier {
+            property("border", "1px solid $BORDER_COLOR")
+            borderRadius(10.px)
+            property("transition", "color 0.15s ease, border-color 0.15s ease")
+            textDecoration("none")
+        }
 }
 
 /** Styles for the bordered, outer container (the form component has an inner and outer layer) */
-val TodoContainerStyle = ComponentStyle("todo-container") {
-    base {
-        Modifier
-            .margin(0.5.cssRem)
-            .styleModifier {
-                display(DisplayStyle.Flex)
-                textAlign(TextAlign.Left)
-                alignItems(AlignItems.Center)
-                property("border", "1px solid $BORDER_COLOR")
-            }
-    }
+val TodoContainerStyle = ComponentStyle.base("todo-container") {
+    Modifier
+        .margin(0.5.cssRem)
+        .styleModifier {
+            display(DisplayStyle.Flex)
+            textAlign(TextAlign.Left)
+            alignItems(AlignItems.Center)
+            property("border", "1px solid $BORDER_COLOR")
+        }
 }
 
 /** Styles for the text parts of todo widgets */
-val TodoTextStyle = ComponentStyle("todo-text") {
-    base {
-        Modifier
-            .padding(1.5.cssRem)
-            .fontSize(1.25.cssRem)
-            .styleModifier {
-                // We use "A" tags for accessibility, but we want our colors to come from our container
-                property("color", "inherit")
-            }
-    }
+val TodoTextStyle = ComponentStyle.base("todo-text") {
+    Modifier
+        .padding(1.5.cssRem)
+        .fontSize(1.25.cssRem)
+        .styleModifier {
+            // We use "A" tags for accessibility, but we want our colors to come from our container
+            property("color", "inherit")
+        }
 }
 
 /** Styles for the input element which handles user input */

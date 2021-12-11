@@ -17,6 +17,7 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
@@ -42,19 +43,17 @@ private suspend fun loadAndReplaceTodos(id: String, todos: SnapshotStateList<Tod
     }
 }
 
-val TitleStyle = ComponentStyle("title") {
-    base {
-        Modifier
-            .lineHeight(1.15)
-            .fontSize(4.cssRem)
-            .margin(top = 0.4.em, bottom = 0.6.em)
-            // "styleModifier" is an escape hatch for when Kobweb doesn't (yet) have the HTML style modifier that you
-            // need. Allows you to define styles the traditional Web Compose way. You can use "attrModifier" too, which
-            // has extra functionality, like specifying event listeners.
-            .styleModifier {
-                fontWeight(FontWeight.Bold)
-            }
-    }
+val TitleStyle = ComponentStyle.base("title") {
+    Modifier
+        .lineHeight(1.15)
+        .fontSize(4.cssRem)
+        .margin(top = 0.4.em, bottom = 0.6.em)
+        // "styleModifier" is an escape hatch for when Kobweb doesn't (yet) have the HTML style modifier that you
+        // need. Allows you to define styles the traditional Web Compose way. You can use "attrModifier" too, which
+        // has extra functionality, like specifying event listeners.
+        .styleModifier {
+            fontWeight(FontWeight.Bold)
+        }
 }
 
 @Page

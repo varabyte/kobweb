@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.ui.asAttributeBuilder
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.ResponsiveValues
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -16,11 +17,9 @@ import org.jetbrains.compose.web.dom.Div
 
 private const val MAX_COLUMN_COUNT = 4
 
-val SimpleGridStyle = ComponentStyle("silk-simple-grid") {
-    base {
-        Modifier.styleModifier {
-            display(DisplayStyle.Grid)
-        }
+val SimpleGridStyle = ComponentStyle.base("silk-simple-grid") {
+    Modifier.styleModifier {
+        display(DisplayStyle.Grid)
     }
 }
 
