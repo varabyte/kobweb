@@ -41,6 +41,7 @@ private fun BODY.buildIndicator() {
                             border-radius: 10px;
                             visibility: hidden;
                             opacity: 0;
+                            z-index: 2147483647;
                         }
                         body > #status > .hidden {
                            display: none;
