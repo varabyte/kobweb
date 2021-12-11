@@ -33,6 +33,8 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(LinkStyle)
     additionalInit(InitSilkContext(SilkConfigInstance, mutableTheme))
 
+    SilkConfigInstance.registerStyles(SilkStyleSheet)
+
     _SilkTheme = ImmutableSilkTheme(mutableTheme)
     SilkTheme.registerStyles(SilkStyleSheet)
 }

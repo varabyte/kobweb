@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.silk.components.style.ComponentModifiers
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentStyleBuilder
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -24,10 +24,72 @@ import org.jetbrains.compose.web.css.cssRem
  */
 interface SilkConfig {
     var initialColorMode: ColorMode
+
+    /**
+     * An alternate way to register global styles with Silk instead of using a Web Compose StyleSheet directly.
+     *
+     * So this:
+     *
+     * ```
+     * @InitSilk
+     * fun initStyles(ctx: InitSilkContext) {
+     *   ctx.registerStyle("*") {
+     *     base {
+     *       Modifier.fontSize(48.px)
+     *     }
+     *     Breakpoint.MD {
+     *       ...
+     *     }
+     *   }
+     * }
+     * ```
+     *
+     * is a replacement for all of this:
+     *
+     * ```
+     * object MyStyleSheet : StyleSheet() {
+     *   init {
+     *     "*" style {
+     *       fontSize(48.px)
+     *
+     *       media(minWidth(...)) {
+     *         self style {
+     *           ...
+     *         }
+     *       }
+     *     }
+     *   }
+     * }
+     *
+     * @App
+     * @Composable
+     * fun MyApp(content: @Composable () -> Unit) {
+     *   SilkApp {
+     *     Style(TodoStyleSheet)
+     *     ...
+     *   }
+     * }
+     * ```
+     */
+    fun registerStyle(className: String, init: ComponentModifiers.() -> Unit)
 }
 
 internal object SilkConfigInstance : SilkConfig {
     override var initialColorMode = ColorMode.LIGHT
+
+    private val styles = mutableListOf<ComponentStyleBuilder>()
+
+    override fun registerStyle(className: String, init: ComponentModifiers.() -> Unit) {
+        styles.add(ComponentStyleBuilder(className, init))
+    }
+
+    // This method is not part of the public API and should be called by Silk at initialization time
+    fun registerStyles(siteStyleSheet: StyleSheet) {
+        styles.forEach { styleBuilder ->
+            styleBuilder.addStyles(siteStyleSheet, styleBuilder.name)
+        }
+    }
+
 }
 
 /**
