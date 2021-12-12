@@ -66,12 +66,12 @@ fun StyleBuilder.transitionDuration(duration: TransitionDuration) {
     property("transition-duration", duration.value)
 }
 
-fun StyleBuilder.transitionDuration(duration: CSSSizeValue<out CSSUnitTime>) {
-    property("transition-duration", duration.toString())
+fun StyleBuilder.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>) {
+    property("transition-duration", duration.joinToString())
 }
 
-fun StyleBuilder.transitionDelay(delay: CSSSizeValue<out CSSUnitTime>) {
-    property("transition-delay", delay.toString())
+fun StyleBuilder.transitionDelay(vararg delay: CSSSizeValue<out CSSUnitTime>) {
+    property("transition-delay", delay.joinToString())
 }
 
 fun StyleBuilder.transitionDelay(delay: TransitionDelay) {
@@ -79,6 +79,6 @@ fun StyleBuilder.transitionDelay(delay: TransitionDelay) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
-fun StyleBuilder.transitionTimingFunction(value: AnimationTimingFunction) {
-    property("transition-timing-function", value.toString())
+fun StyleBuilder.transitionTimingFunction(vararg value: AnimationTimingFunction) {
+    property("transition-timing-function", value.joinToString())
 }

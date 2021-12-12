@@ -27,8 +27,11 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
             .color(palette.color)
             .styleModifier {
                 // Toggling color mode looks much more engaging if it animates instead of being instant
-                transitionProperty("background-color")
-                transitionDuration(200.ms)
+                transitionProperty("background-color", "color")
+                // There's a strange bug in Chrome where color durations are lengthened (perhaps it's accumulating based
+                // on how many ancestors it has?). Anyway, choosing a smaller value seems to avoid anything that feels
+                // too painful.
+                transitionDuration(200.ms, 50.ms)
         }
     }
 
