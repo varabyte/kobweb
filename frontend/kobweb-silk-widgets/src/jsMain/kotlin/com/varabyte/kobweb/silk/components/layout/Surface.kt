@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.TransitionDuration
+import com.varabyte.kobweb.compose.css.TransitionProperty
 import com.varabyte.kobweb.compose.css.transitionDuration
 import com.varabyte.kobweb.compose.css.transitionProperty
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -12,22 +14,30 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.ms
 
-val SurfaceStyle = ComponentStyle.base("silk-surface") {
-    val palette = SilkTheme.palettes[colorMode]
-    Modifier
-        .background(palette.background)
-        .color(palette.color)
-        .styleModifier {
-            // Toggling color mode looks much more engaging if it animates instead of being instant
-            transitionProperty("background-color", "color")
-            transitionDuration(200.ms)
+val SurfaceStyle = ComponentStyle("silk-surface") {
+    base {
+        val palette = SilkTheme.palettes[colorMode]
+        Modifier
+            .background(palette.background)
+            .color(palette.color)
+            .styleModifier {
+                // Toggling color mode looks much more engaging if it animates instead of being instant
+                transitionProperty("background-color")
+                transitionDuration(200.ms)
         }
+    }
+
+    cssRule(" *") {
+        Modifier.styleModifier {
+            transitionProperty(TransitionProperty.Inherit)
+            transitionDuration(TransitionDuration.Inherit)
+        }
+    }
 }
 
 /**
