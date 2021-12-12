@@ -64,7 +64,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
         val response = apiJar.apis.handle("/$pathStr", request)
         if (response != null) {
             call.respondBytes(
-                response.body?.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
+                response.body.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
                 status = HttpStatusCode.fromValue(response.status),
                 contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }
                     ?.let { ContentType.parse(it) }

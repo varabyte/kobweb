@@ -19,11 +19,23 @@ val EMPTY_BODY = ByteArray(0)
  * See also: [Request]
  */
 class Response {
+    private var _status: Int? = null
+    private var _body: ByteArray? = null
+
     /** See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status */
-    var status = 200
+    var status: Int
+        get() = _status ?: 400
+        set(value) { _status = value }
 
     /** The body payload to send back */
-    var body: ByteArray? = null
+    var body: ByteArray
+        get() = _body ?: EMPTY_BODY
+        set(value) {
+            if (_status == null) {
+                _status = 200
+            }
+            _body = value
+        }
 
     /**
      * The content type of the [body], e.g. "image/jpeg" or "application/json". Can include parameters.
