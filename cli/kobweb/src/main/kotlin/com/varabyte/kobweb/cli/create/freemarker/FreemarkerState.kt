@@ -4,7 +4,6 @@ import com.varabyte.kobweb.cli.common.informInfo
 import com.varabyte.kobweb.cli.common.processing
 import com.varabyte.kobweb.cli.common.queryUser
 import com.varabyte.kobweb.cli.common.template.Instruction
-import com.varabyte.kobweb.cli.common.toUnixSeparators
 import com.varabyte.kobweb.cli.common.wildcardToRegex
 import com.varabyte.kobweb.cli.create.freemarker.methods.FileToPackageMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.FileToTitleMethod
@@ -14,6 +13,7 @@ import com.varabyte.kobweb.cli.create.freemarker.methods.IsYesNoMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.PackageToPathMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
 import com.varabyte.kobweb.common.error.KobwebException
+import com.varabyte.kobweb.common.toUnixSeparators
 import com.varabyte.konsole.runtime.KonsoleApp
 import freemarker.cache.NullCacheStorage
 import freemarker.template.Configuration

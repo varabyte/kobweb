@@ -3,6 +3,7 @@ package com.varabyte.kobweb.gradle.application.project.api
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
 import com.varabyte.kobweb.gradle.application.project.PackageUtils.resolvePackageShortcut
 import com.varabyte.kobweb.gradle.application.project.PsiUtils
+import com.varabyte.kobweb.gradle.application.project.Reporter
 import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
@@ -27,7 +28,8 @@ class ApiData {
         fun from(
             group: String,
             apiPackage: String,
-            apiSources: List<File>
+            apiSources: List<File>,
+            reporter: Reporter,
         ): ApiData {
             val kotlinProject = PsiUtils.createKotlinProject()
             val apiData = ApiData()
@@ -82,6 +84,9 @@ class ApiData {
                                                     "$slugPrefix/$slug"
                                                 )
                                             )
+                                        }
+                                        else {
+                                            reporter.report("${file.absolutePath}: Skipped over `@$apiSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`")
                                         }
                                     }
                                 }

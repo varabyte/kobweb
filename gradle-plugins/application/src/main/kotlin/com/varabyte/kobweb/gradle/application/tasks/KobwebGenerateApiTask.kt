@@ -24,7 +24,14 @@ abstract class KobwebGenerateApiTask @Inject constructor(config: KobwebConfig) :
     fun execute() {
         val getSrcRoot = getGenDir()
 
-        with(ApiData.from(project.group.toString(), config.apiPackage.get(), getSourceFilesJvm())) {
+        with(
+            ApiData.from(
+                project.group.toString(),
+                config.apiPackage.get(),
+                getSourceFilesJvm(),
+                GradleReporter(project.logger)
+            )
+        ) {
             getSrcRoot.mkdirs()
             File(getSrcRoot, "ApisFactoryImpl.kt").writeText(createApisFactoryImpl(this))
         }

@@ -25,7 +25,12 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig) :
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebProject.kobwebFolder).content!!.port
 
-        val siteData = SiteData.from(project.group.toString(), getPagesPackage(), getSourceFilesJs())
+        val siteData = SiteData.from(
+            project.group.toString(),
+            getPagesPackage(),
+            getSourceFilesJs(),
+            GradleReporter(project.logger)
+        )
         siteData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
             val launcher = ChromeLauncher()
             val chromeService = launcher.launch(true)

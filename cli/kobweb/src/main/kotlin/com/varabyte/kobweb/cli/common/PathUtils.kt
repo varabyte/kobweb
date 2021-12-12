@@ -33,6 +33,3 @@ fun String.wildcardToRegex(): Regex {
 
     return Regex("^$regexStr\$")
 }
-
-/** Convert a path String to one with Unix separators, useful for standardizing across OSes if necessary */
-fun String.toUnixSeparators() = this.replace(File.separatorChar, '/')

@@ -4,6 +4,7 @@ import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
 import com.varabyte.kobweb.gradle.application.project.PackageUtils.prefixQualifiedPath
 import com.varabyte.kobweb.gradle.application.project.PackageUtils.resolvePackageShortcut
 import com.varabyte.kobweb.gradle.application.project.PsiUtils
+import com.varabyte.kobweb.gradle.application.project.Reporter
 import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -12,6 +13,7 @@ import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.psiUtil.isPublic
 import java.io.File
 
 class SiteData {
@@ -39,52 +41,105 @@ class SiteData {
     val silkVariantFqcns: List<String> = _silkVariantFqcns
 
     companion object {
-        /** Process a line like `val CustomStyle = ComponentStyle("custom") { ... }` */
-        private fun processComponentStyle(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
-            val property = element.parent as? KtProperty ?: return false
-            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
-            if (property.parent !is KtFile) return false
+        private fun processComponentStyle(
+            file: File,
+            filePackage: String,
+            property: KtProperty,
+            siteData: SiteData,
+            reporter: Reporter
+        ): Boolean {
             val propertyName = property.name ?: return false
 
-            siteData._silkStyleFqcns.add(prefixQualifiedPath(filePackage, propertyName))
-            return true
+            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
+            if (property.parent !is KtFile) {
+                reporter.report("${file.absolutePath}: Not registering component style `val $propertyName`, as only top-level component styles are supported at this time")
+                return false
+            }
+
+            return if (property.isPublic) {
+                siteData._silkStyleFqcns.add(prefixQualifiedPath(filePackage, propertyName))
+                true
+            } else {
+                reporter.report("${file.absolutePath}: Not registering component style `val $propertyName`, as it is not public")
+                false
+            }
+        }
+
+        /** Process a line like `val CustomStyle = ComponentStyle("custom") { ... }` */
+        private fun processComponentStyle(
+            file: File,
+            filePackage: String,
+            element: KtCallExpression,
+            siteData: SiteData,
+            reporter: Reporter
+        ): Boolean {
+            val property = element.parent as? KtProperty ?: return false
+            return processComponentStyle(file, filePackage, property, siteData, reporter)
         }
 
         /** Process a line like `val CustomStyle = ComponentStyle.base("custom") { ... }` */
-        private fun processComponentBaseStyle(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
+        private fun processComponentBaseStyle(
+            file: File,
+            filePackage: String,
+            element: KtCallExpression,
+            siteData: SiteData,
+            reporter: Reporter
+        ): Boolean {
             val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
             if (qualifiedExpression.receiverExpression.text != "ComponentStyle") return false
             val property = qualifiedExpression.parent as? KtProperty ?: return false
-            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
-            if (property.parent !is KtFile) return false
-            val propertyName = property.name ?: return false
-
-            siteData._silkStyleFqcns.add(prefixQualifiedPath(filePackage, propertyName))
-            return true
+            return processComponentStyle(file, filePackage, property, siteData, reporter)
         }
 
-        /** Process a line like `val CustomVariant = CustomStyle.addVariant("variant") { ... }` */
-        private fun processComponentVariant(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
-            val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
-            val property = qualifiedExpression.parent as? KtProperty ?: return false
-            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
-            if (property.parent !is KtFile) return false
+        private fun processComponentVariant(
+            file: File,
+            filePackage: String,
+            property: KtProperty,
+            siteData: SiteData,
+            reporter: Reporter
+        ): Boolean {
             val propertyName = property.name ?: return false
 
-            siteData._silkVariantFqcns.add(prefixQualifiedPath(filePackage, propertyName))
-            return true
+            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
+            if (property.parent !is KtFile) {
+                reporter.report("${file.absolutePath}: Not registering component variant `val $propertyName`, as only top-level component variants are supported at this time")
+                return false
+            }
+
+            return if (property.isPublic) {
+                siteData._silkVariantFqcns.add(prefixQualifiedPath(filePackage, propertyName))
+                true
+            } else {
+                reporter.report("${file.absolutePath}: Not registering component variant `val $propertyName`, as it is not public")
+                false
+            }
+        }
+
+
+        /** Process a line like `val CustomVariant = CustomStyle.addVariant("variant") { ... }` */
+        private fun processComponentVariant(
+            file: File,
+            filePackage: String,
+            element: KtCallExpression,
+            siteData: SiteData,
+            reporter: Reporter
+        ): Boolean {
+            val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
+            val property = qualifiedExpression.parent as? KtProperty ?: return false
+            return processComponentVariant(file, filePackage, property, siteData, reporter)
         }
 
         /** Process a line like `val CustomVariant = CustomStyle.addBaseVariant("variant") { ... }` */
-        private fun processComponentBaseVariant(filePackage: String, element: KtCallExpression, siteData: SiteData): Boolean {
+        private fun processComponentBaseVariant(
+            file: File,
+            filePackage: String,
+            element: KtCallExpression,
+            siteData: SiteData,
+            reporter: Reporter
+        ): Boolean {
             val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
             val property = qualifiedExpression.parent as? KtProperty ?: return false
-            // Only top-level properties are allowed for now, so getting the fully qualified path is easy
-            if (property.parent !is KtFile) return false
-            val propertyName = property.name ?: return false
-
-            siteData._silkVariantFqcns.add(prefixQualifiedPath(filePackage, propertyName))
-            return true
+            return processComponentVariant(file, filePackage, property, siteData, reporter)
         }
 
         /**
@@ -98,6 +153,7 @@ class SiteData {
             group: String,
             pagesPackage: String,
             siteSources: List<File>,
+            reporter: Reporter,
         ): SiteData {
             val siteData = SiteData()
             val kotlinProject = PsiUtils.createKotlinProject()
@@ -141,7 +197,8 @@ class SiteData {
                             }
                         }
                         is KtNamedFunction -> {
-                            element.annotationEntries.forEach { entry ->
+                            val annotations = element.annotationEntries.toList()
+                            annotations.forEach { entry ->
                                 when (entry.shortName?.asString()) {
                                     appSimpleName -> {
                                         val appFqn = when {
@@ -151,6 +208,10 @@ class SiteData {
                                         appFqn?.let { siteData.app = AppEntry(it) }
                                     }
                                     pageSimpleName -> {
+                                        if (!annotations.mapNotNull { it.shortName?.asString() }.contains("Composable")) {
+                                            reporter.report("${file.absolutePath}: `fun ${element.name}` annotated with `@$pageSimpleName` must also be `@Composable`.")
+                                        }
+
                                         val qualifiedPagesPackage = resolvePackageShortcut(group, pagesPackage)
                                         if (currPackage.startsWith(qualifiedPagesPackage)) {
                                             // e.g. com.example.pages.blog -> blog
@@ -172,6 +233,9 @@ class SiteData {
                                                     "$slugPrefix/$slug"
                                                 )
                                             )
+
+                                        } else {
+                                            reporter.report("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
                                         }
                                     }
                                     initKobwebSimpleName -> {
@@ -196,10 +260,12 @@ class SiteData {
                         }
                         is KtCallExpression -> {
                             when (element.calleeExpression?.text) {
-                                "ComponentStyle" -> processComponentStyle(currPackage, element, siteData)
-                                "base" -> processComponentBaseStyle(currPackage, element, siteData)
-                                "addVariant" -> processComponentVariant(currPackage, element, siteData)
-                                "addBaseVariant" -> processComponentBaseVariant(currPackage, element, siteData)
+                                "ComponentStyle" ->
+                                    processComponentStyle(file, currPackage, element, siteData, reporter)
+                                "base" -> processComponentBaseStyle(file, currPackage, element, siteData, reporter)
+                                "addVariant" -> processComponentVariant(file, currPackage, element, siteData, reporter)
+                                "addBaseVariant" ->
+                                    processComponentBaseVariant(file, currPackage, element, siteData, reporter)
                             }
                         }
                     }

@@ -2,9 +2,11 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.common.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.index
+import com.varabyte.kobweb.gradle.application.extensions.isDescendantOf
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
@@ -31,10 +33,24 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, 
 
     @TaskAction
     fun execute() {
+        getResourceFilesJsWithRoots()
+                .mapNotNull{ rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.buildDir) && rootAndFile.relativeFile.toUnixSeparators() == "public/index.html"} }
+                .singleOrNull()
+                ?.let { indexFile ->
+                    project.logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
+                }
+
         val genSrcRoot = getGenSrcDir()
         val genResRoot = getGenResDir()
 
-        with(SiteData.from(project.group.toString(), config.pagesPackage.get(), getSourceFiles())) {
+        with(
+            SiteData.from(
+                project.group.toString(),
+                config.pagesPackage.get(),
+                getSourceFiles(),
+                GradleReporter(project.logger)
+            )
+        ) {
             genSrcRoot.mkdirs()
             File(genSrcRoot, "main.kt").writeText(createMainFunction(this, buildTarget))
         }
