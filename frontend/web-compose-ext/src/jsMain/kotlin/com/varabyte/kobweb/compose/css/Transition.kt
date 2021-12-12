@@ -40,6 +40,20 @@ class TransitionDuration(val value: String) {
     }
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
+/**
+ * Special values for Transition Delay Property.
+ */
+class TransitionDelay(val value: String) {
+    companion object {
+        // Global values
+        val Inherit get() = TransitionDelay("inherit")
+        val Initial get() = TransitionDelay("initial")
+        val Revert get() = TransitionDelay("revert")
+        val Unset get() = TransitionDelay("unset")
+    }
+}
+
 fun StyleBuilder.transitionProperty(property: TransitionProperty) {
     transitionProperty(property.value)
 }
@@ -56,9 +70,12 @@ fun StyleBuilder.transitionDuration(duration: CSSSizeValue<out CSSUnitTime>) {
     property("transition-duration", duration.toString())
 }
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
-fun StyleBuilder.transitionDelay(duration: CSSSizeValue<out CSSUnitTime>) {
-    property("transition-delay", duration.toString())
+fun StyleBuilder.transitionDelay(delay: CSSSizeValue<out CSSUnitTime>) {
+    property("transition-delay", delay.toString())
+}
+
+fun StyleBuilder.transitionDelay(delay: TransitionDelay) {
+    property("transition-delay", delay.value)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
