@@ -26,6 +26,20 @@ class TransitionProperty(val value: String) {
     }
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration
+/**
+ * Special values for Transition Duration Property.
+ */
+class TransitionDuration(val value: String) {
+    companion object {
+        // Global values
+        val Inherit get() = TransitionDuration("inherit")
+        val Initial get() = TransitionDuration("initial")
+        val Revert get() = TransitionDuration("revert")
+        val Unset get() = TransitionDuration("unset")
+    }
+}
+
 fun StyleBuilder.transitionProperty(property: TransitionProperty) {
     transitionProperty(property.value)
 }
@@ -34,7 +48,10 @@ fun StyleBuilder.transitionProperty(vararg properties: String) {
     property("transition-property", properties.joinToString())
 }
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration
+fun StyleBuilder.transitionDuration(duration: TransitionDuration) {
+    property("transition-duration", duration.value)
+}
+
 fun StyleBuilder.transitionDuration(duration: CSSSizeValue<out CSSUnitTime>) {
     property("transition-duration", duration.toString())
 }
