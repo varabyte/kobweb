@@ -2,11 +2,9 @@ package com.varabyte.kobweb.silk.components.navigation
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.TextDecorationLine
-import com.varabyte.kobweb.compose.css.textDecorationLine
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.hover
@@ -19,7 +17,7 @@ import org.jetbrains.compose.web.dom.Text
 
 val LinkStyle = ComponentStyle("silk-link") {
     base {
-        Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
+        Modifier.textDecorationLine(TextDecorationLine.None)
     }
 
     link {
@@ -29,13 +27,13 @@ val LinkStyle = ComponentStyle("silk-link") {
         Modifier.color(SilkTheme.palettes[colorMode].link.visited)
     }
     hover {
-        Modifier.styleModifier { textDecorationLine(TextDecorationLine.Underline) }
+        Modifier.textDecorationLine(TextDecorationLine.Underline)
     }
 }
 
 val UndecoratedLinkVariant = LinkStyle.addVariant("undecorated") {
     hover {
-        Modifier.styleModifier { textDecorationLine(TextDecorationLine.None) }
+        Modifier.textDecorationLine(TextDecorationLine.None)
     }
 }
 

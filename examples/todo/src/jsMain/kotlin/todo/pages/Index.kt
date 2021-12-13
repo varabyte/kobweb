@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.*
 import com.varabyte.kobweb.browser.api
 import com.varabyte.kobweb.compose.css.FontWeight
-import com.varabyte.kobweb.compose.css.fontWeight
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -13,7 +12,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -48,12 +46,7 @@ val TitleStyle = ComponentStyle.base("title") {
         .lineHeight(1.15)
         .fontSize(4.cssRem)
         .margin(top = 0.4.em, bottom = 0.6.em)
-        // "styleModifier" is an escape hatch for when Kobweb doesn't (yet) have the HTML style modifier that you
-        // need. Allows you to define styles the traditional Web Compose way. You can use "attrModifier" too, which
-        // has extra functionality, like specifying event listeners.
-        .styleModifier {
-            fontWeight(FontWeight.Bold)
-        }
+        .fontWeight(FontWeight.Bold)
 }
 
 @Page

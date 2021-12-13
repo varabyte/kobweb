@@ -9,12 +9,10 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.SilkTheme
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.fontSize
+import org.jetbrains.compose.web.css.*
 
 @Composable
 fun PageLayout(content: @Composable () -> Unit) {
@@ -27,10 +25,10 @@ fun PageLayout(content: @Composable () -> Unit) {
         val borderColor = SilkTheme.palette.color.toCssColor()
         Spacer()
         Box(
-            Modifier.fillMaxWidth().styleModifier {
-                property("border-top", "1px solid $borderColor")
-                fontSize(1.5.cssRem)
-            },
+            Modifier
+                .fillMaxWidth()
+                .borderTop(1.px, LineStyle.Solid, borderColor)
+                .fontSize(1.5.cssRem),
             Alignment.Center
         ) {
             Row(Modifier.margin(topBottom = 1.cssRem, leftRight = 0.cssRem)) {

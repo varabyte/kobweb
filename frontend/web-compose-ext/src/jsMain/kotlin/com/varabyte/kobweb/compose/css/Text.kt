@@ -23,6 +23,7 @@ class TextDecorationLine(val value: String) {
     companion object {
         val Underline get() = TextDecorationLine("underline")
         val Overline get() = TextDecorationLine("overline")
+        val LineThrough get() = TextDecorationLine("line-through")
         val None get() = TextDecorationLine("none")
 
         val Inherit get() = TextDecorationLine("inherit")
@@ -32,8 +33,8 @@ class TextDecorationLine(val value: String) {
     }
 }
 
-fun StyleBuilder.textDecorationLine(textDecorationLine: TextDecorationLine) {
-    property("text-decoration-line", textDecorationLine.value)
+fun StyleBuilder.textDecorationLine(vararg textDecorationLines: TextDecorationLine) {
+    property("text-decoration-line", textDecorationLines.joinToString { it.value })
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select

@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.components.layout
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -18,9 +19,7 @@ import org.jetbrains.compose.web.dom.Div
 private const val MAX_COLUMN_COUNT = 4
 
 val SimpleGridStyle = ComponentStyle.base("silk-simple-grid") {
-    Modifier.styleModifier {
-        display(DisplayStyle.Grid)
-    }
+    Modifier.display(DisplayStyle.Grid)
 }
 
 private val SimpleGridColumnVariants: Map<Breakpoint?, Map<Int, ComponentVariant>> = run {

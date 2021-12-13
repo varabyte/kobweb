@@ -7,7 +7,12 @@ import com.varabyte.kobweb.compose.css.fontWeight
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.CSSNumeric
+import org.jetbrains.compose.web.css.fontFamily
 import org.jetbrains.compose.web.css.fontSize
+
+fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
+    fontFamily(*values)
+}
 
 fun Modifier.fontSize(value: CSSNumeric): Modifier = styleModifier {
     fontSize(value)

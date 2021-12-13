@@ -4,8 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.modifiers.background
-import com.varabyte.kobweb.compose.ui.modifiers.size
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
@@ -19,22 +18,22 @@ fun MainPage() {
         val square = Modifier.size(250.px)
         SimpleGrid(numColumns(2, md = 3)) {
             Cell {
-                Box(square.background(Colors.Red))
+                Box(square.backgroundColor(Colors.Red))
             }
             Cell {
-                Box(square.background(Colors.Green))
+                Box(square.backgroundColor(Colors.Green))
             }
             Cell {
-                Box(square.background(Colors.Blue))
+                Box(square.backgroundColor(Colors.Blue))
             }
             Cell {
-                Box(square.background(Colors.Yellow))
+                Box(square.backgroundColor(Colors.Yellow))
             }
             Cell {
-                Box(square.background(Colors.Orange))
+                Box(square.backgroundColor(Colors.Orange))
             }
             Cell {
-                Box(square.background(Colors.Magenta))
+                Box(square.backgroundColor(Colors.Magenta))
             }
         }
     }

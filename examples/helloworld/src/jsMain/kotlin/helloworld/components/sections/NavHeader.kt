@@ -41,7 +41,7 @@ fun NavHeader() {
             .fillMaxWidth()
             .height(50.px)
             // Intentionally invert the header colors
-            .background(palette.color),
+            .backgroundColor(palette.color),
     ) {
         Row(
             Modifier.fillMaxSize(),

@@ -8,8 +8,7 @@ import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.background
-import com.varabyte.kobweb.compose.ui.modifiers.clickable
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -31,21 +30,22 @@ val ButtonStyle = ComponentStyle("silk-button") {
     val buttonColors = SilkTheme.palettes[colorMode].button
 
     base {
-        Modifier.background(buttonColors.default).clip(Rect(4.px)).styleModifier {
+        Modifier
+            .backgroundColor(buttonColors.default)
+            .clip(Rect(4.px))
             // No selecting text within buttons
-            userSelect(UserSelect.None)
-            property("role", "button")
-        }
+            .userSelect(UserSelect.None)
+            .role("button")
     }
 
     hover {
-        Modifier.background(buttonColors.hover).styleModifier {
-            cursor(Cursor.Pointer)
-        }
+        Modifier
+            .backgroundColor(buttonColors.hover)
+            .cursor(Cursor.Pointer)
     }
 
     active {
-        Modifier.background(buttonColors.pressed)
+        Modifier.backgroundColor(buttonColors.pressed)
     }
 }
 

@@ -2,19 +2,11 @@ package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.CSSNumeric
-import org.jetbrains.compose.web.css.CSSPercentageValue
-import org.jetbrains.compose.web.css.height
-import org.jetbrains.compose.web.css.lineHeight
-import org.jetbrains.compose.web.css.margin
-import org.jetbrains.compose.web.css.maxHeight
-import org.jetbrains.compose.web.css.maxWidth
-import org.jetbrains.compose.web.css.minHeight
-import org.jetbrains.compose.web.css.minWidth
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.css.*
+
+fun Modifier.display(value: DisplayStyle) = styleModifier {
+    display(value)
+}
 
 fun Modifier.lineHeight(value: CSSNumeric): Modifier = styleModifier {
     lineHeight(value)
@@ -97,4 +89,8 @@ fun Modifier.padding(
     left: CSSNumeric = 0.px
 ): Modifier = styleModifier {
     padding(top, right, bottom, left)
+}
+
+fun Modifier.zIndex(value: Number) = styleModifier {
+    property("z-index", 1)
 }

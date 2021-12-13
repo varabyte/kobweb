@@ -1,9 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.AnimationTimingFunction
-import org.jetbrains.compose.web.css.CSSSizeValue
-import org.jetbrains.compose.web.css.CSSUnitTime
-import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
 
@@ -80,5 +77,5 @@ fun StyleBuilder.transitionDelay(delay: TransitionDelay) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
 fun StyleBuilder.transitionTimingFunction(vararg value: AnimationTimingFunction) {
-    property("transition-timing-function", value.joinToString())
+    property("transition-timing-function", value.joinToString { it.value })
 }

@@ -8,8 +8,11 @@ import com.varabyte.kobweb.compose.css.transitionProperty
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.background
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
+import com.varabyte.kobweb.compose.ui.modifiers.transitionDuration
+import com.varabyte.kobweb.compose.ui.modifiers.transitionProperty
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -23,20 +26,17 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
     base {
         val palette = SilkTheme.palettes[colorMode]
         Modifier
-            .background(palette.background)
+            .backgroundColor(palette.background)
             .color(palette.color)
-            .styleModifier {
-                // Toggling color mode looks much more engaging if it animates instead of being instant
-                transitionProperty("background-color")
-                transitionDuration(200.ms)
-        }
+            // Toggling color mode looks much more engaging if it animates instead of being instant
+            .transitionProperty("background-color")
+            .transitionDuration(200.ms)
     }
 
     cssRule(" *") {
-        Modifier.styleModifier {
-            transitionProperty(TransitionProperty.Inherit)
-            transitionDuration(TransitionDuration.Inherit)
-        }
+        Modifier
+            .transitionProperty(TransitionProperty.Inherit)
+            .transitionDuration(TransitionDuration.Inherit)
     }
 }
 
