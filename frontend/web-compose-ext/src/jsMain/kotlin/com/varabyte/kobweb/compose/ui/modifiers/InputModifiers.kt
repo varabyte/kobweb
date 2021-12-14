@@ -13,7 +13,7 @@ fun Modifier.cursor(cursor: Cursor) = styleModifier {
     cursor(cursor)
 }
 
-fun Modifier.clickable(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrModifier {
+fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrModifier {
     onClick { evt -> onClick(evt) }
 }
 

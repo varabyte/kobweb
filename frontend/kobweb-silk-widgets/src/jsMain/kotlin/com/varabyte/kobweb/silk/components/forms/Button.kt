@@ -62,7 +62,7 @@ fun Button(
     Box(
         ButtonStyle.toModifier(variant)
             .then(modifier)
-            .clickable { onClick() },
+            .onClick { onClick() },
         contentAlignment = Alignment.Center
     ) {
         content()
