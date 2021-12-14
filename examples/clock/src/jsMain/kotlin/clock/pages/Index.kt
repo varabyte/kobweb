@@ -2,27 +2,14 @@ package clock.pages
 
 import androidx.compose.runtime.*
 import clock.components.layouts.PageLayout
-import com.varabyte.kobweb.compose.foundation.layout.Arrangement
-import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
-import com.varabyte.kobweb.compose.foundation.layout.Column
-import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.graphics.Canvas2d
 import com.varabyte.kobweb.silk.components.graphics.ONE_FRAME_MS_60_FPS
-import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
-import com.varabyte.kobweb.silk.components.icons.fa.FaSun
-import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
-import com.varabyte.kobweb.silk.theme.shapes.Circle
-import com.varabyte.kobweb.silk.theme.shapes.clip
-import org.jetbrains.compose.web.css.px
 import org.w3c.dom.CanvasLineCap
 import org.w3c.dom.CanvasState
 import org.w3c.dom.ROUND
@@ -149,21 +136,6 @@ private fun BoxScope.Clock() {
 @Composable
 fun ClockPage() {
     PageLayout {
-        Column(Modifier.fillMaxSize()) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                var colorMode by rememberColorMode()
-                Button(
-                    onClick = { colorMode = colorMode.opposite() },
-                    Modifier.margin(10.px).clip(Circle()).fontSize(24.px)
-                ) {
-                    Box(Modifier.margin(4.px)) {
-                        if (colorMode.isLight()) FaSun() else FaMoon()
-                    }
-                }
-            }
-            Box(Modifier.fillMaxSize()) {
-                Clock()
-            }
-        }
+        Clock()
     }
 }
