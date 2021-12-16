@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.github.kklisura.cdt.launch.ChromeArguments
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
@@ -32,29 +33,38 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig) :
             GradleReporter(project.logger)
         )
         siteData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            val launcher = ChromeLauncher()
-            val chromeService = launcher.launch(true)
+            ChromeLauncher().use { launcher ->
+                // NOTE: Normally "no-sandbox" is NOT recommended for security reasons. However, this option is
+                // necessary when this task runs as root, as Chrome complains otherwise, but this scenario is common in
+                // containers. (It's expected that `kobweb export` will often get run as part of a container image built
+                // in the Cloud). Since the lifetime of the browser is short, and it exists only for doing these exports
+                // of our own code before getting shut down again, the fact we are disabling the sandbox here is not a
+                // concern (as far as I can think through).
+                val chromeService = launcher.launch(
+                    ChromeArguments.defaults(true).additionalArguments("no-sandbox", true).build()
+                )
 
-            pages.forEach { pageEntry ->
-                val tab = chromeService.createTab()
-                val devToolsService = chromeService.createDevToolsService(tab)
-                val page = devToolsService.page
-                val runtime = devToolsService.runtime
-                page.onLoadEventFired { _ ->
-                    val evaluation = runtime.evaluate("document.documentElement.outerHTML")
-                    val filePath = pageEntry.route.substringBeforeLast('/') + "/" +
-                        (pageEntry.route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
-                        ".html"
-                    val prettyHtml = Jsoup.parse(evaluation.result.value.toString()).toString()
-                    File(getSiteDir(), "pages$filePath").run {
-                        parentFile.mkdirs()
-                        writeText(prettyHtml)
+                pages.forEach { pageEntry ->
+                    val tab = chromeService.createTab()
+                    val devToolsService = chromeService.createDevToolsService(tab)
+                    val page = devToolsService.page
+                    val runtime = devToolsService.runtime
+                    page.onLoadEventFired { _ ->
+                        val evaluation = runtime.evaluate("document.documentElement.outerHTML")
+                        val filePath = pageEntry.route.substringBeforeLast('/') + "/" +
+                            (pageEntry.route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
+                            ".html"
+                        val prettyHtml = Jsoup.parse(evaluation.result.value.toString()).toString()
+                        File(getSiteDir(), "pages$filePath").run {
+                            parentFile.mkdirs()
+                            writeText(prettyHtml)
+                        }
+                        devToolsService.close()
                     }
-                    devToolsService.close()
+                    page.enable()
+                    page.navigate("http://localhost:$port${pageEntry.route}")
+                    devToolsService.waitUntilClosed()
                 }
-                page.enable()
-                page.navigate("http://localhost:$port${pageEntry.route}")
-                devToolsService.waitUntilClosed()
             }
         }
 
