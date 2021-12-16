@@ -43,6 +43,7 @@ private enum class RunState {
 }
 
 fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
+    val kobwebGradle = KobwebGradle(env)
     if (isInteractive) konsoleApp {
         val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@konsoleApp
 
@@ -106,7 +107,7 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
             }
         }.runUntilSignal {
             val startServerProcess = try {
-                KobwebGradle.startServer(env)
+                kobwebGradle.startServer()
             }
             catch (ex: Exception) {
                 exception = ex
@@ -147,7 +148,7 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
                             startServerProcess.destroy()
                             startServerProcess.waitFor()
 
-                            val stopServerProcess = KobwebGradle.stopServer()
+                            val stopServerProcess = kobwebGradle.stopServer()
                             stopServerProcess.consumeProcessOutput(::handleConsoleOutput)
                             stopServerProcess.waitFor()
 
@@ -195,6 +196,8 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
     } else {
         assert(!isInteractive)
         assertKobwebProject()
-        KobwebGradle.startServer(env, enableLiveReloading = false).also { it.consumeProcessOutput(); it.waitFor() }
+        // If we're non-interactive, it means we just want to start the Kobweb server and exit without waiting for
+        // for any additional changes. (This is essentially used when run in a web server environment)
+        kobwebGradle.startServer(enableLiveReloading = false).also { it.consumeProcessOutput(); it.waitFor() }
     }
 }

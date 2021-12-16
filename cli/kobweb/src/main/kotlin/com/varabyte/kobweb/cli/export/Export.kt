@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.konsole.foundation.anim.konsoleAnimOf
 import com.varabyte.konsole.foundation.input.Keys
 import com.varabyte.konsole.foundation.input.onKeyPressed
@@ -28,6 +29,8 @@ private enum class ExportState {
 
 @Suppress("BlockingMethodInNonBlockingContext")
 fun handleExport(isInteractive: Boolean) {
+    val kobwebGradle = KobwebGradle(ServerEnvironment.PROD) // exporting is a production-only action
+
     if (isInteractive) konsoleApp {
         findKobwebProject() ?: return@konsoleApp
 
@@ -54,7 +57,7 @@ fun handleExport(isInteractive: Boolean) {
             }
         }.run {
             val exportProcess = try {
-                KobwebGradle.export()
+                kobwebGradle.export()
             }
             catch (ex: Exception) {
                 exception = ex
@@ -88,7 +91,7 @@ fun handleExport(isInteractive: Boolean) {
             }
             check(exportState in listOf(ExportState.FINISHING, ExportState.CANCELLING))
 
-            val stopProcess = KobwebGradle.stopServer()
+            val stopProcess = kobwebGradle.stopServer()
             stopProcess.consumeProcessOutput(::handleConsoleOutput)
             stopProcess.waitFor()
 
@@ -97,7 +100,7 @@ fun handleExport(isInteractive: Boolean) {
     } else {
         assert(!isInteractive)
         assertKobwebProject()
-        KobwebGradle.export().also { it.consumeProcessOutput(); it.waitFor() }
-        KobwebGradle.stopServer().also { it.consumeProcessOutput(); it.waitFor() }
+        kobwebGradle.export().also { it.consumeProcessOutput(); it.waitFor() }
+        kobwebGradle.stopServer().also { it.consumeProcessOutput(); it.waitFor() }
     }
 }
