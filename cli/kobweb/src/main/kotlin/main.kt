@@ -79,7 +79,16 @@ fun main(args: Array<String>) {
     }
 
     class Stop : Subcommand("stop", "Stop a Kobweb server if one is running") {
+        val mode by mode()
+
         override fun execute() {
+            // TODO(#79): Delete this when fixed
+            if (mode == Mode.INTERACTIVE) {
+                println("Interactive mode is not yet implemented for this command, so it will run in dumb mode for now.")
+                println("There won't be any functional difference in this case, just visual.")
+                println("Follow https://github.com/varabyte/kobweb/issues/79 if you want to be notified when it is fixed")
+                println()
+            }
             handleStop()
         }
     }
