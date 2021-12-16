@@ -59,8 +59,9 @@ val DarkSilkPalette = run {
         background = Colors.Black,
         color = Colors.White,
         link = SilkPalette.Link(
-            default = Colors.Blue.lightened(),
-            visited = Colors.Purple.lightened(),
+            // One "lightened" still too dark against black background
+            default = Colors.Blue.lightened().lightened(),
+            visited = Colors.Purple.lightened().lightened(),
         ),
         button = SilkPalette.Button(
             default = buttonBase,
