@@ -92,5 +92,5 @@ fun Modifier.padding(
 }
 
 fun Modifier.zIndex(value: Number) = styleModifier {
-    property("z-index", 1)
+    property("z-index", value)
 }
