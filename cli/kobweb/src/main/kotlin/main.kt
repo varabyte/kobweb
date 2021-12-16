@@ -1,5 +1,6 @@
 import com.varabyte.kobweb.cli.common.DEFAULT_BRANCH
 import com.varabyte.kobweb.cli.common.DEFAULT_REPO
+import com.varabyte.kobweb.cli.conf.handleConf
 import com.varabyte.kobweb.cli.create.handleCreate
 import com.varabyte.kobweb.cli.export.handleExport
 import com.varabyte.kobweb.cli.list.handleList
@@ -93,6 +94,14 @@ fun main(args: Array<String>) {
         }
     }
 
-    parser.subcommands(Version(), List(), Create(), Export(), Run(), Stop())
+    class Conf : Subcommand("conf", "Query a value from the .kobweb/conf.yaml file (e.g. \"server.port\")") {
+        val query by argument(ArgType.String, "query", "The query to search conf.yaml for")
+        override fun execute() {
+            handleConf(query)
+        }
+    }
+
+
+    parser.subcommands(Version(), List(), Create(), Export(), Run(), Stop(), Conf())
     parser.parse(args.takeIf { it.isNotEmpty() } ?: arrayOf("-h"))
 }
