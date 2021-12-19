@@ -15,17 +15,16 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
                 implementation(compose.runtime)
+                implementation(compose.web.core)
 
-                implementation(project(":frontend:kobweb-core"))
-                api(project(":frontend:kobweb-silk-widgets"))
+                api(project(":frontend:web-compose-ext"))
             }
         }
     }
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-silk")
-    description.set("A set of rich UI components built on top of Kobweb and inspired by the best parts of Compose and Chakra UI")
+    artifactId.set("kobweb-compose")
+    description.set("Additions to Web Compose that attempt to mimic Jetpack Compose as much as possible")
 }
