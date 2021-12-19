@@ -16,7 +16,7 @@ fun main() {
     renderComposable(rootElementId = "root") {
         StyleSheet(KobwebComposeStyleSheet) // REQUIRED
         ...
-  }
+    }
 }
 ```
 
