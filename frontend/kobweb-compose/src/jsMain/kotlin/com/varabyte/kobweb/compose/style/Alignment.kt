@@ -3,28 +3,28 @@ package com.varabyte.kobweb.compose.style
 import com.varabyte.kobweb.compose.ui.Alignment
 
 fun Alignment.toClassName() = when(this) {
-    Alignment.TopStart -> "kobweb-top-start"
-    Alignment.TopCenter -> "kobweb-top-center"
-    Alignment.TopEnd -> "kobweb-top-end"
-    Alignment.CenterStart -> "kobweb-center-start"
-    Alignment.Center -> "kobweb-center"
-    Alignment.CenterEnd -> "kobweb-center-end"
-    Alignment.BottomStart -> "kobweb-bottom-start"
-    Alignment.BottomCenter -> "kobweb-bottom"
-    Alignment.BottomEnd -> "kobweb-bottom-end"
+    Alignment.TopStart -> "kobweb-align-top-start"
+    Alignment.TopCenter -> "kobweb-align-top-center"
+    Alignment.TopEnd -> "kobweb-align-top-end"
+    Alignment.CenterStart -> "kobweb-align-center-start"
+    Alignment.Center -> "kobweb-align-center"
+    Alignment.CenterEnd -> "kobweb-align-center-end"
+    Alignment.BottomStart -> "kobweb-align-bottom-start"
+    Alignment.BottomCenter -> "kobweb-align-bottom"
+    Alignment.BottomEnd -> "kobweb-align-bottom-end"
     else -> error("Unexpected alignment: $this")
 }
 
 fun Alignment.Vertical.toClassName() = when(this) {
-    Alignment.Top -> "kobweb-top"
-    Alignment.CenterVertically -> "kobweb-center-vert"
-    Alignment.Bottom -> "kobweb-bottom"
+    Alignment.Top -> "kobweb-align-top"
+    Alignment.CenterVertically -> "kobweb-align-center-vert"
+    Alignment.Bottom -> "kobweb-align-bottom"
     else -> error("Unexpected alignment: $this")
 }
 
 fun Alignment.Horizontal.toClassName() = when(this) {
-    Alignment.Start -> "kobweb-start"
-    Alignment.CenterHorizontally -> "kobweb-center-horiz"
-    Alignment.End -> "kobweb-end"
+    Alignment.Start -> "kobweb-align-start"
+    Alignment.CenterHorizontally -> "kobweb-align-center-horiz"
+    Alignment.End -> "kobweb-align-end"
     else -> error("Unexpected alignment: $this")
 }
