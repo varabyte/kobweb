@@ -1,9 +1,11 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.attrModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
@@ -20,12 +22,8 @@ import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.dom.Div
 
 class RowScope {
-    fun Modifier.align(alignment: Alignment.Vertical) = styleModifier {
-        when (alignment) {
-            Alignment.Top -> alignSelf(AlignSelf.FlexStart)
-            Alignment.CenterVertically -> alignSelf(AlignSelf.Center)
-            Alignment.Bottom -> alignSelf(AlignSelf.FlexEnd)
-        }
+    fun Modifier.align(alignment: Alignment.Vertical) = attrModifier {
+        classes(alignment.toClassName())
     }
 }
 
@@ -36,24 +34,8 @@ fun Row(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: @Composable RowScope.() -> Unit
 ) {
-    Div(attrs = modifier.asAttributeBuilder {
-        style {
-            display(DisplayStyle.Flex)
-            flexDirection(FlexDirection.Row)
-            flexWrap(FlexWrap.Wrap)
-
-            when {
-                horizontalArrangement === Arrangement.Start -> justifyContent(JustifyContent.FlexStart)
-                horizontalArrangement === Arrangement.Center -> justifyContent(JustifyContent.Center)
-                horizontalArrangement === Arrangement.End -> justifyContent(JustifyContent.FlexEnd)
-            }
-
-            when {
-                verticalAlignment === Alignment.Top -> alignItems(AlignItems.FlexStart)
-                verticalAlignment === Alignment.CenterVertically -> alignItems(AlignItems.Center)
-                verticalAlignment === Alignment.Bottom -> alignItems(AlignItems.FlexEnd)
-            }
-        }
+    Div(modifier.asAttributeBuilder {
+        classes("kobweb-row", horizontalArrangement.toClassName(), verticalAlignment.toClassName())
     }) {
         RowScope().content()
     }

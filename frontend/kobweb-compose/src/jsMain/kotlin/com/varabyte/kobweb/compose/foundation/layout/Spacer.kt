@@ -9,11 +9,5 @@ import org.jetbrains.compose.web.dom.Div
  */
 @Composable
 fun Spacer() {
-    Div(
-        attrs = {
-            style {
-                flexGrow(1)
-            }
-        }
-    )
+    Div(attrs = { classes("kobweb-spacer") })
 }

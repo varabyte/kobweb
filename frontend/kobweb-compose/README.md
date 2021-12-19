@@ -8,3 +8,16 @@ Note that, unlike the approach that Jetbrains is taking with their Multiplatform
 class and its extension methods are _not_ trying to be 100% compatible with Android / Desktop compose. See the main
 README's [What about Multiplatform Widgets](https://github.com/varabyte/kobweb#what-about-multiplatform-widgets) section
 for more details on why.
+
+**NOTE**: If you use this library, you must be sure to initialize its stylesheet, like so:
+
+```kotlin
+fun main() {
+    renderComposable(rootElementId = "root") {
+        StyleSheet(KobwebComposeStyleSheet) // REQUIRED
+        ...
+  }
+}
+```
+
+If you are using Silk, however, this has been done for you.

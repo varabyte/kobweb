@@ -1,9 +1,11 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.attrModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
@@ -18,12 +20,8 @@ import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.dom.Div
 
 class ColumnScope {
-    fun Modifier.align(alignment: Alignment.Horizontal) = styleModifier {
-        when (alignment) {
-            Alignment.Start -> alignSelf(AlignSelf.FlexStart)
-            Alignment.CenterHorizontally -> alignSelf(AlignSelf.Center)
-            Alignment.End -> alignSelf(AlignSelf.FlexEnd)
-        }
+    fun Modifier.align(alignment: Alignment.Horizontal) = attrModifier {
+        classes(alignment.toClassName())
     }
 }
 
@@ -34,23 +32,8 @@ fun Column(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Div(attrs = modifier.asAttributeBuilder {
-        style {
-            display(DisplayStyle.Flex)
-            flexDirection(FlexDirection.Column)
-
-            when {
-                verticalArrangement === Arrangement.Top -> justifyContent(JustifyContent.FlexStart)
-                verticalArrangement === Arrangement.Center -> justifyContent(JustifyContent.Center)
-                verticalArrangement === Arrangement.Bottom -> justifyContent(JustifyContent.FlexEnd)
-            }
-
-            when {
-                horizontalAlignment === Alignment.Start -> alignItems(AlignItems.FlexStart)
-                horizontalAlignment === Alignment.CenterHorizontally -> alignItems(AlignItems.Center)
-                horizontalAlignment === Alignment.End -> alignItems(AlignItems.FlexEnd)
-            }
-        }
+    Div(modifier.asAttributeBuilder {
+        classes("kobweb-col", verticalArrangement.toClassName(), horizontalAlignment.toClassName())
     }) {
         ColumnScope().content()
     }
