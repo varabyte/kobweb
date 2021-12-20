@@ -80,5 +80,4 @@ fun displayUntil(breakpoint: Breakpoint, content: @Composable () -> Unit) {
 @Composable
 fun displayBetween(breakpointLower: Breakpoint, breakpointUpper: Breakpoint, content: @Composable () -> Unit) {
     Span(attrs = Modifier.displayBetween(breakpointLower, breakpointUpper).asAttributeBuilder()) { content() }
-
 }
