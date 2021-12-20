@@ -10,12 +10,12 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import com.varabyte.kobweb.silk.theme.toSize
+import org.jetbrains.compose.web.css.CSSMediaQuery
 import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.media
-import org.jetbrains.compose.web.css.mediaMinWidth
 
 // We need our own implementation of StyleBuilder, so we can both test equality and pull values out of it later
 private class ComparableStyleBuilder : StyleBuilder {
@@ -39,18 +39,21 @@ private class ComparableStyleBuilder : StyleBuilder {
     }
 }
 
+private fun Breakpoint.toMinWidthQuery() = CSSMediaQuery.MediaFeature("min-width", this.toSize())
+
 /**
  * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
  */
 internal class CssModifier(
     val modifier: Modifier,
-    val breakpoint: Breakpoint? = null,
+    val mediaQuery: CSSMediaQuery? = null,
     val suffix: String? = null,
 ) {
     companion object {
         val BaseKey = Key(null, null)
     }
-    data class Key(val breakpoint: Breakpoint?, val suffix: String?)
+    data class Key(val mediaQuery: String?, val suffix: String?)
+
     /**
      * A key useful for storing this entry into a map.
      *
@@ -58,7 +61,9 @@ internal class CssModifier(
      * can indicate if a css rule was applied redundantly (where the latter would overrule the former) or allow us to
      * compare modifiers across dark and light color modes.
      */
-    val key get() = Key(breakpoint, suffix)
+    // Note: We have to convert mediaQuery toString for now because it CSSMediaQuery.MediaFeature is not itself defined
+    // correctly for equality checking (for some reason, they don't define the hashcode)
+    val key get() = Key(mediaQuery?.toString(), suffix)
 }
 
 /**
@@ -85,7 +90,7 @@ sealed class CssRule(val target: ComponentModifiers) {
     abstract operator fun invoke(createModifier: () -> Modifier)
 
     protected fun addCssRule(
-        breakpoint: Breakpoint?,
+        mediaQuery: CSSMediaQuery?,
         pseudoClasses: List<String>,
         pseudoElement: String?,
         createModifier: () -> Modifier
@@ -97,20 +102,20 @@ sealed class CssRule(val target: ComponentModifiers) {
             }
         }.takeIf { it.isNotEmpty() }
 
-        target.cssRule(breakpoint, suffix, createModifier)
+        target.cssRule(mediaQuery, suffix, createModifier)
     }
 
     /** A simple CSS rule that represents only setting a single breakpoint */
-    class OfBreakpoint(target: ComponentModifiers, val breakpoint: Breakpoint) : CssRule(target) {
+    class OfMedia(target: ComponentModifiers, val mediaQuery: CSSMediaQuery) : CssRule(target) {
         override fun invoke(createModifier: () -> Modifier) {
-            addCssRule(breakpoint, emptyList(), null, createModifier)
+            addCssRule(mediaQuery, emptyList(), null, createModifier)
         }
 
         operator fun plus(other: OfPseudoClass) =
-            CompositeOpen(target, breakpoint, listOf(other.pseudoClass))
+            CompositeOpen(target, mediaQuery, listOf(other.pseudoClass))
 
         operator fun plus(other: OfPseudoElement) =
-            CompositeClosed(target, breakpoint, emptyList(), other.pseudoElement)
+            CompositeClosed(target, mediaQuery, emptyList(), other.pseudoElement)
     }
 
     class OfPseudoClass(target: ComponentModifiers, val pseudoClass: String) : CssRule(target) {
@@ -135,9 +140,9 @@ sealed class CssRule(val target: ComponentModifiers) {
      * A composite CSS rule that is a chain of subparts and still open to accepting more pseudo classes and/or a
      * pseudo element.
      */
-    class CompositeOpen(target: ComponentModifiers, val breakpoint: Breakpoint?, val pseudoClasses: List<String>) : CssRule(target) {
+    class CompositeOpen(target: ComponentModifiers, val mediaQuery: CSSMediaQuery?, val pseudoClasses: List<String>) : CssRule(target) {
         override fun invoke(createModifier: () -> Modifier) {
-            addCssRule(breakpoint, pseudoClasses, null, createModifier)
+            addCssRule(mediaQuery, pseudoClasses, null, createModifier)
         }
 
         operator fun plus(other: OfPseudoClass) =
@@ -153,19 +158,19 @@ sealed class CssRule(val target: ComponentModifiers) {
      */
     class CompositeClosed(
         target: ComponentModifiers,
-        private val breakpoint: Breakpoint?,
-        private val pseudoClasses: List<String>,
-        private val pseudoElement: String
+        val mediaQuery: CSSMediaQuery?,
+        val pseudoClasses: List<String>,
+        val pseudoElement: String
     ) : CssRule(target) {
         override fun invoke(createModifier: () -> Modifier) {
-            addCssRule(breakpoint, pseudoClasses, pseudoElement, createModifier)
+            addCssRule(mediaQuery, pseudoClasses, pseudoElement, createModifier)
         }
     }
 }
 
 // Breakpoint extensions to allow adding styles to normal breakpoint values, e.g. "Breakpoint.MD + hover"
-operator fun Breakpoint.plus(other: CssRule.OfPseudoClass) = CssRule.OfBreakpoint(other.target, this) + other
-operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) = CssRule.OfBreakpoint(other.target, this) + other
+operator fun Breakpoint.plus(other: CssRule.OfPseudoClass) = CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
+operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) = CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
 
 /**
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
@@ -186,23 +191,25 @@ class ComponentModifiers(val colorMode: ColorMode) {
 
     /**
      * Add a CSS rule that is applied to this component class, passing in a [suffix] (which represents a pseudo-class
-     * or pseudo-element) and a [breakpoint] if the style should only apply to a web window of a certain size.
+     * or pseudo-element) and a [mediaQuery] entry if the style should be defined within a media rule.
      *
      * CSS rules will always be applied in the order they were registered in.
      *
-     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
-     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
+     * See also:
+     *   https://developer.mozilla.org/en-US/docs/Web/CSS/@media
+     *   https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
+     *   https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
      */
-    fun cssRule(breakpoint: Breakpoint?, suffix: String?, createModifier: () -> Modifier) {
-        _cssModifiers.add(CssModifier(createModifier(), breakpoint, suffix))
+    fun cssRule(mediaQuery: CSSMediaQuery?, suffix: String?, createModifier: () -> Modifier) {
+        _cssModifiers.add(CssModifier(createModifier(), mediaQuery, suffix))
     }
 
     fun cssRule(suffix: String, createModifier: () -> Modifier) {
         _cssModifiers.add(CssModifier(createModifier(), null, suffix))
     }
 
-    fun cssRule(breakpoint: Breakpoint, createModifier: () -> Modifier) {
-        _cssModifiers.add(CssModifier(createModifier(), breakpoint))
+    fun cssRule(mediaQuery: CSSMediaQuery, createModifier: () -> Modifier) {
+        _cssModifiers.add(CssModifier(createModifier(), mediaQuery))
     }
 
     /**
@@ -217,14 +224,14 @@ class ComponentModifiers(val colorMode: ColorMode) {
      * which is identical to:
      *
      * ```
-     * cssRule(Breakpoint.MD) { Modifier.color(...) }
+     * cssRule(CSSMediaQuery.MediaFeature("min-width", ...)) { Modifier.color(...) }
      * ```
      *
      * Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
      * (here, we'd need to access both "Breakpoint" and "ComponentModifiers")
      */
     operator fun Breakpoint.invoke(createModifier: () -> Modifier) {
-        cssRule(this, createModifier)
+        cssRule(this.toMinWidthQuery(), createModifier)
     }
 }
 
@@ -420,9 +427,9 @@ class ComponentStyleBuilder internal constructor(
                     ComponentStyle.notifySelectorName(name)
 
                     val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
-                    if (cssRuleKey.breakpoint != null) {
+                    if (cssRuleKey.mediaQuery != null) {
                         styleSheet.apply {
-                            media(mediaMinWidth(cssRuleKey.breakpoint.toSize())) {
+                            media(cssRuleKey.mediaQuery) {
                                 addStyles(cssRule, styles)
                             }
                         }

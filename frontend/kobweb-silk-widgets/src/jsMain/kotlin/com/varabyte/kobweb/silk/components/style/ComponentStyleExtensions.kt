@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.style
 
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import org.jetbrains.compose.web.css.CSSMediaQuery
 
 //region Pseudo classes
 
@@ -286,5 +287,14 @@ val ComponentModifiers.firstLetter get() = CssRule.OfPseudoElement(this, "first-
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line
  */
 val ComponentModifiers.firstLine get() = CssRule.OfPseudoElement(this, "first-line")
+
+//endregion
+
+// region Media queries
+
+/**
+ * Used to indicate styles which should only be applied when the page is being printed.
+ */
+val ComponentModifiers.mediaPrint get() = CssRule.OfMedia(this, CSSMediaQuery.MediaType(CSSMediaQuery.MediaType.Enum.Print))
 
 //endregion
