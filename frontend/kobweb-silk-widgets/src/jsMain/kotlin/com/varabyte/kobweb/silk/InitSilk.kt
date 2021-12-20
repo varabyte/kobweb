@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk
 
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
+import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
@@ -31,6 +32,16 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(SurfaceStyle)
     mutableTheme.registerComponentStyle(TextStyle)
     mutableTheme.registerComponentStyle(LinkStyle)
+
+    mutableTheme.registerComponentStyle(DisplayIfSmStyle)
+    mutableTheme.registerComponentStyle(DisplayIfMdStyle)
+    mutableTheme.registerComponentStyle(DisplayIfLgStyle)
+    mutableTheme.registerComponentStyle(DisplayIfXlStyle)
+    mutableTheme.registerComponentStyle(DisplayUntilSmStyle)
+    mutableTheme.registerComponentStyle(DisplayUntilMdStyle)
+    mutableTheme.registerComponentStyle(DisplayUntilLgStyle)
+    mutableTheme.registerComponentStyle(DisplayUntilXlStyle)
+
     additionalInit(InitSilkContext(SilkConfigInstance, mutableTheme))
 
     _SilkTheme = ImmutableSilkTheme(mutableTheme)
