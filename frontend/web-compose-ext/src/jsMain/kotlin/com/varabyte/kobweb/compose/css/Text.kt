@@ -34,7 +34,7 @@ class TextDecorationLine(val value: String) {
 }
 
 fun StyleBuilder.textDecorationLine(vararg textDecorationLines: TextDecorationLine) {
-    property("text-decoration-line", textDecorationLines.joinToString { it.value })
+    property("text-decoration-line", textDecorationLines.joinToString(" ") { it.value })
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select

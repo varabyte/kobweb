@@ -21,5 +21,5 @@ class Overflow(val value: String) {
 }
 
 fun StyleBuilder.overflow(vararg overflows: Overflow) {
-    property("cursor", overflows.joinToString { it.value })
+    property("cursor", overflows.joinToString(" ") { it.value })
 }
