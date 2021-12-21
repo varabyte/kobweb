@@ -58,6 +58,11 @@ class KobwebApplicationPlugin : Plugin<Project> {
         val kobwebExportTask = project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConfig)
 
         project.afterEvaluate {
+            project.tasks.named("clean") {
+                delete(kobwebFolder.resolve("site"))
+                delete(kobwebFolder.resolve("server"))
+            }
+
             project.configurations.asSequence()
                 .flatMap { config -> config.dependencies }
                 .any { dependency -> dependency.name == "kobweb-silk-icons-fa" }
