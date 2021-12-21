@@ -59,8 +59,10 @@ class KobwebApplicationPlugin : Plugin<Project> {
 
         project.afterEvaluate {
             project.tasks.named("clean") {
-                delete(kobwebFolder.resolve("site"))
-                delete(kobwebFolder.resolve("server"))
+                doLast {
+                    delete(kobwebFolder.resolve("site"))
+                    delete(kobwebFolder.resolve("server"))
+                }
             }
 
             project.configurations.asSequence()
