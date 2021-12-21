@@ -75,3 +75,19 @@ fun Modifier.flex(flexGrow: Int, flexShrink: Int): Modifier = styleModifier {
 fun Modifier.flex(flexGrow: Int, flexShrink: Int, flexBasis: CSSNumeric): Modifier = styleModifier {
     flex(flexGrow, flexShrink, flexBasis)
 }
+
+fun Modifier.rowGap(value: CSSNumeric) = styleModifier {
+    rowGap(value)
+}
+
+fun Modifier.columnGap(value: CSSNumeric) = styleModifier {
+    columnGap(value)
+}
+
+fun Modifier.gap(value: CSSNumeric) = styleModifier {
+    gap(value)
+}
+
+fun Modifier.gap(rowGap: CSSNumeric, columnGap: CSSNumeric) = styleModifier {
+    gap(rowGap, columnGap)
+}
