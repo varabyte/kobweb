@@ -860,7 +860,7 @@ $ git submodule update --init
 ## What about Multiplatform Widgets?
 
 Jetbrains is working on an experimental project called "multiplatform widgets" which is supposed to bring the Desktop /
-Android API to the web. And it may seem like the Kobweb + Silk approach is competing with it.
+Android API to the web. And it may seem like the Kobweb + Silk approach will be obsolete when it is finished.
 
 However, I've found there is a fundamental distance between Desktop / Android Compose and Web Compose. Specifically,
 Desktop / Android targets render to their own surface, while Web modifies a parallel html / css DOM tree and leaves it
@@ -871,16 +871,25 @@ modifiers matters, while in Web, this action simply sets html style properties u
 matter.
 
 One approach would be to own the entire rendering pipeline, ditching html / css entirely and targeting a full page
-canvas or something. However, this limits the ability for robots to crawl and index your site, which is a major
-drawback. It also means that debugging in a browser would be a rough experience, as the browser's developer tools would
-be limited in the insights it could provide for your site. It would also prevent a developer from making use of the rich
-ecosystem of Javascript libraries out there that modify the DOM tree themselves.
+canvas. However, this has several limits:
+
+* robots would lose the ability to crawl and index your site
+* your UI will be opaque to the rich suite of dev tools that come bundled with browsers
+* you won't have the ability to style unvisited vs visited links differently (this information is hidden from you by
+  the browser and can only be set through html / css)
+* you won't have the ability to turn elements on / off when printing the page
+* accessibility tools for browsers might not work
+
+It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there that modify
+the DOM tree themselves.
 
 For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a rich
 UI library of widgets that hopefully makes it relatively rare for the developer to worry about it. For example, flexbox
-is a very powerful component, but you'll find it's much easier to compose Rows and Columns together than trying to
-remember if you should be justifying your items or aligning your content, even if Rows and Columns are just creating the
-correct html / css for you behind the scenes anyways.
+is a very powerful component, but you'll find it's much easier to compose `Row`s and `Column`s together than trying to
+remember if you should be justifying your items or aligning your content, even if `Row`s and `Column`s are just creating
+the correct html / css for you behind the scenes.
+
+I think there is value in supporting both approaches.
 
 # Known Issues
 
