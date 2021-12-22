@@ -52,13 +52,13 @@ fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = 
  * A widget making it easy to create a common case of responsive grids, specifically one where you simply specify the
  * number of columns and then its contents will flow to a new row automatically.
  *
- * To add a new child to this grid, use the [SimpleGridScope.Cell] composable:
+ * Children of the Grid will be auto-slotted based on how many columns you specified
  *
  * ```
  * SimpleGrid(numColumns(2)) {
- *   Cell { Box(...) } // Row 0, Col 0
- *   Cell { Box(...) } // Row 0, Col 1
- *   Cell { Box(...) } // Row 1, Col 0
+ *   Box(...) // Row 0, Col 0
+ *   Box(...) // Row 0, Col 1
+ *   Box(...) // Row 1, Col 0
  * }
  * ```
  *
