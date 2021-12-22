@@ -45,17 +45,6 @@ private val SimpleGridColumnVariants: Map<Breakpoint?, Map<Int, ComponentVariant
         }
 }
 
-interface SimpleGridScope {
-    fun Cell(content: @Composable () -> Unit)
-}
-
-private class SimpleGridScopeImpl : SimpleGridScope {
-    val cells = mutableListOf<@Composable () -> Unit>()
-    override fun Cell(content: @Composable () -> Unit) {
-        cells.add(content)
-    }
-}
-
 fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = lg) =
     ResponsiveValues(base, sm, md, lg, xl)
 
@@ -88,7 +77,7 @@ fun SimpleGrid(
     numColumns: ResponsiveValues<Int>,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    content: SimpleGridScope.() -> Unit
+    content: @Composable () -> Unit
 ) {
     Div(
         attrs = SimpleGridStyle.toModifier(variant).then(modifier).asAttributeBuilder {
@@ -108,8 +97,6 @@ fun SimpleGrid(
             }
         }
     ) {
-        val scope = SimpleGridScopeImpl()
-        scope.content()
-        scope.cells.forEach { cell -> cell() }
+        content()
     }
 }

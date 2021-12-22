@@ -16,25 +16,13 @@ import responsive.components.layouts.PageLayout
 fun MainPage() {
     PageLayout {
         val square = Modifier.size(250.px)
-        SimpleGrid(numColumns(2, md = 3)) {
-            Cell {
-                Box(square.backgroundColor(Colors.Red))
-            }
-            Cell {
-                Box(square.backgroundColor(Colors.Green))
-            }
-            Cell {
-                Box(square.backgroundColor(Colors.Blue))
-            }
-            Cell {
-                Box(square.backgroundColor(Colors.Yellow))
-            }
-            Cell {
-                Box(square.backgroundColor(Colors.Orange))
-            }
-            Cell {
-                Box(square.backgroundColor(Colors.Magenta))
-            }
+        SimpleGrid(numColumns(2, md = 3), Modifier.gap(10.px)) {
+            Box(square.backgroundColor(Colors.Red))
+            Box(square.backgroundColor(Colors.Green))
+            Box(square.backgroundColor(Colors.Blue))
+            Box(square.backgroundColor(Colors.Yellow))
+            Box(square.backgroundColor(Colors.Orange))
+            Box(square.backgroundColor(Colors.Magenta))
         }
     }
 }
