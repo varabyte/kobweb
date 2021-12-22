@@ -863,8 +863,8 @@ Jetbrains is working on an experimental project called "multiplatform widgets" w
 Android API to the web. And it may seem like the Kobweb + Silk approach will be obsolete when it is finished.
 
 However, I've found there is a fundamental distance between Desktop / Android Compose and Web Compose. Specifically,
-Desktop / Android targets render to their own surface, while Web modifies a parallel html / css DOM tree and leaves it
-to do the final rendering.
+Desktop / Android targets render to their own surface, while Web modifies an html / css DOM tree and leaves it up to the
+browser to do the final rendering.
 
 This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
 modifiers matters, while in Web, this action simply sets html style properties under the hood, where order does not
