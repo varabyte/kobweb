@@ -34,7 +34,7 @@ fun StyleBuilder.borderBottom(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
-    borderTop {
+    borderBottom {
         width?.let { width(it) }
         style?.let { style(it) }
         color?.let { color(it) }
@@ -50,7 +50,7 @@ fun StyleBuilder.borderLeft(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
-    borderTop {
+    borderLeft {
         width?.let { width(it) }
         style?.let { style(it) }
         color?.let { color(it) }
@@ -66,7 +66,7 @@ fun StyleBuilder.borderRight(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
-    borderTop {
+    borderRight {
         width?.let { width(it) }
         style?.let { style(it) }
         color?.let { color(it) }
