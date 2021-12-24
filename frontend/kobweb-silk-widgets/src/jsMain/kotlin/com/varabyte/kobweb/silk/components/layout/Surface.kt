@@ -20,11 +20,12 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.ms
 
 val SurfaceStyle = ComponentStyle("silk-surface") {
     base {
-        val palette = SilkTheme.palettes[colorMode]
+        val palette = colorMode.toSilkPalette()
         Modifier
             .backgroundColor(palette.background)
             .color(palette.color)

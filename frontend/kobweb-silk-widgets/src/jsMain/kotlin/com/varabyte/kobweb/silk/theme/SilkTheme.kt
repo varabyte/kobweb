@@ -241,3 +241,9 @@ fun Breakpoint.toSize(): CSSUnitValue {
         Breakpoint.XL -> SilkTheme.breakpoints.xl
     }
 }
+
+/**
+ * Convenience method for fetching the silk palette associated with the target color mode, useful for when you aren't
+ * in a `@Composable` scope (which is common when defining ComponentStyles).
+ */
+fun ColorMode.toSilkPalette() = SilkTheme.palettes[this]

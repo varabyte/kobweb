@@ -18,6 +18,7 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.clip
+import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.px
 
 object Buttons {
@@ -27,7 +28,7 @@ object Buttons {
 }
 
 val ButtonStyle = ComponentStyle("silk-button") {
-    val buttonColors = SilkTheme.palettes[colorMode].button
+    val buttonColors = colorMode.toSilkPalette().button
 
     base {
         Modifier

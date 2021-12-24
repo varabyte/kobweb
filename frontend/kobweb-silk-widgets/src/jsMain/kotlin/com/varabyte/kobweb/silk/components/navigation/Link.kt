@@ -11,7 +11,7 @@ import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.link
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.visited
-import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
 
@@ -20,11 +20,12 @@ val LinkStyle = ComponentStyle("silk-link") {
         Modifier.textDecorationLine(TextDecorationLine.None)
     }
 
+    val linkColors = colorMode.toSilkPalette().link
     link {
-        Modifier.color(SilkTheme.palettes[colorMode].link.default)
+        Modifier.color(linkColors.default)
     }
     visited {
-        Modifier.color(SilkTheme.palettes[colorMode].link.visited)
+        Modifier.color(linkColors.visited)
     }
     hover {
         Modifier.textDecorationLine(TextDecorationLine.Underline)
