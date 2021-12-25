@@ -5,8 +5,6 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 
 data class SilkPalette(
-    val colorMode: ColorMode,
-
     val background: Color,
     val color: Color,
     val link: Link,
@@ -37,7 +35,6 @@ data class SilkPalettes(
 val LightSilkPalette = run {
     val buttonBase = ColorSchemes.White._900
     SilkPalette(
-        ColorMode.LIGHT,
         background = Colors.White,
         color = Colors.Black,
         link = SilkPalette.Link(
@@ -55,7 +52,6 @@ val LightSilkPalette = run {
 val DarkSilkPalette = run {
     val buttonBase = ColorSchemes.Black._900
     SilkPalette(
-        ColorMode.DARK,
         background = Colors.Black,
         color = Colors.White,
         link = SilkPalette.Link(
