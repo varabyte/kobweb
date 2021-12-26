@@ -10,13 +10,13 @@ import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.project.KobwebFolder
-import com.varabyte.konsole.foundation.konsoleApp
-import com.varabyte.konsole.foundation.text.blue
-import com.varabyte.konsole.foundation.text.bold
-import com.varabyte.konsole.foundation.text.green
-import com.varabyte.konsole.foundation.text.magenta
-import com.varabyte.konsole.foundation.text.text
-import com.varabyte.konsole.foundation.text.textLine
+import com.varabyte.kotter.foundation.session
+import com.varabyte.kotter.foundation.text.blue
+import com.varabyte.kotter.foundation.text.bold
+import com.varabyte.kotter.foundation.text.green
+import com.varabyte.kotter.foundation.text.magenta
+import com.varabyte.kotter.foundation.text.text
+import com.varabyte.kotter.foundation.text.textLine
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
@@ -41,8 +41,8 @@ import kotlin.io.path.name
  */
 private const val DEFAULT_SUFFIX = "/default"
 
-fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
-    val tempDir = handleFetch(repo, branch) ?: return@konsoleApp
+fun handleCreate(repo: String, branch: String, template: String) = session {
+    val tempDir = handleFetch(repo, branch) ?: return@session
 
     val templateFile = run {
         val tempPath = tempDir.toPath()
@@ -55,13 +55,13 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
             .firstOrNull()
 
             ?: run {
-                konsole {
+                section {
                     textError("Unable to locate a template named \"$template\"")
                     textLine()
                     text("Consider running `"); cmd("kobweb list"); text("` for a list of choices.")
                 }.run()
 
-                return@konsoleApp
+                return@session
             }
     }
 
@@ -99,7 +99,7 @@ fun handleCreate(repo: String, branch: String, template: String) = konsoleApp {
 
     val projectFolder = dstPath.name
 
-    konsole {
+    section {
         fun indent() {
             text("  ")
         }

@@ -12,19 +12,19 @@ import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerState
 import com.varabyte.kobweb.server.api.ServerStateFile
-import com.varabyte.konsole.foundation.anim.konsoleAnimOf
-import com.varabyte.konsole.foundation.input.Keys
-import com.varabyte.konsole.foundation.input.onKeyPressed
-import com.varabyte.konsole.foundation.konsoleApp
-import com.varabyte.konsole.foundation.konsoleVarOf
-import com.varabyte.konsole.foundation.runUntilSignal
-import com.varabyte.konsole.foundation.text.cyan
-import com.varabyte.konsole.foundation.text.green
-import com.varabyte.konsole.foundation.text.red
-import com.varabyte.konsole.foundation.text.text
-import com.varabyte.konsole.foundation.text.textLine
-import com.varabyte.konsole.foundation.text.yellow
-import com.varabyte.konsole.foundation.timer.addTimer
+import com.varabyte.kotter.foundation.anim.animOf
+import com.varabyte.kotter.foundation.input.Keys
+import com.varabyte.kotter.foundation.input.onKeyPressed
+import com.varabyte.kotter.foundation.liveVarOf
+import com.varabyte.kotter.foundation.runUntilSignal
+import com.varabyte.kotter.foundation.session
+import com.varabyte.kotter.foundation.text.cyan
+import com.varabyte.kotter.foundation.text.green
+import com.varabyte.kotter.foundation.text.red
+import com.varabyte.kotter.foundation.text.text
+import com.varabyte.kotter.foundation.text.textLine
+import com.varabyte.kotter.foundation.text.yellow
+import com.varabyte.kotter.foundation.timer.addTimer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -44,8 +44,8 @@ private enum class RunState {
 
 fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
     val kobwebGradle = KobwebGradle(env)
-    if (isInteractive) konsoleApp {
-        val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@konsoleApp
+    if (isInteractive) session {
+        val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@session
 
         newline() // Put space between user prompt and eventual first line of Gradle output
 
@@ -56,11 +56,11 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
             ServerEnvironment.PROD -> "production"
         }
         var serverState: ServerState? = null // Set on and after RunState.RUNNING
-        val ellipsisAnim = konsoleAnimOf(Anims.ELLIPSIS)
-        var runState by konsoleVarOf(RunState.STARTING)
-        var cancelReason by konsoleVarOf("")
-        var exception by konsoleVarOf<Exception?>(null) // Set if RunState.INTERRUPTED
-        konsole {
+        val ellipsisAnim = animOf(Anims.ELLIPSIS)
+        var runState by liveVarOf(RunState.STARTING)
+        var cancelReason by liveVarOf("")
+        var exception by liveVarOf<Exception?>(null) // Set if RunState.INTERRUPTED
+        section {
             textLine() // Add text line between this block and Gradle output above
 
             when (runState) {

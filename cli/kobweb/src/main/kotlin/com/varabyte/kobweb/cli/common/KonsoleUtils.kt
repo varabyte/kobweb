@@ -1,31 +1,25 @@
 package com.varabyte.kobweb.cli.common
 
-import com.varabyte.konsole.foundation.anim.konsoleAnimOf
-import com.varabyte.konsole.foundation.input.Completions
-import com.varabyte.konsole.foundation.input.input
-import com.varabyte.konsole.foundation.input.onInputChanged
-import com.varabyte.konsole.foundation.input.onInputEntered
-import com.varabyte.konsole.foundation.input.runUntilInputEntered
-import com.varabyte.konsole.foundation.konsoleVarOf
-import com.varabyte.konsole.foundation.render.aside
-import com.varabyte.konsole.foundation.text.black
-import com.varabyte.konsole.foundation.text.bold
-import com.varabyte.konsole.foundation.text.cyan
-import com.varabyte.konsole.foundation.text.green
-import com.varabyte.konsole.foundation.text.invert
-import com.varabyte.konsole.foundation.text.red
-import com.varabyte.konsole.foundation.text.text
-import com.varabyte.konsole.foundation.text.textLine
-import com.varabyte.konsole.foundation.text.yellow
-import com.varabyte.konsole.runtime.KonsoleApp
-import com.varabyte.konsole.runtime.KonsoleBlock.RunScope
-import com.varabyte.konsole.runtime.render.RenderScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
+import com.varabyte.kotter.foundation.anim.animOf
+import com.varabyte.kotter.foundation.input.Completions
+import com.varabyte.kotter.foundation.input.input
+import com.varabyte.kotter.foundation.input.onInputChanged
+import com.varabyte.kotter.foundation.input.onInputEntered
+import com.varabyte.kotter.foundation.input.runUntilInputEntered
+import com.varabyte.kotter.foundation.liveVarOf
+import com.varabyte.kotter.foundation.render.aside
+import com.varabyte.kotter.foundation.text.black
+import com.varabyte.kotter.foundation.text.bold
+import com.varabyte.kotter.foundation.text.cyan
+import com.varabyte.kotter.foundation.text.green
+import com.varabyte.kotter.foundation.text.invert
+import com.varabyte.kotter.foundation.text.red
+import com.varabyte.kotter.foundation.text.text
+import com.varabyte.kotter.foundation.text.textLine
+import com.varabyte.kotter.foundation.text.yellow
+import com.varabyte.kotter.runtime.Section.RunScope
+import com.varabyte.kotter.runtime.Session
+import com.varabyte.kotter.runtime.render.RenderScope
 
 private enum class ProcessingState {
     IN_PROGRESS,
@@ -53,11 +47,11 @@ fun RenderScope.cmd(name: String) {
     }
 }
 
-fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
-    val spinner = konsoleAnimOf(Anims.SPINNER)
-    val ellipsis = konsoleAnimOf(Anims.ELLIPSIS)
-    var state by konsoleVarOf(ProcessingState.IN_PROGRESS)
-    konsole {
+fun Session.processing(message: String, blockingWork: () -> Unit): Boolean {
+    val spinner = animOf(Anims.SPINNER)
+    val ellipsis = animOf(Anims.ELLIPSIS)
+    var state by liveVarOf(ProcessingState.IN_PROGRESS)
+    section {
         when (state) {
             ProcessingState.IN_PROGRESS -> yellow { text(spinner) }
             ProcessingState.FAILED -> red { text("✗") }
@@ -85,14 +79,14 @@ fun KonsoleApp.processing(message: String, blockingWork: () -> Unit): Boolean {
     return state == ProcessingState.SUCCEEDED
 }
 
-fun KonsoleApp.informError(message: String) {
-    konsole {
+fun Session.informError(message: String) {
+    section {
         textError(message)
     }.run()
 }
 
-fun KonsoleApp.informInfo(message: String) {
-    konsole {
+fun Session.informInfo(message: String) {
+    section {
         yellow { text('!') }
         text(' ')
         textLine(message)
@@ -103,14 +97,14 @@ fun KonsoleApp.informInfo(message: String) {
  * @param validateAnswer Take a string (representing a user's answer), returning a new string which represents an error
  *   message, or null if no error.
  */
-fun KonsoleApp.queryUser(
+fun Session.queryUser(
     query: String,
     defaultAnswer: String?,
     validateAnswer: (String) -> String? = Validations::isNotEmpty
 ): String {
-    var answer by konsoleVarOf("")
-    var error by konsoleVarOf<String?>(null)
-    konsole {
+    var answer by liveVarOf("")
+    var error by liveVarOf<String?>(null)
+    section {
         cyan { text('?') }
         text(' ')
         bold { textLine("$query ") }
@@ -151,8 +145,8 @@ fun KonsoleApp.queryUser(
 /**
  * Convenience method for adding a single line, useful to do before or after queries or information messages.
  */
-fun KonsoleApp.newline() {
-    konsole { textLine() }.run()
+fun Session.newline() {
+    section { textLine() }.run()
 }
 
 fun RunScope.handleConsoleOutput(line: String, isError: Boolean) {

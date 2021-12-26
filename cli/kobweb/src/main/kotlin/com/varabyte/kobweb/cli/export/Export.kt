@@ -8,14 +8,14 @@ import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.server.api.ServerEnvironment
-import com.varabyte.konsole.foundation.anim.konsoleAnimOf
-import com.varabyte.konsole.foundation.input.Keys
-import com.varabyte.konsole.foundation.input.onKeyPressed
-import com.varabyte.konsole.foundation.konsoleApp
-import com.varabyte.konsole.foundation.konsoleVarOf
-import com.varabyte.konsole.foundation.text.red
-import com.varabyte.konsole.foundation.text.textLine
-import com.varabyte.konsole.foundation.text.yellow
+import com.varabyte.kotter.foundation.anim.animOf
+import com.varabyte.kotter.foundation.input.Keys
+import com.varabyte.kotter.foundation.input.onKeyPressed
+import com.varabyte.kotter.foundation.session
+import com.varabyte.kotter.foundation.liveVarOf
+import com.varabyte.kotter.foundation.text.red
+import com.varabyte.kotter.foundation.text.textLine
+import com.varabyte.kotter.foundation.text.yellow
 import kotlinx.coroutines.delay
 
 private enum class ExportState {
@@ -31,17 +31,17 @@ private enum class ExportState {
 fun handleExport(isInteractive: Boolean) {
     val kobwebGradle = KobwebGradle(ServerEnvironment.PROD) // exporting is a production-only action
 
-    if (isInteractive) konsoleApp {
-        findKobwebProject() ?: return@konsoleApp
+    if (isInteractive) session {
+        findKobwebProject() ?: return@session
 
         newline() // Put space between user prompt and eventual first line of Gradle output
 
-        var exportState by konsoleVarOf(ExportState.EXPORTING)
+        var exportState by liveVarOf(ExportState.EXPORTING)
 
-        var cancelReason by konsoleVarOf("")
-        val ellipsis = konsoleAnimOf(Anims.ELLIPSIS)
-        var exception by konsoleVarOf<Exception?>(null) // Set if ExportState.INTERRUPTED
-        konsole {
+        var cancelReason by liveVarOf("")
+        val ellipsis = animOf(Anims.ELLIPSIS)
+        var exception by liveVarOf<Exception?>(null) // Set if ExportState.INTERRUPTED
+        section {
             textLine() // Add space between this block and Gradle text which will appear above
             when (exportState) {
                 ExportState.EXPORTING -> textLine("Exporting$ellipsis")

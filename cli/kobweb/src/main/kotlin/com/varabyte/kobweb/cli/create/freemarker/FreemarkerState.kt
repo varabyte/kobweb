@@ -14,7 +14,7 @@ import com.varabyte.kobweb.cli.create.freemarker.methods.PackageToPathMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.common.toUnixSeparators
-import com.varabyte.konsole.runtime.KonsoleApp
+import com.varabyte.kotter.runtime.Session
 import freemarker.cache.NullCacheStorage
 import freemarker.template.Configuration
 import freemarker.template.Template
@@ -68,7 +68,7 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
         fallbackOnNullLoopVariable = false
     }
 
-    private fun KonsoleApp.process(instructions: Iterable<Instruction>) {
+    private fun Session.process(instructions: Iterable<Instruction>) {
         for (inst in instructions) {
             val useInstruction = inst.condition?.process(cfg, model)?.toBoolean() ?: true
             if (!useInstruction) continue
@@ -164,7 +164,7 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
 
     }
 
-    fun execute(app: KonsoleApp, instructions: List<Instruction>) {
+    fun execute(app: Session, instructions: List<Instruction>) {
         app.apply {
             process(instructions)
             processing("Nearly finished. Populating final project") {

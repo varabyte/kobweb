@@ -6,14 +6,14 @@ import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
 import com.varabyte.kobweb.project.KobwebFolder
-import com.varabyte.konsole.foundation.konsoleApp
-import com.varabyte.konsole.foundation.text.cyan
-import com.varabyte.konsole.foundation.text.text
-import com.varabyte.konsole.foundation.text.textLine
+import com.varabyte.kotter.foundation.session
+import com.varabyte.kotter.foundation.text.cyan
+import com.varabyte.kotter.foundation.text.text
+import com.varabyte.kotter.foundation.text.textLine
 import kotlin.io.path.relativeTo
 
-fun handleList(repo: String, branch: String) = konsoleApp {
-    val tempDir = handleFetch(repo, branch) ?: return@konsoleApp
+fun handleList(repo: String, branch: String) = session {
+    val tempDir = handleFetch(repo, branch) ?: return@session
 
     val templates = tempDir.walkBottomUp()
         .filter { it.isDirectory }
@@ -24,7 +24,7 @@ fun handleList(repo: String, branch: String) = konsoleApp {
         .filter { templateFile -> templateFile.content != null }
         .toList()
 
-    konsole {
+    section {
         if (templates.isNotEmpty()) {
             text("You can create the following Kobweb projects by typing `kobweb create ")
             cyan { text("...") }

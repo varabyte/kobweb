@@ -11,7 +11,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.kotlinx.cli)
     implementation(libs.kotlinx.coroutines)
-    implementation(libs.konsole)
+    implementation(libs.kotter)
     implementation(libs.jgit)
     implementation(libs.freemarker)
     implementation(libs.kaml)

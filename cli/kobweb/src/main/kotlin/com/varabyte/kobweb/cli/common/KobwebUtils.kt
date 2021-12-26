@@ -3,7 +3,7 @@ package com.varabyte.kobweb.cli.common
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebProject
 import com.varabyte.kobweb.server.api.ServerEnvironment
-import com.varabyte.konsole.runtime.KonsoleApp
+import com.varabyte.kotter.runtime.Session
 
 fun assertKobwebProject(): KobwebProject {
     return try {
@@ -13,7 +13,7 @@ fun assertKobwebProject(): KobwebProject {
     }
 }
 
-fun KonsoleApp.findKobwebProject(): KobwebProject? {
+fun Session.findKobwebProject(): KobwebProject? {
     return try {
         assertKobwebProject()
     } catch (ex: KobwebException) {
