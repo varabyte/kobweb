@@ -17,6 +17,8 @@ import com.varabyte.kotter.foundation.text.green
 import com.varabyte.kotter.foundation.text.magenta
 import com.varabyte.kotter.foundation.text.text
 import com.varabyte.kotter.foundation.text.textLine
+import com.varabyte.kotterx.decorations.BorderCharacters
+import com.varabyte.kotterx.decorations.bordered
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
@@ -109,8 +111,10 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
             textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
         }
         textLine()
-        text("Consider downloading "); magenta(isBright = true) { textLine("IntelliJ IDEA Community Edition") }
-        text("using "); blue(isBright = true) { textLine("https://www.jetbrains.com/toolbox-app/") }
+        bordered(BorderCharacters.CURVED, paddingLeftRight = 1) {
+            text("Consider downloading "); magenta(isBright = true) { textLine("IntelliJ IDEA Community Edition") }
+            text("using "); blue(isBright = true) { textLine("https://www.jetbrains.com/toolbox-app/") }
+        }
         textLine()
         textLine("We suggest that you begin by typing:")
         textLine()
