@@ -32,7 +32,7 @@ The binary itself is relatively thin - it mostly delegates to `git` (for fetchin
 building code and triggering our [Kobweb Gradle plugins ▼](#gradle-plugins) with all the right arguments.)
 
 If you ever find yourself working in here, you may want to familiarize yourself with the
-[Konsole](https://github.com/varabyte/konsole) library as well, since it makes heavy use of it.
+[Kotter](https://github.com/varabyte/kotter) library as well, since it makes heavy use of it.
 
 ## Frontend
 
