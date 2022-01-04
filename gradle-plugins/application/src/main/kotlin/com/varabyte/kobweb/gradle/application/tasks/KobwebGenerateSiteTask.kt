@@ -61,7 +61,10 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, 
                 createIndexFile(
                     kobwebConf.site.title,
                     config.index.head.get(),
-                    kobwebConf.server.files.dev.script.substringAfterLast("/"),
+                    // Our script will always exist at the root folder, so be sure to ground it,
+                    // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
+                    // a subdirectory.
+                    "/" + kobwebConf.server.files.dev.script.substringAfterLast("/"),
                     buildTarget
                 )
             )
