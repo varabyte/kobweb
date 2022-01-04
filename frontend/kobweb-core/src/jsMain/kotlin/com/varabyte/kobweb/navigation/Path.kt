@@ -1,24 +1,22 @@
 package com.varabyte.kobweb.navigation
 
-private const val HEX_REGEX = "[0-9A-F]"
-
-// Matches: "/example/path", "/example/path/"
-private val PATH_REGEX = Regex("""^/(([a-z0-9]|%${HEX_REGEX}${HEX_REGEX})+/?)*$""")
+import org.w3c.dom.url.URL
 
 /**
- * A path component to a URL string. Does NOT include any query parameters.
+ * A path component to a relative URL string, e.g. "/example/path".
+ *
+ * If the passed-in value includes a domain, e.g. "http://whatever.com", or query parameters, they will be stripped.
  */
-class Path(val value: String) {
+class Path(value: String) {
+    // Pass in a dummy base because without it, URL rejects relative paths
+    val value = URL(value, "http://unused.com").pathname
+
     companion object {
-        fun isLocal(path: String) = tryCreate(path) != null
+        fun isLocal(path: String) = !path.contains("://") && tryCreate(path) != null
         fun tryCreate(path: String) = try {
             Path(path)
-        } catch (ex: IllegalArgumentException) {
+        } catch (ex: Exception) {
             null
         }
-    }
-
-    init {
-        require(value.matches(PATH_REGEX)) { "URL path not formatted properly: $value" }
     }
 }
