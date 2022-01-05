@@ -66,7 +66,9 @@ class Router {
 
         if (!Path.isLocal(path)) {
             require(allowExternalPaths) { "Navigation to \"$pathAndQuery\" not expected by callee" }
-            window.location.assign(pathAndQuery)
+            // Open external links in a new tab
+            // TODO(#90): Allow configuring other options. In place would be window.location.assign(...)
+            window.open(pathAndQuery, target = "_blank")
             return false
         }
 
