@@ -90,7 +90,7 @@ $ kobweb version # to check it's working
 
 or via symbolic link:
 
-```base
+```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
 $ ln -s /path/to/applications/kobweb/kobweb-0.7.11/bin/kobweb kobweb
 ```
