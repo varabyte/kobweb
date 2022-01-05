@@ -62,39 +62,39 @@ object KobwebComposeStyleSheet : StyleSheet() {
 
         // Styles when the child wants to override the parent setting
 
-        ".kobweb-box > .kobweb-align-top-start" {
+        ".kobweb-box > .kobweb-align-top-start-self" {
             alignSelf(AlignSelf.Start)
             justifySelf(AlignSelf.Start.value)
         }
-        ".kobweb-box > .kobweb-align-top" {
+        ".kobweb-box > .kobweb-align-top-self" {
             alignSelf(AlignSelf.Start)
             justifySelf(AlignSelf.Center.value)
         }
-        ".kobweb-box > .kobweb-align-top-end" {
+        ".kobweb-box > .kobweb-align-top-end-self" {
             alignSelf(AlignSelf.Start)
             justifySelf(AlignSelf.End.value)
         }
-        ".kobweb-box > .kobweb-align-center-start" {
+        ".kobweb-box > .kobweb-align-center-start-self" {
             alignSelf(AlignSelf.Center)
             justifySelf(AlignSelf.Start.value)
         }
-        ".kobweb-box > .kobweb-align-center" {
+        ".kobweb-box > .kobweb-align-center-self" {
             alignSelf(AlignSelf.Center)
             justifySelf(AlignSelf.Center.value)
         }
-        ".kobweb-box > .kobweb-align-center-end" {
+        ".kobweb-box > .kobweb-align-center-end-self" {
             justifySelf(AlignSelf.End.value)
             alignSelf(AlignSelf.Center)
         }
-        ".kobweb-box > .kobweb-align-bottom-start" {
+        ".kobweb-box > .kobweb-align-bottom-start-self" {
             justifySelf(AlignSelf.Start.value)
             alignSelf(AlignSelf.End)
         }
-        ".kobweb-box > .kobweb-align-bottom" {
+        ".kobweb-box > .kobweb-align-bottom-self" {
             justifySelf(AlignSelf.Center.value)
             alignSelf(AlignSelf.End)
         }
-        ".kobweb-box > .kobweb-align-bottom-end" {
+        ".kobweb-box > .kobweb-align-bottom-end-self" {
             justifySelf(AlignSelf.End.value)
             alignSelf(AlignSelf.End)
         }
@@ -119,9 +119,9 @@ object KobwebComposeStyleSheet : StyleSheet() {
 
         // Styles when the child wants to override the parent setting
 
-        ".kobweb-row > .kobweb-align-top" { alignSelf(AlignSelf.FlexStart) }
-        ".kobweb-row > .kobweb-align-center-vert" { alignSelf(AlignSelf.Center) }
-        ".kobweb-row > .kobweb-align-bottom" { alignSelf(AlignSelf.FlexEnd) }
+        ".kobweb-row > .kobweb-align-top-self" { alignSelf(AlignSelf.FlexStart) }
+        ".kobweb-row > .kobweb-align-center-vert-self" { alignSelf(AlignSelf.Center) }
+        ".kobweb-row > .kobweb-align-bottom-self" { alignSelf(AlignSelf.FlexEnd) }
     }
 
     private fun initCol() {
@@ -142,9 +142,9 @@ object KobwebComposeStyleSheet : StyleSheet() {
 
         // Styles when the child wants to override the parent setting
 
-        ".kobweb-col > .kobweb-align-start" { alignSelf(AlignSelf.FlexStart) }
-        ".kobweb-col > .kobweb-align-center-horiz" { alignSelf(AlignSelf.Center) }
-        ".kobweb-col > .kobweb-align-end" { alignSelf(AlignSelf.FlexEnd) }
+        ".kobweb-col > .kobweb-align-start-self" { alignSelf(AlignSelf.FlexStart) }
+        ".kobweb-col > .kobweb-align-center-horiz-self" { alignSelf(AlignSelf.Center) }
+        ".kobweb-col > .kobweb-align-end-self" { alignSelf(AlignSelf.FlexEnd) }
     }
 
     private fun initSpacer() {

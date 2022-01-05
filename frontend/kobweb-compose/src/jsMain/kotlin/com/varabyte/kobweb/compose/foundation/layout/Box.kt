@@ -10,7 +10,7 @@ import org.jetbrains.compose.web.dom.Div
 
 class BoxScope {
     fun Modifier.align(alignment: Alignment) = attrModifier {
-        classes(alignment.toClassName())
+        classes("${alignment.toClassName()}-self")
     }
 }
 

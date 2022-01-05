@@ -23,7 +23,7 @@ import org.jetbrains.compose.web.dom.Div
 
 class RowScope {
     fun Modifier.align(alignment: Alignment.Vertical) = attrModifier {
-        classes(alignment.toClassName())
+        classes("${alignment.toClassName()}-self")
     }
 }
 
