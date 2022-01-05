@@ -897,6 +897,11 @@ I think there is value in supporting both approaches.
     * Quit kobweb, run `./gradlew --stop`, and then try again
     * Run `./gradlew kobwebGen` or `./gradlew kobwebStart` with various Gradle debug options to see what's going on
       under the hood (e.g. `./gradlew kobwebStart --stacktrace`)
+* A running kobweb server occasionally won't shutdown upon quitting
+    * The message should indicate the PID
+    * In a separte terminal, kill the process manually (e.g. on Linux: `kill -9 ...`)
+    * Press CTRL-C to kill `kobweb run`
+    * Tracking this issue [here](https://github.com/varabyte/kobweb/issues/89)
 
 Solutions didn't work? Or you're encountering issues not listed here? Please consider
 [leaving feedback ▼](https://github.com/varabyte/kobweb#filing-issues-and-leaving-feedback)!
