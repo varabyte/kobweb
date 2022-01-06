@@ -1,9 +1,9 @@
 package com.varabyte.kobweb.cli.common
 
-import com.varabyte.kotter.foundation.anim.Anim
+import com.varabyte.kotter.foundation.anim.TextAnim
 import java.time.Duration
 
 object Anims {
-    val ELLIPSIS = Anim.Template(listOf("", ".", "..", "..."), Duration.ofMillis(250))
-    val SPINNER = Anim.Template(listOf("⠋", "⠙", "⠸", "⠴", "⠦", "⠇"), Duration.ofMillis(150))
+    val ELLIPSIS = TextAnim.Template(listOf("", ".", "..", "..."), Duration.ofMillis(250))
+    val SPINNER = TextAnim.Template(listOf("⠋", "⠙", "⠸", "⠴", "⠦", "⠇"), Duration.ofMillis(150))
 }

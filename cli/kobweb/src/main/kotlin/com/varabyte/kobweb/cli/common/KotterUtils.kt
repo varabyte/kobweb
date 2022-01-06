@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.cli.common
 
-import com.varabyte.kotter.foundation.anim.animOf
+import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.input.Completions
 import com.varabyte.kotter.foundation.input.input
 import com.varabyte.kotter.foundation.input.onInputChanged
@@ -48,8 +48,8 @@ fun RenderScope.cmd(name: String) {
 }
 
 fun Session.processing(message: String, blockingWork: () -> Unit): Boolean {
-    val spinner = animOf(Anims.SPINNER)
-    val ellipsis = animOf(Anims.ELLIPSIS)
+    val spinner = textAnimOf(Anims.SPINNER)
+    val ellipsis = textAnimOf(Anims.ELLIPSIS)
     var state by liveVarOf(ProcessingState.IN_PROGRESS)
     section {
         when (state) {

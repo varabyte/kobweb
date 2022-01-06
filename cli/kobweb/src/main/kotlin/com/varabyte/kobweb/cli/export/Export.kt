@@ -8,7 +8,7 @@ import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.server.api.ServerEnvironment
-import com.varabyte.kotter.foundation.anim.animOf
+import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.input.Keys
 import com.varabyte.kotter.foundation.input.onKeyPressed
 import com.varabyte.kotter.foundation.session
@@ -39,7 +39,7 @@ fun handleExport(isInteractive: Boolean) {
         var exportState by liveVarOf(ExportState.EXPORTING)
 
         var cancelReason by liveVarOf("")
-        val ellipsis = animOf(Anims.ELLIPSIS)
+        val ellipsis = textAnimOf(Anims.ELLIPSIS)
         var exception by liveVarOf<Exception?>(null) // Set if ExportState.INTERRUPTED
         section {
             textLine() // Add space between this block and Gradle text which will appear above

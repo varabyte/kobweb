@@ -12,7 +12,7 @@ import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerState
 import com.varabyte.kobweb.server.api.ServerStateFile
-import com.varabyte.kotter.foundation.anim.animOf
+import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.input.Keys
 import com.varabyte.kotter.foundation.input.onKeyPressed
 import com.varabyte.kotter.foundation.liveVarOf
@@ -56,7 +56,7 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
             ServerEnvironment.PROD -> "production"
         }
         var serverState: ServerState? = null // Set on and after RunState.RUNNING
-        val ellipsisAnim = animOf(Anims.ELLIPSIS)
+        val ellipsisAnim = textAnimOf(Anims.ELLIPSIS)
         var runState by liveVarOf(RunState.STARTING)
         var cancelReason by liveVarOf("")
         var exception by liveVarOf<Exception?>(null) // Set if RunState.INTERRUPTED
