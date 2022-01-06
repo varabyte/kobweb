@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.name
@@ -164,7 +165,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
                         flush()
                         delay(300)
                     }
-                } catch (ex: ChannelWriteException) {
+                } catch (ex: IOException) {
                     println("Closing socket because client disconnected")
                     // Expected eventually - client connection closed
                 }
