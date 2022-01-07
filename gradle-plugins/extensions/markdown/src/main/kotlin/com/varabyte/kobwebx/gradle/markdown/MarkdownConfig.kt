@@ -168,8 +168,6 @@ abstract class MarkdownComponents {
     abstract val th: Property<NodeScope.(TableCell) -> String>
 
     init {
-        useSilk.convention(true)
-
         text.convention { text ->
             if (useSilk.get()) {
                 "$SILK.text.Text(\"${text.literal}\")"

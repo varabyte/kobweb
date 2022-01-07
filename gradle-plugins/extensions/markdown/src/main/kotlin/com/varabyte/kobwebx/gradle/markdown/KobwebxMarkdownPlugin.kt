@@ -15,10 +15,8 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         val kobwebxBlock = (project.extensions["kobwebx"] as ExtensionAware)
 
         val markdownConfig = kobwebxBlock.extensions.create("markdown", MarkdownConfig::class.java)
-        (markdownConfig as ExtensionAware).extensions.apply {
-            create("components", MarkdownComponents::class.java)
-            create("features", MarkdownFeatures::class.java)
-        }
+        val markdownComponents = (markdownConfig as ExtensionAware).extensions.create("components", MarkdownComponents::class.java)
+        (markdownConfig as ExtensionAware).extensions.create("features", MarkdownFeatures::class.java)
 
         val convertTask = project.tasks.register(
             "kobwebxMarkdownConvert",
@@ -28,6 +26,11 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         )
 
         project.afterEvaluate {
+            markdownComponents.useSilk.convention(project.configurations.asSequence()
+                .flatMap { config -> config.dependencies }
+                .any { dependency -> dependency.name == "kobweb-silk" }
+            )
+
             project.tasks.named("kobwebGenSite") {
                 dependsOn(convertTask)
             }
