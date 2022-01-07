@@ -207,7 +207,7 @@ from [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.h
 ---
 
 **NOTE**: It looks like someone broke something in IntelliJ. Follow along at
-[this YouTrack issue](https://youtrack.jetbrains.com/issue/IDEA-284935) to see when it will be resolved.
+[this YouTrack issue](https://youtrack.jetbrains.com/issue/IDEA-284013) to see when it will be resolved.
 
 As a temporary workaround, consider making a "Shell Script" run configuration, set the "Execute" option to
 "Script text", and set the "Script text" to `./gradlew kobwebStart -t`
