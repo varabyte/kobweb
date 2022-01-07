@@ -214,6 +214,8 @@ As a temporary workaround, consider making a "Shell Script" run configuration, s
 
 ![Kobweb Start Run Config Workaround](https://raw.githubusercontent.com/varabyte/media/main/kobweb/images/kobweb-start-workaround.png)
 
+I found unchecking the "Execute in the terminal" resulted in a better experience.
+
 ## Running examples
 
 Kobweb will provide a growing collection of samples for you to learn from. To see what's available, run:
