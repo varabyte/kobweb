@@ -23,6 +23,7 @@ import org.commonmark.node.ListItem
 import org.commonmark.node.Node
 import org.commonmark.node.OrderedList
 import org.commonmark.node.Paragraph
+import org.commonmark.node.SoftLineBreak
 import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
@@ -154,6 +155,12 @@ class KotlinRenderer(
 
         override fun visit(fencedCodeBlock: FencedCodeBlock) {
             doVisit(fencedCodeBlock, components.code)
+        }
+
+        override fun visit(softLineBreak: SoftLineBreak) {
+            // Treat softline breaks like a space. The newlines here are probably coming from the fact that the user
+            // pressed ENTER to keep the width of their md file from going over 80 or 100 characters.
+            visit(Text(" "))
         }
 
         override fun visit(hardLineBreak: HardLineBreak) {
