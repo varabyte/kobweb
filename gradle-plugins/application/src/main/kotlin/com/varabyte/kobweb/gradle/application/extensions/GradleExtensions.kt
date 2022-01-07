@@ -76,3 +76,15 @@ fun Project.prefixQualifiedPackage(relPathMaybe: String): String {
         else -> relPathMaybe
     }
 }
+
+/**
+ * Returns true if one of this project's dependency is named [name].
+ *
+ * This method should be called in an [Project.afterEvaluate] block, or else it will always return false.
+ */
+fun Project.hasDependencyNamed(name: String): Boolean {
+    check(project.state.executed)
+    return configurations.asSequence()
+        .flatMap { config -> config.dependencies }
+        .any { dependency -> dependency.name == name }
+}

@@ -2,6 +2,8 @@
 
 package com.varabyte.kobwebx.gradle.markdown
 
+import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
@@ -22,7 +24,9 @@ import org.commonmark.node.Paragraph
 import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
+import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import javax.inject.Inject
 
 abstract class MarkdownConfig {
     /**
@@ -133,7 +137,7 @@ class NodeScope {
  * }
  * ```
  */
-abstract class MarkdownComponents {
+abstract class MarkdownComponents @Inject constructor(project: Project) {
     /**
      * Use Silk components instead of Web Compose components when relevant.
      *
@@ -168,6 +172,10 @@ abstract class MarkdownComponents {
     abstract val th: Property<NodeScope.(TableCell) -> String>
 
     init {
+        project.afterEvaluate {
+            useSilk.convention(project.hasDependencyNamed("kobweb-silk"))
+        }
+
         text.convention { text ->
             if (useSilk.get()) {
                 "$SILK.text.Text(\"${text.literal}\")"

@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
+import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import com.varabyte.kobweb.gradle.application.kmp.sourceSets
@@ -65,19 +66,14 @@ class KobwebApplicationPlugin : Plugin<Project> {
                 }
             }
 
-            project.configurations.asSequence()
-                .flatMap { config -> config.dependencies }
-                .any { dependency -> dependency.name == "kobweb-silk-icons-fa" }
-                .let { dependsOnSilkIcons ->
-                    if (dependsOnSilkIcons) {
-                        kobwebConfig.index.head.add {
-                            link {
-                                rel = "stylesheet"
-                                href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-                            }
-                        }
+            if (project.hasDependencyNamed("kobweb-silk-icons-fa")) {
+                kobwebConfig.index.head.add {
+                    link {
+                        rel = "stylesheet"
+                        href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
                     }
                 }
+            }
 
             val cleanTask = project.tasks.named("clean")
             project.tasks.named("compileKotlinJs") {

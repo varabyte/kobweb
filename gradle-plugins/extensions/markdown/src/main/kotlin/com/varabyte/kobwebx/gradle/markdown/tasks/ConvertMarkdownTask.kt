@@ -1,4 +1,4 @@
-package com.varabyte.kobwebx.gradle.markdown
+package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
@@ -6,6 +6,10 @@ import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
 import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.application.extensions.getResourceRoots
 import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
+import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
+import com.varabyte.kobwebx.gradle.markdown.MarkdownComponents
+import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
+import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallExtension
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
@@ -25,6 +29,10 @@ abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebConfig: KobwebConfig,
     private val markdownConfig: MarkdownConfig,
 ) : DefaultTask() {
+    init {
+        description = "Convert markdown files found in the project's resources path to source code in the final project"
+    }
+
     private val markdownComponents =
         (markdownConfig as ExtensionAware).extensions.getByName("components") as MarkdownComponents
     private val markdownFeatures =

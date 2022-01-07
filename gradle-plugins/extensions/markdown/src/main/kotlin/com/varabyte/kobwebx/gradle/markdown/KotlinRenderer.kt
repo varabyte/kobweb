@@ -1,5 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown
 
+import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
@@ -43,6 +44,8 @@ class KotlinRenderer(
 
     private var indentCount = 0
     private val indent get() = "    ".repeat(indentCount)
+    // If true, we have access to the `MarkdownContext` class and CompositionLocal
+    private val dependsOnMarkdownArtifact = project.hasDependencyNamed("kobwebx-markdown")
 
     /**
      * @param name The name of this method. See also [toFqn]
@@ -68,17 +71,21 @@ class KotlinRenderer(
     }
 
     override fun render(node: Node, output: Appendable) {
-        output.appendLine(
-            """
-            package ${project.prefixQualifiedPackage(relativePackage)}
+        output.append(
+            buildString {
+                appendLine("package ${project.prefixQualifiedPackage(relativePackage)}")
+                appendLine()
+                appendLine("import androidx.compose.runtime.*")
+                appendLine("import com.varabyte.kobweb.core.*")
+                if (dependsOnMarkdownArtifact) {
+                    appendLine("import com.varabyte.kobwebx.markdown.*")
+                }
 
-            import androidx.compose.runtime.*
-            import com.varabyte.kobweb.core.*
-
-            @Page
-            @Composable
-            fun $funName() {
-        """.trimIndent()
+                appendLine()
+                appendLine("@Page")
+                appendLine("@Composable")
+                appendLine("fun $funName() {")
+            }
         )
 
         indentCount++
@@ -86,11 +93,7 @@ class KotlinRenderer(
         indentCount--
 
         assert(indentCount == 0)
-        output.appendLine(
-            """
-                }
-            """.trimIndent()
-        )
+        output.appendLine("}")
     }
 
     override fun render(node: Node): String {
@@ -236,20 +239,56 @@ class KotlinRenderer(
             unsupported("Link referencing")
         }
 
+        private fun List<String>.serialize(): String {
+            return buildString {
+                append("listOf(")
+                append(joinToString { "\"${it.replace("\"", "\\\"")}\""})
+                append(")")
+            }
+        }
+
+        private fun Map.Entry<String, List<String>>.serialize(): String {
+            return "\"$key\" to ${value.serialize()}"
+        }
+
+        private fun Map<String, List<String>>.serialize(): String {
+            return buildString {
+                append("mapOf(")
+                append(entries.joinToString { it.serialize() })
+                append(")")
+            }
+        }
+
         override fun visit(customBlock: CustomBlock) {
             if (customBlock is YamlFrontMatterBlock) {
                 val yamlVisitor = YamlFrontMatterVisitor()
                 customBlock.accept(yamlVisitor)
-                // TODO (Bug #19): Put `yamlVisitor.data` into a MdContext object?
-                // If "root" is set in the YAML block, that represents a top level composable which should wrap
-                // everything else.
-                yamlVisitor.data["root"]?.single()?.let { root ->
-                    output.appendLine("$indent${MethodCall(root).toFqn(project)} {")
-                    ++indentCount
-                }
-                onFinish += {
-                    --indentCount
-                    output.appendLine("$indent}")
+
+                if (yamlVisitor.data.isNotEmpty()) {
+                    if (dependsOnMarkdownArtifact) {
+                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides MarkdownContext(${yamlVisitor.data.serialize()})) {")
+                        ++indentCount
+                    }
+
+                    // If "root" is set in the YAML block, that represents a top level composable which should wrap
+                    // everything else.
+                    val maybeRoot = yamlVisitor.data["root"]?.single()
+                    maybeRoot?.let { root ->
+                        output.appendLine("$indent${MethodCall(root).toFqn(project)} {")
+                        ++indentCount
+                    }
+
+                    onFinish += {
+                        if (maybeRoot != null) {
+                            --indentCount
+                            output.appendLine("$indent}")
+                        }
+
+                        if (dependsOnMarkdownArtifact) {
+                            --indentCount
+                            output.appendLine("$indent}")
+                        }
+                    }
                 }
             } else if (customBlock is KobwebCallBlock) {
                 val visitor = KobwebCallVisitor()

@@ -750,12 +750,32 @@ Front Matter is metadata that you can specify at the beginning of your document,
 title: Tutorial
 author: bitspittle
 ---
+
+...
+
+{{ Signature() }}
 ```
 
-and these key / value pairs can be referenced in your Kotlin `@Composable` code (* *coming soon*).
+These key / value pairs can be queried in your Kotlin `@Composable` code, via a page's context:
 
-However, there's a special value which, if set, will be used to render a root `@Composable` that wraps the code your
-markdown file would otherwise create. This is useful for specifying a layout for example:
+```kotlin
+@Composable
+fun Signature() {
+    val ctx = rememberPageContext()
+    // Markdown front matter value can be a list of strings,
+    // but here it's only a single one
+    val author = ctx.markdown.frontMatter.getValue("author").single()
+    Text("Article by $author")
+}
+```
+
+***Note:** If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
+`com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`*.
+
+#### Root
+
+Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
+the code your markdown file would otherwise create. This is useful for specifying a layout for example:
 
 ```markdown
 ---
@@ -765,7 +785,7 @@ root: .components.layout.DocsLayout
 # Kobweb Tutorial
 ```
 
-This will generate code like the following:
+The above will generate code like the following:
 
 ```kotlin
 import com.mysite.components.layout.DocsLayout
