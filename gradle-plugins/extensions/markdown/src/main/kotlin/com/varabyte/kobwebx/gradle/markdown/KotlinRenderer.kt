@@ -10,6 +10,7 @@ import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
 import org.commonmark.node.CustomBlock
+import org.commonmark.node.CustomNode
 import org.commonmark.node.Emphasis
 import org.commonmark.node.FencedCodeBlock
 import org.commonmark.node.HardLineBreak
@@ -44,19 +45,24 @@ class KotlinRenderer(
     private val indent get() = "    ".repeat(indentCount)
 
     /**
-     * Convert raw text into a method call, additionally prefixing the project's package it begins with a period.
-     *
-     * Examples:
-     * * `test` -> `test()`
-     * * `.test` -> `org.example.myproject.test()`
-     * * `test()` -> `test()`
+     * @param name The name of this method. See also [toFqn]
      */
-    private fun String.intoMethodCall(): String {
-        val self = this
-        return buildString {
-            append(project.prefixQualifiedPackage(self))
-            if (self.last().isLetterOrDigit()) {
-                append("()")
+    private class MethodCall(val name: String) : CustomNode() {
+        /**
+         * Convert this class's [name] into a fully qualified name, additionally prefixing the project's package it
+         * begins with a period.
+         *
+         * Examples:
+         * * `test` -> `test()`
+         * * `.test` -> `org.example.myproject.test()`
+         * * `test()` -> `test()`
+         */
+        fun toFqn(project: Project): String {
+            return buildString {
+                append(project.prefixQualifiedPackage(name))
+                if (name.last().isLetterOrDigit()) {
+                    append("()")
+                }
             }
         }
     }
@@ -238,7 +244,7 @@ class KotlinRenderer(
                 // If "root" is set in the YAML block, that represents a top level composable which should wrap
                 // everything else.
                 yamlVisitor.data["root"]?.single()?.let { root ->
-                    output.appendLine("$indent${root.intoMethodCall()} {")
+                    output.appendLine("$indent${MethodCall(root).toFqn(project)} {")
                     ++indentCount
                 }
                 onFinish += {
@@ -248,7 +254,7 @@ class KotlinRenderer(
             } else if (customBlock is KobwebCallBlock) {
                 val visitor = KobwebCallVisitor()
                 customBlock.accept(visitor)
-                output.append(visitor.text.intoMethodCall())
+                output.appendLine("$indent${MethodCall(visitor.text).toFqn(project)}")
             }
         }
     }
