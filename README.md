@@ -204,6 +204,16 @@ You can read all about [IntelliJ's Gradle integration here](https://www.jetbrain
 general, you should create two run configurations: one for `kobwebStart -t` and one for `kobwebStop`. To do this, start
 from [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
 
+---
+
+**NOTE**: It looks like someone broke something in IntelliJ. Follow along at
+[this YouTrack issue](https://youtrack.jetbrains.com/issue/IDEA-284935) to see when it will be resolved.
+
+As a temporary workaround, consider making a "Shell Script" run configuration, set the "Execute" option to
+"Script text", and set the "Script text" to `./gradlew kobwebStart -t`
+
+![Kobweb Start Run Config Workaround](https://raw.githubusercontent.com/varabyte/media/main/kobweb/images/kobweb-start-workaround.png)
+
 ## Running examples
 
 Kobweb will provide a growing collection of samples for you to learn from. To see what's available, run:
