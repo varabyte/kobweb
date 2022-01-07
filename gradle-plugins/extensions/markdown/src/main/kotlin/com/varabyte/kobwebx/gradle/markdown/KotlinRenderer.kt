@@ -193,7 +193,9 @@ class KotlinRenderer(
         }
 
         override fun visit(indentedCodeBlock: IndentedCodeBlock) {
-            unsupported("Indenting code blocks")
+            // Delegate to fenced code blocks, which (as far as I can tell) are a superset of indented code blocks
+            val fenced = FencedCodeBlock().apply { literal = indentedCodeBlock.literal }
+            visit(fenced)
         }
 
         override fun visit(link: Link) {
