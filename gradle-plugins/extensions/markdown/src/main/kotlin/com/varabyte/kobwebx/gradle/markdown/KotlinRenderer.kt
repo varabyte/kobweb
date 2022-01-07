@@ -19,6 +19,7 @@ import org.commonmark.node.HtmlInline
 import org.commonmark.node.Image
 import org.commonmark.node.IndentedCodeBlock
 import org.commonmark.node.Link
+import org.commonmark.node.LinkReferenceDefinition
 import org.commonmark.node.ListItem
 import org.commonmark.node.Node
 import org.commonmark.node.OrderedList
@@ -221,6 +222,10 @@ class KotlinRenderer(
 
         override fun visit(text: Text) {
             doVisit(text, components.text)
+        }
+
+        override fun visit(linkReferenceDefinition: LinkReferenceDefinition) {
+            unsupported("Link referencing")
         }
 
         override fun visit(customBlock: CustomBlock) {
