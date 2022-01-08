@@ -27,7 +27,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
             alignItems(AlignItems.Start)
             justifyItems(AlignItems.Start.value)
         }
-        ".kobweb-box.kobweb-align-top" {
+        ".kobweb-box.kobweb-align-top-center" {
             alignItems(AlignItems.Start)
             justifyItems(AlignItems.Center.value)
         }
@@ -51,7 +51,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
             justifyItems(AlignItems.Start.value)
             alignItems(AlignItems.End)
         }
-        ".kobweb-box.kobweb-align-bottom" {
+        ".kobweb-box.kobweb-align-bottom-center" {
             justifyItems(AlignItems.Center.value)
             alignItems(AlignItems.End)
         }
@@ -66,7 +66,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
             alignSelf(AlignSelf.Start)
             justifySelf(AlignSelf.Start.value)
         }
-        ".kobweb-box > .kobweb-align-top-self" {
+        ".kobweb-box > .kobweb-align-top-center-self" {
             alignSelf(AlignSelf.Start)
             justifySelf(AlignSelf.Center.value)
         }
@@ -90,7 +90,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
             justifySelf(AlignSelf.Start.value)
             alignSelf(AlignSelf.End)
         }
-        ".kobweb-box > .kobweb-align-bottom-self" {
+        ".kobweb-box > .kobweb-align-bottom-center-self" {
             justifySelf(AlignSelf.Center.value)
             alignSelf(AlignSelf.End)
         }

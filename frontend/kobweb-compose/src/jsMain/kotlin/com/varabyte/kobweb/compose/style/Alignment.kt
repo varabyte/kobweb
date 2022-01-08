@@ -10,7 +10,7 @@ fun Alignment.toClassName() = when(this) {
     Alignment.Center -> "kobweb-align-center"
     Alignment.CenterEnd -> "kobweb-align-center-end"
     Alignment.BottomStart -> "kobweb-align-bottom-start"
-    Alignment.BottomCenter -> "kobweb-align-bottom"
+    Alignment.BottomCenter -> "kobweb-align-bottom-center"
     Alignment.BottomEnd -> "kobweb-align-bottom-end"
     else -> error("Unexpected alignment: $this")
 }
