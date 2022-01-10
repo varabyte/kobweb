@@ -38,10 +38,13 @@ import com.varabyte.kobweb.core.PageContext
  * }
  * ```
  *
+ * @param path The original filepath of the markdown file, including its extension, relative to its parent markdown
+ *   folder. In other words, `jsMain/resources/markdown/a/b/c/Hello.md` will result in `a/b/c/Hello.md`.
  * @param frontMatter Exposes data set in a markdown file's front matter block.
  *   See also: https://github.com/varabyte/kobweb#front-matter
  */
 class MarkdownContext(
+    val path: String,
     val frontMatter: Map<String, List<String>>,
 )
 

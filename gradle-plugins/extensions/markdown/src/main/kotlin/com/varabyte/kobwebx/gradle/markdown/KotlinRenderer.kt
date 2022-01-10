@@ -37,6 +37,7 @@ import java.util.*
 
 class KotlinRenderer(
     private val project: Project,
+    private val filePath: String,
     private val components: MarkdownComponents,
     private val relativePackage: String,
     private val funName: String,
@@ -266,7 +267,12 @@ class KotlinRenderer(
 
                 if (yamlVisitor.data.isNotEmpty()) {
                     if (dependsOnMarkdownArtifact) {
-                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides MarkdownContext(${yamlVisitor.data.serialize()})) {")
+                        val mdCtx = buildString {
+                            append("MarkdownContext(")
+                            append(listOf("\"$filePath\"", yamlVisitor.data.serialize()).joinToString())
+                            append(")")
+                        }
+                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
                         ++indentCount
                     }
 

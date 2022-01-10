@@ -102,7 +102,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
             File(getGenDir(), "${dirParts.joinToString("/")}/$funName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
 
-                val ktRenderer = KotlinRenderer(project, markdownComponents, mdPackage, funName)
+                val ktRenderer = KotlinRenderer(project, mdFileRel.path, markdownComponents, mdPackage, funName)
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }
         }
