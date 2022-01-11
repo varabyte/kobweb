@@ -1,5 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
+import com.varabyte.kobweb.common.packageConcat
+import com.varabyte.kobweb.common.toPackageName
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
 import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
@@ -94,13 +96,41 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
             val parts = mdFileRel.path.split("/")
             val dirParts = parts.subList(0, parts.lastIndex)
+            val packageParts = dirParts.map { it.toPackageName() }
 
-            val mdPackage =
-                kobwebConfig.pagesPackage.get() + if (dirParts.isNotEmpty()) ".${dirParts.joinToString(".")}" else ""
+            for (i in dirParts.indices) {
+                if (dirParts[i] != packageParts[i]) {
+                    // If not a match, that means the path that the markdown file is coming from is not compatible with
+                    // Java package names, e.g. "2021" was converted to "_2021". This is fine -- we just need to tell
+                    // Kobweb about the mapping.
+
+                    val subpackage = packageParts.subList(0, i + 1)
+
+                    File(getGenDir(), "${subpackage.joinToString("/")}/PackageMapping.kt")
+                        // Multiple markdown files in the same folder will try to write this over and over again; we
+                        // can skip after the first time
+                        .takeIf { !it.exists() }
+                        ?.let { mappingFile ->
+                            mappingFile.parentFile.mkdirs()
+                            mappingFile.writeText("""
+                                @file:PackageMapping("${dirParts[i]}")
+
+                                package ${project.prefixQualifiedPackage(kobwebConfig.pagesPackage.get().packageConcat(
+                                subpackage.joinToString(".")
+                            )) }
+
+                                import com.varabyte.kobweb.core.PackageMapping
+                            """.trimIndent())
+                    }
+                }
+            }
+
             val funName = mdFileRel.nameWithoutExtension
-
-            File(getGenDir(), "${dirParts.joinToString("/")}/$funName.kt").let { outputFile ->
+            File(getGenDir(), "${packageParts.joinToString("/")}/$funName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
+                val mdPackage = project.prefixQualifiedPackage(
+                    kobwebConfig.pagesPackage.get().packageConcat(packageParts.joinToString("."))
+                )
 
                 val ktRenderer = KotlinRenderer(project, mdFileRel.path, markdownComponents, mdPackage, funName)
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))

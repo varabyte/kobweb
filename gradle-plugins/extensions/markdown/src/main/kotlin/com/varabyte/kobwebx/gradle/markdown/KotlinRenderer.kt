@@ -39,7 +39,7 @@ class KotlinRenderer(
     private val project: Project,
     private val filePath: String,
     private val components: MarkdownComponents,
-    private val relativePackage: String,
+    private val pkg: String,
     private val funName: String,
 ) : Renderer {
 
@@ -74,7 +74,7 @@ class KotlinRenderer(
     override fun render(node: Node, output: Appendable) {
         output.append(
             buildString {
-                appendLine("package ${project.prefixQualifiedPackage(relativePackage)}")
+                appendLine("package $pkg")
                 appendLine()
                 appendLine("import androidx.compose.runtime.*")
                 appendLine("import com.varabyte.kobweb.core.*")

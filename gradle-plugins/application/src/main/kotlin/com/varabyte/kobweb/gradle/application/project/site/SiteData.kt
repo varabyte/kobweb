@@ -6,13 +6,16 @@ import com.varabyte.kobweb.gradle.application.project.PackageUtils.resolvePackag
 import com.varabyte.kobweb.gradle.application.project.PsiUtils
 import com.varabyte.kobweb.gradle.application.project.Reporter
 import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
+import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtFileAnnotationList
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
 import java.io.File
 
@@ -39,6 +42,12 @@ class SiteData {
     private val _silkVariantFqcns = mutableListOf<String>()
     /** The fully-qualified names of properties assigned to `ComponentVariant`s */
     val silkVariantFqcns: List<String> = _silkVariantFqcns
+
+    private class PageToProcess(
+        val funName: String,
+        val pkg: String,
+        val slug: String,
+    )
 
     companion object {
         private fun processComponentStyle(
@@ -157,19 +166,44 @@ class SiteData {
         ): SiteData {
             val siteData = SiteData()
             val kotlinProject = PsiUtils.createKotlinProject()
+
+            // fqPkg to subdir, e.g. "blog._2022._01" to "01"
+            val packageMappings = mutableMapOf<String, String>()
+            // We need to collect all package mappings before we start processing pages, so we store them in this
+            // intermediate structure for a while
+            val pagesToProcess = mutableListOf<PageToProcess>()
+
+            // Qualify the pages package, e.g. ".pages", with this project's group, e.g. "com.site.pages"
+            val qualifiedPagesPackage = resolvePackageShortcut(group, pagesPackage)
+
             siteSources.forEach { file ->
                 val ktFile = kotlinProject.parseKotlinFile(file)
 
                 var currPackage = ""
                 var appSimpleName = APP_SIMPLE_NAME
+                var packageMappingSimpleName = PACKAGE_MAPPING_SIMPLE_NAME
                 var pageSimpleName = PAGE_SIMPLE_NAME
                 var initKobwebSimpleName = INIT_KOBWEB_SIMPLE_NAME
                 var initSilkSimpleName = INIT_SILK_SIMPLE_NAME
+
+                // This value needs to be processed after all children are visited, because `currPackage`
+                // gets set AFTER @file annotations. Wild.
+                var packageMappingAnnotation: KtAnnotationEntry? = null
                 ktFile.visitAllChildren { element ->
                     when (element) {
                         is KtPackageDirective -> {
                             currPackage = element.fqName.asString()
                         }
+                        is KtFileAnnotationList -> {
+                            val annotations = element.annotationEntries.toList()
+                            annotations.forEach { entry ->
+                                when (entry.shortName?.asString()) {
+                                    packageMappingSimpleName ->
+                                        packageMappingAnnotation = entry
+                                }
+                            }
+                        }
+
                         is KtImportDirective -> {
                             // It's unlikely this will happen but catch the "import as" case,
                             // e.g. `import com.varabyte.kobweb.core.Page as MyPage`
@@ -177,6 +211,11 @@ class SiteData {
                                 APP_FQN -> {
                                     element.alias?.let { alias ->
                                         alias.name?.let { appSimpleName = it }
+                                    }
+                                }
+                                PACKAGE_MAPPING_FQN -> {
+                                    element.alias?.let { alias ->
+                                        alias.name?.let { packageMappingSimpleName = it }
                                     }
                                 }
                                 PAGE_FQN -> {
@@ -212,28 +251,18 @@ class SiteData {
                                             reporter.report("${file.absolutePath}: `fun ${element.name}` annotated with `@$pageSimpleName` must also be `@Composable`.")
                                         }
 
-                                        val qualifiedPagesPackage = resolvePackageShortcut(group, pagesPackage)
                                         if (currPackage.startsWith(qualifiedPagesPackage)) {
-                                            // e.g. com.example.pages.blog -> blog
-                                            val slugPrefix = currPackage
-                                                .removePrefix(qualifiedPagesPackage)
-                                                .replace('.', '/')
-
-                                            val slug = when (val maybeSlug =
-                                                file.nameWithoutExtension.toLowerCase()) {
-                                                "index" -> ""
-                                                else -> maybeSlug
-                                            }
-
-                                            // This file should be somewhere underneath the pages package
-                                            check(currPackage.isNotEmpty())
-                                            siteData._pages.add(
-                                                PageEntry(
-                                                    "$currPackage.${element.name}",
-                                                    "$slugPrefix/$slug"
+                                            pagesToProcess.add(
+                                                PageToProcess(
+                                                    funName = element.name!!.toString(),
+                                                    pkg = currPackage,
+                                                    slug = when (val maybeSlug =
+                                                        file.nameWithoutExtension.toLowerCase()) {
+                                                        "index" -> ""
+                                                        else -> maybeSlug
+                                                    },
                                                 )
                                             )
-
                                         } else {
                                             reporter.report("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
                                         }
@@ -270,6 +299,62 @@ class SiteData {
                         }
                     }
                 }
+
+                packageMappingAnnotation?.let { packageMappingAnnotation ->
+                    if (currPackage.startsWith(qualifiedPagesPackage)) {
+                        packageMappings[currPackage] =
+                            (packageMappingAnnotation.valueArguments.first().getArgumentExpression() as KtStringTemplateExpression).entries.first().text
+                    }
+                    else {
+                        reporter.report("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
+                    }
+                }
+            }
+
+            for (pageToProcess in pagesToProcess) {
+                // We have a bunch of potential package to URL mappings, which work on fully qualified packages, so we
+                // process each part of the package separately, going back to front. An example will help here.
+                //
+                // If we had the following mappings:
+                //
+                //   site.pages.blogs._2021._12 -> 12
+                //   site.pages.blogs._2021 -> 2021
+                //
+                // then we'd transform the following fully-qualified package by first building up a list of parts in
+                // reverse. So:
+                //
+                //   site.pages.blogs._2021._12.tutorials
+                //
+                // is processed like so (* means a mapping match was found):
+                //
+                //   site.pages.blogs._2021._12.tutorials ---> [tutorials]
+                //   site.pages.blogs._2021._12 (*)       ---> [12, tutorials]
+                //   site.pages.blogs._2021 (*)           ---> [2021, 12, tutorials]
+                //   site.pages.blogs                     ---> [blogs, 2021, 12, tutorials]
+                //   site.pages                           ---> [pages, blogs, 2021, 12, tutorials]
+                //   site                                 ---> [site, pages, blogs, 2021, 12, tutorials]
+                //
+                // At which point, we're done, and we can just join the final list together to a path:
+                //
+                //   site/pages/blogs/2021/12/tutorials
+                //
+                // (and we remove `site/pages` because it's part of the code, not the final URL)
+                val slugPrefix = run {
+                    var pkg = pageToProcess.pkg
+                    val transformedParts = mutableListOf<String>()
+                    while (pkg.isNotEmpty()) {
+                        transformedParts.add(0, packageMappings[pkg] ?: pkg.substringAfterLast('.'))
+                        pkg = (pkg.takeIf { it.contains('.') } ?: "").substringBeforeLast('.')
+                    }
+                    transformedParts.joinToString(".")
+                }.removePrefix(qualifiedPagesPackage).replace('.', '/')
+
+                siteData._pages.add(
+                    PageEntry(
+                        "${pageToProcess.pkg}.${pageToProcess.funName}",
+                        "$slugPrefix/${pageToProcess.slug}"
+                    )
+                )
             }
 
             return siteData
