@@ -19,6 +19,11 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
 import java.io.File
 
+private fun KtAnnotationEntry.getStringValue(index: Int): String? {
+    val strExpr = valueArguments.getOrNull(index)?.getArgumentExpression() as? KtStringTemplateExpression ?: return null
+    return strExpr.entries.firstOrNull()?.text
+}
+
 class SiteData {
     var app: AppEntry? = null
         internal set
@@ -46,7 +51,9 @@ class SiteData {
     private class PageToProcess(
         val funName: String,
         val pkg: String,
-        val slug: String,
+        val slugFromFile: String,
+        // See @Page annotation header docs for `routeOverride` behavior
+        val routeOverride: String?
     )
 
     companion object {
@@ -251,16 +258,14 @@ class SiteData {
                                             reporter.report("${file.absolutePath}: `fun ${element.name}` annotated with `@$pageSimpleName` must also be `@Composable`.")
                                         }
 
-                                        if (currPackage.startsWith(qualifiedPagesPackage)) {
+                                        val routeOverride = entry.getStringValue(0)?.takeIf { it.isNotBlank() }
+                                        if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedPagesPackage)) {
                                             pagesToProcess.add(
                                                 PageToProcess(
                                                     funName = element.name!!.toString(),
                                                     pkg = currPackage,
-                                                    slug = when (val maybeSlug =
-                                                        file.nameWithoutExtension.toLowerCase()) {
-                                                        "index" -> ""
-                                                        else -> maybeSlug
-                                                    },
+                                                    slugFromFile = file.nameWithoutExtension.toLowerCase(),
+                                                    routeOverride = routeOverride
                                                 )
                                             )
                                         } else {
@@ -302,8 +307,7 @@ class SiteData {
 
                 packageMappingAnnotation?.let { packageMappingAnnotation ->
                     if (currPackage.startsWith(qualifiedPagesPackage)) {
-                        packageMappings[currPackage] =
-                            (packageMappingAnnotation.valueArguments.first().getArgumentExpression() as KtStringTemplateExpression).entries.first().text
+                        packageMappings[currPackage] = packageMappingAnnotation.getStringValue(0)!!
                     }
                     else {
                         reporter.report("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
@@ -312,50 +316,75 @@ class SiteData {
             }
 
             for (pageToProcess in pagesToProcess) {
-                // We have a bunch of potential package to URL mappings, which work on fully qualified packages, so we
-                // process each part of the package separately, going back to front. An example will help here.
-                //
-                // If we had the following mappings:
-                //
-                //   site.pages.blogs._2021._12 -> 12
-                //   site.pages.blogs._2021 -> 2021
-                //
-                // then we'd transform the following fully-qualified package by first building up a list of parts in
-                // reverse. So:
-                //
-                //   site.pages.blogs._2021._12.tutorials
-                //
-                // is processed like so (* means a mapping match was found):
-                //
-                //   site.pages.blogs._2021._12.tutorials ---> [tutorials]
-                //   site.pages.blogs._2021._12 (*)       ---> [12, tutorials]
-                //   site.pages.blogs._2021 (*)           ---> [2021, 12, tutorials]
-                //   site.pages.blogs                     ---> [blogs, 2021, 12, tutorials]
-                //   site.pages                           ---> [pages, blogs, 2021, 12, tutorials]
-                //   site                                 ---> [site, pages, blogs, 2021, 12, tutorials]
-                //
-                // At which point, we're done, and we can just join the final list together to a path:
-                //
-                //   site/pages/blogs/2021/12/tutorials
-                //
-                // (and we remove `site/pages` because it's part of the code, not the final URL)
-                val slugPrefix = run {
-                    var pkg = pageToProcess.pkg
-                    val transformedParts = mutableListOf<String>()
-                    while (pkg.isNotEmpty()) {
-                        transformedParts.add(0, packageMappings[pkg] ?: pkg.substringAfterLast('.'))
-                        pkg = (pkg.takeIf { it.contains('.') } ?: "").substringBeforeLast('.')
-                    }
-                    transformedParts.joinToString(".")
-                }.removePrefix(qualifiedPagesPackage).replace('.', '/')
+                val routeOverride = pageToProcess.routeOverride
+                val slugPrefix = if (routeOverride != null && routeOverride.startsWith("/")) {
+                    routeOverride.substringBeforeLast('/')
+                } else {
+                    // We have a bunch of potential package to URL mappings, which work on fully qualified packages, so
+                    // we process each part of the package separately, going back to front. An example will help here.
+                    //
+                    // If we had the following mappings:
+                    //
+                    //   site.pages.blogs._2021._12 -> 12
+                    //   site.pages.blogs._2021 -> 2021
+                    //
+                    // then we'd transform the following fully-qualified package by first building up a list of parts in
+                    // reverse. So:
+                    //
+                    //   site.pages.blogs._2021._12.tutorials
+                    //
+                    // is processed like so (* means a mapping match was found):
+                    //
+                    //   site.pages.blogs._2021._12.tutorials ---> [tutorials]
+                    //   site.pages.blogs._2021._12 (*)       ---> [12, tutorials]
+                    //   site.pages.blogs._2021 (*)           ---> [2021, 12, tutorials]
+                    //   site.pages.blogs                     ---> [blogs, 2021, 12, tutorials]
+                    //   site.pages                           ---> [pages, blogs, 2021, 12, tutorials]
+                    //   site                                 ---> [site, pages, blogs, 2021, 12, tutorials]
+                    //
+                    // At which point, we're done, and we can just join the final list together to a path:
+                    //
+                    //   site/pages/blogs/2021/12/tutorials
+                    //
+                    // (and we remove `site/pages` because it's part of the code, not the final URL)
+                    run {
+                        var pkg = pageToProcess.pkg
+                        val transformedParts = mutableListOf<String>()
+                        while (pkg.isNotEmpty()) {
+                            transformedParts.add(0, packageMappings[pkg] ?: pkg.substringAfterLast('.'))
+                            pkg = (pkg.takeIf { it.contains('.') } ?: "").substringBeforeLast('.')
+                        }
+                        transformedParts.joinToString(".")
+                    }.removePrefix(qualifiedPagesPackage).replace('.', '/')
+                }
+
+                val prefixExtra = if (routeOverride != null && !routeOverride.startsWith("/") && routeOverride.contains("/")) {
+                    "/" + routeOverride.substringBeforeLast("/")
+                }
+                else {
+                    ""
+                }
+
+                val slug = if (routeOverride != null && routeOverride.last() != '/') {
+                   routeOverride.substringAfterLast("/")
+                } else {
+                    pageToProcess.slugFromFile
+                }.takeIf { it != "index" } ?: ""
 
                 siteData._pages.add(
                     PageEntry(
                         "${pageToProcess.pkg}.${pageToProcess.funName}",
-                        "$slugPrefix/${pageToProcess.slug}"
+                        "$slugPrefix$prefixExtra/$slug"
                     )
                 )
             }
+
+            siteData._pages
+                .groupBy { it.route }
+                .filter { routeToPages -> routeToPages.value.size > 1 }
+                .forEach { routeToPages ->
+                    reporter.report("Route \"${routeToPages.key}\" was generated multiple times; only the one navigating to \"${routeToPages.value.first().fqn}()\" will be used.")
+                }
 
             return siteData
         }

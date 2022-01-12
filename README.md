@@ -267,12 +267,73 @@ fun SettingsPage() {
 
 this will create a page that I can then visit by going to `mysite.com/admin/settings`.
 
-By default, the path comes from the file name, although there will be ways to override this behavior on a case-by-case
-basis (* *coming soon*).
+**Note:** The last part of a URL, here `settings`, is called a *slug*.
+
+By default, the slug comes from the file name but this behavior can be overridden (more on that shortly).
 
 The file name `Index.kt` is special. If a page is defined inside such a file, it will be treated as the default page
 under that URL. For example, a page defined in `.../pages/admin/Index.kt` will be visited if the user visits
-`mysite.com/admin`.
+`mysite.com/admin/`.
+
+### Route Override
+
+If you ever need to change the route generated for a page, you can set the `@Page` annotation's `routeOverride` field:
+
+```kotlin
+// jsMain/kotlin/com/example/mysite/pages/admin/Settings.kt
+
+@Page("config")
+@Composable
+fun SettingsPage() {
+    /* ... */
+}
+```
+
+The above would create a page you could visit by going to `mysite.com/admin/config`.
+
+`routeOverride` can additionally contain slashes, and if the value begins and/or ends with a slash, that has a special
+meaning.
+
+* Begins with a slash - represent the whole route from the root
+* Ends with a slash - a slug will still be generated from the filename and appended to the route.
+
+And if you set the override to "index" that behaves the same as setting the file to `Index.kt` as described above.
+
+Some examples can clarify these rules (and how they behave when combined). Assuming we're defining a page for our site
+`example.com` within the file `Slug.kt` that lives in package `a.b.c`:
+
+| Annotation             | Resulting URL                   |
+|------------------------|---------------------------------|
+| `@Page`                | `example.com/a/b/c/slug`        |
+| `@Page("other")`       | `example.com/a/b/c/other`       |
+ | `@Page("index")`       | `example.com/a/b/c/`            |
+ | `@Page("d/e/f/")`      | `example.com/a/b/c/d/e/f/slug`  |
+ | `@Page("d/e/f/other")` | `example.com/a/b/c/d/e/f/other` |
+ | `@Page("/d/e/f/")`     | `example.com/d/e/f/slug`        |
+ | `@Page("/")`           | `example.com/slug`              |
+
+⚠️ We close this section with a warning - despite the flexibility allowed here, you should not be using this feature
+frequently, if at all. A Kobweb project benefits from the fact that a user can easily associate a URL on your site with
+a file in your codebase, but this feature allows you to break those assumptions. It is mainly provided to enable
+dynamic routing (* *coming soon*) or enabling a URL name that uses characters which don't belong in Kotlin filenames.
+
+### PackageMapping
+
+If you don't want to change your slug but you *do* want to change a part of the route, in addition to `@Page` route
+overrides, you can also tag a package with a `PackageMapping` annotation. Doing so looks like this:
+
+```kotlin
+// site/pages/blog/_2022/PackageMapping.kt
+@file:PackageMapping("2022")
+
+package site.pages.blog._2022
+
+import com.varabyte.kobweb.core.PackageMapping
+```
+
+As in the example above, the main reason you'd want to do this is because the Java / Kotlin package naming requirements
+are much stricter than what you might want to allow in a URL part. `site.com/blog/2022/mypost` looks way better than
+`site.com/blog/_2022/mypost`.
 
 ## Silk
 

@@ -97,7 +97,7 @@ class Router {
 
     @Suppress("unused") // Called by generated code
     fun register(path: String, page: PageMethod) {
-        if (Path.isLocal(path)) {
+        if (Path.isLocal(path) && !pages.containsKey(path)) {
             pages[path] = page
         }
     }

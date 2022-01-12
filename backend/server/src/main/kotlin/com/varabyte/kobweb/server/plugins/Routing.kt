@@ -14,13 +14,13 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
-import io.ktor.util.cio.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
 import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -92,37 +92,48 @@ private fun Routing.configureApiRouting(apiJar: ApiJarFile) {
     }
 }
 
-// Note: This should be defined LAST in the routing { ... } block.
-private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
-    val scriptMap = Path("$script.map")
-    get("{$KOBWEB_PARAMS...}") {
-        var handled = false
-        call.parameters[KOBWEB_PARAMS]?.let { path ->
-            val pathParts = path.split("/")
-            if (pathParts.isNotEmpty()) {
-                handled = true
-                when (val filename = pathParts.last()) {
-                    script.name -> call.respondFile(script.toFile())
-                    scriptMap.name -> call.respondFile(scriptMap.toFile())
-                    else -> {
-                        // Abort early on resources, so we don't serve giant html pages simply because a favicon.ico
-                        // file is missing, for example.
-                        val ext = filename.substringAfterLast(".", "").takeIf { it.isNotEmpty() }
-                        if (ext != null && ext != "html") {
-                            call.respond(HttpStatusCode.NotFound)
-                        } else {
-                            handled = false
-                        }
-                    }
+private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(script: Path, scriptMap: Path, index: Path, filename: String?) {
+    var handled = false
+    if (filename != null) {
+        handled = true
+        when(filename) {
+            script.name -> call.respondFile(script.toFile())
+            scriptMap.name -> call.respondFile(scriptMap.toFile())
+            else -> {
+                // Abort early on resources, so we don't serve giant html pages simply because a favicon.ico
+                // file is missing, for example.
+                val ext = File(filename).extension.takeIf { it.isNotEmpty() }
+                if (ext != null && ext != "html") {
+                    call.respond(HttpStatusCode.NotFound)
+                } else {
+                    handled = false
                 }
             }
         }
+    }
 
-        // If unhandled at this point, we probably want to serve an error page. The index file (plus script) should have
-        // the logic which does this.
-        if (!handled) {
-            call.respondFile(index.toFile())
-        }
+    // If unhandled at this point, we have a URL that should either generate a real page or an error page. Return
+    // the main index.html which, by referencing our site's script, should have the logic which handles this.
+    if (!handled) {
+        call.respondFile(index.toFile())
+    }
+}
+
+// Note: This should be defined LAST in the routing { ... } block and it used to handle general URLs. The site script
+// itself looks at the user's current URL to figure out how to route itself, so in many cases, just returning
+// "index.html" most of the time is enough for the client to figure out what to render next.
+private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
+    val scriptMap = Path("$script.map")
+
+    // Catch URLs of the form a/b/c/
+    get("{$KOBWEB_PARAMS...}/") {
+        handleCatchAllRouting(script, scriptMap, index, null)
+    }
+
+    // Catch URLs of the form a/b/c/slug
+    get("{$KOBWEB_PARAMS...}") {
+        val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
+        handleCatchAllRouting(script, scriptMap, index, pathParts.lastOrNull())
     }
 
 }
