@@ -1,7 +1,5 @@
 package com.varabyte.kobweb.core
 
-import androidx.compose.runtime.*
-
 /**
  * An annotation which allows for mapping the current file's package name to a different URL name.
  *
