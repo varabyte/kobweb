@@ -297,7 +297,7 @@ meaning.
 * Begins with a slash - represent the whole route from the root
 * Ends with a slash - a slug will still be generated from the filename and appended to the route.
 
-And if you set the override to "index" that behaves the same as setting the file to `Index.kt` as described above.
+And if you set the override to "index", that behaves the same as setting the file to `Index.kt` as described above.
 
 Some examples can clarify these rules (and how they behave when combined). Assuming we're defining a page for our site
 `example.com` within the file `a/b/c/Slug.kt`:
