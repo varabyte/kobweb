@@ -282,7 +282,7 @@ If you ever need to change the route generated for a page, you can set the `@Pag
 ```kotlin
 // jsMain/kotlin/com/example/mysite/pages/admin/Settings.kt
 
-@Page("config")
+@Page(routeOverride = "config")
 @Composable
 fun SettingsPage() {
     /* ... */
@@ -300,7 +300,7 @@ meaning.
 And if you set the override to "index" that behaves the same as setting the file to `Index.kt` as described above.
 
 Some examples can clarify these rules (and how they behave when combined). Assuming we're defining a page for our site
-`example.com` within the file `Slug.kt` that lives in package `a.b.c`:
+`example.com` within the file `a/b/c/Slug.kt`:
 
 | Annotation             | Resulting URL                   |
 |------------------------|---------------------------------|
@@ -320,7 +320,7 @@ dynamic routing (* *coming soon*) or enabling a URL name that uses characters wh
 ### PackageMapping
 
 If you don't want to change your slug but you *do* want to change a part of the route, in addition to `@Page` route
-overrides, you can also tag a package with a `PackageMapping` annotation. Doing so looks like this:
+overrides, you can also tag a package with a `PackageMapping` file annotation. Doing so looks like this:
 
 ```kotlin
 // site/pages/blog/_2022/PackageMapping.kt
@@ -331,8 +331,8 @@ package site.pages.blog._2022
 import com.varabyte.kobweb.core.PackageMapping
 ```
 
-As in the example above, the main reason you'd want to do this is because the Java / Kotlin package naming requirements
-are much stricter than what you might want to allow in a URL part. `site.com/blog/2022/mypost` looks way better than
+As in the example above, the main reason you'd want to do this is that Java / Kotlin package naming requirements are
+much stricter than what you might want to allow in a URL part. `site.com/blog/2022/mypost` reads way better than
 `site.com/blog/_2022/mypost`.
 
 ## Silk
