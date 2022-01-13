@@ -384,6 +384,7 @@ class SiteData {
                 .filter { routeToPages -> routeToPages.value.size > 1 }
                 .forEach { routeToPages ->
                     reporter.report("Route \"${routeToPages.key}\" was generated multiple times; only the one navigating to \"${routeToPages.value.first().fqn}()\" will be used.")
+                    routeToPages.value.asSequence().drop(1).forEach { page -> siteData._pages.remove(page) }
                 }
 
             return siteData

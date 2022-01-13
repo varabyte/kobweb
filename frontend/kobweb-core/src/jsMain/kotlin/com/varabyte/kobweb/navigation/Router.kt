@@ -97,7 +97,8 @@ class Router {
 
     @Suppress("unused") // Called by generated code
     fun register(path: String, page: PageMethod) {
-        if (Path.isLocal(path) && !pages.containsKey(path)) {
+        if (Path.isLocal(path)) {
+            require(!pages.containsKey(path)) { "Registration failure. Path already registered: $path" }
             pages[path] = page
         }
     }
