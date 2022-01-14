@@ -28,7 +28,7 @@ enum class UpdateHistoryMode {
  */
 class Router {
     private val activePageData = mutableStateOf<PageData?>(null)
-    private val pathTree = PathTree()
+    private val routeTree = RouteTree()
 
     init {
         window.onpopstate = {
@@ -47,7 +47,7 @@ class Router {
             if (it.size == 1) { it[0] to null } else it[0] to it[1]
         }
 
-        if (!Path.isLocal(path)) {
+        if (!Route.isLocal(path)) {
             require(allowExternalPaths) { "Navigation to \"$pathAndQuery\" not expected by callee" }
             // Open external links in a new tab
             // TODO(#90): Allow configuring other options. In place would be window.location.assign(...)
@@ -55,7 +55,7 @@ class Router {
             return false
         }
 
-        activePageData.value = pathTree.createPageData(this, path, query)
+        activePageData.value = routeTree.createPageData(this, path, query)
         return true
     }
 
@@ -89,13 +89,13 @@ class Router {
      * `user = 123456` and `post = 321` passed down in the `PageContext`.
      */
     @Suppress("unused") // Called by generated code
-    fun register(path: String, pageMethod: PageMethod) {
-        require(Path.isLocal(path) && path.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $path" }
-        require(pathTree.register(path, pageMethod)) { "Registration failure. Path is already registered: $path" }
+    fun register(route: String, pageMethod: PageMethod) {
+        require(Route.isLocal(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
+        require(routeTree.register(route, pageMethod)) { "Registration failure. Path is already registered: $route" }
     }
 
     fun setErrorHandler(errorHandler: ErrorPageMethod) {
-        pathTree.errorHandler = errorHandler
+        routeTree.errorHandler = errorHandler
     }
 
     /**

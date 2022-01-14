@@ -31,25 +31,25 @@ internal class PageData(
 )
 
 /**
- * A tree data structure that represents a parsed path, such as `/example/path` or `/{dynamic}/path`
+ * A tree data structure that represents a parsed route, such as `/example/path` or `/{dynamic}/path`
  */
-internal class PathTree {
+internal class RouteTree {
     sealed class Node(val name: String, var method: PageMethod?) {
         private val children = mutableListOf<Node>()
 
         protected open fun matches(name: String): Boolean { return this.name == name }
 
-        fun createChild(pathPart: String, method: PageMethod?): Node {
-            val node = if (pathPart.startsWith('{') && pathPart.endsWith('}')) {
-                DynamicNode(pathPart.substring(1, pathPart.length - 1), method)
+        fun createChild(routePart: String, method: PageMethod?): Node {
+            val node = if (routePart.startsWith('{') && routePart.endsWith('}')) {
+                DynamicNode(routePart.substring(1, routePart.length - 1), method)
             } else {
-                StaticNode(pathPart, method)
+                StaticNode(routePart, method)
             }
             children.add(node)
             return node
         }
 
-        fun findChild(pathPart: String): Node? = children.firstOrNull { it.matches(pathPart) }
+        fun findChild(routePart: String): Node? = children.firstOrNull { it.matches(routePart) }
     }
 
     class RootNode : Node("", null)
@@ -58,54 +58,56 @@ internal class PathTree {
         override fun matches(name: String) = true // Dynamic nodes eat all possible inputs
     }
 
-    private class ResolvedEntry(val node: Node, val pathPart: String)
+    private class ResolvedEntry(val node: Node, val routePart: String)
 
     private val root = RootNode()
 
     var errorHandler: ErrorPageMethod = { errorCode -> ErrorPage(errorCode) }
 
-    private fun resolve(path: String): List<ResolvedEntry>? {
-        val pathParts = path.split('/')
+    private fun resolve(route: String): List<ResolvedEntry>? {
+        val routeParts = route.split('/')
 
         val resolved = mutableListOf<ResolvedEntry>()
         var currNode: Node = root
-        require(pathParts[0] == root.name) // Will be true if incoming path starts with '/'
+        require(routeParts[0] == root.name) // Will be true if incoming route starts with '/'
 
-        for (i in 1 until pathParts.size) {
-            val pathPart = pathParts[i]
-            currNode = currNode.findChild(pathPart) ?: return null
-            resolved.add(ResolvedEntry(currNode, pathPart))
+        for (i in 1 until routeParts.size) {
+            val routePart = routeParts[i]
+            currNode = currNode.findChild(routePart) ?: return null
+            resolved.add(ResolvedEntry(currNode, routePart))
         }
 
         return resolved
     }
 
-    /** Register [path] with this tree, or return false if it was already added. */
-    fun register(path: String, method: PageMethod): Boolean {
-        if (resolve(path) != null) return false
+    /**
+     * Register [route] with this tree, or return false if it was already added.
+     */
+    fun register(route: String, method: PageMethod): Boolean {
+        if (resolve(route) != null) return false
 
-        val pathParts = path.split('/')
+        val routeParts = route.split('/')
 
         var currNode: Node = root
-        require(pathParts[0] == root.name) // Will be true if incoming path starts with '/'
-        for (i in 1 until pathParts.size) {
-            val pathPart = pathParts[i]
-            currNode = currNode.findChild(pathPart)
-                ?: currNode.createChild(pathPart, method.takeIf { i == pathParts.lastIndex })
+        require(routeParts[0] == root.name) // Will be true if incoming route starts with '/'
+        for (i in 1 until routeParts.size) {
+            val routePart = routeParts[i]
+            currNode = currNode.findChild(routePart)
+                ?: currNode.createChild(routePart, method.takeIf { i == routeParts.lastIndex })
         }
 
         return true
     }
 
-    fun createPageData(router: Router, path: String, query: String?): PageData {
-        val resolvedEntries = resolve(path)
+    fun createPageData(router: Router, route: String, query: String?): PageData {
+        val resolvedEntries = resolve(route)
         val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
 
         val ctx = PageContext(router)
 
         resolvedEntries?.forEach { resolvedEntry ->
             if (resolvedEntry.node is DynamicNode) {
-                ctx.mutableParams[resolvedEntry.node.name] = resolvedEntry.pathPart
+                ctx.mutableParams[resolvedEntry.node.name] = resolvedEntry.routePart
             }
         }
 
