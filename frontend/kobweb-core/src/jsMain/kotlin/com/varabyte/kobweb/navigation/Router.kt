@@ -1,27 +1,9 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
 import kotlinx.browser.document
 import kotlinx.browser.window
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Text
-
-@Page
-@Composable
-fun ErrorPage(errorCode: Int) {
-    Div {
-        Text("Error code: $errorCode")
-    }
-}
-
-private typealias PageMethod = @Composable () -> Unit
-
-private class PageData(
-    val pageMethod: PageMethod,
-    val pageContext: PageContext,
-)
 
 /** How to affect the current history when navigating to a new location */
 enum class UpdateHistoryMode {
@@ -46,7 +28,7 @@ enum class UpdateHistoryMode {
  */
 class Router {
     private val activePageData = mutableStateOf<PageData?>(null)
-    private val pages = mutableMapOf<String, PageMethod>()
+    private val pathTree = PathTree()
 
     init {
         window.onpopstate = {
@@ -61,8 +43,9 @@ class Router {
      * an external site)
      */
     private fun updateActivePage(pathAndQuery: String, allowExternalPaths: Boolean = true): Boolean {
-        val pathParts = pathAndQuery.split('?', limit = 2)
-        val path = pathParts[0]
+        val (path, query) = pathAndQuery.split('?', limit = 2).let {
+            if (it.size == 1) { it[0] to null } else it[0] to it[1]
+        }
 
         if (!Path.isLocal(path)) {
             require(allowExternalPaths) { "Navigation to \"$pathAndQuery\" not expected by callee" }
@@ -72,16 +55,7 @@ class Router {
             return false
         }
 
-        val pageMethod = pages[path] ?: { ErrorPage(404) }
-        val ctx = PageContext(this)
-        if (pathParts.size == 2) {
-            pathParts[1].split("&").forEach { param ->
-                val (key, value) = param.split('=', limit = 2)
-                ctx.mutableParams[key] = value
-            }
-        }
-
-        activePageData.value = PageData(pageMethod, ctx)
+        activePageData.value = pathTree.createPageData(this, path, query)
         return true
     }
 
@@ -95,12 +69,33 @@ class Router {
         data.pageMethod.invoke()
     }
 
+    /**
+     * Register a route, mapping it to some target composable method that will get called when that path is requested by
+     * the browser.
+     *
+     * Routes should be internal, rooted paths, so:
+     *
+     * * Good: `/path`
+     * * Good: `/path/with/subparts`
+     * * Bad: `path`
+     * * Bad: `http://othersite.com/path`
+     *
+     * Paths can also be dynamic routes, i.e. with parts that will consume values typed into the URL and exposed as
+     * variables to the page. To accomplish this, use curly braces for that part of the path.
+     *
+     * For example: `/users/{user}/posts/{post}`
+     *
+     * In that case, if the user visited `/users/123456/posts/321`, then that composable method will be visited, with
+     * `user = 123456` and `post = 321` passed down in the `PageContext`.
+     */
     @Suppress("unused") // Called by generated code
-    fun register(path: String, page: PageMethod) {
-        if (Path.isLocal(path)) {
-            require(!pages.containsKey(path)) { "Registration failure. Path already registered: $path" }
-            pages[path] = page
-        }
+    fun register(path: String, pageMethod: PageMethod) {
+        require(Path.isLocal(path) && path.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $path" }
+        require(pathTree.register(path, pageMethod)) { "Registration failure. Path is already registered: $path" }
+    }
+
+    fun setErrorHandler(errorHandler: ErrorPageMethod) {
+        pathTree.errorHandler = errorHandler
     }
 
     /**

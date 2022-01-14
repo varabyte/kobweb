@@ -260,14 +260,22 @@ class SiteData {
 
                                         val routeOverride = entry.getStringValue(0)?.takeIf { it.isNotBlank() }
                                         if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedPagesPackage)) {
-                                            pagesToProcess.add(
-                                                PageToProcess(
-                                                    funName = element.name!!.toString(),
-                                                    pkg = currPackage,
-                                                    slugFromFile = file.nameWithoutExtension.toLowerCase(),
-                                                    routeOverride = routeOverride
+                                            // We cannot automatically infer the values of any except for the very last dynamic route parts,
+                                            // because there's no guarantee they line up with the actual package. If the user is specifying the
+                                            // whole route manually, then they should just name those parts explicitly.
+                                            if (routeOverride == null || !routeOverride.substringBeforeLast("/", missingDelimiterValue = "").contains("{}")) {
+                                                pagesToProcess.add(
+                                                    PageToProcess(
+                                                        funName = element.name!!.toString(),
+                                                        pkg = currPackage,
+                                                        slugFromFile = file.nameWithoutExtension.toLowerCase(),
+                                                        routeOverride = routeOverride
+                                                    )
                                                 )
-                                            )
+                                            }
+                                            else {
+                                                reporter.report("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. Route override is invalid.")
+                                            }
                                         } else {
                                             reporter.report("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
                                         }
@@ -307,7 +315,11 @@ class SiteData {
 
                 packageMappingAnnotation?.let { packageMappingAnnotation ->
                     if (currPackage.startsWith(qualifiedPagesPackage)) {
-                        packageMappings[currPackage] = packageMappingAnnotation.getStringValue(0)!!
+                        packageMappings[currPackage] = packageMappingAnnotation.getStringValue(0)!!.let { value ->
+                            // {} is a special value which means infer from the current package,
+                            // e.g. `a.b.pkg` -> `"{pkg}"`
+                            if (value != "{}") value else "{${currPackage.substringAfterLast('.')}}"
+                        }
                     }
                     else {
                         reporter.report("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
@@ -366,7 +378,11 @@ class SiteData {
                 }
 
                 val slug = if (routeOverride != null && routeOverride.last() != '/') {
-                   routeOverride.substringAfterLast("/")
+                   routeOverride.substringAfterLast("/").let { value ->
+                       // {} is a special value which means infer from the current file,
+                       // e.g. `Slug.kt` -> `"{slug}"`
+                       if (value != "{}") value else "{${pageToProcess.slugFromFile}}"
+                   }
                 } else {
                     pageToProcess.slugFromFile
                 }.takeIf { it != "index" } ?: ""

@@ -277,7 +277,7 @@ under that URL. For example, a page defined in `.../pages/admin/Index.kt` will b
 
 ### Route Override
 
-If you ever need to change the route generated for a page, you can set the `@Page` annotation's `routeOverride` field:
+If you ever need to change the route generated for a page, you can set the `Page` annotation's `routeOverride` field:
 
 ```kotlin
 // jsMain/kotlin/com/example/mysite/pages/admin/Settings.kt
@@ -290,6 +290,9 @@ fun SettingsPage() {
 ```
 
 The above would create a page you could visit by going to `mysite.com/admin/config`.
+
+You could potentially even use these overrides to create multiple page methods in the same file, in case that helped
+group related behavior together, or generate multiple endpoints that all call to the same final page method.
 
 `routeOverride` can additionally contain slashes, and if the value begins and/or ends with a slash, that has a special
 meaning.
@@ -315,12 +318,14 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 ⚠️ We close this section with a warning - despite the flexibility allowed here, you should not be using this feature
 frequently, if at all. A Kobweb project benefits from the fact that a user can easily associate a URL on your site with
 a file in your codebase, but this feature allows you to break those assumptions. It is mainly provided to enable
-dynamic routing (* *coming soon*) or enabling a URL name that uses characters which don't belong in Kotlin filenames.
+dynamic routing (see the section below) or enabling a URL name that uses characters which don't belong in Kotlin
+filenames.
 
 ### PackageMapping
 
-If you don't want to change your slug but you *do* want to change a part of the route, in addition to `@Page` route
-overrides, you can also tag a package with a `PackageMapping` file annotation. Doing so looks like this:
+If you don't want to change your slug but you *do* want to change a part of the route, you don't have to use a `Page`
+annotation for this. You can also register a package mapping with a `PackageMapping` file annotation. Doing so looks
+like this:
 
 ```kotlin
 // site/pages/blog/_2022/PackageMapping.kt
@@ -331,9 +336,116 @@ package site.pages.blog._2022
 import com.varabyte.kobweb.core.PackageMapping
 ```
 
-As in the example above, the main reason you'd want to do this is that Java / Kotlin package naming requirements are
-much stricter than what you might want to allow in a URL part. `site.com/blog/2022/mypost` reads way better than
-`site.com/blog/_2022/mypost`.
+As with the `Page` route overrides, the main reason you'd want to do this is that Java / Kotlin package naming
+requirements are much stricter than what you might want to allow in a URL part. `site.com/blog/2022/mypost` reads way
+better than `site.com/blog/_2022/mypost`.
+
+### Page context
+
+Within a page method, you can check the current `PageContext` to see values relevant to the page that Kobweb has
+collected. Fetch it using the `rememberPageContext()` method.
+
+```kotlin
+@Page
+@Composable
+fun ExamplePage() {
+    val ctx = rememberPageContext()
+    /* ... */
+}
+```
+
+### Query parameters
+
+You can use the page context to check the values of any query parameters passed into the current page's URL.
+
+So if you visit `site.com/posts?id=12345&mode=edit`, you can check those values from the context with code like:
+
+```kotlin
+@Page
+@Composable
+fun Posts() {
+    val ctx = rememberPageContext()
+    val postId = ctx.params.getValue("id").toInt()
+    val mode = EditMode.from(ctx.params.getValue("mode"))
+    /* ... */
+}
+```
+
+### Dynamic routes
+
+In addition to query parameters, Kobweb supports embedding arguments directly in the URL itself. For example, you might
+want to register the path `users/{user}/posts/{post}` where the end user could type in a specific URL like
+`users/bitspittle/posts/20211231103156`.
+
+You could then read the values out of the URL as if they were query parameters:
+
+```kotlin
+// pages/users/user/posts/Post.kt
+
+/* ... */
+val ctx = rememberPageContext()
+val username = ctx.params.getValue("user")
+val postCreationTimestamp = ctx.params.getValue("post")
+/* ... */
+```
+
+So how do we set it up? Thankfully, it's fairly easy.
+
+But first, notice that in the example dynamic route `users/{user}/posts/{post}` there are actually two different dynamic
+parts, one in the middle and one at the tail end. These can be handled by the `PackageMapping` and `Page` annotations,
+respectively.
+
+#### PackageMapping
+
+Pay attention to the use of the curly braces in the mapping name! That lets Kobweb know that this is a dynamic package.
+
+```kotlin
+// pages/users/user/PackageMapping.kt
+@file:PackageMapping("{user}") // or @file:PackageMapping("{}")
+
+package site.pages.users.user
+
+import com.varabyte.kobweb.core.PackageMapping
+```
+
+In the above case, you can save some typing by passing an empty `"{}"` into the `PackageMapping` annotation. Just be
+aware you need to remember to update any of your pages later if you end up refactoring the code and renaming this
+package.
+
+#### Page
+
+Like `PackageMapping`, the `Page` annotation can also take curly braces to indicate a dynamic value.
+
+We can now flesh out the code that we started with at the beginning of the dynamic routes section:
+
+```kotlin
+// pages/users/user/posts/Post.kt
+
+@Page("{post}") // Or @Page("{}")
+@Composable
+fun PostPage() {
+    val ctx = rememberPageContext()
+    val username = ctx.params.getValue("user")
+    val postCreationTimestamp = ctx.params.getValue("post")
+    /* ... */
+}
+```
+
+Remember that the `Page` annotation allows you to rewrite the entire route. That value also accepts dynamic parts, so
+you could even do something like:
+
+```kotlin
+// pages/users/user/posts/Post.kt
+
+@Page("/users/{user}/posts/{post}") // Or @Page("/users/{user}/posts/{}")
+@Composable
+fun PostPage() {
+    /* ... */
+}
+```
+
+but with great power comes great responsibility. While it works, you should only use this format in cases where you
+absolutely need to (perhaps after a code refactor where you need to support legacy URL paths).
 
 ## Silk
 

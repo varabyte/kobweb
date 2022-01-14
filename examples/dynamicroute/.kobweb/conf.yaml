@@ -1,0 +1,12 @@
+site:
+  title: "Dynamic Routes"
+
+server:
+  files:
+    dev:
+      contentRoot: "build/processedResources/js/main/public"
+      script: "build/js/packages/dynamicroute/kotlin/dynamicroute.js"
+    prod:
+      siteRoot: ".kobweb/site"
+
+  port: 8080
