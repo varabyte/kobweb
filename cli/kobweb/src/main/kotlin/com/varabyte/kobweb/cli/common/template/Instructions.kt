@@ -68,7 +68,7 @@ sealed class Instruction(
 
     /**
      * Directly define a variable, useful if the user already defined another variable elsewhere and this is just a
-     * minor modification to it.
+     * transformation on top of it.
      *
      * @param name The name of this variable, which can be referenced in freemarker expressions later.
      * @param value The value of the variable. This value will be processed by freemarker and can be dynamic!
@@ -88,9 +88,10 @@ sealed class Instruction(
     class ProcessFreemarker : Instruction()
 
     /**
-     * Move files within the source folder.
+     * Move files and/or folders to a destination directory.
      *
-     * This can be a useful step to do before executing a [Keep] instruction later.
+     * This instruction does not change the name of any of the files. Use the [Rename] instruction first if you need to
+     * accomplish that.
      *
      * @param from The files to copy. This can use standard wildcard syntax, e.g. "*.txt" and "a/b/**/README.md"
      * @param to The directory location to copy to. This value will be processed by freemarker and can be dynamic!
@@ -111,9 +112,29 @@ sealed class Instruction(
     }
 
     /**
+     * Rename a file in place.
+     *
+     * @param name The new filename. This value will be processed by freemarker and can be dynamic!
+     * @param description An optional description to show to users, if set, instead of the default message, which
+     *   may be too detailed.
+     */
+    @Serializable
+    @SerialName("Rename")
+    class Rename(
+        val file: String,
+        val name: String,
+        val description: String? = null,
+    ) : Instruction() {
+        init {
+            file.requireNoDirectoryDots()
+            require(name.contains("/")) { "Rename value must be a filename only without directories. "}
+        }
+    }
+
+    /**
      * Specify files for deletion. Directories will be deleted recursively.
      *
-     * @param files The list of files to keep
+     * @param files The list of files to delete
      * @param description An optional description to show to users, if set, instead of the default message.
      */
     @Serializable

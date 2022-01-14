@@ -143,6 +143,27 @@ class FreemarkerState(private val src: Path, private val dest: Path) {
                     }
                 }
 
+                is Instruction.Rename -> {
+                    val name = inst.name.process(cfg, model)
+                    processing(inst.description ?: "Renaming \"${inst.file}\" to \"$name\"") {
+                        val srcFile = src.toFile()
+                        val fileToRename = srcFile.resolve(inst.file)
+                        if (!fileToRename.exists()) {
+                            throw KobwebException("Cannot rename a file (${inst.file}) because it does not exist")
+                        }
+
+                        // If the rename isn't actually changing anything, technically we're done
+                        if (fileToRename.name != name) {
+                            val targetFile = fileToRename.resolveSibling(name)
+                            if (targetFile.exists()) {
+                                throw KobwebException("Cannot rename a file (${inst.file}) because the rename target ($targetFile) already exists")
+                            }
+
+                            fileToRename.renameTo(targetFile)
+                        }
+                    }
+                }
+
                 is Instruction.Delete -> {
                     processing(inst.description ?: "Deleting \"${inst.files}\"") {
                         val deleteMatcher = inst.files.wildcardToRegex()
