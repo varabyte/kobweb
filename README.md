@@ -1,4 +1,4 @@
-![version: 0.7.12](https://img.shields.io/badge/kobweb-v0.7.12-yellow)
+![version: 0.9.0](https://img.shields.io/badge/kobweb-v0.9.0-blue)
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
@@ -77,14 +77,14 @@ Our binary artifact is hosted on github. To download latest:
 
 ```bash
 $ cd /path/to/applications/kobweb
-$ wget https://github.com/varabyte/kobweb/releases/download/v0.7.12/kobweb-0.7.12.zip
-$ unzip kobweb-0.7.12.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/v0.9.0/kobweb-0.9.0.zip
+$ unzip kobweb-0.9.0.zip
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.7.12/bin
+$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.9.0/bin
 $ kobweb version # to check it's working
 ```
 
@@ -92,7 +92,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb/kobweb-0.7.12/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb/kobweb-0.9.0/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
@@ -1021,30 +1021,43 @@ To read more about the feature, please check out the
 
 # Can We Kobweb Yet
 
-Current state: **Functional but early**
+Current state: **Foundations are in place! You may encounter API gaps.**
 
-Kobweb has some pretty big pieces working already. It is easy to set up a new project and get things running quickly.
-The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it. It supports
-generating pages from Markdown that can reference your Composable code. And while it's not quite server-side rendering,
-you can export static pages which will get hydrated on load.
+Kobweb is becoming quite functional. We are already using it to build https://kobweb.varabyte.com and
+https://bitspittle.dev (depending on when you're reading this, they may still be fairly barebones, but these sites will
+get more of our full attention as Kobweb is finally stabilizing).
 
-However, there's still a lot to do. The API surface is a bit lean in some areas right now, especially around Silk UI
-components, plus filling in holes in the APIs that interact with Web Compose. There are probably quite a few sharp
-corners. And while the code is decently documented, higher level documentation is missing. Windows support needs love.
+At this point:
+
+* It is easy to set up a new project and get things running quickly.
+* The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it.
+* It supports generating pages from Markdown that can reference your Composable code. 
+* While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
+* There are nice silk components for canvas rendering and width-aware  
+
+However, there's always more to do.
+
+* The API surface is a bit lean in some areas right now, especially around Silk UI components
+* The APIs that interact with Web Compose may have some holes in them.
+* A lot of detailed documenation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
+
+I think there's enough there now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
+escape hatch to underlying Web Compose / Kotlin/JS approaches, but there might be some areas where it's still a bit DIY.
+It would be great to get real world experience to hear what issues users are actually running into.
 
 So, should you use Kobweb at this point? If you are...
 
-* a Kotlin tinkerer who is excited to play around with new tech and isn't afraid of creating toy projects atop APIs
-  which may shift underfoot:
+* playing around with Web Compose for the first time and want to get up and running quickly on a toy project:
     * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
       below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
       this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
-    * ***Maybe***, but now is probably a bit too early. It's getting close!
+    * **Worth a shot!** I think if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
+      with us at our Discord if you try and have questions or run into missing features.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
-    * **No**
+    * **No** - this may never be a tenable path.
 * a company:
-    * **NOOOOOO** (someday, we hope, but not yet)
+    * **Probably not** (someday, we hope, but not yet)
 
 # Advanced
 
