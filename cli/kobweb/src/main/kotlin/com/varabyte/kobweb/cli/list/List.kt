@@ -41,7 +41,7 @@ fun handleList(repo: String, branch: String) = session {
             templates
                 .sortedBy { template -> template.kobwebFolder.getProjectPath() }
                 .forEach { template ->
-                    val templatePath = template.kobwebFolder.getProjectPath().relativeTo(tempPath).toString()
+                    val templatePath = template.kobwebFolder.getProjectPath().relativeTo(tempPath).toString().removeSuffix("/default")
                     val description = template.content!!.metadata.description
 
                     text("• ")
