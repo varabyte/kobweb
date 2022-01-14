@@ -44,27 +44,31 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig) :
                     ChromeArguments.defaults(true).additionalArguments("no-sandbox", true).build()
                 )
 
-                pages.forEach { pageEntry ->
-                    val tab = chromeService.createTab()
-                    val devToolsService = chromeService.createDevToolsService(tab)
-                    val page = devToolsService.page
-                    val runtime = devToolsService.runtime
-                    page.onLoadEventFired { _ ->
-                        val evaluation = runtime.evaluate("document.documentElement.outerHTML")
-                        val filePath = pageEntry.route.substringBeforeLast('/') + "/" +
-                            (pageEntry.route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
-                            ".html"
-                        val prettyHtml = Jsoup.parse(evaluation.result.value.toString()).toString()
-                        File(getSiteDir(), "pages$filePath").run {
-                            parentFile.mkdirs()
-                            writeText(prettyHtml)
+                pages
+                    // Skip export routes with dynamic parts, as they are dynamically generated based on their URL
+                    // anyway
+                    .filter { !it.route.contains('{') }
+                    .forEach { pageEntry ->
+                        val tab = chromeService.createTab()
+                        val devToolsService = chromeService.createDevToolsService(tab)
+                        val page = devToolsService.page
+                        val runtime = devToolsService.runtime
+                        page.onLoadEventFired { _ ->
+                            val evaluation = runtime.evaluate("document.documentElement.outerHTML")
+                            val filePath = pageEntry.route.substringBeforeLast('/') + "/" +
+                                (pageEntry.route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
+                                ".html"
+                            val prettyHtml = Jsoup.parse(evaluation.result.value.toString()).toString()
+                            File(getSiteDir(), "pages$filePath").run {
+                                parentFile.mkdirs()
+                                writeText(prettyHtml)
+                            }
+                            devToolsService.close()
                         }
-                        devToolsService.close()
+                        page.enable()
+                        page.navigate("http://localhost:$port${pageEntry.route}")
+                        devToolsService.waitUntilClosed()
                     }
-                    page.enable()
-                    page.navigate("http://localhost:$port${pageEntry.route}")
-                    devToolsService.waitUntilClosed()
-                }
             }
         }
 
@@ -91,10 +95,12 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig) :
         }
 
         // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
-        val apiJarFile = project.layout.projectDirectory.file(kobwebConf.server.files.dev.api).asFile
-        if (apiJarFile.exists()) {
-            val destFile = File(getSiteDir(), "system/${apiJarFile.name}")
-            apiJarFile.copyTo(destFile, overwrite = true)
+        kobwebConf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { apiFile ->
+            val apiJarFile = project.layout.projectDirectory.file(apiFile).asFile
+            if (apiJarFile.exists()) {
+                val destFile = File(getSiteDir(), "system/${apiJarFile.name}")
+                apiJarFile.copyTo(destFile, overwrite = true)
+            }
         }
     }
 }
