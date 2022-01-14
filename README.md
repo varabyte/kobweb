@@ -1054,7 +1054,7 @@ So, should you use Kobweb at this point? If you are...
       this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
     * **Worth a shot!** I think if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
-      with us at our Discord if you try and have questions or run into missing features.
+      with us at our Discord if you try it and have questions or run into missing features.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
     * **No** - this may never be a tenable path.
 * a company:
