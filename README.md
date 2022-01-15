@@ -198,7 +198,7 @@ Run gradle commands directly. `kobweb` itself delegates to Gradle, but nothing i
 yourself.
 
 To start a Kobweb server, execute the `kobwebStart -t` command, and to stop it later, use the `kobwebStop` command. The
-`-t` command (or, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
+`-t` argument (or, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
 
 You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html), but in
 general, you should create two run configurations: one for `kobwebStart -t` and one for `kobwebStop`. To do this, start
