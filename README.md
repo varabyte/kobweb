@@ -935,9 +935,12 @@ These key / value pairs can be queried in your Kotlin `@Composable` code, via a 
 @Composable
 fun Signature() {
     val ctx = rememberPageContext()
-    // Markdown front matter value can be a list of strings,
-    // but here it's only a single one
-    val author = ctx.markdown.frontMatter.getValue("author").single()
+    // Markdown front matter value can potentially be a list of strings,
+    // but here it's only a single one.
+    // Note: We use `markdown!!` for this example, but that means we
+    // have to make sure we ONLY reference this composable within a
+    // Markdown file.
+    val author = ctx.markdown!!.frontMatter.getValue("author").single()
     Text("Article by $author")
 }
 ```
