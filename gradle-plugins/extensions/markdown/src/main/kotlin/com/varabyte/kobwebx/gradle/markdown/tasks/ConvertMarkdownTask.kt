@@ -125,13 +125,14 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 }
             }
 
-            val funName = mdFileRel.nameWithoutExtension
-            File(getGenDir(), "${packageParts.joinToString("/")}/$funName.kt").let { outputFile ->
+            val ktFileName = mdFileRel.nameWithoutExtension
+            File(getGenDir(), "${packageParts.joinToString("/")}/$ktFileName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
                 val mdPackage = project.prefixQualifiedPackage(
                     kobwebConfig.pagesPackage.get().packageConcat(packageParts.joinToString("."))
                 )
 
+                val funName = "${ktFileName}Page"
                 val ktRenderer = KotlinRenderer(project, mdFileRel.path, markdownComponents, mdPackage, funName)
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }
