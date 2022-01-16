@@ -177,10 +177,11 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         }
 
         text.convention { text ->
+            val literal = text.literal.escapeQuotes()
             if (useSilk.get()) {
-                "$SILK.text.Text(\"${text.literal}\")"
+                "$SILK.text.Text(\"${literal}\")"
             } else {
-                "$JB_DOM.Text(\"${text.literal}\")"
+                "$JB_DOM.Text(\"${literal}\")"
             }
         }
         img.convention { "$JB_DOM.Img" }
@@ -194,7 +195,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         br.convention { "$JB_DOM.Br" }
         a.convention { link ->
             if (useSilk.get()) {
-                val linkText = link.children().filterIsInstance<Text>().firstOrNull()?.literal.orEmpty()
+                val linkText = link.children().filterIsInstance<Text>().firstOrNull()?.literal?.escapeQuotes().orEmpty()
                 childrenOverride = listOf() // We "consumed" the children, no more need to visit them
                 "$SILK.navigation.Link(\"${link.destination}\", \"$linkText\")"
             } else {
@@ -208,7 +209,8 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         ol.convention { "$JB_DOM.Ol" }
         li.convention { "$JB_DOM.Li" }
         code.convention { codeBlock ->
-            childrenOverride = codeBlock.literal.trim().split("\n").map { line -> Text("$line\\n") }
+            childrenOverride = codeBlock.literal.trim().split("\n")
+                .map { line -> Text("${line.escapeQuotes()}\\n") }
             // See also: https://stackoverflow.com/a/31775545/1299302
             "$JB_DOM.Code(attrs = { style { property(\"display\", \"block\"); property(\"white-space\", \"pre-wrap\") } })"
         }

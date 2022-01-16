@@ -243,7 +243,7 @@ class KotlinRenderer(
         private fun List<String>.serialize(): String {
             return buildString {
                 append("listOf(")
-                append(joinToString { "\"${it.replace("\"", "\\\"")}\""})
+                append(joinToString { "\"${it.escapeQuotes()}\""})
                 append(")")
             }
         }
