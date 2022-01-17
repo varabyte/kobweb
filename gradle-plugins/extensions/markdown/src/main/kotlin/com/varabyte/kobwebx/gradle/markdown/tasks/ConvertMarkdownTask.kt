@@ -12,13 +12,6 @@ import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownComponents
 import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
-import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallExtension
-import org.commonmark.Extension
-import org.commonmark.ext.autolink.AutolinkExtension
-import org.commonmark.ext.front.matter.YamlFrontMatterExtension
-import org.commonmark.ext.gfm.tables.TablesExtension
-import org.commonmark.ext.task.list.items.TaskListItemsExtension
-import org.commonmark.parser.Parser
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.InputFiles
@@ -67,32 +60,10 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @TaskAction
     fun execute() {
+        val parser = markdownFeatures.createParser()
         getMarkdownFilesWithRoots().forEach { rootAndFile ->
             val mdFile = rootAndFile.file
             val mdFileRel = rootAndFile.relativeFile
-
-            val extensions = mutableListOf<Extension>()
-            markdownFeatures.run {
-                if (autolink.get()) {
-                    extensions.add(AutolinkExtension.create())
-                }
-                if (frontMatter.get()) {
-                    extensions.add(YamlFrontMatterExtension.create())
-                }
-                if (kobwebCall.get()) {
-                    extensions.add(KobwebCallExtension.create(kobwebCallDelimiters.get()))
-                }
-                if (tables.get()) {
-                    extensions.add(TablesExtension.create())
-                }
-                if (taskList.get()) {
-                    extensions.add(TaskListItemsExtension.create())
-                }
-            }
-
-            val parser = Parser.builder()
-                .extensions(extensions)
-                .build()
 
             val parts = mdFileRel.path.split("/")
             val dirParts = parts.subList(0, parts.lastIndex)

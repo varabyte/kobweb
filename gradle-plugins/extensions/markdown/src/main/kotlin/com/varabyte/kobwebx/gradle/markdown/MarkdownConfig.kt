@@ -4,11 +4,17 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
+import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallExtension
+import org.commonmark.Extension
+import org.commonmark.ext.autolink.AutolinkExtension
+import org.commonmark.ext.front.matter.YamlFrontMatterExtension
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
 import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
+import org.commonmark.ext.gfm.tables.TablesExtension
+import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
 import org.commonmark.node.Emphasis
@@ -24,6 +30,7 @@ import org.commonmark.node.Paragraph
 import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
+import org.commonmark.parser.Parser
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import javax.inject.Inject
@@ -113,6 +120,32 @@ abstract class MarkdownFeatures {
         kobwebCallDelimiters.convention("{{" to "}}")
         tables.convention(true)
         taskList.convention(true)
+    }
+
+    /**
+     * Create a markdown parser configured based on the currently activated features.
+     */
+    fun createParser(): Parser {
+        val extensions = mutableListOf<Extension>()
+        if (autolink.get()) {
+            extensions.add(AutolinkExtension.create())
+        }
+        if (frontMatter.get()) {
+            extensions.add(YamlFrontMatterExtension.create())
+        }
+        if (kobwebCall.get()) {
+            extensions.add(KobwebCallExtension.create(kobwebCallDelimiters.get()))
+        }
+        if (tables.get()) {
+            extensions.add(TablesExtension.create())
+        }
+        if (taskList.get()) {
+            extensions.add(TaskListItemsExtension.create())
+        }
+
+        return Parser.builder()
+            .extensions(extensions)
+            .build()
     }
 }
 
