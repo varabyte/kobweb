@@ -74,6 +74,7 @@ private class RenderCallback<C: RenderingContext>(
             val scope = RenderScope(ctx, width, height, palette, if (firstRender) 0.0 else min(deltaMs, maxDeltaMs))
             scope.render()
         }
+        lastTimestamp = now
         onStepped()
     }
 }
