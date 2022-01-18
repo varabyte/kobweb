@@ -11,6 +11,7 @@ import com.varabyte.kobweb.server.io.ServerStateFile
 import com.varabyte.kobweb.server.plugins.configureHTTP
 import com.varabyte.kobweb.server.plugins.configureRouting
 import com.varabyte.kobweb.server.plugins.configureSerialization
+import io.ktor.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.delay
@@ -97,7 +98,9 @@ fun main() = runBlocking {
         delay(300)
     }
 
+    engine.application.log.info("Kobweb server shutting down...")
     engine.stop(1, 5, TimeUnit.MILLISECONDS)
     requestsFile.path.deleteIfExists()
     stateFile.content = null
+    engine.application.log.info("Server finished shutting down.")
 }
