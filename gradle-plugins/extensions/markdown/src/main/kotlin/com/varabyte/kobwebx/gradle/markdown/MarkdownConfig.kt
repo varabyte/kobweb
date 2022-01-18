@@ -243,7 +243,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         li.convention { "$JB_DOM.Li" }
         code.convention { codeBlock ->
             childrenOverride = codeBlock.literal.trim().split("\n")
-                .map { line -> Text("${line.escapeQuotes()}\\n") }
+                .map { line -> Text("$line\\n") }
             // See also: https://stackoverflow.com/a/31775545/1299302
             "$JB_DOM.Code(attrs = { style { property(\"display\", \"block\"); property(\"white-space\", \"pre-wrap\") } })"
         }
