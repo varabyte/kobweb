@@ -17,4 +17,4 @@ code blocks
 
 and `inline` code as well.
 
-{{ .components.widgets.GoHomeLink }}
+{{{ .components.widgets.GoHomeLink }}}

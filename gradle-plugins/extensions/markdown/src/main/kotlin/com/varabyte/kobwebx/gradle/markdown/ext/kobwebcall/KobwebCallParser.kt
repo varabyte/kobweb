@@ -1,7 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 
 import org.commonmark.node.Block
-import org.commonmark.node.Text
 import org.commonmark.parser.block.AbstractBlockParser
 import org.commonmark.parser.block.AbstractBlockParserFactory
 import org.commonmark.parser.block.BlockContinue
@@ -10,39 +9,41 @@ import org.commonmark.parser.block.MatchedBlockParser
 import org.commonmark.parser.block.ParserState
 
 /**
- * A parser for the {{ Kobweb Call }} block pattern.
+ * A parser for the {{{ MethodCall }}} block pattern.
  *
- * Currently, the parser assumes that the block will only live on one line, and that it's content will get converted
- * into code, e.g. {{ .example.ComposableCall() }}.
- *
- * If no parentheses are added to the call, they will be appended automatically.
+ * See also: [KobwebCall]
  */
 class KobwebCallParser(val text: String) : AbstractBlockParser() {
     private val block = KobwebCallBlock().apply {
-        appendChild(Text(text))
+        appendChild(KobwebCall(text))
     }
 
     override fun getBlock(): Block {
         return block
     }
 
-    // TODO(Bug #42): Support multi-line kobweb calls
     override fun tryContinue(state: ParserState): BlockContinue? {
-        // A kobweb call is always (for now?) a single line, so this can never be true
+        // A kobweb call is (for now) always a single line, so this can never be true
+        // TODO(Bug #42): Support multi-line kobweb calls
         return BlockContinue.none()
     }
 
-    class Factory(val delimiters: Pair<String, String>) : AbstractBlockParserFactory() {
+    class Factory(delimiters: Pair<Char, Char>) : AbstractBlockParserFactory() {
+        private val BLOCK_DELIMITER_LEN = 3
+        private val OPENING_DELIMITER = delimiters.first.toString().repeat(BLOCK_DELIMITER_LEN)
+        private val CLOSING_DELIMITER = delimiters.second.toString().repeat(BLOCK_DELIMITER_LEN)
+
         override fun tryStart(state: ParserState, matchedBlockParser: MatchedBlockParser): BlockStart? {
             val line = state.line.content.substring(state.nextNonSpaceIndex)
 
-            if (!line.startsWith(delimiters.first)) return BlockStart.none()
+            if (!line.startsWith(OPENING_DELIMITER)) return BlockStart.none()
 
-            val closingIndex = line.indexOf(delimiters.second, startIndex = delimiters.first.length)
+            val closingIndex = line.indexOf(CLOSING_DELIMITER, startIndex = BLOCK_DELIMITER_LEN)
             if (closingIndex < 0) return BlockStart.none()
 
-            val text = line.substring(delimiters.first.length, closingIndex).trim()
-            return BlockStart.of(KobwebCallParser(text)).atIndex(state.nextNonSpaceIndex + delimiters.first.length)
+            val text = line.substring(BLOCK_DELIMITER_LEN, closingIndex).trim()
+            return BlockStart.of(KobwebCallParser(text))
+                .atIndex(state.nextNonSpaceIndex + BLOCK_DELIMITER_LEN)
         }
     }
 }

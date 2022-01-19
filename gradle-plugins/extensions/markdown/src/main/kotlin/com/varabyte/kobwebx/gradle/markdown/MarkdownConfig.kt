@@ -2,7 +2,6 @@
 
 package com.varabyte.kobwebx.gradle.markdown
 
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallExtension
 import org.commonmark.Extension
@@ -80,7 +79,7 @@ abstract class MarkdownFeatures {
      * If true, support a syntax for inserting a composable call into the final generated Kotlin source:
      *
      * ```
-     * {{ .components.widgets.VisitorCounter }}
+     * {{{ .components.widgets.VisitorCounter }}}
      * ```
      *
      * becomes:
@@ -91,7 +90,13 @@ abstract class MarkdownFeatures {
      */
     abstract val kobwebCall: Property<Boolean>
 
-    abstract val kobwebCallDelimiters: Property<Pair<String, String>>
+    /**
+     * The delimiters used to delineate code for the [kobwebCall] feature.
+     *
+     * By default, it is curly braces `{}` but you can change the character if this
+     * causes a problem in your project for some unforeseeable reason.
+     */
+    abstract val kobwebCallDelimiters: Property<Pair<Char, Char>>
 
     /**
      * If true, support creating tables via pipe syntax.
@@ -117,7 +122,7 @@ abstract class MarkdownFeatures {
         autolink.convention(true)
         frontMatter.convention(true)
         kobwebCall.convention(true)
-        kobwebCallDelimiters.convention("{{" to "}}")
+        kobwebCallDelimiters.convention('{' to '}')
         tables.convention(true)
         taskList.convention(true)
     }

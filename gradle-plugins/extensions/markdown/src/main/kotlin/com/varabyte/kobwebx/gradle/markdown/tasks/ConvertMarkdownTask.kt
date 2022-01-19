@@ -13,6 +13,7 @@ import com.varabyte.kobwebx.gradle.markdown.MarkdownComponents
 import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory

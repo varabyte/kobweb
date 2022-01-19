@@ -1,7 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
-import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
+import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
@@ -47,29 +47,6 @@ class KotlinRenderer(
     private val indent get() = "    ".repeat(indentCount)
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact = project.hasDependencyNamed("kobwebx-markdown")
-
-    /**
-     * @param name The name of this method. See also [toFqn]
-     */
-    private class MethodCall(val name: String) : CustomNode() {
-        /**
-         * Convert this class's [name] into a fully qualified name, additionally prefixing the project's package it
-         * begins with a period.
-         *
-         * Examples:
-         * * `test` -> `test()`
-         * * `.test` -> `org.example.myproject.test()`
-         * * `test()` -> `test()`
-         */
-        fun toFqn(project: Project): String {
-            return buildString {
-                append(project.prefixQualifiedPackage(name))
-                if (name.last().isLetterOrDigit()) {
-                    append("()")
-                }
-            }
-        }
-    }
 
     override fun render(node: Node, output: Appendable) {
         output.append(
@@ -240,6 +217,12 @@ class KotlinRenderer(
             unsupported("Link referencing")
         }
 
+        override fun visit(customNode: CustomNode) {
+            if (customNode is KobwebCall) {
+                output.appendLine("$indent${customNode.toFqn(project)}")
+            }
+        }
+
         private fun List<String>.serialize(): String {
             return buildString {
                 append("listOf(")
@@ -280,7 +263,7 @@ class KotlinRenderer(
                     // everything else.
                     val maybeRoot = yamlVisitor.data["root"]?.single()
                     maybeRoot?.let { root ->
-                        output.appendLine("$indent${MethodCall(root).toFqn(project)} {")
+                        visit(KobwebCall(root, appendBrace = true))
                         ++indentCount
                     }
 
@@ -299,7 +282,7 @@ class KotlinRenderer(
             } else if (customBlock is KobwebCallBlock) {
                 val visitor = KobwebCallVisitor()
                 customBlock.accept(visitor)
-                output.appendLine("$indent${MethodCall(visitor.text).toFqn(project)}")
+                visit(visitor.call!!)
             }
         }
     }
