@@ -53,3 +53,24 @@ class UserSelect(val value: String) {
 fun StyleBuilder.userSelect(userSelect: UserSelect) {
     property("user-select", userSelect.value)
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
+class WhiteSpace(val value: String) {
+    companion object {
+        val Normal get() = WhiteSpace("normal");
+        val NoWrap get() = WhiteSpace("nowrap");
+        val Pre get() = WhiteSpace("pre");
+        val PreWrap get() = WhiteSpace("pre-wrap");
+        val PreLine get() = WhiteSpace("pre-line");
+        val BreakSpaces get() = WhiteSpace("break-spaces");
+
+        val Inherit get() = WhiteSpace("inherit")
+        val Initial get() = WhiteSpace("initial")
+        val Revert get() = WhiteSpace("revert")
+        val Unset get() = WhiteSpace("unset")
+    }
+}
+
+fun StyleBuilder.whiteSpace(whiteSpace: WhiteSpace) {
+    property("white-space", whiteSpace.value)
+}
