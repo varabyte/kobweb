@@ -98,10 +98,10 @@ fun main() = runBlocking {
         delay(300)
     }
 
-    engine.application.log.info("Kobweb server shutting down...")
+    println("Kobweb server shutting down...")
     engine.stop(1, 5, TimeUnit.SECONDS)
-    engine.application.log.info("Ktor server stopped, cleaning up...")
+    println("Ktor server stopped, cleaning up...")
     requestsFile.path.deleteIfExists()
     stateFile.content = null
-    engine.application.log.info("Server finished shutting down.")
+    println("Server finished shutting down.")
 }
