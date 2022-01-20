@@ -49,6 +49,9 @@ class KotlinRenderer(
     private val dependsOnMarkdownArtifact = project.hasDependencyNamed("kobwebx-markdown")
 
     override fun render(node: Node, output: Appendable) {
+        node.accept(SoftLineBreakConversionVisitor())
+        node.accept(TextMergingVisitor())
+
         output.append(
             buildString {
                 appendLine("package $pkg")
@@ -83,6 +86,29 @@ class KotlinRenderer(
     private fun RenderVisitor.visitAndFinish(node: Node) {
         node.accept(this)
         finish()
+    }
+
+    /** Soft breaks between lines should just become spaces. */
+    private inner class SoftLineBreakConversionVisitor : AbstractVisitor() {
+        override fun visit(softLineBreak: SoftLineBreak) {
+            val space = Text(" ")
+            space.sourceSpans = softLineBreak.sourceSpans
+            softLineBreak.insertAfter(space)
+            softLineBreak.unlink()
+        }
+    }
+
+    /** Avoid a bunch of unecessary calls to Text functions by merging all sibling text strings together. */
+    private inner class TextMergingVisitor : AbstractVisitor() {
+        override fun visit(text: Text) {
+            (text.previous as? Text)?.let { textPrev ->
+                val merged = Text(textPrev.literal + text.literal)
+                merged.sourceSpans = textPrev.sourceSpans + text.sourceSpans
+                textPrev.insertBefore(merged)
+                textPrev.unlink()
+                text.unlink()
+            }
+        }
     }
 
     private inner class RenderVisitor(private val output: Appendable) : AbstractVisitor() {
@@ -148,12 +174,6 @@ class KotlinRenderer(
 
         override fun visit(fencedCodeBlock: FencedCodeBlock) {
             doVisit(fencedCodeBlock, components.code)
-        }
-
-        override fun visit(softLineBreak: SoftLineBreak) {
-            // Treat softline breaks like a space. The newlines here are probably coming from the fact that the user
-            // pressed ENTER to keep the width of their md file from going over 80 or 100 characters.
-            visit(Text(" "))
         }
 
         override fun visit(hardLineBreak: HardLineBreak) {
