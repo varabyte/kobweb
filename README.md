@@ -1,4 +1,4 @@
-![version: 0.9.0](https://img.shields.io/badge/kobweb-v0.9.0-blue)
+![version: 0.9.1](https://img.shields.io/badge/kobweb-v0.9.1-blue)
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
@@ -77,14 +77,14 @@ Our binary artifact is hosted on github. To download latest:
 
 ```bash
 $ cd /path/to/applications/kobweb
-$ wget https://github.com/varabyte/kobweb/releases/download/v0.9.0/kobweb-0.9.0.zip
-$ unzip kobweb-0.9.0.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/v0.9.1/kobweb-0.9.1.zip
+$ unzip kobweb-0.9.1.zip
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.9.0/bin
+$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.9.1/bin
 $ kobweb version # to check it's working
 ```
 
@@ -92,7 +92,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb/kobweb-0.9.0/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb/kobweb-0.9.1/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
@@ -926,7 +926,7 @@ author: bitspittle
 
 ...
 
-{{ Signature() }}
+{{{ Signature() }}}
 ```
 
 These key / value pairs can be queried in your Kotlin `@Composable` code, via a page's context:
@@ -979,7 +979,7 @@ fun KobwebPage() {
 
 ### Kobweb Call
 
-A markdown extension built just for Kobweb, you can surround a path to a `@Composable` method with double-curly braces
+A markdown extension built just for Kobweb, you can surround a path to a `@Composable` method with triple-curly braces
 to call it:
 
 ```markdown
@@ -987,7 +987,7 @@ to call it:
 
 ...
 
-{{ .components.widgets.VisitorCounter }}
+{{{ .components.widgets.VisitorCounter }}}
 ```
 
 which will generate code for you like the following:
