@@ -94,11 +94,11 @@ class KotlinRenderer(
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
             val scope = NodeScope()
             val code = composableCall.get().invoke(scope, node)
-            doVisit(node, code, scope.childrenOverride)
+            doVisit(node, code, scope)
         }
 
-        private fun doVisit(node: Node, code: String, childrenOverride: List<Node>? = null) {
-            val children = childrenOverride ?: sequence<Node> {
+        private fun doVisit(node: Node, code: String, scope: NodeScope) {
+            val children = scope.childrenOverride ?: sequence<Node> {
                 var curr: Node? = node.firstChild
                 while (curr != null) {
                     yield(curr)
@@ -106,12 +106,17 @@ class KotlinRenderer(
                 }
             }.toList()
 
+            if (code.last() == '}') {
+                --indentCount
+            }
             output.append("$indent$code")
             // If this is a single line call (no children), we need to explicitly add the "()" parens if not already
             // done by the caller. Otherwise, we'll do "composableCall { ... }", which is really calling a function with
             // a lambda.
             if (code.last().isLetterOrDigit() && children.isEmpty()) {
                 output.append("()")
+            } else if (code.last() == '{') {
+                ++indentCount
             }
 
             if (children.isNotEmpty()) {
@@ -168,11 +173,11 @@ class KotlinRenderer(
         }
 
         override fun visit(htmlInline: HtmlInline) {
-            unsupported("Inline HTML")
+            doVisit(htmlInline, components.inlineTag)
         }
 
         override fun visit(htmlBlock: HtmlBlock) {
-            unsupported("Inline HTML")
+            unsupported("Using HTML blocks")
         }
 
         override fun visit(image: Image) {

@@ -17,4 +17,10 @@ code blocks
 
 and `inline` code as well.
 
+You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is
+wrapped in a span.
+
+However, block tags (like `<pre>`, `<body>` etc.) are not supported. Instead, you can use `{{{ code }}}` to call into
+Kotlin code. In fact, the following link is actually provided by Kotlin code:
+
 {{{ .components.widgets.GoHomeLink }}}

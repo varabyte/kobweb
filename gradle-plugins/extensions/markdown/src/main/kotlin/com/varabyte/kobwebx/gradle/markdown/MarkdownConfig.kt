@@ -14,21 +14,7 @@ import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
 import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
-import org.commonmark.node.BulletList
-import org.commonmark.node.Code
-import org.commonmark.node.Emphasis
-import org.commonmark.node.FencedCodeBlock
-import org.commonmark.node.HardLineBreak
-import org.commonmark.node.Heading
-import org.commonmark.node.Image
-import org.commonmark.node.Link
-import org.commonmark.node.ListItem
-import org.commonmark.node.Node
-import org.commonmark.node.OrderedList
-import org.commonmark.node.Paragraph
-import org.commonmark.node.StrongEmphasis
-import org.commonmark.node.Text
-import org.commonmark.node.ThematicBreak
+import org.commonmark.node.*
 import org.commonmark.parser.Parser
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
@@ -155,6 +141,7 @@ abstract class MarkdownFeatures {
 }
 
 private const val JB_DOM = "org.jetbrains.compose.web.dom"
+private const val KOBWEB_DOM = "com.varabyte.kobweb.compose.dom"
 private const val SILK = "com.varabyte.kobweb.silk.components"
 
 class NodeScope {
@@ -209,6 +196,10 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
     abstract val td: Property<NodeScope.(TableCell) -> String>
     abstract val th: Property<NodeScope.(TableCell) -> String>
 
+    /** Handler which is fed the raw text (name and attributes) within an opening tag, e.g. `span id="demo"` */
+    abstract val rawTag: Property<NodeScope.(String) -> String>
+    abstract val inlineTag: Property<NodeScope.(HtmlInline) -> String>
+
     init {
         project.afterEvaluate {
             useSilk.convention(project.hasDependencyNamed("kobweb-silk"))
@@ -262,5 +253,33 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         tr.convention { "$JB_DOM.Tr" }
         td.convention { "$JB_DOM.Td" }
         th.convention { "$JB_DOM.Th" }
+
+        fun String.stripTagBrackets() =
+            this.removePrefix("</").removePrefix("<").removeSuffix("/>").removeSuffix(">")
+
+        rawTag.convention { tag ->
+            val parts = tag.stripTagBrackets().split(' ', limit = 2)
+            val name = "\"${parts[0]}\""
+            val attrs = parts.getOrNull(1)?.escapeQuotes()?.let { "\"$it\""} ?: "null"
+
+            "$KOBWEB_DOM.GenericTag($name, $attrs)"
+        }
+
+        inlineTag.set { htmlInline ->
+            val tag = htmlInline.literal
+
+            val scope = this
+            buildString {
+                if (!tag.startsWith("</")) {
+                    append(rawTag.get().invoke(scope, tag))
+                    if (!tag.endsWith("/>")) {
+                        append(" {")
+                    }
+                } else {
+                    // Closing tag
+                    append("}")
+                }
+            }
+        }
     }
 }

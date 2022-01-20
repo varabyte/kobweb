@@ -12,11 +12,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import kotlinx.browser.localStorage
-import org.jetbrains.compose.web.css.Style
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.fontFamily
-import org.jetbrains.compose.web.css.vh
-import org.jetbrains.compose.web.css.vw
+import org.jetbrains.compose.web.css.*
 
 object CssGlobalsStyleSheet : StyleSheet() {
     init {
@@ -25,6 +21,11 @@ object CssGlobalsStyleSheet : StyleSheet() {
                 "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
                 "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "sans-serif"
             )
+            lineHeight("1.4")
+        }
+
+        "#md-inline-demo" style {
+            color(Color.orangered)
         }
     }
 }
