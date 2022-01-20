@@ -1,8 +1,10 @@
 package com.varabyte.kobweb.silk.components.text
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.modifiers.whiteSpace
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -26,18 +28,14 @@ fun Text(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null
 ) {
-    Span(
-        attrs = TextStyle.toModifier(variant)
-            .then(modifier)
-            .asAttributeBuilder {
-                if (text.startsWith(' ') || text.endsWith(' ')) {
-                    style {
-                        // Prevent spaces in text from being collapsed
-                        whiteSpace("pre-wrap")
-                    }
-                }
-            }
-    ) {
+    val spaceModifier = Modifier.whiteSpace(WhiteSpace.PreWrap).takeIf { text.startsWith(' ') || text.endsWith(' ') } ?: Modifier
+    val finalModifier = TextStyle.toModifier(variant).then(modifier).then(spaceModifier)
+
+    if (finalModifier !== Modifier) {
+        Span(attrs = finalModifier.asAttributeBuilder()) {
+            Text(text)
+        }
+    } else {
         Text(text)
     }
 }
