@@ -334,7 +334,7 @@ private sealed interface StyleGroup {
  * }
  * ```
  */
-class ComponentStyle internal constructor(
+class ComponentStyle(
     val name: String,
     private val init: ComponentModifiers.() -> Unit,
 ) {
