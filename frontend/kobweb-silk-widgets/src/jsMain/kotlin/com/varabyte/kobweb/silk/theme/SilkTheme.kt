@@ -3,11 +3,11 @@ package com.varabyte.kobweb.silk.theme
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifiers
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentStyleBuilder
 import com.varabyte.kobweb.silk.components.style.ComponentStyleState
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.ImmutableComponentStyle
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
@@ -109,10 +109,10 @@ fun SilkConfig.registerBaseStyle(className: String, init: ComponentStyleState.()
 internal object SilkConfigInstance : SilkConfig {
     override var initialColorMode = ColorMode.LIGHT
 
-    private val styles = mutableListOf<ComponentStyleBuilder>()
+    private val styles = mutableListOf<ComponentStyle>()
 
     override fun registerStyle(className: String, init: ComponentModifiers.() -> Unit) {
-        styles.add(ComponentStyleBuilder(className, init))
+        styles.add(ComponentStyle(className, init))
     }
 
     // This method is not part of the public API and should be called by Silk at initialization time
@@ -130,7 +130,7 @@ internal object SilkConfigInstance : SilkConfig {
  * Unlike [SilkConfig] values, theme values are expected to be accessible in user projects via the [SilkTheme] object.
  */
 class MutableSilkTheme {
-    internal val componentStyles = LinkedHashMap<String, ComponentStyleBuilder>() // Preserve insertion order
+    internal val componentStyles = LinkedHashMap<String, ComponentStyle>() // Preserve insertion order
     internal val componentVariants = LinkedHashMap<String, ComponentVariant>() // Preserve insertion order
 
     var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
@@ -151,7 +151,7 @@ class MutableSilkTheme {
      *
      * Once a style is registered, you can reference it in your Composable widget via the following code:
      */
-    fun registerComponentStyle(style: ComponentStyleBuilder) {
+    fun registerComponentStyle(style: ComponentStyle) {
         componentStyles[style.name] = style
         registerComponentVariants(*style.variants.toTypedArray())
     }
@@ -160,7 +160,7 @@ class MutableSilkTheme {
      * Register variants associated with a base style.
      *
      * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
-     * Additionally, any variants created by [ComponentStyleBuilder.addVariant] will be automatically registered when
+     * Additionally, any variants created by [ComponentStyle.addVariant] will be automatically registered when
      * [registerComponentStyle] is called (in which case, calling this is essentially a no-op).
      *
      * However, if you are defining variants on top of base Silk styles, e.g. maybe some new button variants, then they
@@ -198,8 +198,8 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
 
     val breakpoints = mutableSilkTheme.breakpoints
 
-    private val _componentStyles = mutableMapOf<String, ComponentStyle>()
-    val componentStyles: Map<String, ComponentStyle> = _componentStyles
+    private val _componentStyles = mutableMapOf<String, ImmutableComponentStyle>()
+    val componentStyles: Map<String, ImmutableComponentStyle> = _componentStyles
 
     // Note: We separate this function out from the SilkTheme constructor so we can construct it first and then call
     // this later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
@@ -216,12 +216,12 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         check(_SilkTheme != null)
         mutableSilkTheme.componentStyles.values.forEach { styleBuilder ->
             styleBuilder.addStyles(componentStyleSheet)
-            _componentStyles[styleBuilder.name] = ComponentStyle(styleBuilder.name)
+            _componentStyles[styleBuilder.name] = ImmutableComponentStyle(styleBuilder.name)
         }
         // Variants should be defined after base styles to make sure they take priority if used
         mutableSilkTheme.componentVariants.values.forEach { variant ->
             variant.addStyles(componentStyleSheet)
-            _componentStyles[variant.style.name] = ComponentStyle(variant.style.name)
+            _componentStyles[variant.style.name] = ImmutableComponentStyle(variant.style.name)
         }
     }
 }

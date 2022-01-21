@@ -242,68 +242,13 @@ class ComponentModifiers(val colorMode: ColorMode) {
 class ComponentStyleState(val colorMode: ColorMode)
 
 /**
- * A class which allows a user to define styles that get added to the page's stylesheet, instead of just using
- * inline styles.
- *
- * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
- * media queries, and psuedo classes.
- *
- * If defining a style for a custom widget, you should call the [toModifier] method to apply it:
- *
- * ```
- * val CustomStyle = ComponentStyle("my-style") { ... }
- *
- * @Composable
- * fun CustomWidget(..., variant: ComponentVariant? = null, ...) {
- *   val modifier = CustomStyle.toModifier(variant).then(...)
- *   // ^ This modifier is now set with your registered styles.
- * }
- * ```
+ * A [ComponentStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
  */
-class ComponentStyle internal constructor(private val name: String) {
-    companion object {
-        /**
-         * A set of all classnames we have styles registered against.
-         *
-         * This lets us avoid applying unnecessary classnames, which really helps cut down on the number of class tags
-         * we use, making it easier to debug CSS issues in the browser.
-         *
-         * An example can help clarify here. Let's say you define a color-aware style:
-         *
-         * ```
-         * ComponentStyle("custom") { colorMode ->
-         *   base {
-         *     Modifier.color(if (colorMode.isLight()) Colors.Red else Colors.Pink)
-         *   }
-         * }
-         * ```
-         *
-         * For this, you only need the class name "custom-dark" (in dark mode) and "custom-light"; if instead it was
-         * color-agnostic, we would only need "custom". Before, we were applying all color modes because we weren't sure
-         * what was defined and what wasn't.
-         *
-         * In some cases, we have empty styles too, as hooks that user's can optionally replace if they want to.
-         * Now, as long as the style remains empty, we won't add any tagging at all to the user's elements.
-         */
-        private val registeredClasses = mutableSetOf<String>()
-
-        /**
-         * Handle being notified of a selector name, e.g. ".someStyle" or ".someStyle.someVariant"
-         */
-        // Note: This is kind of a hack, but since we can't currently query the StyleSheet for selector names, what we
-        // do instead is update our internal list as we run through all ComponentStyles.
-        internal fun notifySelectorName(selectorName: String) {
-            selectorName.split('.').filter { it.isNotEmpty() }.forEach { registeredClasses.add(it) }
-        }
-
-        operator fun invoke(name: String, init: ComponentModifiers.() -> Unit) =
-            ComponentStyleBuilder(name, init)
-    }
-
+class ImmutableComponentStyle internal constructor(private val name: String) {
     @Composable
     fun toModifier(): Modifier {
         val classNames = listOf(name, "$name-${getColorMode().name.lowercase()}")
-            .filter { name -> registeredClasses.contains(name) }
+            .filter { name -> ComponentStyle.registeredClasses.contains(name) }
 
         return if (classNames.isNotEmpty()) Modifier.classNames(*classNames.toTypedArray()) else Modifier
     }
@@ -333,8 +278,8 @@ class ComponentStyle internal constructor(private val name: String) {
  * You may still wish to use [ComponentStyle.Companion.invoke] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.Companion.base(className: String, init: ComponentStyleState.() -> Modifier): ComponentStyleBuilder {
-    return this.invoke(className) {
+fun ComponentStyle.Companion.base(className: String, init: ComponentStyleState.() -> Modifier): ComponentStyle {
+    return ComponentStyle(className) {
         base {
             ComponentStyleState(colorMode).let(init)
         }
@@ -371,14 +316,68 @@ private sealed interface StyleGroup {
     }
 }
 
-class ComponentStyleBuilder internal constructor(
+/**
+ * A class which allows a user to define styles that get added to the page's stylesheet, instead of inline styles.
+ *
+ * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
+ * media queries, and psuedo classes.
+ *
+ * If defining a style for a custom widget, you should call the [toModifier] method to apply it:
+ *
+ * ```
+ * val CustomStyle = ComponentStyle("my-style") { ... }
+ *
+ * @Composable
+ * fun CustomWidget(..., variant: ComponentVariant? = null, ...) {
+ *   val modifier = CustomStyle.toModifier(variant).then(...)
+ *   // ^ This modifier is now set with your registered styles.
+ * }
+ * ```
+ */
+class ComponentStyle internal constructor(
     val name: String,
     private val init: ComponentModifiers.() -> Unit,
 ) {
+    companion object {
+        /**
+         * A set of all classnames we have styles registered against.
+         *
+         * This lets us avoid applying unnecessary classnames, which really helps cut down on the number of class tags
+         * we use, making it easier to debug CSS issues in the browser.
+         *
+         * An example can help clarify here. Let's say you define a color-aware style:
+         *
+         * ```
+         * ComponentStyle("custom") { colorMode ->
+         *   base {
+         *     Modifier.color(if (colorMode.isLight()) Colors.Red else Colors.Pink)
+         *   }
+         * }
+         * ```
+         *
+         * For this, you only need the class name "custom-dark" (in dark mode) and "custom-light"; if instead it was
+         * color-agnostic, we would only need "custom". Before, we were applying all color modes because we weren't sure
+         * what was defined and what wasn't.
+         *
+         * In some cases, we have empty styles too, as hooks that user's can optionally replace if they want to.
+         * Now, as long as the style remains empty, we won't add any tagging at all to the user's elements.
+         */
+        internal val registeredClasses = mutableSetOf<String>()
+
+        /**
+         * Handle being notified of a selector name, e.g. ".someStyle" or ".someStyle.someVariant"
+         */
+        // Note: This is kind of a hack, but since we can't currently query the StyleSheet for selector names, what we
+        // do instead is update our internal list as we run through all ComponentStyles.
+        private fun notifySelectorName(selectorName: String) {
+            selectorName.split('.').filter { it.isNotEmpty() }.forEach { registeredClasses.add(it) }
+        }
+    }
+
     internal val variants = mutableListOf<ComponentVariant>()
 
     fun addVariant(name: String, init: ComponentModifiers.() -> Unit): ComponentVariant {
-        return ComponentVariant(ComponentStyleBuilder("${this.name}-$name", init), baseStyle = this).also {
+        return ComponentVariant(ComponentStyle("${this.name}-$name", init), baseStyle = this).also {
             variants.add(it)
         }
     }
@@ -415,7 +414,7 @@ class ComponentStyleBuilder internal constructor(
 
         StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
             withFinalSelectorName(selectorName, group) { name, styles ->
-                ComponentStyle.notifySelectorName(name)
+                notifySelectorName(name)
                 styleSheet.addStyles(name, styles)
             }
         }
@@ -424,7 +423,7 @@ class ComponentStyleBuilder internal constructor(
         for (cssRuleKey in allCssRuleKeys) {
             StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)?.let { group ->
                 withFinalSelectorName(selectorName, group) { name, styles ->
-                    ComponentStyle.notifySelectorName(name)
+                    notifySelectorName(name)
 
                     val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
                     if (cssRuleKey.mediaQuery != null) {
@@ -453,10 +452,10 @@ class ComponentStyleBuilder internal constructor(
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
  *
- * You may still wish to use [ComponentStyleBuilder.addVariant] instead if you expect that at some point in the future
+ * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyleBuilder.addBaseVariant(name: String, init: ComponentStyleState.() -> Modifier): ComponentVariant {
+fun ComponentStyle.addBaseVariant(name: String, init: ComponentStyleState.() -> Modifier): ComponentVariant {
     return addVariant(name) {
         base {
             ComponentStyleState(colorMode).let(init)
@@ -464,7 +463,7 @@ fun ComponentStyleBuilder.addBaseVariant(name: String, init: ComponentStyleState
     }
 }
 
-class ComponentVariant(internal val style: ComponentStyleBuilder, private val baseStyle: ComponentStyleBuilder) {
+class ComponentVariant(internal val style: ComponentStyle, private val baseStyle: ComponentStyle) {
     fun addStyles(styleSheet: StyleSheet) {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
@@ -481,7 +480,7 @@ class ComponentVariant(internal val style: ComponentStyleBuilder, private val ba
  * by calling `attrs = style.toModifier.asAttributeBuilder()`
  */
 @Composable
-fun ComponentStyleBuilder.toModifier(variant: ComponentVariant? = null): Modifier {
+fun ComponentStyle.toModifier(variant: ComponentVariant? = null): Modifier {
     return SilkTheme.componentStyles.getValue(name).toModifier().then(
         variant?.style?.toModifier() ?: Modifier
     )
@@ -495,7 +494,7 @@ fun ComponentStyleBuilder.toModifier(variant: ComponentVariant? = null): Modifie
  * `Style1.toModifier().then(Style2.toModifier())...`
  */
 @Composable
-fun Iterable<ComponentStyleBuilder>.toModifier(): Modifier {
+fun Iterable<ComponentStyle>.toModifier(): Modifier {
     var finalModifier: Modifier = Modifier
     for (style in this) {
         finalModifier = finalModifier.then(style.toModifier())
