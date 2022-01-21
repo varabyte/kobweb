@@ -1037,7 +1037,7 @@ At this point:
 * It supports generating pages from Markdown that can reference your Composable code. 
 * While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
 * You can use the `Modifier` builder for a growing number of css properties.
-* There are silk components available for canvas rendering and generating screen-width-aware behavior.
+* Silk components are color mode aware and support responsive behavior.
 
 However, there's always more to do.
 
