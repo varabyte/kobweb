@@ -131,6 +131,7 @@ internal object SilkConfigInstance : SilkConfig {
  */
 class MutableSilkTheme {
     internal val componentStyles = LinkedHashMap<String, ComponentStyle>() // Preserve insertion order
+    internal val overiddenStyles = LinkedHashSet<String>() // Preserve insertion order
     internal val componentVariants = LinkedHashMap<String, ComponentVariant>() // Preserve insertion order
 
     var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
@@ -145,15 +146,58 @@ class MutableSilkTheme {
     /**
      * Register a new component style with this theme.
      *
-     * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
+     * **NOTE:** You shouldn't have to call this yourself. Kobweb detects styles in your code at compile and calls this
+     * method for you.
      *
-     * If this style has defined additional variants, they will also be registered automatically at this time.
+     * Once a style is registered, you can reference it in your Composable widget by calling `toModifier` on it:
      *
-     * Once a style is registered, you can reference it in your Composable widget via the following code:
+     * ```
+     * // Your widget code
+     * @Composable
+     * fun SomeWidget(modifier: Modifier = Modifier) { ... }
+     *
+     * // Your view code:
+     * val SomeStyle = ComponentStyle(...) { // Registered automatically by Kobweb
+     *   base { Modifier.background(Colors.Grey) }
+     * }
+     *
+     * // Later...
+     * SomeWidget(SomeStyle.toModifier()) // <-- Pass Style to the target widget
+     * ```
+     *
+     * See also: [replaceComponentStyle]
      */
     fun registerComponentStyle(style: ComponentStyle) {
+        check(!componentStyles.contains(style.name)) {
+            """
+                Attempting to register a second style with a name that's already used: "${style.name}"
+
+                If this was an intentional override, you should use `replaceComponentStyle` instead.
+            """.trimIndent()
+        }
         componentStyles[style.name] = style
         registerComponentVariants(*style.variants.toTypedArray())
+    }
+
+    /**
+     * Use this method to override a style previously registered using [registerComponentStyle].
+     *
+     * This is particularly if you want to change styles provided by Silk.
+     *
+     * ```
+     * @InitSilk
+     * fun initSilk(ctx: InitSilkContext) {
+     *   // TextStyle comes from Silk
+     *   ctx.theme.replaceComponentStyle(TextStyle) {
+     *     base { Modifier.lineHeight(2) }
+     *   }
+     * }
+     * ```
+     */
+    fun replaceComponentStyle(style: ComponentStyle, init: ComponentModifiers.() -> Unit) {
+        check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
+        check(!overiddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
+        componentStyles[style.name] = ComponentStyle(style.name, init)
     }
 
     /**
@@ -185,6 +229,17 @@ class MutableSilkTheme {
      */
     fun registerComponentVariants(vararg variants: ComponentVariant) {
         variants.forEach { variant -> componentVariants[variant.style.name] = variant }
+    }
+}
+
+/**
+ * Convenience method when you want to replace an upstream style but only need to define a base style.
+ */
+fun MutableSilkTheme.replaceComponentStyleBase(style: ComponentStyle, init: ComponentStyleState.() -> Modifier) {
+    replaceComponentStyle(style) {
+        base {
+            ComponentStyleState(colorMode).let(init)
+        }
     }
 }
 
