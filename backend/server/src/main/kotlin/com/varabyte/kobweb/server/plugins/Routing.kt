@@ -146,11 +146,13 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
         get("/api/kobweb-status") {
-            call.response.cacheControl(CacheControl.NoCache(null))
-            call.respondTextWriter(contentType = ContentType.Text.EventStream) {
-                var lastVersion: Int? = null
-                var lastStatus: String? = null
-                try {
+            println("Client connected requesting kobweb status events")
+
+            try {
+                call.response.cacheControl(CacheControl.NoCache(null))
+                call.respondTextWriter(contentType = ContentType.Text.EventStream) {
+                    var lastVersion: Int? = null
+                    var lastStatus: String? = null
                     while (true) {
                         write(": keepalive\n")
                         write("\n")
@@ -176,10 +178,10 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
                         flush()
                         delay(300)
                     }
-                } catch (ex: IOException) {
-                    println("Closing socket because client disconnected")
-                    // Expected eventually - client connection closed
                 }
+            } catch (ex: IOException) {
+                println("Closing socket because client disconnected")
+                // Expected eventually - client connection closed
             }
         }
 
