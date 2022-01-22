@@ -26,7 +26,7 @@ interface SilkConfig {
     var initialColorMode: ColorMode
 
     /**
-     * An alternate way to register global styles with Silk instead of using a Web Compose StyleSheet directly.
+     * An alternate way to register global styles with Silk instead of using a Compose for Web StyleSheet directly.
      *
      * So this:
      *

@@ -164,7 +164,7 @@ class NodeScope {
  */
 abstract class MarkdownComponents @Inject constructor(project: Project) {
     /**
-     * Use Silk components instead of Web Compose components when relevant.
+     * Use Silk components instead of Compose for Web components when relevant.
      *
      * If the user's project doesn't have a dependency on the Silk library, this should be set to false.
      */

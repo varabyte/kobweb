@@ -6,9 +6,9 @@ private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
 private val DARKENING_AMOUNT = 0.7f
 
 /**
- * A base class for colors which provide additional functionality on top of the color class included in Web Compose.
+ * A base class for colors which provide additional functionality on top of the color class included in Compose for Web.
  *
- * Use [toCssColor] to convert between this class and the Web Compose version.
+ * Use [toCssColor] to convert this class to the Compose for Web version.
  */
 sealed interface Color {
     fun inverted(): Color

@@ -22,7 +22,7 @@ class StyleModifier(internal val styles: (StyleBuilder.() -> Unit)) : WebModifie
 fun Modifier.styleModifier(styles: (StyleBuilder.() -> Unit)) = this then StyleModifier(styles)
 
 /**
- * Convert a [Modifier] into an [AttrsBuilder] which Web Compose tags take as an argument, e.g. use it like so:
+ * Convert a [Modifier] into an [AttrsBuilder] which Compose for Web tags take as an argument, e.g. use it like so:
  *
  * ```
  * Div(attrs = modifier.asAttributeBuilder())

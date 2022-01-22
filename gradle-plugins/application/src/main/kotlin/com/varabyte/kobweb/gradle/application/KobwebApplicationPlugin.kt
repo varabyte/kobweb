@@ -129,7 +129,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
                         ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Building..."))
                     }
 
-                    // Users should be using Kobweb commands instead of the standard Web Compose commands, but they
+                    // Users should be using Kobweb commands instead of the standard Compose for Web commands, but they
                     // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
                     // the Kobweb commands instead.
                     if (task.name in listOf("jsBrowserDevelopmentRun", "jsBrowserProductionRun")) {
