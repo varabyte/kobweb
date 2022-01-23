@@ -179,8 +179,11 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
                         delay(300)
                     }
                 }
-            } catch (ex: IOException) {
-                println("Closing socket because client disconnected")
+            } catch (ex: Exception) {
+                // Use println instead of log because logging may cause issues if this is disconnecting due to the
+                // server shutting down
+                println("Closing socket because client disconnected (probably). Exception:")
+                println("  $ex")
                 // Expected eventually - client connection closed
             }
         }
