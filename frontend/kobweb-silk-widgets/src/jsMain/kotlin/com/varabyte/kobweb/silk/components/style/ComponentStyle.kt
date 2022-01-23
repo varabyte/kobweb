@@ -39,6 +39,10 @@ private class ComparableStyleBuilder : StyleBuilder {
     }
 }
 
+private fun ComparableStyleBuilder.isNotEmpty(): Boolean {
+    return properties.isNotEmpty() || variables.isNotEmpty()
+}
+
 private fun Breakpoint.toMinWidthQuery() = CSSMediaQuery.MediaFeature("min-width", this.toSize())
 
 /**
@@ -414,8 +418,10 @@ class ComponentStyle(
 
         StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
             withFinalSelectorName(selectorName, group) { name, styles ->
-                notifySelectorName(name)
-                styleSheet.addStyles(name, styles)
+                if (styles.isNotEmpty()) {
+                    notifySelectorName(name)
+                    styleSheet.addStyles(name, styles)
+                }
             }
         }
 
@@ -423,17 +429,19 @@ class ComponentStyle(
         for (cssRuleKey in allCssRuleKeys) {
             StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)?.let { group ->
                 withFinalSelectorName(selectorName, group) { name, styles ->
-                    notifySelectorName(name)
+                    if (styles.isNotEmpty()) {
+                        notifySelectorName(name)
 
-                    val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
-                    if (cssRuleKey.mediaQuery != null) {
-                        styleSheet.apply {
-                            media(cssRuleKey.mediaQuery) {
-                                addStyles(cssRule, styles)
+                        val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
+                        if (cssRuleKey.mediaQuery != null) {
+                            styleSheet.apply {
+                                media(cssRuleKey.mediaQuery) {
+                                    addStyles(cssRule, styles)
+                                }
                             }
+                        } else {
+                            styleSheet.addStyles(cssRule, styles)
                         }
-                    } else {
-                        styleSheet.addStyles(cssRule, styles)
                     }
                 }
             }
