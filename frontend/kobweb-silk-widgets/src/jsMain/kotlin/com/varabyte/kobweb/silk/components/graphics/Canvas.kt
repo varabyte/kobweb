@@ -85,17 +85,8 @@ private class RenderCallback<C: RenderingContext>(
  *
  * Instead of this method, callers should use [Canvas2d] or [CanvasGl].
  *
- * @param width The width (in pixels) of this canvas. If the user adds a different value for the width in the [modifier]
- *   parameter, the canvas will be stretched to fit.
- * @param height The height (in pixels) of this canvas. Same additional details as [width].
- * @param minDeltaMs If set, ensures that draw won't be called more than once per this period. If not set, render will
- *   be called as frequently as possible. The constant [ONE_FRAME_MS_60_FPS] could be useful to set here.
- * @param maxDeltaMs Ensured that the delta passed into [RenderScope] will be capped. This is useful to make sure that
- *   render behavior doesn't explode after sitting on a breakpoint for a while or get stuck on some edge case long
- *   calculation. By default, it is capped to half a second.
  * @param createContext A factory method for creating a context for the canvas element. If this returns null, the
  *   canvas will not render.
- * @param render A callback which handles rendering a single frame.
  */
 @Composable
 // Note: This method is marked inline and made private currently to avoid issues with the Composable compiler
@@ -145,6 +136,16 @@ private inline fun <C: RenderingContext> Canvas(
 
 /**
  * Renders a [Canvas] using the "2d" rendering context.
+ *
+ * @param width The width (in pixels) of this canvas. If the user adds a different value for the width in the [modifier]
+ *   parameter, the canvas will be resized to fit.
+ * @param height The height (in pixels) of this canvas. Same additional details as [width].
+ * @param minDeltaMs If set, ensures that draw won't be called more than once per this period. If not set, render will
+ *   be called as frequently as possible. The constant [ONE_FRAME_MS_60_FPS] could be useful to set here.
+ * @param maxDeltaMs Ensured that the delta passed into [RenderScope] will be capped. This is useful to make sure that
+ *   render behavior doesn't explode after sitting on a breakpoint for a while or get stuck on some edge case long
+ *   calculation. By default, it is capped to half a second.
+ * @param render A callback which handles rendering a single frame.
  */
 @Composable
 fun Canvas2d(
@@ -170,6 +171,16 @@ fun Canvas2d(
 
 /**
  * Renders a [Canvas] using the "webgl" rendering context.
+ *
+ * @param width The width (in pixels) of this canvas. If the user adds a different value for the width in the [modifier]
+ *   parameter, the canvas will be resized to fit.
+ * @param height The height (in pixels) of this canvas. Same additional details as [width].
+ * @param minDeltaMs If set, ensures that draw won't be called more than once per this period. If not set, render will
+ *   be called as frequently as possible. The constant [ONE_FRAME_MS_60_FPS] could be useful to set here.
+ * @param maxDeltaMs Ensured that the delta passed into [RenderScope] will be capped. This is useful to make sure that
+ *   render behavior doesn't explode after sitting on a breakpoint for a while or get stuck on some edge case long
+ *   calculation. By default, it is capped to half a second.
+ * @param render A callback which handles rendering a single frame.
  */
 @Composable
 fun CanvasGl(
