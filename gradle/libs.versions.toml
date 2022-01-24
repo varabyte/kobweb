@@ -3,6 +3,7 @@ cdt="4.0.0" # chrome-developer-toolkit
 commonmark = "0.18.0"
 compose = "1.0.0"
 freemarker = "2.3.31"
+jreleaser = "1.0.0-M1"
 jgit = "5.12.0.202106070339-r"
 jsoup = "1.14.3"
 kaml = "0.35.3"
@@ -53,6 +54,7 @@ ktor = ["ktor-server-core", "ktor-serialization", "ktor-auth", "ktor-server-host
 
 [plugins]
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

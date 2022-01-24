@@ -69,8 +69,20 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 
 # Trying it out yourself
 
-The first step is to get the Kobweb binary. You can download it or build it, so we'll include instructions for both
-approaches.
+The first step is to get the Kobweb binary. You can install it, download it, build it, so we'll include instructions for
+all these approaches.
+
+## Install the Kobweb binary
+
+*Major thanks to [aalmiray](https://github.com/aalmiray) and [helpermethod](https://github.com/helpermethod) to helping
+me get these installation options working. Check out [JReleaser](https://github.com/jreleaser/jreleaser) if you ever
+need to do this in your own project!*
+
+### Homebrew
+
+```bash
+$ brew install varabyte/tap/kobweb
+```
 
 ## Download the Kobweb binary
 
