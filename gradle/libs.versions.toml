@@ -51,8 +51,8 @@ commonmark = ["commonmark-core", "commonmark-autolink", "commonmark-frontmatter"
 ktor = ["ktor-server-core", "ktor-serialization", "ktor-auth", "ktor-server-host-common", "ktor-server-netty", "logback"]
 
 [plugins]
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
