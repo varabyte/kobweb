@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.varabyte.kobwebx.gradle"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.libs.get()
 
 dependencies {
     implementation(kotlin("stdlib"))

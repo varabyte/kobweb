@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.cli"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.cli.get()
 
 dependencies {
     implementation(kotlin("stdlib"))

@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.gradle"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.libs.get()
 
 dependencies {
     implementation(kotlin("stdlib"))
@@ -53,7 +53,7 @@ kobwebPublication {
 tasks.register<Copy>("copyServerJar") {
     dependsOn(":backend:server:shadowJar")
 
-    val serverJarName = "server-${libs.versions.kobweb.get()}-all.jar"
+    val serverJarName = "server-${libs.versions.kobweb.libs.get()}-all.jar"
     val serverJarFile = file("${project(":backend:server").buildDir}/libs/$serverJarName")
 
     from(file(serverJarFile))

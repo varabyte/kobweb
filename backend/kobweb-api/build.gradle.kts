@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb"
-version = libs.versions.kobweb.get()
+version = libs.versions.kobweb.libs.get()
 
 java {
     withJavadocJar()
