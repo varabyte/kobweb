@@ -1,4 +1,4 @@
-# When a release is created, run a Gradle command to create a zipped artifact
+# When a release is created, run a Gradle command to create artifacts
 # containing the Kobweb binary.
 
 name: release-kobweb-dist
@@ -22,10 +22,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Build Kobweb CLI artifact zip
-        run: ./gradlew :cli:kobweb:distZip
+      - name: Build Kobweb CLI artifacts
+        run: ./gradlew :cli:kobweb:assembleDist
         
       - uses: actions/upload-artifact@v2
         with:
-          path: cli/kobweb/build/distributions/*.zip
+          path: |
+            cli/kobweb/build/distributions/*.zip
+            cli/kobweb/build/distributions/*.tar
           if-no-files-found: error
