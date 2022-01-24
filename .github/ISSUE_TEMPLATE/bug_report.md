@@ -14,5 +14,5 @@ assignees: ''
 To ensure this bug gets triaged / prioritized quickly, please...
 
 * describe the bug as clearly as possible
-* provide repro steps and, if possible, link to a project or code that causes the problem
+* provide repro steps and, if possible, link to a project or code that demonstrates the problem
 * explain what behavior you expect to happen.
