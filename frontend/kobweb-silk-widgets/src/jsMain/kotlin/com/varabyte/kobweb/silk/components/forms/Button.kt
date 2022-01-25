@@ -8,17 +8,21 @@ import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.attrModifier
+import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.active
+import com.varabyte.kobweb.silk.components.style.focus
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
+import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.px
 
 object Buttons {
@@ -48,6 +52,9 @@ val ButtonStyle = ComponentStyle("silk-button") {
     active {
         Modifier.backgroundColor(buttonColors.pressed)
     }
+    focus {
+        Modifier.backgroundColor(buttonColors.hover)
+    }
 }
 
 /**
@@ -63,7 +70,15 @@ fun Button(
     Box(
         ButtonStyle.toModifier(variant)
             .then(modifier)
-            .onClick { onClick() },
+            .onClick { onClick() }
+            .tabIndex(0) // Allow button to be tabbed to
+            .onKeyDown { evt ->
+                if (evt.isComposing) return@onKeyDown
+                if (evt.key == "Enter") {
+                    onClick()
+                    evt.preventDefault()
+                }
+            },
         contentAlignment = Alignment.Center
     ) {
         content()

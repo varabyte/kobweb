@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
+import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 
 fun Modifier.cursor(cursor: Cursor) = styleModifier {
     cursor(cursor)
@@ -15,6 +16,14 @@ fun Modifier.cursor(cursor: Cursor) = styleModifier {
 
 fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrModifier {
     onClick { evt -> onClick(evt) }
+}
+
+fun Modifier.onKeyDown(onKeyDown: (SyntheticKeyboardEvent) -> Unit) = attrModifier {
+    onKeyDown { evt -> onKeyDown(evt) }
+}
+
+fun Modifier.onKeyUp(onKeyUp: (SyntheticKeyboardEvent) -> Unit) = attrModifier {
+    onKeyUp { evt -> onKeyUp(evt) }
 }
 
 fun Modifier.onMouseDown(onMouseDown: (SyntheticMouseEvent) -> Unit) = attrModifier {
@@ -39,4 +48,8 @@ fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = attrModifier 
 
 fun Modifier.userSelect(userSelect: UserSelect): Modifier = styleModifier {
     userSelect(userSelect)
+}
+
+fun Modifier.tabIndex(value: Int) = attrModifier {
+    tabIndex(value)
 }
