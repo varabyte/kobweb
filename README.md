@@ -1,4 +1,5 @@
-![version: 0.9.1](https://img.shields.io/badge/kobweb-v0.9.1-blue)
+![version: 0.9.2](https://img.shields.io/badge/kobweb-v0.9.2-blue)
+![version: 0.9.2](https://img.shields.io/badge/kobweb_cli-v0.9.2-blue)
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
@@ -77,14 +78,14 @@ Our binary artifact is hosted on github. To download latest:
 
 ```bash
 $ cd /path/to/applications/kobweb
-$ wget https://github.com/varabyte/kobweb/releases/download/v0.9.1/kobweb-0.9.1.zip
-$ unzip kobweb-0.9.1.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/v0.9.2/kobweb-0.9.2.zip
+$ unzip kobweb-0.9.2.zip
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.9.1/bin
+$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.9.2/bin
 $ kobweb version # to check it's working
 ```
 
@@ -92,7 +93,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb/kobweb-0.9.1/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb/kobweb-0.9.2/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
