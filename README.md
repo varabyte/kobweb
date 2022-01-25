@@ -78,7 +78,7 @@ Our binary artifact is hosted on github. To download latest:
 
 ```bash
 $ cd /path/to/applications/kobweb
-$ wget https://github.com/varabyte/kobweb/releases/download/v0.9.2/kobweb-0.9.2.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.2/kobweb-0.9.2.zip
 $ unzip kobweb-0.9.2.zip
 ```
 
