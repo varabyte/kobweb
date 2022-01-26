@@ -1,5 +1,5 @@
 ![version: 0.9.2](https://img.shields.io/badge/kobweb-v0.9.2-blue)
-![version: 0.9.2](https://img.shields.io/badge/kobweb_cli-v0.9.2-blue)
+![version: 0.9.3](https://img.shields.io/badge/kobweb_cli-v0.9.3-blue)
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
@@ -115,19 +115,19 @@ $ cd /path/to/applications
 
 # You can either pull down the zip file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.2/kobweb-0.9.2.zip
-$ unzip kobweb-0.9.2.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.3/kobweb-0.9.3.zip
+$ unzip kobweb-0.9.3.zip
 
 # ... or the tar file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.2/kobweb-0.9.2.tar
-$ tar -xvf kobweb-0.9.2.tar
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.3/kobweb-0.9.3.tar
+$ tar -xvf kobweb-0.9.3.tar
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb-0.9.2/bin
+$ PATH=$PATH:/path/to/applications/kobweb-0.9.3/bin
 $ kobweb version # to check it's working
 ```
 
@@ -135,7 +135,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb-0.9.2/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb-0.9.3/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
