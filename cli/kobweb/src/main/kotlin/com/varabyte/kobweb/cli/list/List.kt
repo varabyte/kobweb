@@ -5,6 +5,7 @@ import com.varabyte.kobweb.cli.common.DEFAULT_REPO
 import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
+import com.varabyte.kobweb.common.toUnixSeparators
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.cyan
@@ -41,13 +42,19 @@ fun handleList(repo: String, branch: String) = session {
             templates
                 .sortedBy { template -> template.kobwebFolder.getProjectPath() }
                 .forEach { template ->
-                    val templatePath = template.kobwebFolder.getProjectPath().relativeTo(tempPath).toString().removeSuffix("/default")
+                    val templatePath =
+                        template.kobwebFolder.getProjectPath().relativeTo(tempPath).toString()
+                            // Even on Windows, show Unix-style slashes, as `kobweb create` expects that format
+                            .toUnixSeparators()
+                            .removeSuffix("/default")
                     val description = template.content!!.metadata.description
 
                     text("• ")
                     cyan { text(templatePath) }
                     textLine(": $description")
                 }
+
+            textLine()
         } else {
             textError("No templates were found in the specified repository.")
         }
