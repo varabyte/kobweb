@@ -79,7 +79,7 @@ jreleaser {
                 "varabyte.github.token" to { token.set(it) },
             ).forEach { (key, setter) ->
                 (findProperty(key) as? String)?.let { setter(it) } ?: run {
-                    println("\"$key\" is missing so disabling github release")
+                    println("\"$key\" is missing so disabling jreleaser config")
                     enabled.set(false)
                 }
             }
