@@ -84,20 +84,32 @@ need to do this in your own project!*
 $ brew install varabyte/tap/kobweb
 ```
 
+### More to come soon
+
+Feel free to follow along at https://github.com/varabyte/kobweb/issues/82
+
 ## Download the Kobweb binary
 
 Our binary artifact is hosted on github. To download latest:
 
 ```bash
-$ cd /path/to/applications/kobweb
+$ cd /path/to/applications
+
+# You can either pull down the zip file
+
 $ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.2/kobweb-0.9.2.zip
 $ unzip kobweb-0.9.2.zip
+
+# ... or the tar file
+
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.2/kobweb-0.9.2.tar
+$ tar -xvf kobweb-0.9.2.tar
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb/kobweb-0.9.2/bin
+$ PATH=$PATH:/path/to/applications/kobweb-0.9.2/bin
 $ kobweb version # to check it's working
 ```
 
@@ -105,7 +117,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb/kobweb-0.9.2/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb-0.9.2/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
