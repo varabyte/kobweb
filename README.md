@@ -78,10 +78,28 @@ all these approaches.
 me get these installation options working. Check out [JReleaser](https://github.com/jreleaser/jreleaser) if you ever
 need to do this in your own project!*
 
-### Homebrew
+### [Homebrew](https://brew.sh/)
+
+*OS: Mac and Linux*
 
 ```bash
 $ brew install varabyte/tap/kobweb
+```
+
+### [Scoop](https://scoop.sh/)
+
+*OS: Windows*
+
+```shell
+# Note: Adding buckets only has to be done once.
+
+# Feel free to skip java if you already have it
+> scoop bucket add java
+> scoop install java/openjdk
+
+# Install kobweb
+> scoop bucket add varabyte https://github.com/varabyte/scoop-varabyte.git
+> scoop install varabyte/kobweb
 ```
 
 ### More to come soon

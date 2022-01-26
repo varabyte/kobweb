@@ -92,6 +92,11 @@ jreleaser {
             downloadUrl.set("https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/download/{{tagName}}/{{artifactFile}}")
             templateDirectory.set(File("jreleaser/templates/brew"))
         }
+        scoop {
+            active.set(Active.RELEASE)
+            // Redundant downloadUrl temporarily required. See https://github.com/jreleaser/jreleaser/issues/699
+            downloadUrl.set("https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/download/{{tagName}}/{{artifactFile}}")
+        }
     }
 
     distributions {
