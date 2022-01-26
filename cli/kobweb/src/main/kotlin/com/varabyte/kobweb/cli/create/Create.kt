@@ -122,6 +122,5 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
             indent(); cmd("cd $projectFolder"); textLine()
         }
         indent(); cmd("kobweb run"); textLine()
-        textLine()
     }.run()
 }

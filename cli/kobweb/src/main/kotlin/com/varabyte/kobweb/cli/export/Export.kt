@@ -55,7 +55,6 @@ fun handleExport(isInteractive: Boolean) {
                     textLine(exception!!.stackTraceToString())
                 }
             }
-            textLine()
         }.run {
             val exportProcess = try {
                 kobwebGradle.export()

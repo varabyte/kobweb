@@ -53,8 +53,6 @@ fun handleList(repo: String, branch: String) = session {
                     cyan { text(templatePath) }
                     textLine(": $description")
                 }
-
-            textLine()
         } else {
             textError("No templates were found in the specified repository.")
         }

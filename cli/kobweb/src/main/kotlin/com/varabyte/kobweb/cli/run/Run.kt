@@ -105,7 +105,6 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
                     textLine(exception!!.stackTraceToString())
                 }
             }
-            textLine()
         }.runUntilSignal {
             val startServerProcess = try {
                 kobwebGradle.startServer()
