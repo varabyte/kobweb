@@ -38,7 +38,7 @@ jreleaser {
     project {
         website.set("https://kobweb.varabyte.com/")
         docsUrl.set("https://kobweb.varabyte.com/docs")
-        description.set("Kobweb CLI provides commands to handle the tedious parts of building a Compose for Web app")
+        description.set("Set up and manage your Compose for Web app")
         longDescription.set("""
             Kobweb CLI provides commands to handle the tedious parts of building a Compose for Web app, including
             project setup and configuration.
