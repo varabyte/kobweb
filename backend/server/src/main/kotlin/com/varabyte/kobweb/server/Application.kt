@@ -35,10 +35,9 @@ fun main() = runBlocking {
     val folder = KobwebFolder.inWorkingDirectory()
         ?: throw KobwebException("Server must be started in the root of a Kobweb project")
 
-    val conf = KobwebConfFile(folder).let { confFile ->
-        KobwebConfFile(folder).content
+    val confFile = KobwebConfFile(folder)
+    val conf = confFile.content
             ?: throw KobwebException("Server cannot start without configuration: ${confFile.path} is missing")
-    }
 
     val stateFile = ServerStateFile(folder)
     stateFile.content?.let { serverState ->
@@ -49,12 +48,18 @@ fun main() = runBlocking {
     }
 
     var port = conf.server.port
-    while (isPortInUse(port)) {
-        ++port
+    val env = ServerEnvironment.get()
+    if (env == ServerEnvironment.DEV) {
+        while (isPortInUse(port)) {
+            ++port
+        }
+    }
+    else {
+        assert(env == ServerEnvironment.PROD)
+        throw KobwebException("Production server can't start as port $port is already occupied. If you need a different port number, consider modifying ${confFile.path}")
     }
 
     val globals = ServerGlobals()
-    val env = ServerEnvironment.get()
     val engine = embeddedServer(Netty, port) {
         configureRouting(env, conf, globals)
         configureSerialization()
