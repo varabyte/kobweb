@@ -3,7 +3,7 @@ package com.varabyte.kobweb.cli.common
 import java.nio.file.Files
 import java.nio.file.Path
 
-private const val PACKAGE_PART = """[\w]([\w\d_]*)"""
+private const val PACKAGE_PART = """[\pL]([\pL\d_]*)"""
 private val PACKAGE_REGEX = Regex("""^${PACKAGE_PART}(\.${PACKAGE_PART})*${"$"}""")
 
 object Validations {
@@ -40,7 +40,7 @@ object Validations {
     fun isValidPackage(value: String): String? {
         return when {
             !PACKAGE_REGEX.matches(value) ->
-                "Package should be letters, numbers, and underscores, optionally separated by dots"
+                "Package should be letters, numbers, and underscores, optionally separated by dots (which cannot be followed by digits)"
             // TODO: Reject protected keywords?
             else -> null
         }
