@@ -1,10 +1,8 @@
 package com.varabyte.kobweb.cli.common
 
+import com.varabyte.kobweb.common.isKeyword
 import java.nio.file.Files
 import java.nio.file.Path
-
-private const val PACKAGE_PART = """[\pL]([\pL\d_]*)"""
-private val PACKAGE_REGEX = Regex("""^${PACKAGE_PART}(\.${PACKAGE_PART})*${"$"}""")
 
 object Validations {
     fun isNotEmpty(value: String): String? {
@@ -38,11 +36,22 @@ object Validations {
     }
 
     fun isValidPackage(value: String): String? {
-        return when {
-            !PACKAGE_REGEX.matches(value) ->
-                "Package should be letters, numbers, and underscores, optionally separated by dots (which cannot be followed by digits)"
-            // TODO: Reject protected keywords?
-            else -> null
+        if (value.isBlank()) return null
+
+        if (value.startsWith('.') || value.endsWith('.') || value.contains("..")) {
+            return "Package should not contain any empty parts."
         }
+
+        value.split(".").forEach { part ->
+            if (part.isKeyword()) {
+                return "\"$part\" is a reserved keyword in Kotlin and cannot be used. Suggestion: Use \"${part}_\" instead."
+            } else if (part.first().isDigit()) {
+                return "Package parts cannot start with digits. Suggestion: Use \"_$part\" instead."
+            } else if (!part.all { it.isLetterOrDigit() || it == '_' }) {
+                return "Package parts can only use letters, numbers, and underscores."
+            }
+        }
+
+        return null
     }
 }
