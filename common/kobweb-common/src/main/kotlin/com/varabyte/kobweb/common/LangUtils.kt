@@ -1,14 +1,15 @@
 package com.varabyte.kobweb.common
 
-
 /**
  * Test if this string is a reserved keyword.
  *
  * See also: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
+ * See also: https://kotlinlang.org/docs/keyword-reference.html
  */
 fun String.isKeyword(): Boolean {
     return when (this) {
         "abstract",
+        "as",
         "assert",
         "boolean",
         "break",
@@ -25,12 +26,16 @@ fun String.isKeyword(): Boolean {
         "else",
         "enum",
         "extends",
+        "false",
         "final",
         "finally",
         "float",
         "for",
+        "fun",
         "goto",
         "if",
+        "in",
+        "is",
         "implements",
         "import",
         "instanceof",
@@ -39,6 +44,8 @@ fun String.isKeyword(): Boolean {
         "long",
         "native",
         "new",
+        "null",
+        "object",
         "package",
         "private",
         "protected",
@@ -54,9 +61,15 @@ fun String.isKeyword(): Boolean {
         "throw",
         "throws",
         "transient",
+        "true",
         "try",
+        "typealias",
+        "typeof",
+        "val",
+        "var",
         "void",
         "volatile",
+        "when",
         "while" -> true
         else -> false
     }
