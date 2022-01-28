@@ -132,7 +132,7 @@ class KotlinRenderer(
                 }
             }.toList()
 
-            if (code.last() == '}') {
+            if (code.last() == '}' && !code.contains('{')) {
                 --indentCount
             }
             output.append("$indent$code")

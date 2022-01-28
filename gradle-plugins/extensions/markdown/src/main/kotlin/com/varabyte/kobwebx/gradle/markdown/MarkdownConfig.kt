@@ -238,10 +238,10 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         ol.convention { "$JB_DOM.Ol" }
         li.convention { "$JB_DOM.Li" }
         code.convention { codeBlock ->
-            childrenOverride = codeBlock.literal.trim().split("\n")
-                .map { line -> Text("$line\\n") }
-            // See also: https://stackoverflow.com/a/31775545/1299302
-            "$JB_DOM.Code(attrs = { style { property(\"display\", \"block\"); property(\"white-space\", \"pre-wrap\") } })"
+            val text = "\"\"\"${codeBlock.literal}\"\"\""
+            // Code blocks should generate <pre><code>...</code></pre>
+            // https://daringfireball.net/projects/markdown/syntax#precode
+            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text($text) } }"
         }
         inlineCode.convention { code ->
             childrenOverride = listOf(Text(code.literal))
