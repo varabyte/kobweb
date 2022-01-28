@@ -3,8 +3,6 @@ package com.varabyte.kobweb.compose.ui.graphics
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
 
-private val DARKENING_AMOUNT = 0.7f
-
 /**
  * A base class for colors which provide additional functionality on top of the color class included in Compose for Web.
  *
@@ -12,7 +10,13 @@ private val DARKENING_AMOUNT = 0.7f
  */
 sealed interface Color {
     fun inverted(): Color
-    fun darkened(): Color
+    /**
+     * Darken this color by some target percent value
+     *
+     * @param byPercent A value between 0 (no change) and 1 (will result in black). Otherwise, darken the current
+     *   color rgb values by some percent amount (so the final result depends upon initial values)
+     */
+    fun darkened(byPercent: Float = DEFAULT_SHIFTING_PERCENT): Color
 
     class Rgb internal constructor(val value: Int) : Color {
         val red: Int get() = value.shr(16).and(0xFF)
@@ -26,8 +30,13 @@ sealed interface Color {
         val alphaf: Float get() = alpha.toColorFloat()
 
         override fun inverted() = rgba(255 - red, 255 - green, 255 - blue, alpha)
-        override fun darkened() =
-            rgba(redf * DARKENING_AMOUNT, greenf * DARKENING_AMOUNT, bluef * DARKENING_AMOUNT, alphaf)
+        override fun darkened(byPercent: Float): Rgb {
+            require(byPercent in (0f..1f)) { "Invalid color shifting percent. Expected between 0 and 1, got $byPercent"}
+            if (byPercent == 0f) return this
+
+            val darkeningMultiplier = 1.0f - byPercent // e.g. reduce by 20% means take 80% of the current value
+            return rgba(redf * darkeningMultiplier, greenf * darkeningMultiplier, bluef * darkeningMultiplier, alphaf)
+        }
 
         fun copy(red: Int = this.red, green: Int = this.green, blue: Int = this.blue, alpha: Int = this.alpha) =
             rgba(red, green, blue, alpha)
@@ -41,6 +50,8 @@ sealed interface Color {
     }
 
     companion object {
+        const val DEFAULT_SHIFTING_PERCENT = 0.3f
+
         fun rgb(value: Int) = Rgb(0xFF.shl(24).or(value))
         fun rgba(value: Int) = Rgb(value)
 
@@ -60,7 +71,13 @@ sealed interface Color {
     }
 }
 
-fun Color.lightened() = inverted().darkened().inverted()
+/**
+ * Lighten this color by some target percent value
+ *
+ * @param byPercent A value between 0 (no change) and 1 (will result in white). Otherwise, lighten the current
+ *   color rgb values by some percent amount (so the final result depends upon initial values)
+ */
+fun Color.lightened(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = inverted().darkened(byPercent).inverted()
 
 object Colors {
     inline val Transparent get() = Color.rgba(0, 0, 0, 0)
