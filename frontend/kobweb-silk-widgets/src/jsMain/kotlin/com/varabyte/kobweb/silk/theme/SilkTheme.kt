@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.theme
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifiers
+import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentStyleState
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -71,7 +72,7 @@ interface SilkConfig {
      * }
      * ```
      */
-    fun registerStyle(className: String, init: ComponentModifiers.() -> Unit)
+    fun registerStyle(className: String, init: StyleModifiers.() -> Unit)
 }
 
 /**
@@ -98,10 +99,10 @@ interface SilkConfig {
  * You may still wish to use [SilkConfig.registerStyle] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun SilkConfig.registerBaseStyle(className: String, init: ComponentStyleState.() -> Modifier) {
+fun SilkConfig.registerBaseStyle(className: String, init: () -> Modifier) {
     registerStyle(className) {
         base {
-            ComponentStyleState(colorMode).let(init)
+            init()
         }
     }
 }
@@ -111,7 +112,7 @@ internal object SilkConfigInstance : SilkConfig {
 
     private val styles = mutableListOf<ComponentStyle>()
 
-    override fun registerStyle(className: String, init: ComponentModifiers.() -> Unit) {
+    override fun registerStyle(className: String, init: StyleModifiers.() -> Unit) {
         styles.add(ComponentStyle(className, init))
     }
 

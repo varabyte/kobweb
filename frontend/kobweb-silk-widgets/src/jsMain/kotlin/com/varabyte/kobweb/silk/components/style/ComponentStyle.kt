@@ -71,7 +71,7 @@ internal class CssModifier(
 }
 
 /**
- * A class which can be used to set CSS rules on a target [ComponentModifiers] instance using types to prevent
+ * A class which can be used to set CSS rules on a target [StyleModifiers] instance using types to prevent
  * invalid combinations.
  *
  * A CSS rule can consist of an optional breakpoint, zero or more pseudo classes, and an optional trailing pseudo
@@ -88,9 +88,9 @@ internal class CssModifier(
  * ```
  *
  * It's not expected for an end user to use this class directly. It's provided for libraries that want to provide
- * additional extension properties to the [ComponentModifiers] class (like `hover` and `after`)
+ * additional extension properties to the [StyleModifiers] class (like `hover` and `after`)
  */
-sealed class CssRule(val target: ComponentModifiers) {
+sealed class CssRule(val target: StyleModifiers) {
     abstract operator fun invoke(createModifier: () -> Modifier)
 
     protected fun addCssRule(
@@ -110,7 +110,7 @@ sealed class CssRule(val target: ComponentModifiers) {
     }
 
     /** A simple CSS rule that represents only setting a single breakpoint */
-    class OfMedia(target: ComponentModifiers, val mediaQuery: CSSMediaQuery) : CssRule(target) {
+    class OfMedia(target: StyleModifiers, val mediaQuery: CSSMediaQuery) : CssRule(target) {
         override fun invoke(createModifier: () -> Modifier) {
             addCssRule(mediaQuery, emptyList(), null, createModifier)
         }
@@ -122,7 +122,7 @@ sealed class CssRule(val target: ComponentModifiers) {
             CompositeClosed(target, mediaQuery, emptyList(), other.pseudoElement)
     }
 
-    class OfPseudoClass(target: ComponentModifiers, val pseudoClass: String) : CssRule(target) {
+    class OfPseudoClass(target: StyleModifiers, val pseudoClass: String) : CssRule(target) {
         override fun invoke(createModifier: () -> Modifier) {
             addCssRule(null, listOf(pseudoClass), null, createModifier)
         }
@@ -134,7 +134,7 @@ sealed class CssRule(val target: ComponentModifiers) {
             CompositeClosed(target, null, listOf(pseudoClass), other.pseudoElement)
     }
 
-    class OfPseudoElement(target: ComponentModifiers, val pseudoElement: String) : CssRule(target) {
+    class OfPseudoElement(target: StyleModifiers, val pseudoElement: String) : CssRule(target) {
         override fun invoke(createModifier: () -> Modifier) {
             addCssRule(null, emptyList(), pseudoElement, createModifier)
         }
@@ -144,7 +144,7 @@ sealed class CssRule(val target: ComponentModifiers) {
      * A composite CSS rule that is a chain of subparts and still open to accepting more pseudo classes and/or a
      * pseudo element.
      */
-    class CompositeOpen(target: ComponentModifiers, val mediaQuery: CSSMediaQuery?, val pseudoClasses: List<String>) : CssRule(target) {
+    class CompositeOpen(target: StyleModifiers, val mediaQuery: CSSMediaQuery?, val pseudoClasses: List<String>) : CssRule(target) {
         override fun invoke(createModifier: () -> Modifier) {
             addCssRule(mediaQuery, pseudoClasses, null, createModifier)
         }
@@ -161,7 +161,7 @@ sealed class CssRule(val target: ComponentModifiers) {
      * be invoked at this point
      */
     class CompositeClosed(
-        target: ComponentModifiers,
+        target: StyleModifiers,
         val mediaQuery: CSSMediaQuery?,
         val pseudoClasses: List<String>,
         val pseudoElement: String
@@ -180,11 +180,10 @@ operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) = CssRule.OfMedia(o
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
  * [Modifier]s).
  *
- * @param colorMode What color mode these modifiers should be designed around. This is passed in so users defining
- *   a component style can use it if relevant.
+ * See also [ComponentModifiers] for places where you can define component styles which have a few extra features
+ * enabled for them.
  */
-// Note: If you change this class's constructor, you should update the `ComponentStyleState` constructor to match
-class ComponentModifiers(val colorMode: ColorMode) {
+abstract class StyleModifiers {
     private val _cssModifiers = mutableListOf<CssModifier>()
     internal val cssModifiers: List<CssModifier> = _cssModifiers
 
@@ -240,7 +239,35 @@ class ComponentModifiers(val colorMode: ColorMode) {
 }
 
 /**
- * Class provided for cases where you only generate a single style (e.g. base), unlike [ComponentModifiers] where you
+ * [StyleModifiers] with enhanced features enabled for [ComponentStyle] support.
+ *
+ * For example, color mode is supported here:
+ *
+ * ```
+ * val MyWidgetStyle = ComponentStyle("my-widget") {
+ *    ...
+ * }
+ * ```
+ *
+ * but not here:
+ *
+ * ```
+ * @InitSilk
+ * fun initSilk(ctx: InitSilkContext) {
+ *   ctx.config.registerStyle("body") {
+ *     ...
+ *   }
+ * }
+ * ```
+ *
+ * @param colorMode What color mode these modifiers should be designed around. This is passed in so users defining
+ *   a component style can use it if relevant.
+ */
+// Note: If you change this class's constructor, you should update the `ComponentStyleState` constructor to match
+class ComponentModifiers(val colorMode: ColorMode): StyleModifiers()
+
+/**
+ * Class provided for cases where you only generate a single style (e.g. base), unlike [StyleModifiers] where you
  * can define a collection of styles.
  */
 class ComponentStyleState(val colorMode: ColorMode)
