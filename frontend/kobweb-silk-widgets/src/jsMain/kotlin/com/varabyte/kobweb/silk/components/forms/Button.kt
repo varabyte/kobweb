@@ -13,6 +13,25 @@ import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.px
 
+enum class Button {
+    LEFT,
+    MIDDLE,
+    RIGHT;
+
+    companion object {
+        fun fromValue(value: Short): Button {
+            return when (value) {
+                Buttons.LEFT -> LEFT
+                Buttons.MIDDLE -> MIDDLE
+                Buttons.RIGHT -> RIGHT
+                else -> LEFT
+            }
+        }
+    }
+}
+
+class ButtonEvent(val button: Button)
+
 object Buttons {
     const val LEFT = 0.toShort()
     const val MIDDLE = 1.toShort()
@@ -50,7 +69,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
  */
 @Composable
 fun Button(
-    onClick: () -> Unit,
+    onClick: (ButtonEvent) -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     content: @Composable () -> Unit
@@ -58,17 +77,18 @@ fun Button(
     Box(
         ButtonStyle.toModifier(variant)
             .then(modifier)
-            .onClick {
-                onClick()
+            .onClick { evt ->
+                onClick(ButtonEvent(Button.fromValue(evt.button)))
                 // Blur is a bad name - it means, here, remove focus
                 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/blur
                 js("document.activeElement.blur()")
+                evt.preventDefault()
             }
             .tabIndex(0) // Allow button to be tabbed to
             .onKeyDown { evt ->
                 if (evt.isComposing) return@onKeyDown
                 if (evt.key == "Enter") {
-                    onClick()
+                    onClick(ButtonEvent(Button.LEFT))
                     evt.preventDefault()
                 }
             },
