@@ -14,7 +14,7 @@ sealed interface Color {
      * Darken this color by some target percent value
      *
      * @param byPercent A value between 0 (no change) and 1 (will result in black). Otherwise, darken the current
-     *   color rgb values by some percent amount (so the final result depends upon initial values)
+     *   color rgb values by some percent amount (meaning the final result depends upon initial values)
      */
     fun darkened(byPercent: Float = DEFAULT_SHIFTING_PERCENT): Color
 
