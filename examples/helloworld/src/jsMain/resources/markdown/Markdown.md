@@ -17,6 +17,10 @@ code blocks
 
 and `inline` code as well.
 
+* And
+* list
+* items
+
 You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is
 wrapped in a span.
 
