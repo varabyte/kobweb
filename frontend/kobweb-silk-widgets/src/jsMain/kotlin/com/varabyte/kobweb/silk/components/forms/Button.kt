@@ -13,31 +13,6 @@ import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.px
 
-enum class Button {
-    LEFT,
-    MIDDLE,
-    RIGHT;
-
-    companion object {
-        fun fromValue(value: Short): Button {
-            return when (value) {
-                Buttons.LEFT -> LEFT
-                Buttons.MIDDLE -> MIDDLE
-                Buttons.RIGHT -> RIGHT
-                else -> LEFT
-            }
-        }
-    }
-}
-
-class ButtonEvent(val button: Button)
-
-object Buttons {
-    const val LEFT = 0.toShort()
-    const val MIDDLE = 1.toShort()
-    const val RIGHT = 2.toShort()
-}
-
 val ButtonStyle = ComponentStyle("silk-button") {
     val buttonColors = colorMode.toSilkPalette().button
 
@@ -69,7 +44,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
  */
 @Composable
 fun Button(
-    onClick: (ButtonEvent) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     content: @Composable () -> Unit
@@ -78,7 +53,7 @@ fun Button(
         ButtonStyle.toModifier(variant)
             .then(modifier)
             .onClick { evt ->
-                onClick(ButtonEvent(Button.fromValue(evt.button)))
+                onClick()
                 // Blur is a bad name - it means, here, remove focus
                 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/blur
                 js("document.activeElement.blur()")
@@ -88,7 +63,7 @@ fun Button(
             .onKeyDown { evt ->
                 if (evt.isComposing) return@onKeyDown
                 if (evt.key == "Enter") {
-                    onClick(ButtonEvent(Button.LEFT))
+                    onClick()
                     evt.preventDefault()
                 }
             },
