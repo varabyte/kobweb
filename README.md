@@ -102,6 +102,24 @@ $ brew install varabyte/tap/kobweb
 > scoop install varabyte/kobweb
 ```
 
+### Arch Linux
+
+*Thanks a ton to [aksh1618](https://github.com/aksh1618) for adding support for this target!*
+
+With an AUR helper:
+
+```shell
+$ trizen -S kobweb
+```
+
+Without an AUR helper:
+
+```shell
+$ git clone https://aur.archlinux.org/kobweb.git
+$ cd kobweb
+$ makepkg -si
+```
+
 ### More to come soon
 
 Feel free to follow along at https://github.com/varabyte/kobweb/issues/82
