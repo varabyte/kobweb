@@ -47,7 +47,7 @@ fun MyApp(content: @Composable () -> Unit) {
         }
 
         Style(CssGlobalsStyleSheet)
-        Surface(Modifier.width(100.vw).height(100.vh)) {
+        Surface(Modifier.minHeight(100.vh)) {
             content()
         }
     }
