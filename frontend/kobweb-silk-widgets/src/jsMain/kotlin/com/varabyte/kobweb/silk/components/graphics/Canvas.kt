@@ -62,19 +62,19 @@ private class RenderCallback<C: RenderingContext>(
     private val render: RenderScope<C>.() -> Unit,
     private val onStepped: RenderCallback<C>.() -> Unit
 ) {
-    private var lastTimestamp: Double = 0.0
+    private var lastRenderedTimestamp: Double = 0.0
     private val minDeltaMs = minDeltaMs.toDouble()
     private val maxDeltaMs = maxDeltaMs.toDouble()
 
     fun step(palette: SilkPalette) {
-        val firstRender = lastTimestamp == 0.0
+        val firstRender = lastRenderedTimestamp == 0.0
         val now = Date.now()
-        val deltaMs = now - lastTimestamp
+        val deltaMs = now - lastRenderedTimestamp
         if (deltaMs >= minDeltaMs) {
             val scope = RenderScope(ctx, width, height, palette, if (firstRender) 0.0 else min(deltaMs, maxDeltaMs))
             scope.render()
+            lastRenderedTimestamp = now
         }
-        lastTimestamp = now
         onStepped()
     }
 }
