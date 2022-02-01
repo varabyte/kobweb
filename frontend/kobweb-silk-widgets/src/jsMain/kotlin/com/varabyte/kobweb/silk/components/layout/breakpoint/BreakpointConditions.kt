@@ -54,30 +54,3 @@ fun Modifier.displayBetween(breakpointLower: Breakpoint, breakpointUpper: Breakp
 
     return this.classNames("silk-display-if-${breakpointLower.name.lowercase()}", "silk-display-until-${breakpointUpper.name.lowercase()}")
 }
-
-/**
- * Show [content] if the width of the screen is at least as big as the size associated with the breakpoint.
- */
-@Composable
-fun displayIf(breakpoint: Breakpoint, content: @Composable () -> Unit) {
-    Span(attrs = Modifier.displayIf(breakpoint).asAttributeBuilder()) { content() }
-}
-
-/**
- * Show [content] if the width of the screen is smaller than the size associated with the breakpoint.
- */
-@Composable
-fun displayUntil(breakpoint: Breakpoint, content: @Composable () -> Unit) {
-    Span(attrs = Modifier.displayUntil(breakpoint).asAttributeBuilder()) { content() }
-}
-
-/**
- * Show [content] block if the width of the screen is larger than the smaller breakpoint and smaller than the larger
- * one.
- *
- * It is an error to pass in a breakpoint lower-bound that is larger than or equal to the upper-bound.
- */
-@Composable
-fun displayBetween(breakpointLower: Breakpoint, breakpointUpper: Breakpoint, content: @Composable () -> Unit) {
-    Span(attrs = Modifier.displayBetween(breakpointLower, breakpointUpper).asAttributeBuilder()) { content() }
-}
