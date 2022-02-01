@@ -92,22 +92,35 @@ private fun Routing.configureApiRouting(apiJar: ApiJarFile) {
     }
 }
 
-private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(script: Path, scriptMap: Path, index: Path, filename: String?) {
+/**
+ * Common handler used by [configureCatchAllRouting] since we have multiple route patterns which need the same handling
+ */
+private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(script: Path, scriptMap: Path, index: Path, pathParts: List<String>, extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean) {
     var handled = false
+    val filename = pathParts.lastOrNull()
+
+    // Add special handling for script requests, since they may live in a totally different path based on server config
     if (filename != null) {
         handled = true
-        when(filename) {
+        when (filename) {
             script.name -> call.respondFile(script.toFile())
             scriptMap.name -> call.respondFile(scriptMap.toFile())
-            else -> {
-                // Abort early on resources, so we don't serve giant html pages simply because a favicon.ico
-                // file is missing, for example.
-                val ext = File(filename).extension.takeIf { it.isNotEmpty() }
-                if (ext != null && ext != "html") {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    handled = false
-                }
+            else -> handled = false
+        }
+    }
+
+    if (!handled) {
+        handled = extraHandler(pathParts.joinToString("/"))
+    }
+
+    if (!handled) {
+        if (filename != null) {
+            // Abort early on missing resources, so we don't serve giant html pages simply because someone forgot to
+            // add a favicon.ico file, for example.
+            val ext = File(filename).extension.takeIf { it.isNotEmpty() }
+            if (ext != null && ext != "html") {
+                call.respond(HttpStatusCode.NotFound)
+                handled = true
             }
         }
     }
@@ -122,18 +135,24 @@ private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(sc
 // Note: This should be defined LAST in the routing { ... } block and it used to handle general URLs. The site script
 // itself looks at the user's current URL to figure out how to route itself, so in many cases, just returning
 // "index.html" most of the time is enough for the client to figure out what to render next.
-private fun Routing.configureCatchAllRouting(script: Path, index: Path) {
+/**
+ * @param script The path to the script.js file, which may be in a custom location depending on server configuration
+ * @param index The path to the index.html file, which may be in a custom location depending on server configuration
+ * @param extraHandler An optional handler so callers can configure additional, one-off handling.
+ */
+private fun Routing.configureCatchAllRouting(script: Path, index: Path, extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean = { false }) {
     val scriptMap = Path("$script.map")
 
     // Catch URLs of the form a/b/c/
     get("{$KOBWEB_PARAMS...}/") {
-        handleCatchAllRouting(script, scriptMap, index, null)
+        val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
+        handleCatchAllRouting(script, scriptMap, index, pathParts, extraHandler)
     }
 
     // Catch URLs of the form a/b/c/slug
     get("{$KOBWEB_PARAMS...}") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
-        handleCatchAllRouting(script, scriptMap, index, pathParts.lastOrNull())
+        handleCatchAllRouting(script, scriptMap, index, pathParts, extraHandler)
     }
 
 }
@@ -193,13 +212,16 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
         }
 
         val contentRootFile = contentRoot.toFile()
-        contentRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
-            get("/${file.relativeTo(contentRootFile)}") {
-                call.respondFile(file)
+        configureCatchAllRouting(script, contentRoot.resolve("index.html")) { path ->
+            contentRootFile.resolve(path).let { contentFile ->
+                if (contentFile.isFile && contentFile.exists()) {
+                    call.respondFile(contentFile)
+                    true
+                } else {
+                    false
+                }
             }
         }
-
-        configureCatchAllRouting(script, contentRoot.resolve("index.html"))
     }
 }
 
