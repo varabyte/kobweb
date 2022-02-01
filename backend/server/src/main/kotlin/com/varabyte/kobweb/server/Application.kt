@@ -56,7 +56,9 @@ fun main() = runBlocking {
     }
     else {
         assert(env == ServerEnvironment.PROD)
-        throw KobwebException("Production server can't start as port $port is already occupied. If you need a different port number, consider modifying ${confFile.path}")
+        if (isPortInUse(port)) {
+            throw KobwebException("Production server can't start as port $port is already occupied. If you need a different port number, consider modifying ${confFile.path}")
+        }
     }
 
     val globals = ServerGlobals()
