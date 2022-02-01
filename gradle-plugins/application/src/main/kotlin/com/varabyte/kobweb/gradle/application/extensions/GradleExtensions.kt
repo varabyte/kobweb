@@ -67,6 +67,12 @@ fun Project.getResourceFiles(platform: TargetPlatform): Sequence<File> {
     return project.getResourceFilesWithRoots(platform).map { it.file }
 }
 
+fun Project.getBuildScripts(): Sequence<File> {
+    return sequenceOf("build.gradle", "build.gradle.kts")
+        .map { script -> project.layout.projectDirectory.file(script).asFile }
+        .filter { it.exists() }
+}
+
 /**
  * Using a [Project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"
  */
