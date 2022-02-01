@@ -46,11 +46,6 @@ jreleaser {
         authors.set(listOf("David Herman"))
         license.set("Apache-2.0")
         copyright.set("Copyright © 2022 Varabyte. All rights reserved.")
-        java {
-            // For some reason, jreleaser isn't seeing that my Java source compatibility is set to 8?
-            // See root build.gradle.kts file.
-            version.set("8")
-        }
     }
     release {
         github {
