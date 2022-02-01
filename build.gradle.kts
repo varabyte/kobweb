@@ -16,7 +16,7 @@ subprojects {
         maven("https://us-central1-maven.pkg.dev/varabyte-repos/public")
     }
 
-    val versionStr = JavaVersion.VERSION_1_8.toString()
+    val versionStr = JavaVersion.VERSION_11.toString()
     tasks.withType<JavaCompile> {
         sourceCompatibility = versionStr
         targetCompatibility = versionStr
