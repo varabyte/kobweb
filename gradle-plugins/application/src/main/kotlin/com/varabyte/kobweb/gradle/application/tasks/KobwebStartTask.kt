@@ -44,7 +44,6 @@ abstract class KobwebStartTask @Inject constructor(
         }
 
         val javaHome = System.getProperty("java.home")!!
-
         val serverJar = KobwebStartTask::class.java.getResourceAsStream("/server.jar")!!.let { stream ->
             File.createTempFile("server", ".jar").apply {
                 appendBytes(stream.readAllBytes())
@@ -52,17 +51,22 @@ abstract class KobwebStartTask @Inject constructor(
             }
         }
 
-        val process = Runtime.getRuntime()
-            .exec(
-                arrayOf(
-                    "$javaHome/bin/java",
-                    env.toSystemPropertyParam(),
-                    // See: https://ktor.io/docs/development-mode.html#system-property
-                    "-Dio.ktor.development=${env == ServerEnvironment.DEV}",
-                    "-jar",
-                    serverJar.absolutePath,
-                )
-            )
+        val processParams = arrayOf(
+            "$javaHome/bin/java",
+            env.toSystemPropertyParam(),
+            // See: https://ktor.io/docs/development-mode.html#system-property
+            "-Dio.ktor.development=${env == ServerEnvironment.DEV}",
+            "-jar",
+            serverJar.absolutePath,
+        )
+
+        println(
+            """
+            Starting server by running:
+                ${processParams.joinToString(" ")}
+            """.trimIndent()
+        )
+        val process = Runtime.getRuntime().exec(processParams)
 
         while (stateFile.content == null && process.isAlive) {
             Thread.sleep(300)
