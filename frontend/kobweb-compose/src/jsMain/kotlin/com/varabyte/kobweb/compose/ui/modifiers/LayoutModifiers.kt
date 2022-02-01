@@ -1,7 +1,11 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.OverflowWrap
 import com.varabyte.kobweb.compose.css.overflow
+import com.varabyte.kobweb.compose.css.overflowX
+import com.varabyte.kobweb.compose.css.overflowY
+import com.varabyte.kobweb.compose.css.overflowWrap
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -96,6 +100,18 @@ fun Modifier.padding(
 
 fun Modifier.overflow(vararg overflows: Overflow) = styleModifier {
     overflow(*overflows)
+}
+
+fun Modifier.overflowX(overflowX: Overflow) = styleModifier {
+    overflowX(overflowX)
+}
+
+fun Modifier.overflowY(overflowY: Overflow) = styleModifier {
+    overflowY(overflowY)
+}
+
+fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = styleModifier {
+    overflowWrap(overflowWrap)
 }
 
 fun Modifier.zIndex(value: Number) = styleModifier {
