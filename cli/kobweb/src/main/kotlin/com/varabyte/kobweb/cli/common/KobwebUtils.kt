@@ -25,6 +25,7 @@ fun Session.findKobwebProject(): KobwebProject? {
 class KobwebGradle(private val env: ServerEnvironment) {
     private fun gradlew(vararg args: String): Process {
         val finalArgs = args.toMutableList()
+        finalArgs.add("--stacktrace")
         if (env == ServerEnvironment.PROD) {
             // When in production, we don't want to leave a daemon running around hoarding resources unecessarily
             finalArgs.add("--no-daemon")
