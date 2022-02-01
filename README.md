@@ -102,6 +102,14 @@ $ brew install varabyte/tap/kobweb
 > scoop install varabyte/kobweb
 ```
 
+### [SDKMAN!](https://sdkman.io/)
+
+*OS: Windows, Mac, and \*nix*
+
+```shell
+> sdk install kobweb
+```
+
 ### Arch Linux
 
 *Thanks a ton to [aksh1618](https://github.com/aksh1618) for adding support for this target!*
@@ -120,9 +128,9 @@ $ cd kobweb
 $ makepkg -si
 ```
 
-### More to come soon
+### Don't see your favorite package manager?
 
-Feel free to follow along at https://github.com/varabyte/kobweb/issues/82
+Please see: https://github.com/varabyte/kobweb/issues/117 and consider leaving a comment!
 
 ## Download the Kobweb binary
 
