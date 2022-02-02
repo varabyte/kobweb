@@ -107,7 +107,7 @@ $ brew install varabyte/tap/kobweb
 *OS: Windows, Mac, and \*nix*
 
 ```shell
-> sdk install kobweb
+$ sdk install kobweb
 ```
 
 ### Arch Linux
