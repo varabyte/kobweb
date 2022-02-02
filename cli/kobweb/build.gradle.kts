@@ -86,16 +86,29 @@ jreleaser {
         }
     }
     packagers {
+        // Redundant downloadUrl temporarily required. See https://github.com/jreleaser/jreleaser/issues/699
+        val artifactDownloadPath = "https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/download/{{tagName}}/{{artifactFile}}"
         brew {
             active.set(Active.RELEASE)
-            // Redundant downloadUrl temporarily required. See https://github.com/jreleaser/jreleaser/issues/699
-            downloadUrl.set("https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/download/{{tagName}}/{{artifactFile}}")
+            downloadUrl.set(artifactDownloadPath)
             templateDirectory.set(File("jreleaser/templates/brew"))
         }
         scoop {
             active.set(Active.RELEASE)
-            // Redundant downloadUrl temporarily required. See https://github.com/jreleaser/jreleaser/issues/699
-            downloadUrl.set("https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/download/{{tagName}}/{{artifactFile}}")
+            downloadUrl.set(artifactDownloadPath)
+        }
+        sdkman {
+            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
+            if (key != null && token != null) {
+                active.set(Active.RELEASE)
+                downloadUrl.set(artifactDownloadPath)
+                consumerKey.set(key)
+                consumerToken.set(token)
+            }
+            else {
+                println("SDKMAN! packager disabled on this machine since key and/or token are not defined")
+                enabled.set(false)
+            }
         }
     }
 
