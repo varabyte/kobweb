@@ -97,19 +97,21 @@ jreleaser {
             active.set(Active.RELEASE)
             downloadUrl.set(artifactDownloadPath)
         }
-        sdkman {
-            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
-            if (key != null && token != null) {
-                active.set(Active.RELEASE)
-                downloadUrl.set(artifactDownloadPath)
-                consumerKey.set(key)
-                consumerToken.set(token)
-            }
-            else {
-                println("SDKMAN! packager disabled on this machine since key and/or token are not defined")
-                enabled.set(false)
-            }
-        }
+
+        // Renable when https://github.com/jreleaser/jreleaser/issues/737 is marked resolved
+//        sdkman {
+//            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
+//            if (key != null && token != null) {
+//                downloadUrl.set(artifactDownloadPath)
+//                consumerKey.set(key)
+//                consumerToken.set(token)
+//                active.set(Active.RELEASE)
+//            }
+//            else {
+//                println("SDKMAN! packager disabled on this machine since key and/or token are not defined")
+//                active.set(Active.NEVER)
+//            }
+//        }
     }
 
     distributions {
