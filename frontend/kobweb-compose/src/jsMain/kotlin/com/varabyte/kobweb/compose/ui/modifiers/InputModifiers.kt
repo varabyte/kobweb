@@ -8,10 +8,19 @@ import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
+import org.jetbrains.compose.web.attributes.Draggable
 import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
+
+fun Modifier.contentEditable(editable: Boolean) = attrModifier {
+    contentEditable(editable)
+}
 
 fun Modifier.cursor(cursor: Cursor) = styleModifier {
     cursor(cursor)
+}
+
+fun Modifier.draggable(draggable: Draggable) = attrModifier {
+    draggable(draggable)
 }
 
 fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrModifier {
