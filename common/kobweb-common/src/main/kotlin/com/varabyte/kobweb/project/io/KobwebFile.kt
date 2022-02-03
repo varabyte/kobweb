@@ -46,14 +46,14 @@ open class KobwebReadableTextFile<T : Any>(
     val path = delegateFile.path
 
     private var lastBytes: ByteArray? = null
-    private lateinit var _content: T
+    private var _content: T? = null
     val content: T?
         get() {
             return delegateFile.content
                 ?.let { bytes ->
                     if (lastBytes == null || bytes !== lastBytes) {
                         lastBytes = bytes
-                        _content = deserialize(bytes.toString(Charsets.UTF_8))
+                        _content = try { deserialize(bytes.toString(Charsets.UTF_8)) } catch(_: Exception) { null }
                     }
                     _content
                 }
