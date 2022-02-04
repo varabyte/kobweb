@@ -6,7 +6,7 @@ root: .components.layouts.PageLayout("MARKDOWN")
 
 This site is generated from markdown.
 
-Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Web Compose](https://compose-web.ui.pages.jetbrains.team/).
+Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose for Web](https://compose-web.ui.pages.jetbrains.team/).
 
 Markdown also supports
 

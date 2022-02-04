@@ -2,7 +2,7 @@ This is a [Kobweb](https://github.com/varabyte/kobweb) project instantiated from
 
 The purpose of this project is to showcase a minimal Todo app, demonstrating:
 
-* a simple, reactive, single-page web app, making use of both Silk UI and Web Compose
+* a simple, reactive, single-page web app, making use of both Silk UI and Compose for Web
 * API endpoints (e.g. for adding, removing, and fetching items)
 * how to share types across client and server (see `TodoItem` which has text and an ID value)
 
