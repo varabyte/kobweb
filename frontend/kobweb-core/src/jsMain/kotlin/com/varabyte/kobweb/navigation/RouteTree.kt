@@ -64,6 +64,9 @@ internal class RouteTree {
 
     var errorHandler: ErrorPageMethod = { errorCode -> ErrorPage(errorCode) }
 
+    /**
+     * Parse a route and associate its split up parts with a [Node] instance.
+     */
     private fun resolve(route: String): List<ResolvedEntry>? {
         val routeParts = route.split('/')
 
@@ -99,11 +102,20 @@ internal class RouteTree {
         return true
     }
 
-    fun createPageData(router: Router, route: String, query: String?): PageData {
+    /**
+     * Create [PageData] from incoming parts of a URL.
+     *
+     * @param route "/a/b/c" from "/a/b/c?x=1&y=2#fragment"
+     * @param query "x=1&y=2" from "/a/b/c?x=1&y=2#fragment"
+     * @param fragment "fragment" from "/a/b/c?x=1&y=2#fragment"
+     */
+    fun createPageData(router: Router, route: String, query: String?, fragment: String?): PageData {
         val resolvedEntries = resolve(route)
         val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
 
-        val ctx = PageContext(router)
+        val ctx = PageContext(router).apply {
+            this.fragment = fragment
+        }
 
         resolvedEntries?.forEach { resolvedEntry ->
             if (resolvedEntry.node is DynamicNode) {

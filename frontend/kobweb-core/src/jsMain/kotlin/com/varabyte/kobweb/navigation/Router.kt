@@ -42,20 +42,24 @@ class Router {
      * Returns true if we updated the active page ourselves or false if we didn't (which means the URL instead goes to
      * an external site)
      */
-    private fun updateActivePage(pathAndQuery: String, allowExternalPaths: Boolean = true): Boolean {
+    private fun updateActivePage(pathQueryAndFragment: String, allowExternalPaths: Boolean = true): Boolean {
+        val (pathAndQuery, fragment) = pathQueryAndFragment.split('#', limit = 2).let {
+            if (it.size == 1) { it[0] to null } else it[0] to it[1]
+        }
+
         val (path, query) = pathAndQuery.split('?', limit = 2).let {
             if (it.size == 1) { it[0] to null } else it[0] to it[1]
         }
 
         if (!Route.isLocal(path)) {
-            require(allowExternalPaths) { "Navigation to \"$pathAndQuery\" not expected by callee" }
+            require(allowExternalPaths) { "Navigation to external URL \"$pathQueryAndFragment\" not expected by callee" }
             // Open external links in a new tab
             // TODO(#90): Allow configuring other options. In place would be window.location.assign(...)
-            window.open(pathAndQuery, target = "_blank")
+            window.open(pathQueryAndFragment, target = "_blank")
             return false
         }
 
-        activePageData.value = routeTree.createPageData(this, path, query)
+        activePageData.value = routeTree.createPageData(this, path, query, fragment)
         return true
     }
 
@@ -99,15 +103,19 @@ class Router {
     }
 
     /**
-     * @param pathAndQuery The path to a page, including (optional) search params, e.g. "/example/path?arg=1234"
+     * For reference to the parts of a URL, see the [standards](https://www.rfc-editor.org/rfc/rfc3986#section-3.3)
+     * documentation.
+     *
+     * @param pathQueryAndHash The path to a page, including (optional) search params and hash,
+     *   e.g. "/example/path?arg=1234#fragment"
      * @param allowExternalPaths If true, the path passed in can be for URLs pointing at a totally different site.
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
-     *   details. Note that this value will be ignored if [pathAndQuery] refers to an external link.
+     *   details. Note that this value will be ignored if [pathQueryAndHash] refers to an external link.
      */
-    fun navigateTo(pathAndQuery: String, allowExternalPaths: Boolean = true, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH) {
-        if (updateActivePage(pathAndQuery, allowExternalPaths)) {
+    fun navigateTo(pathQueryAndHash: String, allowExternalPaths: Boolean = true, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH) {
+        if (updateActivePage(pathQueryAndHash, allowExternalPaths)) {
             // Update URL to match page we navigated to
-            "${window.location.origin}$pathAndQuery".let { url ->
+            "${window.location.origin}$pathQueryAndHash".let { url ->
                 if (window.location.href != url) {
                     when (updateHistoryMode) {
                         UpdateHistoryMode.PUSH -> window.history.pushState(window.history.state, "", url)
