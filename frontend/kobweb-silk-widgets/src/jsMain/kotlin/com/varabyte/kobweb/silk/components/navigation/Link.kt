@@ -51,10 +51,25 @@ fun Link(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null
 ) {
+    Link(path, modifier, variant) {
+        Text(text ?: path)
+    }
+}
+
+/**
+ * Linkable content which, when clicked, navigates to the target [path].
+ */
+@Composable
+fun Link(
+    path: String,
+    modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
+    content: @Composable () -> Unit = {}
+) {
     A(
         path,
         attrs = LinkStyle.toModifier(variant).then(modifier).asAttributeBuilder()
     ) {
-        Text(text ?: path)
+        content()
     }
 }
