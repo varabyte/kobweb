@@ -1,7 +1,9 @@
 package com.varabyte.kobweb.silk.components.style.breakpoint
 
-import org.jetbrains.compose.web.css.CSSUnitValue
-import org.jetbrains.compose.web.css.cssRem
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.LG
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.MD
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.SM
+import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.XL
 
 /**
  * Breakpoints are size values which can be used to affect the layout of the UI at various boundary points.
@@ -24,6 +26,12 @@ import org.jetbrains.compose.web.css.cssRem
  * For more information about breakpoints, see also: https://www.w3schools.com/howto/howto_css_media_query_breakpoints.asp
  */
 enum class Breakpoint {
+    /**
+     * Special value which always mean 0-width, useful for querying the current breakpoint of a screen that's smaller
+     * than "small" (which usually indicates a mobile device)
+     */
+    ZERO,
+
     SM,
     MD,
     LG,

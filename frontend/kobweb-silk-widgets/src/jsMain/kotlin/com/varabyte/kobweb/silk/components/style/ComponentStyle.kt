@@ -9,7 +9,7 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
-import com.varabyte.kobweb.silk.theme.toSize
+import com.varabyte.kobweb.silk.theme.toWidth
 import org.jetbrains.compose.web.css.CSSMediaQuery
 import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleBuilder
@@ -43,7 +43,7 @@ private fun ComparableStyleBuilder.isNotEmpty(): Boolean {
     return properties.isNotEmpty() || variables.isNotEmpty()
 }
 
-private fun Breakpoint.toMinWidthQuery() = CSSMediaQuery.MediaFeature("min-width", this.toSize())
+private fun Breakpoint.toMinWidthQuery() = CSSMediaQuery.MediaFeature("min-width", this.toWidth())
 
 /**
  * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
