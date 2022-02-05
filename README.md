@@ -991,15 +991,14 @@ author: bitspittle
 ---
 
 ...
-
-{{{ Signature() }}}
 ```
 
-These key / value pairs can be queried in your Kotlin `@Composable` code, via a page's context:
+In a following section, we'll discuss how to embed code in your markdown, but for now, know that these key / value pairs
+can be queried in such code using the page's context:
 
 ```kotlin
 @Composable
-fun Signature() {
+fun AuthorWidget() {
     val ctx = rememberPageContext()
     // Markdown front matter value can potentially be a list of strings,
     // but here it's only a single one.
@@ -1046,7 +1045,12 @@ fun KobwebPage() {
 ### Kobweb Call
 
 The power of Kotlin + Compose for Web is interactive components, not static text! Therefore, Kobweb Markdown support
-enables special syntax that can be used to insert Kotlin code. Just use three triple-curly braces to insert a function:
+enables special syntax that can be used to insert Kotlin code.
+
+#### Block syntax
+
+Usually, you will define widgets that belong in their own section. Just use three triple-curly braces to insert a
+function that lives in its own block:
 
 ```markdown
 # Kobweb Tutorial
@@ -1059,18 +1063,28 @@ enables special syntax that can be used to insert Kotlin code. Just use three tr
 which will generate code for you like the following:
 
 ```kotlin
-import com.mysite.components.widgets.VisitorCounter
-
 @Composable
 @Page
 fun KobwebPage() {
     /* ... */
-    VisitorCounter()
+    com.mysite.components.widgets.VisitorCounter()
 }
 ```
 
-In this way, you can write pages that are mostly static text punctuated with beautiful, interactive components. This
-could be a great approach for people who want to write and host their own blogs, for example.
+You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
+will automatically be prepending with your site's full package.
+
+#### Inline syntax
+
+Occasionally, you may want to insert a smaller widget into the flow of a single sentence. For this case, use the
+`${...}` inline syntax:
+
+```markdown
+Press ${.components.widgets.ColorButton} to toggle the site's current color.
+```
+
+**Warning:** Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole
+thing and leaves it as text.
 
 ## Version Catalogs
 
