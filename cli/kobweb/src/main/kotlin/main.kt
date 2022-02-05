@@ -97,7 +97,7 @@ fun main(args: Array<String>) {
     }
 
     class Conf : Subcommand("conf", "Query a value from the .kobweb/conf.yaml file (e.g. \"server.port\")") {
-        val query by argument(ArgType.String, "query", "The query to search conf.yaml for")
+        val query by argument(ArgType.String, "query", "The query to search the .kobweb/conf.yaml for (e.g. \"server.port\")")
         override fun execute() {
             handleConf(query)
         }
