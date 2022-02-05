@@ -12,7 +12,9 @@ import org.w3c.dom.Window
 
 private val Window.bodyFontSize: Number
     get() {
-        val bodySize = getComputedStyle(document.body!!).getPropertyValue("font-size").removeSuffix("px").toIntOrNull()
+        val bodySize = document.body?.let { body ->
+            getComputedStyle(body).getPropertyValue("font-size").removeSuffix("px").toIntOrNull()
+        }
         return bodySize ?: 16
     }
 
