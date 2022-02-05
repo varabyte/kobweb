@@ -1,6 +1,5 @@
 package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 
-import com.varabyte.kobwebx.gradle.markdown.children
 import org.commonmark.node.Block
 import org.commonmark.parser.InlineParser
 import org.commonmark.parser.SourceLine
@@ -20,6 +19,8 @@ import org.commonmark.parser.block.ParserState
 class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockParser() {
     private val block = KobwebCallBlock()
 
+    // If true, looks like {{{ MethodCall }}}, otherwise {{{ MethodCall\n...\n}}}
+    private var isSingleLine = false
     private var method: String? = null
     private val lines = mutableListOf<SourceLine>()
 
@@ -29,7 +30,7 @@ class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockPar
 
     override fun tryContinue(state: ParserState): BlockContinue? {
         val content = state.line.content
-        return if (content.startsWith(closingDelimiters)) {
+        return if (content.startsWith(closingDelimiters) || isSingleLine) {
             return BlockContinue.finished()
         } else {
             BlockContinue.atIndex(state.nextNonSpaceIndex)
@@ -37,9 +38,18 @@ class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockPar
     }
 
     override fun addLine(line: SourceLine) {
-        val content = line.content.toString().removeSuffix(closingDelimiters).trim()
         if (method == null) {
-            method = content
+            // If the block was a single line, e.g. {{{ call }}},
+            // then this will get called BEFORE tryContinue, with trailing delimiters
+            // at the end.
+            var method = line.content.toString().trim()
+            if (method.endsWith(closingDelimiters)) {
+                isSingleLine = true
+                method = method.removeSuffix(closingDelimiters).trim()
+            }
+
+            this.method = method
+
         }
         else {
             lines.add(line)
