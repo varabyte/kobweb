@@ -14,7 +14,7 @@ import org.gradle.api.Project
  * @param partiallyQualifiedName The semi-qualified name of this method. See [toFqn] for how it gets resolved.
  * @param appendBrace If true, this call is meant to start a new block of indented code
  */
-class KobwebCall(private val partiallyQualifiedName: String, private val appendBrace: Boolean = false) : CustomNode() {
+class KobwebCall(val partiallyQualifiedName: String, var appendBrace: Boolean = false) : CustomNode() {
     /**
      * Convert this class's [partiallyQualifiedName] into a fully qualified name, prefixing it with the project's
      * package if it begins with a period.
@@ -27,7 +27,7 @@ class KobwebCall(private val partiallyQualifiedName: String, private val appendB
     fun toFqn(project: Project): String {
         return buildString {
             append(project.prefixQualifiedPackage(partiallyQualifiedName))
-            if (partiallyQualifiedName.last().isLetterOrDigit()) {
+            if (partiallyQualifiedName.last().isLetterOrDigit() && !appendBrace) {
                 append("()")
             }
 

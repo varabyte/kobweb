@@ -317,7 +317,16 @@ class KotlinRenderer(
             } else if (customBlock is KobwebCallBlock) {
                 val visitor = KobwebCallVisitor()
                 customBlock.accept(visitor)
-                visit(visitor.call!!)
+                visitor.call?.let { call ->
+                    visit(call)
+                    visitor.childrenNodes?.let { children ->
+                        ++indentCount
+                        children.forEach { node -> node.accept(this) }
+                        --indentCount
+                        output.appendLine("$indent}")
+                    }
+
+                }
             }
         }
     }
