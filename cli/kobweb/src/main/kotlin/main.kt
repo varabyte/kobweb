@@ -29,11 +29,13 @@ private fun ArgParser.mode() = option(
     description = "If interactive, runs in an ANSI-enabled terminal expecting user input. If dumb, command only outputs, using simple console logging",
 ).default(Mode.INTERACTIVE)
 
+private const val VERSION_HELP = "Print the version of this binary"
+
 @ExperimentalCli
 fun main(args: Array<String>) {
     val parser = ArgParser("kobweb")
 
-    class Version : Subcommand("version", "Print the version of this binary") {
+    class Version : Subcommand("version", VERSION_HELP) {
         override fun execute() {
             handleVersion()
         }
@@ -101,7 +103,16 @@ fun main(args: Array<String>) {
         }
     }
 
+    // I'm not too happy with the redundancy here, because we already have the Version subcommand which makes more
+    // sense. However, by convention users expect "-v" and "--version" to also work. `git` itself supports both
+    // approaches, so if Linus can accept such a compromise, so can I...
+    val version by parser.option(ArgType.Boolean, "version", "v", VERSION_HELP)
 
     parser.subcommands(Version(), List(), Create(), Export(), Run(), Stop(), Conf())
     parser.parse(args.takeIf { it.isNotEmpty() } ?: arrayOf("-h"))
+
+    // It doesn't make sense to show the version if the option is combined with any other command or option
+    if (args.size == 1 && version == true) {
+        handleVersion()
+    }
 }
