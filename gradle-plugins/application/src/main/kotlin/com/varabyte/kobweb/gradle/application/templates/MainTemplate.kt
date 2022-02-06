@@ -152,7 +152,7 @@ fun createMainFunction(siteData: SiteData, target: BuildTarget): String {
             }
 
             addCode("""
-                router.navigateTo(window.location.pathname + window.location.search)
+                router.navigateTo(window.location.href.removePrefix(window.location.origin))
 
                 // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them
                 // the first time we render this page with their composable, dynamic versions. Think of this as

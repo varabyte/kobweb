@@ -49,6 +49,12 @@ class Router {
 
         val (path, query) = pathAndQuery.split('?', limit = 2).let {
             if (it.size == 1) { it[0] to null } else it[0] to it[1]
+        }.let { pair ->
+            // Note: If the user typed just a fragment, e.g. "#id", that means search the current page for an element
+            // with that ID
+            if (pair.first.isBlank() && fragment != null) {
+                window.location.pathname to pair.second
+            } else pair
         }
 
         if (!Route.isLocal(path)) {
@@ -106,21 +112,32 @@ class Router {
      * For reference to the parts of a URL, see the [standards](https://www.rfc-editor.org/rfc/rfc3986#section-3.3)
      * documentation.
      *
-     * @param pathQueryAndHash The path to a page, including (optional) search params and hash,
+     * @param pathQueryAndFragment The path to a page, including (optional) search params and hash,
      *   e.g. "/example/path?arg=1234#fragment"
      * @param allowExternalPaths If true, the path passed in can be for URLs pointing at a totally different site.
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
-     *   details. Note that this value will be ignored if [pathQueryAndHash] refers to an external link.
+     *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
      */
-    fun navigateTo(pathQueryAndHash: String, allowExternalPaths: Boolean = true, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH) {
-        if (updateActivePage(pathQueryAndHash, allowExternalPaths)) {
+    fun navigateTo(pathQueryAndFragment: String, allowExternalPaths: Boolean = true, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH) {
+        // It's possible a link might just target a fragment, e.g. "#id", which we should handle by keeping the current
+        // URL but with this new hash
+        @Suppress("NAME_SHADOWING")
+        val pathQueryAndFragment =
+            pathQueryAndFragment.takeIf { !it.startsWith('#') } ?: (window.location.href.substringBefore('#')
+                .removePrefix(window.location.origin) + pathQueryAndFragment)
+
+        if (updateActivePage(pathQueryAndFragment, allowExternalPaths)) {
             // Update URL to match page we navigated to
-            "${window.location.origin}$pathQueryAndHash".let { url ->
+            "${window.location.origin}$pathQueryAndFragment".let { url ->
                 if (window.location.href != url) {
                     when (updateHistoryMode) {
                         UpdateHistoryMode.PUSH -> window.history.pushState(window.history.state, "", url)
                         UpdateHistoryMode.REPLACE -> window.history.replaceState(window.history.state, "", url)
                     }
+                }
+
+                if (url.contains('#')) {
+                    document.getElementById(url.substringAfter('#'))?.scrollIntoView(js("{behavior: \"smooth\"}"))
                 }
             }
         }
