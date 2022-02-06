@@ -17,7 +17,9 @@ import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.node.*
 import org.commonmark.parser.Parser
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.get
 import javax.inject.Inject
 
 abstract class MarkdownConfig {
@@ -170,6 +172,39 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
      */
     abstract val useSilk: Property<Boolean>
 
+    /**
+     * If true, attach an auto-generated header ID to each header element.
+     *
+     * For example,
+     *
+     * ```markdown
+     * # This Is A Section
+     * ```
+     *
+     * will generate a header tag with `id="this-is-a-section"`
+     *
+     * See also [idGenerator] if you need to override the default algorithm used for generating these IDs.
+     */
+    abstract val generateHeaderIds: Property<Boolean>
+
+    /**
+     * Handler for converting some incoming text (fairly unconstrained) into a final string value that should be used as
+     * an ID for a URL fragment.
+     *
+     * By default, this simply only accepts letters and digits and converts everything else to hyphens (while removing
+     * any duplicate neighboring hyphens), producing a lowercase value.
+     *
+     * However, if your project needs more fine-grained control over the generated names, you can set this callback
+     * however you see fit.
+     *
+     * If you override this callback, you may want to check with https://www.rfc-editor.org/rfc/rfc3986 to ensure the ID
+     * generated is valid.
+     *
+     * See also: [generateHeaderIds]
+     */
+    abstract val idGenerator: Property<(String) -> String>
+
+
     abstract val text: Property<NodeScope.(Text) -> String>
     abstract val img: Property<NodeScope.(Image) -> String>
     abstract val heading: Property<NodeScope.(Heading) -> String>
@@ -200,6 +235,27 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
             useSilk.convention(project.hasDependencyNamed("kobweb-silk"))
         }
 
+        generateHeaderIds.convention(true)
+        idGenerator.convention { text ->
+            var id = text
+                .map { c ->
+                    when {
+                        c.isLetterOrDigit() -> c.toLowerCase()
+                        else -> '-'
+                    }
+                }
+                .joinToString("")
+
+            // Regexes are hard to read, so what's happening here is sometimes multiple special characters / spaces
+            // could end up next to each other, causing double (or more) repeated dashes. We compress those so the
+            // string doesn't look weird.
+            id = id.replace(Regex("""--+"""), "-")
+            id = id.removePrefix("-").removeSuffix("-")
+            id
+        }
+
+        // region Markdown Node handlers
+
         text.convention { text ->
             val literal = text.literal.escapeQuotes()
             if (useSilk.get()) {
@@ -209,7 +265,19 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
             }
         }
         img.convention { "$JB_DOM.Img" }
-        heading.convention { heading -> "$JB_DOM.H${heading.level}" }
+        heading.convention { heading ->
+            buildString {
+                append("$JB_DOM.H${heading.level}")
+                if (generateHeaderIds.get()) {
+                    val text = heading.children()
+                        .filterIsInstance<Text>()
+                        .map { it.literal }
+                        .joinToString("")
+                    val id = idGenerator.get().invoke(text)
+                    append("(attrs = { id(\"$id\") })")
+                }
+            }
+        }
         p.convention { "$JB_DOM.P" }
         br.convention { "$JB_DOM.Br" }
         a.convention { link ->
@@ -271,5 +339,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
                 }
             }
         }
+
+        // endregion
     }
 }
