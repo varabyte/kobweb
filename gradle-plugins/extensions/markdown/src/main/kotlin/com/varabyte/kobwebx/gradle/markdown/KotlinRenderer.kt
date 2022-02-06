@@ -182,11 +182,7 @@ class KotlinRenderer(
         }
 
         override fun visit(heading: Heading) {
-            when (heading.level) {
-                1 -> doVisit(heading, components.h1)
-                2 -> doVisit(heading, components.h2)
-                else -> doVisit(heading, components.h3)
-            }
+            doVisit(heading, components.heading)
         }
 
         override fun visit(thematicBreak: ThematicBreak) {

@@ -172,12 +172,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
 
     abstract val text: Property<NodeScope.(Text) -> String>
     abstract val img: Property<NodeScope.(Image) -> String>
-    abstract val h1: Property<NodeScope.(Heading) -> String>
-    abstract val h2: Property<NodeScope.(Heading) -> String>
-    abstract val h3: Property<NodeScope.(Heading) -> String>
-    abstract val h4: Property<NodeScope.(Heading) -> String>
-    abstract val h5: Property<NodeScope.(Heading) -> String>
-    abstract val h6: Property<NodeScope.(Heading) -> String>
+    abstract val heading: Property<NodeScope.(Heading) -> String>
     abstract val p: Property<NodeScope.(Paragraph) -> String>
     abstract val br: Property<NodeScope.(HardLineBreak) -> String>
     abstract val a: Property<NodeScope.(Link) -> String>
@@ -214,12 +209,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
             }
         }
         img.convention { "$JB_DOM.Img" }
-        h1.convention { "$JB_DOM.H1" }
-        h2.convention { "$JB_DOM.H2" }
-        h3.convention { "$JB_DOM.H3" }
-        h4.convention { "$JB_DOM.H4" }
-        h5.convention { "$JB_DOM.H5" }
-        h6.convention { "$JB_DOM.H6" }
+        heading.convention { heading -> "$JB_DOM.H${heading.level}" }
         p.convention { "$JB_DOM.P" }
         br.convention { "$JB_DOM.Br" }
         a.convention { link ->
