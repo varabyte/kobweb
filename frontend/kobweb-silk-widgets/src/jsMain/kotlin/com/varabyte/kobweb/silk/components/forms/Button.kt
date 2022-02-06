@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.components.forms
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.UserSelect
+import com.varabyte.kobweb.compose.dom.clearFocus
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -11,6 +12,7 @@ import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
+import kotlinx.browser.document
 import org.jetbrains.compose.web.css.px
 
 val ButtonStyle = ComponentStyle("silk-button") {
@@ -54,9 +56,7 @@ fun Button(
             .then(modifier)
             .onClick { evt ->
                 onClick()
-                // Blur is a bad name - it means, here, remove focus
-                // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/blur
-                js("document.activeElement.blur()")
+                document.activeElement?.clearFocus()
                 evt.preventDefault()
             }
             .tabIndex(0) // Allow button to be tabbed to
