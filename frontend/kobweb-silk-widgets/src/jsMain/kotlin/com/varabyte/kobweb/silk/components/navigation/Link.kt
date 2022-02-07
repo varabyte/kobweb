@@ -38,6 +38,12 @@ val UndecoratedLinkVariant = LinkStyle.addVariant("undecorated") {
     }
 }
 
+val UncoloredLinkVariant = LinkStyle.addVariant("uncolored") {
+    val textColor = colorMode.toSilkPalette().color
+    link { Modifier.color(textColor) }
+    visited { Modifier.color(textColor) }
+}
+
 /**
  * Linkable text which, when clicked, navigates to the target [path].
  *
