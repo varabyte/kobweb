@@ -33,11 +33,15 @@ val ButtonStyle = ComponentStyle("silk-button") {
             .cursor(Cursor.Pointer)
     }
 
+    focus {
+        Modifier.backgroundColor(buttonColors.hover)
+    }
+
     active {
         Modifier.backgroundColor(buttonColors.pressed)
     }
-    focus {
-        Modifier.backgroundColor(buttonColors.hover)
+    (focus + active) {
+        Modifier.backgroundColor(buttonColors.pressed)
     }
 }
 
@@ -55,8 +59,8 @@ fun Button(
         ButtonStyle.toModifier(variant)
             .then(modifier)
             .onClick { evt ->
-                onClick()
                 document.activeElement?.clearFocus()
+                onClick()
                 evt.preventDefault()
             }
             .tabIndex(0) // Allow button to be tabbed to
