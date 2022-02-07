@@ -9,13 +9,9 @@
 
 package com.varabyte.kobweb.silk.components.icons.fa
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
-import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
-import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.dom.Div
 
 enum class IconCategory(internal val className: String) {
