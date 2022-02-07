@@ -17,9 +17,7 @@ import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.node.*
 import org.commonmark.parser.Parser
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
-import org.gradle.kotlin.dsl.get
 import javax.inject.Inject
 
 abstract class MarkdownConfig {
@@ -237,7 +235,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
 
         generateHeaderIds.convention(true)
         idGenerator.convention { text ->
-            var id = text
+            val mergedText = text
                 .map { c ->
                     when {
                         c.isLetterOrDigit() -> c.toLowerCase()
@@ -249,9 +247,10 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
             // Regexes are hard to read, so what's happening here is sometimes multiple special characters / spaces
             // could end up next to each other, causing double (or more) repeated dashes. We compress those so the
             // string doesn't look weird.
-            id = id.replace(Regex("""--+"""), "-")
-            id = id.removePrefix("-").removeSuffix("-")
-            id
+            mergedText
+                .replace(Regex("""--+"""), "-")
+                .removePrefix("-")
+                .removeSuffix("-")
         }
 
         // region Markdown Node handlers
