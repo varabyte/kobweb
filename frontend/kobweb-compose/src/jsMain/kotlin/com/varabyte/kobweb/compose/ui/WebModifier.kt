@@ -25,13 +25,13 @@ fun Modifier.styleModifier(styles: (StyleBuilder.() -> Unit)) = this then StyleM
  * Convert a [Modifier] into an [AttrsBuilder] which Compose for Web tags take as an argument, e.g. use it like so:
  *
  * ```
- * Div(attrs = modifier.asAttributeBuilder())
+ * Div(attrs = modifier.asAttributesBuilder())
  * ```
  *
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
  *   be useful to occasionally avoid the creation of an unnecessary [AttrModifier] to append at the tail.
  */
-fun <T: Element, A: AttrsBuilder<T>> Modifier.asAttributeBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <T: Element, A: AttrsBuilder<T>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->

@@ -3,12 +3,11 @@ package com.varabyte.kobweb.silk.components.text
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.whiteSpace
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
-import org.jetbrains.compose.web.css.whiteSpace
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
@@ -32,7 +31,7 @@ fun Text(
     val finalModifier = TextStyle.toModifier(variant).then(modifier).then(spaceModifier)
 
     if (finalModifier !== Modifier) {
-        Span(attrs = finalModifier.asAttributeBuilder()) {
+        Span(attrs = finalModifier.asAttributesBuilder()) {
             Text(text)
         }
     } else {

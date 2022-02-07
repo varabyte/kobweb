@@ -1,15 +1,11 @@
 package com.varabyte.kobweb.silk.components.layout.breakpoint
 
-import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributeBuilder
-import com.varabyte.kobweb.compose.ui.attrModifier
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.dom.Span
 
 internal val DisplayIfSmStyle = ComponentStyle("silk-display-if-sm") {
     base { Modifier.display(DisplayStyle.None) }

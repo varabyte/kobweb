@@ -2,7 +2,7 @@ package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -12,7 +12,6 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.ResponsiveValues
 import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.gridTemplateColumns
 import org.jetbrains.compose.web.dom.Div
 
@@ -80,7 +79,7 @@ fun SimpleGrid(
     content: @Composable () -> Unit
 ) {
     Div(
-        attrs = SimpleGridStyle.toModifier(variant).then(modifier).asAttributeBuilder {
+        attrs = SimpleGridStyle.toModifier(variant).then(modifier).asAttributesBuilder {
             // null is special case to mean "base" in this case
             classes(SimpleGridColumnVariants.getValue(null).getValue(numColumns.base).style.name)
             if (numColumns.sm != numColumns.base) {

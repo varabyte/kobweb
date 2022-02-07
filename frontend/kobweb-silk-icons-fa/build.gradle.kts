@@ -127,7 +127,7 @@ package com.varabyte.kobweb.silk.components.icons.fa
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import org.jetbrains.compose.web.css.color
@@ -151,7 +151,7 @@ fun FaIcon(
     style: IconCategory = IconCategory.REGULAR,
 ) {
     Div(
-        attrs = modifier.asAttributeBuilder {
+        attrs = modifier.asAttributesBuilder {
             classes(style.className, "fa-${'$'}name")
         }
     )

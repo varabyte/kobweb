@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.components.navigation
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.TextDecorationLine
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -74,7 +74,7 @@ fun Link(
 ) {
     A(
         path,
-        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributeBuilder()
+        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder()
     ) {
         content()
     }
