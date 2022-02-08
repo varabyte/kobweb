@@ -5,11 +5,11 @@ import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
-import com.varabyte.kobweb.compose.ui.attrModifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import org.jetbrains.compose.web.dom.Div
 
 class BoxScope {
-    fun Modifier.align(alignment: Alignment) = attrModifier {
+    fun Modifier.align(alignment: Alignment) = attrsModifier {
         classes("${alignment.toClassName()}-self")
     }
 }

@@ -2,12 +2,12 @@ package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.attrModifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.attributes.DirType
 import org.jetbrains.compose.web.css.*
 
-fun Modifier.dir(dirType: DirType) = attrModifier {
+fun Modifier.dir(dirType: DirType) = attrsModifier {
     dir(dirType)
 }
 
@@ -27,7 +27,7 @@ fun Modifier.fontWeight(value: FontWeight): Modifier = styleModifier {
     fontWeight(value)
 }
 
-fun Modifier.lang(value: String) = attrModifier {
+fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }
 
@@ -35,7 +35,7 @@ fun Modifier.letterSpacing(value: CSSNumeric) = styleModifier {
     letterSpacing(value)
 }
 
-fun Modifier.spellCheck(enabled: Boolean) = attrModifier {
+fun Modifier.spellCheck(enabled: Boolean) = attrsModifier {
     spellCheck(enabled)
 }
 

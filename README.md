@@ -621,18 +621,18 @@ Box(Modifier.background(Colors.Red).color(Colors.Green).padding(200.px)) {
 
 would generate an HTML tag with a style property like: `<div style="background:red;color:green;padding:200px">`
 
-#### attrModifier and styleModifier
+#### attrsModifier and styleModifier
 
 There are a bunch of modifier extensions (and they're growing) provided by Kobweb, like `background`, `color`, and
 `padding` above. But there are also two escape hatches anytime you run into a modifier that's missing:
-`attrModifier` and `styleModifier`.
+`attrsModifier` and `styleModifier`.
 
 Using them looks like this:
 
 ```kotlin
 // Modify attributes of an element tag
 // e.g. the "a", "b", and "c" in <tag a="..." b="..." c="..." />
-Modifier.attrModifier {
+Modifier.attrsModifier {
     onMouseDown { /* ... */ }
 }
 
@@ -643,8 +643,8 @@ Modifier.styleModifier {
     height(50.percent)
 }
 
-// Note: Because "style" itself is an attribute, you can define styles in an attrModifier:
-Modifier.attrModifier {
+// Note: Because "style" itself is an attribute, you can define styles in an attrsModifier:
+Modifier.attrsModifier {
     style {
         width(100.percent)
         height(50.percent)

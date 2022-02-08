@@ -6,12 +6,12 @@ import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.css.cursor
 import com.varabyte.kobweb.compose.css.userSelect
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.attrModifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.attributes.Draggable
 import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 
-fun Modifier.contentEditable(editable: Boolean) = attrModifier {
+fun Modifier.contentEditable(editable: Boolean) = attrsModifier {
     contentEditable(editable)
 }
 
@@ -19,39 +19,39 @@ fun Modifier.cursor(cursor: Cursor) = styleModifier {
     cursor(cursor)
 }
 
-fun Modifier.draggable(draggable: Draggable) = attrModifier {
+fun Modifier.draggable(draggable: Draggable) = attrsModifier {
     draggable(draggable)
 }
 
-fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrModifier {
+fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
     onClick { evt -> onClick(evt) }
 }
 
-fun Modifier.onKeyDown(onKeyDown: (SyntheticKeyboardEvent) -> Unit) = attrModifier {
+fun Modifier.onKeyDown(onKeyDown: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
     onKeyDown { evt -> onKeyDown(evt) }
 }
 
-fun Modifier.onKeyUp(onKeyUp: (SyntheticKeyboardEvent) -> Unit) = attrModifier {
+fun Modifier.onKeyUp(onKeyUp: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
     onKeyUp { evt -> onKeyUp(evt) }
 }
 
-fun Modifier.onMouseDown(onMouseDown: (SyntheticMouseEvent) -> Unit) = attrModifier {
+fun Modifier.onMouseDown(onMouseDown: (SyntheticMouseEvent) -> Unit) = attrsModifier {
     onMouseDown { evt -> onMouseDown(evt) }
 }
 
-fun Modifier.onMouseEnter(onMouseEnter: (SyntheticMouseEvent) -> Unit) = attrModifier {
+fun Modifier.onMouseEnter(onMouseEnter: (SyntheticMouseEvent) -> Unit) = attrsModifier {
     onMouseEnter { evt -> onMouseEnter(evt) }
 }
 
-fun Modifier.onMouseLeave(onMouseLeave: (SyntheticMouseEvent) -> Unit) = attrModifier {
+fun Modifier.onMouseLeave(onMouseLeave: (SyntheticMouseEvent) -> Unit) = attrsModifier {
     onMouseLeave { evt -> onMouseLeave(evt) }
 }
 
-fun Modifier.onMouseMove(onMouseMove: (SyntheticMouseEvent) -> Unit) = attrModifier {
+fun Modifier.onMouseMove(onMouseMove: (SyntheticMouseEvent) -> Unit) = attrsModifier {
     onMouseMove { evt -> onMouseMove(evt) }
 }
 
-fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = attrModifier {
+fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = attrsModifier {
     onMouseUp { evt -> onMouseUp(evt) }
 }
 
@@ -59,6 +59,6 @@ fun Modifier.userSelect(userSelect: UserSelect): Modifier = styleModifier {
     userSelect(userSelect)
 }
 
-fun Modifier.tabIndex(value: Int) = attrModifier {
+fun Modifier.tabIndex(value: Int) = attrsModifier {
     tabIndex(value)
 }

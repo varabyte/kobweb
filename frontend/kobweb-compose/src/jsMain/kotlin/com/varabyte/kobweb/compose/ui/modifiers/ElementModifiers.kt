@@ -2,13 +2,10 @@ package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.content
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.attrModifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.DirType
-import org.jetbrains.compose.web.attributes.Draggable
 
-fun Modifier.classNames(vararg classes: String) = attrModifier {
+fun Modifier.classNames(vararg classes: String) = attrsModifier {
     classes(*classes)
 }
 
@@ -16,14 +13,14 @@ fun Modifier.content(value: String) = styleModifier {
     content(value)
 }
 
-fun Modifier.hidden() = attrModifier {
+fun Modifier.hidden() = attrsModifier {
     hidden()
 }
 
-fun Modifier.id(value: String) = attrModifier {
+fun Modifier.id(value: String) = attrsModifier {
     id(value)
 }
 
-fun Modifier.title(value: String) = attrModifier {
+fun Modifier.title(value: String) = attrsModifier {
     title(value)
 }

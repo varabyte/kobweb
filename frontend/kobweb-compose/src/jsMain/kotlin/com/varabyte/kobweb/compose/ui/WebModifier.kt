@@ -10,9 +10,9 @@ interface WebModifier : Modifier.Element
 /**
  * A modifier element which works by setting CSS styles and/or attributes when it is applied.
  */
-class AttrModifier(internal val attrs: (AttrsBuilder<*>.() -> Unit)) : WebModifier
+class AttrsModifier(internal val attrs: (AttrsBuilder<*>.() -> Unit)) : WebModifier
 
-fun Modifier.attrModifier(attrs: (AttrsBuilder<*>.() -> Unit)) = this then AttrModifier(attrs)
+fun Modifier.attrsModifier(attrs: (AttrsBuilder<*>.() -> Unit)) = this then AttrsModifier(attrs)
 
 /**
  * A modifier element that works by CSS styles when it is applied.
@@ -29,13 +29,13 @@ fun Modifier.styleModifier(styles: (StyleBuilder.() -> Unit)) = this then StyleM
  * ```
  *
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
- *   be useful to occasionally avoid the creation of an unnecessary [AttrModifier] to append at the tail.
+ *   be useful to occasionally avoid the creation of an unnecessary [AttrsModifier] to append at the tail.
  */
 fun <T: Element, A: AttrsBuilder<T>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->
-            if (element is AttrModifier) {
+            if (element is AttrsModifier) {
                 element.attrs.invoke(this)
             } else if (element is StyleModifier) {
                 style {
