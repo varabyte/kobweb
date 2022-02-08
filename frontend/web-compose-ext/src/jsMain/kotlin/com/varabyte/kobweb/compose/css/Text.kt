@@ -74,3 +74,21 @@ class WhiteSpace(val value: String) {
 fun StyleBuilder.whiteSpace(whiteSpace: WhiteSpace) {
     property("white-space", whiteSpace.value)
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode
+class WritingMode(val value: String) {
+    // Keyword
+    val HorizontalTb get() = WritingMode("horizontal-tb");
+    val VerticalRl get() = WritingMode("vertical-rl");
+    val VerticalLr get() = WritingMode("vertical-lr");
+
+    // Global
+    val Inherit get() = WritingMode("inherit")
+    val Initial get() = WritingMode("initial")
+    val Revert get() = WritingMode("revert")
+    val Unset get() = WritingMode("unset")
+}
+
+fun StyleBuilder.writingMode(writingMode: WritingMode) {
+    property("writing-mode", writingMode.value)
+}

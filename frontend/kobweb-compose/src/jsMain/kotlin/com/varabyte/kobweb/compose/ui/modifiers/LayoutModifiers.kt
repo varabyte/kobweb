@@ -1,11 +1,6 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
-import com.varabyte.kobweb.compose.css.Overflow
-import com.varabyte.kobweb.compose.css.OverflowWrap
-import com.varabyte.kobweb.compose.css.overflow
-import com.varabyte.kobweb.compose.css.overflowX
-import com.varabyte.kobweb.compose.css.overflowY
-import com.varabyte.kobweb.compose.css.overflowWrap
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -80,6 +75,21 @@ fun Modifier.margin(
 ): Modifier = styleModifier {
     margin(top, right, bottom, left)
 }
+
+fun Modifier.marginInline(
+    start: CSSNumeric = 0.px,
+    end: CSSNumeric = 0.px,
+) = styleModifier {
+    marginInline(start, end)
+}
+
+fun Modifier.marginBlock(
+    start: CSSNumeric = 0.px,
+    end: CSSNumeric = 0.px,
+) = styleModifier {
+    marginBlock(start, end)
+}
+
 fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
     padding(all)
 }
@@ -95,6 +105,20 @@ fun Modifier.padding(
     left: CSSNumeric = 0.px
 ): Modifier = styleModifier {
     padding(top, right, bottom, left)
+}
+
+fun Modifier.paddingInline(
+    start: CSSNumeric = 0.px,
+    end: CSSNumeric = 0.px,
+) = styleModifier {
+    paddingInline(start, end)
+}
+
+fun Modifier.paddingBlock(
+    start: CSSNumeric = 0.px,
+    end: CSSNumeric = 0.px,
+) = styleModifier {
+    paddingBlock(start, end)
 }
 
 

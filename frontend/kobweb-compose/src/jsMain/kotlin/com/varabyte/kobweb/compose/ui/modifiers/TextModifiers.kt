@@ -50,3 +50,7 @@ fun Modifier.textDecorationLine(textDecorationLine: TextDecorationLine): Modifie
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
     whiteSpace(whiteSpace)
 }
+
+fun Modifier.writingMode(writingMode: WritingMode) = styleModifier {
+    writingMode(writingMode)
+}
