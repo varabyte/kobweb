@@ -8,11 +8,11 @@ import com.varabyte.kobweb.compose.ui.modifiers.width
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.SilkTheme
-import com.varabyte.kobweb.silk.theme.colors.SilkPalette
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import kotlinx.browser.document
 import kotlinx.browser.window
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ElementBuilder
 import org.jetbrains.compose.web.dom.TagElement
 import org.khronos.webgl.WebGLRenderingContext
@@ -39,7 +39,7 @@ class RenderScope<C: RenderingContext>(
     val ctx: C,
     val width: Int,
     val height: Int,
-    val palette: SilkPalette,
+    val colorMode: ColorMode,
     val elapsedMs: Double,
 )
 
@@ -66,12 +66,12 @@ private class RenderCallback<C: RenderingContext>(
     private val minDeltaMs = minDeltaMs.toDouble()
     private val maxDeltaMs = maxDeltaMs.toDouble()
 
-    fun step(palette: SilkPalette) {
+    fun step(colorMode: ColorMode) {
         val firstRender = lastRenderedTimestamp == 0.0
         val now = Date.now()
         val deltaMs = now - lastRenderedTimestamp
         if (deltaMs >= minDeltaMs) {
-            val scope = RenderScope(ctx, width, height, palette, if (firstRender) 0.0 else min(deltaMs, maxDeltaMs))
+            val scope = RenderScope(ctx, width, height, colorMode, if (firstRender) 0.0 else min(deltaMs, maxDeltaMs))
             scope.render()
             lastRenderedTimestamp = now
         }
@@ -113,18 +113,18 @@ private inline fun <C: RenderingContext> Canvas(
             }
     ) {
         var requestId by remember { mutableStateOf(0) }
-        val palette = SilkTheme.palette
-        DomSideEffect(palette) { element ->
+        val colorMode = getColorMode()
+        DomSideEffect(colorMode) { element ->
             val ctx = createContext(element)
             if (ctx != null) {
                 val callback = RenderCallback(ctx, width, height, minDeltaMs, maxDeltaMs, render, onStepped = {
-                    requestId = window.requestAnimationFrame { step(palette) }
+                    requestId = window.requestAnimationFrame { step(colorMode) }
                 })
-                requestId = window.requestAnimationFrame { callback.step(palette) }
+                requestId = window.requestAnimationFrame { callback.step(colorMode) }
             }
         }
 
-        DisposableRefEffect(palette) {
+        DisposableRefEffect(colorMode) {
             onDispose {
                 if (requestId != 0) {
                     window.cancelAnimationFrame(requestId)
