@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.list.handleList
 import com.varabyte.kobweb.cli.run.handleRun
 import com.varabyte.kobweb.cli.stop.handleStop
 import com.varabyte.kobweb.cli.version.handleVersion
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
@@ -28,6 +29,13 @@ private fun ArgParser.mode() = option(
     shortName = "m",
     description = "If interactive, runs in an ANSI-enabled terminal expecting user input. If dumb, command only outputs, using simple console logging",
 ).default(Mode.INTERACTIVE)
+
+private fun ArgParser.layout() = option(
+    ArgType.Choice<SiteLayout>(),
+    fullName = "layout",
+    shortName = "l",
+    description = "Specify the organizational layout of the site files.",
+).default(SiteLayout.KOBWEB)
 
 private const val VERSION_HELP = "Print the version of this binary"
 
@@ -66,18 +74,20 @@ fun main(args: Array<String>) {
 
     class Export : Subcommand("export", "Generate a static version of a Kobweb app / site") {
         val mode by mode()
+        val layout by layout()
 
         override fun execute() {
-            handleExport(mode == Mode.INTERACTIVE)
+            handleExport(layout, mode == Mode.INTERACTIVE)
         }
     }
 
     class Run : Subcommand("run", "Run a Kobweb server") {
         val env by option(ArgType.Choice<ServerEnvironment>(), "env").default(ServerEnvironment.DEV)
         val mode by mode()
+        val layout by layout()
 
         override fun execute() {
-            handleRun(env, mode == Mode.INTERACTIVE)
+            handleRun(env, layout, mode == Mode.INTERACTIVE)
         }
     }
 

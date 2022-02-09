@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
@@ -42,7 +43,11 @@ private enum class RunState {
     INTERRUPTED,
 }
 
-fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
+fun handleRun(
+    env: ServerEnvironment,
+    siteLayout: SiteLayout,
+    isInteractive: Boolean,
+) {
     val kobwebGradle = KobwebGradle(env)
     if (isInteractive) session {
         val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@session
@@ -107,7 +112,7 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
             }
         }.runUntilSignal {
             val startServerProcess = try {
-                kobwebGradle.startServer()
+                kobwebGradle.startServer(enableLiveReloading = (env == ServerEnvironment.DEV), siteLayout)
             }
             catch (ex: Exception) {
                 exception = ex
@@ -198,6 +203,6 @@ fun handleRun(env: ServerEnvironment, isInteractive: Boolean) {
         assertKobwebProject()
         // If we're non-interactive, it means we just want to start the Kobweb server and exit without waiting for
         // for any additional changes. (This is essentially used when run in a web server environment)
-        kobwebGradle.startServer(enableLiveReloading = false).also { it.consumeProcessOutput(); it.waitFor() }
+        kobwebGradle.startServer(enableLiveReloading = false, siteLayout).also { it.consumeProcessOutput(); it.waitFor() }
     }
 }

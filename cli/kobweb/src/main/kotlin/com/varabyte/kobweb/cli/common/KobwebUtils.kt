@@ -2,6 +2,7 @@ package com.varabyte.kobweb.cli.common
 
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebProject
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kotter.runtime.Session
 
@@ -34,8 +35,8 @@ class KobwebGradle(private val env: ServerEnvironment) {
         return Runtime.getRuntime().gradlew(*finalArgs.toTypedArray())
     }
 
-    fun startServer(enableLiveReloading: Boolean = (env == ServerEnvironment.DEV)): Process {
-        val args = mutableListOf("-PkobwebEnv=$env", "kobwebStart")
+    fun startServer(enableLiveReloading: Boolean, siteLayout: SiteLayout): Process {
+        val args = mutableListOf("-PkobwebEnv=$env", "-PkobwebRunLayout=$siteLayout", "kobwebStart")
         if (enableLiveReloading) {
             args.add("-t")
         }
@@ -46,7 +47,9 @@ class KobwebGradle(private val env: ServerEnvironment) {
         return gradlew("kobwebStop")
     }
 
-    fun export(): Process {
-        return gradlew("-PkobwebReuseServer=false", "-PkobwebBuildTarget=RELEASE", "kobwebExport")
+    fun export(siteLayout: SiteLayout): Process {
+        // Even if we are exporting a non-Kobweb layout, we still want to start up a dev server using a Kobweb layout so
+        // it looks for the source files in the right place.
+        return gradlew("-PkobwebReuseServer=false", "-PkobwebEnv=DEV", "-PkobwebRunLayout=KOBWEB", "-PkobwebBuildTarget=RELEASE", "-PkobwebExportLayout=$siteLayout", "kobwebExport")
     }
 }

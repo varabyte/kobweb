@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.GradleException
@@ -20,6 +21,7 @@ import javax.inject.Inject
  */
 abstract class KobwebStartTask @Inject constructor(
     private val env: ServerEnvironment,
+    private val siteLayout: SiteLayout,
     private val reuseServer: Boolean
 ) : KobwebTask("Start a Kobweb server") {
 
@@ -54,6 +56,7 @@ abstract class KobwebStartTask @Inject constructor(
         val processParams = arrayOf(
             "$javaHome/bin/java",
             env.toSystemPropertyParam(),
+            siteLayout.toSystemPropertyParam(),
             // See: https://ktor.io/docs/development-mode.html#system-property
             "-Dio.ktor.development=${env == ServerEnvironment.DEV}",
             "-jar",

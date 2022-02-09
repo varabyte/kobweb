@@ -3,6 +3,7 @@ package com.varabyte.kobweb.server
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
@@ -11,7 +12,6 @@ import com.varabyte.kobweb.server.io.ServerStateFile
 import com.varabyte.kobweb.server.plugins.configureHTTP
 import com.varabyte.kobweb.server.plugins.configureRouting
 import com.varabyte.kobweb.server.plugins.configureSerialization
-import io.ktor.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.delay
@@ -60,10 +60,10 @@ fun main() = runBlocking {
             throw KobwebException("Production server can't start as port $port is already occupied. If you need a different port number, consider modifying ${confFile.path}")
         }
     }
-
     val globals = ServerGlobals()
+    val siteLayout = SiteLayout.get()
     val engine = embeddedServer(Netty, port) {
-        configureRouting(env, conf, globals)
+        configureRouting(env, siteLayout, conf, globals)
         configureSerialization()
         configureHTTP(conf)
     }

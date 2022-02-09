@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.input.Keys
@@ -28,7 +29,7 @@ private enum class ExportState {
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
-fun handleExport(isInteractive: Boolean) {
+fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
     val kobwebGradle = KobwebGradle(ServerEnvironment.PROD) // exporting is a production-only action
 
     if (isInteractive) session {
@@ -57,7 +58,7 @@ fun handleExport(isInteractive: Boolean) {
             }
         }.run {
             val exportProcess = try {
-                kobwebGradle.export()
+                kobwebGradle.export(siteLayout)
             }
             catch (ex: Exception) {
                 exception = ex
@@ -100,7 +101,7 @@ fun handleExport(isInteractive: Boolean) {
     } else {
         assert(!isInteractive)
         assertKobwebProject()
-        kobwebGradle.export().also { it.consumeProcessOutput(); it.waitFor() }
+        kobwebGradle.export(siteLayout).also { it.consumeProcessOutput(); it.waitFor() }
         kobwebGradle.stopServer().also { it.consumeProcessOutput(); it.waitFor() }
     }
 }

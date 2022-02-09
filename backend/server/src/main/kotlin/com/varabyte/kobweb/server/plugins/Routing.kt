@@ -6,6 +6,7 @@ import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.ServerGlobals
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.io.ApiJarFile
 import io.ktor.application.*
@@ -21,7 +22,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.name
@@ -29,7 +29,7 @@ import kotlin.io.path.name
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
 
-fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf, globals: ServerGlobals) {
+fun Application.configureRouting(env: ServerEnvironment, siteLayout: SiteLayout, conf: KobwebConf, globals: ServerGlobals) {
     val logger = object : Logger {
         override fun trace(message: String) = log.trace(message)
         override fun debug(message: String) = log.debug(message)
@@ -38,10 +38,26 @@ fun Application.configureRouting(env: ServerEnvironment, conf: KobwebConf, globa
         override fun error(message: String) = log.error(message)
     }
 
-    when (env) {
-        ServerEnvironment.DEV -> configureDevRouting(conf, globals, logger)
-        ServerEnvironment.PROD -> configureProdRouting(conf, logger)
+    if (siteLayout == SiteLayout.STATIC && env != ServerEnvironment.PROD) {
+        log.warn("""
+            Static site layout is configured for a development server.
+
+            This isn't expected, as development servers expect to read their values from the user's project. Static
+            layouts are really only designed to be used in production. The server will still run in static mode as
+            requested, but live-reloading, server APIs, etc. will not work with this configuration.
+        """.trimIndent())
     }
+
+    when (siteLayout) {
+        SiteLayout.KOBWEB -> {
+            when (env) {
+                ServerEnvironment.DEV -> configureDevRouting(conf, globals, logger)
+                ServerEnvironment.PROD -> configureProdRouting(conf, logger)
+            }
+        }
+        SiteLayout.STATIC -> configureStaticRouting(conf)
+    }
+
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
@@ -266,5 +282,47 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
         }
 
         configureCatchAllRouting(script, fallbackIndex)
+    }
+}
+
+/**
+ * Run a Kobweb server as a dumb, static server.
+ *
+ * This is kind of a waste of a Kobweb server, since it has all the smarts removed, but at the same time, it's supported
+ * so a user can test-run the static site experience which will ultimately be provided by some external provider.
+ */
+private fun Application.configureStaticRouting(conf: KobwebConf) {
+    val siteRoot = Path(conf.server.files.prod.siteRoot)
+    routing {
+        siteRoot.toFile().let { siteRootFile ->
+            siteRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
+                val relativeFile = file.relativeTo(siteRootFile)
+                val name = relativeFile.name.removeSuffix(".html")
+                val parent = relativeFile.parent?.let { "$it/" } ?: ""
+                if (name != "index") {
+                    get("/$parent$name") {
+                        call.respondFile(file)
+                    }
+                } else {
+                    get("/$parent") {
+                        call.respondFile(file)
+                    }
+                }
+            }
+
+            // Anything not found is an error
+            val errorFile = siteRootFile.resolve("404.html")
+            if (errorFile.exists()) {
+                // Catch URLs of the form a/b/c/
+                get("{...}/") {
+                    call.respondFile(errorFile)
+                }
+
+                // Catch URLs of the form a/b/c/slug
+                get("{...}") {
+                    call.respondFile(errorFile)
+                }
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
@@ -38,6 +39,10 @@ class KobwebApplicationPlugin : Plugin<Project> {
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
+        val runLayout =
+            project.findProperty("kobwebRunLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.KOBWEB
+        val exportLayout =
+            project.findProperty("kobwebExportLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.KOBWEB
         val buildTarget = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
             ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
 
@@ -53,10 +58,11 @@ class KobwebApplicationPlugin : Plugin<Project> {
 
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
-            project.tasks.register("kobwebStart", KobwebStartTask::class.java, env, reuseServer)
+            project.tasks.register("kobwebStart", KobwebStartTask::class.java, env, runLayout, reuseServer)
         }
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
-        val kobwebExportTask = project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConfig)
+        val kobwebExportTask =
+            project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConfig, env, exportLayout)
 
         project.afterEvaluate {
             project.tasks.named("clean") {
