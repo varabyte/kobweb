@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
@@ -53,6 +54,10 @@ fun handleRun(
         val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@session
 
         newline() // Put space between user prompt and eventual first line of Gradle output
+
+        if (siteLayout == SiteLayout.STATIC) {
+            showStaticSiteLayoutWarning()
+        }
 
         val serverStateFile = ServerStateFile(kobwebFolder)
 

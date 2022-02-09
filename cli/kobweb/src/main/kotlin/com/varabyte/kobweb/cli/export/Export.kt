@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kotter.foundation.anim.textAnimOf
@@ -36,6 +37,10 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
         findKobwebProject() ?: return@session
 
         newline() // Put space between user prompt and eventual first line of Gradle output
+
+        if (siteLayout == SiteLayout.STATIC) {
+            showStaticSiteLayoutWarning()
+        }
 
         var exportState by liveVarOf(ExportState.EXPORTING)
 

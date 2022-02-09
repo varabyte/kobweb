@@ -4,6 +4,8 @@ import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebProject
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kotter.foundation.text.textLine
+import com.varabyte.kotter.foundation.text.yellow
 import com.varabyte.kotter.runtime.Session
 
 fun assertKobwebProject(): KobwebProject {
@@ -21,6 +23,14 @@ fun Session.findKobwebProject(): KobwebProject? {
         informError(ex.message!!)
         null
     }
+}
+
+fun Session.showStaticSiteLayoutWarning() {
+    section {
+        // TODO(#123): Link to URL doc link when available.
+        yellow { textLine("Static site layout chosen. Some Kobweb features like server routes are unavailable in this configuration.") }
+        textLine()
+    }.run()
 }
 
 class KobwebGradle(private val env: ServerEnvironment) {
