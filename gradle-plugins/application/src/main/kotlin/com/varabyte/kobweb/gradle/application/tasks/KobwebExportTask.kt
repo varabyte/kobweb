@@ -32,6 +32,30 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig, privat
         val page = devToolsService.page
         val runtime = devToolsService.runtime
         page.onLoadEventFired {
+            // First - bake dynamic styles into static ones. This ensures styles are applied immediately when
+            // downloaded instead of loading the page once without styles only for them to snap into place after the
+            // page script finished running.
+            runtime.evaluate(
+                """
+                    for (let s = 0; s < document.styleSheets.length; s++) {
+                        var stylesheet = document.styleSheets[s]
+                        stylesheet = stylesheet instanceof CSSStyleSheet ? stylesheet : null;
+
+                        // Trying to peek at external stylesheets causes a security exception so step over them
+                        if (stylesheet != null && stylesheet.href == null) {
+                            var styleNode = stylesheet.ownerNode
+                            styleNode = styleNode instanceof Element ? styleNode : null
+                            if (styleNode != null && styleNode.innerHTML == '') {
+                                const rules = []
+                                for (let r = 0; r < stylesheet.cssRules.length; ++r) {
+                                    rules.push(stylesheet.cssRules[r].cssText.replace(/(\n)/gm, ''))
+                                }
+                                styleNode.innerHTML = rules.join('')
+                            }
+                        }
+                    }
+                """.trimIndent()
+            )
             val evaluation = runtime.evaluate("document.documentElement.outerHTML")
             snapshot = Jsoup.parse(evaluation.result.value.toString()).toString()
             devToolsService.close()
