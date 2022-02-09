@@ -33,6 +33,7 @@ fun createMainFunction(siteData: SiteData, target: BuildTarget): String {
         sort()
     }.forEach { import -> fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.')) }
 
+    // region debug-only functions
     if (target == BuildTarget.DEBUG) {
         fileBuilder.addFunction(
             FunSpec.builder("forceReloadNow")
@@ -107,6 +108,7 @@ fun createMainFunction(siteData: SiteData, target: BuildTarget): String {
                 ).build()
         )
     }
+    // endregion
 
     fileBuilder.addFunction(
         FunSpec.builder("main").apply {
