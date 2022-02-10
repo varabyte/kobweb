@@ -50,6 +50,9 @@ fun handleRun(
     siteLayout: SiteLayout,
     isInteractive: Boolean,
 ) {
+    val originalEnv = env
+    @Suppress("NAME_SHADOWING") // We're intentionally intercepting the original value
+    val env = env.takeIf { siteLayout != SiteLayout.STATIC } ?: ServerEnvironment.PROD
     val kobwebGradle = KobwebGradle(env)
     if (isInteractive) session {
         val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@session
@@ -59,7 +62,7 @@ fun handleRun(
         if (siteLayout == SiteLayout.STATIC) {
             showStaticSiteLayoutWarning()
 
-            if (env == ServerEnvironment.DEV) {
+            if (originalEnv == ServerEnvironment.DEV) {
                 section {
                     // Brighten the color to contrast with the warning above
                     yellow(isBright = true) {
@@ -79,7 +82,6 @@ fun handleRun(
 
         val serverStateFile = ServerStateFile(kobwebFolder)
 
-        val env = env.takeIf { siteLayout != SiteLayout.STATIC } ?: ServerEnvironment.PROD
         val envName = when (env) {
             ServerEnvironment.DEV -> "development"
             ServerEnvironment.PROD -> "production"
