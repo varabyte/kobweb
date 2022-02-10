@@ -36,11 +36,11 @@ abstract class KobwebExportTask @Inject constructor(config: KobwebConfig, privat
             // Compose for Web creates empty style nodes and then adds styles to them programmatically, meaning the page
             // works right but if you go to inspect the DOM using debugging tools or save the page, all you see is an
             // empty style tag and the information is lost.
-            // By visiting those style nodes and explicitly writing their values down into the node, we can then save
-            // the page with filled out style tags. This ensures that when a user first downloads the page, that things
-            // look right even before the javascript is downloaded. When the javascript runs, it will simply clear our
-            // static styles and replace them with the programmatic ones (but users won't be able to tell because the
-            // values should be the same).
+            // By iterating over those style nodes and explicitly overwriting them with their own values, we can then
+            // save the page with filled out style tags. This ensures that when a user first downloads the page, that
+            // things look right even before the javascript is downloaded. When the javascript runs, it will simply
+            // clear our baked in styles and replace them with the programmatic ones (but users won't be able to tell
+            // because the values should be the same).
             // If we didn't do this, then what would happen is the user would download the page, see raw text unadorned
             // without any styles, and then after a brief period of time (depending on download speeds) styles would pop
             // in, quite jarringly.
