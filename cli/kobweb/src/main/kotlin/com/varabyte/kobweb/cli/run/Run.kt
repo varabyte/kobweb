@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.cli.common.showDownloadDelayWarning
 import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -77,8 +78,7 @@ fun handleRun(
                 RunState.STARTING -> {
                     textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
                     textLine()
-                    yellow { textLine("This may take a while if it needs to download dependencies.") }
-                    textLine()
+                    showDownloadDelayWarning()
                     textLine("Press Q anytime to cancel.")
                 }
                 RunState.RUNNING -> {

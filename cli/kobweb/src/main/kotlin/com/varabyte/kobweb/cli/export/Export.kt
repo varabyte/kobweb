@@ -7,6 +7,7 @@ import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.cli.common.showDownloadDelayWarning
 import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -50,7 +51,10 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
         section {
             textLine() // Add space between this block and Gradle text which will appear above
             when (exportState) {
-                ExportState.EXPORTING -> textLine("Exporting$ellipsis")
+                ExportState.EXPORTING -> run {
+                    showDownloadDelayWarning()
+                    textLine("Exporting$ellipsis")
+                }
                 ExportState.FINISHING -> textLine("Cleaning up$ellipsis")
                 ExportState.FINISHED -> textLine("Export finished successfully")
                 ExportState.CANCELLING -> yellow { textLine("Cancelling export: $cancelReason$ellipsis") }

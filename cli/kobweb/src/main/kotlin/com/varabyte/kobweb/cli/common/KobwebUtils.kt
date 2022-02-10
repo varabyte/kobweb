@@ -7,6 +7,7 @@ import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
 import com.varabyte.kotter.runtime.Session
+import com.varabyte.kotter.runtime.render.RenderScope
 
 fun assertKobwebProject(): KobwebProject {
     return try {
@@ -31,6 +32,11 @@ fun Session.showStaticSiteLayoutWarning() {
         yellow { textLine("Static site layout chosen. Some Kobweb features like server routes are unavailable in this configuration.") }
         textLine()
     }.run()
+}
+
+fun RenderScope.showDownloadDelayWarning() {
+    yellow { textLine("Output may seem to pause for a while if Kobweb needs to download new dependencies.") }
+    textLine()
 }
 
 class KobwebGradle(private val env: ServerEnvironment) {
