@@ -58,10 +58,28 @@ fun handleRun(
 
         if (siteLayout == SiteLayout.STATIC) {
             showStaticSiteLayoutWarning()
+
+            if (env == ServerEnvironment.DEV) {
+                section {
+                    // Brighten the color to contrast with the warning above
+                    yellow(isBright = true) {
+                        textLine(
+                            """
+                            Note: Development mode is not designed to work with static layouts, so the
+                            server will run in production mode instead.
+
+                            To avoid seeing this message, use `--env prod` explicitly.
+                            """.trimIndent()
+                        )
+                    }
+                    textLine()
+                }.run()
+            }
         }
 
         val serverStateFile = ServerStateFile(kobwebFolder)
 
+        val env = env.takeIf { siteLayout != SiteLayout.STATIC } ?: ServerEnvironment.PROD
         val envName = when (env) {
             ServerEnvironment.DEV -> "development"
             ServerEnvironment.PROD -> "production"
