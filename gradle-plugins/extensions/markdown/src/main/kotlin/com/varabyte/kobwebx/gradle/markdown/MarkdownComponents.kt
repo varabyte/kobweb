@@ -151,7 +151,11 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
                 "$JB_DOM.Text(\"${literal}\")"
             }
         }
-        img.convention { "$JB_DOM.Img" }
+        img.convention { img ->
+            val altText = img.children().filterIsInstance<Text>().map { it.literal }.joinToString("")
+            this.childrenOverride = emptyList()
+            """$JB_DOM.Img("${img.destination}", "$altText")"""
+        }
         heading.convention { heading ->
             buildString {
                 append("$JB_DOM.H${heading.level}")
