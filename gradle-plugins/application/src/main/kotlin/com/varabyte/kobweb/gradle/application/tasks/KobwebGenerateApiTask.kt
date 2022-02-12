@@ -18,7 +18,7 @@ abstract class KobwebGenerateApiTask @Inject constructor(kobwebBlock: KobwebBloc
     fun getSourceFiles() = getSourceFilesJvm()
 
     @OutputDirectory
-    fun getGenDir(): File = config.getGenJvmSrcRoot(project)
+    fun getGenDir(): File = kobwebBlock.getGenJvmSrcRoot(project)
 
     @TaskAction
     fun execute() {
@@ -27,7 +27,7 @@ abstract class KobwebGenerateApiTask @Inject constructor(kobwebBlock: KobwebBloc
         with(
             ApiData.from(
                 project.group.toString(),
-                config.apiPackage.get(),
+                kobwebBlock.apiPackage.get(),
                 getSourceFilesJvm(),
                 GradleReporter(project.logger)
             )

@@ -13,13 +13,21 @@ import org.w3c.dom.HTMLAnchorElement
  *
  * Instead, it will use the Kobweb [Router] to automatically re-render the content of the page without needing to hit
  * a server.
+ *
+ * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
+ *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
+ *   the same domain.
  */
 @Composable
 fun Link(
     href: String,
+    autoPrefix: Boolean = true,
     attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
+    @Suppress("NAME_SHADOWING") // Intentional shadowing for in-place transformation
+    val href = RoutePrefix.prependIf(autoPrefix, href)
+
     val ctx = rememberPageContext()
     A(
         href,

@@ -13,31 +13,42 @@ import com.varabyte.kobweb.navigation.Link as KobwebLink
  *
  * This composable is SilkTheme-aware, and if colors are not specified, will automatically use the current theme plus
  * color mode.
+ *
+ * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
+ *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
+ *   the same domain.
  */
 @Composable
 fun Link(
     path: String,
     text: String? = null,
     modifier: Modifier = Modifier,
+    autoPrefix: Boolean = true,
     variant: ComponentVariant? = null
 ) {
-    Link(path, modifier, variant) {
+    Link(path, modifier, autoPrefix, variant) {
         Text(text ?: path)
     }
 }
 
 /**
  * Linkable content which, when clicked, navigates to the target [path].
+ *
+ * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
+ *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
+ *   the same domain.
  */
 @Composable
 fun Link(
     path: String,
     modifier: Modifier = Modifier,
+    autoPrefix: Boolean = true,
     variant: ComponentVariant? = null,
     content: @Composable () -> Unit = {}
 ) {
     KobwebLink(
         href = path,
+        autoPrefix,
         attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder()
     ) {
         content()

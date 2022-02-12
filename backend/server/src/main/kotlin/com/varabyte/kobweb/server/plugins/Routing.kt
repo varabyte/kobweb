@@ -5,6 +5,7 @@ import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -57,7 +58,14 @@ fun Application.configureRouting(env: ServerEnvironment, siteLayout: SiteLayout,
         }
         SiteLayout.STATIC -> configureStaticRouting(conf)
     }
+}
 
+val Site.routePrefixNormalized: String get() {
+    // While the URL externally may have a prefix, internally they do not. In other words, if this site has the
+    // prefix "a/b" and the user visits "a/b/nested/page", that means the local file we're going to serve is
+    // "nested/page.html"
+    // We remove any slashes here as it results in cleaner code as most routing code adds the slashes explicitly anyway
+    return routePrefix.removePrefix("/").removeSuffix("/")
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
@@ -93,8 +101,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
 }
 
 
-private fun Routing.configureApiRouting(apiJar: ApiJarFile) {
-    val path = "/api/{$KOBWEB_PARAMS...}"
+private fun Routing.configureApiRouting(apiJar: ApiJarFile, routePrefix: String) {
+    val path = "$routePrefix/api/{$KOBWEB_PARAMS...}"
     HttpMethod.values().forEach { httpMethod ->
         when (httpMethod) {
             HttpMethod.DELETE -> delete(path) { handleApiCall(apiJar, httpMethod) }
@@ -156,21 +164,20 @@ private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(sc
  * @param index The path to the index.html file, which may be in a custom location depending on server configuration
  * @param extraHandler An optional handler so callers can configure additional, one-off handling.
  */
-private fun Routing.configureCatchAllRouting(script: Path, index: Path, extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean = { false }) {
+private fun Routing.configureCatchAllRouting(script: Path, index: Path, routePrefix: String, extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean = { false }) {
     val scriptMap = Path("$script.map")
 
-    // Catch URLs of the form a/b/c/
-    get("{$KOBWEB_PARAMS...}/") {
+    // Catch URLs which end in a trailing slash (e.g. a/b/c/)
+    get("$routePrefix/{$KOBWEB_PARAMS...}/") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
         handleCatchAllRouting(script, scriptMap, index, pathParts, extraHandler)
     }
 
-    // Catch URLs of the form a/b/c/slug
-    get("{$KOBWEB_PARAMS...}") {
+    // Catch URLs which end with a slug (e.g. a/b/c/slug)
+    get("$routePrefix/{$KOBWEB_PARAMS...}") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
         handleCatchAllRouting(script, scriptMap, index, pathParts, extraHandler)
     }
-
 }
 
 private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, logger: Logger) {
@@ -223,12 +230,14 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
             }
         }
 
+        val routePrefix = conf.site.routePrefixNormalized
+
         if (apiJar != null) {
-            configureApiRouting(apiJar)
+            configureApiRouting(apiJar, routePrefix)
         }
 
         val contentRootFile = contentRoot.toFile()
-        configureCatchAllRouting(script, contentRoot.resolve("index.html")) { path ->
+        configureCatchAllRouting(script, contentRoot.resolve("index.html"), routePrefix) { path ->
             contentRootFile.resolve(path).let { contentFile ->
                 if (contentFile.isFile && contentFile.exists()) {
                     call.respondFile(contentFile)
@@ -254,13 +263,15 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
         ?.let { ApiJarFile(systemRoot.resolve(it), logger) }
 
     routing {
+        val routePrefix = conf.site.routePrefixNormalized
+
         if (apiJar != null) {
-            configureApiRouting(apiJar)
+            configureApiRouting(apiJar, routePrefix)
         }
 
         resourcesRoot.toFile().let { resourcesRootFile ->
             resourcesRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
-                get("/${file.relativeTo(resourcesRootFile)}") {
+                get("$routePrefix/${file.relativeTo(resourcesRootFile)}") {
                     call.respondFile(file)
                 }
             }
@@ -270,18 +281,18 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
                 val relativeFile = file.relativeTo(pagesRootFile)
                 val name = relativeFile.nameWithoutExtension
                 if (name != "index") {
-                    get("/${relativeFile.parent}/$name") {
+                    get("$routePrefix/${relativeFile.parent}/$name") {
                         call.respondFile(file)
                     }
                 } else {
-                    get("/${relativeFile.parent}") {
+                    get("$routePrefix/${relativeFile.parent}") {
                         call.respondFile(file)
                     }
                 }
             }
         }
 
-        configureCatchAllRouting(script, fallbackIndex)
+        configureCatchAllRouting(script, fallbackIndex, routePrefix)
     }
 }
 
@@ -293,18 +304,21 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
  */
 private fun Application.configureStaticRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
+
     routing {
         siteRoot.toFile().let { siteRootFile ->
+            val routePrefix = conf.site.routePrefixNormalized
+
             siteRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
                 val relativeFile = file.relativeTo(siteRootFile)
                 val name = relativeFile.name.removeSuffix(".html")
                 val parent = relativeFile.parent?.let { "$it/" } ?: ""
                 if (name != "index") {
-                    get("/$parent$name") {
+                    get("$routePrefix/$parent$name") {
                         call.respondFile(file)
                     }
                 } else {
-                    get("/$parent") {
+                    get("$routePrefix/$parent") {
                         call.respondFile(file)
                     }
                 }

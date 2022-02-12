@@ -25,7 +25,7 @@ fun ServerState.toDisplayText(): String {
  * Base-class for tasks that want convenient utility methods / properties providing insight into the current Kobweb
  * project.
  */
-abstract class KobwebProjectTask(@get:Internal val config: KobwebBlock, desc: String) : KobwebTask(desc) {
+abstract class KobwebProjectTask(@get:Internal val kobwebBlock: KobwebBlock, desc: String) : KobwebTask(desc) {
     @get:Internal
     protected val kobwebConfFile = KobwebConfFile(kobwebProject.kobwebFolder)
 
@@ -60,7 +60,7 @@ abstract class KobwebProjectTask(@get:Internal val config: KobwebBlock, desc: St
      * An initial '.' means this should be prefixed by the project group, e.g. ".pages" -> "com.example.pages"
      */
     @Input
-    fun getPagesPackage(): String = config.pagesPackage.get()
+    fun getPagesPackage(): String = kobwebBlock.pagesPackage.get()
 
     /**
      * The root package of all API handlers.
@@ -70,12 +70,12 @@ abstract class KobwebProjectTask(@get:Internal val config: KobwebBlock, desc: St
      * An initial '.' means this should be prefixed by the project group, e.g. ".api" -> "com.example.api"
      */
     @Input
-    fun getApiPackage(): String = config.apiPackage.get()
+    fun getApiPackage(): String = kobwebBlock.apiPackage.get()
 
     /**
      * The path of public resources inside the project's resources folder, e.g. "public" ->
      * "src/jsMain/resources/public"
      */
     @Input
-    fun getPublicPath(): String = config.publicPath.get()
+    fun getPublicPath(): String = kobwebBlock.publicPath.get()
 }

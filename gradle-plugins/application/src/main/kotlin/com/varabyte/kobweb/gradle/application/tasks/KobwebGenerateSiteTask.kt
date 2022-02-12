@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
@@ -13,6 +14,7 @@ import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.util.prefixIfNot
 import java.io.File
 import javax.inject.Inject
 
@@ -26,10 +28,10 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, p
     fun getResourceFiles() = getResourceFilesJs()
 
     @OutputDirectory
-    fun getGenSrcDir(): File = config.getGenJsSrcRoot(project)
+    fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot(project)
 
     @OutputDirectory
-    fun getGenResDir(): File = config.getGenJsResRoot(project)
+    fun getGenResDir(): File = kobwebBlock.getGenJsResRoot(project)
 
     @TaskAction
     fun execute() {
@@ -43,16 +45,17 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, p
         val genSrcRoot = getGenSrcDir()
         val genResRoot = getGenResDir()
 
+        val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
         with(
             SiteData.from(
                 project.group.toString(),
-                config.pagesPackage.get(),
+                kobwebBlock.pagesPackage.get(),
                 getSourceFiles(),
                 GradleReporter(project.logger)
             )
         ) {
             genSrcRoot.mkdirs()
-            File(genSrcRoot, "main.kt").writeText(createMainFunction(this, buildTarget))
+            File(genSrcRoot, "main.kt").writeText(createMainFunction(this, routePrefix, buildTarget))
         }
 
         File(genResRoot, getPublicPath()).let { publicRoot ->
@@ -60,11 +63,11 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, p
             File(publicRoot, "index.html").writeText(
                 createIndexFile(
                     kobwebConf.site.title,
-                    config.index.head.get(),
+                    kobwebBlock.index.head.get(),
                     // Our script will always exist at the root folder, so be sure to ground it,
                     // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                     // a subdirectory.
-                    "/" + kobwebConf.server.files.dev.script.substringAfterLast("/"),
+                    routePrefix.prepend(kobwebConf.server.files.dev.script.substringAfterLast("/").prefixIfNot("/")),
                     buildTarget
                 )
             )

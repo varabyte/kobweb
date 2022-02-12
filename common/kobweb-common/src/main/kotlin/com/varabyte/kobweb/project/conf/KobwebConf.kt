@@ -7,8 +7,18 @@ import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
 
+/**
+ * @param title The title of the site. See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title
+ * @param routePrefix If specified, it means all content for this site live under a subfolder. So if this value is
+ *   "/a/b/c", then the root index.html file will be visited by the user going to `mysite.com/a/b/c/`. This should
+ *   rarely need to be used, but it may be required by some server configurations which nest your site to a
+ *   subdirectory.
+ */
 @Serializable
-class Site(val title: String)
+class Site(
+    val title: String,
+    val routePrefix: String = "",
+)
 
 @Serializable
 class Server(
@@ -84,6 +94,9 @@ class Server(
     }
 }
 
+/**
+ * Data values exposed to users that are used to define values globally useful to a Kobweb project.
+ */
 @Serializable
 class KobwebConf(
     val site: Site,

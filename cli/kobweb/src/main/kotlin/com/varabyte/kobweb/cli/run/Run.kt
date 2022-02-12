@@ -9,6 +9,8 @@ import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.cli.common.showDownloadDelayWarning
 import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
+import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
@@ -56,6 +58,7 @@ fun handleRun(
     val kobwebGradle = KobwebGradle(env)
     if (isInteractive) session {
         val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@session
+        val conf = KobwebConfFile(kobwebFolder).content!!
 
         newline() // Put space between user prompt and eventual first line of Gradle output
 
@@ -91,6 +94,8 @@ fun handleRun(
         var runState by liveVarOf(RunState.STARTING)
         var cancelReason by liveVarOf("")
         var exception by liveVarOf<Exception?>(null) // Set if RunState.INTERRUPTED
+        // If a route prefix is set, we'll add it to the server URL (at which point we'll need to add slash dividers)
+        val routePrefix = RoutePrefix(conf.site.routePrefix)
         section {
             textLine() // Add text line between this block and Gradle output above
 
@@ -105,7 +110,7 @@ fun handleRun(
                     serverState!!.let { serverState ->
                         green {
                             text("Kobweb server ($envName) is running at ")
-                            cyan { text("http://localhost:${serverState.port}") }
+                            cyan { text("http://localhost:${serverState.port}$routePrefix") }
                         }
                         textLine(" (PID = ${serverState.pid})")
                         textLine()

@@ -12,6 +12,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
@@ -34,7 +35,8 @@ val Project.kobwebFolder: KobwebFolder
 class KobwebApplicationPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebFolder = project.kobwebFolder
-        val kobwebBlock = project.extensions.create("kobweb", KobwebBlock::class.java)
+        val kobwebConf = KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
+        val kobwebBlock = project.extensions.create("kobweb", KobwebBlock::class.java, kobwebConf)
         project.extensions.create("kobwebx", KobwebxBlock::class.java)
 
         val env =

@@ -5,13 +5,15 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.withIndent
+import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
 
-fun createMainFunction(siteData: SiteData, target: BuildTarget): String {
+fun createMainFunction(siteData: SiteData, routePrefix: RoutePrefix, target: BuildTarget): String {
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
     mutableListOf(
+        "com.varabyte.kobweb.navigation.RoutePrefix",
         "com.varabyte.kobweb.navigation.Router",
         "kotlinx.browser.document",
         "kotlinx.browser.window",
@@ -117,6 +119,7 @@ fun createMainFunction(siteData: SiteData, target: BuildTarget): String {
                 addStatement("")
             }
 
+            addStatement("RoutePrefix.set(\"$routePrefix\")")
             addStatement("val router = Router()")
             siteData.pages.sortedBy { it.route }.forEach { entry ->
                 addStatement("""router.register("${entry.route}") { ${entry.fqn}() }""")

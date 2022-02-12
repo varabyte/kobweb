@@ -25,7 +25,7 @@ enum class UpdateHistoryMode {
 
 /**
  * The class responsible for navigating to different pages in a user's app.
- */
+*/
 class Router {
     private val activePageData = mutableStateOf<PageData?>(null)
     private val routeTree = RouteTree()
@@ -80,6 +80,15 @@ class Router {
     }
 
     /**
+     * It's possible a link might just target a fragment, e.g. "#id", which we should handle by keeping the current
+     * URL but with this new hash.
+     */
+    private fun String.addPathIfMissing(): String {
+        return this.takeIf { !it.startsWith('#') } ?:
+        (window.location.href.substringBefore('#').removePrefix(window.location.origin) + this)
+    }
+
+    /**
      * Register a route, mapping it to some target composable method that will get called when that path is requested by
      * the browser.
      *
@@ -97,11 +106,15 @@ class Router {
      *
      * In that case, if the user visited `/users/123456/posts/321`, then that composable method will be visited, with
      * `user = 123456` and `post = 321` passed down in the `PageContext`.
+     *
+     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
+     *   staying in the same domain.
      */
     @Suppress("unused") // Called by generated code
-    fun register(route: String, pageMethod: PageMethod) {
+    fun register(route: String, autoPrefix: Boolean = true, pageMethod: PageMethod) {
         require(Route.isLocal(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
-        require(routeTree.register(route, pageMethod)) { "Registration failure. Path is already registered: $route" }
+        require(routeTree.register(RoutePrefix.prependIf(autoPrefix, route), pageMethod)) { "Registration failure. Path is already registered: $route" }
     }
 
     fun setErrorHandler(errorHandler: ErrorPageMethod) {
@@ -119,12 +132,8 @@ class Router {
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
      */
     fun navigateTo(pathQueryAndFragment: String, allowExternalPaths: Boolean = true, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH) {
-        // It's possible a link might just target a fragment, e.g. "#id", which we should handle by keeping the current
-        // URL but with this new hash
-        @Suppress("NAME_SHADOWING")
-        val pathQueryAndFragment =
-            pathQueryAndFragment.takeIf { !it.startsWith('#') } ?: (window.location.href.substringBefore('#')
-                .removePrefix(window.location.origin) + pathQueryAndFragment)
+        @Suppress("NAME_SHADOWING") // Intentionally transformed
+        val pathQueryAndFragment = pathQueryAndFragment.addPathIfMissing()
 
         if (updateActivePage(pathQueryAndFragment, allowExternalPaths)) {
             // Update URL to match page we navigated to
