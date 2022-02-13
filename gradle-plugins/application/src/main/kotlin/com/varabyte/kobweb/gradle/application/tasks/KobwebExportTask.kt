@@ -5,7 +5,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.github.kklisura.cdt.launch.ChromeArguments
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.github.kklisura.cdt.services.ChromeService
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -16,8 +16,8 @@ import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebExportTask @Inject constructor(config: KobwebConfig, private val serverEnvironment: ServerEnvironment, private val siteLayout: SiteLayout) :
-    KobwebProjectTask(config, "Export the Kobweb project into a static site") {
+abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, private val serverEnvironment: ServerEnvironment, private val siteLayout: SiteLayout) :
+    KobwebProjectTask(kobwebBlock, "Export the Kobweb project into a static site") {
 
     @OutputDirectory
     fun getSiteDir(): File {

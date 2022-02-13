@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application
 
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import com.varabyte.kobweb.gradle.application.extensions.index
@@ -34,7 +34,7 @@ val Project.kobwebFolder: KobwebFolder
 class KobwebApplicationPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebFolder = project.kobwebFolder
-        val kobwebConfig = project.extensions.create("kobweb", KobwebConfig::class.java)
+        val kobwebBlock = project.extensions.create("kobweb", KobwebBlock::class.java)
         project.extensions.create("kobwebx", KobwebxBlock::class.java)
 
         val env =
@@ -47,8 +47,8 @@ class KobwebApplicationPlugin : Plugin<Project> {
             ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
 
         val kobwebGenSiteTask =
-            project.tasks.register("kobwebGenSite", KobwebGenerateSiteTask::class.java, kobwebConfig, buildTarget)
-        val kobwebGenApiTask = project.tasks.register("kobwebGenApi", KobwebGenerateApiTask::class.java, kobwebConfig)
+            project.tasks.register("kobwebGenSite", KobwebGenerateSiteTask::class.java, kobwebBlock, buildTarget)
+        val kobwebGenApiTask = project.tasks.register("kobwebGenApi", KobwebGenerateApiTask::class.java, kobwebBlock)
         // Umbrella task for all other gen tasks
         val kobwebGenTask = project.tasks.register("kobwebGen")
         kobwebGenTask.configure {
@@ -62,7 +62,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
         }
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
         val kobwebExportTask =
-            project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConfig, env, exportLayout)
+            project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, env, exportLayout)
 
         project.afterEvaluate {
             project.tasks.named("clean") {
@@ -73,7 +73,7 @@ class KobwebApplicationPlugin : Plugin<Project> {
             }
 
             if (project.hasDependencyNamed("kobweb-silk-icons-fa")) {
-                kobwebConfig.index.head.add {
+                kobwebBlock.index.head.add {
                     link {
                         rel = "stylesheet"
                         href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"

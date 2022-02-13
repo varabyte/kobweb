@@ -2,7 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
 import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
 import com.varabyte.kobweb.gradle.application.extensions.getBuildScripts
@@ -25,7 +25,7 @@ fun ServerState.toDisplayText(): String {
  * Base-class for tasks that want convenient utility methods / properties providing insight into the current Kobweb
  * project.
  */
-abstract class KobwebProjectTask(@get:Internal val config: KobwebConfig, desc: String) : KobwebTask(desc) {
+abstract class KobwebProjectTask(@get:Internal val config: KobwebBlock, desc: String) : KobwebTask(desc) {
     @get:Internal
     protected val kobwebConfFile = KobwebConfFile(kobwebProject.kobwebFolder)
 

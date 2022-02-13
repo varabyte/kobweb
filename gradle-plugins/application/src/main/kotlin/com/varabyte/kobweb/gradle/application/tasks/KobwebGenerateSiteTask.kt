@@ -4,7 +4,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.BuildTarget
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.extensions.isDescendantOf
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
@@ -16,7 +16,7 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebConfig, private val buildTarget: BuildTarget) :
+abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, private val buildTarget: BuildTarget) :
     KobwebProjectTask(config, "Generate Kobweb code and resources for the frontend site") {
 
     @InputFiles

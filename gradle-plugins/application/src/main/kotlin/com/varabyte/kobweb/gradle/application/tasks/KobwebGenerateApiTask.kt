@@ -2,7 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.extensions.KobwebConfig
+import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.project.api.ApiData
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import org.gradle.api.tasks.InputFiles
@@ -11,8 +11,8 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateApiTask @Inject constructor(config: KobwebConfig) :
-    KobwebProjectTask(config, "Generate Kobweb code for the server") {
+abstract class KobwebGenerateApiTask @Inject constructor(kobwebBlock: KobwebBlock) :
+    KobwebProjectTask(kobwebBlock, "Generate Kobweb code for the server") {
 
     @InputFiles
     fun getSourceFiles() = getSourceFilesJvm()
