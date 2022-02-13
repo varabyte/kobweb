@@ -136,6 +136,8 @@ class Router {
                     }
                 }
 
+                // Even if the URL hasn't changed, still scroll to the target element if you can. Sometimes a user might
+                // scroll the page and then re-enter the same URL to go back.
                 if (url.contains('#')) {
                     document.getElementById(url.substringAfter('#'))?.scrollIntoView(js("{behavior: \"smooth\"}"))
                 }
