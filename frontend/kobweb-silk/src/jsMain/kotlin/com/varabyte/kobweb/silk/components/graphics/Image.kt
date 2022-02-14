@@ -3,10 +3,14 @@ package com.varabyte.kobweb.silk.components.graphics
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.prependIf
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.addBaseVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Img
 
 /**

@@ -1,20 +1,23 @@
 package com.varabyte.kobweb.silk.components.navigation
 
-import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.TextDecorationLine
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
-import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.textDecorationLine
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.link
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.visited
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.dom.A
-import org.jetbrains.compose.web.dom.Text
 
+// Note: The Silk `Link` widget itself is defined in the kobweb-silk module since it has dependencies on kobweb-core
+// However, the styles are defined here, since this module is responsible for registering them, and it can still be
+// useful to use them even without Kobweb.
+
+/**
+ * Style to use with [A] tags to give them Silk-themed colors.
+ */
 val LinkStyle = ComponentStyle("silk-link") {
     base {
         Modifier.textDecorationLine(TextDecorationLine.None)
@@ -42,40 +45,4 @@ val UncoloredLinkVariant = LinkStyle.addVariant("uncolored") {
     val textColor = colorMode.toSilkPalette().color
     link { Modifier.color(textColor) }
     visited { Modifier.color(textColor) }
-}
-
-/**
- * Linkable text which, when clicked, navigates to the target [path].
- *
- * This composable is SilkTheme-aware, and if colors are not specified, will automatically use the current theme plus
- * color mode.
- */
-@Composable
-fun Link(
-    path: String,
-    text: String? = null,
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null
-) {
-    Link(path, modifier, variant) {
-        Text(text ?: path)
-    }
-}
-
-/**
- * Linkable content which, when clicked, navigates to the target [path].
- */
-@Composable
-fun Link(
-    path: String,
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
-    content: @Composable () -> Unit = {}
-) {
-    A(
-        path,
-        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder()
-    ) {
-        content()
-    }
 }

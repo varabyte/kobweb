@@ -21,8 +21,8 @@ import org.w3c.dom.HTMLAnchorElement
 @Composable
 fun Link(
     href: String,
-    autoPrefix: Boolean = true,
     attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
+    autoPrefix: Boolean = true,
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
     @Suppress("NAME_SHADOWING") // Intentional shadowing for in-place transformation

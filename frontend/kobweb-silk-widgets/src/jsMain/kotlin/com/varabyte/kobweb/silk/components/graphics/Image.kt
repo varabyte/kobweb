@@ -1,15 +1,14 @@
 package com.varabyte.kobweb.silk.components.graphics
 
-import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addBaseVariant
-import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.Img
+
+// Note: The Silk `Image` widget itself is defined in the kobweb-silk module since it has dependencies on kobweb-core
+// However, the styles are defined here, since this module is responsible for registering them, and it can still be
+// useful to use them even without Kobweb.
 
 val ImageStyle = ComponentStyle("silk-image") {}
 
@@ -19,20 +18,4 @@ val FitWidthImageVariant = ImageStyle.addBaseVariant("fit") {
             property("width", 100.percent)
             property("object-fit", "scale-down")
         }
-}
-
-/**
- * A Silk-styleable [Img] tag.
- *
- * @param desc An optional description which gets used as alt-text for the image. This is useful to include for
- *   accessibility tools.
- */
-@Composable
-fun Image(
-    src: String,
-    desc: String = "",
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
-) {
-    Img(src, desc, attrs = ImageStyle.toModifier(variant).then(modifier).asAttributesBuilder())
 }

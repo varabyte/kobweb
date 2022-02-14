@@ -23,10 +23,10 @@ fun Link(
     path: String,
     text: String? = null,
     modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
     autoPrefix: Boolean = true,
-    variant: ComponentVariant? = null
 ) {
-    Link(path, modifier, autoPrefix, variant) {
+    Link(path, modifier, variant, autoPrefix) {
         Text(text ?: path)
     }
 }
@@ -42,14 +42,14 @@ fun Link(
 fun Link(
     path: String,
     modifier: Modifier = Modifier,
-    autoPrefix: Boolean = true,
     variant: ComponentVariant? = null,
+    autoPrefix: Boolean = true,
     content: @Composable () -> Unit = {}
 ) {
     KobwebLink(
         href = path,
-        autoPrefix,
-        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder()
+        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder(),
+        autoPrefix
     ) {
         content()
     }
