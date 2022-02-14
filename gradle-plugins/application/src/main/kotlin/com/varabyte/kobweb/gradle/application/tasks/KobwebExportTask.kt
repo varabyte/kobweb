@@ -5,6 +5,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.github.kklisura.cdt.launch.ChromeArguments
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.github.kklisura.cdt.services.ChromeService
+import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.server.api.SiteLayout
@@ -108,6 +109,7 @@ abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, pr
                     ChromeArguments.defaults(true).additionalArguments("no-sandbox", true).build()
                 )
 
+                val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
                 pages
                     .map { it.route }
                     // Skip export routes with dynamic parts, as they are dynamically generated based on their URL
@@ -115,7 +117,8 @@ abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, pr
                     .filter { !it.contains('{') }
                     .toSet()
                     .forEach { route ->
-                        val snapshot = chromeService.takeSnapshot("http://localhost:$port$route")
+                        val prefixedRoute = routePrefix.prepend(route)
+                        val snapshot = chromeService.takeSnapshot("http://localhost:$port$prefixedRoute")
 
                         var filePath = route.substringBeforeLast('/') + "/" +
                             (route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
