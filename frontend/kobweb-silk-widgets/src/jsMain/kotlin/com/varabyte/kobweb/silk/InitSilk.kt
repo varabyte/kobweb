@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk
 
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
+import com.varabyte.kobweb.silk.components.graphics.ImageStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
@@ -28,10 +29,11 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
     mutableTheme.registerComponentStyle(ButtonStyle)
     mutableTheme.registerComponentStyle(CanvasStyle)
+    mutableTheme.registerComponentStyle(ImageStyle)
+    mutableTheme.registerComponentStyle(LinkStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
     mutableTheme.registerComponentStyle(TextStyle)
-    mutableTheme.registerComponentStyle(LinkStyle)
 
     mutableTheme.registerComponentStyle(DisplayIfSmStyle)
     mutableTheme.registerComponentStyle(DisplayIfMdStyle)

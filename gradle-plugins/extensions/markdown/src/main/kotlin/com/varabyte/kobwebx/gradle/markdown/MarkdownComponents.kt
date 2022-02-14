@@ -154,7 +154,12 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         img.convention { img ->
             val altText = img.children().filterIsInstance<Text>().map { it.literal }.joinToString("")
             this.childrenOverride = emptyList()
-            """$JB_DOM.Img("${img.destination}", "$altText")"""
+
+            if (useSilk.get()) {
+                """$SILK.graphics.Image("${img.destination}", "$altText")"""
+            } else {
+                """$JB_DOM.Img("${img.destination}", "$altText")"""
+            }
         }
         heading.convention { heading ->
             buildString {
