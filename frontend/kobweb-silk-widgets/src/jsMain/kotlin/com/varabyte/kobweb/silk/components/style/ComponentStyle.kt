@@ -512,7 +512,7 @@ class ComponentVariant(internal val style: ComponentStyle, private val baseStyle
  * Convert a user's component style into a [Modifier].
  *
  * This can then be passed into Silk widgets directly, or to Compose for Web widgets
- * by calling `attrs = style.toModifier.asAttributeBuilder()`
+ * by calling `attrs = style.toModifier.asAttributesBuilder()`
  */
 @Composable
 fun ComponentStyle.toModifier(variant: ComponentVariant? = null): Modifier {
