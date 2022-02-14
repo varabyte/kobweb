@@ -80,12 +80,16 @@ class Router {
     }
 
     /**
-     * It's possible a link might just target a fragment, e.g. "#id", which we should handle by keeping the current
-     * URL but with this new hash.
+     * Convert the incoming navigation request into a full route (but without the origin).
+     *
+     * This has special handling for incoming routes that are just a fragment, e.g. "#id", or relative routes, e.g.
+     * "profile" instead of "/profile"
      */
-    private fun String.addPathIfMissing(): String {
-        return this.takeIf { !it.startsWith('#') } ?:
-        (window.location.href.substringBefore('#').removePrefix(window.location.origin) + this)
+    private fun String.normalize(): String {
+        if (!Route.isLocal(this)) return this
+
+        val hrefAsRoute = Route(window.location.href)
+        return (hrefAsRoute.resolve(this)).toString()
     }
 
     /**
@@ -133,7 +137,7 @@ class Router {
      */
     fun navigateTo(pathQueryAndFragment: String, allowExternalPaths: Boolean = true, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH) {
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        val pathQueryAndFragment = pathQueryAndFragment.addPathIfMissing()
+        val pathQueryAndFragment = pathQueryAndFragment.normalize()
 
         if (updateActivePage(pathQueryAndFragment, allowExternalPaths)) {
             // Update URL to match page we navigated to
