@@ -141,9 +141,9 @@ internal object SilkConfigInstance : SilkConfig {
  * Unlike [SilkConfig] values, theme values are expected to be accessible in user projects via the [SilkTheme] object.
  */
 class MutableSilkTheme {
-    internal val componentStyles = LinkedHashMap<String, ComponentStyle>() // Preserve insertion order
-    internal val overiddenStyles = LinkedHashSet<String>() // Preserve insertion order
-    internal val componentVariants = LinkedHashMap<String, ComponentVariant>() // Preserve insertion order
+    internal val componentStyles = mutableMapOf<String, ComponentStyle>()
+    internal val overiddenStyles = mutableSetOf<String>()
+    internal val componentVariants = mutableMapOf<String, ComponentVariant>()
 
     var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
 

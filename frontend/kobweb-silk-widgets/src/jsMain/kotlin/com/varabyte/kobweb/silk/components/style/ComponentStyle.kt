@@ -19,8 +19,8 @@ import org.jetbrains.compose.web.css.media
 
 // We need our own implementation of StyleBuilder, so we can both test equality and pull values out of it later
 private class ComparableStyleBuilder : StyleBuilder {
-    val properties = LinkedHashMap<String, String>() // Preserve insertion order
-    val variables = LinkedHashMap<String, String>() // Preserve insertion order
+    val properties = mutableMapOf<String, String>()
+    val variables = mutableMapOf<String, String>()
 
     override fun property(propertyName: String, value: StylePropertyValue) {
         properties[propertyName] = value.toString()
