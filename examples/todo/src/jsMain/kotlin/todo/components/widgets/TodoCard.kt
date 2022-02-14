@@ -1,7 +1,7 @@
 package todo.components.widgets
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.ui.asAttributeBuilder
+import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.dom.A
 
@@ -11,7 +11,7 @@ fun TodoCard(onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
     if (onClick != null) { styles.add(TodoClickableStyle) }
 
     // Use "A" so the item supports a11y (you can tab on it and press enter to click it)
-    A(href = "#", attrs = styles.toModifier().asAttributeBuilder {
+    A(href = "#", attrs = styles.toModifier().asAttributesBuilder {
         tabIndex(0) // Make this item tabbable
 
         onClick { evt ->
