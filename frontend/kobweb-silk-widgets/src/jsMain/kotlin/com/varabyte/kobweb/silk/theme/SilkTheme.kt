@@ -207,7 +207,7 @@ class MutableSilkTheme {
      */
     fun replaceComponentStyle(style: ComponentStyle, init: ComponentModifiers.() -> Unit) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
-        check(!overiddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
+        check(overiddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
         componentStyles[style.name] = ComponentStyle(style.name, init)
     }
 
