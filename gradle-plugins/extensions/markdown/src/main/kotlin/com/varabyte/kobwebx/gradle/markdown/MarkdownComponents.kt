@@ -187,7 +187,13 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         }
         em.convention { "$JB_DOM.Em" }
         strong.convention { "$JB_DOM.B" }
-        hr.convention { "$JB_DOM.Hr" }
+        hr.convention {
+            if (useSilk.get()) {
+                "$SILK.layout.Divider"
+            } else {
+                "$JB_DOM.Hr"
+            }
+        }
         ul.convention { "$JB_DOM.Ul" }
         ol.convention { "$JB_DOM.Ol" }
         li.convention { "$JB_DOM.Li" }
