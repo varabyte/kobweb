@@ -55,7 +55,7 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
                     showDownloadDelayWarning()
                     textLine("Exporting$ellipsis")
                 }
-                ExportState.FINISHING -> textLine("Cleaning up$ellipsis")
+                ExportState.FINISHING -> textLine("Finishing up$ellipsis")
                 ExportState.FINISHED -> textLine("Export finished successfully")
                 ExportState.CANCELLING -> yellow { textLine("Cancelling export: $cancelReason$ellipsis") }
                 ExportState.CANCELLED -> yellow { textLine("Export cancelled: $cancelReason") }
