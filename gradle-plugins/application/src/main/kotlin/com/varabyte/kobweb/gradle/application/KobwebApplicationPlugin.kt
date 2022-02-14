@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.application
 
+import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
@@ -13,26 +14,25 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
-import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
-import com.varabyte.kobweb.server.api.ServerRequest
-import com.varabyte.kobweb.server.api.ServerRequestsFile
+import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.html.link
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.execution.TaskExecutionListener
-import org.gradle.api.tasks.TaskState
+import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
+import javax.inject.Inject
 
 val Project.kobwebFolder: KobwebFolder
     get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
         ?: throw GradleException("This project is not a Kobweb project but is applying the Kobweb plugin.")
 
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
-class KobwebApplicationPlugin : Plugin<Project> {
+class KobwebApplicationPlugin @Inject constructor(
+    private val buildEventsListenerRegistry: BuildEventsListenerRegistry
+) : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebFolder = project.kobwebFolder
         val kobwebConf = KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
@@ -66,11 +66,36 @@ class KobwebApplicationPlugin : Plugin<Project> {
         val kobwebExportTask =
             project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, env, exportLayout)
 
+        val jsRunTasks = listOf("jsBrowserDevelopmentRun", "jsBrowserProductionRun", "jsBrowserRun", "jsRun")
+        val service = project.gradle.sharedServices.registerIfAbsent("task-state-listener", KobwebTaskListener::class.java) {
+            parameters {
+                genSiteTasks.addAll(
+                    kobwebGenSiteTask.name,
+                    kobwebGenApiTask.name,
+                )
+                startSiteTasks.add(kobwebStartTask.name)
+                startSiteTasks.addAll(jsRunTasks)
+            }
+        }
+        service.get().kobwebFolder = kobwebFolder
+        buildEventsListenerRegistry.onTaskCompletion(service)
+
         project.afterEvaluate {
             project.tasks.named("clean") {
                 doLast {
                     delete(kobwebFolder.resolve("site"))
                     delete(kobwebFolder.resolve("server"))
+                }
+            }
+
+            // Users should be using Kobweb commands instead of the standard Compose for Web commands, but they
+            // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
+            // the Kobweb commands instead.
+            jsRunTasks.forEach { taskName ->
+                project.tasks.named(taskName) {
+                    doFirst {
+                        logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
+                    }
                 }
             }
 
@@ -130,40 +155,6 @@ class KobwebApplicationPlugin : Plugin<Project> {
                     }
                 }
             }
-
-            project.gradle.taskGraph.addTaskExecutionListener(object : TaskExecutionListener {
-                override fun beforeExecute(task: Task) {
-                    if (task.name in listOf(kobwebGenSiteTask, kobwebGenApiTask).map { it.name }) {
-                        ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.SetStatus("Building..."))
-                    }
-
-                    // Users should be using Kobweb commands instead of the standard Compose for Web commands, but they
-                    // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
-                    // the Kobweb commands instead.
-                    if (task.name in listOf("jsBrowserDevelopmentRun", "jsBrowserProductionRun")) {
-                        logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
-                    }
-                }
-
-                override fun afterExecute(task: Task, state: TaskState) {
-                    if (task.name == kobwebStartTask.name) {
-                        if (state.failure == null) {
-                            ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.ClearStatus())
-                            ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.IncrementVersion())
-                        }
-                    }
-
-                    if (state.failure != null) {
-                        ServerRequestsFile(kobwebFolder).enqueueRequest(
-                            ServerRequest.SetStatus(
-                                "Failed.",
-                                isError = true,
-                                500
-                            )
-                        )
-                    }
-                }
-            })
         }
     }
 }
