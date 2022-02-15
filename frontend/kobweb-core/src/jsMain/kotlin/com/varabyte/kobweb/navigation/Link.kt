@@ -14,6 +14,12 @@ import org.w3c.dom.HTMLAnchorElement
  * Instead, it will use the Kobweb [Router] to automatically re-render the content of the page without needing to hit
  * a server.
  *
+ * @param openInternalLinksStrategy If set, force the behavior of how internal links open. If not set, this behavior
+ *   will be determined depending on what control keys are being pressed.
+ *
+ * @param openExternalLinksStrategy If set, force the behavior of how external links open. If not set, this behavior
+ *   will be determined depending on what control keys are being pressed.
+ *
  * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
  *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
  *   the same domain.
@@ -22,6 +28,8 @@ import org.w3c.dom.HTMLAnchorElement
 fun Link(
     href: String,
     attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
+    openInternalLinksStrategy: OpenLinkStrategy? = null,
+    openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
@@ -36,7 +44,15 @@ fun Link(
                 attrs()
             }
             onClick { evt ->
-                if (ctx.router.routeTo(href, openLinkStrategy = evt.toOpenLinkStrategy())) {
+                @Suppress("NAME_SHADOWING") // Intentional shadowing - nullable to non-null
+                val openInternalLinksStrategy = openInternalLinksStrategy ?: evt.toOpenLinkStrategy()
+                if (openExternalLinksStrategy == null) {
+                    if (ctx.router.routeTo(href, openLinkStrategy = openInternalLinksStrategy)) {
+                        evt.preventDefault()
+                    }
+                }
+                else {
+                    ctx.router.navigateTo(href, openInternalLinksStrategy = openInternalLinksStrategy, openExternalLinksStrategy = openExternalLinksStrategy)
                     evt.preventDefault()
                 }
             }
