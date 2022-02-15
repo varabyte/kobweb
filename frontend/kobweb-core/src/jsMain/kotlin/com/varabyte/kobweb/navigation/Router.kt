@@ -143,9 +143,16 @@ class Router {
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->
                 if (window.location.href != url) {
+                    // It's possible only the search params or hash changed, in which case we don't want to reset the
+                    // current page scroll
+                    val newPathname = window.location.pathname != Route(url).pathname
                     when (updateHistoryMode) {
                         UpdateHistoryMode.PUSH -> window.history.pushState(window.history.state, "", url)
                         UpdateHistoryMode.REPLACE -> window.history.replaceState(window.history.state, "", url)
+                    }
+
+                    if (newPathname) {
+                        document.documentElement?.scrollTop = 0.0
                     }
                 }
 
