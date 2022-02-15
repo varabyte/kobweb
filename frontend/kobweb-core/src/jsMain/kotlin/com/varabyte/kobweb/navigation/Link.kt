@@ -36,8 +36,9 @@ fun Link(
                 attrs()
             }
             onClick { evt ->
-                evt.preventDefault()
-                ctx.router.navigateTo(href)
+                if (ctx.router.routeTo(href, openLinkStrategy = evt.toOpenLinkStrategy())) {
+                    evt.preventDefault()
+                }
             }
         },
         content

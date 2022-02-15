@@ -58,16 +58,13 @@ class Router {
             } else pair
         }
 
-        if (!Route.isLocal(path)) {
-            require(allowExternalPaths) { "Navigation to external URL \"$pathQueryAndFragment\" not expected by callee" }
-            // Open external links in a new tab
-            // TODO(#90): Allow configuring other options. In place would be window.location.assign(...)
-            window.open(pathQueryAndFragment, target = "_blank")
-            return false
+        return if (Route.isLocal(path)) {
+            activePageData.value = routeTree.createPageData(this, path, query, fragment)
+            true
         }
-
-        activePageData.value = routeTree.createPageData(this, path, query, fragment)
-        return true
+        else {
+            false
+        }
     }
 
     @Suppress("unused") // Called by generated code
@@ -127,20 +124,38 @@ class Router {
     }
 
     /**
-     * For reference to the parts of a URL, see the [standards](https://www.rfc-editor.org/rfc/rfc3986#section-3.3)
-     * documentation.
+     * Attempt to route **internally** within this site, or return false if that's not possible (i.e. because the path
+     * is external).
+     *
+     * You will generally call this method like so:
+     *
+     * ```
+     * onClick { evt ->
+     *   if (ctx.router.routeTo(...)) {
+     *     evt.preventDefault()
+     *   }
+     * ```
+     *
+     * That way, either the router handles the navigation or the browser does.
+     *
+     * See also: [navigateTo], which, if called, handles the external navigation for you
      *
      * @param pathQueryAndFragment The path to a page, including (optional) search params and hash,
-     *   e.g. "/example/path?arg=1234#fragment"
-     * @param allowExternalPaths If true, the path passed in can be for URLs pointing at a totally different site.
+     *   e.g. "/example/path?arg=1234#fragment". See also the
+     *   [standards](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) documentation.
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
      */
-    fun navigateTo(pathQueryAndFragment: String, allowExternalPaths: Boolean = true, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH) {
+    fun routeTo(pathQueryAndFragment: String, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH, openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
         @Suppress("NAME_SHADOWING") // Intentionally transformed
         val pathQueryAndFragment = pathQueryAndFragment.normalize()
 
-        if (updateActivePage(pathQueryAndFragment, allowExternalPaths)) {
+        if (openLinkStrategy != OpenLinkStrategy.IN_PLACE) {
+            window.open(pathQueryAndFragment, openLinkStrategy)
+            return true
+        }
+
+        return if (updateActivePage(pathQueryAndFragment)) {
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->
                 if (window.location.href != url) {
@@ -163,6 +178,35 @@ class Router {
                     document.getElementById(url.substringAfter('#'))?.scrollIntoView(js("{behavior: \"smooth\"}"))
                 }
             }
+
+            true
+        } else {
+            false
+        }
+    }
+
+    /**
+     * Like [routeTo] but handle the external navigation as well.
+     *
+     * You will generally call this method like so:
+     *
+     * ```
+     * onClick { evt ->
+     *   evt.preventDefault()
+     *   ctx.router.naviagteTo(...)
+     * ```
+     *
+     * @param updateHistoryMode This parameter is only used for internal site routing. See [routeTo] for more
+     *   information.
+     */
+    fun navigateTo(
+        pathQueryAndFragment: String,
+        updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
+        openInternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
+        openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB_FOREGROUND,
+    ) {
+        if (!routeTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy)) {
+            window.open(pathQueryAndFragment, openExternalLinksStrategy)
         }
     }
 }
