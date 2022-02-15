@@ -177,8 +177,13 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
                 append("$JB_DOM.H${heading.level}")
                 if (generateHeaderIds.get()) {
                     val text = heading.children()
-                        .filterIsInstance<Text>()
-                        .map { it.literal }
+                        .mapNotNull { node ->
+                            when (node) {
+                                is Text -> node.literal
+                                is Code -> node.literal
+                                else -> null
+                            }
+                        }
                         .joinToString("")
                     val headingIds = data.computeIfAbsent(HeadingIdsKey) { mutableMapOf() }
                     val id = run {
