@@ -33,7 +33,7 @@ class Router {
 
     init {
         window.onpopstate = {
-            updateActivePage(document.location!!.pathname, allowExternalPaths = false)
+            updateActivePage(document.location!!.pathname)
         }
     }
 
@@ -43,7 +43,7 @@ class Router {
      * Returns true if we updated the active page ourselves or false if we didn't (which means the URL instead goes to
      * an external site)
      */
-    private fun updateActivePage(pathQueryAndFragment: String, allowExternalPaths: Boolean = true): Boolean {
+    private fun updateActivePage(pathQueryAndFragment: String): Boolean {
         val (pathAndQuery, fragment) = pathQueryAndFragment.split('#', limit = 2).let {
             if (it.size == 1) { it[0] to null } else it[0] to it[1]
         }
