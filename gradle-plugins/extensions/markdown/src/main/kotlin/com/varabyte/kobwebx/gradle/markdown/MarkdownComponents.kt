@@ -2,6 +2,8 @@
 
 package com.varabyte.kobwebx.gradle.markdown
 
+import com.varabyte.kobweb.common.collect.Key
+import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
@@ -32,7 +34,12 @@ private const val JB_DOM = "org.jetbrains.compose.web.dom"
 private const val KOBWEB_DOM = "com.varabyte.kobweb.compose.dom"
 private const val SILK = "com.varabyte.kobweb.silk.components"
 
-class NodeScope {
+/**
+ * Data available to [MarkdownComponents] callbacks
+ *
+ * @param data A simple map that is created once per file and can be used by components however they want to.
+ */
+class NodeScope(val data: TypedMap) {
     /** If set, will cause the Markdown visit to visit these nodes instead of the node's original children. */
     var childrenOverride: List<Node>? = null
 }
@@ -51,6 +58,11 @@ class NodeScope {
  * ```
  */
 abstract class MarkdownComponents @Inject constructor(project: Project) {
+    companion object {
+        /** Key used by [Heading] nodes to store IDs they generated for themselves. */
+        val HeadingIdsKey = Key.create<MutableMap<Heading, String>>("md.heading.ids")
+    }
+
     /**
      * Use Silk components instead of Compose for Web components when relevant.
      *
@@ -89,7 +101,6 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
      * See also: [generateHeaderIds]
      */
     abstract val idGenerator: Property<(String) -> String>
-
 
     abstract val text: Property<NodeScope.(Text) -> String>
     abstract val img: Property<NodeScope.(Image) -> String>
@@ -169,7 +180,18 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
                         .filterIsInstance<Text>()
                         .map { it.literal }
                         .joinToString("")
-                    val id = idGenerator.get().invoke(text)
+                    val headingIds = data.computeIfAbsent(HeadingIdsKey) { mutableMapOf() }
+                    val id = run {
+                        val baseId = idGenerator.get().invoke(text)
+                        var currId = baseId
+                        var count = 2
+                        while (headingIds.containsValue(currId)) {
+                            currId = "$baseId-$count"
+                            ++count
+                        }
+                        currId
+                    }
+                    headingIds[heading] = id
                     append("(attrs = { id(\"$id\") })")
                 }
             }

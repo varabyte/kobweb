@@ -1,5 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown
 
+import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
@@ -48,6 +49,9 @@ class KotlinRenderer(
     private val indent get() = "    ".repeat(indentCount)
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact = project.hasDependencyNamed("kobwebx-markdown")
+
+    // Flexible data which can be used by Node handlers however they need
+    private val data = TypedMap()
 
     override fun render(node: Node, output: Appendable) {
         node.accept(SoftLineBreakConversionVisitor())
@@ -119,7 +123,7 @@ class KotlinRenderer(
         }
 
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
-            val scope = NodeScope()
+            val scope = NodeScope(data)
             val code = composableCall.get().invoke(scope, node)
             doVisit(node, code, scope)
         }
