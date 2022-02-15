@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.PageContext
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.url.URL
 
 /** How to affect the current history when navigating to a new location */
 enum class UpdateHistoryMode {
@@ -88,8 +89,8 @@ class Router {
     private fun String.normalize(): String {
         if (!Route.isLocal(this)) return this
 
-        val hrefAsRoute = Route(window.location.href)
-        return (hrefAsRoute.resolve(this)).toString()
+        val hrefResolved = URL(this, window.location.href)
+        return Route.fromUrl(hrefResolved).toString()
     }
 
     /**
@@ -145,7 +146,7 @@ class Router {
                 if (window.location.href != url) {
                     // It's possible only the search params or hash changed, in which case we don't want to reset the
                     // current page scroll
-                    val newPathname = window.location.pathname != Route(url).pathname
+                    val newPathname = window.location.pathname != Route.fromUrl(URL(url)).pathname
                     when (updateHistoryMode) {
                         UpdateHistoryMode.PUSH -> window.history.pushState(window.history.state, "", url)
                         UpdateHistoryMode.REPLACE -> window.history.replaceState(window.history.state, "", url)
