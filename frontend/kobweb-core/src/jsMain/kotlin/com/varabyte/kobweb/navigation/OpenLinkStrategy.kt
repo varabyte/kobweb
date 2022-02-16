@@ -19,6 +19,9 @@ fun Window.open(href: String, strategy: OpenLinkStrategy) {
     }
 }
 
+/**
+ * Convert a mouse event plus control key state to an [OpenLinkStrategy]
+ */
 fun SyntheticMouseEvent.toOpenLinkStrategy(): OpenLinkStrategy {
     return when {
         ctrlKey && shiftKey -> OpenLinkStrategy.IN_NEW_TAB_FOREGROUND

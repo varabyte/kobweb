@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
+import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.core.rememberPageContext
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.AttrBuilderContext
@@ -15,10 +16,12 @@ import org.w3c.dom.HTMLAnchorElement
  * a server.
  *
  * @param openInternalLinksStrategy If set, force the behavior of how internal links (links under the site's root) open.
- *   If not set, this behavior will be determined depending on what control keys are being pressed.
+ *   If not set, this behavior will be determined depending on what control keys are being pressed. See
+ *   [SyntheticMouseEvent.toOpenLinkStrategy] for more information.
  *
  * @param openExternalLinksStrategy If set, force the behavior of how external links open (links outside this site's
- *   domain). If not set, this behavior will be determined depending on what control keys are being pressed.
+ *   domain). If not set, this behavior will be determined depending on what control keys are being pressed. See
+ *   [SyntheticMouseEvent.toOpenLinkStrategy] for more information.
  *
  * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
  *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
