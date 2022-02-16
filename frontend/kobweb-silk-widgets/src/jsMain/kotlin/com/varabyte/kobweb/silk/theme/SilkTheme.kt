@@ -239,7 +239,17 @@ class MutableSilkTheme {
      * ```
      */
     fun registerComponentVariants(vararg variants: ComponentVariant) {
-        variants.forEach { variant -> componentVariants[variant.style.name] = variant }
+        variants.forEach { variant ->
+            check(!componentVariants.contains(variant.style.name)) {
+                """
+                Attempting to register a second variant with a name that's already used: "${variant.style.name}"
+
+                This isn't allowed. Please choose a different name. If there's a usecase for this I'm unaware of,
+                consider filing an issue at https://github.com/varabyte/kobweb/issues
+            """.trimIndent()
+            }
+            componentVariants[variant.style.name] = variant
+        }
     }
 }
 
