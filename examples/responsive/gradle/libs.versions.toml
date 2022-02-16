@@ -1,6 +1,6 @@
 [versions]
-jetbrains-compose = "1.0.0-beta1"
-kotlin = "1.5.31"
+jetbrains-compose = "1.0.1"
+kotlin = "1.6.10"
 
 [libraries]
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core" }

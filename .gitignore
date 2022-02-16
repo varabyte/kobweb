@@ -19,6 +19,7 @@
 /.idea/libraries-with-intellij-classes.xml
 
 .DS_Store
+kotlin-js-store/
 build
 out
 /captures
