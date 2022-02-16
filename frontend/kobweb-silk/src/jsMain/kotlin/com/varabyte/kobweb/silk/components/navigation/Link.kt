@@ -15,11 +15,11 @@ import com.varabyte.kobweb.navigation.Link as KobwebLink
  * This composable is SilkTheme-aware, and if colors are not specified, will automatically use the current theme plus
  * color mode.
  *
- * @param openInternalLinksStrategy If set, force the behavior of how internal links open. If not set, this behavior
- *   will be determined depending on what control keys are being pressed.
+ * @param openInternalLinksStrategy If set, force the behavior of how internal links (links under the site's root) open.
+ *   If not set, this behavior will be determined depending on what control keys are being pressed.
  *
- * @param openExternalLinksStrategy If set, force the behavior of how external links open. If not set, this behavior
- *   will be determined depending on what control keys are being pressed.
+ * @param openExternalLinksStrategy If set, force the behavior of how external links open (links outside this site's
+ *   domain). If not set, this behavior will be determined depending on what control keys are being pressed.
  *
  * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
  *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
