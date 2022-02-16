@@ -1,11 +1,13 @@
 package com.varabyte.kobweb.gradle.application.project.site
 
 import com.varabyte.kobweb.gradle.application.extensions.visitAllChildren
-import com.varabyte.kobweb.gradle.application.project.PackageUtils.prefixQualifiedPath
-import com.varabyte.kobweb.gradle.application.project.PackageUtils.resolvePackageShortcut
-import com.varabyte.kobweb.gradle.application.project.PsiUtils
+import com.varabyte.kobweb.gradle.application.project.common.PackageUtils.prefixQualifiedPath
+import com.varabyte.kobweb.gradle.application.project.common.PackageUtils.resolvePackageShortcut
+import com.varabyte.kobweb.gradle.application.project.common.PsiUtils
 import com.varabyte.kobweb.gradle.application.project.Reporter
-import com.varabyte.kobweb.gradle.application.project.parseKotlinFile
+import com.varabyte.kobweb.gradle.application.project.common.RouteUtils
+import com.varabyte.kobweb.gradle.application.project.common.getStringValue
+import com.varabyte.kobweb.gradle.application.project.common.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -15,14 +17,8 @@ import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPackageDirective
 import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
 import java.io.File
-
-private fun KtAnnotationEntry.getStringValue(index: Int): String? {
-    val strExpr = valueArguments.getOrNull(index)?.getArgumentExpression() as? KtStringTemplateExpression ?: return null
-    return strExpr.entries.firstOrNull()?.text
-}
 
 class SiteData {
     var app: AppEntry? = null
@@ -260,9 +256,10 @@ class SiteData {
 
                                         val routeOverride = entry.getStringValue(0)?.takeIf { it.isNotBlank() }
                                         if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedPagesPackage)) {
-                                            // We cannot automatically infer the values of any except for the very last dynamic route parts,
-                                            // because there's no guarantee they line up with the actual package. If the user is specifying the
-                                            // whole route manually, then they should just name those parts explicitly.
+                                            // For simplicity for now, we reject route overrides which use the dynamic
+                                            // route syntax in any part except for the last, e.g. in
+                                            // "/dynamic/{}/route/{}/example/{}" the last "{}" is OK but the previous
+                                            // ones are not currently supported.
                                             if (routeOverride == null || !routeOverride.substringBeforeLast("/", missingDelimiterValue = "").contains("{}")) {
                                                 pagesToProcess.add(
                                                     PageToProcess(
@@ -313,6 +310,7 @@ class SiteData {
                     }
                 }
 
+                @Suppress("NAME_SHADOWING")
                 packageMappingAnnotation?.let { packageMappingAnnotation ->
                     if (currPackage.startsWith(qualifiedPagesPackage)) {
                         packageMappings[currPackage] = packageMappingAnnotation.getStringValue(0)!!.let { value ->
@@ -330,47 +328,17 @@ class SiteData {
             for (pageToProcess in pagesToProcess) {
                 val routeOverride = pageToProcess.routeOverride
                 val slugPrefix = if (routeOverride != null && routeOverride.startsWith("/")) {
+                    // If route override starts with "/" it means the user set the full route explicitly
                     routeOverride.substringBeforeLast('/')
                 } else {
-                    // We have a bunch of potential package to URL mappings, which work on fully qualified packages, so
-                    // we process each part of the package separately, going back to front. An example will help here.
-                    //
-                    // If we had the following mappings:
-                    //
-                    //   site.pages.blogs._2021._12 -> 12
-                    //   site.pages.blogs._2021 -> 2021
-                    //
-                    // then we'd transform the following fully-qualified package by first building up a list of parts in
-                    // reverse. So:
-                    //
-                    //   site.pages.blogs._2021._12.tutorials
-                    //
-                    // is processed like so (* means a mapping match was found):
-                    //
-                    //   site.pages.blogs._2021._12.tutorials ---> [tutorials]
-                    //   site.pages.blogs._2021._12 (*)       ---> [12, tutorials]
-                    //   site.pages.blogs._2021 (*)           ---> [2021, 12, tutorials]
-                    //   site.pages.blogs                     ---> [blogs, 2021, 12, tutorials]
-                    //   site.pages                           ---> [pages, blogs, 2021, 12, tutorials]
-                    //   site                                 ---> [site, pages, blogs, 2021, 12, tutorials]
-                    //
-                    // At which point, we're done, and we can just join the final list together to a path:
-                    //
-                    //   site/pages/blogs/2021/12/tutorials
-                    //
-                    // (and we remove `site/pages` because it's part of the code, not the final URL)
-                    run {
-                        var pkg = pageToProcess.pkg
-                        val transformedParts = mutableListOf<String>()
-                        while (pkg.isNotEmpty()) {
-                            transformedParts.add(0, packageMappings[pkg] ?: pkg.substringAfterLast('.'))
-                            pkg = (pkg.takeIf { it.contains('.') } ?: "").substringBeforeLast('.')
-                        }
-                        transformedParts.joinToString(".")
-                    }.removePrefix(qualifiedPagesPackage).replace('.', '/')
+                    RouteUtils
+                        .resolve(packageMappings, pageToProcess.pkg)
+                        .removePrefix(qualifiedPagesPackage.replace('.', '/'))
                 }
 
                 val prefixExtra = if (routeOverride != null && !routeOverride.startsWith("/") && routeOverride.contains("/")) {
+                    // If route override did NOT begin with slash, but contains at least one subdir, it means append
+                    // subdir to base route
                     "/" + routeOverride.substringBeforeLast("/")
                 }
                 else {

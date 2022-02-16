@@ -20,7 +20,7 @@ package com.varabyte.kobweb.core
  * @file:PackageMapping("01")
  * ```
  *
- * @param subdir The subdirectory part inside the final URL that this package should map to.
+ * @param value The part inside the final URL that this package should map to.
  */
 @Target(AnnotationTarget.FILE)
-annotation class PackageMapping(val subdir: String)
+annotation class PackageMapping(val value: String)

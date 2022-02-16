@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.project.site
 
-import com.varabyte.kobweb.gradle.application.project.KOBWEB_CORE_FQN_PREFIX
+import com.varabyte.kobweb.gradle.application.project.common.KOBWEB_CORE_FQN_PREFIX
 
 const val PAGE_SIMPLE_NAME = "Page"
 const val PAGE_FQN = "$KOBWEB_CORE_FQN_PREFIX$PAGE_SIMPLE_NAME"

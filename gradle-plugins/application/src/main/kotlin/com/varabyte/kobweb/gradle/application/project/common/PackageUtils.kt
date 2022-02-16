@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.gradle.application.project
+package com.varabyte.kobweb.gradle.application.project.common
 
 object PackageUtils {
     /**

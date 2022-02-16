@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.gradle.application.project
+package com.varabyte.kobweb.gradle.application.project.common
 
 const val KOBWEB_FQN_PREFIX = "com.varabyte.kobweb."
 const val KOBWEB_CORE_FQN_PREFIX = "${KOBWEB_FQN_PREFIX}core."

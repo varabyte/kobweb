@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.gradle.application.project.site
 
-import com.varabyte.kobweb.gradle.application.project.KOBWEB_CORE_FQN_PREFIX
-import com.varabyte.kobweb.gradle.application.project.KOBWEB_SILK_FQN_PREFIX
+import com.varabyte.kobweb.gradle.application.project.common.KOBWEB_CORE_FQN_PREFIX
+import com.varabyte.kobweb.gradle.application.project.common.KOBWEB_SILK_FQN_PREFIX
 
 const val INIT_KOBWEB_SIMPLE_NAME = "InitKobweb"
 const val INIT_KOBWEB_FQN = "$KOBWEB_CORE_FQN_PREFIX$INIT_KOBWEB_SIMPLE_NAME"

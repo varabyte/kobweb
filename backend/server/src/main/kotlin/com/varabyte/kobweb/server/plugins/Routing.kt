@@ -72,7 +72,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
     apiJar: ApiJarFile,
     httpMethod: HttpMethod,
 ) {
-    call.parameters[KOBWEB_PARAMS]?.takeIf { it.isNotBlank() }?.let { pathStr ->
+    call.parameters.getAll(KOBWEB_PARAMS)?.joinToString("/")?.let { pathStr ->
         val body: ByteArray? = when (httpMethod) {
             HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT -> {
                 withContext(Dispatchers.IO) { call.receiveStream().readAllBytes() }.takeIf { it.isNotEmpty() }

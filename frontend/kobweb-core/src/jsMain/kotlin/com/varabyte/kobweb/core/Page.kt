@@ -28,7 +28,7 @@ import androidx.compose.runtime.*
  * the filename.
  *
  * Some examples should clear up the various cases. Let's say the site is `com.example` and this `@Page` is defined in
- * `package a.b.c` in file `Slug.kt`:
+ * `package pages.a.b.c` in file `Slug.kt`:
  *
  * ```
  * @Page -> example.com/a/b/c/slug
@@ -39,6 +39,20 @@ import androidx.compose.runtime.*
  * @Page("/d/e/f/") -> example.com/d/e/f/slug
  * @Page("/") -> example.com/slug
  * ```
+ *
+ * And one last item worth mentioning is the special dynamic route indicator, `{}`. Basically, if the route override
+ * (or the very last part of it) is set to "{}", that means we should generate a final URL with the current page
+ * being part of a dynamic route:
+ *
+ * ```
+ * @Page -> example.com/a/b/c/slug
+ * @Page("{}") -> example.com/a/b/c/{slug}
+ * @Page("d/e/f/{}") -> example.com/a/b/c/d/e/f/{slug}
+ * @Page("/d/e/f/{}") -> example.com/d/e/f/{slug}
+ * ```
+ *
+ * At the moment, the dynamic route indicator is only allowed in the last position. If you need intermediate parts of
+ * the URL to also be dynamic, use the [PackageMapping] annotation for that.
  *
  * @param routeOverride If specified, override the logic for generating a route for this page as documented in this
  *   header doc.
