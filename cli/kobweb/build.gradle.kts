@@ -52,6 +52,7 @@ if (githubUsername != null && githubToken != null) {
             )
             authors.set(listOf("David Herman"))
             license.set("Apache-2.0")
+            licenseUrl.set("http://www.apache.org/licenses/LICENSE-2.0")
             copyright.set("Copyright © 2022 Varabyte. All rights reserved.")
         }
         release {
@@ -97,20 +98,20 @@ if (githubUsername != null && githubToken != null) {
                 downloadUrl.set(artifactDownloadPath)
             }
 
-            // Renable when https://github.com/jreleaser/jreleaser/issues/737 is marked resolved
-            //        sdkman {
-            //            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
-            //            if (key != null && token != null) {
-            //                downloadUrl.set(artifactDownloadPath)
-            //                consumerKey.set(key)
-            //                consumerToken.set(token)
-            //                active.set(Active.RELEASE)
-            //            }
-            //            else {
-            //                println("SDKMAN! packager disabled on this machine since key and/or token are not defined")
-            //                active.set(Active.NEVER)
-            //            }
-            //        }
+            // Re-enable this when https://github.com/jreleaser/jreleaser/issues/737 is fixed
+//            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
+//            if (key != null && token != null) {
+//                println("SDKMAN GOT $key + $token")
+//                sdkman {
+//                    downloadUrl.set(artifactDownloadPath)
+//                    consumerKey.set(key)
+//                    consumerToken.set(token)
+//                    active.set(Active.RELEASE)
+//                }
+//            }
+//            else {
+//                println("SDKMAN! packager disabled on this machine since key and/or token are not defined")
+//            }
         }
 
         distributions {
