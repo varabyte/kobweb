@@ -85,17 +85,12 @@ if (githubUsername != null && githubToken != null) {
             }
         }
         packagers {
-            // Redundant downloadUrl temporarily required. See https://github.com/jreleaser/jreleaser/issues/699
-            val artifactDownloadPath =
-                "https://{{repoHost}}/{{repoOwner}}/{{repoName}}/releases/download/{{tagName}}/{{artifactFile}}"
             brew {
                 active.set(Active.RELEASE)
-                downloadUrl.set(artifactDownloadPath)
                 templateDirectory.set(File("jreleaser/templates/brew"))
             }
             scoop {
                 active.set(Active.RELEASE)
-                downloadUrl.set(artifactDownloadPath)
             }
 
             // Re-enable this when https://github.com/jreleaser/jreleaser/issues/737 is fixed
