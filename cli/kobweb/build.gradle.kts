@@ -96,7 +96,6 @@ if (githubUsername != null && githubToken != null) {
             // Re-enable this when https://github.com/jreleaser/jreleaser/issues/737 is fixed
 //            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
 //            if (key != null && token != null) {
-//                println("SDKMAN GOT $key + $token")
 //                sdkman {
 //                    downloadUrl.set(artifactDownloadPath)
 //                    consumerKey.set(key)
