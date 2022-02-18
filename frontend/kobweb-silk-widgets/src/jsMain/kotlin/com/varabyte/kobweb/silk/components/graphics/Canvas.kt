@@ -20,6 +20,7 @@ import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.RenderingContext
 import kotlin.js.Date
+import kotlin.math.max
 import kotlin.math.min
 
 val CanvasStyle = ComponentStyle("silk-canvas") {}
@@ -47,6 +48,11 @@ class RenderScope<C: RenderingContext>(
  * An MS value which, if used, will result in a 60FPS render.
  */
 const val ONE_FRAME_MS_60_FPS = 1000.0f / 60.0f
+
+/**
+ * An MS value which, if used, will result in a 30FPS render.
+ */
+const val ONE_FRAME_MS_30_FPS = ONE_FRAME_MS_60_FPS * 2.0f
 
 private class CanvasElementBuilder : ElementBuilder<HTMLCanvasElement> {
     val canvas by lazy { document.createElement("canvas") as HTMLCanvasElement }
@@ -153,8 +159,8 @@ fun Canvas2d(
     height: Int,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    minDeltaMs: Number = 0f,
-    maxDeltaMs: Number = 500f,
+    minDeltaMs: Number = 0.0,
+    maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     render: RenderScope<CanvasRenderingContext2D>.() -> Unit,
 ) {
     Canvas(
@@ -188,8 +194,8 @@ fun CanvasGl(
     height: Int,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    minDeltaMs: Number = 0f,
-    maxDeltaMs: Number = 500f,
+    minDeltaMs: Number = 0.0,
+    maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     render: RenderScope<WebGLRenderingContext>.() -> Unit,
 ) {
     Canvas(
