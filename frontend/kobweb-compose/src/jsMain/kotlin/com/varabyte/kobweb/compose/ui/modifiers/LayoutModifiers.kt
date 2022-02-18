@@ -2,6 +2,7 @@ package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
@@ -35,12 +36,14 @@ fun Modifier.size(size: CSSNumeric): Modifier = styleModifier {
     height(size)
 }
 
-fun Modifier.width(size: CSSNumeric): Modifier = styleModifier {
-    width(size)
+fun Modifier.width(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier = when (type) {
+    WebModifierType.ATTRS -> attrsModifier { width(size) }
+    WebModifierType.STYLE -> styleModifier { width(size) }
 }
 
-fun Modifier.height(size: CSSNumeric): Modifier = styleModifier {
-    height(size)
+fun Modifier.height(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier = when (type) {
+    WebModifierType.ATTRS -> attrsModifier { height(size) }
+    WebModifierType.STYLE -> styleModifier { height(size) }
 }
 
 fun Modifier.minWidth(size: CSSNumeric): Modifier = styleModifier {
