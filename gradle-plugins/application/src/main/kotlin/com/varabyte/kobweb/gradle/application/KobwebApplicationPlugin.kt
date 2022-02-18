@@ -67,7 +67,7 @@ class KobwebApplicationPlugin @Inject constructor(
             project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, env, exportLayout)
 
         val jsRunTasks = listOf("jsBrowserDevelopmentRun", "jsBrowserProductionRun", "jsBrowserRun", "jsRun")
-        val service = project.gradle.sharedServices.registerIfAbsent("task-state-listener", KobwebTaskListener::class.java) {
+        val service = project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
             parameters {
                 genSiteTasks.addAll(
                     kobwebGenSiteTask.name,
