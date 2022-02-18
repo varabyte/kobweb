@@ -17,21 +17,6 @@ fun Modifier.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap): Modifie
     flexFlow(flexDirection, flexWrap)
 }
 
-fun Modifier.justifyContent(justifyContent: JustifyContent): Modifier = styleModifier {
-    justifyContent(justifyContent)
-}
-fun Modifier.alignSelf(alignSelf: AlignSelf): Modifier = styleModifier {
-    alignSelf(alignSelf)
-}
-
-fun Modifier.alignItems(alignItems: AlignItems): Modifier = styleModifier {
-    alignItems(alignItems)
-}
-
-fun Modifier.alignContent(alignContent: AlignContent): Modifier = styleModifier {
-    alignContent(alignContent)
-}
-
 fun Modifier.order(value: Int): Modifier = styleModifier {
     order(value)
 }
