@@ -1,12 +1,16 @@
 Support for integration of font awesome icons in your project.
 
-To support this module, you also need to add
+Note that, when this module is depended on, Kobweb adds the following entry to the `<head>` block in your document
+template:
 
 ```html
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 ```
 
-to the `<head>` block in your document template.
+which adds to the size of your page, something you should be mindful of if you don't plan to use any of these (awesome!)
+icons.
+
+---
 
 Note that this directory contains a file called `fa-icon-list`, which is parsed and used to generate code used in this
 project. This list was populated using instructions from [Stack Overflow](https://stackoverflow.com/a/33794368/1299302).
