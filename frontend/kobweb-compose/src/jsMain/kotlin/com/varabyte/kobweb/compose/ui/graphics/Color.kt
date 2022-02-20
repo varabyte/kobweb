@@ -18,6 +18,8 @@ sealed interface Color {
      */
     fun darkened(byPercent: Float = DEFAULT_SHIFTING_PERCENT): Color
 
+    fun toRgb(): Color.Rgb
+
     class Rgb internal constructor(val value: Int) : Color {
         val red: Int get() = value.shr(16).and(0xFF)
         val green: Int get() = value.shr(8).and(0xFF)
@@ -43,6 +45,10 @@ sealed interface Color {
 
         fun copyf(red: Float = redf, green: Float = this.greenf, blue: Float = this.bluef, alpha: Float = this.alphaf) =
             rgba(red, green, blue, alpha)
+
+        override fun toRgb(): Rgb {
+            return this
+        }
 
         override fun toString(): String {
             return if (alpha == 0xFF) "rgb(r=$red g=$green b=$blue)" else "rgba(r=$red g=$green b=$blue a=$alpha)"
