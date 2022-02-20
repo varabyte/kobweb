@@ -6,9 +6,15 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.components.forms.Button
+import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
+import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
+import com.varabyte.kobweb.silk.theme.shapes.Circle
+import com.varabyte.kobweb.silk.theme.shapes.clip
 import org.jetbrains.compose.web.css.*
 
 @Composable
@@ -18,16 +24,28 @@ fun PageLayout(content: @Composable BoxScope.() -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(Modifier.fillMaxSize()) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                var colorMode by rememberColorMode()
+                Button(
+                    onClick = { colorMode = colorMode.opposite() },
+                    Modifier.margin(10.px).clip(Circle()).fontSize(24.px)
+                ) {
+                    Box(Modifier.margin(4.px)) {
+                        if (colorMode.isLight()) FaSun() else FaMoon()
+                    }
+                }
+            }
             Box(Modifier.fillMaxSize()) {
                 content()
             }
         }
 
+        val borderColor = SilkTheme.palette.color.toCssColor()
         Spacer()
         Box(
             Modifier
                 .fillMaxWidth()
-                .borderTop(1.px, LineStyle.Solid, SilkTheme.palette.border.toCssColor())
+                .borderTop(1.px, LineStyle.Solid, borderColor)
                 .fontSize(1.5.cssRem),
             Alignment.Center
         ) {
