@@ -337,13 +337,17 @@ private class SceneData(
 
 @Composable
 private fun BoxScope.OpenGlScene() {
-    var sceneData: SceneData? = null
+    var firstRender = true
+    lateinit var sceneData: SceneData
 
     CanvasGl(640, 480, Modifier.align(Alignment.Center), minDeltaMs = ONE_FRAME_MS_60_FPS) {
         val gl = ctx // Makes our code look like official samples
+        if (firstRender) {
+            sceneData = SceneData.from(gl)
+            firstRender = false
+        }
 
-        sceneData = sceneData ?: SceneData.from(gl)
-        with(sceneData!!) {
+        with(sceneData) {
             rotateRad += (elapsedMs / 1000.0)
 
             gl.clearColor(0.0f, 0.0f, 0.0f, 1.0f)
