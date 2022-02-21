@@ -141,6 +141,14 @@ fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = styleModifier {
     overflowWrap(overflowWrap)
 }
 
+fun Modifier.verticalAlign(verticalAlign: VerticalAlign) = styleModifier {
+    verticalAlign(verticalAlign)
+}
+
+fun Modifier.verticalAlign(value: CSSNumeric) = styleModifier {
+    verticalAlign(value)
+}
+
 fun Modifier.zIndex(value: Number) = styleModifier {
     property("z-index", value)
 }

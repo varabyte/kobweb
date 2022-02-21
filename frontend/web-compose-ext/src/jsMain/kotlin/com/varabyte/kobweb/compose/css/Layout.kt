@@ -66,3 +66,35 @@ fun StyleBuilder.marginBlockEnd(value: CSSNumeric) {
 }
 
 // endregion
+
+// region vertical-align See: https://developer.mozilla.org/en-US/docs/Web/CSS/vertical-align
+
+class VerticalAlign(val value: String) {
+    companion object {
+        // Keyword
+        val Baseline get() = VerticalAlign("baseline")
+        val Sub get() = VerticalAlign("sub")
+        val Super get() = VerticalAlign("super")
+        val TextTop get() = VerticalAlign("text-top")
+        val TextBottom get() = VerticalAlign("text-bottom")
+        val Middle get() = VerticalAlign("middle")
+        val Top get() = VerticalAlign("top")
+        val Bottom get() = VerticalAlign("bottom")
+
+        // Global
+        val Inherit get() = WritingMode("inherit")
+        val Initial get() = WritingMode("initial")
+        val Revert get() = WritingMode("revert")
+        val Unset get() = WritingMode("unset")
+    }
+}
+
+fun StyleBuilder.verticalAlign(verticalAlign: VerticalAlign) {
+    property("vertical-align", verticalAlign.value)
+}
+
+fun StyleBuilder.verticalAlign(value: CSSNumeric) {
+    property("vertical-align", value)
+}
+
+// endregion
