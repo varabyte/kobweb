@@ -179,7 +179,7 @@ class MutableSilkTheme {
      * See also: [replaceComponentStyle]
      */
     fun registerComponentStyle(style: ComponentStyle) {
-        check(!componentStyles.contains(style.name)) {
+        check(componentStyles[style.name].let { it == null || it === style }) {
             """
                 Attempting to register a second style with a name that's already used: "${style.name}"
 
@@ -240,7 +240,7 @@ class MutableSilkTheme {
      */
     fun registerComponentVariants(vararg variants: ComponentVariant) {
         variants.forEach { variant ->
-            check(!componentVariants.contains(variant.style.name)) {
+            check(componentVariants[variant.style.name].let { it == null || it === variant }) {
                 """
                 Attempting to register a second variant with a name that's already used: "${variant.style.name}"
 

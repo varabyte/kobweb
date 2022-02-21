@@ -12,37 +12,46 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
 import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
+import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.shapes.Circle
 import com.varabyte.kobweb.silk.theme.shapes.clip
+import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.px
 
-private val NAV_ITEM_PADDING = Modifier.margin(0.px, 15.px)
+val NavHeaderStyle = ComponentStyle.base("nav-header") {
+    Modifier
+        .fillMaxWidth()
+        .height(50.px)
+        // Intentionally invert the header colors from the rest of the page
+        .backgroundColor(colorMode.toSilkPalette().color)
+}
+
+val NavItemStyle = ComponentStyle("nav-item") {
+    // Intentionally invert the header colors from the rest of the page
+    val linkColor = colorMode.toSilkPalette().background
+
+    base { Modifier.margin(topBottom = 0.px, leftRight = 15.px) }
+
+    link { Modifier.color(linkColor) }
+    visited { Modifier.color(linkColor) }
+}
+
+val NavButtonVariant = NavItemStyle.addVariant("button") {
+    base { Modifier.clip(Circle()) }
+}
 
 @Composable
 private fun NavLink(path: String, text: String) {
-    Link(
-        path,
-        text,
-        // Intentionally invert the header colors
-        NAV_ITEM_PADDING.color(SilkTheme.palette.background),
-        UndecoratedLinkVariant,
-    )
+    Link(path, text, NavItemStyle.toModifier(), UndecoratedLinkVariant)
 }
 
 @Composable
 fun NavHeader() {
     var colorMode by rememberColorMode()
-    val palette = SilkTheme.palette
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(50.px)
-            // Intentionally invert the header colors
-            .backgroundColor(palette.color),
-    ) {
+    Box(NavHeaderStyle.toModifier()) {
         Row(
             Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
@@ -53,12 +62,12 @@ fun NavHeader() {
             Spacer()
             Button(
                 onClick = { colorMode = colorMode.opposite() },
-                NAV_ITEM_PADDING.clip(Circle())
+                NavItemStyle.toModifier(NavButtonVariant)
             ) {
-                Box(Modifier.margin(4.px)) {
+                Box(Modifier.margin(8.px)) {
                     when (colorMode) {
-                        ColorMode.LIGHT -> FaSun()
-                        ColorMode.DARK -> FaMoon()
+                        ColorMode.LIGHT -> FaMoon()
+                        ColorMode.DARK -> FaSun()
                     }
                 }
             }
