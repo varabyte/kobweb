@@ -23,6 +23,10 @@ object KobwebComposeStyleSheet : StyleSheet() {
 
         // Default styles for children placement
 
+        ".kobweb-box > *" {
+            gridArea("1", "1")
+        }
+
         ".kobweb-box.kobweb-align-top-start" {
             alignItems(AlignItems.Start)
             justifyItems(AlignItems.Start.value)
