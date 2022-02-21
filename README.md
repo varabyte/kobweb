@@ -1,4 +1,4 @@
-![version: 0.9.7](https://img.shields.io/badge/kobweb-v0.9.7-blue)
+![version: 0.9.8](https://img.shields.io/badge/kobweb-v0.9.8-blue)
 ![version: 0.9.6](https://img.shields.io/badge/kobweb_cli-v0.9.6-blue)
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
