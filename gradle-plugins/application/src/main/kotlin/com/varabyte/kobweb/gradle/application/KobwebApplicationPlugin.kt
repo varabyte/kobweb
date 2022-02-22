@@ -15,6 +15,8 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.ServerRequest
+import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.html.link
 import org.gradle.api.GradleException
@@ -23,6 +25,7 @@ import org.gradle.api.Project
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
+import org.gradle.tooling.events.FailureResult
 import javax.inject.Inject
 
 val Project.kobwebFolder: KobwebFolder
@@ -67,17 +70,36 @@ class KobwebApplicationPlugin @Inject constructor(
             project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, env, exportLayout)
 
         val jsRunTasks = listOf("jsBrowserDevelopmentRun", "jsBrowserProductionRun", "jsBrowserRun", "jsRun")
-        val service = project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
-            parameters {
-                genSiteTasks.addAll(
-                    kobwebGenSiteTask.name,
-                    kobwebGenApiTask.name,
-                )
-                startSiteTasks.add(kobwebStartTask.name)
-                startSiteTasks.addAll(jsRunTasks)
+
+        // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
+        // how else I'm supposed to do this
+        val service = project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
+        run {
+            val genSiteTasks = listOf(kobwebGenSiteTask.name, kobwebGenApiTask.name)
+            val startSiteTasks = listOf(kobwebStartTask.name) + jsRunTasks
+            service.get().onFinishCallbacks.add { event ->
+                val taskName = event.descriptor.name.substringAfterLast(":")
+                val serverRequestsFile = ServerRequestsFile(kobwebFolder)
+                if (genSiteTasks.any { it == taskName }) {
+                    serverRequestsFile.enqueueRequest(ServerRequest.SetStatus("Building..."))
+                }
+
+                if (event.result is FailureResult) {
+                    serverRequestsFile.enqueueRequest(
+                        ServerRequest.SetStatus(
+                            "Failed.",
+                            isError = true,
+                            timeoutMs = 500
+                        )
+                    )
+                } else {
+                    if (startSiteTasks.any { it == taskName }) {
+                        serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
+                        serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
+                    }
+                }
             }
         }
-        service.get().kobwebFolder = kobwebFolder
         buildEventsListenerRegistry.onTaskCompletion(service)
 
         project.afterEvaluate {
