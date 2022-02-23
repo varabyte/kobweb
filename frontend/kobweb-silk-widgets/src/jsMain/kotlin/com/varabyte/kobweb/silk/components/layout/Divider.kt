@@ -27,6 +27,9 @@ val DividerStyle = ComponentStyle.base("silk-divider") {
  * A dividing line (i.e. an `<hr>` tag) which is SilkTheme-aware.
  */
 @Composable
-fun Divider(modifier: Modifier = Modifier, variant: ComponentVariant? = null) {
+fun Divider(
+    modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
+) {
     Hr(DividerStyle.toModifier(variant).then(modifier).asAttributesBuilder())
 }

@@ -8,7 +8,9 @@ import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.navigation.toOpenLinkStrategy
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
+import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.Text
+import org.w3c.dom.HTMLAnchorElement
 import com.varabyte.kobweb.navigation.Link as KobwebLink
 
 /**
@@ -38,8 +40,9 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
+    elementScope: (@Composable ElementScope<HTMLAnchorElement>.() -> Unit)? = null,
 ) {
-    Link(path, modifier, variant, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix) {
+    Link(path, modifier, variant, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, elementScope) {
         Text(text ?: path)
     }
 }
@@ -57,6 +60,7 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
+    elementScope: (@Composable ElementScope<HTMLAnchorElement>.() -> Unit)? = null,
     content: @Composable () -> Unit = {}
 ) {
     KobwebLink(
@@ -66,6 +70,7 @@ fun Link(
         openExternalLinksStrategy,
         autoPrefix
     ) {
+        elementScope?.invoke(this)
         content()
     }
 }

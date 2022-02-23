@@ -15,6 +15,8 @@ import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.dom.ElementScope
+import org.w3c.dom.HTMLDivElement
 
 val ButtonStyle = ComponentStyle("silk-button") {
     val buttonColors = colorMode.toSilkPalette().button
@@ -54,6 +56,7 @@ fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
+    elementScope: (@Composable ElementScope<HTMLDivElement>.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -72,7 +75,8 @@ fun Button(
                     evt.preventDefault()
                 }
             },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+        elementScope,
     ) {
         content()
     }

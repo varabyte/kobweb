@@ -14,6 +14,7 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ElementBuilder
+import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.TagElement
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.CanvasRenderingContext2D
@@ -105,6 +106,7 @@ private inline fun <C: RenderingContext> Canvas(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0f,
     maxDeltaMs: Number = 500f,
+    noinline elementScope: (@Composable ElementScope<HTMLCanvasElement>.() -> Unit)? = null,
     crossinline createContext: (HTMLCanvasElement) -> C?,
     noinline render: RenderScope<C>.() -> Unit,
 ) {
@@ -118,6 +120,8 @@ private inline fun <C: RenderingContext> Canvas(
                 attr("height", height.toString())
             }
     ) {
+        elementScope?.invoke(this)
+
         var requestId by remember { mutableStateOf(0) }
         val colorMode = getColorMode()
         DomSideEffect(colorMode) { element ->
@@ -161,6 +165,7 @@ fun Canvas2d(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
+    elementScope: (@Composable ElementScope<HTMLCanvasElement>.() -> Unit)? = null,
     render: RenderScope<CanvasRenderingContext2D>.() -> Unit,
 ) {
     Canvas(
@@ -170,6 +175,7 @@ fun Canvas2d(
         variant,
         minDeltaMs,
         maxDeltaMs,
+        elementScope,
         { canvas -> canvas.getContext("2d") as? CanvasRenderingContext2D },
         render
     )
@@ -196,6 +202,7 @@ fun CanvasGl(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
+    elementScope: (@Composable ElementScope<HTMLCanvasElement>.() -> Unit)? = null,
     render: RenderScope<WebGLRenderingContext>.() -> Unit,
 ) {
     Canvas(
@@ -205,6 +212,7 @@ fun CanvasGl(
         variant,
         minDeltaMs,
         maxDeltaMs,
+        elementScope,
         { canvas -> canvas.getContext("webgl") as? WebGLRenderingContext },
         render
     )
