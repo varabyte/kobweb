@@ -15,7 +15,6 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.gridTemplateColumns
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.ElementScope
-import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
 
 private const val MAX_COLUMN_COUNT = 4
@@ -83,22 +82,16 @@ fun SimpleGrid(
     content: @Composable () -> Unit
 ) {
     Div(
-        attrs = SimpleGridStyle.toModifier(variant).then(modifier).asAttributesBuilder {
+        attrs = SimpleGridStyle
+            .toModifier(variant)
             // null is special case to mean "base" in this case
-            classes(SimpleGridColumnVariants.getValue(null).getValue(numColumns.base).style.name)
-            if (numColumns.sm != numColumns.base) {
-                classes(SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).style.name)
-            }
-            if (numColumns.md != numColumns.sm) {
-                classes(SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).style.name)
-            }
-            if (numColumns.lg != numColumns.md) {
-                classes(SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).style.name)
-            }
-            if (numColumns.xl != numColumns.lg) {
-                classes(SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).style.name)
-            }
-        }
+            .then(SimpleGridColumnVariants.getValue(null).getValue(numColumns.base).toModifier())
+            .then(SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).toModifier().takeIf { numColumns.sm != numColumns.base } ?: Modifier)
+            .then(SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).toModifier().takeIf { numColumns.md != numColumns.sm } ?: Modifier)
+            .then(SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).toModifier().takeIf { numColumns.lg != numColumns.md } ?: Modifier)
+            .then(SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier().takeIf { numColumns.xl != numColumns.lg } ?: Modifier)
+            .then(modifier)
+            .asAttributesBuilder()
     ) {
         elementScope?.invoke(this)
         content()

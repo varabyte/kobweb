@@ -11,6 +11,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentStyleState
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.ImmutableComponentStyle
+import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointUnitValue
@@ -129,7 +130,7 @@ internal object SilkConfigInstance : SilkConfig {
     // This method is not part of the public API and should be called by Silk at initialization time
     fun registerStyles(siteStyleSheet: StyleSheet) {
         styles.forEach { styleBuilder ->
-            styleBuilder.addStyles(siteStyleSheet, styleBuilder.name)
+            styleBuilder.addStylesInto(siteStyleSheet, styleBuilder.name)
         }
     }
 
@@ -239,7 +240,7 @@ class MutableSilkTheme {
      * ```
      */
     fun registerComponentVariants(vararg variants: ComponentVariant) {
-        variants.forEach { variant ->
+        variants.filterIsInstance<SimpleComponentVariant>().forEach { variant ->
             check(componentVariants[variant.style.name].let { it == null || it === variant }) {
                 """
                 Attempting to register a second variant with a name that's already used: "${variant.style.name}"
@@ -291,12 +292,12 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         // initialization blocks can reference `SilkTheme`.
         check(_SilkTheme != null)
         mutableSilkTheme.componentStyles.values.forEach { styleBuilder ->
-            styleBuilder.addStyles(componentStyleSheet)
+            styleBuilder.addStylesInto(componentStyleSheet)
             _componentStyles[styleBuilder.name] = ImmutableComponentStyle(styleBuilder.name)
         }
         // Variants should be defined after base styles to make sure they take priority if used
-        mutableSilkTheme.componentVariants.values.forEach { variant ->
-            variant.addStyles(componentStyleSheet)
+        mutableSilkTheme.componentVariants.values.filterIsInstance<SimpleComponentVariant>().forEach { variant ->
+            variant.addStylesInto(componentStyleSheet)
             _componentStyles[variant.style.name] = ImmutableComponentStyle(variant.style.name)
         }
     }

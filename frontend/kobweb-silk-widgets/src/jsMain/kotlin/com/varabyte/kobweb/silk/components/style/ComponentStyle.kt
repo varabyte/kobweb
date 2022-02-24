@@ -306,7 +306,7 @@ class ImmutableComponentStyle internal constructor(private val name: String) {
  * }
  * ```
  *
- * You may still wish to use [ComponentStyle.Companion.invoke] instead if you expect that at some point in the future
+ * You may still wish to construct a [ComponentStyle] directly instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
 fun ComponentStyle.Companion.base(className: String, init: ComponentStyleState.() -> Modifier): ComponentStyle {
@@ -408,7 +408,7 @@ class ComponentStyle(
     internal val variants = mutableListOf<ComponentVariant>()
 
     fun addVariant(name: String, init: ComponentModifiers.() -> Unit): ComponentVariant {
-        return ComponentVariant(ComponentStyle("${this.name}-$name", init), baseStyle = this).also {
+        return SimpleComponentVariant(ComponentStyle("${this.name}-$name", init), baseStyle = this).also {
             variants.add(it)
         }
     }
@@ -439,7 +439,7 @@ class ComponentStyle(
         }
     }
 
-    internal fun addStyles(styleSheet: StyleSheet, selectorName: String) {
+    internal fun addStylesInto(styleSheet: StyleSheet, selectorName: String) {
         val lightModifiers = ComponentModifiers(ColorMode.LIGHT).apply(init).cssModifiers.associateBy { it.key }
         val darkModifiers = ComponentModifiers(ColorMode.DARK).apply(init).cssModifiers.associateBy { it.key }
 
@@ -478,9 +478,9 @@ class ComponentStyle(
     /**
      * Add this [ComponentStyle]'s styles to the target [StyleSheet]
      */
-    internal fun addStyles(styleSheet: StyleSheet) {
+    internal fun addStylesInto(styleSheet: StyleSheet) {
         // Register styles associated with this style's classname
-        addStyles(styleSheet, ".$name")
+        addStylesInto(styleSheet, ".$name")
     }
 }
 
@@ -498,14 +498,43 @@ fun ComponentStyle.addBaseVariant(name: String, init: ComponentStyleState.() -> 
     }
 }
 
-class ComponentVariant(internal val style: ComponentStyle, private val baseStyle: ComponentStyle) {
-    fun addStyles(styleSheet: StyleSheet) {
+sealed class ComponentVariant {
+    object Empty : ComponentVariant() {
+        override fun addStylesInto(styleSheet: StyleSheet) = Unit
+        @Composable
+        override fun toModifier() = Modifier
+    }
+
+    fun then(next: ComponentVariant): ComponentVariant {
+        return if (next === Empty) this else CompositeComponentVariant(this, next)
+    }
+
+    internal abstract fun addStylesInto(styleSheet: StyleSheet)
+    @Composable
+    abstract fun toModifier(): Modifier
+}
+
+internal class SimpleComponentVariant(val style: ComponentStyle, private val baseStyle: ComponentStyle): ComponentVariant() {
+    override fun addStylesInto(styleSheet: StyleSheet) {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
         // a link (so this would be registered as ".silk-link.silk-link-undecorated").
         // To put it another way, if you use a link variant with a surface widget, it won't be applied.
-        style.addStyles(styleSheet, ".${baseStyle.name}.${style.name}")
+        style.addStylesInto(styleSheet, ".${baseStyle.name}.${style.name}")
     }
+
+    @Composable
+    override fun toModifier() = style.toModifier()
+}
+
+private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant): ComponentVariant() {
+    override fun addStylesInto(styleSheet: StyleSheet) {
+        head.addStylesInto(styleSheet)
+        tail.addStylesInto(styleSheet)
+    }
+
+    @Composable
+    override fun toModifier() = head.toModifier().then(tail.toModifier())
 }
 
 /**
@@ -517,7 +546,7 @@ class ComponentVariant(internal val style: ComponentStyle, private val baseStyle
 @Composable
 fun ComponentStyle.toModifier(variant: ComponentVariant? = null): Modifier {
     return SilkTheme.componentStyles.getValue(name).toModifier().then(
-        variant?.style?.toModifier() ?: Modifier
+        variant?.toModifier() ?: Modifier
     )
 }
 

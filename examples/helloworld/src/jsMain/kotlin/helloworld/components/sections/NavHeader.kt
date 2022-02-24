@@ -11,6 +11,7 @@ import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
 import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
+import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -30,10 +31,12 @@ val NavHeaderStyle = ComponentStyle.base("nav-header") {
 }
 
 val NavItemStyle = ComponentStyle("nav-item") {
+    base { Modifier.margin(topBottom = 0.px, leftRight = 15.px) }
+}
+
+val NavLinkVariant = LinkStyle.addVariant("nav") {
     // Intentionally invert the header colors from the rest of the page
     val linkColor = colorMode.toSilkPalette().background
-
-    base { Modifier.margin(topBottom = 0.px, leftRight = 15.px) }
 
     link { Modifier.color(linkColor) }
     visited { Modifier.color(linkColor) }
@@ -45,7 +48,7 @@ val NavButtonVariant = NavItemStyle.addVariant("button") {
 
 @Composable
 private fun NavLink(path: String, text: String) {
-    Link(path, text, NavItemStyle.toModifier(), UndecoratedLinkVariant)
+    Link(path, text, NavItemStyle.toModifier(), UndecoratedLinkVariant.then(NavLinkVariant))
 }
 
 @Composable
