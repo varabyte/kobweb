@@ -54,5 +54,10 @@ class PageContext(val router: Router) {
         internal set
 }
 
+/**
+ * Returns the active page's context.
+ *
+ * This will throw an exception if not called within the scope of a `@Page` annotated composable.
+ */
 @Composable
-fun rememberPageContext(): PageContext = remember { PageContext.active.value!! }
+fun rememberPageContext(): PageContext = remember { PageContext.active.value ?: error("`rememberPageContext` called outside of the scope of a `@Page` annotated method.") }
