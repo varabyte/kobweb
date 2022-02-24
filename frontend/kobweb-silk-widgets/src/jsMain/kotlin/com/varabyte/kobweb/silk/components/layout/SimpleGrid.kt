@@ -11,11 +11,10 @@ import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.ResponsiveValues
 import com.varabyte.kobweb.silk.components.style.toModifier
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.gridTemplateColumns
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.ElementScope
-import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLElement
 
 private const val MAX_COLUMN_COUNT = 4
 
@@ -78,7 +77,7 @@ fun SimpleGrid(
     numColumns: ResponsiveValues<Int>,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    elementScope: (@Composable ElementScope<HTMLDivElement>.() -> Unit)? = null,
+    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Div(

@@ -8,7 +8,7 @@ import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.ElementScope
-import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLElement
 
 class BoxScope {
     fun Modifier.align(alignment: Alignment) = attrsModifier {
@@ -20,7 +20,7 @@ class BoxScope {
 fun Box(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    elementScope: (@Composable ElementScope<HTMLDivElement>.() -> Unit)? = null,
+    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit = {}
 ) {
     Div(attrs = modifier.asAttributesBuilder {

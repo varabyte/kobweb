@@ -12,11 +12,11 @@ import com.varabyte.kobweb.compose.ui.modifiers.transitionProperty
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.components.text.Text
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ElementScope
-import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.Element
+import org.w3c.dom.HTMLElement
 
 val SurfaceStyle = ComponentStyle("silk-surface") {
     base {
@@ -46,7 +46,7 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
 fun Surface(
     modifier: Modifier = Modifier.fillMaxSize(),
     variant: ComponentVariant? = null,
-    elementScope: (@Composable ElementScope<HTMLDivElement>.() -> Unit)? = null,
+    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Box(

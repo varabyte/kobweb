@@ -19,6 +19,7 @@ import org.jetbrains.compose.web.dom.TagElement
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.RenderingContext
 import kotlin.js.Date
 import kotlin.math.max
@@ -106,7 +107,7 @@ private inline fun <C: RenderingContext> Canvas(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0f,
     maxDeltaMs: Number = 500f,
-    noinline elementScope: (@Composable ElementScope<HTMLCanvasElement>.() -> Unit)? = null,
+    noinline elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
     crossinline createContext: (HTMLCanvasElement) -> C?,
     noinline render: RenderScope<C>.() -> Unit,
 ) {
@@ -165,7 +166,7 @@ fun Canvas2d(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
-    elementScope: (@Composable ElementScope<HTMLCanvasElement>.() -> Unit)? = null,
+    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
     render: RenderScope<CanvasRenderingContext2D>.() -> Unit,
 ) {
     Canvas(
@@ -202,7 +203,7 @@ fun CanvasGl(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
-    elementScope: (@Composable ElementScope<HTMLCanvasElement>.() -> Unit)? = null,
+    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
     render: RenderScope<WebGLRenderingContext>.() -> Unit,
 ) {
     Canvas(

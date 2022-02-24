@@ -8,7 +8,7 @@ import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.ElementScope
-import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLElement
 
 class RowScope {
     fun Modifier.align(alignment: Alignment.Vertical) = attrsModifier {
@@ -21,7 +21,7 @@ fun Row(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
-    elementScope: (@Composable ElementScope<HTMLDivElement>.() -> Unit)? = null,
+    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
     content: @Composable RowScope.() -> Unit
 ) {
     Div(modifier.asAttributesBuilder {
