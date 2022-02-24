@@ -490,7 +490,7 @@ class ComponentStyle(
  * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.addBaseVariant(name: String, init: ComponentStyleState.() -> Modifier): ComponentVariant {
+fun ComponentStyle.addVariantBase(name: String, init: ComponentStyleState.() -> Modifier): ComponentVariant {
     return addVariant(name) {
         base {
             ComponentStyleState(colorMode).let(init)

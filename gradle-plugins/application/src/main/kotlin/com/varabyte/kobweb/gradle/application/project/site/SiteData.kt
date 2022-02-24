@@ -90,7 +90,7 @@ class SiteData {
         }
 
         /** Process a line like `val CustomStyle = ComponentStyle.base("custom") { ... }` */
-        private fun processComponentBaseStyle(
+        private fun processComponentStyleBase(
             file: File,
             filePackage: String,
             element: KtCallExpression,
@@ -141,8 +141,8 @@ class SiteData {
             return processComponentVariant(file, filePackage, property, siteData, reporter)
         }
 
-        /** Process a line like `val CustomVariant = CustomStyle.addBaseVariant("variant") { ... }` */
-        private fun processComponentBaseVariant(
+        /** Process a line like `val CustomVariant = CustomStyle.addVariantBase("variant") { ... }` */
+        private fun processComponentVariantBase(
             file: File,
             filePackage: String,
             element: KtCallExpression,
@@ -301,10 +301,10 @@ class SiteData {
                             when (element.calleeExpression?.text) {
                                 "ComponentStyle" ->
                                     processComponentStyle(file, currPackage, element, siteData, reporter)
-                                "base" -> processComponentBaseStyle(file, currPackage, element, siteData, reporter)
+                                "base" -> processComponentStyleBase(file, currPackage, element, siteData, reporter)
                                 "addVariant" -> processComponentVariant(file, currPackage, element, siteData, reporter)
-                                "addBaseVariant" ->
-                                    processComponentBaseVariant(file, currPackage, element, siteData, reporter)
+                                "addVariantBase" ->
+                                    processComponentVariantBase(file, currPackage, element, siteData, reporter)
                             }
                         }
                     }
