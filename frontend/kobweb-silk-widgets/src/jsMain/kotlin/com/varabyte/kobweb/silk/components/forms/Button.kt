@@ -24,6 +24,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
         Modifier
             .backgroundColor(buttonColors.default)
             .clip(Rect(4.px))
+            .outline(0.px) // Don't outline focused buttons - we'll use background color instead to indicate focus
             // No selecting text within buttons
             .userSelect(UserSelect.None)
             .role("button")
