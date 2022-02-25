@@ -127,7 +127,7 @@ package com.varabyte.kobweb.silk.components.icons.fa
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
-import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Span
 
 enum class IconCategory(internal val className: String) {
     REGULAR("far"),
@@ -146,7 +146,7 @@ fun FaIcon(
     modifier: Modifier,
     style: IconCategory = IconCategory.REGULAR,
 ) {
-    Div(
+    Span(
         attrs = modifier.asAttributesBuilder {
             classes(style.className, "fa-${'$'}name")
         }
