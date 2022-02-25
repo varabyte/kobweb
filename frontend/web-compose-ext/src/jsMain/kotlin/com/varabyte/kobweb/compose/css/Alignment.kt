@@ -122,6 +122,10 @@ fun StyleBuilder.justifyItems(overflow: AlignmentOverflowStrategy, position: Jus
 
 // endregion
 
+fun StyleBuilder.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) {
+    property("place-content", "${alignContent.value} ${justifyContent.value}")
+}
+
 fun StyleBuilder.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) {
     placeSelf( "${alignSelf.value} ${justifySelf.value}")
 }

@@ -21,14 +21,18 @@ fun Modifier.alignSelf(alignSelf: AlignSelf) = styleModifier {
     alignSelf(alignSelf)
 }
 
-fun Modifier.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) = styleModifier {
-    placeSelf(alignSelf, justifySelf)
-}
-
 fun Modifier.alignItems(alignItems: AlignItems): Modifier = styleModifier {
     alignItems(alignItems)
 }
 
 fun Modifier.alignContent(alignContent: AlignContent): Modifier = styleModifier {
     alignContent(alignContent)
+}
+
+fun Modifier.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) = styleModifier {
+    placeSelf(alignSelf, justifySelf)
+}
+
+fun Modifier.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) = styleModifier {
+    placeContent(alignContent, justifyContent)
 }
