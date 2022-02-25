@@ -239,7 +239,7 @@ abstract class StyleModifiers {
 }
 
 /**
- * [StyleModifiers] with enhanced features enabled for [ComponentStyle] support.
+ * State specific to [ComponentStyle] initialization but not the more general [StyleModifiers] case.
  *
  * For example, color mode is supported here:
  *
@@ -259,18 +259,20 @@ abstract class StyleModifiers {
  *   }
  * }
  * ```
- *
- * @param colorMode What color mode these modifiers should be designed around. This is passed in so users defining
- *   a component style can use it if relevant.
  */
-// Note: If you change this class's constructor, you should update the `ComponentStyleState` constructor to match
-class ComponentModifiers(val colorMode: ColorMode): StyleModifiers()
+interface ComponentModifier {
+    /**
+     * The current color mode, which may impact the look and feel of the current component style.
+     */
+    val colorMode: ColorMode
+}
 
+class ComponentModifiers(override val colorMode: ColorMode): ComponentModifier, StyleModifiers()
 /**
- * Class provided for cases where you only generate a single style (e.g. base), unlike [StyleModifiers] where you
+ * Class provided for cases where you only generate a single style (e.g. base), unlike [ComponentModifiers] where you
  * can define a collection of styles.
  */
-class ComponentStyleState(val colorMode: ColorMode)
+class ComponentBaseModifier(override val colorMode: ColorMode): ComponentModifier
 
 /**
  * A [ComponentStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
@@ -309,10 +311,10 @@ class ImmutableComponentStyle internal constructor(private val name: String) {
  * You may still wish to construct a [ComponentStyle] directly instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.Companion.base(className: String, init: ComponentStyleState.() -> Modifier): ComponentStyle {
+fun ComponentStyle.Companion.base(className: String, init: ComponentModifier.() -> Modifier): ComponentStyle {
     return ComponentStyle(className) {
         base {
-            ComponentStyleState(colorMode).let(init)
+            ComponentBaseModifier(colorMode).let(init)
         }
     }
 }
@@ -490,10 +492,10 @@ class ComponentStyle(
  * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.addVariantBase(name: String, init: ComponentStyleState.() -> Modifier): ComponentVariant {
+fun ComponentStyle.addVariantBase(name: String, init: ComponentBaseModifier.() -> Modifier): ComponentVariant {
     return addVariant(name) {
         base {
-            ComponentStyleState(colorMode).let(init)
+            ComponentBaseModifier(colorMode).let(init)
         }
     }
 }

@@ -5,10 +5,11 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.layout.breakpoint.displayBetween
 import com.varabyte.kobweb.silk.components.layout.breakpoint.displayIf
 import com.varabyte.kobweb.silk.components.layout.breakpoint.displayUntil
+import com.varabyte.kobweb.silk.components.style.ComponentBaseModifier
+import com.varabyte.kobweb.silk.components.style.ComponentModifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifiers
 import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentStyleState
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.ImmutableComponentStyle
 import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant
@@ -257,10 +258,10 @@ class MutableSilkTheme {
 /**
  * Convenience method when you want to replace an upstream style but only need to define a base style.
  */
-fun MutableSilkTheme.replaceComponentStyleBase(style: ComponentStyle, init: ComponentStyleState.() -> Modifier) {
+fun MutableSilkTheme.replaceComponentStyleBase(style: ComponentStyle, init: ComponentModifier.() -> Modifier) {
     replaceComponentStyle(style) {
         base {
-            ComponentStyleState(colorMode).let(init)
+            ComponentBaseModifier(colorMode).let(init)
         }
     }
 }
