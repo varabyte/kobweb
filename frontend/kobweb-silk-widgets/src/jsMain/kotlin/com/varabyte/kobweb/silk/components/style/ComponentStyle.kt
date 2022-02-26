@@ -7,9 +7,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
-import com.varabyte.kobweb.silk.theme.toMinWidthQuery
 import org.jetbrains.compose.web.css.CSSMediaQuery
 import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleBuilder

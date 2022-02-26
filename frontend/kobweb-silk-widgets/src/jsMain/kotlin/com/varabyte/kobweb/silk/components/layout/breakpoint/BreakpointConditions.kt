@@ -5,7 +5,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.theme.toMaxWidthQuery
+import com.varabyte.kobweb.silk.theme.breakpoint.toMaxWidthQuery
 import org.jetbrains.compose.web.css.DisplayStyle
 
 internal val DisplayIfSmStyle = ComponentStyle("silk-display-if-sm") {
