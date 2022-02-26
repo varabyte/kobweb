@@ -4,6 +4,8 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.LG
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.MD
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.SM
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.XL
+import com.varabyte.kobweb.silk.theme.toWidth
+import org.jetbrains.compose.web.css.*
 
 /**
  * Breakpoints are size values which can be used to affect the layout of the UI at various boundary points.

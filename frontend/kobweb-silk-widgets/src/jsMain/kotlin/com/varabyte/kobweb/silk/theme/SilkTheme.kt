@@ -24,10 +24,7 @@ import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import kotlinx.browser.window
-import org.jetbrains.compose.web.css.CSSUnitValue
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Window
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
@@ -331,6 +328,10 @@ fun Breakpoint.toWidth(): CSSUnitValue {
 fun Breakpoint.toPx(): CSSUnitValue {
     return this.toValue()?.toPx() ?: 0.px
 }
+
+fun Breakpoint.toMinWidthQuery() = CSSMediaQuery.MediaFeature("min-width", this.toWidth())
+fun Breakpoint.toMaxWidthQuery() = CSSMediaQuery.MediaFeature("max-width", this.toWidth())
+
 
 /**
  * Returns the bottom of the breakpoint range the current window's width is betwee.

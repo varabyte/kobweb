@@ -5,26 +5,23 @@ import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.theme.toMaxWidthQuery
 import org.jetbrains.compose.web.css.DisplayStyle
 
 internal val DisplayIfSmStyle = ComponentStyle("silk-display-if-sm") {
-    base { Modifier.display(DisplayStyle.None) }
-    Breakpoint.SM { Modifier.display(DisplayStyle.Unset) }
+    cssRule(Breakpoint.SM.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayIfMdStyle = ComponentStyle("silk-display-if-md") {
-    base { Modifier.display(DisplayStyle.None) }
-    Breakpoint.MD { Modifier.display(DisplayStyle.Unset) }
+    cssRule(Breakpoint.MD.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayIfLgStyle = ComponentStyle("silk-display-if-lg") {
-    base { Modifier.display(DisplayStyle.None) }
-    Breakpoint.LG { Modifier.display(DisplayStyle.Unset) }
+    cssRule(Breakpoint.LG.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayIfXlStyle = ComponentStyle("silk-display-if-xl") {
-    base { Modifier.display(DisplayStyle.None) }
-    Breakpoint.XL { Modifier.display(DisplayStyle.Unset) }
+    cssRule(Breakpoint.XL.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayUntilSmStyle = ComponentStyle("silk-display-until-sm") {
