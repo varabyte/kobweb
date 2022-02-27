@@ -11,7 +11,30 @@ import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.cyan
 import com.varabyte.kotter.foundation.text.text
 import com.varabyte.kotter.foundation.text.textLine
+import com.varabyte.kotter.foundation.text.yellow
+import com.varabyte.kotter.runtime.render.RenderScope
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.relativeTo
+
+private fun RenderScope.renderTemplateItem(rootPath: Path, template: KobwebTemplateFile) {
+    val templatePath =
+        template.kobwebFolder.getProjectPath().relativeTo(rootPath).toString()
+            // Even on Windows, show Unix-style slashes, as `kobweb create` expects that format
+            .toUnixSeparators()
+            .removeSuffix("/default")
+    val description = template.content!!.metadata.description
+
+    text("• ")
+    cyan { text(templatePath) }
+    textLine(": $description")
+}
+
+private fun List<KobwebTemplateFile>.renderTemplateItemsInto(rootPath: Path, renderScope: RenderScope) {
+    this
+        .sortedBy { template -> template.kobwebFolder.getProjectPath() }
+        .forEach { template -> renderScope.renderTemplateItem(rootPath, template) }
+}
 
 fun handleList(repo: String, branch: String) = session {
     val tempDir = handleFetch(repo, branch) ?: return@session
@@ -38,21 +61,21 @@ fun handleList(repo: String, branch: String) = session {
             textLine("`")
             textLine()
 
-            val tempPath = tempDir.toPath()
-            templates
-                .sortedBy { template -> template.kobwebFolder.getProjectPath() }
-                .forEach { template ->
-                    val templatePath =
-                        template.kobwebFolder.getProjectPath().relativeTo(tempPath).toString()
-                            // Even on Windows, show Unix-style slashes, as `kobweb create` expects that format
-                            .toUnixSeparators()
-                            .removeSuffix("/default")
-                    val description = template.content!!.metadata.description
+            val rootPath = tempDir.toPath()
 
-                    text("• ")
-                    cyan { text(templatePath) }
-                    textLine(": $description")
+            run {
+                val highlightedTemplates = templates.filter { it.content!!.metadata.shouldHighlight }
+                if (highlightedTemplates.isNotEmpty()) {
+                    yellow { textLine("Highlighted projects") }
+                    textLine()
+                    highlightedTemplates.renderTemplateItemsInto(rootPath, this)
+                    textLine()
+                    yellow { textLine("All projects") }
+                    textLine()
                 }
+            }
+
+            templates.renderTemplateItemsInto(rootPath, this)
         } else {
             textError("No templates were found in the specified repository.")
         }

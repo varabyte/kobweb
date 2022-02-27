@@ -5,9 +5,14 @@ import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
 
+/**
+ * @param shouldHighlight This template is considered important and should be called out
+ *   separately when all templates for a repository are listed.
+ */
 @Serializable
 class Metadata(
     val description: String,
+    val shouldHighlight: Boolean = false,
 )
 
 @Serializable
