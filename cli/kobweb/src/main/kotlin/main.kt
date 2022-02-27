@@ -95,20 +95,7 @@ fun main(args: Array<String>) {
         val mode by mode()
 
         override fun execute() {
-            // TODO(#79): Delete this when fixed
-            if (mode == Mode.INTERACTIVE) {
-                println(
-                    """
-                    ⚠️  Interactive mode is not yet implemented for this command, so it will run in dumb mode for now.
-                    There isn't any functional difference between the two modes for this command; still, the user
-                    experience may feel inconsistent.
-
-                    👀 Follow https://github.com/varabyte/kobweb/issues/79 if you want to be notified when this is fixed.
-                    """.trimIndent()
-                )
-                println()
-            }
-            handleStop()
+            handleStop(mode == Mode.INTERACTIVE)
         }
     }
 
