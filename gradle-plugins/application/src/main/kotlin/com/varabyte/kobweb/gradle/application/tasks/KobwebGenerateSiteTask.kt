@@ -55,7 +55,7 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, p
             )
         ) {
             genSrcRoot.mkdirs()
-            File(genSrcRoot, "main.kt").writeText(createMainFunction(this, routePrefix, buildTarget))
+            File(genSrcRoot, "main.kt").writeText(createMainFunction(this, kobwebBlock.appGlobals.get(), routePrefix, buildTarget))
         }
 
         File(genResRoot, getPublicPath()).let { publicRoot ->

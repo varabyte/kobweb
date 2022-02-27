@@ -9,10 +9,16 @@ import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
 
-fun createMainFunction(siteData: SiteData, routePrefix: RoutePrefix, target: BuildTarget): String {
+private fun String.escapeQuotes(): String {
+    return this.replace("\"", """\"""")
+}
+
+fun createMainFunction(siteData: SiteData, appGlobals: Map<String, String>, routePrefix: RoutePrefix, target: BuildTarget): String {
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
     mutableListOf(
+        "androidx.compose.runtime.CompositionLocalProvider",
+        "com.varabyte.kobweb.core.AppGlobalsLocal",
         "com.varabyte.kobweb.navigation.RoutePrefix",
         "com.varabyte.kobweb.navigation.Router",
         "kotlinx.browser.document",
@@ -169,8 +175,10 @@ fun createMainFunction(siteData: SiteData, routePrefix: RoutePrefix, target: Bui
                 }
 
                 renderComposable(rootElementId = "root") {
-                    ${siteData.app?.fqn ?: "com.varabyte.kobweb.core.KobwebApp"} {
-                        router.renderActivePage()
+                    CompositionLocalProvider(AppGlobalsLocal provides mapOf(${appGlobals.map { entry -> "\"${entry.key.escapeQuotes()}\" to \"${entry.value.escapeQuotes()}\""}.joinToString() })) {
+                        ${siteData.app?.fqn ?: "com.varabyte.kobweb.core.KobwebApp"} {
+                            router.renderActivePage()
+                        }
                     }
                 }
             """.trimIndent())

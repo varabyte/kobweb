@@ -14,6 +14,7 @@ import kotlinx.html.meta
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.get
 import java.io.File
@@ -91,11 +92,14 @@ abstract class KobwebBlock @Inject constructor(conf: KobwebConf) {
      */
     abstract val publicPath: Property<String>
 
+    abstract val appGlobals: MapProperty<String, String>
+
     init {
         genDir.convention(GENERATED_ROOT)
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
+        appGlobals.convention(mapOf())
 
         (this as ExtensionAware).extensions.create("index", IndexDocument::class.java, RoutePrefix(conf.site.routePrefix))
     }
