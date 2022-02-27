@@ -44,6 +44,7 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
         }
 
         var exportState by liveVarOf(ExportState.EXPORTING)
+        var numLinesOutput by liveVarOf(0)
 
         var cancelReason by liveVarOf("")
         val ellipsis = textAnimOf(Anims.ELLIPSIS)
@@ -52,7 +53,9 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
             textLine() // Add space between this block and Gradle text which will appear above
             when (exportState) {
                 ExportState.EXPORTING -> run {
-                    showDownloadDelayWarning()
+                    if (numLinesOutput < 10) {
+                        showDownloadDelayWarning()
+                    }
                     textLine("Exporting$ellipsis")
                 }
                 ExportState.FINISHING -> textLine("Finishing up$ellipsis")
@@ -74,7 +77,10 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
                 exportState = ExportState.INTERRUPTED
                 return@run
             }
-            exportProcess.consumeProcessOutput(::handleConsoleOutput)
+            exportProcess.consumeProcessOutput { line, isError ->
+                ++numLinesOutput
+                handleConsoleOutput(line, isError)
+            }
 
             onKeyPressed {
                 if (exportState == ExportState.EXPORTING && key == Keys.Q) {

@@ -1,11 +1,13 @@
 package com.varabyte.kobweb.cli.run
 
 import com.varabyte.kobweb.cli.common.Anims
+import com.varabyte.kobweb.cli.common.GradleAlertBundle
 import com.varabyte.kobweb.cli.common.KobwebGradle
 import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
+import com.varabyte.kobweb.cli.common.handleGradleOutput
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.cli.common.showDownloadDelayWarning
 import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
@@ -94,6 +96,8 @@ fun handleRun(
         var runState by liveVarOf(RunState.STARTING)
         var cancelReason by liveVarOf("")
         var exception by liveVarOf<Exception?>(null) // Set if RunState.INTERRUPTED
+        var numLinesOutput by liveVarOf(0)
+        val gradleAlertBundle = GradleAlertBundle(this)
         // If a route prefix is set, we'll add it to the server URL (at which point we'll need to add slash dividers)
         val routePrefix = RoutePrefix(conf.site.routePrefix)
         section {
@@ -103,7 +107,10 @@ fun handleRun(
                 RunState.STARTING -> {
                     textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
                     textLine()
-                    showDownloadDelayWarning()
+                    if (numLinesOutput < 10) {
+                        showDownloadDelayWarning()
+                    }
+                    gradleAlertBundle.renderInto(this)
                     textLine("Press Q anytime to cancel.")
                 }
                 RunState.RUNNING -> {
@@ -114,7 +121,8 @@ fun handleRun(
                         }
                         textLine(" (PID = ${serverState.pid})")
                         textLine()
-                        textLine("Press Q anytime to stop it.")
+                        gradleAlertBundle.renderInto(this)
+                        textLine("Press Q anytime to stop the server.")
                     }
                 }
                 RunState.STOPPING -> {
@@ -149,7 +157,10 @@ fun handleRun(
                 runState = RunState.INTERRUPTED
                 return@runUntilSignal
             }
-            startServerProcess.consumeProcessOutput(::handleConsoleOutput)
+            startServerProcess.consumeProcessOutput { line, isError ->
+                ++numLinesOutput
+                handleGradleOutput(line, isError) { alert -> gradleAlertBundle.handleAlert(alert) }
+            }
 
             Runtime.getRuntime().addShutdownHook(Thread {
                 if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
@@ -191,6 +202,9 @@ fun handleRun(
                             signal()
                         }
                     }
+                }
+                else {
+                    gradleAlertBundle.handleKey(key)
                 }
             }
 
