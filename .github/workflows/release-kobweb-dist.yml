@@ -10,6 +10,7 @@ on:
 
 jobs:
   distzip:
+    if: contains(github.ref, 'cli-v') # Only run for kobweb-cli releases; github.ref is of the form 'refs/tags/cli-v0.9.6'
     runs-on: ubuntu-latest
 
     steps:
