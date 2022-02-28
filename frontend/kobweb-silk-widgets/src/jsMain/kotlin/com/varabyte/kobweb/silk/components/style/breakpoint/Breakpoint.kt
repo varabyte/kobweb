@@ -27,7 +27,7 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.XL
  */
 enum class Breakpoint {
     /**
-     * Special value which always mean 0-width, useful for querying the current breakpoint of a screen that's smaller
+     * Special value which always means 0-width, useful for querying the current breakpoint of a screen that's smaller
      * than "small" (which usually indicates a mobile device)
      */
     ZERO,
