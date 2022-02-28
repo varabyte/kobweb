@@ -6,8 +6,6 @@ import com.varabyte.kotter.foundation.collections.liveListOf
 import com.varabyte.kotter.foundation.input.Key
 import com.varabyte.kotter.foundation.input.Keys
 import com.varabyte.kotter.foundation.liveVarOf
-import com.varabyte.kotter.foundation.text.black
-import com.varabyte.kotter.foundation.text.bold
 import com.varabyte.kotter.foundation.text.red
 import com.varabyte.kotter.foundation.text.text
 import com.varabyte.kotter.foundation.text.textLine
@@ -110,16 +108,16 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 10) {
                 if (startIndex > 0) {
                     textLine("... Press UP or PAGE UP to see earlier errors.")
                 }
-                bold {
-                    for (i in startIndex until (startIndex + pageSize)) {
-                        if (i >= alerts.size) break
-                        val alert = alerts[i]
-                        text("${i + 1}: ")
-                        when (alert) {
-                            is GradleAlert.Error -> red { textLine(alert.line) }
-                            is GradleAlert.Warning -> yellow { textLine(alert.line) }
-                            else -> error("Unexpected alert type: $alert")
-                        }
+                for (i in startIndex until (startIndex + pageSize)) {
+                    if (i >= alerts.size) break
+                    val alert = alerts[i]
+
+                    if (i > startIndex) textLine()
+                    text("${i + 1}: ")
+                    when (alert) {
+                        is GradleAlert.Error -> red { textLine(alert.line) }
+                        is GradleAlert.Warning -> yellow { textLine(alert.line) }
+                        else -> error("Unexpected alert type: $alert")
                     }
                 }
                 if (startIndex < maxIndex) {
