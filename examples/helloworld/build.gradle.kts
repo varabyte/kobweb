@@ -14,7 +14,7 @@ repositories {
 }
 
 kotlin {
-    jvm() {
+    jvm {
         tasks.named("jvmJar", Jar::class.java).configure {
             archiveFileName.set("helloworld.jar")
         }
