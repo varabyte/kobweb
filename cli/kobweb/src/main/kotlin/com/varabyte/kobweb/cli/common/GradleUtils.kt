@@ -98,11 +98,18 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 10) {
     }
 
     fun renderInto(renderScope: RenderScope) {
-        if (alerts.isEmpty()) return
+        val numErrors = alerts.filterIsInstance<GradleAlert.Error>().size
+        val numWarnings = alerts.filterIsInstance<GradleAlert.Warning>().size
+
+        if (numErrors + numWarnings == 0) return
 
         renderScope.apply {
             yellow {
-                textLine("Found ${alerts.filterIsInstance<GradleAlert.Error>().size} error(s) and ${alerts.filterIsInstance<GradleAlert.Warning>().size} warning(s). Please resolve to continue.")
+                text("Found $numErrors error(s) and $numWarnings warning(s).")
+                if (numErrors > 0) {
+                    text(" Please resolve errors to continue.")
+                }
+                textLine()
             }
             textLine()
                 if (startIndex > 0) {
