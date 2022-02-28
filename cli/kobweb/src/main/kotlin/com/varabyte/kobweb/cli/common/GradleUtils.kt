@@ -102,7 +102,7 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 10) {
 
         renderScope.apply {
             yellow {
-                textLine("Found ${alerts.filterIsInstance<GradleAlert.Error>().size} error(s) and/or ${alerts.filterIsInstance<GradleAlert.Warning>().size} warning(s). Please resolve to continue.")
+                textLine("Found ${alerts.filterIsInstance<GradleAlert.Error>().size} error(s) and ${alerts.filterIsInstance<GradleAlert.Warning>().size} warning(s). Please resolve to continue.")
             }
             textLine()
                 if (startIndex > 0) {
