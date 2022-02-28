@@ -106,7 +106,7 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 10) {
             }
             textLine()
                 if (startIndex > 0) {
-                    textLine("... Press UP or PAGE UP to see earlier errors.")
+                    textLine("... Press UP, PAGE UP, or HOME to see earlier errors.")
                 }
                 for (i in startIndex until (startIndex + pageSize)) {
                     if (i >= alerts.size) break
@@ -121,7 +121,7 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 10) {
                     }
                 }
                 if (startIndex < maxIndex) {
-                    textLine("... Press DOWN or PAGE DOWN to see later errors.")
+                    textLine("... Press DOWN, PAGE DOWN, or END to see later errors.")
                 }
             textLine()
         }
