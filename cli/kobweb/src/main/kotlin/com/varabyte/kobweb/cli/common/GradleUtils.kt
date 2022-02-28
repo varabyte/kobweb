@@ -69,7 +69,7 @@ fun RunScope.handleGradleOutput(line: String, isError: Boolean, onGradleEvent: (
 /**
  * Class which handles the collection and rendering of Gradle compile warnings and errors.
  */
-class GradleAlertBundle(session: Session, private val pageSize: Int = 10) {
+class GradleAlertBundle(session: Session, private val pageSize: Int = 7) {
     private val alerts = session.liveListOf<GradleAlert>()
     private var startIndex by session.liveVarOf(0)
     private val maxIndex get() = (alerts.size - pageSize).coerceAtLeast(0)
