@@ -505,13 +505,24 @@ sealed class ComponentVariant {
         override fun toModifier() = Modifier
     }
 
-    fun then(next: ComponentVariant): ComponentVariant {
-        return if (next === Empty) this else CompositeComponentVariant(this, next)
+    infix fun then(next: ComponentVariant): ComponentVariant {
+        return if (next === Empty) this
+        else if (this === Empty) next
+        else CompositeComponentVariant(this, next)
     }
 
     internal abstract fun addStylesInto(styleSheet: StyleSheet)
     @Composable
     abstract fun toModifier(): Modifier
+}
+
+fun ComponentVariant.thenIf(condition: Boolean, other: ComponentVariant): ComponentVariant {
+    return this
+        .then(if (condition) other else ComponentVariant.Empty)
+}
+
+fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): ComponentVariant {
+    return this.thenIf(!condition, other)
 }
 
 internal class SimpleComponentVariant(val style: ComponentStyle, private val baseStyle: ComponentStyle): ComponentVariant() {

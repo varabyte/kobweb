@@ -44,6 +44,14 @@ interface Modifier {
     }
 }
 
+fun Modifier.thenIf(condition: Boolean, other: Modifier): Modifier {
+    return Modifier.then(if (condition) other else Modifier)
+}
+
+fun Modifier.thenUnless(condition: Boolean, other: Modifier): Modifier {
+    return Modifier.thenIf(!condition, other)
+}
+
 /**
  * An entry in a [Modifier] chain.
  */
