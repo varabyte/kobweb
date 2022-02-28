@@ -31,3 +31,17 @@ jobs:
             cli/kobweb/build/distributions/*.zip
             cli/kobweb/build/distributions/*.tar
           if-no-files-found: error
+
+  update-aur-package:
+    if: contains(github.ref, 'cli-v') # Only run for kobweb-cli releases; github.ref is of the form 'refs/tags/cli-v0.9.6'
+    runs-on: ubuntu-latest
+    needs: distzip
+    steps:
+      - name: Update AUR Package
+        uses: aksh1618/update-aur-package@v1.0.5
+        with:
+          tag_version_prefix: cli-v # Tags for cli releases are of the form cli-v0.9.6
+          package_name: kobweb
+          commit_username: phi1309
+          commit_email: phi1309@protonmail.com
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
