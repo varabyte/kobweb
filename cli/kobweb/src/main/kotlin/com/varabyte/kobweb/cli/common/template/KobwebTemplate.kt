@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.cli.common.template
 
 import com.charleskorn.kaml.Yaml
+import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
@@ -24,5 +25,5 @@ class KobwebTemplate(
 class KobwebTemplateFile(kobwebFolder: KobwebFolder) : KobwebReadableTextFile<KobwebTemplate>(
     kobwebFolder,
     "template.yaml",
-    deserialize = { text -> Yaml.default.decodeFromString(KobwebTemplate.serializer(), text) }
+    deserialize = { text -> Yaml.nonStrictDefault.decodeFromString(KobwebTemplate.serializer(), text) }
 )

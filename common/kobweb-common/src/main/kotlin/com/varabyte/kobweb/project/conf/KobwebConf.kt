@@ -3,6 +3,7 @@
 package com.varabyte.kobweb.project.conf
 
 import com.charleskorn.kaml.Yaml
+import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
@@ -106,5 +107,5 @@ class KobwebConf(
 class KobwebConfFile(kobwebFolder: KobwebFolder) : KobwebReadableTextFile<KobwebConf>(
     kobwebFolder,
     "conf.yaml",
-    deserialize = { text -> Yaml.default.decodeFromString(KobwebConf.serializer(), text) }
+    deserialize = { text -> Yaml.nonStrictDefault.decodeFromString(KobwebConf.serializer(), text) }
 )
