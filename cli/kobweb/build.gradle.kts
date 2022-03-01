@@ -54,6 +54,13 @@ if (githubUsername != null && githubToken != null) {
             license.set("Apache-2.0")
             licenseUrl.set("http://www.apache.org/licenses/LICENSE-2.0")
             copyright.set("Copyright © 2022 Varabyte. All rights reserved.")
+
+            // Set the Java version explicitly, even though in theory this value should be coming from our root
+            // build.gradle file, but it does not seem to when I run "jreleaserPublish" from the command line.
+            // See also: https://github.com/jreleaser/jreleaser/issues/785
+            java {
+                version.set(JavaVersion.VERSION_11.toString())
+            }
         }
         release {
             github {
