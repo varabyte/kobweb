@@ -12,7 +12,7 @@ import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import java.io.File
@@ -21,17 +21,30 @@ import javax.inject.Inject
 abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, private val buildTarget: BuildTarget) :
     KobwebProjectTask(config, "Generate Kobweb code and resources for the frontend site") {
 
-    @InputFiles
-    fun getSourceFiles() = getSourceFilesJs()
+    private fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot(project)
+    private fun getGenResDir(): File = kobwebBlock.getGenJsResRoot(project)
 
     @InputFiles
-    fun getResourceFiles() = getResourceFilesJs()
+    fun getSourceFiles() = run {
+        // Don't let stuff we output force ourselves to run again
+        val genMainFile = getGenMainFile()
+        getSourceFilesJs()
+            .filter { it.absolutePath != genMainFile.absolutePath }
+    }
 
-    @OutputDirectory
-    fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot(project)
+    @InputFiles
+    fun getResourceFiles() = run {
+        // Don't let stuff we output force ourselves to run again
+        val genIndexFile = getGenIndexFile()
+        getResourceFilesJs()
+            .filter { it.absolutePath != genIndexFile.absolutePath }
+    }
 
-    @OutputDirectory
-    fun getGenResDir(): File = kobwebBlock.getGenJsResRoot(project)
+    @OutputFile
+    fun getGenMainFile() = File(getGenSrcDir(), "main.kt")
+
+    @OutputFile
+    fun getGenIndexFile() = File(File(getGenResDir(), getPublicPath()), "index.html")
 
     @TaskAction
     fun execute() {
@@ -42,9 +55,6 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, p
                     project.logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
                 }
 
-        val genSrcRoot = getGenSrcDir()
-        val genResRoot = getGenResDir()
-
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
         with(
             SiteData.from(
@@ -54,13 +64,14 @@ abstract class KobwebGenerateSiteTask @Inject constructor(config: KobwebBlock, p
                 GradleReporter(project.logger)
             )
         ) {
-            genSrcRoot.mkdirs()
-            File(genSrcRoot, "main.kt").writeText(createMainFunction(this, kobwebBlock.appGlobals.get(), routePrefix, buildTarget))
+            val mainFile = getGenMainFile()
+            mainFile.parentFile.mkdirs()
+            mainFile.writeText(createMainFunction(this, kobwebBlock.appGlobals.get(), routePrefix, buildTarget))
         }
 
-        File(genResRoot, getPublicPath()).let { publicRoot ->
-            publicRoot.mkdirs()
-            File(publicRoot, "index.html").writeText(
+        getGenIndexFile().let { indexFile ->
+            indexFile.parentFile.mkdirs()
+            indexFile.writeText(
                 createIndexFile(
                     kobwebConf.site.title,
                     kobwebBlock.index.head.get(),
