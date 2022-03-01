@@ -35,6 +35,6 @@ fun Session.showStaticSiteLayoutWarning() {
 }
 
 fun RenderScope.showDownloadDelayWarning() {
-    yellow { textLine("Output may seem to pause for a while if Kobweb needs to download new dependencies.") }
+    yellow { textLine("Output may seem to pause for a while if Kobweb needs to download / resolve dependencies.") }
     textLine()
 }
