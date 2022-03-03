@@ -2,20 +2,15 @@ package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.components.layout.breakpoint.displayBetween
-import com.varabyte.kobweb.silk.components.layout.breakpoint.displayIf
-import com.varabyte.kobweb.silk.components.layout.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.components.style.ComponentBaseModifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifiers
-import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.ImmutableComponentStyle
 import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
-import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointUnitValue
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
@@ -23,11 +18,7 @@ import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
-import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
-import org.w3c.dom.Window
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventListener
 
 /**
  * Configuration values which are frozen at initialization time and accessed globally within Silk after that point.
@@ -289,14 +280,14 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         // We shouldn't have called this if we didn't set _SilkTheme already. This being true means ComponentStyle
         // initialization blocks can reference `SilkTheme`.
         check(_SilkTheme != null)
-        mutableSilkTheme.componentStyles.values.forEach { styleBuilder ->
-            styleBuilder.addStylesInto(componentStyleSheet)
-            _componentStyles[styleBuilder.name] = ImmutableComponentStyle(styleBuilder.name)
+        mutableSilkTheme.componentStyles.values.forEach { componentStyle ->
+            componentStyle.addStylesInto(componentStyleSheet)
+            _componentStyles[componentStyle.name] = componentStyle.intoImmutableStyle()
         }
         // Variants should be defined after base styles to make sure they take priority if used
         mutableSilkTheme.componentVariants.values.filterIsInstance<SimpleComponentVariant>().forEach { variant ->
             variant.addStylesInto(componentStyleSheet)
-            _componentStyles[variant.style.name] = ImmutableComponentStyle(variant.style.name)
+            _componentStyles[variant.style.name] = variant.intoImmutableStyle()
         }
     }
 }

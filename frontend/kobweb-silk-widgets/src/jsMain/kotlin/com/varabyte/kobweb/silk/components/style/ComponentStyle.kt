@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.compose.ui.asStyleBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
@@ -51,6 +52,46 @@ internal class CssModifier(
     val mediaQuery: CSSMediaQuery? = null,
     val suffix: String? = null,
 ) {
+    init {
+        modifier.fold(Unit) { _, currModifier ->
+            if (currModifier !is StyleModifier) {
+                throw IllegalArgumentException(
+                    """
+                        You are attempting to construct a ComponentStyle or ComponentVariant with a non-style Modifier
+                        (e.g. `id`, `zIndex`, etc.). Due to technical limitations in html / css, only `StyleModifier`s
+                        are allowed in this context.
+
+                        Unfortunately, at the point this exception is getting thrown, information about the offending
+                        attribute is not known. Please audit your project's ComponentStyle and ComponentVariant
+                        Modifiers, perhaps commenting out recently added ones, until this exception goes away.
+
+                        Once the offending modifier is identified, to fix this, you can either call attribute modifiers
+                        directly on the Modifier you pass into some widget, or you can extend this Style or Variant with
+                        extra modifiers using the `+` syntax:
+
+                        ```
+                        // Approach #1: Call Attribute Modifiers later
+
+                        val ExampleStyle = ComponentStyle("ex") {
+                           ...
+                        }
+
+                        ExampleWidget(ExampleStyle.toModifier().zIndex(0))
+
+                        // Approach #2: Use `+` to add extra (non-style) modifiers to the style
+
+                        val ExampleStyle = ComponentStyle("ex") {
+                           ...
+                        } + Modifier.zIndex(0)
+
+                        ExampleWidget(ExampleStyle.toModifier())
+                        ```
+                    """.trimIndent()
+                )
+            }
+        }
+    }
+
     companion object {
         val BaseKey = Key(null, null)
     }
@@ -274,14 +315,18 @@ class ComponentBaseModifier(override val colorMode: ColorMode): ComponentModifie
 
 /**
  * A [ComponentStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
+ *
+ * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for tacking on
+ *   non-style attributes that should always get applied anyway when this style is applied.
  */
-class ImmutableComponentStyle internal constructor(private val name: String) {
+class ImmutableComponentStyle internal constructor(private val name: String, private val extraModifiers: Modifier = Modifier) {
     @Composable
     fun toModifier(): Modifier {
         val classNames = listOf(name, "$name-${getColorMode().name.lowercase()}")
             .filter { name -> ComponentStyle.registeredClasses.contains(name) }
 
-        return if (classNames.isNotEmpty()) Modifier.classNames(*classNames.toTypedArray()) else Modifier
+        return (if (classNames.isNotEmpty()) Modifier.classNames(*classNames.toTypedArray()) else Modifier)
+            .then(extraModifiers)
     }
 }
 
@@ -406,8 +451,9 @@ class ComponentStyle(
     }
 
     internal val variants = mutableListOf<ComponentVariant>()
+    private var extraModifiers: Modifier = Modifier
 
-    fun addVariant(name: String, init: ComponentModifiers.() -> Unit): ComponentVariant {
+    fun addVariant(name: String, init: ComponentModifiers.() -> Unit): SimpleComponentVariant {
         return SimpleComponentVariant(ComponentStyle("${this.name}-$name", init), baseStyle = this).also {
             variants.add(it)
         }
@@ -482,6 +528,13 @@ class ComponentStyle(
         // Register styles associated with this style's classname
         addStylesInto(styleSheet, ".$name")
     }
+
+    operator fun plus(modifiers: Modifier): ComponentStyle {
+        extraModifiers = extraModifiers.then(modifiers)
+        return this
+    }
+
+    internal fun intoImmutableStyle() = ImmutableComponentStyle(name, extraModifiers)
 }
 
 /**
@@ -490,7 +543,7 @@ class ComponentStyle(
  * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.addVariantBase(name: String, init: ComponentBaseModifier.() -> Modifier): ComponentVariant {
+fun ComponentStyle.addVariantBase(name: String, init: ComponentBaseModifier.() -> Modifier): SimpleComponentVariant {
     return addVariant(name) {
         base {
             ComponentBaseModifier(colorMode).let(init)
@@ -525,7 +578,9 @@ fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): Co
     return this.thenIf(!condition, other)
 }
 
-internal class SimpleComponentVariant(val style: ComponentStyle, private val baseStyle: ComponentStyle): ComponentVariant() {
+class SimpleComponentVariant(val style: ComponentStyle, private val baseStyle: ComponentStyle): ComponentVariant() {
+    private var extraModifiers: Modifier = Modifier
+
     override fun addStylesInto(styleSheet: StyleSheet) {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
@@ -535,7 +590,14 @@ internal class SimpleComponentVariant(val style: ComponentStyle, private val bas
     }
 
     @Composable
-    override fun toModifier() = style.toModifier()
+    override fun toModifier() = style.toModifier().then(extraModifiers)
+
+    operator fun plus(modifiers: Modifier): SimpleComponentVariant {
+        extraModifiers = extraModifiers.then(modifiers)
+        return this
+    }
+
+    internal fun intoImmutableStyle() = ImmutableComponentStyle(style.name)
 }
 
 private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant): ComponentVariant() {

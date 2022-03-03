@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.application.project.common.PackageUtils.resolv
 import com.varabyte.kobweb.gradle.application.project.common.PsiUtils
 import com.varabyte.kobweb.gradle.application.project.Reporter
 import com.varabyte.kobweb.gradle.application.project.common.RouteUtils
+import com.varabyte.kobweb.gradle.application.project.common.ancestors
 import com.varabyte.kobweb.gradle.application.project.common.getStringValue
 import com.varabyte.kobweb.gradle.application.project.common.parseKotlinFile
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
@@ -85,7 +86,7 @@ class SiteData {
             siteData: SiteData,
             reporter: Reporter
         ): Boolean {
-            val property = element.parent as? KtProperty ?: return false
+            val property = element.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
             return processComponentStyle(file, filePackage, property, siteData, reporter)
         }
 
@@ -99,7 +100,7 @@ class SiteData {
         ): Boolean {
             val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
             if (qualifiedExpression.receiverExpression.text != "ComponentStyle") return false
-            val property = qualifiedExpression.parent as? KtProperty ?: return false
+            val property = qualifiedExpression.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
             return processComponentStyle(file, filePackage, property, siteData, reporter)
         }
 
@@ -137,7 +138,7 @@ class SiteData {
             reporter: Reporter
         ): Boolean {
             val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
-            val property = qualifiedExpression.parent as? KtProperty ?: return false
+            val property = qualifiedExpression.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
             return processComponentVariant(file, filePackage, property, siteData, reporter)
         }
 
@@ -150,7 +151,7 @@ class SiteData {
             reporter: Reporter
         ): Boolean {
             val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
-            val property = qualifiedExpression.parent as? KtProperty ?: return false
+            val property = qualifiedExpression.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
             return processComponentVariant(file, filePackage, property, siteData, reporter)
         }
 
