@@ -58,7 +58,7 @@ internal class CssModifier(
                 throw IllegalArgumentException(
                     """
                         You are attempting to construct a ComponentStyle or ComponentVariant with a non-style Modifier
-                        (e.g. `id`, `zIndex`, etc.). Due to technical limitations in html / css, only `StyleModifier`s
+                        (e.g. `id`, `tabIndex`, etc.). Due to technical limitations in html / css, only `StyleModifier`s
                         are allowed in this context.
 
                         Unfortunately, at the point this exception is getting thrown, information about the offending
@@ -76,13 +76,13 @@ internal class CssModifier(
                            ...
                         }
 
-                        ExampleWidget(ExampleStyle.toModifier().zIndex(0))
+                        ExampleWidget(ExampleStyle.toModifier().tabIndex(0))
 
                         // Approach #2: Use `+` to add extra (non-style) modifiers to the style
 
                         val ExampleStyle = ComponentStyle("ex") {
                            ...
-                        } + Modifier.zIndex(0)
+                        } + Modifier.tabIndex(0)
 
                         ExampleWidget(ExampleStyle.toModifier())
                         ```
