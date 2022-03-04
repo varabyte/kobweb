@@ -10,7 +10,8 @@ fun Color.toCssColor(): CSSColorValue {
             if (this.alpha == 0xFF) {
                 rgb(this.red, this.green, this.blue)
             } else {
-                rgba(this.red, this.green, this.blue, this.alpha)
+                // Alpha always has to be a float: https://www.w3schools.com/cssref/func_rgba.asp
+                rgba(this.red, this.green, this.blue, this.alphaf)
             }
         }
     }
