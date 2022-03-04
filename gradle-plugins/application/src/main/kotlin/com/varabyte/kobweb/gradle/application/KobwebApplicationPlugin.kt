@@ -17,6 +17,7 @@ import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
+import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.html.link
 import org.gradle.api.GradleException
@@ -73,34 +74,49 @@ class KobwebApplicationPlugin @Inject constructor(
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
-        val service = project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
+        val taskListenerService = project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
         run {
-            val genSiteTasks = listOf(kobwebGenSiteTask.name, kobwebGenApiTask.name)
-            val startSiteTasks = listOf(kobwebStartTask.name) + jsRunTasks
-            service.get().onFinishCallbacks.add { event ->
+            var isBuilding = false
+            var isServerRunning = run {
+                val stateFile = ServerStateFile(kobwebFolder)
+                stateFile.content?.let { serverState ->
+                    ProcessHandle.of(serverState.pid).isPresent
+                }
+            } ?: false
+
+            taskListenerService.get().onFinishCallbacks.add { event ->
+                if (kobwebStartTask.name !in project.gradle.startParameter.taskNames) return@add
+
                 val taskName = event.descriptor.name.substringAfterLast(":")
                 val serverRequestsFile = ServerRequestsFile(kobwebFolder)
-                if (genSiteTasks.any { it == taskName }) {
-                    serverRequestsFile.enqueueRequest(ServerRequest.SetStatus("Building..."))
-                }
+                val taskFailed = event.result is FailureResult
 
-                if (event.result is FailureResult) {
-                    serverRequestsFile.enqueueRequest(
-                        ServerRequest.SetStatus(
-                            "Failed.",
-                            isError = true,
-                            timeoutMs = 500
+                if (isServerRunning) {
+                    if (taskFailed) {
+                        serverRequestsFile.enqueueRequest(
+                            ServerRequest.SetStatus(
+                                "Failed.",
+                                isError = true,
+                                timeoutMs = 500
+                            )
                         )
-                    )
+                    } else {
+                        if (taskName == kobwebStartTask.name) {
+                            serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
+                            serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
+                        } else if (!isBuilding) {
+                            serverRequestsFile.enqueueRequest(ServerRequest.SetStatus("Building..."))
+                            isBuilding = true
+                        }
+                    }
                 } else {
-                    if (startSiteTasks.any { it == taskName }) {
-                        serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
-                        serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
+                    if (!taskFailed && taskName == kobwebStartTask.name) {
+                        isServerRunning = true
                     }
                 }
             }
         }
-        buildEventsListenerRegistry.onTaskCompletion(service)
+        buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
         project.afterEvaluate {
             project.tasks.named("clean") {
