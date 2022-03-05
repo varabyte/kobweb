@@ -96,7 +96,6 @@ fun handleRun(
         var runState by liveVarOf(RunState.STARTING)
         var cancelReason by liveVarOf("")
         var exception by liveVarOf<Exception?>(null) // Set if RunState.INTERRUPTED
-        var numLinesOutput by liveVarOf(0)
         val gradleAlertBundle = GradleAlertBundle(this)
         // If a route prefix is set, we'll add it to the server URL (at which point we'll need to add slash dividers)
         val routePrefix = RoutePrefix(conf.site.routePrefix)
@@ -107,9 +106,6 @@ fun handleRun(
                 RunState.STARTING -> {
                     textLine("Starting a Kobweb server ($envName)$ellipsisAnim")
                     textLine()
-                    if (numLinesOutput < 10) {
-                        showDownloadDelayWarning()
-                    }
                     gradleAlertBundle.renderInto(this)
                     textLine("Press Q anytime to cancel.")
                 }
@@ -158,7 +154,6 @@ fun handleRun(
                 return@runUntilSignal
             }
             startServerProcess.consumeProcessOutput { line, isError ->
-                ++numLinesOutput
                 handleGradleOutput(line, isError) { alert -> gradleAlertBundle.handleAlert(alert) }
             }
 

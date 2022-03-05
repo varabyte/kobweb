@@ -47,10 +47,12 @@ class KobwebGradle(private val env: ServerEnvironment) {
 
 private const val GRADLE_ERROR_PREFIX = "e: "
 private const val GRADLE_WARNING_PREFIX = "w: "
+private const val GRADLE_TASK_PREFIX = "> Task :"
 
 sealed interface GradleAlert {
     class Warning(val line: String) : GradleAlert
     class Error(val line: String) : GradleAlert
+    class Task(val task: String) : GradleAlert
     object BuildRestarted : GradleAlert
 }
 
@@ -61,6 +63,8 @@ fun RunScope.handleGradleOutput(line: String, isError: Boolean, onGradleEvent: (
         onGradleEvent(GradleAlert.Error(line.removePrefix(GRADLE_ERROR_PREFIX)))
     } else if (line.startsWith(GRADLE_WARNING_PREFIX)) {
         onGradleEvent(GradleAlert.Warning(line.removePrefix(GRADLE_WARNING_PREFIX)))
+    } else if (line.startsWith(GRADLE_TASK_PREFIX)) {
+        onGradleEvent(GradleAlert.Task(line.removePrefix(GRADLE_TASK_PREFIX).substringBefore(' ')))
     } else if (line == "Change detected, executing build...") {
         onGradleEvent(GradleAlert.BuildRestarted)
     }
@@ -71,6 +75,7 @@ fun RunScope.handleGradleOutput(line: String, isError: Boolean, onGradleEvent: (
  */
 class GradleAlertBundle(session: Session, private val pageSize: Int = 7) {
     private val alerts = session.liveListOf<GradleAlert>()
+    private var hasFirstTaskRun by session.liveVarOf(false)
     private var startIndex by session.liveVarOf(0)
     private val maxIndex get() = (alerts.size - pageSize).coerceAtLeast(0)
 
@@ -78,6 +83,8 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 7) {
         if (alert is GradleAlert.BuildRestarted) {
             startIndex = 0
             alerts.clear()
+        } else if (alert is GradleAlert.Task) {
+            hasFirstTaskRun = true
         } else {
             alerts.add(alert)
         }
@@ -98,6 +105,13 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 7) {
     }
 
     fun renderInto(renderScope: RenderScope) {
+        renderScope.apply {
+            if (!hasFirstTaskRun) {
+                yellow { textLine("Output may seem to pause for a while if Kobweb needs to download / resolve dependencies.") }
+                textLine()
+            }
+        }
+
         val numErrors = alerts.filterIsInstance<GradleAlert.Error>().size
         val numWarnings = alerts.filterIsInstance<GradleAlert.Warning>().size
 

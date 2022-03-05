@@ -1,11 +1,13 @@
 package com.varabyte.kobweb.cli.export
 
 import com.varabyte.kobweb.cli.common.Anims
+import com.varabyte.kobweb.cli.common.GradleAlertBundle
 import com.varabyte.kobweb.cli.common.KobwebGradle
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.assertKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
+import com.varabyte.kobweb.cli.common.handleGradleOutput
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.cli.common.showDownloadDelayWarning
 import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
@@ -44,20 +46,16 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
         }
 
         var exportState by liveVarOf(ExportState.EXPORTING)
-        var numLinesOutput by liveVarOf(0)
+        val gradleAlertBundle = GradleAlertBundle(this)
 
         var cancelReason by liveVarOf("")
         val ellipsis = textAnimOf(Anims.ELLIPSIS)
         var exception by liveVarOf<Exception?>(null) // Set if ExportState.INTERRUPTED
         section {
             textLine() // Add space between this block and Gradle text which will appear above
+            gradleAlertBundle.renderInto(this)
             when (exportState) {
-                ExportState.EXPORTING -> run {
-                    if (numLinesOutput < 10) {
-                        showDownloadDelayWarning()
-                    }
-                    textLine("Exporting$ellipsis")
-                }
+                ExportState.EXPORTING -> textLine("Exporting$ellipsis")
                 ExportState.FINISHING -> textLine("Finishing up$ellipsis")
                 ExportState.FINISHED -> textLine("Export finished successfully")
                 ExportState.CANCELLING -> yellow { textLine("Cancelling export: $cancelReason$ellipsis") }
@@ -78,8 +76,7 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
                 return@run
             }
             exportProcess.consumeProcessOutput { line, isError ->
-                ++numLinesOutput
-                handleConsoleOutput(line, isError)
+                handleGradleOutput(line, isError) { alert -> gradleAlertBundle.handleAlert(alert) }
             }
 
             onKeyPressed {
@@ -87,6 +84,9 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
                     cancelReason = "User requested cancellation"
                     exportProcess.destroy()
                     exportState = ExportState.CANCELLING
+                }
+                else {
+                    gradleAlertBundle.handleKey(key)
                 }
             }
 
