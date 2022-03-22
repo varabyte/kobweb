@@ -15,7 +15,6 @@ dependencies {
     implementation(libs.kotlinx.cli)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotter)
-    implementation(libs.jgit)
     implementation(libs.freemarker)
     implementation(libs.kaml)
     implementation(project(":common:kobweb-common"))

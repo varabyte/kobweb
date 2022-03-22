@@ -25,6 +25,12 @@ fun Runtime.gradlew(vararg args: String): Process {
     return exec(finalArgs.toTypedArray())
 }
 
+fun Runtime.git(vararg args: String): Process {
+    val finalArgs = mutableListOf("git")
+    finalArgs.addAll(args)
+    return exec(finalArgs.toTypedArray())
+}
+
 private fun consumeStream(stream: InputStream, isError: Boolean, onLineRead: (String, Boolean) -> Unit) {
     val isr = InputStreamReader(stream)
     val br = BufferedReader(isr)

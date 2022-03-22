@@ -3,6 +3,7 @@ package com.varabyte.kobweb.cli.create
 import com.varabyte.kobweb.cli.common.PathUtils
 import com.varabyte.kobweb.cli.common.Validations
 import com.varabyte.kobweb.cli.common.cmd
+import com.varabyte.kobweb.cli.common.findGit
 import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.informInfo
 import com.varabyte.kobweb.cli.common.queryUser
@@ -44,14 +45,14 @@ import kotlin.io.path.name
 private const val DEFAULT_SUFFIX = "/default"
 
 fun handleCreate(repo: String, branch: String, template: String) = session {
-    val tempDir = handleFetch(repo, branch) ?: return@session
+    val gitClient = findGit() ?: return@session
+    val tempDir = handleFetch(gitClient, repo, branch) ?: return@session
 
     val templateFile = run {
-        val tempPath = tempDir.toPath()
         val subPaths = listOf("$template$DEFAULT_SUFFIX", template)
         subPaths
             .asSequence()
-            .map { subPath -> tempPath.resolve(subPath) }
+            .map { subPath -> tempDir.resolve(subPath) }
             .mapNotNull { currPath -> KobwebFolder.inPath(currPath)?.let { KobwebTemplateFile(it) } }
             .filter { it.content != null }
             .firstOrNull()

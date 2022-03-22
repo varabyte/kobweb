@@ -4,7 +4,6 @@ commonmark = "0.18.0"
 compose = "1.0.1"
 freemarker = "2.3.31"
 jreleaser = "1.0.0-M2"
-jgit = "5.12.0.202106070339-r"
 jsoup = "1.14.3"
 kaml = "0.35.3"
 kobweb-cli = "0.9.8-SNAPSHOT"
@@ -29,7 +28,6 @@ commonmark-frontmatter = { module = "org.commonmark:commonmark-ext-yaml-front-ma
 commonmark-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark" }
 commonmark-tasklist = { module = "org.commonmark:commonmark-ext-task-list-items", version.ref = "commonmark" }
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker"}
-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotter = { module = "com.varabyte.kotter:kotter", version.ref = "kotter" }

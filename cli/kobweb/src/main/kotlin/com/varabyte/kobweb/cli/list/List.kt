@@ -2,6 +2,7 @@ package com.varabyte.kobweb.cli.list
 
 import com.varabyte.kobweb.cli.common.DEFAULT_BRANCH
 import com.varabyte.kobweb.cli.common.DEFAULT_REPO
+import com.varabyte.kobweb.cli.common.findGit
 import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
@@ -14,7 +15,6 @@ import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
 import com.varabyte.kotter.runtime.render.RenderScope
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.relativeTo
 
 private fun RenderScope.renderTemplateItem(rootPath: Path, template: KobwebTemplateFile) {
@@ -37,9 +37,10 @@ private fun List<KobwebTemplateFile>.renderTemplateItemsInto(rootPath: Path, ren
 }
 
 fun handleList(repo: String, branch: String) = session {
-    val tempDir = handleFetch(repo, branch) ?: return@session
+    val gitClient = findGit() ?: return@session
+    val tempDir = handleFetch(gitClient, repo, branch) ?: return@session
 
-    val templates = tempDir.walkBottomUp()
+    val templates = tempDir.toFile().walkBottomUp()
         .filter { it.isDirectory }
         .mapNotNull { dir ->
             KobwebFolder.inPath(dir.toPath())
@@ -61,21 +62,19 @@ fun handleList(repo: String, branch: String) = session {
             textLine("`")
             textLine()
 
-            val rootPath = tempDir.toPath()
-
             run {
                 val highlightedTemplates = templates.filter { it.content!!.metadata.shouldHighlight }
                 if (highlightedTemplates.isNotEmpty()) {
                     yellow { textLine("Highlighted projects") }
                     textLine()
-                    highlightedTemplates.renderTemplateItemsInto(rootPath, this)
+                    highlightedTemplates.renderTemplateItemsInto(tempDir, this)
                     textLine()
                     yellow { textLine("All projects") }
                     textLine()
                 }
             }
 
-            templates.renderTemplateItemsInto(rootPath, this)
+            templates.renderTemplateItemsInto(tempDir, this)
         } else {
             textError("No templates were found in the specified repository.")
         }
