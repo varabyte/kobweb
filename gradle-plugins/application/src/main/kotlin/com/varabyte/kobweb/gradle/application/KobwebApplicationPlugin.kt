@@ -121,7 +121,7 @@ class KobwebApplicationPlugin @Inject constructor(
         project.afterEvaluate {
             project.tasks.named("clean") {
                 doLast {
-                    delete(kobwebFolder.resolve("site"))
+                    delete(kobwebConf.server.files.prod.siteRoot)
                     delete(kobwebFolder.resolve("server"))
                 }
             }
