@@ -59,6 +59,31 @@ class GitClient {
         args.add(branch)
         args.add(into.absolutePathString())
 
-        Runtime.getRuntime().git(*args.toTypedArray()).waitFor()
+        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
+    }
+
+    fun init(rootDir: Path? = null) {
+        val args = mutableListOf("init")
+        if (rootDir != null) {
+            args.add(rootDir.absolutePathString())
+        }
+
+        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
+    }
+
+    fun add(filePattern: String, rootDir: Path? = null) {
+        val args = mutableListOf("add", filePattern)
+        if (rootDir != null) {
+            args.addAll(0, listOf("-C", rootDir.absolutePathString()))
+        }
+        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
+    }
+
+    fun commit(message: String, rootDir: Path? = null) {
+        val args = mutableListOf("commit", "-m", message)
+        if (rootDir != null) {
+            args.addAll(0, listOf("-C", rootDir.absolutePathString()))
+        }
+        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
     }
 }

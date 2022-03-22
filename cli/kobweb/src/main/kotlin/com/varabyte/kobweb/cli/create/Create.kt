@@ -6,10 +6,13 @@ import com.varabyte.kobweb.cli.common.cmd
 import com.varabyte.kobweb.cli.common.findGit
 import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.informInfo
+import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.cli.common.queryUser
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
+import com.varabyte.kobweb.cli.create.freemarker.methods.IsNotEmptyMethod
+import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.blue
@@ -102,11 +105,37 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
 
     val projectFolder = dstPath.name
 
+    newline()
+    var gitInitialized = false
+    queryUser("Would you like to initialize git for this project?", "yes").let { initializeAnswer ->
+        val yesNoToBool = YesNoToBoolMethod()
+        val isNotEmpty = IsNotEmptyMethod()
+
+        val shouldInitialize = yesNoToBool.exec(initializeAnswer).toBoolean()
+        if (shouldInitialize) {
+            gitClient.init(dstPath)
+
+            val commitAnswer = queryUser("Would you like to create an initial commit?", "yes")
+            val shouldCommit = yesNoToBool.exec(commitAnswer).toBoolean()
+
+            if (shouldCommit) {
+                val commitMessage = queryUser(
+                    "Commit message:",
+                    "Initial commit",
+                    validateAnswer = { answer -> isNotEmpty.exec(answer) }
+                ).trim()
+
+                gitClient.add(".", dstPath)
+                gitClient.commit(commitMessage, dstPath)
+            }
+            gitInitialized = true
+        }
+    }
+
     section {
         fun indent() {
             text("  ")
         }
-        textLine()
         bold {
             green { text("Success! ") }
             textLine("Created $projectFolder at ${dstPath.absolutePathString()}")
@@ -121,6 +150,9 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
         textLine()
         if (dstPath != Path.of("").toAbsolutePath()) {
             indent(); cmd("cd $projectFolder"); textLine()
+        }
+        if (!gitInitialized) {
+            indent(); cmd("git add . && "); cmd("git commit -m \"Initial commit\""); textLine()
         }
         indent(); cmd("kobweb run"); textLine()
     }.run()
