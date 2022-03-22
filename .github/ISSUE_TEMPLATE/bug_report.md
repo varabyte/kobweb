@@ -9,6 +9,11 @@ assignees: ''
 
 *YOUR BUG DESCRIPTION HERE*
 
+If relevant, specify:
+* OS: _(Choose one: Linux/Mac/Win)_
+* Kobweb libs version: _(from your `gradle/libs.version.toml` file)_
+* Kobweb CLI version: _(run `kobweb version`)_
+
 ---
 
 To ensure this bug gets triaged / prioritized quickly, please...
