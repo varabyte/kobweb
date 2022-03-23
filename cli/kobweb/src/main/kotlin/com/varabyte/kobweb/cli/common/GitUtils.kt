@@ -43,6 +43,10 @@ class GitClient {
         versionDeferred.await()
     }
 
+    private fun git(vararg args: String) {
+        Runtime.getRuntime().git(*args).waitFor()
+    }
+
     fun clone(
         repo: String,
         branch: String,
@@ -59,7 +63,7 @@ class GitClient {
         args.add(branch)
         args.add(into.absolutePathString())
 
-        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
+        git(*args.toTypedArray())
     }
 
     fun init(rootDir: Path? = null) {
@@ -68,7 +72,7 @@ class GitClient {
             args.add(rootDir.absolutePathString())
         }
 
-        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
+        git(*args.toTypedArray())
     }
 
     fun add(filePattern: String, rootDir: Path? = null) {
@@ -76,7 +80,7 @@ class GitClient {
         if (rootDir != null) {
             args.addAll(0, listOf("-C", rootDir.absolutePathString()))
         }
-        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
+        git(*args.toTypedArray())
     }
 
     fun commit(message: String, rootDir: Path? = null) {
@@ -84,6 +88,6 @@ class GitClient {
         if (rootDir != null) {
             args.addAll(0, listOf("-C", rootDir.absolutePathString()))
         }
-        Runtime.getRuntime().gitBlocking(*args.toTypedArray())
+        git(*args.toTypedArray())
     }
 }

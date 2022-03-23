@@ -31,8 +31,6 @@ fun Runtime.git(vararg args: String): Process {
     return exec(finalArgs.toTypedArray())
 }
 
-fun Runtime.gitBlocking(vararg args: String) = git(*args).waitFor()
-
 private fun consumeStream(stream: InputStream, isError: Boolean, onLineRead: (String, Boolean) -> Unit) {
     val isr = InputStreamReader(stream)
     val br = BufferedReader(isr)
