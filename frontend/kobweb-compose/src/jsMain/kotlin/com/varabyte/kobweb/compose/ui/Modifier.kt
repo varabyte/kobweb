@@ -44,12 +44,20 @@ interface Modifier {
     }
 }
 
+fun Modifier.thenIf(condition: Boolean, produce: () -> Modifier): Modifier {
+    return Modifier.then(if (condition) produce() else Modifier)
+}
+
+fun Modifier.thenUnless(condition: Boolean, produce: () -> Modifier): Modifier {
+    return Modifier.thenIf(!condition, produce)
+}
+
 fun Modifier.thenIf(condition: Boolean, other: Modifier): Modifier {
-    return Modifier.then(if (condition) other else Modifier)
+    return Modifier.thenIf(condition) { other }
 }
 
 fun Modifier.thenUnless(condition: Boolean, other: Modifier): Modifier {
-    return Modifier.thenIf(!condition, other)
+    return Modifier.thenUnless(condition) { other }
 }
 
 /**

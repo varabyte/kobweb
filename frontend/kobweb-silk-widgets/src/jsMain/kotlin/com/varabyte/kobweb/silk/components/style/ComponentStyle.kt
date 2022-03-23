@@ -569,13 +569,21 @@ sealed class ComponentVariant {
     abstract fun toModifier(): Modifier
 }
 
-fun ComponentVariant.thenIf(condition: Boolean, other: ComponentVariant): ComponentVariant {
+fun ComponentVariant.thenIf(condition: Boolean, produce: () -> ComponentVariant): ComponentVariant {
     return this
-        .then(if (condition) other else ComponentVariant.Empty)
+        .then(if (condition) produce() else ComponentVariant.Empty)
+}
+
+fun ComponentVariant.thenUnless(condition: Boolean, produce: () -> ComponentVariant): ComponentVariant {
+    return this.thenIf(!condition, produce)
+}
+
+fun ComponentVariant.thenIf(condition: Boolean, other: ComponentVariant): ComponentVariant {
+    return this.thenIf(condition) { other }
 }
 
 fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): ComponentVariant {
-    return this.thenIf(!condition, other)
+    return this.thenUnless(condition) { other }
 }
 
 class SimpleComponentVariant(val style: ComponentStyle, private val baseStyle: ComponentStyle): ComponentVariant() {
