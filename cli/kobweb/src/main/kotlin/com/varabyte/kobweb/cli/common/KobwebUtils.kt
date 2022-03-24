@@ -2,8 +2,8 @@ package com.varabyte.kobweb.cli.common
 
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebProject
-import com.varabyte.kobweb.server.api.SiteLayout
-import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.ServerState
+import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
 import com.varabyte.kotter.runtime.Session
@@ -17,12 +17,39 @@ fun assertKobwebProject(): KobwebProject {
     }
 }
 
+fun KobwebProject.assertServerNotAlreadyRunning() {
+    ServerStateFile(this.kobwebFolder).content?.let { serverState ->
+        if (serverState.isRunning()) {
+            throw KobwebException("Cannot execute this command as a server is already running (PID=${serverState.pid}). Consider running `kobweb stop` if this is unexpected.")
+        }
+    }
+}
+
+fun KobwebProject.isServerAlreadyRunning(): Boolean {
+    return try {
+        assertServerNotAlreadyRunning()
+        false
+    } catch (ex: KobwebException) {
+        true
+    }
+}
+
 fun Session.findKobwebProject(): KobwebProject? {
     return try {
         assertKobwebProject()
     } catch (ex: KobwebException) {
         informError(ex.message!!)
         null
+    }
+}
+
+fun Session.isServerAlreadyRunningFor(project: KobwebProject): Boolean {
+    return try {
+        project.assertServerNotAlreadyRunning()
+        false
+    } catch (ex: KobwebException) {
+        informError(ex.message!!)
+        true
     }
 }
 

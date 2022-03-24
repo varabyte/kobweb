@@ -4,12 +4,13 @@ import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.GradleAlertBundle
 import com.varabyte.kobweb.cli.common.KobwebGradle
 import com.varabyte.kobweb.cli.common.assertKobwebProject
+import com.varabyte.kobweb.cli.common.assertServerNotAlreadyRunning
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebProject
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.handleGradleOutput
+import com.varabyte.kobweb.cli.common.isServerAlreadyRunningFor
 import com.varabyte.kobweb.cli.common.newline
-import com.varabyte.kobweb.cli.common.showDownloadDelayWarning
 import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.project.conf.KobwebConfFile
@@ -59,7 +60,10 @@ fun handleRun(
     val env = env.takeIf { siteLayout != SiteLayout.STATIC } ?: ServerEnvironment.PROD
     val kobwebGradle = KobwebGradle(env)
     if (isInteractive) session {
-        val kobwebFolder = findKobwebProject()?.kobwebFolder ?: return@session
+        val kobwebProject = findKobwebProject() ?: return@session
+        if (isServerAlreadyRunningFor(kobwebProject)) return@session
+
+        val kobwebFolder = kobwebProject.kobwebFolder
         val conf = KobwebConfFile(kobwebFolder).content!!
 
         newline() // Put space between user prompt and eventual first line of Gradle output
@@ -84,8 +88,6 @@ fun handleRun(
                 }.run()
             }
         }
-
-        val serverStateFile = ServerStateFile(kobwebFolder)
 
         val envName = when (env) {
             ServerEnvironment.DEV -> "development"
@@ -203,18 +205,12 @@ fun handleRun(
                 }
             }
 
+            val serverStateFile = ServerStateFile(kobwebFolder)
             coroutineScope {
                 while (runState == RunState.STARTING) {
                     serverStateFile.content?.takeIf { it.isRunning() }?.let {
-                        if (it.env != env) {
-                            cancelReason =
-                                "A server is already running using a different environment configuration (want = $env, current = ${it.env})"
-                            runState = RunState.CANCELLED
-                            signal()
-                        } else {
-                            serverState = it
-                            runState = RunState.RUNNING
-                        }
+                        serverState = it
+                        runState = RunState.RUNNING
                         return@coroutineScope
                     }
                     delay(300)
@@ -240,6 +236,8 @@ fun handleRun(
     } else {
         assert(!isInteractive)
         assertKobwebProject()
+            .also { kobwebProject -> kobwebProject.assertServerNotAlreadyRunning() }
+
         // If we're non-interactive, it means we just want to start the Kobweb server and exit without waiting for
         // for any additional changes. (This is essentially used when run in a web server environment)
         kobwebGradle.startServer(enableLiveReloading = false, siteLayout).also { it.consumeProcessOutput(); it.waitFor() }
