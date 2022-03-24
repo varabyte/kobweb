@@ -135,10 +135,10 @@ fun handleRun(
                 }
                 RunState.CANCELLING -> {
                     check(cancelReason.isNotBlank())
-                    yellow { textLine("Server startup cancelling: $cancelReason$ellipsisAnim") }
+                    yellow { textLine("Cancelling: $cancelReason$ellipsisAnim") }
                 }
                 RunState.CANCELLED -> {
-                    yellow { textLine("Server startup cancelled: $cancelReason") }
+                    yellow { textLine("cancelled: $cancelReason") }
                 }
                 RunState.INTERRUPTED -> {
                     red { textLine("Interrupted by exception:") }
