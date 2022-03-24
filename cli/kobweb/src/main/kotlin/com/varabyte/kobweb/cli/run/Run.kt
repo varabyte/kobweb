@@ -138,7 +138,7 @@ fun handleRun(
                     yellow { textLine("Cancelling: $cancelReason$ellipsisAnim") }
                 }
                 RunState.CANCELLED -> {
-                    yellow { textLine("cancelled: $cancelReason") }
+                    yellow { textLine("Cancelled: $cancelReason") }
                 }
                 RunState.INTERRUPTED -> {
                     red { textLine("Interrupted by exception:") }
