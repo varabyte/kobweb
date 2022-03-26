@@ -162,7 +162,7 @@ fun handleRun(
             Runtime.getRuntime().addShutdownHook(Thread {
                 if (runState == RunState.RUNNING || runState == RunState.STOPPING) {
                     cancelReason =
-                        "CTRL-C received. We already kicked off a request to stop the server but we have to exit NOW."
+                        "CTRL-C received. We kicked off a request to stop the server but we have to exit NOW before waiting for a confirmation."
                     runState = RunState.CANCELLED
 
                     ServerRequestsFile(kobwebFolder).enqueueRequest(ServerRequest.Stop())
