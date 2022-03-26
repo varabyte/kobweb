@@ -55,7 +55,7 @@ fun handleStop(
         else {
             section {
                 textLine("Did not detect a running server.")
-            }.run()s
+            }.run()
         }
     }
     else {
