@@ -152,7 +152,7 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
             indent(); cmd("cd $projectFolder"); textLine()
         }
         if (!gitInitialized) {
-            indent(); cmd("git add . && "); cmd("git commit -m \"Initial commit\""); textLine()
+            indent(); cmd("git init && "); cmd("git add . && "); cmd("git commit -m \"Initial commit\""); textLine()
         }
         indent(); cmd("kobweb run"); textLine()
     }.run()
