@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
@@ -22,23 +23,35 @@ fun Session.findGit(): GitClient? {
 }
 
 private val GIT_VERSION_REGEX = Regex("""git.* ((\d+).(\d+).(\d+))""")
-data class GitVersion(val major: Int, val minor: Int, val patch: Int)
+
+sealed interface GitVersion {
+    data class Parsed(val major: Int, val minor: Int, val patch: Int) : GitVersion
+    // If we detect git (e.g. we're able to run the process), we should always move forward
+    // if we can, even if we can't parse the version.
+    data class Unparsed(val text: String) : GitVersion
+}
 
 class GitClient {
     val version: GitVersion = runBlocking(Dispatchers.IO) {
-        val process = Runtime.getRuntime().git("version")
+        val process = try {
+            Runtime.getRuntime().git("version")
+        } catch (ex: IOException) {
+            throw KobwebException("git must be installed and present on the path")
+        }
         val versionDeferred = CompletableDeferred<GitVersion>()
-        process.consumeProcessOutput { line, isError ->
-            val result = GIT_VERSION_REGEX.matchEntire(line)
-            if (result != null) {
-                versionDeferred.complete(GitVersion(
-                    result.groupValues[2].toInt(),
-                    result.groupValues[3].toInt(),
-                    result.groupValues[4].toInt(),
-                ))
-            } else {
-                throw KobwebException("git must be installed and present on the path")
-            }
+        process.consumeProcessOutput { line, _ ->
+            val result = GIT_VERSION_REGEX.find(line)
+            versionDeferred.complete(
+                if (result != null) {
+                    GitVersion.Parsed(
+                        result.groupValues[2].toInt(),
+                        result.groupValues[3].toInt(),
+                        result.groupValues[4].toInt(),
+                    )
+                } else {
+                    GitVersion.Unparsed(line)
+                }
+            )
         }
         versionDeferred.await()
     }
