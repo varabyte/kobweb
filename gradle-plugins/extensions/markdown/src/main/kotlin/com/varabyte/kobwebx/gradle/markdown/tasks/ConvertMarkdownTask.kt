@@ -4,10 +4,10 @@ import com.varabyte.kobweb.common.packageConcat
 import com.varabyte.kobweb.common.toPackageName
 import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
-import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
 import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.application.extensions.getResourceRoots
 import com.varabyte.kobweb.gradle.application.extensions.prefixQualifiedPackage
+import com.varabyte.kobweb.gradle.application.kmp.jsTarget
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownComponents
 import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
@@ -33,12 +33,12 @@ abstract class ConvertMarkdownTask @Inject constructor(
     private val markdownFeatures =
         (markdownConfig as ExtensionAware).extensions.getByName("features") as MarkdownFeatures
 
-    private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(TargetPlatform.JS)
+    private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(project.jsTarget)
         .map { root -> File(root, markdownConfig.markdownPath.get()) }
 
     private fun getMarkdownFilesWithRoots(): List<RootAndFile> {
         val mdRoots = getMarkdownRoots()
-        return project.getResourceFilesWithRoots(TargetPlatform.JS)
+        return project.getResourceFilesWithRoots(project.jsTarget)
             .filter { rootAndFile -> rootAndFile.file.extension == "md" }
             .mapNotNull { rootAndFile ->
                 mdRoots.find { mdRoot -> rootAndFile.file.startsWith(mdRoot) }

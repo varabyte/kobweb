@@ -5,6 +5,8 @@ import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
 import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import com.varabyte.kobweb.gradle.application.extensions.index
+import com.varabyte.kobweb.gradle.application.kmp.jsTarget
+import com.varabyte.kobweb.gradle.application.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import com.varabyte.kobweb.gradle.application.kmp.sourceSets
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
@@ -24,8 +26,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.build.event.BuildEventsListenerRegistry
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.getting
 import org.gradle.tooling.events.FailureResult
 import javax.inject.Inject
 
@@ -69,8 +69,6 @@ class KobwebApplicationPlugin @Inject constructor(
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
         val kobwebExportTask =
             project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, env, exportLayout)
-
-        val jsRunTasks = listOf("jsBrowserDevelopmentRun", "jsBrowserProductionRun", "jsBrowserRun", "jsRun")
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
@@ -126,6 +124,11 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
+            val jsRunTasks = listOf(
+                jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun,
+                jsTarget.browserRun, jsTarget.run,
+            )
+
             // Users should be using Kobweb commands instead of the standard Compose for Web commands, but they
             // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
             // the Kobweb commands instead.
@@ -147,26 +150,28 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             val cleanTask = project.tasks.named("clean")
-            project.tasks.named("compileKotlinJs") {
+            project.tasks.named(jsTarget.compileKotlin) {
                 dependsOn(kobwebGenSiteTask)
             }
-            project.tasks.named("jsProcessResources") {
+            project.tasks.named(jsTarget.processResources) {
                 dependsOn(kobwebGenSiteTask)
             }
 
             // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
-            project.tasks.findByName("compileKotlinJvm")?.dependsOn(kobwebGenApiTask)
+            jvmTarget?.let { jvm ->
+                project.tasks.findByName(jvm.compileKotlin)?.dependsOn(kobwebGenApiTask)
 
-            val jarTask = project.tasks.findByName("jvmJar")
-            jarTask?.dependsOn(kobwebGenApiTask)
+                project.tasks.findByName(jvm.jar)?.dependsOn(kobwebGenApiTask)
+            }
+
 
             val compileExecutableTask = when (buildTarget) {
-                BuildTarget.DEBUG -> project.tasks.named("jsDevelopmentExecutableCompileSync")
-                BuildTarget.RELEASE -> project.tasks.named("jsProductionExecutableCompileSync")
+                BuildTarget.DEBUG -> project.tasks.named(jsTarget.developmentExecutableCompileSync)
+                BuildTarget.RELEASE -> project.tasks.named(jsTarget.productionExecutableCompileSync)
             }
             kobwebStartTask.configure {
-                if (jarTask != null) {
-                    dependsOn(jarTask)
+                jvmTarget?.let { jvm ->
+                    dependsOn(project.tasks.findByName(jvm.jar))
                 }
                 if (env == ServerEnvironment.DEV) {
                     dependsOn(compileExecutableTask)
@@ -179,16 +184,14 @@ class KobwebApplicationPlugin @Inject constructor(
 
             project.kotlin {
                 sourceSets {
-                    @Suppress("UNUSED_VARIABLE") // jsMain name is necessary for "getting"
-                    val jsMain by getting {
-                        kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$JS_SRC_SUFFIX"))
-                        resources.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$JS_RESOURCE_SUFFIX"))
+                    getByName(jsTarget.mainSourceSet) {
+                        kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT${jsTarget.srcSuffix}"))
+                        resources.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT${jsTarget.resourceSuffix}"))
                     }
 
-                    if (jarTask != null) {
-                        @Suppress("UNUSED_VARIABLE") // jvmMain name is necessary for "getting"
-                        val jvmMain by getting {
-                            kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT$JVM_SRC_SUFFIX"))
+                    jvmTarget?.let { jvm ->
+                        getByName(jvm.mainSourceSet) {
+                            kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT${jvm.srcSuffix}"))
                         }
                     }
                 }
