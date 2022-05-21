@@ -4,10 +4,13 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.RootAndFile
-import com.varabyte.kobweb.gradle.application.extensions.TargetPlatform
 import com.varabyte.kobweb.gradle.application.extensions.getBuildScripts
 import com.varabyte.kobweb.gradle.application.extensions.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.application.extensions.getSourceFiles
+import com.varabyte.kobweb.gradle.application.kmp.JsTarget
+import com.varabyte.kobweb.gradle.application.kmp.JvmTarget
+import com.varabyte.kobweb.gradle.application.kmp.jsTarget
+import com.varabyte.kobweb.gradle.application.kmp.jvmTarget
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerState
 import org.gradle.api.GradleException
@@ -40,13 +43,14 @@ abstract class KobwebProjectTask(@get:Internal val kobwebBlock: KobwebBlock, des
     fun getBuildScripts(): List<File> = project.getBuildScripts().toList()
 
     @Internal
-    protected fun getSourceFilesJs(): List<File> = project.getSourceFiles(TargetPlatform.JS).toList()
+    protected fun getSourceFilesJs(): List<File> = project.getSourceFiles(project.jsTarget).toList()
 
     @Internal
-    protected fun getSourceFilesJvm(): List<File> = project.getSourceFiles(TargetPlatform.JVM).toList()
+    protected fun getSourceFilesJvm(): List<File> =
+        project.jvmTarget?.let { project.getSourceFiles(it).toList() } ?: emptyList()
 
     @Internal
-    fun getResourceFilesJsWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(TargetPlatform.JS)
+    fun getResourceFilesJsWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(project.jsTarget)
         .filter { rootAndFile -> rootAndFile.relativeFile.path.startsWith("${getPublicPath()}/") }
 
     @Internal

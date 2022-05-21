@@ -4,9 +4,8 @@ package com.varabyte.kobweb.gradle.application.extensions
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.GENERATED_ROOT
-import com.varabyte.kobweb.gradle.application.JS_RESOURCE_SUFFIX
-import com.varabyte.kobweb.gradle.application.JS_SRC_SUFFIX
-import com.varabyte.kobweb.gradle.application.JVM_SRC_SUFFIX
+import com.varabyte.kobweb.gradle.application.kmp.jsTarget
+import com.varabyte.kobweb.gradle.application.kmp.jvmTarget
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.HEAD
 import kotlinx.html.link
@@ -104,14 +103,20 @@ abstract class KobwebBlock @Inject constructor(conf: KobwebConf) {
         (this as ExtensionAware).extensions.create("index", IndexDocument::class.java, RoutePrefix(conf.site.routePrefix))
     }
 
-    fun getGenJsSrcRoot(project: Project): File =
-        project.layout.buildDirectory.dir("${genDir.get()}$JS_SRC_SUFFIX").get().asFile
+    fun getGenJsSrcRoot(project: Project): File {
+        val jsSrcSuffix = project.jsTarget.srcSuffix
+        return project.layout.buildDirectory.dir("${genDir.get()}$jsSrcSuffix").get().asFile
+    }
 
-    fun getGenJsResRoot(project: Project): File =
-        project.layout.buildDirectory.dir("${genDir.get()}$JS_RESOURCE_SUFFIX").get().asFile
+    fun getGenJsResRoot(project: Project): File {
+        val jsResourceSuffix = project.jsTarget.resourceSuffix
+        return project.layout.buildDirectory.dir("${genDir.get()}$jsResourceSuffix").get().asFile
+    }
 
-    fun getGenJvmSrcRoot(project: Project): File =
-        project.layout.buildDirectory.dir("${genDir.get()}$JVM_SRC_SUFFIX").get().asFile
+    fun getGenJvmSrcRoot(project: Project): File {
+        val jvmSrcSuffix = (project.jvmTarget ?: error("No JVM target defined")).srcSuffix
+        return project.layout.buildDirectory.dir("${genDir.get()}$jvmSrcSuffix").get().asFile
+    }
 }
 
 val KobwebBlock.index: KobwebBlock.IndexDocument
