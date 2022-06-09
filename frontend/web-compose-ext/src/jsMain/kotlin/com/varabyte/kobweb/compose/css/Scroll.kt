@@ -76,7 +76,7 @@ fun StyleBuilder.scrollPadding(
     property("scroll-padding", "$top $right $bottom $left")
 }
 
-fun StyleBuilder.scrollPadding(value: CSSNumeric) {
+fun StyleBuilder.scrollPadding(value: CSSNumeric = 0.px) {
     property("scroll-padding", "$value")
 }
 
