@@ -31,7 +31,7 @@ val NavHeaderStyle = ComponentStyle.base("nav-header") {
 }
 
 val NavItemStyle = ComponentStyle("nav-item") {
-    base { Modifier.margin(topBottom = 0.px, leftRight = 15.px) }
+    base { Modifier.margin(leftRight = 15.px) }
 }
 
 val NavLinkVariant = LinkStyle.addVariant("nav") {
