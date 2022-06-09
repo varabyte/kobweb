@@ -77,9 +77,9 @@ fun StyleBuilder.justifySelf(overflow: AlignmentOverflowStrategy, position: Just
 
 // endregion
 
-// region JustifySelf
+// region JustifyItems
 
-// See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
+// See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
 class JustifyItems(val value: String) {
     companion object {
         // Basic
