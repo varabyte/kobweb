@@ -62,7 +62,7 @@ fun Modifier.maxHeight(size: CSSNumeric): Modifier = styleModifier {
     maxHeight(size)
 }
 
-fun Modifier.margin(all: CSSNumeric = 0.px): Modifier = styleModifier {
+fun Modifier.margin(all: CSSNumeric): Modifier = styleModifier {
     margin(all)
 }
 
@@ -93,7 +93,7 @@ fun Modifier.marginBlock(
     marginBlock(start, end)
 }
 
-fun Modifier.padding(all: CSSNumeric = 0.px): Modifier = styleModifier {
+fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
     padding(all)
 }
 

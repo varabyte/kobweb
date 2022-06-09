@@ -27,7 +27,7 @@ fun Modifier.scrollPadding(
     scrollPadding(top, right, bottom, left)
 }
 
-fun Modifier.scrollPadding(value: CSSNumeric = 0.px) = styleModifier {
+fun Modifier.scrollPadding(value: CSSNumeric) = styleModifier {
     scrollPadding(value)
 }
 
@@ -60,7 +60,7 @@ fun Modifier.scrollMargin(
     scrollMargin(top, right, bottom, left)
 }
 
-fun Modifier.scrollMargin(value: CSSNumeric = 0.px) = styleModifier {
+fun Modifier.scrollMargin(value: CSSNumeric) = styleModifier {
     scrollMargin(value)
 }
 
