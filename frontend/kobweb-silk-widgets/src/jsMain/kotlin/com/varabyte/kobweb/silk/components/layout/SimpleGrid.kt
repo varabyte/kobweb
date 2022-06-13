@@ -11,6 +11,7 @@ import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.ResponsiveValues
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.ui.thenIf
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.ElementScope
@@ -98,10 +99,10 @@ fun SimpleGrid(
             .toModifier(variant)
             // Breakpoint.ZERO is special case used to mean "base" in this case
             .then(SimpleGridColumnVariants.getValue(Breakpoint.ZERO).getValue(numColumns.base).toModifier())
-            .then(SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).toModifier().takeIf { numColumns.sm != numColumns.base } ?: Modifier)
-            .then(SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).toModifier().takeIf { numColumns.md != numColumns.sm } ?: Modifier)
-            .then(SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).toModifier().takeIf { numColumns.lg != numColumns.md } ?: Modifier)
-            .then(SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier().takeIf { numColumns.xl != numColumns.lg } ?: Modifier)
+            .thenIf(numColumns.sm != numColumns.base) { SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).toModifier() }
+            .thenIf(numColumns.md != numColumns.sm) { SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).toModifier() }
+            .thenIf(numColumns.lg != numColumns.md) { SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).toModifier() }
+            .thenIf(numColumns.xl != numColumns.lg) { SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier() }
             .then(modifier)
             .asAttributesBuilder()
     ) {
