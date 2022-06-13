@@ -16,16 +16,24 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.ElementScope
 import org.w3c.dom.HTMLElement
 
+// Note: We restrict the number of columns supported by this widget because we have to statically predefine
+// (num breakpoints) * (num columns) style variants (and num breakpoints is 5).
+// I'm trying to be conservative for now, but if your project needs more than this, consider pinging me at
+// https://github.com/varabyte/kobweb/issues/154
+// In a pinch, you can fork this file into your own code, rename the base style from "silk-simple-grid" to your own name,
+// and increase the column count.
 private const val MAX_COLUMN_COUNT = 4
 
 val SimpleGridStyle = ComponentStyle.base("silk-simple-grid") {
     Modifier.display(DisplayStyle.Grid)
 }
 
-private val SimpleGridColumnVariants: Map<Breakpoint?, Map<Int, ComponentVariant>> = run {
-    (listOf(null) + Breakpoint.values())
+private val SimpleGridColumnVariants: Map<Breakpoint, Map<Int, ComponentVariant>> = run {
+    Breakpoint.values()
         .associateWith { breakpoint ->
-            val name = breakpoint?.toString()?.lowercase() ?: "base"
+            val isBaseVariant = breakpoint == Breakpoint.ZERO
+            val name = if (isBaseVariant) "base" else breakpoint.toString().lowercase()
+
             val variants = (0 until MAX_COLUMN_COUNT)
                 .associate { i ->
                     val numColumns = i + 1
@@ -33,7 +41,7 @@ private val SimpleGridColumnVariants: Map<Breakpoint?, Map<Int, ComponentVariant
                         gridTemplateColumns("repeat($numColumns, 1fr)")
                     }
                     numColumns to SimpleGridStyle.addVariant("$name-$numColumns") {
-                        if (breakpoint == null) {
+                        if (isBaseVariant) {
                             base { gridModifier }
                         } else {
                             breakpoint { gridModifier }
@@ -45,6 +53,11 @@ private val SimpleGridColumnVariants: Map<Breakpoint?, Map<Int, ComponentVariant
         }
 }
 
+/**
+ * A convenience function for generating a [ResponsiveValues] instance to be consumed by [SimpleGrid].
+ *
+ * See the header docs for that method for more details.
+ */
 fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = lg) =
     ResponsiveValues(base, sm, md, lg, xl)
 
@@ -83,8 +96,8 @@ fun SimpleGrid(
     Div(
         attrs = SimpleGridStyle
             .toModifier(variant)
-            // null is special case to mean "base" in this case
-            .then(SimpleGridColumnVariants.getValue(null).getValue(numColumns.base).toModifier())
+            // Breakpoint.ZERO is special case used to mean "base" in this case
+            .then(SimpleGridColumnVariants.getValue(Breakpoint.ZERO).getValue(numColumns.base).toModifier())
             .then(SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).toModifier().takeIf { numColumns.sm != numColumns.base } ?: Modifier)
             .then(SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).toModifier().takeIf { numColumns.md != numColumns.sm } ?: Modifier)
             .then(SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).toModifier().takeIf { numColumns.lg != numColumns.md } ?: Modifier)
