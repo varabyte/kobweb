@@ -44,20 +44,38 @@ interface Modifier {
     }
 }
 
-fun Modifier.thenIf(condition: Boolean, produce: () -> Modifier): Modifier {
-    return Modifier.then(if (condition) produce() else Modifier)
-}
-
-fun Modifier.thenUnless(condition: Boolean, produce: () -> Modifier): Modifier {
-    return Modifier.thenIf(!condition, produce)
-}
-
+/**
+ * Like [then] but the [other] modifier is only applied if the condition is true.
+ */
 fun Modifier.thenIf(condition: Boolean, other: Modifier): Modifier {
-    return Modifier.thenIf(condition) { other }
+    return this.thenIf(condition) { other }
 }
 
+/**
+ * Like [thenIf] but with an inverted condition.
+ */
 fun Modifier.thenUnless(condition: Boolean, other: Modifier): Modifier {
-    return Modifier.thenUnless(condition) { other }
+    return this.thenUnless(condition) { other }
+}
+
+/**
+ * Like the version of [thenIf] which takes in a modifier directly, but it produces that modifier lazily.
+ *
+ * This is occasionally useful if you have a Modifier that is expensive to create, e.g. it takes some complicated
+ * parameters you need to allocate which is a waste if the condition is false.
+ */
+fun Modifier.thenIf(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
+    return this.then(if (condition) lazyProduce() else Modifier)
+}
+
+/**
+ * Like the version of [thenUnless] which takes in a modifier directly, but it produces that modifier lazily.
+ *
+ * This is occasionally useful if you have a Modifier that is expensive to create, e.g. it takes some complicated
+ * parameters you need to allocate which is a waste if the condition is true.
+ */
+fun Modifier.thenUnless(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
+    return this.thenIf(!condition, lazyProduce)
 }
 
 /**
