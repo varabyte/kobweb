@@ -99,10 +99,18 @@ fun SimpleGrid(
             .toModifier(variant)
             // Breakpoint.ZERO is special case used to mean "base" in this case
             .then(SimpleGridColumnVariants.getValue(Breakpoint.ZERO).getValue(numColumns.base).toModifier())
-            .thenIf(numColumns.sm != numColumns.base) { SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).toModifier() }
-            .thenIf(numColumns.md != numColumns.sm) { SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).toModifier() }
-            .thenIf(numColumns.lg != numColumns.md) { SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).toModifier() }
-            .thenIf(numColumns.xl != numColumns.lg) { SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier() }
+            .thenIf(numColumns.sm != numColumns.base) {
+                SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).toModifier()
+            }
+            .thenIf(numColumns.md != numColumns.sm) {
+                SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).toModifier()
+            }
+            .thenIf(numColumns.lg != numColumns.md) {
+                SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).toModifier()
+            }
+            .thenIf(numColumns.xl != numColumns.lg) {
+                SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier()
+            }
             .then(modifier)
             .asAttributesBuilder()
     ) {
