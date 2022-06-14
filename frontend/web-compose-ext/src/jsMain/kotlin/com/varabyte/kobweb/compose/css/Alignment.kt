@@ -2,37 +2,32 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class AlignmentBaselinePosition(val value: String) {
-    companion object {
-        inline val First get() = AlignmentBaselinePosition("first")
-        inline val Last get() = AlignmentBaselinePosition("last")
-    }
-}
-
-class AlignmentOverflowStrategy(val value: String) {
-    companion object {
-        inline val Safe get() = AlignmentOverflowStrategy("safe")
-        inline val Unsafe get() = AlignmentOverflowStrategy("unsafe")
-    }
-}
-
-
 // region JustifySelf
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
 class JustifySelf(val value: String) {
-    class BaselinePosition(val value: String) {
-        companion object {
-            inline val First get() = BaselinePosition("first")
-            inline val Last get() = BaselinePosition("last")
+    class BaselineAlignment(val baselineSet: BaselineSet? = null) {
+        enum class BaselineSet {
+            FIRST,
+            LAST
+        }
+
+        override fun toString() = buildString {
+            if (baselineSet != null) {
+                append(baselineSet.name.lowercase())
+                append(' ')
+            }
+            append("baseline")
         }
     }
 
-    class OverflowStrategy(val value: String) {
-        companion object {
-            inline val Safe get() = OverflowStrategy("safe")
-            inline val Unsafe get() = OverflowStrategy("unsafe")
+    class OverflowAlignment(val position: JustifySelf, val strategy: Strategy) {
+        enum class Strategy {
+            SAFE,
+            UNSAFE,
         }
+
+        override fun toString() = "${strategy.name.lowercase()} ${position.value}"
     }
 
     companion object {
@@ -67,12 +62,12 @@ fun StyleBuilder.justifySelf(justifySelf: JustifySelf) {
     property("justify-self", justifySelf.value)
 }
 
-fun StyleBuilder.justifySelf(baseline: AlignmentBaselinePosition) {
-    property("justify-self", "${baseline.value} baseline")
+fun StyleBuilder.justifySelf(baseline: JustifySelf.BaselineAlignment) {
+    property("justify-self", baseline.toString())
 }
 
-fun StyleBuilder.justifySelf(overflow: AlignmentOverflowStrategy, position: JustifySelf) {
-    property("justify-self", "${overflow.value} ${position.value}")
+fun StyleBuilder.justifySelf(overflow: JustifySelf.OverflowAlignment) {
+    property("justify-self", overflow.toString())
 }
 
 // endregion
@@ -81,6 +76,30 @@ fun StyleBuilder.justifySelf(overflow: AlignmentOverflowStrategy, position: Just
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
 class JustifyItems(val value: String) {
+    class BaselineAlignment(val baselineSet: BaselineSet? = null) {
+        enum class BaselineSet {
+            FIRST,
+            LAST
+        }
+
+        override fun toString() = buildString {
+            if (baselineSet != null) {
+                append(baselineSet.name.lowercase())
+                append(' ')
+            }
+            append("baseline")
+        }
+    }
+
+    class OverflowAlignment(val position: JustifySelf, val strategy: Strategy) {
+        enum class Strategy {
+            SAFE,
+            UNSAFE,
+        }
+
+        override fun toString() = "${strategy.name.lowercase()} ${position.value}"
+    }
+
     companion object {
         // Basic
         inline val Normal get() = JustifyItems("normal")
@@ -112,12 +131,12 @@ fun StyleBuilder.justifyItems(justifyItems: JustifyItems) {
     property("justify-items", justifyItems.value)
 }
 
-fun StyleBuilder.justifyItems(baseline: AlignmentBaselinePosition) {
-    property("justify-items", "${baseline.value} baseline")
+fun StyleBuilder.justifyItems(baseline: JustifyItems.BaselineAlignment) {
+    property("justify-items", baseline.toString())
 }
 
-fun StyleBuilder.justifyItems(overflow: AlignmentOverflowStrategy, position: JustifyItems) {
-    property("justify-items", "${overflow.value} ${position.value}")
+fun StyleBuilder.justifyItems(overflow: JustifyItems.OverflowAlignment) {
+    property("justify-items", overflow.toString())
 }
 
 // endregion
