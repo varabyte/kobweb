@@ -99,19 +99,17 @@ if (githubUsername != null && githubToken != null) {
                 active.set(Active.RELEASE)
             }
 
-            // Re-enable this when https://github.com/jreleaser/jreleaser/issues/737 is fixed
-//            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
-//            if (key != null && token != null) {
-//                sdkman {
-//                    downloadUrl.set(artifactDownloadPath)
-//                    consumerKey.set(key)
-//                    consumerToken.set(token)
-//                    active.set(Active.RELEASE)
-//                }
-//            }
-//            else {
-//                println("SDKMAN! packager disabled on this machine since key and/or token are not defined")
-//            }
+            val (key, token) = listOf(findProperty("sdkman.key") as? String, findProperty("sdkman.token") as? String)
+            if (key != null && token != null) {
+                sdkman {
+                    consumerKey.set(key)
+                    consumerToken.set(token)
+                    active.set(Active.RELEASE)
+                }
+            }
+            else {
+                println("SDKMAN! packager disabled on this machine since key and/or token are not defined")
+            }
         }
 
         distributions {
