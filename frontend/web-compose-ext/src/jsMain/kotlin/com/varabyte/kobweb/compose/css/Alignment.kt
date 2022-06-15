@@ -2,15 +2,20 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+/**
+ * Enumeration identifying which baseline set to apply additional alignment to.
+ */
+enum class BaselineSet {
+    FIRST,
+    LAST
+}
+
 // region JustifySelf
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
 class JustifySelf(val value: String) {
+
     class BaselineAlignment(val baselineSet: BaselineSet? = null) {
-        enum class BaselineSet {
-            FIRST,
-            LAST
-        }
 
         override fun toString() = buildString {
             if (baselineSet != null) {
@@ -77,11 +82,6 @@ fun StyleBuilder.justifySelf(overflow: JustifySelf.OverflowAlignment) {
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
 class JustifyItems(val value: String) {
     class BaselineAlignment(val baselineSet: BaselineSet? = null) {
-        enum class BaselineSet {
-            FIRST,
-            LAST
-        }
-
         override fun toString() = buildString {
             if (baselineSet != null) {
                 append(baselineSet.name.lowercase())
