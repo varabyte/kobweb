@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.css.*
 
-fun StyleBuilder.fontFamily(value: String) {
+fun StyleScope.fontFamily(value: String) {
     property("font-family", value)
 }
 
@@ -13,7 +13,7 @@ class FontStyle(val value: String) {
     }
 }
 
-fun StyleBuilder.fontStyle(style: FontStyle) {
+fun StyleScope.fontStyle(style: FontStyle) {
     property("font-style", style.value)
 }
 
@@ -29,7 +29,7 @@ sealed interface FontWeight {
 class StringFontWeight(val value: String) : FontWeight
 class IntFontWeight(val value: Int) : FontWeight
 
-fun StyleBuilder.fontWeight(weight: FontWeight) {
+fun StyleScope.fontWeight(weight: FontWeight) {
     when (weight) {
         is StringFontWeight -> property("font-weight", weight.value)
         is IntFontWeight -> {

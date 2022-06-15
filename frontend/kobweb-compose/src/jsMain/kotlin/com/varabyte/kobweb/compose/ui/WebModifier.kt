@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.compose.ui
 
-import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 
 // Just a marker interface to express intention
@@ -10,19 +10,19 @@ interface WebModifier : Modifier.Element
 /**
  * A modifier element which works by setting CSS styles and/or attributes when it is applied.
  */
-class AttrsModifier(internal val attrs: (AttrsBuilder<*>.() -> Unit)) : WebModifier
+class AttrsModifier(internal val attrs: (AttrsScope<*>.() -> Unit)) : WebModifier
 
-fun Modifier.attrsModifier(attrs: (AttrsBuilder<*>.() -> Unit)) = this then AttrsModifier(attrs)
+fun Modifier.attrsModifier(attrs: (AttrsScope<*>.() -> Unit)) = this then AttrsModifier(attrs)
 
 /**
  * A modifier element that works by CSS styles when it is applied.
  */
-class StyleModifier(internal val styles: (StyleBuilder.() -> Unit)) : WebModifier
+class StyleModifier(internal val styles: (StyleScope.() -> Unit)) : WebModifier
 
-fun Modifier.styleModifier(styles: (StyleBuilder.() -> Unit)) = this then StyleModifier(styles)
+fun Modifier.styleModifier(styles: (StyleScope.() -> Unit)) = this then StyleModifier(styles)
 
 /**
- * Convert a [Modifier] into an [AttrsBuilder] which Compose for Web tags take as an argument, e.g. use it like so:
+ * Convert a [Modifier] into an [AttrsScope] which Compose for Web tags take as an argument, e.g. use it like so:
  *
  * ```
  * Div(attrs = modifier.asAttributesBuilder())
@@ -31,7 +31,7 @@ fun Modifier.styleModifier(styles: (StyleBuilder.() -> Unit)) = this then StyleM
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
  *   be useful to occasionally avoid the creation of an unnecessary [AttrsModifier] to append at the tail.
  */
-fun <T: Element, A: AttrsBuilder<T>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <T: Element, A: AttrsScope<T>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->
@@ -54,7 +54,7 @@ fun <T: Element, A: AttrsBuilder<T>> Modifier.asAttributesBuilder(finalHandler: 
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
  *   be useful to occasionally avoid the creation of an unnecessary [StyleModifier] to append at the tail.
  */
-fun Modifier.asStyleBuilder(finalHandler: (StyleBuilder.() -> Unit)? = null): StyleBuilder.() -> Unit {
+fun Modifier.asStyleBuilder(finalHandler: (StyleScope.() -> Unit)? = null): StyleScope.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->

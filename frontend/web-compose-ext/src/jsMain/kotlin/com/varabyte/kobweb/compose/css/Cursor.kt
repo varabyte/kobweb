@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 class Cursor(val value: String) {
@@ -55,6 +55,6 @@ class Cursor(val value: String) {
     }
 }
 
-fun StyleBuilder.cursor(cursor: Cursor) {
+fun StyleScope.cursor(cursor: Cursor) {
     property("cursor", cursor.value)
 }

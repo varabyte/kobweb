@@ -11,15 +11,10 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
-import org.jetbrains.compose.web.css.CSSMediaQuery
-import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
-import org.jetbrains.compose.web.css.StyleBuilder
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.media
+import org.jetbrains.compose.web.css.*
 
 // We need our own implementation of StyleBuilder, so we can both test equality and pull values out of it later
-private class ComparableStyleBuilder : StyleBuilder {
+private class ComparableStyleBuilder : StyleScope {
     val properties = mutableMapOf<String, String>()
     val variables = mutableMapOf<String, String>()
 
@@ -462,7 +457,7 @@ class ComponentStyle(
     /**
      * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
      */
-    private fun <T: StyleBuilder> GenericStyleSheetBuilder<T>.addStyles(cssRule: String, styles: ComparableStyleBuilder) {
+    private fun <T : StyleScope> GenericStyleSheetBuilder<T>.addStyles(cssRule: String, styles: ComparableStyleBuilder) {
         cssRule style {
             styles.properties.forEach { entry -> property(entry.key, entry.value) }
             styles.variables.forEach { entry -> variable(entry.key, entry.value) }

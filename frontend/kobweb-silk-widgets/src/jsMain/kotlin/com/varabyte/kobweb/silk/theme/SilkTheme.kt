@@ -118,8 +118,8 @@ internal object SilkConfigInstance : SilkConfig {
 
     // This method is not part of the public API and should be called by Silk at initialization time
     fun registerStyles(siteStyleSheet: StyleSheet) {
-        styles.forEach { styleBuilder ->
-            styleBuilder.addStylesInto(siteStyleSheet, styleBuilder.name)
+        styles.forEach { componentStyle ->
+            componentStyle.addStylesInto(siteStyleSheet, componentStyle.name)
         }
     }
 

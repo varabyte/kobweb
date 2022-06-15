@@ -51,31 +51,31 @@ class TransitionDelay(val value: String) {
     }
 }
 
-fun StyleBuilder.transitionProperty(property: TransitionProperty) {
+fun StyleScope.transitionProperty(property: TransitionProperty) {
     transitionProperty(property.value)
 }
 
-fun StyleBuilder.transitionProperty(vararg properties: String) {
+fun StyleScope.transitionProperty(vararg properties: String) {
     property("transition-property", properties.joinToString(" "))
 }
 
-fun StyleBuilder.transitionDuration(duration: TransitionDuration) {
+fun StyleScope.transitionDuration(duration: TransitionDuration) {
     property("transition-duration", duration.value)
 }
 
-fun StyleBuilder.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>) {
+fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>) {
     property("transition-duration", duration.joinToString(" "))
 }
 
-fun StyleBuilder.transitionDelay(vararg delay: CSSSizeValue<out CSSUnitTime>) {
+fun StyleScope.transitionDelay(vararg delay: CSSSizeValue<out CSSUnitTime>) {
     property("transition-delay", delay.joinToString(" "))
 }
 
-fun StyleBuilder.transitionDelay(delay: TransitionDelay) {
+fun StyleScope.transitionDelay(delay: TransitionDelay) {
     property("transition-delay", delay.value)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
-fun StyleBuilder.transitionTimingFunction(vararg value: AnimationTimingFunction) {
+fun StyleScope.transitionTimingFunction(vararg value: AnimationTimingFunction) {
     property("transition-timing-function", value.joinToString(" ") { it.value })
 }

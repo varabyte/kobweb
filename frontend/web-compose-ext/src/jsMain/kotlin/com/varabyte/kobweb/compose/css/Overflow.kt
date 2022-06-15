@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
 class Overflow(val value: String) {
@@ -36,18 +36,18 @@ class OverflowWrap(val value: String) {
     }
 }
 
-fun StyleBuilder.overflow(vararg overflows: Overflow) {
+fun StyleScope.overflow(vararg overflows: Overflow) {
     property("overflow", overflows.joinToString(" ") { it.value })
 }
 
-fun StyleBuilder.overflowX(overflowX: Overflow) {
+fun StyleScope.overflowX(overflowX: Overflow) {
     property("overflow-x", overflowX.value)
 }
 
-fun StyleBuilder.overflowY(overflowY: Overflow) {
+fun StyleScope.overflowY(overflowY: Overflow) {
     property("overflow-y", overflowY.value)
 }
 
-fun StyleBuilder.overflowWrap(overflowWrap: OverflowWrap) {
+fun StyleScope.overflowWrap(overflowWrap: OverflowWrap) {
     property("overflow-wrap", overflowWrap.value)
 }

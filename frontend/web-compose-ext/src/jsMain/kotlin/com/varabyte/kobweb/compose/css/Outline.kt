@@ -21,11 +21,11 @@ class CSSOutline : CSSStyleValue {
     }
 }
 
-inline fun StyleBuilder.outline(crossinline outlineBuilder: CSSOutline.() -> Unit) {
+inline fun StyleScope.outline(crossinline outlineBuilder: CSSOutline.() -> Unit) {
     property("outline", CSSOutline().apply(outlineBuilder))
 }
 
-fun StyleBuilder.outline(
+fun StyleScope.outline(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
@@ -52,21 +52,21 @@ class OutlineColor(val value: String) {
     }
 }
 
-fun StyleBuilder.outlineColor(outlineColor: OutlineColor) {
+fun StyleScope.outlineColor(outlineColor: OutlineColor) {
     property("outline-color", outlineColor.value)
 }
 
-fun StyleBuilder.outlineColor(value: CSSColorValue) {
+fun StyleScope.outlineColor(value: CSSColorValue) {
     property("outline-color", value)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-offset
-fun StyleBuilder.outlineOffset(value: CSSLengthValue) {
+fun StyleScope.outlineOffset(value: CSSLengthValue) {
     property("outline-offset", value)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-style
-fun StyleBuilder.outlineStyle(value: LineStyle) {
+fun StyleScope.outlineStyle(value: LineStyle) {
     property("outline-style", value)
 }
 
@@ -86,10 +86,10 @@ class OutlineWidth(val value: String) {
     }
 }
 
-fun StyleBuilder.outlineWidth(outlineWidth: OutlineWidth) {
+fun StyleScope.outlineWidth(outlineWidth: OutlineWidth) {
     property("outline-width", outlineWidth.value)
 }
 
-fun StyleBuilder.outlineWidth(value: CSSLengthValue) {
+fun StyleScope.outlineWidth(value: CSSLengthValue) {
     property("outline-width", value)
 }

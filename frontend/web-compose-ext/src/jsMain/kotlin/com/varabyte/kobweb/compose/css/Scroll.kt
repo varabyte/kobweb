@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.CSSNumeric
-import org.jetbrains.compose.web.css.StyleBuilder
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 
 class ScrollBehavior(val value: String) {
     companion object {
@@ -18,7 +16,7 @@ class ScrollBehavior(val value: String) {
     }
 }
 
-fun StyleBuilder.scrollBehavior(scrollBehavior: ScrollBehavior) {
+fun StyleScope.scrollBehavior(scrollBehavior: ScrollBehavior) {
     property("scroll-behavior", scrollBehavior.value)
 }
 
@@ -55,11 +53,11 @@ class ScrollSnapMode(val value: String) {
     }
 }
 
-fun StyleBuilder.scrollSnapType(type: ScrollSnapType) {
+fun StyleScope.scrollSnapType(type: ScrollSnapType) {
     property("scroll-snap-type", type.value)
 }
 
-fun StyleBuilder.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = null) {
+fun StyleScope.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = null) {
     val value = if (mode == null) axis.value else "${axis.value} ${mode.value}"
     property("scroll-snap-type", value)
 }
@@ -67,7 +65,7 @@ fun StyleBuilder.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = nu
 
 // region Scroll padding
 
-fun StyleBuilder.scrollPadding(
+fun StyleScope.scrollPadding(
     top: CSSNumeric = 0.px,
     right: CSSNumeric = 0.px,
     bottom: CSSNumeric = 0.px,
@@ -76,47 +74,47 @@ fun StyleBuilder.scrollPadding(
     property("scroll-padding", "$top $right $bottom $left")
 }
 
-fun StyleBuilder.scrollPadding(value: CSSNumeric) {
+fun StyleScope.scrollPadding(value: CSSNumeric) {
     property("scroll-padding", "$value")
 }
 
-fun StyleBuilder.scrollPaddingTop(value: CSSNumeric) {
+fun StyleScope.scrollPaddingTop(value: CSSNumeric) {
     property("scroll-padding-top", value)
 }
 
-fun StyleBuilder.scrollPaddingRight(value: CSSNumeric) {
+fun StyleScope.scrollPaddingRight(value: CSSNumeric) {
     property("scroll-padding-right", value)
 }
 
-fun StyleBuilder.scrollPaddingBottom(value: CSSNumeric) {
+fun StyleScope.scrollPaddingBottom(value: CSSNumeric) {
     property("scroll-padding-bottom", value)
 }
 
-fun StyleBuilder.scrollPaddingLeft(value: CSSNumeric) {
+fun StyleScope.scrollPaddingLeft(value: CSSNumeric) {
     property("scroll-padding-left", value)
 }
 
-fun StyleBuilder.scrollPaddingInline(vararg value: CSSNumeric) {
+fun StyleScope.scrollPaddingInline(vararg value: CSSNumeric) {
     property("scroll-padding-inline", value.joinToString(" "))
 }
 
-fun StyleBuilder.scrollPaddingInlineStart(value: CSSNumeric) {
+fun StyleScope.scrollPaddingInlineStart(value: CSSNumeric) {
     property("scroll-padding-inline-start", value)
 }
 
-fun StyleBuilder.scrollPaddingInlineEnd(value: CSSNumeric) {
+fun StyleScope.scrollPaddingInlineEnd(value: CSSNumeric) {
     property("scroll-padding-inline-end", value)
 }
 
-fun StyleBuilder.scrollPaddingBlock(vararg value: CSSNumeric) {
+fun StyleScope.scrollPaddingBlock(vararg value: CSSNumeric) {
     property("scroll-padding-block", value.joinToString(" "))
 }
 
-fun StyleBuilder.scrollPaddingBlockStart(value: CSSNumeric) {
+fun StyleScope.scrollPaddingBlockStart(value: CSSNumeric) {
     property("scroll-padding-block-start", value)
 }
 
-fun StyleBuilder.scrollPaddingBlockEnd(value: CSSNumeric) {
+fun StyleScope.scrollPaddingBlockEnd(value: CSSNumeric) {
     property("scroll-padding-block-end", value)
 }
 
@@ -141,11 +139,11 @@ class ScrollSnapAlign(val value: String) {
     }
 }
 
-fun StyleBuilder.scrollSnapAlign(align: ScrollSnapAlign) {
+fun StyleScope.scrollSnapAlign(align: ScrollSnapAlign) {
     scrollSnapAlign(align, align)
 }
 
-fun StyleBuilder.scrollSnapAlign(blockAxis: ScrollSnapAlign, inlineAxis: ScrollSnapAlign? = null) {
+fun StyleScope.scrollSnapAlign(blockAxis: ScrollSnapAlign, inlineAxis: ScrollSnapAlign? = null) {
     property("scroll-snap-align", "$blockAxis $inlineAxis")
 }
 
@@ -167,7 +165,7 @@ class ScrollSnapStop(val value: String) {
     }
 }
 
-fun StyleBuilder.scrollSnapStop(scrollSnapStop: ScrollSnapStop) {
+fun StyleScope.scrollSnapStop(scrollSnapStop: ScrollSnapStop) {
     property("scroll-snap-stop", scrollSnapStop.value)
 }
 
@@ -175,7 +173,7 @@ fun StyleBuilder.scrollSnapStop(scrollSnapStop: ScrollSnapStop) {
 
 // region Scroll margin
 
-fun StyleBuilder.scrollMargin(
+fun StyleScope.scrollMargin(
     top: CSSNumeric = 0.px,
     right: CSSNumeric = 0.px,
     bottom: CSSNumeric = 0.px,
@@ -184,47 +182,47 @@ fun StyleBuilder.scrollMargin(
     property("scroll-margin", "$top $right $bottom $left")
 }
 
-fun StyleBuilder.scrollMargin(vararg value: CSSNumeric) {
+fun StyleScope.scrollMargin(vararg value: CSSNumeric) {
     property("scroll-margin", value.joinToString(" "))
 }
 
-fun StyleBuilder.scrollMarginTop(value: CSSNumeric) {
+fun StyleScope.scrollMarginTop(value: CSSNumeric) {
     property("scroll-margin-top", value)
 }
 
-fun StyleBuilder.scrollMarginRight(value: CSSNumeric) {
+fun StyleScope.scrollMarginRight(value: CSSNumeric) {
     property("scroll-margin-right", value)
 }
 
-fun StyleBuilder.scrollMarginBottom(value: CSSNumeric) {
+fun StyleScope.scrollMarginBottom(value: CSSNumeric) {
     property("scroll-margin-bottom", value)
 }
 
-fun StyleBuilder.scrollMarginLeft(value: CSSNumeric) {
+fun StyleScope.scrollMarginLeft(value: CSSNumeric) {
     property("scroll-margin-left", value)
 }
 
-fun StyleBuilder.scrollMarginInline(vararg value: CSSNumeric) {
+fun StyleScope.scrollMarginInline(vararg value: CSSNumeric) {
     property("scroll-margin-inline", value.joinToString(" "))
 }
 
-fun StyleBuilder.scrollMarginInlineStart(value: CSSNumeric) {
+fun StyleScope.scrollMarginInlineStart(value: CSSNumeric) {
     property("scroll-margin-inline-start", value)
 }
 
-fun StyleBuilder.scrollMarginInlineEnd(value: CSSNumeric) {
+fun StyleScope.scrollMarginInlineEnd(value: CSSNumeric) {
     property("scroll-margin-inline-end", value)
 }
 
-fun StyleBuilder.scrollMarginBlock(vararg value: CSSNumeric) {
+fun StyleScope.scrollMarginBlock(vararg value: CSSNumeric) {
     property("scroll-margin-block", value.joinToString(" "))
 }
 
-fun StyleBuilder.scrollMarginBlockStart(value: CSSNumeric) {
+fun StyleScope.scrollMarginBlockStart(value: CSSNumeric) {
     property("scroll-margin-block-start", value)
 }
 
-fun StyleBuilder.scrollMarginBlockEnd(value: CSSNumeric) {
+fun StyleScope.scrollMarginBlockEnd(value: CSSNumeric) {
     property("scroll-margin-block-end", value)
 }
 

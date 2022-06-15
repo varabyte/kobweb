@@ -20,6 +20,6 @@ class ObjectFit(val value: String) {
     }
 }
 
-fun StyleBuilder.objectFit(objectFit: ObjectFit) {
+fun StyleScope.objectFit(objectFit: ObjectFit) {
     property("object-fit", objectFit.value)
 }

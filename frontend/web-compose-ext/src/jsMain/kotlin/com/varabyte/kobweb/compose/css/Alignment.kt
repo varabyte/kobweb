@@ -63,15 +63,15 @@ class JustifySelf(val value: String) {
     }
 }
 
-fun StyleBuilder.justifySelf(justifySelf: JustifySelf) {
+fun StyleScope.justifySelf(justifySelf: JustifySelf) {
     property("justify-self", justifySelf.value)
 }
 
-fun StyleBuilder.justifySelf(baseline: JustifySelf.BaselineAlignment) {
+fun StyleScope.justifySelf(baseline: JustifySelf.BaselineAlignment) {
     property("justify-self", baseline.toString())
 }
 
-fun StyleBuilder.justifySelf(overflow: JustifySelf.OverflowAlignment) {
+fun StyleScope.justifySelf(overflow: JustifySelf.OverflowAlignment) {
     property("justify-self", overflow.toString())
 }
 
@@ -127,24 +127,24 @@ class JustifyItems(val value: String) {
     }
 }
 
-fun StyleBuilder.justifyItems(justifyItems: JustifyItems) {
+fun StyleScope.justifyItems(justifyItems: JustifyItems) {
     property("justify-items", justifyItems.value)
 }
 
-fun StyleBuilder.justifyItems(baseline: JustifyItems.BaselineAlignment) {
+fun StyleScope.justifyItems(baseline: JustifyItems.BaselineAlignment) {
     property("justify-items", baseline.toString())
 }
 
-fun StyleBuilder.justifyItems(overflow: JustifyItems.OverflowAlignment) {
+fun StyleScope.justifyItems(overflow: JustifyItems.OverflowAlignment) {
     property("justify-items", overflow.toString())
 }
 
 // endregion
 
-fun StyleBuilder.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) {
+fun StyleScope.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) {
     property("place-content", "${alignContent.value} ${justifyContent.value}")
 }
 
-fun StyleBuilder.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) {
-    placeSelf( "${alignSelf.value} ${justifySelf.value}")
+fun StyleScope.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) {
+    placeSelf("${alignSelf.value} ${justifySelf.value}")
 }

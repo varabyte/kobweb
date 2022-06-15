@@ -1,7 +1,7 @@
 [versions]
 cdt="4.0.0" # chrome-developer-toolkit
 commonmark = "0.18.0"
-compose = "1.0.1"
+compose = "1.1.1"
 freemarker = "2.3.31"
 jreleaser = "1.0.0"
 jsoup = "1.14.3"

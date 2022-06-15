@@ -1,19 +1,12 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.CSSBorder
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.CSSLengthValue
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.StyleBuilder
-import org.jetbrains.compose.web.css.color
-import org.jetbrains.compose.web.css.style
-import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.css.*
 
-inline fun StyleBuilder.borderTop(crossinline borderBuild: CSSBorder.() -> Unit) {
+inline fun StyleScope.borderTop(crossinline borderBuild: CSSBorder.() -> Unit) {
     property("border-top", CSSBorder().apply(borderBuild))
 }
 
-fun StyleBuilder.borderTop(
+fun StyleScope.borderTop(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
@@ -25,11 +18,11 @@ fun StyleBuilder.borderTop(
     }
 }
 
-inline fun StyleBuilder.borderBottom(crossinline borderBuild: CSSBorder.() -> Unit) {
+inline fun StyleScope.borderBottom(crossinline borderBuild: CSSBorder.() -> Unit) {
     property("border-bottom", CSSBorder().apply(borderBuild))
 }
 
-fun StyleBuilder.borderBottom(
+fun StyleScope.borderBottom(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
@@ -41,11 +34,11 @@ fun StyleBuilder.borderBottom(
     }
 }
 
-inline fun StyleBuilder.borderLeft(crossinline borderBuild: CSSBorder.() -> Unit) {
+inline fun StyleScope.borderLeft(crossinline borderBuild: CSSBorder.() -> Unit) {
     property("border-left", CSSBorder().apply(borderBuild))
 }
 
-fun StyleBuilder.borderLeft(
+fun StyleScope.borderLeft(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
@@ -57,11 +50,11 @@ fun StyleBuilder.borderLeft(
     }
 }
 
-inline fun StyleBuilder.borderRight(crossinline borderBuild: CSSBorder.() -> Unit) {
+inline fun StyleScope.borderRight(crossinline borderBuild: CSSBorder.() -> Unit) {
     property("border-right", CSSBorder().apply(borderBuild))
 }
 
-fun StyleBuilder.borderRight(
+fun StyleScope.borderRight(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null

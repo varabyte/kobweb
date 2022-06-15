@@ -1,5 +1,4 @@
-import org.jetbrains.compose.web.css.CSSNumeric
-import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
 sealed interface FlexBasis {
@@ -22,7 +21,7 @@ sealed interface FlexBasis {
 class StringFlexBasis(val value: String) : FlexBasis
 class NumericFlexBasis(val value: CSSNumeric) : FlexBasis
 
-fun StyleBuilder.flexBasis(flexBasis: FlexBasis) {
+fun StyleScope.flexBasis(flexBasis: FlexBasis) {
     when (flexBasis) {
         is StringFlexBasis -> property("flex-basis", flexBasis.value)
         is NumericFlexBasis -> property("flex-basis", flexBasis.value)

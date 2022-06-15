@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.StyleBuilder
+import org.jetbrains.compose.web.css.*
 
 class TextAlign(val value: String) {
     companion object {
@@ -15,7 +15,7 @@ class TextAlign(val value: String) {
     }
 }
 
-fun StyleBuilder.textAlign(textAlign: TextAlign) {
+fun StyleScope.textAlign(textAlign: TextAlign) {
     property("text-align", textAlign.value)
 }
 
@@ -33,7 +33,7 @@ class TextDecorationLine(val value: String) {
     }
 }
 
-fun StyleBuilder.textDecorationLine(vararg textDecorationLines: TextDecorationLine) {
+fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine) {
     property("text-decoration-line", textDecorationLines.joinToString(" ") { it.value })
 }
 
@@ -50,7 +50,7 @@ class UserSelect(val value: String) {
     }
 }
 
-fun StyleBuilder.userSelect(userSelect: UserSelect) {
+fun StyleScope.userSelect(userSelect: UserSelect) {
     property("user-select", userSelect.value)
 }
 
@@ -71,7 +71,7 @@ class WhiteSpace(val value: String) {
     }
 }
 
-fun StyleBuilder.whiteSpace(whiteSpace: WhiteSpace) {
+fun StyleScope.whiteSpace(whiteSpace: WhiteSpace) {
     property("white-space", whiteSpace.value)
 }
 
@@ -89,6 +89,6 @@ class WritingMode(val value: String) {
     val Unset get() = WritingMode("unset")
 }
 
-fun StyleBuilder.writingMode(writingMode: WritingMode) {
+fun StyleScope.writingMode(writingMode: WritingMode) {
     property("writing-mode", writingMode.value)
 }
