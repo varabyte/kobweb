@@ -1,5 +1,5 @@
 [versions]
-jetbrains-compose = "1.0.1"
+jetbrains-compose = "1.1.1"
 kotlin = "1.6.10"
 
 [libraries]
