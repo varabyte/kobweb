@@ -31,7 +31,7 @@ fun HomePage() {
     H1 {
       Text("Welcome to Kobweb!")
     }
-    Row {
+    Row(Modifier.whiteSpace(WhiteSpace.PreWrap)) { // Preserve trailing whitespace
       Text("Create rich, dynamic web apps with ease, leveraging ")
       Link("https://kotlinlang.org/", "Kotlin")
       Text(" and ")

@@ -17,6 +17,7 @@ import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.components.text.SpanText
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -30,7 +31,6 @@ import todo.components.widgets.LoadingSpinner
 import todo.components.widgets.TodoCard
 import todo.components.widgets.TodoForm
 import todo.model.TodoItem
-import com.varabyte.kobweb.silk.components.text.Text as SilkText
 
 private suspend fun loadAndReplaceTodos(id: String, todos: SnapshotStateList<TodoItem>) {
     return window.api.get("list?owner=$id")!!.let { listBytes ->
@@ -84,7 +84,7 @@ fun HomePage() {
         }
 
         Row(TitleStyle.toModifier(), horizontalArrangement = Arrangement.Center) {
-            SilkText("TODO App with ")
+            SpanText("TODO App with ")
             Link("https://github.com/varabyte/kobweb", "Kobweb!")
         }
 
@@ -121,7 +121,7 @@ fun HomePage() {
             Spacer()
             Footer {
                 Row {
-                    SilkText("Project inspired by ")
+                    SpanText("Project inspired by ")
                     Link(
                         "https://blog.upstash.com/nextjs-todo",
                         "Upstash's Next.js TODO App",

@@ -154,14 +154,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
 
         // region Markdown Node handlers
 
-        text.convention { text ->
-            val literal = text.literal.escapeQuotes()
-            if (useSilk.get()) {
-                "$SILK.text.Text(\"${literal}\")"
-            } else {
-                "$JB_DOM.Text(\"${literal}\")"
-            }
-        }
+        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeQuotes()}\")" }
         img.convention { img ->
             val altText = img.children().filterIsInstance<Text>().map { it.literal }.joinToString("")
             this.childrenOverride = emptyList()

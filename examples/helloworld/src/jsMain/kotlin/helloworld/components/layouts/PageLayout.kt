@@ -7,9 +7,9 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.text.Text
 import kotlinx.browser.document
 import org.jetbrains.compose.web.dom.H1
+import org.jetbrains.compose.web.dom.Text
 import helloworld.components.sections.NavHeader
 
 @Composable

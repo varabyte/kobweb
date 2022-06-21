@@ -8,7 +8,7 @@ import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
-import com.varabyte.kobweb.silk.components.text.TextStyle
+import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkConfig
@@ -35,7 +35,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(LinkStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
-    mutableTheme.registerComponentStyle(TextStyle)
+    mutableTheme.registerComponentStyle(SpanTextStyle)
 
     mutableTheme.registerComponentStyle(DisplayIfSmStyle)
     mutableTheme.registerComponentStyle(DisplayIfMdStyle)
