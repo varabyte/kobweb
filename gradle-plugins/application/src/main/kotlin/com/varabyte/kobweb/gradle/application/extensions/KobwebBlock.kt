@@ -98,7 +98,7 @@ abstract class KobwebBlock @Inject constructor(conf: KobwebConf) {
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
-        appGlobals.convention(mapOf())
+        appGlobals.convention(mapOf("title" to conf.site.title))
 
         (this as ExtensionAware).extensions.create("index", IndexDocument::class.java, RoutePrefix(conf.site.routePrefix))
     }
