@@ -81,10 +81,10 @@ class VerticalAlign(val value: String) {
         val Bottom get() = VerticalAlign("bottom")
 
         // Global
-        val Inherit get() = WritingMode("inherit")
-        val Initial get() = WritingMode("initial")
-        val Revert get() = WritingMode("revert")
-        val Unset get() = WritingMode("unset")
+        val Inherit get() = VerticalAlign("inherit")
+        val Initial get() = VerticalAlign("initial")
+        val Revert get() = VerticalAlign("revert")
+        val Unset get() = VerticalAlign("unset")
     }
 }
 

@@ -48,8 +48,8 @@ class ScrollSnapAxis(val value: String) {
 class ScrollSnapMode(val value: String) {
     companion object {
         // Keyword
-        val Mandatory get() = ScrollSnapAxis("mandatory")
-        val Proximity get() = ScrollSnapAxis("proximity")
+        val Mandatory get() = ScrollSnapMode("mandatory")
+        val Proximity get() = ScrollSnapMode("proximity")
     }
 }
 
