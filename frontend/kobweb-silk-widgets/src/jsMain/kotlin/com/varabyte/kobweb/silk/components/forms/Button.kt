@@ -27,7 +27,6 @@ val ButtonStyle = ComponentStyle("silk-button") {
             .outline(0.px) // Don't outline focused buttons - we'll use background color instead to indicate focus
             // No selecting text within buttons
             .userSelect(UserSelect.None)
-            .role("button")
     }
 
     hover {
@@ -61,6 +60,7 @@ fun Button(
 ) {
     Box(
         ButtonStyle.toModifier(variant)
+            .role("button")
             .then(modifier)
             .onClick { evt ->
                 document.activeElement?.clearFocus()
