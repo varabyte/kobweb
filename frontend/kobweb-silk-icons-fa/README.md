@@ -4,7 +4,7 @@ Note that, when this module is depended on, Kobweb adds the following entry to t
 template:
 
 ```html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
 ```
 
 which adds to the size of your page, something you should be mindful of if you don't plan to use any of these (awesome!)
@@ -12,19 +12,16 @@ icons.
 
 ---
 
-Note that this directory contains a file called `fa-icon-list`, which is parsed and used to generate code used in this
-project. This list was populated using instructions from [Stack Overflow](https://stackoverflow.com/a/33794368/1299302).
-For example, visit [the Font Awesome Solid icons cheatsheet](https://fontawesome.com/v5/cheatsheet/free/solid) and, in
-the developer console, run
+Note that this directory contains a file called `fa-icon-list.txt`, which is parsed and used to generate code used in
+this project.
 
-```js
-var names = new Set();
-var icons = document.getElementsByClassName('icon');
-for (const icon of icons) {
-  const name = icon.getElementsByTagName('dd')[0].innerText;
-  names.add(name);
-}
-console.log(JSON.stringify(Array.from(names)));
-```
+To populate it, I visited the
+[Font Awesome free icon search](https://fontawesome.com/search?o=a&m=free&f=classic%2Cbrands), inspected the site using
+dev tools, and visited each of the 12 pages, copying the DOM subtree under the `<div id="icon-results">` element into a
+temporary text file.
 
-Copy the results, paste it into the text file, and then repeat for regular and brand icons.
+I then manually reorganized the results (into solid, regular, and brand subsets) and migrated the XML format into the
+custom text format seen in the `fa-icon-list.txt` file (using regex search and replace).
+
+I also removed the *brand* entry of the `font-awesome` icon, since there were already solid and regular versions of it,
+and having an icon that spans all three categories confused my codegen logic.

@@ -83,7 +83,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
         }
         .let { invalidGroupings ->
             if (invalidGroupings.isNotEmpty()) {
-                throw GradleException("Found unexpected groupings: $invalidGroupings")
+                throw GradleException("Found unexpected groupings. An icon should only be in its own category OR it can have solid and regular versions: $invalidGroupings")
             }
         }
 

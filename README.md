@@ -868,13 +868,13 @@ Button(Modifier.background(Colors.Blue), variant = OutlineButtonVariant) { /* ..
 ### Font Awesome
 
 Kobweb provides the `kobweb-silk-icons-fa` artifact which you can use in your project if you want access to all the free
-Font Awesome icons.
+Font Awesome (v6) icons.
 
-Using it is easy! Search the [Font Awesome gallery](https://fontawesome.com/v5.15/icons?d=gallery&p=2&m=free), choose an
+Using it is easy! Search the [Font Awesome gallery](https://fontawesome.com/search?o=r&m=free), choose an
 icon, and then call it using the associated Font Awesome icon composable.
 
 For example, if I wanted to add the Kobweb-themed
-[spider icon](https://fontawesome.com/v5.15/icons/spider?style=solid), what I could do is call this in my Kobweb code:
+[spider icon](https://fontawesome.com/icons/spider?s=solid&f=classic), what I could do is call this in my Kobweb code:
 
 ```kotlin
 FaSpider()
@@ -883,9 +883,9 @@ FaSpider()
 That's it!
 
 Some icons have a choice between solid and outline versions, such as "Square"
-([outline](https://fontawesome.com/v5.15/icons/square?style=regular) and
-[filled](https://fontawesome.com/v5.15/icons/square?style=solid)). In that case, the default choice will be outline mode,
-but you can pass in a style enum to control this:
+([outline](https://fontawesome.com/icons/square?s=solid&f=classic) and
+[filled](https://fontawesome.com/icons/square?s=regular&f=classic)). In that case, the default choice will be outline
+mode, but you can pass in a style enum to control this:
 
 ```kotlin
 FaSquare(style = IconStyle.FILLED)
