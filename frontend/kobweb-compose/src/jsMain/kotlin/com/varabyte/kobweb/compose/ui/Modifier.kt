@@ -88,4 +88,9 @@ private class ChainedModifier(
     override fun <R> fold(initial: R, operation: (R, Modifier.Element) -> R): R {
         return next.fold(current.fold(initial, operation), operation)
     }
+
+    override fun equals(other: Any?): Boolean =
+        other is ChainedModifier && current == other.current && next == other.next
+
+    override fun hashCode(): Int = current.hashCode() + 31 * next.hashCode()
 }
