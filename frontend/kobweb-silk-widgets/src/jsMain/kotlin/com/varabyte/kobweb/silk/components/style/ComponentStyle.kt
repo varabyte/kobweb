@@ -14,7 +14,7 @@ import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import org.jetbrains.compose.web.css.*
 
 // We need our own implementation of StyleBuilder, so we can both test equality and pull values out of it later
-private class ComparableStyleBuilder : StyleScope {
+private class ComparableStyleScope : StyleScope {
     val properties = mutableMapOf<String, String>()
     val variables = mutableMapOf<String, String>()
 
@@ -27,7 +27,7 @@ private class ComparableStyleBuilder : StyleScope {
     }
 
     override fun equals(other: Any?): Boolean {
-        return (other is ComparableStyleBuilder) && properties == other.properties && variables == other.variables
+        return (other is ComparableStyleScope) && properties == other.properties && variables == other.variables
     }
 
     override fun hashCode(): Int {
@@ -35,7 +35,7 @@ private class ComparableStyleBuilder : StyleScope {
     }
 }
 
-private fun ComparableStyleBuilder.isNotEmpty(): Boolean {
+private fun ComparableStyleScope.isNotEmpty(): Boolean {
     return properties.isNotEmpty() || variables.isNotEmpty()
 }
 
@@ -359,19 +359,19 @@ fun ComponentStyle.Companion.base(className: String, init: ComponentModifier.() 
 
 
 private sealed interface StyleGroup {
-    class Light(val styles: ComparableStyleBuilder) : StyleGroup
-    class Dark(val styles: ComparableStyleBuilder) : StyleGroup
-    class ColorAgnostic(val styles: ComparableStyleBuilder) : StyleGroup
-    class ColorAware(val lightStyles: ComparableStyleBuilder, val darkStyles: ComparableStyleBuilder) : StyleGroup
+    class Light(val styles: ComparableStyleScope) : StyleGroup
+    class Dark(val styles: ComparableStyleScope) : StyleGroup
+    class ColorAgnostic(val styles: ComparableStyleScope) : StyleGroup
+    class ColorAware(val lightStyles: ComparableStyleScope, val darkStyles: ComparableStyleScope) : StyleGroup
 
     companion object {
         @Suppress("NAME_SHADOWING") // Shadowing used to turn nullable into non-null
         fun from(lightModifiers: Modifier?, darkModifiers: Modifier?): StyleGroup? {
             val lightStyles = lightModifiers?.let { lightModifiers ->
-                ComparableStyleBuilder().apply { lightModifiers.asStyleBuilder().invoke(this) }
+                ComparableStyleScope().apply { lightModifiers.asStyleBuilder().invoke(this) }
             }
             val darkStyles = darkModifiers?.let { darkModifiers ->
-                ComparableStyleBuilder().apply { darkModifiers.asStyleBuilder().invoke(this) }
+                ComparableStyleScope().apply { darkModifiers.asStyleBuilder().invoke(this) }
             }
 
             if (lightStyles == null && darkStyles == null) return null
@@ -457,7 +457,7 @@ class ComponentStyle(
     /**
      * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
      */
-    private fun <T : StyleScope> GenericStyleSheetBuilder<T>.addStyles(cssRule: String, styles: ComparableStyleBuilder) {
+    private fun <T : StyleScope> GenericStyleSheetBuilder<T>.addStyles(cssRule: String, styles: ComparableStyleScope) {
         cssRule style {
             styles.properties.forEach { entry -> property(entry.key, entry.value) }
             styles.variables.forEach { entry -> variable(entry.key, entry.value) }
@@ -468,7 +468,7 @@ class ComponentStyle(
      * Shared logic for using an initial selector name and triggering a callback with the final selector name and
      * CSS styles to be associated with it.
      */
-    private fun withFinalSelectorName(selectorBaseName: String, group: StyleGroup, handler: (String, ComparableStyleBuilder) -> Unit) {
+    private fun withFinalSelectorName(selectorBaseName: String, group: StyleGroup, handler: (String, ComparableStyleScope) -> Unit) {
         when (group) {
             is StyleGroup.Light -> handler("$selectorBaseName-light", group.styles)
             is StyleGroup.Dark -> handler("$selectorBaseName-dark", group.styles)
