@@ -37,9 +37,7 @@ class ComparableAttrsScope<E: Element>(private val wrapped: AttrsScope<E>) : Att
     }
 
     override fun classes(vararg classes: String) {
-        for (cssClass in classes) {
-            this.classes.add(cssClass)
-        }
+        this.classes.addAll(classes)
     }
 
     override fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V) {
