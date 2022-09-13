@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.compose.ui
 
+import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
+import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
@@ -10,14 +12,52 @@ interface WebModifier : Modifier.Element
 /**
  * A modifier element which works by setting CSS styles and/or attributes when it is applied.
  */
-class AttrsModifier(internal val attrs: (AttrsScope<*>.() -> Unit)) : WebModifier
+class AttrsModifier(internal val attrs: (AttrsScope<*>.() -> Unit)) : WebModifier {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AttrsModifier) return false
+
+        val attrsResolved = ComparableAttrsScope<Element>()
+        attrs.invoke(attrsResolved)
+
+        val otherAttrsResolved = ComparableAttrsScope<Element>()
+        other.attrs.invoke(otherAttrsResolved)
+
+        return attrsResolved == otherAttrsResolved
+    }
+
+    override fun hashCode(): Int {
+        val attrsResolved = ComparableAttrsScope<Element>()
+        attrs.invoke(attrsResolved)
+        return attrsResolved.hashCode()
+    }
+}
 
 fun Modifier.attrsModifier(attrs: (AttrsScope<*>.() -> Unit)) = this then AttrsModifier(attrs)
 
 /**
  * A modifier element that works by CSS styles when it is applied.
  */
-class StyleModifier(internal val styles: (StyleScope.() -> Unit)) : WebModifier
+class StyleModifier(internal val styles: (StyleScope.() -> Unit)) : WebModifier {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is StyleModifier) return false
+
+        val stylesResolved = ComparableStyleScope()
+        styles.invoke(stylesResolved)
+
+        val otherStylesResolved = ComparableStyleScope()
+        other.styles.invoke(otherStylesResolved)
+
+        return stylesResolved == otherStylesResolved
+    }
+
+    override fun hashCode(): Int {
+        val stylesResolved = ComparableStyleScope()
+        styles.invoke(stylesResolved)
+        return stylesResolved.hashCode()
+    }
+}
 
 fun Modifier.styleModifier(styles: (StyleScope.() -> Unit)) = this then StyleModifier(styles)
 

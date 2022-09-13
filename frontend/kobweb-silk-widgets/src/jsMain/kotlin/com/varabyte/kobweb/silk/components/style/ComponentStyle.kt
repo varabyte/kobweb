@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.compose.ui.asStyleBuilder
@@ -12,32 +13,6 @@ import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import org.jetbrains.compose.web.css.*
-
-// We need our own implementation of StyleBuilder, so we can both test equality and pull values out of it later
-private class ComparableStyleScope : StyleScope {
-    val properties = mutableMapOf<String, String>()
-    val variables = mutableMapOf<String, String>()
-
-    override fun property(propertyName: String, value: StylePropertyValue) {
-        properties[propertyName] = value.toString()
-    }
-
-    override fun variable(variableName: String, value: StylePropertyValue) {
-        variables[variableName] = value.toString()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return (other is ComparableStyleScope) && properties == other.properties && variables == other.variables
-    }
-
-    override fun hashCode(): Int {
-        return properties.hashCode() + variables.hashCode()
-    }
-}
-
-private fun ComparableStyleScope.isNotEmpty(): Boolean {
-    return properties.isNotEmpty() || variables.isNotEmpty()
-}
 
 /**
  * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
