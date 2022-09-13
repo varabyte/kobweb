@@ -73,6 +73,10 @@ class ComparableAttrsScope<E: Element>(private val wrapped: AttrsScope<E>) : Att
     }
 
     override fun hashCode(): Int {
-        return (attributes.hashCode() + classes.hashCode() + listeners.hashCode() + (style?.hashCode() ?: 0))
+        var result = attributes.hashCode()
+        result = 31 * result + classes.hashCode()
+        result = 31 * result + listeners.hashCode()
+        result = 31 * result + (style?.hashCode() ?: 0)
+        return result
     }
 }

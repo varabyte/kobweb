@@ -23,7 +23,9 @@ class ComparableStyleScope : StyleScope {
     }
 
     override fun hashCode(): Int {
-        return (properties.hashCode() + variables.hashCode())
+        var result = properties.hashCode()
+        result = 31 * result + variables.hashCode()
+        return result
     }
 }
 
