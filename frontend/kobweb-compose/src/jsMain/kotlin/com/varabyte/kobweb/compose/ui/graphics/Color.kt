@@ -51,7 +51,7 @@ sealed interface Color {
         }
 
         override fun toString(): String {
-            return if (alpha == 0xFF) "rgb(r=$red g=$green b=$blue)" else "rgba(r=$red g=$green b=$blue a=$alpha)"
+            return if (alpha == 0xFF) "rgb($red, $green, $blue)" else "rgba($red, $green, $blue, $alpha)"
         }
     }
 
