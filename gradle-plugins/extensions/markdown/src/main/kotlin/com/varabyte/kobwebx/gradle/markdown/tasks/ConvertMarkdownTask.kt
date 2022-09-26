@@ -65,7 +65,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
             val mdFile = rootAndFile.file
             val mdFileRel = rootAndFile.relativeFile
 
-            val parts = mdFileRel.path.split("/")
+            val parts = mdFileRel.path.split(File.separatorChar)
             val dirParts = parts.subList(0, parts.lastIndex)
             val packageParts = dirParts.map { it.toPackageName() }
 
