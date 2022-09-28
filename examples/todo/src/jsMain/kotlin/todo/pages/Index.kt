@@ -112,7 +112,6 @@ fun HomePage() {
                             loadingCount--
                         }
                     }) {
-                        // Avoid collision with Silk's Text method.
                         Text(todo.text)
                     }
                 }
