@@ -39,7 +39,8 @@ import com.varabyte.kobweb.core.PageContext
  * ```
  *
  * @param path The original filepath of the markdown file, including its extension, relative to its parent markdown
- *   folder. In other words, `jsMain/resources/markdown/a/b/c/Hello.md` will result in `a/b/c/Hello.md`.
+ *   folder. In other words, `jsMain/resources/markdown/a/b/c/Hello.md` will result in `a/b/c/Hello.md`. Note that the
+ *   path will always use forward slashes, even if the user is working on Windows.
  * @param frontMatter Exposes data set in a markdown file's front matter block.
  *   See also: https://github.com/varabyte/kobweb#front-matter
  */

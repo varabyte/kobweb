@@ -63,9 +63,9 @@ abstract class ConvertMarkdownTask @Inject constructor(
         val parser = markdownFeatures.createParser()
         getMarkdownFilesWithRoots().forEach { rootAndFile ->
             val mdFile = rootAndFile.file
-            val mdFileRel = rootAndFile.relativeFile
+            val mdPathRel = rootAndFile.relativeFile.path.replace("\\", "/")
 
-            val parts = mdFileRel.path.split(File.separatorChar)
+            val parts = mdPathRel.split('/')
             val dirParts = parts.subList(0, parts.lastIndex)
             val packageParts = dirParts.map { it.toPackageName() }
 
@@ -96,7 +96,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 }
             }
 
-            val ktFileName = mdFileRel.nameWithoutExtension
+            val ktFileName = mdFile.nameWithoutExtension
             File(getGenDir(), "${packageParts.joinToString("/")}/$ktFileName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
                 val mdPackage = project.prefixQualifiedPackage(
@@ -104,7 +104,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 )
 
                 val funName = "${ktFileName}Page"
-                val ktRenderer = KotlinRenderer(project, mdFileRel.path, markdownComponents, mdPackage, funName)
+                val ktRenderer = KotlinRenderer(project, mdPathRel, markdownComponents, mdPackage, funName)
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }
         }
