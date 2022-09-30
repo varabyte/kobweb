@@ -283,15 +283,24 @@ class KotlinRenderer(
                 val yamlVisitor = YamlFrontMatterVisitor()
                 customBlock.accept(yamlVisitor)
 
+                var contextCreated = false
                 if (yamlVisitor.data.isNotEmpty()) {
                     if (dependsOnMarkdownArtifact) {
-                        val mdCtx = buildString {
-                            append("MarkdownContext(")
-                            append(listOf("\"$filePath\"", yamlVisitor.data.serialize()).joinToString())
-                            append(")")
+                        // "root" if present is a special value and not something that should be exposed to users. This
+                        // lets us avoid worrying about nasty escape / slash issues, since it's possible you'll
+                        // pass String values into the root (e.g. `PageLayout(title = "\"Hello\" they said")`) that
+                        // already have escaped characters in it. This makes the `serialize` call below less complex.
+                        val dataWithoutRoot = yamlVisitor.data.minus("root")
+                        if (dataWithoutRoot.isNotEmpty()) {
+                            val mdCtx = buildString {
+                                append("MarkdownContext(")
+                                append(listOf("\"$filePath\"", dataWithoutRoot.serialize()).joinToString())
+                                append(")")
+                            }
+                            output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
+                            ++indentCount
+                            contextCreated = true
                         }
-                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
-                        ++indentCount
                     }
 
                     // If "root" is set in the YAML block, that represents a top level composable which should wrap
@@ -308,7 +317,7 @@ class KotlinRenderer(
                             output.appendLine("$indent}")
                         }
 
-                        if (dependsOnMarkdownArtifact) {
+                        if (contextCreated) {
                             --indentCount
                             output.appendLine("$indent}")
                         }
