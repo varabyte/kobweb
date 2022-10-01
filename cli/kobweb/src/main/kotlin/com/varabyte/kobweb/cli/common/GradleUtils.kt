@@ -126,24 +126,24 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 7) {
                 textLine()
             }
             textLine()
-                if (startIndex > 0) {
-                    textLine("... Press UP, PAGE UP, or HOME to see earlier errors.")
-                }
-                for (i in startIndex until (startIndex + pageSize)) {
-                    if (i >= alerts.size) break
-                    val alert = alerts[i]
+            if (startIndex > 0) {
+                textLine("... Press UP, PAGE UP, or HOME to see earlier errors.")
+            }
+            for (i in startIndex until (startIndex + pageSize)) {
+                if (i >= alerts.size) break
+                val alert = alerts[i]
 
-                    if (i > startIndex) textLine()
-                    text("${i + 1}: ")
-                    when (alert) {
-                        is GradleAlert.Error -> red { textLine(alert.line) }
-                        is GradleAlert.Warning -> yellow { textLine(alert.line) }
-                        else -> error("Unexpected alert type: $alert")
-                    }
+                if (i > startIndex) textLine()
+                text("${i + 1}: ")
+                when (alert) {
+                    is GradleAlert.Error -> red { textLine(alert.line) }
+                    is GradleAlert.Warning -> yellow { textLine(alert.line) }
+                    else -> error("Unexpected alert type: $alert")
                 }
-                if (startIndex < maxIndex) {
-                    textLine("... Press DOWN, PAGE DOWN, or END to see later errors.")
-                }
+            }
+            if (startIndex < maxIndex) {
+                textLine("... Press DOWN, PAGE DOWN, or END to see later errors.")
+            }
             textLine()
         }
     }
