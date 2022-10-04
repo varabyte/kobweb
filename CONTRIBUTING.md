@@ -1,7 +1,7 @@
 # Contributing
 
 Are you interested in contributing code to Kobweb? First of all, let me say -- thanks! I really mean it. I appreciate
-your time and that you're giving some of it to us.
+your time and that you're giving some of it to this project.
 
 As it's still very early in the life of the project, the requirements set out for now will be pretty minimal, but I
 expect to tighten them over time as the project stabilizes.
