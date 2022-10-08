@@ -1198,7 +1198,7 @@ Solutions didn't work? Or you're encountering issues not listed here? Please con
 
 # Connecting with us
 
-* [Join our Discord!](https://discord.gg/5NZ2GKV5Cs)
+* [Join my Discord!](https://discord.gg/5NZ2GKV5Cs)
 * Follow me on Twitter: [@bitspittle](https://twitter.com/bitspittle)
 * You can send direct queries to [my email](mailto:bitspittle@gmail.com)
 
