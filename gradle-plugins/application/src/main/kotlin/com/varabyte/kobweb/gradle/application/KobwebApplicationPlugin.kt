@@ -26,6 +26,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.build.event.BuildEventsListenerRegistry
+import org.gradle.kotlin.dsl.extra
 import org.gradle.tooling.events.FailureResult
 import javax.inject.Inject
 
@@ -38,6 +39,11 @@ class KobwebApplicationPlugin @Inject constructor(
     private val buildEventsListenerRegistry: BuildEventsListenerRegistry
 ) : Plugin<Project> {
     override fun apply(project: Project) {
+        // TODO(#170): Since Kotlin 1.6.20, the JS compiler compiles one JS file per module, instead of generating a
+        //  single uber JS file. We'd like to support this new approach eventually (it's probably more cache friendly),
+        //  but we'll need some time to investigate it. For now, just revert the setting back to the classic mode.
+        project.extra["kotlin.js.ir.output.granularity"] = "whole-program"
+
         val kobwebFolder = project.kobwebFolder
         val kobwebConf = KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
         val kobwebBlock = project.extensions.create("kobweb", KobwebBlock::class.java, kobwebConf)
