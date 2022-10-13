@@ -11,12 +11,13 @@ import org.w3c.dom.HTMLElement
 
 private class DummyAttrsScope<E: Element> : AttrsScope<E> {
     override fun attr(attr: String, value: String): AttrsScope<E> = this
-    override fun classes(vararg classes: String) = Unit
+    override fun classes(classes: Collection<String>) = Unit
     override fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V) = Unit
     @ComposeWebInternalApi
     override fun registerEventListener(listener: SyntheticEventListener<*>) = Unit
     override fun style(builder: StyleScope.() -> Unit) = Unit
     override fun ref(effect: DisposableEffectScope.(E) -> DisposableEffectResult) = Unit
+
 }
 
 /**
@@ -36,7 +37,7 @@ class ComparableAttrsScope<E: Element>(private val wrapped: AttrsScope<E>) : Att
         return this
     }
 
-    override fun classes(vararg classes: String) {
+    override fun classes(classes: Collection<String>) {
         this.classes.addAll(classes)
     }
 
