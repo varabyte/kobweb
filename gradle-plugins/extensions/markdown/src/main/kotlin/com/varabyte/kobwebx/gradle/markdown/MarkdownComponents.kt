@@ -154,7 +154,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
 
         // region Markdown Node handlers
 
-        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeQuotes()}\")" }
+        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeQuotes().escapeDollars()}\")" }
         img.convention { img ->
             val altText = img.children().filterIsInstance<Text>().map { it.literal }.joinToString("")
             this.childrenOverride = emptyList()
@@ -221,7 +221,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
             val text = "\"\"\"${codeBlock.literal}\"\"\""
             // Code blocks should generate <pre><code>...</code></pre>
             // https://daringfireball.net/projects/markdown/syntax#precode
-            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text($text) } }"
+            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text(${text.escapeDollars()}) } }"
         }
         inlineCode.convention { code ->
             childrenOverride = listOf(Text(code.literal))
