@@ -600,13 +600,13 @@ Silk introduces the `Modifier` class, in order to provide an experience similar 
 In the world of Compose for Web, you can think of a `Modifier` as a layer on top of CSS styles. So this:
 
 ```kotlin
-Modifier.background(Colors.Red).color(Colors.Green).padding(200.px)
+Modifier.backgroundColor(Colors.Red).color(Colors.Green).padding(200.px)
 ```
 
 if passed into a widget composable, like `Box`:
 
 ```kotlin
-Box(Modifier.background(Colors.Red).color(Colors.Green).padding(200.px)) {
+Box(Modifier.backgroundColor(Colors.Red).color(Colors.Green).padding(200.px)) {
     Text("Green on red")
 }
 ```
@@ -662,7 +662,7 @@ which takes a `Modifier` parameter:
 
 ```kotlin
 // Approach #1 (uses inline styles)
-Box(Modifier.background(Colors.Red)) { /* ... */ }
+Box(Modifier.backgroundColor(Colors.Red)) { /* ... */ }
 
 // Appraoch #2 (uses stylesheets)
 Box(CustomStyle.toModifier()) { /* ... */}
@@ -795,7 +795,7 @@ _after_ the base style is). Here's an example:
 ```kotlin
 val CustomVariant = CustomStyle.addVariant("example-variant") {
     base {
-        Modifier.background(Colors.Green)
+        Modifier.backgroundColor(Colors.Green)
     }
 }
 ```
@@ -852,10 +852,10 @@ Button { /* ... */ }
 Button(variant = OutlineButtonVariant) { /* ... */ }
 
 // Approach #3: Apply the default style modified by additional inline styles
-Button(Modifier.background(Colors.Blue)) { /* ... */ }
+Button(Modifier.backgroundColor(Colors.Blue)) { /* ... */ }
 
 // Approach #4: Apply the default style modified first by a variant and then by inline styles
-Button(Modifier.background(Colors.Blue), variant = OutlineButtonVariant) { /* ... */ }
+Button(Modifier.backgroundColor(Colors.Blue), variant = OutlineButtonVariant) { /* ... */ }
 ```
 
 ### Font Awesome
