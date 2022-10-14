@@ -839,7 +839,8 @@ fun Button(
 }
 ```
 
-In other words, apply the modifiers in order of base style, then variant, then finally user overrides.
+In other words, if you ever want to write your own control that supports variants, you should apply the modifiers in
+order of: base style, then variant, then finally user overrides.
 
 A caller might call your widget one of several ways:
 
@@ -847,13 +848,13 @@ A caller might call your widget one of several ways:
 // Approach #1: Use default styling
 Button { /* ... */ }
 
-// Approach #1: Tweak default styles with a button variant
+// Approach #2: Apply the default style modified by a variant
 Button(variant = OutlineButtonVariant) { /* ... */ }
 
-// Approach #3: Tweak default styles with inline styles
+// Approach #3: Apply the default style modified by additional inline styles
 Button(Modifier.background(Colors.Blue)) { /* ... */ }
 
-// Approach #4: Tweak variant styles with inline styles
+// Approach #4: Apply the default style modified first by a variant and then by inline styles
 Button(Modifier.background(Colors.Blue), variant = OutlineButtonVariant) { /* ... */ }
 ```
 
