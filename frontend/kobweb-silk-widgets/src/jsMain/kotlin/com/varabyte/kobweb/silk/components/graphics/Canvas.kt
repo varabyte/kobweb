@@ -125,17 +125,15 @@ private inline fun <C: RenderingContext> Canvas(
 
         var requestId by remember { mutableStateOf(0) }
         val colorMode = getColorMode()
-        DomSideEffect(colorMode) { element ->
-            val ctx = createContext(element)
+        DisposableEffect(colorMode) {
+            val ctx = createContext(scopeElement)
             if (ctx != null) {
                 val callback = RenderCallback(ctx, width, height, minDeltaMs, maxDeltaMs, render, onStepped = {
                     requestId = window.requestAnimationFrame { step(colorMode) }
                 })
                 requestId = window.requestAnimationFrame { callback.step(colorMode) }
             }
-        }
 
-        DisposableRefEffect(colorMode) {
             onDispose {
                 if (requestId != 0) {
                     window.cancelAnimationFrame(requestId)
