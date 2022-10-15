@@ -11,17 +11,6 @@ plugins {
 group = "com.varabyte.kobwebx.gradle"
 version = libs.versions.kobweb.libs.get()
 
-// kotlin-dsl uses 1.4 by default, but this spawns warnings at build time.
-// See also: https://handstandsam.com/2022/04/13/using-the-kotlin-dsl-gradle-plugin-forces-kotlin-1-4-compatibility/
-afterEvaluate {
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            apiVersion = "1.5"
-            languageVersion = "1.5"
-        }
-    }
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
     // Get access to Kotlin multiplatform source sets
