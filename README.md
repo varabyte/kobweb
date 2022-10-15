@@ -138,7 +138,7 @@ Please see: https://github.com/varabyte/kobweb/issues/117 and consider leaving a
 
 ## Download the Kobweb binary
 
-Our binary artifact is hosted on github. To download latest:
+Our binary artifact is hosted on GitHub. To download latest:
 
 ```bash
 $ cd /path/to/applications
@@ -170,7 +170,7 @@ $ ln -s /path/to/applications/kobweb-0.9.9/bin/kobweb kobweb
 
 ## Build the Kobweb binary
 
-Although we host Kobweb artifacts on github, it's easy enough to build your own.
+Although we host Kobweb artifacts on GitHub, it's easy enough to build your own.
 
 **Note:** Building Kobweb requires JDK11 or newer. If you don't already have this set up, the easiest way is to
 [download a JDK](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html), unzip it somewhere,
