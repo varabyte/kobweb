@@ -286,10 +286,13 @@ class ComponentBaseModifier(override val colorMode: ColorMode): ComponentModifie
 /**
  * A [ComponentStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
  *
- * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for tacking on
- *   non-style attributes that should always get applied anyway when this style is applied.
+ * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
+ *   non-style attributes whenever this style is applied.
  */
-class ImmutableComponentStyle internal constructor(private val name: String, private val extraModifiers: Modifier = Modifier) {
+class ImmutableComponentStyle internal constructor(
+    private val name: String,
+    private val extraModifiers: Modifier = Modifier
+) {
     @Composable
     fun toModifier(): Modifier {
         val classNames = listOf(name, "$name-${getColorMode().name.lowercase()}")
@@ -379,9 +382,13 @@ private sealed interface StyleGroup {
  *   // ^ This modifier is now set with your registered styles.
  * }
  * ```
+ *
+ * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
+ *   non-style attributes whenever this style is applied.
  */
 class ComponentStyle(
     val name: String,
+    private val extraModifiers: Modifier = Modifier,
     private val init: ComponentModifiers.() -> Unit,
 ) {
     companion object {
@@ -421,10 +428,22 @@ class ComponentStyle(
     }
 
     internal val variants = mutableListOf<ComponentVariant>()
-    private var extraModifiers: Modifier = Modifier
 
-    fun addVariant(name: String, init: ComponentModifiers.() -> Unit): SimpleComponentVariant {
-        return SimpleComponentVariant(ComponentStyle("${this.name}-$name", init), baseStyle = this).also {
+    /**
+     * Create a new variant that builds on top of this style.
+     *
+     *  @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for
+     *    including non-style attributes that should always get applied whenever this variant style is applied.
+     */
+    fun addVariant(
+        name: String,
+        extraModifiers: Modifier = Modifier,
+        init: ComponentModifiers.() -> Unit
+    ): ComponentVariant {
+        return SimpleComponentVariant(
+            ComponentStyle("${this.name}-$name", extraModifiers, init),
+            baseStyle = this
+        ).also {
             variants.add(it)
         }
     }
@@ -499,11 +518,6 @@ class ComponentStyle(
         addStylesInto(styleSheet, ".$name")
     }
 
-    operator fun plus(modifiers: Modifier): ComponentStyle {
-        extraModifiers = extraModifiers.then(modifiers)
-        return this
-    }
-
     internal fun intoImmutableStyle() = ImmutableComponentStyle(name, extraModifiers)
 }
 
@@ -513,8 +527,12 @@ class ComponentStyle(
  * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.addVariantBase(name: String, init: ComponentBaseModifier.() -> Modifier): SimpleComponentVariant {
-    return addVariant(name) {
+fun ComponentStyle.addVariantBase(
+    name: String,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+): ComponentVariant {
+    return addVariant(name, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -556,9 +574,17 @@ fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): Co
     return this.thenUnless(condition) { other }
 }
 
-class SimpleComponentVariant(val style: ComponentStyle, private val baseStyle: ComponentStyle): ComponentVariant() {
-    private var extraModifiers: Modifier = Modifier
-
+/**
+ * A default [ComponentVariant] implementation that represents a single variant style.
+ *
+ * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
+ *   non-style attributes whenever this variant style is applied.
+ */
+class SimpleComponentVariant(
+    val style: ComponentStyle,
+    private val baseStyle: ComponentStyle,
+    private val extraModifiers: Modifier = Modifier
+) : ComponentVariant() {
     override fun addStylesInto(styleSheet: StyleSheet) {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
@@ -569,11 +595,6 @@ class SimpleComponentVariant(val style: ComponentStyle, private val baseStyle: C
 
     @Composable
     override fun toModifier() = style.toModifier().then(extraModifiers)
-
-    operator fun plus(modifiers: Modifier): SimpleComponentVariant {
-        extraModifiers = extraModifiers.then(modifiers)
-        return this
-    }
 
     internal fun intoImmutableStyle() = ImmutableComponentStyle(style.name)
 }

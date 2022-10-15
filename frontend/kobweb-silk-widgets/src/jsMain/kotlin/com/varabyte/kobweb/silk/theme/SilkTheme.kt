@@ -72,7 +72,7 @@ interface SilkConfig {
      * }
      * ```
      */
-    fun registerStyle(className: String, init: StyleModifiers.() -> Unit)
+    fun registerStyle(className: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit)
 }
 
 /**
@@ -99,8 +99,8 @@ interface SilkConfig {
  * You may still wish to use [SilkConfig.registerStyle] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun SilkConfig.registerBaseStyle(className: String, init: () -> Modifier) {
-    registerStyle(className) {
+fun SilkConfig.registerBaseStyle(className: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
+    registerStyle(className, extraModifiers) {
         base {
             init()
         }
@@ -112,8 +112,8 @@ internal object SilkConfigInstance : SilkConfig {
 
     private val styles = mutableListOf<ComponentStyle>()
 
-    override fun registerStyle(className: String, init: StyleModifiers.() -> Unit) {
-        styles.add(ComponentStyle(className, init))
+    override fun registerStyle(className: String, extraModifiers: Modifier, init: StyleModifiers.() -> Unit) {
+        styles.add(ComponentStyle(className, extraModifiers, init))
     }
 
     // This method is not part of the public API and should be called by Silk at initialization time
@@ -195,10 +195,14 @@ class MutableSilkTheme {
      * }
      * ```
      */
-    fun replaceComponentStyle(style: ComponentStyle, init: ComponentModifiers.() -> Unit) {
+    fun replaceComponentStyle(
+        style: ComponentStyle,
+        extraModifiers: Modifier = Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
         check(overiddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
-        componentStyles[style.name] = ComponentStyle(style.name, init)
+        componentStyles[style.name] = ComponentStyle(style.name, extraModifiers, init)
     }
 
     /**
@@ -246,8 +250,12 @@ class MutableSilkTheme {
 /**
  * Convenience method when you want to replace an upstream style but only need to define a base style.
  */
-fun MutableSilkTheme.replaceComponentStyleBase(style: ComponentStyle, init: ComponentModifier.() -> Modifier) {
-    replaceComponentStyle(style) {
+fun MutableSilkTheme.replaceComponentStyleBase(
+    style: ComponentStyle,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceComponentStyle(style, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
