@@ -127,6 +127,9 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
     abstract val rawTag: Property<NodeScope.(String) -> String>
     abstract val inlineTag: Property<NodeScope.(HtmlInline) -> String>
 
+    fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
+    fun String.escapeTripleQuotedText() = escapeDollars()
+
     init {
         project.afterEvaluate {
             useSilk.convention(project.hasDependencyNamed("kobweb-silk"))
@@ -154,9 +157,12 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
 
         // region Markdown Node handlers
 
-        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeQuotes().escapeDollars()}\")" }
+        text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeSingleQuotedText()}\")" }
         img.convention { img ->
-            val altText = img.children().filterIsInstance<Text>().map { it.literal }.joinToString("")
+            val altText = img.children()
+                .filterIsInstance<Text>()
+                .map { it.literal.escapeSingleQuotedText() }
+                .joinToString("")
             this.childrenOverride = emptyList()
 
             if (useSilk.get()) {
@@ -198,7 +204,13 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         br.convention { "$JB_DOM.Br" }
         a.convention { link ->
             if (useSilk.get()) {
-                val linkText = link.children().filterIsInstance<Text>().firstOrNull()?.literal?.escapeQuotes().orEmpty()
+                val linkText = link.children()
+                    .filterIsInstance<Text>()
+                    .firstOrNull()
+                    ?.literal
+                    ?.escapeSingleQuotedText()
+                    .orEmpty()
+
                 childrenOverride = listOf() // We "consumed" the children, no more need to visit them
                 "$SILK.navigation.Link(\"${link.destination}\", \"$linkText\")"
             } else {
@@ -218,10 +230,10 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         ol.convention { "$JB_DOM.Ol" }
         li.convention { "$JB_DOM.Li" }
         code.convention { codeBlock ->
-            val text = "\"\"\"${codeBlock.literal}\"\"\""
+            val text = "\"\"\"${codeBlock.literal.escapeTripleQuotedText()}\"\"\""
             // Code blocks should generate <pre><code>...</code></pre>
             // https://daringfireball.net/projects/markdown/syntax#precode
-            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text(${text.escapeDollars()}) } }"
+            "$JB_DOM.Pre { $JB_DOM.Code { $JB_DOM.Text($text) } }"
         }
         inlineCode.convention { code ->
             childrenOverride = listOf(Text(code.literal))
