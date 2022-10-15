@@ -11,7 +11,8 @@ import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import com.varabyte.kobweb.gradle.application.kmp.sourceSets
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApiTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteSourceTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.project.KobwebFolder
@@ -58,15 +59,21 @@ class KobwebApplicationPlugin @Inject constructor(
         val buildTarget = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
             ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
 
-        val kobwebGenSiteTask =
-            project.tasks.register("kobwebGenSite", KobwebGenerateSiteTask::class.java, kobwebBlock, buildTarget)
+        val kobwebGenSiteSourceTask =
+            project.tasks.register("kobwebGenSiteSource", KobwebGenerateSiteSourceTask::class.java, kobwebBlock, buildTarget)
+        val kobwebGenSiteIndexTask =
+            project.tasks.register("kobwebGenSiteIndex", KobwebGenerateSiteIndexTask::class.java, kobwebBlock, buildTarget)
+
         val kobwebGenApiTask = project.tasks.register("kobwebGenApi", KobwebGenerateApiTask::class.java, kobwebBlock)
-        // Umbrella task for all other gen tasks
-        val kobwebGenTask = project.tasks.register("kobwebGen")
-        kobwebGenTask.configure {
-            dependsOn(kobwebGenSiteTask)
-            dependsOn(kobwebGenApiTask)
+
+        // Umbrella tasks for all other gen tasks
+        val kobwebGenSiteTask = project.tasks.register("kobwebGenSite")
+        kobwebGenSiteTask.configure {
+            dependsOn(kobwebGenSiteIndexTask)
+            dependsOn(kobwebGenSiteSourceTask)
         }
+
+        val kobwebGenTask = project.tasks.register("kobwebGen")
 
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
@@ -155,21 +162,26 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
+            kobwebGenTask.configure {
+                dependsOn(kobwebGenSiteTask)
+                if (jvmTarget != null) {
+                    dependsOn(kobwebGenApiTask)
+                }
+            }
+
             val cleanTask = project.tasks.named("clean")
             project.tasks.named(jsTarget.compileKotlin) {
-                dependsOn(kobwebGenSiteTask)
+                dependsOn(kobwebGenSiteSourceTask)
             }
             project.tasks.named(jsTarget.processResources) {
-                dependsOn(kobwebGenSiteTask)
+                dependsOn(kobwebGenSiteIndexTask)
             }
 
             // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
             jvmTarget?.let { jvm ->
                 project.tasks.findByName(jvm.compileKotlin)?.dependsOn(kobwebGenApiTask)
-
                 project.tasks.findByName(jvm.jar)?.dependsOn(kobwebGenApiTask)
             }
-
 
             val compileExecutableTask = when (buildTarget) {
                 BuildTarget.DEBUG -> project.tasks.named(jsTarget.developmentExecutableCompileSync)
