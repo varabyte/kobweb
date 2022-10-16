@@ -202,7 +202,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 check(env == ServerEnvironment.DEV)
 
                 dependsOn(cleanTask)
-                dependsOn(kobwebGenTask)
                 dependsOn(project.tasks.named(jsTarget.browserProductionWebpack))
                 dependsOn(kobwebStartTask)
             }
