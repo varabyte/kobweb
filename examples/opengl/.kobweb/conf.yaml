@@ -8,6 +8,7 @@ server:
       script: "build/js/packages/opengl/kotlin/opengl.js"
       api: "build/libs/opengl.jar"
     prod:
+      script: "build/distributions/opengl.js"
       siteRoot: ".kobweb/site"
 
   port: 8080

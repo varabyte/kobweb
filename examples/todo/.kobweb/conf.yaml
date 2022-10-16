@@ -8,6 +8,7 @@ server:
       script: "build/js/packages/todo/kotlin/todo.js"
       api: "build/libs/todo.jar"
     prod:
+      script: "build/distributions/todo.js"
       siteRoot: ".kobweb/site"
 
   port: 8080

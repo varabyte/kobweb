@@ -8,6 +8,7 @@ server:
       script: "build/js/packages/clock/kotlin/clock.js"
       api: "build/libs/clock.jar"
     prod:
+      script: "build/distributions/clock.js"
       siteRoot: ".kobweb/site"
 
   port: 8080

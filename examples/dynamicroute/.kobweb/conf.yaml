@@ -7,6 +7,7 @@ server:
       contentRoot: "build/processedResources/js/main/public"
       script: "build/js/packages/dynamicroute/kotlin/dynamicroute.js"
     prod:
+      script: "build/distributions/dynamicroute.js"
       siteRoot: ".kobweb/site"
 
   port: 8080
