@@ -158,6 +158,12 @@ abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, pr
             scriptFile.copyTo(destFile, overwrite = true)
         }
 
+        val scriptMapFile = File("${scriptFile}.map")
+        run {
+            val destFile = systemRoot.resolve(scriptMapFile.name)
+            scriptMapFile.copyTo(destFile, overwrite = true)
+        }
+
         // Kobweb servers are only supported by the Kobweb layout
         if (siteLayout == SiteLayout.KOBWEB) {
             // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
