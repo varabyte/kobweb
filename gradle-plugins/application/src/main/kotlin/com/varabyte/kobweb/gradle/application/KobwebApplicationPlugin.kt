@@ -191,12 +191,17 @@ class KobwebApplicationPlugin @Inject constructor(
                 jvmTarget?.let { jvm ->
                     dependsOn(project.tasks.findByName(jvm.jar))
                 }
+
+                // PROD env uses a file copied over into a site folder by the export task, so it doesn't need to
+                // actually compile anything itself.
                 if (env == ServerEnvironment.DEV) {
                     dependsOn(compileExecutableTask)
                 }
             }
+
             kobwebExportTask.configure {
                 dependsOn(cleanTask)
+                dependsOn(project.tasks.named(jsTarget.browserProductionWebpack))
                 dependsOn(kobwebStartTask)
             }
 

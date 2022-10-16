@@ -256,7 +256,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
     val resourcesRoot = siteRoot.resolve("resources")
     val pagesRoot = siteRoot.resolve("pages")
 
-    val script = systemRoot.resolve(conf.server.files.dev.script.substringAfterLast("/"))
+    val script = systemRoot.resolve(conf.server.files.prod.script.substringAfterLast("/"))
     val fallbackIndex = systemRoot.resolve("index.html")
     val apiJar = conf.server.files.dev.api.substringAfterLast("/")
         .takeIf { it.isNotBlank() }

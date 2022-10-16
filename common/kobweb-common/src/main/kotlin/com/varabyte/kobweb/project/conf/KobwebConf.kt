@@ -52,9 +52,12 @@ class Server(
 
         /**
          * @param siteRoot The path to the root of where the static site lives
+         * @param script The path to the final JavaScript file generated from the user's Kotlin code. Unlike the [Dev]
+         *   script's path, this version should be minimized.
          */
         @Serializable
         class Prod(
+            val script: String,
             val siteRoot: String,
         )
     }

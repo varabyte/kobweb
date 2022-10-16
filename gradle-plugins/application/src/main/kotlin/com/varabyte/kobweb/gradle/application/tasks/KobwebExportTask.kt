@@ -152,7 +152,7 @@ abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, pr
                 }
         }
 
-        val scriptFile = project.layout.projectDirectory.file(kobwebConf.server.files.dev.script).asFile
+        val scriptFile = project.layout.projectDirectory.file(kobwebConf.server.files.prod.script).asFile
         run {
             val destFile = systemRoot.resolve(scriptFile.name)
             scriptFile.copyTo(destFile, overwrite = true)

@@ -27,6 +27,9 @@ class JsTarget(private val target: KotlinJsIrTarget) : TargetPlatform<KotlinJsIr
     override val compileKotlin by lazy { "compileKotlin${target.name.capitalize()}" }
     val processResources by lazy { "${target.name}ProcessResources" }
 
+    val browserDevelopmentWebpack by lazy { "${target.name}BrowserDevelopmentWebpack" }
+    val browserProductionWebpack by lazy { "${target.name}BrowserProductionWebpack" }
+
     val developmentExecutableCompileSync by lazy { "${target.name}DevelopmentExecutableCompileSync" }
     val productionExecutableCompileSync by lazy { "${target.name}ProductionExecutableCompileSync" }
 }

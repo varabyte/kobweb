@@ -8,6 +8,7 @@ server:
       script: "build/js/packages/helloworld/kotlin/helloworld.js"
       api: "build/libs/helloworld.jar"
     prod:
+      script: "build/distributions/helloworld.js"
       siteRoot: ".kobweb/site"
 
   port: 8080
