@@ -17,7 +17,7 @@ import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, private val serverEnvironment: ServerEnvironment, private val siteLayout: SiteLayout) :
+abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, private val siteLayout: SiteLayout) :
     KobwebProjectTask(kobwebBlock, "Export the Kobweb project into a static site") {
 
     @OutputDirectory
@@ -156,14 +156,6 @@ abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, pr
         run {
             val destFile = systemRoot.resolve(scriptFile.name)
             scriptFile.copyTo(destFile, overwrite = true)
-        }
-
-        if (serverEnvironment == ServerEnvironment.DEV) {
-            val scriptMapFile = File("${scriptFile}.map")
-            run {
-                val destFile = systemRoot.resolve(scriptMapFile.name)
-                scriptMapFile.copyTo(destFile, overwrite = true)
-            }
         }
 
         // Kobweb servers are only supported by the Kobweb layout

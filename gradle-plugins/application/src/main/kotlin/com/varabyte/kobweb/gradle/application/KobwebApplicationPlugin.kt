@@ -81,7 +81,7 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
         val kobwebExportTask =
-            project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, env, exportLayout)
+            project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, exportLayout)
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
@@ -188,19 +188,21 @@ class KobwebApplicationPlugin @Inject constructor(
                 BuildTarget.RELEASE -> project.tasks.named(jsTarget.productionExecutableCompileSync)
             }
             kobwebStartTask.configure {
-                jvmTarget?.let { jvm ->
-                    dependsOn(project.tasks.findByName(jvm.jar))
-                }
-
-                // PROD env uses a file copied over into a site folder by the export task, so it doesn't need to
-                // actually compile anything itself.
+                // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
+                // much.
                 if (env == ServerEnvironment.DEV) {
+                    dependsOn(kobwebGenTask)
                     dependsOn(compileExecutableTask)
                 }
             }
 
             kobwebExportTask.configure {
+                // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
+                // before outputting them into a final prod folder.
+                check(env == ServerEnvironment.DEV)
+
                 dependsOn(cleanTask)
+                dependsOn(kobwebGenTask)
                 dependsOn(project.tasks.named(jsTarget.browserProductionWebpack))
                 dependsOn(kobwebStartTask)
             }
