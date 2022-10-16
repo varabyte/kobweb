@@ -4,11 +4,12 @@ import com.varabyte.kobweb.api.http.EMPTY_BODY
 import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
+import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
-import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.io.ApiJarFile
 import io.ktor.application.*
 import io.ktor.http.*
@@ -25,6 +26,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.exists
 import kotlin.io.path.name
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
@@ -252,9 +254,17 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
 
 private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
+    if (!siteRoot.exists()) {
+        throw KobwebException("No site folder found. Did you run `kobweb export`?")
+    }
+
     val systemRoot = siteRoot.resolve("system")
     val resourcesRoot = siteRoot.resolve("resources")
     val pagesRoot = siteRoot.resolve("pages")
+
+    if (!systemRoot.exists()) {
+        throw KobwebException("No site subfolders found. If you ran `kobweb export --layout static`, you should run `kobweb run --env prod --layout static` instead.")
+    }
 
     val script = systemRoot.resolve(conf.server.files.prod.script.substringAfterLast("/"))
     val fallbackIndex = systemRoot.resolve("index.html")
