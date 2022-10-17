@@ -192,6 +192,9 @@ class KobwebApplicationPlugin @Inject constructor(
                 // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
                 // much.
                 if (env == ServerEnvironment.DEV) {
+                    // If this site has server routes, make sure we built the jar that our servers can load
+                    jvmTarget?.let { jvm -> dependsOn(project.tasks.findByName(jvm.jar)) }
+
                     dependsOn(kobwebGenTask)
                     dependsOn(compileExecutableTask)
                 }
