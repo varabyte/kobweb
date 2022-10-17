@@ -74,6 +74,7 @@ class KobwebApplicationPlugin @Inject constructor(
         }
 
         val kobwebGenTask = project.tasks.register("kobwebGen")
+        // Note: Configured below, in `afterEvaluate`
 
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
