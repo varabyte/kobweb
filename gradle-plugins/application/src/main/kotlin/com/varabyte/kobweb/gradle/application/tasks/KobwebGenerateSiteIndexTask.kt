@@ -9,6 +9,7 @@ import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.extensions.isDescendantOf
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -16,8 +17,10 @@ import org.jetbrains.kotlin.util.prefixIfNot
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateSiteIndexTask @Inject constructor(config: KobwebBlock, private val buildTarget: BuildTarget) :
-    KobwebProjectTask(config, "Generate an index.html file for this Kobweb project") {
+abstract class KobwebGenerateSiteIndexTask @Inject constructor(
+    config: KobwebBlock,
+    @get:Input val buildTarget: BuildTarget
+) : KobwebProjectTask(config, "Generate an index.html file for this Kobweb project") {
 
     private fun getGenResDir(): File = kobwebBlock.getGenJsResRoot(project)
 

@@ -7,14 +7,17 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateSiteSourceTask @Inject constructor(config: KobwebBlock, private val buildTarget: BuildTarget) :
-    KobwebProjectTask(config, "Generate extra code for this Kobweb project") {
+abstract class KobwebGenerateSiteSourceTask @Inject constructor(
+    config: KobwebBlock,
+    @get:Input val buildTarget: BuildTarget
+) : KobwebProjectTask(config, "Generate extra code for this Kobweb project") {
 
     private fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot(project)
 
