@@ -266,7 +266,9 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
         throw KobwebException("No site subfolders found. If you ran `kobweb export --layout static`, you should run `kobweb run --env prod --layout static` instead.")
     }
 
-    val script = systemRoot.resolve(conf.server.files.prod.script.substringAfterLast("/"))
+    val script = systemRoot.resolve(
+        (conf.server.files.prod.script ?: conf.server.files.dev.script).substringAfterLast("/")
+    )
     val fallbackIndex = systemRoot.resolve("index.html")
     val apiJar = conf.server.files.dev.api.substringAfterLast("/")
         .takeIf { it.isNotBlank() }
