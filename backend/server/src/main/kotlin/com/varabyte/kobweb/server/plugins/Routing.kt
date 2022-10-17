@@ -185,7 +185,7 @@ private fun Routing.configureCatchAllRouting(script: Path, index: Path, routePre
 private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, logger: Logger) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
-    val apiJar = conf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { ApiJarFile(Path(it), logger) }
+    val apiJar = conf.server.files.dev.api?.let { ApiJarFile(Path(it), logger) }
 
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
@@ -270,8 +270,8 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
         (conf.server.files.prod.script ?: conf.server.files.dev.script).substringAfterLast("/")
     )
     val fallbackIndex = systemRoot.resolve("index.html")
-    val apiJar = conf.server.files.dev.api.substringAfterLast("/")
-        .takeIf { it.isNotBlank() }
+    val apiJar = conf.server.files.dev.api
+        ?.substringAfterLast("/")
         ?.let { ApiJarFile(systemRoot.resolve(it), logger) }
 
     routing {

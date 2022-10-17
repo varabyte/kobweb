@@ -173,7 +173,7 @@ abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, pr
         // Kobweb servers are only supported by the Kobweb layout
         if (siteLayout == SiteLayout.KOBWEB) {
             // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
-            kobwebConf.server.files.dev.api.takeIf { it.isNotBlank() }?.let { apiFile ->
+            kobwebConf.server.files.dev.api?.let { apiFile ->
                 val apiJarFile = project.layout.projectDirectory.file(apiFile).asFile
                 if (apiJarFile.exists()) {
                     val destFile = systemRoot.resolve(apiJarFile.name)

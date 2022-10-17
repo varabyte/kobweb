@@ -47,7 +47,7 @@ class Server(
         class Dev(
             val contentRoot: String,
             val script: String,
-            val api: String = "",
+            val api: String? = null,
         )
 
         /**
