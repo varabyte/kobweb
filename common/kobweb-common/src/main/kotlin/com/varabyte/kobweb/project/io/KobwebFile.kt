@@ -53,7 +53,7 @@ open class KobwebReadableTextFile<T : Any>(
                 ?.let { bytes ->
                     if (lastBytes == null || bytes !== lastBytes) {
                         lastBytes = bytes
-                        _content = try { deserialize(bytes.toString(Charsets.UTF_8)) } catch(_: Exception) { null }
+                        _content = deserialize(bytes.toString(Charsets.UTF_8))
                     }
                     _content
                 }
