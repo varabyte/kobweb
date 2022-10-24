@@ -28,12 +28,6 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
             .transitionProperty("background-color")
             .transitionDuration(200.ms)
     }
-
-    cssRule(" *") {
-        Modifier
-            .transitionProperty(TransitionProperty.Inherit)
-            .transitionDuration(TransitionDuration.Inherit)
-    }
 }
 
 /**
