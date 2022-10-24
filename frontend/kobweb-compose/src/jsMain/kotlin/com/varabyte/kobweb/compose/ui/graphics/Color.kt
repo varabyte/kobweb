@@ -53,6 +53,19 @@ sealed interface Color {
         override fun toString(): String {
             return if (alpha == 0xFF) "rgb($red, $green, $blue)" else "rgba($red, $green, $blue, $alpha)"
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            return other is Rgb && red == other.red && green == other.green && blue == other.blue && alpha == other.alpha
+        }
+
+        override fun hashCode(): Int {
+            var result = red.hashCode()
+            result = 31 * result + green.hashCode()
+            result = 31 * result + blue.hashCode()
+            result = 31 * result + alpha.hashCode()
+            return result
+        }
     }
 
     companion object {
