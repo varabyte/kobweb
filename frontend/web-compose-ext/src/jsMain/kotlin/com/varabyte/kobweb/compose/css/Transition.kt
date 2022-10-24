@@ -23,6 +23,14 @@ class TransitionProperty(val value: String) {
     }
 }
 
+fun StyleScope.transitionProperty(property: TransitionProperty) {
+    transitionProperty(property.value)
+}
+
+fun StyleScope.transitionProperty(vararg properties: String) {
+    property("transition-property", properties.joinToString())
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration
 /**
  * Special values for Transition Duration Property.
@@ -35,6 +43,14 @@ class TransitionDuration(val value: String) {
         val Revert get() = TransitionDuration("revert")
         val Unset get() = TransitionDuration("unset")
     }
+}
+
+fun StyleScope.transitionDuration(duration: TransitionDuration) {
+    property("transition-duration", duration.value)
+}
+
+fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>) {
+    property("transition-duration", duration.joinToString())
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
@@ -51,22 +67,7 @@ class TransitionDelay(val value: String) {
     }
 }
 
-fun StyleScope.transitionProperty(property: TransitionProperty) {
-    transitionProperty(property.value)
-}
-
-fun StyleScope.transitionProperty(vararg properties: String) {
-    property("transition-property", properties.joinToString())
-}
-
-fun StyleScope.transitionDuration(duration: TransitionDuration) {
-    property("transition-duration", duration.value)
-}
-
-fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>) {
-    property("transition-duration", duration.joinToString())
-}
-
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
 fun StyleScope.transitionDelay(vararg delay: CSSSizeValue<out CSSUnitTime>) {
     property("transition-delay", delay.joinToString())
 }
@@ -77,5 +78,5 @@ fun StyleScope.transitionDelay(delay: TransitionDelay) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
 fun StyleScope.transitionTimingFunction(vararg value: AnimationTimingFunction) {
-    property("transition-timing-function", value.joinToString() { it.value })
+    property("transition-timing-function", value.joinToString { it.value })
 }

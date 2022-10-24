@@ -1,11 +1,9 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
-import com.varabyte.kobweb.compose.css.TransitionDuration
-import com.varabyte.kobweb.compose.css.TransitionProperty
-import com.varabyte.kobweb.compose.css.transitionDuration
-import com.varabyte.kobweb.compose.css.transitionProperty
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
+import org.jetbrains.compose.web.css.AnimationTimingFunction
 import org.jetbrains.compose.web.css.CSSSizeValue
 import org.jetbrains.compose.web.css.CSSUnitTime
 
@@ -27,4 +25,16 @@ fun Modifier.transitionDuration(vararg durations: CSSSizeValue<out CSSUnitTime>)
 
 fun Modifier.transitionDuration(duration: TransitionDuration) = styleModifier {
     transitionDuration(duration)
+}
+
+fun Modifier.transitionDelay(vararg delays: CSSSizeValue<out CSSUnitTime>) = styleModifier {
+    transitionDelay(*delays)
+}
+
+fun Modifier.transitionDelay(delay: TransitionDelay) = styleModifier {
+    transitionDelay(delay)
+}
+
+fun Modifier.transitionTimingFunction(vararg timingFunctions: AnimationTimingFunction) = styleModifier {
+    transitionTimingFunction(*timingFunctions)
 }
