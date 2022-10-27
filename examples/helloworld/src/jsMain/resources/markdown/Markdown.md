@@ -46,14 +46,6 @@ You can also use block tags, like `<a>` and `<pre>`. Here, we use html blocks to
 </a>
 ```
 
-<div>
-  Hey
-  <div>
-     there
-  </div>
-
-</div>
-
 Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose for Web calls. In fact,
 the following link is actually provided by Kotlin code:
 
