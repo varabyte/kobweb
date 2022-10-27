@@ -17,6 +17,7 @@ dependencies {
     implementation(kotlin("gradle-plugin"))
 
     implementation(libs.bundles.commonmark)
+    implementation(libs.jsoup)
 
     implementation(project(":common:kobweb-common"))
 

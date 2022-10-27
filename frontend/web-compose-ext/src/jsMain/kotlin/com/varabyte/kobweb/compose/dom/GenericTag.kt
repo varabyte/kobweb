@@ -21,10 +21,9 @@ class GenericElementBuilder private constructor(private val name: String) : Elem
 }
 
 /**
- * A way to specify a generic tag and optional attributes.
+ * A way to easily specify a generic tag and optional attributes.
  *
- * Created as an alternate method to use until the org.jetbrains.compose.web.dom.TagElement version that takes a string
- * argument is unmarked as experimental.
+ * See also [TagElement], which this delegates to.
  *
  * @param name The name of the tag, e.g. "link"
  * @param attrs An (optional) list of attributes separated by spaces, e.g. "href=\"...\" target=\"_blank\""
@@ -39,11 +38,37 @@ fun GenericTag(
         elementBuilder = GenericElementBuilder.create(name),
         applyAttrs = if (attrs != null) {
             {
-                attrs.split(' ').filter { it.isNotBlank() }.forEach { attrAssignment ->
+                // Handle input like "key=\"value\""
+                fun parseAttrAssignment(attrAssignment: String) {
                     val parts = attrAssignment.split('=', limit = 2)
                     val attr = parts[0]
                     val value = parts.getOrElse(1) { "" }
                     attr(attr, value.removeSurrounding("\""))
+                }
+
+                // Break into parts separated by spaces, but ignore spaces within quotes
+                val sb = StringBuilder()
+                var insideQuotes = false
+                for (c in attrs) {
+                    when (c) {
+                        '"' -> {
+                            insideQuotes = !insideQuotes
+                            sb.append(c)
+                        }
+                        ' ' -> {
+                            if (insideQuotes) {
+                                sb.append(c)
+                            } else {
+                                parseAttrAssignment(sb.toString())
+                                sb.clear()
+                            }
+                        }
+                        else -> sb.append(c)
+                    }
+                }
+                if (sb.isNotEmpty()) {
+                    check(!insideQuotes) { "Got invalid attributes with unclosed string: $attrs" }
+                    parseAttrAssignment(sb.toString())
                 }
             }
         } else {

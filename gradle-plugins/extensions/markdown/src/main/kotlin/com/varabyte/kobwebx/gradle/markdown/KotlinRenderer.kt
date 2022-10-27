@@ -124,8 +124,9 @@ class KotlinRenderer(
 
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
             val scope = NodeScope(data)
-            val code = composableCall.get().invoke(scope, node)
-            doVisit(node, code, scope)
+            composableCall.get().invoke(scope, node).takeIf { it.isNotBlank() }?.let { code ->
+                doVisit(node, code, scope)
+            }
         }
 
         private fun doVisit(node: Node, code: String, scope: NodeScope) {
@@ -198,7 +199,7 @@ class KotlinRenderer(
         }
 
         override fun visit(htmlBlock: HtmlBlock) {
-            unsupported("Using HTML blocks")
+            doVisit(htmlBlock, components.html)
         }
 
         override fun visit(image: Image) {

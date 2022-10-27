@@ -16,6 +16,7 @@ import org.commonmark.node.Emphasis
 import org.commonmark.node.FencedCodeBlock
 import org.commonmark.node.HardLineBreak
 import org.commonmark.node.Heading
+import org.commonmark.node.HtmlBlock
 import org.commonmark.node.HtmlInline
 import org.commonmark.node.Image
 import org.commonmark.node.Link
@@ -28,6 +29,9 @@ import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
+import org.jsoup.nodes.TextNode
 import javax.inject.Inject
 
 private const val JB_DOM = "org.jetbrains.compose.web.dom"
@@ -126,6 +130,8 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
     /** Handler which is fed the raw text (name and attributes) within an opening tag, e.g. `span id="demo"` */
     abstract val rawTag: Property<NodeScope.(String) -> String>
     abstract val inlineTag: Property<NodeScope.(HtmlInline) -> String>
+
+    abstract val html: Property<NodeScope.(HtmlBlock) -> String>
 
     fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
     fun String.escapeTripleQuotedText() = escapeDollars()
@@ -272,6 +278,50 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
                     append("}")
                 }
             }
+        }
+
+        html.set { htmlBlock ->
+            fun renderNode(el: Element, indent: Int, sb: StringBuilder) {
+                sb.append("$KOBWEB_DOM.GenericTag(\"${el.tagName()}\"")
+
+                if (el.attributesSize() > 0) {
+                    sb.append(", ")
+                    sb.append('"')
+                    sb.append(
+                        el.attributes().joinToString(" ") { attr ->
+                            """${attr.key}=\"${attr.value.escapeSingleQuotedText()}\""""
+                        }
+                    )
+                    sb.append('"')
+                }
+
+                el.textNodes()
+
+                if (el.childNodeSize() > 0) {
+                    sb.append (") { ")
+                    el.childNodes().forEach { child ->
+                        if (child is TextNode) {
+                            if (child.text().isNotBlank()) {
+                                sb.appendLine(text.get().invoke(this, Text(child.text().trim())))
+                            }
+                        } else if (child is Element) {
+                            renderNode(child, indent + 1, sb)
+                        }
+                    }
+                    sb.append(" }")
+                } else {
+                    sb.append(')')
+                }
+            }
+
+            val sb = StringBuilder()
+            val doc = Jsoup.parseBodyFragment(htmlBlock.literal)
+            val body = doc.body()
+            // Children size can be 0 (if input text was a <!-- comment -->) or 1, if we have a single root element
+            check(body.childrenSize() <= 1) { "Unexpected html block in Markdown." }
+            doc.body().children().first()?.let { root -> renderNode(root, indent = 0, sb) }
+
+            sb.toString()
         }
 
         // endregion

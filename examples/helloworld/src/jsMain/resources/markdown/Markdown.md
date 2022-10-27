@@ -26,7 +26,19 @@ and `inline` code as well.
 You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is
 wrapped in a span.
 
-However, block tags (like `<pre>`, `<body>` etc.) are not supported. Instead, you can use `{{{ code }}}` to call into
-Kotlin code. In fact, the following link is actually provided by Kotlin code:
+You can also use block tags, like `<a>` and `<pre>`. Here, we use html blocks to create a Discord badge:
+
+<a href="https://discord.gg/5NZ2GKV5Cs">
+<img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
+</a>
+
+```
+<a href="https://discord.gg/5NZ2GKV5Cs">
+<img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
+</a>
+```
+
+Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose for Web calls. In fact,
+the following link is actually provided by Kotlin code:
 
 {{{ .components.widgets.GoHomeLink }}}
