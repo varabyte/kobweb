@@ -23,6 +23,12 @@ and `inline` code as well.
 
 ---
 
+You can use blockquotes:
+
+> The trouble with quotes on the internet is you never know if they are genuine.
+>
+> -- Abraham Lincoln
+
 You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is
 wrapped in a span.
 

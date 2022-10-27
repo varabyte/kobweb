@@ -167,7 +167,7 @@ class KotlinRenderer(
         }
 
         override fun visit(blockQuote: BlockQuote) {
-            unsupported("Block quoting")
+            doVisit(blockQuote, components.blockquote)
         }
 
         override fun visit(code: Code) {

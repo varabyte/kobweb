@@ -10,6 +10,7 @@ import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
 import org.commonmark.ext.gfm.tables.TableHead
 import org.commonmark.ext.gfm.tables.TableRow
+import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
 import org.commonmark.node.Emphasis
@@ -120,6 +121,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
     abstract val li: Property<NodeScope.(ListItem) -> String>
     abstract val code: Property<NodeScope.(FencedCodeBlock) -> String>
     abstract val inlineCode: Property<NodeScope.(Code) -> String>
+    abstract val blockquote: Property<NodeScope.(BlockQuote) -> String>
     abstract val table: Property<NodeScope.(TableBlock) -> String>
     abstract val thead: Property<NodeScope.(TableHead) -> String>
     abstract val tbody: Property<NodeScope.(TableBody) -> String>
@@ -244,6 +246,9 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         inlineCode.convention { code ->
             childrenOverride = listOf(Text(code.literal))
             "$JB_DOM.Code"
+        }
+        blockquote.convention {
+            "$KOBWEB_DOM.GenericTag(\"blockquote\")"
         }
         table.convention { "$JB_DOM.Table" }
         thead.convention { "$JB_DOM.Thead" }
