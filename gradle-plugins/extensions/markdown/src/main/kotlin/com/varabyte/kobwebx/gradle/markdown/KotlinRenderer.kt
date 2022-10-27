@@ -22,7 +22,6 @@ import org.commonmark.node.HtmlInline
 import org.commonmark.node.Image
 import org.commonmark.node.IndentedCodeBlock
 import org.commonmark.node.Link
-import org.commonmark.node.LinkReferenceDefinition
 import org.commonmark.node.ListBlock
 import org.commonmark.node.ListItem
 import org.commonmark.node.Node
@@ -162,10 +161,6 @@ class KotlinRenderer(
             }
         }
 
-        private fun unsupported(feature: String) {
-            error("$feature is currently unsupported")
-        }
-
         override fun visit(blockQuote: BlockQuote) {
             doVisit(blockQuote, components.blockquote)
         }
@@ -247,10 +242,6 @@ class KotlinRenderer(
 
         override fun visit(text: Text) {
             doVisit(text, components.text)
-        }
-
-        override fun visit(linkReferenceDefinition: LinkReferenceDefinition) {
-            unsupported("Link referencing")
         }
 
         override fun visit(customNode: CustomNode) {

@@ -4,6 +4,8 @@ root: .components.layouts.PageLayout("MARKDOWN")
 
 ## Markdown Example
 
+This is [an example][id] reference-style link.
+
 This site is generated from markdown.
 
 Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose for Web](https://compose-web.ui.pages.jetbrains.team/).
@@ -44,7 +46,17 @@ You can also use block tags, like `<a>` and `<pre>`. Here, we use html blocks to
 </a>
 ```
 
+<div>
+  Hey
+  <div>
+     there
+  </div>
+
+</div>
+
 Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose for Web calls. In fact,
 the following link is actually provided by Kotlin code:
 
 {{{ .components.widgets.GoHomeLink }}}
+
+[id]: http://example.com/
