@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.cli.common
 
+import com.varabyte.kotter.foundation.anim.text
 import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.input.Completions
 import com.varabyte.kotter.foundation.input.input
