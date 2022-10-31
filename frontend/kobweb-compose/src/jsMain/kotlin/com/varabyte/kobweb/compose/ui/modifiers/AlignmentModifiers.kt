@@ -20,22 +20,22 @@ fun Modifier.justifyContent(justifyContent: JustifyContent) = styleModifier {
     justifyContent(justifyContent)
 }
 
-fun Modifier.justifySelf(justifySelf: JustifySelf) = styleModifier {
-    justifySelf(justifySelf)
-}
-
 fun Modifier.justifyItems(justifyItems: JustifyItems) = styleModifier {
     justifyItems(justifyItems)
 }
 
-fun Modifier.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) = styleModifier {
-    placeSelf(alignSelf, justifySelf)
+fun Modifier.justifySelf(justifySelf: JustifySelf) = styleModifier {
+    justifySelf(justifySelf)
+}
+
+fun Modifier.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) = styleModifier {
+    placeContent(alignContent, justifyContent)
 }
 
 fun Modifier.placeItems(alignItems: AlignItems, justifyItems: JustifyItems) = styleModifier {
     placeItems(alignItems, justifyItems)
 }
 
-fun Modifier.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) = styleModifier {
-    placeContent(alignContent, justifyContent)
+fun Modifier.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) = styleModifier {
+    placeSelf(alignSelf, justifySelf)
 }
