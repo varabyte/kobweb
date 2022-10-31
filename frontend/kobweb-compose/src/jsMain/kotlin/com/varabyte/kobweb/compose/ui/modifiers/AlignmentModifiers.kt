@@ -3,9 +3,20 @@ package com.varabyte.kobweb.compose.ui.modifiers
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.*
 
-fun Modifier.justifyContent(justifyContent: JustifyContent): Modifier = styleModifier {
+fun Modifier.alignContent(alignContent: AlignContent) = styleModifier {
+    alignContent(alignContent)
+}
+
+fun Modifier.alignItems(alignItems: AlignItems) = styleModifier {
+    alignItems(alignItems)
+}
+
+fun Modifier.alignSelf(alignSelf: AlignSelf) = styleModifier {
+    alignSelf(alignSelf)
+}
+
+fun Modifier.justifyContent(justifyContent: JustifyContent) = styleModifier {
     justifyContent(justifyContent)
 }
 
@@ -17,20 +28,12 @@ fun Modifier.justifyItems(justifyItems: JustifyItems) = styleModifier {
     justifyItems(justifyItems)
 }
 
-fun Modifier.alignSelf(alignSelf: AlignSelf) = styleModifier {
-    alignSelf(alignSelf)
-}
-
-fun Modifier.alignItems(alignItems: AlignItems): Modifier = styleModifier {
-    alignItems(alignItems)
-}
-
-fun Modifier.alignContent(alignContent: AlignContent): Modifier = styleModifier {
-    alignContent(alignContent)
-}
-
 fun Modifier.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) = styleModifier {
     placeSelf(alignSelf, justifySelf)
+}
+
+fun Modifier.placeItems(alignItems: AlignItems, justifyItems: JustifyItems) = styleModifier {
+    placeItems(alignItems, justifyItems)
 }
 
 fun Modifier.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) = styleModifier {
