@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.silk.components.graphics
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.dom.ElementRefListener
+import com.varabyte.kobweb.compose.dom.registerRefListener
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.height
@@ -14,7 +16,6 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ElementBuilder
-import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.TagElement
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.CanvasRenderingContext2D
@@ -107,7 +108,7 @@ private inline fun <C: RenderingContext> Canvas(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0f,
     maxDeltaMs: Number = 500f,
-    noinline elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
     crossinline createContext: (HTMLCanvasElement) -> C?,
     noinline render: RenderScope<C>.() -> Unit,
 ) {
@@ -119,10 +120,9 @@ private inline fun <C: RenderingContext> Canvas(
             .then(modifier).asAttributesBuilder {
                 attr("width", width.toString())
                 attr("height", height.toString())
+                registerRefListener(refListener)
             }
     ) {
-        elementScope?.invoke(this)
-
         var requestId by remember { mutableStateOf(0) }
         val colorMode = getColorMode()
         DisposableEffect(colorMode) {
@@ -164,7 +164,7 @@ fun Canvas2d(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
-    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
     render: RenderScope<CanvasRenderingContext2D>.() -> Unit,
 ) {
     Canvas(
@@ -174,7 +174,7 @@ fun Canvas2d(
         variant,
         minDeltaMs,
         maxDeltaMs,
-        elementScope,
+        refListener,
         { canvas -> canvas.getContext("2d") as? CanvasRenderingContext2D },
         render
     )
@@ -201,7 +201,7 @@ fun CanvasGl(
     variant: ComponentVariant? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
-    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
     render: RenderScope<WebGLRenderingContext>.() -> Unit,
 ) {
     Canvas(
@@ -211,7 +211,7 @@ fun CanvasGl(
         variant,
         minDeltaMs,
         maxDeltaMs,
-        elementScope,
+        refListener,
         { canvas -> canvas.getContext("webgl") as? WebGLRenderingContext },
         render
     )

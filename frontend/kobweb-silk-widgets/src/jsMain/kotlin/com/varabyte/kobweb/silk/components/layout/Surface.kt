@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.dom.ElementRefListener
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
@@ -14,8 +14,6 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.ElementScope
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
 val SurfaceStyle = ComponentStyle("silk-surface") {
@@ -40,12 +38,12 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
 fun Surface(
     modifier: Modifier = Modifier.fillMaxSize(),
     variant: ComponentVariant? = null,
-    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {
     Box(
         SurfaceStyle.toModifier(variant).then(modifier),
-        elementScope = elementScope
+        refListener = refListener
     ) {
         content()
     }

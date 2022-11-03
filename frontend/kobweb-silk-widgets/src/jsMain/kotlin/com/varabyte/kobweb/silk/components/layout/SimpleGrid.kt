@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.dom.ElementRefListener
+import com.varabyte.kobweb.compose.dom.registerRefListener
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.display
@@ -14,7 +16,6 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.ui.thenIf
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.ElementScope
 import org.w3c.dom.HTMLElement
 
 // Note: We restrict the number of columns supported by this widget because we have to statically predefine
@@ -91,7 +92,7 @@ fun SimpleGrid(
     numColumns: ResponsiveValues<Int>,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {
     Div(
@@ -112,9 +113,10 @@ fun SimpleGrid(
                 SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier()
             }
             .then(modifier)
-            .asAttributesBuilder()
+            .asAttributesBuilder {
+                registerRefListener(refListener)
+            }
     ) {
-        elementScope?.invoke(this)
         content()
     }
 }

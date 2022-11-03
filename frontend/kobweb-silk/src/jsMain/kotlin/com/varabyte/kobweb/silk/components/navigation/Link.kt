@@ -2,13 +2,14 @@ package com.varabyte.kobweb.silk.components.navigation
 
 import androidx.compose.runtime.*
 import androidx.compose.web.events.SyntheticMouseEvent
+import com.varabyte.kobweb.compose.dom.ElementRefListener
+import com.varabyte.kobweb.compose.dom.registerRefListener
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.navigation.toOpenLinkStrategy
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
-import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 import com.varabyte.kobweb.navigation.Link as KobwebLink
@@ -40,9 +41,9 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
-    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
 ) {
-    Link(path, modifier, variant, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, elementScope) {
+    Link(path, modifier, variant, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, refListener) {
         Text(text ?: path)
     }
 }
@@ -60,17 +61,18 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
-    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
     content: @Composable () -> Unit = {}
 ) {
     KobwebLink(
         href = path,
-        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder(),
+        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder {
+            registerRefListener(refListener)
+        },
         openInternalLinksStrategy,
         openExternalLinksStrategy,
         autoPrefix
     ) {
-        elementScope?.invoke(this)
         content()
     }
 }

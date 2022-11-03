@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.dom.ElementRefListener
 import com.varabyte.kobweb.compose.dom.clearFocus
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -14,7 +15,6 @@ import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.ElementScope
 import org.w3c.dom.HTMLElement
 
 val ButtonStyle = ComponentStyle("silk-button") {
@@ -55,7 +55,7 @@ fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    elementScope: (@Composable ElementScope<HTMLElement>.() -> Unit)? = null,
+    refListener: ElementRefListener<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -76,7 +76,7 @@ fun Button(
                 }
             },
         contentAlignment = Alignment.Center,
-        elementScope,
+        refListener = refListener,
     ) {
         content()
     }
