@@ -2,14 +2,26 @@ package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.dom.ElementRefListener
+import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.clearFocus
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.onKeyDown
+import com.varabyte.kobweb.compose.ui.modifiers.outline
+import com.varabyte.kobweb.compose.ui.modifiers.role
+import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
+import com.varabyte.kobweb.compose.ui.modifiers.userSelect
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.active
+import com.varabyte.kobweb.silk.components.style.focus
+import com.varabyte.kobweb.silk.components.style.hover
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
@@ -55,7 +67,7 @@ fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    refListener: ElementRefListener<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -76,7 +88,7 @@ fun Button(
                 }
             },
         contentAlignment = Alignment.Center,
-        refListener = refListener,
+        ref = ref,
     ) {
         content()
     }

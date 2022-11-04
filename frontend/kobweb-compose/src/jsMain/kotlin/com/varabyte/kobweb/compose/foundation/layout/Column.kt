@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.dom.ElementRefListener
-import com.varabyte.kobweb.compose.dom.registerRefListener
+import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -22,13 +22,13 @@ fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    refListener: ElementRefListener<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Div(modifier.asAttributesBuilder {
         classes("kobweb-col", verticalArrangement.toClassName(), horizontalAlignment.toClassName())
-        registerRefListener(refListener)
     }) {
+        registerRefScope(ref)
         ColumnScope().content()
     }
 }

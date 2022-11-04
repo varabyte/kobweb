@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.dom.ElementRefListener
-import com.varabyte.kobweb.compose.dom.registerRefListener
+import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -21,13 +21,13 @@ class BoxScope {
 fun Box(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    refListener: ElementRefListener<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}
 ) {
     Div(attrs = modifier.asAttributesBuilder {
         classes("kobweb-box", contentAlignment.toClassName())
-        registerRefListener(refListener)
     }) {
+        registerRefScope(ref)
         BoxScope().content()
     }
 }

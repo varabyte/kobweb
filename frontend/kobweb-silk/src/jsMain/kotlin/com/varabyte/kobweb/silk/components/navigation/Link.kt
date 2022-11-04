@@ -2,8 +2,8 @@ package com.varabyte.kobweb.silk.components.navigation
 
 import androidx.compose.runtime.*
 import androidx.compose.web.events.SyntheticMouseEvent
-import com.varabyte.kobweb.compose.dom.ElementRefListener
-import com.varabyte.kobweb.compose.dom.registerRefListener
+import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
@@ -41,9 +41,9 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
-    refListener: ElementRefListener<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
 ) {
-    Link(path, modifier, variant, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, refListener) {
+    Link(path, modifier, variant, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, ref) {
         Text(text ?: path)
     }
 }
@@ -61,18 +61,17 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
-    refListener: ElementRefListener<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit = {}
 ) {
     KobwebLink(
         href = path,
-        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder {
-            registerRefListener(refListener)
-        },
+        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder(),
         openInternalLinksStrategy,
         openExternalLinksStrategy,
         autoPrefix
     ) {
+        registerRefScope(ref)
         content()
     }
 }

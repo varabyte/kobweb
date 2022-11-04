@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.dom.ElementRefListener
-import com.varabyte.kobweb.compose.dom.registerRefListener
+import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.display
@@ -92,7 +92,7 @@ fun SimpleGrid(
     numColumns: ResponsiveValues<Int>,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
-    refListener: ElementRefListener<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {
     Div(
@@ -113,10 +113,9 @@ fun SimpleGrid(
                 SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier()
             }
             .then(modifier)
-            .asAttributesBuilder {
-                registerRefListener(refListener)
-            }
+            .asAttributesBuilder()
     ) {
+        registerRefScope(ref)
         content()
     }
 }
