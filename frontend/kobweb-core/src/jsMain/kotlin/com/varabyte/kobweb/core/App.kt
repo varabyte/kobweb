@@ -14,22 +14,29 @@ import org.jetbrains.compose.web.css.px
  *
  * The method should take a `content: @Composable () -> Unit` parameter.
  *
- * If no method is annotated `@App` then [KobwebApp] will be used. Of course, your own custom app method can compose
- * that function if it wishes:
+ * If no method is annotated `@App` then a reasonable default will be used ([KobwebApp] at a bare minimum, or possibly
+ * `SilkApp` if using the silk library). Of course, your own custom app method can compose these functions if it wishes
+ * to:
  *
  * ```
+ * object SiteStyleSheet : StyleSheet() {
+ *    /* ... global styles here, for example fonts or site-wide line spacing ... */
+ * }
+ *
  * @App
  * @Composable
  * fun MyApp(content: @Composable () -> Unit) {
  *   KobwebApp {
- *     // My own extra initialization
- *     content()
+ *     Style(SiteStyleSheet)
+ *     Box(Modifier.fillMaxSize().backgroundColor(Colors.magenta)) {
+ *       content()
+ *     }
  *   }
  * }
  * ```
  *
- * Finally, there must either be no methods or just a single method marked with this annotation. If Kobweb encounters
- * more than one App annotation, it will log an error and discard duplicates arbitrarily.
+ * Finally, there must either be **no methods** or **just a single method** marked with this annotation. If Kobweb
+ * encounters more than one App annotation, it will log an error and discard duplicates arbitrarily.
  */
 @Target(AnnotationTarget.FUNCTION)
 annotation class App

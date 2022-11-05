@@ -7,19 +7,26 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.withIndent
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
-import com.varabyte.kobweb.gradle.application.project.site.SiteData
+import com.varabyte.kobweb.gradle.application.project.app.AppData
+import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
+import com.varabyte.kobweb.gradle.core.project.frontend.merge
 
 private fun String.escapeQuotes(): String {
     return this.replace("\"", """\"""")
 }
 
 fun createMainFunction(
-    siteData: SiteData,
+    appData: AppData,
+    libData: List<FrontendData>,
     usingSilk: Boolean,
     appGlobals: Map<String, String>,
     routePrefix: RoutePrefix,
     target: BuildTarget
 ): String {
+    val appFqn = appData.appEntry?.fqn
+        ?: if (usingSilk) "com.varabyte.kobweb.silk.SilkApp" else "com.varabyte.kobweb.core.KobwebApp"
+
+    val frontendData = (mutableListOf(appData.frontendData) + libData).merge()
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
     mutableListOf(
@@ -40,7 +47,7 @@ fun createMainFunction(
             add("org.w3c.dom.get")
         }
 
-        if (siteData.kobwebInits.any { it.acceptsContext }) {
+        if (frontendData.kobwebInits.any { it.acceptsContext }) {
             add("com.varabyte.kobweb.core.InitKobwebContext")
         }
 
@@ -133,33 +140,34 @@ fun createMainFunction(
 
             addStatement("RoutePrefix.set(\"$routePrefix\")")
             addStatement("val router = Router()")
-            siteData.pages.sortedBy { it.route }.forEach { entry ->
+            frontendData.pages.sortedBy { it.route }.forEach { entry ->
                 addStatement("""router.register("${entry.route}") { ${entry.fqn}() }""")
             }
             addStatement("")
 
-            if (siteData.kobwebInits.isNotEmpty()) {
-                if (siteData.kobwebInits.any { entry -> entry.acceptsContext }) {
+            if (frontendData.kobwebInits.isNotEmpty()) {
+                if (frontendData.kobwebInits.any { entry -> entry.acceptsContext }) {
                     addStatement("val ctx = InitContext(router)")
                 }
-                siteData.kobwebInits.forEach { entry ->
+                frontendData.kobwebInits.forEach { entry ->
                     val ctx = if (entry.acceptsContext) "ctx" else ""
                     addStatement("${entry.fqn}($ctx)")
                 }
                 addStatement("")
             }
 
-            if (siteData.silkInits.isNotEmpty() || siteData.silkStyleFqcns.isNotEmpty() || siteData.silkVariantFqcns.isNotEmpty()) {
+            if (usingSilk
+                && frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty() || frontendData.silkVariants.isNotEmpty()) {
                 addCode(CodeBlock.builder().apply {
                     addStatement("com.varabyte.kobweb.silk.initSilkHook = { ctx ->")
                     withIndent {
-                        siteData.silkStyleFqcns.forEach { fqcn ->
-                            addStatement("ctx.theme.registerComponentStyle($fqcn)")
+                        frontendData.silkStyles.forEach { entry ->
+                            addStatement("ctx.theme.registerComponentStyle(${entry.fqcn})")
                         }
-                        siteData.silkVariantFqcns.forEach { fqcn ->
-                            addStatement("ctx.theme.registerComponentVariants($fqcn)")
+                        frontendData.silkVariants.forEach { entry ->
+                            addStatement("ctx.theme.registerComponentVariants(${entry.fqcn})")
                         }
-                        siteData.silkInits.forEach { init ->
+                        frontendData.silkInits.forEach { init ->
                             addStatement("${init.fqn}(ctx)")
                         }
                     }
@@ -182,7 +190,7 @@ fun createMainFunction(
 
                 renderComposable(rootElementId = "root") {
                     CompositionLocalProvider(AppGlobalsLocal provides mapOf(${appGlobals.map { entry -> "\"${entry.key.escapeQuotes()}\" to \"${entry.value.escapeQuotes()}\""}.joinToString() })) {
-                        ${siteData.app?.fqn ?: if (usingSilk) "com.varabyte.kobweb.silk.SilkApp" else "com.varabyte.kobweb.core.KobwebApp"} {
+                        $appFqn {
                             router.renderActivePage()
                         }
                     }

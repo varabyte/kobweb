@@ -12,8 +12,6 @@ import kotlinx.html.head
 import kotlinx.html.html
 import kotlinx.html.id
 import kotlinx.html.lang
-import kotlinx.html.link
-import kotlinx.html.meta
 import kotlinx.html.script
 import kotlinx.html.title
 import kotlinx.html.unsafe

@@ -3,10 +3,10 @@ package com.varabyte.kobweb.cli.run
 import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.GradleAlertBundle
 import com.varabyte.kobweb.cli.common.KobwebGradle
-import com.varabyte.kobweb.cli.common.assertKobwebProject
+import com.varabyte.kobweb.cli.common.assertKobwebApplication
 import com.varabyte.kobweb.cli.common.assertServerNotAlreadyRunning
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
-import com.varabyte.kobweb.cli.common.findKobwebProject
+import com.varabyte.kobweb.cli.common.findKobwebApplication
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.handleGradleOutput
 import com.varabyte.kobweb.cli.common.isServerAlreadyRunningFor
@@ -61,10 +61,10 @@ fun handleRun(
     val env = env.takeIf { siteLayout != SiteLayout.STATIC } ?: ServerEnvironment.PROD
     val kobwebGradle = KobwebGradle(env)
     if (isInteractive) session {
-        val kobwebProject = findKobwebProject() ?: return@session
-        if (isServerAlreadyRunningFor(kobwebProject)) return@session
+        val kobwebApplication = findKobwebApplication() ?: return@session
+        if (isServerAlreadyRunningFor(kobwebApplication)) return@session
 
-        val kobwebFolder = kobwebProject.kobwebFolder
+        val kobwebFolder = kobwebApplication.kobwebFolder
         val conf = KobwebConfFile(kobwebFolder).content!!
 
         newline() // Put space between user prompt and eventual first line of Gradle output
@@ -236,8 +236,8 @@ fun handleRun(
         }
     } else {
         assert(!isInteractive)
-        assertKobwebProject()
-            .also { kobwebProject -> kobwebProject.assertServerNotAlreadyRunning() }
+        assertKobwebApplication()
+            .also { kobwebApplication -> kobwebApplication.assertServerNotAlreadyRunning() }
 
         // If we're non-interactive, it means we just want to start the Kobweb server and exit without waiting for
         // for any additional changes. (This is essentially used when run in a web server environment)

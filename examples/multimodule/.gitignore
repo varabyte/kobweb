@@ -1,0 +1,14 @@
+# General ignores
+.DS_Store
+build
+out
+
+# IntelliJ ignores
+*.iml
+/*.ipr
+
+/.idea
+
+# Gradle ignores
+.gradle
+

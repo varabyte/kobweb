@@ -216,26 +216,21 @@ like:
 
 ```
 my-project
-└── src
-    └── jsMain
-        ├── kotlin
-        │   └── org
-        │       └── example
-        │           └── myproject
-        │               ├── components
-        │               │  ├── layouts
-        │               │  │  └── PageLayout.kt
-        │               │  ├── sections
-        │               │  │  └── NavHeader.kt
-        │               │  └── widgets
-        │               │     └── GoHomeLink.kt
-        │               ├── MyApp.kt
-        │               └── pages
-        │                   ├── About.kt
-        │                   └── Index.kt
-        └── resources
-            └── markdown
-                └── Markdown.md
+└── src/jsMain
+    ├── kotlin.org.example.myproject
+    │   ├── components
+    │   │   ├── layouts
+    │   │   │   └── PageLayout.kt
+    │   │   ├── sections
+    │   │   │   └── NavHeader.kt
+    │   │   └── widgets
+    │   │       └── GoHomeLink.kt
+    │   ├── pages
+    │   │   ├── About.kt
+    │   │   └── Index.kt
+    │   └── MyApp.kt
+    └── resources/markdown
+        └── Markdown.md
 ```
 
 Note that there's no index.html or routing logic anywhere! We generate that for you automatically when you run Kobweb.
@@ -293,12 +288,10 @@ You can create the following Kobweb projects by typing `kobweb create ...`
 
 For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 
-# Basic topics
+# Beginner topics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
-Compose for Web app, such as routing and configuring basic CSS styles. It exposes a handful of annotations and utility
-methods which your app can use to communicate intent with the framework. These annotations work in conjunction with our
-Gradle plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
+Compose for Web app, such as routing and configuring basic CSS styles.
 
 Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and / or
 running a Compose for Web app. We want to get that stuff out of the way, so you can enjoy focusing on the more
@@ -430,7 +423,7 @@ So if you visit `site.com/posts?id=12345&mode=edit`, you can query those values 
 fun Posts() {
     val ctx = rememberPageContext()
     // Here, I'm assuming these params are always present, but you can
-    // use `get` instead to handle the nullable case.
+    // use `get` instead of `getValue` to handle the nullable case.
     val postId = ctx.params.getValue("id").toInt()
     val mode = EditMode.from(ctx.params.getValue("mode"))
     /* ... */
@@ -578,7 +571,8 @@ That said, there are times when you have to use stylesheets, because without the
 behaviors (particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes),
 [pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and
 [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries), the discussion of
-which are outside the scope of this README). So it's good to realize that there are occasional differences.
+which are outside the scope of this README). For example, you can't override the color of visited links without using a
+stylesheet approach. So it's worth realizing there are occasional differences.
 
 ---
 
@@ -991,7 +985,7 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder.
 
-### Redefining your application root
+### Specifying your application root
 
 By default, Kobweb will automatically root every page to the [`KobwebApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-core/src/jsMain/kotlin/com/varabyte/kobweb/core/App.kt)
 (or, if using Silk, to a [`SilkApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-silk/src/jsMain/kotlin/com/varabyte/kobweb/silk/SilkApp.kt)).
@@ -1012,7 +1006,7 @@ fun HomePage() {
 then the final result that actually runs on your site will be:
 
 ```kotlin
-// somewhere in a generated main.kt
+// In a generated main.kt somewhere...
 
 KobwebApp {
   HomePage()
@@ -1204,7 +1198,7 @@ fun KobwebPage() {
 ```
 
 You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
-will automatically be prepending with your site's full package.
+will automatically be prepended with your site's full package.
 
 ##### Inline syntax
 
@@ -1235,6 +1229,52 @@ To read more about the feature, please check out the
 [official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
 
 # Advanced topics
+
+## Multimodule
+
+For simplicity, the default site Kobweb creates for you is a monolithic project. All your code is dumped into a single
+module at the project root.
+
+However, Kobweb is capable of splitting code up across modules. To do this, you move your components, pages, and/or
+widgets to separate modules and apply the `com.varabyte.kobweb.library` plugin on them (while the main module applies
+the `com.varabyte.kobweb.application` plugin.)
+
+In other words, you can change a project layout from this:
+
+```
+my-project
+├── build.gradle.kts
+└── src/jsMain
+    └── kotlin.org.example.myproject
+        ├── components
+        └── pages
+```
+
+To something like this:
+
+```
+my-project
+├── sitelib
+│   ├── build.gradle.kts # apply "com.varabyte.kobweb.library"
+│   └── src/jsMain
+│       └── kotlin.org.example.myproject.sitelib
+│           ├── components
+│           └── pages
+└── site
+    ├── build.gradle.kts # apply "com.varabyte.kobweb.application"
+    └── src/jsMain
+        └── kotlin.org.example.myproject.site
+            ├── components
+            └── pages
+```
+
+If you'd like to explore a multimodule project example, you can do so by running:
+
+```bash
+$ kobweb create examples/chat
+```
+
+which demonstrates a chat application with its auth and chat functionality managed in their own, separate modules.
 
 ## Templates
 
@@ -1324,21 +1364,6 @@ So, should you use Kobweb at this point? If you are...
     * **No** - this may never be a tenable path.
 * a company:
     * **Probably not** (someday, we hope, but not yet)
-
-# Known Issues
-
-* `kobweb run` sometimes gets stuck when Gradle (running behind it) gets stuck.
-    * Quit kobweb, run `./gradlew --stop`, and then try again
-    * Run `./gradlew kobwebGen` or `./gradlew kobwebStart` with various Gradle debug options to see what's going on
-      under the hood (e.g. `./gradlew kobwebStart --stacktrace`)
-* A running kobweb server occasionally won't shutdown upon quitting
-    * The message should indicate the PID
-    * In a separte terminal, kill the process manually (e.g. on Linux: `kill -9 ...`)
-    * Press CTRL-C to kill `kobweb run`
-    * Tracking this issue [here](https://github.com/varabyte/kobweb/issues/89)
-
-Solutions didn't work? Or you're encountering issues not listed here? Please consider
-[leaving feedback ▼](https://github.com/varabyte/kobweb#filing-issues-and-leaving-feedback)!
 
 # Connecting with us
 

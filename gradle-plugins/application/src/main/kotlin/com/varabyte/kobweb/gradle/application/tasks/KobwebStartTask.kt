@@ -2,9 +2,11 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.server.api.SiteLayout
+import com.varabyte.kobweb.gradle.application.util.toDisplayText
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerStateFile
+import com.varabyte.kobweb.server.api.SiteLayout
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -27,7 +29,7 @@ abstract class KobwebStartTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        val stateFile = ServerStateFile(kobwebProject.kobwebFolder)
+        val stateFile = ServerStateFile(kobwebApplication.kobwebFolder)
         stateFile.content?.let { serverState ->
             val alreadyRunningMessage = "A Kobweb server is already running at ${serverState.toDisplayText()}"
             if (serverState.isRunning()) {

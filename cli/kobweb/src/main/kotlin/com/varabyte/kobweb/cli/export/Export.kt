@@ -4,8 +4,8 @@ import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.GradleAlertBundle
 import com.varabyte.kobweb.cli.common.KobwebGradle
 import com.varabyte.kobweb.cli.common.consumeProcessOutput
-import com.varabyte.kobweb.cli.common.findKobwebProject
-import com.varabyte.kobweb.cli.common.assertKobwebProject
+import com.varabyte.kobweb.cli.common.findKobwebApplication
+import com.varabyte.kobweb.cli.common.assertKobwebApplication
 import com.varabyte.kobweb.cli.common.assertServerNotAlreadyRunning
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.handleGradleOutput
@@ -38,8 +38,8 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
     val kobwebGradle = KobwebGradle(ServerEnvironment.PROD) // exporting is a production-only action
 
     if (isInteractive) session {
-        val kobwebProject = findKobwebProject() ?: return@session
-        if (isServerAlreadyRunningFor(kobwebProject)) return@session
+        val kobwebApplication = findKobwebApplication() ?: return@session
+        if (isServerAlreadyRunningFor(kobwebApplication)) return@session
 
         newline() // Put space between user prompt and eventual first line of Gradle output
 
@@ -117,8 +117,8 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
         }
     } else {
         assert(!isInteractive)
-        assertKobwebProject()
-            .also { kobwebProject -> kobwebProject.assertServerNotAlreadyRunning() }
+        assertKobwebApplication()
+            .also { kobwebApplication -> kobwebApplication.assertServerNotAlreadyRunning() }
 
         kobwebGradle.export(siteLayout).also { it.consumeProcessOutput(); it.waitFor() }
         kobwebGradle.stopServer().also { it.consumeProcessOutput(); it.waitFor() }

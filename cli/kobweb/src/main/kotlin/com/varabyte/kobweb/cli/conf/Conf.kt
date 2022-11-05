@@ -1,13 +1,13 @@
 package com.varabyte.kobweb.cli.conf
 
-import com.varabyte.kobweb.cli.common.assertKobwebProject
+import com.varabyte.kobweb.cli.common.assertKobwebApplication
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 
 fun handleConf(query: String) {
-    val kobwebProject = assertKobwebProject()
+    val kobwebApplication = assertKobwebApplication()
     if (query.isBlank()) return // No query? OK I guess we're done
 
-    val confFile = KobwebConfFile(kobwebProject.kobwebFolder)
+    val confFile = KobwebConfFile(kobwebApplication.kobwebFolder)
     val conf = confFile.content!!
 
     // Use reflection to convert a query, e.g. "server.port", into an answer

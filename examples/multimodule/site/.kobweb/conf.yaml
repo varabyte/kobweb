@@ -1,0 +1,14 @@
+site:
+  title: "Multimodule"
+
+server:
+  files:
+    dev:
+      contentRoot: "build/processedResources/js/main/public"
+      script: "../build/js/packages/multimodule-site/kotlin/multimodule-site.js"
+      api: "build/libs/multimodule.jar"
+    prod:
+      script: "build/distributions/multimodule.js"
+      siteRoot: ".kobweb/site"
+
+  port: 8080

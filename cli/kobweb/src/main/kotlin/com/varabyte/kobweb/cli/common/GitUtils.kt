@@ -1,13 +1,9 @@
 package com.varabyte.kobweb.cli.common
 
 import com.varabyte.kobweb.common.error.KobwebException
-import com.varabyte.kobweb.project.KobwebProject
 import com.varabyte.kotter.runtime.Session
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.nio.file.Path

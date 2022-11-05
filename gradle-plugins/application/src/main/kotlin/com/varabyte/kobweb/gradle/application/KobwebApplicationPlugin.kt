@@ -1,28 +1,25 @@
 package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
-import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.application.extensions.KobwebxBlock
-import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
-import com.varabyte.kobweb.gradle.application.extensions.index
-import com.varabyte.kobweb.gradle.application.kmp.jsTarget
-import com.varabyte.kobweb.gradle.application.kmp.jvmTarget
-import com.varabyte.kobweb.gradle.application.kmp.kotlin
-import com.varabyte.kobweb.gradle.application.kmp.sourceSets
+import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.tasks.*
+import com.varabyte.kobweb.gradle.application.util.includeDependencyPublicResourcesInJar
+import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
+import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
+import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
-import com.varabyte.kobweb.server.api.ServerEnvironment
-import com.varabyte.kobweb.server.api.ServerRequest
-import com.varabyte.kobweb.server.api.ServerRequestsFile
-import com.varabyte.kobweb.server.api.ServerStateFile
-import com.varabyte.kobweb.server.api.SiteLayout
-import kotlinx.html.link
+import com.varabyte.kobweb.server.api.*
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.invoke
 import org.gradle.tooling.events.FailureResult
 import javax.inject.Inject
 
@@ -35,6 +32,8 @@ class KobwebApplicationPlugin @Inject constructor(
     private val buildEventsListenerRegistry: BuildEventsListenerRegistry
 ) : Plugin<Project> {
     override fun apply(project: Project) {
+        project.pluginManager.apply(KobwebCorePlugin::class.java)
+
         // TODO(#170): Since Kotlin 1.6.20, the JS compiler compiles one JS file per module, instead of generating a
         //  single uber JS file. We'd like to support this new approach eventually (it's probably more cache friendly),
         //  but we'll need some time to investigate it. For now, just revert the setting back to the classic mode.
@@ -42,8 +41,9 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebFolder = project.kobwebFolder
         val kobwebConf = KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
-        val kobwebBlock = project.extensions.create("kobweb", KobwebBlock::class.java, kobwebConf)
-        project.extensions.create("kobwebx", KobwebxBlock::class.java)
+        val kobwebBlock = ((project as ExtensionAware).extensions["kobweb"] as KobwebBlock).apply {
+            createAppBlock(kobwebConf)
+        }
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
@@ -54,20 +54,36 @@ class KobwebApplicationPlugin @Inject constructor(
         val buildTarget = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
             ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
 
-        val kobwebGenSiteSourceTask =
-            project.tasks.register("kobwebGenSiteSource", KobwebGenerateSiteSourceTask::class.java, kobwebBlock, buildTarget)
-        val kobwebGenSiteIndexTask =
-            project.tasks.register("kobwebGenSiteIndex", KobwebGenerateSiteIndexTask::class.java, kobwebBlock, buildTarget)
+        val kobwebGenFrontendMetadata =
+            project.tasks.register("kobwebGenFrontendMetadata", KobwebGenerateMetadataFrontendTask::class.java, kobwebBlock)
 
-        val kobwebGenBackendTask = project.tasks.register("kobwebGenBackend", KobwebGenerateBackendTask::class.java, kobwebBlock)
+        val kobwebGenBackendMetadata =
+            project.tasks.register("kobwebGenBackendMetadata", KobwebGenerateMetadataBackendTask::class.java, kobwebBlock)
+
+        val kobwebGenSiteEntryTask =
+            project.tasks.register("kobwebGenSiteEntry", KobwebGenerateSiteEntryTask::class.java, kobwebConf, kobwebBlock, buildTarget)
+        kobwebGenSiteEntryTask.configure {
+            dependsOn(kobwebGenFrontendMetadata)
+        }
+
+        val kobwebGenSiteIndexTask =
+            project.tasks.register("kobwebGenSiteIndex", KobwebGenerateSiteIndexTask::class.java, kobwebConf, kobwebBlock, buildTarget)
+
+        val kobwebGenApisFactoryTask = project.tasks.register("kobwebGenApisFactory", KobwebGenerateApisFactoryTask::class.java, kobwebBlock)
+        kobwebGenApisFactoryTask.configure {
+            dependsOn(kobwebGenBackendMetadata)
+        }
 
         // Umbrella tasks for all other gen tasks
         val kobwebGenFrontendTask = project.tasks.register("kobwebGenFrontend", KobwebTask::class.java, "The umbrella task that combines all Kobweb frontend generation tasks")
         kobwebGenFrontendTask.configure {
             dependsOn(kobwebGenSiteIndexTask)
-            dependsOn(kobwebGenSiteSourceTask)
+            dependsOn(kobwebGenSiteEntryTask)
         }
-
+        val kobwebGenBackendTask = project.tasks.register("kobwebGenBackend", KobwebTask::class.java, "The umbrella task that combines all Kobweb backend generation tasks")
+        kobwebGenBackendTask.configure {
+            dependsOn(kobwebGenApisFactoryTask)
+        }
         val kobwebGenTask = project.tasks.register("kobwebGen", KobwebTask::class.java, "The umbrella task that combines all frontend and backend Kobweb generation tasks")
         // Note: Configured below, in `afterEvaluate`
 
@@ -77,7 +93,7 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
         val kobwebExportTask =
-            project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebBlock, exportLayout)
+            project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConf, kobwebBlock, exportLayout)
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
@@ -126,7 +142,8 @@ class KobwebApplicationPlugin @Inject constructor(
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
         project.afterEvaluate {
-            project.tasks.named("clean") {
+            val cleanTask = project.tasks.named("clean")
+            cleanTask {
                 doLast {
                     delete(kobwebConf.server.files.prod.siteRoot)
                     delete(kobwebFolder.resolve("server"))
@@ -141,22 +158,13 @@ class KobwebApplicationPlugin @Inject constructor(
             // Users should be using Kobweb commands instead of the standard Compose for Web commands, but they
             // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
             // the Kobweb commands instead.
-            jsRunTasks.forEach { taskName ->
-                project.tasks.named(taskName) {
-                    doFirst {
+            jsRunTasks
+                .mapNotNull { taskName -> project.tasks.findByName(taskName) }
+                .forEach { task ->
+                    task.doFirst {
                         logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
                     }
                 }
-            }
-
-            if (project.hasDependencyNamed("kobweb-silk-icons-fa")) {
-                kobwebBlock.index.head.add {
-                    link {
-                        rel = "stylesheet"
-                        href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-                    }
-                }
-            }
 
             kobwebGenTask.configure {
                 dependsOn(kobwebGenFrontendTask)
@@ -165,13 +173,15 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
-            val cleanTask = project.tasks.named("clean")
             project.tasks.named(jsTarget.compileKotlin) {
-                dependsOn(kobwebGenSiteSourceTask)
+                dependsOn(kobwebGenSiteEntryTask)
             }
             project.tasks.named(jsTarget.processResources) {
                 dependsOn(kobwebGenSiteIndexTask)
             }
+
+
+            jsTarget.kotlinTarget.includeDependencyPublicResourcesInJar()
 
             // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
             jvmTarget?.let { jvm ->
@@ -203,21 +213,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 dependsOn(cleanTask)
                 dependsOn(project.tasks.named(jsTarget.browserProductionWebpack))
                 dependsOn(kobwebStartTask)
-            }
-
-            project.kotlin {
-                sourceSets {
-                    getByName(jsTarget.mainSourceSet) {
-                        kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT${jsTarget.srcSuffix}"))
-                        resources.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT${jsTarget.resourceSuffix}"))
-                    }
-
-                    jvmTarget?.let { jvm ->
-                        getByName(jvm.mainSourceSet) {
-                            kotlin.srcDir(project.layout.buildDirectory.dir("$GENERATED_ROOT${jvm.srcSuffix}"))
-                        }
-                    }
-                }
             }
         }
     }

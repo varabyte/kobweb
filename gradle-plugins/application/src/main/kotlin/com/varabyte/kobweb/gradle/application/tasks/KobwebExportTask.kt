@@ -6,23 +6,39 @@ import com.github.kklisura.cdt.launch.ChromeArguments
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.github.kklisura.cdt.services.ChromeService
 import com.varabyte.kobweb.common.navigation.RoutePrefix
-import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.application.project.site.SiteData
-import com.varabyte.kobweb.server.api.SiteLayout
-import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
+import com.varabyte.kobweb.gradle.application.project.app.AppData
+import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
+import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
+import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
+import com.varabyte.kobweb.gradle.core.project.frontend.merge
+import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
+import com.varabyte.kobweb.gradle.core.utils.searchZipFor
+import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.api.ServerStateFile
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import com.varabyte.kobweb.server.api.SiteLayout
+import kotlinx.serialization.json.Json
+import org.gradle.api.tasks.*
 import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, private val siteLayout: SiteLayout) :
-    KobwebProjectTask(kobwebBlock, "Export the Kobweb project into a static site") {
+abstract class KobwebExportTask @Inject constructor(
+    private val kobwebConf: KobwebConf,
+    kobwebBlock: KobwebBlock,
+    private val siteLayout: SiteLayout
+) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
+
+    @InputFiles
+    fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
+
+    @InputFile
+    fun getAppFrontendMetadata() = File(project.buildDir, KOBWEB_APP_METADATA_FRONTEND)
 
     @OutputDirectory
     fun getSiteDir(): File {
-        return project.layout.projectDirectory.dir(kobwebConfFile.content!!.server.files.prod.siteRoot).asFile
+        return project.layout.projectDirectory.dir(kobwebConf.server.files.prod.siteRoot).asFile
     }
 
     private fun ChromeService.takeSnapshot(url: String): String {
@@ -83,21 +99,24 @@ abstract class KobwebExportTask @Inject constructor(kobwebBlock: KobwebBlock, pr
     @TaskAction
     fun execute() {
         // Sever should be running since "kobwebStart" is a prerequisite for this task
-        val port = ServerStateFile(kobwebProject.kobwebFolder).content!!.port
+        val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 
-        val siteData = SiteData.from(
-            project.group.toString(),
-            getPagesPackage(),
-            getSourceFilesJs(),
-            GradleReporter(project.logger)
-        )
+        val appData = Json.decodeFromString(AppData.serializer(), getAppFrontendMetadata().readText())
+        val frontendData = mutableListOf(appData.frontendData).apply {
+            getCompileClasspath().get().files.forEach { file ->
+                file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
+                    add(Json.decodeFromString(FrontendData.serializer(), bytes.decodeToString()))
+                }
+            }
+        }.merge()
+
 
         val (pagesRoot, resourcesRoot, systemRoot) = when(siteLayout) {
             SiteLayout.KOBWEB -> Triple("pages", "resources", "system").map { File(getSiteDir(), it) }
             SiteLayout.STATIC -> getSiteDir().toTriple()
         }
 
-        siteData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
+        frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
             ChromeLauncher().use { launcher ->
                 // NOTE: Normally "no-sandbox" is NOT recommended for security reasons. However, this option is
                 // necessary when this task runs as root, as Chrome complains otherwise, but this scenario is common in

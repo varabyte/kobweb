@@ -2,6 +2,8 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.gradle.application.util.toDisplayText
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
@@ -16,7 +18,7 @@ import java.nio.file.Files
 abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is running") {
     @TaskAction
     fun execute() {
-        val kobwebFolder = kobwebProject.kobwebFolder
+        val kobwebFolder = kobwebApplication.kobwebFolder
         val stateFile = ServerStateFile(kobwebFolder)
         stateFile.content?.let { serverState ->
             if (ProcessHandle.of(serverState.pid).isPresent) {

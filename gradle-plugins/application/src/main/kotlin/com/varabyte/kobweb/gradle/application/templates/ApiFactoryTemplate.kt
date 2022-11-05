@@ -1,10 +1,8 @@
 package com.varabyte.kobweb.gradle.application.templates
 
-import com.varabyte.kobweb.gradle.application.project.api.ApiData
-import com.varabyte.kobweb.gradle.application.project.api.ApiEntry
-import com.varabyte.kobweb.gradle.application.project.api.InitApiEntry
+import com.varabyte.kobweb.gradle.core.project.backend.BackendData
 
-fun createApisFactoryImpl(apiData: ApiData): String {
+fun createApisFactoryImpl(backendData: BackendData): String {
     return """
         import com.varabyte.kobweb.api.Apis
         import com.varabyte.kobweb.api.ApisFactory
@@ -19,13 +17,13 @@ fun createApisFactoryImpl(apiData: ApiData): String {
                 ${
                     // Generates lines like: apis.register("/path/to/api") { ctx -> path.to.api.method(ctx)  }
                     // Sort values as it makes the generated registration logic easier to follow
-                    apiData.apiMethods.sortedBy { entry -> entry.route }.joinToString("\n                ") { entry ->
+                    backendData.apiMethods.sortedBy { entry -> entry.route }.joinToString("\n                ") { entry ->
                         """apis.register("${entry.route}") { ctx -> ${entry.fqn}(ctx) }"""
                     }
                 }
 
                 ${
-                    if (apiData.initMethods.isNotEmpty()) {
+                    if (backendData.initMethods.isNotEmpty()) {
                         "val initCtx = InitApiContext(apis, data, logger)"
                     }
                     else {
@@ -33,7 +31,7 @@ fun createApisFactoryImpl(apiData: ApiData): String {
                     }
                 }
                 ${
-                    apiData.initMethods.joinToString("\n                ") { entry ->
+                    backendData.initMethods.joinToString("\n                ") { entry ->
                         """${entry.fqn}(initCtx)"""
                     }
                 }

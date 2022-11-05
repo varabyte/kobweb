@@ -1,23 +1,22 @@
 package com.varabyte.kobweb.cli.common
 
 import com.varabyte.kobweb.common.error.KobwebException
-import com.varabyte.kobweb.project.KobwebProject
-import com.varabyte.kobweb.server.api.ServerState
+import com.varabyte.kobweb.project.KobwebApplication
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
 import com.varabyte.kotter.runtime.Session
 import com.varabyte.kotter.runtime.render.RenderScope
 
-fun assertKobwebProject(): KobwebProject {
+fun assertKobwebApplication(): KobwebApplication {
     return try {
-        KobwebProject()
+        KobwebApplication()
     } catch (ex: KobwebException) {
-        throw KobwebException("This command must be called in the root of a Kobweb project.")
+        throw KobwebException("This command must be called in a Kobweb application module.")
     }
 }
 
-fun KobwebProject.assertServerNotAlreadyRunning() {
+fun KobwebApplication.assertServerNotAlreadyRunning() {
     ServerStateFile(this.kobwebFolder).content?.let { serverState ->
         if (serverState.isRunning()) {
             throw KobwebException("Cannot execute this command as a server is already running (PID=${serverState.pid}). Consider running `kobweb stop` if this is unexpected.")
@@ -25,7 +24,7 @@ fun KobwebProject.assertServerNotAlreadyRunning() {
     }
 }
 
-fun KobwebProject.isServerAlreadyRunning(): Boolean {
+fun KobwebApplication.isServerAlreadyRunning(): Boolean {
     return try {
         assertServerNotAlreadyRunning()
         false
@@ -34,16 +33,16 @@ fun KobwebProject.isServerAlreadyRunning(): Boolean {
     }
 }
 
-fun Session.findKobwebProject(): KobwebProject? {
+fun Session.findKobwebApplication(): KobwebApplication? {
     return try {
-        assertKobwebProject()
+        assertKobwebApplication()
     } catch (ex: KobwebException) {
         informError(ex.message!!)
         null
     }
 }
 
-fun Session.isServerAlreadyRunningFor(project: KobwebProject): Boolean {
+fun Session.isServerAlreadyRunningFor(project: KobwebApplication): Boolean {
     return try {
         project.assertServerNotAlreadyRunning()
         false

@@ -1,3 +1,5 @@
+import com.varabyte.kobweb.gradle.application.util.kobwebServerJar
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.jetbrains.compose)
@@ -14,14 +16,12 @@ repositories {
 }
 
 kotlin {
-    jvm {
-        tasks.named("jvmJar", Jar::class.java).configure {
-            archiveFileName.set("helloworld.jar")
-        }
-    }
     js(IR) {
         browser()
         binaries.executable()
+    }
+    jvm {
+        kobwebServerJar("helloworld.jar")
     }
     sourceSets {
         val commonMain by getting {

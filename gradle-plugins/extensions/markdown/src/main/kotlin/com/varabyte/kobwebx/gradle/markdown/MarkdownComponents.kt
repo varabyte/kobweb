@@ -4,7 +4,7 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.Key
 import com.varabyte.kobweb.common.collect.TypedMap
-import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
+import com.varabyte.kobweb.gradle.core.utils.hasJsDependencyNamed
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
@@ -154,7 +154,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
 
     init {
         project.afterEvaluate {
-            useSilk.convention(project.hasDependencyNamed("kobweb-silk"))
+            useSilk.convention(project.hasJsDependencyNamed("kobweb-silk"))
         }
 
         defaultRoot.convention("com.varabyte.kobweb.compose.foundation.layout.Column")

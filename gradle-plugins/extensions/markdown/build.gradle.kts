@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
     kotlin("jvm")
@@ -21,8 +19,9 @@ dependencies {
 
     implementation(project(":common:kobweb-common"))
 
-    // Compile only - the plugin itself should exist at runtime
-    compileOnly(project(":gradle-plugins:application"))
+    // Compile only - the plugin itself should exist at runtime, provided by either the
+    // Library or Application plugin.
+    compileOnly(project(":gradle-plugins:core"))
 }
 
 val DESCRIPTION = "A Gradle plugin that adds markdown support to a Kobweb project"

@@ -1,11 +1,10 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
     kotlin("jvm")
     id("com.varabyte.kobweb.internal.publish")
     `java-library`
     `java-gradle-plugin`
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 group = "com.varabyte.kobweb.gradle"
@@ -16,8 +15,10 @@ dependencies {
     // Get access to Kotlin multiplatform source sets
     implementation(kotlin("gradle-plugin"))
 
-    // For parsing code. Instead, use KSP someday? See also: Bug #4
-    implementation(kotlin("compiler-embeddable"))
+    implementation(libs.kotlinx.serialization.json)
+
+    // Common Gradle plugin used by Library and Application plugins
+    implementation(project(":gradle-plugins:core"))
 
     // For generating code / html
     implementation(libs.kotlinpoet)
