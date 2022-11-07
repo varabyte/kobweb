@@ -45,6 +45,12 @@ private fun OverflowStrategy.toValue(position: String) = "${name.lowercase()} $p
 
 // region AlignContent
 
+/**
+ * Kobweb's version of the `AlignContent` class, which is more fully featured than the Compose for Web one.
+ *
+ * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
+ * version provides it.
+ */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
 sealed class AlignContent(val value: String) {
     open class AlignContentKeyword(value: String) : AlignContent(value)
@@ -96,6 +102,12 @@ fun StyleScope.alignContent(alignContent: AlignContent) {
 
 // region AlignItems
 
+/**
+ * Kobweb's version of the `AlignItems` class, which is more fully featured than the Compose for Web one.
+ *
+ * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
+ * version provides it.
+ */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
 sealed class AlignItems(val value: String) {
     open class AlignItemsKeyword(value: String) : AlignItems(value)
@@ -144,6 +156,12 @@ fun StyleScope.alignItems(alignItems: AlignItems) {
 
 // region AlignSelf
 
+/**
+ * Kobweb's version of the `AlignSelf` class, which is more fully featured than the Compose for Web one.
+ *
+ * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
+ * version provides it.
+ */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-self
 sealed class AlignSelf(val value: String) {
     open class AlignSelfKeyword(value: String) : AlignSelf(value)
@@ -194,6 +212,12 @@ fun StyleScope.alignSelf(alignSelf: AlignSelf) {
 
 // region JustifyContent
 
+/**
+ * Kobweb's version of the `JustifyContent` class, which is more fully featured than the Compose for Web one.
+ *
+ * In many common cases, you may not need to use it, but if you're doing anything with overflow, this version provides
+ * it.
+ */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
 sealed class JustifyContent(val value: String) {
     open class JustifyContentKeyword(value: String) : JustifyContent(value)
@@ -237,6 +261,12 @@ fun StyleScope.justifyContent(justifyContent: JustifyContent) {
 
 // region JustifyItems
 
+/**
+ * Kobweb's version of the `JustifyItems` class, which is more fully featured than the Compose for Web one.
+ *
+ * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
+ * version provides it.
+ */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
 sealed class JustifyItems(val value: String) {
     open class JustifyItemsKeyword(value: String) : JustifyItems(value)
@@ -287,6 +317,12 @@ fun StyleScope.justifyItems(justifyItems: JustifyItems) {
 
 // region JustifySelf
 
+/**
+ * Kobweb's version of the `JustifySelf` class, which is more fully featured than the Compose for Web one.
+ *
+ * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
+ * version provides it.
+ */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
 sealed class JustifySelf(val value: String) {
     open class JustifySelfKeyword(value: String) : JustifySelf(value)
