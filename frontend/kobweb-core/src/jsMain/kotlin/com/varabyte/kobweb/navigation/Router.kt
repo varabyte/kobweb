@@ -136,14 +136,14 @@ class Router {
         routeTree.errorHandler = errorHandler
     }
 
-    @Deprecated("\"routeTo\" has been renamed to \"tryNavigateTo\".",
-        ReplaceWith("tryNavigateTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)")
+    @Deprecated("\"routeTo\" has been renamed to \"tryRoutingTo\".",
+        ReplaceWith("tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)")
     )
     fun routeTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
-        return tryNavigateTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)
+        return tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)
     }
 
     /**
@@ -154,7 +154,7 @@ class Router {
      *
      * ```
      * onClick { evt ->
-     *   if (ctx.router.tryNavigateTo(...)) {
+     *   if (ctx.router.tryRoutingTo(...)) {
      *     evt.preventDefault()
      *   }
      * ```
@@ -169,7 +169,7 @@ class Router {
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
      */
-    fun tryNavigateTo(
+    fun tryRoutingTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
@@ -212,7 +212,7 @@ class Router {
     }
 
     /**
-     * Like [tryNavigateTo] but handle the external navigation as well.
+     * Like [tryRoutingTo] but handle the external navigation as well.
      *
      * You will generally call this method like so:
      *
@@ -222,7 +222,7 @@ class Router {
      *   ctx.router.navigateTo(...)
      * ```
      *
-     * @param updateHistoryMode This parameter is only used for internal site routing. See [tryNavigateTo] for more
+     * @param updateHistoryMode This parameter is only used for internal site routing. See [tryRoutingTo] for more
      *   information.
      */
     fun navigateTo(
@@ -231,7 +231,7 @@ class Router {
         openInternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
         openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB_FOREGROUND,
     ) {
-        if (!tryNavigateTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy)) {
+        if (!tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy)) {
             window.open(pathQueryAndFragment, openExternalLinksStrategy)
         }
     }
