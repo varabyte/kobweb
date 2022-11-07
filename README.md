@@ -858,6 +858,71 @@ Button(Modifier.backgroundColor(Colors.Blue)) { /* ... */ }
 Button(Modifier.backgroundColor(Colors.Blue), variant = OutlineButtonVariant) { /* ... */ }
 ```
 
+### ElementRefScope and raw HTML elements
+
+Occasionally, you may need access to the raw element backing the Silk widget you've just created, perhaps to accomplish
+something that Compose for Web doesn't provide an API for yet.
+
+To allow for this, all Silk widgets provide a `ref` parameter which take a listener that provide this information:
+
+```kotlin
+Box(
+    ref = ref { element ->
+        // Triggered when the Box is added into the DOM
+        element.focus()
+    }
+) {
+    /* ... */
+}
+```
+
+You can check out the [Element](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-element/) class (and its often
+even more relevant [HTMLElement](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-h-t-m-l-element/) inheritor)
+to see the sort of methods and properties that are available on it.
+
+The `ref { ... }` method can actually take one or more optional keys of any value. If any of these keys change on a
+subsequent recomposition, the element will be disposed of and recreated:
+
+```kotlin
+var uiState by remember { mutableStateOf(UiState.DarkMode) }
+Box(
+    // Will get triggered each time the UI state changes
+    ref = ref(uiState) { element -> /* ... */}
+)
+```
+
+If you need to know both when the element enters AND exits the DOM, you can use `disposableRef` instead. With
+`disposableRef`, the very last line in your block must be a call to `onDispose`:
+
+```kotlin
+val activeElements: MutableSet<HTMLElement> = /* ... */
+
+/* ... later ... */
+
+Box(
+    ref = disposableRef { element ->
+        activeElements.put(element)
+        onDispose { activeElements.remove(element) }
+    }
+)
+```
+
+And, finally, in some rare cases, you may want to have multiple independent keys that can each cause your UI element to
+be disposed of, but for different reasons and with different handlers. You can use `refScope` as a way to combine two or
+more `ref` and `disposableRef` calls in any combination:
+
+```kotlin
+val isFeature1Enabled: Boolean = /* ... */
+val isFeature2Enabled: Boolean = /* ... */
+
+Box(
+    ref = refScope {
+        ref(isFeature1Enabled) { element -> /* ... */ }
+        dispoasbleRef(isFeature2Enabled) { element -> /* ... */; onDispose { /* ... */ } }
+    }
+)
+```
+
 ### Font Awesome
 
 Kobweb provides the `kobweb-silk-icons-fa` artifact which you can use in your project if you want access to all the free
