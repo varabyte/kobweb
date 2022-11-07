@@ -1,15 +1,15 @@
 [versions]
 cdt="4.0.0" # chrome-developer-toolkit
 commonmark = "0.18.0"
-compose = "1.2.0"
+compose = "1.2.1"
 freemarker = "2.3.31"
 jreleaser = "1.0.0"
 jsoup = "1.14.3"
 kaml = "0.35.3"
 kobweb-cli = "0.9.10-SNAPSHOT"
-kobweb-libs = "0.10.3"
+kobweb-libs = "0.10.4"
 kotter = "1.0.0"
-kotlin = "1.7.10"
+kotlin = "1.7.20"
 kotlinpoet = "1.10.2"
 kotlinx-coroutines = "1.6.0"
 kotlinx-cli = "0.3.2"
