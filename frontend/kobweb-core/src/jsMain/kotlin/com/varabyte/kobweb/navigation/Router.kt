@@ -37,6 +37,19 @@ class Router {
         }
     }
 
+    /** A sequence of all registered routes that do not have dynamic components. */
+    val staticRoutes: Sequence<String>
+        get() {
+            return routeTree.nodes
+                .filter { nodePath ->
+                    val leafNode = nodePath.last()
+                    leafNode is RouteTree.StaticNode && leafNode.method != null
+                }
+                .map { nodePath ->
+                    nodePath.toPathString()
+                }
+        }
+
     /**
      * See docs for [navigateTo].
      *

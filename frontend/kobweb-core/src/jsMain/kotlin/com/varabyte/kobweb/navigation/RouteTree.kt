@@ -50,6 +50,26 @@ internal class RouteTree {
         }
 
         fun findChild(routePart: String): Node? = children.firstOrNull { it.matches(routePart) }
+
+        /** A sequence of all nodes from this node (including itself) in a breadth first order */
+        val nodes get() = sequence<List<Node>> {
+            val parents = mutableMapOf<Node, Node>()
+
+            val nodeQueue = mutableListOf(this@Node)
+            while (nodeQueue.isNotEmpty()) {
+                val node = nodeQueue.removeFirst()
+                val nodePath = mutableListOf<Node>()
+                nodePath.add(node)
+                var parent = parents[node]
+                while (parent != null) {
+                    nodePath.add(0, parent)
+                    parent = parents[parent]
+                }
+                yield(nodePath)
+                node.children.forEach { child -> parents[child] = node }
+                nodeQueue.addAll(node.children)
+            }
+        }
     }
 
     class RootNode : Node("", null)
@@ -130,4 +150,19 @@ internal class RouteTree {
 
         return PageData(pageMethod, ctx)
     }
+
+    /**
+     * A sequence of all nodes in this tree, in breadth first order.
+     *
+     * So if "/a/b/c", "/a/b/d", and "/a/x/y" are registered, this sequence will yield "/a", "/a/b/", "/a/x/", "/a/b/c",
+     * "/a/b/d", and finally "a/x/y".
+     *
+     * The handler will be given the full path of parent nodes along with the current one, which can be used if
+     * necessary to construct the full path.
+     */
+    val nodes get() = root.nodes
+}
+
+internal fun Iterable<RouteTree.Node>.toPathString(): String {
+    return this.joinToString("/") { node -> node.name }
 }
