@@ -25,7 +25,7 @@ class GenericElementBuilder private constructor(private val name: String) : Elem
  *
  * See also [TagElement], which this delegates to.
  *
- * @param name The name of the tag, e.g. "link"
+ * @param name The name of the tag, e.g. "a"
  * @param attrs An (optional) list of attributes separated by spaces, e.g. "href=\"...\" target=\"_blank\""
  */
 @Composable
