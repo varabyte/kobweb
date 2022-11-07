@@ -1172,7 +1172,7 @@ At this point:
 
 * It is easy to set up a new project and get things running quickly.
 * The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it.
-* It supports generating pages from Markdown that can reference your Composable code. 
+* It supports generating pages from Markdown that can reference your Composable code.
 * While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
 * You can use the `Modifier` builder for a growing number of css properties.
 * Silk components are color mode aware and support responsive behavior.
