@@ -67,7 +67,7 @@ fun Anchor(
                 @Suppress("NAME_SHADOWING") // Intentional shadowing - nullable to non-null
                 val openInternalLinksStrategy = openInternalLinksStrategy ?: evt.toOpenLinkStrategy()
                 if (openExternalLinksStrategy == null) {
-                    if (ctx.router.routeTo(href, openLinkStrategy = openInternalLinksStrategy)) {
+                    if (ctx.router.tryNavigateTo(href, openLinkStrategy = openInternalLinksStrategy)) {
                         evt.preventDefault()
                     }
                 }

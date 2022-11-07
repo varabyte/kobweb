@@ -38,7 +38,7 @@ class Router {
     }
 
     /**
-     * See docs for [navigateTo]
+     * See docs for [navigateTo].
      *
      * Returns true if we updated the active page ourselves or false if we didn't (which means the URL instead goes to
      * an external site)
@@ -123,22 +123,32 @@ class Router {
         routeTree.errorHandler = errorHandler
     }
 
+    @Deprecated("\"routeTo\" has been renamed to \"tryNavigateTo\".",
+        ReplaceWith("tryNavigateTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)")
+    )
+    fun routeTo(
+        pathQueryAndFragment: String,
+        updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
+        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
+        return tryNavigateTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)
+    }
+
     /**
-     * Attempt to route **internally** within this site, or return false if that's not possible (i.e. because the path
-     * is external).
+     * Attempt to navigate **internally** within this site, or return false if that's not possible (i.e. because the
+     * path is external).
      *
      * You will generally call this method like so:
      *
      * ```
      * onClick { evt ->
-     *   if (ctx.router.routeTo(...)) {
+     *   if (ctx.router.tryNavigateTo(...)) {
      *     evt.preventDefault()
      *   }
      * ```
      *
      * That way, either the router handles the navigation or the browser does.
      *
-     * See also: [navigateTo], which, if called, handles the external navigation for you
+     * See also: [navigateTo], which, if called, handles the external navigation for you.
      *
      * @param pathQueryAndFragment The path to a page, including (optional) search params and hash,
      *   e.g. "/example/path?arg=1234#fragment". See also the
@@ -146,7 +156,10 @@ class Router {
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
      */
-    fun routeTo(pathQueryAndFragment: String, updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH, openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
+    fun tryNavigateTo(
+        pathQueryAndFragment: String,
+        updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
+        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
         @Suppress("NAME_SHADOWING") // Intentionally transformed
         val pathQueryAndFragment = pathQueryAndFragment.normalize()
 
@@ -186,17 +199,17 @@ class Router {
     }
 
     /**
-     * Like [routeTo] but handle the external navigation as well.
+     * Like [tryNavigateTo] but handle the external navigation as well.
      *
      * You will generally call this method like so:
      *
      * ```
      * onClick { evt ->
      *   evt.preventDefault()
-     *   ctx.router.naviagteTo(...)
+     *   ctx.router.navigateTo(...)
      * ```
      *
-     * @param updateHistoryMode This parameter is only used for internal site routing. See [routeTo] for more
+     * @param updateHistoryMode This parameter is only used for internal site routing. See [tryNavigateTo] for more
      *   information.
      */
     fun navigateTo(
@@ -205,7 +218,7 @@ class Router {
         openInternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
         openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB_FOREGROUND,
     ) {
-        if (!routeTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy)) {
+        if (!tryNavigateTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy)) {
             window.open(pathQueryAndFragment, openExternalLinksStrategy)
         }
     }
