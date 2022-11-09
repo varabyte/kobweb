@@ -13,7 +13,13 @@ private fun String.escapeQuotes(): String {
     return this.replace("\"", """\"""")
 }
 
-fun createMainFunction(siteData: SiteData, appGlobals: Map<String, String>, routePrefix: RoutePrefix, target: BuildTarget): String {
+fun createMainFunction(
+    siteData: SiteData,
+    usingSilk: Boolean,
+    appGlobals: Map<String, String>,
+    routePrefix: RoutePrefix,
+    target: BuildTarget
+): String {
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
     mutableListOf(
@@ -176,7 +182,7 @@ fun createMainFunction(siteData: SiteData, appGlobals: Map<String, String>, rout
 
                 renderComposable(rootElementId = "root") {
                     CompositionLocalProvider(AppGlobalsLocal provides mapOf(${appGlobals.map { entry -> "\"${entry.key.escapeQuotes()}\" to \"${entry.value.escapeQuotes()}\""}.joinToString() })) {
-                        ${siteData.app?.fqn ?: "com.varabyte.kobweb.core.KobwebApp"} {
+                        ${siteData.app?.fqn ?: if (usingSilk) "com.varabyte.kobweb.silk.SilkApp" else "com.varabyte.kobweb.core.KobwebApp"} {
                             router.renderActivePage()
                         }
                     }

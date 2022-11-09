@@ -5,6 +5,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
+import com.varabyte.kobweb.gradle.application.extensions.hasDependencyNamed
 import com.varabyte.kobweb.gradle.application.project.site.SiteData
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import org.gradle.api.tasks.Input
@@ -45,7 +46,8 @@ abstract class KobwebGenerateSiteSourceTask @Inject constructor(
         ) {
             val mainFile = getGenMainFile()
             mainFile.parentFile.mkdirs()
-            mainFile.writeText(createMainFunction(this, kobwebBlock.appGlobals.get(), routePrefix, buildTarget))
+            val usingSilk = project.hasDependencyNamed("kobweb-silk")
+            mainFile.writeText(createMainFunction(this, usingSilk, kobwebBlock.appGlobals.get(), routePrefix, buildTarget))
         }
     }
 }
