@@ -5,14 +5,15 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.CSSLengthValue
-import org.jetbrains.compose.web.css.CSSNumeric
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.border
-import org.jetbrains.compose.web.css.borderRadius
-import org.jetbrains.compose.web.css.borderWidth
+import org.jetbrains.compose.web.css.*
 
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { property(\"border\", value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier"
+    )
+)
 fun Modifier.border(value: String) = styleModifier {
     property("border", value)
 }
@@ -24,6 +25,20 @@ fun Modifier.border(
 ) = styleModifier {
      border(width, style, color)
 }
+
+fun Modifier.borderColor(color: CSSColorValue) = styleModifier {
+    borderColor(color)
+}
+
+fun Modifier.borderColor(color: Color) = borderColor(color.toCssColor())
+
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { property(\"border-top\", value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier"
+    )
+)
 
 fun Modifier.borderTop(value: String) = styleModifier {
     property("border-top", value)
@@ -37,6 +52,13 @@ fun Modifier.borderTop(
      borderTop(width, style, color)
 }
 
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { property(\"border-bottom\", value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier"
+    )
+)
 fun Modifier.borderBottom(value: String) = styleModifier {
     property("border-bottom", value)
 }
@@ -49,6 +71,13 @@ fun Modifier.borderBottom(
     borderBottom(width, style, color)
 }
 
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { property(\"border-left\", value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier"
+    )
+)
 fun Modifier.borderLeft(value: String) = styleModifier {
     property("border-left", value)
 }
@@ -61,6 +90,13 @@ fun Modifier.borderLeft(
      borderLeft(width, style, color)
 }
 
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { property(\"border-right\", value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier"
+    )
+)
 fun Modifier.borderRight(value: String) = styleModifier {
     property("border-right", value)
 }
@@ -98,6 +134,10 @@ fun Modifier.borderRadius(
     borderRadius(topLeft, topRight, bottomRight, bottomLeft)
 }
 
+fun Modifier.borderStyle(lineStyle: LineStyle) = styleModifier {
+    borderStyle(lineStyle)
+}
+
 fun Modifier.borderWidth(width: CSSNumeric) = styleModifier {
     borderWidth(width)
 }
@@ -122,13 +162,3 @@ fun Modifier.borderWidth(
 ) = styleModifier {
     borderWidth(topLeft, topRight, bottomRight, bottomLeft)
 }
-
-fun Modifier.borderColor(value: String) = styleModifier {
-    property("border-color", value)
-}
-
-fun Modifier.borderColor(color: CSSColorValue) = styleModifier {
-    property("border-color", color)
-}
-
-fun Modifier.borderColor(color: Color) = borderColor(color.toCssColor())

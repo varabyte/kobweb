@@ -2,6 +2,18 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+fun StyleScope.borderStyle(lineStyle: LineStyle) {
+    property("border-style", lineStyle.value)
+}
+
+fun StyleScope.borderWidth(width: CSSLengthValue) {
+    property("border-width", width)
+}
+
+fun StyleScope.borderColor(color: CSSColorValue) {
+    property("border-color", color)
+}
+
 inline fun StyleScope.borderTop(crossinline borderBuild: CSSBorder.() -> Unit) {
     property("border-top", CSSBorder().apply(borderBuild))
 }
