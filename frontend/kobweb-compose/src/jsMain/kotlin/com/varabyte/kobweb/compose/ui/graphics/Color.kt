@@ -7,8 +7,6 @@ private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
 
 /**
  * A base class for colors which provide additional functionality on top of the color class included in Compose for Web.
- *
- * Use [toCssColor] to convert this class to the Compose for Web version.
  */
 sealed interface Color : CSSColorValue {
     fun inverted(): Color
@@ -20,7 +18,7 @@ sealed interface Color : CSSColorValue {
      */
     fun darkened(byPercent: Float = DEFAULT_SHIFTING_PERCENT): Color
 
-    fun toRgb(): Color.Rgb
+    fun toRgb(): Rgb
 
     class Rgb internal constructor(val value: Int) : Color {
         val red: Int get() = value.shr(16).and(0xFF)
