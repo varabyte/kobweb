@@ -3,12 +3,8 @@ package com.varabyte.kobweb.silk.components.layout
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.asAttributesBuilder
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
-import com.varabyte.kobweb.compose.ui.modifiers.border
-import com.varabyte.kobweb.compose.ui.modifiers.borderColor
 import com.varabyte.kobweb.compose.ui.modifiers.borderTop
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
-import com.varabyte.kobweb.compose.ui.modifiers.margin
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
@@ -19,7 +15,7 @@ import org.jetbrains.compose.web.dom.Hr
 
 val DividerStyle = ComponentStyle.base("silk-divider") {
     Modifier
-        .borderTop(1.px, LineStyle.Solid, colorMode.toSilkPalette().border.toCssColor())
+        .borderTop(1.px, LineStyle.Solid, colorMode.toSilkPalette().border)
         .fillMaxWidth(90.percent)
 }
 
