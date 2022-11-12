@@ -6,7 +6,6 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.graphics.Canvas2d
 import com.varabyte.kobweb.silk.components.graphics.ONE_FRAME_MS_60_FPS
@@ -41,8 +40,8 @@ private fun BoxScope.Clock() {
         val colorSecondHand = palette.link.visited
 
         ctx.save {
-            ctx.strokeStyle = colorTicks.toCssColor()
-            ctx.fillStyle = palette.background.toCssColor()
+            ctx.strokeStyle = colorTicks
+            ctx.fillStyle = palette.background
 
             ctx.clearRect(0.0, 0.0, width.toDouble(), height.toDouble())
             ctx.translate(r, r)
@@ -81,7 +80,7 @@ private fun BoxScope.Clock() {
 
             // Hour hand
             ctx.save {
-                ctx.strokeStyle = colorHourHand.toCssColor()
+                ctx.strokeStyle = colorHourHand
                 ctx.rotate(hr * (PI / 6) + (PI / 360) * min + (PI / 21600) * sec)
                 ctx.lineWidth = 14.0
                 ctx.beginPath()
@@ -92,7 +91,7 @@ private fun BoxScope.Clock() {
 
             // write Minutes
             ctx.save {
-                ctx.strokeStyle = colorMinuteHand.toCssColor()
+                ctx.strokeStyle = colorMinuteHand
                 ctx.rotate((PI / 30) * min + (PI / 1800) * sec)
                 ctx.lineWidth = 10.0
                 ctx.beginPath()
@@ -104,8 +103,8 @@ private fun BoxScope.Clock() {
             // Write seconds
             ctx.save {
                 ctx.rotate(sec * PI / 30)
-                ctx.strokeStyle = colorSecondHand.toCssColor()
-                ctx.fillStyle = colorSecondHand.toCssColor()
+                ctx.strokeStyle = colorSecondHand
+                ctx.fillStyle = colorSecondHand
                 ctx.lineWidth = 6.0
                 ctx.beginPath()
                 ctx.moveTo(-30.0, 0.0)
@@ -119,7 +118,7 @@ private fun BoxScope.Clock() {
                 ctx.beginPath()
                 ctx.arc(95.0, 0.0, 10.0, 0.0, PI * 2, true)
                 ctx.stroke()
-                ctx.fillStyle = Colors.Transparent.toCssColor()
+                ctx.fillStyle = Colors.Transparent
                 ctx.arc(0.0, 0.0, 3.0, 0.0, PI * 2, true)
                 ctx.fill()
             }
@@ -127,7 +126,7 @@ private fun BoxScope.Clock() {
             // The outer circle that frames the clock
             ctx.beginPath()
             ctx.lineWidth = 14.0
-            ctx.strokeStyle = colorBorder.toCssColor()
+            ctx.strokeStyle = colorBorder
             ctx.arc(0.0, 0.0, 142.0, 0.0, PI * 2, true)
             ctx.stroke()
         }

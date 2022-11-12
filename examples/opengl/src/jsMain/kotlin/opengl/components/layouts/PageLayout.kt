@@ -5,7 +5,6 @@ import com.varabyte.kobweb.compose.css.WhiteSpace
 import com.varabyte.kobweb.compose.foundation.layout.*
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
@@ -41,7 +40,7 @@ fun PageLayout(content: @Composable BoxScope.() -> Unit) {
             }
         }
 
-        val borderColor = SilkTheme.palette.color.toCssColor()
+        val borderColor = SilkTheme.palette.color
         Spacer()
         Box(
             Modifier

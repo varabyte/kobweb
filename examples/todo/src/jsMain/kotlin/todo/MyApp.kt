@@ -3,7 +3,6 @@ package todo
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.InitSilk
@@ -29,7 +28,7 @@ fun initSiteStyles(ctx: InitSilkContext) {
             .width(100.percent)
             .height(100.px)
             .fontSize(1.5.cssRem)
-            .borderTop(1.px, LineStyle.Solid, BORDER_COLOR.toCssColor())
+            .borderTop(1.px, LineStyle.Solid, BORDER_COLOR)
             .display(DisplayStyle.Flex)
             .justifyContent(JustifyContent.Center)
             .alignItems(AlignItems.Center)

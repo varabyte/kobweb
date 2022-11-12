@@ -4,7 +4,6 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.base
@@ -20,7 +19,7 @@ val TodoStyle = ComponentStyle.base("todo") {
     Modifier
         .width(85.percent)
         .height(5.cssRem)
-        .border(1.px, LineStyle.Solid, BORDER_COLOR.toCssColor())
+        .border(1.px, LineStyle.Solid, BORDER_COLOR)
         .borderRadius(10.px)
         .transition("color 0.15s ease, border-color 0.15s ease")
         .textDecorationLine(TextDecorationLine.None)
@@ -30,7 +29,7 @@ val TodoStyle = ComponentStyle.base("todo") {
 val TodoContainerStyle = ComponentStyle.base("todo-container") {
     Modifier
         .margin(0.5.cssRem)
-        .border(1.px, LineStyle.Solid, BORDER_COLOR.toCssColor())
+        .border(1.px, LineStyle.Solid, BORDER_COLOR)
         .display(DisplayStyle.Flex)
         .textAlign(TextAlign.Left)
         .alignItems(AlignItems.Center)
@@ -65,7 +64,7 @@ val TodoClickableStyle = ComponentStyle("todo-clickable") {
         Modifier
             .color(INTERACT_COLOR)
             .cursor(Cursor.Pointer)
-            .borderColor(INTERACT_COLOR.toCssColor())
+            .borderColor(INTERACT_COLOR)
             .textDecorationLine(TextDecorationLine.LineThrough)
     }
 }
