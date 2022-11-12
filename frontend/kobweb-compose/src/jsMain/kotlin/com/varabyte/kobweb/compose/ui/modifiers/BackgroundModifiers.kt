@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Color
-import com.varabyte.kobweb.compose.ui.graphics.toCssColor
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
@@ -16,10 +14,6 @@ fun Modifier.backgroundAttachment(value: String) = styleModifier {
 
 fun Modifier.backgroundClip(value: String) = styleModifier {
     backgroundClip(value)
-}
-
-fun Modifier.backgroundColor(color: Color) = styleModifier {
-    backgroundColor(color.toCssColor())
 }
 
 fun Modifier.backgroundColor(value: String) = styleModifier {

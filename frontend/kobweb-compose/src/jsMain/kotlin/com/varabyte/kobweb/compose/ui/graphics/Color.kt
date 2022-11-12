@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.compose.ui.graphics
 
+import org.jetbrains.compose.web.css.*
+
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
 
@@ -8,7 +10,7 @@ private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
  *
  * Use [toCssColor] to convert this class to the Compose for Web version.
  */
-sealed interface Color {
+sealed interface Color : CSSColorValue {
     fun inverted(): Color
     /**
      * Darken this color by some target percent value
