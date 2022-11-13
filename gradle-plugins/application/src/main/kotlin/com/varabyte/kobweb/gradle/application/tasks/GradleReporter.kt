@@ -5,6 +5,6 @@ import org.gradle.api.logging.Logger
 
 class GradleReporter(private val logger: Logger) : Reporter {
     override fun report(message: String) {
-        logger.error(message)
+        logger.error("e: $message") // Prepend with "e:" so Kobweb highlights it as an error
     }
 }
