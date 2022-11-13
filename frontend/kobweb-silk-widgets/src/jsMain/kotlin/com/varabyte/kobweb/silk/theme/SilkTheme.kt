@@ -2,22 +2,10 @@ package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.components.style.ComponentBaseModifier
-import com.varabyte.kobweb.silk.components.style.ComponentModifier
-import com.varabyte.kobweb.silk.components.style.ComponentModifiers
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.ImmutableComponentStyle
-import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant
-import com.varabyte.kobweb.silk.components.style.StyleModifiers
+import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
-import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
-import com.varabyte.kobweb.silk.theme.colors.SilkPalette
-import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
-import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import com.varabyte.kobweb.silk.theme.colors.*
 import org.jetbrains.compose.web.css.*
 
 /**
@@ -134,6 +122,7 @@ class MutableSilkTheme {
     internal val componentStyles = mutableMapOf<String, ComponentStyle>()
     internal val overiddenStyles = mutableSetOf<String>()
     internal val componentVariants = mutableMapOf<String, ComponentVariant>()
+    internal val overiddenVariants = mutableSetOf<String>()
 
     var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
 
@@ -183,7 +172,7 @@ class MutableSilkTheme {
     /**
      * Use this method to override a style previously registered using [registerComponentStyle].
      *
-     * This is particularly if you want to change styles provided by Silk.
+     * This is particularly useful if you want to change styles provided by Silk.
      *
      * ```
      * @InitSilk
@@ -245,6 +234,36 @@ class MutableSilkTheme {
             componentVariants[variant.style.name] = variant
         }
     }
+
+    /**
+     * Use this method to override a variant previously registered using [registerComponentVariants].
+     *
+     * This is particularly useful if you want to change variants provided by Silk.
+     *
+     * ```
+     * @InitSilk
+     * fun initSilk(ctx: InitSilkContext) {
+     *   // UndecoratedLinkVariant comes from Silk
+     *   ctx.theme.replaceComponentVariant(UndecoratedLinkVariant) {
+     *     base { Modifier.fontStyle(FontStyle.Italic) }
+     *     hover { Modifier.textDecorationLine(TextDecorationLine.None) }
+     *   }
+     * }
+     * ```
+     */
+    fun replaceComponentVariant(
+        variant: ComponentVariant,
+        extraModifiers: Modifier = Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        @Suppress("NAME_SHADOWING")
+        val variant = variant as? SimpleComponentVariant
+            ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
+
+        check(componentVariants.contains(variant.style.name)) { "Attempting to replace a variant that was never registered: \"${variant.style.name}\"" }
+        check(overiddenVariants.add(variant.style.name)) { "Attempting to override variant \"${variant.style.name}\" twice" }
+        componentVariants[variant.style.name] = variant.baseStyle.addVariant(variant.name, extraModifiers, init)
+    }
 }
 
 /**
@@ -256,6 +275,21 @@ fun MutableSilkTheme.replaceComponentStyleBase(
     init: ComponentModifier.() -> Modifier
 ) {
     replaceComponentStyle(style, extraModifiers) {
+        base {
+            ComponentBaseModifier(colorMode).let(init)
+        }
+    }
+}
+
+/**
+ * Convenience method when you want to replace an upstream variant but only need to define a base style.
+ */
+fun MutableSilkTheme.replaceComponentVariantBase(
+    variant: ComponentVariant,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceComponentVariant(variant, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }

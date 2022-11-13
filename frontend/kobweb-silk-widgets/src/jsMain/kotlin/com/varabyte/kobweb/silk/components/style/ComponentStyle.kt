@@ -581,10 +581,18 @@ fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): Co
  *   non-style attributes whenever this variant style is applied.
  */
 class SimpleComponentVariant(
-    val style: ComponentStyle,
-    private val baseStyle: ComponentStyle,
-    private val extraModifiers: Modifier = Modifier
+    internal val style: ComponentStyle,
+    internal val baseStyle: ComponentStyle,
+    internal val extraModifiers: Modifier = Modifier
 ) : ComponentVariant() {
+    /**
+     * The raw variant name, unqualified by its parent base style.
+     *
+     * This name is not guaranteed to be unique across all variants. If you need that, check `style.name` instead.
+     */
+    val name: String
+        get() = style.name.removePrefix("${baseStyle.name}-")
+
     override fun addStylesInto(styleSheet: StyleSheet) {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
