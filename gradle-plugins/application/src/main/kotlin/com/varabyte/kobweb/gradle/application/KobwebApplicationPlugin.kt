@@ -9,12 +9,7 @@ import com.varabyte.kobweb.gradle.application.kmp.jsTarget
 import com.varabyte.kobweb.gradle.application.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.application.kmp.kotlin
 import com.varabyte.kobweb.gradle.application.kmp.sourceSets
-import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApiTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteSourceTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
+import com.varabyte.kobweb.gradle.application.tasks.*
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -64,16 +59,16 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebGenSiteIndexTask =
             project.tasks.register("kobwebGenSiteIndex", KobwebGenerateSiteIndexTask::class.java, kobwebBlock, buildTarget)
 
-        val kobwebGenApiTask = project.tasks.register("kobwebGenApi", KobwebGenerateApiTask::class.java, kobwebBlock)
+        val kobwebGenBackendTask = project.tasks.register("kobwebGenBackend", KobwebGenerateBackendTask::class.java, kobwebBlock)
 
         // Umbrella tasks for all other gen tasks
-        val kobwebGenSiteTask = project.tasks.register("kobwebGenSite")
-        kobwebGenSiteTask.configure {
+        val kobwebGenFrontendTask = project.tasks.register("kobwebGenFrontend", KobwebTask::class.java, "The umbrella task that combines all Kobweb frontend generation tasks")
+        kobwebGenFrontendTask.configure {
             dependsOn(kobwebGenSiteIndexTask)
             dependsOn(kobwebGenSiteSourceTask)
         }
 
-        val kobwebGenTask = project.tasks.register("kobwebGen")
+        val kobwebGenTask = project.tasks.register("kobwebGen", KobwebTask::class.java, "The umbrella task that combines all frontend and backend Kobweb generation tasks")
         // Note: Configured below, in `afterEvaluate`
 
         val kobwebStartTask = run {
@@ -164,9 +159,9 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebGenTask.configure {
-                dependsOn(kobwebGenSiteTask)
+                dependsOn(kobwebGenFrontendTask)
                 if (jvmTarget != null) {
-                    dependsOn(kobwebGenApiTask)
+                    dependsOn(kobwebGenBackendTask)
                 }
             }
 
@@ -180,8 +175,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
             // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
             jvmTarget?.let { jvm ->
-                project.tasks.findByName(jvm.compileKotlin)?.dependsOn(kobwebGenApiTask)
-                project.tasks.findByName(jvm.jar)?.dependsOn(kobwebGenApiTask)
+                project.tasks.findByName(jvm.compileKotlin)?.dependsOn(kobwebGenBackendTask)
+                project.tasks.findByName(jvm.jar)?.dependsOn(kobwebGenBackendTask)
             }
 
             val compileExecutableTask = when (buildTarget) {

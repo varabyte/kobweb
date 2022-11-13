@@ -6,13 +6,12 @@ import com.varabyte.kobweb.gradle.application.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.application.project.api.ApiData
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateApiTask @Inject constructor(kobwebBlock: KobwebBlock) :
+abstract class KobwebGenerateBackendTask @Inject constructor(kobwebBlock: KobwebBlock) :
     KobwebProjectTask(kobwebBlock, "Generate Kobweb code for the server") {
 
     private fun getGenDir() = kobwebBlock.getGenJvmSrcRoot(project)
