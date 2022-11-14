@@ -583,7 +583,6 @@ fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): Co
 class SimpleComponentVariant(
     internal val style: ComponentStyle,
     internal val baseStyle: ComponentStyle,
-    internal val extraModifiers: Modifier = Modifier
 ) : ComponentVariant() {
     /**
      * The raw variant name, unqualified by its parent base style.
@@ -602,9 +601,8 @@ class SimpleComponentVariant(
     }
 
     @Composable
-    override fun toModifier() = style.toModifier().then(extraModifiers)
-
-    internal fun intoImmutableStyle() = ImmutableComponentStyle(style.name)
+    override fun toModifier() = style.toModifier()
+    internal fun intoImmutableStyle() = style.intoImmutableStyle()
 }
 
 private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant): ComponentVariant() {
