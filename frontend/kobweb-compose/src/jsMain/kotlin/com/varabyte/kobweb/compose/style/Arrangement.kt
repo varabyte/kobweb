@@ -19,4 +19,5 @@ fun Arrangement.HorizontalOrVertical.toClassName() = when(this) {
     Arrangement.SpaceAround -> "kobweb-arrange-space-around"
     Arrangement.SpaceBetween -> "kobweb-arrange-space-between"
     Arrangement.SpaceEvenly -> "kobweb-arrange-space-evenly"
+    Arrangement.FromStyle -> "kobweb-arrange-from-style"
 }

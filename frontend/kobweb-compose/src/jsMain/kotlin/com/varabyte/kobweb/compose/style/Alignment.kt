@@ -14,6 +14,7 @@ fun Alignment.toClassName() = when(this) {
     Alignment.BottomEnd -> "kobweb-align-bottom-end"
     is Alignment.Vertical -> this.toClassName()
     is Alignment.Horizontal -> this.toClassName()
+    Alignment.FromStyle -> "kobweb-align-from-style"
 }
 
 fun Alignment.Vertical.toClassName() = when(this) {
