@@ -1,15 +1,16 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
-interface Arrangement {
-    interface Horizontal
-    interface Vertical
-    interface HorizontalOrVertical : Horizontal, Vertical
+object Arrangement {
+    sealed interface Horizontal
+    sealed interface Vertical
+    sealed interface HorizontalOrVertical : Horizontal, Vertical
 
-    companion object {
-        val End = object : Horizontal {}
-        val Start = object : Horizontal {}
-        val Top = object : Vertical {}
-        val Bottom = object : Vertical {}
-        val Center = object : HorizontalOrVertical {}
-    }
+    object End : Horizontal
+    object Start : Horizontal
+    object Top : Vertical
+    object Bottom : Vertical
+    object Center : HorizontalOrVertical
+    object SpaceEvenly : HorizontalOrVertical
+    object SpaceBetween : HorizontalOrVertical
+    object SpaceAround : HorizontalOrVertical
 }
