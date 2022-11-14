@@ -10,8 +10,10 @@ import com.varabyte.kobweb.api.log.Logger
  *
  * The classes can be used to query the current state of the API call as well as respond to it.
  *
- * @param req Request information sent from the client.
- * @param res Response information that will be returned to the client.
+ * @property req Request information sent from the client.
+ * @property res Response information that will be returned to the client.
+ * @property data Readonly data store potentially populated by methods annotated with [InitApi].
+ *   See also: [InitApiContext].
  */
 class ApiContext(
     val req: Request,
