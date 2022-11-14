@@ -12,19 +12,18 @@ fun Alignment.toClassName() = when(this) {
     Alignment.BottomStart -> "kobweb-align-bottom-start"
     Alignment.BottomCenter -> "kobweb-align-bottom-center"
     Alignment.BottomEnd -> "kobweb-align-bottom-end"
-    else -> error("Unexpected alignment: $this")
+    is Alignment.Vertical -> this.toClassName()
+    is Alignment.Horizontal -> this.toClassName()
 }
 
 fun Alignment.Vertical.toClassName() = when(this) {
     Alignment.Top -> "kobweb-align-top"
     Alignment.CenterVertically -> "kobweb-align-center-vert"
     Alignment.Bottom -> "kobweb-align-bottom"
-    else -> error("Unexpected alignment: $this")
 }
 
 fun Alignment.Horizontal.toClassName() = when(this) {
     Alignment.Start -> "kobweb-align-start"
     Alignment.CenterHorizontally -> "kobweb-align-center-horiz"
     Alignment.End -> "kobweb-align-end"
-    else -> error("Unexpected alignment: $this")
 }
