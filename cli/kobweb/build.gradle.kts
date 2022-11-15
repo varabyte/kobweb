@@ -40,8 +40,11 @@ if (githubUsername != null && githubToken != null) {
         dryrun.set(false) // Specified explicitly for convenience - set dryrun to true when experimenting with values!
         gitRootSearch.set(true)
         project {
-            website.set("https://kobweb.varabyte.com/")
-            docsUrl.set("https://kobweb.varabyte.com/docs")
+            links {
+                homepage.set("https://kobweb.varabyte.com/")
+                documentation.set("https://kobweb.varabyte.com/docs")
+                license.set("http://www.apache.org/licenses/LICENSE-2.0")
+            }
             description.set("Set up and manage your Compose for Web app")
             longDescription.set(
                 """
@@ -51,7 +54,6 @@ if (githubUsername != null && githubToken != null) {
             )
             authors.set(listOf("David Herman"))
             license.set("Apache-2.0")
-            licenseUrl.set("http://www.apache.org/licenses/LICENSE-2.0")
             copyright.set("Copyright © 2022 Varabyte. All rights reserved.")
 
             // Set the Java version explicitly, even though in theory this value should be coming from our root
@@ -63,7 +65,7 @@ if (githubUsername != null && githubToken != null) {
         }
         release {
             github {
-                owner.set("varabyte")
+                repoOwner.set("varabyte")
                 tagName.set("cli-v{{projectVersion}}")
                 username.set(githubUsername)
                 token.set(githubToken)
