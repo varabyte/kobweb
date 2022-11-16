@@ -1,5 +1,9 @@
 package com.varabyte.kobweb.compose.style
 
+import com.varabyte.kobweb.compose.css.JustifyItems
+import com.varabyte.kobweb.compose.css.JustifySelf
+import com.varabyte.kobweb.compose.css.justifyItems
+import com.varabyte.kobweb.compose.css.justifySelf
 import org.jetbrains.compose.web.css.*
 
 object KobwebComposeStyleSheet : StyleSheet() {
@@ -29,77 +33,77 @@ object KobwebComposeStyleSheet : StyleSheet() {
 
         ".kobweb-box.kobweb-align-top-start" {
             alignItems(AlignItems.Start)
-            justifyItems(AlignItems.Start.value)
+            justifyItems(JustifyItems.Start)
         }
         ".kobweb-box.kobweb-align-top-center" {
             alignItems(AlignItems.Start)
-            justifyItems(AlignItems.Center.value)
+            justifyItems(JustifyItems.Center)
         }
         ".kobweb-box.kobweb-align-top-end" {
             alignItems(AlignItems.Start)
-            justifyItems(AlignItems.End.value)
+            justifyItems(JustifyItems.End)
         }
         ".kobweb-box.kobweb-align-center-start" {
             alignItems(AlignItems.Center)
-            justifyItems(AlignItems.Start.value)
+            justifyItems(JustifyItems.Start)
         }
         ".kobweb-box.kobweb-align-center" {
             alignItems(AlignItems.Center)
-            justifyItems(AlignItems.Center.value)
+            justifyItems(JustifyItems.Center)
         }
         ".kobweb-box.kobweb-align-center-end" {
-            justifyItems(AlignItems.End.value)
             alignItems(AlignItems.Center)
+            justifyItems(JustifyItems.End)
         }
         ".kobweb-box.kobweb-align-bottom-start" {
-            justifyItems(AlignItems.Start.value)
             alignItems(AlignItems.End)
+            justifyItems(JustifyItems.Start)
         }
         ".kobweb-box.kobweb-align-bottom-center" {
-            justifyItems(AlignItems.Center.value)
             alignItems(AlignItems.End)
+            justifyItems(JustifyItems.Center)
         }
         ".kobweb-box.kobweb-align-bottom-end" {
-            justifyItems(AlignItems.End.value)
             alignItems(AlignItems.End)
+            justifyItems(JustifyItems.End)
         }
 
         // Styles when the child wants to override the parent setting
 
         ".kobweb-box > .kobweb-align-top-start-self" {
             alignSelf(AlignSelf.Start)
-            justifySelf(AlignSelf.Start.value)
+            justifySelf(JustifySelf.Start)
         }
         ".kobweb-box > .kobweb-align-top-center-self" {
             alignSelf(AlignSelf.Start)
-            justifySelf(AlignSelf.Center.value)
+            justifySelf(JustifySelf.Center)
         }
         ".kobweb-box > .kobweb-align-top-end-self" {
             alignSelf(AlignSelf.Start)
-            justifySelf(AlignSelf.End.value)
+            justifySelf(JustifySelf.End)
         }
         ".kobweb-box > .kobweb-align-center-start-self" {
             alignSelf(AlignSelf.Center)
-            justifySelf(AlignSelf.Start.value)
+            justifySelf(JustifySelf.Start)
         }
         ".kobweb-box > .kobweb-align-center-self" {
             alignSelf(AlignSelf.Center)
-            justifySelf(AlignSelf.Center.value)
+            justifySelf(JustifySelf.Center)
         }
         ".kobweb-box > .kobweb-align-center-end-self" {
-            justifySelf(AlignSelf.End.value)
+            justifySelf(JustifySelf.End)
             alignSelf(AlignSelf.Center)
         }
         ".kobweb-box > .kobweb-align-bottom-start-self" {
-            justifySelf(AlignSelf.Start.value)
+            justifySelf(JustifySelf.Start)
             alignSelf(AlignSelf.End)
         }
         ".kobweb-box > .kobweb-align-bottom-center-self" {
-            justifySelf(AlignSelf.Center.value)
+            justifySelf(JustifySelf.Center)
             alignSelf(AlignSelf.End)
         }
         ".kobweb-box > .kobweb-align-bottom-end-self" {
-            justifySelf(AlignSelf.End.value)
+            justifySelf(JustifySelf.End)
             alignSelf(AlignSelf.End)
         }
     }
