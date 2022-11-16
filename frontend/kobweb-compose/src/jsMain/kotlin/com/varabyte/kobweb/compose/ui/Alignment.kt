@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.compose.ui
 
 sealed interface Alignment {
-    sealed interface Vertical : Alignment
-    sealed interface Horizontal : Alignment
+    sealed interface Vertical
+    sealed interface Horizontal
 
     object TopStart : Alignment
     object TopCenter : Alignment
