@@ -4,58 +4,60 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.clearFocus
+import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.cursor
-import com.varabyte.kobweb.compose.ui.modifiers.onClick
-import com.varabyte.kobweb.compose.ui.modifiers.onKeyDown
-import com.varabyte.kobweb.compose.ui.modifiers.outline
-import com.varabyte.kobweb.compose.ui.modifiers.role
-import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
-import com.varabyte.kobweb.compose.ui.modifiers.userSelect
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.active
-import com.varabyte.kobweb.silk.components.style.focus
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
+import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.theme.shapes.Rect
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
+import org.jetbrains.compose.web.dom.Button as JbButton
+
 
 val ButtonStyle = ComponentStyle("silk-button") {
-    val buttonColors = colorMode.toSilkPalette().button
+    val palette = colorMode.toSilkPalette()
+    val buttonColors = palette.button
 
     base {
         Modifier
+            .color(palette.color)
             .backgroundColor(buttonColors.default)
+            .fontSize(16.px)
+            .padding(0.px)
             .clip(Rect(4.px))
+            .borderWidth(0.px)
             .outline(0.px) // Don't outline focused buttons - we'll use background color instead to indicate focus
             // No selecting text within buttons
             .userSelect(UserSelect.None)
     }
 
-    hover {
+    (hover + enabled) {
         Modifier
             .backgroundColor(buttonColors.hover)
             .cursor(Cursor.Pointer)
     }
 
-    focus {
+    (focus + enabled) {
         Modifier.backgroundColor(buttonColors.hover)
     }
 
-    active {
+    (active + enabled) {
         Modifier.backgroundColor(buttonColors.pressed)
     }
-    (focus + active) {
+    (focus + active + enabled) {
         Modifier.backgroundColor(buttonColors.pressed)
+    }
+
+    disabled {
+        Modifier.opacity(0.5)
     }
 }
 
@@ -67,29 +69,33 @@ fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
+    enabled: Boolean = true,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
-    Box(
-        ButtonStyle.toModifier(variant)
-            .role("button")
+    JbButton(
+        attrs = ButtonStyle.toModifier(variant)
+            .thenIf(!enabled, Modifier.disabled())
             .then(modifier)
             .onClick { evt ->
-                document.activeElement?.clearFocus()
-                onClick()
+                if (enabled) {
+                    document.activeElement?.clearFocus()
+                    onClick()
+                }
                 evt.preventDefault()
             }
             .tabIndex(0) // Allow button to be tabbed to
             .onKeyDown { evt ->
+                if (!enabled) return@onKeyDown
                 if (evt.isComposing) return@onKeyDown
                 if (evt.key == "Enter") {
                     onClick()
                     evt.preventDefault()
                 }
-            },
-        contentAlignment = Alignment.Center,
-        ref = ref,
+            }.asAttributesBuilder()
     ) {
-        content()
+        registerRefScope(ref)
+        Box(contentAlignment = Alignment.Center, content = content)
     }
+
 }

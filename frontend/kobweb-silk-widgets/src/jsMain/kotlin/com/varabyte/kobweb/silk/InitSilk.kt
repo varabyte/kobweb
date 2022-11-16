@@ -28,6 +28,8 @@ class InitSilkContext(val config: SilkConfig, val theme: MutableSilkTheme)
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
+
+    // TODO: Automate the creation of this list (with a Gradle task?)
     mutableTheme.registerComponentStyle(ButtonStyle)
     mutableTheme.registerComponentStyle(CanvasStyle)
     mutableTheme.registerComponentStyle(DividerStyle)
