@@ -51,7 +51,7 @@ sealed interface Color : CSSColorValue {
         }
 
         override fun toString(): String {
-            return if (alpha == 0xFF) "rgb($red, $green, $blue)" else "rgba($red, $green, $blue, $alpha)"
+            return if (alpha == 0xFF) "rgb($red, $green, $blue)" else "rgba($red, $green, $blue, $alphaf)"
         }
 
         override fun equals(other: Any?): Boolean {
