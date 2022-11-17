@@ -7,30 +7,7 @@ import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
-import org.commonmark.node.AbstractVisitor
-import org.commonmark.node.BlockQuote
-import org.commonmark.node.BulletList
-import org.commonmark.node.Code
-import org.commonmark.node.CustomBlock
-import org.commonmark.node.CustomNode
-import org.commonmark.node.Emphasis
-import org.commonmark.node.FencedCodeBlock
-import org.commonmark.node.HardLineBreak
-import org.commonmark.node.Heading
-import org.commonmark.node.HtmlBlock
-import org.commonmark.node.HtmlInline
-import org.commonmark.node.Image
-import org.commonmark.node.IndentedCodeBlock
-import org.commonmark.node.Link
-import org.commonmark.node.ListBlock
-import org.commonmark.node.ListItem
-import org.commonmark.node.Node
-import org.commonmark.node.OrderedList
-import org.commonmark.node.Paragraph
-import org.commonmark.node.SoftLineBreak
-import org.commonmark.node.StrongEmphasis
-import org.commonmark.node.Text
-import org.commonmark.node.ThematicBreak
+import org.commonmark.node.*
 import org.commonmark.renderer.Renderer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -43,7 +20,7 @@ class KotlinRenderer(
     private val pkg: String,
     private val funName: String,
 ) : Renderer {
-
+    private val defaultRoot: String? = components.defaultRoot.get().takeIf { it.isNotBlank() }
     private var indentCount = 0
     private val indent get() = "    ".repeat(indentCount)
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
@@ -161,6 +138,21 @@ class KotlinRenderer(
             }
         }
 
+        override fun visit(document: Document) {
+            // The Yaml block normally provides a root node, but it definitely won't if not present!
+            if (document.children().none { it is YamlFrontMatterBlock } && defaultRoot != null) {
+                visit(KobwebCall(defaultRoot, appendBrace = true))
+                ++indentCount
+
+                onFinish += {
+                    --indentCount
+                    output.appendLine("$indent}")
+                }
+            }
+
+            super.visit(document)
+        }
+
         override fun visit(blockQuote: BlockQuote) {
             doVisit(blockQuote, components.blockquote)
         }
@@ -276,43 +268,40 @@ class KotlinRenderer(
                 customBlock.accept(yamlVisitor)
 
                 var contextCreated = false
-                if (yamlVisitor.data.isNotEmpty()) {
-                    if (dependsOnMarkdownArtifact) {
-                        // "root" if present is a special value and not something that should be exposed to users. This
-                        // lets us avoid worrying about nasty escape / slash issues, since it's possible you'll
-                        // pass String values into the root (e.g. `PageLayout(title = "\"Hello\" they said")`) that
-                        // already have escaped characters in it. This makes the `serialize` call below less complex.
-                        val dataWithoutRoot = yamlVisitor.data.minus("root")
-                        if (dataWithoutRoot.isNotEmpty()) {
-                            val mdCtx = buildString {
-                                append("MarkdownContext(")
-                                append(listOf("\"$filePath\"", dataWithoutRoot.serialize()).joinToString())
-                                append(")")
-                            }
-                            output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
-                            ++indentCount
-                            contextCreated = true
+                if (dependsOnMarkdownArtifact) {
+                    // "root" if present is a special value and not something that should be exposed to users. This
+                    // lets us avoid worrying about nasty escape / slash issues, since it's possible you'll
+                    // pass String values into the root (e.g. `PageLayout(title = "\"Hello\" they said")`) that
+                    // already have escaped characters in it. This makes the `serialize` call below less complex.
+                    val dataWithoutRoot = yamlVisitor.data.minus("root")
+                    if (dataWithoutRoot.isNotEmpty()) {
+                        val mdCtx = buildString {
+                            append("MarkdownContext(")
+                            append(listOf("\"$filePath\"", dataWithoutRoot.serialize()).joinToString())
+                            append(")")
                         }
-                    }
-
-                    // If "root" is set in the YAML block, that represents a top level composable which should wrap
-                    // everything else.
-                    val maybeRoot = yamlVisitor.data["root"]?.single()
-                    maybeRoot?.let { root ->
-                        visit(KobwebCall(root, appendBrace = true))
+                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
                         ++indentCount
+                        contextCreated = true
+                    }
+                }
+
+                // If "root" is set in the YAML block, that represents a top level composable which should wrap
+                // everything else.
+                val root = yamlVisitor.data["root"]?.single() ?: defaultRoot
+                if (root != null) {
+                    visit(KobwebCall(root, appendBrace = true))
+                }
+
+                onFinish += {
+                    if (root != null) {
+                        --indentCount
+                        output.appendLine("$indent}")
                     }
 
-                    onFinish += {
-                        if (maybeRoot != null) {
-                            --indentCount
-                            output.appendLine("$indent}")
-                        }
-
-                        if (contextCreated) {
-                            --indentCount
-                            output.appendLine("$indent}")
-                        }
+                    if (contextCreated) {
+                        --indentCount
+                        output.appendLine("$indent}")
                     }
                 }
             } else if (customBlock is KobwebCallBlock) {
