@@ -1,29 +1,38 @@
+package com.varabyte.kobweb.compose.css
+
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
-sealed interface FlexBasis {
+class FlexBasis private constructor(val value: StylePropertyValue) {
+    private constructor(value: String) : this(StylePropertyValue(value))
+    constructor(value: CSSNumeric) : this(value.unsafeCast<StylePropertyValue>())
+
     companion object {
-        val Fill get() = StringFlexBasis("fill")
-        val MaxContent get() = StringFlexBasis("max-content")
-        val MinContent get() = StringFlexBasis("min-content")
-        val FitContent get() = StringFlexBasis("fit-content")
+        // Width
+        val Auto get() = FlexBasis("auto")
 
-        val Content get() = StringFlexBasis("content")
+        // Intrinsic sizing
+        val MaxContent get() = FlexBasis("max-content")
+        val MinContent get() = FlexBasis("min-content")
+        val FitContent get() = FlexBasis("fit-content")
 
-        val Auto get() = StringFlexBasis("auto")
-        val Inherit get() = StringFlexBasis("inherit")
-        val Initial get() = StringFlexBasis("initial")
-        val Revert get() = StringFlexBasis("revert")
-        val Unset get() = StringFlexBasis("unset")
+        // Content sizing
+        val Content get() = FlexBasis("content")
+
+        // Global
+        val Inherit get() = FlexBasis("inherit")
+        val Initial get() = FlexBasis("initial")
+        val Revert get() = FlexBasis("revert")
+        val RevertLayer get() = FlexBasis("revert-layer")
+        val Unset get() = FlexBasis("unset")
     }
 }
 
-class StringFlexBasis(val value: String) : FlexBasis
-class NumericFlexBasis(val value: CSSNumeric) : FlexBasis
+@Deprecated("This factory method is no longer required. Construct a FlexBasis directly instead.",
+    ReplaceWith("FlexBasis(value)", "com.varabyte.kobweb.compose.css.FlexBasis"),
+)
+fun NumericFlexBasis(value: CSSNumeric) = FlexBasis(value)
 
 fun StyleScope.flexBasis(flexBasis: FlexBasis) {
-    when (flexBasis) {
-        is StringFlexBasis -> property("flex-basis", flexBasis.value)
-        is NumericFlexBasis -> property("flex-basis", flexBasis.value)
-    }
+    property("flex-basis", flexBasis.value)
 }

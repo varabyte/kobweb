@@ -1,9 +1,15 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
+import com.varabyte.kobweb.compose.css.FlexBasis
+import com.varabyte.kobweb.compose.css.flexBasis
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.flexWrap
+
+fun Modifier.flexBasis(flexBasis: FlexBasis): Modifier = styleModifier {
+    flexBasis(flexBasis)
+}
 
 fun Modifier.flexDirection(flexDirection: FlexDirection): Modifier = styleModifier {
     flexDirection(flexDirection)
