@@ -27,6 +27,10 @@ fun Modifier.fontWeight(value: FontWeight): Modifier = styleModifier {
     fontWeight(value)
 }
 
+fun Modifier.fontWeight(value: Int): Modifier = styleModifier {
+    fontWeight(value)
+}
+
 fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }
