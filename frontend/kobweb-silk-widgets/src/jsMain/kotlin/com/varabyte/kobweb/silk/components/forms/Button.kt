@@ -52,9 +52,6 @@ val ButtonStyle = ComponentStyle("silk-button") {
     active {
         Modifier.backgroundColor(buttonColors.pressed)
     }
-    (focus + active) {
-        Modifier.backgroundColor(buttonColors.pressed)
-    }
 
     disabled {
         Modifier
