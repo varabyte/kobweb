@@ -7,8 +7,24 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.flexWrap
 
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { flexBasis(value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier",
+        "org.jetbrains.compose.web.css.flexBasis"
+    ),
+)
+fun Modifier.flexBasis(value: String): Modifier = styleModifier {
+    flexBasis(value)
+}
+
 fun Modifier.flexBasis(flexBasis: FlexBasis): Modifier = styleModifier {
     flexBasis(flexBasis)
+}
+
+fun Modifier.flexBasis(value: CSSNumeric): Modifier = styleModifier {
+    flexBasis(value)
 }
 
 fun Modifier.flexDirection(flexDirection: FlexDirection): Modifier = styleModifier {
@@ -33,14 +49,6 @@ fun Modifier.flexGrow(value: Number): Modifier = styleModifier {
 
 fun Modifier.flexShrink(value: Number): Modifier = styleModifier {
     flexShrink(value)
-}
-
-fun Modifier.flexBasis(value: String): Modifier = styleModifier {
-    flexBasis(value)
-}
-
-fun Modifier.flexBasis(value: CSSNumeric): Modifier = styleModifier {
-    flexBasis(value)
 }
 
 fun Modifier.flex(value: String): Modifier = styleModifier {
