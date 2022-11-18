@@ -39,25 +39,28 @@ val ButtonStyle = ComponentStyle("silk-button") {
             .userSelect(UserSelect.None)
     }
 
-    (hover + enabled) {
+    hover {
         Modifier
             .backgroundColor(buttonColors.hover)
             .cursor(Cursor.Pointer)
     }
 
-    (focus + enabled) {
+    focus {
         Modifier.backgroundColor(buttonColors.hover)
     }
 
-    (active + enabled) {
+    active {
         Modifier.backgroundColor(buttonColors.pressed)
     }
-    (focus + active + enabled) {
+    (focus + active) {
         Modifier.backgroundColor(buttonColors.pressed)
     }
 
     disabled {
-        Modifier.opacity(0.5)
+        Modifier
+            .backgroundColor(buttonColors.default)
+            .cursor(Cursor.Default)
+            .opacity(0.5)
     }
 }
 
