@@ -51,8 +51,9 @@ fun HomePage() {
 
 ---
 
-**Kobweb is still a technology preview, but it's getting close to ready**. Please consider starring the project to
-indicate interest, so we know we're creating something the community wants. [How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
+**Kobweb is still a technology preview, but it's usable, and it is getting close to stabilization**. Please consider
+starring the project to indicate interest, so we know we're creating something the community wants.
+[How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
 
 Our goal is to provide:
 
