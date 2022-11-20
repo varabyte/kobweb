@@ -366,15 +366,16 @@ And if you set the override to "index", that behaves the same as setting the fil
 Some examples can clarify these rules (and how they behave when combined). Assuming we're defining a page for our site
 `example.com` within the file `a/b/c/Slug.kt`:
 
-| Annotation             | Resulting URL                   |
-|------------------------|---------------------------------|
-| `@Page`                | `example.com/a/b/c/slug`        |
-| `@Page("other")`       | `example.com/a/b/c/other`       |
- | `@Page("index")`       | `example.com/a/b/c/`            |
- | `@Page("d/e/f/")`      | `example.com/a/b/c/d/e/f/slug`  |
- | `@Page("d/e/f/other")` | `example.com/a/b/c/d/e/f/other` |
- | `@Page("/d/e/f/")`     | `example.com/d/e/f/slug`        |
- | `@Page("/")`           | `example.com/slug`              |
+| Annotation              | Resulting URL                   |
+|-------------------------|---------------------------------|
+| `@Page`                 | `example.com/a/b/c/slug`        |
+| `@Page("other")`        | `example.com/a/b/c/other`       |
+ | `@Page("index")`        | `example.com/a/b/c/`            |
+ | `@Page("d/e/f/")`       | `example.com/a/b/c/d/e/f/slug`  |
+ | `@Page("d/e/f/other")`  | `example.com/a/b/c/d/e/f/other` |
+ | `@Page("/d/e/f/")`      | `example.com/d/e/f/slug`        |
+ | `@Page("/d/e/f/other")` | `example.com/d/e/f/other`       |
+ | `@Page("/")`            | `example.com/slug`              |
 
 ⚠️ We close this section with a warning - despite the flexibility allowed here, you should not be using this feature
 frequently, if at all. A Kobweb project benefits from the fact that a user can easily associate a URL on your site with
