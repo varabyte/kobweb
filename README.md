@@ -330,7 +330,7 @@ this will create a page that I can then visit by going to `mysite.com/admin/sett
 
 **Note:** The last part of a URL, here `settings`, is called a *slug*.
 
-By default, the slug comes from the file name but this behavior can be overridden (more on that shortly).
+By default, the slug comes from the file name, but this behavior can be overridden (more on that shortly).
 
 The file name `Index.kt` is special. If a page is defined inside such a file, it will be treated as the default page
 under that URL. For example, a page defined in `.../pages/admin/Index.kt` will be visited if the user visits
@@ -351,9 +351,6 @@ fun SettingsPage() {
 ```
 
 The above would create a page you could visit by going to `mysite.com/admin/config`.
-
-You could potentially even use these overrides to create multiple page methods in the same file, in case that helped
-group related behavior together, or generate multiple endpoints that all call to the same final page method.
 
 `routeOverride` can additionally contain slashes, and if the value begins and/or ends with a slash, that has a special
 meaning.
@@ -376,17 +373,18 @@ Some examples can clarify these rules (and how they behave when combined). Assum
  | `@Page("/d/e/f/")`      | `example.com/d/e/f/slug`        |
  | `@Page("/d/e/f/other")` | `example.com/d/e/f/other`       |
  | `@Page("/")`            | `example.com/slug`              |
+ | `@Page("/other")`       | `example.com/other`             |
 
 ⚠️ We close this section with a warning - despite the flexibility allowed here, you should not be using this feature
 frequently, if at all. A Kobweb project benefits from the fact that a user can easily associate a URL on your site with
 a file in your codebase, but this feature allows you to break those assumptions. It is mainly provided to enable
-dynamic routing (see the section below) or enabling a URL name that uses characters which don't belong in Kotlin
+dynamic routing (see the section below) or enabling a URL name that uses characters which aren't allowed in Kotlin
 filenames.
 
 ### PackageMapping
 
 If you don't want to change your slug but you *do* want to change a part of the route, you don't have to use a `Page`
-annotation for this. You can also register a package mapping with a `PackageMapping` file annotation. Doing so looks
+annotation for this. You can instead register a package mapping with a `PackageMapping` file annotation. Doing so looks
 like this:
 
 ```kotlin
@@ -404,15 +402,19 @@ better than `site.com/blog/_2022/mypost`.
 
 ### Page context
 
-Within a page method, you can check the current `PageContext` to see values relevant to the page that Kobweb has
-collected. Fetch it using the `rememberPageContext()` method.
+Every page method provides access to its `PageContent` via the `rememberPageContext()` method.
+
+A page's context provides it access to a router, allowing you to navigate to other pages, as well as other dynamic
+information about the current page's URL (discussed in the following sections).
 
 ```kotlin
 @Page
 @Composable
 fun ExamplePage() {
     val ctx = rememberPageContext()
-    /* ... */
+    Button(onClick = { ctx.router.navigateTo("/other/page") }) {
+        Text("Click me")
+    }
 }
 ```
 
@@ -420,13 +422,15 @@ fun ExamplePage() {
 
 You can use the page context to check the values of any query parameters passed into the current page's URL.
 
-So if you visit `site.com/posts?id=12345&mode=edit`, you can check those values from the context with code like:
+So if you visit `site.com/posts?id=12345&mode=edit`, you can query those values like so:
 
 ```kotlin
 @Page
 @Composable
 fun Posts() {
     val ctx = rememberPageContext()
+    // Here, I'm assuming these params are always present, but you can
+    // use `get` instead to handle the nullable case.
     val postId = ctx.params.getValue("id").toInt()
     val mode = EditMode.from(ctx.params.getValue("mode"))
     /* ... */
@@ -436,22 +440,10 @@ fun Posts() {
 ### Dynamic routes
 
 In addition to query parameters, Kobweb supports embedding arguments directly in the URL itself. For example, you might
-want to register the path `users/{user}/posts/{post}` where the end user could type in a specific URL like
+want to register the path `users/{user}/posts/{post}` which would be visited if the site visitor typed in a URL like
 `users/bitspittle/posts/20211231103156`.
 
-You could then read the values out of the URL as if they were query parameters:
-
-```kotlin
-// pages/users/user/posts/Post.kt
-
-/* ... */
-val ctx = rememberPageContext()
-val username = ctx.params.getValue("user")
-val postCreationTimestamp = ctx.params.getValue("post")
-/* ... */
-```
-
-So how do we set it up? Thankfully, it's fairly easy.
+How do we set it up? Thankfully, it's fairly easy.
 
 But first, notice that in the example dynamic route `users/{user}/posts/{post}` there are actually two different dynamic
 parts, one in the middle and one at the tail end. These can be handled by the `PackageMapping` and `Page` annotations,
@@ -470,15 +462,12 @@ package site.pages.users.user
 import com.varabyte.kobweb.core.PackageMapping
 ```
 
-In the above case, you can save some typing by passing an empty `"{}"` into the `PackageMapping` annotation. Just be
-aware you need to remember to update any of your pages later if you end up refactoring the code and renaming this
-package.
+If you pass an empty `"{}"` into the `PackageMapping` annotation, it directs Kobweb to use the name of the package
+itself (i.e. `user` in this specific case).
 
 #### Page
 
 Like `PackageMapping`, the `Page` annotation can also take curly braces to indicate a dynamic value.
-
-We can now flesh out the code that we started with at the beginning of the dynamic routes section:
 
 ```kotlin
 // pages/users/user/posts/Post.kt
@@ -486,12 +475,11 @@ We can now flesh out the code that we started with at the beginning of the dynam
 @Page("{post}") // Or @Page("{}")
 @Composable
 fun PostPage() {
-    val ctx = rememberPageContext()
-    val username = ctx.params.getValue("user")
-    val postCreationTimestamp = ctx.params.getValue("post")
-    /* ... */
+   /* ... */
 }
 ```
+
+An empty `"{}"` tells Kobweb to use the name of the current file.
 
 Remember that the `Page` annotation allows you to rewrite the entire route. That value also accepts dynamic parts, so
 you could even do something like:
@@ -506,8 +494,27 @@ fun PostPage() {
 }
 ```
 
-but with great power comes great responsibility. While it works, you should only use this format in cases where you
-absolutely need to (perhaps after a code refactor where you need to support legacy URL paths).
+but with great power comes great responsibility. Tricks like this may be hard to find and/or update later, especially as
+your project gets larger. While it works, you should only use this format in cases where you absolutely need to (perhaps
+after a code refactor where you have to support legacy URL paths).
+
+#### Querying dynamic route values
+
+You query dynamic route values exactly the same as if you were requesting query parameters. That is, use `ctx.params`:
+
+```kotlin
+@Page("{}")
+@Composable
+fun PostPage() {
+    val ctx = rememberPageContext()
+    val postId = ctx.params.getValue("post")
+    /* ... */
+}
+```
+
+**Note:** You should avoid creating URL paths where the dynamic path and the query parameters have the same name, as in
+`mysite.com/posts/{post}?post=...`, as there are no guarantees about which value will win out. Either way, one will be
+overwritten by the other.
 
 ## Silk
 
@@ -519,24 +526,25 @@ away, providing an API more akin to what you might experience developing a Compo
 "div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
 
 We consider Silk a pretty important part of the Kobweb experience, but it's worth pointing out that it's designed as an
-optional component. You can absolutely use Kobweb without Silk. You can also interleave Silk and Compose for Web
-components without issue (as Silk is just composing them itself).
+optional component. You can absolutely use Kobweb without Silk. (You can also use Silk without Kobweb!).
+
+You can also interleave Silk and Compose for Web components easily (as Silk is just composing them itself).
 
 ### Inline vs StyleSheet
 
-Before continuing, for those new to the web, it's worth understanding that there are two ways to set styles on your HTML
-elements: inline and stylesheet.
+For those new to web dev, it's worth understanding that there are two ways to set styles on your HTML elements: inline
+and stylesheet.
 
-Inline styles are defined on the element tag itself, and in raw HTML might look like:
+Inline styles are defined on the element tag itself. In raw HTML, this might look like:
 
 ```html
 <div style="background-color:black">
 ```
 
 Meanwhile, any given html page can reference a list of stylesheets which can define a bunch of styles, where each style
-is tied to a selector (which _selects_ what elements those styles apply to).
+is tied to a selector (a rule which _selects_ what elements those styles apply to).
 
-A concrete example stylesheet can help here:
+A concrete example of a very short stylesheet can help here:
 
 ```css
 body {
@@ -564,33 +572,33 @@ inline styles as it better maintains a separation of concerns. That is, the html
 site, while the css controls the look and feel.
 
 Of course, sometimes, you need to define the style of a single, specific element only. You can do that by giving it an
-ID and then targeting it via an ID selector in your stylesheet (like "#title" in the example above), or you can just
-set inline styles on it, which may be far easier.
+ID and then targeting it via an ID selector in your stylesheet (like `#title` in the example above). Or you can just set
+inline styles on it, which may be far easier.
 
-We're not writing html / css by hand, however -- we're using Compose for Web! So the distinctions discussed up until now
+However! We're not writing html / css by hand. We're using Compose for Web! So the distinctions discussed up until now
 are less important here.
 
-However, there are times when you have to use stylesheets, because without them you can't define styles for advanced
+That said, there are times when you have to use stylesheets, because without them you can't define styles for advanced
 behaviors (particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes),
 [pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and
 [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries), the discussion of
-which are outside the scope of this README). So in those cases, it's good to understand that there's an occasional
-and fundamental difference.
+which are outside the scope of this README). So it's good to realize that there are occasional differences.
 
 In general, when you pass styles defined on the fly into a composable widget in Silk, those will result in inline
-styles, whereas if you use `ComponentStyle` to define the styles, that will get embedded into the site's stylesheet.
-We'll talk more about these approaches in the following sections.
+styles, whereas if you use a `ComponentStyle` to define the styles, those will get embedded into the site's stylesheet:
 
 ```kotlin
 // Uses inline styles
-Box(Modifier.color(Colors.Red)) { ... }
+Box(Modifier.color(Colors.Red)) { /* ... */ }
 
 // Uses a stylesheet
 val MyBoxStyle = ComponentStyle("my-box") {
     base { Modifier.Color(Colors.Red) }
 }
-Box(MyBoxStyle.toModifier()) { ... }
+Box(MyBoxStyle.toModifier()) { /* ... */ }
 ```
+
+We'll talk more about these approaches in the following sections.
 
 One last note: debugging your page with browser tools may be easier if you lean on stylesheets over inline styles,
 because it makes your DOM tree easier to look through without all that extra noise.
@@ -598,17 +606,20 @@ because it makes your DOM tree easier to look through without all that extra noi
 ### Modifier
 
 Silk introduces the `Modifier` class, in order to provide an experience similar to what you find in Jetpack Compose.
-In the world of Compose for Web, you can think of a `Modifier` as a layer on top of CSS styles. So this:
+(You can read [more about them here](https://developer.android.com/jetpack/compose/modifiers) if you're unfamiliar with
+the concept).
+
+In the world of Compose for Web, you can think of a `Modifier` as a layer on top of CSS styles and attributes. So this:
 
 ```kotlin
 Modifier.backgroundColor(Colors.Red).color(Colors.Green).padding(200.px)
 ```
 
-if passed into a widget composable, like `Box`:
+when passed into a widget provided by Kobweb, like `Box`:
 
 ```kotlin
 Box(Modifier.backgroundColor(Colors.Red).color(Colors.Green).padding(200.px)) {
-    Text("Green on red")
+    /* ... */
 }
 ```
 
@@ -711,35 +722,34 @@ val CustomStyle = ComponentStyle("custom") {
 #### Breakpoints
 
 There's a feature in the world of responsive html / css design called breakpoints, which confusingly have nothing to do
-with debugging breakpoints, but rather specifying size boundaries where styles change. This is how sites often present
-content differently on mobile vs. tablet vs. desktop.
+with debugging breakpoints. Rather, they specify size boundaries for your site when styles change. This is how sites
+present content differently on mobile vs. tablet vs. desktop.
 
-Kobweb provides five breakpoints for your use, named after sizes: "sm", "md", "lg", "xl". They are initialized with
-reasonable values, but you can override them if you want to decide what they mean for your app.
+Kobweb provides four breakpoint sizes you can use for your project, which, including using no breakpoint size at all,
+gives you five buckets you can work with when designing your site:
 
-By default, it can be useful to think of:
-
-* no breakpoint - mobile (more specifically, the style will appear the same on mobile as any other device)
+* no breakpoint - mobile (and larger)
 * sm - tablets (and larger)
 * md - desktops (and larger)
 * lg - widescreen (and larger)
 * xl - ultra widescreen
 
-You can change the default values by adding an "init silk" block to your code:
+You can change the default values by adding an "@InitSilk" block to your code:
 
 ```kotlin
 @InitSilk
 fun initializeBreakpoints(ctx: InitSilkContext) {
     ctx.theme.breakpoints = BreakpointSizes(
-        sm = ...,
-        md = ...,
-        lg = ...,
+        sm = 30.cssRem,
+        md = 48.cssRem,
+        lg = 62.cssRem,
+        xl = 80.cssRem,
     )
 }
 ```
 
-Despite the flexible potential of multiple sizes, many projects will be able to get away just using base styles and occasional
-"md" styles.
+Despite the flexible potential of multiple sizes, many projects will be able to get away just using base styles and
+occasional `md` styles.
 
 To reference a breakpoint in a `ComponentStyle`, just invoke it:
 
@@ -778,20 +788,23 @@ val CustomStyle = ComponentStyle("custom") {
 }
 ```
 
-`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in an "init silk" method,
+`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in an `@InitSilk` method,
 perhaps to something that is more brand aware:
 
 ```kotlin
 @InitSilk
 fun overrideSilkTheme(ctx: InitSilkContext) {
-    ctx.theme.palettes = SilkPalettes(...)
+    ctx.theme.palettes = SilkPalettes(/* ... */)
 }
 ```
 
 #### ComponentVariant
 
 With a style, you can also create a variant of that style (that is, additional modifications that are always applied
-_after_ the base style is). Here's an example:
+_on top of_ the style).
+
+You define one using the `ComponentStyle.addVariant` method, but otherwise the experience is the same as defining a
+`ComponentStyle`:
 
 ```kotlin
 val CustomVariant = CustomStyle.addVariant("example-variant") {
@@ -817,46 +830,53 @@ val InvertButtonVariant = ButtonStyle.addVariant("invert") { /* ... */ }
 ```
 
 The `ComponentStyle.toModifier(...)` method, mentioned earlier, optionally takes a variant parameter. When passed in,
-both styles will be applied. For example, `ButtonStyle.toModifier(OutlineButtonVariant)` will create a modifier for
-styling your element with both the button base style and outline style combined.
+both styles will be applied.
+
+For example, `ButtonStyle.toModifier(OutlineButtonVariant)` will create a modifier for styling your element with both
+the button base style and outline style combined.
 
 ***Note:** Using a variant that was created from a different style will have no effect. In other words,
-`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button style. We tried to use generics as a fancy way to
+`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant. We tried to use generics as a fancy way to
 enforce this at compile time but ran into limitations with the Compose compiler (see
-[Web Comopse bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later if
+[Compose for Web bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later if
 resolved, but until then, don't do that!*
 
-So bringing it all together, you should write code that looks something like this:
+#### Writing custom widgets
+
+While Silk methods are all written to support component styles and variants, if you ever want to write your own custom
+widget that mimics Silk, your code should look something like:
 
 ```kotlin
+val CustomWidgetStyle = ComponentStyle("custom-widget") { /* ... */ }
+
 @Composable
-fun Button(
+fun CustomWidget(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     @Composable content: () -> Unit
 ) {
-    val finalModifier = ButtonStyle.toModifier(variant).then(modifier)
+    val finalModifier = CustomWidgetStyle.toModifier(variant).then(modifier)
     Box(finalModifier, content)
 }
 ```
 
-In other words, if you ever want to write your own control that supports variants, you should apply the modifiers in
+In other words, you should take in an optional `ComponentVariant` parameter, and then you should apply the modifiers in
 order of: base style, then variant, then finally user overrides.
 
 A caller might call your widget one of several ways:
 
 ```kotlin
 // Approach #1: Use default styling
-Button { /* ... */ }
+CustomWidget { /* ... */ }
 
-// Approach #2: Apply the default style modified by a variant
-Button(variant = OutlineButtonVariant) { /* ... */ }
+// Approach #2: Tweak default styling with a variant
+CustomWidget(variant = TransparentWidgetVariant) { /* ... */ }
 
-// Approach #3: Apply the default style modified by additional inline styles
-Button(Modifier.backgroundColor(Colors.Blue)) { /* ... */ }
+// Approach #3: Tweak default styling with user overrides
+CustomWidget(Modifier.backgroundColor(Colors.Blue)) { /* ... */ }
 
-// Approach #4: Apply the default style modified first by a variant and then by inline styles
-Button(Modifier.backgroundColor(Colors.Blue), variant = OutlineButtonVariant) { /* ... */ }
+// Approach #4: Tweak default styling with a variant and then user overrides
+CustomWidget(Modifier.backgroundColor(Colors.Blue), variant = TransparentWidgetVariant) { /* ... */ }
 ```
 
 ### ElementRefScope and raw HTML elements
@@ -878,17 +898,17 @@ Box(
 ```
 
 You can check out the [Element](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-element/) class (and its often
-even more relevant [HTMLElement](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-h-t-m-l-element/) inheritor)
-to see the sort of methods and properties that are available on it.
+more relevant [HTMLElement](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-h-t-m-l-element/) inheritor)
+to see the methods and properties that are available on it.
 
 The `ref { ... }` method can actually take one or more optional keys of any value. If any of these keys change on a
 subsequent recomposition, the element will be disposed of and recreated:
 
 ```kotlin
-var uiState by remember { mutableStateOf(UiState.DarkMode) }
+val colorMode by rememberColorMode()
 Box(
-    // Will get triggered each time the UI state changes
-    ref = ref(uiState) { element -> /* ... */}
+    // Will get triggered each time the color mode changes
+    ref = ref(colorMode) { element -> /* ... */}
 )
 ```
 
@@ -910,7 +930,7 @@ Box(
 
 And, finally, in some rare cases, you may want to have multiple independent keys that can each cause your UI element to
 be disposed of, but for different reasons and with different handlers. You can use `refScope` as a way to combine two or
-more `ref` and `disposableRef` calls in any combination:
+more `ref` and/or `disposableRef` calls in any combination:
 
 ```kotlin
 val isFeature1Enabled: Boolean = /* ... */
@@ -933,7 +953,7 @@ Using it is easy! Search the [Font Awesome gallery](https://fontawesome.com/sear
 icon, and then call it using the associated Font Awesome icon composable.
 
 For example, if I wanted to add the Kobweb-themed
-[spider icon](https://fontawesome.com/icons/spider?s=solid&f=classic), what I could do is call this in my Kobweb code:
+[spider icon](https://fontawesome.com/icons/spider?s=solid&f=classic), I could call this in my Kobweb code:
 
 ```kotlin
 FaSpider()
@@ -982,11 +1002,6 @@ By default, Kobweb will automatically root every page to the [`KobwebApp` compos
 (or, if using Silk, to a [`SilkApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-silk/src/jsMain/kotlin/com/varabyte/kobweb/silk/SilkApp.kt)).
 These perform some minimal common work (e.g. applying CSS styles) that should be present across your whole site.
 
-In other words, if you write code like:
-
-```kotlin
-
-```
 This means if you register a page:
 
 ```kotlin
@@ -1002,6 +1017,8 @@ fun HomePage() {
 then the final result that actually runs on your site will be:
 
 ```kotlin
+// somewhere in a generated main.kt
+
 KobwebApp {
   HomePage()
 }
@@ -1012,8 +1029,8 @@ like to globally define (e.g. the default font used by your site). Perhaps you h
 like to run before any page gets run (like logic for updating saved settings into local storage).
 
 In this case, you can create your own root composable and annotate it with `@App`. If present, Kobweb will use that
-instead. You should, of course, delegate to `KobwebApp` (or `SilkApp` if using Silk), as the initialization logic from
-those methods should still be run.
+instead of its own default. You should, of course, delegate to `KobwebApp` (or `SilkApp` if using Silk), as the
+initialization logic from those methods should still be run.
 
 Here's an example application composable override that I use in my own project:
 
@@ -1145,7 +1162,7 @@ the code your markdown file would otherwise create. This is useful for specifyin
 root: .components.layout.DocsLayout
 ---
 
-# Kobweb Tutorial
+# Kobweb Manual
 ```
 
 The above will generate code like the following:
@@ -1158,7 +1175,7 @@ import com.mysite.components.layout.DocsLayout
 fun KobwebPage() {
     DocsLayout {
         H1 {
-            Text("Kobweb Tutorial")
+            Text("Kobweb Manual")
         }
     }
 }
