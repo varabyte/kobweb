@@ -74,8 +74,8 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 
 # Trying it out yourself
 
-The first step is to get the Kobweb binary. You can install it, download it, build it, so we'll include instructions for
-all these approaches.
+The first step is to get the Kobweb binary. You can install it, download it, and/or build it, so we'll include
+instructions for all these approaches.
 
 ## Install the Kobweb binary
 
@@ -236,7 +236,6 @@ my-project
         └── resources
             └── markdown
                 └── Markdown.md
-
 ```
 
 Note that there's no index.html or routing logic anywhere! We generate that for you automatically when you run Kobweb.
@@ -958,7 +957,9 @@ FaSpider(Modifier.color(Colors.Red))
 
 ***Note**: When you create a project using our `site` template, Font Awesome icons are included.*
 
-## Components: Layouts, Sections, and Widgets
+## Intermediate
+
+### Components: Layouts, Sections, and Widgets
 
 Outside of pages, it is common to create reusable, composable parts. While Kobweb doesn't enforce any particular rule
 here, we recommend a convention which, if followed, may make it easier to allow new readers of your codebase to get
@@ -974,7 +975,68 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder.
 
-## Define API routes
+### Redefining your application root
+
+By default, Kobweb will automatically root every page to the [`KobwebApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-core/src/jsMain/kotlin/com/varabyte/kobweb/core/App.kt)
+(or, if using Silk, to a [`SilkApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-silk/src/jsMain/kotlin/com/varabyte/kobweb/silk/SilkApp.kt)).
+These perform some minimal common work (e.g. applying CSS styles) that should be present across your whole site.
+
+In other words, if you write code like:
+
+```kotlin
+
+```
+This means if you register a page:
+
+```kotlin
+// jsMain/kotlin/com/example/mysite/pages/Index.kt
+
+@Page
+@Composable
+fun HomePage() {
+    /* ... */
+}
+```
+
+then the final result that actually runs on your site will be:
+
+```kotlin
+KobwebApp {
+  HomePage()
+}
+```
+
+It is likely you'll want to configure this further for your own application. Perhaps you have additional styles you'd
+like to globally define (e.g. the default font used by your site). Perhaps you have some initialization logic that you'd
+like to run before any page gets run (like logic for updating saved settings into local storage).
+
+In this case, you can create your own root composable and annotate it with `@App`. If present, Kobweb will use that
+instead. You should, of course, delegate to `KobwebApp` (or `SilkApp` if using Silk), as the initialization logic from
+those methods should still be run.
+
+Here's an example application composable override that I use in my own project:
+
+```kotlin
+@App
+@Composable
+fun MyApp(content: @Composable () -> Unit) {
+    SilkApp {
+        val colorMode = getColorMode()
+        LaunchedEffect(colorMode) { // Relaunched every time the color mode changes
+            localStorage.setItem(COLOR_MODE_KEY, colorMode.name)
+        }
+
+        // A full screen Silk surface. Sets the background based on Silk's palette and animates color changes.
+        Surface(Modifier.minHeight(100.vh)) {
+            content()
+        }
+    }
+}
+```
+
+You may only define a single `@App` on your site, or else the Kobweb Application plugin will complain at build time.
+
+### Define API routes
 
 You can define and annotate methods which will generate server endpoints you can interact with. To add one:
 
@@ -1022,7 +1084,7 @@ fun ApiDemoPage() {
 
 All the HTTP methods are supported (`post`, `put`, etc.). Of course, you can also use `window.fetch(...)` directly.
 
-## Markdown
+### Markdown
 
 If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for you
 at build time, using the filename as its path.
@@ -1039,7 +1101,7 @@ For example, if I create the following file:
 
 this will create a page that I can then visit by going to `mysite.com/docs/tutorial/kobweb`
 
-### Front Matter
+#### Front Matter
 
 Front Matter is metadata that you can specify at the beginning of your document, like so:
 
@@ -1072,7 +1134,7 @@ fun AuthorWidget() {
 ***Note:** If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
 `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`*.
 
-#### Root
+##### Root
 
 Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
 the code your markdown file would otherwise create. This is useful for specifying a layout for example:
@@ -1101,12 +1163,12 @@ fun KobwebPage() {
 }
 ```
 
-### Kobweb Call
+#### Kobweb Call
 
 The power of Kotlin + Compose for Web is interactive components, not static text! Therefore, Kobweb Markdown support
 enables special syntax that can be used to insert Kotlin code.
 
-#### Block syntax
+##### Block syntax
 
 Usually, you will define widgets that belong in their own section. Just use three triple-curly braces to insert a
 function that lives in its own block:
@@ -1133,7 +1195,7 @@ fun KobwebPage() {
 You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
 will automatically be prepending with your site's full package.
 
-#### Inline syntax
+##### Inline syntax
 
 Occasionally, you may want to insert a smaller widget into the flow of a single sentence. For this case, use the
 `${...}` inline syntax:
@@ -1145,7 +1207,7 @@ Press ${.components.widgets.ColorButton} to toggle the site's current color.
 **Warning:** Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole
 thing and leaves it as text.
 
-## Version Catalogs
+### Version Catalogs
 
 The project templates created by Kobweb all embrace Gradle version catalogs, which are (at the time of writing this
 README) a relatively new feature, so users may not be aware of it.
@@ -1160,47 +1222,6 @@ landing site.
 
 To read more about the feature, please check out the
 [official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
-
-# Can We Kobweb Yet
-
-Current state: **Foundations are in place! You may encounter API gaps.**
-
-Kobweb is becoming quite functional. We are already using it to build https://kobweb.varabyte.com and
-https://bitspittle.dev (depending on when you're reading this, they may still be fairly barebones, but these sites will
-get more of our full attention as Kobweb is finally stabilizing).
-
-At this point:
-
-* It is easy to set up a new project and get things running quickly.
-* The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it.
-* It supports generating pages from Markdown that can reference your Composable code.
-* While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
-* You can use the `Modifier` builder for a growing number of css properties.
-* Silk components are color mode aware and support responsive behavior.
-
-However, there's always more to do.
-
-* The API surface is a bit lean in some areas right now, especially around Silk UI components
-* The APIs that interact with Compose for Web may have some holes in them.
-* A lot of detailed documentation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
-
-I think there's enough there now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
-escape hatch to underlying Compose for Web / Kotlin/JS approaches, but there might be some areas where it's still a bit
-DIY. It would be great to get real world experience to hear what issues users are actually running into.
-
-So, should you use Kobweb at this point? If you are...
-
-* playing around with Compose for Web for the first time and want to get up and running quickly on a toy project:
-    * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
-      below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
-      this project.
-* a Kotlin developer who wants to write a small web app or create a new blog from scratch:
-    * **Worth a shot!** I think if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
-      with us at our Discord if you try it and have questions or run into missing features.
-* someone who already has an existing project in progress and wants to integrate Kobweb into it:
-    * **No** - this may never be a tenable path.
-* a company:
-    * **Probably not** (someday, we hope, but not yet)
 
 # Advanced
 
@@ -1251,6 +1272,47 @@ remember if you should be justifying your items or aligning your content, even i
 the correct html / css for you behind the scenes.
 
 I think there is value in supporting both approaches.
+
+# Can We Kobweb Yet
+
+Current state: **Foundations are in place! You may encounter API gaps.**
+
+Kobweb is becoming quite functional. We are already using it to build https://kobweb.varabyte.com and
+https://bitspittle.dev (depending on when you're reading this, they may still be fairly barebones, but these sites will
+get more of our full attention as Kobweb is finally stabilizing).
+
+At this point:
+
+* It is easy to set up a new project and get things running quickly.
+* The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it.
+* It supports generating pages from Markdown that can reference your Composable code.
+* While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
+* You can use the `Modifier` builder for a growing number of css properties.
+* Silk components are color mode aware and support responsive behavior.
+
+However, there's always more to do.
+
+* The API surface is a bit lean in some areas right now, especially around Silk UI components
+* The APIs that interact with Compose for Web may have some holes in them.
+* A lot of detailed documentation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
+
+I think there's enough there now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
+escape hatch to underlying Compose for Web / Kotlin/JS approaches, but there might be some areas where it's still a bit
+DIY. It would be great to get real world experience to hear what issues users are actually running into.
+
+So, should you use Kobweb at this point? If you are...
+
+* playing around with Compose for Web for the first time and want to get up and running quickly on a toy project:
+    * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
+      below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
+      this project.
+* a Kotlin developer who wants to write a small web app or create a new blog from scratch:
+    * **Worth a shot!** I think if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
+      with us at our Discord if you try it and have questions or run into missing features.
+* someone who already has an existing project in progress and wants to integrate Kobweb into it:
+    * **No** - this may never be a tenable path.
+* a company:
+    * **Probably not** (someday, we hope, but not yet)
 
 # Known Issues
 
