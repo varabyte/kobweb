@@ -295,10 +295,10 @@ For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 
 # Basics
 
-Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a Web
-Compose app, such as routing and configuring basic CSS styles. It exposes a handful of annotations and utility methods
-which your app can use to communicate intent with the framework. These annotations work in conjunction with our Gradle
-plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
+Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
+Compose for Web app, such as routing and configuring basic CSS styles. It exposes a handful of annotations and utility
+methods which your app can use to communicate intent with the framework. These annotations work in conjunction with our
+Gradle plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
 
 Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and / or
 running a Compose for Web app. We want to get that stuff out of the way, so you can enjoy focusing on the more
