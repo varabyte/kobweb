@@ -1072,12 +1072,9 @@ For example, here's a simple method that echoes back an argument passed into it:
 fun echo(ctx: ApiContext) {
     // ctx.req is for the incoming request, ctx.res for responding back to the client
 
-    // Queries are parsed from the URL, e.g. here "/echo?message=..."
-    val msg = ctx.req.query["message"] ?: ""
+    // Params are parsed from the URL, e.g. here "/echo?message=..."
+    val msg = ctx.req.params["message"] ?: ""
     ctx.res.setBodyText(msg)
-
-    // You could also do something like: `ctx.res.body = ctx.req.body`
-    // but using query parameters makes for an easier demo
 }
 ```
 

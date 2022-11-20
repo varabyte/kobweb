@@ -10,8 +10,8 @@ import todo.model.TodoStore
 fun addTodo(ctx: ApiContext) {
     if (ctx.req.method != HttpMethod.POST) return
 
-    val ownerId = ctx.req.query["owner"]
-    val todo = ctx.req.query["todo"]
+    val ownerId = ctx.req.params["owner"]
+    val todo = ctx.req.params["todo"]
     if (ownerId == null || todo == null) {
         return
     }

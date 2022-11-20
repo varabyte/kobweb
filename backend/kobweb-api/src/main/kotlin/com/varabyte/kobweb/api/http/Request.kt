@@ -9,7 +9,7 @@ package com.varabyte.kobweb.api.http
  * ```
  * @Api
  * fun echo(ctx: ApiContext) {
- *   val msg = ctx.req.query["msg"]
+ *   val msg = ctx.req.params["msg"]
  *   if (msg != null) {
  *     ctx.res.setBodyText("Received message: $msg")
  *   }
@@ -22,18 +22,21 @@ package com.varabyte.kobweb.api.http
  *
  * See also: [Response]
  *
- * @param method The type of http method this call was sent with.
- * @param query A list of key/value pairs extracted from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
- * @param body An (optional) payload sent with the request. Will only potentially be set with appropriate methods that
+ * @property method The type of http method this call was sent with.
+ * @property params A list of key/value pairs extracted from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
+ * @property body An (optional) payload sent with the request. Will only potentially be set with appropriate methods that
  * are allowed to send data, i.e. [HttpMethod.POST], [HttpMethod.PUT], and [HttpMethod.PATCH]
- * @param contentType The content type of the [body], if set and sent.
+ * @property contentType The content type of the [body], if set and sent.
  */
 class Request(
     val method: HttpMethod,
-    val query: Map<String, String>,
+    val params: Map<String, String>,
     val body: ByteArray?,
     val contentType: String?,
-)
+) {
+    @get:Deprecated("`query` has been renamed to `params` for consistency with `PageContext`.", ReplaceWith("params"))
+    val query get() = params
+}
 
 fun Request.readBodyText(): String? {
     return body?.toString(Charsets.UTF_8)

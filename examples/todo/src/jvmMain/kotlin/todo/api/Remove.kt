@@ -10,8 +10,8 @@ import todo.model.TodoStore
 fun removeTodo(ctx: ApiContext) {
     if (ctx.req.method != HttpMethod.POST) return
 
-    val ownerId = ctx.req.query["owner"]
-    val todoId = ctx.req.query["todo"]
+    val ownerId = ctx.req.params["owner"]
+    val todoId = ctx.req.params["todo"]
     if (ownerId == null || todoId == null) {
         return
     }

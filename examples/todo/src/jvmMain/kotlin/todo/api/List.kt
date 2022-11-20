@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 @Api
 fun listTodos(ctx: ApiContext) {
     if (ctx.req.method != HttpMethod.GET) return
-    val ownerId = ctx.req.query["owner"] ?: return
+    val ownerId = ctx.req.params["owner"] ?: return
 
     val todos = ctx.data.getValue<TodoStore>()
     ctx.res.setBodyText(Json.encodeToString(todos[ownerId]))
