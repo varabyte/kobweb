@@ -2,7 +2,7 @@ package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.borderTop
 import com.varabyte.kobweb.compose.ui.modifiers.fillMaxWidth
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -27,5 +27,5 @@ fun Divider(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
 ) {
-    Hr(DividerStyle.toModifier(variant).then(modifier).asAttributesBuilder())
+    Hr(DividerStyle.toModifier(variant).then(modifier).toAttrs())
 }

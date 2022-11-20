@@ -9,7 +9,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.*
@@ -92,7 +92,7 @@ fun Button(
                     onClick()
                     evt.preventDefault()
                 }
-            }.asAttributesBuilder()
+            }.toAttrs()
     ) {
         registerRefScope(ref)
         Box(contentAlignment = Alignment.Center, content = content)

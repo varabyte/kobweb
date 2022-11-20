@@ -11,7 +11,7 @@ package com.varabyte.kobweb.silk.components.icons.fa
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.dom.Span
 
 enum class IconCategory(internal val className: String) {
@@ -32,7 +32,7 @@ fun FaIcon(
     style: IconCategory = IconCategory.REGULAR,
 ) {
     Span(
-        attrs = modifier.asAttributesBuilder {
+        attrs = modifier.toAttrs {
             classes(style.className, "fa-$name")
         }
     )

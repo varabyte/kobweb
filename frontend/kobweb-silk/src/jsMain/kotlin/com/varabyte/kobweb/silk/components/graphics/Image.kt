@@ -2,7 +2,7 @@ package com.varabyte.kobweb.silk.components.graphics
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.prependIf
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -27,5 +27,5 @@ fun Image(
     autoPrefix: Boolean = true,
     variant: ComponentVariant? = null,
 ) {
-    Img(RoutePrefix.prependIf(autoPrefix, src), desc, attrs = ImageStyle.toModifier(variant).then(modifier).asAttributesBuilder())
+    Img(RoutePrefix.prependIf(autoPrefix, src), desc, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs())
 }

@@ -6,7 +6,7 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -24,7 +24,7 @@ fun Box(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}
 ) {
-    Div(attrs = modifier.asAttributesBuilder {
+    Div(attrs = modifier.toAttrs {
         classes("kobweb-box", contentAlignment.toClassName())
     }) {
         registerRefScope(ref)

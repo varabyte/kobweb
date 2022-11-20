@@ -65,13 +65,13 @@ fun Modifier.styleModifier(styles: (StyleScope.() -> Unit)) = this then StyleMod
  * Convert a [Modifier] into an [AttrsScope] which Compose for Web tags take as an argument, e.g. use it like so:
  *
  * ```
- * Div(attrs = modifier.asAttributesBuilder())
+ * Div(attrs = modifier.toAttrs())
  * ```
  *
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
  *   be useful to occasionally avoid the creation of an unnecessary [AttrsModifier] to append at the tail.
  */
-fun <T: Element, A: AttrsScope<T>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <T: Element, A: AttrsScope<T>> Modifier.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->
@@ -88,13 +88,18 @@ fun <T: Element, A: AttrsScope<T>> Modifier.asAttributesBuilder(finalHandler: (A
     }
 }
 
+@Deprecated("This method has been shortened to `toAttrs`.", ReplaceWith("toAttrs(finalHandler)"))
+fun <T: Element, A: AttrsScope<T>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+    return toAttrs(finalHandler)
+}
+
 /**
- * Convert a [Modifier] into a [StyleBuilder] which can be used to initialize a StyleSheet, for example.
+ * Convert a [Modifier] into a [StyleScope] which can be used to initialize a StyleSheet, for example.
  *
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
  *   be useful to occasionally avoid the creation of an unnecessary [StyleModifier] to append at the tail.
  */
-fun Modifier.asStyleBuilder(finalHandler: (StyleScope.() -> Unit)? = null): StyleScope.() -> Unit {
+fun Modifier.toStyles(finalHandler: (StyleScope.() -> Unit)? = null): StyleScope.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->
@@ -105,4 +110,9 @@ fun Modifier.asStyleBuilder(finalHandler: (StyleScope.() -> Unit)? = null): Styl
 
         finalHandler?.invoke(this)
     }
+}
+
+@Deprecated("This method has been shortened to `toStyles`.", ReplaceWith("toStyles(finalHandler)"))
+fun Modifier.asStyleBuilder(finalHandler: (StyleScope.() -> Unit)? = null): StyleScope.() -> Unit {
+    return toStyles(finalHandler)
 }

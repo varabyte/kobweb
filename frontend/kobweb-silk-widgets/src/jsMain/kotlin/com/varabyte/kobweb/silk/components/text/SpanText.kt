@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.components.text
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.whiteSpace
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -22,7 +22,7 @@ val SpanTextStyle = ComponentStyle("silk-span-text") { }
  * Essentially a convenient shortcut for
  *
  * ```
- * Span(attrs = modifier.asAttributesBuilder()) {
+ * Span(attrs = modifier.toAttrs()) {
  *   Text("Some text")
  * }
  * ```
@@ -50,7 +50,7 @@ fun SpanText(
             Modifier.whiteSpace(WhiteSpace.PreWrap)
         }
 
-    Span(attrs = finalModifier.asAttributesBuilder()) {
+    Span(attrs = finalModifier.toAttrs()) {
         Text(text)
     }
 }

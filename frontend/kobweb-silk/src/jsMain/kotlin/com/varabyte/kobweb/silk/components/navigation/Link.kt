@@ -5,7 +5,7 @@ import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.navigation.toOpenLinkStrategy
@@ -66,7 +66,7 @@ fun Link(
 ) {
     Anchor(
         href = path,
-        attrs = LinkStyle.toModifier(variant).then(modifier).asAttributesBuilder(),
+        attrs = LinkStyle.toModifier(variant).then(modifier).toAttrs(),
         openInternalLinksStrategy,
         openExternalLinksStrategy,
         autoPrefix

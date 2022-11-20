@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -113,7 +113,7 @@ fun SimpleGrid(
                 SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier()
             }
             .then(modifier)
-            .asAttributesBuilder()
+            .toAttrs()
     ) {
         registerRefScope(ref)
         content()

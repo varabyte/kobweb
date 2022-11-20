@@ -4,8 +4,8 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.StyleModifier
-import com.varabyte.kobweb.compose.ui.asStyleBuilder
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
+import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -346,10 +346,10 @@ private sealed interface StyleGroup {
         @Suppress("NAME_SHADOWING") // Shadowing used to turn nullable into non-null
         fun from(lightModifiers: Modifier?, darkModifiers: Modifier?): StyleGroup? {
             val lightStyles = lightModifiers?.let { lightModifiers ->
-                ComparableStyleScope().apply { lightModifiers.asStyleBuilder().invoke(this) }
+                ComparableStyleScope().apply { lightModifiers.toStyles().invoke(this) }
             }
             val darkStyles = darkModifiers?.let { darkModifiers ->
-                ComparableStyleScope().apply { darkModifiers.asStyleBuilder().invoke(this) }
+                ComparableStyleScope().apply { darkModifiers.toStyles().invoke(this) }
             }
 
             if (lightStyles == null && darkStyles == null) return null
@@ -617,9 +617,6 @@ private class CompositeComponentVariant(private val head: ComponentVariant, priv
 
 /**
  * Convert a user's component style into a [Modifier].
- *
- * This can then be passed into Silk widgets directly, or to Compose for Web widgets
- * by calling `attrs = style.toModifier.asAttributesBuilder()`
  */
 @Composable
 fun ComponentStyle.toModifier(variant: ComponentVariant? = null): Modifier {
@@ -629,7 +626,7 @@ fun ComponentStyle.toModifier(variant: ComponentVariant? = null): Modifier {
 }
 
 /**
- * A convenience method for converting a collection of styles into a single modifier.
+ * A convenience method for chaining a collection of styles into a single modifier.
  *
  * This can be useful as sometimes you might break up many css rules across multiple styles for re-usability, and it's
  * much easier to type `listOf(Style1, Style2, Style3).toModifier()` than

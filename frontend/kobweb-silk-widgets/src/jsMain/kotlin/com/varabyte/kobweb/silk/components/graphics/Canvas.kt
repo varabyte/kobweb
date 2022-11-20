@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.height
 import com.varabyte.kobweb.compose.ui.modifiers.width
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -117,7 +117,7 @@ private inline fun <C: RenderingContext> Canvas(
         builder,
         CanvasStyle.toModifier(variant)
             .width(width.px).height(height.px)
-            .then(modifier).asAttributesBuilder {
+            .then(modifier).toAttrs {
                 attr("width", width.toString())
                 attr("height", height.toString())
             }

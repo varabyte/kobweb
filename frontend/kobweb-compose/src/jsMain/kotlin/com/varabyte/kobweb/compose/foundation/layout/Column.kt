@@ -6,7 +6,7 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -25,7 +25,7 @@ fun Column(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Div(modifier.asAttributesBuilder {
+    Div(modifier.toAttrs {
         classes("kobweb-col", verticalArrangement.toClassName(), horizontalAlignment.toClassName())
     }) {
         registerRefScope(ref)
