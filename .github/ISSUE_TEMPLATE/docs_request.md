@@ -4,6 +4,9 @@ about: Request to add missing documentation
 title: '*YOUR REQUEST HERE*'
 labels: documentation
 assignees: ''
+---
+
+*ADDITIONAL DETAILS HERE*
 
 ---
 
