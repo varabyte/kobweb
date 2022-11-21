@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
@@ -12,7 +13,9 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
+import org.w3c.dom.Element
 
 /**
  * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
@@ -626,6 +629,16 @@ fun ComponentStyle.toModifier(variant: ComponentVariant? = null): Modifier {
 }
 
 /**
+ * Convert a user's component style into an [AttrsScope] builder.
+ *
+ * This is useful if you need to convert a style into something directly consumable by a Compose for Web widget.
+ */
+@Composable
+fun <T: Element, A: AttrsScope<T>> ComponentStyle.toAttrs(variant: ComponentVariant? = null, finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+    return this.toModifier(variant).toAttrs(finalHandler)
+}
+
+/**
  * A convenience method for chaining a collection of styles into a single modifier.
  *
  * This can be useful as sometimes you might break up many css rules across multiple styles for re-usability, and it's
@@ -639,4 +652,12 @@ fun Iterable<ComponentStyle>.toModifier(): Modifier {
         finalModifier = finalModifier.then(style.toModifier())
     }
     return finalModifier
+}
+
+/**
+ * A convenience method for chaining a collection of styles into a single [AttrsScope] builder.
+ */
+@Composable
+fun <T: Element, A: AttrsScope<T>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+    return this.toModifier().toAttrs(finalHandler)
 }

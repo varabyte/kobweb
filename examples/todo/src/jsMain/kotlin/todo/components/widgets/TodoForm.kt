@@ -2,7 +2,7 @@ package todo.components.widgets
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.components.style.toAttrs
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.name
 import org.jetbrains.compose.web.attributes.onSubmit
@@ -18,7 +18,7 @@ fun TodoForm(placeholder: String, loading: Boolean, submitTodo: (String) -> Unit
         }
     } else {
         var todo by remember { mutableStateOf("") }
-        Form(attrs = listOf(TodoStyle, TodoContainerStyle).toModifier().toAttrs {
+        Form(attrs = listOf(TodoStyle, TodoContainerStyle).toAttrs {
             onSubmit { evt ->
                 evt.preventDefault()
                 submitTodo(todo)
@@ -26,7 +26,7 @@ fun TodoForm(placeholder: String, loading: Boolean, submitTodo: (String) -> Unit
         }) {
             Input(
                 InputType.Text,
-                attrs = listOf(TodoStyle, TodoTextStyle, TodoInputStyle).toModifier()
+                attrs = listOf(TodoStyle, TodoTextStyle, TodoInputStyle)
                     .toAttrs {
                         placeholder(placeholder)
                         name("todo")
