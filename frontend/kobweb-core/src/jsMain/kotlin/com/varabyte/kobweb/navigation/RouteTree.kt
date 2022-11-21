@@ -144,7 +144,13 @@ internal class RouteTree {
         }
 
         query?.split("&")?.forEach { param ->
-            val (key, value) = param.split('=', limit = 2)
+            // Handle all three params cases...
+            // 1) Common: `url?key=value&...`
+            // 2) No value: `url?key&...`
+            // 3) Value with equal sign in it: `url?id=aj3=zk50i&...`
+            val keyValue = param.split('=', limit = 2)
+            val key = keyValue[0]
+            val value = keyValue.elementAtOrNull(1) ?: ""
             ctx.mutableParams[key] = value
         }
 
