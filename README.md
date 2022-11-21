@@ -293,7 +293,7 @@ You can create the following Kobweb projects by typing `kobweb create ...`
 
 For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 
-# Basics
+# Basic topics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
 Compose for Web app, such as routing and configuring basic CSS styles. It exposes a handful of annotations and utility
@@ -571,10 +571,6 @@ There's no hard and fast rule, but in general, when writing html / css by hand, 
 inline styles as it better maintains a separation of concerns. That is, the html should represent the content of your
 site, while the css controls the look and feel.
 
-Of course, sometimes, you need to define the style of a single, specific element only. You can do that by giving it an
-ID and then targeting it via an ID selector in your stylesheet (like `#title` in the example above). Or you can just set
-inline styles on it, which may be far easier.
-
 However! We're not writing html / css by hand. We're using Compose for Web! So the distinctions discussed up until now
 are less important here.
 
@@ -583,6 +579,8 @@ behaviors (particularly [pseudo classes](https://developer.mozilla.org/en-US/doc
 [pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and
 [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries), the discussion of
 which are outside the scope of this README). So it's good to realize that there are occasional differences.
+
+---
 
 In general, when you pass styles defined on the fly into a composable widget in Silk, those will result in inline
 styles, whereas if you use a `ComponentStyle` to define the styles, those will get embedded into the site's stylesheet:
@@ -601,7 +599,8 @@ Box(MyBoxStyle.toModifier()) { /* ... */ }
 We'll talk more about these approaches in the following sections.
 
 One last note: debugging your page with browser tools may be easier if you lean on stylesheets over inline styles,
-because it makes your DOM tree easier to look through without all that extra noise.
+because it makes your DOM tree easier to look through without all that extra noise. As a result, I tend to use
+`ComponentStyle` quite often.
 
 ### Modifier
 
@@ -609,7 +608,8 @@ Silk introduces the `Modifier` class, in order to provide an experience similar 
 (You can read [more about them here](https://developer.android.com/jetpack/compose/modifiers) if you're unfamiliar with
 the concept).
 
-In the world of Compose for Web, you can think of a `Modifier` as a layer on top of CSS styles and attributes. So this:
+In the world of Compose for Web, you can think of a `Modifier` as a wrapper on top of CSS styles and attributes. So
+this:
 
 ```kotlin
 Modifier.backgroundColor(Colors.Red).color(Colors.Green).padding(200.px)
@@ -732,9 +732,9 @@ gives you five buckets you can work with when designing your site:
 * sm - tablets (and larger)
 * md - desktops (and larger)
 * lg - widescreen (and larger)
-* xl - ultra widescreen
+* xl - ultra widescreen (and larger)
 
-You can change the default values by adding an "@InitSilk" block to your code:
+You can change the default values of breakpoints for your site by adding an "@InitSilk" block to your code:
 
 ```kotlin
 @InitSilk
@@ -747,9 +747,6 @@ fun initializeBreakpoints(ctx: InitSilkContext) {
     )
 }
 ```
-
-Despite the flexible potential of multiple sizes, many projects will be able to get away just using base styles and
-occasional `md` styles.
 
 To reference a breakpoint in a `ComponentStyle`, just invoke it:
 
@@ -803,7 +800,7 @@ fun overrideSilkTheme(ctx: InitSilkContext) {
 With a style, you can also create a variant of that style (that is, additional modifications that are always applied
 _on top of_ the style).
 
-You define one using the `ComponentStyle.addVariant` method, but otherwise the experience is the same as defining a
+You define one using the `ComponentStyle.addVariant` method, but otherwise the declaration looks the same as defining a
 `ComponentStyle`:
 
 ```kotlin
@@ -820,26 +817,26 @@ callers an easy way to deviate from it in special cases.
 For example, maybe you define a button widget (perhaps you're not happy with the one provided by Silk):
 
 ```kotlin
-val ButtonStyle = ComponentStyle("my-button") { /* ... */ }
+val MyButtonStyle = ComponentStyle("my-button") { /* ... */ }
 
 // Note: Creates a style called "my-button-outline"
-val OutlineButtonVariant = ButtonStyle.addVariant("outline") { /* ... */ }
+val OutlineButtonVariant = MyButtonStyle.addVariant("outline") { /* ... */ }
 
 // Note: Creates a style called "my-button-invert"
-val InvertButtonVariant = ButtonStyle.addVariant("invert") { /* ... */ }
+val InvertButtonVariant = MyButtonStyle.addVariant("invert") { /* ... */ }
 ```
 
 The `ComponentStyle.toModifier(...)` method, mentioned earlier, optionally takes a variant parameter. When passed in,
-both styles will be applied.
+both styles will be applied -- the base style followed by the variant style.
 
-For example, `ButtonStyle.toModifier(OutlineButtonVariant)` will create a modifier for styling your element with both
-the button base style and outline style combined.
+For example, `MyButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first followed by additional
+outline styling.
 
 ***Note:** Using a variant that was created from a different style will have no effect. In other words,
-`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant. We tried to use generics as a fancy way to
-enforce this at compile time but ran into limitations with the Compose compiler (see
-[Compose for Web bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later if
-resolved, but until then, don't do that!*
+`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case. We tried to use generics as a
+fancy way to enforce this at compile time but ran into limitations with the Compose compiler (see
+[Compose for Web bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later
+if resolved, but until then, don't do that!*
 
 #### Writing custom widgets
 
@@ -881,15 +878,13 @@ CustomWidget(Modifier.backgroundColor(Colors.Blue), variant = TransparentWidgetV
 
 ### ElementRefScope and raw HTML elements
 
-Occasionally, you may need access to the raw element backing the Silk widget you've just created, perhaps to accomplish
-something that Compose for Web doesn't provide an API for yet.
-
-To allow for this, all Silk widgets provide a `ref` parameter which take a listener that provide this information:
+Occasionally, you may need access to the raw element backing the Silk widget you've just created. To allow for this, all
+Silk widgets provide a `ref` parameter which take a listener that provide this information:
 
 ```kotlin
 Box(
     ref = ref { element ->
-        // Triggered when the Box is added into the DOM
+        // Triggered when this Box is first added into the DOM
         element.focus()
     }
 ) {
@@ -978,7 +973,7 @@ FaSpider(Modifier.color(Colors.Red))
 
 ***Note**: When you create a project using our `site` template, Font Awesome icons are included.*
 
-## Intermediate
+## Intermediate topics
 
 ### Components: Layouts, Sections, and Widgets
 
@@ -1032,7 +1027,7 @@ In this case, you can create your own root composable and annotate it with `@App
 instead of its own default. You should, of course, delegate to `KobwebApp` (or `SilkApp` if using Silk), as the
 initialization logic from those methods should still be run.
 
-Here's an example application composable override that I use in my own project:
+Here's an example application composable override that I use in one of my own projects:
 
 ```kotlin
 @App
@@ -1052,7 +1047,8 @@ fun MyApp(content: @Composable () -> Unit) {
 }
 ```
 
-You may only define a single `@App` on your site, or else the Kobweb Application plugin will complain at build time.
+You can only define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
+time.
 
 ### Define API routes
 
@@ -1072,7 +1068,7 @@ For example, here's a simple method that echoes back an argument passed into it:
 fun echo(ctx: ApiContext) {
     // ctx.req is for the incoming request, ctx.res for responding back to the client
 
-    // Params are parsed from the URL, e.g. here "/echo?message=..."
+    // Params are parsed from the URL, e.g. here "/api/echo?message=..."
     val msg = ctx.req.params["message"] ?: ""
     ctx.res.setBodyText(msg)
 }
@@ -1097,7 +1093,9 @@ fun ApiDemoPage() {
 }
 ```
 
-All the HTTP methods are supported (`post`, `put`, etc.). Of course, you can also use `window.fetch(...)` directly.
+All the HTTP methods are supported (`post`, `put`, etc.).
+
+If you know what you're doing, you can also use `window.fetch(...)` directly.
 
 ### Markdown
 
@@ -1130,17 +1128,15 @@ author: bitspittle
 ```
 
 In a following section, we'll discuss how to embed code in your markdown, but for now, know that these key / value pairs
-can be queried in such code using the page's context:
+can be queried in code using the page's context:
 
 ```kotlin
 @Composable
 fun AuthorWidget() {
     val ctx = rememberPageContext()
-    // Markdown front matter value can potentially be a list of strings,
-    // but here it's only a single one.
-    // Note: We use `markdown!!` for this example, but that means we
-    // have to make sure we ONLY reference this composable within a
-    // Markdown file.
+    // Note: You can use `markdown!!` only if you're sure that
+    // this composable is called while inside a page generated
+    // from Markdown.
     val author = ctx.markdown!!.frontMatter.getValue("author").single()
     Text("Article by $author")
 }
@@ -1159,7 +1155,7 @@ the code your markdown file would otherwise create. This is useful for specifyin
 root: .components.layout.DocsLayout
 ---
 
-# Kobweb Manual
+# Kobweb Tutorial
 ```
 
 The above will generate code like the following:
@@ -1172,7 +1168,7 @@ import com.mysite.components.layout.DocsLayout
 fun KobwebPage() {
     DocsLayout {
         H1 {
-            Text("Kobweb Manual")
+            Text("Kobweb Tutorial")
         }
     }
 }
@@ -1238,7 +1234,7 @@ landing site.
 To read more about the feature, please check out the
 [official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
 
-# Advanced
+# Advanced topics
 
 ## Templates
 
