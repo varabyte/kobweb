@@ -30,10 +30,10 @@ class KobwebFolder private constructor(private val path: Path) {
         fun inWorkingDirectory(): KobwebFolder? = inPath(Path.of(""))
 
         /**
-         * Return true if the current path represents a Kobweb project (that is, a project with a Kobweb folder in its
-         * root).
+         * Return true if the current path represents a Kobweb application (that is, a directory that owns a Kobweb
+         * folder).
          */
-        fun isKobwebProject(path: Path): Boolean {
+        fun isFoundIn(path: Path): Boolean {
             return inPath(path) != null
         }
 

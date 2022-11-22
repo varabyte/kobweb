@@ -93,7 +93,7 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
         root.walkTopDown()
             .filter { file -> file != root }
             .forEach { file ->
-                if (file.isDirectory && KobwebFolder.isKobwebProject(file.toPath())) {
+                if (file.isDirectory && KobwebFolder.isFoundIn(file.toPath())) {
                     subTemplates.add(file)
                 }
             }
@@ -146,14 +146,26 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
             text("using "); blue(isBright = true) { textLine("https://www.jetbrains.com/toolbox-app/") }
         }
         textLine()
-        textLine("We suggest that you begin by typing:")
-        textLine()
-        if (dstPath != Path.of("").toAbsolutePath()) {
-            indent(); cmd("cd $projectFolder"); textLine()
+
+        // Search for the root where you can run `kobweb run` within. This is usually at the root of a Kobweb project,
+        // but it might be inside a submodule in some cases. We always expect to find it, but if we can't, no big deal
+        // -- just don't show the suggestion.
+        val kobwebRootPath = dstPath.toFile().walkTopDown()
+            .filter { file -> file.isDirectory && KobwebFolder.isFoundIn(file.toPath()) }
+            .firstOrNull()?.toPath()
+
+        if (kobwebRootPath != null) {
+            textLine("We suggest that you begin by typing:")
+            textLine()
+
+            val currPath = Path.of("").toAbsolutePath()
+            if (kobwebRootPath != currPath) {
+                indent(); cmd("cd ${currPath.relativize(kobwebRootPath)}"); textLine()
+            }
+            if (!gitInitialized) {
+                indent(); cmd("git init && "); cmd("git add . && "); cmd("git commit -m \"Initial commit\""); textLine()
+            }
+            indent(); cmd("kobweb run"); textLine()
         }
-        if (!gitInitialized) {
-            indent(); cmd("git init && "); cmd("git add . && "); cmd("git commit -m \"Initial commit\""); textLine()
-        }
-        indent(); cmd("kobweb run"); textLine()
     }.run()
 }
