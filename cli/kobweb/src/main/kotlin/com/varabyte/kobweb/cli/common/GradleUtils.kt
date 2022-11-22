@@ -12,7 +12,9 @@ import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
 import com.varabyte.kotter.runtime.RunScope
 import com.varabyte.kotter.runtime.Session
+import com.varabyte.kotter.runtime.concurrent.createKey
 import com.varabyte.kotter.runtime.render.RenderScope
+import kotlin.text.StringBuilder
 
 class KobwebGradle(private val env: ServerEnvironment) {
     private fun gradlew(vararg args: String): Process {
@@ -47,6 +49,8 @@ class KobwebGradle(private val env: ServerEnvironment) {
 
 private const val GRADLE_ERROR_PREFIX = "e: "
 private const val GRADLE_WARNING_PREFIX = "w: "
+private const val GRADLE_WHAT_WENT_WRONG = "* What went wrong:"
+private const val GRADLE_TRY_PREFIX = "* Try:"
 private const val GRADLE_TASK_PREFIX = "> Task :"
 
 sealed interface GradleAlert {
@@ -55,6 +59,8 @@ sealed interface GradleAlert {
     class Task(val task: String) : GradleAlert
     object BuildRestarted : GradleAlert
 }
+
+private val WhatWentWrongKey = RunScope.Lifecycle.createKey<StringBuilder>()
 
 fun RunScope.handleGradleOutput(line: String, isError: Boolean, onGradleEvent: (GradleAlert) -> Unit) {
     handleConsoleOutput(line, isError)
@@ -67,6 +73,23 @@ fun RunScope.handleGradleOutput(line: String, isError: Boolean, onGradleEvent: (
         onGradleEvent(GradleAlert.Task(line.removePrefix(GRADLE_TASK_PREFIX).substringBefore(' ')))
     } else if (line == "Change detected, executing build...") {
         onGradleEvent(GradleAlert.BuildRestarted)
+    }
+    // For the next two else statements, error messages appear sandwiched between "what went wrong:" and "try:" blocks.
+    // We surface just the error message for now. We'll see in practice if that results in confusing output or not
+    // based on user reports...
+    else if (line == GRADLE_WHAT_WENT_WRONG) {
+        data[WhatWentWrongKey] = StringBuilder()
+    } else if (data.contains(WhatWentWrongKey)) {
+        if (line.startsWith(GRADLE_TRY_PREFIX)) {
+            data.remove(WhatWentWrongKey) {
+                val sb = this
+                // Remove a trailing newline, which separated previous error text from the
+                // "* Try:" block below it.
+                onGradleEvent(GradleAlert.Error(sb.toString().trimEnd()))
+            }
+        } else {
+            data.getValue(WhatWentWrongKey).appendLine(line)
+        }
     }
 }
 
