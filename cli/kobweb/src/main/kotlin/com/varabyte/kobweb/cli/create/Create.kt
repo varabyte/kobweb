@@ -90,7 +90,7 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
     run {
         val subTemplates = mutableListOf<File>()
         val root = srcPath.toFile()
-        root.walkBottomUp()
+        root.walkTopDown()
             .filter { file -> file != root }
             .forEach { file ->
                 if (file.isDirectory && KobwebFolder.isKobwebProject(file.toPath())) {
