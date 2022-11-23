@@ -18,10 +18,10 @@ import kotlin.io.path.relativeTo
 
 private fun RenderScope.renderTemplateItem(rootPath: Path, templateFile: KobwebTemplateFile) {
     val templatePath =
-        templateFile.folder.relativeTo(rootPath).toString()
+        templateFile.template.metadata.name ?: templateFile.folder.relativeTo(rootPath).toString()
             // Even on Windows, show Unix-style slashes, as `kobweb create` expects that format
             .toUnixSeparators()
-            .removeSuffix("/default")
+
     val description = templateFile.template.metadata.description
 
     text("• ")

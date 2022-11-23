@@ -1,7 +1,5 @@
 package com.varabyte.kobweb.cli.common
 
-import java.io.File
-
 object PathUtils {
     /**
      * Given a path, e.g. "myproject", return it OR the path with a number appended on it if there are already existing
