@@ -36,5 +36,7 @@ class KobwebTemplateFile private constructor(val folder: Path = Path.of("")) {
         fun inPath(path: Path): KobwebTemplateFile? {
             return if (path.templateFile.exists()) KobwebTemplateFile(path) else null
         }
+
+        fun isFoundIn(path: Path): Boolean = inPath(path) != null
     }
 }

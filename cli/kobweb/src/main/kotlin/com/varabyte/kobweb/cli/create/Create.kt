@@ -89,13 +89,16 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
     // Delete legacy template.yaml file, if found. TODO(#188): Delete this line before 1.0
     KobwebFolder.inPath(templateFile.folder)?.resolve("template.yaml")?.deleteIfExists()
 
+    // If a user wants to create a template underneath another template for naming purposes, e.g.
+    // `demosite` and `demosite/dark`, they can just nest one template project underneath another, and Kobweb will
+    // remove it after syncing.
     run {
         val subTemplates = mutableListOf<File>()
         val root = srcPath.toFile()
         root.walkTopDown()
             .filter { file -> file != root }
             .forEach { file ->
-                if (file.isDirectory && KobwebFolder.isFoundIn(file.toPath())) {
+                if (file.isDirectory && KobwebTemplateFile.isFoundIn(file.toPath())) {
                     subTemplates.add(file)
                 }
             }
