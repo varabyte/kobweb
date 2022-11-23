@@ -54,21 +54,10 @@ class KobwebFolder private constructor(private val path: Path) {
             }
             return null
         }
-
-        /**
-         * Helper function for giving the name of a path inside a Kobweb folder (necessary as we don't expose the
-         * value of [KOBWEB_FOLDER]).
-         */
-        fun pathNameTo(child: String): String = "$KOBWEB_FOLDER/$child"
     }
 
     /**
      * Return a child file that lives (or will live) within the Kobweb folder.
      */
     fun resolve(child: String): Path = path.resolve(child)
-
-    /**
-     * Return the parent project folder which owns this Kobweb configuration folder.
-     */
-    fun getProjectPath(): Path = path.parent
 }

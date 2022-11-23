@@ -2,9 +2,10 @@ package com.varabyte.kobweb.cli.common.template
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.common.yaml.nonStrictDefault
-import com.varabyte.kobweb.project.KobwebFolder
-import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
+import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.readBytes
 
 /**
  * @param shouldHighlight This template is considered important and should be called out
@@ -22,8 +23,18 @@ class KobwebTemplate(
     val instructions: List<Instruction> = emptyList(),
 )
 
-class KobwebTemplateFile(kobwebFolder: KobwebFolder) : KobwebReadableTextFile<KobwebTemplate>(
-    kobwebFolder,
-    "template.yaml",
-    deserialize = { text -> Yaml.nonStrictDefault.decodeFromString(KobwebTemplate.serializer(), text) }
-)
+private val Path.templateFile get() = this.resolve(".kobweb-template.yaml")
+
+class KobwebTemplateFile private constructor(val folder: Path = Path.of("")) {
+    val path = folder.templateFile
+    val template = Yaml.nonStrictDefault.decodeFromString(
+        KobwebTemplate.serializer(),
+        folder.templateFile.readBytes().toString(Charsets.UTF_8)
+    )
+
+    companion object {
+        fun inPath(path: Path): KobwebTemplateFile? {
+            return if (path.templateFile.exists()) KobwebTemplateFile(path) else null
+        }
+    }
+}

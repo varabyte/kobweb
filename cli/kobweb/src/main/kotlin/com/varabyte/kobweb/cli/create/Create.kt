@@ -27,6 +27,7 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.deleteExisting
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.name
 
 /**
@@ -56,8 +57,7 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
         subPaths
             .asSequence()
             .map { subPath -> tempDir.resolve(subPath) }
-            .mapNotNull { currPath -> KobwebFolder.inPath(currPath)?.let { KobwebTemplateFile(it) } }
-            .filter { it.content != null }
+            .mapNotNull { currPath -> KobwebTemplateFile.inPath(currPath) }
             .firstOrNull()
 
             ?: run {
@@ -82,11 +82,13 @@ fun handleCreate(repo: String, branch: String, template: String) = session {
     }.let { answer ->
         Path.of(if (answer != ".") answer else "").toAbsolutePath()
     }
-    val srcPath = KobwebFolder.fromChildPath(templateFile.path)!!.getProjectPath()
-    val kobwebTemplate = templateFile.content!! // We already checked this was set, above
-
-    // Template almost ready to be processed - remove all files that should NEVER end up in the final project
+    val srcPath = templateFile.folder
+    val kobwebTemplate = templateFile.template // We already checked this was set, above
+    // We've parsed the template and don't need it anymore. Delete it so we don't copy it over
     templateFile.path.deleteExisting()
+    // Delete legacy template.yaml file, if found. TODO(#188): Delete this line before 1.0
+    KobwebFolder.inPath(templateFile.folder)?.resolve("template.yaml")?.deleteIfExists()
+
     run {
         val subTemplates = mutableListOf<File>()
         val root = srcPath.toFile()

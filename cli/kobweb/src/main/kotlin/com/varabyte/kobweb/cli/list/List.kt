@@ -7,7 +7,6 @@ import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
 import com.varabyte.kobweb.common.toUnixSeparators
-import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.cyan
 import com.varabyte.kotter.foundation.text.text
@@ -17,13 +16,13 @@ import com.varabyte.kotter.runtime.render.RenderScope
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
-private fun RenderScope.renderTemplateItem(rootPath: Path, template: KobwebTemplateFile) {
+private fun RenderScope.renderTemplateItem(rootPath: Path, templateFile: KobwebTemplateFile) {
     val templatePath =
-        template.kobwebFolder.getProjectPath().relativeTo(rootPath).toString()
+        templateFile.folder.relativeTo(rootPath).toString()
             // Even on Windows, show Unix-style slashes, as `kobweb create` expects that format
             .toUnixSeparators()
             .removeSuffix("/default")
-    val description = template.content!!.metadata.description
+    val description = templateFile.template.metadata.description
 
     text("• ")
     cyan { text(templatePath) }
@@ -32,7 +31,7 @@ private fun RenderScope.renderTemplateItem(rootPath: Path, template: KobwebTempl
 
 private fun List<KobwebTemplateFile>.renderTemplateItemsInto(rootPath: Path, renderScope: RenderScope) {
     this
-        .sortedBy { template -> template.kobwebFolder.getProjectPath() }
+        .sortedBy { template -> template.folder }
         .forEach { template -> renderScope.renderTemplateItem(rootPath, template) }
 }
 
@@ -40,13 +39,9 @@ fun handleList(repo: String, branch: String) = session {
     val gitClient = findGit() ?: return@session
     val tempDir = handleFetch(gitClient, repo, branch) ?: return@session
 
-    val templates = tempDir.toFile().walkBottomUp()
+    val templates = tempDir.toFile().walkTopDown()
         .filter { it.isDirectory }
-        .mapNotNull { dir ->
-            KobwebFolder.inPath(dir.toPath())
-                ?.let { kobwebFolder -> KobwebTemplateFile(kobwebFolder) }
-        }
-        .filter { templateFile -> templateFile.content != null }
+        .mapNotNull { dir -> KobwebTemplateFile.inPath(dir.toPath()) }
         .toList()
 
     section {
@@ -63,7 +58,7 @@ fun handleList(repo: String, branch: String) = session {
             textLine()
 
             run {
-                val highlightedTemplates = templates.filter { it.content!!.metadata.shouldHighlight }
+                val highlightedTemplates = templates.filter { it.template.metadata.shouldHighlight }
                 if (highlightedTemplates.isNotEmpty()) {
                     yellow { textLine("Highlighted projects") }
                     textLine()
