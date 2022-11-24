@@ -1,4 +1,4 @@
-![version: 0.10.6](https://img.shields.io/badge/kobweb-0.10.6-blue)
+![version: 0.11.0](https://img.shields.io/badge/kobweb-0.11.0-blue)
 ![version: 0.9.10](https://img.shields.io/badge/kobweb_cli-0.9.10-blue)
 <br>
 ![kotlin: 1.7.20](https://img.shields.io/badge/kotlin-1.7.20-blue?logo=kotlin)
@@ -36,9 +36,9 @@ fun HomePage() {
       Text("Welcome to Kobweb!")
     }
     Row(Modifier.whiteSpace(WhiteSpace.PreWrap)) { // Preserve trailing whitespace
-      Text("Create rich, dynamic web apps with ease, leveraging ")
+      SpanText("Create rich, dynamic web apps with ease, leveraging ")
       Link("https://kotlinlang.org/", "Kotlin")
-      Text(" and ")
+      SpanText(" and ")
       Link("https://compose-web.ui.pages.jetbrains.team/", "Compose for Web")
     }
   }
