@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -22,9 +23,29 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
         Modifier
             .backgroundColor(palette.background)
             .color(palette.color)
+    }
+}
+
+/**
+ * A variant which provides a smoother color animation effect for this surface and all of its children.
+ *
+ * Without applying this variant, colors will snap instantly between dark and light colors. With applying it, the
+ * colors will transition smoothly.
+ */
+val AnimatedColorSurfaceVariant = SurfaceStyle.addVariant("animated-color") {
+    base {
+        Modifier
             // Toggling color mode looks much more engaging if it animates instead of being instant
             .transitionProperty("background-color")
             .transitionDuration(200.ms)
+    }
+
+    // By default, the transition properties are not inherited, but we want animated colors to occur for all
+    // elements underneath this surface, not just the parent surface itself
+    cssRule(" *") {
+        Modifier
+            .transitionProperty(TransitionProperty.Inherit)
+            .transitionDuration(TransitionDuration.Inherit)
     }
 }
 
