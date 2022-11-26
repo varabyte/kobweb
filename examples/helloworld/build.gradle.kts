@@ -1,4 +1,4 @@
-import com.varabyte.kobweb.gradle.application.utils.configAsKobwebApplication
+import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
