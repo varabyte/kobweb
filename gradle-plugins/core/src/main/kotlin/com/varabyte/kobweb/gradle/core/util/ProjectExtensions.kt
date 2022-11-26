@@ -98,4 +98,10 @@ fun Project.hasTransitiveJsDependencyNamed(name: String): Boolean {
         ?: false
 }
 
-fun Project.suggestKobwebModuleName() = project.group.toString().replace('.', '-')
+/**
+ * Suggest a name to use to represent this Kobweb project.
+ *
+ * This name could be used, for example, when generating output resources for a Kobweb application, like the server
+ * jar name or the main javascript file.
+ */
+fun Project.suggestKobwebProjectName() = project.group.toString().replace('.', '-')

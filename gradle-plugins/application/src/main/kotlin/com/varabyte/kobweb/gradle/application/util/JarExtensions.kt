@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.gradle.application.util
 
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_SUBFOLDER
-import com.varabyte.kobweb.gradle.core.util.suggestKobwebModuleName
+import com.varabyte.kobweb.gradle.core.util.suggestKobwebProjectName
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.jvm.tasks.Jar
@@ -14,9 +14,12 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
  * The Kobweb server is designed to load a single jar responsible for providing
  *
  * TODO(#179): Take in a boolean parameter that does dead code elimination if true.
+ *
+ * @param kobwebName A name to use as the base of the output jar file. If left blank, a name will be
+ *   created using [suggestKobwebProjectName]
  */
-fun KotlinJvmTarget.kobwebServerJar(moduleName: String? = null) {
-    val archiveFileName = (moduleName ?: project.suggestKobwebModuleName()).addSuffix(".jar")
+fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
+    val archiveFileName = (kobwebName ?: project.suggestKobwebProjectName()).addSuffix(".jar")
     project.tasks.named("jvmJar", Jar::class.java).configure {
         this.archiveFileName.set(archiveFileName)
 
