@@ -8,6 +8,7 @@ import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateMetadataBackendTas
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateMetadataFrontendTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebLibraryPlugin : Plugin<Project> {
@@ -32,4 +33,12 @@ class KobwebLibraryPlugin : Plugin<Project> {
             }
         }
     }
+}
+
+fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
+    tasks.named("kobwebGenFrontendMetadata") { dependsOn(task) }
+}
+
+fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
+    tasks.named("kobwebGenBackendMetadata") { dependsOn(task) }
 }

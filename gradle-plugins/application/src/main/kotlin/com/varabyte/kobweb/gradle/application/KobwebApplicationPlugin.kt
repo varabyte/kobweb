@@ -15,6 +15,7 @@ import com.varabyte.kobweb.server.api.*
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.extra
@@ -216,4 +217,12 @@ class KobwebApplicationPlugin @Inject constructor(
             }
         }
     }
+}
+
+fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
+    tasks.named("kobwebGenFrontendMetadata") { dependsOn(task) }
+}
+
+fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
+    tasks.named("kobwebGenBackendMetadata") { dependsOn(task) }
 }
