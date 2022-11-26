@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.gradle.application.util
 
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_SUBFOLDER
+import com.varabyte.kobweb.gradle.core.util.suggestKobwebModuleName
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.jvm.tasks.Jar
@@ -14,7 +15,8 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
  *
  * TODO(#179): Take in a boolean parameter that does dead code elimination if true.
  */
-fun KotlinJvmTarget.kobwebServerJar(archiveFileName: String) {
+fun KotlinJvmTarget.kobwebServerJar(moduleName: String? = null) {
+    val archiveFileName = (moduleName ?: project.suggestKobwebModuleName()).addSuffix(".jar")
     project.tasks.named("jvmJar", Jar::class.java).configure {
         this.archiveFileName.set(archiveFileName)
 
@@ -32,7 +34,7 @@ fun KotlinJvmTarget.kobwebServerJar(archiveFileName: String) {
     }
 }
 
-fun KotlinJsIrTarget.includeDependencyPublicResourcesInJar() {
+internal fun KotlinJsIrTarget.includeDependencyPublicResourcesInJar() {
     project.tasks.named("jsJar", Jar::class.java).configure {
         val classpathProvider = project.configurations.named("jsRuntimeClasspath")
         inputs.files(classpathProvider)

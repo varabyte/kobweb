@@ -1,3 +1,5 @@
+import com.varabyte.kobweb.gradle.library.util.configAsKobwebLibrary
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.jetbrains.compose)
@@ -14,10 +16,8 @@ repositories {
 }
 
 kotlin {
-    js(IR) {
-        browser()
-    }
-    jvm()
+    configAsKobwebLibrary(includeServer = true)
+
     sourceSets {
         val commonMain by getting {
             dependencies {

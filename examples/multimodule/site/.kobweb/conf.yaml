@@ -6,9 +6,9 @@ server:
     dev:
       contentRoot: "build/processedResources/js/main/public"
       script: "../build/js/packages/multimodule-site/kotlin/multimodule-site.js"
-      api: "build/libs/multimodule.jar"
+      api: "build/libs/multimodule-site.jar"
     prod:
-      script: "build/distributions/multimodule.js"
+      script: "build/distributions/multimodule-site.js"
       siteRoot: ".kobweb/site"
 
   port: 8080

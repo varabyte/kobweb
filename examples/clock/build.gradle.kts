@@ -1,3 +1,5 @@
+import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.jetbrains.compose)
@@ -14,15 +16,8 @@ group = "clock"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    js(IR) {
-        moduleName = "clock"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "clock.js"
-            }
-        }
-        binaries.executable()
-    }
+    configAsKobwebApplication()
+
     sourceSets {
         val jsMain by getting {
             dependencies {

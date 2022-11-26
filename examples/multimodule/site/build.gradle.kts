@@ -1,4 +1,4 @@
-import com.varabyte.kobweb.gradle.application.util.kobwebServerJar
+import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -15,14 +15,8 @@ repositories {
 }
 
 kotlin {
-    js(IR) {
-        browser()
-        binaries.executable()
-    }
+    configAsKobwebApplication(includeServer = true)
 
-    jvm {
-        kobwebServerJar("multimodule.jar")
-    }
     sourceSets {
         val commonMain by getting {
             dependencies {

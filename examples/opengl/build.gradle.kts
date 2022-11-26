@@ -1,3 +1,4 @@
+import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 import kotlinx.html.script
 
 plugins {
@@ -22,15 +23,8 @@ kobweb.app.index.head.add {
 }
 
 kotlin {
-    js(IR) {
-        moduleName = "opengl"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "opengl.js"
-            }
-        }
-        binaries.executable()
-    }
+    configAsKobwebApplication()
+
     sourceSets {
         val jsMain by getting {
             dependencies {

@@ -1,3 +1,5 @@
+import com.varabyte.kobweb.gradle.library.util.configAsKobwebLibrary
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.jetbrains.compose)
@@ -14,10 +16,10 @@ repositories {
 }
 
 kotlin {
-    js(IR) {
-        browser()
-    }
-    jvm() // Allows us to include ":core" as a commonMain dependency, even if we don't have any JVM code
+    // Even though this module doesn't actually define any server routes itself, 'includeServer = true' allows us to
+    // depened on ":core" as a commonMain dependency from other modules, instead of a JS-only dependency.
+    configAsKobwebLibrary(includeServer = true)
+
     sourceSets {
         val commonMain by getting {
             dependencies {

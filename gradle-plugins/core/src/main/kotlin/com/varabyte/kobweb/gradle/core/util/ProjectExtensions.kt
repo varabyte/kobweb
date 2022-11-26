@@ -3,7 +3,6 @@ package com.varabyte.kobweb.gradle.core.util
 import com.varabyte.kobweb.gradle.core.kmp.TargetPlatform
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -98,3 +97,5 @@ fun Project.hasTransitiveJsDependencyNamed(name: String): Boolean {
         ?.any { artifact -> artifact.moduleVersion.id.name == name }
         ?: false
 }
+
+fun Project.suggestKobwebModuleName() = project.group.toString().replace('.', '-')
