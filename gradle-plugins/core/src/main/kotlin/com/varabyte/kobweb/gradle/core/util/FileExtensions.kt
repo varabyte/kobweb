@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.gradle.core.utils
+package com.varabyte.kobweb.gradle.core.util
 
 import java.io.File
 import java.util.zip.ZipInputStream

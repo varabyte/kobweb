@@ -1,7 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
-import com.varabyte.kobweb.gradle.core.utils.hasJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor

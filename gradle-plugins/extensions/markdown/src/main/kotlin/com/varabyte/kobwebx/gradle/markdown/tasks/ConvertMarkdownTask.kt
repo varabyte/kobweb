@@ -4,10 +4,10 @@ import com.varabyte.kobweb.common.packageConcat
 import com.varabyte.kobweb.common.toPackageName
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
-import com.varabyte.kobweb.gradle.core.utils.RootAndFile
-import com.varabyte.kobweb.gradle.core.utils.getResourceFilesWithRoots
-import com.varabyte.kobweb.gradle.core.utils.getResourceRoots
-import com.varabyte.kobweb.gradle.core.utils.prefixQualifiedPackage
+import com.varabyte.kobweb.gradle.core.util.RootAndFile
+import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
+import com.varabyte.kobweb.gradle.core.util.getResourceRoots
+import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownComponents
 import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig

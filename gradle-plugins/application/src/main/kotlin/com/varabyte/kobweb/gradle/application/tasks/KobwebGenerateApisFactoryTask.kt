@@ -10,7 +10,7 @@ import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.project.backend.BackendData
 import com.varabyte.kobweb.gradle.core.project.backend.merge
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
-import com.varabyte.kobweb.gradle.core.utils.searchZipFor
+import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.provider.DefaultProvider

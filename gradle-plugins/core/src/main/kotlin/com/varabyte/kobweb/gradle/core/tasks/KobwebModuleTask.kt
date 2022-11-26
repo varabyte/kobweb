@@ -3,10 +3,10 @@ package com.varabyte.kobweb.gradle.core.tasks
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
-import com.varabyte.kobweb.gradle.core.utils.RootAndFile
-import com.varabyte.kobweb.gradle.core.utils.getBuildScripts
-import com.varabyte.kobweb.gradle.core.utils.getResourceFilesWithRoots
-import com.varabyte.kobweb.gradle.core.utils.getSourceFiles
+import com.varabyte.kobweb.gradle.core.util.RootAndFile
+import com.varabyte.kobweb.gradle.core.util.getBuildScripts
+import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
+import com.varabyte.kobweb.gradle.core.util.getSourceFiles
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal

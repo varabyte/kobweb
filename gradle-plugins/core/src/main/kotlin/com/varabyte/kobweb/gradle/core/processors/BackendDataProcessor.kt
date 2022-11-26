@@ -10,8 +10,8 @@ import com.varabyte.kobweb.gradle.core.project.backend.InitApiEntry
 import com.varabyte.kobweb.gradle.core.project.backend.assertValid
 import com.varabyte.kobweb.gradle.core.project.common.RouteUtils
 import com.varabyte.kobweb.gradle.core.project.common.getStringValue
-import com.varabyte.kobweb.gradle.core.utils.Reporter
-import com.varabyte.kobweb.gradle.core.utils.visitAllChildren
+import com.varabyte.kobweb.gradle.core.util.Reporter
+import com.varabyte.kobweb.gradle.core.util.visitAllChildren
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFileAnnotationList

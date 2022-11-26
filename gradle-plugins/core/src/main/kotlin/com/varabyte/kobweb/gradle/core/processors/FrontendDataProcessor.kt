@@ -19,8 +19,8 @@ import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_FQN
 import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_SIMPLE_NAME
 import com.varabyte.kobweb.gradle.core.project.frontend.PageEntry
 import com.varabyte.kobweb.gradle.core.project.frontend.assertValid
-import com.varabyte.kobweb.gradle.core.utils.Reporter
-import com.varabyte.kobweb.gradle.core.utils.visitAllChildren
+import com.varabyte.kobweb.gradle.core.util.Reporter
+import com.varabyte.kobweb.gradle.core.util.visitAllChildren
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression

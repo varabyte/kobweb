@@ -6,8 +6,8 @@ import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.application.project.app.AppEntry
 import com.varabyte.kobweb.gradle.core.processors.FrontendDataProcessor
 import com.varabyte.kobweb.gradle.core.processors.TokenProcessor
-import com.varabyte.kobweb.gradle.core.utils.Reporter
-import com.varabyte.kobweb.gradle.core.utils.visitAllChildren
+import com.varabyte.kobweb.gradle.core.util.Reporter
+import com.varabyte.kobweb.gradle.core.util.visitAllChildren
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNamedFunction

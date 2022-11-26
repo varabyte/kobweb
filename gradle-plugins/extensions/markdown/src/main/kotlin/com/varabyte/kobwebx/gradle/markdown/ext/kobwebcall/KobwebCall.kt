@@ -1,6 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 
-import com.varabyte.kobweb.gradle.core.utils.prefixQualifiedPackage
+import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import org.commonmark.node.CustomNode
 import org.gradle.api.Project
 

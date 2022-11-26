@@ -13,8 +13,8 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
-import com.varabyte.kobweb.gradle.core.utils.hasTransitiveJsDependencyNamed
-import com.varabyte.kobweb.gradle.core.utils.searchZipFor
+import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.serialization.json.Json
 import org.gradle.api.tasks.Input

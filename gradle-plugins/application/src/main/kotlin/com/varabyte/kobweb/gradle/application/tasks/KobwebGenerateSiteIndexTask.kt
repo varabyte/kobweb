@@ -10,8 +10,8 @@ import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
-import com.varabyte.kobweb.gradle.core.utils.hasTransitiveJsDependencyNamed
-import com.varabyte.kobweb.gradle.core.utils.isDescendantOf
+import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.link
 import org.gradle.api.tasks.Input

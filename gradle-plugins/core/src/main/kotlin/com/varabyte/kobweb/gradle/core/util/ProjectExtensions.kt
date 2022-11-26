@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.gradle.core.utils
+package com.varabyte.kobweb.gradle.core.util
 
 import com.varabyte.kobweb.gradle.core.kmp.TargetPlatform
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget

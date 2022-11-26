@@ -8,7 +8,7 @@ import com.varabyte.kobweb.gradle.core.processors.FrontendDataProcessor
 import com.varabyte.kobweb.gradle.core.project.common.PackageUtils.resolvePackageShortcut
 import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateMetadataTask
-import com.varabyte.kobweb.gradle.core.utils.LoggingReporter
+import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
