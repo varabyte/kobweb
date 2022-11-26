@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.CSSLengthOrPercentageValue
@@ -45,4 +46,8 @@ fun Modifier.right(value: CSSLengthOrPercentageValue) = styleModifier {
 
 fun Modifier.right(value: CSSAutoKeyword) = styleModifier {
     right(value)
+}
+
+fun Modifier.float(float: CSSFloat) = styleModifier {
+    float(float)
 }
