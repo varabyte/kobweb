@@ -6,10 +6,6 @@ import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
-fun Modifier.display(value: DisplayStyle) = styleModifier {
-    display(value)
-}
-
 fun Modifier.lineHeight(value: CSSNumeric): Modifier = styleModifier {
     lineHeight(value)
 }
