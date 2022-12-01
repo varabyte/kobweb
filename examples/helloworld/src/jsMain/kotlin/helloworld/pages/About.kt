@@ -1,6 +1,6 @@
 package helloworld.pages
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.Page
 import helloworld.components.layouts.PageLayout
 import helloworld.components.widgets.GoHomeLink
