@@ -30,9 +30,7 @@ fun Breakpoint.toPx(): CSSUnitValue {
     return this.toValue()?.toPx() ?: 0.px
 }
 
-fun Breakpoint.toMinWidthQuery() = CSSMediaQuery.MediaFeature("min-width", this.toWidth())
-fun Breakpoint.toMaxWidthQuery() = CSSMediaQuery.MediaFeature("max-width", this.toWidth())
-
+fun Breakpoint.toMinWidthQuery(): CSSMediaQuery = CSSMediaQuery.MediaFeature("min-width", this.toWidth())
 
 /**
  * Returns the bottom of the breakpoint range the current window's width is betwee.

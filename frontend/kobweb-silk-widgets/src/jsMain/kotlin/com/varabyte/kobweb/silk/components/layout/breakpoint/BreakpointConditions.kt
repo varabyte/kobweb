@@ -5,23 +5,32 @@ import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.modifiers.display
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.theme.breakpoint.toMaxWidthQuery
-import org.jetbrains.compose.web.css.DisplayStyle
+import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
+import org.jetbrains.compose.web.css.*
+
+
+private fun CSSMediaQuery.invert(): CSSMediaQuery {
+    // Note: We invert a min-width query instead of using a max-width query because otherwise there's a width where
+    // both media queries overlap. It seems like you have to include the "not all" for some technical reason; otherwise,
+    // this would just be "Not(this)"
+    // See also: https://stackoverflow.com/a/13611538
+    return CSSMediaQuery.Raw("not all and $this")
+}
 
 internal val DisplayIfSmStyle = ComponentStyle("silk-display-if-sm") {
-    cssRule(Breakpoint.SM.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
+    cssRule(Breakpoint.SM.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayIfMdStyle = ComponentStyle("silk-display-if-md") {
-    cssRule(Breakpoint.MD.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
+    cssRule(Breakpoint.MD.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayIfLgStyle = ComponentStyle("silk-display-if-lg") {
-    cssRule(Breakpoint.LG.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
+    cssRule(Breakpoint.LG.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayIfXlStyle = ComponentStyle("silk-display-if-xl") {
-    cssRule(Breakpoint.XL.toMaxWidthQuery()) { Modifier.display(DisplayStyle.None) }
+    cssRule(Breakpoint.XL.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
 internal val DisplayUntilSmStyle = ComponentStyle("silk-display-until-sm") {
