@@ -28,7 +28,7 @@ data class ElementRefScope<TElement : Element> internal constructor(
     }
 
     internal data class KeysToEffect<TElement : Element>(
-        val keys: List<Any>,
+        val keys: List<Any?>,
         val refCallback: RefCallback<TElement>,
     )
 
@@ -38,7 +38,7 @@ data class ElementRefScope<TElement : Element> internal constructor(
         /**
          * Register a listener that will be triggered with the raw html element whenever it gets added to the DOM.
          */
-        fun ref(vararg keys: Any, handle: (TElement) -> Unit) {
+        fun ref(vararg keys: Any?, handle: (TElement) -> Unit) {
             keyedCallbacks.add(KeysToEffect(keys.toList(), RefCallback.Simple(handle)))
         }
 
@@ -54,7 +54,7 @@ data class ElementRefScope<TElement : Element> internal constructor(
          *  }
          * ```
          */
-        fun disposableRef(vararg keys: Any, effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) {
+        fun disposableRef(vararg keys: Any?, effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) {
             keyedCallbacks.add(KeysToEffect(keys.toList(), RefCallback.Disposable(effect)))
         }
 
@@ -95,7 +95,7 @@ fun <TElement : Element> ElementScope<TElement>.registerRefScope(scope: ElementR
  * @param keys Any number of keys which, if any change, will cause the element to be thrown out and rebuilt (including
  *   the composable widget built on top of it).
  */
-fun <TElement : Element> ref(vararg keys: Any, handle: (TElement) -> Unit) = refScope {
+fun <TElement : Element> ref(vararg keys: Any?, handle: (TElement) -> Unit) = refScope {
     ref(*keys, handle = handle)
 }
 
@@ -118,7 +118,7 @@ fun <TElement : Element> ref(vararg keys: Any, handle: (TElement) -> Unit) = ref
  * @param keys Any number of keys which, if any change, will cause the element to be thrown out and rebuilt (including
  *   the composable widget built on top of it).
  */
-fun <TElement : Element> disposableRef(vararg keys: Any, effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) = refScope {
+fun <TElement : Element> disposableRef(vararg keys: Any?, effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) = refScope {
     disposableRef(*keys, effect = effect)
 }
 
