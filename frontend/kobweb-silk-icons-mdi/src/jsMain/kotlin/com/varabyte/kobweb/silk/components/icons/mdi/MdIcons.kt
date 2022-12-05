@@ -11,6 +11,7 @@ package com.varabyte.kobweb.silk.components.icons.mdi
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Icon
@@ -21,18 +22,18 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 sealed class MdCategory {
-    sealed class Symbol : MdCategory() {
-        object Outlined : Symbol()
-        object Rounded : Symbol()
-        object Sharp : Symbol()
+    sealed class Symbol(internal val className: String) : MdCategory() {
+        object Outlined : Symbol("outlined")
+        object Rounded : Symbol("rounded")
+        object Sharp : Symbol("sharp")
     }
 
-    sealed class Icon : MdCategory() {
-        object Default : Icon()
-        object Outlined : Icon()
-        object Rounded : Icon()
-        object Sharp : Icon()
-        object TwoToned : Icon()
+    sealed class Icon(internal val className: String?) : MdCategory() {
+        object Default : Icon(null)
+        object Outlined : Icon("-outlined")
+        object Rounded : Icon("-rounded")
+        object Sharp : Icon("-sharp")
+        object TwoToned : Icon("two-toned")
 
         sealed class Status(internal val className: String?) {
             object ACTIVE : Status(null)
@@ -58,9 +59,8 @@ fun Modifier.size(size: Int) = attrsModifier {
     classes("md-$size")
 }
 
-// TODO: None of these will work currently. Need to figure out how to get `font-variation-settings` building working
-//  correctly. This will probably change to a different method of setting these a la builder? These are specific to
-//  Symbols btw.
+// TODO: None of these will work currently. Need to figure out how to get `font-variation-settings` building working 
+//  correctly. This will probably change to a different method of setting these a la builder?
 fun Modifier.wght(weight: Int) = attrsModifier {
     weight.coerceIn(100..700).toString().let {
         attr("wght", it)
@@ -92,7 +92,7 @@ fun MdIcon(
     style: Icon = Default,
 ) {
     Span(
-        attrs = modifier.toAttrs { classes("material-icons${'$'}{style.className}") }
+        attrs = modifier.toAttrs { classes("material-icons${style.className}") }
     ) {
         Text(name)
     }
@@ -106,7 +106,7 @@ fun MdSymbol(
 ) {
     Span(
         attrs = modifier.toAttrs {
-            classes("material-symbols${'$'}{style.className}")
+            classes("material-symbols-${style.className}")
         }
     ) {
         Text(name)

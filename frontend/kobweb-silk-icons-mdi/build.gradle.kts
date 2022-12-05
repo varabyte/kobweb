@@ -33,11 +33,7 @@ kobwebPublication {
 }
 
 sealed class Category {
-    open class Symbol : Category() {
-        object Outlined : Symbol()
-        object Rounded : Symbol()
-        object Sharp : Symbol()
-    }
+    object Symbol : Category()
 
     sealed class Icon : Category() {
         object Default : Icon()
@@ -63,7 +59,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
         .map { line ->
             line.split("=", limit = 2).let { parts ->
                 val category = when (parts.first())  {
-                    "mds" -> Symbol()
+                    "mds" -> Symbol
                     "mdi" -> Icon.Default
                     "mdio" -> Icon.Outlined
                     "mdir" -> Icon.Rounded
@@ -96,7 +92,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
             val categories = entry.value
 
             when {
-                categories.contains(Symbol()) -> {}
+                categories.contains(Symbol) -> {}
                 else -> "@Composable fun Mdi$methodName(modifier: Modifier = Modifier, status: IconStatus = IconStatus.ACTIVE, mode: IconMode = IconMode.LIGHT, style: IconCategory = IconCategory.Default) = MdiIcon(\"$rawName\", modifier, status, mode, style)"
             }
         }
@@ -210,7 +206,7 @@ fun MdSymbol(
 ) {
     Span(
         attrs = modifier.toAttrs {
-            classes("material-symbols${'$'}{style.className}")
+            classes("material-symbols-${'$'}{style.className}")
         }
     ) {
         Text(name)
