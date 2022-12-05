@@ -92,8 +92,7 @@ fun <TElement : Element> ElementScope<TElement>.registerRefScope(scope: ElementR
  *
  * See also: [disposableRef], [refScope]
  *
- * @param keys Any number of keys which, if any change, will cause the element to be thrown out and rebuilt (including
- *   the composable widget built on top of it).
+ * @param keys Any number of keys which, if any change, will cause the effect to be disposed and restarted.
  */
 fun <TElement : Element> ref(vararg keys: Any?, handle: (TElement) -> Unit) = refScope {
     ref(*keys, handle = handle)
@@ -115,8 +114,7 @@ fun <TElement : Element> ref(vararg keys: Any?, handle: (TElement) -> Unit) = re
  *
  * See also: [ref], [refScope]
  *
- * @param keys Any number of keys which, if any change, will cause the element to be thrown out and rebuilt (including
- *   the composable widget built on top of it).
+ * @param keys Any number of keys which, if any change, will cause the effect to be disposed and restarted.
  */
 fun <TElement : Element> disposableRef(vararg keys: Any?, effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) = refScope {
     disposableRef(*keys, effect = effect)
