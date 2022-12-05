@@ -11,29 +11,28 @@ package com.varabyte.kobweb.silk.components.icons.mdi
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Icon
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Icon.*
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Symbol
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Symbol.Outlined
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.IconStyle
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.IconStyle.*
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.SymbolStyle
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.SymbolStyle.Outlined
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-sealed class MdCategory {
-    sealed class Symbol(internal val className: String) : MdCategory() {
-        object Outlined : Symbol("outlined")
-        object Rounded : Symbol("rounded")
-        object Sharp : Symbol("sharp")
+sealed class MdStyle {
+    sealed class SymbolStyle(internal val className: String) : MdStyle() {
+        object Outlined : SymbolStyle("outlined")
+        object Rounded : SymbolStyle("rounded")
+        object Sharp : SymbolStyle("sharp")
     }
 
-    sealed class Icon(internal val className: String?) : MdCategory() {
-        object Default : Icon(null)
-        object Outlined : Icon("-outlined")
-        object Rounded : Icon("-rounded")
-        object Sharp : Icon("-sharp")
-        object TwoToned : Icon("two-toned")
+    sealed class IconStyle(internal val className: String?) : MdStyle() {
+        object Default : IconStyle(null)
+        object Outlined : IconStyle("-outlined")
+        object Rounded : IconStyle("-rounded")
+        object Sharp : IconStyle("-sharp")
+        object TwoToned : IconStyle("two-toned")
 
         sealed class Status(internal val className: String?) {
             object ACTIVE : Status(null)
@@ -89,10 +88,10 @@ fun Modifier.opsz(opsz: Int) = attrsModifier {
 fun MdIcon(
     name: String,
     modifier: Modifier,
-    style: Icon = Default,
+    style: IconStyle = Default,
 ) {
     Span(
-        attrs = modifier.toAttrs { classes("material-icons${style.className}") }
+        attrs = modifier.toAttrs { classes("material-icons${style.className.orEmpty()}") }
     ) {
         Text(name)
     }
@@ -102,7 +101,7 @@ fun MdIcon(
 fun MdSymbol(
     name: String,
     modifier: Modifier,
-    style: Symbol = Outlined,
+    style: SymbolStyle = Outlined,
 ) {
     Span(
         attrs = modifier.toAttrs {
@@ -113,5 +112,5 @@ fun MdSymbol(
     }
 }
 
-@Composable fun Mdi10k(modifier: Modifier = Modifier, style: Icon = Default) = MdIcon("10k", modifier, style)
-@Composable fun Mdi10mp(modifier: Modifier = Modifier, style: Icon = Default) = MdIcon("10mp", modifier, style)
+@Composable fun Mdi10k(modifier: Modifier = Modifier, style: IconStyle = Default) = MdIcon("10k", modifier, style)
+@Composable fun Mdi10mp(modifier: Modifier = Modifier, style: IconStyle = Default) = MdIcon("10mp", modifier, style)

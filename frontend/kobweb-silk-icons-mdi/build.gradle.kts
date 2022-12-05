@@ -93,7 +93,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
 
             when {
                 categories.contains(Symbol) -> {}
-                else -> "@Composable fun Mdi$methodName(modifier: Modifier = Modifier, status: IconStatus = IconStatus.ACTIVE, mode: IconMode = IconMode.LIGHT, style: IconCategory = IconCategory.Default) = MdiIcon(\"$rawName\", modifier, status, mode, style)"
+                else -> "@Composable fun Mdi$methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.Default) = MdiIcon(\"$rawName\", modifier, style)"
             }
         }
 
@@ -111,29 +111,28 @@ package com.varabyte.kobweb.silk.components.icons.mdi
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.asAttributesBuilder
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Icon
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Icon.*
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Symbol
-import com.varabyte.kobweb.silk.components.icons.mdi.MdCategory.Symbol.Outlined
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.IconStyle
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.IconStyle.*
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.SymbolStyle
+import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.SymbolStyle.Outlined
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-sealed class MdCategory {
-    sealed class Symbol : MdCategory() {
-        object Outlined : Symbol()
-        object Rounded : Symbol()
-        object Sharp : Symbol()
+sealed class MdStyle {
+    sealed class SymbolStyle(internal val className: String) : MdStyle() {
+        object Outlined : SymbolStyle("outlined")
+        object Rounded : SymbolStyle("rounded")
+        object Sharp : SymbolStyle("sharp")
     }
 
-    sealed class Icon : MdCategory() {
-        object Default : Icon()
-        object Outlined : Icon()
-        object Rounded : Icon()
-        object Sharp : Icon()
-        object TwoToned : Icon()
+    sealed class IconStyle(internal val className: String?) : MdStyle() {
+        object Default : IconStyle(null)
+        object Outlined : IconStyle("-outlined")
+        object Rounded : IconStyle("-rounded")
+        object Sharp : IconStyle("-sharp")
+        object TwoToned : IconStyle("two-toned")
 
         sealed class Status(internal val className: String?) {
             object ACTIVE : Status(null)
@@ -156,7 +155,7 @@ fun Modifier.mode(mode: Mode) = attrsModifier {
 }
 
 fun Modifier.size(size: Int) = attrsModifier {
-    classes("md-${'$'}size")
+    classes("md-${"$"}size")
 }
 
 // TODO: None of these will work currently. Need to figure out how to get `font-variation-settings` building working 
@@ -189,10 +188,10 @@ fun Modifier.opsz(opsz: Int) = attrsModifier {
 fun MdIcon(
     name: String,
     modifier: Modifier,
-    style: Icon = Default,
+    style: IconStyle = Default,
 ) {
     Span(
-        attrs = modifier.toAttrs { classes("material-icons${'$'}{style.className}") }
+        attrs = modifier.toAttrs { classes("material-icons${"$"}{style.className.orEmpty()}") }
     ) {
         Text(name)
     }
@@ -202,11 +201,11 @@ fun MdIcon(
 fun MdSymbol(
     name: String,
     modifier: Modifier,
-    style: Symbol = Outlined,
+    style: SymbolStyle = Outlined,
 ) {
     Span(
         attrs = modifier.toAttrs {
-            classes("material-symbols-${'$'}{style.className}")
+            classes("material-symbols-${"$"}{style.className}")
         }
     ) {
         Text(name)
