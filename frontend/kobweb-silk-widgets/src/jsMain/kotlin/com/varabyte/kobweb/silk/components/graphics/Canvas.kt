@@ -124,9 +124,9 @@ private inline fun <C: RenderingContext> Canvas(
     ) {
         registerRefScope(ref)
 
-        var requestId by remember { mutableStateOf(0) }
         val colorMode = getColorMode()
         DisposableEffect(colorMode) {
+            var requestId = 0
             val ctx = createContext(scopeElement)
             if (ctx != null) {
                 val callback = RenderCallback(ctx, width, height, minDeltaMs, maxDeltaMs, render, onStepped = {
