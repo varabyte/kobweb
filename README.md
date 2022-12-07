@@ -872,8 +872,28 @@ CustomWidget(Modifier.backgroundColor(Colors.Blue), variant = TransparentWidgetV
 
 ### ElementRefScope and raw HTML elements
 
-Occasionally, you may need access to the raw element backing the Silk widget you've just created. To allow for this, all
-Silk widgets provide a `ref` parameter which take a listener that provide this information:
+Occasionally, you may need access to the raw element backing the Silk widget you've just created. All Silk widgets
+provide an optional `ref` parameter which take a listener that provide this information.
+
+```kotlin
+Box(
+    ref = /* ... */
+) {
+    /* ... */
+}
+```
+
+All callbacks (discussed shortly) will receive an `org.w3c.dom.Element` subclass. You can check out the
+[Element](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-element/) class (and its often more
+relevant [HTMLElement](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-h-t-m-l-element/) inheritor) to see the
+methods and properties that are available on it.
+
+For example, you could use this to set initial focus on one element in your DOM.
+
+#### `ref`
+
+Additionally, Silk provides a `ref` method which takes a callback and whose output can be passed into the `ref`
+parameter:
 
 ```kotlin
 Box(
@@ -881,25 +901,21 @@ Box(
         // Triggered when this Box is first added into the DOM
         element.focus()
     }
-) {
-    /* ... */
-}
+)
 ```
 
-You can check out the [Element](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-element/) class (and its often
-more relevant [HTMLElement](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-h-t-m-l-element/) inheritor)
-to see the methods and properties that are available on it.
-
 The `ref { ... }` method can actually take one or more optional keys of any value. If any of these keys change on a
-subsequent recomposition, the element will be disposed of and recreated:
+subsequent recomposition, the callback will be rerun:
 
 ```kotlin
 val colorMode by rememberColorMode()
 Box(
-    // Will get triggered each time the color mode changes
+    // Callback will get triggered each time the color mode changes
     ref = ref(colorMode) { element -> /* ... */}
 )
 ```
+
+#### `disposableRef`
 
 If you need to know both when the element enters AND exits the DOM, you can use `disposableRef` instead. With
 `disposableRef`, the very last line in your block must be a call to `onDispose`:
@@ -917,9 +933,13 @@ Box(
 )
 ```
 
-And, finally, in some rare cases, you may want to have multiple independent keys that can each cause your UI element to
-be disposed of, but for different reasons and with different handlers. You can use `refScope` as a way to combine two or
-more `ref` and/or `disposableRef` calls in any combination:
+The `disposableRef` method can also take keys which rerun the listener if any of them change. The `onDispose` callback
+will also be triggered in that case, as the old effect gets discarded.
+
+#### `refScope`
+
+And, finally, you may want to have multiple listeners that are recreated independently of one another based on different
+keys. You can use `refScope` as a way to combine two or more `ref` and/or `disposableRef` calls in any combination:
 
 ```kotlin
 val isFeature1Enabled: Boolean = /* ... */
