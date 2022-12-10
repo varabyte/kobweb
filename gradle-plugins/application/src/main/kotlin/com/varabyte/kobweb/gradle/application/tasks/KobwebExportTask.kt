@@ -6,6 +6,7 @@ import com.github.kklisura.cdt.launch.ChromeArguments
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.github.kklisura.cdt.services.ChromeService
 import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.common.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
@@ -161,7 +162,7 @@ abstract class KobwebExportTask @Inject constructor(
         // defined by the site.
         getResourceFilesJsWithRoots().forEach { rootAndFile ->
             // Drop the leading slash so we don't confuse File resolve logic
-            val relativePath = rootAndFile.relativeFile.toString().substringAfter(getPublicPath()).drop(1)
+            val relativePath = rootAndFile.relativeFile.toUnixSeparators().substringAfter(getPublicPath()).drop(1)
             if (relativePath == "index.html" && siteLayout != SiteLayout.KOBWEB) return@forEach
 
             (if (relativePath != "index.html") resourcesRoot else systemRoot)

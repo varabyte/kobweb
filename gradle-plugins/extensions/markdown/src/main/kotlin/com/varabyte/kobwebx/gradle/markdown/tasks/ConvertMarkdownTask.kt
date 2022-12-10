@@ -2,6 +2,7 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.common.packageConcat
 import com.varabyte.kobweb.common.toPackageName
+import com.varabyte.kobweb.common.toUnixSeparators
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
@@ -63,7 +64,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
         val parser = markdownFeatures.createParser()
         getMarkdownFilesWithRoots().forEach { rootAndFile ->
             val mdFile = rootAndFile.file
-            val mdPathRel = rootAndFile.relativeFile.path.replace("\\", "/")
+            val mdPathRel = rootAndFile.relativeFile.toUnixSeparators()
 
             val parts = mdPathRel.split('/')
             val dirParts = parts.subList(0, parts.lastIndex)
