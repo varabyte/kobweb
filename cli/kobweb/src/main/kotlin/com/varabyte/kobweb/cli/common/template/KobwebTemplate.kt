@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.cli.common.template
 
 import com.charleskorn.kaml.Yaml
-import com.varabyte.kobweb.common.toUnixSeparators
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import kotlinx.serialization.Serializable
 import java.nio.file.Path

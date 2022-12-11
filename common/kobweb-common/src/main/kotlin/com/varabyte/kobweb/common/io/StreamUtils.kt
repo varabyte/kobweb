@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.common
+package com.varabyte.kobweb.common.io
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

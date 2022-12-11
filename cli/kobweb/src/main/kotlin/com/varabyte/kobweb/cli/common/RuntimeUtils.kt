@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.cli.common
 
-import com.varabyte.kobweb.common.consumeAsync
+import com.varabyte.kobweb.common.io.consumeAsync
 import java.io.File
 import java.io.FileNotFoundException
 

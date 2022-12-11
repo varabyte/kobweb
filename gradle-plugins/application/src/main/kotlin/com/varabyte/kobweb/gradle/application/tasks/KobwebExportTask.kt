@@ -6,7 +6,7 @@ import com.github.kklisura.cdt.launch.ChromeArguments
 import com.github.kklisura.cdt.launch.ChromeLauncher
 import com.github.kklisura.cdt.services.ChromeService
 import com.varabyte.kobweb.common.navigation.RoutePrefix
-import com.varabyte.kobweb.common.toUnixSeparators
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND

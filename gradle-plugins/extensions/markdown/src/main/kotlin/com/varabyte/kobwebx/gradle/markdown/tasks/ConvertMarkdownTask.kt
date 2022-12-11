@@ -1,8 +1,8 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
-import com.varabyte.kobweb.common.packageConcat
-import com.varabyte.kobweb.common.toPackageName
-import com.varabyte.kobweb.common.toUnixSeparators
+import com.varabyte.kobweb.common.lang.packageConcat
+import com.varabyte.kobweb.common.lang.toPackageName
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.util.RootAndFile

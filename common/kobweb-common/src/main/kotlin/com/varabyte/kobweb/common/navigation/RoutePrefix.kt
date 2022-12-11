@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.common.navigation
 
-import com.varabyte.kobweb.common.ensureSurrounded
+import com.varabyte.kobweb.common.text.ensureSurrounded
 
 class RoutePrefix(value: String) {
     val value = value.takeIf { it.isNotBlank() }?.ensureSurrounded("/") ?: ""

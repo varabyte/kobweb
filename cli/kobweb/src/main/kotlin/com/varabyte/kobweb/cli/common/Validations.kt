@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.cli.common
 
-import com.varabyte.kobweb.common.isKeyword
+import com.varabyte.kobweb.common.lang.isKeyword
 import java.nio.file.Files
 import java.nio.file.Path
 

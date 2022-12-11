@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.core.tasks
 
-import com.varabyte.kobweb.common.toUnixSeparators
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget

@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.common
+package com.varabyte.kobweb.common.lang
 
 /**
  * Test if this string is a reserved keyword.

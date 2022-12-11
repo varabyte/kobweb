@@ -6,7 +6,7 @@ import com.varabyte.kobweb.cli.common.findGit
 import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.textError
-import com.varabyte.kobweb.common.toUnixSeparators
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.cyan
 import com.varabyte.kotter.foundation.text.text

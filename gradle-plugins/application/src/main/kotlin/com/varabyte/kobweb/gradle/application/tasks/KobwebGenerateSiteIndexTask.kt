@@ -3,7 +3,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
-import com.varabyte.kobweb.common.toUnixSeparators
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.index

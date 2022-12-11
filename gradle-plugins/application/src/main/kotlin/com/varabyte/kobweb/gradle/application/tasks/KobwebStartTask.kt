@@ -2,7 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.consumeAsync
+import com.varabyte.kobweb.common.io.consumeAsync
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerEnvironment

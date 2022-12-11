@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.common
+package com.varabyte.kobweb.common.text
 
 fun String.prefixIfNot(prefix: String) = if (this.startsWith(prefix)) this else prefix + this
 fun String.suffixIfNot(suffix: String) = if (this.endsWith(suffix)) this else this + suffix

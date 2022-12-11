@@ -13,7 +13,7 @@ import com.varabyte.kobweb.cli.create.freemarker.methods.IsYesNoMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.PackageToPathMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
 import com.varabyte.kobweb.common.error.KobwebException
-import com.varabyte.kobweb.common.toUnixSeparators
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kotter.runtime.Session
 import freemarker.cache.NullCacheStorage
 import freemarker.template.Configuration
