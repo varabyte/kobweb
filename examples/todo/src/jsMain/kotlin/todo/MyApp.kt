@@ -8,6 +8,7 @@ import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.InitSilk
 import com.varabyte.kobweb.silk.InitSilkContext
 import com.varabyte.kobweb.silk.SilkApp
+import com.varabyte.kobweb.silk.components.layout.AnimatedColorSurfaceVariant
 import com.varabyte.kobweb.silk.components.layout.Surface
 import com.varabyte.kobweb.silk.theme.registerBaseStyle
 import org.jetbrains.compose.web.css.*
@@ -39,7 +40,7 @@ fun initSiteStyles(ctx: InitSilkContext) {
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
     SilkApp {
-        Surface(Modifier.width(100.vw).height(100.vh)) {
+        Surface(Modifier.width(100.vw).height(100.vh), variant = AnimatedColorSurfaceVariant) {
             content()
         }
     }
