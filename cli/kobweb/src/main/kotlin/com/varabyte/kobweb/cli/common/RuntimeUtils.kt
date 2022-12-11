@@ -1,13 +1,8 @@
 package com.varabyte.kobweb.cli.common
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.BufferedReader
+import com.varabyte.kobweb.common.consumeAsync
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.InputStream
-import java.io.InputStreamReader
 
 fun Runtime.gradlew(vararg args: String): Process {
     val gradlewBinary = if (!Os.isWindows()) "gradlew" else "gradlew.bat"
@@ -31,15 +26,6 @@ fun Runtime.git(vararg args: String): Process {
     return exec(finalArgs.toTypedArray())
 }
 
-private fun consumeStream(stream: InputStream, isError: Boolean, onLineRead: (String, Boolean) -> Unit) {
-    val isr = InputStreamReader(stream)
-    val br = BufferedReader(isr)
-    while (true) {
-        val line = br.readLine() ?: break
-        onLineRead(line, isError)
-    }
-}
-
 private fun defaultOutputHandler(line: String, isError: Boolean) {
     if (isError) {
         System.err.println(line)
@@ -49,7 +35,7 @@ private fun defaultOutputHandler(line: String, isError: Boolean) {
     }
 }
 
-fun Process.consumeProcessOutput(onLineRead: (String, Boolean) -> Unit = ::defaultOutputHandler) {
-    CoroutineScope(Dispatchers.IO).launch { consumeStream(inputStream, isError = false, onLineRead) }
-    CoroutineScope(Dispatchers.IO).launch { consumeStream(errorStream, isError = true, onLineRead) }
+fun Process.consumeProcessOutput(onLineRead: (line: String, isError: Boolean) -> Unit = ::defaultOutputHandler) {
+    inputStream.consumeAsync { line -> onLineRead(line, false) }
+    errorStream.consumeAsync { line -> onLineRead(line, true) }
 }

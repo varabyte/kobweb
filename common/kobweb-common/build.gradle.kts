@@ -10,6 +10,7 @@ version = libs.versions.kobweb.libs.get()
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.kaml)
+    implementation(libs.kotlinx.coroutines)
 }
 
 kobwebPublication {

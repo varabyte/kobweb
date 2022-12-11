@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.common.consumeAsync
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -71,7 +72,12 @@ abstract class KobwebStartTask @Inject constructor(
                 ${processParams.joinToString(" ")}
             """.trimIndent()
         )
+        // Flush above println. Otherwise, it can end up mixed-up in exception reporting below.
+        System.out.flush()
+
         val process = Runtime.getRuntime().exec(processParams)
+        val errorMessage = StringBuilder()
+        process.errorStream.consumeAsync { line -> errorMessage.appendLine(line) }
 
         while (stateFile.content == null && process.isAlive) {
             Thread.sleep(300)
@@ -80,6 +86,13 @@ abstract class KobwebStartTask @Inject constructor(
             println("A Kobweb server is now running at ${serverState.toDisplayText()}")
             println()
             println("Run `gradlew kobwebStop` when you're ready to shut it down.")
-        } ?: throw GradleException("Unable to start the Kobweb server")
+        } ?: run {
+            throw GradleException(buildString {
+                append("Unable to start the Kobweb server.")
+                if (errorMessage.isNotEmpty()) {
+                    append("\n\nError: $errorMessage")
+                }
+            })
+        }
     }
 }
