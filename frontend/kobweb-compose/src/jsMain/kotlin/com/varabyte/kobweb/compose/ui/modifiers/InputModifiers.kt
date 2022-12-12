@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
+import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.css.UserSelect
@@ -25,6 +26,18 @@ fun Modifier.draggable(draggable: Draggable) = attrsModifier {
 
 fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
     onClick { evt -> onClick(evt) }
+}
+
+fun Modifier.onDrag(onDrag: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
+    onDrag { evt -> onDrag(evt) }
+}
+
+fun Modifier.onDragOver(onDragOver: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
+    onDragOver { evt -> onDragOver(evt) }
+}
+
+fun Modifier.onDrop(onDrop: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
+    onDrag { evt -> onDrop(evt) }
 }
 
 fun Modifier.onKeyDown(onKeyDown: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
