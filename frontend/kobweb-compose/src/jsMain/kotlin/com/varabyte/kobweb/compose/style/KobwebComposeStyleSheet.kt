@@ -112,7 +112,6 @@ object KobwebComposeStyleSheet : StyleSheet() {
         ".kobweb-row" {
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Row)
-            flexWrap(FlexWrap.Wrap)
         }
 
         // Default styles for children placement
