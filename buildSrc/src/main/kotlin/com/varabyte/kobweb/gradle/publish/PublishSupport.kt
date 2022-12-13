@@ -4,6 +4,7 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.http.BasicAuthentication
@@ -43,9 +44,16 @@ internal fun PublishingExtension.addVarabyteArtifact(
         }
     }
 
+    val javaComponent = project.components.findByName("java")
+    if (javaComponent != null) {
+        project.java?.let {
+            it.withJavadocJar()
+            it.withSourcesJar()
+        }
+    }
+
     // kotlin("jvm") projects don't automatically declare a maven publication
     if (publications.none { it is MavenPublication }) {
-        val javaComponent = project.components.findByName("java")
         if (javaComponent != null) {
             publications.create("maven", MavenPublication::class.java) {
                 groupId = project.group.toString()
@@ -74,8 +82,11 @@ internal fun PublishingExtension.addVarabyteArtifact(
     }
 }
 
-private val Project.publishing: PublishingExtension get() =
-    (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
+private val Project.java: JavaPluginExtension?
+    get() = (this as ExtensionAware).extensions.getByName("java") as? JavaPluginExtension
+
+private val Project.publishing: PublishingExtension
+    get() = (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
 
 private fun Project.publishing(configure: Action<PublishingExtension>): Unit =
     (this as ExtensionAware).extensions.configure("publishing", configure)
