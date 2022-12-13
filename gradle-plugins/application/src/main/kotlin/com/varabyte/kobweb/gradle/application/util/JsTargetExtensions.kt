@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 
 /**
  * @param kobwebName A name to use as the base of the output JS file. If left blank, a name will be
- *   created using [suggestKobwebProjectName]
+ *   created using [suggestKobwebProjectName].
  */
 fun KotlinJsTargetDsl.kobwebApplicationBrowser(kobwebName: String? = null) {
     @Suppress("NAME_SHADOWING")
