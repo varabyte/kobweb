@@ -20,10 +20,11 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
  */
 fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
     val archiveFileName = (kobwebName ?: project.suggestKobwebProjectName()).addSuffix(".jar")
-    project.tasks.named("jvmJar", Jar::class.java).configure {
+    val jvmTargetName = name
+    project.tasks.named("${jvmTargetName}Jar", Jar::class.java).configure {
         this.archiveFileName.set(archiveFileName)
 
-        val classpathProvider = project.configurations.named("jvmRuntimeClasspath")
+        val classpathProvider = project.configurations.named("${jvmTargetName}RuntimeClasspath")
         inputs.files(classpathProvider)
 
         doFirst {
@@ -38,8 +39,9 @@ fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
 }
 
 internal fun KotlinJsIrTarget.includeDependencyPublicResourcesInJar() {
-    project.tasks.named("jsJar", Jar::class.java).configure {
-        val classpathProvider = project.configurations.named("jsRuntimeClasspath")
+    val jsTargetName = name
+    project.tasks.named("${jsTargetName}Jar", Jar::class.java).configure {
+        val classpathProvider = project.configurations.named("${jsTargetName}RuntimeClasspath")
         inputs.files(classpathProvider)
 
         doFirst {
