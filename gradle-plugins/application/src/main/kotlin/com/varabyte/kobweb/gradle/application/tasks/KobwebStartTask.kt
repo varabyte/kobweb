@@ -75,7 +75,12 @@ abstract class KobwebStartTask @Inject constructor(
         // Flush above println. Otherwise, it can end up mixed-up in exception reporting below.
         System.out.flush()
 
-        val process = Runtime.getRuntime().exec(processParams)
+        val process = Runtime.getRuntime().exec(
+            processParams,
+            emptyArray(), // empty env
+            kobwebApplication.path.toFile()
+        )
+
         val errorMessage = StringBuilder()
         process.errorStream.consumeAsync { line -> errorMessage.appendLine(line) }
 
