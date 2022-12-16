@@ -127,11 +127,13 @@ package com.varabyte.kobweb.silk.components.icons.mdi
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.mdi.IconMode.DARK
 import com.varabyte.kobweb.silk.components.icons.mdi.IconMode.LIGHT
 import com.varabyte.kobweb.silk.components.icons.mdi.IconStatus.*
 import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.*
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
@@ -158,7 +160,7 @@ enum class IconStatus {
     DISABLED;
 }
 
-private fun IconStatus.toClassNameSuffix(): String {
+private fun IconStatus.toClassName(): String {
     return when (this) {
         DISABLED -> "md-inactive"
         else -> ""
@@ -171,7 +173,7 @@ enum class IconMode {
     DARK;
 }
 
-private fun IconMode.toClassNameSuffix(): String {
+private fun IconMode.toClassName(): String {
     return when (this) {
         LIGHT -> "md-dark"
         DARK -> "md-light"
@@ -180,15 +182,15 @@ private fun IconMode.toClassNameSuffix(): String {
 }
 
 fun Modifier.status(status: IconStatus) = attrsModifier {
-    classes(status.toClassNameSuffix())
+    classes(status.toClassName())
 }
 
 fun Modifier.mode(mode: IconMode) = attrsModifier {
-    classes(mode.toClassNameSuffix())
+    classes(mode.toClassName())
 }
 
-fun Modifier.size(size: Int) = attrsModifier {
-    classes("md-${"$"}size")
+fun Modifier.iconSize(size: CSSNumeric) = styleModifier {
+    fontSize(size)
 }
 
 @Composable
