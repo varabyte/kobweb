@@ -9,12 +9,11 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.*
-import com.varabyte.kobweb.silk.theme.shapes.Rect
-import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
@@ -32,7 +31,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
             .backgroundColor(buttonColors.default)
             .fontSize(16.px)
             .padding(0.px)
-            .clip(Rect(4.px))
+            .borderRadius(4.px)
             .borderWidth(0.px)
             .outline(0.px) // Don't outline focused buttons - we'll use background color instead to indicate focus
             // No selecting text within buttons
