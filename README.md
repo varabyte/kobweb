@@ -987,6 +987,38 @@ FaSpider(Modifier.color(Colors.Red))
 
 ***Note**: When you create a project using our `site` template, Font Awesome icons are included.*
 
+### Material Design Icons
+
+Kobweb provides the `kobweb-silk-icons-mdi` artifact which you can use in your project if you want access to all the
+free Material Design icons.
+
+Using it is easy! Search the [Material Icons gallery](https://fonts.google.com/icons?icon.set=Material+Icons), choose an
+icon, and then call it using the associated Material Design Icon composable.
+
+For example, let's say after a search I found and wanted to use their
+[bug report icon](https://fonts.google.com/icons?icon.set=Material+Icons&icon.query=bug+report), I could call this in my
+Kobweb code by converting the name to camel case:
+
+```kotlin
+MdiBugReport()
+```
+
+That's it!
+
+Most material design icons support multiple styles: outlined, filled, rounded, sharp, and two-tone. Check the gallery
+search link above to verify what styles are supported by your icon. You can identify the one you want to use by passing
+it into the method's `style` parameter:
+
+```kotlin
+MdiLightMode(style = IconStyle.TWO_TONE)
+```
+
+All Material Design Icon composables accept a modifier parameter, so you can tweak it further:
+
+```kotlin
+MdiError(Modifier.color(Colors.Red))
+```
+
 ## Intermediate topics
 
 ### Components: Layouts, Sections, and Widgets

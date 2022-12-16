@@ -52,6 +52,15 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
+        if (project.hasTransitiveJsDependencyNamed("kobweb-silk-icons-mdi")) {
+            kobwebBlock.app.index.head.add {
+                link {
+                    rel = "stylesheet"
+                    href = "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
+                }
+            }
+        }
+
         getResourceFilesJsWithRoots()
                 .mapNotNull{ rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.buildDir) && rootAndFile.relativeFile.toUnixSeparators() == "public/index.html"} }
                 .singleOrNull()
