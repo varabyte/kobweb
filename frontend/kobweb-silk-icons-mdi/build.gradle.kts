@@ -1,5 +1,4 @@
-import Build_gradle.Category.Icon
-import Build_gradle.Category.Symbol
+import Build_gradle.IconCategory.*
 
 plugins {
     kotlin("multiplatform")
@@ -32,15 +31,21 @@ kobwebPublication {
     description.set("A collection of Kobweb Silk components that directly wrap Material Design icons")
 }
 
-sealed class Category {
-    object Symbol : Category()
+enum class IconCategory {
+    DEFAULT,
+    OUTLINED,
+    ROUNDED,
+    SHARP,
+    TWO_TONED;
+}
 
-    sealed class Icon : Category() {
-        object Default : Icon()
-        object Outlined : Icon()
-        object Rounded : Icon()
-        object Sharp : Icon()
-        object TwoToned : Icon()
+fun IconCategory.toFunctionSuffix(): String {
+    return when (this) {
+        OUTLINED -> "Outlined"
+        ROUNDED -> "Rounded"
+        SHARP -> "Sharp"
+        TWO_TONED -> "TwoToned"
+        else -> ""
     }
 }
 
@@ -52,19 +57,20 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
     inputs.files(srcFile, layout.projectDirectory.file("build.gradle.kts"))
     outputs.file(dstFile)
 
-    // {SOLID=[ad, address-book, address-card, ...], REGULAR=[address-book, address-card, angry, ...], ... }
     val iconRawNames = srcFile.asFile
-        .readLines().asSequence()
+        .readLines()
+        .asSequence()
         .filter { line -> !line.startsWith("#") }
         .map { line ->
+            // Convert icon name to function name, e.g.
+            // align-left -> FaAlignLeft
             line.split("=", limit = 2).let { parts ->
-                val category = when (parts.first())  {
-                    "mds" -> Symbol
-                    "mdi" -> Icon.Default
-                    "mdio" -> Icon.Outlined
-                    "mdir" -> Icon.Rounded
-                    "mdis" -> Icon.Sharp
-                    "mdit" -> Icon.TwoToned
+                val category = when (parts[0]) {
+                    "mdi" -> DEFAULT
+                    "mdio" -> OUTLINED
+                    "mdir" -> ROUNDED
+                    "mdis" -> SHARP
+                    "mdit" -> TWO_TONED
                     else -> throw GradleException("Unexpected category string: ${parts[0]}")
                 }
                 val names = parts[1]
@@ -75,8 +81,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
         .toMap()
 
     // For each icon name, figure out what categories they are in. This will affect the function signature we generate.
-    // {ad=[SOLID], address-book=[SOLID, REGULAR], address-card=[SOLID, REGULAR], ...
-    val iconCategories = mutableMapOf<String, MutableSet<Category>>()
+    val iconCategories = mutableMapOf<String, MutableSet<IconCategory>>()
     iconRawNames.forEach { entry ->
         val category = entry.key
         entry.value.forEach { rawName ->
@@ -92,8 +97,18 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
             val categories = entry.value
 
             when {
-                categories.contains(Symbol) -> {}
-                else -> "@Composable fun Mdi$methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.Default) = MdiIcon(\"$rawName\", modifier, style)"
+                // If the icon is in all categories, we can just use the default function signature
+                categories.size == IconCategory.values().size -> {
+                    "@Composable fun Mdi$methodName(modifier: Modifier = Modifier, style: IconStyle = DEFAULT) = MdIcon(\"$rawName\", modifier, style)"
+                }
+                // Otherwise, we need to generate a function for each category
+                categories.size >= 1 -> {
+                    categories.joinToString("\n") { category ->
+                        "@Composable fun Mdi$methodName${category.toFunctionSuffix()}(modifier: Modifier = Modifier) = MdIcon(\"$rawName\", modifier, ${category.name})"
+                    }
+                }
+                // If we get here, something went wrong
+                else -> GradleException("Unhandled icon entry: $entry")
             }
         }
 
@@ -113,100 +128,77 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.IconStyle
-import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.IconStyle.*
-import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.SymbolStyle
-import com.varabyte.kobweb.silk.components.icons.mdi.MdStyle.SymbolStyle.Outlined
+import com.varabyte.kobweb.silk.components.icons.mdi.IconMode.DARK
+import com.varabyte.kobweb.silk.components.icons.mdi.IconMode.LIGHT
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStatus.*
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.*
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-sealed class MdStyle {
-    sealed class SymbolStyle(internal val className: String) : MdStyle() {
-        object Outlined : SymbolStyle("outlined")
-        object Rounded : SymbolStyle("rounded")
-        object Sharp : SymbolStyle("sharp")
-    }
+enum class IconStyle {
+    DEFAULT,
+    OUTLINED,
+    ROUNDED,
+    SHARP,
+    TWO_TONED;
+}
 
-    sealed class IconStyle(internal val className: String?) : MdStyle() {
-        object Default : IconStyle(null)
-        object Outlined : IconStyle("-outlined")
-        object Rounded : IconStyle("-rounded")
-        object Sharp : IconStyle("-sharp")
-        object TwoToned : IconStyle("two-toned")
-
-        sealed class Status(internal val className: String?) {
-            object ACTIVE : Status(null)
-            object DISABLED : Status("md-inactive")
-        }
-        sealed class Mode(internal val className: String?) {
-            object DEFAULT : Mode(null)
-            object LIGHT : Mode("md-dark")
-            object DARK : Mode("md-light")
-        }
+private fun IconStyle.toClassNameSuffix(): String {
+    return when (this) {
+        OUTLINED -> "-outlined"
+        ROUNDED -> "-round"
+        SHARP -> "-sharp"
+        TWO_TONED -> "-two-tone"
+        else -> ""
     }
 }
 
-fun Modifier.status(status: Status) = attrsModifier {
-    status.className?.let { classes(it) }
+enum class IconStatus {
+    ACTIVE,
+    DISABLED;
 }
 
-fun Modifier.mode(mode: Mode) = attrsModifier {
-    mode.className?.let { classes(it) }
+private fun IconStatus.toClassNameSuffix(): String {
+    return when (this) {
+        DISABLED -> "md-inactive"
+        else -> ""
+    }
+}
+
+enum class IconMode {
+    DEFAULT,
+    LIGHT,
+    DARK;
+}
+
+private fun IconMode.toClassNameSuffix(): String {
+    return when (this) {
+        LIGHT -> "md-dark"
+        DARK -> "md-light"
+        else -> ""
+    }
+}
+
+fun Modifier.status(status: IconStatus) = attrsModifier {
+    classes(status.toClassNameSuffix())
+}
+
+fun Modifier.mode(mode: IconMode) = attrsModifier {
+    classes(mode.toClassNameSuffix())
 }
 
 fun Modifier.size(size: Int) = attrsModifier {
     classes("md-${"$"}size")
 }
 
-// TODO: None of these will work currently. Need to figure out how to get `font-variation-settings` building working 
-//  correctly. This will probably change to a different method of setting these a la builder?
-fun Modifier.wght(weight: Int) = attrsModifier {
-    weight.coerceIn(100..700).toString().let {
-        attr("wght", it)
-    }
-}
-
-fun Modifier.FILL(fill: Float) = attrsModifier {
-    fill.coerceIn(0F..1F).toString().let {
-        attr("FILL", it)
-    }
-}
-
-fun Modifier.GRAD(grad: Int) = attrsModifier {
-    grad.coerceIn(-25..200).toString().let {
-        attr("GRAD", it)
-    }
-}
-
-fun Modifier.opsz(opsz: Int) = attrsModifier {
-    opsz.coerceIn(20..48).toString().let {
-        attr("opsz", it)
-    }
-}
-
 @Composable
 fun MdIcon(
     name: String,
     modifier: Modifier,
-    style: IconStyle = Default,
+    style: IconStyle = DEFAULT,
 ) {
     Span(
-        attrs = modifier.toAttrs { classes("material-icons${"$"}{style.className.orEmpty()}") }
-    ) {
-        Text(name)
-    }
-}
-
-@Composable
-fun MdSymbol(
-    name: String,
-    modifier: Modifier,
-    style: SymbolStyle = Outlined,
-) {
-    Span(
-        attrs = modifier.toAttrs {
-            classes("material-symbols-${"$"}{style.className}")
-        }
+        attrs = modifier.toAttrs { classes("material-icons${"$"}{style.toClassNameSuffix()}") }
     ) {
         Text(name)
     }
