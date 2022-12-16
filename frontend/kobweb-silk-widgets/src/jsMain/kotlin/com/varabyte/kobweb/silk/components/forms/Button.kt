@@ -9,7 +9,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
@@ -29,13 +28,15 @@ val ButtonStyle = ComponentStyle("silk-button") {
         Modifier
             .color(palette.color)
             .backgroundColor(buttonColors.default)
+            .lineHeight(1.2)
             .fontSize(16.px)
-            .padding(0.px)
+            .padding(topBottom = 8.px, leftRight = 16.px)
             .borderRadius(4.px)
             .borderWidth(0.px)
-            .outline(0.px) // Don't outline focused buttons - we'll use background color instead to indicate focus
-            // No selecting text within buttons
-            .userSelect(UserSelect.None)
+            // By default, don't use outlines to indicate focused buttons - we'll use background color instead to
+            // indicate focus
+            .outline(0.px)
+            .userSelect(UserSelect.None) // No selecting text within buttons
     }
 
     hover {
@@ -55,7 +56,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
     disabled {
         Modifier
             .backgroundColor(buttonColors.default)
-            .cursor(Cursor.Default)
+            .cursor(Cursor.NotAllowed)
             .opacity(0.5)
     }
 }

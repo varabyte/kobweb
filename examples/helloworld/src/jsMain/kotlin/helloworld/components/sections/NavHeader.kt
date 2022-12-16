@@ -43,7 +43,7 @@ val NavLinkVariant = LinkStyle.addVariant("nav") {
 }
 
 val NavButtonVariant = NavItemStyle.addVariant("button") {
-    base { Modifier.clip(Circle()) }
+    base { Modifier.padding(0.px).clip(Circle()) }
 }
 
 @Composable
