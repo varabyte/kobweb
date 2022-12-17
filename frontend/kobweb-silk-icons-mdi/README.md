@@ -16,7 +16,8 @@ this project.
 
 To populate it, I visited the
 [Material Design Icons GitHub repository](https://github.com/google/material-design-icons/tree/master/font), copied the
-contents of each of the codepoint files, converted them into comma-separated lists, and deleted the ligatures.
+contents of each of the codepoint files, converted them into comma-separated lists, and deleted the ligature fallback
+codes.
 
 I then manually reorganized the results (into default, outlined, rounded, sharp and two-toned subsets) and migrated the
 temporary text file into the custom text format seen in the `md-icon-list.txt` file.
