@@ -77,7 +77,10 @@ abstract class KobwebStartTask @Inject constructor(
 
         val process = Runtime.getRuntime().exec(
             processParams,
-            emptyArray(), // empty env
+            // Set envp to empty to indicate that the new process should get its own fresh environment
+            // Note: It's possible it could be better to pass in null here, and let the process inherit Gradle's
+            // environment. Happy to revisit this later.
+            emptyArray(),
             kobwebApplication.path.toFile()
         )
 
