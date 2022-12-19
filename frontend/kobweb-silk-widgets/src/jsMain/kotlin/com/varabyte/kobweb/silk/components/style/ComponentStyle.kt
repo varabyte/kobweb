@@ -40,7 +40,7 @@ internal class CssModifier(
 
                         Once the offending modifier is identified, to fix this, you can either call attribute modifiers
                         directly on the Modifier you pass into some widget, or you can extend this Style or Variant with
-                        extra modifiers using the `+` syntax:
+                        extra modifiers by passing them in the `extraModifier` parameter:
 
                         ```
                         // Approach #1: Call Attribute Modifiers later
@@ -51,11 +51,11 @@ internal class CssModifier(
 
                         ExampleWidget(ExampleStyle.toModifier().tabIndex(0))
 
-                        // Approach #2: Use `+` to add extra (non-style) modifiers to the style
+                        // Approach #2: Use `extraModifiers`:
 
-                        val ExampleStyle = ComponentStyle("ex") {
+                        val ExampleStyle = ComponentStyle("ex", extraModifiers = Modifier.tabIndex(0)) {
                            ...
-                        } + Modifier.tabIndex(0)
+                        }
 
                         ExampleWidget(ExampleStyle.toModifier())
                         ```
@@ -330,8 +330,8 @@ class ImmutableComponentStyle internal constructor(
  * You may still wish to construct a [ComponentStyle] directly instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.Companion.base(className: String, init: ComponentModifier.() -> Modifier): ComponentStyle {
-    return ComponentStyle(className) {
+fun ComponentStyle.Companion.base(className: String, extraModifiers: Modifier = Modifier, init: ComponentModifier.() -> Modifier): ComponentStyle {
+    return ComponentStyle(className, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -579,9 +579,6 @@ fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): Co
 
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
- *
- * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
- *   non-style attributes whenever this variant style is applied.
  */
 class SimpleComponentVariant(
     internal val style: ComponentStyle,
