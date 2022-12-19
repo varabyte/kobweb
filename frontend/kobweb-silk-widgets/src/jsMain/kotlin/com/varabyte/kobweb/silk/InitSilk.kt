@@ -8,6 +8,7 @@ import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
+import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
@@ -32,6 +33,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     // TODO: Automate the creation of this list (with a Gradle task?)
     mutableTheme.registerComponentStyle(ButtonStyle)
     mutableTheme.registerComponentStyle(CanvasStyle)
+    mutableTheme.registerComponentStyle(DisabledStyle)
     mutableTheme.registerComponentStyle(DividerStyle)
     mutableTheme.registerComponentStyle(ImageStyle)
     mutableTheme.registerComponentStyle(LinkStyle)

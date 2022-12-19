@@ -296,3 +296,9 @@ val StyleModifiers.firstLine get() = CssRule.OfPseudoElement(this, "first-line")
 val StyleModifiers.mediaPrint get() = CssRule.OfMedia(this, CSSMediaQuery.MediaType(CSSMediaQuery.MediaType.Enum.Print))
 
 //endregion
+
+// region Functional psuedo classes
+
+fun StyleModifiers.not(vararg params: CssRule.NonMediaCssRule) = CssRule.OfFunctionalPseudoClass(this, "not", *params)
+
+//endregion

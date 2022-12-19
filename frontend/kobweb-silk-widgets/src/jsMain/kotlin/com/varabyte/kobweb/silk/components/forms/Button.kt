@@ -9,10 +9,31 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
+import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
+import com.varabyte.kobweb.compose.ui.modifiers.borderWidth
+import com.varabyte.kobweb.compose.ui.modifiers.color
+import com.varabyte.kobweb.compose.ui.modifiers.cursor
+import com.varabyte.kobweb.compose.ui.modifiers.fontSize
+import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
+import com.varabyte.kobweb.compose.ui.modifiers.onClick
+import com.varabyte.kobweb.compose.ui.modifiers.onKeyDown
+import com.varabyte.kobweb.compose.ui.modifiers.outline
+import com.varabyte.kobweb.compose.ui.modifiers.padding
+import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
+import com.varabyte.kobweb.compose.ui.modifiers.userSelect
 import com.varabyte.kobweb.compose.ui.thenIf
-import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.CssRule
+import com.varabyte.kobweb.silk.components.style.active
+import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
+import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
+import com.varabyte.kobweb.silk.components.style.focus
+import com.varabyte.kobweb.silk.components.style.hover
+import com.varabyte.kobweb.silk.components.style.not
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
@@ -39,25 +60,18 @@ val ButtonStyle = ComponentStyle("silk-button") {
             .userSelect(UserSelect.None) // No selecting text within buttons
     }
 
-    hover {
+    (hover + not(ariaDisabled)) {
         Modifier
             .backgroundColor(buttonColors.hover)
             .cursor(Cursor.Pointer)
     }
 
-    focus {
+    (focus + not(ariaDisabled)) {
         Modifier.backgroundColor(buttonColors.hover)
     }
 
-    active {
+    (active + not(ariaDisabled)) {
         Modifier.backgroundColor(buttonColors.pressed)
-    }
-
-    disabled {
-        Modifier
-            .backgroundColor(buttonColors.default)
-            .cursor(Cursor.NotAllowed)
-            .opacity(0.5)
     }
 }
 
@@ -75,7 +89,7 @@ fun Button(
 ) {
     JbButton(
         attrs = ButtonStyle.toModifier(variant)
-            .thenIf(!enabled, Modifier.disabled())
+            .thenIf(!enabled, DisabledStyle.toModifier())
             .then(modifier)
             .onClick { evt ->
                 if (enabled) {
