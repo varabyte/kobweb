@@ -21,7 +21,7 @@ it can be a great way to share custom widgets.
 In this project, the `site` module represents the entire application. It is in this project that you'll trigger
 `kobweb run`.
 
-Then, there are three library modules: `common` (a bunch of general components, shared by multiple modules), `auth`
+Then, there are three library modules: `core` (a bunch of general components, shared by multiple modules), `auth`
 (which provides pages and server support for creating an account and logging in), and `chat` (which handles posting and
 fetching messages).
 
@@ -34,7 +34,7 @@ The rest, it should delegate to the other modules.
 
 Some things to notice about this multimodule app (vs. how it differs from a Kobweb monolith project):
 
-* The `common`, `auth`, and `chat` modules apply the `com.varabyte.kobweb.library` plugin in their build script, while
+* The `core`, `auth`, and `chat` modules apply the `com.varabyte.kobweb.library` plugin in their build script, while
   the `site` module applies the `com.varabyte.kobweb.application` plugin.
 
 * The `.kobweb/conf.yaml` file lives under `site` and not at the root level.
@@ -42,7 +42,7 @@ Some things to notice about this multimodule app (vs. how it differs from a Kobw
   * There is a `.gitignore` file in the `site` subfolder in addition to the one at the root level. This is because it is
     responsible for ignoring the `.kobweb` folder, which moved into the `site` folder. 
 
-`common`, `auth`, and `chat` each get processed by the Kobweb library plugin at build time, generating some intermediate
+`core`, `auth`, and `chat` each get processed by the Kobweb library plugin at build time, generating some intermediate
 artifacts that the Kobweb application plugin looks for and consumes.
 
 The application plugin is responsible for bundling everything together into a final, cohesive, single site.
