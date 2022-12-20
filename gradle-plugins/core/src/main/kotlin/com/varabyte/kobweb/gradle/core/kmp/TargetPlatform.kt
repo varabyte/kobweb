@@ -15,6 +15,7 @@ abstract class TargetPlatform<T : KotlinTarget> {
 
     val compileKotlin: String get() = "compileKotlin${name.capitalize()}"
     val compileClasspath: String get() = "${name}CompileClasspath"
+    val runtimeClasspath: String get() = "${name}RuntimeClasspath"
 
     val jar get() = "${name}Jar"
     val processResources get() = "${name}ProcessResources"

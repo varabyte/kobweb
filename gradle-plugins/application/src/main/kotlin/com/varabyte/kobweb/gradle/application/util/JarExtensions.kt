@@ -37,20 +37,3 @@ fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
         }
     }
 }
-
-internal fun KotlinJsIrTarget.includeDependencyPublicResourcesInJar() {
-    val jsTargetName = name
-    project.tasks.named("${jsTargetName}Jar", Jar::class.java).configure {
-        val classpathProvider = project.configurations.named("${jsTargetName}RuntimeClasspath")
-        inputs.files(classpathProvider)
-
-        doFirst {
-            duplicatesStrategy = DuplicatesStrategy.WARN
-            val classpath = classpathProvider.get()
-            val patterns = PatternSet().apply {
-                include("public/**")
-            }
-            from(classpath.map { if (it.isDirectory) it else project.zipTree(it).matching(patterns) })
-        }
-    }
-}

@@ -3,7 +3,6 @@ package com.varabyte.kobweb.gradle.application
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.tasks.*
-import com.varabyte.kobweb.gradle.application.util.includeDependencyPublicResourcesInJar
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
@@ -17,11 +16,13 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.util.PatternSet
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.tooling.events.FailureResult
+import java.io.File
 import javax.inject.Inject
 
 val Project.kobwebFolder: KobwebFolder
@@ -67,8 +68,14 @@ class KobwebApplicationPlugin @Inject constructor(
             dependsOn(kobwebGenFrontendMetadata)
         }
 
+        val kobwebCopyDependencyResourcesTask = project.tasks.register("kobwebCopyDepResources", KobwebCopyDependencyResources::class.java, kobwebBlock)
         val kobwebGenSiteIndexTask =
             project.tasks.register("kobwebGenSiteIndex", KobwebGenerateSiteIndexTask::class.java, kobwebConf, kobwebBlock, buildTarget)
+
+        kobwebGenSiteIndexTask.configure {
+            // Make sure copy resources occurs first, so that our index.html file doesn't get overwritten
+            dependsOn(kobwebCopyDependencyResourcesTask)
+        }
 
         val kobwebGenApisFactoryTask = project.tasks.register("kobwebGenApisFactory", KobwebGenerateApisFactoryTask::class.java, kobwebBlock)
         kobwebGenApisFactoryTask.configure {
@@ -179,10 +186,8 @@ class KobwebApplicationPlugin @Inject constructor(
             }
             project.tasks.named(jsTarget.processResources) {
                 dependsOn(kobwebGenSiteIndexTask)
+                dependsOn(kobwebCopyDependencyResourcesTask)
             }
-
-
-            jsTarget.kotlinTarget.includeDependencyPublicResourcesInJar()
 
             // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
             jvmTarget?.let { jvm ->
