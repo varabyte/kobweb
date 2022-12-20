@@ -511,12 +511,15 @@ private class CompositeComponentVariant(private val head: ComponentVariant, priv
 
 /**
  * Convert a user's component style into a [Modifier].
+ *
+ * @param variants 0 or more variants that can potentially extend the base style. Although it may seem odd at first that
+ *   nullable values are accepted here, that's because Silk widgets all default their `variant` parameter to null, so
+ *   it's easier to just accept null here rather than require users to branch based on whether the variant is null or
+ *   not.
  */
 @Composable
-fun ComponentStyle.toModifier(variant: ComponentVariant? = null): Modifier {
-    return SilkTheme.componentStyles.getValue(name).toModifier().then(
-        variant?.toModifier() ?: Modifier
-    )
+fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
+    return SilkTheme.componentStyles.getValue(name).toModifier().then(variants.toList().combine().toModifier())
 }
 
 /**
@@ -551,4 +554,16 @@ fun Iterable<ComponentStyle>.toModifier(): Modifier {
 @Composable
 fun <T: Element, A: AttrsScope<T>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
+}
+
+/**
+ * A convenience method for folding a list of component variants into one single one that represents all of them.
+ */
+@Composable
+fun Iterable<ComponentVariant?>.combine(): ComponentVariant {
+    var finalVariant: ComponentVariant = ComponentVariant.Empty
+    for (variant in this) {
+        finalVariant = finalVariant.then(variant ?: ComponentVariant.Empty)
+    }
+    return finalVariant
 }
