@@ -191,7 +191,7 @@ fun createMainFunction(
                 renderComposable(rootElementId = "root") {
                     CompositionLocalProvider(AppGlobalsLocal provides mapOf(${appGlobals.map { entry -> "\"${entry.key.escapeQuotes()}\" to \"${entry.value.escapeQuotes()}\""}.joinToString() })) {
                         $appFqn {
-                            router.renderActivePage()
+                            ${if (usingSilk) "com.varabyte.kobweb.silk.defer.renderWithDeferred { router.renderActivePage() }" else "router.renderActivePage()" }
                         }
                     }
                 }

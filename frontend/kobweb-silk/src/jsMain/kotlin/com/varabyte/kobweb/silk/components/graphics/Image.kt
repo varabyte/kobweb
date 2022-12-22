@@ -9,6 +9,8 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.dom.Img
 
+// Note: Styles defined in kobweb-silk-widgets
+
 /**
  * A Silk-styleable [Img] tag.
  *

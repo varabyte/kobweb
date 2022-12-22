@@ -4,18 +4,18 @@ import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
 import com.varabyte.kobweb.silk.components.layout.DividerStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
+import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
+import com.varabyte.kobweb.silk.components.overlay.ModalBackdropStyle
+import com.varabyte.kobweb.silk.components.overlay.ModalStyle
+import com.varabyte.kobweb.silk.components.overlay.PopupStyle
+import com.varabyte.kobweb.silk.components.overlay.TooltipArrowStyle
+import com.varabyte.kobweb.silk.components.overlay.TooltipStyle
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
-import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
-import com.varabyte.kobweb.silk.theme.MutableSilkTheme
-import com.varabyte.kobweb.silk.theme.SilkConfig
-import com.varabyte.kobweb.silk.theme.SilkConfigInstance
-import com.varabyte.kobweb.silk.theme.SilkTheme
-import com.varabyte.kobweb.silk.theme._SilkTheme
+import com.varabyte.kobweb.silk.theme.*
 
 /**
  * Various classes passed to the user in a method annotated by `@InitSilk` which they can use to for initializing Silk
@@ -37,9 +37,14 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(DividerStyle)
     mutableTheme.registerComponentStyle(ImageStyle)
     mutableTheme.registerComponentStyle(LinkStyle)
+    mutableTheme.registerComponentStyle(ModalBackdropStyle)
+    mutableTheme.registerComponentStyle(ModalStyle)
+    mutableTheme.registerComponentStyle(PopupStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
     mutableTheme.registerComponentStyle(SpanTextStyle)
+    mutableTheme.registerComponentStyle(TooltipArrowStyle)
+    mutableTheme.registerComponentStyle(TooltipStyle)
 
     mutableTheme.registerComponentStyle(DisplayIfSmStyle)
     mutableTheme.registerComponentStyle(DisplayIfMdStyle)

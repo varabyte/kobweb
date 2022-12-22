@@ -23,6 +23,15 @@ data class SilkPalette(
     val link: Link,
     val button: Button,
     val border: Color = color,
+    val modal: Modal = Modal(
+        backdrop = color.toRgb().copyf(alpha = 0.5f),
+        background = background
+    ),
+    val tooltip: Tooltip = Tooltip(
+        // Intentionally inversed from main colors, for contrast.
+        background = color,
+        color = background,
+    )
 ) {
     /**
      * Silk link related colors.
@@ -46,6 +55,26 @@ data class SilkPalette(
         val default: Color,
         val hover: Color,
         val pressed: Color,
+    )
+
+    /**
+     * Silk modal dialog related colors.
+     *
+     * @param backdrop The color of the fullscreen shade behind the modal popup, useful for visually
+     *   de-emphasizing background content.
+     * @param background The color of the dialog that more tightly wraps modal content.
+     */
+    data class Modal(
+        val backdrop: Color,
+        val background: Color,
+    )
+
+    /**
+     * Silk tooltip related colors.
+     */
+    data class Tooltip(
+        val background: Color,
+        val color: Color,
     )
 }
 
