@@ -8,8 +8,7 @@ import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
-import com.varabyte.kobweb.silk.components.overlay.ModalBackdropStyle
-import com.varabyte.kobweb.silk.components.overlay.ModalStyle
+import com.varabyte.kobweb.silk.components.overlay.OverlayStyle
 import com.varabyte.kobweb.silk.components.overlay.PopupStyle
 import com.varabyte.kobweb.silk.components.overlay.TooltipArrowStyle
 import com.varabyte.kobweb.silk.components.overlay.TooltipStyle
@@ -37,8 +36,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(DividerStyle)
     mutableTheme.registerComponentStyle(ImageStyle)
     mutableTheme.registerComponentStyle(LinkStyle)
-    mutableTheme.registerComponentStyle(ModalBackdropStyle)
-    mutableTheme.registerComponentStyle(ModalStyle)
+    mutableTheme.registerComponentStyle(OverlayStyle)
     mutableTheme.registerComponentStyle(PopupStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
