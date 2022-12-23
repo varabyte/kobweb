@@ -44,7 +44,6 @@ enum class PopupPlacement {
 
 val PopupStyle = ComponentStyle.base("silk-popup") {
     Modifier
-        .position(Position.Absolute)
         .opacity(1)
         .transitionProperty("opacity")
         .transitionDuration(100.ms)
@@ -115,7 +114,7 @@ fun Popup(
             // that compose doesn't realize the tooltip should be rerendered
             key(targetElement) {
                 Box(
-                    PopupStyle.toModifier(variant).then(absPosModifier).then(modifier),
+                    PopupStyle.toModifier(variant).position(Position.Absolute).then(absPosModifier).then(modifier),
                     ref = ref { element ->
                         popupBounds = element.getBoundingClientRect()
                     },
