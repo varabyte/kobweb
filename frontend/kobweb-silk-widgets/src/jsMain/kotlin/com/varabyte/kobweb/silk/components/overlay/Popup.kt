@@ -47,11 +47,7 @@ enum class PopupPlacement {
     //  Also, maybe auto? As a way to avoid tooltips or popups going off screen
 }
 
-val PopupStyle = ComponentStyle.base("silk-popup") {
-    Modifier
-        .opacity(1)
-        .transitionProperty("opacity")
-        .transitionDuration(100.ms)
+val PopupStyle = ComponentStyle("silk-popup") {
 }
 
 /**
@@ -113,16 +109,29 @@ fun Popup(
                 }
             }
         }
-        // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
-        // causing focus to be gained and lost
-            ?: Modifier.top((-100).percent).left((-100).percent).opacity(0) // Hide for a frame or so until we've calculated the final popup location
+            ?: Modifier
+                // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
+                // causing focus to be gained and lost
+                .top((-100).percent).left((-100).percent)
+                .opacity(0)
+                .then(when (placement) {
+                    PopupPlacement.Top -> Modifier.translateY((-5).px)
+                    PopupPlacement.Left -> Modifier.translateX((-5).px)
+                    PopupPlacement.Right -> Modifier.translateX(5.px)
+                    PopupPlacement.Bottom -> Modifier.translateY(5.px)
+                })
 
         deferRender {
             // Need to set targetElement as the key because otherwise you might move from one element to another so fast
             // that compose doesn't realize the tooltip should be rerendered
             key(targetElement) {
                 Box(
-                    PopupStyle.toModifier(variant).position(Position.Absolute).then(absPosModifier).then(modifier),
+                    PopupStyle.toModifier(variant)
+                        .position(Position.Absolute)
+                        .transitionProperty("opacity")
+                        .transitionDuration(200.ms)
+                        .then(absPosModifier)
+                        .then(modifier),
                     ref = ref { element ->
                         popupBounds = element.getBoundingClientRect()
                     },
