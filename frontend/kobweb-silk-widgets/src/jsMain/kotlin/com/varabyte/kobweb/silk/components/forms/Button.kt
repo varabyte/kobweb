@@ -26,7 +26,6 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.CssRule
 import com.varabyte.kobweb.silk.components.style.active
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
@@ -98,7 +97,8 @@ fun Button(
                 }
                 evt.preventDefault()
             }
-            .tabIndex(0) // Allow button to be tabbed to
+            // Note: Just leaving tabIndex out doesn't seem to be enough; have to explicitly disable for some reason
+            .tabIndex(if (enabled) 0 else -1) // Allow button to be tabbed to
             .onKeyDown { evt ->
                 if (!enabled) return@onKeyDown
                 if (evt.isComposing) return@onKeyDown
