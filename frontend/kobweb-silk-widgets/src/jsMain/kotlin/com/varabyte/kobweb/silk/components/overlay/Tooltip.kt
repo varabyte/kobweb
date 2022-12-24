@@ -97,10 +97,11 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
+    offsetPixels: Double = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    Popup(target, Modifier, placement, null) {
+    Popup(target, Modifier, placement, offsetPixels, null) {
         Box(
             TooltipStyle.toModifier(variant).then(modifier),
         ) {
@@ -134,9 +135,10 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
+    offsetPixels: Double = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
 ) {
-    Tooltip(target, modifier, placement, hasArrow, variant) {
+    Tooltip(target, modifier, placement, hasArrow, offsetPixels, variant) {
         Column(Modifier.padding(5.px)) {
             text.split("\n").forEach { line -> SpanText(line) }
         }

@@ -19,9 +19,12 @@ import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
+
+const val DEFAULT_POPUP_OFFSET_PX = 10.0
 
 /**
  * An enumeration for placing a popup outside of while still being aligned to another.
@@ -63,6 +66,7 @@ fun Popup(
     target: ElementTarget,
     modifier: Modifier = Modifier,
     placement: PopupPlacement = PopupPlacement.Bottom,
+    offsetPixels: Double = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -85,23 +89,23 @@ fun Popup(
             when (placement) {
                 PopupPlacement.Top -> {
                     Modifier
-                        .left((targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                        .top((targetBounds.top - 10 - popupBounds.height).px)
+                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
+                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
                 }
                 PopupPlacement.Bottom -> {
                     Modifier
-                        .left((targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                        .top((targetBounds.bottom + 10).px)
+                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
+                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
                 }
                 PopupPlacement.Left -> {
                     Modifier
-                        .top((targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                        .left((targetBounds.left - 10 - popupBounds.width).px)
+                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
                 }
                 PopupPlacement.Right -> {
                     Modifier
-                        .top((targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                        .left((targetBounds.right + 10).px)
+                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
                 }
             }
         }
