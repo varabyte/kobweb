@@ -122,8 +122,6 @@ fun Popup(
                 Box(
                     PopupStyle.toModifier(variant)
                         .position(Position.Absolute)
-                        .transitionProperty("opacity")
-                        .transitionDuration(200.ms)
                         .then(absPosModifier)
                         .then(modifier),
                     ref = ref { element ->
