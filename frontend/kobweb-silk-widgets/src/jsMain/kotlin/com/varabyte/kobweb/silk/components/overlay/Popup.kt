@@ -24,7 +24,9 @@ import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
 
-const val DEFAULT_POPUP_OFFSET_PX = 10.0
+// A small but comfortable amount of space. Also allows the Tooltip composable to extend up a bit with an arrow while
+// still leaving a bit of space to go.
+const val DEFAULT_POPUP_OFFSET_PX = 15
 
 /**
  * An enumeration for placing a popup outside of while still being aligned to another.
@@ -66,7 +68,7 @@ fun Popup(
     target: ElementTarget,
     modifier: Modifier = Modifier,
     placement: PopupPlacement = PopupPlacement.Bottom,
-    offsetPixels: Double = DEFAULT_POPUP_OFFSET_PX,
+    offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -84,6 +86,8 @@ fun Popup(
     targetElement?.let { element ->
         val targetBounds = element.getBoundingClientRect()
         var popupBounds by remember { mutableStateOf<DOMRect?>(null) }
+        @Suppress("NAME_SHADOWING")
+        val offsetPixels = offsetPixels.toDouble()
         @Suppress("NAME_SHADOWING")
         val absPosModifier = popupBounds?.let { popupBounds ->
             when (placement) {

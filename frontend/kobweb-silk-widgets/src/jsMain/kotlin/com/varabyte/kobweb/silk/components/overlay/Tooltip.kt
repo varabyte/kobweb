@@ -97,7 +97,7 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
-    offsetPixels: Double = DEFAULT_POPUP_OFFSET_PX,
+    offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -135,7 +135,7 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
-    offsetPixels: Double = DEFAULT_POPUP_OFFSET_PX,
+    offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
 ) {
     Tooltip(target, modifier, placement, hasArrow, offsetPixels, variant) {
