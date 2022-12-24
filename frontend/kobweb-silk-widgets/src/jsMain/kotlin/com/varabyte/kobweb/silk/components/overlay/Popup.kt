@@ -114,12 +114,6 @@ fun Popup(
                 // causing focus to be gained and lost
                 .top((-100).percent).left((-100).percent)
                 .opacity(0)
-                .then(when (placement) {
-                    PopupPlacement.Top -> Modifier.translateY((-5).px)
-                    PopupPlacement.Left -> Modifier.translateX((-5).px)
-                    PopupPlacement.Right -> Modifier.translateX(5.px)
-                    PopupPlacement.Bottom -> Modifier.translateY(5.px)
-                })
 
         deferRender {
             // Need to set targetElement as the key because otherwise you might move from one element to another so fast
