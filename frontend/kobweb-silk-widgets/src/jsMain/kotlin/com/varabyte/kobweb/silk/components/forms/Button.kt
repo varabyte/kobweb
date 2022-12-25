@@ -88,25 +88,24 @@ fun Button(
 ) {
     JbButton(
         attrs = ButtonStyle.toModifier(variant)
-            .thenIf(!enabled, DisabledStyle.toModifier())
+            .thenIf(!enabled, DisabledStyle.toModifier().tabIndex(-1))
             .then(modifier)
-            .onClick { evt ->
-                if (enabled) {
-                    document.activeElement?.clearFocus()
-                    onClick()
-                }
-                evt.preventDefault()
+            .thenIf(enabled) {
+                Modifier
+                    .onClick { evt ->
+                        document.activeElement?.clearFocus()
+                        onClick()
+                        evt.preventDefault()
+                    }
+                    .onKeyDown { evt ->
+                        if (evt.isComposing) return@onKeyDown
+                        if (evt.key == "Enter" || evt.key == "Space") {
+                            onClick()
+                            evt.preventDefault()
+                        }
+                    }
             }
-            // Note: Just leaving tabIndex out doesn't seem to be enough; have to explicitly disable for some reason
-            .tabIndex(if (enabled) 0 else -1) // Allow button to be tabbed to
-            .onKeyDown { evt ->
-                if (!enabled) return@onKeyDown
-                if (evt.isComposing) return@onKeyDown
-                if (evt.key == "Enter") {
-                    onClick()
-                    evt.preventDefault()
-                }
-            }.toAttrs()
+            .toAttrs()
     ) {
         registerRefScope(ref)
         Box(contentAlignment = Alignment.Center, content = content)
