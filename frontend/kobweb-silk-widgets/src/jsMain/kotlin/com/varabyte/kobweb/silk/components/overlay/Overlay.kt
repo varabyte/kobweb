@@ -52,7 +52,7 @@ fun Overlay(modifier: Modifier = Modifier, contentAlignment: Alignment = Alignme
         Box(
             OverlayStyle
                 .toModifier()
-                .position(Position.Absolute)
+                .position(Position.Fixed)
                 .top(0.px).bottom(0.px).left(0.px).right(0.px)
                 .then(modifier),
             contentAlignment = contentAlignment) {
