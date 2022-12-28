@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -18,6 +19,7 @@ import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
+import org.w3c.dom.HTMLElement
 
 val OverlayStyle = ComponentStyle.base("silk-overlay") {
     Modifier.backgroundColor(colorMode.toSilkPalette().overlay)
@@ -47,7 +49,12 @@ val OverlayStyle = ComponentStyle.base("silk-overlay") {
  * first, as a parent method that this lives under. See the method for more details.
  */
 @Composable
-fun Overlay(modifier: Modifier = Modifier, contentAlignment: Alignment = Alignment.TopCenter, content: @Composable BoxScope.() -> Unit) {
+fun Overlay(
+    modifier: Modifier = Modifier,
+    contentAlignment: Alignment = Alignment.TopCenter,
+    ref: ElementRefScope<HTMLElement>? = null,
+    content: @Composable BoxScope.() -> Unit
+) {
     deferRender {
         Box(
             OverlayStyle
@@ -55,8 +62,9 @@ fun Overlay(modifier: Modifier = Modifier, contentAlignment: Alignment = Alignme
                 .position(Position.Fixed)
                 .top(0.px).bottom(0.px).left(0.px).right(0.px)
                 .then(modifier),
-            contentAlignment = contentAlignment) {
-            content()
-        }
+            contentAlignment = contentAlignment,
+            ref = ref,
+            content = content,
+        )
     }
 }

@@ -62,6 +62,10 @@ data class ElementRefScope<TElement : Element> internal constructor(
     }
 }
 
+operator fun <TElement : Element> ElementRefScope<TElement>.plus(other: ElementRefScope<TElement>?): ElementRefScope<TElement> {
+    return if (other != null) ElementRefScope(keyedCallbacks + other.keyedCallbacks) else this
+}
+
 /**
  * Convenience method for installing an [ElementRefScope] into an [ElementScope].
  *

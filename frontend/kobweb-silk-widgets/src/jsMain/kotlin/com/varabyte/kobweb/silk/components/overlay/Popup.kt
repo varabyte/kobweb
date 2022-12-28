@@ -1,7 +1,9 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
+import com.varabyte.kobweb.compose.dom.plus
 import com.varabyte.kobweb.compose.dom.ref
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -66,6 +68,7 @@ fun Popup(
     placement: PopupPlacement = PopupPlacement.Bottom,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     var targetElement by remember { mutableStateOf<HTMLElement?>(null) }
@@ -124,9 +127,9 @@ fun Popup(
                         .position(Position.Absolute)
                         .then(absPosModifier)
                         .then(modifier),
-                    ref = ref { element ->
+                    ref = ref<HTMLElement> { element ->
                         popupBounds = element.getBoundingClientRect()
-                    },
+                    } + ref,
                     content = content
                 )
             }

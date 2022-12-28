@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -17,6 +18,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
+import org.w3c.dom.HTMLElement
 
 val TooltipStyle = ComponentStyle.base("silk-tooltip") {
     val palette = colorMode.toSilkPalette()
@@ -99,9 +101,10 @@ fun Tooltip(
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     variant: ComponentVariant? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    Popup(target, Modifier, placement, offsetPixels, null) {
+    Popup(target, Modifier, placement, offsetPixels, null, ref) {
         Box(
             TooltipStyle.toModifier(variant).then(modifier),
         ) {
@@ -136,9 +139,10 @@ fun Tooltip(
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
+    ref: ElementRefScope<HTMLElement>? = null,
     variant: ComponentVariant? = null,
 ) {
-    Tooltip(target, modifier, placement, hasArrow, offsetPixels, variant) {
+    Tooltip(target, modifier, placement, hasArrow, offsetPixels, variant, ref) {
         Column(Modifier.padding(5.px)) {
             text.split("\n").forEach { line -> SpanText(line) }
         }
