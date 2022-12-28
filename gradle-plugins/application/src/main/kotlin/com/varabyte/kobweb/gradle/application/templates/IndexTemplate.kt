@@ -40,6 +40,7 @@ private fun BODY.buildIndicator() {
                             visibility: hidden;
                             opacity: 0;
                             z-index: 2147483647;
+                            user-select: none;
                         }
                         body > #status > .hidden {
                            display: none;
