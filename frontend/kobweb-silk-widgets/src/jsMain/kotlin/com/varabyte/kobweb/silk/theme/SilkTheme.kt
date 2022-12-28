@@ -60,7 +60,7 @@ interface SilkConfig {
      * }
      * ```
      */
-    fun registerStyle(className: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit)
+    fun registerStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit)
 }
 
 /**
@@ -87,8 +87,8 @@ interface SilkConfig {
  * You may still wish to use [SilkConfig.registerStyle] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun SilkConfig.registerBaseStyle(className: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
-    registerStyle(className, extraModifiers) {
+fun SilkConfig.registerBaseStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
+    registerStyle(cssSelector, extraModifiers) {
         base {
             init()
         }
@@ -100,8 +100,8 @@ internal object SilkConfigInstance : SilkConfig {
 
     private val styles = mutableListOf<ComponentStyle>()
 
-    override fun registerStyle(className: String, extraModifiers: Modifier, init: StyleModifiers.() -> Unit) {
-        styles.add(ComponentStyle(className, extraModifiers, init))
+    override fun registerStyle(cssSelector: String, extraModifiers: Modifier, init: StyleModifiers.() -> Unit) {
+        styles.add(ComponentStyle(cssSelector, extraModifiers, init))
     }
 
     // This method is not part of the public API and should be called by Silk at initialization time
