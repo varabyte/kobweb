@@ -58,12 +58,21 @@ data class ElementRefScope<TElement : Element> internal constructor(
             keyedCallbacks.add(KeysToEffect(keys.toList(), RefCallback.Disposable(effect)))
         }
 
+        /**
+         * Add any ref callbacks contained in another ref scope.
+         *
+         * This is useful to have if a widget internally creates its own ref scope for some reason but also wants to
+         * accommodate any callbacks passed in by the caller.
+         *
+         * @param other Another ref scope to include as part of this one. Accepts null for convenience because this is
+         *  often a nullable parameter that accepts a value passed in from a user.
+         */
+        fun add(other: ElementRefScope<TElement>?) {
+            if (other != null) keyedCallbacks.addAll(other.keyedCallbacks)
+        }
+
         internal fun build() = ElementRefScope(keyedCallbacks)
     }
-}
-
-operator fun <TElement : Element> ElementRefScope<TElement>.plus(other: ElementRefScope<TElement>?): ElementRefScope<TElement> {
-    return if (other != null) ElementRefScope(keyedCallbacks + other.keyedCallbacks) else this
 }
 
 /**

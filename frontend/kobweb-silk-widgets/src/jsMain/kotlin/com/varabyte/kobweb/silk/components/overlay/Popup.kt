@@ -3,8 +3,8 @@ package com.varabyte.kobweb.silk.components.overlay
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
-import com.varabyte.kobweb.compose.dom.plus
 import com.varabyte.kobweb.compose.dom.ref
+import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -13,11 +13,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.left
 import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.position
 import com.varabyte.kobweb.compose.ui.modifiers.top
-import com.varabyte.kobweb.compose.ui.modifiers.transitionDuration
-import com.varabyte.kobweb.compose.ui.modifiers.transitionProperty
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
@@ -127,9 +124,12 @@ fun Popup(
                         .position(Position.Absolute)
                         .then(absPosModifier)
                         .then(modifier),
-                    ref = ref<HTMLElement> { element ->
-                        popupBounds = element.getBoundingClientRect()
-                    } + ref,
+                    ref = refScope {
+                        ref { element ->
+                            popupBounds = element.getBoundingClientRect()
+                        }
+                        add(ref)
+                    },
                     content = content
                 )
             }
