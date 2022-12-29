@@ -7,7 +7,6 @@ import com.varabyte.kobweb.silk.components.layout.breakpoint.displayIf
 import com.varabyte.kobweb.silk.components.layout.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import kotlinx.browser.window
-import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
 
 /**
