@@ -13,9 +13,7 @@ private class DeferredComposablesState {
     fun forEach(render: @Composable (Entry) -> Unit) {
         // Copy the entries before enumerating, as the callback may, as a side effect, append more entries (for example,
         // a modal dialog triggering a tooltip).
-        entries.toList().forEach { overlay ->
-            render(overlay)
-        }
+        entries.toList().forEach { render(it) }
     }
 
     inner class Entry {
@@ -44,7 +42,7 @@ fun deferRender(content: @Composable () -> Unit) {
     val state = LocalDeferred.current
     val deferredEntry = remember(state) { state.append() }
     deferredEntry.content = content
-    DisposableEffect(deferredEntry) { onDispose { deferredEntry.dismiss() }}
+    DisposableEffect(deferredEntry) { onDispose { deferredEntry.dismiss() } }
 }
 
 /**
