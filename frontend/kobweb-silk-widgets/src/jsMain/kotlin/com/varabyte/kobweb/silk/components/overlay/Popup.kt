@@ -64,6 +64,7 @@ fun Popup(
     modifier: Modifier = Modifier,
     placement: PopupPlacement = PopupPlacement.Bottom,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
+    placementTarget: ElementTarget? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
@@ -73,7 +74,7 @@ fun Popup(
         Modifier.display(DisplayStyle.None),
         ref = ref { element ->
             target(startingFrom = element)?.apply {
-                onmouseenter = { targetElement = this; Unit }
+                onmouseenter = { targetElement = placementTarget?.invoke(startingFrom = element) ?: this; Unit }
                 onmouseleave = { targetElement = null; Unit }
             }
         }

@@ -104,7 +104,7 @@ fun Tooltip(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    Popup(target, Modifier, placement, offsetPixels, null, ref) {
+    Popup(target, Modifier, placement, offsetPixels, null, ref = ref) {
         Box(
             TooltipStyle.toModifier(variant).then(modifier),
         ) {
@@ -139,8 +139,8 @@ fun Tooltip(
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
-    ref: ElementRefScope<HTMLElement>? = null,
     variant: ComponentVariant? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
 ) {
     Tooltip(target, modifier, placement, hasArrow, offsetPixels, variant, ref) {
         Column(Modifier.padding(5.px)) {
