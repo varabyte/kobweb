@@ -1,25 +1,48 @@
 package com.varabyte.kobweb.silk.defer
 
 import androidx.compose.runtime.*
+import kotlinx.browser.window
 
 private class DeferredComposablesState {
-    private val entries = mutableStateListOf<Entry>()
+    private var changeCount = 0
+    private var timeoutHandle = -1
+    private val batchedCommands = mutableListOf<() -> Unit>()
+    private val entries = mutableStateListOf<DeferredComposablesState.Entry>()
+
+    // By not running some commands immediately, instead delaying and batching them toghether, this prevents a bunch of
+    // intermediate recompositions.
+    private fun delayAndBatchCommand(block: () -> Unit) {
+        batchedCommands.add(block)
+        if (timeoutHandle == -1) {
+            timeoutHandle = window.setTimeout({
+                batchedCommands.forEach { it.invoke() }
+                batchedCommands.clear()
+
+                ++changeCount
+                timeoutHandle = -1
+            })
+        }
+    }
 
     fun append(): Entry = Entry().also {
-        entries += it
+        delayAndBatchCommand {
+            entries.add(it)
+        }
     }
 
     @Composable
     fun forEach(render: @Composable (Entry) -> Unit) {
-        // Copy the entries before enumerating, as the callback may, as a side effect, append more entries (for example,
-        // a modal dialog triggering a tooltip).
-        entries.toList().forEach { render(it) }
+        key(changeCount) {
+            entries.forEach { render(it) }
+        }
     }
 
     inner class Entry {
         var content: (@Composable () -> Unit)? = null
         fun dismiss() {
-            entries -= this
+            delayAndBatchCommand {
+                entries.remove(this)
+            }
         }
     }
 }
@@ -58,6 +81,11 @@ fun renderWithDeferred(content: @Composable () -> Unit) {
     val state = DeferredComposablesState()
     CompositionLocalProvider(LocalDeferred provides state) {
         content()
-        state.forEach { entry -> entry.content?.invoke() }
+        state.forEach { entry ->
+            // Deferred content itself may defer more content! Like showing a tooltip within an overlay
+            // If we don't do this, we end up with the deferred list constantly getting modified and causing
+            // recompositions as a result.
+            entry.content?.let { renderWithDeferred(it) }
+        }
     }
 }
