@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class ScrollBehavior(val value: String) {
+class ScrollBehavior private constructor(val value: String) {
     companion object {
         // Keyword
         val Auto get() = ScrollBehavior("auto")
@@ -22,10 +22,10 @@ fun StyleScope.scrollBehavior(scrollBehavior: ScrollBehavior) {
 
 // region Scroll snap
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-type
-class ScrollSnapType(val value: String) {
+class ScrollSnapType private constructor(val value: String) {
     companion object {
         // Keyword
-        val None get() = ScrollSnapAxis("none")
+        val None get() = ScrollSnapType("none")
 
         // Global
         val Inherit get() = ScrollSnapType("inherit")
@@ -34,7 +34,7 @@ class ScrollSnapType(val value: String) {
     }
 }
 
-class ScrollSnapAxis(val value: String) {
+class ScrollSnapAxis private constructor(val value: String) {
     companion object {
         // Keyword
         val X get() = ScrollSnapAxis("x")
@@ -45,7 +45,7 @@ class ScrollSnapAxis(val value: String) {
     }
 }
 
-class ScrollSnapMode(val value: String) {
+class ScrollSnapMode private constructor(val value: String) {
     companion object {
         // Keyword
         val Mandatory get() = ScrollSnapMode("mandatory")
@@ -123,7 +123,7 @@ fun StyleScope.scrollPaddingBlockEnd(value: CSSNumeric) {
 // region Scroll snap align
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-align
-class ScrollSnapAlign(val value: String) {
+class ScrollSnapAlign private constructor(val value: String) {
     companion object {
         // Keyword
         val None get() = ScrollSnapAlign("none")
@@ -152,7 +152,7 @@ fun StyleScope.scrollSnapAlign(blockAxis: ScrollSnapAlign, inlineAxis: ScrollSna
 // region Scroll snap stop
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-stop
-class ScrollSnapStop(val value: String) {
+class ScrollSnapStop private constructor(val value: String) {
     companion object {
         // Keyword
         val Normal get() = ScrollSnapStop("normal")

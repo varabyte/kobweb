@@ -52,7 +52,7 @@ private fun OverflowStrategy.toValue(position: String) = "${name.lowercase()} $p
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
-sealed class AlignContent(val value: String) {
+sealed class AlignContent private constructor(val value: String) {
     open class AlignContentKeyword(value: String) : AlignContent(value)
     class AlignContentPosition(value: String) : AlignContentKeyword(value)
 
@@ -109,7 +109,7 @@ fun StyleScope.alignContent(alignContent: AlignContent) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
-sealed class AlignItems(val value: String) {
+sealed class AlignItems private constructor(val value: String) {
     open class AlignItemsKeyword(value: String) : AlignItems(value)
     class AlignItemsPosition(value: String) : AlignItemsKeyword(value)
 
@@ -163,7 +163,7 @@ fun StyleScope.alignItems(alignItems: AlignItems) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-self
-sealed class AlignSelf(val value: String) {
+sealed class AlignSelf private constructor(val value: String) {
     open class AlignSelfKeyword(value: String) : AlignSelf(value)
     class AlignSelfPosition(value: String) : AlignSelfKeyword(value)
 
@@ -219,7 +219,7 @@ fun StyleScope.alignSelf(alignSelf: AlignSelf) {
  * it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
-sealed class JustifyContent(val value: String) {
+sealed class JustifyContent private constructor(val value: String) {
     open class JustifyContentKeyword(value: String) : JustifyContent(value)
     class JustifyContentPosition(value: String) : JustifyContentKeyword(value)
 
@@ -268,7 +268,7 @@ fun StyleScope.justifyContent(justifyContent: JustifyContent) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
-sealed class JustifyItems(val value: String) {
+sealed class JustifyItems private constructor(val value: String) {
     open class JustifyItemsKeyword(value: String) : JustifyItems(value)
     class JustifyItemsPosition(value: String) : JustifyItemsKeyword(value)
 
@@ -324,7 +324,7 @@ fun StyleScope.justifyItems(justifyItems: JustifyItems) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
-sealed class JustifySelf(val value: String) {
+sealed class JustifySelf private constructor(val value: String) {
     open class JustifySelfKeyword(value: String) : JustifySelf(value)
     class JustifySelfPosition(value: String) : JustifySelfKeyword(value)
 

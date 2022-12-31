@@ -38,7 +38,7 @@ fun StyleScope.outline(
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color
-class OutlineColor(val value: String) {
+class OutlineColor private constructor(val value: String) {
     companion object {
         // Keyword
         val Invert get() = OutlineColor("invert")
@@ -71,7 +71,7 @@ fun StyleScope.outlineStyle(value: LineStyle) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
-class OutlineWidth(val value: String) {
+class OutlineWidth private constructor(val value: String) {
     companion object {
         // Keyword
         val Thin get() = OutlineWidth("thin")

@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
-class Overflow(val value: String) {
+class Overflow private constructor(val value: String) {
     companion object {
         // General
         val Visible get() = Overflow("visible")
@@ -21,7 +21,7 @@ class Overflow(val value: String) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
-class OverflowWrap(val value: String) {
+class OverflowWrap private constructor(val value: String) {
     companion object {
         // General
         val Normal get() = OverflowWrap("normal")

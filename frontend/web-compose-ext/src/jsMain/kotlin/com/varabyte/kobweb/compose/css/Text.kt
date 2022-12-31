@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class TextAlign(val value: String) {
+class TextAlign private constructor(val value: String) {
     companion object {
         val Left get() = TextAlign("left")
         val Right get() = TextAlign("right")
@@ -19,7 +19,7 @@ fun StyleScope.textAlign(textAlign: TextAlign) {
     property("text-align", textAlign.value)
 }
 
-class TextDecorationLine(val value: String) {
+class TextDecorationLine private constructor(val value: String) {
     companion object {
         val Underline get() = TextDecorationLine("underline")
         val Overline get() = TextDecorationLine("overline")
@@ -38,7 +38,7 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
-class UserSelect(val value: String) {
+class UserSelect private constructor(val value: String) {
     companion object {
         val None get() = UserSelect("none")
         val Auto get() = UserSelect("auto")
@@ -55,7 +55,7 @@ fun StyleScope.userSelect(userSelect: UserSelect) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
-class WhiteSpace(val value: String) {
+class WhiteSpace private constructor(val value: String) {
     companion object {
         val Normal get() = WhiteSpace("normal");
         val NoWrap get() = WhiteSpace("nowrap");
@@ -76,7 +76,7 @@ fun StyleScope.whiteSpace(whiteSpace: WhiteSpace) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode
-class WritingMode(val value: String) {
+class WritingMode private constructor(val value: String) {
     // Keyword
     val HorizontalTb get() = WritingMode("horizontal-tb");
     val VerticalRl get() = WritingMode("vertical-rl");

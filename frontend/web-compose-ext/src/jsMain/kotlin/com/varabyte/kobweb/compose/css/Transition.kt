@@ -35,7 +35,7 @@ fun StyleScope.transitionProperty(vararg properties: String) {
 /**
  * Special values for Transition Duration Property.
  */
-class TransitionDuration(val value: String) {
+class TransitionDuration private constructor(val value: String) {
     companion object {
         // Global values
         val Inherit get() = TransitionDuration("inherit")
@@ -57,7 +57,7 @@ fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>
 /**
  * Special values for Transition Delay Property.
  */
-class TransitionDelay(val value: String) {
+class TransitionDelay private constructor(val value: String) {
     companion object {
         // Global values
         val Inherit get() = TransitionDelay("inherit")

@@ -68,7 +68,7 @@ fun StyleScope.marginBlockEnd(value: CSSNumeric) {
 
 // region vertical-align See: https://developer.mozilla.org/en-US/docs/Web/CSS/vertical-align
 
-class VerticalAlign(val value: String) {
+class VerticalAlign private constructor(val value: String) {
     companion object {
         // Keyword
         val Baseline get() = VerticalAlign("baseline")

@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
-sealed class BoxDecorationBreak(val value: String) {
+sealed class BoxDecorationBreak private constructor(val value: String) {
     // Keyword
     object Slice : BoxDecorationBreak("slice")
     object Clone : BoxDecorationBreak("clone")
@@ -21,7 +21,7 @@ fun StyleScope.boxDecorationBreak(boxDecorationBreak: BoxDecorationBreak) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-sealed class BoxSizing(val value: String) {
+sealed class BoxSizing private constructor(val value: String) {
     // Keyword
     object BorderBox : BoxSizing("border-box")
     object ContentBox : BoxSizing("content-box")

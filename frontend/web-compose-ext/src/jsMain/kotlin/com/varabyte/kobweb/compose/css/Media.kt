@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
-class ObjectFit(val value: String) {
+class ObjectFit private constructor(val value: String) {
     companion object {
         // Keywords
         val Contain get() = ObjectFit("contain")
