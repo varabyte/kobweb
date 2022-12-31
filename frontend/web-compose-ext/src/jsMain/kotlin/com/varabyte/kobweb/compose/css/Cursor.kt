@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-class Cursor(val value: String) {
+class Cursor private constructor(val value: String) {
     companion object {
         // General
         val Auto get() = Cursor("auto")

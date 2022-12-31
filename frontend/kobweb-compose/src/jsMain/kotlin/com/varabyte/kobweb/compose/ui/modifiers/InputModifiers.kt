@@ -2,10 +2,7 @@ package com.varabyte.kobweb.compose.ui.modifiers
 
 import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticMouseEvent
-import com.varabyte.kobweb.compose.css.Cursor
-import com.varabyte.kobweb.compose.css.UserSelect
-import com.varabyte.kobweb.compose.css.cursor
-import com.varabyte.kobweb.compose.css.userSelect
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
@@ -66,6 +63,10 @@ fun Modifier.onMouseMove(onMouseMove: (SyntheticMouseEvent) -> Unit) = attrsModi
 
 fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = attrsModifier {
     onMouseUp { evt -> onMouseUp(evt) }
+}
+
+fun Modifier.pointerEvents(pointerEvents: PointerEvents) = styleModifier {
+    pointerEvents(pointerEvents)
 }
 
 fun Modifier.userSelect(userSelect: UserSelect): Modifier = styleModifier {
