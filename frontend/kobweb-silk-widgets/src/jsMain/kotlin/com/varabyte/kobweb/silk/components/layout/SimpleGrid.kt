@@ -24,7 +24,7 @@ import org.w3c.dom.HTMLElement
 // https://github.com/varabyte/kobweb/issues/154
 // In a pinch, you can fork this file into your own code, rename the base style from "silk-simple-grid" to your own name,
 // and increase the column count.
-private const val MAX_COLUMN_COUNT = 4
+private const val MAX_COLUMN_COUNT = 5
 
 val SimpleGridStyle = ComponentStyle.base("silk-simple-grid") {
     Modifier.display(DisplayStyle.Grid)
@@ -95,6 +95,10 @@ fun SimpleGrid(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {
+    require(numColumns.base <= MAX_COLUMN_COUNT && numColumns.sm <= MAX_COLUMN_COUNT && numColumns.md <= MAX_COLUMN_COUNT && numColumns.lg <= MAX_COLUMN_COUNT && numColumns.xl <= MAX_COLUMN_COUNT) {
+        "SimpleGrid supports at most $MAX_COLUMN_COUNT columns. If you need more than this, consider pinging https://github.com/varabyte/kobweb/issues/154."
+    }
+
     Div(
         attrs = SimpleGridStyle
             .toModifier(variant)
