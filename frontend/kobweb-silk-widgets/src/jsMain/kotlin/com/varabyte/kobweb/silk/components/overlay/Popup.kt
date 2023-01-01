@@ -8,11 +8,9 @@ import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.display
-import com.varabyte.kobweb.compose.ui.modifiers.left
-import com.varabyte.kobweb.compose.ui.modifiers.opacity
-import com.varabyte.kobweb.compose.ui.modifiers.position
-import com.varabyte.kobweb.compose.ui.modifiers.top
+import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.components.overlay.PopupPlacement.LeftTop
+import com.varabyte.kobweb.silk.components.overlay.PopupPlacement.TopLeft
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -30,20 +28,33 @@ const val DEFAULT_POPUP_OFFSET_PX = 15
 /**
  * An enumeration for placing a popup outside of while still being aligned to another.
  *
- * Popups should avoid covering the element itself
+ *      TL  T  TR
+ *   LT +-------+ RT
+ *      |       |
+ *    L |       | R
+ *      |       |
+ *   LB +-------+ RB
+ *      BL  B  BR
+ *
+ * Note the difference between e.g. [TopLeft] and [LeftTop]. The former will place the popup above the target, with
+ * left edges aligned, while the latter will place to popup to the left of the target, with top edges aligned.
+ *
+ * Note that popups should avoid covering the element itself (as that would make the popup go away since it would cause
+ * the mouseleave event to fire, removing the popup), so there is no option for `Center` placement.
  */
 enum class PopupPlacement {
+    TopLeft,
     Top,
+    TopRight,
+    LeftTop,
+    RightTop,
     Left,
     Right,
+    LeftBottom,
+    RightBottom,
+    BottomLeft,
     Bottom,
-    // TODO(#199): Add more locations
-    //     TL  TR
-    //  LT +----+ RT
-    //     |    |
-    //  LB +----+ RB
-    //     BL  BR
-    //  Also, maybe auto? As a way to avoid tooltips or popups going off screen
+    BottomRight,
 }
 
 val PopupStyle = ComponentStyle("silk-popup") {
@@ -88,25 +99,71 @@ fun Popup(
         @Suppress("NAME_SHADOWING")
         val absPosModifier = popupBounds?.let { popupBounds ->
             when (placement) {
+                PopupPlacement.TopLeft -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left).px)
+                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+                }
                 PopupPlacement.Top -> {
                     Modifier
                         .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
                         .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+                }
+                PopupPlacement.TopRight -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
+                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+                }
+
+                PopupPlacement.LeftTop -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                        .top((window.pageYOffset + targetBounds.top).px)
+
+                }
+                PopupPlacement.RightTop -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                        .top((window.pageYOffset + targetBounds.top).px)
+
+                }
+
+                PopupPlacement.Left -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+                }
+                PopupPlacement.Right -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+                }
+
+                PopupPlacement.LeftBottom -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
+                }
+                PopupPlacement.RightBottom -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
+                }
+
+                PopupPlacement.BottomLeft -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left).px)
+                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
                 }
                 PopupPlacement.Bottom -> {
                     Modifier
                         .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
                         .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
                 }
-                PopupPlacement.Left -> {
+                PopupPlacement.BottomRight -> {
                     Modifier
-                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                }
-                PopupPlacement.Right -> {
-                    Modifier
-                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
+                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
                 }
             }
         }
