@@ -15,6 +15,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.Br
 import org.w3c.dom.HTMLElement
 
 private fun Modifier.triangleUp(color: Color) = styleModifier {
@@ -220,7 +221,7 @@ fun Tooltip(
 ) {
     Tooltip(target, TooltipTextContainerStyle.toModifier().then(modifier), placement, hasArrow, offsetPixels,  placementTarget, variant, ref) {
         Column {
-            text.split("\n").forEach { line -> SpanText(line) }
+            text.split("\n").forEach { line -> if (line.isNotEmpty()) SpanText(line) else Br() }
         }
     }
 }
