@@ -34,7 +34,7 @@ fun Modifier.onDragOver(onDragOver: (SyntheticDragEvent) -> Unit): Modifier = at
 }
 
 fun Modifier.onDrop(onDrop: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
-    onDrag { evt -> onDrop(evt) }
+    onDrop { evt -> onDrop(evt) }
 }
 
 fun Modifier.onKeyDown(onKeyDown: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
