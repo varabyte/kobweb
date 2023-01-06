@@ -97,16 +97,16 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
 
             when {
                 categories.size == 2 -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE) = FaIcon(\"$rawName\", modifier, style.category)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
                 }
                 categories.contains(IconCategory.SOLID) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID, size)"
                 }
                 categories.contains(IconCategory.REGULAR) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR, size)"
                 }
                 categories.contains(IconCategory.BRAND) -> {
-                    "@Composable fun $methodName(modifier: Modifier = Modifier) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND)"
+                    "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND, size)"
                 }
                 else -> GradleException("Unhandled icon entry: $entry")
             }
@@ -140,15 +140,42 @@ enum class IconStyle(internal val category: IconCategory) {
     OUTLINE(IconCategory.REGULAR);
 }
 
+// See: https://fontawesome.com/docs/web/style/size
+enum class IconSize(internal val className: String) {
+    // Relative sizes
+    XXS("fa-2xs"),
+    XS("fa-xs"),
+    SM("fa-sm"),
+    LG("fa-lg"),
+    XL("fa-xl"),
+    XXL("fa-2xl"),
+
+    // Literal sizes
+    X1("fa-1x"),
+    X2("fa-2x"),
+    X3("fa-3x"),
+    X4("fa-4x"),
+    X5("fa-5x"),
+    X6("fa-6x"),
+    X7("fa-7x"),
+    X8("fa-8x"),
+    X9("fa-9x"),
+    X10("fa-10x");
+}
+
 @Composable
 fun FaIcon(
     name: String,
     modifier: Modifier,
     style: IconCategory = IconCategory.REGULAR,
+    size: IconSize? = null,
 ) {
     Span(
         attrs = modifier.toAttrs {
             classes(style.className, "fa-${'$'}name")
+            if (size != null) {
+                classes(size.className)
+            }
         }
     )
 }
