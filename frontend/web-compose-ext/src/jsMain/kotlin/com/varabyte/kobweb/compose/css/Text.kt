@@ -40,12 +40,18 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
 class UserSelect private constructor(val value: String) {
     companion object {
+        // Keyword
         val None get() = UserSelect("none")
         val Auto get() = UserSelect("auto")
+        val Text get() = UserSelect("text")
+        val Contain get() = UserSelect("contain")
+        val All get() = UserSelect("all")
 
+        // Global
         val Inherit get() = UserSelect("inherit")
         val Initial get() = UserSelect("initial")
         val Revert get() = UserSelect("revert")
+        val RevertLayer get() = UserSelect("revert-layer")
         val Unset get() = UserSelect("unset")
     }
 }
