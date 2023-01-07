@@ -16,7 +16,7 @@ dependencies {
     implementation(kotlin("gradle-plugin"))
 
     // Common Gradle plugin used by Library and Application plugins
-    implementation(project(":gradle-plugins:core"))
+    api(project(":gradle-plugins:core"))
 
     // For generating code
     implementation(libs.kotlinpoet)

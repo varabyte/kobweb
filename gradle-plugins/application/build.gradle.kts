@@ -18,11 +18,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // Common Gradle plugin used by Library and Application plugins
-    implementation(project(":gradle-plugins:core"))
+    api(project(":gradle-plugins:core"))
 
     // For generating code / html
     implementation(libs.kotlinpoet)
-    implementation(libs.kotlinx.html)
+    api(libs.kotlinx.html) // Exposed as api dependency because it's exposed by the kobweb.app.index API anyway.
 
     // Export
     implementation(libs.cdt) // Run ChromeLauncher during export
