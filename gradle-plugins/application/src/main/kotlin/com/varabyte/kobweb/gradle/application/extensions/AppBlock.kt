@@ -26,7 +26,7 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf) {
         /**
          * A list of head element builders to add to the generated index.html file.
          *
-         * The reason this is exposed as a list instead of a property is so that different plugins can add their own
+         * The reason this is exposed as a list instead of a property is so that different tasks can add their own
          * values (usually scripts or stylesheets) independently of one another.
          */
         abstract val head: ListProperty<HEAD.() -> Unit>
