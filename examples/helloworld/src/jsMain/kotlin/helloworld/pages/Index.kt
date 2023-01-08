@@ -12,7 +12,7 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun HomePage() {
     PageLayout("Welcome to Kobweb!") {
-        Text("Please Please enter your name")
+        Text("Please enter your name")
         var name by remember { mutableStateOf("") }
         Input(
             InputType.Text,
