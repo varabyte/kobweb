@@ -196,8 +196,8 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             val compileExecutableTask = when (buildTarget) {
-                BuildTarget.DEBUG -> project.tasks.named(jsTarget.developmentExecutableCompileSync)
-                BuildTarget.RELEASE -> project.tasks.named(jsTarget.productionExecutableCompileSync)
+                BuildTarget.DEBUG -> project.tasks.named(jsTarget.browserDevelopmentWebpack)
+                BuildTarget.RELEASE -> project.tasks.named(jsTarget.browserProductionWebpack)
             }
             kobwebStartTask.configure {
                 // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger

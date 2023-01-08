@@ -5,7 +5,7 @@ server:
   files:
     dev:
       contentRoot: "build/processedResources/js/main/public"
-      script: "build/js/packages/dynamicroute/kotlin/dynamicroute.js"
+      script: "build/developmentExecutable/dynamicroute.js"
     prod:
       script: "build/distributions/dynamicroute.js"
       siteRoot: ".kobweb/site"

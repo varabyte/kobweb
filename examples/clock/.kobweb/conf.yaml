@@ -5,8 +5,7 @@ server:
   files:
     dev:
       contentRoot: "build/processedResources/js/main/public"
-      script: "build/js/packages/clock/kotlin/clock.js"
-      api: "build/libs/clock.jar"
+      script: "build/developmentExecutable/clock.js"
     prod:
       script: "build/distributions/clock.js"
       siteRoot: ".kobweb/site"

@@ -5,7 +5,7 @@ server:
   files:
     dev:
       contentRoot: "build/processedResources/js/main/public"
-      script: "build/js/packages/todo/kotlin/todo.js"
+      script: "build/developmentExecutable/todo.js"
       api: "build/libs/todo.jar"
     prod:
       script: "build/distributions/todo.js"
