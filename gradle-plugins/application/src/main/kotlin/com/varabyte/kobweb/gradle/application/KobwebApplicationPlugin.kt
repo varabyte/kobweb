@@ -16,13 +16,11 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.util.PatternSet
 import org.gradle.build.event.BuildEventsListenerRegistry
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.tooling.events.FailureResult
-import java.io.File
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import javax.inject.Inject
 
 val Project.kobwebFolder: KobwebFolder
@@ -35,11 +33,6 @@ class KobwebApplicationPlugin @Inject constructor(
 ) : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
-
-        // TODO(#170): Since Kotlin 1.6.20, the JS compiler compiles one JS file per module, instead of generating a
-        //  single uber JS file. We'd like to support this new approach eventually (it's probably more cache friendly),
-        //  but we'll need some time to investigate it. For now, just revert the setting back to the classic mode.
-        project.extra["kotlin.js.ir.output.granularity"] = "whole-program"
 
         val kobwebFolder = project.kobwebFolder
         val kobwebConf = KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
@@ -150,6 +143,8 @@ class KobwebApplicationPlugin @Inject constructor(
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
         project.afterEvaluate {
+            hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
+
             val cleanTask = project.tasks.named("clean")
             cleanTask {
                 doLast {
@@ -230,4 +225,26 @@ fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
 
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
     tasks.named("kobwebGenBackendMetadata") { dependsOn(task) }
+}
+
+// For context, see: https://youtrack.jetbrains.com/issue/KT-55820/jsBrowserDevelopmentWebpack-in-continuous-mode-doesnt-keep-outputs-up-to-date
+// It seems like the webpack tasks are broken when run in continuous mode (it has a special branch of logic for handling
+// `isContinuous` mode and I guess it just needs more time to bake).
+// Unfortunately, `kobweb run` lives and dies on its live reloading behavior. So in order to allow it to support
+// webpack, we need to get a little dirty here, using reflection to basically force the webpack task to always take the
+// non-continuous logic branch.
+// Basically, we're setting this value to always be false:
+// https://github.com/JetBrains/kotlin/blob/4af0f110c7053d753c92fd9caafb4be138fdafba/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpack.kt#L276
+private fun Project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode() {
+    tasks.withType(KotlinWebpack::class.java).forEach { webpackTask ->
+        // Gradle generates subclasses via bytecode generation magic. Here, we need to grab the superclass to find
+        // the private field we want.
+        webpackTask::class.java.superclass.declaredFields
+            // Note: Isn't ever null for now but checking protects us against future changes to KotlinWebpack
+            .firstOrNull { it.name == "isContinuous" }
+            ?.let { isContinuousField ->
+                isContinuousField.isAccessible = true
+                isContinuousField.setBoolean(webpackTask, false)
+            }
+    }
 }
