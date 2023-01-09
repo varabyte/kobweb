@@ -2,6 +2,7 @@ package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.navigation.Router
+import kotlinx.browser.window
 
 /**
  * Various contextual information useful for a page.
@@ -23,6 +24,14 @@ class PageContext(val router: Router) {
     }
 
     internal val mutableParams = mutableMapOf<String, String>()
+
+    /**
+     * The slug for the current page, stripped of any fragments and parameters.
+     *
+     * This is a convenience function, so you don't have to remember the right `window.location`
+     * field to call.
+     */
+    val slug: String get() = window.location.pathname
 
     /**
      * Params extracted either from the URL's query parameters OR from a dynamic route
