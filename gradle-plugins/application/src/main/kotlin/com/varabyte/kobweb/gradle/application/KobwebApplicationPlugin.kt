@@ -53,8 +53,10 @@ class KobwebApplicationPlugin @Inject constructor(
             project.findProperty("kobwebRunLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.KOBWEB
         val exportLayout =
             project.findProperty("kobwebExportLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.KOBWEB
-        val buildTarget = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
+
+        project.extra["kobwebBuildTarget"] = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
             ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
+        val buildTarget = project.kobwebBuildTarget
 
         val kobwebGenFrontendMetadata =
             project.tasks.register("kobwebGenFrontendMetadata", KobwebGenerateMetadataFrontendTask::class.java, kobwebBlock)
@@ -272,6 +274,8 @@ fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
     tasks.named("kobwebGenBackendMetadata") { dependsOn(task) }
 }
+
+val Project.kobwebBuildTarget get() = project.extra["kobwebBuildTarget"] as BuildTarget
 
 // For context, see: https://youtrack.jetbrains.com/issue/KT-55820/jsBrowserDevelopmentWebpack-in-continuous-mode-doesnt-keep-outputs-up-to-date
 // It seems like the webpack tasks are broken when run in continuous mode (it has a special branch of logic for handling
