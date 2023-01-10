@@ -1,8 +1,8 @@
-![version: 0.11.5](https://img.shields.io/badge/kobweb-0.11.5-blue)
+![version: 0.11.6](https://img.shields.io/badge/kobweb-0.11.6-blue)
 ![version: 0.9.10](https://img.shields.io/badge/kobweb_cli-0.9.10-blue)
 <br>
 ![kotlin: 1.7.20](https://img.shields.io/badge/kotlin-1.7.20-blue?logo=kotlin)
-![compose: 1.2.1](https://img.shields.io/badge/compose-1.2.1-blue?logo=jetpackcompose)
+![compose: 1.2.2](https://img.shields.io/badge/compose-1.2.2-blue?logo=jetpackcompose)
 <br>
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
@@ -202,7 +202,7 @@ $ kobweb version # to check it's working
 
 ```bash
 $ cd /path/to/projects/
-$ kobweb create site
+$ kobweb create app
 ```
 
 You'll be asked a few questions required for setting up your project.
@@ -216,7 +216,7 @@ like:
 
 ```
 my-project
-└── src/jsMain
+└── site/src/jsMain
     ├── kotlin.org.example.myproject
     │   ├── components
     │   │   ├── layouts
@@ -239,7 +239,7 @@ Which brings us to the next section...
 ## Run your Kobweb site
 
 ```bash
-$ cd /path/to/projects/root/your-project
+$ cd /path/to/projects/your-project/site
 $ kobweb run
 ```
 
@@ -281,9 +281,9 @@ $ kobweb list
 
 You can create the following Kobweb projects by typing `kobweb create ...`
 
+• app: A template for a minimal site that demonstrates the basic features of Kobweb
 • examples/jb/counter: A very minimal site with just a counter (based on the Jetbrains tutorial)
 • examples/todo: An example TODO app, showcasing client / server interactions
-• site: A template for a minimal site that demonstrates the basic features of Kobweb
 ```
 
 For example, `kobweb create examples/todo` will instantiate a TODO app locally.
@@ -985,7 +985,7 @@ All Font Awesome composables accept a modifier parameter, so you can tweak it fu
 FaSpider(Modifier.color(Colors.Red))
 ```
 
-***Note**: When you create a project using our `site` template, Font Awesome icons are included.*
+***Note**: When you create a project using our `app` template, Font Awesome icons are included.*
 
 ### Material Design Icons
 
