@@ -24,6 +24,7 @@ import org.gradle.api.tasks.*
 import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
+import kotlin.system.measureTimeMillis
 
 abstract class KobwebExportTask @Inject constructor(
     private val kobwebConf: KobwebConf,
@@ -137,8 +138,15 @@ abstract class KobwebExportTask @Inject constructor(
                     .filter { !it.contains('{') }
                     .toSet()
                     .forEach { route ->
+                        logger.lifecycle("\nSnapshotting html for \"$route\"...")
+
                         val prefixedRoute = routePrefix.prepend(route)
-                        val snapshot = chromeService.takeSnapshot("http://localhost:$port$prefixedRoute")
+
+                        val snapshot: String
+                        val elapsedMs = measureTimeMillis {
+                            snapshot = chromeService.takeSnapshot("http://localhost:$port$prefixedRoute")
+                        }
+                        logger.lifecycle("Snapshot finished in ${elapsedMs}ms.")
 
                         var filePath = route.substringBeforeLast('/') + "/" +
                             (route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
