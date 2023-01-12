@@ -25,7 +25,7 @@ dependencies {
     api(libs.kotlinx.html) // Exposed as api dependency because it's exposed by the kobweb.app.index API anyway.
 
     // Export
-    implementation(libs.cdt) // Run ChromeLauncher during export
+    implementation(libs.playwright)
     implementation(libs.jsoup)
 
     implementation(project(":common:kobweb-common"))

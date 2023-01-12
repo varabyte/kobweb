@@ -1,5 +1,5 @@
 [versions]
-cdt="4.0.0" # chrome-developer-toolkit
+playwright="1.28.1"
 commonmark = "0.18.0"
 compose = "1.2.2"
 freemarker = "2.3.31"
@@ -22,7 +22,6 @@ truthish = "0.6.0"
 shadow = "7.0.0"
 
 [libraries]
-cdt = { module = "com.github.kklisura.cdt:cdt-java-client", version.ref = "cdt" }
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
 commonmark-autolink = { module = "org.commonmark:commonmark-ext-autolink", version.ref = "commonmark" }
 commonmark-frontmatter = { module = "org.commonmark:commonmark-ext-yaml-front-matter", version.ref = "commonmark" }
@@ -46,6 +45,7 @@ ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor"}
 ktor-server-tests = { module = "io.ktor:ktor-server-tests", version.ref = "ktor"}
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
 truthish = { module = "com.varabyte.truthish:truthish", version.ref = "truthish" }
 
 [bundles]
