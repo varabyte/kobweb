@@ -3,6 +3,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.microsoft.playwright.Browser
+import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.path.toUnixSeparators
@@ -42,19 +43,15 @@ abstract class KobwebExportTask @Inject constructor(
         return project.layout.projectDirectory.dir(kobwebConf.server.files.prod.siteRoot).asFile
     }
 
-    private fun Browser.takeSnapshot(url: String): String {
-        lateinit var snapshot: String
-
-        val context = newContext()
-        val page = context.newPage()
-        page.onPageError {
+    private fun Page.takeSnapshot(url: String): String {
+        onPageError {
             logger.error(
                 "e: Route \"/${
                     url.removePrefix("http://").substringAfter('/')
                 }\" crashed mid-export. You should investigate this by using `kobweb run` and visiting that route."
             )
         }
-        page.navigate(url)
+        navigate(url)
 
         // First, we bake dynamic styles into static ones. Let me explain :)
         // Compose for Web creates empty style nodes and then adds styles to them programmatically, meaning the page
@@ -68,7 +65,7 @@ abstract class KobwebExportTask @Inject constructor(
         // If we didn't do this, then what would happen is the user would download the page, see raw text unadorned
         // without any styles, and then after a brief period of time (depending on download speeds) styles would pop
         // in, quite jarringly.
-        page.evaluate(
+        evaluate(
             """
                 for (let s = 0; s < document.styleSheets.length; s++) {
                     var stylesheet = document.styleSheets[s]
@@ -91,10 +88,15 @@ abstract class KobwebExportTask @Inject constructor(
         )
 
         // Use Jsoup for pretty printing
-        snapshot = Jsoup.parse(page.content()).toString()
-        page.close()
+        return Jsoup.parse(content()).toString()
+    }
 
-        return snapshot
+    private fun Browser.takeSnapshot(url: String): String {
+        newContext().use { context ->
+            context.newPage().use { page ->
+                return page.takeSnapshot(url)
+            }
+        }
     }
 
     private fun <T> T.toTriple() = Triple(this, this, this)
