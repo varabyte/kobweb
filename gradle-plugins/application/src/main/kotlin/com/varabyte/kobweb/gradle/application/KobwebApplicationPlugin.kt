@@ -199,10 +199,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 project.tasks.findByName(jvm.jar)?.dependsOn(kobwebGenBackendTask)
             }
 
-            val webpackTask = when (buildTarget) {
-                BuildTarget.DEBUG -> project.tasks.findByName(jsTarget.browserDevelopmentWebpack)
-                BuildTarget.RELEASE -> project.tasks.findByName(jsTarget.browserProductionWebpack)
-            } as KotlinWebpack
             kobwebStartTask.configure {
                 // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
                 // much.
@@ -211,6 +207,7 @@ class KobwebApplicationPlugin @Inject constructor(
                     jvmTarget?.let { jvm -> dependsOn(project.tasks.findByName(jvm.jar)) }
 
                     dependsOn(kobwebGenTask)
+                    val webpackTask = project.tasks.findByName(jsTarget.browserDevelopmentWebpack) as KotlinWebpack
                     dependsOn(webpackTask)
 
                     // The following warning is for a dev value only, but `kobweb export` ends up in this path because
