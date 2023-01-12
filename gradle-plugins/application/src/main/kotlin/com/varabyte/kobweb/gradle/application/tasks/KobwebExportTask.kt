@@ -47,6 +47,13 @@ abstract class KobwebExportTask @Inject constructor(
 
         val context = newContext()
         val page = context.newPage()
+        page.onPageError {
+            logger.error(
+                "e: Route \"/${
+                    url.removePrefix("http://").substringAfter('/')
+                }\" crashed mid-export and results may not be correct."
+            )
+        }
         page.navigate(url)
 
         // First, we bake dynamic styles into static ones. Let me explain :)
