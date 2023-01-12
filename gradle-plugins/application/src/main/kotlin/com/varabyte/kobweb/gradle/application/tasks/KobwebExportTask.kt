@@ -51,7 +51,7 @@ abstract class KobwebExportTask @Inject constructor(
             logger.error(
                 "e: Route \"/${
                     url.removePrefix("http://").substringAfter('/')
-                }\" crashed mid-export and results may not be correct."
+                }\" crashed mid-export. You should investigate this by using `kobweb run` and visiting that route."
             )
         }
         page.navigate(url)
