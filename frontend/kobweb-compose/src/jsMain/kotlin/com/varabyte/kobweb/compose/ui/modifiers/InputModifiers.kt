@@ -25,6 +25,10 @@ fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrsMo
     onClick { evt -> onClick(evt) }
 }
 
+fun Modifier.onContextMenu(onContextMenu: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
+    onContextMenu { evt -> onContextMenu(evt) }
+}
+
 fun Modifier.onDrag(onDrag: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
     onDrag { evt -> onDrag(evt) }
 }
