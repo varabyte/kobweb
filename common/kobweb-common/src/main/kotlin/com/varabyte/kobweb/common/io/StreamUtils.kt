@@ -21,7 +21,7 @@ fun InputStream.consumeAsync(onLineRead: (String) -> Unit) {
                 // No need to warn, we're in an IO block
                 @Suppress("BlockingMethodInNonBlockingContext")
                 val line = br.readLine()
-                onLineRead(line)
+                if (line != null) onLineRead(line) else break
             }
         } catch (ignored: IOException) { }
     }
