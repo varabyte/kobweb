@@ -8,11 +8,15 @@ import org.w3c.dom.Element
  * A callback scope for listeners that inform the user about events associated with an underlying raw DOM element.
  *
  * You do not construct these directly. Instead, see [ref], [disposableRef], and [refScope].
+ *
+ * @param TElement The element type of this scope is `in`, so that even if you register a refscope against a very
+ *   specific element type (e.g. `HTMLDivElement`), you can still register a more generic handler against it
+ *   (e.g. an `HTMLElement`)
  */
-data class ElementRefScope<TElement : Element> internal constructor(
+data class ElementRefScope<in TElement : Element> internal constructor(
     internal val keyedCallbacks: List<KeysToEffect<TElement>>
 ) {
-    internal sealed class RefCallback<TElement : Element> {
+    internal sealed class RefCallback<in TElement : Element> {
         abstract operator fun invoke(scope: DisposableEffectScope, element: TElement): DisposableEffectResult
         class Simple<TElement : Element>(val handle: (TElement) -> Unit) : RefCallback<TElement>() {
             override fun invoke(scope: DisposableEffectScope, element: TElement): DisposableEffectResult {
@@ -27,7 +31,7 @@ data class ElementRefScope<TElement : Element> internal constructor(
         }
     }
 
-    internal data class KeysToEffect<TElement : Element>(
+    internal data class KeysToEffect<in TElement : Element>(
         val keys: List<Any?>,
         val refCallback: RefCallback<TElement>,
     )
@@ -86,7 +90,7 @@ data class ElementRefScope<TElement : Element> internal constructor(
 fun <TElement : Element> ElementScope<TElement>.registerRefScope(scope: ElementRefScope<TElement>?) {
     if (scope == null) return
     scope.keyedCallbacks.forEach { keyedCallback ->
-        DisposableEffect(*keyedCallback.keys.toTypedArray()) {
+        DisposableEffect(*(listOf(scope) + keyedCallback.keys).toTypedArray()) {
             keyedCallback.refCallback.invoke(this, scopeElement)
         }
     }
