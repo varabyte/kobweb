@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.components.forms
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
-import com.varabyte.kobweb.compose.dom.clearFocus
+import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -34,7 +34,6 @@ import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.toSilkPalette
-import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 import org.jetbrains.compose.web.dom.Button as JbButton
@@ -75,7 +74,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
 }
 
 /**
- * An area which provides a SilkTheme-aware background color.
+ * A button widget.
  */
 @Composable
 fun Button(
@@ -86,6 +85,8 @@ fun Button(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
+    var backingElement: HTMLElement? = remember { null }
+
     JbButton(
         attrs = ButtonStyle.toModifier(variant)
             .thenIf(!enabled, DisabledStyle.toModifier().tabIndex(-1))
@@ -93,22 +94,26 @@ fun Button(
             .thenIf(enabled) {
                 Modifier
                     .onClick { evt ->
-                        document.activeElement?.clearFocus()
+                        backingElement!!.focus()
                         onClick()
                         evt.preventDefault()
                     }
                     .onKeyDown { evt ->
                         if (evt.isComposing) return@onKeyDown
                         if (evt.key == "Enter" || evt.key == "Space") {
-                            onClick()
+                            backingElement!!.click()
                             evt.preventDefault()
                         }
                     }
             }
             .toAttrs()
     ) {
-        registerRefScope(ref)
+        registerRefScope(
+            refScope {
+                ref { backingElement = it }
+                add(ref)
+            }
+        )
         Box(contentAlignment = Alignment.Center, content = content)
     }
-
 }
