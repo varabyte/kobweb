@@ -64,6 +64,14 @@ class PageContext(val router: Router) {
 }
 
 /**
+ * A property which indicates if this current page is being rendered as part of a Kobweb export.
+ *
+ * While it should be rare that you'll need to use it, it can be useful to check if you want to avoid doing some
+ * side-effect that shouldn't happen at export time, like sending page visit analytics to a server for example.
+ */
+val PageContext.isExporting: Boolean get() = params.containsKey("_kobwebIsExporting")
+
+/**
  * Returns the active page's context.
  *
  * This will throw an exception if not called within the scope of a `@Page` annotated composable.
