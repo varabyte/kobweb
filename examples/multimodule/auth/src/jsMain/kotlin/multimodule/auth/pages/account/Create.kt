@@ -63,7 +63,7 @@ fun CreateAccountPage() {
             LabeledTextInput("Password", mask = true, onCommit = ::tryCreate) { errorText = ""; password1 = it }
             LabeledTextInput("Confirm Password", mask = true, onCommit = ::tryCreate) { errorText = ""; password2 = it }
 
-            TextButton("Create Account", enabled = isValid(), onClick = ::tryCreate)
+            TextButton("Create Account", enabled = isValid(), onClick =  { tryCreate() })
 
             if (errorText.isNotBlank()) {
                 SpanText(errorText, ErrorTextStyle.toModifier())

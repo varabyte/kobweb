@@ -1,6 +1,7 @@
 package multimodule.core.components.widgets
 
 import androidx.compose.runtime.*
+import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.forms.Button
@@ -18,7 +19,7 @@ val TextButtonStyle = ComponentStyle.base("text-button") {
 }
 
 @Composable
-fun TextButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+fun TextButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: (SyntheticMouseEvent) -> Unit) {
     Button(onClick = onClick, TextButtonStyle.toModifier().then(modifier), enabled = enabled) {
         Text(text)
     }

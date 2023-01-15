@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
+import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.refScope
@@ -78,7 +79,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
  */
 @Composable
 fun Button(
-    onClick: () -> Unit,
+    onClick: (SyntheticMouseEvent) -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = true,
@@ -95,7 +96,7 @@ fun Button(
                 Modifier
                     .onClick { evt ->
                         backingElement!!.focus()
-                        onClick()
+                        onClick(evt)
                         evt.preventDefault()
                     }
                     .onKeyDown { evt ->

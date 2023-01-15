@@ -61,7 +61,7 @@ fun LoginPage() {
             LabeledTextInput("Username", ref = { it.focus() }, onCommit = ::tryLogin) { errorText = ""; username = it }
             LabeledTextInput("Password", mask = true, onCommit = ::tryLogin) { errorText = ""; password = it }
 
-            TextButton("Login", enabled = isValid(), onClick = ::tryLogin)
+            TextButton("Login", enabled = isValid(), onClick = { tryLogin() })
 
             if (errorText.isNotBlank()) {
                 SpanText(errorText, ErrorTextStyle.toModifier())

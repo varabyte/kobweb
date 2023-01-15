@@ -1,6 +1,7 @@
 package multimodule.core.components.sections
 
 import androidx.compose.runtime.*
+import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.css.FontWeight
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -51,7 +52,7 @@ val NavButtonStyle = ComponentStyle.base("nav-button-outer") {
 }
 
 @Composable
-private fun NavButton(onClick: () -> Unit, content: @Composable BoxScope.() -> Unit) {
+private fun NavButton(onClick: (SyntheticMouseEvent) -> Unit, content: @Composable BoxScope.() -> Unit) {
     Button(onClick, NavButtonStyle.toModifier(), content = content)
 }
 

@@ -89,7 +89,7 @@ fun ChatPage() {
                     }
                 }
                 TextInput(message, Modifier.width(70.percent).align(Alignment.BottomStart), ref = { it.focus() }, onCommit = ::sendMessage) { message = it }
-                TextButton("Send", Modifier.width(20.percent).align(Alignment.BottomEnd), enabled = message.isNotBlank(), onClick = ::sendMessage)
+                TextButton("Send", Modifier.width(20.percent).align(Alignment.BottomEnd), enabled = message.isNotBlank(), onClick = { sendMessage() })
             }
         }
     }
