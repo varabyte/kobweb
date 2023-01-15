@@ -53,7 +53,7 @@ fun Overlay(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopCenter,
     ref: ElementRefScope<HTMLElement>? = null,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.() -> Unit = {}
 ) {
     deferRender {
         Box(
