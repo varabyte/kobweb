@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.css.*
 
 sealed class Width private constructor(val value: String) {
     // Keyword
-    class FitContent(value: CSSLengthOrPercentageValue) : Width("fit-content($value)")
+    object FitContent : Width("fit-content")
     object MaxContext : Width("max-content")
     object MinContent : Width("min-content")
 
@@ -33,7 +33,7 @@ fun StyleScope.minWidth(minWidth: MinWidth) {
 
 sealed class Height private constructor(val value: String) {
     // Keyword
-    class FitContent(value: CSSLengthOrPercentageValue) : Height("fit-content($value)")
+    object FitContent : Height("fit-content")
     object MaxContext : Height("max-content")
     object MinContent : Height("min-content")
 
@@ -60,7 +60,7 @@ fun StyleScope.minHeight(minHeight: MinHeight) {
 
 sealed class MaxWidth private constructor(val value: String) {
     // Keyword
-    class FitContent(value: CSSLengthOrPercentageValue) : MaxWidth("fit-content($value)")
+    object FitContent : MaxWidth("fit-content")
     object MaxContext : MaxWidth("max-content")
     object MinContent : MaxWidth("min-content")
     object None : MaxWidth("none")
@@ -83,7 +83,7 @@ fun StyleScope.maxWidth(maxWidth: MaxWidth) {
 
 sealed class MaxHeight private constructor(val value: String) {
     // Keyword
-    class FitContent(value: CSSLengthOrPercentageValue) : MaxHeight("fit-content($value)")
+    object FitContent : MaxHeight("fit-content")
     object MaxContext : MaxHeight("max-content")
     object MinContent : MaxHeight("min-content")
     object None : MaxHeight("none")
