@@ -79,7 +79,7 @@ val ButtonStyle = ComponentStyle("silk-button") {
  */
 @Composable
 fun Button(
-    onClick: (SyntheticMouseEvent) -> Unit,
+    onClick: (evt: SyntheticMouseEvent) -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = true,
