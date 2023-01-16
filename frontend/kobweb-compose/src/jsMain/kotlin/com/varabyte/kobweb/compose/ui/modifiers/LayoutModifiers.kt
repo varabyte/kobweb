@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 fun Modifier.lineHeight(value: CSSNumeric): Modifier = styleModifier {
     lineHeight(value)
@@ -42,20 +43,52 @@ fun Modifier.height(size: CSSNumeric, type: WebModifierType = WebModifierType.ST
     WebModifierType.STYLE -> styleModifier { height(size) }
 }
 
+fun Modifier.width(width: Width): Modifier = styleModifier {
+    width(width)
+}
+
+fun Modifier.width(auto: CSSAutoKeyword): Modifier = styleModifier {
+    width(auto)
+}
+
+fun Modifier.height(height: Height): Modifier = styleModifier {
+    height(height)
+}
+
+fun Modifier.height(auto: CSSAutoKeyword): Modifier = styleModifier {
+    height(auto)
+}
+
 fun Modifier.minWidth(size: CSSNumeric): Modifier = styleModifier {
     minWidth(size)
+}
+
+fun Modifier.minWidth(minWidth: MinWidth): Modifier = styleModifier {
+    minWidth(minWidth)
 }
 
 fun Modifier.maxWidth(size: CSSNumeric): Modifier = styleModifier {
     maxWidth(size)
 }
 
+fun Modifier.maxWidth(maxWidth: MaxWidth): Modifier = styleModifier {
+    maxWidth(maxWidth)
+}
+
 fun Modifier.minHeight(size: CSSNumeric): Modifier = styleModifier {
     minHeight(size)
 }
 
+fun Modifier.minHeight(minHeight: MinHeight): Modifier = styleModifier {
+    minHeight(minHeight)
+}
+
 fun Modifier.maxHeight(size: CSSNumeric): Modifier = styleModifier {
     maxHeight(size)
+}
+
+fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
+    maxHeight(maxHeight)
 }
 
 fun Modifier.margin(all: CSSNumeric): Modifier = styleModifier {

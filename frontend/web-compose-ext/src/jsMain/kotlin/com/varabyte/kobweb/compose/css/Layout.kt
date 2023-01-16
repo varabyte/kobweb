@@ -2,6 +2,106 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// region width See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
+
+sealed class Width private constructor(val value: String) {
+    // Keyword
+    class FitContent(value: CSSLengthOrPercentageValue) : Width("fit-content($value)")
+    object MaxContext : Width("max-content")
+    object MinContent : Width("min-content")
+
+    // Global
+    object Inherit : Width("inherit")
+    object Initial : Width("initial")
+    object Revert : Width("revert")
+    object RevertLayer : Width("revert-layer")
+    object Unset : Width("unset")
+}
+typealias MinWidth = Width
+
+fun StyleScope.width(width: Width) {
+    property("width", width.value)
+}
+
+fun StyleScope.minWidth(minWidth: MinWidth) {
+    property("min-width", minWidth.value)
+}
+
+// endregion
+
+// region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
+
+sealed class Height private constructor(val value: String) {
+    // Keyword
+    class FitContent(value: CSSLengthOrPercentageValue) : Height("fit-content($value)")
+    object MaxContext : Height("max-content")
+    object MinContent : Height("min-content")
+
+    // Global
+    object Inherit : Height("inherit")
+    object Initial : Height("initial")
+    object Revert : Height("revert")
+    object RevertLayer : Height("revert-layer")
+    object Unset : Height("unset")
+}
+typealias MinHeight = Height
+
+fun StyleScope.height(height: Height) {
+    property("height", height.value)
+}
+
+fun StyleScope.minHeight(minHeight: MinHeight) {
+    property("min-height", minHeight.value)
+}
+
+// endregion
+
+// region max-width See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
+
+sealed class MaxWidth private constructor(val value: String) {
+    // Keyword
+    class FitContent(value: CSSLengthOrPercentageValue) : MaxWidth("fit-content($value)")
+    object MaxContext : MaxWidth("max-content")
+    object MinContent : MaxWidth("min-content")
+    object None : MaxWidth("none")
+
+    // Global
+    object Inherit : MaxWidth("inherit")
+    object Initial : MaxWidth("initial")
+    object Revert : MaxWidth("revert")
+    object RevertLayer : MaxWidth("revert-layer")
+    object Unset : MaxWidth("unset")
+}
+
+fun StyleScope.maxWidth(maxWidth: MaxWidth) {
+    property("max-width", maxWidth.value)
+}
+
+// endregion
+
+// region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
+
+sealed class MaxHeight private constructor(val value: String) {
+    // Keyword
+    class FitContent(value: CSSLengthOrPercentageValue) : MaxHeight("fit-content($value)")
+    object MaxContext : MaxHeight("max-content")
+    object MinContent : MaxHeight("min-content")
+    object None : MaxHeight("none")
+
+    // Global
+    object Inherit : MaxHeight("inherit")
+    object Initial : MaxHeight("initial")
+    object Revert : MaxHeight("revert")
+    object RevertLayer : MaxHeight("revert-layer")
+    object Unset : MaxHeight("unset")
+}
+
+fun StyleScope.maxHeight(maxHeight: MaxHeight) {
+    property("max-height", maxHeight.value)
+}
+
+// endregion
+
 // region padding-inline See: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-inline
 
 fun StyleScope.paddingInline(vararg value: CSSNumeric) {
