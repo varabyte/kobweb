@@ -34,6 +34,9 @@ class JsTarget(val kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTa
 
     val developmentExecutableCompileSync get() = "${kotlinTarget.name}DevelopmentExecutableCompileSync"
     val productionExecutableCompileSync get() = "${kotlinTarget.name}ProductionExecutableCompileSync"
+
+    val compileDevelopmentExecutableKotlin get() = "compileDevelopmentExecutableKotlin${kotlinTarget.name.capitalize()}"
+    val compileProductionExecutableKotlin get() = "compileProductionExecutableKotlin${kotlinTarget.name.capitalize()}"
 }
 
 val Project.jsTarget: JsTarget

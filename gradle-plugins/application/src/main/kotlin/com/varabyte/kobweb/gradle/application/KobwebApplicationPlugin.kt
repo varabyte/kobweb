@@ -18,7 +18,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.build.event.BuildEventsListenerRegistry
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.tooling.events.FailureResult
@@ -212,7 +211,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 project.tasks.named(jsTarget.browserProductionWebpack) {
                     mustRunAfter(kobwebStartTask)
                 }
-                project.tasks.named(jsTarget.productionExecutableCompileSync) {
+                project.tasks.named(jsTarget.compileProductionExecutableKotlin) {
                     mustRunAfter(kobwebStartTask)
                 }
             }
