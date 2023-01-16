@@ -176,12 +176,7 @@ abstract class KobwebExportTask @Inject constructor(
                 }
         }
 
-        val scriptFileStr = kobwebConf.server.files.prod.script ?: run {
-            logger.warn(
-                "w: Your kobweb.conf file does not specify a production script. It should, as that one will be minimized / optimized. Falling back to the dev script for now."
-            )
-            kobwebConf.server.files.dev.script
-        }
+        val scriptFileStr = kobwebConf.server.files.prod.script
         val scriptFile = project.layout.projectDirectory.file(scriptFileStr).asFile
         run {
             val destFile = systemRoot.resolve(scriptFile.name)

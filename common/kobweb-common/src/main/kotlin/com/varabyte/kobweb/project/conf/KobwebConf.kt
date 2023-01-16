@@ -52,14 +52,13 @@ class Server(
 
         /**
          * @param siteRoot The path to the root of where the static site lives
-         * @param script The path to the final JavaScript file generated from the user's Kotlin code. Unlike the [Dev]
-         *   script's path, this version should be minimized. For legacy reasons, we support it not being specified,
-         *   in which case, callers should just load the dev script. But users really should specify it.
+         * @param script The path to the final JavaScript file generated from the user's Kotlin code. Unlike
+         *   the [Dev.script] path, this version should be minimized.
          */
         @Serializable
         class Prod(
             val siteRoot: String,
-            val script: String? = null,
+            val script: String,
         )
     }
 

@@ -267,7 +267,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
     }
 
     val script = systemRoot.resolve(
-        (conf.server.files.prod.script ?: conf.server.files.dev.script).substringAfterLast("/")
+        conf.server.files.prod.script.substringAfterLast("/")
     )
     val fallbackIndex = systemRoot.resolve("index.html")
     val apiJar = conf.server.files.dev.api
