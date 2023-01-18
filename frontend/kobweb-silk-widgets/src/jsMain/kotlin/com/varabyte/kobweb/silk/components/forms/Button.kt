@@ -97,13 +97,13 @@ fun Button(
                     .onClick { evt ->
                         backingElement!!.focus()
                         onClick(evt)
-                        evt.preventDefault()
+                        evt.stopPropagation()
                     }
                     .onKeyDown { evt ->
                         if (evt.isComposing) return@onKeyDown
                         if (evt.key == "Enter" || evt.key == "Space") {
                             backingElement!!.click()
-                            evt.preventDefault()
+                            evt.stopPropagation()
                         }
                     }
             }

@@ -68,12 +68,12 @@ fun Anchor(
                 val openInternalLinksStrategy = openInternalLinksStrategy ?: evt.toOpenLinkStrategy()
                 if (openExternalLinksStrategy == null) {
                     if (ctx.router.tryRoutingTo(href, openLinkStrategy = openInternalLinksStrategy)) {
-                        evt.preventDefault()
+                        evt.stopPropagation()
                     }
                 }
                 else {
                     ctx.router.navigateTo(href, openInternalLinksStrategy = openInternalLinksStrategy, openExternalLinksStrategy = openExternalLinksStrategy)
-                    evt.preventDefault()
+                    evt.stopPropagation()
                 }
             }
         },
