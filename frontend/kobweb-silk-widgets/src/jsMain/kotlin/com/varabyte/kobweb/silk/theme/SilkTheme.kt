@@ -54,13 +54,50 @@ interface SilkConfig {
      * @Composable
      * fun MyApp(content: @Composable () -> Unit) {
      *   SilkApp {
-     *     Style(TodoStyleSheet)
+     *     Style(MyStyleSheet)
      *     ...
      *   }
      * }
      * ```
      */
     fun registerStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit)
+
+    /**
+     * An alternate way to register keyframes via Silk instead of using a Compose for Web StyleSheet directly.
+     *
+     * So this:
+     *
+     * ```
+     * @InitSilk
+     * fun initStyles(ctx: InitSilkContext) {
+     *   ctx.registerKeyframes("pulse") {
+     *     ...
+     *   }
+     * }
+     * ```
+     *
+     * is a replacement for:
+     *
+     * ```
+     * object MyStyleSheet : StyleSheet() {
+     *   init {
+     *     val pulse by ctx.keyframes {
+     *       ...
+     *     }
+     *   }
+     * }
+     *
+     * @App
+     * @Composable
+     * fun MyApp(content: @Composable () -> Unit) {
+     *   SilkApp {
+     *     Style(MyStyleSheet)
+     *     ...
+     *   }
+     * }
+     * ```
+     */
+    fun registerKeyframes(name: String, cssKeyframes: CSSKeyframesBuilder.() -> Unit)
 }
 
 /**
@@ -99,18 +136,28 @@ internal object SilkConfigInstance : SilkConfig {
     override var initialColorMode = ColorMode.LIGHT
 
     private val styles = mutableListOf<ComponentStyle>()
+    private val keyframes = mutableMapOf<String, CSSKeyframesBuilder.() -> Unit>()
 
     override fun registerStyle(cssSelector: String, extraModifiers: Modifier, init: StyleModifiers.() -> Unit) {
         styles.add(ComponentStyle(cssSelector, extraModifiers, init))
     }
 
-    // This method is not part of the public API and should be called by Silk at initialization time
-    fun registerStyles(siteStyleSheet: StyleSheet) {
+    override fun registerKeyframes(name: String, cssKeyframes: CSSKeyframesBuilder.() -> Unit) {
+        require(!keyframes.contains(name)) { "User is registering duplicate keyframe name: $name"}
+        keyframes[name] = cssKeyframes
+    }
+
+    // This method is not part of the public API and should only be called by Silk itself at initialization time
+    fun registerStylesAndKeyframesInto(siteStyleSheet: StyleSheet) {
         styles.forEach { componentStyle ->
             componentStyle.addStylesInto(siteStyleSheet, componentStyle.name)
         }
-    }
 
+        keyframes.forEach { (name, builder) ->
+            val frames = CSSKeyframesBuilder(builder).frames
+            siteStyleSheet.add(CSSKeyframesRuleDeclaration(name, frames))
+        }
+    }
 }
 
 /**

@@ -54,6 +54,6 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     additionalInit(InitSilkContext(SilkConfigInstance, mutableTheme))
 
     _SilkTheme = ImmutableSilkTheme(mutableTheme)
-    SilkConfigInstance.registerStyles(SilkStyleSheet)
+    SilkConfigInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
     SilkTheme.registerStyles(SilkStyleSheet)
 }
