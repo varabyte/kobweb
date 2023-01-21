@@ -3,12 +3,16 @@ package com.varabyte.kobweb.silk.components.overlay
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
-import com.varabyte.kobweb.compose.dom.ref
+import com.varabyte.kobweb.compose.dom.disposableRef
 import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.left
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
+import com.varabyte.kobweb.compose.ui.modifiers.position
+import com.varabyte.kobweb.compose.ui.modifiers.top
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement.LeftTop
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement.TopLeft
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -20,6 +24,7 @@ import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.events.Event
 
 // A small but comfortable amount of space. Also allows the Tooltip composable to extend up a bit with an arrow while
 // still leaving a bit of space to go.
@@ -68,6 +73,11 @@ val PopupStyle = ComponentStyle("silk-popup") {
  *
  * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
  * first, as a parent method that this lives under. See the method for more details.
+ *
+ * @param target Indicates which element should listen for mouse enter and leave events in order to cause this popup to
+ *   show up.
+ * @param placementTarget If set, indicates which element the popup should be shown relative to. If not set, the
+ *   original [target] will be used.
  */
 @Composable
 fun Popup(
@@ -80,19 +90,45 @@ fun Popup(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    var targetElement by remember { mutableStateOf<HTMLElement?>(null) }
+    fun HTMLElement?.apply(targetFinder: ElementTarget?): HTMLElement? {
+        if (this == null || targetFinder == null) return this
+        return target(startingFrom = this)
+    }
+
+    var srcElement by remember { mutableStateOf<HTMLElement?>(null) }
+    val targetElement by remember { derivedStateOf { srcElement.apply(target) } }
+    val placementElement by remember { derivedStateOf { targetElement.apply(placementTarget) } }
+
+    var showPopup by remember { mutableStateOf(false) }
+    val onMouseEnter: (Event) -> Unit = { showPopup = true }
+    val onMouseLeave: (Event) -> Unit = { showPopup = false }
+
     Box(
         Modifier.display(DisplayStyle.None),
-        ref = ref { element ->
-            target(startingFrom = element)?.apply {
-                onmouseenter = { targetElement = placementTarget?.invoke(startingFrom = element) ?: this; Unit }
-                onmouseleave = { targetElement = null; Unit }
+        ref = disposableRef { element ->
+            srcElement = element
+
+            // Intentionally shadow here. We want our own copy to avoid infinite recompositions
+            // when srcElement changes (srcElement changes targetElement changes this Box changes srcElement...)
+            @Suppress("NAME_SHADOWING")
+            val targetElement = element.apply(target)
+            targetElement?.addEventListener("mouseenter", onMouseEnter)
+            targetElement?.addEventListener("mouseleave", onMouseLeave)
+            if (targetElement?.matches(":hover") == true) {
+                showPopup = true
+            }
+
+            onDispose {
+                targetElement?.removeEventListener("mouseenter", onMouseEnter)
+                targetElement?.removeEventListener("mouseleave", onMouseLeave)
             }
         }
     )
 
-    targetElement?.let { element ->
-        val targetBounds = element.getBoundingClientRect()
+    if (placementElement != null && showPopup) {
+        @Suppress("NAME_SHADOWING")
+        val placementElement = placementElement!!
+        val targetBounds = placementElement.getBoundingClientRect()
         var popupBounds by remember { mutableStateOf<DOMRect?>(null) }
         @Suppress("NAME_SHADOWING")
         val offsetPixels = offsetPixels.toDouble()
@@ -173,23 +209,25 @@ fun Popup(
                 .top((-100).percent).left((-100).percent)
                 .opacity(0)
 
-        deferRender {
-            // Need to set targetElement as the key because otherwise you might move from one element to another so fast
-            // that compose doesn't realize the tooltip should be rerendered
-            key(targetElement) {
-                Box(
-                    PopupStyle.toModifier(variant)
-                        .position(Position.Absolute)
-                        .then(absPosModifier)
-                        .then(modifier),
-                    ref = refScope {
-                        ref { element ->
-                            popupBounds = element.getBoundingClientRect()
-                        }
-                        add(ref)
-                    },
-                    content = content
-                )
+        if (showPopup) {
+            deferRender {
+                // Need to set targetElement as the key because otherwise you might move from one element to another so fast
+                // that compose doesn't realize the tooltip should be rerendered
+                key(targetElement) {
+                    Box(
+                        PopupStyle.toModifier(variant)
+                            .position(Position.Absolute)
+                            .then(absPosModifier)
+                            .then(modifier),
+                        ref = refScope {
+                            ref { element ->
+                                popupBounds = element.getBoundingClientRect()
+                            }
+                            add(ref)
+                        },
+                        content = content
+                    )
+                }
             }
         }
     }
