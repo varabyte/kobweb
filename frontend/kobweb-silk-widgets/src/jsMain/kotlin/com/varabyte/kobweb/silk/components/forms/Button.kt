@@ -18,7 +18,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.cursor
 import com.varabyte.kobweb.compose.ui.modifiers.fontSize
 import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
 import com.varabyte.kobweb.compose.ui.modifiers.onClick
-import com.varabyte.kobweb.compose.ui.modifiers.onKeyDown
 import com.varabyte.kobweb.compose.ui.modifiers.outline
 import com.varabyte.kobweb.compose.ui.modifiers.padding
 import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
@@ -36,6 +35,7 @@ import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.jetbrains.compose.web.dom.Button as JbButton
 
@@ -86,8 +86,7 @@ fun Button(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
-    var backingElement: HTMLElement? = remember { null }
-
+    var backingElement: HTMLButtonElement? by remember { mutableStateOf(null) }
     JbButton(
         attrs = ButtonStyle.toModifier(variant)
             .thenIf(!enabled, DisabledStyle.toModifier().tabIndex(-1))
@@ -99,13 +98,6 @@ fun Button(
                         onClick(evt)
                         evt.stopPropagation()
                     }
-                    .onKeyDown { evt ->
-                        if (evt.isComposing) return@onKeyDown
-                        if (evt.key == "Enter" || evt.key == "Space") {
-                            backingElement!!.click()
-                            evt.stopPropagation()
-                        }
-                    }
             }
             .toAttrs()
     ) {
@@ -115,6 +107,7 @@ fun Button(
                 add(ref)
             }
         )
+
         Box(contentAlignment = Alignment.Center, content = content)
     }
 }

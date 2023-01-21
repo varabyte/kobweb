@@ -90,7 +90,7 @@ data class ElementRefScope<in TElement : Element> internal constructor(
 fun <TElement : Element> ElementScope<TElement>.registerRefScope(scope: ElementRefScope<TElement>?) {
     if (scope == null) return
     scope.keyedCallbacks.forEach { keyedCallback ->
-        DisposableEffect(*(listOf(scope) + keyedCallback.keys).toTypedArray()) {
+        DisposableEffect(*keyedCallback.keys.toTypedArray()) {
             keyedCallback.refCallback.invoke(this, scopeElement)
         }
     }
