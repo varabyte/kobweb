@@ -19,6 +19,7 @@ class FrontendData(
     val silkInits: List<InitSilkEntry>,
     val silkStyles: List<ComponentStyleEntry>,
     val silkVariants: List<ComponentVariantEntry>,
+    val keyframesList: List<KeyframesEntry>,
 )
 
 fun Iterable<FrontendData>.merge(): FrontendData {
@@ -28,6 +29,7 @@ fun Iterable<FrontendData>.merge(): FrontendData {
         this.flatMap { it.silkInits },
         this.flatMap { it.silkStyles },
         this.flatMap { it.silkVariants },
+        this.flatMap { it.keyframesList },
     ).also { it.assertValid() }
 }
 

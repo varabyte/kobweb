@@ -2,6 +2,8 @@ package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
 import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
@@ -70,8 +72,9 @@ interface SilkConfig {
      * ```
      * @InitSilk
      * fun initStyles(ctx: InitSilkContext) {
-     *   ctx.registerKeyframes("pulse") {
-     *     ...
+     *   ctx.registerKeyframes("bounce") {
+     *     from { Modifier.translateX((-50).percent) }
+     *     to { Modifier.translateX(50.percent) }
      *   }
      * }
      * ```
@@ -81,8 +84,9 @@ interface SilkConfig {
      * ```
      * object MyStyleSheet : StyleSheet() {
      *   init {
-     *     val pulse by ctx.keyframes {
-     *       ...
+     *     val pulse by keyframes {
+     *       from { property("transform", "translateX(-50%)")
+     *       to { property("transform", "translateX(50%)")
      *     }
      *   }
      * }
@@ -97,7 +101,7 @@ interface SilkConfig {
      * }
      * ```
      */
-    fun registerKeyframes(name: String, cssKeyframes: CSSKeyframesBuilder.() -> Unit)
+    fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit)
 }
 
 /**
@@ -136,15 +140,15 @@ internal object SilkConfigInstance : SilkConfig {
     override var initialColorMode = ColorMode.LIGHT
 
     private val styles = mutableListOf<ComponentStyle>()
-    private val keyframes = mutableMapOf<String, CSSKeyframesBuilder.() -> Unit>()
+    private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
 
     override fun registerStyle(cssSelector: String, extraModifiers: Modifier, init: StyleModifiers.() -> Unit) {
         styles.add(ComponentStyle(cssSelector, extraModifiers, init))
     }
 
-    override fun registerKeyframes(name: String, cssKeyframes: CSSKeyframesBuilder.() -> Unit) {
+    override fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit) {
         require(!keyframes.contains(name)) { "User is registering duplicate keyframe name: $name"}
-        keyframes[name] = cssKeyframes
+        keyframes[name] = build
     }
 
     // This method is not part of the public API and should only be called by Silk itself at initialization time
@@ -153,9 +157,19 @@ internal object SilkConfigInstance : SilkConfig {
             componentStyle.addStylesInto(siteStyleSheet, componentStyle.name)
         }
 
-        keyframes.forEach { (name, builder) ->
-            val frames = CSSKeyframesBuilder(builder).frames
-            siteStyleSheet.add(CSSKeyframesRuleDeclaration(name, frames))
+        keyframes.map { (name, build) ->
+            val builder = KeyframesBuilder().apply(build)
+
+            val keyframeRules = builder.keyframeStyles.map { (keyframe, create) ->
+                val styles = create().toStyles()
+
+                val cssRuleBuilder = StyleScopeBuilder()
+                styles.invoke(cssRuleBuilder)
+
+                CSSKeyframeRuleDeclaration(keyframe, cssRuleBuilder)
+            }
+
+            siteStyleSheet.add(CSSKeyframesRuleDeclaration(name, keyframeRules))
         }
     }
 }

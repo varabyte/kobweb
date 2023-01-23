@@ -51,6 +51,10 @@ fun createMainFunction(
             add("com.varabyte.kobweb.core.InitKobwebContext")
         }
 
+        if (frontendData.keyframesList.isNotEmpty()) {
+            add("com.varabyte.kobweb.silk.components.animation.registerKeyframes")
+        }
+
         sort()
     }.forEach { import -> fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.')) }
 
@@ -156,8 +160,10 @@ fun createMainFunction(
                 addStatement("")
             }
 
-            if (usingSilk
-                && frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty() || frontendData.silkVariants.isNotEmpty()) {
+            if (usingSilk &&
+                (frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty() || frontendData.silkVariants.isNotEmpty()
+                        || frontendData.keyframesList.isNotEmpty())
+            ) {
                 addCode(CodeBlock.builder().apply {
                     addStatement("com.varabyte.kobweb.silk.initSilkHook = { ctx ->")
                     withIndent {
@@ -166,6 +172,9 @@ fun createMainFunction(
                         }
                         frontendData.silkVariants.forEach { entry ->
                             addStatement("ctx.theme.registerComponentVariants(${entry.fqcn})")
+                        }
+                        frontendData.keyframesList.forEach { entry ->
+                            addStatement("ctx.config.registerKeyframes(${entry.fqcn})")
                         }
                         frontendData.silkInits.forEach { init ->
                             addStatement("${init.fqn}(ctx)")

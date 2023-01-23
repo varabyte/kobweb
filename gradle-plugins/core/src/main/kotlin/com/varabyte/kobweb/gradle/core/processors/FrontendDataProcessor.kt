@@ -4,21 +4,7 @@ import com.varabyte.kobweb.gradle.core.project.common.PackageUtils.prefixQualifi
 import com.varabyte.kobweb.gradle.core.project.common.RouteUtils
 import com.varabyte.kobweb.gradle.core.project.common.ancestors
 import com.varabyte.kobweb.gradle.core.project.common.getStringValue
-import com.varabyte.kobweb.gradle.core.project.frontend.ComponentStyleEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.ComponentVariantEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
-import com.varabyte.kobweb.gradle.core.project.frontend.INIT_KOBWEB_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.INIT_KOBWEB_SIMPLE_NAME
-import com.varabyte.kobweb.gradle.core.project.frontend.INIT_SILK_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.INIT_SILK_SIMPLE_NAME
-import com.varabyte.kobweb.gradle.core.project.frontend.InitKobwebEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.InitSilkEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.PACKAGE_MAPPING_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.PACKAGE_MAPPING_SIMPLE_NAME
-import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_SIMPLE_NAME
-import com.varabyte.kobweb.gradle.core.project.frontend.PageEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.assertValid
+import com.varabyte.kobweb.gradle.core.project.frontend.*
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.visitAllChildren
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
@@ -152,6 +138,32 @@ private fun processComponentVariantBase(
     return processComponentVariant(file, filePackage, element, silkVariants, reporter)
 }
 
+/** Process a line like `val AnimName = Keyframes("name") { ... }` */
+private fun processKeyframes(
+    file: File,
+    filePackage: String,
+    element: KtCallExpression,
+    keyframesList: MutableList<KeyframesEntry>,
+    reporter: Reporter
+): Boolean {
+    val property = element.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
+    val propertyName = property.name ?: return false // Null name not expected in practice; fail silently
+
+    // Only top-level properties are allowed for now, so getting the fully qualified path is easy
+    if (property.parent !is KtFile) {
+        reporter.report("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as only top-level definitions are supported at this time")
+        return false
+    }
+
+    return if (property.isPublic) {
+        keyframesList.add(KeyframesEntry(prefixQualifiedPath(filePackage, propertyName)))
+        true
+    } else {
+        reporter.report("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as it is not public")
+        false
+    }
+}
+
 /**
  * A processor that runs over a site's frontend code, searching for Kobweb hooks like `@Page` annotations and
  * component styles.
@@ -178,6 +190,7 @@ class FrontendDataProcessor(
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val silkStyles = mutableListOf<ComponentStyleEntry>()
     private val silkVariants = mutableListOf<ComponentVariantEntry>()
+    private val keyframesList = mutableListOf<KeyframesEntry>()
 
     // fqPkg to subdir, e.g. "blog._2022._01" to "01"
     private val packageMappings = mutableMapOf<String, String>()
@@ -308,6 +321,9 @@ class FrontendDataProcessor(
 
                         "addVariantBase" ->
                             processComponentVariantBase(file, currPackage, element, silkVariants, reporter)
+
+                        "Keyframes", "keyframes" ->
+                            processKeyframes(file, currPackage, element, keyframesList, reporter)
                     }
                 }
             }
@@ -366,6 +382,6 @@ class FrontendDataProcessor(
             )
         }
 
-        return FrontendData(pages, kobwebInits, silkInits, silkStyles, silkVariants).also { it.assertValid() }
+        return FrontendData(pages, kobwebInits, silkInits, silkStyles, silkVariants, keyframesList).also { it.assertValid() }
     }
 }
