@@ -122,36 +122,6 @@ class KeyframesProvider(private val init: KeyframesBuilder.() -> Unit) {
         return Keyframes(name, init)
     }
 }
-//class KeyframesProvider(private val init: KeyframesBuilder.() -> Unit) {
-//    // e.g. "ExampleText" to "example_text"
-//    private fun String.titleCamelCaseToSnakeCase(): String {
-//        require(this.isNotBlank())
-//
-//        val currentWord = StringBuilder()
-//        val words = mutableListOf<String>()
-//
-//        this.forEach { c ->
-//            if (c.isUpperCase()) {
-//                if (currentWord.isNotEmpty()) {
-//                    words.add(currentWord.toString())
-//                    currentWord.clear()
-//                }
-//            }
-//            currentWord.append(c)
-//        }
-//        words.add(currentWord.toString())
-//
-//        return words.joinToString("_") { it.decapitalize() }
-//    }
-//
-//    operator fun provideDelegate(
-//        thisRef: Any?,
-//        property: KProperty<*>
-//    ): ReadOnlyProperty<Any?, Keyframes> {
-//        val name = property.name.titleCamelCaseToSnakeCase()
-//        return ReadOnlyProperty { _, _ -> Keyframes(name, init) }
-//    }
-//}
 
 fun SilkConfig.registerKeyframes(keyframes: Keyframes) = registerKeyframes(keyframes.name, keyframes.init)
 
