@@ -2,174 +2,39 @@ package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.toStyles
-import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
-import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.silk.components.style.ComponentBaseModifier
+import com.varabyte.kobweb.silk.components.style.ComponentModifier
+import com.varabyte.kobweb.silk.components.style.ComponentModifiers
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.ImmutableComponentStyle
+import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
-import com.varabyte.kobweb.silk.theme.colors.*
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.SilkPalette
+import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
+import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import org.jetbrains.compose.web.css.*
 
-/**
- * Configuration values which are frozen at initialization time and accessed globally within Silk after that point.
- */
-interface SilkConfig {
-    var initialColorMode: ColorMode
+// TODO(#168): Remove in v1.0
+@Deprecated(
+    message = "SilkConfig has moved. Please change your import to `com.varabyte.kobweb.silk.init.SilkConfig`",
+    replaceWith = ReplaceWith("com.varabyte.kobweb.silk.init.SilkConfig")
+)
+typealias SilkConfig = com.varabyte.kobweb.silk.init.SilkConfig
 
-    /**
-     * An alternate way to register global styles with Silk instead of using a Compose for Web StyleSheet directly.
-     *
-     * So this:
-     *
-     * ```
-     * @InitSilk
-     * fun initStyles(ctx: InitSilkContext) {
-     *   ctx.registerStyle("*") {
-     *     base {
-     *       Modifier.fontSize(48.px)
-     *     }
-     *     Breakpoint.MD {
-     *       ...
-     *     }
-     *   }
-     * }
-     * ```
-     *
-     * is a replacement for all of this:
-     *
-     * ```
-     * object MyStyleSheet : StyleSheet() {
-     *   init {
-     *     "*" style {
-     *       fontSize(48.px)
-     *
-     *       media(minWidth(...)) {
-     *         self style {
-     *           ...
-     *         }
-     *       }
-     *     }
-     *   }
-     * }
-     *
-     * @App
-     * @Composable
-     * fun MyApp(content: @Composable () -> Unit) {
-     *   SilkApp {
-     *     Style(MyStyleSheet)
-     *     ...
-     *   }
-     * }
-     * ```
-     */
-    fun registerStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit)
-
-    /**
-     * An alternate way to register keyframes via Silk instead of using a Compose for Web StyleSheet directly.
-     *
-     * So this:
-     *
-     * ```
-     * @InitSilk
-     * fun initStyles(ctx: InitSilkContext) {
-     *   ctx.registerKeyframes("bounce") {
-     *     from { Modifier.translateX((-50).percent) }
-     *     to { Modifier.translateX(50.percent) }
-     *   }
-     * }
-     * ```
-     *
-     * is a replacement for:
-     *
-     * ```
-     * object MyStyleSheet : StyleSheet() {
-     *   init {
-     *     val pulse by keyframes {
-     *       from { property("transform", "translateX(-50%)")
-     *       to { property("transform", "translateX(50%)")
-     *     }
-     *   }
-     * }
-     *
-     * @App
-     * @Composable
-     * fun MyApp(content: @Composable () -> Unit) {
-     *   SilkApp {
-     *     Style(MyStyleSheet)
-     *     ...
-     *   }
-     * }
-     * ```
-     */
-    fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit)
-}
-
-/**
- * Convenience method when you only care about registering the base method, which can help avoid a few extra lines.
- *
- * So this:
- *
- * ```
- * config.registerBaseStyle("*") {
- *   Modifier.fontSize(48.px)
- * }
- * ```
- *
- * replaces this:
- *
- * ```
- * config.registerStyle("*") {
- *   base {
- *     Modifier.fontSize(48.px)
- *   }
- * }
- * ```
- *
- * You may still wish to use [SilkConfig.registerStyle] instead if you expect that at some point in the future
- * you'll want to add additional, non-base styles.
- */
+// TODO(#168): Remove in v1.0
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION") // Couldn't get this to work properly with extension methods
+@Deprecated(
+    message = "registerBaseStyle has moved. Please change your import to `com.varabyte.kobweb.silk.init.registerBaseStyle` and your code from `ctx.config.registerBaseStyle` to `ctx.stylesheet.registerBaseStyle`",
+)
 fun SilkConfig.registerBaseStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
     registerStyle(cssSelector, extraModifiers) {
         base {
             init()
-        }
-    }
-}
-
-internal object SilkConfigInstance : SilkConfig {
-    override var initialColorMode = ColorMode.LIGHT
-
-    private val styles = mutableListOf<ComponentStyle>()
-    private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
-
-    override fun registerStyle(cssSelector: String, extraModifiers: Modifier, init: StyleModifiers.() -> Unit) {
-        styles.add(ComponentStyle(cssSelector, extraModifiers, init))
-    }
-
-    override fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit) {
-        require(!keyframes.contains(name)) { "User is registering duplicate keyframe name: $name"}
-        keyframes[name] = build
-    }
-
-    // This method is not part of the public API and should only be called by Silk itself at initialization time
-    fun registerStylesAndKeyframesInto(siteStyleSheet: StyleSheet) {
-        styles.forEach { componentStyle ->
-            componentStyle.addStylesInto(siteStyleSheet, componentStyle.name)
-        }
-
-        keyframes.map { (name, build) ->
-            val builder = KeyframesBuilder().apply(build)
-
-            val keyframeRules = builder.keyframeStyles.map { (keyframe, create) ->
-                val styles = create().toStyles()
-
-                val cssRuleBuilder = StyleScopeBuilder()
-                styles.invoke(cssRuleBuilder)
-
-                CSSKeyframeRuleDeclaration(keyframe, cssRuleBuilder)
-            }
-
-            siteStyleSheet.add(CSSKeyframesRuleDeclaration(name, keyframeRules))
         }
     }
 }

@@ -4,16 +4,16 @@ import androidx.compose.runtime.Composable
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.App
-import com.varabyte.kobweb.silk.InitSilk
-import com.varabyte.kobweb.silk.InitSilkContext
+import com.varabyte.kobweb.silk.init.InitSilk
+import com.varabyte.kobweb.silk.init.InitSilkContext
 import com.varabyte.kobweb.silk.SilkApp
 import com.varabyte.kobweb.silk.components.layout.Surface
-import com.varabyte.kobweb.silk.theme.registerBaseStyle
+import com.varabyte.kobweb.silk.init.registerBaseStyle
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.css.vw
 
 @InitSilk
-fun registerGlobalStyles(ctx: InitSilkContext) = ctx.config.apply {
+fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
     registerBaseStyle("body") {
         Modifier
             .fontFamily(

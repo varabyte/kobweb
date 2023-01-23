@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.theme.colors
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.lightened
-import com.varabyte.kobweb.silk.theme.SilkConfigInstance
+import com.varabyte.kobweb.silk.init.SilkConfigInstance
 import kotlin.math.absoluteValue
 
 enum class ColorMode {

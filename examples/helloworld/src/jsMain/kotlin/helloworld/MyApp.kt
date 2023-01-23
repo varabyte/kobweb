@@ -7,14 +7,14 @@ import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.App
-import com.varabyte.kobweb.silk.InitSilk
-import com.varabyte.kobweb.silk.InitSilkContext
+import com.varabyte.kobweb.silk.init.InitSilk
+import com.varabyte.kobweb.silk.init.InitSilkContext
 import com.varabyte.kobweb.silk.SilkApp
 import com.varabyte.kobweb.silk.components.layout.AnimatedColorSurfaceVariant
 import com.varabyte.kobweb.silk.components.layout.Surface
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
-import com.varabyte.kobweb.silk.theme.registerBaseStyle
+import com.varabyte.kobweb.silk.init.registerBaseStyle
 import kotlinx.browser.localStorage
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.em
@@ -24,12 +24,12 @@ import org.jetbrains.compose.web.css.vh
 private const val COLOR_MODE_KEY = "helloworld:app:colorMode"
 
 @InitSilk
-fun updateTheme(ctx: InitSilkContext) = ctx.config.apply {
+fun updateTheme(ctx: InitSilkContext) = ctx.stylesheet.apply {
     initialColorMode = localStorage.getItem(COLOR_MODE_KEY)?.let { ColorMode.valueOf(it) } ?: ColorMode.DARK
 }
 
 @InitSilk
-fun registerGlobalStyles(ctx: InitSilkContext) = ctx.config.apply {
+fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
     registerBaseStyle("body") {
         Modifier
             .fontFamily(

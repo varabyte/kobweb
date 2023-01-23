@@ -165,7 +165,7 @@ fun createMainFunction(
                         || frontendData.keyframesList.isNotEmpty())
             ) {
                 addCode(CodeBlock.builder().apply {
-                    addStatement("com.varabyte.kobweb.silk.initSilkHook = { ctx ->")
+                    addStatement("com.varabyte.kobweb.silk.init.initSilkHook = { ctx ->")
                     withIndent {
                         frontendData.silkStyles.forEach { entry ->
                             addStatement("ctx.theme.registerComponentStyle(${entry.fqcn})")
@@ -174,7 +174,7 @@ fun createMainFunction(
                             addStatement("ctx.theme.registerComponentVariants(${entry.fqcn})")
                         }
                         frontendData.keyframesList.forEach { entry ->
-                            addStatement("ctx.config.registerKeyframes(${entry.fqcn})")
+                            addStatement("ctx.stylesheet.registerKeyframes(${entry.fqcn})")
                         }
                         frontendData.silkInits.forEach { init ->
                             addStatement("${init.fqn}(ctx)")

@@ -2,9 +2,8 @@ package com.varabyte.kobweb.silk.components.animation
 
 import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.theme.SilkConfig
+import com.varabyte.kobweb.silk.init.SilkStylesheet
 import org.jetbrains.compose.web.css.*
-import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 class KeyframesBuilder internal constructor() {
@@ -123,7 +122,7 @@ class KeyframesProvider(private val init: KeyframesBuilder.() -> Unit) {
     }
 }
 
-fun SilkConfig.registerKeyframes(keyframes: Keyframes) = registerKeyframes(keyframes.name, keyframes.init)
+fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(keyframes.name, keyframes.init)
 
 /**
  * Construct a [Keyframes] instance where the name comes from the variable name.
