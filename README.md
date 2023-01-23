@@ -1284,25 +1284,13 @@ To read more about the feature, please check out the
 
 ## Multimodule
 
-For simplicity, the default site Kobweb creates for you is a monolithic project. All your code is dumped into a single
-module at the project root.
+For simplicity, most new projects will put all their pages and widgets inside a single application module.
 
-However, Kobweb is capable of splitting code up across modules. To do this, you move your components, pages, and/or
-widgets to separate modules and apply the `com.varabyte.kobweb.library` plugin on them (while the main module applies
-the `com.varabyte.kobweb.application` plugin.)
+However, Kobweb is capable of splitting code up across modules. You can define components and/or pages in separate
+modules and apply the `com.varabyte.kobweb.library` plugin on them (in contrast to your main module which applies the
+`com.varabyte.kobweb.application` plugin.)
 
-In other words, you can change a project layout from this:
-
-```
-my-project
-├── build.gradle.kts
-└── src/jsMain
-    └── kotlin.org.example.myproject
-        ├── components
-        └── pages
-```
-
-To something like this:
+In other words, you can lay out your project like this:
 
 ```
 my-project
@@ -1326,7 +1314,7 @@ If you'd like to explore a multimodule project example, you can do so by running
 $ kobweb create examples/chat
 ```
 
-which demonstrates a chat application with its auth and chat functionality managed in their own, separate modules.
+which demonstrates a chat application with its auth and chat functionality each managed in their own separate modules.
 
 ## Templates
 
