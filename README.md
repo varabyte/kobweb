@@ -870,6 +870,50 @@ CustomWidget(Modifier.backgroundColor(Colors.Blue)) { /* ... */ }
 CustomWidget(Modifier.backgroundColor(Colors.Blue), variant = TransparentWidgetVariant) { /* ... */ }
 ```
 
+### Animations
+
+In CSS, animations work by letting you define keyframes in a stylesheet which you then reference, by name, in an
+animation style. You can read more about them
+[on Mozilla's documentation site](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations).
+
+For example, here's the CSS for an animation of a sliding rectangle
+([from this tutorial](https://www.w3schools.com/cssref/tryit.php?filename=trycss3_animation)):
+
+```css
+div {
+  width: 100px;
+  height: 100px;
+  background: red;
+  position: relative;
+  animation: mymove 5s infinite;
+}
+
+@keyframes mymove {
+  from {left: 0px;}
+  to {left: 200px;}
+}
+```
+
+Kobweb lets you define your keyframes in code by using the `by keyframes` pattern:
+
+```kotlin
+val MyMove by keyframes {
+    from { Modifier.left(0.px) }
+    to { Modifier.left(200.px) }
+}
+
+// Later
+Div(
+    Modifier
+        .size(100.px).backgroundColor(Colors.Red).position(Position.Relative)
+        .animation(MyMove.toAnimation(duration = 5.s, iterationCount = IterationCount.Infinite))
+)
+```
+
+The name of the keyframes block is automatically derived from the property name (here, `MyMove` is converted into
+`"my-move"`). You can then use the `toAnimation` method to convert your collection of keyframes into an animation that
+uses them, which you can pass into the `Modifier.animation` modifier.
+
 ### ElementRefScope and raw HTML elements
 
 Occasionally, you may need access to the raw element backing the Silk widget you've just created. All Silk widgets
