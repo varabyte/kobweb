@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.components.animation
 
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.init.SilkStylesheet
@@ -151,7 +152,7 @@ fun Keyframes.toAnimation(
     duration: CSSSizeValue<out CSSUnitTime>? = null,
     timingFunction: AnimationTimingFunction? = null,
     delay: CSSSizeValue<out CSSUnitTime>? = null,
-    iterationCount: CSSAnimation.IterationCount? = null,
+    iterationCount: AnimationIterationCount? = null,
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null
