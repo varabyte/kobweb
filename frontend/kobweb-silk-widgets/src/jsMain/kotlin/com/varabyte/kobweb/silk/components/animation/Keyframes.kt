@@ -69,17 +69,6 @@ class KeyframesBuilder internal constructor() {
  * )
  * ```
  *
- * Important! If you are using Kobweb, its Gradle plugin will automatically do this for you, but otherwise, you will
- * have to use an `@InitSilk` block to register your keyframes:
- *
- * ```
- * val Bounce = Keyframes("bounce") { ... }
- * @InitSilk
- * fun initSilk(ctx: InitSilkContext) {
- *   ctx.config.registerKeyframes(Bounce)
- * }
- * ```
- *
  * Note: You should prefer to create keyframes using the [keyframes] delegate method to avoid needing to duplicate the
  * property name, e.g.
  *
@@ -89,6 +78,19 @@ class KeyframesBuilder internal constructor() {
  *   to { Modifier.translateX((50).percent) }
  * }
  * ```
+ *
+ * If you are not using Kobweb, e.g. if you're using these widgets as a standalone library, you will have to use an
+ * `@InitSilk` block to register your keyframes:
+ *
+ * ```
+ * val Bounce = Keyframes("bounce") { ... }
+ * @InitSilk
+ * fun initSilk(ctx: InitSilkContext) {
+ *   ctx.config.registerKeyframes(Bounce)
+ * }
+ * ```
+ *
+ * Otherwise, the Kobweb Gradle plugin will do this for you.
  */
 class Keyframes(val name: String, internal val init: KeyframesBuilder.() -> Unit)
 
@@ -134,7 +136,7 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
  * val Bounce by keyframes { ... }
  * ```
  *
- * creates a keyframe entry into the current site stylesheet with the name "bounce".
+ * creates a keyframe entry into the site stylesheet (provided by Silk) with the name "bounce".
  *
  * Title camel case gets converted to snake case, so if the variable was called "AnimBounce", the final name added to
  * the style sheet would be "anim-bounce"
