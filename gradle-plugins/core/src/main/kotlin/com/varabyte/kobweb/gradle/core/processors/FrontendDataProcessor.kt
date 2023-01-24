@@ -142,7 +142,21 @@ private fun processKeyframes(
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
     if (property.parent !is KtFile) {
-        reporter.report("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as only top-level definitions are supported at this time")
+        var showWarning = true
+
+        // A user may be using the `by keyframes` delegate pattern *inside* a Compose for Web StyleSheet, where in that
+        // case they're not using *our* keyframes method but are instead using the StyleSheet inherited one. Don't show
+        // warnings about that because those cases are valid.
+        val propertyDelegate = element.parents.filterIsInstance<KtPropertyDelegate>().firstOrNull()
+        if (propertyDelegate != null) {
+            val isInsideStylesheet = propertyDelegate.parents.filterIsInstance<KtClassOrObject>().any {
+                it.getSuperNames().contains("StyleSheet")
+            }
+            showWarning = !isInsideStylesheet
+        }
+        if (showWarning) {
+            reporter.report("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as only top-level definitions are supported at this time")
+        }
         return false
     }
 
