@@ -24,7 +24,7 @@ import org.jetbrains.compose.web.css.vh
 private const val COLOR_MODE_KEY = "helloworld:app:colorMode"
 
 @InitSilk
-fun updateTheme(ctx: InitSilkContext) = ctx.stylesheet.apply {
+fun updateTheme(ctx: InitSilkContext) = ctx.config.apply {
     initialColorMode = localStorage.getItem(COLOR_MODE_KEY)?.let { ColorMode.valueOf(it) } ?: ColorMode.DARK
 }
 
