@@ -360,13 +360,13 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 |-------------------------|---------------------------------|
 | `@Page`                 | `example.com/a/b/c/slug`        |
 | `@Page("other")`        | `example.com/a/b/c/other`       |
- | `@Page("index")`        | `example.com/a/b/c/`            |
- | `@Page("d/e/f/")`       | `example.com/a/b/c/d/e/f/slug`  |
- | `@Page("d/e/f/other")`  | `example.com/a/b/c/d/e/f/other` |
- | `@Page("/d/e/f/")`      | `example.com/d/e/f/slug`        |
- | `@Page("/d/e/f/other")` | `example.com/d/e/f/other`       |
- | `@Page("/")`            | `example.com/slug`              |
- | `@Page("/other")`       | `example.com/other`             |
+| `@Page("index")`        | `example.com/a/b/c/`            |
+| `@Page("d/e/f/")`       | `example.com/a/b/c/d/e/f/slug`  |
+| `@Page("d/e/f/other")`  | `example.com/a/b/c/d/e/f/other` |
+| `@Page("/d/e/f/")`      | `example.com/d/e/f/slug`        |
+| `@Page("/d/e/f/other")` | `example.com/d/e/f/other`       |
+| `@Page("/")`            | `example.com/slug`              |
+| `@Page("/other")`       | `example.com/other`             |
 
 ⚠️ We close this section with a warning - despite the flexibility allowed here, you should not be using this feature
 frequently, if at all. A Kobweb project benefits from the fact that a user can easily associate a URL on your site with
