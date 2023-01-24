@@ -63,7 +63,7 @@ class KeyframesBuilder internal constructor() {
  *       duration = 2.s,
  *       timingFunction = AnimationTimingFunction.EaseIn,
  *       direction = AnimationDirection.Alternate,
- *       iterationCount = IterationCount.Infinite
+ *       iterationCount = AnimationIterationCount.Infinite
  *     )
  *     .toAttrs()
  * )

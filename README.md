@@ -906,7 +906,10 @@ val MyMove by keyframes {
 Div(
     Modifier
         .size(100.px).backgroundColor(Colors.Red).position(Position.Relative)
-        .animation(MyMove.toAnimation(duration = 5.s, iterationCount = IterationCount.Infinite))
+        .animation(MyMove.toAnimation(
+            duration = 5.s,
+            iterationCount = AnimationIterationCount.Infinite
+        ))
 )
 ```
 
