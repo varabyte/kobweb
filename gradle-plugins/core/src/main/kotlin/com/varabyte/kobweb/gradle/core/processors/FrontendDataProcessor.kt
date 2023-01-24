@@ -2,21 +2,12 @@ package com.varabyte.kobweb.gradle.core.processors
 
 import com.varabyte.kobweb.gradle.core.project.common.PackageUtils.prefixQualifiedPath
 import com.varabyte.kobweb.gradle.core.project.common.RouteUtils
-import com.varabyte.kobweb.gradle.core.project.common.ancestors
 import com.varabyte.kobweb.gradle.core.project.common.getStringValue
 import com.varabyte.kobweb.gradle.core.project.frontend.*
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.visitAllChildren
-import org.jetbrains.kotlin.psi.KtAnnotationEntry
-import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
-import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtFileAnnotationList
-import org.jetbrains.kotlin.psi.KtImportDirective
-import org.jetbrains.kotlin.psi.KtNamedFunction
-import org.jetbrains.kotlin.psi.KtPackageDirective
-import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.psiUtil.isPublic
+import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.psiUtil.*
 import java.io.File
 
 private fun processComponentStyle(
@@ -57,7 +48,7 @@ private fun processComponentStyle(
     silkStyles: MutableList<ComponentStyleEntry>,
     reporter: Reporter
 ): Boolean {
-    val property = element.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
+    val property = element.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
     val styleName = element.getStringValue(0) ?: run {
         reporter.report("${file.absolutePath}: Skipping over \"${element.text.elideLinesAfterFirst()}\" as the style name must be specified as a raw string.")
         return false
@@ -75,7 +66,7 @@ private fun processComponentStyleBase(
 ): Boolean {
     val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
     if (qualifiedExpression.receiverExpression.text != "ComponentStyle") return false
-    val property = qualifiedExpression.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
+    val property = qualifiedExpression.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
     val styleName = element.getStringValue(0) ?: run {
         reporter.report("${file.absolutePath}: Skipping over \"${qualifiedExpression.text.elideLinesAfterFirst()}\" as the style name must be specified as a raw string.")
         return false
@@ -118,7 +109,7 @@ private fun processComponentVariant(
     reporter: Reporter
 ): Boolean {
     val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
-    val property = qualifiedExpression.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
+    val property = qualifiedExpression.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
     val variantName = element.getStringValue(0) ?: run {
         reporter.report("${file.absolutePath}: Skipping over \"${qualifiedExpression.text.elideLinesAfterFirst()}\" as the variant name must be specified as a raw string.")
         return false
@@ -146,7 +137,7 @@ private fun processKeyframes(
     keyframesList: MutableList<KeyframesEntry>,
     reporter: Reporter
 ): Boolean {
-    val property = element.ancestors.filterIsInstance<KtProperty>().firstOrNull() ?: return false
+    val property = element.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
     val propertyName = property.name ?: return false // Null name not expected in practice; fail silently
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy

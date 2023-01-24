@@ -42,13 +42,3 @@ fun KtCallElement.getStringValue(index: Int): String? {
     val strExpr = valueArguments.getOrNull(index)?.getArgumentExpression() as? KtStringTemplateExpression ?: return null
     return strExpr.entries.firstOrNull()?.text
 }
-
-val PsiElement.ancestors: Sequence<PsiElement> get() {
-    var currAncestor = this.parent
-    return sequence {
-        while (currAncestor != null) {
-            yield(currAncestor)
-            currAncestor = currAncestor.parent
-        }
-    }
-}
