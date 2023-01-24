@@ -129,7 +129,7 @@ private fun processComponentVariantBase(
     return processComponentVariant(file, filePackage, element, silkVariants, reporter)
 }
 
-/** Process a line like `val AnimName = Keyframes("name") { ... }` */
+/** Process a line like `val AnimName = Keyframes("anim-name") { ... }` or `val AnimName by keyframes { ... }` */
 private fun processKeyframes(
     file: File,
     filePackage: String,
