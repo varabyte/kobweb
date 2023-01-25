@@ -12,6 +12,8 @@ value class AnimationIterationCount private constructor(private val count: Numbe
 }
 
 // A replacement for the upstream CSSAnimation which is currently implemented incorrectly
+// (it exposes a 1:many relationship between an animation's name and its properties, but
+// it should be 1:1).
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
 data class CSSAnimation(
     val name: String,
