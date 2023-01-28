@@ -1,10 +1,13 @@
 package com.varabyte.kobweb.server.plugins
 
 import com.varabyte.kobweb.project.conf.KobwebConf
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
+import io.ktor.server.plugins.compression.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.defaultheaders.*
 
 fun Application.configureHTTP(conf: KobwebConf) {
     install(DefaultHeaders) {
@@ -12,14 +15,14 @@ fun Application.configureHTTP(conf: KobwebConf) {
     }
 
     install(CORS) {
-        method(HttpMethod.Options)
-        method(HttpMethod.Put)
-        method(HttpMethod.Delete)
-        method(HttpMethod.Patch)
-        header(HttpHeaders.Authorization)
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
+        allowHeader(HttpHeaders.Authorization)
         allowCredentials = true
 
-        conf.server.cors.hosts.forEach { host -> host(host.name, host.schemes, host.subDomains) }
+        conf.server.cors.hosts.forEach { host -> allowHost(host.name, host.schemes, host.subDomains) }
     }
 
     install(Compression) {
@@ -42,7 +45,7 @@ fun Application.configureHTTP(conf: KobwebConf) {
     }
 
     install(CachingHeaders) {
-        options { outgoingContent ->
+        options { _, outgoingContent ->
             when (outgoingContent.contentType?.withoutParameters()) {
                 ContentType.Text.CSS -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
                 else -> null
