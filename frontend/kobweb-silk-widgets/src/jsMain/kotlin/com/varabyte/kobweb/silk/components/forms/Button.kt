@@ -96,6 +96,7 @@ fun Button(
                     .onClick { evt ->
                         backingElement!!.focus()
                         onClick(evt)
+                        evt.preventDefault()
                         evt.stopPropagation()
                     }
             }
