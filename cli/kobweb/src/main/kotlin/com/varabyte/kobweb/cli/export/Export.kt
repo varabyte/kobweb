@@ -3,26 +3,24 @@ package com.varabyte.kobweb.cli.export
 import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.GradleAlertBundle
 import com.varabyte.kobweb.cli.common.KobwebGradle
-import com.varabyte.kobweb.cli.common.consumeProcessOutput
-import com.varabyte.kobweb.cli.common.findKobwebApplication
 import com.varabyte.kobweb.cli.common.assertKobwebApplication
 import com.varabyte.kobweb.cli.common.assertServerNotAlreadyRunning
+import com.varabyte.kobweb.cli.common.findKobwebApplication
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.handleGradleOutput
 import com.varabyte.kobweb.cli.common.isServerAlreadyRunningFor
 import com.varabyte.kobweb.cli.common.newline
 import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
-import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.input.Keys
 import com.varabyte.kotter.foundation.input.onKeyPressed
-import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.liveVarOf
+import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.red
 import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
-import kotlinx.coroutines.delay
 
 private enum class ExportState {
     EXPORTING,
@@ -33,10 +31,14 @@ private enum class ExportState {
     INTERRUPTED,
 }
 
-@Suppress("BlockingMethodInNonBlockingContext")
 fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
-    val kobwebGradle = KobwebGradle(ServerEnvironment.PROD) // exporting is a production-only action
+    // exporting is a production-only action
+    KobwebGradle(ServerEnvironment.PROD).use { kobwebGradle ->
+        handleExport(siteLayout, isInteractive, kobwebGradle)
+    }
+}
 
+private fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean, kobwebGradle: KobwebGradle) {
     if (isInteractive) session {
         val kobwebApplication = findKobwebApplication() ?: return@session
         if (isServerAlreadyRunningFor(kobwebApplication)) return@session
@@ -77,14 +79,23 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
                 exportState = ExportState.INTERRUPTED
                 return@run
             }
-            exportProcess.consumeProcessOutput { line, isError ->
+            exportProcess.lineHandler = { line, isError ->
                 handleGradleOutput(line, isError) { alert -> gradleAlertBundle.handleAlert(alert) }
+            }
+            exportProcess.onCompleted = { failure ->
+                if (failure != null) {
+                    if (exportState != ExportState.CANCELLING) {
+                        cancelReason =
+                            "Server failed to build. Please check Gradle output and fix the errors before retrying."
+                        exportState = ExportState.CANCELLING
+                    }
+                }
             }
 
             onKeyPressed {
                 if (exportState == ExportState.EXPORTING && key == Keys.Q) {
                     cancelReason = "User requested cancellation"
-                    exportProcess.destroy()
+                    exportProcess.cancel()
                     exportState = ExportState.CANCELLING
                 }
                 else {
@@ -92,25 +103,14 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
                 }
             }
 
-            while (exportProcess.isAlive) {
-                delay(300)
-            }
-
-            if (exportProcess.exitValue() != 0) {
-                if (exportState != ExportState.CANCELLING) {
-                    cancelReason =
-                        "Server failed to build. Please check Gradle output and fix the errors before continuing."
-                    exportState = ExportState.CANCELLING
-                }
-            }
-
+            exportProcess.waitFor()
             if (exportState == ExportState.EXPORTING) {
                 exportState = ExportState.FINISHING
             }
             check(exportState in listOf(ExportState.FINISHING, ExportState.CANCELLING))
 
             val stopProcess = kobwebGradle.stopServer()
-            stopProcess.consumeProcessOutput(::handleConsoleOutput)
+            stopProcess.lineHandler = ::handleConsoleOutput
             stopProcess.waitFor()
 
             exportState = if (exportState == ExportState.FINISHING) ExportState.FINISHED else ExportState.CANCELLED
@@ -120,7 +120,7 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
         assertKobwebApplication()
             .also { kobwebApplication -> kobwebApplication.assertServerNotAlreadyRunning() }
 
-        kobwebGradle.export(siteLayout).also { it.consumeProcessOutput(); it.waitFor() }
-        kobwebGradle.stopServer().also { it.consumeProcessOutput(); it.waitFor() }
+        kobwebGradle.export(siteLayout).also { it.waitFor() }
+        kobwebGradle.stopServer().also { it.waitFor() }
     }
 }

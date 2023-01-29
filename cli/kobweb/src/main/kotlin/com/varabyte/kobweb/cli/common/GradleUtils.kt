@@ -14,36 +14,112 @@ import com.varabyte.kotter.runtime.RunScope
 import com.varabyte.kotter.runtime.Session
 import com.varabyte.kotter.runtime.concurrent.createKey
 import com.varabyte.kotter.runtime.render.RenderScope
+import org.gradle.tooling.CancellationTokenSource
+import org.gradle.tooling.GradleConnectionException
+import org.gradle.tooling.GradleConnector
+import org.gradle.tooling.ProjectConnection
+import org.gradle.tooling.ResultHandler
+import java.io.ByteArrayOutputStream
+import java.io.Closeable
+import java.io.File
+import java.io.OutputStream
+import java.util.concurrent.CountDownLatch
 import kotlin.text.StringBuilder
 
-class KobwebGradle(private val env: ServerEnvironment) {
-    private fun gradlew(vararg args: String): Process {
-        val finalArgs = args.toMutableList()
-        finalArgs.add("--stacktrace")
-        if (env == ServerEnvironment.PROD) {
-            // When in production, we don't want to leave a daemon running around hoarding resources unecessarily
-            finalArgs.add("--no-daemon")
-        }
+class KobwebGradle(private val env: ServerEnvironment, projectDir: File = File(".")): Closeable {
+    private val gradleConnector = GradleConnector.newConnector().forProjectDirectory(projectDir)
+    private val projectConnection: ProjectConnection = gradleConnector.connect()
 
-        return Runtime.getRuntime().gradlew(*finalArgs.toTypedArray())
+    override fun close() {
+        projectConnection.close()
+        // When in production, we don't want to leave a daemon running around hoarding resources unnecessarily
+        if (env == ServerEnvironment.PROD) {
+            gradleConnector.disconnect()
+        }
     }
 
-    fun startServer(enableLiveReloading: Boolean, siteLayout: SiteLayout): Process {
-        val args = mutableListOf("-PkobwebEnv=$env", "-PkobwebRunLayout=$siteLayout", "kobwebStart")
+    class Handle internal constructor(private val cancellationSource: CancellationTokenSource) {
+        var lineHandler: (line: String, isError: Boolean) -> Unit = { line, isError ->
+            if (isError) {
+                System.err.println(line)
+            } else {
+                println(line)
+            }
+        }
+
+        var onCompleted: (failure: Exception?) -> Unit = { }
+
+        internal inner class HandleOutputStream(private val isError: Boolean) : OutputStream() {
+            private val delegateStream = ByteArrayOutputStream()
+            override fun write(b: Int) {
+                if (b == 10) {
+                    lineHandler.invoke(delegateStream.toString(), isError)
+                    delegateStream.reset()
+                } else if (b != 13) { // Skip newline bytes on Windows
+                    delegateStream.write(b)
+                }
+            }
+        }
+
+        internal val latch = CountDownLatch(1)
+
+        fun cancel() {
+            cancellationSource.cancel()
+            latch.countDown()
+        }
+
+        fun waitFor() {
+            latch.await()
+        }
+    }
+
+    fun gradlew(task: String, vararg args: String): Handle {
+        val finalArgs = args.toMutableList()
+        finalArgs.add("--stacktrace")
+
+        val cancelToken = GradleConnector.newCancellationTokenSource()
+        val handle = Handle(cancelToken)
+        projectConnection.newBuild()
+            .setStandardOutput(handle.HandleOutputStream(isError = false))
+            .setStandardError(handle.HandleOutputStream(isError = true))
+            .forTasks(task)
+            .withArguments(*finalArgs.toTypedArray())
+            .withCancellationToken(cancelToken.token())
+            .run(object : ResultHandler<Void> {
+                private fun handleFinished() {
+                    handle.latch.countDown()
+                }
+
+                override fun onComplete(result: Void?) {
+                    handle.onCompleted.invoke(null)
+                    handleFinished()
+                }
+
+                override fun onFailure(failure: GradleConnectionException) {
+                    handle.onCompleted.invoke(failure)
+                    handleFinished()
+                }
+            })
+
+        return handle
+    }
+
+    fun startServer(enableLiveReloading: Boolean, siteLayout: SiteLayout): Handle {
+        val args = mutableListOf("-PkobwebEnv=$env", "-PkobwebRunLayout=$siteLayout")
         if (enableLiveReloading) {
             args.add("-t")
         }
-        return gradlew(*args.toTypedArray())
+        return gradlew("kobwebStart", *args.toTypedArray())
     }
 
-    fun stopServer(): Process {
+    fun stopServer(): Handle {
         return gradlew("kobwebStop")
     }
 
-    fun export(siteLayout: SiteLayout): Process {
+    fun export(siteLayout: SiteLayout): Handle {
         // Even if we are exporting a non-Kobweb layout, we still want to start up a dev server using a Kobweb layout so
         // it looks for the source files in the right place.
-        return gradlew("-PkobwebReuseServer=false", "-PkobwebEnv=DEV", "-PkobwebRunLayout=KOBWEB", "-PkobwebBuildTarget=RELEASE", "-PkobwebExportLayout=$siteLayout", "kobwebExport")
+        return gradlew("kobwebExport", "-PkobwebReuseServer=false", "-PkobwebEnv=DEV", "-PkobwebRunLayout=KOBWEB", "-PkobwebBuildTarget=RELEASE", "-PkobwebExportLayout=$siteLayout")
     }
 }
 

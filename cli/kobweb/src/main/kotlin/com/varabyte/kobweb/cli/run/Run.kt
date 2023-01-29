@@ -5,7 +5,6 @@ import com.varabyte.kobweb.cli.common.GradleAlertBundle
 import com.varabyte.kobweb.cli.common.KobwebGradle
 import com.varabyte.kobweb.cli.common.assertKobwebApplication
 import com.varabyte.kobweb.cli.common.assertServerNotAlreadyRunning
-import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebApplication
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.handleGradleOutput
@@ -57,9 +56,19 @@ fun handleRun(
     isInteractive: Boolean,
 ) {
     val originalEnv = env
+
     @Suppress("NAME_SHADOWING") // We're intentionally intercepting the original value
     val env = env.takeIf { siteLayout != SiteLayout.STATIC } ?: ServerEnvironment.PROD
-    val kobwebGradle = KobwebGradle(env)
+    KobwebGradle(env).use { kobwebGradle -> handleRun(originalEnv, env, siteLayout, isInteractive, kobwebGradle) }
+}
+
+private fun handleRun(
+    originalEnv: ServerEnvironment,
+    env: ServerEnvironment,
+    siteLayout: SiteLayout,
+    isInteractive: Boolean,
+    kobwebGradle: KobwebGradle
+) {
     if (isInteractive) session {
         val kobwebApplication = findKobwebApplication() ?: return@session
         if (isServerAlreadyRunningFor(kobwebApplication)) return@session
@@ -156,7 +165,7 @@ fun handleRun(
                 runState = RunState.INTERRUPTED
                 return@runUntilSignal
             }
-            startServerProcess.consumeProcessOutput { line, isError ->
+            startServerProcess.lineHandler = { line, isError ->
                 handleGradleOutput(line, isError) { alert -> gradleAlertBundle.handleAlert(alert) }
             }
 
@@ -179,7 +188,7 @@ fun handleRun(
                     if (runState == RunState.STARTING) {
                         runState = RunState.STOPPING
                         CoroutineScope(Dispatchers.IO).launch {
-                            startServerProcess.destroy()
+                            startServerProcess.cancel()
                             startServerProcess.waitFor()
 
                             cancelReason = "User quit before server could finish starting up"
@@ -189,11 +198,11 @@ fun handleRun(
                     } else if (runState == RunState.RUNNING) {
                         runState = RunState.STOPPING
                         CoroutineScope(Dispatchers.IO).launch {
-                            startServerProcess.destroy()
+                            startServerProcess.cancel()
                             startServerProcess.waitFor()
 
                             val stopServerProcess = kobwebGradle.stopServer()
-                            stopServerProcess.consumeProcessOutput(::handleConsoleOutput)
+                            stopServerProcess.lineHandler = ::handleConsoleOutput
                             stopServerProcess.waitFor()
 
                             runState = RunState.STOPPED
@@ -241,6 +250,6 @@ fun handleRun(
 
         // If we're non-interactive, it means we just want to start the Kobweb server and exit without waiting for
         // for any additional changes. (This is essentially used when run in a web server environment)
-        kobwebGradle.startServer(enableLiveReloading = false, siteLayout).also { it.consumeProcessOutput(); it.waitFor() }
+        kobwebGradle.startServer(enableLiveReloading = false, siteLayout).also { it.waitFor() }
     }
 }

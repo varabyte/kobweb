@@ -3,7 +3,6 @@ package com.varabyte.kobweb.cli.stop
 import com.varabyte.kobweb.cli.common.Anims
 import com.varabyte.kobweb.cli.common.KobwebGradle
 import com.varabyte.kobweb.cli.common.assertKobwebApplication
-import com.varabyte.kobweb.cli.common.consumeProcessOutput
 import com.varabyte.kobweb.cli.common.findKobwebApplication
 import com.varabyte.kobweb.cli.common.handleConsoleOutput
 import com.varabyte.kobweb.cli.common.isServerAlreadyRunning
@@ -24,8 +23,15 @@ fun handleStop(
 ) {
     // Server environment doesn't really matter for "stop". Still, let's default to prod because that's usually the case
     // where a server is left running for a long time.
-    val kobwebGradle = KobwebGradle(ServerEnvironment.PROD)
+    KobwebGradle(ServerEnvironment.PROD).use { kobwebGradle ->
+        handleStop(isInteractive, kobwebGradle)
+    }
+}
 
+private fun handleStop(
+    isInteractive: Boolean,
+    kobwebGradle: KobwebGradle,
+) {
     if (isInteractive) session {
         val kobwebApplication = findKobwebApplication() ?: return@session
         if (kobwebApplication.isServerAlreadyRunning()) {
@@ -46,7 +52,7 @@ fun handleStop(
                 }
             }.run {
                 val stopServerProcess = kobwebGradle.stopServer()
-                stopServerProcess.consumeProcessOutput(::handleConsoleOutput)
+                stopServerProcess.lineHandler = ::handleConsoleOutput
                 stopServerProcess.waitFor()
                 stopState = StopState.STOPPED
             }
@@ -64,6 +70,6 @@ fun handleStop(
             return
         }
 
-        kobwebGradle.stopServer().also { it.consumeProcessOutput(); it.waitFor() }
+        kobwebGradle.stopServer().also { it.waitFor() }
     }
 }

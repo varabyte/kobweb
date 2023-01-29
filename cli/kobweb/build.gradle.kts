@@ -10,6 +10,11 @@ plugins {
 group = "com.varabyte.kobweb.cli"
 version = libs.versions.kobweb.cli.get()
 
+repositories {
+    // For Gradle Tooling API
+    maven { url = uri("https://repo.gradle.org/gradle/libs-releases") }
+}
+
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.kotlinx.cli)
@@ -18,6 +23,10 @@ dependencies {
     implementation(libs.freemarker)
     implementation(libs.kaml)
     implementation(project(":common:kobweb-common"))
+
+    // For Gradle Tooling API
+    implementation("org.gradle:gradle-tooling-api:${gradle.gradleVersion}")
+    runtimeOnly("org.slf4j:slf4j-nop:2.0.6")
 }
 
 application {
