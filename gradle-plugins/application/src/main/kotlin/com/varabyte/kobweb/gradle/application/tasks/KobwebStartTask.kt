@@ -3,6 +3,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.io.consumeAsync
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -57,7 +58,7 @@ abstract class KobwebStartTask @Inject constructor(
         }
 
         val processParams = arrayOf(
-            "$javaHome/bin/java",
+            "${javaHome.toUnixSeparators()}/bin/java",
             env.toSystemPropertyParam(),
             siteLayout.toSystemPropertyParam(),
             // See: https://ktor.io/docs/development-mode.html#system-property
