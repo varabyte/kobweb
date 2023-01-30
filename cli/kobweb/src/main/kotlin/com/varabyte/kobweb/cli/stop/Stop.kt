@@ -47,7 +47,7 @@ private fun handleStop(
                         textLine("Stopping a Kobweb server$ellipsisAnim")
                     }
                     StopState.STOPPED -> {
-                        textLine("Server stopped gracefully.")
+                        textLine("The server has stopped.")
                     }
                 }
             }.run {
