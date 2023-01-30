@@ -9,6 +9,9 @@ import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
+import java.time.Duration
+
+private val STOP_TIMEOUT_MS = Duration.ofSeconds(10).toMillis()
 
 /**
  * Stop a Kobweb web server started by the [KobwebStartTask].
@@ -21,16 +24,24 @@ abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is runni
         val kobwebFolder = kobwebApplication.kobwebFolder
         val stateFile = ServerStateFile(kobwebFolder)
         stateFile.content?.let { serverState ->
-            if (ProcessHandle.of(serverState.pid).isPresent) {
+            ProcessHandle.of(serverState.pid).ifPresent { processHandle ->
                 val requestsFile = ServerRequestsFile(kobwebFolder)
                 requestsFile.enqueueRequest(ServerRequest.Stop())
+
+                val startTime = System.currentTimeMillis()
                 while (stateFile.content != null) {
                     Thread.sleep(300)
+                    if (System.currentTimeMillis() - startTime >= STOP_TIMEOUT_MS) {
+                        println("A Kobweb server is taking longer than expected to shut down. Attempting to force stop it...")
+                        processHandle.destroyForcibly()
+                        break
+                    }
                 }
                 println("A Kobweb server running at ${serverState.toDisplayText()} was stopped")
-            } else {
-                Files.delete(stateFile.path)
             }
+
+            // Stale file may be left over from a previous server crash or from being forcibly killed
+            Files.deleteIfExists(stateFile.path)
         }
     }
 }
