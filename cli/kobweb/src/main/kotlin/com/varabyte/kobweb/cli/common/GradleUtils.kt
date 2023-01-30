@@ -32,10 +32,7 @@ class KobwebGradle(private val env: ServerEnvironment, projectDir: File = File("
 
     override fun close() {
         projectConnection.close()
-        // When in production, we don't want to leave a daemon running around hoarding resources unnecessarily
-        if (env == ServerEnvironment.PROD) {
-            gradleConnector.disconnect()
-        }
+        gradleConnector.disconnect()
     }
 
     class Handle internal constructor(private val cancellationSource: CancellationTokenSource) {
