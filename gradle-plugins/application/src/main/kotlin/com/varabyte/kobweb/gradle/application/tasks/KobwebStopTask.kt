@@ -32,15 +32,18 @@ abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is runni
                 while (stateFile.content != null) {
                     Thread.sleep(300)
                     if (System.currentTimeMillis() - startTime >= STOP_TIMEOUT_MS) {
-                        println("A Kobweb server is taking longer than expected to shut down. Attempting to force stop it...")
+                        println("A Kobweb server running at ${serverState.toDisplayText()} is taking longer than expected to shut down. Attempting to force stop it...")
                         processHandle.destroyForcibly()
+                        // This may be overkill, but let's make sure it's really dead before continuing. This should
+                        // barely block for any at all, as far as I'm aware.
+                        processHandle.onExit().get()
                         break
                     }
                 }
                 println("A Kobweb server running at ${serverState.toDisplayText()} was stopped")
             }
 
-            // Stale file may be left over from a previous server crash or from being forcibly killed
+            // Occasionally a stale file can get left over from a previous server crash or from being forcibly killed
             Files.deleteIfExists(stateFile.path)
         }
     }
