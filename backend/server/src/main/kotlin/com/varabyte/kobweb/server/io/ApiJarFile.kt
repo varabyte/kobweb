@@ -5,13 +5,12 @@ import com.varabyte.kobweb.api.ApisFactory
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import kotlin.io.path.writeBytes
 
 /**
  * Wrapper around a Kobweb API jar, which is expected (in dev mode at least) to occasionally be reloaded on the fly.
@@ -21,9 +20,9 @@ import kotlin.io.path.writeBytes
 class ApiJarFile(path: Path, private val logger: Logger) {
     private class DynamicClassLoader(private val content: ByteArray) : ClassLoader(ApiJarFile::class.java.classLoader) {
         private val zipFile: ZipFile = run {
-            val path = Files.createTempFile("KobwebApiJar", ".jar").also { it.toFile().deleteOnExit() }
-            ByteArrayInputStream(content).use { stream -> path.writeBytes(stream.readBytes()) }
-            ZipFile(path.toFile())
+            val file = File.createTempFile("KobwebApiJar", ".jar").also { it.deleteOnExit() }
+            ByteArrayInputStream(content).use { stream -> file.writeBytes(stream.readBytes()) }
+            ZipFile(file)
         }
 
         private val classCache = mutableMapOf<String, Class<*>?>()
