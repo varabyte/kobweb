@@ -37,5 +37,7 @@ tasks.withType<ShadowJar> {
     minimize {
         // Code may end up getting referenced via reflection
         exclude(project(":backend:kobweb-api"))
+        // Logger classes are accessed at runtime
+        exclude(dependency("ch.qos.logback:.*:.*"))
     }
 }
