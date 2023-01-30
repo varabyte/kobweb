@@ -19,15 +19,25 @@ import org.gradle.tooling.GradleConnectionException
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.gradle.tooling.ResultHandler
+import org.gradle.tooling.internal.consumer.DefaultGradleConnector
 import java.io.ByteArrayOutputStream
 import java.io.Closeable
 import java.io.File
 import java.io.OutputStream
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.text.StringBuilder
 
 class KobwebGradle(private val env: ServerEnvironment, projectDir: File = File(".")): Closeable {
-    private val gradleConnector = GradleConnector.newConnector().forProjectDirectory(projectDir)
+    private val gradleConnector = GradleConnector.newConnector().forProjectDirectory(projectDir).also {
+        // The Gradle daemon spawned by the tooling API seems to stick around and not always get removed by
+        // ./gradlew --stop for some reason? Adding a timeout seems to be the way that some projects deal with
+        // leaked daemons go away when working with the Gradle Tooling API
+        // Note we do a safe "as?" check here, for future safety, but it seems that the `DefaultGradleConnector`
+        // interface has been used since at least 2014:
+        // https://discuss.gradle.org/t/setting-org-gradle-daemon-idletimeout-through-tooling-api/5875
+        (it as? DefaultGradleConnector)?.daemonMaxIdleTime(1, TimeUnit.MINUTES)
+    }
     private val projectConnection: ProjectConnection = gradleConnector.connect()
 
     override fun close() {
