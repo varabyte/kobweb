@@ -23,10 +23,6 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-tasks.jar {
-    archiveFileName.set("kobweb-server.jar")
-}
-
 val applicationClass = "com.varabyte.kobweb.server.ApplicationKt"
 project.setProperty("mainClassName", applicationClass)
 application {
