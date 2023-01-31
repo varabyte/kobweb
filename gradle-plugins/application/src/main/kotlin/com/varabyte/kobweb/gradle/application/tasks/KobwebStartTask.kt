@@ -89,8 +89,22 @@ abstract class KobwebStartTask @Inject constructor(
         process.inputStream.consumeAsync {
             // We're not observing server output now, but maybe we will in the future.
             // You'd think therefore we should delete this handler, but it actually seems
-            // to help avoid the server stalling on startups in Windows(???).
+            // to help avoid the server stalling on startup in Windows.
             // So until we understand the root problem, we'll just leave this in for now.
+
+            // Potentially related discussions:
+            // - https://github.com/gradle/gradle/issues/16716
+            //   Running a child process from Gradle on Windows and trying to read the stdin
+            //   via inheritIO() will cause the waitFor() to hang endlessly. The reason is
+            //   most probably that the inheritIO() is not properly piped out from Gradle's
+            //   process, causing the stdout buffer to overflow and the child process to block.
+            //   The issue is only reproducible on Windows 10, most probably because Windows 10
+            //   stdout buffer is rather small.
+            // - https://docs.oracle.com/javase/7/docs/api/java/lang/Process.html
+            //   Because some native platforms only provide limited buffer size for standard
+            //   input and output streams, failure to promptly write the input stream or read
+            //   the output stream of the subprocess may cause the subprocess to block, or
+            //   even deadlock.
         }
 
         val errorMessage = StringBuilder()
