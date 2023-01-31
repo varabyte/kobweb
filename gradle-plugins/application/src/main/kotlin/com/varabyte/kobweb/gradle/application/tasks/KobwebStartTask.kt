@@ -86,6 +86,13 @@ abstract class KobwebStartTask @Inject constructor(
             kobwebApplication.path.toFile()
         )
 
+        process.inputStream.consumeAsync {
+            // We're not observing server output now, but maybe we will in the future.
+            // You'd think therefore we should delete this handler, but it actually seems
+            // to help avoid the server stalling on startups in Windows(???).
+            // So until we understand the root problem, we'll just leave this in for now.
+        }
+
         val errorMessage = StringBuilder()
         process.errorStream.consumeAsync { line -> errorMessage.appendLine(line) }
 
