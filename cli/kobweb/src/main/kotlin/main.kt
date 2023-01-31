@@ -7,13 +7,14 @@ import com.varabyte.kobweb.cli.list.handleList
 import com.varabyte.kobweb.cli.run.handleRun
 import com.varabyte.kobweb.cli.stop.handleStop
 import com.varabyte.kobweb.cli.version.handleVersion
-import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.ExperimentalCli
 import kotlinx.cli.Subcommand
 import kotlinx.cli.default
+import kotlinx.cli.optional
 
 private enum class Mode {
     /** Expect a user at an ANSI-enabled terminal interacting with the command */
@@ -61,7 +62,7 @@ fun main(args: Array<String>) {
     }
 
     class Create : Subcommand("create", "Create a Kobweb app / site") {
-        val template by argument(ArgType.String, "template", "The name of the template to start from, e.g. 'site'")
+        val template by argument(ArgType.String, "template", "The name of the template to instantiate, e.g. 'site'. If not specified, choices will be presented.").optional()
         val repo by option(ArgType.String, "repo", "The repository that hosts Kobweb templates")
             .default(DEFAULT_REPO)
         val branch by option(ArgType.String, "branch", "The branch in the repository to use")

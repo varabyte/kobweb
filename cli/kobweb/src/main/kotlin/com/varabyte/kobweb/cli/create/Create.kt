@@ -15,13 +15,20 @@ import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.cli.create.freemarker.methods.IsNotEmptyMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
 import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kotter.foundation.input.Keys
+import com.varabyte.kotter.foundation.input.onKeyPressed
+import com.varabyte.kotter.foundation.input.runUntilKeyPressed
+import com.varabyte.kotter.foundation.liveVarOf
 import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.blue
 import com.varabyte.kotter.foundation.text.bold
+import com.varabyte.kotter.foundation.text.cyan
 import com.varabyte.kotter.foundation.text.green
 import com.varabyte.kotter.foundation.text.magenta
 import com.varabyte.kotter.foundation.text.text
 import com.varabyte.kotter.foundation.text.textLine
+import com.varabyte.kotter.foundation.text.yellow
+import com.varabyte.kotter.runtime.render.RenderScope
 import com.varabyte.kotterx.decorations.BorderCharacters
 import com.varabyte.kotterx.decorations.bordered
 import java.io.File
@@ -31,27 +38,93 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.name
 
-fun handleCreate(repo: String, branch: String, templateName: String) = session {
+private fun RenderScope.renderTemplateItem(
+    rootPath: Path,
+    templateFile: KobwebTemplateFile,
+    isSelected: Boolean,
+) {
+    val templatePath = templateFile.getName(rootPath)
+    val description = templateFile.template.metadata.description
+    val isImportant = templateFile.template.metadata.shouldHighlight
+
+    text(if (isSelected) '>' else ' ')
+    text(' ')
+    cyan(isBright = isImportant) { text(templatePath) }
+    textLine(": $description")
+}
+
+
+fun handleCreate(repo: String, branch: String, templateName: String?) = session {
     val gitClient = findGit() ?: return@session
     val tempDir = handleFetch(gitClient, repo, branch) ?: return@session
 
-    val templateFile = tempDir.toFile().walkTopDown()
+    val templateRoots = tempDir.toFile().walkTopDown()
         .filter { it.isDirectory }
         .mapNotNull { dir -> KobwebTemplateFile.inPath(dir.toPath()) }
-        .firstOrNull { templateFile -> templateFile.getName(tempDir) == templateName }
-        ?: run {
-            section {
-                textError("Unable to locate a template named \"$templateName\"")
-                textLine()
-                text("Consider running `"); cmd("kobweb list"); text("` for a list of choices.")
-            }.run()
+        .toList()
 
-            return@session
-        }
 
-    // Convert template name to folder name, e.g. "site" -> "site" and "examples/clock" -> "clock".
+    val templateFile =
+        (if (templateName != null) {
+            templateRoots
+                .firstOrNull { templateFile -> templateFile.getName(tempDir) == templateName }
+                ?: run {
+                    section {
+                        textError("Unable to locate a template named \"$templateName\". Falling back to choosing...")
+                        textLine()
+                    }.run()
+
+                    null
+                }
+        } else null)
+        // If we can't find the template OR if no template is specified, offer a list to choose from
+            ?: run {
+                @Suppress("NAME_SHADOWING")
+                val templateRoots = templateRoots
+                    .sortedBy { templateFile -> templateFile.folder }
+                    .sortedByDescending { templateFile -> templateFile.template.metadata.shouldHighlight }
+
+                var selectedIndex by liveVarOf(0)
+                var finished by liveVarOf(false)
+                section {
+                    bold { textLine("Press ENTER to select a project to instantiate:") }
+                    textLine()
+                    templateRoots.forEachIndexed { i, templateFile ->
+                        this.renderTemplateItem(tempDir, templateFile, selectedIndex == i)
+                    }
+                    textLine()
+                    if (!finished) {
+                        if (templateRoots[selectedIndex].template.metadata.shouldHighlight) {
+                            yellow {
+                                textLine("  Note: This project has been highlighted as important by the template creator.")
+                            }
+                        }
+                    }
+                }
+                    .onFinishing { finished = true }
+                    .runUntilKeyPressed(Keys.ENTER) {
+                        onKeyPressed {
+                            when (key) {
+                                Keys.UP -> selectedIndex =
+                                    if (selectedIndex == 0) templateRoots.lastIndex else selectedIndex - 1
+
+                                Keys.DOWN -> selectedIndex =
+                                    if (selectedIndex == templateRoots.lastIndex) 0 else selectedIndex + 1
+
+                                Keys.HOME -> selectedIndex = 0
+                                Keys.END -> selectedIndex = templateRoots.lastIndex
+                            }
+                        }
+                    }
+
+                templateRoots[selectedIndex]
+            }
+
+
+    // Convert full template name to folder name, e.g. "site" -> "site" and "examples/clock" -> "clock".
     val defaultFolderName =
-        PathUtils.generateEmptyPathName(templateName.substringAfterLast('/'))
+        PathUtils.generateEmptyPathName(templateFile.getName(tempDir).substringAfterLast('/'))
+
     informInfo("The folder you choose here will be created under your current path.")
     informInfo("You can enter `.` if you want to use the current directory.")
     val dstPath = queryUser("Specify a folder for your project:", defaultFolderName) { answer ->

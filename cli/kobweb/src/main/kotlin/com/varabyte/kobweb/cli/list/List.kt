@@ -5,8 +5,8 @@ import com.varabyte.kobweb.cli.common.DEFAULT_REPO
 import com.varabyte.kobweb.cli.common.findGit
 import com.varabyte.kobweb.cli.common.handleFetch
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
+import com.varabyte.kobweb.cli.common.template.getName
 import com.varabyte.kobweb.cli.common.textError
-import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.cyan
 import com.varabyte.kotter.foundation.text.text
@@ -14,14 +14,12 @@ import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
 import com.varabyte.kotter.runtime.render.RenderScope
 import java.nio.file.Path
-import kotlin.io.path.relativeTo
 
-private fun RenderScope.renderTemplateItem(rootPath: Path, templateFile: KobwebTemplateFile) {
-    val templatePath =
-        templateFile.template.metadata.name ?: templateFile.folder.relativeTo(rootPath).toString()
-            // Even on Windows, show Unix-style slashes, as `kobweb create` expects that format
-            .toUnixSeparators()
-
+private fun RenderScope.renderTemplateItem(
+    rootPath: Path,
+    templateFile: KobwebTemplateFile,
+) {
+    val templatePath = templateFile.getName(rootPath)
     val description = templateFile.template.metadata.description
 
     text("• ")
@@ -29,7 +27,10 @@ private fun RenderScope.renderTemplateItem(rootPath: Path, templateFile: KobwebT
     textLine(": $description")
 }
 
-private fun List<KobwebTemplateFile>.renderTemplateItemsInto(rootPath: Path, renderScope: RenderScope) {
+private fun List<KobwebTemplateFile>.renderTemplateItems(
+    rootPath: Path,
+    renderScope: RenderScope,
+) {
     this
         .sortedBy { template -> template.folder }
         .forEach { template -> renderScope.renderTemplateItem(rootPath, template) }
@@ -62,14 +63,14 @@ fun handleList(repo: String, branch: String) = session {
                 if (highlightedTemplates.isNotEmpty()) {
                     yellow { textLine("Highlighted projects") }
                     textLine()
-                    highlightedTemplates.renderTemplateItemsInto(tempDir, this)
+                    highlightedTemplates.renderTemplateItems(tempDir, this)
                     textLine()
                     yellow { textLine("All projects") }
                     textLine()
                 }
             }
 
-            templates.renderTemplateItemsInto(tempDir, this)
+            templates.renderTemplateItems(tempDir, this)
         } else {
             textError("No templates were found in the specified repository.")
         }
