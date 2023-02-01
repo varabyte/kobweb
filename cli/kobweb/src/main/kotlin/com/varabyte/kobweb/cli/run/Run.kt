@@ -141,7 +141,7 @@ private fun handleRun(
                     textLine(ellipsisAnim)
                 }
                 RunState.STOPPED -> {
-                    textLine("The server has stopped.")
+                    textLine("Server was stopped.")
                 }
                 RunState.CANCELLING -> {
                     check(cancelReason.isNotBlank())
