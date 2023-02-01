@@ -35,7 +35,6 @@ fun Iterable<FrontendData>.merge(): FrontendData {
 
 fun FrontendData.assertValid() {
     pages.assertValidPages()
-    silkStyles.assertValidStyles()
 }
 
 private fun Iterable<PageEntry>.assertValidPages() {
@@ -47,15 +46,6 @@ private fun Iterable<PageEntry>.assertValidPages() {
 
         if (route.removePrefix("/").split('/', limit = 2).first() == "api") {
             throw GradleException("The route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
-        }
-    }
-}
-
-private fun Iterable<ComponentStyleEntry>.assertValidStyles() {
-    val entriesByName = this.groupBy { it.name }
-    entriesByName.forEach { (name, styles) ->
-        if (styles.size > 1) {
-            throw GradleException("The style name \"$name\" was used more than once. Used by:\n${styles.joinToString("\n") { style -> " - ${style.fqcn}" }}")
         }
     }
 }

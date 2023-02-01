@@ -3,7 +3,9 @@ package com.varabyte.kobweb.silk.components.animation
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.init.SilkStylesheet
+import com.varabyte.kobweb.silk.util.titleCamelCaseToSnakeCase
 import org.jetbrains.compose.web.css.*
 import kotlin.reflect.KProperty
 
@@ -94,28 +96,10 @@ class KeyframesBuilder internal constructor() {
  */
 class Keyframes(val name: String, internal val init: KeyframesBuilder.() -> Unit)
 
-class KeyframesProvider(private val init: KeyframesBuilder.() -> Unit) {
-    // e.g. "ExampleText" to "example_text"
-    private fun String.titleCamelCaseToSnakeCase(): String {
-        require(this.isNotBlank())
-
-        val currentWord = StringBuilder()
-        val words = mutableListOf<String>()
-
-        this.forEach { c ->
-            if (c.isUpperCase()) {
-                if (currentWord.isNotEmpty()) {
-                    words.add(currentWord.toString())
-                    currentWord.clear()
-                }
-            }
-            currentWord.append(c)
-        }
-        words.add(currentWord.toString())
-
-        return words.joinToString("_") { it.decapitalize() }
-    }
-
+/**
+ * A delegate provider class which allows you to create a [Keyframes] instance via the `by` keyword.
+ */
+class KeyframesProvider internal constructor(private val init: KeyframesBuilder.() -> Unit) {
     operator fun getValue(
         thisRef: Any?,
         property: KProperty<*>

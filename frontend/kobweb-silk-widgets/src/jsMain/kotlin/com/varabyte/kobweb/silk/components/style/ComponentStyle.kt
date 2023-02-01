@@ -7,15 +7,20 @@ import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.components.animation.Keyframes
+import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
+import com.varabyte.kobweb.silk.components.animation.KeyframesProvider
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import com.varabyte.kobweb.silk.util.titleCamelCaseToSnakeCase
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
+import kotlin.reflect.KProperty
 
 /**
  * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
@@ -417,6 +422,57 @@ class ComponentStyle(
 
     internal fun intoImmutableStyle() = ImmutableComponentStyle(name, extraModifiers)
 }
+
+/**
+ * A delegate provider class which allows you to create a [ComponentStyle] via the `by` keyword.
+ */
+class ComponentStyleProvider internal constructor(
+    private val extraModifiers: Modifier = Modifier,
+    private val init: ComponentModifiers.() -> Unit,
+) {
+    operator fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>
+    ): ComponentStyle {
+        // e.g. "TitleTextStyle" to "title-text"
+        val name = property.name.removeSuffix("Style").titleCamelCaseToSnakeCase()
+        return ComponentStyle(name, extraModifiers, init)
+    }
+}
+
+fun componentStyle(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
+    = ComponentStyleProvider(extraModifiers, init)
+
+fun ComponentStyle.Companion.base(extraModifiers: Modifier = Modifier, init: () -> Modifier)
+    = ComponentStyleProvider(extraModifiers, init = { base { init() }})
+
+
+/**
+ * A delegate provider class which allows you to create a [ComponentVariant] via the `by` keyword.
+ */
+class ComponentVariantProvider internal constructor(
+    private val style: ComponentStyle,
+    private val extraModifiers: Modifier = Modifier,
+    private val init: ComponentModifiers.() -> Unit,
+) {
+    operator fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>
+    ): ComponentVariant {
+        // e.g. "OutlinedTitleTextVariant" to "outlined", assuming it's a variant for "TitleTextStyle"
+        val withoutSuffix = property.name.removeSuffix("Variant").titleCamelCaseToSnakeCase()
+        // Unlikely, but protect against "val TextVariant by TextStyle.addVariant { ... }" ending up with an empty
+        // string. (The user should have called it *Something*TextVariant but no guarantee a user won't be lazy)
+        val name = withoutSuffix.removeSuffix(style.name).takeIf { it.isNotEmpty() } ?: withoutSuffix
+        return style.addVariant(name, extraModifiers, init)
+    }
+}
+
+fun ComponentStyle.addVariant(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
+    = ComponentVariantProvider(this, extraModifiers, init)
+
+fun ComponentStyle.addVariantBase(extraModifiers: Modifier = Modifier, init: () -> Modifier)
+    = ComponentVariantProvider(this, extraModifiers, init = { base { init() }})
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.

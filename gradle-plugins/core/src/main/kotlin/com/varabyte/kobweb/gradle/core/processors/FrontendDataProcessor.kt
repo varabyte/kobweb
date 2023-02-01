@@ -14,7 +14,6 @@ private fun processComponentStyle(
     file: File,
     filePackage: String,
     property: KtProperty,
-    styleName: String,
     silkStyles: MutableList<ComponentStyleEntry>,
     reporter: Reporter
 ): Boolean {
@@ -27,7 +26,7 @@ private fun processComponentStyle(
     }
 
     return if (property.isPublic) {
-        silkStyles.add(ComponentStyleEntry(prefixQualifiedPath(filePackage, propertyName), styleName))
+        silkStyles.add(ComponentStyleEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
         reporter.report("${file.absolutePath}: Not registering component style `val $propertyName`, as it is not public")
@@ -40,45 +39,64 @@ private fun String.elideLinesAfterFirst(): String {
     return if (lines.size > 1) "${lines.first()}..." else this
 }
 
-/** Process a line like `val CustomStyle = ComponentStyle("custom") { ... }` */
+/**
+ * Ensure user is using a `by` keyword when working with delegate methods.
+ *
+ * For example...
+ *
+ * Good: `val TestStyle by ComponentStyle.base { ... }` // delegate method
+ * Good: `val TestStyle = ComponentStyle.base("test") { ... }` // normal method
+ * Bad: `val TestStyle = ComponentStyle.base { ... }` // TestStyle is `ComponentStyleProvider`, not `ComponentStyle`
+ */
+private fun assertUsingPropertyDelegateIfNecessary(
+    file: File,
+    callExpr: KtCallExpression,
+    property: KtProperty,
+    reporter: Reporter
+): Boolean {
+    val isPropertyDelegate = property.getChildrenOfType<KtPropertyDelegate>().any()
+    val isDelegateProvider = callExpr.getStringValue(0) == null
+    if (isDelegateProvider && !isPropertyDelegate) {
+        val name = property.name
+        reporter.report("${file.absolutePath}: Expected `by`, not assignment. Change \"val $name = ...\" to \"val $name by ...\"?")
+        return false
+    }
+    return true
+}
+
+/** Process a line like `val CustomStyle = ComponentStyle("custom") { ... }` or `val CustomStyle by componentStyle { ... }` */
 private fun processComponentStyle(
     file: File,
     filePackage: String,
-    element: KtCallExpression,
+    callExpr: KtCallExpression,
     silkStyles: MutableList<ComponentStyleEntry>,
     reporter: Reporter
 ): Boolean {
-    val property = element.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
-    val styleName = element.getStringValue(0) ?: run {
-        reporter.report("${file.absolutePath}: Skipping over \"${element.text.elideLinesAfterFirst()}\" as the style name must be specified as a raw string.")
-        return false
-    }
-    return processComponentStyle(file, filePackage, property, styleName, silkStyles, reporter)
+    val property = callExpr.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
+    assertUsingPropertyDelegateIfNecessary(file, callExpr, property, reporter)
+    return processComponentStyle(file, filePackage, property, silkStyles, reporter)
 }
 
 /** Process a line like `val CustomStyle = ComponentStyle.base("custom") { ... }` */
 private fun processComponentStyleBase(
     file: File,
     filePackage: String,
-    element: KtCallExpression,
+    callExpr: KtCallExpression,
     silkStyles: MutableList<ComponentStyleEntry>,
     reporter: Reporter
 ): Boolean {
-    val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
+    val qualifiedExpression = callExpr.parent as? KtDotQualifiedExpression ?: return false
     if (qualifiedExpression.receiverExpression.text != "ComponentStyle") return false
     val property = qualifiedExpression.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
-    val styleName = element.getStringValue(0) ?: run {
-        reporter.report("${file.absolutePath}: Skipping over \"${qualifiedExpression.text.elideLinesAfterFirst()}\" as the style name must be specified as a raw string.")
-        return false
-    }
-    return processComponentStyle(file, filePackage, property, styleName, silkStyles, reporter)
+
+    if (!assertUsingPropertyDelegateIfNecessary(file, callExpr, property, reporter)) return false
+    return processComponentStyle(file, filePackage, property, silkStyles, reporter)
 }
 
 private fun processComponentVariant(
     file: File,
     filePackage: String,
     property: KtProperty,
-    variantName: String,
     silkVariants: MutableList<ComponentVariantEntry>,
     reporter: Reporter
 ): Boolean {
@@ -91,7 +109,7 @@ private fun processComponentVariant(
     }
 
     return if (property.isPublic) {
-        silkVariants.add(ComponentVariantEntry(prefixQualifiedPath(filePackage, propertyName), variantName))
+        silkVariants.add(ComponentVariantEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
         reporter.report("${file.absolutePath}: Not registering component variant `val $propertyName`, as it is not public")
@@ -104,40 +122,38 @@ private fun processComponentVariant(
 private fun processComponentVariant(
     file: File,
     filePackage: String,
-    element: KtCallExpression,
+    callExpr: KtCallExpression,
     silkVariants: MutableList<ComponentVariantEntry>,
     reporter: Reporter
 ): Boolean {
-    val qualifiedExpression = element.parent as? KtDotQualifiedExpression ?: return false
+    val qualifiedExpression = callExpr.parent as? KtDotQualifiedExpression ?: return false
     val property = qualifiedExpression.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
-    val variantName = element.getStringValue(0) ?: run {
-        reporter.report("${file.absolutePath}: Skipping over \"${qualifiedExpression.text.elideLinesAfterFirst()}\" as the variant name must be specified as a raw string.")
-        return false
-    }
-    return processComponentVariant(file, filePackage, property, variantName, silkVariants, reporter)
+
+    assertUsingPropertyDelegateIfNecessary(file, callExpr, property, reporter)
+    return processComponentVariant(file, filePackage, property,silkVariants, reporter)
 }
 
 /** Process a line like `val CustomVariant = CustomStyle.addVariantBase("variant") { ... }` */
 private fun processComponentVariantBase(
     file: File,
     filePackage: String,
-    element: KtCallExpression,
+    callExpr: KtCallExpression,
     silkVariants: MutableList<ComponentVariantEntry>,
     reporter: Reporter
 ): Boolean {
     // Despite the different method name, processing `addVariantBase` is the same as processing `addVariant`
-    return processComponentVariant(file, filePackage, element, silkVariants, reporter)
+    return processComponentVariant(file, filePackage, callExpr, silkVariants, reporter)
 }
 
 /** Process a line like `val AnimName = Keyframes("anim-name") { ... }` or `val AnimName by keyframes { ... }` */
 private fun processKeyframes(
     file: File,
     filePackage: String,
-    element: KtCallExpression,
+    callExpr: KtCallExpression,
     keyframesList: MutableList<KeyframesEntry>,
     reporter: Reporter
 ): Boolean {
-    val property = element.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
+    val property = callExpr.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
     val propertyName = property.name ?: return false // Null name not expected in practice; fail silently
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
@@ -147,7 +163,7 @@ private fun processKeyframes(
         // A user may be using the `by keyframes` delegate pattern *inside* a Compose for Web StyleSheet, where in that
         // case they're not using *our* keyframes method but are instead using the StyleSheet inherited one. Don't show
         // warnings about that because those cases are valid.
-        val propertyDelegate = element.parents.filterIsInstance<KtPropertyDelegate>().firstOrNull()
+        val propertyDelegate = callExpr.parents.filterIsInstance<KtPropertyDelegate>().firstOrNull()
         if (propertyDelegate != null) {
             val isInsideStylesheet = propertyDelegate.parents.filterIsInstance<KtClassOrObject>().any {
                 it.getSuperNames().contains("StyleSheet")
@@ -160,6 +176,7 @@ private fun processKeyframes(
         return false
     }
 
+    assertUsingPropertyDelegateIfNecessary(file, callExpr, property, reporter)
     return if (property.isPublic) {
         keyframesList.add(KeyframesEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
@@ -315,7 +332,7 @@ class FrontendDataProcessor(
 
                 is KtCallExpression -> {
                     when (element.calleeExpression?.text) {
-                        "ComponentStyle" ->
+                        "ComponentStyle", "componentStyle" ->
                             processComponentStyle(file, currPackage, element, silkStyles, reporter)
 
                         "base" ->
