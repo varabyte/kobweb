@@ -1,5 +1,5 @@
 ![version: 0.11.8](https://img.shields.io/badge/kobweb-0.11.8-blue)
-![version: 0.9.10](https://img.shields.io/badge/kobweb_cli-0.9.10-blue)
+![version: 0.9.11](https://img.shields.io/badge/kobweb_cli-0.9.11-blue)
 <br>
 ![kotlin: 1.7.20](https://img.shields.io/badge/kotlin-1.7.20-blue?logo=kotlin)
 ![compose: 1.2.2](https://img.shields.io/badge/compose-1.2.2-blue?logo=jetpackcompose)
@@ -146,19 +146,19 @@ $ cd /path/to/applications
 
 # You can either pull down the zip file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.10/kobweb-0.9.10.zip
-$ unzip kobweb-0.9.10.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.11/kobweb-0.9.11.zip
+$ unzip kobweb-0.9.11.zip
 
 # ... or the tar file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.10/kobweb-0.9.10.tar
-$ tar -xvf kobweb-0.9.10.tar
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.11/kobweb-0.9.11.tar
+$ tar -xvf kobweb-0.9.11.tar
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb-0.9.10/bin
+$ PATH=$PATH:/path/to/applications/kobweb-0.9.11/bin
 $ kobweb version # to check it's working
 ```
 
@@ -166,7 +166,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb-0.9.10/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb-0.9.11/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
