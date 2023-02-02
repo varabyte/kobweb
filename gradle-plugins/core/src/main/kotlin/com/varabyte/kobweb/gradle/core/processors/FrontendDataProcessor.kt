@@ -332,7 +332,10 @@ class FrontendDataProcessor(
 
                 is KtCallExpression -> {
                     when (element.calleeExpression?.text) {
-                        "ComponentStyle", "componentStyle" ->
+                        // Note: componentStyleBase is handled here and NOT below because it is actually a top level
+                        // method, vs. a method that lives underneath the "ComponentStyle" class, which the next case
+                        // checks for.
+                        "ComponentStyle", "componentStyle", "componentStyleBase" ->
                             processComponentStyle(file, currPackage, element, silkStyles, reporter)
 
                         "base" ->

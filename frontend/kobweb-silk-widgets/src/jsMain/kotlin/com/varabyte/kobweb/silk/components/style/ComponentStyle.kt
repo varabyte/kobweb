@@ -364,12 +364,12 @@ class ComponentStyle(
      */
     private fun withFinalSelectorName(selectorBaseName: String, group: StyleGroup, handler: (String, ComparableStyleScope) -> Unit) {
         when (group) {
-            is StyleGroup.Light -> handler("$selectorBaseName-light", group.styles)
-            is StyleGroup.Dark -> handler("$selectorBaseName-dark", group.styles)
+            is StyleGroup.Light -> handler(selectorBaseName.suffixedWith(ColorMode.LIGHT), group.styles)
+            is StyleGroup.Dark -> handler(selectorBaseName.suffixedWith(ColorMode.DARK), group.styles)
             is StyleGroup.ColorAgnostic -> handler(selectorBaseName, group.styles)
             is StyleGroup.ColorAware -> {
-                handler("$selectorBaseName-light", group.lightStyles)
-                handler("$selectorBaseName-dark", group.darkStyles)
+                handler(selectorBaseName.suffixedWith(ColorMode.LIGHT), group.lightStyles)
+                handler(selectorBaseName.suffixedWith(ColorMode.DARK), group.darkStyles)
             }
         }
     }
@@ -441,8 +441,15 @@ class ComponentStyleProvider internal constructor(
 fun componentStyle(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
     = ComponentStyleProvider(extraModifiers, init)
 
-fun ComponentStyle.Companion.base(extraModifiers: Modifier = Modifier, init: () -> Modifier)
-    = ComponentStyleProvider(extraModifiers, init = { base { init() }})
+// Note: Technically, the more correct code to use would probably be `by ComponentStyle.base { ... }`, since that's
+// equivalent to `ComponentStyle.base("name")`. However, it can be really convenient to toggle between `by
+// componentStyle` and `by componentStyleBase` when prototyping, so both versions are included for the user's
+// convenience.
+fun componentStyleBase(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier)
+        = ComponentStyleProvider(extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) }})
+
+fun ComponentStyle.Companion.base(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier)
+    = componentStyleBase(extraModifiers, init)
 
 
 /**
@@ -461,7 +468,7 @@ class ComponentVariantProvider internal constructor(
         val withoutSuffix = property.name.removeSuffix("Variant").titleCamelCaseToKebabCase()
         // Unlikely, but protect against "val TextVariant by TextStyle.addVariant { ... }" ending up with an empty
         // string. (The user should have called it *Something*TextVariant but no guarantee a user won't be lazy)
-        val name = withoutSuffix.removeSuffix(style.name).takeIf { it.isNotEmpty() } ?: withoutSuffix
+        val name = withoutSuffix.removeSuffix("-${style.name}").takeIf { it.isNotEmpty() } ?: withoutSuffix
         return style.addVariant(name, extraModifiers, init)
     }
 }
@@ -469,8 +476,8 @@ class ComponentVariantProvider internal constructor(
 fun ComponentStyle.addVariant(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
     = ComponentVariantProvider(this, extraModifiers, init)
 
-fun ComponentStyle.addVariantBase(extraModifiers: Modifier = Modifier, init: () -> Modifier)
-    = ComponentVariantProvider(this, extraModifiers, init = { base { init() }})
+fun ComponentStyle.addVariantBase(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier)
+    = ComponentVariantProvider(this, extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) }})
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.

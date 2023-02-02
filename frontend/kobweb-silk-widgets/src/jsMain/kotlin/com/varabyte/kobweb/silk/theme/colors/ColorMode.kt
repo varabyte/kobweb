@@ -18,7 +18,15 @@ enum class ColorMode {
     }
 }
 
-internal fun String.suffixedWith(colorMode: ColorMode) = "$this-${colorMode.name.lowercase()}"
+// Note: We use an underscore here as a separator instead of a hyphen, since we otherwise use hyphens when generating
+// names, so this makes the separator stand out as something more orthogonal to the base name.
+//
+// It also avoids ambiguity if you call some style's variant "dark", as in `ComponentStyle.addVariant("dark")`, since
+// that would generate a full style name of "style-dark".
+//
+// By using underscores instead, if we have dark and light mode variants of the parent style and its "dark" variant, we
+// would have "style_dark", "style_light", "style-dark_dark", and "style-dark_light"
+internal fun String.suffixedWith(colorMode: ColorMode) = "${this}_${colorMode.name.lowercase()}"
 
 /**
  * Lighten or darken the color, as appropriate, based on the specified color mode.
