@@ -64,7 +64,7 @@ fun Modifier.thenUnless(condition: Boolean, other: Modifier): Modifier {
  * This is occasionally useful if you have a Modifier that is expensive to create, e.g. it takes some complicated
  * parameters you need to allocate which is a waste if the condition is false.
  */
-fun Modifier.thenIf(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
+inline fun Modifier.thenIf(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
     return this.then(if (condition) lazyProduce() else Modifier)
 }
 
@@ -74,7 +74,7 @@ fun Modifier.thenIf(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
  * This is occasionally useful if you have a Modifier that is expensive to create, e.g. it takes some complicated
  * parameters you need to allocate which is a waste if the condition is true.
  */
-fun Modifier.thenUnless(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
+inline fun Modifier.thenUnless(condition: Boolean, lazyProduce: () -> Modifier): Modifier {
     return this.thenIf(!condition, lazyProduce)
 }
 
