@@ -3,9 +3,8 @@ package com.varabyte.kobweb.silk.components.animation
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.init.SilkStylesheet
-import com.varabyte.kobweb.silk.util.titleCamelCaseToSnakeCase
+import com.varabyte.kobweb.silk.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 import kotlin.reflect.KProperty
 
@@ -104,7 +103,7 @@ class KeyframesProvider internal constructor(private val init: KeyframesBuilder.
         thisRef: Any?,
         property: KProperty<*>
     ): Keyframes {
-        val name = property.name.titleCamelCaseToSnakeCase()
+        val name = property.name.titleCamelCaseToKebabCase()
         return Keyframes(name, init)
     }
 }

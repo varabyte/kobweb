@@ -7,16 +7,13 @@ import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
-import com.varabyte.kobweb.silk.components.animation.Keyframes
-import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
-import com.varabyte.kobweb.silk.components.animation.KeyframesProvider
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
-import com.varabyte.kobweb.silk.util.titleCamelCaseToSnakeCase
+import com.varabyte.kobweb.silk.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
@@ -435,7 +432,7 @@ class ComponentStyleProvider internal constructor(
         property: KProperty<*>
     ): ComponentStyle {
         // e.g. "TitleTextStyle" to "title-text"
-        val name = property.name.removeSuffix("Style").titleCamelCaseToSnakeCase()
+        val name = property.name.removeSuffix("Style").titleCamelCaseToKebabCase()
         return ComponentStyle(name, extraModifiers, init)
     }
 }
@@ -460,7 +457,7 @@ class ComponentVariantProvider internal constructor(
         property: KProperty<*>
     ): ComponentVariant {
         // e.g. "OutlinedTitleTextVariant" to "outlined", assuming it's a variant for "TitleTextStyle"
-        val withoutSuffix = property.name.removeSuffix("Variant").titleCamelCaseToSnakeCase()
+        val withoutSuffix = property.name.removeSuffix("Variant").titleCamelCaseToKebabCase()
         // Unlikely, but protect against "val TextVariant by TextStyle.addVariant { ... }" ending up with an empty
         // string. (The user should have called it *Something*TextVariant but no guarantee a user won't be lazy)
         val name = withoutSuffix.removeSuffix(style.name).takeIf { it.isNotEmpty() } ?: withoutSuffix

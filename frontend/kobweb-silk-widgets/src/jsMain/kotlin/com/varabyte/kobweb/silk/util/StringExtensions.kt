@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.silk.util
 
-// e.g. "ExampleText" to "example_text"
-internal fun String.titleCamelCaseToSnakeCase(): String {
+// e.g. "ExampleText" to "example-text"
+internal fun String.titleCamelCaseToKebabCase(): String {
     require(this.isNotBlank())
 
     val currentWord = StringBuilder()
@@ -18,5 +18,5 @@ internal fun String.titleCamelCaseToSnakeCase(): String {
     }
     words.add(currentWord.toString())
 
-    return words.joinToString("_") { it.decapitalize() }
+    return words.joinToString("-") { it.decapitalize() }
 }
