@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 
 // region width See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
@@ -20,6 +21,10 @@ class Width private constructor(val value: String) {
     }
 }
 typealias MinWidth = Width
+
+fun AttrsScope<*>.width(width: CSSNumeric) {
+    attr("width", width.toString())
+}
 
 fun StyleScope.width(width: Width) {
     property("width", width.value)
@@ -49,6 +54,10 @@ class Height private constructor(val value: String) {
     }
 }
 typealias MinHeight = Height
+
+fun AttrsScope<*>.height(height: CSSNumeric) {
+    attr("height", height.toString())
+}
 
 fun StyleScope.height(height: Height) {
     property("height", height.value)
