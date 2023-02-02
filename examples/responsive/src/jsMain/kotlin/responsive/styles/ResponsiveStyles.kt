@@ -6,7 +6,7 @@ import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import org.jetbrains.compose.web.css.*
 
-val MobileHiddenStyle = ComponentStyle("mobile-hidden") {
+val MobileHiddenStyle by ComponentStyle {
     base {
         Modifier.display(DisplayStyle.None)
     }
@@ -16,7 +16,7 @@ val MobileHiddenStyle = ComponentStyle("mobile-hidden") {
     }
 }
 
-val DesktopHiddenStyle = ComponentStyle("desktop-hidden") {
+val DesktopHiddenStyle by ComponentStyle {
     Breakpoint.MD {
         Modifier.display(DisplayStyle.None)
     }

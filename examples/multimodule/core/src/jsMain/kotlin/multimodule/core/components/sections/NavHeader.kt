@@ -26,7 +26,7 @@ import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 
-val NavHeaderStyle = ComponentStyle.base("nav-header") {
+val NavHeaderStyle by ComponentStyle.base {
     Modifier
         .fillMaxWidth()
         .height(60.px)
@@ -35,7 +35,7 @@ val NavHeaderStyle = ComponentStyle.base("nav-header") {
         .backgroundColor(colorMode.toSilkPalette().color)
 }
 
-val TitleStyle = ComponentStyle.base("nav-title") {
+val TitleStyle by ComponentStyle.base {
     Modifier
         .fontSize(26.px)
         .fontWeight(FontWeight.Bold)
@@ -43,7 +43,7 @@ val TitleStyle = ComponentStyle.base("nav-title") {
         .color(colorMode.toSilkPalette().background)
 }
 
-val NavButtonStyle = ComponentStyle.base("nav-button-outer") {
+val NavButtonStyle by ComponentStyle.base {
     Modifier
         .padding(0.px)
         .margin(leftRight = 5.px)

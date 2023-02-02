@@ -20,13 +20,13 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 
-val NavMenuButtonStyle = ComponentStyle.base("nav-menu-button") {
+val NavMenuButtonStyle by ComponentStyle.base {
     Modifier
         .margin(5.px)
         .padding(5.px)
 }
 
-val NavMenuStyle = ComponentStyle("nav-menu") {
+val NavMenuStyle by ComponentStyle {
     base {
         Modifier
             .userSelect(UserSelect.None)
@@ -40,7 +40,7 @@ val NavMenuStyle = ComponentStyle("nav-menu") {
     }
 }
 
-val NavMenuItemStyle = ComponentStyle("nav-menu-item") {
+val NavMenuItemStyle by ComponentStyle {
     base {
         Modifier
             .fillMaxWidth()

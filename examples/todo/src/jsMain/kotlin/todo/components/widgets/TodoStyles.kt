@@ -16,7 +16,7 @@ import todo.BORDER_COLOR
 private val INTERACT_COLOR = Color.rgb(0x00, 0x70, 0xf3)
 
 /** Common styles for all todo widgets */
-val TodoStyle = ComponentStyle.base("todo") {
+val TodoStyle by ComponentStyle.base {
     Modifier
         .width(85.percent)
         .height(5.cssRem)
@@ -27,7 +27,7 @@ val TodoStyle = ComponentStyle.base("todo") {
 }
 
 /** Styles for the bordered, outer container (the form component has an inner and outer layer) */
-val TodoContainerStyle = ComponentStyle.base("todo-container") {
+val TodoContainerStyle by ComponentStyle.base {
     Modifier
         .margin(0.5.cssRem)
         .border(1.px, LineStyle.Solid, BORDER_COLOR)
@@ -37,7 +37,7 @@ val TodoContainerStyle = ComponentStyle.base("todo-container") {
 }
 
 /** Styles for the text parts of todo widgets */
-val TodoTextStyle = ComponentStyle.base("todo-text") {
+val TodoTextStyle by ComponentStyle.base {
     Modifier
         .padding(1.5.cssRem)
         .fontSize(1.25.cssRem)
@@ -46,7 +46,7 @@ val TodoTextStyle = ComponentStyle.base("todo-text") {
 }
 
 /** Styles for the input element which handles user input */
-val TodoInputStyle = ComponentStyle("todo-input") {
+val TodoInputStyle by ComponentStyle {
     base {
         Modifier
             .fillMaxWidth()
@@ -60,7 +60,7 @@ val TodoInputStyle = ComponentStyle("todo-input") {
 }
 
 /** Styles for mouse interaction with todo widgets */
-val TodoClickableStyle = ComponentStyle("todo-clickable") {
+val TodoClickableStyle by ComponentStyle {
     hover {
         Modifier
             .color(INTERACT_COLOR)

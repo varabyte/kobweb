@@ -41,7 +41,7 @@ private suspend fun loadAndReplaceTodos(id: String, todos: SnapshotStateList<Tod
     }
 }
 
-val TitleStyle = ComponentStyle.base("title") {
+val TitleStyle by ComponentStyle.base {
     Modifier
         .lineHeight(1.15)
         .fontSize(4.cssRem)

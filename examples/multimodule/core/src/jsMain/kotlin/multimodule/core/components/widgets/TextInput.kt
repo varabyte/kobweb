@@ -17,13 +17,13 @@ import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 
-val TextInputLabelStyle = ComponentStyle.base("text-input-label") {
+val TextInputLabelStyle by ComponentStyle.base {
     Modifier
         .fontSize(G.Ui.Text.Small)
         .color(Colors.Grey)
 }
 
-val TextInputStyle = ComponentStyle.base("text-input") {
+val TextInputStyle by ComponentStyle.base {
     Modifier
         .width(G.Ui.Width.Medium)
         .margin(bottom = 10.px)
