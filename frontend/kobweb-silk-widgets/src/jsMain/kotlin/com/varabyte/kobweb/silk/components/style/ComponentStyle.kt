@@ -438,18 +438,11 @@ class ComponentStyleProvider internal constructor(
     }
 }
 
-fun componentStyle(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
+fun ComponentStyle(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
     = ComponentStyleProvider(extraModifiers, init)
 
-// Note: Technically, the more correct code to use would probably be `by ComponentStyle.base { ... }`, since that's
-// equivalent to `ComponentStyle.base("name")`. However, it can be really convenient to toggle between `by
-// componentStyle` and `by componentStyleBase` when prototyping, so both versions are included for the user's
-// convenience.
-fun componentStyleBase(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier)
-        = ComponentStyleProvider(extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) }})
-
 fun ComponentStyle.Companion.base(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier)
-    = componentStyleBase(extraModifiers, init)
+    = ComponentStyleProvider(extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) }})
 
 
 /**

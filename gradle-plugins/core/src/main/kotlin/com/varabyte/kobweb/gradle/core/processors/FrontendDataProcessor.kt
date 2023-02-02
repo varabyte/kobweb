@@ -332,10 +332,7 @@ class FrontendDataProcessor(
 
                 is KtCallExpression -> {
                     when (element.calleeExpression?.text) {
-                        // Note: componentStyleBase is handled here and NOT below because it is actually a top level
-                        // method, vs. a method that lives underneath the "ComponentStyle" class, which the next case
-                        // checks for.
-                        "ComponentStyle", "componentStyle", "componentStyleBase" ->
+                        "ComponentStyle" ->
                             processComponentStyle(file, currPackage, element, silkStyles, reporter)
 
                         "base" ->
@@ -347,6 +344,7 @@ class FrontendDataProcessor(
                         "addVariantBase" ->
                             processComponentVariantBase(file, currPackage, element, silkVariants, reporter)
 
+                        // TODO(#168): Delete "keyframes" before 1.0
                         "Keyframes", "keyframes" ->
                             processKeyframes(file, currPackage, element, keyframesList, reporter)
                     }

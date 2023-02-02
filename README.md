@@ -584,7 +584,7 @@ styles, whereas if you use a `ComponentStyle` to define the styles, those will g
 Box(Modifier.color(Colors.Red)) { /* ... */ }
 
 // Uses a stylesheet
-val MyBoxStyle = ComponentStyle("my-box") {
+val MyBoxStyle by ComponentStyle {
     base { Modifier.Color(Colors.Red) }
 }
 Box(MyBoxStyle.toModifier()) { /* ... */ }
@@ -656,7 +656,7 @@ Modifier.attrsModifier {
 With Silk, you can define a style like so, using the `base` block:
 
 ```kotlin
-val CustomStyle = ComponentStyle("custom") {
+val CustomStyle by ComponentStyle {
     base {
         Modifier.backgroud(Colors.Red)
     }
@@ -685,7 +685,7 @@ multiple states are applicable at the same time, they will be applied in the ord
 Here, we create a style which is red by default, but green when the mouse hovers over it:
 
 ```kotlin
-val CustomStyle = ComponentStyle("custom") {
+val CustomStyle by ComponentStyle {
     base {
         Modifier.color(Colors.Red)
     }
@@ -702,7 +702,7 @@ define the CSS rule directly to enable more complex combinations or reference st
 For example, this is identical to the above style definition:
 
 ```kotlin
-val CustomStyle = ComponentStyle("custom") {
+val CustomStyle by ComponentStyle {
     base {
         Modifier.color(Colors.Red)
     }
@@ -745,7 +745,7 @@ fun initializeBreakpoints(ctx: InitSilkContext) {
 To reference a breakpoint in a `ComponentStyle`, just invoke it:
 
 ```kotlin
-val CustomStyle = ComponentStyle("custom") {
+val CustomStyle by ComponentStyle {
     base {
         Modifier.fontSize(24.px)
     }
@@ -761,7 +761,7 @@ val CustomStyle = ComponentStyle("custom") {
 When you define a `ComponentStyle`, an optional field is available for you to use called `colorMode`:
 
 ```kotlin
-val CustomStyle = ComponentStyle("custom") {
+val CustomStyle by ComponentStyle {
     base {
         Modifier.color(if (colorMode.isLight()) Colors.Red else Colors.Pink)
     }
@@ -772,7 +772,7 @@ Note that Silk provides a `SilkTheme` object you can reference in styles. For ex
 color to match the color that we use for links, you can reference the `SilkTheme.palettes[colorMode]` object to do so:
 
 ```kotlin
-val CustomStyle = ComponentStyle("custom") {
+val CustomStyle by ComponentStyle {
     base {
         Modifier.color(SilkTheme.palettes[colorMode].link.default)
     }
@@ -798,12 +798,15 @@ You define one using the `ComponentStyle.addVariant` method, but otherwise the d
 `ComponentStyle`:
 
 ```kotlin
-val CustomVariant = CustomStyle.addVariant("example-variant") {
+val HighlightedCustomVariant by CustomStyle.addVariant {
     base {
         Modifier.backgroundColor(Colors.Green)
     }
 }
 ```
+
+Note: A common naming convention for variants is to take their associated style and use its name as a suffix, e.g.
+"ButtonStyle" -> "GhostButtonVariant" and "TextStyle" -> "OutlinedTextVariant".
 
 Variants can be particularly useful if you're defining a custom widget that has default styles, but you want to give
 callers an easy way to deviate from it in special cases.
@@ -811,13 +814,13 @@ callers an easy way to deviate from it in special cases.
 For example, maybe you define a button widget (perhaps you're not happy with the one provided by Silk):
 
 ```kotlin
-val MyButtonStyle = ComponentStyle("my-button") { /* ... */ }
+val ButtonStyle by ComponentStyle { /* ... */ }
 
-// Note: Creates a style called "my-button-outline"
-val OutlineButtonVariant = MyButtonStyle.addVariant("outline") { /* ... */ }
+// Note: Creates a style called "button-outline"
+val OutlineButtonVariant by ButtonStyle.addVariant { /* ... */ }
 
-// Note: Creates a style called "my-button-invert"
-val InvertButtonVariant = MyButtonStyle.addVariant("invert") { /* ... */ }
+// Note: Creates a style called "button-inverted"
+val InvertedButtonVariant by ButtonStyle.addVariant { /* ... */ }
 ```
 
 The `ComponentStyle.toModifier(...)` method, mentioned earlier, optionally takes a variant parameter. When passed in,
@@ -838,7 +841,7 @@ While Silk methods are all written to support component styles and variants, if 
 widget that mimics Silk, your code should look something like:
 
 ```kotlin
-val CustomWidgetStyle = ComponentStyle("custom-widget") { /* ... */ }
+val CustomWidgetStyle by ComponentStyle { /* ... */ }
 
 @Composable
 fun CustomWidget(

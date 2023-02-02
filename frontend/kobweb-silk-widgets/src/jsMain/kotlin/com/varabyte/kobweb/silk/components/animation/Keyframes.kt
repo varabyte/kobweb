@@ -180,7 +180,12 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
  * val LegacyBounce = Keyframes("bounce") { ... }
  * ```
  */
-fun keyframes(init: KeyframesBuilder.() -> Unit) = KeyframesProvider(init)
+@Suppress("FunctionName") // name chosen to look like a constructor intentionally
+fun Keyframes(init: KeyframesBuilder.() -> Unit) = KeyframesProvider(init)
+
+// TODO(#168): Delete this before 1.0
+@Deprecated("`keyframes` has been replaced with `Keyframes` (capitalized) for consistency with `ComponentStyle` behavior.", ReplaceWith("Keyframes(init)"))
+fun keyframes(init: KeyframesBuilder.() -> Unit) = Keyframes(init)
 
 @Composable
 fun Keyframes.toAnimation(
