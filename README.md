@@ -925,7 +925,7 @@ div {
 Kobweb lets you define your keyframes in code by using the `by keyframes` pattern:
 
 ```kotlin
-val MyMove by Keyframes {
+val ShiftRight by Keyframes {
     from { Modifier.left(0.px) }
     to { Modifier.left(200.px) }
 }
@@ -934,15 +934,15 @@ val MyMove by Keyframes {
 Div(
     Modifier
         .size(100.px).backgroundColor(Colors.Red).position(Position.Relative)
-        .animation(MyMove.toAnimation(
+        .animation(ShiftRight.toAnimation(
             duration = 5.s,
             iterationCount = AnimationIterationCount.Infinite
         ))
 )
 ```
 
-The name of the keyframes block is automatically derived from the property name (here, `MyMove` is converted into
-`"my-move"`). You can then use the `toAnimation` method to convert your collection of keyframes into an animation that
+The name of the keyframes block is automatically derived from the property name (here, `ShiftRight` is converted into
+`"shift-right"`). You can then use the `toAnimation` method to convert your collection of keyframes into an animation that
 uses them, which you can pass into the `Modifier.animation` modifier.
 
 ### ElementRefScope and raw HTML elements
