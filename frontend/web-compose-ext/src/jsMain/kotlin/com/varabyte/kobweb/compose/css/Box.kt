@@ -3,17 +3,19 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
-sealed class BoxDecorationBreak private constructor(val value: String) {
-    // Keyword
-    object Slice : BoxDecorationBreak("slice")
-    object Clone : BoxDecorationBreak("clone")
+class BoxDecorationBreak private constructor(val value: String) {
+    companion object {
+        // Keyword
+        val Slice = BoxDecorationBreak("slice")
+        val Clone = BoxDecorationBreak("clone")
 
-    // Global
-    object Inherit : BoxDecorationBreak("inherit")
-    object Initial : BoxDecorationBreak("initial")
-    object Revert : BoxDecorationBreak("revert")
-    object RevertLayer : BoxDecorationBreak("revert-layer")
-    object Unset : BoxDecorationBreak("unset")
+        // Global
+        val Inherit = BoxDecorationBreak("inherit")
+        val Initial = BoxDecorationBreak("initial")
+        val Revert = BoxDecorationBreak("revert")
+        val RevertLayer = BoxDecorationBreak("revert-layer")
+        val Unset = BoxDecorationBreak("unset")
+    }
 }
 
 fun StyleScope.boxDecorationBreak(boxDecorationBreak: BoxDecorationBreak) {
@@ -21,17 +23,19 @@ fun StyleScope.boxDecorationBreak(boxDecorationBreak: BoxDecorationBreak) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-sealed class BoxSizing private constructor(val value: String) {
-    // Keyword
-    object BorderBox : BoxSizing("border-box")
-    object ContentBox : BoxSizing("content-box")
+class BoxSizing private constructor(val value: String) {
+    companion object {
+        // Keyword
+        val BorderBox = BoxSizing("border-box")
+        val ContentBox = BoxSizing("content-box")
 
-    // Global
-    object Inherit : BoxSizing("inherit")
-    object Initial : BoxSizing("initial")
-    object Revert : BoxSizing("revert")
-    object RevertLayer : BoxSizing("revert-layer")
-    object Unset : BoxSizing("unset")
+        // Global
+        val Inherit = BoxSizing("inherit")
+        val Initial = BoxSizing("initial")
+        val Revert = BoxSizing("revert")
+        val RevertLayer = BoxSizing("revert-layer")
+        val Unset = BoxSizing("unset")
+    }
 }
 
 fun StyleScope.boxSizing(boxSizing: BoxSizing) {

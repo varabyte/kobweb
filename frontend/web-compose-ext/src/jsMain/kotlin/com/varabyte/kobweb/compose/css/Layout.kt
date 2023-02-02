@@ -4,18 +4,20 @@ import org.jetbrains.compose.web.css.*
 
 // region width See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
 
-sealed class Width private constructor(val value: String) {
-    // Keyword
-    object FitContent : Width("fit-content")
-    object MaxContext : Width("max-content")
-    object MinContent : Width("min-content")
+class Width private constructor(val value: String) {
+    companion object {
+        // Keyword
+        val FitContent = Width("fit-content")
+        val MaxContext = Width("max-content")
+        val MinContent = Width("min-content")
 
-    // Global
-    object Inherit : Width("inherit")
-    object Initial : Width("initial")
-    object Revert : Width("revert")
-    object RevertLayer : Width("revert-layer")
-    object Unset : Width("unset")
+        // Global
+        val Inherit = Width("inherit")
+        val Initial = Width("initial")
+        val Revert = Width("revert")
+        val RevertLayer = Width("revert-layer")
+        val Unset = Width("unset")
+    }
 }
 typealias MinWidth = Width
 
@@ -31,18 +33,20 @@ fun StyleScope.minWidth(minWidth: MinWidth) {
 
 // region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 
-sealed class Height private constructor(val value: String) {
-    // Keyword
-    object FitContent : Height("fit-content")
-    object MaxContext : Height("max-content")
-    object MinContent : Height("min-content")
+class Height private constructor(val value: String) {
+    companion object {
+        // Keyword
+        val FitContent = Height("fit-content")
+        val MaxContext = Height("max-content")
+        val MinContent = Height("min-content")
 
-    // Global
-    object Inherit : Height("inherit")
-    object Initial : Height("initial")
-    object Revert : Height("revert")
-    object RevertLayer : Height("revert-layer")
-    object Unset : Height("unset")
+        // Global
+        val Inherit = Height("inherit")
+        val Initial = Height("initial")
+        val Revert = Height("revert")
+        val RevertLayer = Height("revert-layer")
+        val Unset = Height("unset")
+    }
 }
 typealias MinHeight = Height
 
@@ -58,19 +62,21 @@ fun StyleScope.minHeight(minHeight: MinHeight) {
 
 // region max-width See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
 
-sealed class MaxWidth private constructor(val value: String) {
-    // Keyword
-    object FitContent : MaxWidth("fit-content")
-    object MaxContext : MaxWidth("max-content")
-    object MinContent : MaxWidth("min-content")
-    object None : MaxWidth("none")
+class MaxWidth private constructor(val value: String) {
+    companion object {
+        // Keyword
+        val FitContent = MaxWidth("fit-content")
+        val MaxContext = MaxWidth("max-content")
+        val MinContent = MaxWidth("min-content")
+        val None = MaxWidth("none")
 
-    // Global
-    object Inherit : MaxWidth("inherit")
-    object Initial : MaxWidth("initial")
-    object Revert : MaxWidth("revert")
-    object RevertLayer : MaxWidth("revert-layer")
-    object Unset : MaxWidth("unset")
+        // Global
+        val Inherit = MaxWidth("inherit")
+        val Initial = MaxWidth("initial")
+        val Revert = MaxWidth("revert")
+        val RevertLayer = MaxWidth("revert-layer")
+        val Unset = MaxWidth("unset")
+    }
 }
 
 fun StyleScope.maxWidth(maxWidth: MaxWidth) {
@@ -81,19 +87,21 @@ fun StyleScope.maxWidth(maxWidth: MaxWidth) {
 
 // region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 
-sealed class MaxHeight private constructor(val value: String) {
-    // Keyword
-    object FitContent : MaxHeight("fit-content")
-    object MaxContext : MaxHeight("max-content")
-    object MinContent : MaxHeight("min-content")
-    object None : MaxHeight("none")
+class MaxHeight private constructor(val value: String) {
+    companion object {
+        // Keyword
+        val FitContent = MaxHeight("fit-content")
+        val MaxContext = MaxHeight("max-content")
+        val MinContent = MaxHeight("min-content")
+        val None = MaxHeight("none")
 
-    // Global
-    object Inherit : MaxHeight("inherit")
-    object Initial : MaxHeight("initial")
-    object Revert : MaxHeight("revert")
-    object RevertLayer : MaxHeight("revert-layer")
-    object Unset : MaxHeight("unset")
+        // Global
+        val Inherit = MaxHeight("inherit")
+        val Initial = MaxHeight("initial")
+        val Revert = MaxHeight("revert")
+        val RevertLayer = MaxHeight("revert-layer")
+        val Unset = MaxHeight("unset")
+    }
 }
 
 fun StyleScope.maxHeight(maxHeight: MaxHeight) {
