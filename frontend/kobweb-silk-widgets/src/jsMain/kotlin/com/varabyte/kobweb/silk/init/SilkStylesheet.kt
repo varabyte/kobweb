@@ -2,10 +2,12 @@ package com.varabyte.kobweb.silk.init
 
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.components.animation.Keyframes
 import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
 
 /**
@@ -152,18 +154,15 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         }
 
         keyframes.map { (name, build) ->
-            val builder = KeyframesBuilder().apply(build)
+            val lightBuilder = KeyframesBuilder(ColorMode.LIGHT).apply(build)
+            val darkBuilder = KeyframesBuilder(ColorMode.DARK).apply(build)
 
-            val keyframeRules = builder.keyframeStyles.map { (keyframe, create) ->
-                val styles = create().toStyles()
-
-                val cssRuleBuilder = StyleScopeBuilder()
-                styles.invoke(cssRuleBuilder)
-
-                CSSKeyframeRuleDeclaration(keyframe, cssRuleBuilder)
+            if (lightBuilder == darkBuilder) {
+                lightBuilder.addKeyframesIntoStylesheet(siteStyleSheet, name)
+            } else {
+                lightBuilder.addKeyframesIntoStylesheet(siteStyleSheet, name.suffixedWith(ColorMode.LIGHT))
+                darkBuilder.addKeyframesIntoStylesheet(siteStyleSheet, name.suffixedWith(ColorMode.DARK))
             }
-
-            siteStyleSheet.add(CSSKeyframesRuleDeclaration(name, keyframeRules))
         }
     }
 }

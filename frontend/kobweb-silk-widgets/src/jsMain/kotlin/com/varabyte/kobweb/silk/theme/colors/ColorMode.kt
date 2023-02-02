@@ -18,6 +18,8 @@ enum class ColorMode {
     }
 }
 
+internal fun String.suffixedWith(colorMode: ColorMode) = "$this-${colorMode.name.lowercase()}"
+
 /**
  * Lighten or darken the color, as appropriate, based on the specified color mode.
  *

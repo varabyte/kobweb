@@ -1,14 +1,26 @@
 package com.varabyte.kobweb.silk.components.animation
 
-import com.varabyte.kobweb.compose.css.*
+import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.CSSAnimation
+import com.varabyte.kobweb.compose.css.ComparableStyleScope
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.init.SilkStylesheet
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
+import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import com.varabyte.kobweb.silk.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 import kotlin.reflect.KProperty
 
-class KeyframesBuilder internal constructor() {
+private val KeyframesBuilder.comparableKeyframeStyles get() = keyframeStyles.mapValues { (_, create) ->
+    ComparableStyleScope().apply {
+        create().toStyles().invoke(this)
+    }
+}
+
+class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
     internal val keyframeStyles = mutableMapOf<CSSKeyframe, () -> Modifier>()
 
     /** Describe the style of the element when this animation starts. */
@@ -42,6 +54,28 @@ class KeyframesBuilder internal constructor() {
      */
     fun each(vararg keys: CSSSizeValue<CSSUnit.percent>, createStyle: () -> Modifier) {
         keyframeStyles += CSSKeyframe.Combine(keys.toList()) to createStyle
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is KeyframesBuilder) return false
+        return this === other || this.comparableKeyframeStyles == other.comparableKeyframeStyles
+    }
+
+    override fun hashCode(): Int {
+        return comparableKeyframeStyles.hashCode()
+    }
+
+    internal fun addKeyframesIntoStylesheet(stylesheet: StyleSheet, keyframesName: String) {
+        val keyframeRules = keyframeStyles.map { (keyframe, create) ->
+            val styles = create().toStyles()
+
+            val cssRuleBuilder = StyleScopeBuilder()
+            styles.invoke(cssRuleBuilder)
+
+            CSSKeyframeRuleDeclaration(keyframe, cssRuleBuilder)
+        }
+
+        stylesheet.add(CSSKeyframesRuleDeclaration(keyframesName, keyframeRules))
     }
 }
 
@@ -93,7 +127,22 @@ class KeyframesBuilder internal constructor() {
  *
  * Otherwise, the Kobweb Gradle plugin will do this for you.
  */
-class Keyframes(val name: String, internal val init: KeyframesBuilder.() -> Unit)
+class Keyframes(val name: String, internal val init: KeyframesBuilder.() -> Unit) {
+    companion object {
+        internal fun isColorModeAgnostic(build: KeyframesBuilder.() -> Unit): Boolean {
+            // A user can use colorMode checks to change the keyframes builder, either by completely changing what sort
+            // of keyframes show up across the light version and the dark version, or (more commonly) keeping the same
+            // keyframes but changing some color values in the styles.
+            return listOf(ColorMode.LIGHT, ColorMode.DARK)
+                .map { colorMode -> KeyframesBuilder(colorMode).apply(build) }
+                .distinct().count() == 1
+        }
+    }
+
+    // Note: Need to postpone checking this value, because color modes aren't ready until after a certain point in
+    // Silk's initialization.
+    val usesColorMode by lazy { !isColorModeAgnostic(init) }
+}
 
 /**
  * A delegate provider class which allows you to create a [Keyframes] instance via the `by` keyword.
@@ -133,6 +182,7 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
  */
 fun keyframes(init: KeyframesBuilder.() -> Unit) = KeyframesProvider(init)
 
+@Composable
 fun Keyframes.toAnimation(
     duration: CSSSizeValue<out CSSUnitTime>? = null,
     timingFunction: AnimationTimingFunction? = null,
@@ -141,13 +191,22 @@ fun Keyframes.toAnimation(
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null
-) = CSSAnimation(
-    name,
-    duration,
-    timingFunction,
-    delay,
-    iterationCount,
-    direction,
-    fillMode,
-    playState
-)
+): CSSAnimation
+{
+    val finalName = if (this.usesColorMode) {
+        this.name.suffixedWith(rememberColorMode().value)
+    } else {
+        this.name
+    }
+
+    return CSSAnimation(
+        finalName,
+        duration,
+        timingFunction,
+        delay,
+        iterationCount,
+        direction,
+        fillMode,
+        playState
+    )
+}
