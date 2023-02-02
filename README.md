@@ -925,7 +925,7 @@ div {
 Kobweb lets you define your keyframes in code by using the `by keyframes` pattern:
 
 ```kotlin
-val MyMove by keyframes {
+val MyMove by Keyframes {
     from { Modifier.left(0.px) }
     to { Modifier.left(200.px) }
 }
