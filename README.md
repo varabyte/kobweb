@@ -1,8 +1,8 @@
-![version: 0.11.12](https://img.shields.io/badge/kobweb-0.11.12-blue)
+![version: 0.12.0](https://img.shields.io/badge/kobweb-0.12.0-blue)
 ![version: 0.9.11](https://img.shields.io/badge/kobweb_cli-0.9.11-blue)
 <br>
-![kotlin: 1.7.20](https://img.shields.io/badge/kotlin-1.7.20-blue?logo=kotlin)
-![compose: 1.2.2](https://img.shields.io/badge/compose-1.2.2-blue?logo=jetpackcompose)
+![kotlin: 1.8.0](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)
+![compose: 1.3.0](https://img.shields.io/badge/compose-1.3.0-blue?logo=jetpackcompose)
 <br>
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
