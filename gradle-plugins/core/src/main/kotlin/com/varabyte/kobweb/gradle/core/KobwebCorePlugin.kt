@@ -8,6 +8,7 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.kmp.sourceSets
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.the
@@ -24,18 +25,24 @@ class KobwebCorePlugin : Plugin<Project> {
         kobwebBlock.createYarnBlock()
 
         project.rootProject.plugins.withType(YarnPlugin::class.java) {
-            with(project.rootProject.the<YarnRootExtension>()) {
-                val yarnBlock = kobwebBlock.yarn
-                yarnLockMismatchReport = when(yarnBlock.lockChangedStrategy.get()) {
-                    is YarnLockChangedStrategy.Fail -> YarnLockMismatchReport.FAIL
-                    else -> YarnLockMismatchReport.WARNING
-                }
+            try {
+                with(project.rootProject.the<YarnRootExtension>()) {
+                    val yarnBlock = kobwebBlock.yarn
+                    yarnLockMismatchReport = when (yarnBlock.lockChangedStrategy.get()) {
+                        is YarnLockChangedStrategy.Fail -> YarnLockMismatchReport.FAIL
+                        else -> YarnLockMismatchReport.WARNING
+                    }
 
-                yarnLockAutoReplace = yarnBlock.lockChangedStrategy.get() == YarnLockChangedStrategy.Regenerate
-                reportNewYarnLock = (yarnBlock.lockChangedStrategy.get() as? YarnLockChangedStrategy.Fail)?.rejectCreatingNewLock
-                    ?: false
+                    yarnLockAutoReplace = yarnBlock.lockChangedStrategy.get() == YarnLockChangedStrategy.Regenerate
+                    reportNewYarnLock =
+                        (yarnBlock.lockChangedStrategy.get() as? YarnLockChangedStrategy.Fail)?.rejectCreatingNewLock
+                            ?: false
+                }
+            } catch (ex: NoSuchMethodError) {
+                throw GradleException("This version of Kobweb requires a newer Kotlin version than what this project is using. Please refer to https://github.com/varabyte/kobweb/blob/main/COMPATIBILITY.md")
             }
         }
+
 
         // Kobweb applications and libraries both put stuff in generated folders, which the Kotlin project should be
         // aware of.
