@@ -1,6 +1,9 @@
 package com.varabyte.kobweb.gradle.core
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
+import com.varabyte.kobweb.gradle.core.extensions.YarnLockChangedStrategy
+import com.varabyte.kobweb.gradle.core.extensions.createYarnBlock
+import com.varabyte.kobweb.gradle.core.extensions.yarn
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
@@ -18,16 +21,19 @@ class KobwebCorePlugin : Plugin<Project> {
         // A `kobweb` block is not used directly here in the core plugin but is provided as a foundational building
         // block for both library and application plugins.
         val kobwebBlock = project.extensions.create("kobweb", KobwebBlock::class.java)
+        kobwebBlock.createYarnBlock()
 
-        // Starting in Kotlin 1.8.0, you can start getting errors around yarn locking. The experience sucks for
-        // Kobweb users, since the binary tries to shield people from using Gradle directly when possible.
-        // Here, we go ahead and make the rules about yarn locking a bit softer, but full disclosure, I don't
-        // 100% know if my choices here have unexpected consequences.
-        // The following code adapted from https://kotlinlang.org/docs/js-project-setup.html#reporting-that-yarn-lock-has-been-updated
         project.rootProject.plugins.withType(YarnPlugin::class.java) {
             with(project.rootProject.the<YarnRootExtension>()) {
-                yarnLockMismatchReport = YarnLockMismatchReport.WARNING
-                yarnLockAutoReplace = true
+                val yarnBlock = kobwebBlock.yarn
+                yarnLockMismatchReport = when(yarnBlock.lockChangedStrategy.get()) {
+                    is YarnLockChangedStrategy.Fail -> YarnLockMismatchReport.FAIL
+                    else -> YarnLockMismatchReport.WARNING
+                }
+
+                yarnLockAutoReplace = yarnBlock.lockChangedStrategy.get() == YarnLockChangedStrategy.Regenerate
+                reportNewYarnLock = (yarnBlock.lockChangedStrategy.get() as? YarnLockChangedStrategy.Fail)?.rejectCreatingNewLock
+                    ?: false
             }
         }
 
