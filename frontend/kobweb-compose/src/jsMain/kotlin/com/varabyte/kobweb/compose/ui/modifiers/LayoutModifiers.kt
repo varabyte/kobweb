@@ -28,8 +28,16 @@ fun Modifier.fillMaxSize(percent: CSSPercentageValue = 100.percent): Modifier = 
     height(percent)
 }
 
-fun Modifier.size(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier =
-    width(size, type).then(height(size, type))
+fun Modifier.size(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier = when (type) {
+    WebModifierType.ATTRS -> attrsModifier {
+        width(size)
+        height(size)
+    }
+    WebModifierType.STYLE -> styleModifier {
+        width(size)
+        height(size)
+    }
+}
 
 fun Modifier.width(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier = when (type) {
     WebModifierType.ATTRS -> attrsModifier { width(size) }
