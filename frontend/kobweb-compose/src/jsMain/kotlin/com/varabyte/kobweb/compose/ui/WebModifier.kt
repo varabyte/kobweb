@@ -71,7 +71,7 @@ fun Modifier.styleModifier(styles: (StyleScope.() -> Unit)) = this then StyleMod
  * @param finalHandler A handler which, if supplied, gets called at the very end before returning the builder. This can
  *   be useful to occasionally avoid the creation of an unnecessary [AttrsModifier] to append at the tail.
  */
-fun <T: Element, A: AttrsScope<T>> Modifier.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <A: AttrsScope<Element>> Modifier.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     val firstModifier = this
     return {
         firstModifier.fold(Unit) { _, element ->
@@ -89,7 +89,7 @@ fun <T: Element, A: AttrsScope<T>> Modifier.toAttrs(finalHandler: (A.() -> Unit)
 }
 
 @Deprecated("This method has been shortened to `toAttrs`.", ReplaceWith("toAttrs(finalHandler)"))
-fun <T: Element, A: AttrsScope<T>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <A: AttrsScope<Element>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return toAttrs(finalHandler)
 }
 
