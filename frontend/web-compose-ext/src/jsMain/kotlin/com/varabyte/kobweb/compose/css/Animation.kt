@@ -29,8 +29,10 @@ data class CSSAnimation(
         // https://developer.mozilla.org/en-US/docs/Web/CSS/animation#syntax
         duration?.let { add(it.toString()) }
         timingFunction?.let { add(it.toString()) }
-        if (delay != null && duration == null) {
-            add("0s") // Needed so parser knows that the next time string is for "delay"
+        if (delay != null) {
+            if (duration == null) {
+                add("0s") // Needed so parser knows that the next time string is for "delay"
+            }
             add(delay.toString())
         }
         iterationCount?.let { add(it.toString()) }
