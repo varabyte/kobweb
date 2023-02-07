@@ -62,7 +62,7 @@ fun Link(
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLElement>? = null,
-    content: @Composable () -> Unit = {}
+    content: @Composable () -> Unit
 ) {
     Anchor(
         href = path,
