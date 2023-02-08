@@ -5,11 +5,8 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.fillMaxSize
-import com.varabyte.kobweb.compose.ui.modifiers.transitionDuration
-import com.varabyte.kobweb.compose.ui.modifiers.transitionProperty
+import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -34,18 +31,17 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
  */
 val AnimatedColorSurfaceVariant = SurfaceStyle.addVariant("animated-color") {
     base {
-        Modifier
-            // Toggling color mode looks much more engaging if it animates instead of being instant
-            .transitionProperty("background-color")
-            .transitionDuration(200.ms)
+        // Toggling color mode looks much more engaging if it animates instead of being instant
+        Modifier.transition(CSSTransition("background-color", 200.ms))
     }
 
     // By default, the transition properties are not inherited, but we want animated colors to occur for all
     // elements underneath this surface, not just the parent surface itself
     cssRule(" *") {
-        Modifier
-            .transitionProperty(TransitionProperty.Inherit)
-            .transitionDuration(TransitionDuration.Inherit)
+        Modifier.styleModifier {
+            transitionProperty(TransitionProperty.Inherit)
+            transitionDuration(TransitionDuration.Inherit)
+        }
     }
 }
 

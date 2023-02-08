@@ -22,7 +22,7 @@ val TodoStyle by ComponentStyle.base {
         .height(5.cssRem)
         .border(1.px, LineStyle.Solid, BORDER_COLOR)
         .borderRadius(10.px)
-        .transition("color 0.15s ease, border-color 0.15s ease")
+        .transition(*CSSTransition.group(listOf("color", "border-color"), 0.15.s, TransitionTimingFunction.Ease))
         .textDecorationLine(TextDecorationLine.None)
 }
 
