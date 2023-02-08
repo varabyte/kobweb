@@ -91,6 +91,41 @@ data class CSSTransition(
     val timingFunction: TransitionTimingFunction? = null,
     val delay: CSSSizeValue<out CSSUnitTime>? = null,
 ) : CSSStyleValue {
+    companion object {
+
+        /**
+         * A convenience method for when you want to animate multiple properties with the same values.
+         *
+         * Returns an array so you can use feed it into [transition] as vararg parameters using the spread operator:
+         *
+         * ```
+         * transition(*CSSTrasition.group(listOf("width", "height"), ...))
+         * ```
+         */
+        fun group(
+            properties: Iterable<String>,
+            duration: CSSSizeValue<out CSSUnitTime>? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSSizeValue<out CSSUnitTime>? = null
+        ) = properties.map { property -> CSSTransition(property, duration, timingFunction, delay) }.toTypedArray()
+
+        /**
+         * A convenience method for when you want to animate multiple properties with the same values.
+         *
+         * Returns an array so you can use feed it into [transition] as vararg parameters using the spread operator:
+         *
+         * ```
+         * transition(*CSSTrasition.group(listOf("width", "height"), ...))
+         * ```
+         */
+        fun group(
+            properties: Iterable<TransitionProperty>,
+            duration: CSSSizeValue<out CSSUnitTime>? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSSizeValue<out CSSUnitTime>? = null
+        ) = properties.map { property -> CSSTransition(property, duration, timingFunction, delay) }.toTypedArray()
+    }
+
     constructor(
         property: String, duration: CSSSizeValue<out CSSUnitTime>? = null,
         timingFunction: TransitionTimingFunction? = null,
