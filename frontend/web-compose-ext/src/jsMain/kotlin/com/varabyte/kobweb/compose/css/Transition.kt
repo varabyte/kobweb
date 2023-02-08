@@ -1,9 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.attributes.AttrsScope
-import org.jetbrains.compose.web.attributes.EventsListenerScope
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.events.SyntheticAnimationEvent
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
 
