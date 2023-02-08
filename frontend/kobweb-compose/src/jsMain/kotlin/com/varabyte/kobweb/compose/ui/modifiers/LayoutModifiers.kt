@@ -1,3 +1,5 @@
+@file:Suppress("DeprecatedCallableAddReplaceWith")
+
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
@@ -28,7 +30,9 @@ fun Modifier.fillMaxSize(percent: CSSPercentageValue = 100.percent): Modifier = 
     height(percent)
 }
 
-fun Modifier.size(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier = when (type) {
+// TODO(#168): Remove before v1.0
+@Deprecated("This method will be removed before v1.0. If targeting styles, just use `size` without the type argument. Otherwise, call `attrsModifier { width(...); height(...) }`.")
+fun Modifier.size(size: CSSNumeric, type: WebModifierType): Modifier = when (type) {
     WebModifierType.ATTRS -> attrsModifier {
         width(size)
         height(size)
@@ -39,14 +43,31 @@ fun Modifier.size(size: CSSNumeric, type: WebModifierType = WebModifierType.STYL
     }
 }
 
-fun Modifier.width(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier = when (type) {
+fun Modifier.size(size: CSSNumeric): Modifier = styleModifier {
+    width(size)
+    height(size)
+}
+
+// TODO(#168): Remove before v1.0
+@Deprecated("This method will be removed before v1.0. If targeting styles, just use `width` without the type argument. Otherwise, call `attrsModifier { width(...) }`.")
+fun Modifier.width(size: CSSNumeric, type: WebModifierType): Modifier = when (type) {
     WebModifierType.ATTRS -> attrsModifier { width(size) }
     WebModifierType.STYLE -> styleModifier { width(size) }
 }
 
-fun Modifier.height(size: CSSNumeric, type: WebModifierType = WebModifierType.STYLE): Modifier = when (type) {
+// TODO(#168): Remove before v1.0
+@Deprecated("This method will be removed before v1.0. If targeting styles, just use `height` without the type argument. Otherwise, call `attrsModifier { height(...) }`.")
+fun Modifier.height(size: CSSNumeric, type: WebModifierType): Modifier = when (type) {
     WebModifierType.ATTRS -> attrsModifier { height(size) }
     WebModifierType.STYLE -> styleModifier { height(size) }
+}
+
+fun Modifier.width(size: CSSNumeric): Modifier = styleModifier {
+    width(size)
+}
+
+fun Modifier.height(size: CSSNumeric): Modifier = styleModifier {
+    height(size)
 }
 
 fun Modifier.width(width: Width): Modifier = styleModifier {
