@@ -71,6 +71,7 @@ val Site.routePrefixNormalized: String get() {
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
+    env: ServerEnvironment,
     apiJar: ApiJarFile,
     httpMethod: HttpMethod,
 ) {
@@ -88,32 +89,56 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
             .toMap()
 
         val request = Request(httpMethod, query, body, bodyContentType)
-        val response = apiJar.apis.handle("/$pathStr", request)
-        if (response != null) {
-            call.respondBytes(
-                response.body.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
-                status = HttpStatusCode.fromValue(response.status),
-                contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }
-                    ?.let { ContentType.parse(it) }
-            )
-        } else {
-            call.respond(HttpStatusCode.NotFound)
+        try {
+            val response = apiJar.apis.handle("/$pathStr", request)
+            if (response != null) {
+                call.respondBytes(
+                    response.body.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
+                    status = HttpStatusCode.fromValue(response.status),
+                    contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }
+                        ?.let { ContentType.parse(it) }
+                )
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        } catch (t: Throwable) {
+            when (env) {
+                ServerEnvironment.DEV -> {
+                    call.respondText(
+                        buildString {
+                            appendLine(t.toString())
+
+                            // Show the stack trace of the user's code but no need to share anything outside of that.
+                            // The user can't do anything with the extra information anyway, and this keeps the message
+                            // so much shorter.
+                            // Note: We use "startsWith" and not "equals" below because the full classname is an
+                            // anonymous inner class, something like "ApisFactoryImpo$create$2"
+                            t.stackTrace.takeWhile { !it.className.startsWith("ApisFactoryImpl") }.forEach {
+                                appendLine("\tat $it")
+                            }
+                        },
+                        status = HttpStatusCode.InternalServerError,
+                        contentType = ContentType.Text.Plain,
+                    )
+                }
+                ServerEnvironment.PROD -> call.respondBytes(EMPTY_BODY, status = HttpStatusCode.InternalServerError)
+            }
         }
     }
 }
 
 
-private fun Routing.configureApiRouting(apiJar: ApiJarFile, routePrefix: String) {
+private fun Routing.configureApiRouting(env: ServerEnvironment, apiJar: ApiJarFile, routePrefix: String) {
     val path = "$routePrefix/api/{$KOBWEB_PARAMS...}"
     HttpMethod.values().forEach { httpMethod ->
         when (httpMethod) {
-            HttpMethod.DELETE -> delete(path) { handleApiCall(apiJar, httpMethod) }
-            HttpMethod.GET -> get(path) { handleApiCall(apiJar, httpMethod) }
-            HttpMethod.HEAD -> head(path) { handleApiCall(apiJar, httpMethod) }
-            HttpMethod.OPTIONS -> options(path) { handleApiCall(apiJar, httpMethod) }
-            HttpMethod.PATCH -> patch(path) { handleApiCall(apiJar, httpMethod) }
-            HttpMethod.POST -> post(path) { handleApiCall(apiJar, httpMethod) }
-            HttpMethod.PUT -> put(path) { handleApiCall(apiJar, httpMethod) }
+            HttpMethod.DELETE -> delete(path) { handleApiCall(env, apiJar, httpMethod) }
+            HttpMethod.GET -> get(path) { handleApiCall(env, apiJar, httpMethod) }
+            HttpMethod.HEAD -> head(path) { handleApiCall(env, apiJar, httpMethod) }
+            HttpMethod.OPTIONS -> options(path) { handleApiCall(env, apiJar, httpMethod) }
+            HttpMethod.PATCH -> patch(path) { handleApiCall(env, apiJar, httpMethod) }
+            HttpMethod.POST -> post(path) { handleApiCall(env, apiJar, httpMethod) }
+            HttpMethod.PUT -> put(path) { handleApiCall(env, apiJar, httpMethod) }
         }
     }
 }
@@ -235,7 +260,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
         val routePrefix = conf.site.routePrefixNormalized
 
         if (apiJar != null) {
-            configureApiRouting(apiJar, routePrefix)
+            configureApiRouting(ServerEnvironment.DEV, apiJar, routePrefix)
         }
 
         val contentRootFile = contentRoot.toFile()
@@ -278,7 +303,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
         val routePrefix = conf.site.routePrefixNormalized
 
         if (apiJar != null) {
-            configureApiRouting(apiJar, routePrefix)
+            configureApiRouting(ServerEnvironment.PROD, apiJar, routePrefix)
         }
 
         resourcesRoot.toFile().let { resourcesRootFile ->

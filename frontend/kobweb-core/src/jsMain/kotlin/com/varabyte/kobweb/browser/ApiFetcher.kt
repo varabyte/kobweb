@@ -26,14 +26,22 @@ class ApiFetcher {
             } else undefined,
             body = body ?: undefined,
         )
-        window.fetch(RoutePrefix.prependIf(autoPrefix, "/api/$apiPath"), requestInit).then {
-            it.arrayBuffer().then { responseBuffer ->
-                val int8Array = Int8Array(responseBuffer)
-                responseBytesDeferred.complete(ByteArray(int8Array.length) { i -> int8Array[i] })
-            }
-        }.catch {
-            responseBytesDeferred.complete(null)
-        }
+
+        window.fetch(RoutePrefix.prependIf(autoPrefix, "/api/$apiPath"), requestInit).then(
+            onFulfilled = { res ->
+                if (res.ok) {
+                    res.arrayBuffer().then { responseBuffer ->
+                        val int8Array = Int8Array(responseBuffer)
+                        responseBytesDeferred.complete(ByteArray(int8Array.length) { i -> int8Array[i] })
+                    }
+                } else {
+                    res.text().then { msg -> if (msg.isNotBlank()) console.error(msg) }
+                    responseBytesDeferred.complete(null)
+                }
+            },
+            onRejected = {
+                responseBytesDeferred.complete(null)
+            })
 
         return responseBytesDeferred.await()
     }
