@@ -457,11 +457,20 @@ class ComponentVariantProvider internal constructor(
         thisRef: Any?,
         property: KProperty<*>
     ): ComponentVariant {
-        // e.g. "OutlinedTitleTextVariant" to "outlined", assuming it's a variant for "TitleTextStyle"
+        // Given a style called "ExampleStyle", we want to support the following variant name simplifications:
+        // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
+        // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
+        // - "OutlinedVariant"        -> "outlined" // But really the user should have kept "Example" in the name
+        // - "ExampleVariant"         -> "example" // In other words, protect against empty strings!
+        // - "ExampleExampleVariant"  -> "example"
+
+        // Step 1, remove variant suffix and turn the code style into CSS sytle,
+        // e.g. "OutlinedExampleVariant" -> "outlined-example"
         val withoutSuffix = property.name.removeSuffix("Variant").titleCamelCaseToKebabCase()
-        // Unlikely, but protect against "val TextVariant by TextStyle.addVariant { ... }" ending up with an empty
-        // string. (The user should have called it *Something*TextVariant but no guarantee a user won't be lazy)
-        val name = withoutSuffix.removeSuffix("-${style.name}").takeIf { it.isNotEmpty() } ?: withoutSuffix
+
+        val name =
+            withoutSuffix.removePrefix("${style.name}-").removeSuffix("-${style.name}")
+                .takeIf { it.isNotEmpty() } ?: withoutSuffix
         return style.addVariant(name, extraModifiers, init)
     }
 }
