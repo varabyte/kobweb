@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.css.functions.CSSFilter
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 
+// TODO(#168): Remove before v1.0
 @Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
 @Deprecated(
     "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",

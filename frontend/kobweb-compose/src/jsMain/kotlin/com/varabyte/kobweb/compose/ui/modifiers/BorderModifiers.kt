@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
+// TODO(#168): Remove before v1.0
 @Deprecated(
     "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
     ReplaceWith(
@@ -28,6 +29,7 @@ fun Modifier.borderColor(color: CSSColorValue) = styleModifier {
     borderColor(color)
 }
 
+// TODO(#168): Remove before v1.0
 @Deprecated(
     "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
     ReplaceWith(
@@ -48,6 +50,7 @@ fun Modifier.borderTop(
      borderTop(width, style, color)
 }
 
+// TODO(#168): Remove before v1.0
 @Deprecated(
     "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
     ReplaceWith(
@@ -67,6 +70,7 @@ fun Modifier.borderBottom(
     borderBottom(width, style, color)
 }
 
+// TODO(#168): Remove before v1.0
 @Deprecated(
     "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
     ReplaceWith(
@@ -86,6 +90,7 @@ fun Modifier.borderLeft(
      borderLeft(width, style, color)
 }
 
+// TODO(#168): Remove before v1.0
 @Deprecated(
     "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
     ReplaceWith(
