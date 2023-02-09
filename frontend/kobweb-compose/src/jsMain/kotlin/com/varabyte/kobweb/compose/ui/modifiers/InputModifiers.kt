@@ -8,8 +8,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.attributes.Draggable
-import org.jetbrains.compose.web.attributes.EventsListenerScope
-import org.jetbrains.compose.web.attributes.SyntheticEventListener
 import org.jetbrains.compose.web.events.SyntheticFocusEvent
 import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 import org.jetbrains.compose.web.events.SyntheticTouchEvent
@@ -41,60 +39,60 @@ fun Modifier.tabIndex(value: Int) = attrsModifier {
 
 // region mouse events
 
-fun Modifier.onClick(onClick: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
-    onClick { evt -> onClick(evt) }
+fun Modifier.onClick(listener: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
+    onClick(listener)
 }
 
-fun Modifier.onDoubleClick(onDoubleClick: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
-    onDoubleClick { evt -> onDoubleClick(evt) }
+fun Modifier.onDoubleClick(listener: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
+    onDoubleClick(listener)
 }
 
-fun Modifier.onContextMenu(onContextMenu: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
-    onContextMenu { evt -> onContextMenu(evt) }
+fun Modifier.onContextMenu(listener: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
+    onContextMenu(listener)
 }
 
-fun Modifier.onMouseDown(onMouseDown: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onMouseDown { evt -> onMouseDown(evt) }
+fun Modifier.onMouseDown(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onMouseDown(listener)
 }
 
-fun Modifier.onMouseEnter(onMouseEnter: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onMouseEnter { evt -> onMouseEnter(evt) }
+fun Modifier.onMouseEnter(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onMouseEnter(listener)
 }
 
-fun Modifier.onMouseLeave(onMouseLeave: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onMouseLeave { evt -> onMouseLeave(evt) }
+fun Modifier.onMouseLeave(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onMouseLeave(listener)
 }
 
-fun Modifier.onMouseMove(onMouseMove: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onMouseMove { evt -> onMouseMove(evt) }
+fun Modifier.onMouseMove(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onMouseMove(listener)
 }
 
-fun Modifier.onMouseOut(onMouseOut: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onMouseOut { evt -> onMouseOut(evt) }
+fun Modifier.onMouseOut(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onMouseOut(listener)
 }
 
-fun Modifier.onMouseOver(onMouseOver: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onMouseOver { evt -> onMouseOver(evt) }
+fun Modifier.onMouseOver(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onMouseOver(listener)
 }
 
-fun Modifier.onMouseUp(onMouseUp: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onMouseUp { evt -> onMouseUp(evt) }
+fun Modifier.onMouseUp(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onMouseUp(listener)
 }
 
-fun Modifier.onWheel(onWheel: (SyntheticMouseEvent) -> Unit) = attrsModifier {
-    onWheel { evt -> onWheel(evt) }
+fun Modifier.onWheel(listener: (SyntheticMouseEvent) -> Unit) = attrsModifier {
+    onWheel(listener)
 }
 
 // endregion
 
 // region drag events
 
-fun Modifier.onDrag(onDrag: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
-    onDrag { evt -> onDrag(evt) }
+fun Modifier.onDrag(listener: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
+    onDrag(listener)
 }
 
-fun Modifier.onDrop(onDrop: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
-    onDrop { evt -> onDrop(evt) }
+fun Modifier.onDrop(listener: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
+    onDrop(listener)
 }
 
 fun Modifier.onDragStart(listener: (SyntheticDragEvent) -> Unit): Modifier = attrsModifier {
@@ -121,12 +119,12 @@ fun Modifier.onDragLeave(listener: (SyntheticDragEvent) -> Unit): Modifier = att
 
 // region keyboard events
 
-fun Modifier.onKeyDown(onKeyDown: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
-    onKeyDown { evt -> onKeyDown(evt) }
+fun Modifier.onKeyDown(listener: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
+    onKeyDown(listener)
 }
 
-fun Modifier.onKeyUp(onKeyUp: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
-    onKeyUp { evt -> onKeyUp(evt) }
+fun Modifier.onKeyUp(listener: (SyntheticKeyboardEvent) -> Unit) = attrsModifier {
+    onKeyUp(listener)
 }
 
 // endregion

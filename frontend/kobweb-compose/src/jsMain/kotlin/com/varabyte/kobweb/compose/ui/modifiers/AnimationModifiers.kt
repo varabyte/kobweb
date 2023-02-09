@@ -10,14 +10,14 @@ fun Modifier.animation(vararg animations: CSSAnimation) = styleModifier {
     animation(*animations)
 }
 
-fun Modifier.onAnimationEnd(onAnimationEnd: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
-    onAnimationEnd(onAnimationEnd)
+fun Modifier.onAnimationEnd(listener: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
+    onAnimationEnd(listener)
 }
 
-fun Modifier.onAnimationIteration(onAnimationIteration: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
-    onAnimationIteration(onAnimationIteration)
+fun Modifier.onAnimationIteration(listener: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
+    onAnimationIteration(listener)
 }
 
-fun Modifier.onAnimationStart(onAnimationStart: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
-    onAnimationStart(onAnimationStart)
+fun Modifier.onAnimationStart(listener: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
+    onAnimationStart(listener)
 }

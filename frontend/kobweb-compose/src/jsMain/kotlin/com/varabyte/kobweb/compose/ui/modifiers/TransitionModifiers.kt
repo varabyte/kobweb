@@ -73,18 +73,18 @@ fun Modifier.transition(vararg transitions: CSSTransition) = styleModifier {
     transition(*transitions)
 }
 
-fun Modifier.onTransitionCancel(onTransitionCancel: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
-    onTransitionCancel(onTransitionCancel)
+fun Modifier.onTransitionCancel(listener: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
+    onTransitionCancel(listener)
 }
 
-fun Modifier.onTransitionEnd(onTransitionEnd: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
-    onTransitionEnd(onTransitionEnd)
+fun Modifier.onTransitionEnd(listener: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
+    onTransitionEnd(listener)
 }
 
-fun Modifier.onTransitionRun(onTransitionRun: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
-    onTransitionRun(onTransitionRun)
+fun Modifier.onTransitionRun(listener: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
+    onTransitionRun(listener)
 }
 
-fun Modifier.onTransitionStart(onTransitionStart: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
-    onTransitionStart(onTransitionStart)
+fun Modifier.onTransitionStart(listener: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
+    onTransitionStart(listener)
 }
