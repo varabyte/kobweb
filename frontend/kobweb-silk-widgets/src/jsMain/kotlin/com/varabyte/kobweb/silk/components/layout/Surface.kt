@@ -24,25 +24,18 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
 }
 
 /**
- * A variant which provides a smoother color animation effect for this surface and all of its children.
+ * A variant which provides a smoother color animation effect for this surface and all of its div children.
  *
  * Without applying this variant, colors will snap instantly between dark and light colors. With applying it, the
  * colors will transition smoothly.
  */
 val AnimatedColorSurfaceVariant = SurfaceStyle.addVariant("animated-color") {
-    base {
-        // Toggling color mode looks much more engaging if it animates instead of being instant
-        Modifier.transition(CSSTransition("background-color", 200.ms))
-    }
+    val backgroundColorTransition = Modifier.transition(CSSTransition("background-color", 200.ms))
 
-    // By default, the transition properties are not inherited, but we want animated colors to occur for all
-    // elements underneath this surface, not just the parent surface itself
-    cssRule(" *") {
-        Modifier.styleModifier {
-            transitionProperty(TransitionProperty.Inherit)
-            transitionDuration(TransitionDuration.Inherit)
-        }
-    }
+    base { backgroundColorTransition }
+    // It looks weird if parts of the screen snap colors while others transition smoothly. Do our best to make sure all
+    // container elements transition as well.
+    cssRule(" div") { backgroundColorTransition }
 }
 
 /**
