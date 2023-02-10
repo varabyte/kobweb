@@ -14,7 +14,7 @@ fun StyleScope.borderColor(color: CSSColorValue) {
     property("border-color", color)
 }
 
-inline fun StyleScope.borderTop(crossinline borderBuild: CSSBorder.() -> Unit) {
+fun StyleScope.borderTop(borderBuild: CSSBorder.() -> Unit) {
     property("border-top", CSSBorder().apply(borderBuild))
 }
 
@@ -30,7 +30,7 @@ fun StyleScope.borderTop(
     }
 }
 
-inline fun StyleScope.borderBottom(crossinline borderBuild: CSSBorder.() -> Unit) {
+fun StyleScope.borderBottom(borderBuild: CSSBorder.() -> Unit) {
     property("border-bottom", CSSBorder().apply(borderBuild))
 }
 
@@ -46,7 +46,7 @@ fun StyleScope.borderBottom(
     }
 }
 
-inline fun StyleScope.borderLeft(crossinline borderBuild: CSSBorder.() -> Unit) {
+fun StyleScope.borderLeft(borderBuild: CSSBorder.() -> Unit) {
     property("border-left", CSSBorder().apply(borderBuild))
 }
 
@@ -62,7 +62,7 @@ fun StyleScope.borderLeft(
     }
 }
 
-inline fun StyleScope.borderRight(crossinline borderBuild: CSSBorder.() -> Unit) {
+fun StyleScope.borderRight(borderBuild: CSSBorder.() -> Unit) {
     property("border-right", CSSBorder().apply(borderBuild))
 }
 

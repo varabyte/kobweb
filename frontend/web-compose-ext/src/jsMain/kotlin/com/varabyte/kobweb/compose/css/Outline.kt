@@ -21,7 +21,7 @@ class CSSOutline : CSSStyleValue {
     }
 }
 
-inline fun StyleScope.outline(crossinline outlineBuilder: CSSOutline.() -> Unit) {
+fun StyleScope.outline(outlineBuilder: CSSOutline.() -> Unit) {
     property("outline", CSSOutline().apply(outlineBuilder))
 }
 
