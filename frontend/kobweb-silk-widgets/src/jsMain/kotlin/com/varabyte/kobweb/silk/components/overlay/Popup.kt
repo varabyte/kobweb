@@ -100,8 +100,8 @@ fun Popup(
     val placementElement by remember { derivedStateOf { targetElement.apply(placementTarget) } }
 
     var showPopup by remember { mutableStateOf(false) }
-    val onMouseEnter: (Event) -> Unit = { showPopup = true }
-    val onMouseLeave: (Event) -> Unit = { showPopup = false }
+    val requestShowPopup: (Event) -> Unit = { showPopup = true }
+    val requestHidePopup: (Event) -> Unit = { showPopup = false }
 
     Box(
         Modifier.display(DisplayStyle.None),
@@ -112,15 +112,15 @@ fun Popup(
             // when srcElement changes (srcElement changes targetElement changes this Box changes srcElement...)
             @Suppress("NAME_SHADOWING")
             val targetElement = element.apply(target)
-            targetElement?.addEventListener("mouseenter", onMouseEnter)
-            targetElement?.addEventListener("mouseleave", onMouseLeave)
+            targetElement?.addEventListener("mouseenter", requestShowPopup)
+            targetElement?.addEventListener("mouseleave", requestHidePopup)
             if (targetElement?.matches(":hover") == true) {
                 showPopup = true
             }
 
             onDispose {
-                targetElement?.removeEventListener("mouseenter", onMouseEnter)
-                targetElement?.removeEventListener("mouseleave", onMouseLeave)
+                targetElement?.removeEventListener("mouseenter", requestShowPopup)
+                targetElement?.removeEventListener("mouseleave", requestHidePopup)
             }
         }
     )
