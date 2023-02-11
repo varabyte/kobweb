@@ -41,6 +41,7 @@ val TooltipStyle = ComponentStyle.base("silk-tooltip") {
     val palette = colorMode.toSilkPalette()
 
     Modifier
+        .position(Position.Relative) // So arrow is positioned relative to tooltip area
         .backgroundColor(palette.tooltip.background)
         .color(palette.tooltip.color)
         .borderRadius(6.px)
@@ -219,8 +220,8 @@ fun Tooltip(
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
-    Tooltip(target, TooltipTextContainerStyle.toModifier().then(modifier), placement, hasArrow, offsetPixels,  placementTarget, variant, ref) {
-        Column {
+    Tooltip(target, modifier, placement, hasArrow, offsetPixels,  placementTarget, variant, ref) {
+        Column(TooltipTextContainerStyle.toModifier()) {
             text.split("\n").forEach { line -> if (line.isNotEmpty()) SpanText(line) else Br() }
         }
     }
