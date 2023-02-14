@@ -85,7 +85,7 @@ interface SilkStylesheet {
      * ```
      * object MyStyleSheet : StyleSheet() {
      *   init {
-     *     val pulse by keyframes {
+     *     val pulse by Keyframes {
      *       from { property("transform", "translateX(-50%)")
      *       to { property("transform", "translateX(50%)")
      *     }
