@@ -102,7 +102,7 @@ class MutableSilkPalettes(
             button = MutableSilkPalette.Button(
                 default = buttonBase,
                 hover = buttonBase.darkened(byPercent = 0.2f),
-                focus = Colors.CornflowerBlue.copyf(alpha = 0.6f),
+                focus = Colors.CornflowerBlue,
                 pressed = buttonBase.darkened(byPercent = 0.4f)
             )
         )
@@ -119,7 +119,7 @@ class MutableSilkPalettes(
             button = MutableSilkPalette.Button(
                 default = buttonBase,
                 hover = buttonBase.lightened(byPercent = 0.2f),
-                focus = Colors.Cyan.copyf(alpha = 0.6f),
+                focus = Colors.LightSkyBlue,
                 pressed = buttonBase.lightened(byPercent = 0.4f)
             )
         )
