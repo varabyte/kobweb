@@ -52,6 +52,7 @@ data class SilkPalette(
     data class Button(
         val default: Color,
         val hover: Color,
+        val focus: Color,
         val pressed: Color,
     )
 
@@ -86,6 +87,7 @@ val LightSilkPalette = run {
         button = SilkPalette.Button(
             default = buttonBase,
             hover = buttonBase.darkened(byPercent = 0.2f),
+            focus = Colors.CornflowerBlue.copyf(alpha = 0.6f),
             pressed = buttonBase.darkened(byPercent = 0.4f)
         )
     )
@@ -103,6 +105,7 @@ val DarkSilkPalette = run {
         button = SilkPalette.Button(
             default = buttonBase,
             hover = buttonBase.lightened(byPercent = 0.2f),
+            focus = Colors.CornflowerBlue.copyf(alpha = 0.6f),
             pressed = buttonBase.lightened(byPercent = 0.4f)
         )
     )

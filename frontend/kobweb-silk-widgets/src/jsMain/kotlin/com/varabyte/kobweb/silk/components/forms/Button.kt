@@ -10,29 +10,12 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.borderRadius
-import com.varabyte.kobweb.compose.ui.modifiers.borderWidth
-import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.cursor
-import com.varabyte.kobweb.compose.ui.modifiers.fontSize
-import com.varabyte.kobweb.compose.ui.modifiers.lineHeight
-import com.varabyte.kobweb.compose.ui.modifiers.onClick
-import com.varabyte.kobweb.compose.ui.modifiers.outline
-import com.varabyte.kobweb.compose.ui.modifiers.padding
-import com.varabyte.kobweb.compose.ui.modifiers.tabIndex
-import com.varabyte.kobweb.compose.ui.modifiers.userSelect
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.active
+import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
-import com.varabyte.kobweb.silk.components.style.focus
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.not
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLButtonElement
@@ -53,8 +36,8 @@ val ButtonStyle = ComponentStyle("silk-button") {
             .padding(topBottom = 8.px, leftRight = 16.px)
             .borderRadius(4.px)
             .borderWidth(0.px)
-            // By default, don't use outlines to indicate focused buttons - we'll use background color instead to
-            // indicate focus
+            // For focus, we'll use a box shadow instead of an outline. Box shadow combines the general style of a
+            // border (which appears outside the button, not inside it) while also not affecting the layout.
             .outline(0.px)
             .userSelect(UserSelect.None) // No selecting text within buttons
     }
@@ -65,8 +48,8 @@ val ButtonStyle = ComponentStyle("silk-button") {
             .cursor(Cursor.Pointer)
     }
 
-    (focus + not(ariaDisabled)) {
-        Modifier.backgroundColor(buttonColors.hover)
+    (focusVisible + not(ariaDisabled)) {
+        Modifier.boxShadow(spreadRadius = 3.px, color = buttonColors.focus)
     }
 
     (active + not(ariaDisabled)) {
