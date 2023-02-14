@@ -10,103 +10,118 @@ import com.varabyte.kobweb.compose.ui.graphics.lightened
  * In order to retheme Silk widgets, you can always override their styles, but changing the palette is perhaps an easier
  * way to affect all Silk widgets globally with minimal effort. Of course, it can make sense to do both -- modify the
  * palette to match your own branding while overriding themes for one-off widget adjustments.
- *
- * @param background Color used for the background of HTML elements on this page
- * @param color Color used for the foreground (e.g. text) of HTML elements on this page
- * @param link Colors related to Silk links. See also: [Link]
- * @param button Colors related to Silk buttons. See also: [Button]
- * @param border Color used for Silk borders, i.e. lines drawn around or between elements
  */
-data class SilkPalette(
-    val background: Color,
-    val color: Color,
-    val link: Link,
-    val button: Button,
-    val border: Color = color,
+interface SilkPalette {
+    /** Color used for the background of HTML elements on this page. */
+    val background: Color
+    /** Color used for the foreground (e.g. text) of HTML elements on this page. */
+    val color: Color
+    val link: Link
+    val button: Button
+    /** Color used for Silk borders, i.e. lines drawn around or between elements. */
+    val border: Color
+    val overlay: Color
+    val tooltip: Tooltip
+
+    interface Link {
+        /** Color used for links that the user has never clicked on before. */
+        val default: Color
+        /** Color used for links that have been visited before. */
+        val visited: Color
+    }
+
+    interface Button {
+        /** Color used for buttons in a normal state. */
+        val default: Color
+        /** Color used for buttons when the mouse is over the button (but not clicked). */
+        val hover: Color
+        /** Color used for the outline of buttons that have been focused on (e.g. by keyboard nav). */
+        val focus: Color
+        /** Color used for buttons when they are being depressed by the user. */
+        val pressed: Color
+    }
+
+    interface Tooltip {
+        val background: Color
+        val color: Color
+    }
+}
+
+class MutableSilkPalette(
+    override var background: Color,
+    override var color: Color,
+    override var link: Link,
+    override var button: Button,
+    override var border: Color = color,
     // Intentionally invert backdrop from normal background
-    val overlay: Color = color.toRgb().copyf(alpha = 0.5f),
-    val tooltip: Tooltip = Tooltip(
+    override var overlay: Color = color.toRgb().copyf(alpha = 0.5f),
+    override var tooltip: Tooltip = Tooltip(
         // Intentionally inversed from main colors, for contrast.
         background = color,
         color = background,
-    )
-) {
-    /**
-     * Silk link related colors.
-     *
-     * @param default Color used for links that the user has never clicked on before.
-     * @param visited Color used for links that have been visited before.
-     */
-    data class Link(
-        val default: Color,
-        val visited: Color,
-    )
+    ),
+) : SilkPalette {
+    class Link(
+        override var default: Color,
+        override var visited: Color,
+    ) : SilkPalette.Link
 
-    /**
-     * Silk button related colors.
-     *
-     * @param default Color used for buttons in a normal state
-     * @param hover Color used for buttons when the mouse is over the button (but not clicked)
-     * @param pressed Color used for buttons when they are being depressed by the user.
-     */
-    data class Button(
-        val default: Color,
-        val hover: Color,
-        val focus: Color,
-        val pressed: Color,
-    )
+    class Button(
+        override var default: Color,
+        override var hover: Color,
+        override var focus: Color,
+        override var pressed: Color,
+    ) : SilkPalette.Button
 
-    /**
-     * Silk tooltip related colors.
-     */
-    data class Tooltip(
-        val background: Color,
-        val color: Color,
-    )
+    class Tooltip(
+        override var background: Color,
+        override var color: Color,
+    ) : SilkPalette.Tooltip
 }
 
-data class SilkPalettes(
-    val light: SilkPalette,
-    val dark: SilkPalette,
-) {
+interface SilkPalettes {
+    val light: SilkPalette
+    val dark: SilkPalette
+
     operator fun get(colorMode: ColorMode) = when (colorMode) {
         ColorMode.LIGHT -> light
         ColorMode.DARK -> dark
     }
 }
 
-val LightSilkPalette = run {
-    val buttonBase = Colors.White.darkened(byPercent = 0.2f)
-    SilkPalette(
-        background = Colors.White,
-        color = Colors.Black,
-        link = SilkPalette.Link(
-            default = Colors.Blue,
-            visited = Colors.Purple,
-        ),
-        button = SilkPalette.Button(
-            default = buttonBase,
-            hover = buttonBase.darkened(byPercent = 0.2f),
-            focus = Colors.CornflowerBlue.copyf(alpha = 0.6f),
-            pressed = buttonBase.darkened(byPercent = 0.4f)
+class MutableSilkPalettes(
+    override val light: MutableSilkPalette = run {
+        val buttonBase = Colors.White.darkened(byPercent = 0.2f)
+        MutableSilkPalette(
+            background = Colors.White,
+            color = Colors.Black,
+            link = MutableSilkPalette.Link(
+                default = Colors.Blue,
+                visited = Colors.Purple,
+            ),
+            button = MutableSilkPalette.Button(
+                default = buttonBase,
+                hover = buttonBase.darkened(byPercent = 0.2f),
+                focus = Colors.CornflowerBlue.copyf(alpha = 0.6f),
+                pressed = buttonBase.darkened(byPercent = 0.4f)
+            )
         )
-    )
-}
-
-val DarkSilkPalette = run {
-    val buttonBase = Colors.Black.lightened(byPercent = 0.2f)
-    SilkPalette(
-        background = Colors.Black,
-        color = Colors.White,
-        link = SilkPalette.Link(
-            default = Colors.Cyan,
-            visited = Colors.Violet,
-        ),
-        button = SilkPalette.Button(
-            default = buttonBase,
-            hover = buttonBase.lightened(byPercent = 0.2f),
-            focus = Colors.CornflowerBlue.copyf(alpha = 0.6f),
-            pressed = buttonBase.lightened(byPercent = 0.4f)
+    },
+    override val dark: MutableSilkPalette = run {
+        val buttonBase = Colors.Black.lightened(byPercent = 0.2f)
+        MutableSilkPalette(
+            background = Colors.Black,
+            color = Colors.White,
+            link = MutableSilkPalette.Link(
+                default = Colors.Cyan,
+                visited = Colors.Violet,
+            ),
+            button = MutableSilkPalette.Button(
+                default = buttonBase,
+                hover = buttonBase.lightened(byPercent = 0.2f),
+                focus = Colors.Cyan.copyf(alpha = 0.6f),
+                pressed = buttonBase.lightened(byPercent = 0.4f)
+            )
         )
-    )
-}
+    }
+) : SilkPalettes

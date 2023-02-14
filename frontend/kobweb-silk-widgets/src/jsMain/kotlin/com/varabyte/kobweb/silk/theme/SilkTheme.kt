@@ -11,12 +11,7 @@ import com.varabyte.kobweb.silk.components.style.ImmutableComponentStyle
 import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.DarkSilkPalette
-import com.varabyte.kobweb.silk.theme.colors.LightSilkPalette
-import com.varabyte.kobweb.silk.theme.colors.SilkPalette
-import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
-import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import com.varabyte.kobweb.silk.theme.colors.*
 import org.jetbrains.compose.web.css.*
 
 // TODO(#168): Remove in v1.0
@@ -50,7 +45,7 @@ class MutableSilkTheme {
     internal val componentVariants = mutableMapOf<String, ComponentVariant>()
     internal val overiddenVariants = mutableSetOf<String>()
 
-    var palettes = SilkPalettes(LightSilkPalette, DarkSilkPalette)
+    var palettes = MutableSilkPalettes()
 
     var breakpoints: BreakpointValues<CSSUnitValue> = BreakpointSizes(
         30.cssRem,
