@@ -70,6 +70,10 @@ fun StyleScope.boxShadow(
         }
 
         if (spreadRadius != null) {
+            if (blurRadius == null) {
+                append(' ')
+                append('0')
+            }
             append(' ')
             append(spreadRadius)
         }
