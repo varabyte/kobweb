@@ -1,5 +1,5 @@
 [versions]
-playwright="1.28.1"
+playwright="1.30.0"
 commonmark = "0.18.0"
 compose = "1.2.2"
 freemarker = "2.3.31"
