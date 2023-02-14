@@ -20,6 +20,7 @@ import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.shapes.Circle
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
+import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 
 val NavHeaderStyle by ComponentStyle.base {
@@ -43,7 +44,7 @@ val NavLinkVariant by LinkStyle.addVariant {
 }
 
 val NavButtonVariant by NavItemStyle.addVariant {
-    base { Modifier.padding(0.px).clip(Circle()) }
+    base { Modifier.padding(0.px).borderRadius(50.percent) }
 }
 
 @Composable
