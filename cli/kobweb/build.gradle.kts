@@ -1,5 +1,6 @@
 import org.jreleaser.model.Active
 
+@Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
