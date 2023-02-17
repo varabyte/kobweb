@@ -1028,6 +1028,177 @@ Box(
 )
 ```
 
+### CSS Variables
+
+Kobweb supports CSS variables (also called CSS custom properties), which is a feature where you can store and retrieve
+property values from variables declared within your CSS styles.
+
+***Note:** You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties),
+and you can read about [Compose for Web support here](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Style_Dsl#css-variables).*
+
+Using variables is fairly simple. You first declare one without a value (but lock it down to a type), and later you can
+set the variable using `Modifier.setVariable(...)` and reference it using the `CSSVariable.value()` method.
+
+You set a variable within the scope of some element, at which point it can be referenced by that element or any of its
+children. Therefore, CSS variables are only allowed to be set within a style block.
+
+Below, we declare a background color, create a root container scope which sets it, a child style that uses it,
+and, finally, a child style variant that overrides it:
+
+```kotlin
+val bgColor by variable<CSSColor>()
+
+val ContainerStyle by ComponentStyle {
+    base { Modifier.setVariable(bgColor, Colors.Blue) }
+}
+val SquareStyle by ComponentStyle {
+    base { Modifier.size(100.px).backgroundColor(bgColor.value()) }
+}
+val RedSquareVariant by SquareStyle.addVariant {
+    base { Modifier.setVariable(bgColor, Colors.Red) }
+}
+```
+
+The following code brings the above styles together (and in some cases uses inline styles to override the background
+color further):
+
+```kotlin
+@Composable
+fun ColoredSquares() {
+    Box(ContainerStyle.toModifier()) {
+        Column {
+            Row {
+                // 1: Read color from ancestor's component style
+                Box(SquareStyle.toModifier())
+                // 2: Override color via variant
+                Box(SquareStyle.toModifier(RedSquareVariant))
+            }
+            Row {
+                // 3: Override color via inline styles
+                Box(SquareStyle.toModifier().setVariable(bgColor, Colors.Green))
+                Span(Modifier.setVariable(bgColor, Colors.Yellow).toAttrs()) {
+                    // 4: Read color from parent's inline style
+                    Box(SquareStyle.toModifier())
+                }
+            }
+        }
+    }
+}
+```
+
+The above renders the following output:
+
+![Kobweb CSS Variables, Squares example](https://github.com/varabyte/media/raw/main/kobweb/images/kobweb-variable-squares-example.png)
+
+---
+
+You can also set CSS variables directly from code, if you have access to the backing HTML element. Below, we use the
+`ref` callback to get the backing element for a fullscreen `Box` and then use a `Button` to set it to a random color
+from the colors of the rainbow:
+
+```kotlin
+val bgColor by variable<CSSColorValue>()
+
+val ScreenStyle by ComponentStyle {
+    base {
+        Modifier.fillMaxSize().backgroundColor(
+            // We specify `Red` as a fallback here, since the variable
+            // won't otherwise be set when the UI first renders.
+            bgColor.value(Colors.Red)
+        )
+    }
+}
+
+@Page
+@Composable
+fun RainbowBackground() {
+    val roygbiv = listOf(Colors.Red, /*...*/ Colors.Violet)
+
+    var screenElement: HTMLElement? by remember { mutableStateOf(null) }
+    Box(ScreenStyle.toModifier(), ref = ref { screenElement = it }) {
+        Button(onClick = {
+            // We have the backing HTML element, so use setProperty to set the variable value directly
+            screenElement!!.style.setProperty("--bgColor", roygbiv.random().toString())
+        }) {
+            Text("Click me")
+        }
+    }
+}
+```
+
+The above results in the following UI:
+
+![Kobweb CSS Variables, Rainbow example](https://github.com/varabyte/media/raw/main/kobweb/screencasts/kobweb-variable-roygbiv-example.gif)
+
+#### In most cases, don't use CSS Variables
+
+Most of the time, you can actually get away with not using CSS Variables! Your Kotlin code is often a more natural place
+to describe dynamic behavior than HTML / CSS is.
+
+Let's revisit the "colored squares" example from above. Note it's much easier to read if we don't try to use variables
+at all.
+
+```kotlin
+val SquareStyle by ComponentStyle {
+    base { Modifier.size(100.px) }
+}
+
+@Composable
+fun ColoredSquares() {
+    Column {
+        Row {
+            Box(SquareStyle.toModifier().backgroundColor(Colors.Blue))
+            Box(SquareStyle.toModifier().backgroundColor(Colors.Red))
+        }
+        Row {
+            Box(SquareStyle.toModifier().backgroundColor(Colors.Green))
+            Box(SquareStyle.toModifier().backgroundColor(Colors.Yellow))
+        }
+    }
+}
+```
+
+And the "rainbow background" example is similarly easier to read by using Kotlin variables
+(i.e. `var someValue by remember { mutableStateOf(...) }`) instead of CSS variables:
+
+```kotlin
+val ScreenStyle by ComponentStyle {
+    base { Modifier.fillMaxSize() }
+}
+
+@Page
+@Composable
+fun RainbowBackground() {
+    val roygbiv = listOf(Colors.Red, /*...*/ Colors.Violet)
+
+    var currColor by remember { mutableStateOf(Colors.Red) }
+    Box(ScreenStyle.toModifier().backgroundColor(currColor)) {
+        Button(onClick = { currColor = roygbiv.random() }) {
+            Text("Click me")
+        }
+    }
+}
+```
+
+Even though you should rarely need CSS variables, there may be occasions where they can be a useful tool in your
+toolbox. The above examples were artificial examples used as a way to show off CSS variables in relatively isolated
+environments. But here are some situations that might benefit from CSS variables:
+
+* You have a site which allows users to choose from a list of several themes (e.g. primary and secondary colors). It
+  would be trivial enough to add CSS variables for `themePrimary` and `themeSecondary` (applied at the site's root)
+  which you can then reference throughout your styles.
+* You want to create a widget which dynamically changes its behavior based on the context it is added within. For
+  example, maybe your site has a dark area and a light area, and the widget should use white outlines in the dark area
+  and black outlines in the light. This can be accomplished by exposing an outline color variable, which each area of
+  your site is responsible for setting.
+* You have a widget that you ended up creating a bunch of variants for, but instead you realize you could replace them
+  all with one or two CSS variables.
+
+When in doubt, however, lean on Kotlin for handling dynamic behavior. If you want to share common style settings across
+multiple component styles, just declare a `Modifier` instance somewhere and share *that* in each style. If you
+want behavior to change based on some event, prefer using inline styles instead of hiding the logic inside component
+styles.
+
 ### Font Awesome
 
 Kobweb provides the `kobweb-silk-icons-fa` artifact which you can use in your project if you want access to all the free
