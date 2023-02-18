@@ -1,11 +1,14 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSFilter
+import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.StyleScope
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
 // See also: CSSFilter
-class Filter private constructor(val value: String) {
+class Filter private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val None = Filter("none")
@@ -23,7 +26,7 @@ class Filter private constructor(val value: String) {
 typealias BackdropFilter = Filter
 
 fun StyleScope.backdropFilter(backdropFilter: BackdropFilter) {
-    property("backdrop-filter", backdropFilter.value)
+    property("backdrop-filter", backdropFilter)
 }
 
 fun StyleScope.backdropFilter(vararg filters: CSSFilter) {
@@ -33,7 +36,7 @@ fun StyleScope.backdropFilter(vararg filters: CSSFilter) {
 }
 
 fun StyleScope.filter(filter: Filter) {
-    property("filter", filter.value)
+    property("filter", filter)
 }
 
 fun StyleScope.filter(vararg filters: CSSFilter) {

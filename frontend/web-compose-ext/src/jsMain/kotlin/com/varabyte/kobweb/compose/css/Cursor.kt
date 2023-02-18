@@ -3,7 +3,9 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
-class Cursor private constructor(val value: String) {
+class Cursor private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // General
         val Auto get() = Cursor("auto")
@@ -56,5 +58,5 @@ class Cursor private constructor(val value: String) {
 }
 
 fun StyleScope.cursor(cursor: Cursor) {
-    property("cursor", cursor.value)
+    property("cursor", cursor)
 }

@@ -5,7 +5,9 @@ import org.jetbrains.compose.web.css.*
 
 // region width See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
 
-class Width private constructor(val value: String) {
+class Width private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val FitContent = Width("fit-content")
@@ -27,18 +29,20 @@ fun AttrsScope<*>.width(width: CSSNumeric) {
 }
 
 fun StyleScope.width(width: Width) {
-    property("width", width.value)
+    property("width", width)
 }
 
 fun StyleScope.minWidth(minWidth: MinWidth) {
-    property("min-width", minWidth.value)
+    property("min-width", minWidth)
 }
 
 // endregion
 
 // region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 
-class Height private constructor(val value: String) {
+class Height private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val FitContent = Height("fit-content")
@@ -60,18 +64,20 @@ fun AttrsScope<*>.height(height: CSSNumeric) {
 }
 
 fun StyleScope.height(height: Height) {
-    property("height", height.value)
+    property("height", height)
 }
 
 fun StyleScope.minHeight(minHeight: MinHeight) {
-    property("min-height", minHeight.value)
+    property("min-height", minHeight)
 }
 
 // endregion
 
 // region max-width See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
 
-class MaxWidth private constructor(val value: String) {
+class MaxWidth private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val FitContent = MaxWidth("fit-content")
@@ -89,14 +95,16 @@ class MaxWidth private constructor(val value: String) {
 }
 
 fun StyleScope.maxWidth(maxWidth: MaxWidth) {
-    property("max-width", maxWidth.value)
+    property("max-width", maxWidth)
 }
 
 // endregion
 
 // region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 
-class MaxHeight private constructor(val value: String) {
+class MaxHeight private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val FitContent = MaxHeight("fit-content")
@@ -114,7 +122,7 @@ class MaxHeight private constructor(val value: String) {
 }
 
 fun StyleScope.maxHeight(maxHeight: MaxHeight) {
-    property("max-height", maxHeight.value)
+    property("max-height", maxHeight)
 }
 
 // endregion
@@ -185,7 +193,9 @@ fun StyleScope.marginBlockEnd(value: CSSNumeric) {
 
 // region vertical-align See: https://developer.mozilla.org/en-US/docs/Web/CSS/vertical-align
 
-class VerticalAlign private constructor(val value: String) {
+class VerticalAlign private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Baseline get() = VerticalAlign("baseline")
@@ -206,7 +216,7 @@ class VerticalAlign private constructor(val value: String) {
 }
 
 fun StyleScope.verticalAlign(verticalAlign: VerticalAlign) {
-    property("vertical-align", verticalAlign.value)
+    property("vertical-align", verticalAlign)
 }
 
 fun StyleScope.verticalAlign(value: CSSNumeric) {

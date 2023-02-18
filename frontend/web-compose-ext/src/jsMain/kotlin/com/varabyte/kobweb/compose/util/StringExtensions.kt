@@ -1,7 +1,7 @@
-package com.varabyte.kobweb.silk.util
+package com.varabyte.kobweb.compose.util
 
 // e.g. "ExampleText" to "example-text"
-internal fun String.titleCamelCaseToKebabCase(): String {
+fun String.titleCamelCaseToKebabCase(): String {
     require(this.isNotBlank())
 
     val currentWord = StringBuilder()

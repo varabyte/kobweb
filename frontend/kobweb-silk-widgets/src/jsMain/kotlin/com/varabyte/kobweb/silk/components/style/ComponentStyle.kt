@@ -7,6 +7,7 @@ import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -14,7 +15,6 @@ import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
-import com.varabyte.kobweb.silk.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element

@@ -38,7 +38,9 @@ fun StyleScope.outline(
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color
-class OutlineColor private constructor(val value: String) {
+class OutlineColor private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Invert get() = OutlineColor("invert")
@@ -53,7 +55,7 @@ class OutlineColor private constructor(val value: String) {
 }
 
 fun StyleScope.outlineColor(outlineColor: OutlineColor) {
-    property("outline-color", outlineColor.value)
+    property("outline-color", outlineColor)
 }
 
 fun StyleScope.outlineColor(value: CSSColorValue) {
@@ -71,7 +73,9 @@ fun StyleScope.outlineStyle(value: LineStyle) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
-class OutlineWidth private constructor(val value: String) {
+class OutlineWidth private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Thin get() = OutlineWidth("thin")
@@ -87,7 +91,7 @@ class OutlineWidth private constructor(val value: String) {
 }
 
 fun StyleScope.outlineWidth(outlineWidth: OutlineWidth) {
-    property("outline-width", outlineWidth.value)
+    property("outline-width", outlineWidth)
 }
 
 fun StyleScope.outlineWidth(value: CSSLengthValue) {

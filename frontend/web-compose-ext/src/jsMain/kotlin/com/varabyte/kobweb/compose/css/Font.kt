@@ -6,7 +6,9 @@ fun StyleScope.fontFamily(value: String) {
     property("font-family", value)
 }
 
-class FontStyle private constructor(val value: String) {
+class FontStyle private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Normal get() = FontStyle("normal")
@@ -24,10 +26,12 @@ class FontStyle private constructor(val value: String) {
 }
 
 fun StyleScope.fontStyle(style: FontStyle) {
-    property("font-style", style.value)
+    property("font-style", style)
 }
 
-class FontWeight private constructor(val value: String) {
+class FontWeight private constructor(private val value: String): CSSStyleValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Normal get() = FontWeight("normal")
@@ -47,5 +51,5 @@ class FontWeight private constructor(val value: String) {
 }
 
 fun StyleScope.fontWeight(weight: FontWeight) {
-    property("font-weight", weight.value)
+    property("font-weight", weight)
 }

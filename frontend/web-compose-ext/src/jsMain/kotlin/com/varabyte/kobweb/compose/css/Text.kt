@@ -2,7 +2,9 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class TextAlign private constructor(val value: String) {
+class TextAlign private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         val Left get() = TextAlign("left")
         val Right get() = TextAlign("right")
@@ -16,10 +18,12 @@ class TextAlign private constructor(val value: String) {
 }
 
 fun StyleScope.textAlign(textAlign: TextAlign) {
-    property("text-align", textAlign.value)
+    property("text-align", textAlign)
 }
 
-class TextDecorationLine private constructor(val value: String) {
+class TextDecorationLine private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         val Underline get() = TextDecorationLine("underline")
         val Overline get() = TextDecorationLine("overline")
@@ -34,11 +38,13 @@ class TextDecorationLine private constructor(val value: String) {
 }
 
 fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine) {
-    property("text-decoration-line", textDecorationLines.joinToString(" ") { it.value })
+    property("text-decoration-line", textDecorationLines.joinToString(" "))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
-class UserSelect private constructor(val value: String) {
+class UserSelect private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val None get() = UserSelect("none")
@@ -57,11 +63,13 @@ class UserSelect private constructor(val value: String) {
 }
 
 fun StyleScope.userSelect(userSelect: UserSelect) {
-    property("user-select", userSelect.value)
+    property("user-select", userSelect)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
-class WhiteSpace private constructor(val value: String) {
+class WhiteSpace private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         val Normal get() = WhiteSpace("normal");
         val NoWrap get() = WhiteSpace("nowrap");
@@ -78,11 +86,13 @@ class WhiteSpace private constructor(val value: String) {
 }
 
 fun StyleScope.whiteSpace(whiteSpace: WhiteSpace) {
-    property("white-space", whiteSpace.value)
+    property("white-space", whiteSpace)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode
-class WritingMode private constructor(val value: String) {
+class WritingMode private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     // Keyword
     val HorizontalTb get() = WritingMode("horizontal-tb");
     val VerticalRl get() = WritingMode("vertical-rl");
@@ -96,5 +106,5 @@ class WritingMode private constructor(val value: String) {
 }
 
 fun StyleScope.writingMode(writingMode: WritingMode) {
-    property("writing-mode", writingMode.value)
+    property("writing-mode", writingMode)
 }

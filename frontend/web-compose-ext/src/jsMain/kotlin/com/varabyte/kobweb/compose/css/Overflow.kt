@@ -3,7 +3,9 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
-class Overflow private constructor(val value: String) {
+class Overflow private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // General
         val Visible get() = Overflow("visible")
@@ -21,7 +23,9 @@ class Overflow private constructor(val value: String) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
-class OverflowWrap private constructor(val value: String) {
+class OverflowWrap private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // General
         val Normal get() = OverflowWrap("normal")
@@ -37,17 +41,17 @@ class OverflowWrap private constructor(val value: String) {
 }
 
 fun StyleScope.overflow(vararg overflows: Overflow) {
-    property("overflow", overflows.joinToString(" ") { it.value })
+    property("overflow", overflows.joinToString(" "))
 }
 
 fun StyleScope.overflowX(overflowX: Overflow) {
-    property("overflow-x", overflowX.value)
+    property("overflow-x", overflowX)
 }
 
 fun StyleScope.overflowY(overflowY: Overflow) {
-    property("overflow-y", overflowY.value)
+    property("overflow-y", overflowY)
 }
 
 fun StyleScope.overflowWrap(overflowWrap: OverflowWrap) {
-    property("overflow-wrap", overflowWrap.value)
+    property("overflow-wrap", overflowWrap)
 }

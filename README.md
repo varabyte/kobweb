@@ -1031,10 +1031,9 @@ Box(
 ### CSS Variables
 
 Kobweb supports CSS variables (also called CSS custom properties), which is a feature where you can store and retrieve
-property values from variables declared within your CSS styles.
+property values from variables declared within your CSS styles. It does this through a class called `StyleVariable`.
 
-***Note:** You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties),
-and you can read about [Compose for Web support here](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Style_Dsl#css-variables).*
+***Note:** You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).*
 
 Using variables is fairly simple. You first declare one without a value (but lock it down to a type), and later you can
 set the variable using `Modifier.setVariable(...)` and reference it using the `CSSVariable.value()` method.
@@ -1046,7 +1045,7 @@ Below, we declare a background color, create a root container scope which sets i
 and, finally, a child style variant that overrides it:
 
 ```kotlin
-val bgColor by variable<CSSColor>()
+val bgColor by StyleVariable<CSSColorValue>()
 
 val ContainerStyle by ComponentStyle {
     base { Modifier.setVariable(bgColor, Colors.Blue) }
@@ -1097,7 +1096,7 @@ You can also set CSS variables directly from code, if you have access to the bac
 from the colors of the rainbow:
 
 ```kotlin
-val bgColor by variable<CSSColorValue>()
+val bgColor by StyleVariable<CSSColorValue>()
 
 val ScreenStyle by ComponentStyle {
     base {

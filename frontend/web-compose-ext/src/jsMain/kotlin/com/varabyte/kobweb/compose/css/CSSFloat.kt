@@ -9,7 +9,9 @@ import org.jetbrains.compose.web.css.*
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/CSS/float
  */
-class CSSFloat private constructor(val value: String) {
+class CSSFloat private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Left get() = CSSFloat("left")
@@ -28,5 +30,5 @@ class CSSFloat private constructor(val value: String) {
 }
 
 fun StyleScope.float(float: CSSFloat) {
-    property("float", float.value)
+    property("float", float)
 }

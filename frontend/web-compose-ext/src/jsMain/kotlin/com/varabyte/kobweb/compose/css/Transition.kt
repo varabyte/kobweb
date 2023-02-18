@@ -5,7 +5,9 @@ import org.jetbrains.compose.web.css.*
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
-class TransitionProperty private constructor(val value: String) {
+class TransitionProperty private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Custom
         fun of(customValue: String) = TransitionProperty(customValue)
@@ -24,7 +26,7 @@ class TransitionProperty private constructor(val value: String) {
 }
 
 fun StyleScope.transitionProperty(property: TransitionProperty) {
-    transitionProperty(property.value)
+    transitionProperty(property.toString())
 }
 
 fun StyleScope.transitionProperty(vararg properties: String) {
@@ -35,7 +37,9 @@ fun StyleScope.transitionProperty(vararg properties: String) {
 /**
  * Special values for Transition Duration Property.
  */
-class TransitionDuration private constructor(val value: String) {
+class TransitionDuration private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Global values
         val Inherit get() = TransitionDuration("inherit")
@@ -46,7 +50,7 @@ class TransitionDuration private constructor(val value: String) {
 }
 
 fun StyleScope.transitionDuration(duration: TransitionDuration) {
-    property("transition-duration", duration.value)
+    property("transition-duration", duration)
 }
 
 fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>) {
@@ -57,7 +61,9 @@ fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>
 /**
  * Special values for Transition Delay Property.
  */
-class TransitionDelay private constructor(val value: String) {
+class TransitionDelay private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Global values
         val Inherit get() = TransitionDelay("inherit")
@@ -74,7 +80,7 @@ fun StyleScope.transitionDelay(vararg delay: CSSSizeValue<out CSSUnitTime>) {
 }
 
 fun StyleScope.transitionDelay(delay: TransitionDelay) {
-    property("transition-delay", delay.value)
+    property("transition-delay", delay)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
@@ -133,7 +139,7 @@ data class CSSTransition(
     ) : this(TransitionProperty.of(property), duration, timingFunction, delay)
 
     override fun toString() = buildList {
-        add(property.value)
+        add(property.toString())
         // https://developer.mozilla.org/en-US/docs/Web/CSS/animation#syntax
         duration?.let { add(it.toString()) }
         timingFunction?.let { add(it.toString()) }

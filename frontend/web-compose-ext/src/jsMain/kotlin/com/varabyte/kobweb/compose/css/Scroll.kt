@@ -2,7 +2,9 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class ScrollBehavior private constructor(val value: String) {
+class ScrollBehavior private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Auto get() = ScrollBehavior("auto")
@@ -17,12 +19,14 @@ class ScrollBehavior private constructor(val value: String) {
 }
 
 fun StyleScope.scrollBehavior(scrollBehavior: ScrollBehavior) {
-    property("scroll-behavior", scrollBehavior.value)
+    property("scroll-behavior", scrollBehavior)
 }
 
 // region Scroll snap
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-type
-class ScrollSnapType private constructor(val value: String) {
+class ScrollSnapType private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val None get() = ScrollSnapType("none")
@@ -34,7 +38,9 @@ class ScrollSnapType private constructor(val value: String) {
     }
 }
 
-class ScrollSnapAxis private constructor(val value: String) {
+class ScrollSnapAxis private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val X get() = ScrollSnapAxis("x")
@@ -45,7 +51,9 @@ class ScrollSnapAxis private constructor(val value: String) {
     }
 }
 
-class ScrollSnapMode private constructor(val value: String) {
+class ScrollSnapMode private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Mandatory get() = ScrollSnapMode("mandatory")
@@ -54,11 +62,17 @@ class ScrollSnapMode private constructor(val value: String) {
 }
 
 fun StyleScope.scrollSnapType(type: ScrollSnapType) {
-    property("scroll-snap-type", type.value)
+    property("scroll-snap-type", type)
 }
 
 fun StyleScope.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = null) {
-    val value = if (mode == null) axis.value else "${axis.value} ${mode.value}"
+    val value = buildString {
+        append(axis.toString())
+        if (mode != null) {
+            append(' ')
+            append(mode.toString())
+        }
+    }
     property("scroll-snap-type", value)
 }
 // endregion
@@ -123,7 +137,7 @@ fun StyleScope.scrollPaddingBlockEnd(value: CSSNumeric) {
 // region Scroll snap align
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-align
-class ScrollSnapAlign private constructor(val value: String) {
+class ScrollSnapAlign private constructor(private val value: String): StylePropertyValue {
     companion object {
         // Keyword
         val None get() = ScrollSnapAlign("none")
@@ -152,7 +166,9 @@ fun StyleScope.scrollSnapAlign(blockAxis: ScrollSnapAlign, inlineAxis: ScrollSna
 // region Scroll snap stop
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-stop
-class ScrollSnapStop private constructor(val value: String) {
+class ScrollSnapStop private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val Normal get() = ScrollSnapStop("normal")
@@ -166,7 +182,7 @@ class ScrollSnapStop private constructor(val value: String) {
 }
 
 fun StyleScope.scrollSnapStop(scrollSnapStop: ScrollSnapStop) {
-    property("scroll-snap-stop", scrollSnapStop.value)
+    property("scroll-snap-stop", scrollSnapStop)
 }
 
 // endregion

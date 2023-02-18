@@ -1,16 +1,15 @@
 package com.varabyte.kobweb.silk.components.animation
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.AnimationIterationCount
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.CSSAnimation
-import com.varabyte.kobweb.compose.css.ComparableStyleScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
-import com.varabyte.kobweb.silk.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 import kotlin.reflect.KProperty
 

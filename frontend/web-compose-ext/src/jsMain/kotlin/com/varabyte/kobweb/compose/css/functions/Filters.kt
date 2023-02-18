@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css.functions
 
 import org.jetbrains.compose.web.css.*
 
-class CSSFilter internal constructor(private val value: String) {
+class CSSFilter internal constructor(private val value: String): CSSStyleValue {
     override fun toString() = value
 }
 

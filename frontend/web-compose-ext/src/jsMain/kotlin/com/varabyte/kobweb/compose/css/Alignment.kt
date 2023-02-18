@@ -39,7 +39,7 @@ private fun BaselineSet?.toValue(): String {
     }
 }
 
-private fun OverflowStrategy.toValue(position: String) = "${name.lowercase()} $position"
+private fun OverflowStrategy.toValue(position: StylePropertyValue) = "${name.lowercase()} $position"
 
 // endregion
 
@@ -52,12 +52,14 @@ private fun OverflowStrategy.toValue(position: String) = "${name.lowercase()} $p
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
-sealed class AlignContent private constructor(val value: String) {
+sealed class AlignContent private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     open class AlignContentKeyword(value: String) : AlignContent(value)
     class AlignContentPosition(value: String) : AlignContentKeyword(value)
 
     class BaselineAlignment(baselineSet: BaselineSet?) : AlignContent(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: AlignContentPosition) : AlignContent(strategy.toValue(position.value))
+    class OverflowAlignment(strategy: OverflowStrategy, position: AlignContentPosition) : AlignContent(strategy.toValue(position))
 
     companion object {
         // Basic
@@ -95,7 +97,7 @@ sealed class AlignContent private constructor(val value: String) {
 }
 
 fun StyleScope.alignContent(alignContent: AlignContent) {
-    property("align-content", alignContent.value)
+    property("align-content", alignContent)
 }
 
 // endregion
@@ -109,12 +111,14 @@ fun StyleScope.alignContent(alignContent: AlignContent) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
-sealed class AlignItems private constructor(val value: String) {
+sealed class AlignItems private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     open class AlignItemsKeyword(value: String) : AlignItems(value)
     class AlignItemsPosition(value: String) : AlignItemsKeyword(value)
 
     class BaselineAlignment(baselineSet: BaselineSet?) : AlignItems(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: AlignItemsPosition) : AlignItems(strategy.toValue(position.value))
+    class OverflowAlignment(strategy: OverflowStrategy, position: AlignItemsPosition) : AlignItems(strategy.toValue(position))
 
     companion object {
         // Basic
@@ -149,7 +153,7 @@ sealed class AlignItems private constructor(val value: String) {
 }
 
 fun StyleScope.alignItems(alignItems: AlignItems) {
-    property("align-items", alignItems.value)
+    property("align-items", alignItems)
 }
 
 // endregion
@@ -163,12 +167,14 @@ fun StyleScope.alignItems(alignItems: AlignItems) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-self
-sealed class AlignSelf private constructor(val value: String) {
+sealed class AlignSelf private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     open class AlignSelfKeyword(value: String) : AlignSelf(value)
     class AlignSelfPosition(value: String) : AlignSelfKeyword(value)
 
     class BaselineAlignment(baselineSet: BaselineSet?) : AlignSelf(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: AlignSelfPosition) : AlignSelf(strategy.toValue(position.value))
+    class OverflowAlignment(strategy: OverflowStrategy, position: AlignSelfPosition) : AlignSelf(strategy.toValue(position))
 
     companion object {
         // Basic
@@ -204,7 +210,7 @@ sealed class AlignSelf private constructor(val value: String) {
 }
 
 fun StyleScope.alignSelf(alignSelf: AlignSelf) {
-    property("align-self", alignSelf.value)
+    property("align-self", alignSelf)
 }
 
 // endregion
@@ -219,11 +225,13 @@ fun StyleScope.alignSelf(alignSelf: AlignSelf) {
  * it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content
-sealed class JustifyContent private constructor(val value: String) {
+sealed class JustifyContent private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     open class JustifyContentKeyword(value: String) : JustifyContent(value)
     class JustifyContentPosition(value: String) : JustifyContentKeyword(value)
 
-    class OverflowAlignment(strategy: OverflowStrategy, position: JustifyContentPosition) : JustifyContent(strategy.toValue(position.value))
+    class OverflowAlignment(strategy: OverflowStrategy, position: JustifyContentPosition) : JustifyContent(strategy.toValue(position))
 
     companion object {
         // Basic
@@ -254,7 +262,7 @@ sealed class JustifyContent private constructor(val value: String) {
 }
 
 fun StyleScope.justifyContent(justifyContent: JustifyContent) {
-    property("justify-content", justifyContent.value)
+    property("justify-content", justifyContent)
 }
 
 // endregion
@@ -268,12 +276,14 @@ fun StyleScope.justifyContent(justifyContent: JustifyContent) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
-sealed class JustifyItems private constructor(val value: String) {
+sealed class JustifyItems private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     open class JustifyItemsKeyword(value: String) : JustifyItems(value)
     class JustifyItemsPosition(value: String) : JustifyItemsKeyword(value)
 
     class BaselineAlignment(baselineSet: BaselineSet?) : JustifyItems(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: JustifyItemsPosition) : JustifyItems(strategy.toValue(position.value))
+    class OverflowAlignment(strategy: OverflowStrategy, position: JustifyItemsPosition) : JustifyItems(strategy.toValue(position))
 
     companion object {
         // Basic
@@ -310,7 +320,7 @@ sealed class JustifyItems private constructor(val value: String) {
 }
 
 fun StyleScope.justifyItems(justifyItems: JustifyItems) {
-    property("justify-items", justifyItems.value)
+    property("justify-items", justifyItems)
 }
 
 // endregion
@@ -324,12 +334,14 @@ fun StyleScope.justifyItems(justifyItems: JustifyItems) {
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
-sealed class JustifySelf private constructor(val value: String) {
+sealed class JustifySelf private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
     open class JustifySelfKeyword(value: String) : JustifySelf(value)
     class JustifySelfPosition(value: String) : JustifySelfKeyword(value)
 
     class BaselineAlignment(baselineSet: BaselineSet?) : JustifySelf(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: JustifySelfPosition) : JustifySelf(strategy.toValue(position.value))
+    class OverflowAlignment(strategy: OverflowStrategy, position: JustifySelfPosition) : JustifySelf(strategy.toValue(position))
 
     companion object {
         // Basic
@@ -367,7 +379,7 @@ sealed class JustifySelf private constructor(val value: String) {
 }
 
 fun StyleScope.justifySelf(justifySelf: JustifySelf) {
-    property("justify-self", justifySelf.value)
+    property("justify-self", justifySelf)
 }
 
 // endregion
@@ -375,15 +387,15 @@ fun StyleScope.justifySelf(justifySelf: JustifySelf) {
 // region Place methods
 
 fun StyleScope.placeContent(alignContent: AlignContent, justifyContent: JustifyContent) {
-    property("place-content", "${alignContent.value} ${justifyContent.value}")
+    property("place-content", "$alignContent $justifyContent")
 }
 
 fun StyleScope.placeItems(alignItems: AlignItems, justifyItems: JustifyItems) {
-    property("place-items","${alignItems.value} ${justifyItems.value}")
+    property("place-items","$alignItems $justifyItems")
 }
 
 fun StyleScope.placeSelf(alignSelf: AlignSelf, justifySelf: JustifySelf) {
-    placeSelf("${alignSelf.value} ${justifySelf.value}")
+    placeSelf("$alignSelf $justifySelf")
 }
 
 // endregion
