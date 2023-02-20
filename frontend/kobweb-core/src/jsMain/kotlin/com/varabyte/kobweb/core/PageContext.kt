@@ -26,12 +26,11 @@ class PageContext(val router: Router) {
     internal val mutableParams = mutableMapOf<String, String>()
 
     /**
-     * The slug for the current page, stripped of any fragments and parameters.
+     * The slug for the current page.
      *
-     * This is a convenience function, so you don't have to remember the right `window.location`
-     * field to call.
+     * In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", the slug is "slug"
      */
-    val slug: String get() = window.location.pathname
+    val slug: String get() = window.location.pathname.substringAfterLast('/')
 
     /**
      * Params extracted either from the URL's query parameters OR from a dynamic route
