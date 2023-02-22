@@ -15,7 +15,7 @@ import kotlin.io.path.writeText
  * Base class for a file which may get updated behind the scenes, at which point, [content] will be lazily loaded with
  * the latest value.
  */
-open class LiveFile(val path: Path) {
+class LiveFile(val path: Path) {
     private var lastModified = 0L
     private lateinit var _contentBytes: ByteArray
 
