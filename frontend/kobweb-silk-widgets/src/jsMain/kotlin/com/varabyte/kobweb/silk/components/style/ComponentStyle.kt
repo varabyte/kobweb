@@ -514,7 +514,7 @@ sealed class ComponentVariant {
 
     internal abstract fun addStylesInto(styleSheet: StyleSheet)
     @Composable
-    abstract fun toModifier(): Modifier
+    internal abstract fun toModifier(): Modifier
 }
 
 fun ComponentVariant.thenIf(condition: Boolean, produce: () -> ComponentVariant): ComponentVariant {

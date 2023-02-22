@@ -101,21 +101,25 @@ fun SimpleGrid(
 
     Div(
         attrs = SimpleGridStyle
-            .toModifier(variant)
-            // Breakpoint.ZERO is special case used to mean "base" in this case
-            .then(SimpleGridColumnVariants.getValue(Breakpoint.ZERO).getValue(numColumns.base).toModifier())
-            .thenIf(numColumns.sm != numColumns.base) {
-                SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm).toModifier()
-            }
-            .thenIf(numColumns.md != numColumns.sm) {
-                SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md).toModifier()
-            }
-            .thenIf(numColumns.lg != numColumns.md) {
-                SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg).toModifier()
-            }
-            .thenIf(numColumns.xl != numColumns.lg) {
-                SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl).toModifier()
-            }
+            .toModifier(
+                *buildList {
+                    add(variant)
+                    // Breakpoint.ZERO is special case used to mean "base" in this case
+                    add(SimpleGridColumnVariants.getValue(Breakpoint.ZERO).getValue(numColumns.base))
+                    if (numColumns.sm != numColumns.base) {
+                        add(SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm))
+                    }
+                    if (numColumns.md != numColumns.sm) {
+                        add(SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md))
+                    }
+                    if (numColumns.lg != numColumns.md) {
+                        add(SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg))
+                    }
+                    if (numColumns.xl != numColumns.lg) {
+                        add(SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl))
+                    }
+                }.toTypedArray()
+            )
             .then(modifier)
             .toAttrs()
     ) {
