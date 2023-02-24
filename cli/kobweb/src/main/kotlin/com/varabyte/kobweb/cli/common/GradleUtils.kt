@@ -183,28 +183,52 @@ class GradleAlertBundle(session: Session, private val pageSize: Int = 7) {
     private val alerts = session.liveListOf<GradleAlert>()
     private var hasFirstTaskRun by session.liveVarOf(false)
     private var startIndex by session.liveVarOf(0)
+    private var stuckToEnd = false
     private val maxIndex get() = (alerts.size - pageSize).coerceAtLeast(0)
 
     fun handleAlert(alert: GradleAlert) {
         if (alert is GradleAlert.BuildRestarted) {
             startIndex = 0
+            stuckToEnd = false
             alerts.clear()
         } else if (alert is GradleAlert.Task) {
             hasFirstTaskRun = true
         } else {
             alerts.add(alert)
         }
+
+        if (stuckToEnd) {
+            startIndex = maxIndex
+        }
     }
 
     fun handleKey(key: Key): Boolean {
         var handled = true
         when(key) {
-            Keys.HOME -> startIndex = 0
-            Keys.END -> startIndex = maxIndex
-            Keys.UP -> startIndex = (startIndex - 1).coerceAtLeast(0)
-            Keys.PAGE_UP -> startIndex = (startIndex - pageSize).coerceAtLeast(0)
-            Keys.DOWN -> startIndex = (startIndex + 1).coerceAtMost(maxIndex)
-            Keys.PAGE_DOWN -> startIndex = (startIndex + pageSize).coerceAtMost(maxIndex)
+            Keys.HOME -> {
+                startIndex = 0
+                stuckToEnd = false
+            }
+            Keys.END -> {
+                startIndex = maxIndex
+                stuckToEnd = true
+            }
+            Keys.UP -> {
+                startIndex = (startIndex - 1).coerceAtLeast(0)
+                stuckToEnd = false
+            }
+            Keys.PAGE_UP -> {
+                startIndex = (startIndex - pageSize).coerceAtLeast(0)
+                stuckToEnd = false
+            }
+            Keys.DOWN -> {
+                startIndex = (startIndex + 1).coerceAtMost(maxIndex)
+                stuckToEnd = (startIndex == maxIndex)
+            }
+            Keys.PAGE_DOWN -> {
+                startIndex = (startIndex + pageSize).coerceAtMost(maxIndex)
+                stuckToEnd = (startIndex == maxIndex)
+            }
             else -> handled = false
         }
         return handled
