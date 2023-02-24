@@ -4,6 +4,7 @@ import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
+import com.varabyte.kobweb.silk.components.layout.SmoothColorStyle
 import com.varabyte.kobweb.silk.components.layout.DividerStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
@@ -38,6 +39,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(OverlayStyle)
     mutableTheme.registerComponentStyle(PopupStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
+    mutableTheme.registerComponentStyle(SmoothColorStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
     mutableTheme.registerComponentStyle(SpanTextStyle)
     mutableTheme.registerComponentStyle(TooltipArrowStyle)

@@ -10,8 +10,9 @@ import com.varabyte.kobweb.core.App
 import com.varabyte.kobweb.silk.init.InitSilk
 import com.varabyte.kobweb.silk.init.InitSilkContext
 import com.varabyte.kobweb.silk.SilkApp
-import com.varabyte.kobweb.silk.components.layout.AnimatedColorSurfaceVariant
+import com.varabyte.kobweb.silk.components.layout.SmoothColorStyle
 import com.varabyte.kobweb.silk.components.layout.Surface
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import com.varabyte.kobweb.silk.init.registerBaseStyle
@@ -61,7 +62,7 @@ fun MyApp(content: @Composable () -> Unit) {
             localStorage.setItem(COLOR_MODE_KEY, colorMode.name)
         }
 
-        Surface(Modifier.minHeight(100.vh), variant = AnimatedColorSurfaceVariant) {
+        Surface(SmoothColorStyle.toModifier().minHeight(100.vh)) {
             content()
         }
     }
