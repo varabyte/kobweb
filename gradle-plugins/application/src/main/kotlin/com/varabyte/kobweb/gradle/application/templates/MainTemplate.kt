@@ -11,10 +11,6 @@ import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
 import com.varabyte.kobweb.gradle.core.project.frontend.merge
 
-private fun String.escapeQuotes(): String {
-    return this.replace("\"", """\"""")
-}
-
 fun createMainFunction(
     appData: AppData,
     libData: List<FrontendData>,
@@ -185,6 +181,8 @@ fun createMainFunction(
                 addStatement("")
             }
 
+            // Note: Below, we use %S when specifying key/value pairs. This prevents KotlinPoet from breaking
+            // our text in the middle of a String.
             addCode("""
                 router.navigateTo(window.location.href.removePrefix(window.location.origin))
 
@@ -198,13 +196,16 @@ fun createMainFunction(
                 }
 
                 renderComposable(rootElementId = "root") {
-                    CompositionLocalProvider(AppGlobalsLocal provides mapOf(${appGlobals.map { entry -> "\"${entry.key.escapeQuotes()}\" to \"${entry.value.escapeQuotes()}\""}.joinToString() })) {
-                        $appFqn {
+                    CompositionLocalProvider(
+                        AppGlobalsLocal provides mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()})
+                    ) { $appFqn {
                             ${if (usingSilk) "com.varabyte.kobweb.silk.defer.renderWithDeferred { router.renderActivePage() }" else "router.renderActivePage()" }
                         }
                     }
                 }
-            """.trimIndent())
+            """.trimIndent(),
+                *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
+            )
         }.build()
     )
 
