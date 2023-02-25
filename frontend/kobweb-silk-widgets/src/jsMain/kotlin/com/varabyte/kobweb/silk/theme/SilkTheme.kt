@@ -110,6 +110,14 @@ class MutableSilkTheme {
         extraModifiers: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
+        replaceComponentStyle(style, { extraModifiers }, init)
+    }
+
+    fun replaceComponentStyle(
+        style: ComponentStyle,
+        extraModifiers: @Composable () -> Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
         check(overiddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
         componentStyles[style.name] = ComponentStyle(style.name, extraModifiers, init)
@@ -177,6 +185,14 @@ class MutableSilkTheme {
         extraModifiers: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
+        replaceComponentVariant(variant, { extraModifiers }, init)
+    }
+
+    fun replaceComponentVariant(
+        variant: ComponentVariant,
+        extraModifiers: @Composable () -> Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
         @Suppress("NAME_SHADOWING")
         val variant = variant as? SimpleComponentVariant
             ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
@@ -195,6 +211,14 @@ fun MutableSilkTheme.replaceComponentStyleBase(
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
+    replaceComponentStyleBase(style, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.replaceComponentStyleBase(
+    style: ComponentStyle,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
     replaceComponentStyle(style, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
@@ -208,6 +232,17 @@ fun MutableSilkTheme.replaceComponentStyleBase(
 fun MutableSilkTheme.replaceComponentVariantBase(
     variant: ComponentVariant,
     extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceComponentVariantBase(variant, { extraModifiers }, init)
+}
+
+/**
+ * Convenience method when you want to replace an upstream variant but only need to define a base style.
+ */
+fun MutableSilkTheme.replaceComponentVariantBase(
+    variant: ComponentVariant,
+    extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
     replaceComponentVariant(variant, extraModifiers) {

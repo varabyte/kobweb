@@ -48,6 +48,15 @@ val StyleModifiers.ariaDisabled get() = CssRule.OfAttributeSelector(this, """ari
  * but you may need to additionally apply it on children which themselves modify their own background colors in response
  * to color mode changes, since in CSS, transitions are not inherited.
  *
+ * Pro-tip: If you are defining your own ComponentStyle that updates the background color and want it to also apply
+ * smooth styles, you can use this `extraModifiers` pattern:
+ *
+ * ```
+ * val ExampleStyle by ComponentStyle(extraModifiers = { SmoothColorStyle.toModifier() }) {
+ *    ...
+ * }
+ * ```
+ *
  * Note: This is shared as a style instead of a simple modifier so that a user can tweak the timing in their own site by
  * overriding the style if they'd like.
  */

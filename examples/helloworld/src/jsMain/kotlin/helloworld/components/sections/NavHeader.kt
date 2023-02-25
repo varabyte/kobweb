@@ -24,7 +24,7 @@ import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 
-val NavHeaderStyle by ComponentStyle.base {
+val NavHeaderStyle by ComponentStyle.base(extraModifiers = { SmoothColorStyle.toModifier() }) {
     Modifier
         .fillMaxWidth()
         .height(50.px)
@@ -56,7 +56,7 @@ private fun NavLink(path: String, text: String) {
 @Composable
 fun NavHeader() {
     var colorMode by rememberColorMode()
-    Box(listOf(SmoothColorStyle, NavHeaderStyle).toModifier()) {
+    Box(NavHeaderStyle.toModifier()) {
         Row(
             Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically

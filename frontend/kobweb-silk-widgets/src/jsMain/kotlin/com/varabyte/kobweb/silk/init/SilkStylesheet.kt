@@ -1,8 +1,7 @@
 package com.varabyte.kobweb.silk.init
 
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.toStyles
-import com.varabyte.kobweb.silk.components.animation.Keyframes
 import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.StyleModifiers
@@ -63,7 +62,11 @@ interface SilkStylesheet {
      * }
      * ```
      */
-    fun registerStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit)
+    fun registerStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit) {
+        registerStyle(cssSelector, { extraModifiers }, init)
+    }
+
+    fun registerStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: StyleModifiers.() -> Unit)
 
     /**
      * An alternate way to register keyframes via Silk instead of using a Compose for Web StyleSheet directly.
@@ -127,6 +130,11 @@ interface SilkStylesheet {
  * ```
  */
 fun SilkStylesheet.registerBaseStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
+    registerBaseStyle(cssSelector, { extraModifiers }, init)
+
+}
+
+fun SilkStylesheet.registerBaseStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: () -> Modifier) {
     registerStyle(cssSelector, extraModifiers) {
         base {
             init()
@@ -138,7 +146,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
     private val styles = mutableListOf<ComponentStyle>()
     private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
 
-    override fun registerStyle(cssSelector: String, extraModifiers: Modifier, init: StyleModifiers.() -> Unit) {
+    override fun registerStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: StyleModifiers.() -> Unit) {
         styles.add(ComponentStyle(cssSelector, extraModifiers, init))
     }
 
