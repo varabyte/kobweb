@@ -66,7 +66,7 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf) {
     abstract val globals: MapProperty<String, String>
 
     init {
-        globals.convention(mapOf("title" to conf.site.title))
+        globals.set(mapOf("title" to conf.site.title))
         (this as ExtensionAware).extensions.create("index", IndexBlock::class.java, RoutePrefix(conf.site.routePrefix))
     }
 
