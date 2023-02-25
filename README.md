@@ -1190,6 +1190,8 @@ environments. But here are some situations that might benefit from CSS variables
   example, maybe your site has a dark area and a light area, and the widget should use white outlines in the dark area
   and black outlines in the light. This can be accomplished by exposing an outline color variable, which each area of
   your site is responsible for setting.
+* You are using a component style for a pseudo-class selector already (e.g. hover, focus, active) and you want that
+  behavior to be dynamic.
 * You have a widget that you ended up creating a bunch of variants for, but instead you realize you could replace them
   all with one or two CSS variables.
 
