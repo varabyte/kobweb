@@ -4,7 +4,6 @@ import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
-import com.varabyte.kobweb.silk.components.layout.SmoothColorStyle
 import com.varabyte.kobweb.silk.components.layout.DividerStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
@@ -12,6 +11,7 @@ import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.overlay.*
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
+import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.theme.*
 

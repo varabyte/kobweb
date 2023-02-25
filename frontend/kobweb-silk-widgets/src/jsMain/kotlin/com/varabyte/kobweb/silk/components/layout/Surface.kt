@@ -24,26 +24,6 @@ val SurfaceStyle = ComponentStyle("silk-surface") {
 }
 
 /**
- * A style which opts an element into background color transitions, which looks better than color snapping when the
- * color mode changes.
- *
- * In other words, consider using
- *
- * ```
- * Surface(AnimatedColorStyle.toModifier())` instead
- * ```
- *
- * You may need to apply this style on selected children as well in case they otherwise interrupt the smooth color
- * animation flow, since in CSS, transitions are not inherited.
- *
- * This is shared as a style instead of a simple modifier so that a user can replace the behavior in their own site by
- * overriding the style.
- */
-val SmoothColorStyle = ComponentStyle.base("silk-smooth-color") {
-    Modifier.transition(CSSTransition("background-color", 200.ms))
-}
-
-/**
  * A variant which provides a smoother color animation effect.
  *
  * Without applying this variant, colors will snap instantly between dark and light colors. With applying it, the

@@ -17,11 +17,9 @@ import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
 import com.varabyte.kobweb.silk.components.overlay.Tooltip
 import com.varabyte.kobweb.silk.components.style.*
-import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
-import com.varabyte.kobweb.silk.theme.shapes.Circle
-import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
@@ -58,7 +56,7 @@ private fun NavLink(path: String, text: String) {
 @Composable
 fun NavHeader() {
     var colorMode by rememberColorMode()
-    Box(NavHeaderStyle.toModifier()) {
+    Box(listOf(SmoothColorStyle, NavHeaderStyle).toModifier()) {
         Row(
             Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
