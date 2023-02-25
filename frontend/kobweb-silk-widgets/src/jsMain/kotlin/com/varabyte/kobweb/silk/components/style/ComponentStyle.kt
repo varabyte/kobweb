@@ -375,6 +375,11 @@ class ComponentStyle(
     }
 
     internal fun addStylesInto(styleSheet: StyleSheet, selectorName: String) {
+        // Always add the base selector name, even if the ComponentStyle is empty. Callers may use empty
+        // component styles as classnames, which can still be useful for targeting one element from another, or
+        // searching for all elements tagged with a certain class.
+        notifySelectorName(selectorName)
+
         val lightModifiers = ComponentModifiers(ColorMode.LIGHT).apply(init).cssModifiers.associateBy { it.key }
         val darkModifiers = ComponentModifiers(ColorMode.DARK).apply(init).cssModifiers.associateBy { it.key }
 
