@@ -20,6 +20,9 @@ sealed interface Color : CSSColorValue {
 
     fun toRgb(): Rgb
 
+    /**
+     * @property value A hex value representing this color as AARRGGBB, e.g. 0xFFFF0000 is red and 0xFF0000FF is blue.
+     */
     class Rgb internal constructor(val value: Int) : Color {
         val red: Int get() = value.shr(16).and(0xFF)
         val green: Int get() = value.shr(8).and(0xFF)
@@ -68,11 +71,24 @@ sealed interface Color : CSSColorValue {
         }
     }
 
+    // NOTE: argb versions provided for convenience, as Android devs are used to that order
     companion object {
         const val DEFAULT_SHIFTING_PERCENT = 0.3f
 
         fun rgb(value: Int) = Rgb(0xFF.shl(24).or(value))
-        fun rgba(value: Int) = Rgb(value)
+        fun argb(value: Int) = Rgb(value)
+        fun argb(value: Long) = run {
+            // We accept Long here because Kotlin treats 0xFF000000 and such values as a Long, even though that can
+            // still fit into 4 bytes and be represented by an Int. Therefore, let's accept Longs but fail at runtime if
+            // the user passes in something with a higher bit set.
+            check(0xFFFFFFFF.inv().and(value) == 0L) { "Got an invalid hex color (0x${value.toString(16).uppercase()}) value larger than 0xFFFFFFFF" }
+            argb(value.toInt())
+        }
+        @Deprecated(
+            "`rgba` was incorrectly named. Please use `argb` instead, since the first 8 bits of the hex value are for alpha. In a future version, `rgba` may be reintroduced with the correct implementation.",
+            ReplaceWith("Color.argb(value)")
+        )
+        fun rgba(value: Int) = argb(value)
 
         fun rgb(r: Int, g: Int, b: Int) = rgba(r, g, b, 0xFF)
         fun rgba(r: Int, g: Int, b: Int, a: Int) = Rgb(
@@ -81,12 +97,15 @@ sealed interface Color : CSSColorValue {
                 .or(b.and(0xFF).shl(0))
                 .or(a.and(0xFF).shl(24))
         )
+        fun argb(a: Int, r: Int, g: Int, b: Int) = rgba(r, g, b, a)
 
         fun rgb(r: Float, g: Float, b: Float) = rgb(r.toColorInt(), g.toColorInt(), b.toColorInt())
         fun rgba(r: Float, g: Float, b: Float, a: Float) =
             rgba(r.toColorInt(), g.toColorInt(), b.toColorInt(), a.toColorInt())
+        fun argb(a: Float, r: Float, g: Float, b: Float) = rgba(r, g, b, a)
 
         fun rgba(r: Int, g: Int, b: Int, a: Float) = rgba(r, g, b, a.toColorInt())
+        fun argb(a: Float, r: Int, g: Int, b: Int) = rgba(r, g, b, a)
     }
 }
 
