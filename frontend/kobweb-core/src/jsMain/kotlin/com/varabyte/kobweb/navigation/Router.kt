@@ -25,41 +25,80 @@ enum class UpdateHistoryMode {
 }
 
 /**
+ * Scope provided backing the handler for [Router.addRouteInterceptor].
+ *
+ * Through this scope, various parts of a route are exposed and can be set.
+ */
+class RouteInterceptorScope(pathQueryAndFragment: String) {
+    private val route = Route(pathQueryAndFragment)
+
+    /**
+     * The path part of a route.
+     *
+     * For example, "/a/b/c" in the route "/a/b/c?key=value#fragment"
+     *
+     * This path should always be absolute; if you set it without a leading slash, one will
+     * be added for you.
+     */
+    var path = route.path
+        set(value) {
+            field = if (value.startsWith('/')) value else "/$value"
+        }
+
+    /**
+     * A map of query parameters.
+     *
+     * For example, { "key" = "value" } in the route "/a/b/c?key=value"
+     */
+    var queryParams = route.queryParams.toMutableMap()
+
+    /**
+     * The fragment part of a route, if present, or null otherwise.
+     *
+     * For example, "fragment" in the route "/a/b/c#fragment"
+     */
+    var fragment = route.fragment
+
+    /**
+     * The full route, built up of all the other parts of this scope.
+     *
+     * This value is read-only. To affect it, set the various parts.
+     */
+    val pathQueryAndFragment get() = Route(path, queryParams, fragment).toString()
+}
+
+
+/**
  * The class responsible for navigating to different pages in a user's app.
 */
 class Router {
     private val activePageData = mutableStateOf<PageData?>(null)
     private val routeTree = RouteTree()
+    private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
 
     init {
         window.onpopstate = {
-            updateActivePage(document.location!!.pathname)
+            updateActiveRoute(document.location!!.pathname)
         }
     }
 
     /**
-     * See docs for [navigateTo].
+     * See docs for [tryRoutingTo].
      *
-     * Returns true if we updated the active page ourselves or false if we didn't (which means the URL instead goes to
-     * an external site)
+     * Returns true if we were able to navigate to a route that's internal to this site; false otherwise, e.g. if the
+     * path targets some external website.
      */
-    private fun updateActivePage(pathQueryAndFragment: String): Boolean {
-        val (pathAndQuery, fragment) = pathQueryAndFragment.split('#', limit = 2).let {
-            if (it.size == 1) { it[0] to null } else it[0] to it[1]
+    private fun updateActiveRoute(pathQueryAndFragment: String): Boolean {
+        // Special case - sometimes the value passed in here is simply a fragment, which means the browser
+        // should scroll to an element on the same page
+        if (pathQueryAndFragment.startsWith("#")) {
+            activePageData.value?.pageContext?.fragment = pathQueryAndFragment.removePrefix("#")
+            return activePageData.value != null
         }
 
-        val (path, query) = pathAndQuery.split('?', limit = 2).let {
-            if (it.size == 1) { it[0] to null } else it[0] to it[1]
-        }.let { pair ->
-            // Note: If the user typed just a fragment, e.g. "#id", that means search the current page for an element
-            // with that ID
-            if (pair.first.isBlank() && fragment != null) {
-                window.location.pathname to pair.second
-            } else pair
-        }
-
-        return if (Route.isLocal(path)) {
-            activePageData.value = routeTree.createPageData(this, path, query, fragment)
+        val route = Route.tryCreate(pathQueryAndFragment)
+        return if (route != null) {
+            activePageData.value = routeTree.createPageData(this, route)
             true
         }
         else {
@@ -87,7 +126,11 @@ class Router {
         if (!Route.isLocal(this)) return this
 
         val hrefResolved = URL(this, window.location.href)
-        return Route.fromUrl(hrefResolved).toString()
+        return interceptors.fold(Route.fromUrl(hrefResolved).toString()) { acc, intercept ->
+            val interceptor = RouteInterceptorScope(acc)
+            interceptor.intercept()
+            interceptor.pathQueryAndFragment
+        }
     }
 
     /**
@@ -121,6 +164,36 @@ class Router {
 
     fun setErrorHandler(errorHandler: ErrorPageMethod) {
         routeTree.errorHandler = errorHandler
+    }
+
+    /**
+     * If set, get a chance to modify the page's route before Kobweb navigates to it.
+     *
+     * This could be a cheap way to redirect to a new URL if an old one was removed due to
+     * a refactor.
+     *
+     * A simple way to use this might look like:
+     *
+     * ```
+     * @InitKobweb
+     * fun initKobweb(ctx: InitKobwebContext) {
+     *   ctx.router.addRouteInterceptor {
+     *     if (path == "admin") {
+     *       // The old admin has grown and is being split up into multiple pages.
+     *       // Send people to the dashboard by default.
+     *       path = "admin/dashboard"
+     *     }
+     *   }
+     * }
+     * ```
+     *
+     * In the above case, if a user navigates to `https://yoursite.com/admin` the URL will automatically change to
+     * `https://yoursite.com/admin/dashboard`.
+     *
+     * See [RouteInterceptorScope] for more options.
+     */
+    fun addRouteInterceptor(interceptor: RouteInterceptorScope.() -> Unit) {
+        interceptors.add(interceptor)
     }
 
     @Deprecated("\"routeTo\" has been renamed to \"tryRoutingTo\".",
@@ -168,13 +241,13 @@ class Router {
             return true
         }
 
-        return if (updateActivePage(pathQueryAndFragment)) {
+        return if (updateActiveRoute(pathQueryAndFragment)) {
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->
                 if (window.location.href != url) {
                     // It's possible only the search params or hash changed, in which case we don't want to reset the
                     // current page scroll
-                    val newPathname = window.location.pathname != Route.fromUrl(URL(url)).pathname
+                    val newPathname = window.location.pathname != Route.fromUrl(URL(url)).path
                     when (updateHistoryMode) {
                         UpdateHistoryMode.PUSH -> window.history.pushState(window.history.state, "", url)
                         UpdateHistoryMode.REPLACE -> window.history.replaceState(window.history.state, "", url)

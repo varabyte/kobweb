@@ -129,12 +129,12 @@ internal class RouteTree {
      * @param query "x=1&y=2" from "/a/b/c?x=1&y=2#fragment"
      * @param fragment "fragment" from "/a/b/c?x=1&y=2#fragment"
      */
-    fun createPageData(router: Router, route: String, query: String?, fragment: String?): PageData {
-        val resolvedEntries = resolve(route)
+    internal fun createPageData(router: Router, route: Route): PageData {
+        val resolvedEntries = resolve(route.path)
         val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
 
         val ctx = PageContext(router).apply {
-            this.fragment = fragment
+            this.fragment = route.fragment
         }
 
         resolvedEntries?.forEach { resolvedEntry ->
@@ -143,16 +143,7 @@ internal class RouteTree {
             }
         }
 
-        query?.split("&")?.forEach { param ->
-            // Handle all three params cases...
-            // 1) Common: `url?key=value&...`
-            // 2) No value: `url?key&...`
-            // 3) Value with equal sign in it: `url?id=aj3=zk50i&...`
-            val keyValue = param.split('=', limit = 2)
-            val key = keyValue[0]
-            val value = keyValue.elementAtOrNull(1) ?: ""
-            ctx.mutableParams[key] = value
-        }
+        ctx.mutableParams.putAll(route.queryParams)
 
         return PageData(pageMethod, ctx)
     }
