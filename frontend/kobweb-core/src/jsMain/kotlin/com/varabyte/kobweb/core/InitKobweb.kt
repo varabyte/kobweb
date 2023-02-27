@@ -1,8 +1,13 @@
 package com.varabyte.kobweb.core
 
-/**
- * An annotation which identifies a function as one which will be called when the page opens before nodes are liad out.
- * The function should take an [InitKobwebContext] as its only parameter.
- */
-@Target(AnnotationTarget.FUNCTION)
-annotation class InitKobweb
+@Deprecated(
+    message = "InitKobweb has moved. Please change your import to `com.varabyte.kobweb.core.init.InitKobweb",
+    replaceWith = ReplaceWith("com.varabyte.kobweb.core.init.InitKobweb")
+)
+typealias InitKobweb = com.varabyte.kobweb.core.init.InitKobweb
+
+@Deprecated(
+    message = "InitKobwebContext has moved. Please change your import to `com.varabyte.kobweb.core.init.InitKobwebContext",
+    replaceWith = ReplaceWith("com.varabyte.kobweb.core.init.InitKobwebContext")
+)
+typealias InitKobwebContext = com.varabyte.kobweb.core.init.InitKobwebContext

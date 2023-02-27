@@ -1,8 +1,13 @@
 package com.varabyte.kobweb.api
 
-/**
- * An annotation which identifies a function as one which will be called when the server starts up. The function should
- * take an [InitApiContext] as its only parameter.
- */
-@Target(AnnotationTarget.FUNCTION)
-annotation class InitApi
+@Deprecated(
+    message = "InitApi has moved. Please change your import to `com.varabyte.kobweb.api.init.InitApi",
+    replaceWith = ReplaceWith("com.varabyte.kobweb.api.init.InitApi")
+)
+typealias InitApi = com.varabyte.kobweb.api.init.InitApi
+
+@Deprecated(
+    message = "InitApiContext has moved. Please change your import to `com.varabyte.kobweb.api.init.InitApiContext",
+    replaceWith = ReplaceWith("com.varabyte.kobweb.api.init.InitApiContext")
+)
+typealias InitApiContext = com.varabyte.kobweb.api.init.InitApiContext

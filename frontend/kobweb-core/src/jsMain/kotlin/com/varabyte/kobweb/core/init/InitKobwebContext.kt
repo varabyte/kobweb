@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.core
+package com.varabyte.kobweb.core.init
 
 import com.varabyte.kobweb.navigation.Router
 

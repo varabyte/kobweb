@@ -6,8 +6,8 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     return """
         import com.varabyte.kobweb.api.Apis
         import com.varabyte.kobweb.api.ApisFactory
-        import com.varabyte.kobweb.api.InitApiContext
         import com.varabyte.kobweb.api.data.MutableData
+        import com.varabyte.kobweb.api.init.InitApiContext
         import com.varabyte.kobweb.api.log.Logger
 
         class ApisFactoryImpl : ApisFactory {

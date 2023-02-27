@@ -44,7 +44,7 @@ fun createMainFunction(
         }
 
         if (frontendData.kobwebInits.any { it.acceptsContext }) {
-            add("com.varabyte.kobweb.core.InitKobwebContext")
+            add("com.varabyte.kobweb.core.init.InitKobwebContext")
         }
 
         if (frontendData.keyframesList.isNotEmpty()) {
@@ -146,14 +146,20 @@ fun createMainFunction(
             addStatement("")
 
             if (frontendData.kobwebInits.isNotEmpty()) {
-                if (frontendData.kobwebInits.any { entry -> entry.acceptsContext }) {
-                    addStatement("val ctx = InitContext(router)")
-                }
-                frontendData.kobwebInits.forEach { entry ->
-                    val ctx = if (entry.acceptsContext) "ctx" else ""
-                    addStatement("${entry.fqn}($ctx)")
-                }
-                addStatement("")
+                addCode(CodeBlock.builder().apply {
+                    addStatement("run {")
+                    withIndent {
+                        if (frontendData.kobwebInits.any { entry -> entry.acceptsContext }) {
+                            addStatement("val ctx = InitKobwebContext(router)")
+                        }
+                        frontendData.kobwebInits.forEach { entry ->
+                            val ctx = if (entry.acceptsContext) "ctx" else ""
+                            addStatement("${entry.fqn}($ctx)")
+                        }
+                    }
+                    addStatement("}")
+                    addStatement("")
+                }.build())
             }
 
             if (usingSilk &&

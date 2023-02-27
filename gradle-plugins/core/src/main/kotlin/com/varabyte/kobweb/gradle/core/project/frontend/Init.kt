@@ -5,7 +5,7 @@ import com.varabyte.kobweb.gradle.core.project.common.KOBWEB_SILK_FQN_PREFIX
 import kotlinx.serialization.Serializable
 
 const val INIT_KOBWEB_SIMPLE_NAME = "InitKobweb"
-const val INIT_KOBWEB_FQN = "$KOBWEB_CORE_FQN_PREFIX$INIT_KOBWEB_SIMPLE_NAME"
+const val INIT_KOBWEB_FQN = "${KOBWEB_CORE_FQN_PREFIX}init.$INIT_KOBWEB_SIMPLE_NAME"
 
 const val INIT_SILK_SIMPLE_NAME = "InitSilk"
 const val INIT_SILK_FQN = "${KOBWEB_SILK_FQN_PREFIX}init.$INIT_SILK_SIMPLE_NAME"
