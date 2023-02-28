@@ -11,12 +11,13 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 /**
  * Create a fat jar for use by a Kobweb server.
  *
- * The Kobweb server is designed to load a single jar responsible for providing
+ * The Kobweb server loads a single jar which is responsible for providing all functionality backing its server routes.
  *
- * TODO(#179): Take in a boolean parameter that does dead code elimination if true.
+ * TODO(#179): Allow configuring DCE for the final server jar.
  *
- * @param kobwebName A name to use as the base of the output jar file. If left blank, a name will be
- *   created using [suggestKobwebProjectName]
+ * @param kobwebName A name to use as the base of the output jar file. If left blank, a name will be created using
+ * [suggestKobwebProjectName]. If you change this later, you should also check your .kobweb/conf.yaml file and update
+ * relevant entries.
  */
 fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
     val archiveFileName = (kobwebName ?: project.suggestKobwebProjectName()).addSuffix(".jar")
