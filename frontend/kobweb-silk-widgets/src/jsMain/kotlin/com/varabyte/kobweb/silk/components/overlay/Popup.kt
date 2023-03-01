@@ -91,9 +91,11 @@ fun Popup(
 
     var srcElement by remember { mutableStateOf<HTMLElement?>(null) }
     val targetElement by remember(srcElement, target) { mutableStateOf(srcElement.apply(target)) }
-    val placementElement by remember(srcElement, targetElement, placementTarget) { mutableStateOf(
-        if (placementTarget == null) targetElement else srcElement.apply(placementTarget)
-    ) }
+    val placementElement by remember(srcElement, targetElement, placementTarget) {
+        mutableStateOf(
+            if (placementTarget == null) targetElement else srcElement.apply(placementTarget)
+        )
+    }
 
     var showPopup by remember { mutableStateOf(false) }
     val requestShowPopup: (Event) -> Unit = { showPopup = true }
@@ -104,127 +106,140 @@ fun Popup(
         ref = disposableRef(target) { element ->
             srcElement = element
 
-            // Intentionally shadow here. We want our own copy to avoid infinite recompositions
-            // when srcElement changes (srcElement changes targetElement changes this Box changes srcElement...)
-            @Suppress("NAME_SHADOWING")
-            val targetElement = element.apply(target)
-            targetElement?.addEventListener("mouseenter", requestShowPopup)
-            targetElement?.addEventListener("mouseleave", requestHidePopup)
-            if (targetElement?.matches(":hover") == true) {
-                showPopup = true
-            }
+            element.apply(target)?.let { targetElement ->
+                targetElement.addEventListener("mouseenter", requestShowPopup)
+                targetElement.addEventListener("mouseleave", requestHidePopup)
+                if (targetElement.matches(":hover")) {
+                    showPopup = true
+                }
 
-            onDispose {
-                targetElement?.removeEventListener("mouseenter", requestShowPopup)
-                targetElement?.removeEventListener("mouseleave", requestHidePopup)
-            }
+                onDispose {
+                    targetElement.removeEventListener("mouseenter", requestShowPopup)
+                    targetElement.removeEventListener("mouseleave", requestHidePopup)
+                }
+            } ?: onDispose {}
         }
     )
 
-    if (placementElement != null && showPopup) {
-        @Suppress("NAME_SHADOWING")
-        val placementElement = placementElement!!
-        val targetBounds = placementElement.getBoundingClientRect()
-        var popupBounds by remember { mutableStateOf<DOMRect?>(null) }
-        @Suppress("NAME_SHADOWING")
-        val offsetPixels = offsetPixels.toDouble()
-        @Suppress("NAME_SHADOWING")
-        val absPosModifier = popupBounds?.let { popupBounds ->
-            when (placement) {
-                PopupPlacement.TopLeft -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left).px)
-                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-                }
-                PopupPlacement.Top -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-                }
-                PopupPlacement.TopRight -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
-                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-                }
+    if (placementElement == null || !showPopup) return
 
-                PopupPlacement.LeftTop -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                        .top((window.pageYOffset + targetBounds.top).px)
+    val targetBounds = placementElement!!.getBoundingClientRect()
+    var popupBounds by remember { mutableStateOf<DOMRect?>(null) }
 
-                }
-                PopupPlacement.RightTop -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                        .top((window.pageYOffset + targetBounds.top).px)
+    val absPosModifier = getAbsModifier(
+        placement,
+        popupBounds,
+        targetBounds,
+        offsetPixels.toDouble()
+    )
 
-                }
-
-                PopupPlacement.Left -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                }
-                PopupPlacement.Right -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                }
-
-                PopupPlacement.LeftBottom -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
-                }
-                PopupPlacement.RightBottom -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
-                }
-
-                PopupPlacement.BottomLeft -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left).px)
-                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-                }
-                PopupPlacement.Bottom -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-                }
-                PopupPlacement.BottomRight -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
-                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-                }
-            }
+    deferRender {
+        // Need to set targetElement as the key because otherwise you might move from one element to another so fast
+        // that compose doesn't realize the tooltip should be rerendered
+        key(targetElement) {
+            Box(
+                PopupStyle.toModifier(variant)
+                    .position(Position.Absolute)
+                    .then(absPosModifier)
+                    .then(modifier),
+                ref = refScope {
+                    ref { element ->
+                        popupBounds = element.getBoundingClientRect()
+                    }
+                    add(ref)
+                },
+                content = content
+            )
         }
-            ?: Modifier
-                // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
-                // causing focus to be gained and lost
-                .top((-100).percent).left((-100).percent)
-                .opacity(0)
+    }
+}
 
-        if (showPopup) {
-            deferRender {
-                // Need to set targetElement as the key because otherwise you might move from one element to another so fast
-                // that compose doesn't realize the tooltip should be rerendered
-                key(targetElement) {
-                    Box(
-                        PopupStyle.toModifier(variant)
-                            .position(Position.Absolute)
-                            .then(absPosModifier)
-                            .then(modifier),
-                        ref = refScope {
-                            ref { element ->
-                                popupBounds = element.getBoundingClientRect()
-                            }
-                            add(ref)
-                        },
-                        content = content
-                    )
-                }
-            }
+private fun getAbsModifier(
+    placement: PopupPlacement,
+    popupBounds: DOMRect?,
+    targetBounds: DOMRect,
+    offsetPixels: Double,
+): Modifier {
+    if (popupBounds == null)
+        return Modifier
+            // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
+            // causing focus to be gained and lost
+            .top((-100).percent).left((-100).percent)
+            .opacity(0)
+
+    return when (placement) {
+        PopupPlacement.TopLeft -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left).px)
+                .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+        }
+
+        PopupPlacement.Top -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
+                .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+        }
+
+        PopupPlacement.TopRight -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
+                .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+        }
+
+        PopupPlacement.LeftTop -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                .top((window.pageYOffset + targetBounds.top).px)
+
+        }
+
+        PopupPlacement.RightTop -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                .top((window.pageYOffset + targetBounds.top).px)
+
+        }
+
+        PopupPlacement.Left -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+        }
+
+        PopupPlacement.Right -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+        }
+
+        PopupPlacement.LeftBottom -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
+        }
+
+        PopupPlacement.RightBottom -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
+        }
+
+        PopupPlacement.BottomLeft -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left).px)
+                .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
+        }
+
+        PopupPlacement.Bottom -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
+                .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
+        }
+
+        PopupPlacement.BottomRight -> {
+            Modifier
+                .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
+                .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
         }
     }
 }
