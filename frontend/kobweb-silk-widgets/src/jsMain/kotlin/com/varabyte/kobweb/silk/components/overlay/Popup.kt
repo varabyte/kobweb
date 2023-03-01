@@ -90,10 +90,10 @@ fun Popup(
     }
 
     var srcElement by remember { mutableStateOf<HTMLElement?>(null) }
-    val targetElement by remember(target) { derivedStateOf { srcElement.apply(target) } }
-    val placementElement by remember(placementTarget, targetElement) { derivedStateOf {
-        if (placementTarget == null) targetElement else srcElement.apply(placementTarget) }
-    }
+    val targetElement by remember(srcElement, target) { mutableStateOf(srcElement.apply(target)) }
+    val placementElement by remember(srcElement, targetElement, placementTarget) { mutableStateOf(
+        if (placementTarget == null) targetElement else srcElement.apply(placementTarget)
+    ) }
 
     var showPopup by remember { mutableStateOf(false) }
     val requestShowPopup: (Event) -> Unit = { showPopup = true }
