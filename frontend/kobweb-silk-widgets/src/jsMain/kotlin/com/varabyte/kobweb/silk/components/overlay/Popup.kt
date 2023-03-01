@@ -8,13 +8,7 @@ import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.display
-import com.varabyte.kobweb.compose.ui.modifiers.left
-import com.varabyte.kobweb.compose.ui.modifiers.opacity
-import com.varabyte.kobweb.compose.ui.modifiers.position
-import com.varabyte.kobweb.compose.ui.modifiers.top
-import com.varabyte.kobweb.silk.components.overlay.PopupPlacement.LeftTop
-import com.varabyte.kobweb.silk.components.overlay.PopupPlacement.TopLeft
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
