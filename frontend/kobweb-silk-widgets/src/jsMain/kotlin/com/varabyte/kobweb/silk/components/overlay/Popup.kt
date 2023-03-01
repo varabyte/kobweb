@@ -92,12 +92,14 @@ fun Popup(
 ) {
     fun HTMLElement?.apply(targetFinder: ElementTarget?): HTMLElement? {
         if (this == null || targetFinder == null) return this
-        return target(startingFrom = this)
+        return targetFinder(startingFrom = this)
     }
 
     var srcElement by remember { mutableStateOf<HTMLElement?>(null) }
-    val targetElement by remember { derivedStateOf { srcElement.apply(target) } }
-    val placementElement by remember { derivedStateOf { targetElement.apply(placementTarget) } }
+    val targetElement by remember(target) { derivedStateOf { srcElement.apply(target) } }
+    val placementElement by remember(placementTarget, targetElement) { derivedStateOf {
+        if (placementTarget == null) targetElement else srcElement.apply(placementTarget) }
+    }
 
     var showPopup by remember { mutableStateOf(false) }
     val requestShowPopup: (Event) -> Unit = { showPopup = true }
@@ -105,7 +107,7 @@ fun Popup(
 
     Box(
         Modifier.display(DisplayStyle.None),
-        ref = disposableRef { element ->
+        ref = disposableRef(target) { element ->
             srcElement = element
 
             // Intentionally shadow here. We want our own copy to avoid infinite recompositions
