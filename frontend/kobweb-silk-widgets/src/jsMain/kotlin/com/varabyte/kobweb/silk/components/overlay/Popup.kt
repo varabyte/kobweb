@@ -90,11 +90,9 @@ fun Popup(
     }
 
     var srcElement by remember { mutableStateOf<HTMLElement?>(null) }
-    val targetElement by remember(srcElement, target) { mutableStateOf(srcElement.apply(target)) }
-    val placementElement by remember(srcElement, targetElement, placementTarget) {
-        mutableStateOf(
-            if (placementTarget == null) targetElement else srcElement.apply(placementTarget)
-        )
+    val targetElement = remember(srcElement, target) { srcElement.apply(target) }
+    val placementElement = remember(srcElement, targetElement, placementTarget) {
+        if (placementTarget == null) targetElement else srcElement.apply(placementTarget)
     }
 
     var showPopup by remember { mutableStateOf(false) }
@@ -123,7 +121,7 @@ fun Popup(
 
     if (placementElement == null || !showPopup) return
 
-    val targetBounds = placementElement!!.getBoundingClientRect()
+    val targetBounds = placementElement.getBoundingClientRect()
     var popupBounds by remember { mutableStateOf<DOMRect?>(null) }
 
     val absPosModifier = getAbsModifier(
