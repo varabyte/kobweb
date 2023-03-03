@@ -10,7 +10,12 @@ class TransitionProperty private constructor(private val value: String): StylePr
 
     companion object {
         // Custom
-        fun of(customValue: String) = TransitionProperty(customValue)
+        fun of(customValue: String): TransitionProperty {
+            check(customValue.isNotEmpty() && customValue.none { it.isWhitespace() }) {
+                "Invalid transition property name. A property shouldn't contain any spaces, but got \"$customValue\"."
+            }
+            return TransitionProperty(customValue)
+        }
 
         // Keywords
         val None get() = TransitionProperty("none")
