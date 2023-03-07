@@ -30,7 +30,7 @@ private fun File.parentStartingWith(prefix: String): File {
 
 abstract class KobwebCopyDependencyResources @Inject constructor(
     kobwebBlock: KobwebBlock,
-) : KobwebModuleTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
+) : KobwebModuleTask(kobwebBlock, "Copy and make available all public/ resources from the application and any libraries to the final site") {
 
     @InputFiles
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
