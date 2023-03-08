@@ -39,6 +39,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 private enum class RunState {
     STARTING,
@@ -228,7 +229,7 @@ private fun handleRun(
             }
 
             if (runState == RunState.RUNNING) {
-                addTimer(Duration.ofMillis(500), repeat = true) {
+                addTimer(500.milliseconds, repeat = true) {
                     if (runState == RunState.RUNNING) {
                         serverState!!.let { serverState ->
                             if (!serverState.isRunning() || serverStateFile.content != serverState) {
