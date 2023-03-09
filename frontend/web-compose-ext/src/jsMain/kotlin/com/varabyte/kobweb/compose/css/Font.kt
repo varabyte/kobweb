@@ -33,6 +33,19 @@ class FontWeight private constructor(private val value: String): CSSStyleValue {
     override fun toString() = value
 
     companion object {
+        // Common value constants
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight#common_weight_name_mapping
+        val Thin get() = FontWeight("100")
+        val ExtraLight get() = FontWeight("200")
+        val Light get() = FontWeight("300")
+        // val Normal get() = FontWeight("400") // Same as "Normal" keyword"
+        val Medium get() = FontWeight("500")
+        val SemiBold get() = FontWeight("600")
+        // val Bold get() = FontWeight("700") // Same as "Bold" keyword"
+        val ExtraBold get() = FontWeight("800")
+        val Black get() = FontWeight("900")
+        val ExtraBlack get() = FontWeight("950")
+
         // Keyword
         val Normal get() = FontWeight("normal")
         val Bold get() = FontWeight("bold")
