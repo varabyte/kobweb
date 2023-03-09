@@ -179,7 +179,12 @@ fun RunScope.handleGradleOutput(line: String, isError: Boolean, onGradleEvent: (
 /**
  * Class which handles the collection and rendering of Gradle compile warnings and errors.
  */
-class GradleAlertBundle(session: Session, private val pageSize: Int = 7) {
+// Why 5 errors only? As errors may be ~2-3 lines long with a space between them, 5 errors
+// would easily take up about 20-25 lines. If we end rerendering the whole screen, this
+// causes annoying flickering on Windows. So try to choose a small enough value, aiming to avoid
+// Windows flickering while still presenting enough information for users. If people complain,
+// 5 is too small, we can allow users to configure this somehow, e.g. via CLI params.
+class GradleAlertBundle(session: Session, private val pageSize: Int = 5) {
     private val alerts = session.liveListOf<GradleAlert>()
     private var hasFirstTaskRun by session.liveVarOf(false)
     private var startIndex by session.liveVarOf(0)
