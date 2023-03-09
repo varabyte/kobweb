@@ -36,7 +36,7 @@ import org.w3c.dom.events.EventListener
  * ```
  */
 @Composable
-fun rememberBreakpoint() = produceState(window.breakpointFloor, key1 = window.location.href) {
+fun rememberBreakpoint() = produceState(window.breakpointFloor) {
     val resizeListener = EventListener { value = window.breakpointFloor }
 
     window.addEventListener("resize", resizeListener)
