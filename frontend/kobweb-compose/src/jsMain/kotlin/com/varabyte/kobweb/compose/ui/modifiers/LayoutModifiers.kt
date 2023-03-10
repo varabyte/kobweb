@@ -149,6 +149,10 @@ fun Modifier.marginBlock(
     marginBlock(start, end)
 }
 
+fun Modifier.resize(resize: Resize) = styleModifier {
+    resize(resize)
+}
+
 fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
     padding(all)
 }

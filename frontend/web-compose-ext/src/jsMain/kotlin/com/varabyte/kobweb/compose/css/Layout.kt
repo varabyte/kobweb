@@ -224,3 +224,32 @@ fun StyleScope.verticalAlign(value: CSSNumeric) {
 }
 
 // endregion
+
+// region resize See: https://developer.mozilla.org/en-US/docs/Web/CSS/resize
+
+class Resize private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword
+        val None get() = Resize("none")
+        val Both get() = Resize("both")
+        val Horizontal get() = Resize("horizontal")
+        val Vertical get() = Resize("vertical")
+        val Block get() = Resize("block")
+        val Inline get() = Resize("inline")
+
+        // Global
+        val Inherit get() = Resize("inherit")
+        val Initial get() = Resize("initial")
+        val Revert get() = Resize("revert")
+        val RevertLayer get() = Resize("revert-layer")
+        val Unset get() = Resize("unset")
+    }
+}
+
+fun StyleScope.resize(resize: Resize) {
+    property("resize", resize)
+}
+
+// endregion
