@@ -234,7 +234,30 @@ class Router {
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        val pathQueryAndFragment = pathQueryAndFragment.normalize()
+        val pathQueryAndFragment = pathQueryAndFragment.normalize().let { pqf ->
+            // Here, we check a common edge case where the site has registered "slug" and the user typed "slug/"
+            // OR vice versa ("slug/" and user typed "slug"). Let's help the user find the right place.
+
+            // Note: We don't touch the path if it has queries or fragments. Because in that case, if the original route
+            // isn't found, we don't want to waste time adding a slash to the end of it (since slashes shouldn't ever
+            // come after queries / fragments).
+            if (pqf.any { it == '#' || it == '?' }) return@let pqf
+
+            @Suppress("UnnecessaryVariable") // Emphasize we've checked that this is only the route part
+            val route = pqf
+
+            if (!routeTree.isRegistered(route)) {
+                if (route.endsWith('/')) {
+                    val withoutSlash = route.removeSuffix("/")
+                    if (routeTree.isRegistered(withoutSlash)) withoutSlash else route
+                } else {
+                    val withSlash = "$route/"
+                    if (routeTree.isRegistered(withSlash)) withSlash else route
+                }
+            } else {
+                route
+            }
+        }
 
         if (openLinkStrategy != OpenLinkStrategy.IN_PLACE) {
             window.open(pathQueryAndFragment, openLinkStrategy)

@@ -104,6 +104,13 @@ internal class RouteTree {
     }
 
     /**
+     * Return true if the route was previously registered via [register], false otherwise.
+     */
+    fun isRegistered(route: String): Boolean {
+        return resolve(route)?.last()?.node?.method != null
+    }
+
+    /**
      * Register [route] with this tree, or return false if it was already added.
      */
     fun register(route: String, method: PageMethod): Boolean {
@@ -130,17 +137,7 @@ internal class RouteTree {
      * @param fragment "fragment" from "/a/b/c?x=1&y=2#fragment"
      */
     internal fun createPageData(router: Router, route: Route): PageData {
-        val resolvedEntries = resolve(route.path).let { initialEntries ->
-            // A site may have defined "slug" but not "slug/", or "slug/" but not "slug"; we should try doing an
-            // automatic fallback in case the user types one or the other.
-            if (initialEntries != null && initialEntries.last().node.method != null) return@let initialEntries
-
-            val fallback =
-                if (route.path.endsWith('/')) resolve(route.path.dropLast(1)) else resolve("${route.path}/")
-
-            fallback?.takeIf { it.last().node.method != null } ?: initialEntries
-        }
-
+        val resolvedEntries = resolve(route.path)
         val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
 
         val ctx = PageContext(router).apply {
