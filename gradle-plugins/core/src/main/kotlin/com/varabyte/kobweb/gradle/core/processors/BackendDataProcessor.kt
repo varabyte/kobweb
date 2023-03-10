@@ -120,7 +120,7 @@ class BackendDataProcessor(
                                         )
                                     )
                                 } else {
-                                    reporter.report("${file.absolutePath}: Skipped over `@$apiSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`")
+                                    reporter.error("${file.absolutePath}: Skipped over `@$apiSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`")
                                 }
                             }
                         }
@@ -138,7 +138,7 @@ class BackendDataProcessor(
                     if (value != "{}") value else "{${currPackage.substringAfterLast('.')}}"
                 }
             } else {
-                reporter.report("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`")
+                reporter.error("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`")
             }
         }
     }

@@ -21,7 +21,7 @@ private fun processComponentStyle(
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
     if (property.parent !is KtFile) {
-        reporter.report("${file.absolutePath}: Not registering component style `val $propertyName`, as only top-level component styles are supported at this time")
+        reporter.error("${file.absolutePath}: Not registering component style `val $propertyName`, as only top-level component styles are supported at this time")
         return false
     }
 
@@ -29,7 +29,7 @@ private fun processComponentStyle(
         silkStyles.add(ComponentStyleEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
-        reporter.report("${file.absolutePath}: Not registering component style `val $propertyName`, as it is not public")
+        reporter.error("${file.absolutePath}: Not registering component style `val $propertyName`, as it is not public")
         false
     }
 }
@@ -58,7 +58,7 @@ private fun assertUsingPropertyDelegateIfNecessary(
     val isDelegateProvider = callExpr.getStringValue(0) == null
     if (isDelegateProvider && !isPropertyDelegate) {
         val name = property.name
-        reporter.report("${file.absolutePath}: Expected `by`, not assignment. Change \"val $name = ...\" to \"val $name by ...\"?")
+        reporter.error("${file.absolutePath}: Expected `by`, not assignment. Change \"val $name = ...\" to \"val $name by ...\"?")
         return false
     }
     return true
@@ -104,7 +104,7 @@ private fun processComponentVariant(
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
     if (property.parent !is KtFile) {
-        reporter.report("${file.absolutePath}: Not registering component variant `val $propertyName`, as only top-level component variants are supported at this time")
+        reporter.error("${file.absolutePath}: Not registering component variant `val $propertyName`, as only top-level component variants are supported at this time")
         return false
     }
 
@@ -112,7 +112,7 @@ private fun processComponentVariant(
         silkVariants.add(ComponentVariantEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
-        reporter.report("${file.absolutePath}: Not registering component variant `val $propertyName`, as it is not public")
+        reporter.error("${file.absolutePath}: Not registering component variant `val $propertyName`, as it is not public")
         false
     }
 }
@@ -171,7 +171,7 @@ private fun processKeyframes(
             showWarning = !isInsideStylesheet
         }
         if (showWarning) {
-            reporter.report("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as only top-level definitions are supported at this time")
+            reporter.error("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as only top-level definitions are supported at this time")
         }
         return false
     }
@@ -181,7 +181,7 @@ private fun processKeyframes(
         keyframesList.add(KeyframesEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
-        reporter.report("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as it is not public")
+        reporter.error("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as it is not public")
         false
     }
 }
@@ -275,7 +275,7 @@ class FrontendDataProcessor(
                         when (entry.shortName?.asString()) {
                             pageSimpleName -> {
                                 if (!annotations.mapNotNull { it.shortName?.asString() }.contains("Composable")) {
-                                    reporter.report("${file.absolutePath}: `fun ${element.name}` annotated with `@$pageSimpleName` must also be `@Composable`.")
+                                    reporter.error("${file.absolutePath}: `fun ${element.name}` annotated with `@$pageSimpleName` must also be `@Composable`.")
                                 }
 
                                 val routeOverride = entry.getStringValue(0)?.takeIf { it.isNotBlank() }
@@ -301,10 +301,10 @@ class FrontendDataProcessor(
                                             )
                                         )
                                     } else {
-                                        reporter.report("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. Route override is invalid.")
+                                        reporter.error("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. Route override is invalid.")
                                     }
                                 } else {
-                                    reporter.report("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
+                                    reporter.error("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
                                 }
                             }
 
@@ -361,7 +361,7 @@ class FrontendDataProcessor(
                     if (value != "{}") value else "{${currPackage.substringAfterLast('.')}}"
                 }
             } else {
-                reporter.report("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
+                reporter.error("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
             }
         }
     }
@@ -403,6 +403,18 @@ class FrontendDataProcessor(
                     "$slugPrefix$prefixExtra/$slug"
                 )
             )
+        }
+
+        run {
+            val finalRouteNames = pages.map { page -> page.route }.toSet()
+            pages.forEach { page ->
+                if (page.route.endsWith('/')) {
+                    val withoutSlashSuffix = page.route.removeSuffix("/")
+                    if (finalRouteNames.contains(withoutSlashSuffix)) {
+                        reporter.warn("Your site defines both \"$withoutSlashSuffix\" and \"${page.route}\", which may be confusing to users. Unless this was intentional, removing one or the other is suggested.")
+                    }
+                }
+            }
         }
 
         return FrontendData(pages, kobwebInits, silkInits, silkStyles, silkVariants, keyframesList).also { it.assertValid() }
