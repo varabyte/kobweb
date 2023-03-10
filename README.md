@@ -1577,39 +1577,47 @@ $ git clone --recurse-submodules https://github.com/varabyte/kobweb
 $ git submodule update --init
 ```
 
-## What about Multiplatform Widgets?
+<!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
+## <span id="what-about-multiplatform-widgets">What about Compose for Web Canvas?</span>
 
-Jetbrains is working on an experimental project called "multiplatform widgets" which is supposed to bring the Desktop /
-Android API to the web. And it may seem like the Kobweb + Silk approach will be obsolete when it is finished.
+Jetbrains is working on a project called "Compose for Web Canvas", which will bring the Android API to the web. And it
+may seem like the Kobweb + Silk approach will be obsolete when it is finished.
 
-However, I've found there is a fundamental distance between Desktop / Android flavors of Compose and Compose for Web.
-Specifically, Desktop / Android targets render to their own surface, while Web modifies an html / css DOM tree and
-leaves it up to the browser to do the final rendering.
+
+It's first worth understanding the core difference between the two approaches. With Jetpack Compose, the framework owns
+its own rendering pipeline, drawing to a buffer, while Compose for Web modifies an HTML / CSS DOM tree and leaves it up
+to the browser to do the final rendering.
 
 This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
 modifiers matters, while in Web, this action simply sets html style properties under the hood, where order does not
 matter.
 
-One approach would be to own the entire rendering pipeline, ditching html / css entirely and targeting a full page
-canvas. However, this has several limits:
+Ditching HTML / CSS entirely at first can seem like a total win, but this approach has several limits:
 
-* robots would lose the ability to crawl and index your site
-* your UI will be opaque to the rich suite of dev tools that come bundled with browsers
+* robots would lose the ability to crawl and index your site, hurting SEO.
+* your initial render may take longer.
+* your site will need to allocate a large canvas buffer, which could be *very* expensive on high res, wide-screen
+  desktops.
+* your UI will be opaque to the rich suite of dev tools that come bundled with browsers.
 * you won't have the ability to style unvisited vs visited links differently (this information is hidden from you by
-  the browser and can only be set through html / css)
-* you won't have the ability to turn elements on / off when printing the page
-* accessibility tools for browsers might not work
+  the browser for security reasons and can only be set through HTML / CSS).
+* you won't have the ability to turn elements on / off when printing the page.
+* accessibility tools for browsers might not work.
 
-It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there that modify
-the DOM tree themselves.
+It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there.
 
-For now, I am making a bet that the best way forward is to embrace the web, sticking to html / css, but providing a rich
-UI library of widgets that hopefully makes it relatively rare for the developer to worry about it. For example, flexbox
-is a very powerful component, but you'll find it's much easier to compose `Row`s and `Column`s together than trying to
-remember if you should be justifying your items or aligning your content, even if `Row`s and `Column`s are just creating
-the correct html / css for you behind the scenes.
+For now, I am making a bet that there will always be value in embracing the web, providing a framework that sticks to
+HTML / CSS but provides a growing suite of UI widgets that hopefully makes it relatively rare for the developer to
+need to worry about it.
 
-I think there is value in supporting both approaches.
+For example, flexbox is a very powerful component, but you'll find it's much easier to compose `Row`s and `Column`s
+together than trying to remember if you should be justifying your items or aligning your content, even if `Row`s and
+`Column`s are just creating the correct HTML / CSS for you behind the scenes.
+
+Ultimately, I believe there is room for both approaches. If you want to make an app experience that feels the same on
+Android, iOS, and web, then "Compose for Web Canvas" could be great for you. However, if you just want to make a
+traditional website but would rather use Kotlin instead of TypeScript, Kobweb can provide an excellent experience in
+that case.
 
 # Can We Kobweb Yet
 
