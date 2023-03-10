@@ -514,7 +514,7 @@ overwritten by the other.
 Silk is a UI layer included with Kobweb and built upon Compose for Web. (To learn more about Compose for Web, please
 visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started)).
 
-While Compose for Web requires you to understand underlying html / css concepts, Silk attempts to abstract some of that
+While Compose for Web requires you to understand underlying HTML / CSS concepts, Silk attempts to abstract some of that
 away, providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
 "div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
 
@@ -534,7 +534,7 @@ Inline styles are defined on the element tag itself. In raw HTML, this might loo
 <div style="background-color:black">
 ```
 
-Meanwhile, any given html page can reference a list of stylesheets which can define a bunch of styles, where each style
+Meanwhile, any given HTML page can reference a list of stylesheets which can define a bunch of styles, where each style
 is tied to a selector (a rule which _selects_ what elements those styles apply to).
 
 A concrete example of a very short stylesheet can help here:
@@ -560,11 +560,11 @@ And you could use that stylesheet to style the following document:
 </body>
 ```
 
-There's no hard and fast rule, but in general, when writing html / css by hand, stylesheets are often preferred over
-inline styles as it better maintains a separation of concerns. That is, the html should represent the content of your
-site, while the css controls the look and feel.
+There's no hard and fast rule, but in general, when writing HTML / CSS by hand, stylesheets are often preferred over
+inline styles as it better maintains a separation of concerns. That is, the HTML should represent the content of your
+site, while the CSS controls the look and feel.
 
-However! We're not writing html / css by hand. We're using Compose for Web! So the distinctions discussed up until now
+However! We're not writing HTML / CSS by hand. We're using Compose for Web! So the distinctions discussed up until now
 are less important here.
 
 That said, there are times when you have to use stylesheets, because without them you can't define styles for advanced
@@ -734,7 +734,7 @@ val CustomStyle by ComponentStyle {
 
 #### Breakpoints
 
-There's a feature in the world of responsive html / css design called breakpoints, which confusingly have nothing to do
+There's a feature in the world of responsive HTML / CSS design called breakpoints, which confusingly have nothing to do
 with debugging breakpoints. Rather, they specify size boundaries for your site when styles change. This is how sites
 present content differently on mobile vs. tablet vs. desktop.
 
