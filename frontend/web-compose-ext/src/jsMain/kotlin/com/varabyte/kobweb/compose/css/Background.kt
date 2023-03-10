@@ -78,3 +78,37 @@ class BackgroundOrigin private constructor(private val value: String): StyleProp
 fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
     backgroundOrigin(backgroundOrigin.toString())
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
+sealed class BackgroundRepeat private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    open class Keyword internal constructor(value: String) : BackgroundRepeat(value)
+    class RepeatStyle internal constructor(value: String) : Keyword(value)
+
+    companion object {
+        // Keywords
+        val RepeatX get() = Keyword("repeat-x")
+        val RepeatY get() = Keyword("repeat-y")
+
+        val Repeat get() = RepeatStyle("repeat")
+        val Space get() = RepeatStyle("space")
+        val Round get() = RepeatStyle("round")
+        val NoRepeat get() = RepeatStyle("np-repeat")
+
+        // Global values
+        val Inherit get() = Keyword("inherit")
+        val Initial get() = Keyword("initial")
+        val Revert get() = Keyword("revert")
+        val RevertLayer get() = Keyword("revert")
+        val Unset get() = Keyword("unset")
+    }
+}
+
+fun StyleScope.backgroundRepeat(backgroundRepeat: BackgroundRepeat) {
+    backgroundRepeat(backgroundRepeat.toString())
+}
+
+fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertical: BackgroundRepeat.RepeatStyle) {
+    backgroundRepeat("$horizontal $vertical")
+}

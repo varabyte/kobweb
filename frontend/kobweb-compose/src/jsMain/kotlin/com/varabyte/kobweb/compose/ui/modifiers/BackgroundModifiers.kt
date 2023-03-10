@@ -88,6 +88,23 @@ fun Modifier.backgroundPosition(value: String) = styleModifier {
     backgroundPosition(value)
 }
 
+fun Modifier.backgroundRepeat(backgroundRepeat: BackgroundRepeat) = styleModifier {
+    backgroundRepeat(backgroundRepeat)
+}
+
+fun Modifier.backgroundRepeat(horizontalRepeat: BackgroundRepeat.RepeatStyle, verticalRepeat: BackgroundRepeat.RepeatStyle) = styleModifier {
+    backgroundRepeat(horizontalRepeat, verticalRepeat)
+}
+
+// TODO(#168): Remove before v1.0
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { backgroundRepeat(value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier",
+        "org.jetbrains.compose.web.css.backgroundRepeat"
+    ),
+)
 fun Modifier.backgroundRepeat(value: String) = styleModifier {
     backgroundRepeat(value)
 }
