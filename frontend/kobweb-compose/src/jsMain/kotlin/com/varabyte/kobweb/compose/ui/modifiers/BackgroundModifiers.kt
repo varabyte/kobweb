@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
+import com.varabyte.kobweb.compose.css.MixBlendMode
+import com.varabyte.kobweb.compose.css.backgroundBlendMode
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -10,6 +12,10 @@ fun Modifier.background(value: String) = styleModifier {
 
 fun Modifier.backgroundAttachment(value: String) = styleModifier {
     backgroundAttachment(value)
+}
+
+fun Modifier.backgroundBlendMode(vararg blendModes: MixBlendMode) = styleModifier {
+    backgroundBlendMode(*blendModes)
 }
 
 fun Modifier.backgroundClip(value: String) = styleModifier {
