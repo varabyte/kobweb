@@ -67,6 +67,19 @@ fun Modifier.backgroundImage(value: String) = styleModifier {
     backgroundImage(value)
 }
 
+fun Modifier.backgroundOrigin(backgroundOrigin: BackgroundOrigin) = styleModifier {
+    backgroundOrigin(backgroundOrigin)
+}
+
+// TODO(#168): Remove before v1.0
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { backgroundOrigin(value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier",
+        "org.jetbrains.compose.web.css.backgroundOrigin"
+    ),
+)
 fun Modifier.backgroundOrigin(value: String) = styleModifier {
     backgroundOrigin(value)
 }

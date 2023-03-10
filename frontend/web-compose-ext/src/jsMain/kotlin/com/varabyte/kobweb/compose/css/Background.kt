@@ -1,8 +1,7 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.StyleScope
-import org.jetbrains.compose.web.css.backgroundAttachment
+import com.varabyte.kobweb.compose.css.backgroundOrigin
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.backgroundClip
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
@@ -55,4 +54,27 @@ class BackgroundClip private constructor(private val value: String): StyleProper
 
 fun StyleScope.backgroundClip(backgroundClip: BackgroundClip) {
     backgroundClip(backgroundClip.toString())
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
+class BackgroundOrigin private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val BorderBox get() = BackgroundOrigin("border-box")
+        val PaddingBox get() = BackgroundOrigin("padding-box")
+        val ContentBox get() = BackgroundOrigin("content-box")
+
+        // Global values
+        val Inherit get() = BackgroundOrigin("inherit")
+        val Initial get() = BackgroundOrigin("initial")
+        val Revert get() = BackgroundOrigin("revert")
+        val RevertLayer get() = BackgroundOrigin("revert")
+        val Unset get() = BackgroundOrigin("unset")
+    }
+}
+
+fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
+    backgroundOrigin(backgroundOrigin.toString())
 }
