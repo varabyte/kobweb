@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.graphics
 
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.CSSColorValue
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
@@ -19,6 +21,7 @@ sealed interface Color : CSSColorValue {
     fun darkened(byPercent: Float = DEFAULT_SHIFTING_PERCENT): Color
 
     fun toRgb(): Rgb
+    fun toHsl(): Hsl
 
     /**
      * @property value A hex value representing this color as AARRGGBB, e.g. 0xFFFF0000 is red and 0xFF0000FF is blue.
@@ -34,8 +37,8 @@ sealed interface Color : CSSColorValue {
         val bluef: Float get() = blue.toColorFloat()
         val alphaf: Float get() = alpha.toColorFloat()
 
-        override fun inverted() = rgba(255 - red, 255 - green, 255 - blue, alpha)
-        override fun darkened(byPercent: Float): Rgb {
+        override fun inverted(): Color = rgba(255 - red, 255 - green, 255 - blue, alpha)
+        override fun darkened(byPercent: Float): Color {
             require(byPercent in (0f..1f)) { "Invalid color shifting percent. Expected between 0 and 1, got $byPercent"}
             if (byPercent == 0f) return this
 
@@ -53,6 +56,28 @@ sealed interface Color : CSSColorValue {
             return this
         }
 
+        override fun toHsl(): Hsl {
+            // https://en.wikipedia.org/wiki/HSL_and_HSV#Color_conversion_formulae
+            val chromaMax = maxOf(redf, greenf, bluef)
+            val chromaMin = minOf(redf, greenf, bluef)
+            val chromaDelta = chromaMax - chromaMin
+
+            val lightness = (chromaMin + chromaMax) / 2f
+            val saturation = chromaDelta / (1f - abs(2f*lightness - 1f))
+            val hue = if (chromaDelta == 0f) {
+                0f
+            } else {
+                60f * when {
+                    chromaMax == redf -> ((greenf - bluef) / chromaDelta) % 6
+                    chromaMax == greenf -> ((bluef - redf) / chromaDelta) + 2f
+                    chromaMax == bluef -> ((redf - greenf) / chromaDelta) + 4f
+                    else -> error("Unexpected chromaMax value $chromaMax")
+                }
+            }
+
+            return hsla(hue, saturation, lightness, alphaf)
+        }
+
         override fun toString(): String {
             return if (alpha == 0xFF) "rgb($red, $green, $blue)" else "rgba($red, $green, $blue, $alphaf)"
         }
@@ -66,6 +91,96 @@ sealed interface Color : CSSColorValue {
             var result = red.hashCode()
             result = 31 * result + green.hashCode()
             result = 31 * result + blue.hashCode()
+            result = 31 * result + alpha.hashCode()
+            return result
+        }
+    }
+
+    /**
+     * A representation for a color specified via hue, saturation, and lightness values.
+     *
+     * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
+     *
+     * @property hue An angle (0-360) representing the color based on its location in a color wheel.
+     * @property saturation A percentage value (0-1) representing how grey the color is
+     * @property lightness A percentage value (0-1) representing how bright the color is.`
+     * @property alpha A percentage value (0-1) representing how transparent the color is
+     */
+    class Hsl internal constructor(val hue: Float, val saturation: Float, val lightness: Float, val alpha: Float) : Color {
+        override fun inverted() = toRgb().inverted()
+        override fun darkened(byPercent: Float) = toRgb().darkened(byPercent)
+
+        fun copy(hue: Float = this.hue, saturation: Float = this.saturation, lightness: Float = this.lightness, alpha: Float = this.alpha) =
+            hsla(hue, saturation, lightness, alpha)
+
+        override fun toRgb(): Rgb {
+            // https://en.wikipedia.org/wiki/HSL_and_HSV#Color_conversion_formulae
+            val chroma = (1 - abs(2 * lightness - 1)) * saturation
+            val intermediateValue = chroma * (1 - abs(((hue / 60) % 2) - 1))
+            val hueSection = (hue.toInt() % 360) / 60
+            val r: Float; val g: Float; val b: Float;
+            when (hueSection) {
+                0 -> {
+                    r = chroma
+                    g = intermediateValue
+                    b = 0f
+                }
+                1 -> {
+                    r = intermediateValue
+                    g = chroma
+                    b = 0f
+                }
+                2 -> {
+                    r = 0f
+                    g = chroma
+                    b = intermediateValue
+                }
+                3 -> {
+                    r = 0f
+                    g = intermediateValue
+                    b = chroma
+                }
+                4 -> {
+                    r = intermediateValue
+                    g = 0f
+                    b = chroma
+                }
+                else -> {
+                    check(hueSection == 5)
+                    r = chroma
+                    g = 0f
+                    b = intermediateValue
+                }
+            }
+            val lightnessAdjustment = lightness - chroma / 2
+
+            return rgba(r + lightnessAdjustment, g + lightnessAdjustment, b + lightnessAdjustment, alpha)
+        }
+
+        override fun toHsl(): Hsl {
+            return this
+        }
+
+        override fun toString(): String {
+            // Make sure println doesn't show more than a single decimal point
+            val hueRounded = (hue * 10).roundToInt() / 10f
+            val saturationPercent = (saturation * 1000).roundToInt() / 10f
+            val lightnessPercent = (lightness * 1000).roundToInt() / 10f
+            return if (alpha == 1.0f)
+                "hsl($hueRounded°, $saturationPercent%, $lightnessPercent%)"
+            else
+                "hsla($hueRounded°, $saturationPercent%, $lightnessPercent%, $alpha)"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            return other is Hsl && hue == other.hue && saturation == other.saturation && lightness == other.lightness && alpha == other.alpha
+        }
+
+        override fun hashCode(): Int {
+            var result = hue.hashCode()
+            result = 31 * result + saturation.hashCode()
+            result = 31 * result + lightness.hashCode()
             result = 31 * result + alpha.hashCode()
             return result
         }
@@ -106,6 +221,11 @@ sealed interface Color : CSSColorValue {
 
         fun rgba(r: Int, g: Int, b: Int, a: Float) = rgba(r, g, b, a.toColorInt())
         fun argb(a: Float, r: Int, g: Int, b: Int) = rgba(r, g, b, a)
+
+        fun hsl(h: Int, s: Float, l: Float) = hsl(h.toFloat(), s, l)
+        fun hsla(h: Int, s: Float, l: Float, a: Float) = hsla(h.toFloat(), s, l, a)
+        fun hsl(h: Float, s: Float, l: Float) = Hsl(h, s, l, 1f)
+        fun hsla(h: Float, s: Float, l: Float, a: Float) = Hsl(h, s, l, a)
     }
 }
 
