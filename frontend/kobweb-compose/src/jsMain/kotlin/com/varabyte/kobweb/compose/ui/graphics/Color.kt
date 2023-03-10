@@ -1,11 +1,22 @@
 package com.varabyte.kobweb.compose.ui.graphics
 
+import org.jetbrains.compose.web.css.CSSAngleValue
 import org.jetbrains.compose.web.css.CSSColorValue
+import org.jetbrains.compose.web.css.CSSPercentageValue
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
+
+private fun CSSAngleValue.toDegrees() = when (this.unit.toString()) {
+    "deg" -> value
+    "grad" -> (value * 0.9f)
+    "rad" -> (value * 180f / PI.toFloat())
+    "turn" -> (value * 360f)
+    else -> error("Unexpected unit type ${this.unit}")
+} % 360f
 
 /**
  * A base class for colors which provide additional functionality on top of the color class included in Compose for Web.
@@ -226,6 +237,24 @@ sealed interface Color : CSSColorValue {
         fun hsla(h: Int, s: Float, l: Float, a: Float) = hsla(h.toFloat(), s, l, a)
         fun hsl(h: Float, s: Float, l: Float) = Hsl(h, s, l, 1f)
         fun hsla(h: Float, s: Float, l: Float, a: Float) = Hsl(h, s, l, a)
+
+        // Provide convenience methods for CSS value parameter types
+
+        fun rgb(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) = rgba(r, g, b, 1f)
+        fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: CSSPercentageValue) =
+            rgba(r.value / 100f, g.value / 100f, b.value / 100f, a.value / 100f)
+        fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: Float) =
+            rgba(r.value / 100f, g.value / 100f, b.value / 100f, a)
+        fun argb(a: CSSPercentageValue, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) =
+            argb(a.value / 100f, r.value / 100f, g.value / 100f, b.value / 100f)
+        fun argb(a: Float, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) =
+            argb(a, r.value / 100f, g.value / 100f, b.value / 100f)
+
+        fun hsl(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue) = hsla(h, s, l, 1f)
+        fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: Float) =
+            hsla(h.toDegrees(), s.value / 100f, l.value / 100f, alpha)
+        fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: CSSPercentageValue) =
+            hsla(h, s, l, alpha.value / 100f)
     }
 }
 
