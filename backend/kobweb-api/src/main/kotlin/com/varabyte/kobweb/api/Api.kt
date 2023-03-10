@@ -7,6 +7,8 @@ package com.varabyte.kobweb.api
  * The method's filename will be used to generate its slug, e.g. "api/user/Fetch.kt" ->
  * "/api/user/fetch".
  *
+ * Additionally, the name transformation lowercases the route, e.g. "api/ReserveId.kt" -> "api/reserveid"
+ *
  * ## routeOverride
  *
  * Note that the route generated for this page is quite customizable by setting the [routeOverride] parameter. In
