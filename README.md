@@ -1531,7 +1531,7 @@ To read more about the feature, please check out the
 
 ## Multimodule
 
-For simplicity, most new projects will put all their pages and widgets inside a single application module.
+For simplicity, new projects can choose to put all their pages and widgets inside a single application module.
 
 However, Kobweb is capable of splitting code up across modules. You can define components and/or pages in separate
 modules and apply the `com.varabyte.kobweb.library` plugin on them (in contrast to your main module which applies the
