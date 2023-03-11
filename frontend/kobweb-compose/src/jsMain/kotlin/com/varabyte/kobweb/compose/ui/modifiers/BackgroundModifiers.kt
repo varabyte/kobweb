@@ -4,7 +4,6 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 fun Modifier.background(value: String) = styleModifier {
     background(value)
@@ -125,26 +124,6 @@ fun Modifier.backgroundRepeat(value: String) = styleModifier {
 
 fun Modifier.backgroundSize(backgroundSize: BackgroundSize) = styleModifier {
     backgroundSize(backgroundSize)
-}
-
-fun Modifier.backgroundSize(width: CSSLengthOrPercentageValue) = styleModifier {
-    backgroundSize(width)
-}
-
-fun Modifier.backgroundSize(width: CSSAutoKeyword) = styleModifier {
-    backgroundSize(width)
-}
-
-fun Modifier.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue) = styleModifier {
-    backgroundSize(width, height)
-}
-
-fun Modifier.backgroundSize(width: CSSAutoKeyword, height: CSSLengthOrPercentageValue) = styleModifier {
-    backgroundSize(width, height)
-}
-
-fun Modifier.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSAutoKeyword) = styleModifier {
-    backgroundSize(width, height)
 }
 
 // TODO(#168): Remove before v1.0

@@ -154,47 +154,32 @@ fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertic
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
-class BackgroundSize private constructor(private val value: String): StylePropertyValue {
+sealed class BackgroundSize private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
 
+    private class Keyword internal constructor(value: String) : BackgroundSize(value)
+    private class Size internal constructor(value: String) : BackgroundSize(value)
+
     companion object {
+        fun of(width: CSSLengthOrPercentageValue): BackgroundSize = Size("$width")
+        fun of(width: CSSAutoKeyword): BackgroundSize = Size("$width")
+        fun of(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue): BackgroundSize = Size("$width $height")
+        fun of(width: CSSAutoKeyword, height: CSSLengthOrPercentageValue): BackgroundSize = Size("$width $height")
+        fun of(width: CSSLengthOrPercentageValue, height: CSSAutoKeyword): BackgroundSize = Size("$width $height")
+
         // Keywords
-        val Cover get() = BackgroundSize("cover")
-        val Contain get() = BackgroundSize("contain")
+        val Cover get(): BackgroundSize = Keyword("cover")
+        val Contain get(): BackgroundSize = Keyword("contain")
 
         // Global values
-        val Inherit get() = BackgroundSize("inherit")
-        val Initial get() = BackgroundSize("initial")
-        val Revert get() = BackgroundSize("revert")
-        val RevertLayer get() = BackgroundSize("revert")
-        val Unset get() = BackgroundSize("unset")
+        val Inherit get(): BackgroundSize = Keyword("inherit")
+        val Initial get(): BackgroundSize = Keyword("initial")
+        val Revert get(): BackgroundSize = Keyword("revert")
+        val RevertLayer get(): BackgroundSize = Keyword("revert")
+        val Unset get(): BackgroundSize = Keyword("unset")
     }
 }
 
 fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
     backgroundSize(backgroundSize.toString())
-}
-
-// Width only
-
-fun StyleScope.backgroundSize(width: CSSLengthOrPercentageValue) {
-    backgroundSize("$width")
-}
-
-fun StyleScope.backgroundSize(width: CSSAutoKeyword) {
-    backgroundSize("$width")
-}
-
-// Width / height
-
-fun StyleScope.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue) {
-    backgroundSize("$width $height")
-}
-
-fun StyleScope.backgroundSize(width: CSSAutoKeyword, height: CSSLengthOrPercentageValue) {
-    backgroundSize("$width $height")
-}
-
-fun StyleScope.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSAutoKeyword) {
-    backgroundSize("$width $height")
 }
