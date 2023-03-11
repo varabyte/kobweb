@@ -216,3 +216,46 @@ sealed class BackgroundSize private constructor(private val value: String): Styl
 fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
     backgroundSize(backgroundSize.toString())
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
+data class CSSBackground(
+    val image: BackgroundImage? = null,
+    val color: CSSColorValue? = null,
+    val repeat: BackgroundRepeat? = null,
+    val position: BackgroundPosition? = null,
+    val size: BackgroundSize? = null,
+    val origin: BackgroundOrigin? = null,
+    val clip: BackgroundClip? = null,
+    val attachment: BackgroundAttachment? = null
+) : CSSStyleValue {
+    override fun toString() = buildList {
+        image?.let { add(it.toString()) }
+        color?.let { add(it.toString()) }
+        repeat?.let { add(it) }
+        position?.let { add(it.toString()) }
+        this@CSSBackground.size?.let {
+            // Size must ALWAYS follow position with a slash
+            // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#syntax
+            if (position == null) add(BackgroundPosition.Center.toString())
+            add("/")
+            add(it.toString())
+        }
+        origin?.let {
+            add(it)
+            // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#values
+            if (clip == null) add(BackgroundClip.BorderBox.toString())
+        }
+        clip?.let {
+            // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#values
+            if (origin == null) add(BackgroundOrigin.PaddingBox.toString())
+            add(it)
+        }
+        attachment?.let { add(it) }
+    }.joinToString(" ")
+}
+
+fun StyleScope.background(vararg backgrounds: CSSBackground) {
+    if (backgrounds.isNotEmpty()) {
+        property("background", backgrounds.joinToString(", "))
+    }
+}

@@ -7,6 +7,19 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
+fun Modifier.background(vararg backgrounds: CSSBackground) = styleModifier {
+    background(*backgrounds)
+}
+
+// TODO(#168): Remove before v1.0
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { background(value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier",
+        "org.jetbrains.compose.web.css.background"
+    ),
+)
 fun Modifier.background(value: String) = styleModifier {
     background(value)
 }
