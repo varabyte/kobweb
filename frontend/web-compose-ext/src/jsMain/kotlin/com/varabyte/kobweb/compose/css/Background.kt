@@ -79,6 +79,46 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
     backgroundOrigin(backgroundOrigin.toString())
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
+sealed class BackgroundPosition(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    class Keyword internal constructor(value: String) : BackgroundPosition(value)
+    sealed class Edge(value: String) : BackgroundPosition(value)
+    class EdgeX internal constructor(value: String) : Edge(value)
+    class EdgeY internal constructor(value: String) : Edge(value)
+    class EdgeOffset internal constructor(edge: Edge? = null, offset: CSSLengthOrPercentageValue) : BackgroundPosition("$edge $offset")
+    class Position internal constructor(x: EdgeOffset, y: EdgeOffset) : BackgroundPosition("$x $y")
+
+    companion object {
+        fun of(xAnchor: EdgeX, x: CSSLengthOrPercentageValue) = EdgeOffset(xAnchor, x)
+        fun of(yAnchor: EdgeY, y: CSSLengthOrPercentageValue) = EdgeOffset(yAnchor, y)
+        fun of(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) =
+            Position(EdgeOffset(xAnchor, x), EdgeOffset(yAnchor, y))
+        fun of(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) = this.of(Left, x, Top, y)
+
+        // Edges
+        val Top get() = EdgeY("top")
+        val Bottom get() = EdgeY("bottom")
+        val Left get() = EdgeX("left")
+        val Right get() = EdgeX("right")
+
+        // Keyword
+        val Center get() = Keyword("center")
+
+        // Global values
+        val Inherit get() = Keyword("inherit")
+        val Initial get() = Keyword("initial")
+        val Revert get() = Keyword("revert")
+        val RevertLayer get() = Keyword("revert")
+        val Unset get() = Keyword("unset")
+    }
+}
+
+fun StyleScope.backgroundPosition(backgroundPosition: BackgroundPosition) {
+    backgroundPosition(backgroundPosition.toString())
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
 sealed class BackgroundRepeat private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
