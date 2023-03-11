@@ -4,6 +4,7 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 fun Modifier.background(value: String) = styleModifier {
     background(value)
@@ -109,6 +110,39 @@ fun Modifier.backgroundRepeat(value: String) = styleModifier {
     backgroundRepeat(value)
 }
 
+fun Modifier.backgroundSize(backgroundSize: BackgroundSize) = styleModifier {
+    backgroundSize(backgroundSize)
+}
+
+fun Modifier.backgroundSize(width: CSSLengthOrPercentageValue) = styleModifier {
+    backgroundSize(width)
+}
+
+fun Modifier.backgroundSize(width: CSSAutoKeyword) = styleModifier {
+    backgroundSize(width)
+}
+
+fun Modifier.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue) = styleModifier {
+    backgroundSize(width, height)
+}
+
+fun Modifier.backgroundSize(width: CSSAutoKeyword, height: CSSLengthOrPercentageValue) = styleModifier {
+    backgroundSize(width, height)
+}
+
+fun Modifier.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSAutoKeyword) = styleModifier {
+    backgroundSize(width, height)
+}
+
+// TODO(#168): Remove before v1.0
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { backgroundSize(value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier",
+        "org.jetbrains.compose.web.css.backgroundSize"
+    ),
+)
 fun Modifier.backgroundSize(value: String) = styleModifier {
     backgroundSize(value)
 }

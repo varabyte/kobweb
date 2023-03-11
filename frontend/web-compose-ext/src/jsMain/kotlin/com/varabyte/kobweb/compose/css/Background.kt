@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.css.backgroundOrigin
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.backgroundClip
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
 class BackgroundAttachment private constructor(private val value: String): StylePropertyValue {
@@ -111,4 +111,50 @@ fun StyleScope.backgroundRepeat(backgroundRepeat: BackgroundRepeat) {
 
 fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertical: BackgroundRepeat.RepeatStyle) {
     backgroundRepeat("$horizontal $vertical")
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
+class BackgroundSize private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val Cover get() = BackgroundSize("cover")
+        val Contain get() = BackgroundSize("contain")
+
+        // Global values
+        val Inherit get() = BackgroundSize("inherit")
+        val Initial get() = BackgroundSize("initial")
+        val Revert get() = BackgroundSize("revert")
+        val RevertLayer get() = BackgroundSize("revert")
+        val Unset get() = BackgroundSize("unset")
+    }
+}
+
+fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
+    backgroundSize(backgroundSize.toString())
+}
+
+// Width only
+
+fun StyleScope.backgroundSize(width: CSSLengthOrPercentageValue) {
+    backgroundSize("$width")
+}
+
+fun StyleScope.backgroundSize(width: CSSAutoKeyword) {
+    backgroundSize("$width")
+}
+
+// Width / height
+
+fun StyleScope.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue) {
+    backgroundSize("$width $height")
+}
+
+fun StyleScope.backgroundSize(width: CSSAutoKeyword, height: CSSLengthOrPercentageValue) {
+    backgroundSize("$width $height")
+}
+
+fun StyleScope.backgroundSize(width: CSSLengthOrPercentageValue, height: CSSAutoKeyword) {
+    backgroundSize("$width $height")
 }
