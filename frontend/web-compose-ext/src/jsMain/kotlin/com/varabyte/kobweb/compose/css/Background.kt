@@ -1,7 +1,8 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.functions.CSSUrl
+import com.varabyte.kobweb.compose.css.functions.LinearGradient
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.backgroundClip
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
@@ -55,6 +56,38 @@ class BackgroundClip private constructor(private val value: String): StyleProper
 fun StyleScope.backgroundClip(backgroundClip: BackgroundClip) {
     backgroundClip(backgroundClip.toString())
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
+sealed class BackgroundImage private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    private class Keyword(value: String) : BackgroundImage(value)
+    private class Url(url: CSSUrl) : BackgroundImage(url.toString())
+    private class LinearGradient(linearGradient: com.varabyte.kobweb.compose.css.functions.LinearGradient) :
+        BackgroundImage(linearGradient.toString())
+
+
+    companion object {
+        fun of(url: CSSUrl): BackgroundImage = Url(url)
+        fun of(gradient: com.varabyte.kobweb.compose.css.functions.LinearGradient): BackgroundImage = LinearGradient(gradient)
+
+        // Global values
+        val Inherit get(): BackgroundImage = Keyword("inherit")
+        val Initial get(): BackgroundImage = Keyword("initial")
+        val Revert get(): BackgroundImage = Keyword("revert")
+        val RevertLayer get(): BackgroundImage = Keyword("revert")
+        val Unset get(): BackgroundImage = Keyword("unset")
+    }
+}
+
+fun StyleScope.backgroundImage(backgroundImage: BackgroundImage) {
+    backgroundImage(backgroundImage.toString())
+}
+
+// Convenience methods for common cases
+
+fun StyleScope.backgroundImage(url: CSSUrl) = backgroundImage(BackgroundImage.of(url))
+fun StyleScope.backgroundImage(linearGradient: LinearGradient) = backgroundImage(BackgroundImage.of(linearGradient))
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
 class BackgroundOrigin private constructor(private val value: String): StylePropertyValue {

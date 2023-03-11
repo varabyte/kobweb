@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.functions.CSSUrl
+import com.varabyte.kobweb.compose.css.functions.LinearGradient
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -63,6 +65,27 @@ fun Modifier.backgroundColor(color: CSSColorValue) = styleModifier {
     backgroundColor(color)
 }
 
+fun Modifier.backgroundImage(backgroundImage: BackgroundImage) = styleModifier {
+    backgroundImage(backgroundImage)
+}
+
+fun Modifier.backgroundImage(url: CSSUrl) = styleModifier {
+    backgroundImage(url)
+}
+
+fun Modifier.backgroundImage(gradient: LinearGradient) = styleModifier {
+    backgroundImage(gradient)
+}
+
+// TODO(#168): Remove before v1.0
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
+    ReplaceWith(
+        "styleModifier { backgroundImage(value) }",
+        "com.varabyte.kobweb.compose.ui.styleModifier",
+        "org.jetbrains.compose.web.css.backgroundImage"
+    ),
+)
 fun Modifier.backgroundImage(value: String) = styleModifier {
     backgroundImage(value)
 }
