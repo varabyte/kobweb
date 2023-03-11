@@ -134,7 +134,7 @@ sealed class BackgroundRepeat private constructor(private val value: String): St
         val Repeat get() = RepeatStyle("repeat")
         val Space get() = RepeatStyle("space")
         val Round get() = RepeatStyle("round")
-        val NoRepeat get() = RepeatStyle("np-repeat")
+        val NoRepeat get() = RepeatStyle("no-repeat")
 
         // Global values
         val Inherit get() = Keyword("inherit")
