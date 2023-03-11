@@ -45,7 +45,7 @@ sealed class LinearGradient(private val paramsStr: String) : Gradient {
     class ParamsBuilder {
         private val params = mutableListOf<LinearGradient.Param>()
         internal fun verifiedParams(): Array<LinearGradient.Param> {
-            check(params.count { it is LinearGradient.Param.Color } >= 2) { "A linear gradient should consistent of at least three color entries"}
+            check(params.count { it is LinearGradient.Param.Color } >= 2) { "A linear gradient should consistent of at least two color entries (an initial color and an end color)"}
             params.forEachIndexed { i, param ->
                 if (param is LinearGradient.Param.Hint) {
                     check(params.getOrNull(i - 1) is LinearGradient.Param.Color && params.getOrNull(i + 1) is LinearGradient.Param.Color) {
