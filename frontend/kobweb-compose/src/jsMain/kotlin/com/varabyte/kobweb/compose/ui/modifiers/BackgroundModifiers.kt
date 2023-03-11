@@ -26,8 +26,8 @@ fun Modifier.backgroundAttachment(value: String) = styleModifier {
     backgroundAttachment(value)
 }
 
-fun Modifier.backgroundBlendMode(vararg blendModes: MixBlendMode) = styleModifier {
-    backgroundBlendMode(*blendModes)
+fun Modifier.backgroundBlendMode(blendMode: MixBlendMode) = styleModifier {
+    backgroundBlendMode(blendMode)
 }
 
 fun Modifier.backgroundClip(backgroundClip: BackgroundClip) = styleModifier {

@@ -28,8 +28,8 @@ fun StyleScope.backgroundAttachment(backgroundAttachment: BackgroundAttachment) 
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode
-fun StyleScope.backgroundBlendMode(vararg blendModes: MixBlendMode) {
-    property("background-blend-mode", blendModes.joinToString())
+fun StyleScope.backgroundBlendMode(blendMode: MixBlendMode) {
+    property("background-blend-mode", blendMode)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip
