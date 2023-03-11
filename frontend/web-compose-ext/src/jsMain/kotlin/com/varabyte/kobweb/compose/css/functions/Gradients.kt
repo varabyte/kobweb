@@ -43,12 +43,12 @@ sealed class LinearGradient(private val paramsStr: String) : Gradient {
     }
 
     class ParamsBuilder {
-        private val params = mutableListOf<LinearGradient.Param>()
-        internal fun verifiedParams(): Array<LinearGradient.Param> {
-            check(params.count { it is LinearGradient.Param.Color } >= 2) { "A linear gradient should consistent of at least two color entries (an initial color and an end color)"}
+        private val params = mutableListOf<Param>()
+        internal fun verifiedParams(): Array<Param> {
+            check(params.count { it is Param.Color } >= 2) { "A linear gradient should consistent of at least two color entries (an initial color and an end color)"}
             params.forEachIndexed { i, param ->
-                if (param is LinearGradient.Param.Hint) {
-                    check(params.getOrNull(i - 1) is LinearGradient.Param.Color && params.getOrNull(i + 1) is LinearGradient.Param.Color) {
+                if (param is Param.Hint) {
+                    check(params.getOrNull(i - 1) is Param.Color && params.getOrNull(i + 1) is Param.Color) {
                         "A gradient color midpoint must only be added between two colors"
                     }
                 }
@@ -56,14 +56,14 @@ sealed class LinearGradient(private val paramsStr: String) : Gradient {
             return params.toTypedArray()
         }
 
-        fun add(color: CSSColorValue) = params.add(LinearGradient.Param.Color.Simple(color))
-        fun add(color: CSSColorValue, stop: CSSLengthOrPercentageValue) = params.add(LinearGradient.Param.Color.Stop(color, stop))
-        fun add(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) = params.add(LinearGradient.Param.Color.StopRange(color, from, to))
-        fun setMidpoint(hint: CSSLengthOrPercentageValue) = params.add(LinearGradient.Param.Hint(hint))
+        fun add(color: CSSColorValue) = params.add(Param.Color.Simple(color))
+        fun add(color: CSSColorValue, stop: CSSLengthOrPercentageValue) = params.add(Param.Color.Stop(color, stop))
+        fun add(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) = params.add(Param.Color.StopRange(color, from, to))
+        fun setMidpoint(hint: CSSLengthOrPercentageValue) = params.add(Param.Hint(hint))
     }
 
     internal class Default internal constructor(vararg params: Param) : LinearGradient(params.joinToString())
-    internal class ByDirection internal constructor(dir: LinearGradient.Direction, vararg params: Param) : LinearGradient("$dir, ${params.joinToString()}")
+    internal class ByDirection internal constructor(dir: Direction, vararg params: Param) : LinearGradient("$dir, ${params.joinToString()}")
     internal class ByAngle internal constructor(angle: CSSAngleValue, vararg params: Param) : LinearGradient("$angle, ${params.joinToString()}")
 }
 
