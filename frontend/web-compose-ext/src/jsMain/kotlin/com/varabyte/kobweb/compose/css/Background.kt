@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
-import com.varabyte.kobweb.compose.css.functions.LinearGradient
+import com.varabyte.kobweb.compose.css.functions.Gradient
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
@@ -63,13 +63,13 @@ sealed class BackgroundImage private constructor(private val value: String): Sty
 
     private class Keyword(value: String) : BackgroundImage(value)
     private class Url(url: CSSUrl) : BackgroundImage(url.toString())
-    private class LinearGradient(linearGradient: com.varabyte.kobweb.compose.css.functions.LinearGradient) :
-        BackgroundImage(linearGradient.toString())
+    private class Gradient(gradient: com.varabyte.kobweb.compose.css.functions.Gradient) :
+        BackgroundImage(gradient.toString())
 
 
     companion object {
         fun of(url: CSSUrl): BackgroundImage = Url(url)
-        fun of(gradient: com.varabyte.kobweb.compose.css.functions.LinearGradient): BackgroundImage = LinearGradient(gradient)
+        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): BackgroundImage = Gradient(gradient)
 
         // Global values
         val Inherit get(): BackgroundImage = Keyword("inherit")
@@ -87,7 +87,7 @@ fun StyleScope.backgroundImage(backgroundImage: BackgroundImage) {
 // Convenience methods for common cases
 
 fun StyleScope.backgroundImage(url: CSSUrl) = backgroundImage(BackgroundImage.of(url))
-fun StyleScope.backgroundImage(linearGradient: LinearGradient) = backgroundImage(BackgroundImage.of(linearGradient))
+fun StyleScope.backgroundImage(gradient: Gradient) = backgroundImage(BackgroundImage.of(gradient))
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
 class BackgroundOrigin private constructor(private val value: String): StylePropertyValue {

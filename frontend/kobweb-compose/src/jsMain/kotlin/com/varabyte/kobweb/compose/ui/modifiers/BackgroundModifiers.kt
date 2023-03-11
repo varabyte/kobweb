@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
-import com.varabyte.kobweb.compose.css.functions.LinearGradient
+import com.varabyte.kobweb.compose.css.functions.Gradient
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -73,7 +73,7 @@ fun Modifier.backgroundImage(url: CSSUrl) = styleModifier {
     backgroundImage(url)
 }
 
-fun Modifier.backgroundImage(gradient: LinearGradient) = styleModifier {
+fun Modifier.backgroundImage(gradient: Gradient) = styleModifier {
     backgroundImage(gradient)
 }
 
