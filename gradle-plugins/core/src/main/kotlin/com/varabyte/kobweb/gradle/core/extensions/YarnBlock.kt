@@ -42,6 +42,19 @@ sealed class YarnLockChangedStrategy {
     */
     class Fail(val rejectCreatingNewLock: Boolean = false) : YarnLockChangedStrategy()
 
+   /**
+    * Have the build leave the existing yarn lock as is.
+    *
+    * This should give the user a chance to manually inspect their yarn.lock file / update it with a command like
+    * `./gradlew kotlinUpgradeYarnLock`.
+    *
+    * This is expected to be a very rarely used strategy. It is provided for users who know what they are doing -- for
+    * example, they've manually updated their yarn.lock file on their own, they've removed it from the .gitignore file,
+    * they've checked it into source control, and they want to allow their Kobweb site to build despite newer
+    * dependencies being available.
+    */
+    object Ignore : YarnLockChangedStrategy()
+
     /**
      * Aggressively regenerate the yarn.lock file anytime it changes.
      *
