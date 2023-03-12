@@ -106,15 +106,29 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                 ServerEnvironment.DEV -> {
                     call.respondText(
                         buildString {
-                            appendLine(t.toString())
+                            var currThrowable: Throwable? = t
+                            var lastThrowable: Throwable? = null
+                            while (currThrowable != null) {
+                                if (lastThrowable != null) append("caused by: ")
+                                appendLine(currThrowable.toString())
 
-                            // Show the stack trace of the user's code but no need to share anything outside of that.
-                            // The user can't do anything with the extra information anyway, and this keeps the message
-                            // so much shorter.
-                            // Note: We use "startsWith" and not "equals" below because the full classname is an
-                            // anonymous inner class, something like "ApisFactoryImpo$create$2"
-                            t.stackTrace.takeWhile { !it.className.startsWith("ApisFactoryImpl") }.forEach {
-                                appendLine("\tat $it")
+                                // Show the stack trace of the user's code but no need to share anything outside of that.
+                                // The user can't do anything with the extra information anyway, and this keeps the message
+                                // so much shorter.
+                                // Note: We use "startsWith" and not "equals" below because the full classname is an
+                                // anonymous inner class, something like "ApisFactoryImpo$create$2"
+                                // If we're handling a "caused by" stack track, make sure the first stack trace doesn't
+                                // get repeated it in.
+                                val lastThrowableFirstStackTrace = lastThrowable?.stackTrace?.firstOrNull()?.toString()
+                                currThrowable.stackTrace.takeWhile {
+                                    !it.className.startsWith("ApisFactoryImpl")
+                                        && (lastThrowableFirstStackTrace == null || it.toString() != lastThrowableFirstStackTrace)
+                                }.forEach {
+                                    appendLine("\tat $it")
+                                }
+
+                                lastThrowable = currThrowable
+                                currThrowable = currThrowable.cause
                             }
                         },
                         status = HttpStatusCode.InternalServerError,
