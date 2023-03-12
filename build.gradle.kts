@@ -16,6 +16,8 @@ subprojects {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
+    // Require Java 11 for a few APIs. A very important one is ProcessHandle, used for detecting if a
+    // server is running in a cross-platform way.
     val versionStr = JavaVersion.VERSION_11.toString()
     tasks.withType<JavaCompile> {
         sourceCompatibility = versionStr
