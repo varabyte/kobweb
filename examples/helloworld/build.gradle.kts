@@ -18,6 +18,7 @@ repositories {
 
 kotlin {
     configAsKobwebApplication(includeServer = true)
+    jvmToolchain(11)
 
     sourceSets {
         val commonMain by getting {
