@@ -3,30 +3,16 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.path.toUnixSeparators
-import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
-import com.varabyte.kobweb.project.conf.KobwebConf
-import org.gradle.api.file.ConfigurableFileTree
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
 import javax.inject.Inject
-
-private fun File.parentStartingWith(prefix: String): File {
-    var match: File? = this
-    while (match != null) {
-        if (match.name.startsWith(prefix)) return match
-        match = match.parentFile
-    }
-    error("No parent found matching file prefix $prefix")
-}
 
 abstract class KobwebCopyDependencyResources @Inject constructor(
     kobwebBlock: KobwebBlock,
@@ -53,13 +39,14 @@ abstract class KobwebCopyDependencyResources @Inject constructor(
                     val fileTree = project.fileTree(jar)
                     fileTree.matching(patterns).files.map { file -> jar to RootAndFile(fileTree.dir, file) }
                 } else {
-                    // Annoyingly, zipTree won't tell you the root dir! But we need it to find the relative directory we
-                    // need to copy to. We use the jar name instead, as the zip file creates a path like
-                    // /some/tmp/path/jarname.jar_198403920482/path/to/zipped/file
-                    val zipTree = project.zipTree(jar)
-                    zipTree.matching(patterns).files.map { file ->
-                        jar to RootAndFile(file.parentStartingWith(jar.name), file)
+                    val unzipped = mutableListOf<Pair<File, RootAndFile>>()
+                    project.zipTree(jar).matching(patterns).visit {
+                        if (!this.isDirectory) {
+                            unzipped.add(jar to RootAndFile(File(file.absolutePath.removeSuffix(relativePath)), file))
+                        }
                     }
+
+                    unzipped
                 }
             }.forEach { (jar, rootAndFile) ->
                 val targetFile = File(getGenPublicRoot(), rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
