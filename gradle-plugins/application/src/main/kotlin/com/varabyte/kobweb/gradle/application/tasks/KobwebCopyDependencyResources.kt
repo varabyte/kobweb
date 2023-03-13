@@ -42,7 +42,9 @@ abstract class KobwebCopyDependencyResources @Inject constructor(
                     val unzipped = mutableListOf<Pair<File, RootAndFile>>()
                     project.zipTree(jar).matching(patterns).visit {
                         if (!this.isDirectory) {
-                            unzipped.add(jar to RootAndFile(File(file.absolutePath.removeSuffix(relativePath)), file))
+                            // relativePath always uses forward slash. Convert the absolute path to forward slashes,
+                            // therefore, before removing the suffix, or else Windows breaks.
+                            unzipped.add(jar to RootAndFile(File(file.absolutePath.toUnixSeparators().removeSuffix(relativePath)), file))
                         }
                     }
 
