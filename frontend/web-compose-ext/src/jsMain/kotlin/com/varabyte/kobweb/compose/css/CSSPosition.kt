@@ -72,7 +72,18 @@ class CSSPosition internal constructor(private val value: String): StyleProperty
     constructor(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) : this("$x $y")
 
     companion object {
+        /**
+         * Create a [CSSPosition] only specifying an absolute x position, offset from the left side of some element.
+         *
+         * The y position will default to the element's center.
+         */
         fun x(offset: CSSLengthOrPercentageValue) = CSSPosition("$offset")
+
+        /**
+         * Create a [CSSPosition] only specifying an absolute y position, offset from the top side of some element.
+         *
+         * The x position will default to the element's center.
+         */
         fun y(offset: CSSLengthOrPercentageValue) = CSSPosition("center $offset")
 
         // Positions
