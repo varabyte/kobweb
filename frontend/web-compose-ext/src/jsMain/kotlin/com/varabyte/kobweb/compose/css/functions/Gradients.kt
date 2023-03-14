@@ -4,11 +4,43 @@ import com.varabyte.kobweb.compose.css.CSSPosition
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 
-interface Gradient : CSSStyleValue
+interface Gradient : CSSStyleValue {
+    class ColorStopsBuilder {
+        internal sealed class Entry(private val entryStr: String) {
+            override fun toString() = entryStr
+            open class Color(val value: String) : Entry(value) {
+                class Simple(value: CSSColorValue) : Color("$value")
+                class Stop(color: CSSColorValue, stop: CSSLengthOrPercentageValue) : Color("$color $stop")
+                class StopRange(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) :
+                    Color("$color $from $to")
+            }
+            class Hint(val value: CSSLengthOrPercentageValue) : Entry("$value")
+        }
+
+        private val entries = mutableListOf<Entry>()
+        internal fun verifiedEntries(): Array<Entry> {
+            check(entries.count { it is Entry.Color } >= 2) { "A linear gradient should consistent of at least two color entries (an initial color and an end color)"}
+            entries.forEachIndexed { i, entry ->
+                if (entry is Entry.Hint) {
+                    check(entries.getOrNull(i - 1) is Entry.Color && entries.getOrNull(i + 1) is Entry.Color) {
+                        "A gradient color midpoint must only be added between two colors"
+                    }
+                }
+            }
+            return entries.toTypedArray()
+        }
+
+        fun add(color: CSSColorValue) = entries.add(Entry.Color.Simple(color))
+        fun add(color: CSSColorValue, stop: CSSLengthOrPercentageValue) = entries.add(Entry.Color.Stop(color, stop))
+        fun add(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) = entries.add(
+            Entry.Color.StopRange(color, from, to))
+        fun setMidpoint(hint: CSSLengthOrPercentageValue) = entries.add(Entry.Hint(hint))
+    }
+}
 
 // region linear gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/linear-gradient
 
-sealed class LinearGradient(private val paramsStr: String) : Gradient {
+sealed class LinearGradient(private val gradientStr: String) : Gradient {
     enum class Direction {
         ToTop,
         ToTopRight,
@@ -31,59 +63,28 @@ sealed class LinearGradient(private val paramsStr: String) : Gradient {
         }
     }
 
-    override fun toString() = "linear-gradient($paramsStr)"
+    override fun toString() = "linear-gradient($gradientStr)"
 
-    internal sealed class Param(private val paramStr: String) {
-        override fun toString() = paramStr
-        open class Color(val value: String) : Param(value) {
-            class Simple(value: CSSColorValue) : Color("$value")
-            class Stop(color: CSSColorValue, stop: CSSLengthOrPercentageValue) : Color("$color $stop")
-            class StopRange(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) :
-                Color("$color $from $to")
-        }
-        class Hint(val value: CSSLengthOrPercentageValue) : Param("$value")
-    }
-
-    class ParamsBuilder {
-        private val params = mutableListOf<Param>()
-        internal fun verifiedParams(): Array<Param> {
-            check(params.count { it is Param.Color } >= 2) { "A linear gradient should consistent of at least two color entries (an initial color and an end color)"}
-            params.forEachIndexed { i, param ->
-                if (param is Param.Hint) {
-                    check(params.getOrNull(i - 1) is Param.Color && params.getOrNull(i + 1) is Param.Color) {
-                        "A gradient color midpoint must only be added between two colors"
-                    }
-                }
-            }
-            return params.toTypedArray()
-        }
-
-        fun add(color: CSSColorValue) = params.add(Param.Color.Simple(color))
-        fun add(color: CSSColorValue, stop: CSSLengthOrPercentageValue) = params.add(Param.Color.Stop(color, stop))
-        fun add(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) = params.add(Param.Color.StopRange(color, from, to))
-        fun setMidpoint(hint: CSSLengthOrPercentageValue) = params.add(Param.Hint(hint))
-    }
-
-    internal class Default internal constructor(vararg params: Param) : LinearGradient(params.joinToString())
-    internal class ByDirection internal constructor(dir: Direction, vararg params: Param) : LinearGradient("$dir, ${params.joinToString()}")
-    internal class ByAngle internal constructor(angle: CSSAngleValue, vararg params: Param) : LinearGradient("$angle, ${params.joinToString()}")
+    internal class Default internal constructor(vararg entries: Gradient.ColorStopsBuilder.Entry) : LinearGradient(entries.joinToString())
+    internal class ByDirection internal constructor(dir: Direction, vararg entries: Gradient.ColorStopsBuilder.Entry) : LinearGradient("$dir, ${entries.joinToString()}")
+    internal class ByAngle internal constructor(angle: CSSAngleValue, vararg entries: Gradient.ColorStopsBuilder.Entry) : LinearGradient("$angle, ${entries.joinToString()}")
 }
 
-fun linearGradient(dir: LinearGradient.Direction, init: LinearGradient.ParamsBuilder.() -> Unit): LinearGradient {
-    return LinearGradient.ParamsBuilder().apply(init).let {
-        LinearGradient.ByDirection(dir, *it.verifiedParams())
+fun linearGradient(dir: LinearGradient.Direction, init: Gradient.ColorStopsBuilder.() -> Unit): LinearGradient {
+    return Gradient.ColorStopsBuilder().apply(init).let {
+        LinearGradient.ByDirection(dir, *it.verifiedEntries())
     }
 }
 
-fun linearGradient(angle: CSSAngleValue, init: LinearGradient.ParamsBuilder.() -> Unit): LinearGradient {
-    return LinearGradient.ParamsBuilder().apply(init).let {
-        LinearGradient.ByAngle(angle, *it.verifiedParams())
+fun linearGradient(angle: CSSAngleValue, init: Gradient.ColorStopsBuilder.() -> Unit): LinearGradient {
+    return Gradient.ColorStopsBuilder().apply(init).let {
+        LinearGradient.ByAngle(angle, *it.verifiedEntries())
     }
 }
 
-fun linearGradient(init: LinearGradient.ParamsBuilder.() -> Unit): LinearGradient {
-    return LinearGradient.ParamsBuilder().apply(init).let {
-        LinearGradient.Default(*it.verifiedParams())
+fun linearGradient(init: Gradient.ColorStopsBuilder.() -> Unit): LinearGradient {
+    return Gradient.ColorStopsBuilder().apply(init).let {
+        LinearGradient.Default(*it.verifiedEntries())
     }
 }
 
@@ -108,7 +109,7 @@ fun linearGradient(from: CSSColorValue, to: CSSColorValue) = linearGradient {
 
 // region linear gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/radial-gradient
 
-sealed class RadialGradient(private val paramsStr: String) : Gradient {
+sealed class RadialGradient(private val gradientStr: String) : Gradient {
     sealed class Shape(private val value: String) {
         override fun toString() = value
 
@@ -166,40 +167,9 @@ sealed class RadialGradient(private val paramsStr: String) : Gradient {
         override fun toString() = name.titleCamelCaseToKebabCase()
     }
 
-    override fun toString() = "radial-gradient($paramsStr)"
+    override fun toString() = "radial-gradient($gradientStr)"
 
-    internal sealed class Param(private val paramStr: String) {
-        override fun toString() = paramStr
-        open class Color(val value: String) : Param(value) {
-            class Simple(value: CSSColorValue) : Color("$value")
-            class Stop(color: CSSColorValue, stop: CSSLengthOrPercentageValue) : Color("$color $stop")
-            class StopRange(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) :
-                Color("$color $from $to")
-        }
-        class Hint(val value: CSSLengthOrPercentageValue) : Param("$value")
-    }
-
-    class ParamsBuilder {
-        private val params = mutableListOf<Param>()
-        internal fun verifiedParams(): Array<Param> {
-            check(params.count { it is Param.Color } >= 2) { "A linear gradient should consistent of at least two color entries (an initial color and an end color)"}
-            params.forEachIndexed { i, param ->
-                if (param is Param.Hint) {
-                    check(params.getOrNull(i - 1) is Param.Color && params.getOrNull(i + 1) is Param.Color) {
-                        "A gradient color midpoint must only be added between two colors"
-                    }
-                }
-            }
-            return params.toTypedArray()
-        }
-
-        fun add(color: CSSColorValue) = params.add(Param.Color.Simple(color))
-        fun add(color: CSSColorValue, stop: CSSLengthOrPercentageValue) = params.add(Param.Color.Stop(color, stop))
-        fun add(color: CSSColorValue, from: CSSLengthOrPercentageValue, to: CSSLengthOrPercentageValue) = params.add(Param.Color.StopRange(color, from, to))
-        fun setMidpoint(hint: CSSLengthOrPercentageValue) = params.add(Param.Hint(hint))
-    }
-
-    internal class Default internal constructor(position: CSSPosition?, extent: Extent?, vararg params: Param) :
+    internal class Default internal constructor(position: CSSPosition?, extent: Extent?, vararg entries: Gradient.ColorStopsBuilder.Entry) :
         RadialGradient(buildString {
             if (extent != null) {
                 append(extent.toString())
@@ -212,10 +182,10 @@ sealed class RadialGradient(private val paramsStr: String) : Gradient {
             if (this.isNotEmpty()) {
                 append(", ")
             }
-            append(params.joinToString())
+            append(entries.joinToString())
         })
 
-    internal class ByShape internal constructor(shape: Shape, position: CSSPosition?, extent: Extent?, vararg params: Param) :
+    internal class ByShape internal constructor(shape: Shape, position: CSSPosition?, extent: Extent?, vararg entries: Gradient.ColorStopsBuilder.Entry) :
         RadialGradient(buildString {
             append(shape.toString())
             if (extent != null) {
@@ -226,19 +196,19 @@ sealed class RadialGradient(private val paramsStr: String) : Gradient {
                 append(" at $position")
             }
             append(", ")
-            append(params.joinToString())
+            append(entries.joinToString())
         })
 }
 
-fun radialGradient(shape: RadialGradient.Shape, position: CSSPosition? = null, extent: RadialGradient.Extent? = null, init: RadialGradient.ParamsBuilder.() -> Unit): RadialGradient {
-    return RadialGradient.ParamsBuilder().apply(init).let {
-        RadialGradient.ByShape(shape, position, extent, *it.verifiedParams())
+fun radialGradient(shape: RadialGradient.Shape, position: CSSPosition? = null, extent: RadialGradient.Extent? = null, init: Gradient.ColorStopsBuilder.() -> Unit): RadialGradient {
+    return Gradient.ColorStopsBuilder().apply(init).let {
+        RadialGradient.ByShape(shape, position, extent, *it.verifiedEntries())
     }
 }
 
-fun radialGradient(position: CSSPosition? = null, extent: RadialGradient.Extent? = null, init: RadialGradient.ParamsBuilder.() -> Unit): RadialGradient {
-    return RadialGradient.ParamsBuilder().apply(init).let {
-        RadialGradient.Default(position, extent, *it.verifiedParams())
+fun radialGradient(position: CSSPosition? = null, extent: RadialGradient.Extent? = null, init: Gradient.ColorStopsBuilder.() -> Unit): RadialGradient {
+    return Gradient.ColorStopsBuilder().apply(init).let {
+        RadialGradient.Default(position, extent, *it.verifiedEntries())
     }
 }
 
