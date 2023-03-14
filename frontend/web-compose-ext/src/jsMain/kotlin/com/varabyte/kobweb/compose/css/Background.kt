@@ -161,8 +161,8 @@ sealed class BackgroundRepeat private constructor(private val value: String): St
 
     companion object {
         // Keywords
-        val RepeatX get() = Keyword("repeat-x")
-        val RepeatY get() = Keyword("repeat-y")
+        val RepeatX get(): BackgroundRepeat = Keyword("repeat-x")
+        val RepeatY get(): BackgroundRepeat = Keyword("repeat-y")
 
         val Repeat get() = RepeatStyle("repeat")
         val Space get() = RepeatStyle("space")
@@ -170,11 +170,11 @@ sealed class BackgroundRepeat private constructor(private val value: String): St
         val NoRepeat get() = RepeatStyle("no-repeat")
 
         // Global values
-        val Inherit get() = Keyword("inherit")
-        val Initial get() = Keyword("initial")
-        val Revert get() = Keyword("revert")
-        val RevertLayer get() = Keyword("revert-layer")
-        val Unset get() = Keyword("unset")
+        val Inherit get(): BackgroundRepeat = Keyword("inherit")
+        val Initial get(): BackgroundRepeat = Keyword("initial")
+        val Revert get(): BackgroundRepeat = Keyword("revert")
+        val RevertLayer get(): BackgroundRepeat = Keyword("revert-layer")
+        val Unset get(): BackgroundRepeat = Keyword("unset")
     }
 }
 
