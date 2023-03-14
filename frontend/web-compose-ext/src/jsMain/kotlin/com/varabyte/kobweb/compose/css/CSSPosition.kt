@@ -4,58 +4,10 @@ import org.jetbrains.compose.web.css.CSSLengthOrPercentageValue
 import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.percent
 
-/**
- * Support for declaring a 2D coordinate relative to some element rectangle.
- *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/position_value
- *
- * Note that CSS positions support the concept of a general "center" position,
- * which uses heuristics to figure out if you mean horizontal centering or vertical
- * centering. However, this API is strongly typed and provides explicit [CenterX]
- * and [CenterY] versions.
- */
-class CSSPosition internal constructor(private val value: String): StylePropertyValue {
+sealed class Edge(private val value: String) {
     override fun toString() = value
 
-    sealed class Edge(private val value: String) {
-        override fun toString() = value
-    }
-    open class EdgeX internal constructor(value: String) : Edge(value)
-    class CenterX internal constructor() : EdgeX("center")
-    open class EdgeY internal constructor(value: String) : Edge(value)
-    class CenterY internal constructor() : EdgeY("center")
-    private class EdgeOffset(val edge: Edge? = null, val offset: CSSLengthOrPercentageValue) {
-        init {
-            require(edge !is CenterX && edge !is CenterY) {
-                "Specifying an offset from a center position is not supported"
-            }
-        }
-        override fun toString() = buildString {
-            if (edge != null) {
-                append(edge.toString())
-                append(' ')
-            }
-            append(offset)
-        }
-    }
-
     companion object {
-        operator fun invoke() = this(0.percent, 0.percent)
-        operator fun invoke(xAnchor: EdgeX) = CSSPosition("$xAnchor")
-        operator fun invoke(yAnchor: EdgeY) = CSSPosition("center $yAnchor")
-        operator fun invoke(xAnchor: EdgeX, yAnchor: EdgeY) = CSSPosition("$xAnchor $yAnchor")
-        operator fun invoke(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY) = CSSPosition("${EdgeOffset(xAnchor, x)} $yAnchor")
-        operator fun invoke(xAnchor: EdgeX, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) = CSSPosition("$xAnchor ${EdgeOffset(yAnchor, y)}")
-        operator fun invoke(xAnchor: EdgeX, x: CSSLengthOrPercentageValue) = CSSPosition(EdgeOffset(xAnchor, x).toString())
-        operator fun invoke(yAnchor: EdgeY, y: CSSLengthOrPercentageValue) = this(Left, 50.percent, yAnchor, y)
-        operator fun invoke(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) =
-            CSSPosition("${EdgeOffset(xAnchor, x)} ${EdgeOffset(yAnchor, y)}")
-
-        operator fun invoke(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) = CSSPosition("$x $y")
-
-        fun x(offset: CSSLengthOrPercentageValue) = CSSPosition("$offset")
-        fun y(offset: CSSLengthOrPercentageValue) = CSSPosition("center $offset")
-
         // Edges
         val Top get() = EdgeY("top")
         val Bottom get() = EdgeY("bottom")
@@ -63,5 +15,64 @@ class CSSPosition internal constructor(private val value: String): StyleProperty
         val Right get() = EdgeX("right")
         val CenterX get() = EdgeX("center")
         val CenterY get() = EdgeY("center")
+    }
+}
+open class EdgeX internal constructor(value: String) : Edge(value)
+class CenterX internal constructor() : EdgeX("center")
+open class EdgeY internal constructor(value: String) : Edge(value)
+class CenterY internal constructor() : EdgeY("center")
+private class EdgeOffset(val edge: Edge? = null, val offset: CSSLengthOrPercentageValue) {
+    init {
+        require(edge !is CenterX && edge !is CenterY) {
+            "Specifying an offset from a center position is not supported"
+        }
+    }
+    override fun toString() = buildString {
+        if (edge != null) {
+            append(edge.toString())
+            append(' ')
+        }
+        append(offset)
+    }
+}
+
+/**
+ * Support for declaring a 2D coordinate relative to some element rectangle.
+ *
+ * We also introduce the [Edge] class to support a strongly-typed API for the
+ * position concept.
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/position_value
+ */
+class CSSPosition internal constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    constructor() : this(0.percent, 0.percent)
+    constructor(xAnchor: EdgeX) : this("$xAnchor")
+    constructor(yAnchor: EdgeY) : this("center $yAnchor")
+    constructor(xAnchor: EdgeX, yAnchor: EdgeY) : this("$xAnchor $yAnchor")
+    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY) : this("${EdgeOffset(xAnchor, x)} $yAnchor")
+    constructor(xAnchor: EdgeX, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this("$xAnchor ${EdgeOffset(yAnchor, y)}")
+    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue) : this(EdgeOffset(xAnchor, x).toString())
+    constructor(yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this(Edge.CenterX, yAnchor, y)
+    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) :
+        this("${EdgeOffset(xAnchor, x)} ${EdgeOffset(yAnchor, y)}")
+
+    constructor(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) : this("$x $y")
+
+    companion object {
+        fun x(offset: CSSLengthOrPercentageValue) = CSSPosition("$offset")
+        fun y(offset: CSSLengthOrPercentageValue) = CSSPosition("center $offset")
+
+        // Positions
+        val Top get() = CSSPosition(Edge.Top)
+        val TopRight get() = CSSPosition(Edge.Right, Edge.Top)
+        val Right get() = CSSPosition(Edge.Right)
+        val BottomRight get() = CSSPosition(Edge.Right, Edge.Bottom)
+        val Bottom get() = CSSPosition(Edge.Bottom)
+        val BottomLeft get() = CSSPosition(Edge.Left, Edge.Bottom)
+        val Left get() = CSSPosition(Edge.Left)
+        val TopLeft get() = CSSPosition(Edge.Left, Edge.Top)
+        val Center get() = CSSPosition(Edge.CenterX, Edge.CenterY)
     }
 }
