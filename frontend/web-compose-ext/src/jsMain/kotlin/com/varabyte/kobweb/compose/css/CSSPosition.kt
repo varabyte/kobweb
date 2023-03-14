@@ -56,6 +56,9 @@ class CSSPosition internal constructor(private val value: String): StyleProperty
     constructor(yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this(Edge.CenterX, yAnchor, y)
     constructor(yOffset: EdgeYOffset) : this(Edge.CenterX, yOffset)
 
+    constructor(xCenter: CenterX, y: CSSLengthOrPercentageValue) : this("$xCenter $y")
+    constructor(x: CSSLengthOrPercentageValue, yCenter: CenterY) : this("$x $yCenter")
+
     constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeYOrCenter) : this(EdgeXOffset(xAnchor, x), yAnchor)
     constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this("$xOffset $yAnchor")
 
