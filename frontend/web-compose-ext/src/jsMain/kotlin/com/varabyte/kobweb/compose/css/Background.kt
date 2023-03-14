@@ -145,6 +145,9 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
+// Suppress: We only have deprecated methods calling deprecated methods, so no need to warn about them. They'll all get
+// removed at the same time.
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
 sealed class BackgroundPosition private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
 
@@ -282,7 +285,7 @@ data class CSSBackground(
         this@CSSBackground.size?.let {
             // Size must ALWAYS follow position with a slash
             // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#syntax
-            if (position == null) add(BackgroundPosition.of(0.percent, 0.percent))
+            if (position == null) add(BackgroundPosition.of(CSSPosition()))
             add("/")
             add(it.toString())
         }
