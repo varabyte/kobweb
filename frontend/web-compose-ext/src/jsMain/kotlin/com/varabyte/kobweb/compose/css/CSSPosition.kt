@@ -13,27 +13,25 @@ sealed class Edge(private val value: String) {
         val Bottom get() = EdgeY("bottom")
         val Left get() = EdgeX("left")
         val Right get() = EdgeX("right")
-        val CenterX get() = EdgeX("center")
-        val CenterY get() = EdgeY("center")
+        val CenterX get() = CenterX()
+        val CenterY get() = CenterY()
     }
 }
-open class EdgeX internal constructor(value: String) : Edge(value)
-class CenterX internal constructor() : EdgeX("center")
-open class EdgeY internal constructor(value: String) : Edge(value)
-class CenterY internal constructor() : EdgeY("center")
-private class EdgeOffset(val edge: Edge? = null, val offset: CSSLengthOrPercentageValue) {
-    init {
-        require(edge !is CenterX && edge !is CenterY) {
-            "Specifying an offset from a center position is not supported"
-        }
-    }
-    override fun toString() = buildString {
-        if (edge != null) {
-            append(edge.toString())
-            append(' ')
-        }
-        append(offset)
-    }
+sealed class EdgeXOrCenter(value: String) : Edge(value)
+class EdgeX internal constructor(value: String) : EdgeXOrCenter(value) {
+    operator fun invoke(offset: CSSLengthOrPercentageValue) = EdgeXOffset(this, offset)
+}
+class CenterX internal constructor() : EdgeXOrCenter("center")
+class EdgeXOffset(val edgeX: EdgeX, val offset: CSSLengthOrPercentageValue) {
+    override fun toString() = "$edgeX $offset"
+}
+sealed class EdgeYOrCenter(value: String) : Edge(value)
+class EdgeY internal constructor(value: String) : EdgeYOrCenter(value) {
+    operator fun invoke(offset: CSSLengthOrPercentageValue) = EdgeYOffset(this, offset)
+}
+class CenterY internal constructor() : EdgeYOrCenter("center")
+class EdgeYOffset(val edgeY: EdgeY, val offset: CSSLengthOrPercentageValue) {
+    override fun toString() = "$edgeY $offset"
 }
 
 /**
@@ -48,15 +46,25 @@ class CSSPosition internal constructor(private val value: String): StyleProperty
     override fun toString() = value
 
     constructor() : this(0.percent, 0.percent)
-    constructor(xAnchor: EdgeX) : this("$xAnchor")
-    constructor(yAnchor: EdgeY) : this("center $yAnchor")
-    constructor(xAnchor: EdgeX, yAnchor: EdgeY) : this("$xAnchor $yAnchor")
-    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY) : this("${EdgeOffset(xAnchor, x)} $yAnchor")
-    constructor(xAnchor: EdgeX, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this("$xAnchor ${EdgeOffset(yAnchor, y)}")
-    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue) : this(EdgeOffset(xAnchor, x).toString())
+
+    constructor(xAnchor: EdgeXOrCenter) : this("$xAnchor")
+    constructor(yAnchor: EdgeYOrCenter) : this("center $yAnchor")
+    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this("$xAnchor $yAnchor")
+
+    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue) : this(EdgeXOffset(xAnchor, x).toString())
+    constructor(xOffset: EdgeXOffset) : this(xOffset.toString())
     constructor(yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this(Edge.CenterX, yAnchor, y)
+    constructor(yOffset: EdgeYOffset) : this(Edge.CenterX, yOffset)
+
+    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeYOrCenter) : this(EdgeXOffset(xAnchor, x), yAnchor)
+    constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this("$xOffset $yAnchor")
+
+    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this(xAnchor, EdgeYOffset(yAnchor, y))
+    constructor(xAnchor: EdgeXOrCenter, yOffset: EdgeYOffset) : this("$xAnchor $yOffset")
+
     constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) :
-        this("${EdgeOffset(xAnchor, x)} ${EdgeOffset(yAnchor, y)}")
+        this(EdgeXOffset(xAnchor, x), EdgeYOffset(yAnchor, y))
+    constructor(xAnchor: EdgeXOffset, yAnchor: EdgeYOffset) : this("$xAnchor $yAnchor")
 
     constructor(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) : this("$x $y")
 
