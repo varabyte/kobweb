@@ -113,38 +113,52 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-sealed class BackgroundPosition(private val value: String): StylePropertyValue {
+sealed class BackgroundPosition private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
 
-    class Keyword internal constructor(value: String) : BackgroundPosition(value)
-    sealed class Edge(value: String) : BackgroundPosition(value)
-    class EdgeX internal constructor(value: String) : Edge(value)
-    class EdgeY internal constructor(value: String) : Edge(value)
-    class EdgeOffset internal constructor(edge: Edge? = null, offset: CSSLengthOrPercentageValue) : BackgroundPosition("$edge $offset")
-    class Position internal constructor(x: EdgeOffset, y: EdgeOffset) : BackgroundPosition("$x $y")
+    private class Keyword internal constructor(value: String) : BackgroundPosition(value)
+    private class Position internal constructor(position: CSSPosition) : BackgroundPosition("$position")
+
+    // TODO(#168): Remove before v1.0, these were replaced by CSSPosition
+    sealed class LegacyEdge(value: String) : BackgroundPosition(value)
+    class LegacyEdgeX internal constructor(value: String) : LegacyEdge(value)
+    class LegacyEdgeY internal constructor(value: String) : LegacyEdge(value)
+    private class LegacyEdgeOffset(edge: LegacyEdge? = null, offset: CSSLengthOrPercentageValue) : BackgroundPosition("$edge $offset")
+    private class LegacyPosition(x: LegacyEdgeOffset, y: LegacyEdgeOffset) : BackgroundPosition("$x $y")
 
     companion object {
-        fun of(xAnchor: EdgeX, x: CSSLengthOrPercentageValue) = EdgeOffset(xAnchor, x)
-        fun of(yAnchor: EdgeY, y: CSSLengthOrPercentageValue) = EdgeOffset(yAnchor, y)
-        fun of(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) =
-            Position(EdgeOffset(xAnchor, x), EdgeOffset(yAnchor, y))
+        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Left, 50.px)))")
+        fun of(xAnchor: LegacyEdgeX, x: CSSLengthOrPercentageValue): BackgroundPosition = LegacyEdgeOffset(xAnchor, x)
+        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Top, 20.percent)))")
+        fun of(yAnchor: LegacyEdgeY, y: CSSLengthOrPercentageValue): BackgroundPosition = LegacyEdgeOffset(yAnchor, y)
+        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Left, 50.px, Top, 20.percent)))")
+        fun of(xAnchor: LegacyEdgeX, x: CSSLengthOrPercentageValue, yAnchor: LegacyEdgeY, y: CSSLengthOrPercentageValue): BackgroundPosition =
+            LegacyPosition(LegacyEdgeOffset(xAnchor, x), LegacyEdgeOffset(yAnchor, y))
+        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(50.px, 20.percent)))")
         fun of(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) = this.of(Left, x, Top, y)
 
+        fun of(position: CSSPosition): BackgroundPosition = Position(position)
+
         // Edges
-        val Top get() = EdgeY("top")
-        val Bottom get() = EdgeY("bottom")
-        val Left get() = EdgeX("left")
-        val Right get() = EdgeX("right")
+        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Top)")
+        val Top get() = LegacyEdgeY("top")
+        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Bottom)")
+        val Bottom get() = LegacyEdgeY("bottom")
+        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Left)")
+        val Left get() = LegacyEdgeX("left")
+        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Right)")
+        val Right get() = LegacyEdgeX("right")
 
         // Keyword
-        val Center get() = Keyword("center")
+        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Center)")
+        val Center get(): BackgroundPosition = Keyword("center")
 
         // Global values
-        val Inherit get() = Keyword("inherit")
-        val Initial get() = Keyword("initial")
-        val Revert get() = Keyword("revert")
-        val RevertLayer get() = Keyword("revert-layer")
-        val Unset get() = Keyword("unset")
+        val Inherit get(): BackgroundPosition = Keyword("inherit")
+        val Initial get(): BackgroundPosition = Keyword("initial")
+        val Revert get(): BackgroundPosition = Keyword("revert")
+        val RevertLayer get(): BackgroundPosition = Keyword("revert-layer")
+        val Unset get(): BackgroundPosition = Keyword("unset")
     }
 }
 
