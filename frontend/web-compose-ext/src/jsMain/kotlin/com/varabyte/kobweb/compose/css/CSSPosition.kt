@@ -51,22 +51,22 @@ class CSSPosition internal constructor(private val value: String): StyleProperty
     constructor(yAnchor: EdgeYOrCenter) : this("center $yAnchor")
     constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this("$xAnchor $yAnchor")
 
-    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue) : this(EdgeXOffset(xAnchor, x).toString())
+    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageValue) : this(EdgeXOffset(xAnchor, xOffset).toString())
     constructor(xOffset: EdgeXOffset) : this(xOffset.toString())
-    constructor(yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this(Edge.CenterX, yAnchor, y)
+    constructor(yAnchor: EdgeY, yOffset: CSSLengthOrPercentageValue) : this(Edge.CenterX, yAnchor, yOffset)
     constructor(yOffset: EdgeYOffset) : this(Edge.CenterX, yOffset)
 
     constructor(xCenter: CenterX, y: CSSLengthOrPercentageValue) : this("$xCenter $y")
     constructor(x: CSSLengthOrPercentageValue, yCenter: CenterY) : this("$x $yCenter")
 
-    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeYOrCenter) : this(EdgeXOffset(xAnchor, x), yAnchor)
+    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageValue, yAnchor: EdgeYOrCenter) : this(EdgeXOffset(xAnchor, xOffset), yAnchor)
     constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this("$xOffset $yAnchor")
 
-    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) : this(xAnchor, EdgeYOffset(yAnchor, y))
+    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeY, yOffset: CSSLengthOrPercentageValue) : this(xAnchor, EdgeYOffset(yAnchor, yOffset))
     constructor(xAnchor: EdgeXOrCenter, yOffset: EdgeYOffset) : this("$xAnchor $yOffset")
 
-    constructor(xAnchor: EdgeX, x: CSSLengthOrPercentageValue, yAnchor: EdgeY, y: CSSLengthOrPercentageValue) :
-        this(EdgeXOffset(xAnchor, x), EdgeYOffset(yAnchor, y))
+    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageValue, yAnchor: EdgeY, yOffset: CSSLengthOrPercentageValue) :
+        this(EdgeXOffset(xAnchor, xOffset), EdgeYOffset(yAnchor, yOffset))
     constructor(xAnchor: EdgeXOffset, yAnchor: EdgeYOffset) : this("$xAnchor $yAnchor")
 
     companion object {
