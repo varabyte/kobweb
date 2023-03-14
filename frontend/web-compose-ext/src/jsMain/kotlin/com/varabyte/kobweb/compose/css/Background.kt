@@ -285,7 +285,7 @@ data class CSSBackground(
         this@CSSBackground.size?.let {
             // Size must ALWAYS follow position with a slash
             // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#syntax
-            if (position == null) add(BackgroundPosition.of(CSSPosition()))
+            if (position == null) add(BackgroundPosition.of(CSSPosition.TopLeft))
             add("/")
             add(it.toString())
         }

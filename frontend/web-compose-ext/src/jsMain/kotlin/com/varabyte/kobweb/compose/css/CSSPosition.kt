@@ -45,7 +45,7 @@ class EdgeYOffset(val edgeY: EdgeY, val offset: CSSLengthOrPercentageValue) {
 class CSSPosition internal constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
 
-    constructor() : this(0.percent, 0.percent)
+    constructor(x: CSSLengthOrPercentageValue = 50.percent, y: CSSLengthOrPercentageValue = 50.percent) : this("$x $y")
 
     constructor(xAnchor: EdgeXOrCenter) : this("$xAnchor")
     constructor(yAnchor: EdgeYOrCenter) : this("center $yAnchor")
@@ -69,23 +69,7 @@ class CSSPosition internal constructor(private val value: String): StyleProperty
         this(EdgeXOffset(xAnchor, x), EdgeYOffset(yAnchor, y))
     constructor(xAnchor: EdgeXOffset, yAnchor: EdgeYOffset) : this("$xAnchor $yAnchor")
 
-    constructor(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) : this("$x $y")
-
     companion object {
-        /**
-         * Create a [CSSPosition] only specifying an absolute x position, offset from the left side of some element.
-         *
-         * The y position will default to the element's center.
-         */
-        fun x(offset: CSSLengthOrPercentageValue) = CSSPosition("$offset")
-
-        /**
-         * Create a [CSSPosition] only specifying an absolute y position, offset from the top side of some element.
-         *
-         * The x position will default to the element's center.
-         */
-        fun y(offset: CSSLengthOrPercentageValue) = CSSPosition("center $offset")
-
         // Positions
         val Top get() = CSSPosition(Edge.Top)
         val TopRight get() = CSSPosition(Edge.Right, Edge.Top)
