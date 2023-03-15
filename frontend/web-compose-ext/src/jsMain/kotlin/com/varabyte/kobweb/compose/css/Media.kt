@@ -53,7 +53,7 @@ class MixBlendMode private constructor(private val value: String): StyleProperty
         val Inherit get() = MixBlendMode("inherit")
         val Initial get() = MixBlendMode("initial")
         val Revert get() = MixBlendMode("revert")
-        val RevertLayer get() = MixBlendMode("revert")
+        val RevertLayer get() = MixBlendMode("revert-layer")
         val Unset get() = MixBlendMode("unset")
     }
 }
