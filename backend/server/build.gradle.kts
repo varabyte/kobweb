@@ -32,6 +32,9 @@ application {
 
 tasks.withType<ShadowJar> {
     minimize {
+        // Leave all kotlin-reflect bits in, as many libraries expect it to be there. When users register
+        // server API routes, their code should be able to use it.
+        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:.*"))
         // Code may end up getting referenced via reflection
         exclude(project(":backend:kobweb-api"))
         // Logger classes are accessed at runtime
