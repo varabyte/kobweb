@@ -25,19 +25,11 @@ class ApiJarFile(path: Path, private val logger: Logger) {
             ZipFile(file)
         }
 
-        private val classCache = mutableMapOf<String, Class<*>?>()
-
         override fun findClass(name: String): Class<*> {
-            // Intentionally do NOT use computeIfAbsent, because `findClassInZip` can call this method
-            // recursively, which explodes if we're still in the middle of computeIfAbsent
-            if (!classCache.containsKey(name)) {
-                classCache[name] = findClassInZip(name)
-                    ?.use { stream -> stream.readBytes() }
-                    ?.let { bytes -> defineClass(name, bytes, 0, bytes.size) }
-            }
-
-            val classValue = classCache[name]
-            return classValue ?: super.findClass(name)
+            return findClassInZip(name)
+                ?.use { stream -> stream.readBytes() }
+                ?.let { bytes -> defineClass(name, bytes, 0, bytes.size) }
+                ?: super.findClass(name)
         }
 
         private fun findClassInZip(name: String): InputStream? {
