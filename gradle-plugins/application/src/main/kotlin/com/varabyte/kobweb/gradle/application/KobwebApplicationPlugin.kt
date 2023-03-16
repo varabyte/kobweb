@@ -236,10 +236,20 @@ class KobwebApplicationPlugin @Inject constructor(
     }
 }
 
+/**
+ * Method provided for users to call if they generate their own Gradle task that generates some JS (frontend) code.
+ *
+ * Calling this ensures that their task will be triggered before the relevant Kobweb compilation task.
+ */
 fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
     tasks.named("kobwebGenFrontendMetadata") { dependsOn(task) }
 }
 
+/**
+ * Method provided for users to call if they generate their own Gradle task that generates some JVM (server) code.
+ *
+ * Calling this ensures that their task will be triggered before the relevant Kobweb compilation task.
+ */
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
     tasks.named("kobwebGenBackendMetadata") { dependsOn(task) }
 }
