@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.gradle.application
 
-import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.tasks.*
@@ -27,11 +26,6 @@ import javax.inject.Inject
 val Project.kobwebFolder: KobwebFolder
     get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
         ?: throw GradleException("This project is not a Kobweb project but is applying the Kobweb plugin.")
-
-private const val DISMISS_GRANULAIRTY_KEY = "kobweb.dismiss.granularity.warning"
-
-private const val GRANULARITY_SETTING_KEY = "kotlin.js.ir.output.granularity"
-private const val GRANULARITY_WHOLE_PROGRAM = "whole-program"
 
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebApplicationPlugin @Inject constructor(
@@ -226,53 +220,6 @@ class KobwebApplicationPlugin @Inject constructor(
                     dependsOn(kobwebGenTask)
                     val webpackTask = project.tasks.findByName(jsTarget.browserDevelopmentWebpack) as KotlinWebpack
                     dependsOn(webpackTask)
-
-                    // The following warning is for a dev value only, but `kobweb export` ends up in this path because
-                    // it creates a dev server in order to generate and snapshot files. Therefore, we also have to check
-                    // the build target to make sure if we should show the warning or not.
-                    // TODO(#168): Remove warning before v1.0
-                    if (buildTarget == BuildTarget.DEBUG) {
-                        doLast {
-
-                            // Note: WebpackTask has an "outputFile" field but for some reason it's stale...
-                            // so here, just check the destination
-                            val webpackOutputDir =
-                                webpackTask.destinationDirectory.relativeTo(project.layout.projectDirectory.asFile)
-                                    .toUnixSeparators()
-
-                            if (project.properties[DISMISS_GRANULAIRTY_KEY] != "true" &&
-                                kobwebConf.server.files.dev.script.substringBeforeLast('/') != webpackOutputDir &&
-                                (project.properties[GRANULARITY_SETTING_KEY] != GRANULARITY_WHOLE_PROGRAM
-                                    || project.extra[GRANULARITY_SETTING_KEY] != GRANULARITY_WHOLE_PROGRAM)
-                            ) {
-                                project.logger.warn(
-                                    """
-
-                                        ${"-".repeat(70)}
-                                        w: ⚠️  Starting in 0.11.6, Kobweb no longer forces whole-program granularity.
-
-                                        If you're seeing this warning, you might get a runtime error when running
-                                        your site that looks like:
-
-                                        🚨 Error loading module '...'. Its dependency '...' was not found. 🚨
-
-                                        To stop seeing this warning, take one of the following actions:
-
-                                        1) Update your .kobweb/conf.yaml, setting the dev script path to:
-                                           script: "$webpackOutputDir/${jsTarget.kotlinTarget.moduleName}.js"
-                                           # You will also need to stop and restart your kobweb server
-
-                                        2) Add the following line to your gradle.properties file:
-                                           ${GRANULARITY_SETTING_KEY}=${GRANULARITY_WHOLE_PROGRAM}
-
-                                        3) Add the following line to your gradle.properties file:
-                                           ${DISMISS_GRANULAIRTY_KEY}=true
-                                        ${"-".repeat(70)}
-                                    """.trimIndent()
-                                )
-                            }
-                        }
-                    }
                 }
             }
 
