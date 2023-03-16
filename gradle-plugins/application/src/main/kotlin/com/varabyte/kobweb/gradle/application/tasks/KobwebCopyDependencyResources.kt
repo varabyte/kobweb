@@ -12,6 +12,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
+import java.util.zip.ZipException
 import javax.inject.Inject
 
 abstract class KobwebCopyDependencyResources @Inject constructor(
@@ -39,16 +40,29 @@ abstract class KobwebCopyDependencyResources @Inject constructor(
                     val fileTree = project.fileTree(jar)
                     fileTree.matching(patterns).files.map { file -> jar to RootAndFile(fileTree.dir, file) }
                 } else {
-                    val unzipped = mutableListOf<Pair<File, RootAndFile>>()
-                    project.zipTree(jar).matching(patterns).visit {
-                        if (!this.isDirectory) {
-                            // relativePath always uses forward slash. Convert the absolute path to forward slashes,
-                            // therefore, before removing the suffix, or else Windows breaks.
-                            unzipped.add(jar to RootAndFile(File(file.absolutePath.toUnixSeparators().removeSuffix(relativePath)), file))
+                    try {
+                        val unzipped = mutableListOf<Pair<File, RootAndFile>>()
+                        project.zipTree(jar).matching(patterns).visit {
+                            if (!this.isDirectory) {
+                                // relativePath always uses forward slash. Convert the absolute path to forward slashes,
+                                // therefore, before removing the suffix, or else Windows breaks.
+                                unzipped.add(
+                                    jar to RootAndFile(
+                                        File(
+                                            file.absolutePath.toUnixSeparators().removeSuffix(relativePath)
+                                        ), file
+                                    )
+                                )
+                            }
                         }
-                    }
 
-                    unzipped
+                        unzipped
+                    } catch (ex: ZipException) {
+                        // It's possible to get a classpath file that's not a jar -- npm dependencies are like this --
+                        // at which point the file isn't a zip nor a directory. Such dependencies will never contain
+                        // Kobweb resources, so we don't care about them. Just skip 'em!
+                        listOf()
+                    }
                 }
             }.forEach { (jar, rootAndFile) ->
                 val targetFile = File(getGenPublicRoot(), rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
