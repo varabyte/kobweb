@@ -40,7 +40,8 @@ class Route(pathQueryAndFragment: String) {
             })
 
     companion object {
-        fun isLocal(path: String) = tryCreate(path) != null
+        /** Returns true if a route, i.e. a path without an origin */
+        fun isRoute(path: String) = tryCreate(path) != null
         fun tryCreate(path: String) = try {
             Route(path)
         } catch (ex: RouteException) {

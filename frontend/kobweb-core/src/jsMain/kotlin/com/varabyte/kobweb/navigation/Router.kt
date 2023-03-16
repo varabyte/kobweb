@@ -123,8 +123,6 @@ class Router {
      * "profile" instead of "/profile"
      */
     private fun String.normalize(): String {
-        if (!Route.isLocal(this)) return this
-
         val hrefResolved = URL(this, window.location.href)
         return interceptors.fold(Route.fromUrl(hrefResolved).toString()) { acc, intercept ->
             val interceptor = RouteInterceptorScope(acc)
@@ -158,7 +156,7 @@ class Router {
      */
     @Suppress("unused") // Called by generated code
     fun register(route: String, autoPrefix: Boolean = true, pageMethod: PageMethod) {
-        require(Route.isLocal(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
+        require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(routeTree.register(RoutePrefix.prependIf(autoPrefix, route), pageMethod)) { "Registration failure. Path is already registered: $route" }
     }
 
@@ -233,30 +231,35 @@ class Router {
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
+
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        val pathQueryAndFragment = pathQueryAndFragment.normalize().let { pqf ->
+        val pathQueryAndFragment = if (Route.isRoute(pathQueryAndFragment)) {
             // Here, we check a common edge case where the site has registered "slug" and the user typed "slug/"
             // OR vice versa ("slug/" and user typed "slug"). Let's help the user find the right place.
 
             // Note: We don't touch the path if it has queries or fragments. Because in that case, if the original route
             // isn't found, we don't want to waste time adding a slash to the end of it (since slashes shouldn't ever
             // come after queries / fragments).
-            if (pqf.any { it == '#' || it == '?' }) return@let pqf
+            if (pathQueryAndFragment.all { it != '#' && it != '?' }) {
+                @Suppress("UnnecessaryVariable") // Emphasize we've checked that this is only the route part
+                val route = pathQueryAndFragment
 
-            @Suppress("UnnecessaryVariable") // Emphasize we've checked that this is only the route part
-            val route = pqf
-
-            if (!routeTree.isRegistered(route)) {
-                if (route.endsWith('/')) {
-                    val withoutSlash = route.removeSuffix("/")
-                    if (routeTree.isRegistered(withoutSlash)) withoutSlash else route
+                if (!routeTree.isRegistered(route)) {
+                    if (route.endsWith('/')) {
+                        val withoutSlash = route.removeSuffix("/")
+                        if (routeTree.isRegistered(withoutSlash)) withoutSlash else route
+                    } else {
+                        val withSlash = "$route/"
+                        if (routeTree.isRegistered(withSlash)) withSlash else route
+                    }
                 } else {
-                    val withSlash = "$route/"
-                    if (routeTree.isRegistered(withSlash)) withSlash else route
+                    route
                 }
             } else {
-                route
+                pathQueryAndFragment
             }
+        } else {
+            pathQueryAndFragment
         }
 
         if (openLinkStrategy != OpenLinkStrategy.IN_PLACE) {
