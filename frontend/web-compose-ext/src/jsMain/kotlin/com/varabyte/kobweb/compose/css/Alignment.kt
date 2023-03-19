@@ -147,7 +147,6 @@ sealed class AlignItems private constructor(private val value: String): StylePro
         val Inherit get() = AlignItemsKeyword("inherit")
         val Initial get() = AlignItemsKeyword("initial")
         val Revert get() = AlignItemsKeyword("revert")
-        val RevertLayer get() = AlignItemsKeyword("revert-layer")
         val Unset get() = AlignItemsKeyword("unset")
     }
 }
@@ -204,7 +203,6 @@ sealed class AlignSelf private constructor(private val value: String): StyleProp
         val Inherit get() = AlignSelfKeyword("inherit")
         val Initial get() = AlignSelfKeyword("initial")
         val Revert get() = AlignSelfKeyword("revert")
-        val RevertLayer get() = AlignSelfKeyword("revert-layer")
         val Unset get() = AlignSelfKeyword("unset")
     }
 }
@@ -256,7 +254,6 @@ sealed class JustifyContent private constructor(private val value: String): Styl
         val Inherit get() = JustifyContentKeyword("inherit")
         val Initial get() = JustifyContentKeyword("initial")
         val Revert get() = JustifyContentKeyword("revert")
-        val RevertLayer get() = JustifyContentKeyword("revert-layer")
         val Unset get() = JustifyContentKeyword("unset")
     }
 }
@@ -314,7 +311,6 @@ sealed class JustifyItems private constructor(private val value: String): StyleP
         val Inherit get() = JustifyItemsKeyword("inherit")
         val Initial get() = JustifyItemsKeyword("initial")
         val Revert get() = JustifyItemsKeyword("revert")
-        val RevertLayer get() = JustifyItemsKeyword("revert-layer")
         val Unset get() = JustifyItemsKeyword("unset")
     }
 }
@@ -373,7 +369,6 @@ sealed class JustifySelf private constructor(private val value: String): StylePr
         val Inherit get() = JustifySelfKeyword("inherit")
         val Initial get() = JustifySelfKeyword("initial")
         val Revert get() = JustifySelfKeyword("revert")
-        val RevertLayer get() = JustifySelfKeyword("revert-layer")
         val Unset get() = JustifySelfKeyword("unset")
     }
 }

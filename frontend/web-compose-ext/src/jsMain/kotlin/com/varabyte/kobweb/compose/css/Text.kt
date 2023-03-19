@@ -57,7 +57,6 @@ class UserSelect private constructor(private val value: String): StylePropertyVa
         val Inherit get() = UserSelect("inherit")
         val Initial get() = UserSelect("initial")
         val Revert get() = UserSelect("revert")
-        val RevertLayer get() = UserSelect("revert-layer")
         val Unset get() = UserSelect("unset")
     }
 }

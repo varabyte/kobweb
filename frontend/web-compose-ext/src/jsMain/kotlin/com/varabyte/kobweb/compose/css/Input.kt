@@ -19,7 +19,6 @@ class CaretColor private constructor(private val value: String): StylePropertyVa
         val Inherit get() = CaretColor("inherit")
         val Initial get() = CaretColor("initial")
         val Revert get() = CaretColor("revert")
-        val RevertLayer get() = CaretColor("revert-layer")
         val Unset get() = CaretColor("unset")
     }
 }

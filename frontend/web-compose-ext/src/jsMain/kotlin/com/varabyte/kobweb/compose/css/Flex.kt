@@ -22,7 +22,6 @@ class FlexBasis private constructor(private val value: String): StylePropertyVal
         val Inherit get() = FlexBasis("inherit")
         val Initial get() = FlexBasis("initial")
         val Revert get() = FlexBasis("revert")
-        val RevertLayer get() = FlexBasis("revert-layer")
         val Unset get() = FlexBasis("unset")
     }
 }

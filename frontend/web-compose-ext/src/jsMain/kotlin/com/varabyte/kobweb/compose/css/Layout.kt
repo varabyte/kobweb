@@ -18,7 +18,6 @@ class Width private constructor(private val value: String): StylePropertyValue {
         val Inherit = Width("inherit")
         val Initial = Width("initial")
         val Revert = Width("revert")
-        val RevertLayer = Width("revert-layer")
         val Unset = Width("unset")
     }
 }
@@ -53,7 +52,6 @@ class Height private constructor(private val value: String): StylePropertyValue 
         val Inherit = Height("inherit")
         val Initial = Height("initial")
         val Revert = Height("revert")
-        val RevertLayer = Height("revert-layer")
         val Unset = Height("unset")
     }
 }
@@ -89,7 +87,6 @@ class MaxWidth private constructor(private val value: String): StylePropertyValu
         val Inherit = MaxWidth("inherit")
         val Initial = MaxWidth("initial")
         val Revert = MaxWidth("revert")
-        val RevertLayer = MaxWidth("revert-layer")
         val Unset = MaxWidth("unset")
     }
 }
@@ -116,7 +113,6 @@ class MaxHeight private constructor(private val value: String): StylePropertyVal
         val Inherit = MaxHeight("inherit")
         val Initial = MaxHeight("initial")
         val Revert = MaxHeight("revert")
-        val RevertLayer = MaxHeight("revert-layer")
         val Unset = MaxHeight("unset")
     }
 }
@@ -243,7 +239,6 @@ class Resize private constructor(private val value: String): StylePropertyValue 
         val Inherit get() = Resize("inherit")
         val Initial get() = Resize("initial")
         val Revert get() = Resize("revert")
-        val RevertLayer get() = Resize("revert-layer")
         val Unset get() = Resize("unset")
     }
 }

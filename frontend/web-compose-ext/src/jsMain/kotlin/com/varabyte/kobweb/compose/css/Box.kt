@@ -15,7 +15,6 @@ class BoxDecorationBreak private constructor(private val value: String): StylePr
         val Inherit = BoxDecorationBreak("inherit")
         val Initial = BoxDecorationBreak("initial")
         val Revert = BoxDecorationBreak("revert")
-        val RevertLayer = BoxDecorationBreak("revert-layer")
         val Unset = BoxDecorationBreak("unset")
     }
 }
@@ -37,7 +36,6 @@ class BoxSizing private constructor(private val value: String): StylePropertyVal
         val Inherit = BoxSizing("inherit")
         val Initial = BoxSizing("initial")
         val Revert = BoxSizing("revert")
-        val RevertLayer = BoxSizing("revert-layer")
         val Unset = BoxSizing("unset")
     }
 }

@@ -25,7 +25,6 @@ class TransitionProperty private constructor(private val value: String): StylePr
         val Inherit get() = TransitionProperty("inherit")
         val Initial get() = TransitionProperty("initial")
         val Revert get() = TransitionProperty("revert")
-        val RevertLayer get() = TransitionProperty("revert-layer")
         val Unset get() = TransitionProperty("unset")
     }
 }
@@ -74,7 +73,6 @@ class TransitionDelay private constructor(private val value: String): StylePrope
         val Inherit get() = TransitionDelay("inherit")
         val Initial get() = TransitionDelay("initial")
         val Revert get() = TransitionDelay("revert")
-        val RevertLayer get() = TransitionDelay("revert-layer")
         val Unset get() = TransitionDelay("unset")
     }
 }

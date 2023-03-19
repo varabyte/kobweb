@@ -15,7 +15,6 @@ class PointerEvents private constructor(private val value: String): StylePropert
         val Inherit get() = PointerEvents("inherit")
         val Initial get() = PointerEvents("initial")
         val Revert get() = PointerEvents("revert")
-        val RevertLayer get() = PointerEvents("revert-layer")
         val Unset get() = PointerEvents("unset")
     }
 }

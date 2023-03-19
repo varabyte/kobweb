@@ -21,7 +21,6 @@ class FontStyle private constructor(private val value: String): StylePropertyVal
         val Inherit get() = FontStyle("inherit")
         val Initial get() = FontStyle("initial")
         val Revert get() = FontStyle("revert")
-        val RevertLayer get() = FontStyle("revert-layer")
         val Unset get() = FontStyle("unset")    }
 }
 
@@ -58,7 +57,6 @@ class FontWeight private constructor(private val value: String): CSSStyleValue {
         val Inherit get() = FontWeight("inherit")
         val Initial get() = FontWeight("initial")
         val Revert get() = FontWeight("revert")
-        val RevertLayer get() = FontWeight("revert-layer")
         val Unset get() = FontWeight("unset")
     }
 }

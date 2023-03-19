@@ -14,7 +14,6 @@ class CSSColor private constructor(private val value: String): StylePropertyValu
         val Inherit get() = Color("inherit")
         val Initial get() = Color("initial")
         val Revert get() = Color("revert")
-        val RevertLayer get() = Color("revert-layer")
         val Unset get() = Color("unset")
     }
 }

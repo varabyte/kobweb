@@ -24,7 +24,6 @@ class CSSFloat private constructor(private val value: String): StylePropertyValu
         val Inherit get() = CSSFloat("inherit")
         val Initial get() = CSSFloat("initial")
         val Revert get() = CSSFloat("revert")
-        val RevertLayer get() = CSSFloat("revert-layer")
         val Unset get() = CSSFloat("unset")
     }
 }

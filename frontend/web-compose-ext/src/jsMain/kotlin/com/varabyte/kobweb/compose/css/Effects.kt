@@ -17,7 +17,6 @@ class Filter private constructor(private val value: String): StylePropertyValue 
         val Inherit = Filter("inherit")
         val Initial = Filter("initial")
         val Revert = Filter("revert")
-        val RevertLayer = Filter("revert-layer")
         val Unset = Filter("unset")
     }
 }

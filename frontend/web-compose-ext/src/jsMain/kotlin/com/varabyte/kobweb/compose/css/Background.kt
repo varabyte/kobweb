@@ -19,7 +19,6 @@ class BackgroundAttachment private constructor(private val value: String): Style
         val Inherit get() = BackgroundAttachment("inherit")
         val Initial get() = BackgroundAttachment("initial")
         val Revert get() = BackgroundAttachment("revert")
-        val RevertLayer get() = BackgroundAttachment("revert-layer")
         val Unset get() = BackgroundAttachment("unset")
     }
 }
@@ -48,7 +47,6 @@ class BackgroundClip private constructor(private val value: String): StyleProper
         val Inherit get() = BackgroundClip("inherit")
         val Initial get() = BackgroundClip("initial")
         val Revert get() = BackgroundClip("revert")
-        val RevertLayer get() = BackgroundClip("revert-layer")
         val Unset get() = BackgroundClip("unset")
     }
 }
@@ -79,7 +77,6 @@ sealed class BackgroundImage private constructor(private val value: String): Sty
         val Inherit get(): BackgroundImage = Keyword("inherit")
         val Initial get(): BackgroundImage = Keyword("initial")
         val Revert get(): BackgroundImage = Keyword("revert")
-        val RevertLayer get(): BackgroundImage = Keyword("revert-layer")
         val Unset get(): BackgroundImage = Keyword("unset")
     }
 }
@@ -135,7 +132,6 @@ class BackgroundOrigin private constructor(private val value: String): StyleProp
         val Inherit get() = BackgroundOrigin("inherit")
         val Initial get() = BackgroundOrigin("initial")
         val Revert get() = BackgroundOrigin("revert")
-        val RevertLayer get() = BackgroundOrigin("revert-layer")
         val Unset get() = BackgroundOrigin("unset")
     }
 }
@@ -192,7 +188,6 @@ sealed class BackgroundPosition private constructor(private val value: String): 
         val Inherit get(): BackgroundPosition = Keyword("inherit")
         val Initial get(): BackgroundPosition = Keyword("initial")
         val Revert get(): BackgroundPosition = Keyword("revert")
-        val RevertLayer get(): BackgroundPosition = Keyword("revert-layer")
         val Unset get(): BackgroundPosition = Keyword("unset")
     }
 }
@@ -222,7 +217,6 @@ sealed class BackgroundRepeat private constructor(private val value: String): St
         val Inherit get(): BackgroundRepeat = Keyword("inherit")
         val Initial get(): BackgroundRepeat = Keyword("initial")
         val Revert get(): BackgroundRepeat = Keyword("revert")
-        val RevertLayer get(): BackgroundRepeat = Keyword("revert-layer")
         val Unset get(): BackgroundRepeat = Keyword("unset")
     }
 }
@@ -257,7 +251,6 @@ sealed class BackgroundSize private constructor(private val value: String): Styl
         val Inherit get(): BackgroundSize = Keyword("inherit")
         val Initial get(): BackgroundSize = Keyword("initial")
         val Revert get(): BackgroundSize = Keyword("revert")
-        val RevertLayer get(): BackgroundSize = Keyword("revert-layer")
         val Unset get(): BackgroundSize = Keyword("unset")
     }
 }
