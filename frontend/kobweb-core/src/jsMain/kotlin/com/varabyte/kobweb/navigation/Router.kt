@@ -119,8 +119,8 @@ class Router {
     /**
      * Convert the incoming navigation request into a full route (but without the origin).
      *
-     * This has special handling for incoming routes that are just a fragment, e.g. "#id", or relative routes, e.g.
-     * "profile" instead of "/profile"
+     * Note that this can handle an isolated fragment, e.g. `#test`, which will, after normalization, be prepended with
+     * the full route. Routes without a leading slash will have one prepended as well.
      */
     private fun String.normalize(): String {
         val hrefResolved = URL(this, window.location.href)
