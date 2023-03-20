@@ -92,7 +92,7 @@ internal class RouteTree {
 
         val resolved = mutableListOf<ResolvedEntry>()
         var currNode: Node = root
-        require(routeParts[0] == root.name) // Will be true if incoming route starts with '/'
+        require(routeParts[0] == root.name) // Will be true as long as incoming route starts with '/'
 
         for (i in 1 until routeParts.size) {
             val routePart = routeParts[i]
