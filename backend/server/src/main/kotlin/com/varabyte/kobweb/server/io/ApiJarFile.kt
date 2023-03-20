@@ -8,7 +8,11 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.net.URL
+import java.net.URLConnection
+import java.net.URLStreamHandler
 import java.nio.file.Path
+import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -32,9 +36,49 @@ class ApiJarFile(path: Path, private val logger: Logger) {
                 ?: super.findClass(name)
         }
 
-        private fun findClassInZip(name: String): InputStream? {
+        // Code inspired by org.jetbrains.kotlin.codegen.GeneratedClassLoader and .BytesUrlUtils
+        private fun InputStream.toInMemoryUrl(): URL {
+            return this
+                .use { readBytes() }
+                .let { bytes ->
+                    URL(
+                        null,
+                        "bytes:${Base64.getEncoder().encodeToString(bytes)}",
+                        object : URLStreamHandler() {
+                            override fun openConnection(url: URL): URLConnection {
+                                return object : URLConnection(url) {
+                                    override fun connect() {}
+                                    override fun getInputStream(): InputStream {
+                                        return ByteArrayInputStream(Base64.getDecoder().decode(url.path))
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+        }
+
+        override fun findResource(name: String): URL {
+            return findFileInZip(name)
+                ?.toInMemoryUrl()
+                ?: super.findResource(name)
+        }
+
+        override fun findResources(name: String): Enumeration<URL> {
+            val ourResource = findFileInZip(name)
+                ?.toInMemoryUrl()
+                ?.let { listOf(it) }
+                ?: emptyList()
+
+            return Collections.enumeration(ourResource + super.findResources(name).toList())
+        }
+
+        // Convert a class name (e.g. "com.example.Demo") to its path form ("com/example/Demo.class")
+        private fun findClassInZip(name: String) = findFileInZip("${name.replace('.', '/')}.class")
+
+        private fun findFileInZip(name: String): InputStream? {
             // Convert a class name (e.g. "com.example.Demo") to its path form ("com/example/Demo.class")
-            val entry: ZipEntry? = zipFile.getEntry("${name.replace('.', '/')}.class")
+            val entry: ZipEntry? = zipFile.getEntry(name)
             return entry
                 ?.let {
                     try {
