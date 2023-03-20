@@ -38,6 +38,12 @@ fun RoutePrefix.Companion.prependIf(condition: Boolean, path: String): String {
     return if (condition) RoutePrefix.prepend(path) else path
 }
 
+/** Remove the route prefix from some target *absolute* path (relative paths will be returned as is). */
+fun RoutePrefix.Companion.remove(path: String): String {
+    // dropLast because value always ends with a slash
+    return if (value.isNotEmpty()) path.removePrefix(value.dropLast(1)) else path
+}
+
 @Suppress("ObjectPropertyName") // Ignore bad naming, it's internal to this module anyway
 internal class RoutePrefixImpl(value: String) : RoutePrefix {
     companion object {

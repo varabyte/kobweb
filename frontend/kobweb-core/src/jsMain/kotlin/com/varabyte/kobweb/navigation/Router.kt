@@ -123,12 +123,18 @@ class Router {
      * the full route. Routes without a leading slash will have one prepended as well.
      */
     private fun String.normalize(): String {
-        val hrefResolved = URL(this, window.location.href)
-        return interceptors.fold(Route.fromUrl(hrefResolved).toString()) { acc, intercept ->
+        check(Route.isRoute(this))
+
+        // Be design, whether a site has a route prefix or not should be invisible to the user. So here, we strip one
+        // if it is present only to put it back again in case we stripped it.
+        val withoutPrefix = RoutePrefix.remove(this)
+        val hadPrefix = withoutPrefix != this
+        val hrefResolved = URL(withoutPrefix, window.location.href)
+        return RoutePrefix.prependIf(hadPrefix, interceptors.fold(Route.fromUrl(hrefResolved).toString()) { acc, intercept ->
             val interceptor = RouteInterceptorScope(acc)
             interceptor.intercept()
             interceptor.pathQueryAndFragment
-        }
+        })
     }
 
     /**
