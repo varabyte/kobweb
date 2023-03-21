@@ -321,7 +321,7 @@ class Router {
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openInternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
-        openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB_FOREGROUND,
+        openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB,
     ) {
         if (!tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy)) {
             window.open(pathQueryAndFragment, openExternalLinksStrategy)

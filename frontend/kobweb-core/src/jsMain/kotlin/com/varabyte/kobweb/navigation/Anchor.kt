@@ -31,12 +31,12 @@ fun Link(
  * a server.
  *
  * @param openInternalLinksStrategy If set, force the behavior of how internal links (links under the site's root) open.
- *   If not set, this behavior will be determined depending on what control keys are being pressed. See
- *   [SyntheticMouseEvent.toOpenLinkStrategy] for more information.
+ *   If not set, this behavior will default to in place. Note that this behavior may be overridden by the browser based
+ *   on keyboard/mouse shortcuts.
  *
  * @param openExternalLinksStrategy If set, force the behavior of how external links open (links outside this site's
- *   domain). If not set, this behavior will be determined depending on what control keys are being pressed. See
- *   [SyntheticMouseEvent.toOpenLinkStrategy] for more information.
+ *   domain). If not set, this behavior will default to in a new tab. Note that this behavior may be overridden by the
+ *   browser based on keyboard/mouse shortcuts.
  *
  * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front.For example,
  *   if the [href] parameter was set to "example/path" and the site's route prefix was set to "parent-site/nested", then
@@ -63,20 +63,13 @@ fun Anchor(
             if (attrs != null) {
                 attrs()
             }
+            @Suppress("NAME_SHADOWING") // Intentional shadowing - nullable to non-null
             onClick { evt ->
-                @Suppress("NAME_SHADOWING") // Intentional shadowing - nullable to non-null
-                val openInternalLinksStrategy = openInternalLinksStrategy ?: evt.toOpenLinkStrategy()
-                if (openExternalLinksStrategy == null) {
-                    if (ctx.router.tryRoutingTo(href, openLinkStrategy = openInternalLinksStrategy)) {
-                        evt.preventDefault()
-                        evt.stopPropagation()
-                    }
-                }
-                else {
-                    ctx.router.navigateTo(href, openInternalLinksStrategy = openInternalLinksStrategy, openExternalLinksStrategy = openExternalLinksStrategy)
-                    evt.preventDefault()
-                    evt.stopPropagation()
-                }
+                val openInternalLinksStrategy = openInternalLinksStrategy ?: evt.toOpenLinkStrategy(OpenLinkStrategy.IN_PLACE)
+                val openExternalLinksStrategy = openExternalLinksStrategy ?: evt.toOpenLinkStrategy(OpenLinkStrategy.IN_NEW_TAB)
+                ctx.router.navigateTo(href, openInternalLinksStrategy = openInternalLinksStrategy, openExternalLinksStrategy = openExternalLinksStrategy)
+                evt.preventDefault()
+                evt.stopPropagation()
             }
         },
         content
