@@ -125,12 +125,18 @@ class Router {
     private fun String.normalize(): String {
         check(Route.isRoute(this))
 
-        // Be design, whether a site has a route prefix or not should be invisible to the user. So here, we strip one
-        // if it is present only to put it back again in case we stripped it.
-        val withoutPrefix = RoutePrefix.remove(this)
-        val hadPrefix = withoutPrefix != this
-        val hrefResolved = URL(withoutPrefix, window.location.href)
-        return RoutePrefix.prependIf(hadPrefix, interceptors.fold(Route.fromUrl(hrefResolved).toString()) { acc, intercept ->
+        // The following line handles cases where the user passed in just query params / a fragment without a path
+        // e.g. "#test" -> "/currpage#test" if the current page is "https://yoursite.com/currpage"
+        // as well as relative routes, ensuring the final version is a full path that begins with a leading slash.
+        val hrefResolved = Route.fromUrl(URL(this, window.location.href)).toString()
+
+        // By design, whether a site has a route prefix or not should be invisible to the user. So here, we remove a
+        // prefix if it is present only to put it back again (in the case that we removed it) after the interceptors
+        // all have their pass.
+        val withoutPrefix = RoutePrefix.remove(hrefResolved)
+        val hadPrefix = withoutPrefix != hrefResolved
+
+        return RoutePrefix.prependIf(hadPrefix, interceptors.fold(Route(withoutPrefix).toString()) { acc, intercept ->
             val interceptor = RouteInterceptorScope(acc)
             interceptor.intercept()
             interceptor.pathQueryAndFragment
