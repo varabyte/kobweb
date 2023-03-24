@@ -138,29 +138,23 @@ fun createMainFunction(
                 addStatement("")
             }
 
-            addStatement("RoutePrefix.set(\"$routePrefix\")")
-            addStatement("val router = Router()")
-            frontendData.pages.sortedBy { it.route }.forEach { entry ->
-                addStatement("""router.register("${entry.route}") { ${entry.fqn}() }""")
-            }
-            addStatement("")
-
-            if (frontendData.kobwebInits.isNotEmpty()) {
-                addCode(CodeBlock.builder().apply {
-                    addStatement("run {")
-                    withIndent {
-                        if (frontendData.kobwebInits.any { entry -> entry.acceptsContext }) {
-                            addStatement("val ctx = InitKobwebContext(router)")
-                        }
-                        frontendData.kobwebInits.forEach { entry ->
-                            val ctx = if (entry.acceptsContext) "ctx" else ""
-                            addStatement("${entry.fqn}($ctx)")
-                        }
+            addCode(CodeBlock.builder().apply {
+                addStatement("RoutePrefix.set(\"$routePrefix\")")
+                addStatement("val router = Router()")
+                addStatement("com.varabyte.kobweb.core.init.initKobweb(router) { ctx ->")
+                withIndent {
+                    frontendData.pages.sortedBy { it.route }.forEach { entry ->
+                        addStatement("""ctx.router.register("${entry.route}") { ${entry.fqn}() }""")
                     }
-                    addStatement("}")
                     addStatement("")
-                }.build())
-            }
+
+                    frontendData.kobwebInits.forEach { entry ->
+                        val ctx = if (entry.acceptsContext) "ctx" else ""
+                        addStatement("${entry.fqn}($ctx)")
+                    }
+                }
+                addStatement("}")
+            }.build())
 
             if (usingSilk &&
                 (frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty() || frontendData.silkVariants.isNotEmpty()
