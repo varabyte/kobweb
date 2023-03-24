@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.theme.colors
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.lightened
-import com.varabyte.kobweb.silk.init.SilkConfigInstance
+import com.varabyte.kobweb.silk.init.SilkConfig
 import kotlin.math.absoluteValue
 
 enum class ColorMode {
@@ -52,7 +52,7 @@ fun Color.shifted(colorMode: ColorMode, byPercent: Float = Color.DEFAULT_SHIFTIN
 @ReadOnlyComposable
 fun Color.shifted(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = shifted(getColorMode(), byPercent)
 
-private val colorModeState by lazy { mutableStateOf(SilkConfigInstance.initialColorMode) }
+private val colorModeState by lazy { mutableStateOf(SilkConfig.Instance.initialColorMode) }
 
 @Composable
 fun rememberColorMode() = remember { colorModeState }

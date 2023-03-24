@@ -24,7 +24,7 @@ import com.varabyte.kobweb.silk.theme.*
  * @param theme A version of [SilkTheme] that is still mutable (before it has been frozen, essentially, at startup).
  *   Use this if you need to modify site global colors, shapes, typography, and/or styles.
  */
-class InitSilkContext(val config: SilkConfig, val stylesheet: SilkStylesheet, val theme: MutableSilkTheme)
+class InitSilkContext(val config: MutableSilkConfig, val stylesheet: SilkStylesheet, val theme: MutableSilkTheme)
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
@@ -55,7 +55,9 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(DisplayUntilLgStyle)
     mutableTheme.registerComponentStyle(DisplayUntilXlStyle)
 
-    additionalInit(InitSilkContext(SilkConfigInstance, SilkStylesheetInstance, mutableTheme))
+    val config = MutableSilkConfig()
+    additionalInit(InitSilkContext(config, SilkStylesheetInstance, mutableTheme))
+    MutableSilkConfigInstance = config
 
     _SilkTheme = ImmutableSilkTheme(mutableTheme)
     SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)

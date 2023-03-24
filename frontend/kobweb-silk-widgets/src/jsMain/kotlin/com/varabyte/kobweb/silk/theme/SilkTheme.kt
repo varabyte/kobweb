@@ -14,26 +14,6 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
 import com.varabyte.kobweb.silk.theme.colors.*
 import org.jetbrains.compose.web.css.*
 
-// TODO(#168): Remove in v1.0
-@Deprecated(
-    message = "SilkConfig has moved. Please change your import to `com.varabyte.kobweb.silk.init.SilkConfig`",
-    replaceWith = ReplaceWith("com.varabyte.kobweb.silk.init.SilkConfig")
-)
-typealias SilkConfig = com.varabyte.kobweb.silk.init.SilkConfig
-
-// TODO(#168): Remove in v1.0
-@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION") // Couldn't get this to work properly with extension methods
-@Deprecated(
-    message = "registerBaseStyle has moved. Please change your import to `com.varabyte.kobweb.silk.init.registerBaseStyle` and your code from `ctx.config.registerBaseStyle` to `ctx.stylesheet.registerBaseStyle`",
-)
-fun SilkConfig.registerBaseStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
-    registerStyle(cssSelector, extraModifiers) {
-        base {
-            init()
-        }
-    }
-}
-
 /**
  * Theme values that will get frozen at initialization time.
  *
