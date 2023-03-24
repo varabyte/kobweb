@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.api.init
 
+import com.varabyte.kobweb.api.Api
 import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.data.MutableData
 import com.varabyte.kobweb.api.log.Logger
