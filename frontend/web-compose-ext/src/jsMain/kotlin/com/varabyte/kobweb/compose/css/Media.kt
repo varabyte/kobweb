@@ -40,7 +40,7 @@ class MixBlendMode private constructor(private val value: String): StyleProperty
         val Lighten get() = MixBlendMode("lighten")
         val ColorDodge get() = MixBlendMode("color-dodge")
         val ColorBurn get() = MixBlendMode("color-burn")
-        val hardLight get() = MixBlendMode("hard-light")
+        val HardLight get() = MixBlendMode("hard-light")
         val SoftLight get() = MixBlendMode("soft-light")
         val Difference get() = MixBlendMode("difference")
         val Exclusion get() = MixBlendMode("exclusion")
