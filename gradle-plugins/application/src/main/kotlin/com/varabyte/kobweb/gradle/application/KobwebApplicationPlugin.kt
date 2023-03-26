@@ -177,6 +177,13 @@ class KobwebApplicationPlugin @Inject constructor(
                     }
                 }
 
+            val jsSourceTasks = listOf(jsTarget.compileKotlin, jsTarget.sourcesJar)
+            jsSourceTasks
+                .mapNotNull { taskName -> project.tasks.findByName(taskName) }
+                .forEach { task ->
+                    task.dependsOn(kobwebGenSiteEntryTask)
+                }
+
             kobwebGenTask.configure {
                 dependsOn(kobwebGenFrontendTask)
                 if (jvmTarget != null) {
@@ -184,9 +191,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
-            project.tasks.named(jsTarget.compileKotlin) {
-                dependsOn(kobwebGenSiteEntryTask)
-            }
             project.tasks.named(jsTarget.processResources) {
                 dependsOn(kobwebGenSiteIndexTask)
                 dependsOn(kobwebCopyDependencyResourcesTask)

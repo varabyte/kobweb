@@ -37,6 +37,8 @@ class JsTarget(val kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTa
 
     val compileDevelopmentExecutableKotlin get() = "compileDevelopmentExecutableKotlin${kotlinTarget.name.capitalize()}"
     val compileProductionExecutableKotlin get() = "compileProductionExecutableKotlin${kotlinTarget.name.capitalize()}"
+
+    val sourcesJar get() = "${kotlinTarget.name}SourcesJar"
 }
 
 val Project.jsTarget: JsTarget
