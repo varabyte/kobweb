@@ -51,8 +51,9 @@ fun HomePage() {
 
 ---
 
-**Kobweb is still a technology preview, but it's usable, and it is getting close to stabilization**. Please consider
-starring the project to indicate interest, so we know we're creating something the community wants.
+**Kobweb is still only publishing pre-release versions, but it's been usable for a while now, and it is getting close to
+stabilization**. Please consider starring the project to indicate interest, so we know we're creating something the
+community wants.
 [How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
 
 Our goal is to provide:
@@ -66,6 +67,9 @@ Our goal is to provide:
 * out-of-the-box Markdown support
 * an open source foundation that the community can extend
 * and much, much more!
+
+| 📚🧑‍🎓 One of Kobweb's users, Stevdza-San, [is offering a course on Compose for Web using Kobweb](https://stevdza-san.com/p/build-a-complete-website-with-kotlin-and-jetpack-compose). Consider checking it out! |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 Here's a demo where we create a Compose for Web project from scratch with Markdown support and live reloading, in under
 10 seconds:
@@ -1638,8 +1642,8 @@ At this point:
 
 However, there's always more to do.
 
-* The API surface is a bit lean in some areas right now, especially around Silk UI components
-* The APIs that interact with Compose for Web may have some holes in them.
+* I'm trying to add support for every stabilized CSS property, but some are still missing, especially less
+  common ones. (You can use a fallback for such cases in the meanwhile).
 * A lot of detailed documentation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
 
 I think there's enough there now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
@@ -1650,15 +1654,18 @@ So, should you use Kobweb at this point? If you are...
 
 * playing around with Compose for Web for the first time and want to get up and running quickly on a toy project:
     * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
-      below, we'd definitely love to hear from you. Now's a great time if you'd want to have a voice in the direction of
-      this project.
+      below, we'd definitely love to hear from you. It's still a good time if you'd want to have a voice in the
+      direction of this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
     * **Worth a shot!** I think if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
       with us at our Discord if you try it and have questions or run into missing features.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
-    * **No** - this may never be a tenable path.
+    * **Probably not?** Depending how much work you've done, it may not be a trivial refactor.
 * a company:
-    * **Probably not** (someday, we hope, but not yet)
+    * **Probably not?** I'm assuming a company is more risk-averse even to Compose for Web, which Kobweb is
+      building on top of. If you *were* considering Compose for Web, however, Kobweb may be worth a look.
+
+On the fence but not sure? Connect with us, and I'd be happy to help you assess your situation.
 
 # Connecting with us
 
