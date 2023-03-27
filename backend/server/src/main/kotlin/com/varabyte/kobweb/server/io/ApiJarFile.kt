@@ -103,7 +103,7 @@ class ApiJarFile(path: Path, private val logger: Logger) {
 
     val apis: Apis
         get() {
-            val currContent = delegateFile.content ?: error { "No API jar found at: ${delegateFile.path}" }
+            val currContent = delegateFile.content ?: error("No API jar found at: ${delegateFile.path}")
 
             var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
             if (cache == null || cache.content !== delegateFile.content) {
