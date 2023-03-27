@@ -74,6 +74,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
     env: ServerEnvironment,
     apiJar: ApiJarFile,
     httpMethod: HttpMethod,
+    logger: Logger,
 ) {
     call.parameters.getAll(KOBWEB_PARAMS)?.joinToString("/")?.let { pathStr ->
         val body: ByteArray? = when (httpMethod) {
@@ -102,8 +103,16 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                 call.respond(HttpStatusCode.NotFound)
             }
         } catch (t: Throwable) {
-            when (env) {
-                ServerEnvironment.DEV -> {
+            val fullErrorString = t.stackTraceToString()
+            println(fullErrorString)
+            logger.error(fullErrorString)
+            when {
+                // Show the stack trace of the user's code but no need to share anything outside of that.
+                // The user can't do anything with the extra information anyway, and this keeps the message
+                // so much shorter.
+                // Note: We use "startsWith" and not "equals" below because the full classname is an
+                // anonymous inner class, something like "ApisFactoryImpl$create$2"
+                env == ServerEnvironment.DEV && t.stackTrace.any { it.className.startsWith("ApisFactoryImpl") } -> {
                     call.respondText(
                         buildString {
                             var currThrowable: Throwable? = t
@@ -112,11 +121,6 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                                 if (lastThrowable != null) append("caused by: ")
                                 appendLine(currThrowable.toString())
 
-                                // Show the stack trace of the user's code but no need to share anything outside of that.
-                                // The user can't do anything with the extra information anyway, and this keeps the message
-                                // so much shorter.
-                                // Note: We use "startsWith" and not "equals" below because the full classname is an
-                                // anonymous inner class, something like "ApisFactoryImpo$create$2"
                                 // If we're handling a "caused by" stack track, make sure the first stack trace doesn't
                                 // get repeated it in.
                                 val lastThrowableFirstStackTrace = lastThrowable?.stackTrace?.firstOrNull()?.toString()
@@ -135,24 +139,24 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                         contentType = ContentType.Text.Plain,
                     )
                 }
-                ServerEnvironment.PROD -> call.respondBytes(EMPTY_BODY, status = HttpStatusCode.InternalServerError)
+                else -> call.respondBytes(EMPTY_BODY, status = HttpStatusCode.InternalServerError)
             }
         }
     }
 }
 
 
-private fun Routing.configureApiRouting(env: ServerEnvironment, apiJar: ApiJarFile, routePrefix: String) {
+private fun Routing.configureApiRouting(env: ServerEnvironment, apiJar: ApiJarFile, routePrefix: String, logger: Logger) {
     val path = "$routePrefix/api/{$KOBWEB_PARAMS...}"
     HttpMethod.values().forEach { httpMethod ->
         when (httpMethod) {
-            HttpMethod.DELETE -> delete(path) { handleApiCall(env, apiJar, httpMethod) }
-            HttpMethod.GET -> get(path) { handleApiCall(env, apiJar, httpMethod) }
-            HttpMethod.HEAD -> head(path) { handleApiCall(env, apiJar, httpMethod) }
-            HttpMethod.OPTIONS -> options(path) { handleApiCall(env, apiJar, httpMethod) }
-            HttpMethod.PATCH -> patch(path) { handleApiCall(env, apiJar, httpMethod) }
-            HttpMethod.POST -> post(path) { handleApiCall(env, apiJar, httpMethod) }
-            HttpMethod.PUT -> put(path) { handleApiCall(env, apiJar, httpMethod) }
+            HttpMethod.DELETE -> delete(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.GET -> get(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.HEAD -> head(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.OPTIONS -> options(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.PATCH -> patch(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.POST -> post(path) { handleApiCall(env, apiJar, httpMethod, logger) }
+            HttpMethod.PUT -> put(path) { handleApiCall(env, apiJar, httpMethod, logger) }
         }
     }
 }
@@ -274,7 +278,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
         val routePrefix = conf.site.routePrefixNormalized
 
         if (apiJar != null) {
-            configureApiRouting(ServerEnvironment.DEV, apiJar, routePrefix)
+            configureApiRouting(ServerEnvironment.DEV, apiJar, routePrefix, logger)
         }
 
         val contentRootFile = contentRoot.toFile()
@@ -317,7 +321,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
         val routePrefix = conf.site.routePrefixNormalized
 
         if (apiJar != null) {
-            configureApiRouting(ServerEnvironment.PROD, apiJar, routePrefix)
+            configureApiRouting(ServerEnvironment.PROD, apiJar, routePrefix, logger)
         }
 
         resourcesRoot.toFile().let { resourcesRootFile ->
