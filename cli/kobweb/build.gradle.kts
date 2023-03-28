@@ -14,6 +14,7 @@ version = libs.versions.kobweb.cli.get()
 repositories {
     // For Gradle Tooling API
     maven { url = uri("https://repo.gradle.org/gradle/libs-releases") }
+    // maven("https://us-central1-maven.pkg.dev/varabyte-repos/public") // <-- For testing kotter snapshots
 }
 
 dependencies {
