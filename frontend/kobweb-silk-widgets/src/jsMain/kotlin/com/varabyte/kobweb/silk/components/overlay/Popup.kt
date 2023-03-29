@@ -27,13 +27,13 @@ const val DEFAULT_POPUP_OFFSET_PX = 15
 /**
  * An enumeration for placing a popup outside of while still being aligned to another.
  *
- *      TL  T  TR
- *   LT +-------+ RT
- *      |       |
- *    L |       | R
- *      |       |
- *   LB +-------+ RB
- *      BL  B  BR
+ *       TL  T  TR
+ *    LT +-------+ RT
+ *       |       |
+ *     L |       | R
+ *       |       |
+ *    LB +-------+ RB
+ *       BL  B  BR
  *
  * Note the difference between e.g. [TopLeft] and [LeftTop]. The former will place the popup above the target, with
  * left edges aligned, while the latter will place to popup to the left of the target, with top edges aligned.
