@@ -35,7 +35,20 @@ private fun Modifier.triangleRight(color: Color) = styleModifier {
 }
 
 private val TRIANGLE_WIDTH = 5.px
-private val TRIANGLE_WIDTH_2X = TRIANGLE_WIDTH * 2
+// Note: This following constant is used to shift the triangle into view. For example, a "down" arrow is actually the
+// top half of a border where only one of the three sides is not transparent. Imaging the following triangles were all
+// jammed together into a single solid box (which I can't capture well in ascii art), where left, right, and bottom
+// triangles are transparent:
+//  ▼   <-- top part of border, height = 5.px -┐
+// ► ◄  <-- left / right parts of border       ├ height = 10.px
+//  ▲   <-- bottom part of border             -┘
+// To expose the "down" triangle, we need to shift the whole height of the border box to have it peek out.
+//
+// Note2: We use a size 1px smaller that 2x width as otherwise sometimes the way pixels round on pages as you zoom out
+// result in the triangle getting separated from the message box by a sliver due to, presumably, rounding errors. This
+// -1 should be an unnoticeable difference at normal and zoomed in views but definitely seems to help zoomed out cases
+// from separating.
+private val TRIANGLE_WIDTH_2X = 9.px
 
 val TooltipStyle = ComponentStyle.base("silk-tooltip") {
     val palette = colorMode.toSilkPalette()
@@ -50,7 +63,7 @@ val TooltipStyle = ComponentStyle.base("silk-tooltip") {
 val TooltipArrowStyle = ComponentStyle.base("silk-tooltip-arrow") {
     Modifier
         .position(Position.Absolute)
-        .borderWidth(5.px)
+        .borderWidth(TRIANGLE_WIDTH)
         .borderStyle(LineStyle.Solid)
 }
 
