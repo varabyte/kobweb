@@ -28,7 +28,7 @@ dependencies {
     implementation(project(":common:kobweb-common"))
 }
 
-val DESCRIPTION = "A Gradle plugin that generates useful code to a user's Kobweb library"
+val DESCRIPTION = "A Gradle plugin that generates useful code for a user's Kobweb library"
 gradlePlugin {
     plugins {
         create("kobwebLibrary") {
