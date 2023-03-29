@@ -1,3 +1,5 @@
+import com.varabyte.kobweb.gradle.publish.set
+
 plugins {
     kotlin("jvm")
     id("com.varabyte.kobweb.internal.publish")

@@ -4,22 +4,60 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.provider.Property
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.create
 
+// In some cases, we aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
+// libraries, but they need to be defined in a multiplatform module because it does extra Compose-related
+// processing on the artifacts as a side effect. For simplicity in our maven repo, though, we only send
+// the JS bits.
+val FILTER_OUT_MULTIPLATFORM_PUBLICATIONS: (Task) -> Boolean =
+    { task -> !task.name.startsWith("publishKotlinMultiplatformPublication") }
+
 abstract class KobwebPublicationConfig {
-    abstract val artifactId: Property<String>
+    /**
+     * Provide an artifact ID given the name of the publication.
+     *
+     * The name can be useful for disambiguation in case a single project generates multiple publications (such as
+     * multiplatform, js, and jvm artifacts).
+     *
+     * An extension method [set] is provided for the very common case where the user knows that they'll only be
+     * producing a single publication and don't care about disambiguating the final name.
+     */
+    abstract val artifactId: Property<(String) -> String>
+
+    /**
+     * A human-readable description for this artifact.
+     */
     abstract val description: Property<String>
+
+    /**
+     * The website URL to associate with this artifact.
+     */
     abstract val site: Property<String>
+
+    /**
+     * Whether this artifact should be published or not.
+     *
+     * The callback should return true to get published or false to get filtered out.
+     */
     abstract val filter: Property<(Task) -> Boolean>
 
     init {
-        // We aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
-        // libraries but they need to be defined in a multiplatform module because it does extra Compose-related
-        // processing on the artifacts as a side effect. For simplicity in our maven repo, though, we only send
-        // the JS bits.
-        filter.convention { task -> !task.name.startsWith("publishKotlinMultiplatformPublication") }
+        site.convention("https://github.com/varabyte/kobweb")
+        filter.convention { true }
     }
+}
+
+/**
+ * Convenience setter for the common case where we aren't worried about disambiguation.
+ *
+ * This can be either because we know there's only one artifact that will get produced for this configuration, OR
+ * because we plan on using [KobwebPublicationConfig.filter] to remove other artifacts so we're not worried about a name
+ * collision.
+ */
+fun Property<(String) -> String>.set(value: String) {
+    this.set { value }
 }
 
 /**
@@ -43,8 +81,11 @@ class KobwebPublishPlugin : Plugin<Project> {
             // Configure after evaluating to allow the user to set extension values first
             configurePublishing(config)
 
-            tasks.withType(PublishToMavenRepository::class.java) {
-                onlyIf { task -> config.filter.get().invoke(task) }
+            // AbstractPublishToMaven configured both maven local and remote maven publish tasks
+            tasks.withType(AbstractPublishToMaven::class.java) {
+                onlyIf {
+                    config.filter.get().invoke(this)
+                }
             }
         }
     }

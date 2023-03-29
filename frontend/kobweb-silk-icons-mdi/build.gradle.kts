@@ -1,4 +1,6 @@
 import Build_gradle.IconStyle.*
+import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
+import com.varabyte.kobweb.gradle.publish.set
 
 plugins {
     kotlin("multiplatform")
@@ -29,6 +31,7 @@ kotlin {
 kobwebPublication {
     artifactId.set("kobweb-silk-icons-mdi")
     description.set("A collection of Kobweb Silk components that directly wrap Material Design icons")
+    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }
 
 enum class IconStyle {

@@ -1,3 +1,6 @@
+import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
+import com.varabyte.kobweb.gradle.publish.set
+
 @Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -29,4 +32,5 @@ kotlin {
 kobwebPublication {
     artifactId.set("kobweb-silk")
     description.set("A set of rich UI components built on top of Kobweb and inspired by the best parts of Compose and Chakra UI")
+    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

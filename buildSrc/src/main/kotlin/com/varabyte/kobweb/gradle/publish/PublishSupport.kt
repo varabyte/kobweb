@@ -27,6 +27,11 @@ internal fun MavenArtifactRepository.gcloudAuth(project: Project) {
     }
 }
 
+// Some publications should add a suffix to the end of their artifact name to avoid ambiguity with the multiplatform
+// artifact. For example, you might generate "artifact", "artifact-js", and "artifact-jvm", three separate maven
+// entries, which a multiplatform project can then handle importing.
+private val MULTIPLATFORM_SUFFIX_NAMES = mutableSetOf("jvm", "js")
+
 /**
  * @param artifactId Can be null if we want to let the system use the default value for this project.
  *   This is particularly useful for publishing Gradle plugins, which does some of its own magic that we don't want
@@ -34,7 +39,7 @@ internal fun MavenArtifactRepository.gcloudAuth(project: Project) {
  */
 internal fun PublishingExtension.addVarabyteArtifact(
     project: Project,
-    artifactId: String?,
+    artifactId: ((String) -> String)?,
     description: String?,
     site: String?,
 ) {
@@ -57,7 +62,9 @@ internal fun PublishingExtension.addVarabyteArtifact(
         if (javaComponent != null) {
             publications.create("maven", MavenPublication::class.java) {
                 groupId = project.group.toString()
-                this.artifactId = artifactId
+                if (artifactId != null) {
+                    this.artifactId = artifactId.invoke(this.name)
+                }
                 version = project.version.toString()
 
                 from(javaComponent)
@@ -67,11 +74,11 @@ internal fun PublishingExtension.addVarabyteArtifact(
 
     publications.withType(MavenPublication::class.java) {
         if (artifactId != null) {
-            this.artifactId = artifactId
+            this.artifactId = artifactId.invoke(this.name)
         }
         pom {
             description?.let { this.description.set(it) }
-            url.set(site ?: "https://github.com/varabyte/kobweb")
+            site?.let { this.url.set(it) }
             licenses {
                 license {
                     name.set("The Apache License, Version 2.0")
