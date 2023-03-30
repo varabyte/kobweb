@@ -12,6 +12,7 @@ import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.overlay.*
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
+import com.varabyte.kobweb.silk.components.text.DivTextStyle
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.theme.*
 
@@ -34,6 +35,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(CanvasStyle)
     mutableTheme.registerComponentStyle(DisabledStyle)
     mutableTheme.registerComponentStyle(DividerStyle)
+    mutableTheme.registerComponentStyle(DivTextStyle)
     mutableTheme.registerComponentStyle(ImageStyle)
     mutableTheme.registerComponentStyle(LinkStyle)
     mutableTheme.registerComponentStyle(OverlayStyle)

@@ -33,9 +33,6 @@ val SpanTextStyle = ComponentStyle("silk-span-text") { }
  *
  * Note it is perfectly fine (and expected) for callers to reach to the `Text` method that comes from *Compose for Web*
  * in most cases.
- *
- * This composable is SilkTheme-aware, and if colors are not specified, will automatically use the current theme plus
- * color mode.
  */
 @Composable
 fun SpanText(
