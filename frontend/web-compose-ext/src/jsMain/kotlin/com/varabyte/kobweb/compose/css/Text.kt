@@ -21,6 +21,7 @@ fun StyleScope.textAlign(textAlign: TextAlign) {
     property("text-align", textAlign)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line
 class TextDecorationLine private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
 
