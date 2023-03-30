@@ -51,6 +51,14 @@ fun Modifier.textDecorationLine(textDecorationLine: TextDecorationLine): Modifie
     textDecorationLine(textDecorationLine)
 }
 
+fun Modifier.textShadow(offsetX: CSSLengthValue, offsetY: CSSLengthValue, blurRadius: CSSLengthValue? = null, color: CSSColorValue? = null) = styleModifier {
+    textShadow(offsetX, offsetY, blurRadius, color)
+}
+
+fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
+    textShadow(textShadow)
+}
+
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
     whiteSpace(whiteSpace)
 }

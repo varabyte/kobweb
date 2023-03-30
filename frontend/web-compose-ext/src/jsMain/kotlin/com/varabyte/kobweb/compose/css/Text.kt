@@ -41,6 +41,38 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
     property("text-decoration-line", textDecorationLines.joinToString(" "))
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
+class TextShadow private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        val Inherit get() = TextShadow("inherit")
+        val Initial get() = TextShadow("initial")
+        val Revert get() = TextShadow("revert")
+        val Unset get() = TextShadow("unset")
+    }
+}
+
+fun StyleScope.textShadow(offsetX: CSSLengthValue, offsetY: CSSLengthValue, blurRadius: CSSLengthValue? = null, color: CSSColorValue? = null) {
+    property("text-shadow", buildString {
+        append(offsetX)
+        append(" ")
+        append(offsetY)
+        if (blurRadius != null) {
+            append(" ")
+            append(blurRadius)
+        }
+        if (color != null) {
+            append(" ")
+            append(color)
+        }
+    })
+}
+
+fun StyleScope.textShadow(textShadow: TextShadow) {
+    property("text-shadow", textShadow)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
 class UserSelect private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
