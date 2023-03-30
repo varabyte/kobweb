@@ -40,8 +40,12 @@ class OverflowWrap private constructor(private val value: String): StyleProperty
     }
 }
 
-fun StyleScope.overflow(vararg overflows: Overflow) {
-    property("overflow", overflows.joinToString(" "))
+fun StyleScope.overflow(overflow: Overflow) {
+    property("overflow", overflow)
+}
+
+fun StyleScope.overflow(overflowX: Overflow, overflowY: Overflow) {
+    property("overflow", "$overflowX $overflowY")
 }
 
 fun StyleScope.overflowX(overflowX: Overflow) {

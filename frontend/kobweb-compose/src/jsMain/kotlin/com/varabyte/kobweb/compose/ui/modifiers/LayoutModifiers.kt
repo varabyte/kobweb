@@ -185,8 +185,12 @@ fun Modifier.paddingBlock(
 }
 
 
-fun Modifier.overflow(vararg overflows: Overflow) = styleModifier {
-    overflow(*overflows)
+fun Modifier.overflow(overflow: Overflow) = styleModifier {
+    overflow(overflow)
+}
+
+fun Modifier.overflow(overflowX: Overflow, overflowY: Overflow) = styleModifier {
+    overflow(overflowX, overflowY)
 }
 
 fun Modifier.overflowX(overflowX: Overflow) = styleModifier {
