@@ -1,42 +1,59 @@
 package com.varabyte.kobweb.gradle.application.templates
 
+import com.squareup.kotlinpoet.*
 import com.varabyte.kobweb.gradle.core.project.backend.BackendData
 
 fun createApisFactoryImpl(backendData: BackendData): String {
-    return """
-        import com.varabyte.kobweb.api.Apis
-        import com.varabyte.kobweb.api.ApisFactory
-        import com.varabyte.kobweb.api.data.MutableData
-        import com.varabyte.kobweb.api.init.InitApiContext
-        import com.varabyte.kobweb.api.log.Logger
+    // Final code should look something like:
+    //
+    // class ApisFactoryImpl : ApisFactory {
+    //    override fun create(logger: Logger): Apis {
+    //        val data = MutableData()
+    //        val apis = Apis(data, logger)
+    //        apis.register("/add") { ctx -> example.api.add(ctx) }
+    //        apis.register("/remove") { ctx -> example.api.remove(ctx) }
+    //        val initCtx = InitApiContext(apis, data, logger)
+    //        example.init(initCtx)
+    //        return apis
+    //    }
+    //  }
 
-        class ApisFactoryImpl : ApisFactory {
-            override fun create(logger: Logger): Apis {
-                val data = MutableData()
-                val apis = Apis(data, logger)
-                ${
-                    // Generates lines like: apis.register("/path/to/api") { ctx -> path.to.api.method(ctx)  }
-                    // Sort values as it makes the generated registration logic easier to follow
-                    backendData.apiMethods.sortedBy { entry -> entry.route }.joinToString("\n                ") { entry ->
-                        """apis.register("${entry.route}") { ctx -> ${entry.fqn}(ctx) }"""
-                    }
-                }
+    val fileBuilder = FileSpec.builder("", "ApisFactoryImpl").indent(" ".repeat(4))
 
-                ${
-                    if (backendData.initMethods.isNotEmpty()) {
-                        "val initCtx = InitApiContext(apis, data, logger)"
-                    }
-                    else {
-                        ""
-                    }
-                }
-                ${
-                    backendData.initMethods.joinToString("\n                ") { entry ->
-                        """${entry.fqn}(initCtx)"""
-                    }
-                }
-                return apis
-            }
-        }
-    """.trimIndent()
+    val apiPackage = "com.varabyte.kobweb.api"
+    val classApis = ClassName(apiPackage, "Apis")
+    val classApisFactory = ClassName(apiPackage, "ApisFactory")
+    val classMutableData = ClassName("$apiPackage.data", "MutableData")
+    val classInitApiContext = ClassName("$apiPackage.init", "InitApiContext")
+    val classLogger = ClassName("$apiPackage.log", "Logger")
+
+    fileBuilder.addType(
+        TypeSpec.classBuilder("ApisFactoryImpl")
+            .addSuperinterface(classApisFactory)
+            .addFunction(
+                FunSpec.builder("create")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addParameter(ParameterSpec("logger", classLogger))
+                    .returns(classApis)
+                    .addCode(CodeBlock.builder().apply {
+                        addStatement("val data = %T()", classMutableData)
+                        addStatement("val apis = %T(data, logger)", classApis)
+                        backendData.apiMethods.sortedBy { entry -> entry.route }.forEach { entry ->
+                            addStatement("apis.register(%S) { ctx -> ${entry.fqn}(ctx) }", entry.route)
+                        }
+                        if (backendData.initMethods.isNotEmpty()) {
+                            addStatement("val initCtx = %T(apis, data, logger)", classInitApiContext)
+                            backendData.initMethods.sortedBy { entry -> entry.fqn }.forEach { entry ->
+                                addStatement("${entry.fqn}(initCtx)")
+                            }
+                        }
+                        addStatement("")
+                        addStatement("return apis")
+                    }.build())
+                    .build()
+            )
+            .build()
+    )
+
+    return fileBuilder.build().toString()
 }
