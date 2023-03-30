@@ -55,6 +55,10 @@ fun Modifier.textShadow(offsetX: CSSLengthValue, offsetY: CSSLengthValue, blurRa
     textShadow(offsetX, offsetY, blurRadius, color)
 }
 
+fun Modifier.textShadow(vararg textShadows: CSSTextShadow) = styleModifier {
+    textShadow(*textShadows)
+}
+
 fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
     textShadow(textShadow)
 }
