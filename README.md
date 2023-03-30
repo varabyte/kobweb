@@ -54,7 +54,7 @@ fun HomePage() {
 **Kobweb is still only publishing pre-release versions, but it's been usable for a while now, and it is getting close to
 stabilization**. Please consider starring the project to indicate interest, so we know we're creating something the
 community wants.
-[How ready is it? ▼](https://github.com/varabyte/kobweb#can-we-kobweb-yet)
+[How ready is it? ▼](#can-we-kobweb-yet)
 
 Our goal is to provide:
 
@@ -1741,7 +1741,7 @@ DIY. It would be great to get real world experience to hear what issues users ar
 So, should you use Kobweb at this point? If you are...
 
 * playing around with Compose for Web for the first time and want to get up and running quickly on a toy project:
-    * **YES!!!** Please see the [connecting with us ▼](https://github.com/varabyte/kobweb#connecting-with-us) section
+    * **YES!!!** Please see the [connecting with us ▼](#connecting-with-us) section
       below, we'd definitely love to hear from you. It's still a good time if you'd want to have a voice in the
       direction of this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
