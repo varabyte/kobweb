@@ -128,6 +128,14 @@ fun Modifier.margin(topBottom: CSSNumeric = 0.px, leftRight: CSSNumeric = 0.px):
 
 fun Modifier.margin(
     top: CSSNumeric = 0.px,
+    leftRight: CSSNumeric = 0.px,
+    bottom: CSSNumeric = 0.px,
+): Modifier = styleModifier {
+    margin(top, leftRight, bottom)
+}
+
+fun Modifier.margin(
+    top: CSSNumeric = 0.px,
     right: CSSNumeric = 0.px,
     bottom: CSSNumeric = 0.px,
     left: CSSNumeric = 0.px
@@ -159,6 +167,14 @@ fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
 
 fun Modifier.padding(topBottom: CSSNumeric = 0.px, leftRight: CSSNumeric = 0.px): Modifier = styleModifier {
     padding(topBottom, leftRight)
+}
+
+fun Modifier.padding(
+    top: CSSNumeric = 0.px,
+    leftRight: CSSNumeric = 0.px,
+    bottom: CSSNumeric = 0.px,
+): Modifier = styleModifier {
+    padding(top, leftRight, bottom)
 }
 
 fun Modifier.padding(
