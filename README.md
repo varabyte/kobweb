@@ -1577,7 +1577,7 @@ As long as you understand that this path isn't officially supported yet, we'll p
 help people accomplish this manually for now. Honestly, the hardest part is creating a correct `.kobweb/conf.yaml`,
 which the following steps help you work around:
 
-1. Be sure to check the Kobweb compatability matrix [(see: COMPATIBILITY.md)](https://github.com/varabyte/kobweb/blob/main/COMPATIBILITY.md)
+1. Be sure to check the Kobweb compatibility matrix [(see: COMPATIBILITY.md)](https://github.com/varabyte/kobweb/blob/main/COMPATIBILITY.md)
    to make sure you can match the versions it expects.
 2. Create a dummy app project somewhere. Pay attention to the questions it asks you, as you may want to choose a
    package name that matches your project.
@@ -1587,13 +1587,14 @@ which the following steps help you work around:
    # or `kobweb create app/empty`, if you are already
    # experienced with Kobweb and know what you're doing
    ```
-3. When finished, copy the `site` subfolder out into your own project. (Once done, you can delete this project, as it
-   has served its usefulness.)
+3. When finished, copy the `site` subfolder out into your own project. (Once done, you can delete the dummy project, as
+   it has served its usefulness.)
    ```bash
    cp -r app/site /path/to/your/project
+   # delete app
    ```
-4. In your project's root `settings.gradle.kts` file, include the new project *and* add our custom artifact repository
-   link so your project can find the Kobweb Gradle plugins.
+4. In your own project's root `settings.gradle.kts` file, include the new module *and* add our custom artifact
+   repository link so your project can find the Kobweb Gradle plugins.
    ```kotlin
    // settings.gradle.kts
    pluginManagement {
@@ -1645,7 +1646,7 @@ which the following steps help you work around:
 If everything is working as expected, you should be able to run Kobweb within your project now:
 
 ```bash
-cd /path/to/your/project
+# In /path/to/your/project
 cd site
 kobweb run
 ```
