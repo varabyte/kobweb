@@ -1,17 +1,18 @@
 package com.varabyte.kobweb.silk.components.animation
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.CSSAnimation
+import com.varabyte.kobweb.compose.css.ComparableStyleScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
+import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
-import kotlin.reflect.KProperty
 
 private val KeyframesBuilder.comparableKeyframeStyles get() = keyframeStyles.mapValues { (_, create) ->
     ComparableStyleScope().apply {
@@ -146,12 +147,9 @@ class Keyframes(val name: String, internal val init: KeyframesBuilder.() -> Unit
 /**
  * A delegate provider class which allows you to create a [Keyframes] instance via the `by` keyword.
  */
-class KeyframesProvider internal constructor(private val init: KeyframesBuilder.() -> Unit) {
-    operator fun getValue(
-        thisRef: Any?,
-        property: KProperty<*>
-    ): Keyframes {
-        val name = property.name.titleCamelCaseToKebabCase()
+class KeyframesProvider internal constructor(private val init: KeyframesBuilder.() -> Unit) : CacheByPropertyNameDelegate<Keyframes>() {
+    override fun create(propertyName: String): Keyframes {
+        val name = propertyName.titleCamelCaseToKebabCase()
         return Keyframes(name, init)
     }
 }

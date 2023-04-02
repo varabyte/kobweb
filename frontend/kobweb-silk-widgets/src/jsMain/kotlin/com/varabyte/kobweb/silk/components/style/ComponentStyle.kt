@@ -3,7 +3,8 @@
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.ComparableStyleScope
+import com.varabyte.kobweb.compose.css.isNotEmpty
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.compose.ui.modifiers.classNames
@@ -12,6 +13,7 @@ import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
@@ -20,7 +22,6 @@ import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
-import kotlin.reflect.KProperty
 
 /**
  * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
@@ -455,13 +456,10 @@ class ComponentStyle(
 class ComponentStyleProvider internal constructor(
     private val extraModifiers: @Composable () -> Modifier,
     private val init: ComponentModifiers.() -> Unit,
-) {
-    operator fun getValue(
-        thisRef: Any?,
-        property: KProperty<*>
-    ): ComponentStyle {
+) : CacheByPropertyNameDelegate<ComponentStyle>() {
+    override fun create(propertyName: String): ComponentStyle {
         // e.g. "TitleTextStyle" to "title-text"
-        val name = property.name.removeSuffix("Style").titleCamelCaseToKebabCase()
+        val name = propertyName.removeSuffix("Style").titleCamelCaseToKebabCase()
         return ComponentStyle(name, extraModifiers, init)
     }
 }
@@ -486,11 +484,8 @@ class ComponentVariantProvider internal constructor(
     private val style: ComponentStyle,
     private val extraModifiers: @Composable () -> Modifier,
     private val init: ComponentModifiers.() -> Unit,
-) {
-    operator fun getValue(
-        thisRef: Any?,
-        property: KProperty<*>
-    ): ComponentVariant {
+) : CacheByPropertyNameDelegate<ComponentVariant>() {
+    override fun create(propertyName: String): ComponentVariant {
         // Given a style called "ExampleStyle", we want to support the following variant name simplifications:
         // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
         // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
@@ -500,7 +495,7 @@ class ComponentVariantProvider internal constructor(
 
         // Step 1, remove variant suffix and turn the code style into CSS sytle,
         // e.g. "OutlinedExampleVariant" -> "outlined-example"
-        val withoutSuffix = property.name.removeSuffix("Variant").titleCamelCaseToKebabCase()
+        val withoutSuffix = propertyName.removeSuffix("Variant").titleCamelCaseToKebabCase()
 
         val name =
             withoutSuffix.removePrefix("${style.name}-").removeSuffix("-${style.name}")
