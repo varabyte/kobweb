@@ -114,8 +114,8 @@ fun Modifier.borderRadius(r: CSSNumeric) = styleModifier {
     borderRadius(r)
 }
 
-fun Modifier.borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) = styleModifier {
-    borderRadius(topLeft, bottomRight)
+fun Modifier.borderRadius(topLeftAndBottomRight: CSSNumeric, topRightAndBottomLeft: CSSNumeric) = styleModifier {
+    borderRadius(topLeftAndBottomRight, topRightAndBottomLeft)
 }
 
 fun Modifier.borderRadius(
