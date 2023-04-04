@@ -143,23 +143,23 @@ fun Modifier.borderWidth(width: CSSNumeric) = styleModifier {
     borderWidth(width)
 }
 
-fun Modifier.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric) = styleModifier {
-    borderWidth(topLeft, bottomRight)
+fun Modifier.borderWidth(vertical: CSSNumeric, horizontal: CSSNumeric) = styleModifier {
+    borderWidth(vertical, horizontal)
 }
 
 fun Modifier.borderWidth(
     topLeft: CSSNumeric,
-    topRightAndBottomLeft: CSSNumeric,
+    horizontal: CSSNumeric,
     bottomRight: CSSNumeric
 ) = styleModifier {
-    borderWidth(topLeft, topRightAndBottomLeft, bottomRight)
+    borderWidth(topLeft, horizontal, bottomRight)
 }
 
 fun Modifier.borderWidth(
-    topLeft: CSSNumeric,
-    topRight: CSSNumeric,
-    bottomRight: CSSNumeric,
-    bottomLeft: CSSNumeric
+    top: CSSNumeric,
+    right: CSSNumeric,
+    bottom: CSSNumeric,
+    left: CSSNumeric
 ) = styleModifier {
-    borderWidth(topLeft, topRight, bottomRight, bottomLeft)
+    borderWidth(top, right, bottom, left)
 }
