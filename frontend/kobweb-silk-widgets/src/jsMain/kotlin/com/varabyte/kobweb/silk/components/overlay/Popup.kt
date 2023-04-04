@@ -56,7 +56,7 @@ enum class PopupPlacement {
     BottomRight,
 }
 
-val PopupStyle = ComponentStyle("silk-popup") {
+val PopupStyle by ComponentStyle(prefix = "silk-") {
 }
 
 /**

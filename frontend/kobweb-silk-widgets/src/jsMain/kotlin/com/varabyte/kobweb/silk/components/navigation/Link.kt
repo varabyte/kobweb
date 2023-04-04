@@ -18,7 +18,7 @@ import org.jetbrains.compose.web.dom.A
 /**
  * Style to use with [A] tags to give them Silk-themed colors.
  */
-val LinkStyle = ComponentStyle("silk-link") {
+val LinkStyle by ComponentStyle(prefix = "silk-") {
     base {
         Modifier.textDecorationLine(TextDecorationLine.None)
     }

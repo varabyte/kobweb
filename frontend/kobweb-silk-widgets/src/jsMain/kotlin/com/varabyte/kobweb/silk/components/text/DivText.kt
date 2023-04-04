@@ -14,7 +14,7 @@ import org.jetbrains.compose.web.dom.Text
 
 // Normally, the color of the text is inherited from its parent (see SurfaceStyle), but users may still want to
 // override text styles globally in their own app, so we still register a style here even if it's empty
-val DivTextStyle = ComponentStyle("silk-div-text") { }
+val DivTextStyle by ComponentStyle(prefix = "silk-") { }
 
 /**
  * A text wrapped in a div block, which can be styled based on a passed-in `Modifier`.

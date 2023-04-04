@@ -50,7 +50,7 @@ private val TRIANGLE_WIDTH = 5.px
 // from separating.
 private val TRIANGLE_WIDTH_2X = 9.px
 
-val TooltipStyle = ComponentStyle.base("silk-tooltip") {
+val TooltipStyle by ComponentStyle.base(prefix = "silk-") {
     val palette = colorMode.toSilkPalette()
 
     Modifier
@@ -60,7 +60,7 @@ val TooltipStyle = ComponentStyle.base("silk-tooltip") {
         .borderRadius(6.px)
 }
 
-val TooltipArrowStyle = ComponentStyle.base("silk-tooltip-arrow") {
+val TooltipArrowStyle by ComponentStyle.base(prefix = "silk-") {
     Modifier
         .position(Position.Absolute)
         .borderWidth(TRIANGLE_WIDTH)

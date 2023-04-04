@@ -147,7 +147,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
     private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
 
     override fun registerStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: StyleModifiers.() -> Unit) {
-        styles.add(ComponentStyle(cssSelector, extraModifiers, init))
+        styles.add(ComponentStyle(cssSelector, extraModifiers, prefix = null, init))
     }
 
     override fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit) {

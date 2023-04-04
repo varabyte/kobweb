@@ -14,7 +14,7 @@ import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
-val SurfaceStyle = ComponentStyle("silk-surface") {
+val SurfaceStyle by ComponentStyle(prefix = "silk-") {
     base {
         val palette = colorMode.toSilkPalette()
         Modifier

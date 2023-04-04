@@ -26,7 +26,7 @@ import org.w3c.dom.HTMLElement
 // and increase the column count.
 private const val MAX_COLUMN_COUNT = 5
 
-val SimpleGridStyle = ComponentStyle.base("silk-simple-grid") {
+val SimpleGridStyle by ComponentStyle.base(prefix = "silk-") {
     Modifier.display(DisplayStyle.Grid)
 }
 

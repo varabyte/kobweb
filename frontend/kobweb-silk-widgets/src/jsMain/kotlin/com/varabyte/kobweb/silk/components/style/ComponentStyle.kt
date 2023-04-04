@@ -290,16 +290,32 @@ private sealed interface StyleGroup {
  * }
  * ```
  *
+ * @param name The name of the style, which will be used as the CSS class name.
  * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
+ * @param prefix An optional prefix to prepend in front of the style name, as a helpful tool for reducing the chance of
+ *   style name collisions. (Note: unless you are a library author, it's not expected you'll set this.) Why not just put
+ *   the prefix directly in the name itself? We allow separating it out since you can use delegation to create a style,
+ *   at which point the name will be derived from the style's property name. In contrast, a prefix will be manually
+ *   chosen. For a concrete example, `val ButtonStyle by ComponentStyle(prefix = "silk-")` creates the full name
+ *   `"silk-button"`). Also, when creating a variant by delegation, it is useful to know the non-prefixed name of the
+ *   style it is based on when creating a name for it.
  */
 class ComponentStyle(
-    val name: String,
+    name: String,
     private val extraModifiers: @Composable () -> Modifier,
+    val prefix: String? = null,
     private val init: ComponentModifiers.() -> Unit,
 ) {
-    constructor(name: String, extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
-            : this(name, { extraModifiers }, init)
+    init {
+        require(name.isNotEmpty()) { "ComponentStyle name must not be empty" }
+    }
+
+    internal val nameWithoutPrefix = name
+    val name = "${prefix.orEmpty()}$name"
+
+    constructor(name: String, extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit)
+            : this(name, { extraModifiers }, prefix, init)
 
     companion object {
         /**
@@ -365,7 +381,7 @@ class ComponentStyle(
         init: ComponentModifiers.() -> Unit
     ): ComponentVariant {
         return SimpleComponentVariant(
-            ComponentStyle("${this.name}-$name", extraModifiers, init),
+            ComponentStyle("${this.name}-$name", extraModifiers, prefix = null, init),
             baseStyle = this
         ).also {
             variants.add(it)
@@ -455,26 +471,27 @@ class ComponentStyle(
  */
 class ComponentStyleProvider internal constructor(
     private val extraModifiers: @Composable () -> Modifier,
+    private val prefix: String? = null,
     private val init: ComponentModifiers.() -> Unit,
 ) : CacheByPropertyNameDelegate<ComponentStyle>() {
     override fun create(propertyName: String): ComponentStyle {
         // e.g. "TitleTextStyle" to "title-text"
         val name = propertyName.removeSuffix("Style").titleCamelCaseToKebabCase()
-        return ComponentStyle(name, extraModifiers, init)
+        return ComponentStyle(name, extraModifiers, prefix, init)
     }
 }
 
-fun ComponentStyle(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
-    = ComponentStyle({ extraModifiers }, init)
+fun ComponentStyle(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit)
+    = ComponentStyle({ extraModifiers }, prefix, init)
 
-fun ComponentStyle(extraModifiers: @Composable () -> Modifier, init: ComponentModifiers.() -> Unit)
-    = ComponentStyleProvider(extraModifiers, init)
+fun ComponentStyle(extraModifiers: @Composable () -> Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit)
+    = ComponentStyleProvider(extraModifiers, prefix, init)
 
-fun ComponentStyle.Companion.base(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier)
-    = base({ extraModifiers}, init)
+fun ComponentStyle.Companion.base(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentBaseModifier.() -> Modifier)
+    = base({ extraModifiers}, prefix, init)
 
-fun ComponentStyle.Companion.base(extraModifiers: @Composable () -> Modifier, init: ComponentBaseModifier.() -> Modifier)
-    = ComponentStyleProvider(extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) }})
+fun ComponentStyle.Companion.base(extraModifiers: @Composable () -> Modifier, prefix: String? = null, init: ComponentBaseModifier.() -> Modifier)
+    = ComponentStyleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) }})
 
 
 /**
@@ -498,7 +515,7 @@ class ComponentVariantProvider internal constructor(
         val withoutSuffix = propertyName.removeSuffix("Variant").titleCamelCaseToKebabCase()
 
         val name =
-            withoutSuffix.removePrefix("${style.name}-").removeSuffix("-${style.name}")
+            withoutSuffix.removePrefix("${style.nameWithoutPrefix}-").removeSuffix("-${style.nameWithoutPrefix}")
                 .takeIf { it.isNotEmpty() } ?: withoutSuffix
         return style.addVariant(name, extraModifiers, init)
     }

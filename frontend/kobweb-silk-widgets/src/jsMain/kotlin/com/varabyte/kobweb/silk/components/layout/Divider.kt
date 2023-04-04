@@ -13,7 +13,7 @@ import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Hr
 
-val DividerStyle = ComponentStyle.base("silk-divider") {
+val DividerStyle by ComponentStyle.base(prefix = "silk-") {
     Modifier
         .borderTop(1.px, LineStyle.Solid, colorMode.toSilkPalette().border)
         .fillMaxWidth(90.percent)

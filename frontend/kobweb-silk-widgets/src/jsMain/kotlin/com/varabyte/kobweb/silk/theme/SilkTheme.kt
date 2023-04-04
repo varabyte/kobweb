@@ -100,7 +100,7 @@ class MutableSilkTheme {
     ) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
         check(overiddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
-        componentStyles[style.name] = ComponentStyle(style.name, extraModifiers, init)
+        componentStyles[style.name] = ComponentStyle(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
     }
 
     /**
@@ -247,7 +247,7 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
 
     // Note: We separate this function out from the SilkTheme constructor so we can construct it first and then call
     // this later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
-    //  val TextStyle = ComponentStyle("silk-text") {
+    //  val TextStyle by ComponentStyle {
     //    base {
     //      Modifier.color(SilkTheme.palettes[colorMode].color)
     //                     ^^^^^^^^^

@@ -60,6 +60,6 @@ val StyleModifiers.ariaDisabled get() = CssRule.OfAttributeSelector(this, """ari
  * Note: This is shared as a style instead of a simple modifier so that a user can tweak the timing in their own site by
  * overriding the style if they'd like.
  */
-val SmoothColorStyle = ComponentStyle.base("silk-smooth-color") {
+val SmoothColorStyle by ComponentStyle.base(prefix = "silk-") {
     Modifier.transition(CSSTransition("background-color", 200.ms))
 }

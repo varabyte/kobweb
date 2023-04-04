@@ -23,7 +23,7 @@ import org.w3c.dom.HTMLElement
 import org.jetbrains.compose.web.dom.Button as JbButton
 
 
-val ButtonStyle = ComponentStyle("silk-button") {
+val ButtonStyle by ComponentStyle(prefix = "silk-") {
     val palette = colorMode.toSilkPalette()
     val buttonColors = palette.button
 
