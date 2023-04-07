@@ -9,6 +9,7 @@ import com.varabyte.kotter.foundation.input.onInputEntered
 import com.varabyte.kotter.foundation.input.runUntilInputEntered
 import com.varabyte.kotter.foundation.liveVarOf
 import com.varabyte.kotter.foundation.render.aside
+import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.black
 import com.varabyte.kotter.foundation.text.bold
 import com.varabyte.kotter.foundation.text.cyan
@@ -155,4 +156,32 @@ fun RunScope.handleConsoleOutput(line: String, isError: Boolean) {
         if (isError) red() else black(isBright = true)
         textLine(line)
     }
+}
+
+/**
+ * Try running a session, returning false if it could not start.
+ *
+ * The main reason a session would not start is if the terminal environment is not interactive, which is common in
+ * environments like docker containers and CIs. In that case, the code that calls this method can handle the boolean
+ * signal and run some fallback code that doesn't require interactivity.
+ */
+fun trySession(block: Session.() -> Unit): Boolean {
+    var sessionStarted = false
+    try {
+        session {
+            sessionStarted = true
+            block()
+        }
+    } catch (ex: Exception) {
+        if (!sessionStarted) {
+            return false
+        } else {
+            // This exception came from after startup, when the user was
+            // interacting with Kotter. Crashing with an informative stack
+            // is probably the best thing we can do at this point.
+            throw ex
+        }
+    }
+
+    return true
 }

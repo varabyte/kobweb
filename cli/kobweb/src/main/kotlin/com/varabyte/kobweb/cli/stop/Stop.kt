@@ -1,12 +1,6 @@
 package com.varabyte.kobweb.cli.stop
 
-import com.varabyte.kobweb.cli.common.Anims
-import com.varabyte.kobweb.cli.common.KobwebGradle
-import com.varabyte.kobweb.cli.common.assertKobwebApplication
-import com.varabyte.kobweb.cli.common.findKobwebApplication
-import com.varabyte.kobweb.cli.common.handleConsoleOutput
-import com.varabyte.kobweb.cli.common.isServerAlreadyRunning
-import com.varabyte.kobweb.cli.common.newline
+import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.liveVarOf
@@ -32,8 +26,10 @@ private fun handleStop(
     isInteractive: Boolean,
     kobwebGradle: KobwebGradle,
 ) {
-    if (isInteractive) session {
-        val kobwebApplication = findKobwebApplication() ?: return@session
+    var runFallbackLogic = !isInteractive
+
+    if (isInteractive && !trySession {
+        val kobwebApplication = findKobwebApplication() ?: return@trySession
         if (kobwebApplication.isServerAlreadyRunning()) {
             newline() // Put space between user prompt and eventual first line of Gradle output
 
@@ -62,8 +58,11 @@ private fun handleStop(
                 textLine("Did not detect a running server.")
             }.run()
         }
+    }) {
+        runFallbackLogic = true
     }
-    else {
+
+    if (runFallbackLogic) {
         val kobwebApplication = assertKobwebApplication()
         if (!kobwebApplication.isServerAlreadyRunning()) {
             println("Did not detect a running server.")

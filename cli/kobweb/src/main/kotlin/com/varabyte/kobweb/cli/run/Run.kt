@@ -1,16 +1,6 @@
 package com.varabyte.kobweb.cli.run
 
-import com.varabyte.kobweb.cli.common.Anims
-import com.varabyte.kobweb.cli.common.GradleAlertBundle
-import com.varabyte.kobweb.cli.common.KobwebGradle
-import com.varabyte.kobweb.cli.common.assertKobwebApplication
-import com.varabyte.kobweb.cli.common.assertServerNotAlreadyRunning
-import com.varabyte.kobweb.cli.common.findKobwebApplication
-import com.varabyte.kobweb.cli.common.handleConsoleOutput
-import com.varabyte.kobweb.cli.common.handleGradleOutput
-import com.varabyte.kobweb.cli.common.isServerAlreadyRunningFor
-import com.varabyte.kobweb.cli.common.newline
-import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
+import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.SiteLayout
@@ -25,7 +15,6 @@ import com.varabyte.kotter.foundation.input.Keys
 import com.varabyte.kotter.foundation.input.onKeyPressed
 import com.varabyte.kotter.foundation.liveVarOf
 import com.varabyte.kotter.foundation.runUntilSignal
-import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.cyan
 import com.varabyte.kotter.foundation.text.green
 import com.varabyte.kotter.foundation.text.red
@@ -38,7 +27,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 private enum class RunState {
@@ -70,9 +58,10 @@ private fun handleRun(
     isInteractive: Boolean,
     kobwebGradle: KobwebGradle
 ) {
-    if (isInteractive) session {
-        val kobwebApplication = findKobwebApplication() ?: return@session
-        if (isServerAlreadyRunningFor(kobwebApplication)) return@session
+    var runFallbackLogic = !isInteractive
+    if (isInteractive && !trySession {
+        val kobwebApplication = findKobwebApplication() ?: return@trySession
+        if (isServerAlreadyRunningFor(kobwebApplication)) return@trySession
 
         val kobwebFolder = kobwebApplication.kobwebFolder
         val conf = KobwebConfFile(kobwebFolder).content!!
@@ -244,8 +233,11 @@ private fun handleRun(
                 }
             }
         }
-    } else {
-        assert(!isInteractive)
+    }) {
+        runFallbackLogic = true
+    }
+
+    if (runFallbackLogic) {
         assertKobwebApplication()
             .also { kobwebApplication -> kobwebApplication.assertServerNotAlreadyRunning() }
 

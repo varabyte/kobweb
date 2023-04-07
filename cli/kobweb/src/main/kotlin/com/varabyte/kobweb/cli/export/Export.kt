@@ -1,16 +1,6 @@
 package com.varabyte.kobweb.cli.export
 
-import com.varabyte.kobweb.cli.common.Anims
-import com.varabyte.kobweb.cli.common.GradleAlertBundle
-import com.varabyte.kobweb.cli.common.KobwebGradle
-import com.varabyte.kobweb.cli.common.assertKobwebApplication
-import com.varabyte.kobweb.cli.common.assertServerNotAlreadyRunning
-import com.varabyte.kobweb.cli.common.findKobwebApplication
-import com.varabyte.kobweb.cli.common.handleConsoleOutput
-import com.varabyte.kobweb.cli.common.handleGradleOutput
-import com.varabyte.kobweb.cli.common.isServerAlreadyRunningFor
-import com.varabyte.kobweb.cli.common.newline
-import com.varabyte.kobweb.cli.common.showStaticSiteLayoutWarning
+import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kotter.foundation.anim.textAnimOf
@@ -39,9 +29,11 @@ fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
 }
 
 private fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean, kobwebGradle: KobwebGradle) {
-    if (isInteractive) session {
-        val kobwebApplication = findKobwebApplication() ?: return@session
-        if (isServerAlreadyRunningFor(kobwebApplication)) return@session
+    var runFallbackLogic = !isInteractive
+
+    if (isInteractive && !trySession {
+        val kobwebApplication = findKobwebApplication() ?: return@trySession
+        if (isServerAlreadyRunningFor(kobwebApplication)) return@trySession
 
         newline() // Put space between user prompt and eventual first line of Gradle output
 
@@ -115,8 +107,11 @@ private fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean, kobwebG
 
             exportState = if (exportState == ExportState.FINISHING) ExportState.FINISHED else ExportState.CANCELLED
         }
-    } else {
-        assert(!isInteractive)
+    }) {
+        runFallbackLogic = true
+    }
+
+    if (runFallbackLogic) {
         assertKobwebApplication()
             .also { kobwebApplication -> kobwebApplication.assertServerNotAlreadyRunning() }
 
