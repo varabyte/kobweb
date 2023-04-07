@@ -65,7 +65,7 @@ private fun handleStop(
     }
     else {
         val kobwebApplication = assertKobwebApplication()
-        if (kobwebApplication.isServerAlreadyRunning()) {
+        if (!kobwebApplication.isServerAlreadyRunning()) {
             println("Did not detect a running server.")
             return
         }
