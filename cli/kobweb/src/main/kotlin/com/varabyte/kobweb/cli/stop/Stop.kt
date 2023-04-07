@@ -4,7 +4,6 @@ import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.liveVarOf
-import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.textLine
 
 private enum class StopState {
@@ -12,23 +11,21 @@ private enum class StopState {
     STOPPED,
 }
 
-fun handleStop(
-    isInteractive: Boolean
-) {
+fun handleStop(useAnsi: Boolean) {
     // Server environment doesn't really matter for "stop". Still, let's default to prod because that's usually the case
     // where a server is left running for a long time.
     KobwebGradle(ServerEnvironment.PROD).use { kobwebGradle ->
-        handleStop(isInteractive, kobwebGradle)
+        handleStop(useAnsi, kobwebGradle)
     }
 }
 
 private fun handleStop(
-    isInteractive: Boolean,
+    useAnsi: Boolean,
     kobwebGradle: KobwebGradle,
 ) {
-    var runFallbackLogic = !isInteractive
+    var runInPlainMode = !useAnsi
 
-    if (isInteractive && !trySession {
+    if (useAnsi && !trySession {
         val kobwebApplication = findKobwebApplication() ?: return@trySession
         if (kobwebApplication.isServerAlreadyRunning()) {
             newline() // Put space between user prompt and eventual first line of Gradle output
@@ -59,10 +56,10 @@ private fun handleStop(
             }.run()
         }
     }) {
-        runFallbackLogic = true
+        runInPlainMode = true
     }
 
-    if (runFallbackLogic) {
+    if (runInPlainMode) {
         val kobwebApplication = assertKobwebApplication()
         if (!kobwebApplication.isServerAlreadyRunning()) {
             println("Did not detect a running server.")

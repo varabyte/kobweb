@@ -42,24 +42,24 @@ private enum class RunState {
 fun handleRun(
     env: ServerEnvironment,
     siteLayout: SiteLayout,
-    isInteractive: Boolean,
+    useAnsi: Boolean,
 ) {
     val originalEnv = env
 
     @Suppress("NAME_SHADOWING") // We're intentionally intercepting the original value
     val env = env.takeIf { siteLayout != SiteLayout.STATIC } ?: ServerEnvironment.PROD
-    KobwebGradle(env).use { kobwebGradle -> handleRun(originalEnv, env, siteLayout, isInteractive, kobwebGradle) }
+    KobwebGradle(env).use { kobwebGradle -> handleRun(originalEnv, env, siteLayout, useAnsi, kobwebGradle) }
 }
 
 private fun handleRun(
     originalEnv: ServerEnvironment,
     env: ServerEnvironment,
     siteLayout: SiteLayout,
-    isInteractive: Boolean,
+    useAnsi: Boolean,
     kobwebGradle: KobwebGradle
 ) {
-    var runFallbackLogic = !isInteractive
-    if (isInteractive && !trySession {
+    var runInPlainMode = !useAnsi
+    if (useAnsi && !trySession {
         val kobwebApplication = findKobwebApplication() ?: return@trySession
         if (isServerAlreadyRunningFor(kobwebApplication)) return@trySession
 
@@ -234,10 +234,10 @@ private fun handleRun(
             }
         }
     }) {
-        runFallbackLogic = true
+        runInPlainMode = true
     }
 
-    if (runFallbackLogic) {
+    if (runInPlainMode) {
         assertKobwebApplication()
             .also { kobwebApplication -> kobwebApplication.assertServerNotAlreadyRunning() }
 

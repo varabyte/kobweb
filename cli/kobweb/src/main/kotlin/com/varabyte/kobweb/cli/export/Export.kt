@@ -7,7 +7,6 @@ import com.varabyte.kotter.foundation.anim.textAnimOf
 import com.varabyte.kotter.foundation.input.Keys
 import com.varabyte.kotter.foundation.input.onKeyPressed
 import com.varabyte.kotter.foundation.liveVarOf
-import com.varabyte.kotter.foundation.session
 import com.varabyte.kotter.foundation.text.red
 import com.varabyte.kotter.foundation.text.textLine
 import com.varabyte.kotter.foundation.text.yellow
@@ -21,17 +20,17 @@ private enum class ExportState {
     INTERRUPTED,
 }
 
-fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean) {
+fun handleExport(siteLayout: SiteLayout, useAnsi: Boolean) {
     // exporting is a production-only action
     KobwebGradle(ServerEnvironment.PROD).use { kobwebGradle ->
-        handleExport(siteLayout, isInteractive, kobwebGradle)
+        handleExport(siteLayout, useAnsi, kobwebGradle)
     }
 }
 
-private fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean, kobwebGradle: KobwebGradle) {
-    var runFallbackLogic = !isInteractive
+private fun handleExport(siteLayout: SiteLayout, useAnsi: Boolean, kobwebGradle: KobwebGradle) {
+    var runInPlainMode = !useAnsi
 
-    if (isInteractive && !trySession {
+    if (useAnsi && !trySession {
         val kobwebApplication = findKobwebApplication() ?: return@trySession
         if (isServerAlreadyRunningFor(kobwebApplication)) return@trySession
 
@@ -108,10 +107,10 @@ private fun handleExport(siteLayout: SiteLayout, isInteractive: Boolean, kobwebG
             exportState = if (exportState == ExportState.FINISHING) ExportState.FINISHED else ExportState.CANCELLED
         }
     }) {
-        runFallbackLogic = true
+        runInPlainMode = true
     }
 
-    if (runFallbackLogic) {
+    if (runInPlainMode) {
         assertKobwebApplication()
             .also { kobwebApplication -> kobwebApplication.assertServerNotAlreadyRunning() }
 
