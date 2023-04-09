@@ -14,12 +14,14 @@ import kotlin.io.path.relativeTo
  *   specified, this name will come from the template's path to the root. See also: [KobwebTemplateFile.getName].
  * @property shouldHighlight This template is considered important and should be called out
  *   separately when all templates for a repository are listed.
+ * @property minimumVersion The minimum version of the Kobweb CLI that this template is compatible with.
  */
 @Serializable
 class Metadata(
     val description: String,
     val name: String? = null,
     val shouldHighlight: Boolean = false,
+    val minimumVersion: String = "0.0.0"
 )
 
 @Serializable

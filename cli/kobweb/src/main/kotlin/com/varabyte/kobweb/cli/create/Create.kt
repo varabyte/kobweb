@@ -1,16 +1,9 @@
 package com.varabyte.kobweb.cli.create
 
-import com.varabyte.kobweb.cli.common.PathUtils
-import com.varabyte.kobweb.cli.common.Validations
-import com.varabyte.kobweb.cli.common.cmd
-import com.varabyte.kobweb.cli.common.findGit
-import com.varabyte.kobweb.cli.common.handleFetch
-import com.varabyte.kobweb.cli.common.informInfo
-import com.varabyte.kobweb.cli.common.newline
-import com.varabyte.kobweb.cli.common.queryUser
+import com.varabyte.kobweb.cli.common.*
 import com.varabyte.kobweb.cli.common.template.KobwebTemplateFile
 import com.varabyte.kobweb.cli.common.template.getName
-import com.varabyte.kobweb.cli.common.textError
+import com.varabyte.kobweb.cli.common.version.versionIsSupported
 import com.varabyte.kobweb.cli.create.freemarker.FreemarkerState
 import com.varabyte.kobweb.cli.create.freemarker.methods.IsNotEmptyMethod
 import com.varabyte.kobweb.cli.create.freemarker.methods.YesNoToBoolMethod
@@ -20,14 +13,7 @@ import com.varabyte.kotter.foundation.input.onKeyPressed
 import com.varabyte.kotter.foundation.input.runUntilKeyPressed
 import com.varabyte.kotter.foundation.liveVarOf
 import com.varabyte.kotter.foundation.session
-import com.varabyte.kotter.foundation.text.blue
-import com.varabyte.kotter.foundation.text.bold
-import com.varabyte.kotter.foundation.text.cyan
-import com.varabyte.kotter.foundation.text.green
-import com.varabyte.kotter.foundation.text.magenta
-import com.varabyte.kotter.foundation.text.text
-import com.varabyte.kotter.foundation.text.textLine
-import com.varabyte.kotter.foundation.text.yellow
+import com.varabyte.kotter.foundation.text.*
 import com.varabyte.kotter.runtime.render.RenderScope
 import com.varabyte.kotterx.decorations.BorderCharacters
 import com.varabyte.kotterx.decorations.bordered
@@ -61,8 +47,15 @@ fun handleCreate(repo: String, branch: String, templateName: String?) = session 
     val templateRoots = tempDir.toFile().walkTopDown()
         .filter { it.isDirectory }
         .mapNotNull { dir -> KobwebTemplateFile.inPath(dir.toPath()) }
+        .filter { it.template.versionIsSupported }
         .toList()
 
+    if (templateRoots.isEmpty()) {
+        section {
+            textError("No templates were found in the specified repository.")
+        }.run()
+        return@session
+    }
 
     val templateFile =
         (if (templateName != null) {
