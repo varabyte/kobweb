@@ -37,11 +37,10 @@ fun Session.reportUpdateAvailable(oldVersion: SemVer.Parsed, newVersion: SemVer.
                     text(newVersion.toString())
                 }
                 textLine(); textLine()
-                text("Please review the README at ")
-                cyan(isBright = false) { text("https://github.com/varabyte/kobweb") }
-                textLine(" for")
-                textLine("instructions, and/or use your chosen package manager to upgrade to the")
-                textLine("latest version.")
+                text("Please review ")
+                cyan(isBright = false) { text("https://github.com/varabyte/kobweb#update-the-kobweb-binary") }
+                textLine()
+                textLine("for instructions.")
             }
         }
     }.run()
