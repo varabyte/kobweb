@@ -202,6 +202,18 @@ $ PATH=$PATH:/path/to/src/root/kobweb/cli/kobweb/build/install/kobweb/bin
 $ kobweb version # to check it's working
 ```
 
+## Update the Kobweb binary
+
+If you previously installed Kobweb and are aware that a new version is available, the way you update it depends on how
+you installed it.
+
+| Method                    | Instructions                                                                                                                         |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Homebrew                  | `brew upgrade kobweb`                                                                                                                |
+| Scoop                     | `scoop update kobweb`                                                                                                                |
+| SDKMAN!                   | `sdk upgrade kobweb`                                                                                                                 |
+| Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb/releases/tag/cli-v0.9.11). You can find both a zip and tar file there. |
+
 ## Create your Kobweb site
 
 ```bash
