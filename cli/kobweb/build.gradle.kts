@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.kotter)
     implementation(libs.freemarker)
     implementation(libs.kaml)
+    implementation(libs.okhttp)
     implementation(project(":common:kobweb-common"))
 
     // For Gradle Tooling API (used for starting up / communicating with a gradle daemon)

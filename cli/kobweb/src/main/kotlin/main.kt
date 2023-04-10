@@ -9,6 +9,10 @@ import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.enum
 import com.varabyte.kobweb.cli.common.DEFAULT_BRANCH
 import com.varabyte.kobweb.cli.common.DEFAULT_REPO
+import com.varabyte.kobweb.cli.common.trySession
+import com.varabyte.kobweb.cli.common.version.SemVer
+import com.varabyte.kobweb.cli.common.version.kobwebCliVersion
+import com.varabyte.kobweb.cli.common.version.reportUpdateAvailable
 import com.varabyte.kobweb.cli.conf.handleConf
 import com.varabyte.kobweb.cli.create.handleCreate
 import com.varabyte.kobweb.cli.export.handleExport
@@ -18,6 +22,11 @@ import com.varabyte.kobweb.cli.stop.handleStop
 import com.varabyte.kobweb.cli.version.handleVersion
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.SiteLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 private enum class Mode {
     /** Expect a user at an ANSI-enabled terminal interacting with the command */
@@ -83,6 +92,59 @@ private fun shouldUseAnsi(tty: Int, notty: Int, mode: Mode?): Boolean {
 }
 
 fun main(args: Array<String>) {
+    /**
+     * Subclasses for most Kobweb commands, which include common functionality that should run across all of them.
+     *
+     * @param checkForUpgrade If true, do an upgrade check while this command is running, and if one is available, show
+     *   an upgrade message after the command finishes running. This should be set to false if the command is
+     *   short-lived or returns a simple value that is expected to be read from a script.
+     */
+    abstract class KobwebSubcommand(private val checkForUpgrade: Boolean = true, help: String) : CliktCommand(help = help) {
+        private var newVersionAvailable: SemVer.Parsed? = null
+
+        private fun checkForUpgradeAsync() {
+            CoroutineScope(Dispatchers.IO).launch {
+                val client = OkHttpClient()
+                val latestVersionRequest =
+                    Request.Builder()
+                        .url("https://raw.githubusercontent.com/varabyte/data/main/kobweb/cli-version.txt")
+                        .build()
+
+                client.newCall(latestVersionRequest).execute().use { response ->
+                    if (response.isSuccessful) {
+                        response.body?.string()?.trim()
+                            ?.let { latestVersionStr ->
+                                SemVer.parse(latestVersionStr) as? SemVer.Parsed
+                            }
+                            ?.let { latestVersion ->
+                                if (kobwebCliVersion < latestVersion) {
+                                    newVersionAvailable = latestVersion
+                                }
+                            }
+                    }
+                }
+            }
+        }
+
+        override fun run() {
+            if (checkForUpgrade) checkForUpgradeAsync()
+
+            doRun()
+
+            // If we were able to connect in time AND see that a new version is available, then show an upgrade
+            // message. Worst case if the command finished running before we were able to check? We don't show the
+            // message, but that's not a big deal.
+            newVersionAvailable?.let { newVersion ->
+                // If we can create a session, that means we're in a TTY and a user is likely watching.
+                // In that case, we can print a message to upgrade. Otherwise, e.g. if on a CI, this should
+                // just fail silently.
+                trySession { this.reportUpdateAvailable(kobwebCliVersion, newVersion) }
+            }
+        }
+
+        protected abstract fun doRun()
+    }
+
     class Kobweb : NoOpCliktCommand() {
         init {
             context { helpFormatter = CliktHelpFormatter(showDefaultValues = true) }
@@ -90,68 +152,76 @@ fun main(args: Array<String>) {
 
     }
 
-    class Version : CliktCommand(help = "Print the version of this binary") {
-        override fun run() {
+    // We don't want to print the "upgrade" message if users are just running "kobweb -v" (it will reply so quickly that
+    // we probably wouldn't have time to download and check the response anyway).
+    class Version : KobwebSubcommand(checkForUpgrade = false, help = "Print the version of this binary") {
+        override fun doRun() {
             handleVersion()
         }
     }
 
-    class List : CliktCommand(help = "List all project templates") {
+    class List : KobwebSubcommand(help = "List all project templates") {
         val repo by option(help = "The repository that hosts Kobweb templates").default(DEFAULT_REPO)
         val branch by option(help = "The branch in the repository to use").default(DEFAULT_BRANCH)
 
-        override fun run() {
+        override fun doRun() {
             handleList(repo, branch)
         }
     }
 
-    class Create : CliktCommand("Create a Kobweb app / site from a template") {
+    // Don't check for an upgrade on create, because the user probably just intalled kobweb anyway, and the update
+    // message kind of obfuscates the instructions to start running the app.
+    class Create : KobwebSubcommand(checkForUpgrade = false, help = "Create a Kobweb app / site from a template") {
         val template by argument(help = "The name of the template to instantiate, e.g. 'app'. If not specified, choices will be presented.").optional()
         val repo by option(help = "The repository that hosts Kobweb templates").default(DEFAULT_REPO)
         val branch by option(help = "The branch in the repository to use").default(DEFAULT_BRANCH)
 
-        override fun run() {
+        override fun doRun() {
             handleCreate(repo, branch, template)
         }
     }
 
-    class Export : CliktCommand("Generate a static version of a Kobweb app / site") {
+    class Export : KobwebSubcommand(help = "Generate a static version of a Kobweb app / site") {
         val tty by tty()
         val notty by notty()
         val mode by mode()
         val layout by layout()
 
-        override fun run() {
+        override fun doRun() {
             handleExport(layout, shouldUseAnsi(tty, notty, mode))
         }
     }
 
-    class Run : CliktCommand("Run a Kobweb server") {
+    class Run : KobwebSubcommand(help = "Run a Kobweb server") {
         val env by option(help = "Whether the server should run in development mode or production.").enum<ServerEnvironment>().default(ServerEnvironment.DEV)
         val tty by tty()
         val notty by notty()
         val mode by mode()
         val layout by layout()
 
-        override fun run() {
+        override fun doRun() {
             handleRun(env, layout, shouldUseAnsi(tty, notty, mode))
         }
     }
 
-    class Stop : CliktCommand("Stop a Kobweb server if one is running") {
+    // This command is run pretty rarely, and almost always run after `kobweb run`, so no need to check for
+    // an upgrade here.
+    class Stop : KobwebSubcommand(checkForUpgrade = false, "Stop a Kobweb server if one is running") {
         val tty by tty()
         val notty by notty()
         val mode by mode()
 
-        override fun run() {
+        override fun doRun() {
             handleStop(shouldUseAnsi(tty, notty, mode))
         }
     }
 
-    class Conf : CliktCommand("Query a value from the .kobweb/conf.yaml file (e.g. \"server.port\")") {
+    // We don't check for an upgrade here because people are expecting this method to return a queried value,
+    // and an update message would probably screw up scripts trying to read it.
+    class Conf : KobwebSubcommand(checkForUpgrade = false, help = "Query a value from the .kobweb/conf.yaml file (e.g. \"server.port\")") {
         val query by argument(help = "The query to search the .kobweb/conf.yaml for (e.g. \"server.port\")")
 
-        override fun run() {
+        override fun doRun() {
             handleConf(query)
         }
     }
