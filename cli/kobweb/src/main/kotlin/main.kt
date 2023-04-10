@@ -93,14 +93,20 @@ private fun shouldUseAnsi(tty: Int, notty: Int, mode: Mode?): Boolean {
 
 fun main(args: Array<String>) {
     /**
-     * Subclasses for most Kobweb commands, which include common functionality that should run across all of them.
-     *
-     * @param checkForUpgrade If true, do an upgrade check while this command is running, and if one is available, show
-     *   an upgrade message after the command finishes running. This is generally false unless the command is one that
-     *   is long-running where a message showing up after it is finished wouldn't be considered intrusive.
+     * Common functionality for all Kobweb subcommands.
      */
-    abstract class KobwebSubcommand(private val checkForUpgrade: Boolean = false, help: String) : CliktCommand(help = help) {
+    abstract class KobwebSubcommand(help: String) : CliktCommand(help = help) {
         private var newVersionAvailable: SemVer.Parsed? = null
+
+        /**
+         * If true, do an upgrade check while this command is running.
+         *
+         * If one is available, show an upgrade message after the command finishes running.
+         *
+         * This value should generally be false unless the command is one that is long-running where a message showing
+         * up after it is finished wouldn't be considered intrusive.
+         */
+        protected open fun shouldCheckForUpgrade(): Boolean = false
 
         private fun checkForUpgradeAsync() {
             CoroutineScope(Dispatchers.IO).launch {
@@ -127,7 +133,7 @@ fun main(args: Array<String>) {
         }
 
         override fun run() {
-            if (checkForUpgrade) checkForUpgradeAsync()
+            if (shouldCheckForUpgrade()) checkForUpgradeAsync()
 
             doRun()
 
@@ -158,56 +164,63 @@ fun main(args: Array<String>) {
         }
     }
 
-    class List : KobwebSubcommand(checkForUpgrade = true, help = "List all project templates") {
+    class List : KobwebSubcommand(help = "List all project templates") {
         val repo by option(help = "The repository that hosts Kobweb templates").default(DEFAULT_REPO)
         val branch by option(help = "The branch in the repository to use").default(DEFAULT_BRANCH)
 
+        override fun shouldCheckForUpgrade() = true
         override fun doRun() {
             handleList(repo, branch)
         }
     }
 
-    // Don't check for an upgrade on create, because the user probably just installed kobweb anyway, and the update
-    // message kind of overwhelms the instructions to start running the app.
     class Create : KobwebSubcommand(help = "Create a Kobweb app / site from a template") {
         val template by argument(help = "The name of the template to instantiate, e.g. 'app'. If not specified, choices will be presented.").optional()
         val repo by option(help = "The repository that hosts Kobweb templates").default(DEFAULT_REPO)
         val branch by option(help = "The branch in the repository to use").default(DEFAULT_BRANCH)
+
+        // Don't check for an upgrade on create, because the user probably just installed kobweb anyway, and the update
+        // message kind of overwhelms the instructions to start running the app.
+        override fun shouldCheckForUpgrade() = false
 
         override fun doRun() {
             handleCreate(repo, branch, template)
         }
     }
 
-    class Export : KobwebSubcommand(checkForUpgrade = true, help = "Generate a static version of a Kobweb app / site") {
+    class Export : KobwebSubcommand(help = "Generate a static version of a Kobweb app / site") {
         val tty by tty()
         val notty by notty()
         val mode by mode()
         val layout by layout()
 
+        override fun shouldCheckForUpgrade() = shouldUseAnsi(tty, notty, mode)
         override fun doRun() {
             handleExport(layout, shouldUseAnsi(tty, notty, mode))
         }
     }
 
-    class Run : KobwebSubcommand(checkForUpgrade = true, help = "Run a Kobweb server") {
+    class Run : KobwebSubcommand(help = "Run a Kobweb server") {
         val env by option(help = "Whether the server should run in development mode or production.").enum<ServerEnvironment>().default(ServerEnvironment.DEV)
         val tty by tty()
         val notty by notty()
         val mode by mode()
         val layout by layout()
 
+        override fun shouldCheckForUpgrade() = shouldUseAnsi(tty, notty, mode)
         override fun doRun() {
             handleRun(env, layout, shouldUseAnsi(tty, notty, mode))
         }
     }
 
-    // This command is run pretty rarely, and almost always run after `kobweb run`, so no need to check for
-    // an upgrade here.
     class Stop : KobwebSubcommand(help = "Stop a Kobweb server if one is running") {
         val tty by tty()
         val notty by notty()
         val mode by mode()
+
+        // Don't check for an upgrade on create, because the user probably just installed kobweb anyway, and the update
+        // message kind of overwhelms the instructions to start running the app.
+        override fun shouldCheckForUpgrade() = false
 
         override fun doRun() {
             handleStop(shouldUseAnsi(tty, notty, mode))
