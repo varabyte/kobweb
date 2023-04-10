@@ -96,10 +96,10 @@ fun main(args: Array<String>) {
      * Subclasses for most Kobweb commands, which include common functionality that should run across all of them.
      *
      * @param checkForUpgrade If true, do an upgrade check while this command is running, and if one is available, show
-     *   an upgrade message after the command finishes running. This should be set to false if the command is
-     *   short-lived or returns a simple value that is expected to be read from a script.
+     *   an upgrade message after the command finishes running. This is generally false unless the command is one that
+     *   is long-running where a message showing up after it is finished wouldn't be considered intrusive.
      */
-    abstract class KobwebSubcommand(private val checkForUpgrade: Boolean = true, help: String) : CliktCommand(help = help) {
+    abstract class KobwebSubcommand(private val checkForUpgrade: Boolean = false, help: String) : CliktCommand(help = help) {
         private var newVersionAvailable: SemVer.Parsed? = null
 
         private fun checkForUpgradeAsync() {
@@ -152,15 +152,13 @@ fun main(args: Array<String>) {
 
     }
 
-    // We don't want to print the "upgrade" message if users are just running "kobweb -v" (it will reply so quickly that
-    // we probably wouldn't have time to download and check the response anyway).
-    class Version : KobwebSubcommand(checkForUpgrade = false, help = "Print the version of this binary") {
+    class Version : KobwebSubcommand(help = "Print the version of this binary") {
         override fun doRun() {
             handleVersion()
         }
     }
 
-    class List : KobwebSubcommand(help = "List all project templates") {
+    class List : KobwebSubcommand(checkForUpgrade = true, help = "List all project templates") {
         val repo by option(help = "The repository that hosts Kobweb templates").default(DEFAULT_REPO)
         val branch by option(help = "The branch in the repository to use").default(DEFAULT_BRANCH)
 
@@ -169,9 +167,9 @@ fun main(args: Array<String>) {
         }
     }
 
-    // Don't check for an upgrade on create, because the user probably just intalled kobweb anyway, and the update
-    // message kind of obfuscates the instructions to start running the app.
-    class Create : KobwebSubcommand(checkForUpgrade = false, help = "Create a Kobweb app / site from a template") {
+    // Don't check for an upgrade on create, because the user probably just installed kobweb anyway, and the update
+    // message kind of overwhelms the instructions to start running the app.
+    class Create : KobwebSubcommand(help = "Create a Kobweb app / site from a template") {
         val template by argument(help = "The name of the template to instantiate, e.g. 'app'. If not specified, choices will be presented.").optional()
         val repo by option(help = "The repository that hosts Kobweb templates").default(DEFAULT_REPO)
         val branch by option(help = "The branch in the repository to use").default(DEFAULT_BRANCH)
@@ -181,7 +179,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    class Export : KobwebSubcommand(help = "Generate a static version of a Kobweb app / site") {
+    class Export : KobwebSubcommand(checkForUpgrade = true, help = "Generate a static version of a Kobweb app / site") {
         val tty by tty()
         val notty by notty()
         val mode by mode()
@@ -192,7 +190,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    class Run : KobwebSubcommand(help = "Run a Kobweb server") {
+    class Run : KobwebSubcommand(checkForUpgrade = true, help = "Run a Kobweb server") {
         val env by option(help = "Whether the server should run in development mode or production.").enum<ServerEnvironment>().default(ServerEnvironment.DEV)
         val tty by tty()
         val notty by notty()
@@ -206,7 +204,7 @@ fun main(args: Array<String>) {
 
     // This command is run pretty rarely, and almost always run after `kobweb run`, so no need to check for
     // an upgrade here.
-    class Stop : KobwebSubcommand(checkForUpgrade = false, "Stop a Kobweb server if one is running") {
+    class Stop : KobwebSubcommand(help = "Stop a Kobweb server if one is running") {
         val tty by tty()
         val notty by notty()
         val mode by mode()
@@ -216,9 +214,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    // We don't check for an upgrade here because people are expecting this method to return a queried value,
-    // and an update message would probably screw up scripts trying to read it.
-    class Conf : KobwebSubcommand(checkForUpgrade = false, help = "Query a value from the .kobweb/conf.yaml file (e.g. \"server.port\")") {
+    class Conf : KobwebSubcommand(help = "Query a value from the .kobweb/conf.yaml file (e.g. \"server.port\")") {
         val query by argument(help = "The query to search the .kobweb/conf.yaml for (e.g. \"server.port\")")
 
         override fun doRun() {
