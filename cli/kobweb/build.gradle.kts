@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jreleaser.model.Active
 
 @Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
@@ -6,6 +7,7 @@ plugins {
     kotlin("plugin.serialization")
     application
     alias(libs.plugins.jreleaser)
+    alias(libs.plugins.shadow)
 }
 
 group = "com.varabyte.kobweb.cli"
@@ -35,6 +37,26 @@ dependencies {
 application {
     applicationDefaultJvmArgs = listOf("-Dkobweb.version=${version}")
     mainClass.set("MainKt")
+}
+
+tasks.withType<ShadowJar> {
+    minimize {
+        // Leave Jansi deps in place, or else Windows won't work
+        exclude(dependency("org.fusesource.jansi:.*:.*"))
+        exclude(dependency("org.jline:jline-terminal-jansi:.*"))
+        // Leave SLF4J in place, or else a warning is spit out
+        exclude(dependency("org.slf4j.*:.*:.*"))
+    }
+}
+
+distributions {
+    named("shadow") {
+        // We choose to make the output names of "assembleShadowDist" the same as "assembleDist" here, since ideally
+        // they should be interchangeable (the shadow version just has dead code removed). However, this means if you
+        // run "assembleDist" and then "assembleShadowDist" (or the other way around), the latter command will overwrite
+        // the output of the prior one.
+        distributionBaseName.set("kobweb")
+    }
 }
 
 // Avoid ambiguity / add clarity in generated artifacts
