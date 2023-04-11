@@ -105,6 +105,8 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebExportTask =
             project.tasks.register("kobwebExport", KobwebExportTask::class.java, kobwebConf, kobwebBlock, exportLayout)
 
+        project.tasks.register("kobwebBrowserCacheId", KobwebBrowserCacheIdTask::class.java)
+
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
         val taskListenerService = project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}

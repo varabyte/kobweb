@@ -9,6 +9,7 @@ import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.application.project.app.AppData
+import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
@@ -116,14 +117,17 @@ abstract class KobwebExportTask @Inject constructor(
             }
         }.merge()
 
-
         val (pagesRoot, resourcesRoot, systemRoot) = when(siteLayout) {
             SiteLayout.KOBWEB -> Triple("pages", "resources", "system").map { File(getSiteDir(), it) }
             SiteLayout.STATIC -> getSiteDir().toTriple()
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            Playwright.create().use { playwright ->
+            PlaywrightCache().install()
+            Playwright.create(Playwright.CreateOptions().setEnv(mapOf(
+                // Should have been downloaded above, by updatePlaywrightCacheIfNecessary()
+                "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
+            ))).use { playwright ->
                 playwright.chromium().launch().use { browser ->
                     val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
                     pages
