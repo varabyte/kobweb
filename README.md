@@ -1,5 +1,5 @@
 ![version: 0.12.4](https://img.shields.io/badge/kobweb-0.12.4-blue)
-![version: 0.9.11](https://img.shields.io/badge/kobweb_cli-0.9.11-blue)
+![version: 0.9.12](https://img.shields.io/badge/kobweb_cli-0.9.12-blue)
 <br>
 ![kotlin: 1.8.0](https://img.shields.io/badge/kotlin-1.8.0-blue?logo=kotlin)
 ![compose: 1.3.0](https://img.shields.io/badge/compose-1.3.0-blue?logo=jetpackcompose)
@@ -150,19 +150,19 @@ $ cd /path/to/applications
 
 # You can either pull down the zip file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.11/kobweb-0.9.11.zip
-$ unzip kobweb-0.9.11.zip
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.12/kobweb-0.9.12.zip
+$ unzip kobweb-0.9.12.zip
 
 # ... or the tar file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.11/kobweb-0.9.11.tar
-$ tar -xvf kobweb-0.9.11.tar
+$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.12/kobweb-0.9.12.tar
+$ tar -xvf kobweb-0.9.12.tar
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb-0.9.11/bin
+$ PATH=$PATH:/path/to/applications/kobweb-0.9.12/bin
 $ kobweb version # to check it's working
 ```
 
@@ -170,7 +170,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb-0.9.11/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb-0.9.12/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
@@ -212,7 +212,7 @@ you installed it.
 | Homebrew                  | `brew upgrade kobweb`                                                                                                                |
 | Scoop                     | `scoop update kobweb`                                                                                                                |
 | SDKMAN!                   | `sdk upgrade kobweb`                                                                                                                 |
-| Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb/releases/tag/cli-v0.9.11). You can find both a zip and tar file there. |
+| Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb/releases/tag/cli-v0.9.12). You can find both a zip and tar file there. |
 
 ## Create your Kobweb site
 
