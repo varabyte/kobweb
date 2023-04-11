@@ -234,6 +234,7 @@ private fun handleRun(
             }
         }
     }) {
+        warnFallingBackToPlainText()
         runInPlainMode = true
     }
 

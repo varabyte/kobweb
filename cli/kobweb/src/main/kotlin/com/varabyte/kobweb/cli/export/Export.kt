@@ -107,6 +107,7 @@ private fun handleExport(siteLayout: SiteLayout, useAnsi: Boolean, kobwebGradle:
             exportState = if (exportState == ExportState.FINISHING) ExportState.FINISHED else ExportState.CANCELLED
         }
     }) {
+        warnFallingBackToPlainText()
         runInPlainMode = true
     }
 

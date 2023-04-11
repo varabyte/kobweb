@@ -56,6 +56,7 @@ private fun handleStop(
             }.run()
         }
     }) {
+        warnFallingBackToPlainText()
         runInPlainMode = true
     }
 

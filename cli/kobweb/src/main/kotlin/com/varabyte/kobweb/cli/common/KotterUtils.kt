@@ -158,6 +158,12 @@ fun RunScope.handleConsoleOutput(line: String, isError: Boolean) {
     }
 }
 
+fun warnFallingBackToPlainText() {
+    println("Kobweb could not initialize an ANSI terminal session. Falling back to plain text.")
+    println("You can run Kobweb with `--notty` to avoid seeing this message.")
+    println()
+}
+
 /**
  * Try running a session, returning false if it could not start.
  *
