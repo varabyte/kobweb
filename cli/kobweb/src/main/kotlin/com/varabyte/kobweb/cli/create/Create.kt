@@ -154,7 +154,6 @@ fun handleCreate(repo: String, branch: String, templateName: String?) = session 
     val projectFolder = dstPath.name
 
     newline()
-    var gitInitialized = false
     queryUser("Would you like to initialize git for this project?", "yes").let { initializeAnswer ->
         val yesNoToBool = YesNoToBoolMethod()
         val isNotEmpty = IsNotEmptyMethod()
@@ -176,7 +175,6 @@ fun handleCreate(repo: String, branch: String, templateName: String?) = session 
                 gitClient.add(".", dstPath)
                 gitClient.commit(commitMessage, dstPath)
             }
-            gitInitialized = true
         }
     }
 
@@ -209,9 +207,6 @@ fun handleCreate(repo: String, branch: String, templateName: String?) = session 
             val currPath = Path.of("").toAbsolutePath()
             if (kobwebRootPath != currPath) {
                 indent(); cmd("cd ${currPath.relativize(kobwebRootPath)}"); textLine()
-            }
-            if (!gitInitialized) {
-                indent(); cmd("git init && "); cmd("git add . && "); cmd("git commit -m \"Initial commit\""); textLine()
             }
             indent(); cmd("kobweb run"); textLine()
         }
