@@ -1,6 +1,7 @@
+@Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     `kotlin-dsl`
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     id("com.varabyte.kobweb.internal.publish")
     `java-library`
     `java-gradle-plugin`

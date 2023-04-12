@@ -1,7 +1,8 @@
 import com.varabyte.kobweb.gradle.publish.set
 
+@Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     id("com.varabyte.kobweb.internal.publish")
 }
 
