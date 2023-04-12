@@ -143,19 +143,21 @@ Please see: https://github.com/varabyte/kobweb/issues/117 and consider leaving a
 
 ## Download the Kobweb binary
 
-Our binary artifact is hosted on GitHub. To download latest:
+Our binary artifact is hosted on GitHub. To download latest, you can either
+[grab the zip or tar file from the GitHub](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.12) or you can fetch
+it from your terminal:
 
 ```bash
 $ cd /path/to/applications
 
 # You can either pull down the zip file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.12/kobweb-0.9.12.zip
+$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.12/kobweb-0.9.12.zip
 $ unzip kobweb-0.9.12.zip
 
 # ... or the tar file
 
-$ wget https://github.com/varabyte/kobweb/releases/download/cli-v0.9.12/kobweb-0.9.12.tar
+$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.12/kobweb-0.9.12.tar
 $ tar -xvf kobweb-0.9.12.tar
 ```
 
@@ -212,7 +214,7 @@ you installed it.
 | Homebrew                  | `brew upgrade kobweb`                                                                                                                |
 | Scoop                     | `scoop update kobweb`                                                                                                                |
 | SDKMAN!                   | `sdk upgrade kobweb`                                                                                                                 |
-| Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb/releases/tag/cli-v0.9.12). You can find both a zip and tar file there. |
+| Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.12). You can find both a zip and tar file there. |
 
 ## Create your Kobweb site
 

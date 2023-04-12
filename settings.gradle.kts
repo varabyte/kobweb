@@ -7,7 +7,6 @@ pluginManagement {
 
 rootProject.name = "kobweb"
 
-include(":cli:kobweb")
 include(":common:kobweb-common")
 include(":frontend:kobweb-core")
 include(":frontend:kobweb-compose")
