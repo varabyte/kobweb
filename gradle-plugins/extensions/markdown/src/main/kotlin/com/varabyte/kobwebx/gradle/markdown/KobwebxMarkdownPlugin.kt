@@ -13,7 +13,7 @@ import org.gradle.api.plugins.ExtensionAware
 class KobwebxMarkdownPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val kobwebBlock = project.extensions.findByName("kobweb") as? KobwebBlock
-            ?: throw GradleException("The Gradle markdown plugin should only be applied AFTER com.varabyte.kobweb.application OR com.varabyte.kobweb.application plugins.")
+            ?: throw GradleException("The Gradle markdown plugin should only be applied AFTER com.varabyte.kobweb.application OR com.varabyte.kobweb.library plugins.")
 
         val markdownConfig = (kobwebBlock as ExtensionAware).extensions.create("markdown", MarkdownConfig::class.java)
         (markdownConfig as ExtensionAware).extensions.apply {
