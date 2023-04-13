@@ -14,6 +14,10 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.kaml)
     implementation(libs.kotlinx.coroutines)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.truthish)
+    testImplementation(libs.kotlinx.serialization.json)
 }
 
 kobwebPublication {
