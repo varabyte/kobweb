@@ -3,8 +3,11 @@
 package com.varabyte.kobweb.project.conf
 
 import com.charleskorn.kaml.Yaml
+import com.varabyte.kobweb.common.data.DataSize
+import com.varabyte.kobweb.common.data.DataSize.Companion.mebibytes
 import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
+import com.varabyte.kobweb.project.conf.Server.Logging.Level
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
 
@@ -25,7 +28,8 @@ class Site(
 class Server(
     val files: Files,
     val port: Int = 8080,
-    val cors: Cors = Cors()
+    val logging: Logging = Logging(),
+    val cors: Cors = Cors(),
 ) {
     /**
      * A collection of files and paths needed by the Kobweb server to serve its files.
@@ -51,15 +55,58 @@ class Server(
         )
 
         /**
-         * @param siteRoot The path to the root of where the static site lives
          * @param script The path to the final JavaScript file generated from the user's Kotlin code. Unlike
          *   the [Dev.script] path, this version should be minimized.
+         * @param siteRoot The path to the root of where the static site lives
          */
         @Serializable
         class Prod(
-            val siteRoot: String,
             val script: String,
+            val siteRoot: String = ".kobweb/site",
         )
+    }
+
+    /**
+     * Configuration for logging.
+     *
+     * By default, logs append to a single file and rollover at the end of each day.
+     *
+     * @param level The minimum level of log messages to show. If set to [Level.OFF], no logs will be shown. See the
+     *   [Level] enum for more details.
+     * @param logRoot The root directory where logs will be stored. If you change this to a directory that will contain
+     *   other files besides just logs, consider setting [clearLogsOnDevStart] to false.
+     * @param clearLogsOnStart If true, all existing files under the log root will be deleted when a server is
+     *   started in dev mode. Be careful if you changed [logRoot] to a path with non-log files in it!
+     * @param logFileBaseName The base name of the log file. A log suffix will automatically be added. Later, if the
+     *   logs roll over, they'll be archived, and the base name will be used again in that context.
+     * @param maxFileCount The maximum number of log files to keep before old entries get deleted. Pass in null (or 0)
+     *   to indicate unbounded file count.
+     * @param totalSizeCap The maximum size of all log files before old entries get deleted. Pass in null (or "0b") to
+     *   indicate unbounded size.
+     * @param compressHistory If true, log files will be compressed when they roll over.
+     */
+    @Serializable
+    class Logging(
+        val level: Level = Level.DEBUG,
+        val logRoot: String = ".kobweb/server/logs",
+        val clearLogsOnStart: Boolean = true,
+        val logFileBaseName: String = "kobweb-server",
+        val maxFileCount: Int? = null,
+        // Note: We're being very conservative here with the default size cap, just in case the user is running Kobweb
+        // in a constrained server environment. Users should definitely consider overriding this value. That said, we
+        // may revisit this value later if people complain it's too small!
+        val totalSizeCap: DataSize? = 10.mebibytes,
+        val compressHistory: Boolean = true,
+    ) {
+        /**
+         * The various logging levels supported by Logback, the engine used by the server to do logging.
+         *
+         * Review [the official documentation](https://logback.qos.ch/apidocs/ch/qos/logback/classic/Level.html) for
+         * more details.
+         */
+        enum class Level {
+            ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
+        }
     }
 
     /**

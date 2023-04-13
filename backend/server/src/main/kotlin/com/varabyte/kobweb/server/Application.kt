@@ -3,11 +3,7 @@ package com.varabyte.kobweb.server
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
-import com.varabyte.kobweb.server.api.SiteLayout
-import com.varabyte.kobweb.server.api.ServerEnvironment
-import com.varabyte.kobweb.server.api.ServerRequest
-import com.varabyte.kobweb.server.api.ServerRequestsFile
-import com.varabyte.kobweb.server.api.ServerState
+import com.varabyte.kobweb.server.api.*
 import com.varabyte.kobweb.server.io.ServerStateFile
 import com.varabyte.kobweb.server.plugins.configureHTTP
 import com.varabyte.kobweb.server.plugins.configureRouting
@@ -19,7 +15,7 @@ import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.net.ServerSocket
 import java.util.concurrent.TimeUnit
-import kotlin.io.path.deleteIfExists
+import kotlin.io.path.*
 
 private fun isPortInUse(port: Int): Boolean {
     try {
@@ -39,6 +35,32 @@ fun main() = runBlocking {
     val conf = confFile.content
             ?: throw KobwebException("Server cannot start without configuration: ${confFile.path} is missing")
 
+    val env = ServerEnvironment.get()
+
+    with(conf.server.logging) {
+        val logRootPath = Path("").resolve(logRoot)
+        if (clearLogsOnStart && logRootPath.exists()) {
+            logRootPath.listDirectoryEntries().forEach { child ->
+                try {
+                    child.deleteExisting()
+                } catch (_: IOException) {
+                    println("Failed to delete file: ${child.absolutePathString()}")
+                }
+            }
+        }
+
+        System.setProperty("LOG_LEVEL", level.name)
+        System.setProperty("LOG_DEST", logRootPath.absolutePathString())
+        System.setProperty("LOG_NAME", logFileBaseName)
+        System.setProperty("LOG_SUFFIX", ".log")
+        System.setProperty("LOG_ROLLOVER_SUFFIX", if (compressHistory) ".gz" else ".log")
+        // For some reason, logback ignores size capacity if max files are left unbounded. This doesn't make sense in my
+        // opinion -- it can be useful to have unbounded files but still have a size cap. So we trick logback here if
+        // the user sets a size cap but not a max file count.
+        System.setProperty("LOG_MAX_HISTORY", maxFileCount?.takeIf { it > 0 }?.toString() ?: if (totalSizeCap?.takeIf { it.inWholeBytes > 0 } == null) "0" else Int.MAX_VALUE.toString())
+        System.setProperty("LOG_SIZE_CAP", totalSizeCap?.inWholeBytes?.toString() ?: "0")
+    }
+
     val stateFile = ServerStateFile(folder)
     stateFile.content?.let { serverState ->
         if (ProcessHandle.of(serverState.pid).isPresent) {
@@ -48,7 +70,6 @@ fun main() = runBlocking {
     }
 
     var port = conf.server.port
-    val env = ServerEnvironment.get()
     if (env == ServerEnvironment.DEV) {
         while (isPortInUse(port)) {
             ++port
