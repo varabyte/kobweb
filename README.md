@@ -1887,6 +1887,9 @@ On the fence but not sure? Connect with us, and I'd be happy to help you assess 
 * Follow me on Mastodon: [@bitspittle@fosstodon.org](https://fosstodon.org/@bitspittle)
 * You can send direct queries to [my email](mailto:bitspittle@gmail.com)
 
+If you're comfortable with it, using Discord is recommended, because there's a growing community of users in there who
+can offer help even when I'm not around.
+
 # Filing issues and leaving feedback
 
 It is still early days, and while we believe we've proven the feasibility of this approach at this point, there's still
