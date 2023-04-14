@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.gradle.application.util
 
 import com.microsoft.playwright.Playwright
+import com.varabyte.kobweb.gradle.application.Browser
 import java.security.Permission
 
 /**
@@ -12,7 +13,7 @@ import java.security.Permission
  * This class works by delegating to the playwright CLI. See also:
  * https://playwright.dev/java/docs/browsers#install-browsers
  */
-class PlaywrightCache {
+internal class PlaywrightCache {
 
     // Note: We delegate to the Playwright CLI, which calls System.exit() when it's done. But we don't want
     // to exit Gradle... so we temporarily prevent this.
@@ -35,12 +36,12 @@ class PlaywrightCache {
      */
     val version = Playwright::class.java.getPackage().implementationVersion ?: "0.0.0"
 
-    fun install() {
+    fun install(browser: Browser) {
         val prevSecurityManager = System.getSecurityManager()
         System.setSecurityManager(NoExitSecurityManager())
 
         try {
-            com.microsoft.playwright.CLI.main(arrayOf("install", "chromium"))
+            com.microsoft.playwright.CLI.main(arrayOf("install", browser.playwrightName))
         } catch (_: ExitPreventedException) {
         } finally {
             System.setSecurityManager(prevSecurityManager)
