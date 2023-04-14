@@ -2,7 +2,6 @@ import Build_gradle.IconStyle.*
 import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
 import com.varabyte.kobweb.gradle.publish.set
 
-@Suppress("DSL_SCOPE_VIOLATION") // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("org.jetbrains.compose")
