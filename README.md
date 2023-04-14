@@ -1669,20 +1669,126 @@ If you're still having issues, you may want to [connect with us ▼](#connecting
 for support (but understand that getting Kobweb added to complex existing projects may not be something we can currently
 prioritize).
 
-## Cloning the templates submodule
+## Kobweb server logs
 
-Kobweb provides its templates in a separate git repository, which is referenced within this project as a submodule for
-convenience. To pull down everything, run:
+When you run `kobweb run`, the spun up web server will, by default, log to the `.kobweb/server/logs` directory.
 
-```bash
-/path/to/src/root
-$ git clone --recurse-submodules https://github.com/varabyte/kobweb
+You can configure logging behavior by editing the `.kobweb/conf.yaml` file. Below we show setting all parameters to
+their default values:
 
-# or, if you've already previously cloned kobweb...
-/path/to/src/root/kobweb
-$ git submodule update --init
+```yaml
+server:
+  logging:
+    level: DEBUG # ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
+    logRoot: ".kobweb/server/logs"
+    clearLogsOnStart: true # Warning - if true, wipes ALL files in logRoot on startup
+    logFileBaseName: "kobweb-server" # e.g. "kobweb-server.log", "kobweb-server.2023-04-13.log"
+    maxFileCount: null # null = unbound. One log file is created per day, so 30 = 1 month of logs
+    totalSizeCap: 10MiB # null = unbound. Accepted units: B, K, M, G, KB, MB, GB, KiB, MiB, GiB
+    compressHistory: true # If true, old log files are compressed with gzip
 ```
 
+The above defaults were chosen to be reasonable for most users running their projects on their local machines in
+developer mode. However, for production servers, you may want to set `clearLogsOnStart` to false, bump up the
+`totalSizeCap` after reviewing disk limitations of your web server host, and maybe set `maxFileCount` to a reasonable
+limit.
+
+Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
+10 * 1000 * 1000 bytes. You probably want to use "KiB", "MiB", or "GiB" when you configure this value.
+
+## Exporting your site in a GitHub Workflow
+
+While you can always export your site manually on your machine, you may want to automate this process. A common
+environment for this is a GitHub workflow.
+
+For your convenience, we include a sample workflow below that exports your site and then uploads the results (which can
+be downloaded from a link shown in the workflow summary page):
+
+```yaml
+# .github/workflows/export-site.yml
+
+name: Export Kobweb site
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      KOBWEB_CLI_VERSION: 0.9.12
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Query Browser Cache ID
+        id: browser-cache-id
+        run: |
+          echo "value=$(./gradlew -q :site:kobwebBrowserCacheId)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Cache Browser Dependencies
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.browser-cache-id.outputs.value }}
+
+      - name: Fetch kobweb
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: "varabyte/kobweb-cli"
+          tag: "v${{ env.KOBWEB_CLI_VERSION }}"
+          fileName: "kobweb-${{ env.KOBWEB_CLI_VERSION }}.zip"
+          tarBall: false
+          zipBall: false
+
+      - name: Unzip kobweb
+        run: |
+          unzip kobweb-${{ env.KOBWEB_CLI_VERSION }}.zip
+
+      - name: Run export
+        run: |
+          cd site
+          ../kobweb-${{ env.KOBWEB_CLI_VERSION }}/bin/kobweb export --layout static
+
+      - name: Upload site
+        uses: actions/upload-artifact@v3
+        with:
+          name: site
+          path: site/.kobweb/site/
+          if-no-files-found: error
+          retention-days: 1
+```
+
+You can copy this workflow (or parts of it) into your own GitHub project and then modify it to your needs.
+
+Some notes...
+
+* ***workflow_dispatch***: This means that you can manually trigger this workflow from the GitHub UI, which I
+  suggested here to prevent running an expensive export operation more than you need to. Of course, you can also
+  configure your workflow to run on a schedule, or on push to a branch, etc.
+* ***Setup Gradle***: This action is optional but I recommend it because it configures a bunch of caching for you.
+* ***Caching the browser***: `kobweb export` needs to download a browser the first time it is run. This workflow sets up
+  a cache that saves it across runs. The cache is tagged with a unique ID so that future Kobweb releases, which may
+  change the version of browser downloaded, will use a new cache bucket (allowing GitHub to eventually clean up the old
+  one).
+* ***Upload site***: This action uploads the exported site as an artifact. You can then download the artifact from the
+  workflow summary page. Your own workflow will likely delete this action and do something else here, like upload to a
+  web server (or some location accessible by your webserver) or copy files over into a `gh_pages` repository. I've
+  included this here (and set the retention days very low) just so you can verify that the workflow is working for your
+  project.
+
+For a simple site, the above workflow should take about 2 minutes to run.
 
 <!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
 ## <span id="what-about-multiplatform-widgets">What about Compose for Web Canvas?</span>
