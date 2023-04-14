@@ -16,6 +16,8 @@ kotlin {
         browser()
         binaries.executable()
     }
+
+    @Suppress("UNUSED_VARIABLE") // Suppress spurious warnings about sourceset variables not being used
     sourceSets {
         val jsMain by getting {
             dependencies {
