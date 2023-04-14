@@ -290,6 +290,10 @@ You can read all about [IntelliJ's Gradle integration here](https://www.jetbrain
 general, you should create two run configurations: one for `kobwebStart -t` and one for `kobwebStop`. To do this, start
 from [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
 
+*ASIDE: If you ever want to export your site via Gradle, it's a bit more complicated but the command is<br>
+`kobwebExport -PkobwebReuseServer=false -PkobwebEnv=DEV -PkobwebRunLayout=KOBWEB -PkobwebBuildTarget=RELEASE`. If you
+want to export a static layout, also add `-PkobwebExportLayout=STATIC`.*
+
 ## Running examples
 
 Kobweb will provide a growing collection of samples for you to learn from. To see what's available, run:
