@@ -1681,7 +1681,7 @@ server:
   logging:
     level: DEBUG # ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
     logRoot: ".kobweb/server/logs"
-    clearLogsOnStart: true # Warning - if true, wipes ALL files in logRoot on startup
+    clearLogsOnStart: true # Warning - if true, wipes ALL files in logRoot, so don't put other files in there!
     logFileBaseName: "kobweb-server" # e.g. "kobweb-server.log", "kobweb-server.2023-04-13.log"
     maxFileCount: null # null = unbound. One log file is created per day, so 30 = 1 month of logs
     totalSizeCap: 10MiB # null = unbound. Accepted units: B, K, M, G, KB, MB, GB, KiB, MiB, GiB
@@ -1759,7 +1759,7 @@ jobs:
       - name: Run export
         run: |
           cd site
-          ../kobweb-${{ env.KOBWEB_CLI_VERSION }}/bin/kobweb export --layout static
+          ../kobweb-${{ env.KOBWEB_CLI_VERSION }}/bin/kobweb export --notty --layout static
 
       - name: Upload site
         uses: actions/upload-artifact@v3
