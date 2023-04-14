@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
+import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
 import com.varabyte.kobweb.gradle.application.tasks.*
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
@@ -38,6 +39,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebConf = KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
         val kobwebBlock = ((project as ExtensionAware).extensions["kobweb"] as KobwebBlock).apply {
             createAppBlock(kobwebConf)
+            createExportBlock()
         }
 
         val env =

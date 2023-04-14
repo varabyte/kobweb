@@ -8,6 +8,7 @@ import com.microsoft.playwright.Playwright
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
+import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
@@ -26,6 +27,7 @@ import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
+import com.varabyte.kobweb.gradle.application.Browser as KobwebBrowser
 
 abstract class KobwebExportTask @Inject constructor(
     private val kobwebConf: KobwebConf,
@@ -123,12 +125,18 @@ abstract class KobwebExportTask @Inject constructor(
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            PlaywrightCache().install()
+            val browser = kobwebBlock.export.browser.get()
+            PlaywrightCache().install(browser)
             Playwright.create(Playwright.CreateOptions().setEnv(mapOf(
                 // Should have been downloaded above, by updatePlaywrightCacheIfNecessary()
                 "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
             ))).use { playwright ->
-                playwright.chromium().launch().use { browser ->
+                val browserType = when(browser) {
+                    KobwebBrowser.Chromium -> playwright.chromium()
+                    KobwebBrowser.Firefox -> playwright.firefox()
+                    KobwebBrowser.WebKit -> playwright.webkit()
+                }
+                browserType.launch().use { browser ->
                     val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
                     pages
                         .map { it.route }
