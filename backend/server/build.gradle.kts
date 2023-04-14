@@ -59,6 +59,8 @@ tasks.withType<ShadowJar> {
         // Need to exclude this or else we get an exception at runtime
         exclude("org.xml.sax.**")
     }
-    relocate("io", "relocated.io")
+    relocate("io", "relocated.io") {
+        exclude("io.netty.**") // Relocating io.netty causes exceptions to happen on server startup
+    }
     relocate("kotlinx", "relocated.kotlinx")
 }
