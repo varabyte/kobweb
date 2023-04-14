@@ -23,7 +23,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                api(project(":frontend:web-compose-ext"))
+                api(project(":frontend:compose-html-ext"))
             }
         }
     }

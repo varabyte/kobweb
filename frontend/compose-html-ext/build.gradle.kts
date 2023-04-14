@@ -28,7 +28,7 @@ kotlin {
 }
 
 kobwebPublication {
-    artifactId.set("web-compose-ext")
+    artifactId.set("compose-html-ext")
     description.set("Generally useful Compose extensions that could potentially move upstream someday; until then, needed now for Kobweb")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }
