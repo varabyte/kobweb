@@ -83,7 +83,7 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
     abstract val defaultRoot: Property<String>
 
     /**
-     * Use Silk components instead of Compose for Web components when relevant.
+     * Use Silk components instead of Compose HTML components when relevant.
      *
      * If the user's project doesn't have a dependency on the Silk library, this should be set to false.
      */

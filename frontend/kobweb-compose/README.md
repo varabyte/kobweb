@@ -1,7 +1,7 @@
-A layer of Jetpack Compose-inspired code on top of Compose for Web
+A layer of Jetpack Compose-inspired code on top of Compose HTML
 
 This module introduces the Jetpack Compose concept of `Modifier` but with an implementation designed to work well with
-Compose for Web specifically (by delegating to its concept of `AttrBuilder`s and `StyleBuilder`s). It also
+Compose HTML specifically (by delegating to its concept of `AttrBuilder`s and `StyleBuilder`s). It also
 introduces a handful of foundation classes that use it, porting (a subset of) Jetpack Compose's foundation layer.
 
 Note that, unlike the approach that Jetbrains is taking with their Multiplatform Widgets approach, this `Modifier`

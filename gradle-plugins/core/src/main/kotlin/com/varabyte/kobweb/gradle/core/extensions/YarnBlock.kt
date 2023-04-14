@@ -58,8 +58,8 @@ sealed class YarnLockChangedStrategy {
     /**
      * Aggressively regenerate the yarn.lock file anytime it changes.
      *
-     * This setting may be dangerous long term but is probably fine for new Compose for Web projects that don't
-     * themselves add additional NPM dependencies (since if that broke, then anyone creating a new Compose for Web
+     * This setting may be dangerous long term but is probably fine for new Compose HTML projects that don't
+     * themselves add additional NPM dependencies (since if that broke, then anyone creating a new Compose HTML
      * project would also break).
      *
      * This is therefor chosen as a default strategy, since it's the least painful for new users, and is equivalent to

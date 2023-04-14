@@ -31,7 +31,7 @@ val SpanTextStyle by ComponentStyle(prefix = "silk-") { }
  * some `Modifier` styles to. It may also be useful if you want to ensure that a leading or trailing space doesn't get
  * swallowed, which `Text` suffers from in some cases (e.g. within a parent container that uses a flex display).
  *
- * Note it is perfectly fine (and expected) for callers to reach to the `Text` method that comes from *Compose for Web*
+ * Note it is perfectly fine (and expected) for callers to reach to the `Text` method that comes from *Compose HTML*
  * in most cases.
  */
 @Composable

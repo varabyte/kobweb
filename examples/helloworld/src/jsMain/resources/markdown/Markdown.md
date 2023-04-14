@@ -8,7 +8,7 @@ This is [an example][id] reference-style link.
 
 This site is generated from markdown.
 
-Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose for Web](https://compose-web.ui.pages.jetbrains.team/).
+Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose HTML](https://compose-web.ui.pages.jetbrains.team/).
 
 Markdown also supports
 
@@ -46,7 +46,7 @@ You can also use block tags, like `<a>` and `<pre>`. Here, we use html blocks to
 </a>
 ```
 
-Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose for Web calls. In fact,
+Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose HTML calls. In fact,
 the following link is actually provided by Kotlin code:
 
 {{{ .components.widgets.GoHomeLink }}}

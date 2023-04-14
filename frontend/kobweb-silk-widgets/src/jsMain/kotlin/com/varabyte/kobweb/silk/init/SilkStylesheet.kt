@@ -12,12 +12,12 @@ import org.jetbrains.compose.web.css.*
 /**
  * Access to useful methods that can append CSS styles and keyframes to the global stylesheet provided by Silk.
  *
- * You can use this as a replacement for defining your own stylesheet using Compose for Web. In addition to being fewer
+ * You can use this as a replacement for defining your own stylesheet using Compose HTML. In addition to being fewer
  * lines of code, this provides an API that lets you work with [Modifier]s for providing styles.
  */
 interface SilkStylesheet {
     /**
-     * An alternate way to register global styles with Silk instead of using a Compose for Web StyleSheet directly.
+     * An alternate way to register global styles with Silk instead of using a Compose HTML StyleSheet directly.
      *
      * So this:
      *
@@ -69,7 +69,7 @@ interface SilkStylesheet {
     fun registerStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: StyleModifiers.() -> Unit)
 
     /**
-     * An alternate way to register keyframes via Silk instead of using a Compose for Web StyleSheet directly.
+     * An alternate way to register keyframes via Silk instead of using a Compose HTML StyleSheet directly.
      *
      * So this:
      *

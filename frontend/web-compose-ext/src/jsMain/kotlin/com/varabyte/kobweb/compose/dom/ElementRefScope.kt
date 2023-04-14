@@ -82,7 +82,7 @@ data class ElementRefScope<in TElement : Element> internal constructor(
 /**
  * Convenience method for installing an [ElementRefScope] into an [ElementScope].
  *
- * This helps avoid a bunch of annoying boilerplate that the Compose for Web API otherwise requires you to do fairly
+ * This helps avoid a bunch of annoying boilerplate that the Compose HTML API otherwise requires you to do fairly
  * regularly.
  */
 @NonRestartableComposable

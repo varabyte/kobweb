@@ -12,7 +12,7 @@
 # K🕸️bweb
 
 Kobweb is an opinionated Kotlin framework for creating websites and web apps, built on top of
-[Compose for Web](https://compose-web.ui.pages.jetbrains.team) and inspired by [Next.js](https://nextjs.org)
+[Compose HTML](https://compose-web.ui.pages.jetbrains.team) and inspired by [Next.js](https://nextjs.org)
 and [Chakra UI](https://chakra-ui.com).
 
 ```kotlin
@@ -39,7 +39,7 @@ fun HomePage() {
       SpanText("Create rich, dynamic web apps with ease, leveraging ")
       Link("https://kotlinlang.org/", "Kotlin")
       SpanText(" and ")
-      Link("https://compose-web.ui.pages.jetbrains.team/", "Compose for Web")
+      Link("https://compose-web.ui.pages.jetbrains.team/", "Compose HTML")
     }
   }
 }
@@ -60,7 +60,7 @@ Our goal is to provide:
 
 * an intuitive structure for organizing your Kotlin website or web app
 * automatic handling of routing between pages
-* a collection of useful _batteries included_ widgets built on top of Compose for Web
+* a collection of useful _batteries included_ widgets built on top of Compose HTML
 * an environment built from the ground up around live reloading
 * static site exports for improved SEO and potentially cheaper server setups
 * shared, rich types between client and server
@@ -68,10 +68,10 @@ Our goal is to provide:
 * an open source foundation that the community can extend
 * and much, much more!
 
-| 📚🧑‍🎓 One of Kobweb's users, Stevdza-San, [is offering a course on Compose for Web using Kobweb](https://stevdza-san.com/p/build-a-complete-website-with-kotlin-and-jetpack-compose). Consider checking it out! |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 📚🧑‍🎓 One of Kobweb's users, Stevdza-San, [is offering a course on Compose HTML using Kobweb](https://stevdza-san.com/p/build-a-complete-website-with-kotlin-and-jetpack-compose). Consider checking it out! |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
-Here's a demo where we create a Compose for Web project from scratch with Markdown support and live reloading, in under
+Here's a demo where we create a Compose HTML project from scratch with Markdown support and live reloading, in under
 10 seconds:
 
 https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-aac0-88f8992145ef.mp4
@@ -313,10 +313,10 @@ For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 # Beginner topics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
-Compose for Web app, such as routing and configuring basic CSS styles.
+Compose HTML app, such as routing and configuring basic CSS styles.
 
 Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and / or
-running a Compose for Web app. We want to get that stuff out of the way, so you can enjoy focusing on the more
+running a Compose HTML app. We want to get that stuff out of the way, so you can enjoy focusing on the more
 interesting work!
 
 ## Create a page
@@ -533,17 +533,17 @@ overwritten by the other.
 
 ## Silk
 
-Silk is a UI layer included with Kobweb and built upon Compose for Web. (To learn more about Compose for Web, please
-visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started)).
+Silk is a UI layer included with Kobweb and built upon Compose HTML. (To learn more about Compose HTML, please
+visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/HTML/Getting_Started)).
 
-While Compose for Web requires you to understand underlying HTML / CSS concepts, Silk attempts to abstract some of that
+While Compose HTML requires you to understand underlying HTML / CSS concepts, Silk attempts to abstract some of that
 away, providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
 "div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
 
 We consider Silk a pretty important part of the Kobweb experience, but it's worth pointing out that it's designed as an
 optional component. You can absolutely use Kobweb without Silk. (You can also use Silk without Kobweb!).
 
-You can also interleave Silk and Compose for Web components easily (as Silk is just composing them itself).
+You can also interleave Silk and Compose HTML components easily (as Silk is just composing them itself).
 
 ### Inline vs StyleSheet
 
@@ -586,7 +586,7 @@ There's no hard and fast rule, but in general, when writing HTML / CSS by hand, 
 inline styles as it better maintains a separation of concerns. That is, the HTML should represent the content of your
 site, while the CSS controls the look and feel.
 
-However! We're not writing HTML / CSS by hand. We're using Compose for Web! So the distinctions discussed up until now
+However! We're not writing HTML / CSS by hand. We're using Compose HTML! So the distinctions discussed up until now
 are less important here.
 
 That said, there are times when you have to use stylesheets, because without them you can't define styles for advanced
@@ -624,7 +624,7 @@ Silk introduces the `Modifier` class, in order to provide an experience similar 
 (You can read [more about them here](https://developer.android.com/jetpack/compose/modifiers) if you're unfamiliar with
 the concept).
 
-In the world of Compose for Web, you can think of a `Modifier` as a wrapper on top of CSS styles and attributes. So
+In the world of Compose HTML, you can think of a `Modifier` as a wrapper on top of CSS styles and attributes. So
 this:
 
 ```kotlin
@@ -871,10 +871,7 @@ For example, `MyButtonStyle.toModifier(OutlineButtonVariant)` applies the main b
 outline styling.
 
 ***Note:** Using a variant that was created from a different style will have no effect. In other words,
-`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case. We tried to use generics as a
-fancy way to enforce this at compile time but ran into limitations with the Compose compiler (see
-[Compose for Web bug #1333](https://github.com/JetBrains/compose-jb/issues/1333)). We may revisit this API design later
-if resolved, but until then, don't do that!*
+`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.*
 
 ##### ComponentVariantName
 
@@ -1491,7 +1488,7 @@ fun KobwebPage() {
 
 #### Kobweb Call
 
-The power of Kotlin + Compose for Web is interactive components, not static text! Therefore, Kobweb Markdown support
+The power of Kotlin + Compose HTML is interactive components, not static text! Therefore, Kobweb Markdown support
 enables special syntax that can be used to insert Kotlin code.
 
 ##### Block syntax
@@ -1795,18 +1792,18 @@ Some notes...
 For a simple site, the above workflow should take about 2 minutes to run.
 
 <!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
-## <span id="what-about-multiplatform-widgets">What about Compose for Web Canvas?</span>
+## <span id="what-about-multiplatform-widgets"><span id="what-about-compose-for-web-canvas">What about Compose Multiplatform for Web?</span></span>
 
-Jetbrains is working on a project called "Compose for Web Canvas", which will bring the Android API to the web. And it
-may seem like the Kobweb + Silk approach will be obsolete when it is finished.
+Jetbrains is working on a project called "Compose Multiplatform for Web" which, which allows one to use the same Compose
+API across Android, Desktop, and the Web. And it may seem like the Kobweb + Silk approach will be obsolete when it is
+finished.
 
-
-It's first worth understanding the core difference between the two approaches. With Jetpack Compose, the framework owns
-its own rendering pipeline, drawing to a buffer, while Compose for Web modifies an HTML / CSS DOM tree and leaves it up
-to the browser to do the final rendering.
+It's first worth understanding the core difference between the two approaches. With Multiplatform Compose, the framework
+owns its own rendering pipeline, drawing to a buffer, while Compose HTML modifies an HTML / CSS DOM tree and leaves it
+up to the browser to do the final rendering.
 
 This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
-modifiers matters, while in Web, this action simply sets html style properties under the hood, where order does not
+modifiers matters, while in HTML, this action simply sets html style properties under the hood, where order does not
 matter.
 
 Ditching HTML / CSS entirely at first can seem like a total win, but this approach has several limits:
@@ -1832,9 +1829,9 @@ together than trying to remember if you should be justifying your items or align
 `Column`s are just creating the correct HTML / CSS for you behind the scenes.
 
 Ultimately, I believe there is room for both approaches. If you want to make an app experience that feels the same on
-Android, iOS, and web, then "Compose for Web Canvas" could be great for you. However, if you just want to make a
-traditional website but would rather use Kotlin instead of TypeScript, Kobweb can provide an excellent experience in
-that case.
+Android, iOS, and web, then "Multiplatform Compose" could be great for you. However, if you just want to make a
+traditional website but want to use Kotlin instead of TypeScript, Kobweb can provide an excellent experience in that
+case.
 
 # Can We Kobweb Yet
 
@@ -1860,12 +1857,12 @@ However, there's always more to do.
 * A lot of detailed documentation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
 
 I think there's enough there now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
-escape hatch to underlying Compose for Web / Kotlin/JS approaches, but there might be some areas where it's still a bit
+escape hatch to underlying Compose HTML / Kotlin/JS approaches, but there might be some areas where it's still a bit
 DIY. It would be great to get real world experience to hear what issues users are actually running into.
 
 So, should you use Kobweb at this point? If you are...
 
-* playing around with Compose for Web for the first time and want to get up and running quickly on a toy project:
+* playing around with Compose HTML for the first time and want to get up and running quickly on a toy project:
     * **YES!!!** Please see the [connecting with us ▼](#connecting-with-us) section
       below, we'd definitely love to hear from you. It's still a good time if you'd want to have a voice in the
       direction of this project.
@@ -1876,8 +1873,8 @@ So, should you use Kobweb at this point? If you are...
     * **Maybe not?** Depending how much work you've done, it may not be a trivial refactor. You can review
       [this earlier section ▲](#adding-kobweb-to-an-existing-project) if you want to try anyway.
 * a company:
-    * **Probably not?** I'm assuming a company is more risk-averse even to Compose for Web, which Kobweb is
-      building on top of. If you *were* considering Compose for Web, however, Kobweb may be worth a look.
+    * **Probably not?** I'm assuming a company is more risk-averse even to Compose HTML, which Kobweb is
+      building on top of. If you *were* considering Compose HTML, however, Kobweb may be worth a look.
 
 On the fence but not sure? Connect with us, and I'd be happy to help you assess your situation.
 

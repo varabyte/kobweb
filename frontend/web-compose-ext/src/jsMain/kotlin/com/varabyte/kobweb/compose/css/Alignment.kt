@@ -46,7 +46,7 @@ private fun OverflowStrategy.toValue(position: StylePropertyValue) = "${name.low
 // region AlignContent
 
 /**
- * Kobweb's version of the `AlignContent` class, which is more fully featured than the Compose for Web one.
+ * Kobweb's version of the `AlignContent` class, which is more fully featured than the Compose HTML one.
  *
  * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
  * version provides it.
@@ -105,7 +105,7 @@ fun StyleScope.alignContent(alignContent: AlignContent) {
 // region AlignItems
 
 /**
- * Kobweb's version of the `AlignItems` class, which is more fully featured than the Compose for Web one.
+ * Kobweb's version of the `AlignItems` class, which is more fully featured than the Compose HTML one.
  *
  * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
  * version provides it.
@@ -160,7 +160,7 @@ fun StyleScope.alignItems(alignItems: AlignItems) {
 // region AlignSelf
 
 /**
- * Kobweb's version of the `AlignSelf` class, which is more fully featured than the Compose for Web one.
+ * Kobweb's version of the `AlignSelf` class, which is more fully featured than the Compose HTML one.
  *
  * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
  * version provides it.
@@ -217,7 +217,7 @@ fun StyleScope.alignSelf(alignSelf: AlignSelf) {
 // region JustifyContent
 
 /**
- * Kobweb's version of the `JustifyContent` class, which is more fully featured than the Compose for Web one.
+ * Kobweb's version of the `JustifyContent` class, which is more fully featured than the Compose HTML one.
  *
  * In many common cases, you may not need to use it, but if you're doing anything with overflow, this version provides
  * it.
@@ -267,7 +267,7 @@ fun StyleScope.justifyContent(justifyContent: JustifyContent) {
 // region JustifyItems
 
 /**
- * Kobweb's version of the `JustifyItems` class, which is more fully featured than the Compose for Web one.
+ * Kobweb's version of the `JustifyItems` class, which is more fully featured than the Compose HTML one.
  *
  * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
  * version provides it.
@@ -324,7 +324,7 @@ fun StyleScope.justifyItems(justifyItems: JustifyItems) {
 // region JustifySelf
 
 /**
- * Kobweb's version of the `JustifySelf` class, which is more fully featured than the Compose for Web one.
+ * Kobweb's version of the `JustifySelf` class, which is more fully featured than the Compose HTML one.
  *
  * In many common cases, you may not need to use it, but if you're doing anything with baseline or overflow, this
  * version provides it.

@@ -640,7 +640,7 @@ fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
 /**
  * Convert a user's component style into an [AttrsScope] builder.
  *
- * This is useful if you need to convert a style into something directly consumable by a Compose for Web widget.
+ * This is useful if you need to convert a style into something directly consumable by a Compose HTML widget.
  */
 @Composable
 fun <T: Element, A: AttrsScope<T>> ComponentStyle.toAttrs(variant: ComponentVariant? = null, finalHandler: (A.() -> Unit)? = null): A.() -> Unit {

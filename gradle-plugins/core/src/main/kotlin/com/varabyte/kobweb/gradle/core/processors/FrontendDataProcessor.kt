@@ -160,7 +160,7 @@ private fun processKeyframes(
     if (property.parent !is KtFile) {
         var showWarning = true
 
-        // A user may be using the `by keyframes` delegate pattern *inside* a Compose for Web StyleSheet, where in that
+        // A user may be using the `by keyframes` delegate pattern *inside* a Compose HTML StyleSheet, where in that
         // case they're not using *our* keyframes method but are instead using the StyleSheet inherited one. Don't show
         // warnings about that because those cases are valid.
         val propertyDelegate = callExpr.parents.filterIsInstance<KtPropertyDelegate>().firstOrNull()

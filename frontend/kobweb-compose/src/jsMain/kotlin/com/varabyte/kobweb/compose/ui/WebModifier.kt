@@ -62,7 +62,7 @@ class StyleModifier(internal val styles: (StyleScope.() -> Unit)) : WebModifier 
 fun Modifier.styleModifier(styles: (StyleScope.() -> Unit)) = this then StyleModifier(styles)
 
 /**
- * Convert a [Modifier] into an [AttrsScope] which Compose for Web tags take as an argument, e.g. use it like so:
+ * Convert a [Modifier] into an [AttrsScope] which Compose HTML tags take as an argument, e.g. use it like so:
  *
  * ```
  * Div(attrs = modifier.toAttrs())

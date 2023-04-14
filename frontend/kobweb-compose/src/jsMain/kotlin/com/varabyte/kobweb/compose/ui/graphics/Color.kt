@@ -19,7 +19,7 @@ private fun CSSAngleValue.toDegrees() = when (this.unit.toString()) {
 } % 360f
 
 /**
- * A base class for colors which provide additional functionality on top of the color class included in Compose for Web.
+ * A base class for colors which provide additional functionality on top of the color class included in Compose HTML.
  */
 sealed interface Color : CSSColorValue {
     fun inverted(): Color

@@ -170,7 +170,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 jsTarget.browserRun, jsTarget.run,
             )
 
-            // Users should be using Kobweb commands instead of the standard Compose for Web commands, but they
+            // Users should be using Kobweb tasks instead of the standard multiplatform tasks, but they
             // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
             // the Kobweb commands instead.
             jsRunTasks

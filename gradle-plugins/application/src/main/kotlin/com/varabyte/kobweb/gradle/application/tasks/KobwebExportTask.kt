@@ -57,7 +57,7 @@ abstract class KobwebExportTask @Inject constructor(
         navigate("${url}?_kobwebIsExporting=true")
 
         // First, we bake dynamic styles into static ones. Let me explain :)
-        // Compose for Web creates empty style nodes and then adds styles to them programmatically, meaning the page
+        // Compose HTML creates empty style nodes and then adds styles to them programmatically, meaning the page
         // works right but if you go to inspect the DOM using debugging tools or save the page, all you see is an empty
         // style tag and the information is lost.
         // By iterating over those style nodes and explicitly overwriting them with their own values, we can then save
