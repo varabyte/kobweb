@@ -21,7 +21,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(compose.web.core)
+                implementation(compose.html.core)
 
                 api(project(":frontend:web-compose-ext"))
             }
