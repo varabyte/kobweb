@@ -24,9 +24,9 @@ fun HomePage() {
       var colorMode by rememberColorMode()
       Button(
         onClick = { colorMode = colorMode.opposite() },
-        Modifier.clip(Circle())
+        Modifier.borderRadius(50.percent).padding(0.px)
       ) {
-        Box(Modifier.margin(4.px)) {
+        Box(Modifier.margin(7.px)) {
           // Includes support for Font Awesome icons
           if (colorMode.isLight()) FaSun() else FaMoon()
         }
@@ -35,7 +35,7 @@ fun HomePage() {
     H1 {
       Text("Welcome to Kobweb!")
     }
-    Row(Modifier.whiteSpace(WhiteSpace.PreWrap)) { // Preserve trailing whitespace
+    Row(Modifier.flexWrap(FlexWrap.Wrap)) {
       SpanText("Create rich, dynamic web apps with ease, leveraging ")
       Link("https://kotlinlang.org/", "Kotlin")
       SpanText(" and ")
