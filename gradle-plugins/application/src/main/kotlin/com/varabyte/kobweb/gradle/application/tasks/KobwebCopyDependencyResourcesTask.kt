@@ -15,7 +15,7 @@ import java.io.File
 import java.util.zip.ZipException
 import javax.inject.Inject
 
-abstract class KobwebCopyDependencyResources @Inject constructor(
+abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
     kobwebBlock: KobwebBlock,
 ) : KobwebModuleTask(kobwebBlock, "Copy and make available all public/ resources from the application and any libraries to the final site") {
 

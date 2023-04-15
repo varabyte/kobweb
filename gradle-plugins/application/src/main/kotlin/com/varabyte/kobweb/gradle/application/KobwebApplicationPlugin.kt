@@ -65,7 +65,7 @@ class KobwebApplicationPlugin @Inject constructor(
             dependsOn(kobwebGenFrontendMetadata)
         }
 
-        val kobwebCopyDependencyResourcesTask = project.tasks.register("kobwebCopyDepResources", KobwebCopyDependencyResources::class.java, kobwebBlock)
+        val kobwebCopyDependencyResourcesTask = project.tasks.register("kobwebCopyDepResources", KobwebCopyDependencyResourcesTask::class.java, kobwebBlock)
         val kobwebGenSiteIndexTask =
             project.tasks.register("kobwebGenSiteIndex", KobwebGenerateSiteIndexTask::class.java, kobwebConf, kobwebBlock, buildTarget)
 
