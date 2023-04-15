@@ -1699,10 +1699,10 @@ limit.
 Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
 10 * 1000 * 1000 bytes. You probably want to use "KiB", "MiB", or "GiB" when you configure this value.
 
-## Exporting your site in a GitHub Workflow
+## Exporting your site in a GitHub workflow
 
 While you can always export your site manually on your machine, you may want to automate this process. A common
-environment for this is a GitHub workflow.
+solution for this is a [GitHub workflow](https://docs.github.com/en/actions/using-workflows).
 
 For your convenience, we include a sample workflow below that exports your site and then uploads the results (which can
 be downloaded from a link shown in the workflow summary page):
