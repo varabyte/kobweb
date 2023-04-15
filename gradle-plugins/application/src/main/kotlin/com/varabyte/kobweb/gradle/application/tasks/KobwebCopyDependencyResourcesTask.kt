@@ -57,7 +57,11 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
                         }
 
                         unzipped
-                    } catch (ex: ZipException) {
+                    } catch (ex: Exception) {
+                        // NOTE: I used to catch ZipException here, but it became GradleException at some point?? So
+                        // let's just be safe and block all exceptions here. It sucks if this task crashes here because
+                        // not being able to unzip a non-zip file is not really a big deal.
+
                         // It's possible to get a classpath file that's not a jar -- npm dependencies are like this --
                         // at which point the file isn't a zip nor a directory. Such dependencies will never contain
                         // Kobweb resources, so we don't care about them. Just skip 'em!
