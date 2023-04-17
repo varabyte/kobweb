@@ -826,9 +826,14 @@ val CustomStyle by ComponentStyle {
 perhaps to something that is more brand aware:
 
 ```kotlin
+// Assume a bunch of color constants (e.g. BRAND_LIGHT_COLOR) are defined somewhere
+
 @InitSilk
 fun overrideSilkTheme(ctx: InitSilkContext) {
-    ctx.theme.palettes = SilkPalettes(/* ... */)
+    ctx.theme.palettes.light.background = BRAND_LIGHT_BACKGROUND
+    ctx.theme.palettes.light.color = BRAND_LIGHT_COLOR
+    ctx.theme.palettes.dark.background = BRAND_DARK_BACKGROUND
+    ctx.theme.palettes.dark.color = BRAND_DARK_COLOR
 }
 ```
 
