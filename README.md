@@ -181,28 +181,43 @@ $ ln -s /path/to/applications/kobweb-0.9.12/bin/kobweb kobweb
 
 Although we host Kobweb artifacts on GitHub, it's easy enough to build your own.
 
-**Note:** Building Kobweb requires JDK11 or newer. If you don't already have this set up, the easiest way is to
-[download a JDK](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html), unzip it somewhere,
-and update your `JAVA_HOME` variable to point at it.
+Building Kobweb requires JDK11 or newer. We'll first discuss how to add it.
+
+### Download a JDK
+
+If you want full control over your JDK install, manually downloading is a good option.
+
+* [Download a JDK for your OS](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
+* Unzip it somewhere
+* Update your `JAVA_HOME` variable to point at it.
 
 ```bash
 JAVA_HOME=/path/to/jdks/corretto-11.0.12
 # ... or whatever version or path you chose
 ```
 
-With `JAVA_HOME` set up, building is just a single Gradle command:
+### Install a JDK with the IntelliJ IDE
+
+For a more automated approach, you can request IntelliJ install a JDK for you.
+
+Follow their instructions here: https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk
+
+### Building the Kobweb CLI
+
+The Kobweb CLI is actually maintained in a separate GitHub repo. Once you have the JDK set up, it should be easy to
+clone and build it:
 
 ```bash
-$ cd /path/to/src/root
-$ git clone --recurse-submodules https://github.com/varabyte/kobweb
-$ cd kobweb
-$ ./gradlew :cli:kobweb:installDist
+$ cd /path/to/src/root # some folder you've created for storing src code
+$ git clone https://github.com/varabyte/kobweb-cli
+$ cd kobweb-cli
+$ ./gradlew :kobweb:installDist
 ```
 
 Finally, update your PATH:
 
 ```bash
-$ PATH=$PATH:/path/to/src/root/kobweb/cli/kobweb/build/install/kobweb/bin
+$ PATH=$PATH:/path/to/src/root/kobweb-cli/kobweb/build/install/kobweb/bin
 $ kobweb version # to check it's working
 ```
 
