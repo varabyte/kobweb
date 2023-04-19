@@ -12,7 +12,7 @@
 # K🕸️bweb
 
 Kobweb is an opinionated Kotlin framework for creating websites and web apps, built on top of
-[Compose HTML](https://compose-web.ui.pages.jetbrains.team) and inspired by [Next.js](https://nextjs.org)
+[Compose HTML](https://github.com/JetBrains/compose-multiplatform#compose-html) and inspired by [Next.js](https://nextjs.org)
 and [Chakra UI](https://chakra-ui.com).
 
 ```kotlin
@@ -39,7 +39,7 @@ fun HomePage() {
       SpanText("Create rich, dynamic web apps with ease, leveraging ")
       Link("https://kotlinlang.org/", "Kotlin")
       SpanText(" and ")
-      Link("https://compose-web.ui.pages.jetbrains.team/", "Compose HTML")
+      Link("https://github.com/JetBrains/compose-multiplatform#compose-html/", "Compose HTML")
     }
   }
 }
