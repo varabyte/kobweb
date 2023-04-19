@@ -72,18 +72,20 @@ internal class CssModifier(
     }
 
     companion object {
-        val BaseKey = Key(null, null)
+        // We use this key to represent the base CSS rule, which is always applied first
+        internal val BaseKey = Key(null, null)
     }
     data class Key(val mediaQuery: String?, val suffix: String?)
 
     /**
      * A key useful for storing this entry into a map.
      *
-     * If two [CssModifier] instances have the same key, that means they would evaluate to the same CSS rule. This
-     * can indicate if a css rule was applied redundantly (where the latter would overrule the former) or allow us to
-     * compare modifiers across dark and light color modes.
+     * If two [CssModifier] instances have the same key, that means they would evaluate to the same CSS rule. Although
+     * we don't expect this to happen in practice, if it does, then both selectors can be merged. We can also use this
+     * key to test a light and dark version of the same component style to see if this particular selector is the same
+     * or not across the two.
      */
-    // Note: We have to convert mediaQuery toString for now because it CSSMediaQuery.MediaFeature is not itself defined
+    // Note: We have to convert mediaQuery toString for now because CSSMediaQuery.MediaFeature is not itself defined
     // correctly for equality checking (for some reason, they don't define the hashcode)
     val key get() = Key(mediaQuery?.toString(), suffix)
 }
@@ -303,9 +305,9 @@ private sealed interface StyleGroup {
  */
 class ComponentStyle(
     name: String,
-    private val extraModifiers: @Composable () -> Modifier,
+    internal val extraModifiers: @Composable () -> Modifier,
     val prefix: String? = null,
-    private val init: ComponentModifiers.() -> Unit,
+    internal val init: ComponentModifiers.() -> Unit,
 ) {
     init {
         require(name.isNotEmpty()) { "ComponentStyle name must not be empty" }
@@ -420,8 +422,30 @@ class ComponentStyle(
         // searching for all elements tagged with a certain class.
         notifySelectorName(selectorName)
 
-        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).apply(init).cssModifiers.associateBy { it.key }
-        val darkModifiers = ComponentModifiers(ColorMode.DARK).apply(init).cssModifiers.associateBy { it.key }
+        // Collect all CSS selectors (e.g. all base, hover, breakpoints, etc. modifiers) and, if we ever find multiple
+        // definitions for the same selector, just combine them together. One way this is useful is you can use
+        // `MutableSilkTheme.modifyComponentStyle` to layer additional styles on top of a base style. In almost all
+        // practical cases, however, there will only ever be a single selector of each type per component style.
+        fun ComponentModifiers.mergeCssModifiers(init: ComponentModifiers.() -> Unit): Map<CssModifier.Key, CssModifier> {
+            return apply(init).cssModifiers
+                .groupBy { it.key }
+                .mapValues { (_, group) ->
+                    val first = group.first()
+                    if (group.size == 1) return@mapValues first
+
+                    // Weird "Modifier as Modifier" casting trick required to get around type ambiguity
+                    var mergedModifier = Modifier as Modifier
+                    group.forEach { curr ->
+                        check(curr.mediaQuery == first.mediaQuery && curr.suffix == first.suffix)
+                        mergedModifier = mergedModifier.then(curr.modifier)
+                    }
+
+                    CssModifier(mergedModifier, first.mediaQuery, first.suffix)
+                }
+        }
+
+        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).mergeCssModifiers(init)
+        val darkModifiers = ComponentModifiers(ColorMode.DARK).mergeCssModifiers(init)
 
         StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
             withFinalSelectorName(selectorName, group) { name, styles ->
