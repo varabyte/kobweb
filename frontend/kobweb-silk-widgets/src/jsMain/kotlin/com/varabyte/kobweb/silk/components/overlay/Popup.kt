@@ -18,7 +18,7 @@ import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
 
 // A small but comfortable amount of space. Also allows the Tooltip composable to extend up a bit with an arrow while
 // still leaving a bit of space to go.
@@ -72,6 +72,11 @@ val PopupStyle by ComponentStyle(prefix = "silk-") {
  *   show up.
  * @param placementTarget If set, indicates which element the popup should be shown relative to. If not set, the
  *   original [target] will be used.
+ * @param showDelayMs If set, there will be a delay before the popup is shown after the mouse enters the target.
+ * @param hideDelayMs If set, there will be a delay before the popup is hidden after the mouse leaves the target.
+ * @param stayOpenStrategy Once a popup is open, this strategy controls how it should decide to stay open. If no
+ *   strategy is passed in, the popup will stay open as long as the mouse is over it or if any child inside of it has
+ *   focus. See also: [StayOpenStrategy].
  */
 @Composable
 fun Popup(
@@ -80,10 +85,23 @@ fun Popup(
     placement: PopupPlacement = PopupPlacement.Bottom,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     placementTarget: ElementTarget? = null,
+    showDelayMs: Int = 0,
+    hideDelayMs: Int = 0,
+    stayOpenStrategy: StayOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember {
+        stayOpenStrategy ?: CompositeStayOpenStrategy(
+            IsMouseOverStayOpenStrategy(),
+            HasFocusStayOpenStrategy()
+        )
+    }
+
+    @Suppress("NAME_SHADOWING") val showDelayMs = showDelayMs.coerceAtLeast(0)
+    @Suppress("NAME_SHADOWING") val hideDelayMs = hideDelayMs.coerceAtLeast(0)
+
     fun HTMLElement?.apply(targetFinder: ElementTarget?): HTMLElement? {
         if (this == null || targetFinder == null) return this
         return targetFinder(startingFrom = this)
@@ -96,8 +114,33 @@ fun Popup(
     }
 
     var showPopup by remember { mutableStateOf(false) }
-    val requestShowPopup: (Event) -> Unit = { showPopup = true }
-    val requestHidePopup: (Event) -> Unit = { showPopup = false }
+    var keepPopupOpen by remember { mutableStateOf(false) }
+
+    var showTimeoutId by remember { mutableStateOf(-1) }
+    var hideTimeoutId by remember { mutableStateOf(-1) }
+
+    fun requestShowPopup() {
+        window.clearTimeout(hideTimeoutId)
+        showTimeoutId = window.setTimeout({ showPopup = true }, showDelayMs)
+    }
+
+    fun requestHidePopup(hideNow: Boolean = false) {
+        window.clearTimeout(showTimeoutId)
+        hideTimeoutId = window.setTimeout({
+            if (!keepPopupOpen) showPopup = false
+        }, if (hideNow) 0 else hideDelayMs)
+    }
+
+    val prevKeepPopupOpen = keepPopupOpen
+    keepPopupOpen = stayOpenStrategy.shouldStayOpen
+    if (!keepPopupOpen && keepPopupOpen != prevKeepPopupOpen) {
+        // The hideDelay only makes sense for automatically hiding the popup. If our stayOpenStrategy is the one to
+        // request the close, then we should close down now, or else things feel a little sloppy.
+        requestHidePopup(hideNow = true)
+    }
+
+    val requestShowPopupListener = EventListener { requestShowPopup() }
+    val requestHidePopupListener = EventListener { requestHidePopup() }
 
     Box(
         Modifier.display(DisplayStyle.None),
@@ -105,15 +148,15 @@ fun Popup(
             srcElement = element
 
             element.apply(target)?.let { targetElement ->
-                targetElement.addEventListener("mouseenter", requestShowPopup)
-                targetElement.addEventListener("mouseleave", requestHidePopup)
+                targetElement.addEventListener("mouseenter", requestShowPopupListener)
+                targetElement.addEventListener("mouseleave", requestHidePopupListener)
                 if (targetElement.matches(":hover")) {
-                    showPopup = true
+                    requestShowPopup()
                 }
 
                 onDispose {
-                    targetElement.removeEventListener("mouseenter", requestShowPopup)
-                    targetElement.removeEventListener("mouseleave", requestHidePopup)
+                    targetElement.removeEventListener("mouseenter", requestShowPopupListener)
+                    targetElement.removeEventListener("mouseleave", requestHidePopupListener)
                 }
             } ?: onDispose {}
         }
@@ -143,6 +186,7 @@ fun Popup(
                 ref = refScope {
                     ref { element ->
                         popupBounds = element.getBoundingClientRect()
+                        stayOpenStrategy.init(element)
                     }
                     add(ref)
                 },

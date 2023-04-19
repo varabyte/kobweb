@@ -182,11 +182,24 @@ fun Tooltip(
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     placementTarget: ElementTarget? = null,
+    showDelayMs: Int = 0,
+    hideDelayMs: Int = 0,
+    stayOpenStrategy: StayOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    Popup(target, Modifier, placement, offsetPixels, placementTarget, ref = ref) {
+    Popup(
+        target,
+        Modifier,
+        placement,
+        offsetPixels,
+        placementTarget,
+        showDelayMs,
+        hideDelayMs,
+        stayOpenStrategy,
+        ref = ref
+    ) {
         Box(
             TooltipStyle.toModifier(variant).then(modifier),
         ) {
@@ -230,10 +243,25 @@ fun Tooltip(
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     placementTarget: ElementTarget? = null,
+    showDelayMs: Int = 0,
+    hideDelayMs: Int = 0,
+    stayOpenStrategy: StayOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
-    Tooltip(target, modifier, placement, hasArrow, offsetPixels,  placementTarget, variant, ref) {
+    Tooltip(
+        target,
+        modifier,
+        placement,
+        hasArrow,
+        offsetPixels,
+        placementTarget,
+        showDelayMs,
+        hideDelayMs,
+        stayOpenStrategy,
+        variant,
+        ref
+    ) {
         Column(TooltipTextContainerStyle.toModifier()) {
             text.split("\n").forEach { line -> if (line.isNotEmpty()) SpanText(line) else Br() }
         }
