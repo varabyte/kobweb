@@ -8,7 +8,7 @@ This is [an example][id] reference-style link.
 
 This site is generated from markdown.
 
-Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose HTML](https://compose-web.ui.pages.jetbrains.team/).
+Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose HTML](https://github.com/JetBrains/compose-multiplatform#compose-html).
 
 Markdown also supports
 
