@@ -5,8 +5,10 @@ import com.varabyte.kobweb.compose.css.AnimationIterationCount
 import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.css.ComparableStyleScope
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.modifiers.animation
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
@@ -184,6 +186,13 @@ fun Keyframes(init: KeyframesBuilder.() -> Unit) = KeyframesProvider(init)
 @Deprecated("`keyframes` has been replaced with `Keyframes` (capitalized) for consistency with `ComponentStyle` behavior.", ReplaceWith("Keyframes(init)"))
 fun keyframes(init: KeyframesBuilder.() -> Unit) = Keyframes(init)
 
+/**
+ * A convenience method to convert this [Keyframes] instance into an object that can be passed into [Modifier.animation].
+ *
+ * This version of the method is [Composable] because it's aware of the site's current color mode.
+ *
+ * See also: [rememberColorMode]
+ */
 @Composable
 fun Keyframes.toAnimation(
     duration: CSSSizeValue<out CSSUnitTime>? = null,
@@ -195,8 +204,50 @@ fun Keyframes.toAnimation(
     playState: AnimationPlayState? = null
 ): CSSAnimation
 {
-    val finalName = if (this.usesColorMode) {
-        this.name.suffixedWith(rememberColorMode().value)
+    val colorMode = if (this.usesColorMode) rememberColorMode().value else null
+    return toAnimation(colorMode, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
+}
+
+/**
+ * A convenience method to convert this [Keyframes] instance into an object that can be passed into [Modifier.animation].
+ *
+ * This version of the method is not [Composable] and requires the user pass in a [ColorMode] explicitly, especially to
+ * distinguish it from the other [toAnimation] method.
+ *
+ * If you defined a [Keyframes] that uses references the site's color mode, it is an error if you pass in [colorMode] is
+ * null. Alternately, if the [Keyframes] doesn't reference the site's color mode in its definition, then whatever color
+ * mode is passed in is ignored.
+ *
+ * It can be useful to call this method from within a [ComponentStyle]. For example:
+ *
+ * ```
+ * val MyAnimatedStyle by ComponentStyle {
+ *   after {
+ *     Modifier.animation(AnimOut.toAnimation(colorMode, ...))
+ *   }
+ * }
+ * ```
+ */
+fun Keyframes.toAnimation(
+    colorMode: ColorMode?,
+    duration: CSSSizeValue<out CSSUnitTime>? = null,
+    timingFunction: AnimationTimingFunction? = null,
+    delay: CSSSizeValue<out CSSUnitTime>? = null,
+    iterationCount: AnimationIterationCount? = null,
+    direction: AnimationDirection? = null,
+    fillMode: AnimationFillMode? = null,
+    playState: AnimationPlayState? = null,
+): CSSAnimation
+{
+    @Suppress("NAME_SHADOWING")
+    val colorMode = if (this.usesColorMode) {
+        colorMode ?: error("Animation $name depends on the site's color mode but no color mode was specified.")
+    } else {
+        null
+    }
+
+    val finalName = if (colorMode != null) {
+        this.name.suffixedWith(colorMode)
     } else {
         this.name
     }
