@@ -232,6 +232,131 @@ fun MutableSilkTheme.replaceComponentVariantBase(
     }
 }
 
+/**
+ * Use this method to tweak a style previously registered using [registerComponentStyle].
+ *
+ * This is particularly useful if you want to supplement changes to styles provided by Silk.
+ *
+ * ```
+ * @InitSilk
+ * fun initSilk(ctx: InitSilkContext) {
+ *   // TextStyle comes from Silk
+ *   ctx.theme.modifyComponentStyle(TextStyle) {
+ *     base { Modifier.fontWeight(FontWeight.Bold) }
+ *   }
+ * }
+ * ```
+ */
+fun MutableSilkTheme.modifyComponentStyle(
+    style: ComponentStyle,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyComponentStyle(style, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.modifyComponentStyle(
+    style: ComponentStyle,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    check(componentStyles.contains(style.name)) { "Attempting to modify a style that was never registered: \"${style.name}\"" }
+    val existingExtraModifiers = style.extraModifiers
+    val existingInit = style.init
+
+    replaceComponentStyle(style, {
+        existingExtraModifiers().then(extraModifiers())
+    }) {
+        existingInit.invoke(this)
+        init.invoke(this)
+    }
+}
+
+fun MutableSilkTheme.modifyComponentStyleBase(
+    style: ComponentStyle,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyComponentStyleBase(style, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.modifyComponentStyleBase(
+    style: ComponentStyle,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyComponentStyle(style, extraModifiers) {
+        base {
+            ComponentBaseModifier(colorMode).let(init)
+        }
+    }
+}
+
+/**
+ * Use this method to tweak a variant previously registered using [MutableSilkTheme.registerComponentVariants].
+ *
+ * This is particularly useful if you want to change variants provided by Silk.
+ *
+ * ```
+ * @InitSilk
+ * fun initSilk(ctx: InitSilkContext) {
+ *   // UndecoratedLinkVariant comes from Silk
+ *   ctx.theme.modifyComponentVariant(UndecoratedLinkVariant) {
+ *     base { Modifier.fontStyle(FontStyle.Italic) }
+ *   }
+ * }
+ * ```
+ */
+fun MutableSilkTheme.modifyComponentVariant(
+    variant: ComponentVariant,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyComponentVariant(variant, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.modifyComponentVariant(
+    variant: ComponentVariant,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    @Suppress("NAME_SHADOWING")
+    val variant = variant as? SimpleComponentVariant
+        ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
+
+    check(componentVariants.contains(variant.style.name)) { "Attempting to modify a variant that was never registered: \"${variant.style.name}\"" }
+    val existingExtraModifiers = variant.style.extraModifiers
+    val existingInit = variant.style.init
+
+    replaceComponentVariant(variant, {
+        existingExtraModifiers().then(extraModifiers())
+    }) {
+        existingInit.invoke(this)
+        init.invoke(this)
+    }
+}
+
+fun MutableSilkTheme.modifyComponentVariantBase(
+    variant: ComponentVariant,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyComponentVariantBase(variant, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.modifyComponentVariantBase(
+    variant: ComponentVariant,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyComponentVariant(variant, extraModifiers) {
+        base {
+            ComponentBaseModifier(colorMode).let(init)
+        }
+    }
+}
+
+
 class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     val palettes = mutableSilkTheme.palettes
 
