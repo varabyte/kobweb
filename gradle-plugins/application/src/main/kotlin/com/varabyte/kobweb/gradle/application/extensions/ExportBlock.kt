@@ -22,8 +22,19 @@ abstract class ExportBlock {
      */
     abstract val browser: Property<Browser>
 
+    /**
+     * Whether to include a source map when exporting your site.
+     *
+     * In release mode, source gets minified and obfuscated, but if you include your source map with your site, browsers
+     * can still show you the original source code when you inspect an element.
+     *
+     * By default, this value is set to true, making it easier for developers to debug a problem gone awry.
+     */
+    abstract val includeSourceMap: Property<Boolean>
+
     init {
         browser.convention(Browser.Chromium)
+        includeSourceMap.convention(true)
     }
 }
 

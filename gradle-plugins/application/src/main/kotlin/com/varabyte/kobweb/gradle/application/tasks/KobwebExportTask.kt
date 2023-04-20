@@ -195,8 +195,8 @@ abstract class KobwebExportTask @Inject constructor(
             scriptFile.copyTo(destFile, overwrite = true)
         }
 
-        val scriptMapFile = File("${scriptFile}.map")
-        run {
+        if (kobwebBlock.export.includeSourceMap.get()) {
+            val scriptMapFile = File("${scriptFile}.map")
             val destFile = systemRoot.resolve(scriptMapFile.name)
             scriptMapFile.copyTo(destFile, overwrite = true)
         }
