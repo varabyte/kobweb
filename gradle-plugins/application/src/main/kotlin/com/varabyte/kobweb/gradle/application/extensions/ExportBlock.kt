@@ -2,14 +2,9 @@
 
 package com.varabyte.kobweb.gradle.application.extensions
 
-import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.Browser
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.project.conf.KobwebConf
-import kotlinx.html.link
-import kotlinx.html.meta
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.get
 
