@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.attributes.TransitionEventListener
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
