@@ -127,6 +127,7 @@ fun Popup(
     var hideTimeoutId by remember { mutableStateOf(-1) }
 
     fun requestShowPopup() {
+        startHidingPopup = false
         window.clearTimeout(showTimeoutId)
         window.clearTimeout(hideTimeoutId)
         showTimeoutId = window.setTimeout({ showPopup = true; startHidingPopup = false }, showDelayMs)
