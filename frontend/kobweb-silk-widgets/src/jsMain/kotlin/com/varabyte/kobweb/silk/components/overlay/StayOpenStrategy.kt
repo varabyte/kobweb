@@ -13,11 +13,14 @@ import org.w3c.dom.events.FocusEvent
  * `remember` it somewhere, before passing it into a widget that uses it.
  *
  * Implementors may want to consider using [StayOpenStrategyBase] to handle some of the boilerplate.
- *
- * @property stayOpenState A [State] that can be used to observe whether the popup should stay open or not. By being a
- *   state object, this allows children classes just to update the value and not worry about notifying observers.
  */
 interface StayOpenStrategy {
+    /**
+     * A [State] that can be used to observe whether the popup should stay open or not.
+     *
+     * By being a state object, this allows children classes just to update the value and not worry about notifying
+     * observers.
+     */
     val stayOpenState: State<Boolean>
 
     /**
