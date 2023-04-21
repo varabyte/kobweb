@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.attributes.TransitionEventListener
+import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.dom.disposableRef
@@ -9,6 +11,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -57,6 +60,9 @@ enum class PopupPlacement {
 }
 
 val PopupStyle by ComponentStyle(prefix = "silk-") {
+    base {
+        Modifier.transition(CSSTransition("opacity", 150.ms))
+    }
 }
 
 /**
@@ -115,19 +121,22 @@ fun Popup(
 
     var showPopup by remember { mutableStateOf(false) }
     var keepPopupOpen by remember { mutableStateOf(false) }
+    var startHidingPopup by remember { mutableStateOf(false) }
 
     var showTimeoutId by remember { mutableStateOf(-1) }
     var hideTimeoutId by remember { mutableStateOf(-1) }
 
     fun requestShowPopup() {
+        window.clearTimeout(showTimeoutId)
         window.clearTimeout(hideTimeoutId)
-        showTimeoutId = window.setTimeout({ showPopup = true }, showDelayMs)
+        showTimeoutId = window.setTimeout({ showPopup = true; startHidingPopup = false }, showDelayMs)
     }
 
     fun requestHidePopup(hideNow: Boolean = false) {
         window.clearTimeout(showTimeoutId)
+        window.clearTimeout(hideTimeoutId)
         hideTimeoutId = window.setTimeout({
-            if (!keepPopupOpen) showPopup = false
+            if (!keepPopupOpen && showPopup) startHidingPopup = true
         }, if (hideNow) 0 else hideDelayMs)
     }
 
@@ -172,7 +181,7 @@ fun Popup(
         popupBounds,
         targetBounds,
         offsetPixels.toDouble()
-    )
+    ).thenIf(startHidingPopup, Modifier.opacity(0.0))
 
     deferRender {
         // Need to set targetElement as the key because otherwise you might move from one element to another so fast
@@ -182,7 +191,18 @@ fun Popup(
                 PopupStyle.toModifier(variant)
                     .position(Position.Absolute)
                     .then(absPosModifier)
-                    .then(modifier),
+                    .then(modifier)
+                    .onTransitionEnd { evt ->
+                        if (evt.propertyName == "opacity") {
+                            if (startHidingPopup) {
+                                startHidingPopup = false
+                                showPopup = false
+                                window.clearTimeout(hideTimeoutId)
+                                window.clearTimeout(showTimeoutId)
+                            }
+                        }
+                    }
+                ,
                 ref = refScope {
                     ref { element ->
                         popupBounds = element.getBoundingClientRect()
