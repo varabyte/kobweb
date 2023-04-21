@@ -129,15 +129,15 @@ fun Popup(
         startHidingPopup = false
         window.clearTimeout(showTimeoutId)
         window.clearTimeout(hideTimeoutId)
-        showTimeoutId = window.setTimeout({ showPopup = true; startHidingPopup = false }, showDelayMs)
+        showTimeoutId = window.setTimeout({ showPopup = true }, showDelayMs)
     }
 
-    fun requestHidePopup(hideNow: Boolean = false) {
+    fun requestHidePopup() {
         window.clearTimeout(showTimeoutId)
         window.clearTimeout(hideTimeoutId)
         hideTimeoutId = window.setTimeout({
             if (!keepPopupOpen && showPopup) startHidingPopup = true
-        }, if (hideNow) 0 else hideDelayMs)
+        }, hideDelayMs)
     }
 
     val prevKeepPopupOpen = keepPopupOpen
@@ -145,7 +145,7 @@ fun Popup(
     if (!keepPopupOpen && keepPopupOpen != prevKeepPopupOpen) {
         // The hideDelay only makes sense for automatically hiding the popup. If our stayOpenStrategy is the one to
         // request the close, then we should close down now, or else things feel a little sloppy.
-        requestHidePopup(hideNow = stayOpenStrategy.hideImmediately)
+        requestHidePopup()
     }
 
     val requestShowPopupListener = EventListener { requestShowPopup() }
