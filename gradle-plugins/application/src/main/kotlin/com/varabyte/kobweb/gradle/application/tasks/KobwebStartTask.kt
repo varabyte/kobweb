@@ -110,7 +110,11 @@ abstract class KobwebStartTask @Inject constructor(
         val errorMessage = StringBuilder()
         process.errorStream.consumeAsync { line -> errorMessage.appendLine(line) }
 
-        while (stateFile.content == null && process.isAlive) {
+        // Note: We protect against old state files left around from previous runs by checking the PID explicitly.
+        // If the PIDs don't match, the file will get overwritten shortly.
+        while (process.isAlive && (stateFile.content.let { content ->
+                content == null || content.pid != process.pid()
+            })) {
             Thread.sleep(300)
         }
         stateFile.content?.let { serverState ->
