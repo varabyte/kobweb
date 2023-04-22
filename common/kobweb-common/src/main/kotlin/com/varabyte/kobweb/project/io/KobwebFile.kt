@@ -52,8 +52,13 @@ open class KobwebReadableTextFile<T : Any>(
             return delegateFile.content
                 ?.let { bytes ->
                     if (lastBytes == null || bytes !== lastBytes) {
-                        lastBytes = bytes
-                        _content = deserialize(bytes.toString(Charsets.UTF_8))
+                        try {
+                            _content = deserialize(bytes.toString(Charsets.UTF_8))
+                            lastBytes = bytes
+                        } catch (_: Exception) {
+                            _content = null
+                            lastBytes = null
+                        }
                     }
                     _content
                 }
