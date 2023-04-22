@@ -33,8 +33,8 @@ abstract class KobwebStartTask @Inject constructor(
     fun execute() {
         val stateFile = ServerStateFile(kobwebApplication.kobwebFolder)
         stateFile.content?.let { serverState ->
-            val alreadyRunningMessage = "A Kobweb server is already running at ${serverState.toDisplayText()}"
             if (serverState.isRunning()) {
+                val alreadyRunningMessage = "A Kobweb server is already running at ${serverState.toDisplayText()}"
                 if (!reuseServer) {
                     throw GradleException("$alreadyRunningMessage and cannot be reused for this task.")
                 } else if (serverState.env != env) {
