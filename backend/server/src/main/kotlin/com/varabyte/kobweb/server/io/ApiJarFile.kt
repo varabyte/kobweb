@@ -4,6 +4,7 @@ import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.ApisFactory
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
+import io.ktor.util.date.*
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
@@ -93,8 +94,16 @@ class ApiJarFile(path: Path, private val logger: Logger) {
     private class Cache(val content: ByteArray, logger: Logger) {
         val apis: Apis = run {
             val classLoader = DynamicClassLoader(content)
-            val factory = classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
-            factory.create(logger)
+            val startMs = getTimeMillis()
+
+            try {
+                val factory =
+                    classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
+                factory.create(logger)
+            } finally {
+                val elapsedMs = getTimeMillis() - startMs
+                logger.info("Loaded and initialized server API jar in ${elapsedMs}ms.")
+            }
         }
     }
 
