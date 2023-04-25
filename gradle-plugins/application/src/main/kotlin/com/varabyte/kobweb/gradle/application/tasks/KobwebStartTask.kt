@@ -4,15 +4,19 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.io.consumeAsync
 import com.varabyte.kobweb.common.path.toUnixSeparators
+import com.varabyte.kobweb.gradle.application.KOBWEB_SERVER_JAR
+import com.varabyte.kobweb.gradle.application.util.getServerJar
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 
 /**
  * Start a Kobweb web server.
@@ -28,6 +32,9 @@ abstract class KobwebStartTask @Inject constructor(
     private val siteLayout: SiteLayout,
     private val reuseServer: Boolean
 ) : KobwebTask("Start a Kobweb server") {
+
+    @InputFile
+    fun getServerJar() = kobwebApplication.kobwebFolder.getServerJar()
 
     @TaskAction
     fun execute() {
@@ -50,13 +57,6 @@ abstract class KobwebStartTask @Inject constructor(
         }
 
         val javaHome = System.getProperty("java.home")!!
-        val serverJar = KobwebStartTask::class.java.getResourceAsStream("/server.jar")!!.let { stream ->
-            File.createTempFile("server", ".jar").apply {
-                appendBytes(stream.readAllBytes())
-                deleteOnExit()
-            }
-        }
-
         val processParams = arrayOf(
             "${javaHome.toUnixSeparators()}/bin/java",
             env.toSystemPropertyParam(),
@@ -64,7 +64,7 @@ abstract class KobwebStartTask @Inject constructor(
             // See: https://ktor.io/docs/development-mode.html#system-property
             "-Dio.ktor.development=${env == ServerEnvironment.DEV}",
             "-jar",
-            serverJar.absolutePath,
+            getServerJar().absolutePath
         )
 
         println(

@@ -22,7 +22,10 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
@@ -201,7 +204,7 @@ abstract class KobwebExportTask @Inject constructor(
             scriptMapFile.copyTo(destFile, overwrite = true)
         }
 
-        // Kobweb servers are only supported by the Kobweb layout
+        // API routes are only supported by the Kobweb layout
         if (siteLayout == SiteLayout.KOBWEB) {
             // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
             kobwebConf.server.files.dev.api?.let { apiFile ->

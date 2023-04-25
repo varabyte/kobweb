@@ -7,3 +7,5 @@ package com.varabyte.kobweb.gradle.application
 const val KOBWEB_APP_METADATA_SUBFOLDER = "kobweb/metadata"
 const val KOBWEB_APP_METADATA_FRONTEND = "$KOBWEB_APP_METADATA_SUBFOLDER/frontend.json"
 const val KOBWEB_APP_METADATA_BACKEND = "$KOBWEB_APP_METADATA_SUBFOLDER/backend.json"
+
+const val KOBWEB_SERVER_JAR = "server/server.jar"
