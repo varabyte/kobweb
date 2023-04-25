@@ -38,7 +38,7 @@ fun main() = runBlocking {
     val env = ServerEnvironment.get()
 
     with(conf.server.logging) {
-        val logRootPath = Path("").resolve(logRoot)
+        val logRootPath = Path(logRoot)
         if (clearLogsOnStart && logRootPath.exists()) {
             logRootPath.listDirectoryEntries().forEach { child ->
                 try {
