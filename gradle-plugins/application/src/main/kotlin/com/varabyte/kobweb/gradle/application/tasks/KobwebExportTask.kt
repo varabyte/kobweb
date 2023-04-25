@@ -42,7 +42,7 @@ abstract class KobwebExportTask @Inject constructor(
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
     @InputFile
-    fun getAppFrontendMetadata() = File(project.buildDir, KOBWEB_APP_METADATA_FRONTEND)
+    fun getAppFrontendMetadata() = project.buildDir.resolve(KOBWEB_APP_METADATA_FRONTEND)
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -123,7 +123,7 @@ abstract class KobwebExportTask @Inject constructor(
         }.merge()
 
         val (pagesRoot, resourcesRoot, systemRoot) = when(siteLayout) {
-            SiteLayout.KOBWEB -> Triple("pages", "resources", "system").map { File(getSiteDir(), it) }
+            SiteLayout.KOBWEB -> Triple("pages", "resources", "system").map { getSiteDir().resolve(it) }
             SiteLayout.STATIC -> getSiteDir().toTriple()
         }
 

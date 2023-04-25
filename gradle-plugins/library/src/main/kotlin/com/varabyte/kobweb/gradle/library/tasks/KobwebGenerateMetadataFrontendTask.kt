@@ -18,7 +18,7 @@ abstract class KobwebGenerateMetadataFrontendTask @Inject constructor(kobwebBloc
     : KobwebGenerateMetadataTask<FrontendData>(kobwebBlock, "Generate Kobweb metadata about this project's frontend structure that can be consumed later by a Kobweb app.") {
 
     override fun getSourceFiles() = getSourceFilesJs()
-    override fun getGeneratedMetadataFile() = File(kobwebBlock.getGenJsResRoot(project), KOBWEB_METADATA_FRONTEND)
+    override fun getGeneratedMetadataFile() = kobwebBlock.getGenJsResRoot(project).resolve(KOBWEB_METADATA_FRONTEND)
 
     override fun createProcessor() = FrontendDataProcessor(
         LoggingReporter(project.logger),

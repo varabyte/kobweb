@@ -23,7 +23,7 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
     @OutputDirectory
-    fun getGenPublicRoot() = File(kobwebBlock.getGenJsResRoot(project), kobwebBlock.publicPath.get())
+    fun getGenPublicRoot() = kobwebBlock.getGenJsResRoot(project).resolve(kobwebBlock.publicPath.get())
 
     @TaskAction
     fun execute() {
@@ -69,7 +69,7 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
                     }
                 }
             }.forEach { (jar, rootAndFile) ->
-                val targetFile = File(getGenPublicRoot(), rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
+                val targetFile = getGenPublicRoot().resolve(rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
                 if (targetFile.exists() && !rootAndFile.file.readBytes().contentEquals(targetFile.readBytes())) {
                     project.logger.warn("Overwriting ${rootAndFile.relativeFile} with the public resource found in ${jar.name}")
                 }

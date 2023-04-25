@@ -39,7 +39,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     }
 
     @OutputFile
-    fun getGenIndexFile() = File(File(getGenResDir(), getPublicPath()), "index.html")
+    fun getGenIndexFile() = getGenResDir().resolve(getPublicPath()).resolve("index.html")
 
     @TaskAction
     fun execute() {

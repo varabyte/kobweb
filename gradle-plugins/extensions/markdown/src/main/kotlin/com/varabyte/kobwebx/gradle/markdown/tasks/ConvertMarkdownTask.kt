@@ -35,7 +35,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
         (markdownConfig as ExtensionAware).extensions.getByName("features") as MarkdownFeatures
 
     private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(project.jsTarget)
-        .map { root -> File(root, markdownConfig.markdownPath.get()) }
+        .map { root -> root.resolve(markdownConfig.markdownPath.get()) }
 
     private fun getMarkdownFilesWithRoots(): List<RootAndFile> {
         val mdRoots = getMarkdownRoots()

@@ -18,7 +18,7 @@ abstract class KobwebGenerateMetadataBackendTask @Inject constructor(kobwebBlock
     : KobwebGenerateMetadataTask<BackendData>(kobwebBlock, "Generate Kobweb metadata about this project's backend structure that can be consumed later by a Kobweb app.") {
 
     override fun getSourceFiles() = getSourceFilesJvm()
-    override fun getGeneratedMetadataFile() = File(project.buildDir, KOBWEB_APP_METADATA_BACKEND)
+    override fun getGeneratedMetadataFile() = project.buildDir.resolve(KOBWEB_APP_METADATA_BACKEND)
 
     override fun createProcessor() = BackendDataProcessor(
         LoggingReporter(project.logger),

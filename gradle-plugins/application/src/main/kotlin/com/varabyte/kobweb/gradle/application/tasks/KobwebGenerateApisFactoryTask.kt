@@ -29,10 +29,10 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
     } ?: DefaultProvider { project.objects.fileCollection() }
 
     @InputFile
-    fun getAppBackendMetadata() = File(project.buildDir, KOBWEB_APP_METADATA_BACKEND)
+    fun getAppBackendMetadata() = project.buildDir.resolve(KOBWEB_APP_METADATA_BACKEND)
 
     @OutputFile
-    fun getGenApisFactoryFile() = File(kobwebBlock.getGenJvmSrcRoot(project), "ApisFactoryImpl.kt")
+    fun getGenApisFactoryFile() = kobwebBlock.getGenJvmSrcRoot(project).resolve("ApisFactoryImpl.kt")
 
     @TaskAction
     fun execute() {
