@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.events.EventListener
@@ -51,6 +52,7 @@ class IsMouseOverStayOpenStrategy : StayOpenStrategyBase() {
     override fun init(popupElement: HTMLElement) {
         popupElement.addEventListener("mouseenter", EventListener { shouldStayOpen = true })
         popupElement.addEventListener("mouseleave", EventListener { shouldStayOpen = false })
+        shouldStayOpen = popupElement.matches(":hover")
     }
 }
 
@@ -65,6 +67,7 @@ class HasFocusStayOpenStrategy : StayOpenStrategyBase() {
             val newFocus = focusEvent.relatedTarget as? Node
             shouldStayOpen = if (newFocus != null) popupElement.contains(newFocus) else false
         })
+        shouldStayOpen = popupElement.contains(window.document.activeElement)
     }
 }
 
@@ -74,7 +77,7 @@ class HasFocusStayOpenStrategy : StayOpenStrategyBase() {
  * This can be useful for one-off custom behavior, like a popup that stays open until you click a button elsewhere on
  * the page, or one that closes when a timer runs down, etc.
  */
-class ManualStayOpenStrategy() : StayOpenStrategy {
+class ManualStayOpenStrategy : StayOpenStrategy {
     private val _stayOpenState = mutableStateOf(false)
     override val stayOpenState: State<Boolean> = _stayOpenState
 
