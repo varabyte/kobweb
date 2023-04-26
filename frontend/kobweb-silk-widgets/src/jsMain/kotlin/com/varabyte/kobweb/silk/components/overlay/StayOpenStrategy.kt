@@ -59,7 +59,7 @@ class IsMouseOverStayOpenStrategy : StayOpenStrategyBase() {
  */
 class HasFocusStayOpenStrategy : StayOpenStrategyBase() {
     override fun init(popupElement: HTMLElement) {
-        popupElement.addEventListener("focusin", { evt -> shouldStayOpen = true })
+        popupElement.addEventListener("focusin", { shouldStayOpen = true })
         popupElement.addEventListener("focusout", { evt ->
             val focusEvent = evt as FocusEvent
             val newFocus = focusEvent.relatedTarget as? Node
