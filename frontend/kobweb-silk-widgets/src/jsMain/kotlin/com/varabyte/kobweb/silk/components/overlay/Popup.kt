@@ -10,7 +10,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -37,7 +36,7 @@ const val DEFAULT_POPUP_OFFSET_PX = 15
  *    LB +-------+ RB
  *       BL  B  BR
  *
- * Note the difference between e.g. [TopLeft] and [LeftTop]. The former will place the popup above the target, with
+ * Note the difference between e.g. [PopupPlacement.TopLeft] and [PopupPlacement.LeftTop]. The former will place the popup above the target, with
  * left edges aligned, while the latter will place to popup to the left of the target, with top edges aligned.
  *
  * Note that popups should avoid covering the element itself (as that would make the popup go away since it would cause
@@ -61,6 +60,270 @@ enum class PopupPlacement {
 val PopupStyle by ComponentStyle(prefix = "silk-") {
     base {
         Modifier.transition(CSSTransition("opacity", 150.ms))
+    }
+}
+
+// When first declared, popups need to make several passes to set themselves up. First, they need to find the raw
+// html elements that will be associated with the popup's location. Then, they need to calculate the width of the popup,
+// which requires the raw element of the popup itself.
+private sealed interface PopupState {
+    object Uninitialized : PopupState
+
+    sealed interface Initialized : PopupState {
+        val elements: PopupElements
+    }
+
+    class FoundElements(override val elements: PopupElements) : Initialized
+
+    sealed interface Visible : Initialized {
+        val modifier: Modifier
+    }
+
+    /** State for when we're about to show the popup, but we need a bit of time to calculate its width. */
+    class Calculating(override val elements: PopupElements) : Visible {
+        override val modifier = Modifier
+            // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
+            // causing focus to be gained and lost
+            .top((-100).percent).left((-100).percent)
+            .opacity(0)
+    }
+    class Shown(override val elements: PopupElements, placement: PopupPlacement, bounds: DOMRect, offsetPixels: Number) : Visible {
+        private fun getAbsModifier(
+            placement: PopupPlacement,
+            popupBounds: DOMRect,
+            targetBounds: DOMRect,
+            offsetPixels: Double,
+        ): Modifier {
+            return when (placement) {
+                PopupPlacement.TopLeft -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left).px)
+                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+                }
+
+                PopupPlacement.Top -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
+                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+                }
+
+                PopupPlacement.TopRight -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
+                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
+                }
+
+                PopupPlacement.LeftTop -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                        .top((window.pageYOffset + targetBounds.top).px)
+
+                }
+
+                PopupPlacement.RightTop -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                        .top((window.pageYOffset + targetBounds.top).px)
+
+                }
+
+                PopupPlacement.Left -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+                }
+
+                PopupPlacement.Right -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
+                }
+
+                PopupPlacement.LeftBottom -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
+                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
+                }
+
+                PopupPlacement.RightBottom -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
+                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
+                }
+
+                PopupPlacement.BottomLeft -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left).px)
+                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
+                }
+
+                PopupPlacement.Bottom -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
+                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
+                }
+
+                PopupPlacement.BottomRight -> {
+                    Modifier
+                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
+                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
+                }
+            }
+        }
+
+        override val modifier = run {
+            val targetBounds = elements.placementElement.getBoundingClientRect()
+            getAbsModifier(
+                placement,
+                bounds,
+                targetBounds,
+                offsetPixels.toDouble()
+            )
+        }
+
+    }
+    class Hiding(override val elements: PopupElements, modifier: Modifier) : Visible {
+        override val modifier = modifier.opacity(0)
+    }
+}
+
+private class PopupStateController(
+    private val placement: PopupPlacement,
+    private val offsetPixels: Number,
+    private val showDelayMs: Int,
+    private val hideDelayMs: Int,
+    private val stayOpenStrategy: StayOpenStrategy,
+) {
+    private var _state by mutableStateOf<PopupState>(PopupState.Uninitialized)
+    val state get() = _state
+
+    private var hideWasPostponed by mutableStateOf(false)
+
+    private var showTimeoutId = -1
+    private var hideTimeoutId = -1
+
+    private fun reset() {
+        hideWasPostponed = false
+        window.clearTimeout(showTimeoutId)
+        window.clearTimeout(hideTimeoutId)
+    }
+
+    fun initialize(elements: PopupElements) {
+        check(state is PopupState.Uninitialized)
+        _state = PopupState.FoundElements(elements)
+    }
+
+    fun requestShowPopup() {
+        val state = _state
+        if(state !is PopupState.Initialized) return
+
+        reset()
+        showTimeoutId = window.setTimeout({
+            this._state = PopupState.Calculating(state.elements)
+            // Sometimes, we can end up having a show request happen before a hiding finishes. In that case, we can
+            // bypass the calculation step and jump straight into showing the popup
+            state.elements.popupElement?.let { finishShowing(it) }
+        }, showDelayMs)
+    }
+
+    fun updatePopupElement(popupElement: HTMLElement) {
+        val state = _state
+        check(state is PopupState.Initialized)
+        stayOpenStrategy.init(popupElement)
+        state.elements.popupElement = popupElement
+    }
+
+    fun clearPopupElement() {
+        val state = _state
+        check(state is PopupState.Initialized)
+        state.elements.popupElement = null
+    }
+
+    fun finishShowing(popupElement: HTMLElement) {
+        val state = _state
+        if(state !is PopupState.Calculating) return
+
+        _state = PopupState.Shown(
+            state.elements,
+            placement,
+            popupElement.getBoundingClientRect(),
+            offsetPixels
+        )
+    }
+
+    fun requestHidePopup() {
+        val state = _state
+        if(state !is PopupState.Visible) return
+
+        reset()
+        hideTimeoutId = window.setTimeout({
+            if (!stayOpenStrategy.shouldStayOpen) {
+                this._state = PopupState.Hiding(state.elements, state.modifier)
+            } else {
+                hideWasPostponed = true
+            }
+        }, hideDelayMs)
+    }
+
+    fun finishHiding(elements: PopupElements) {
+        val state = _state
+        if (state !is PopupState.Hiding) return
+
+        _state = PopupState.FoundElements(elements)
+        hideWasPostponed = false
+        window.clearTimeout(showTimeoutId)
+        window.clearTimeout(hideTimeoutId)
+    }
+
+    // This needs to be called by the Compose method that creates this controller. Under the hood, it checks State
+    // values which ensure that the popup will be recomposed at a later time if a strategy made a request to keep the
+    // popup open and then later changed to allowing it to close.
+    fun checkIfStayOpenStrategyChanged() {
+        if (!stayOpenStrategy.shouldStayOpen && hideWasPostponed) {
+            hideWasPostponed = false
+            requestHidePopup()
+        }
+    }
+}
+
+private class PopupElements(
+    private val controller: PopupStateController,
+    srcElement: HTMLElement,
+    popupTarget: ElementTarget,
+    placementTarget: ElementTarget?
+) {
+    private fun HTMLElement?.resolve(targetFinder: ElementTarget?): HTMLElement? {
+        if (this == null || targetFinder == null) return this
+        return targetFinder(startingFrom = this)
+    }
+
+    private val requestShowPopupListener = EventListener { controller.requestShowPopup() }
+    private val requestHidePopupListener = EventListener { controller.requestHidePopup() }
+
+    val targetElement = srcElement.resolve(popupTarget) ?: error("Target element finder returned null")
+    val placementElement = if (placementTarget == null) targetElement else
+        (srcElement.resolve(placementTarget) ?: error("Placement element finder returned null"))
+
+    // Kind of a hack, but this field is exposed so that the "Show" step can store its raw element somewhere. That way,
+    // if we end up back in the "Calculation" state later (this can happen when you flail your mouse cursor wildly
+    // across multiple elements that have popups attached to them), we can fast-forward to the "Show" step.
+    var popupElement: HTMLElement? = null
+
+    init {
+        targetElement.apply {
+            addEventListener("mouseenter", requestShowPopupListener)
+            addEventListener("mouseleave", requestHidePopupListener)
+            if (matches(":hover")) {
+                controller.requestShowPopup()
+            }
+        }
+    }
+
+    fun dispose() {
+        targetElement.apply {
+            removeEventListener("mouseenter", requestShowPopupListener)
+            removeEventListener("mouseleave", requestHidePopupListener)
+        }
     }
 }
 
@@ -97,211 +360,59 @@ fun Popup(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember {
-        stayOpenStrategy ?: CompositeStayOpenStrategy(
-            IsMouseOverStayOpenStrategy(),
-            HasFocusStayOpenStrategy()
+    val popupStateController = remember {
+        PopupStateController(
+            placement, offsetPixels,
+            showDelayMs.coerceAtLeast(0), hideDelayMs.coerceAtLeast(0),
+            stayOpenStrategy ?: CompositeStayOpenStrategy(
+                IsMouseOverStayOpenStrategy(),
+                HasFocusStayOpenStrategy()
+            )
         )
     }
+    popupStateController.checkIfStayOpenStrategyChanged()
 
-    @Suppress("NAME_SHADOWING") val showDelayMs = showDelayMs.coerceAtLeast(0)
-    @Suppress("NAME_SHADOWING") val hideDelayMs = hideDelayMs.coerceAtLeast(0)
-
-    fun HTMLElement?.apply(targetFinder: ElementTarget?): HTMLElement? {
-        if (this == null || targetFinder == null) return this
-        return targetFinder(startingFrom = this)
-    }
-
-    var srcElement by remember { mutableStateOf<HTMLElement?>(null) }
-    val targetElement = remember(srcElement, target) { srcElement.apply(target) }
-    val placementElement = remember(srcElement, targetElement, placementTarget) {
-        if (placementTarget == null) targetElement else srcElement.apply(placementTarget)
-    }
-
-    var showPopup by remember { mutableStateOf(false) }
-    var keepPopupOpen by remember { mutableStateOf(false) }
-    var startHidingPopup by remember { mutableStateOf(false) }
-
-    var showTimeoutId by remember { mutableStateOf(-1) }
-    var hideTimeoutId by remember { mutableStateOf(-1) }
-
-    fun requestShowPopup() {
-        startHidingPopup = false
-        window.clearTimeout(showTimeoutId)
-        window.clearTimeout(hideTimeoutId)
-        showTimeoutId = window.setTimeout({ showPopup = true }, showDelayMs)
-    }
-
-    fun requestHidePopup() {
-        window.clearTimeout(showTimeoutId)
-        window.clearTimeout(hideTimeoutId)
-        hideTimeoutId = window.setTimeout({
-            if (!keepPopupOpen && showPopup) startHidingPopup = true
-        }, hideDelayMs)
-    }
-
-    val prevKeepPopupOpen = keepPopupOpen
-    keepPopupOpen = stayOpenStrategy.shouldStayOpen
-    if (!keepPopupOpen && keepPopupOpen != prevKeepPopupOpen) {
-        // The hideDelay only makes sense for automatically hiding the popup. If our stayOpenStrategy is the one to
-        // request the close, then we should close down now, or else things feel a little sloppy.
-        requestHidePopup()
-    }
-
-    val requestShowPopupListener = EventListener { requestShowPopup() }
-    val requestHidePopupListener = EventListener { requestHidePopup() }
-
+    // Create a dummy element whose purpose is to search for the target element that we want to attach a popup to.
     Box(
         Modifier.display(DisplayStyle.None),
         ref = disposableRef(target) { element ->
-            srcElement = element
-
-            element.apply(target)?.let { targetElement ->
-                targetElement.addEventListener("mouseenter", requestShowPopupListener)
-                targetElement.addEventListener("mouseleave", requestHidePopupListener)
-                if (targetElement.matches(":hover")) {
-                    requestShowPopup()
-                }
-
-                onDispose {
-                    targetElement.removeEventListener("mouseenter", requestShowPopupListener)
-                    targetElement.removeEventListener("mouseleave", requestHidePopupListener)
-                }
-            } ?: onDispose {}
+            var popupElements: PopupElements? = null
+            try {
+                popupElements = PopupElements(popupStateController, element, target, placementTarget)
+                popupStateController.initialize(popupElements)
+            } catch (_: IllegalStateException) {}
+            onDispose {
+                popupElements?.dispose()
+            }
         }
     )
 
-    if (placementElement == null || !showPopup) return
-
-    val targetBounds = placementElement.getBoundingClientRect()
-    var popupBounds by remember { mutableStateOf<DOMRect?>(null) }
-
-    val absPosModifier = getAbsModifier(
-        placement,
-        popupBounds,
-        targetBounds,
-        offsetPixels.toDouble()
-    ).thenIf(startHidingPopup, Modifier.opacity(0.0))
-
+    // Copy into local var for smart casting.
+    val popupState = (popupStateController.state as? PopupState.Visible) ?: return
     deferRender {
-        // Need to set targetElement as the key because otherwise you might move from one element to another so fast
-        // that compose doesn't realize the tooltip should be rerendered
-        key(targetElement) {
-            Box(
-                PopupStyle.toModifier(variant)
-                    .position(Position.Absolute)
-                    .then(absPosModifier)
-                    .then(modifier)
-                    .onTransitionEnd { evt ->
-                        if (evt.propertyName == "opacity") {
-                            if (startHidingPopup) {
-                                startHidingPopup = false
-                                showPopup = false
-                                window.clearTimeout(hideTimeoutId)
-                                window.clearTimeout(showTimeoutId)
-                            }
-                        }
+        Box(
+            PopupStyle.toModifier(variant)
+                .position(Position.Absolute)
+                .then(popupState.modifier)
+                .then(modifier)
+                .onTransitionEnd { evt ->
+                    val state = popupStateController.state
+                    if (evt.propertyName == "opacity" && state is PopupState.Hiding) {
+                        popupStateController.finishHiding(state.elements)
                     }
-                ,
-                ref = refScope {
-                    ref { element ->
-                        popupBounds = element.getBoundingClientRect()
-                        stayOpenStrategy.init(element)
-                    }
-                    add(ref)
                 },
-                content = content
-            )
-        }
-    }
-}
-
-private fun getAbsModifier(
-    placement: PopupPlacement,
-    popupBounds: DOMRect?,
-    targetBounds: DOMRect,
-    offsetPixels: Double,
-): Modifier {
-    if (popupBounds == null)
-        return Modifier
-            // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
-            // causing focus to be gained and lost
-            .top((-100).percent).left((-100).percent)
-            .opacity(0)
-
-    return when (placement) {
-        PopupPlacement.TopLeft -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left).px)
-                .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-        }
-
-        PopupPlacement.Top -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-        }
-
-        PopupPlacement.TopRight -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
-                .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-        }
-
-        PopupPlacement.LeftTop -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                .top((window.pageYOffset + targetBounds.top).px)
-
-        }
-
-        PopupPlacement.RightTop -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                .top((window.pageYOffset + targetBounds.top).px)
-
-        }
-
-        PopupPlacement.Left -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-        }
-
-        PopupPlacement.Right -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-        }
-
-        PopupPlacement.LeftBottom -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
-        }
-
-        PopupPlacement.RightBottom -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
-        }
-
-        PopupPlacement.BottomLeft -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left).px)
-                .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-        }
-
-        PopupPlacement.Bottom -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-        }
-
-        PopupPlacement.BottomRight -> {
-            Modifier
-                .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
-                .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-        }
+            ref = refScope {
+                disposableRef { popupElement ->
+                    popupStateController.updatePopupElement(popupElement)
+                    popupStateController.finishShowing(popupElement)
+                    onDispose {
+                        popupStateController.clearPopupElement()
+                        popupStateController.finishHiding(popupState.elements)
+                    }
+                }
+                add(ref)
+            },
+            content = content
+        )
     }
 }
