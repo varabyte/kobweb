@@ -16,6 +16,10 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
@@ -197,13 +201,10 @@ private class PopupStateController(
     private var _state by mutableStateOf<PopupState>(PopupState.Uninitialized)
     val state get() = _state
 
-    private var hideWasPostponed by mutableStateOf(false)
-
     private var showTimeoutId = -1
     private var hideTimeoutId = -1
 
-    private fun reset() {
-        hideWasPostponed = false
+    private fun resetTimers() {
         window.clearTimeout(showTimeoutId)
         window.clearTimeout(hideTimeoutId)
     }
@@ -217,7 +218,7 @@ private class PopupStateController(
         val state = _state
         if(state !is PopupState.Initialized) return
 
-        reset()
+        resetTimers()
         showTimeoutId = window.setTimeout({
             this._state = PopupState.Calculating(state.elements)
             // Sometimes, we can end up having a show request happen before a hiding finishes. In that case, we can
@@ -236,6 +237,7 @@ private class PopupStateController(
     fun clearPopupElement() {
         val state = _state
         check(state is PopupState.Initialized)
+        stayOpenStrategy.reset()
         state.elements.popupElement = null
     }
 
@@ -255,13 +257,11 @@ private class PopupStateController(
         val state = _state
         if(state !is PopupState.Visible) return
 
-        reset()
+        resetTimers()
         hideTimeoutId = window.setTimeout({
             if (!stayOpenStrategy.shouldStayOpen) {
                 this._state = PopupState.Hiding(state.elements, state.modifier)
-            } else {
-                hideWasPostponed = true
-            }
+            } // else a new hide request will be issued automatically when shouldStayOpen is false
         }, hideDelayMs)
     }
 
@@ -270,19 +270,13 @@ private class PopupStateController(
         if (state !is PopupState.Hiding) return
 
         _state = PopupState.FoundElements(elements)
-        hideWasPostponed = false
-        window.clearTimeout(showTimeoutId)
-        window.clearTimeout(hideTimeoutId)
+        resetTimers()
     }
 
-    // This needs to be called by the Compose method that creates this controller. Under the hood, it checks State
-    // values which ensure that the popup will be recomposed at a later time if a strategy made a request to keep the
-    // popup open and then later changed to allowing it to close.
-    fun checkIfStayOpenStrategyChanged() {
-        if (!stayOpenStrategy.shouldStayOpen && hideWasPostponed) {
-            hideWasPostponed = false
-            requestHidePopup()
-        }
+    init {
+        stayOpenStrategy.stayOpenFlow.onEach { stayOpen ->
+            if (!stayOpen) requestHidePopup()
+        }.launchIn(CoroutineScope(window.asCoroutineDispatcher()))
     }
 }
 
@@ -370,7 +364,6 @@ fun Popup(
             )
         )
     }
-    popupStateController.checkIfStayOpenStrategyChanged()
 
     // Create a dummy element whose purpose is to search for the target element that we want to attach a popup to.
     Box(
