@@ -387,9 +387,9 @@ fun Popup(
         }
     )
 
-    // Copy into local var for smart casting.
-    val popupState = (popupStateController.state as? PopupState.Visible) ?: return
     deferRender {
+        // Copy into local var for smart casting.
+        val popupState = (popupStateController.state as? PopupState.Visible) ?: return@deferRender
         Box(
             PopupStyle.toModifier(variant)
                 .position(Position.Absolute)
