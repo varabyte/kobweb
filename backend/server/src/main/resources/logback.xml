@@ -5,9 +5,6 @@
         </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>${LOG_LEVEL}</level>
-        </filter>
         <file>${LOG_DEST}/${LOG_NAME}${LOG_SUFFIX}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
@@ -23,7 +20,7 @@
         </encoder>
     </appender>
 
-    <root level="TRACE">
+    <root level="${LOG_LEVEL}">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>
