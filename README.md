@@ -1736,8 +1736,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  export_and_upload:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
 
     env:
       KOBWEB_CLI_VERSION: 0.9.12
@@ -1749,21 +1752,22 @@ jobs:
           distribution: temurin
           java-version: 11
 
+      # When projects are created on Windows, the executable bit is sometimes lost. So set it back just in case.
+      - name: Ensure Gradle is executable
+        run: chmod +x gradlew
+
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
       - name: Query Browser Cache ID
         id: browser-cache-id
-        run: |
-          echo "value=$(./gradlew -q :site:kobwebBrowserCacheId)" >> $GITHUB_OUTPUT
-        shell: bash
+        run: echo "value=$(./gradlew -q :site:kobwebBrowserCacheId)" >> $GITHUB_OUTPUT
 
       - name: Cache Browser Dependencies
         uses: actions/cache@v3
         id: playwright-cache
         with:
-          path: |
-            ~/.cache/ms-playwright
+          path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.browser-cache-id.outputs.value }}
 
       - name: Fetch kobweb
@@ -1776,8 +1780,7 @@ jobs:
           zipBall: false
 
       - name: Unzip kobweb
-        run: |
-          unzip kobweb-${{ env.KOBWEB_CLI_VERSION }}.zip
+        run: unzip kobweb-${{ env.KOBWEB_CLI_VERSION }}.zip
 
       - name: Run export
         run: |
