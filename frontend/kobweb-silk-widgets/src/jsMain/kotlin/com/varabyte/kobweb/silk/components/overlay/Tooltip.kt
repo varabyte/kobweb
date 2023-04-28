@@ -196,7 +196,7 @@ fun Tooltip(
 
     Popup(
         target,
-        Modifier,
+        TooltipStyle.toModifier(variant).then(modifier),
         placement,
         offsetPixels,
         placementTarget,
@@ -205,31 +205,27 @@ fun Tooltip(
         stayOpenStrategy,
         ref = ref
     ) {
-        Box(
-            TooltipStyle.toModifier(variant).then(modifier),
-        ) {
-            content()
-            if (hasArrow) {
-                Box(
-                    // e.g. if tooltip is below the target, arrow points up
-                    TooltipArrowStyle.toModifier(
-                        when (placement) {
-                            PopupPlacement.TopLeft -> BottomLeftTooltipArrowVariant
-                            PopupPlacement.Top -> BottomTooltipArrowVariant
-                            PopupPlacement.TopRight -> BottomRightTooltipArrowVariant
-                            PopupPlacement.LeftTop -> RightTopTooltipArrowVariant
-                            PopupPlacement.Left -> RightTooltipArrowVariant
-                            PopupPlacement.LeftBottom -> RightBottomTooltipArrowVariant
-                            PopupPlacement.RightTop -> LeftTopTooltipArrowVariant
-                            PopupPlacement.Right -> LeftTooltipArrowVariant
-                            PopupPlacement.RightBottom -> LeftBottomTooltipArrowVariant
-                            PopupPlacement.BottomLeft -> TopLeftTooltipArrowVariant
-                            PopupPlacement.Bottom -> TopTooltipArrowVariant
-                            PopupPlacement.BottomRight -> TopRightTooltipArrowVariant
-                        }
-                    )
+        content()
+        if (hasArrow) {
+            Box(
+                // e.g. if tooltip is below the target, arrow points up
+                TooltipArrowStyle.toModifier(
+                    when (placement) {
+                        PopupPlacement.TopLeft -> BottomLeftTooltipArrowVariant
+                        PopupPlacement.Top -> BottomTooltipArrowVariant
+                        PopupPlacement.TopRight -> BottomRightTooltipArrowVariant
+                        PopupPlacement.LeftTop -> RightTopTooltipArrowVariant
+                        PopupPlacement.Left -> RightTooltipArrowVariant
+                        PopupPlacement.LeftBottom -> RightBottomTooltipArrowVariant
+                        PopupPlacement.RightTop -> LeftTopTooltipArrowVariant
+                        PopupPlacement.Right -> LeftTooltipArrowVariant
+                        PopupPlacement.RightBottom -> LeftBottomTooltipArrowVariant
+                        PopupPlacement.BottomLeft -> TopLeftTooltipArrowVariant
+                        PopupPlacement.Bottom -> TopTooltipArrowVariant
+                        PopupPlacement.BottomRight -> TopRightTooltipArrowVariant
+                    }
                 )
-            }
+            )
         }
     }
 }
