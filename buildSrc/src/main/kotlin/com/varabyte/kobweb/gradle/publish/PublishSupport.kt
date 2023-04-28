@@ -8,7 +8,9 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.http.BasicAuthentication
+import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.plugins.signing.SigningExtension
+import java.io.File
 
 internal fun Project.shouldSign() = (findProperty("kobweb.sign") as? String).toBoolean()
 internal fun Project.shouldPublishToGCloud(): Boolean {
@@ -101,6 +103,8 @@ private fun Project.signing(configure: Action<SigningExtension>): Unit =
     (this as ExtensionAware).extensions.configure("signing", configure)
 
 internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
+    val project = this
+
     publishing {
         addVarabyteArtifact(
             project,
@@ -112,6 +116,20 @@ internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
 
     if (shouldSign()) {
         signing {
+            val secretKeyRingExists = (findProperty("signing.secretKeyRingFile") as? String)
+                ?.let { File(it).exists() }
+                ?: false
+
+            // If "shouldSign" returns true, then singing password should be set
+            val signingPassword = findProperty("signing.password") as String
+
+            // If here, we're on a CI. Check for the signing key which must be set in an environment variable.
+            // See also: https://docs.gradle.org/current/userguide/signing_plugin.html#sec:in-memory-keys
+            if (!secretKeyRingExists) {
+                val signingKey: String? by project
+                useInMemoryPgpKeys(signingKey, signingPassword)
+            }
+
             // Signing requires following steps at https://docs.gradle.org/current/userguide/signing_plugin.html#sec:signatory_credentials
             // and adding singatory properties somewhere reachable, e.g. ~/.gradle/gradle.properties
             sign(publishing.publications)
