@@ -303,19 +303,23 @@ private class PopupElements(
     // across multiple elements that have popups attached to them), we can fast-forward to the "Show" step.
     var popupElement: HTMLElement? = null
 
-    init {
-        targetElement.apply {
-            addEventListener("mouseenter", requestShowPopupListener)
-            addEventListener("mouseleave", requestHidePopupListener)
-        }
+init {
+    targetElement.apply {
+        addEventListener("mouseenter", requestShowPopupListener)
+        addEventListener("mouseleave", requestHidePopupListener)
+        addEventListener("focusin", requestShowPopupListener)
+        addEventListener("focusout", requestHidePopupListener)
     }
+}
 
-    fun dispose() {
-        targetElement.apply {
-            removeEventListener("mouseenter", requestShowPopupListener)
-            removeEventListener("mouseleave", requestHidePopupListener)
-        }
+fun dispose() {
+    targetElement.apply {
+        removeEventListener("mouseenter", requestShowPopupListener)
+        removeEventListener("mouseleave", requestHidePopupListener)
+        removeEventListener("focusin", requestShowPopupListener)
+        removeEventListener("focusout", requestHidePopupListener)
     }
+}
 }
 
 /**
