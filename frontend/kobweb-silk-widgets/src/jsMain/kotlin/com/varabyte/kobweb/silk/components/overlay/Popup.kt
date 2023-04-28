@@ -387,11 +387,11 @@ fun Popup(
 
     deferRender {
         // Copy into local var for smart casting.
-        val popupState = (popupStateController.state as? PopupState.Visible) ?: return@deferRender
+        val visiblePopupState = (popupStateController.state as? PopupState.Visible) ?: return@deferRender
         Box(
             PopupStyle.toModifier(variant)
                 .position(Position.Absolute)
-                .then(popupState.modifier)
+                .then(visiblePopupState.modifier)
                 .then(modifier)
                 .onTransitionEnd { evt ->
                     val state = popupStateController.state
@@ -405,7 +405,7 @@ fun Popup(
                     popupStateController.finishShowing(popupElement)
                     onDispose {
                         popupStateController.clearPopupElement()
-                        popupStateController.finishHiding(popupState.elements)
+                        popupStateController.finishHiding(visiblePopupState.elements)
                     }
                 }
                 add(ref)
