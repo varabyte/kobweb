@@ -210,7 +210,6 @@ private class PopupStateController(
     }
 
     fun initialize(elements: PopupElements) {
-        check(state is PopupState.Uninitialized)
         _state = PopupState.FoundElements(elements)
     }
 
@@ -355,21 +354,26 @@ fun Popup(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val popupStateController = remember {
-        PopupStateController(
-            placement, offsetPixels,
-            showDelayMs.coerceAtLeast(0), hideDelayMs.coerceAtLeast(0),
-            stayOpenStrategy ?: CompositeStayOpenStrategy(
-                IsMouseOverStayOpenStrategy(),
-                HasFocusStayOpenStrategy()
-            )
+    @Suppress("NAME_SHADOWING")
+    val stayOpenStrategy = remember(stayOpenStrategy) {
+        stayOpenStrategy ?: CompositeStayOpenStrategy(
+            IsMouseOverStayOpenStrategy(),
+            HasFocusStayOpenStrategy()
         )
     }
+    val popupStateController =
+        remember(placement, showDelayMs, hideDelayMs, stayOpenStrategy) {
+            PopupStateController(
+                placement, offsetPixels,
+                showDelayMs.coerceAtLeast(0), hideDelayMs.coerceAtLeast(0),
+                stayOpenStrategy
+            )
+        }
 
     // Create a dummy element whose purpose is to search for the target element that we want to attach a popup to.
     Box(
         Modifier.display(DisplayStyle.None),
-        ref = disposableRef(target) { element ->
+        ref = disposableRef(target, placementTarget) { element ->
             var popupElements: PopupElements? = null
             try {
                 popupElements = PopupElements(popupStateController, element, target, placementTarget)
