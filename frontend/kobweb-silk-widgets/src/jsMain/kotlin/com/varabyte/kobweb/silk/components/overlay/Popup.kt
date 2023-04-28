@@ -307,9 +307,6 @@ private class PopupElements(
         targetElement.apply {
             addEventListener("mouseenter", requestShowPopupListener)
             addEventListener("mouseleave", requestHidePopupListener)
-            if (matches(":hover")) {
-                controller.requestShowPopup()
-            }
         }
     }
 

@@ -65,7 +65,6 @@ class IsMouseOverStayOpenStrategy : StayOpenStrategy() {
     override fun init(popupElement: HTMLElement) {
         popupElement.addEventListener("mouseenter", EventListener { emitShouldStayOpen(true) })
         popupElement.addEventListener("mouseleave", EventListener { emitShouldStayOpen(false) })
-        emitShouldStayOpen(popupElement.matches(":hover"))
     }
 }
 
@@ -80,7 +79,6 @@ class HasFocusStayOpenStrategy : StayOpenStrategy() {
             val newFocus = focusEvent.relatedTarget as? Node
             emitShouldStayOpen(if (newFocus != null) popupElement.contains(newFocus) else false)
         })
-        emitShouldStayOpen(popupElement.contains(window.document.activeElement))
     }
 }
 
