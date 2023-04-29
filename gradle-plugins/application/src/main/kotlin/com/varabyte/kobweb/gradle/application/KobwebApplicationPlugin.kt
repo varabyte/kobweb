@@ -93,6 +93,7 @@ class KobwebApplicationPlugin @Inject constructor(
         // Note: Configured below, in `afterEvaluate`
 
         val kobwebUnpackServerJarTask = project.tasks.register("kobwebUnpackServerJar", KobwebUnpackServerJarTask::class.java)
+        val kobwebCreateServerScriptsTask = project.tasks.register("kobwebCreateServerScripts", KobwebCreateServerScriptsTask::class.java)
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
             project.tasks.register("kobwebStart", KobwebStartTask::class.java, env, runLayout, reuseServer)
@@ -241,6 +242,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 check(env == ServerEnvironment.DEV)
 
                 dependsOn(kobwebCleanSiteTask)
+                dependsOn(kobwebCreateServerScriptsTask)
                 dependsOn(kobwebStartTask)
                 dependsOn(project.tasks.findByName(jsTarget.browserProductionWebpack))
             }
