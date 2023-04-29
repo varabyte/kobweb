@@ -4,43 +4,39 @@ import androidx.compose.runtime.*
 import kotlinx.browser.window
 
 private class DeferredComposablesState {
-    private var changeCount = 0
     private var timeoutHandle = -1
     private val batchedCommands = mutableListOf<() -> Unit>()
     private val entries = mutableStateListOf<DeferredComposablesState.Entry>()
 
-    // By not running some commands immediately, instead delaying and batching them toghether, this prevents a bunch of
+    // By not running some commands immediately, instead delaying and batching them together, this prevents a bunch of
     // intermediate recompositions.
-    private fun delayAndBatchCommand(block: () -> Unit) {
+    private fun invokeLater(block: () -> Unit) {
         batchedCommands.add(block)
         if (timeoutHandle == -1) {
             timeoutHandle = window.setTimeout({
                 batchedCommands.forEach { it.invoke() }
                 batchedCommands.clear()
 
-                ++changeCount
                 timeoutHandle = -1
             })
         }
     }
 
     fun append(): Entry = Entry().also {
-        delayAndBatchCommand {
+        invokeLater {
             entries.add(it)
         }
     }
 
     @Composable
     fun forEach(render: @Composable (Entry) -> Unit) {
-        key(changeCount) {
-            entries.forEach { render(it) }
-        }
+        entries.forEach { render(it) }
     }
 
     inner class Entry {
         var content: (@Composable () -> Unit)? = null
         fun dismiss() {
-            delayAndBatchCommand {
+            invokeLater {
                 entries.remove(this)
             }
         }
