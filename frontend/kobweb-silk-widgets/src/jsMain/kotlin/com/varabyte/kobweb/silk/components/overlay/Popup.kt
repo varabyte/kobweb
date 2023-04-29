@@ -74,24 +74,26 @@ private sealed interface PopupState {
     object Uninitialized : PopupState
 
     sealed interface Initialized : PopupState {
-        val elements: PopupElements
+        var elements: PopupElements
     }
 
-    class FoundElements(override val elements: PopupElements) : Initialized
+    class FoundElements(override var elements: PopupElements) : Initialized
 
     sealed interface Visible : Initialized {
         val modifier: Modifier
     }
 
+    sealed interface Showing : Visible
+
     /** State for when we're about to show the popup, but we need a bit of time to calculate its width. */
-    class Calculating(override val elements: PopupElements) : Visible {
+    class Calculating(override var elements: PopupElements) : Showing {
         override val modifier = Modifier
             // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
             // causing focus to be gained and lost
             .top((-100).percent).left((-100).percent)
             .opacity(0)
     }
-    class Shown(override val elements: PopupElements, placement: PopupPlacement, bounds: DOMRect, offsetPixels: Number) : Visible {
+    class Shown(override var elements: PopupElements, placement: PopupPlacement, bounds: DOMRect, offsetPixels: Number) : Showing {
         private fun getAbsModifier(
             placement: PopupPlacement,
             popupBounds: DOMRect,
@@ -186,7 +188,7 @@ private sealed interface PopupState {
         }
 
     }
-    class Hiding(override val elements: PopupElements, modifier: Modifier) : Visible {
+    class Hiding(override var elements: PopupElements, modifier: Modifier) : Visible {
         override val modifier = modifier.opacity(0)
     }
 }
@@ -209,13 +211,23 @@ private class PopupStateController(
         window.clearTimeout(hideTimeoutId)
     }
 
-    fun initialize(elements: PopupElements) {
+    fun resetToFoundElements(elements: PopupElements) {
+        resetTimers()
         _state = PopupState.FoundElements(elements)
+    }
+
+    fun updateElements(elements: PopupElements) {
+        val state = _state
+        if (state is PopupState.Initialized) {
+            state.elements = elements
+        } else {
+            _state = PopupState.FoundElements(elements)
+        }
     }
 
     fun requestShowPopup() {
         val state = _state
-        if(state !is PopupState.Initialized) return
+        if (state !is PopupState.Initialized) return
 
         resetTimers()
         showTimeoutId = window.setTimeout({
@@ -229,6 +241,7 @@ private class PopupStateController(
     fun updatePopupElement(popupElement: HTMLElement) {
         val state = _state
         check(state is PopupState.Initialized)
+
         stayOpenStrategy.init(popupElement)
         state.elements.popupElement = popupElement
     }
@@ -236,6 +249,7 @@ private class PopupStateController(
     fun clearPopupElement() {
         val state = _state
         check(state is PopupState.Initialized)
+
         stayOpenStrategy.reset()
         state.elements.popupElement = null
     }
@@ -254,7 +268,11 @@ private class PopupStateController(
 
     fun requestHidePopup() {
         val state = _state
-        if(state !is PopupState.Visible) return
+        if (state is PopupState.FoundElements) {
+            resetTimers()
+            return
+        }
+        check(state is PopupState.Visible)
 
         resetTimers()
         hideTimeoutId = window.setTimeout({
@@ -280,7 +298,6 @@ private class PopupStateController(
 }
 
 private class PopupElements(
-    private val controller: PopupStateController,
     srcElement: HTMLElement,
     popupTarget: ElementTarget,
     placementTarget: ElementTarget?
@@ -290,9 +307,6 @@ private class PopupElements(
         return targetFinder(startingFrom = this)
     }
 
-    private val requestShowPopupListener = EventListener { controller.requestShowPopup() }
-    private val requestHidePopupListener = EventListener { controller.requestHidePopup() }
-
     val targetElement = srcElement.resolve(popupTarget) ?: error("Target element finder returned null")
     val placementElement = if (placementTarget == null) targetElement else
         (srcElement.resolve(placementTarget) ?: error("Placement element finder returned null"))
@@ -301,24 +315,6 @@ private class PopupElements(
     // if we end up back in the "Calculation" state later (this can happen when you flail your mouse cursor wildly
     // across multiple elements that have popups attached to them), we can fast-forward to the "Show" step.
     var popupElement: HTMLElement? = null
-
-init {
-    targetElement.apply {
-        addEventListener("mouseenter", requestShowPopupListener)
-        addEventListener("mouseleave", requestHidePopupListener)
-        addEventListener("focusin", requestShowPopupListener)
-        addEventListener("focusout", requestHidePopupListener)
-    }
-}
-
-fun dispose() {
-    targetElement.apply {
-        removeEventListener("mouseenter", requestShowPopupListener)
-        removeEventListener("mouseleave", requestHidePopupListener)
-        removeEventListener("focusin", requestShowPopupListener)
-        removeEventListener("focusout", requestHidePopupListener)
-    }
-}
 }
 
 /**
@@ -373,20 +369,38 @@ fun Popup(
     // Create a dummy element whose purpose is to search for the target element that we want to attach a popup to.
     Box(
         Modifier.display(DisplayStyle.None),
-        ref = disposableRef(target, placementTarget) { element ->
+        ref = disposableRef(popupStateController, target, placementTarget) { element ->
+            val requestShowPopupListener = EventListener { popupStateController.requestShowPopup() }
+            val requestHidePopupListener = EventListener { popupStateController.requestHidePopup() }
+
             var popupElements: PopupElements? = null
             try {
-                popupElements = PopupElements(popupStateController, element, target, placementTarget)
-                popupStateController.initialize(popupElements)
+                popupElements = PopupElements(element, target, placementTarget).apply {
+                    // The popupElement is created in the deferRender block and it should carry over across this
+                    // "element finder" element being recreated.
+                    popupElement = (popupStateController.state as? PopupState.Initialized)?.elements?.popupElement
+                }
+                popupElements.targetElement.apply {
+                    addEventListener("mouseenter", requestShowPopupListener)
+                    addEventListener("mouseleave", requestHidePopupListener)
+                    addEventListener("focusin", requestShowPopupListener)
+                    addEventListener("focusout", requestHidePopupListener)
+                }
+                popupStateController.updateElements(popupElements)
             } catch (_: IllegalStateException) {}
             onDispose {
-                popupElements?.dispose()
+                popupElements?.targetElement?.apply {
+                    removeEventListener("mouseenter", requestShowPopupListener)
+                    removeEventListener("mouseleave", requestHidePopupListener)
+                    removeEventListener("focusin", requestShowPopupListener)
+                    removeEventListener("focusout", requestHidePopupListener)
+                }
             }
         }
     )
 
+    // Copy into local var for smart casting.
     deferRender {
-        // Copy into local var for smart casting.
         val visiblePopupState = (popupStateController.state as? PopupState.Visible) ?: return@deferRender
         Box(
             PopupStyle.toModifier(variant)
@@ -405,7 +419,7 @@ fun Popup(
                     popupStateController.finishShowing(popupElement)
                     onDispose {
                         popupStateController.clearPopupElement()
-                        popupStateController.finishHiding(visiblePopupState.elements)
+                        popupStateController.resetToFoundElements(visiblePopupState.elements)
                     }
                 }
                 add(ref)
