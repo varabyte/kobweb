@@ -42,6 +42,28 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
     property("text-decoration-line", textDecorationLines.joinToString(" "))
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
+class TextOverflow private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val Clip get() = TextOverflow("clip")
+        val Ellipsis get() = TextOverflow("ellipsis")
+
+        // Global values
+        val Inherit get() = TextOverflow("inherit")
+        val Initial get() = TextOverflow("initial")
+        val Revert get() = TextOverflow("revert")
+        val Unset get() = TextOverflow("unset")
+    }
+}
+
+fun StyleScope.textOverflow(textOverflow: TextOverflow) {
+    property("text-overflow", textOverflow)
+}
+
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
 class TextShadow private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
