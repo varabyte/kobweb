@@ -279,13 +279,10 @@ private class PopupStateController(
             if (!stayOpenStrategy.shouldStayOpen) {
                 val currentOpacity = state.elements.popupElement?.let { window.getComputedStyle(it).getPropertyValue("opacity").toDouble() }
                 this._state = PopupState.Hiding(state.elements, state.modifier)
-                // If the popup element's opacity is ALREADY 0, then the hiding transition won't happen (see
-                // "onTransitionEnd" later in this file). In that case, just fire the "finish hiding" event directly.
-                // NOTE: If currentOpacity is null, that means the popup element was disposed, which is fine here. In
-                // that case, a different code branch will get us to the "finishHiding" state.
-                if (currentOpacity != null && currentOpacity == 0.0) {
-                    finishHiding(state.elements)
-                }
+                // Normally, the "hiding" state is marked finished once the "onTransitionEnd" event is reached (see
+                // later in this file). However, if the following condition is true, it means we're in a state that the
+                // event would never fire, so just fire the "finish hiding" event directly.
+                if (currentOpacity == null || currentOpacity == 0.0) finishHiding(state.elements)
             } // else a new hide request will be issued automatically when shouldStayOpen is false
         }, hideDelayMs)
     }
