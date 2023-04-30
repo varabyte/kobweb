@@ -192,7 +192,7 @@ fun Tooltip(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember { stayOpenStrategy ?: NeverStayOpenStrategy() }
+    @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember(stayOpenStrategy) { stayOpenStrategy ?: NeverStayOpenStrategy() }
 
     Popup(
         target,

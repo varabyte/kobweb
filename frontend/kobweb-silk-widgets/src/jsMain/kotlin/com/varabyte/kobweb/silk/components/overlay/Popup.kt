@@ -363,7 +363,7 @@ fun Popup(
         )
     }
     val popupStateController =
-        remember(placement, showDelayMs, hideDelayMs, stayOpenStrategy) {
+        remember(placement, offsetPixels, showDelayMs, hideDelayMs, stayOpenStrategy) {
             PopupStateController(
                 placement, offsetPixels,
                 showDelayMs.coerceAtLeast(0), hideDelayMs.coerceAtLeast(0),
