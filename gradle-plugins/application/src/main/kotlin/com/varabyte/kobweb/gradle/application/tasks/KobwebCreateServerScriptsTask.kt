@@ -42,7 +42,9 @@ abstract class KobwebCreateServerScriptsTask : KobwebTask("Create scripts which 
             cd /d "%~dp0"
             cd ..\..
             
-            if defined JAVA_HOME (
+            if defined KOBWEB_JAVA_HOME (
+                set "java_cmd=%KOBWEB_JAVA_HOME%\bin\java"
+            ) else if defined JAVA_HOME (
                 set "java_cmd=%JAVA_HOME%\bin\java"
             ) else (
                 set "java_cmd=java"
@@ -62,12 +64,12 @@ abstract class KobwebCreateServerScriptsTask : KobwebTask("Create scripts which 
             
                 args="$javaArgs"
                 
-                if [ -z "${'$'}JAVA_HOME" ]; then
-                    # JAVA_HOME is not set, use default java command
-                    java ${'$'}args
-                else
-                    # JAVA_HOME is set, use custom java command
+                if [ -n "${'$'}KOBWEB_JAVA_HOME" ]; then
+                    "${'$'}KOBWEB_JAVA_HOME/bin/java" ${'$'}args
+                elif [ -n "${'$'}JAVA_HOME" ]; then
                     "${'$'}JAVA_HOME/bin/java" ${'$'}args
+                else
+                    java ${'$'}args
                 fi
             """.trimIndent())
             setExecutable(true)

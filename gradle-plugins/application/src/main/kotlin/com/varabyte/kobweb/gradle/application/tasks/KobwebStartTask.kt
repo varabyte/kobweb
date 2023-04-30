@@ -56,7 +56,7 @@ abstract class KobwebStartTask @Inject constructor(
             }
         }
 
-        val javaHome = System.getProperty("java.home")!!
+        val javaHome = System.getenv("KOBWEB_JAVA_HOME") ?: System.getProperty("java.home")!!
         val processParams = arrayOf(
             "${javaHome.toUnixSeparators()}/bin/java",
             env.toSystemPropertyParam(),
