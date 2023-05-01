@@ -234,7 +234,10 @@ private class PopupStateController(
             this._state = PopupState.Calculating(state.elements)
             // Sometimes, we can end up having a show request happen before a hiding finishes. In that case, we can
             // bypass the calculation step and jump straight into showing the popup
-            state.elements.popupElement?.let { finishShowing(it) }
+            state.elements.popupElement
+                // If the popup element was disposed and recreated at some point, its size will need to be recalculated.
+                ?.takeIf { it.getBoundingClientRect().let { rect -> rect.width * rect.height } > 0 }
+                ?.let { finishShowing(it) }
         }, showDelayMs)
     }
 
