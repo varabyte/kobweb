@@ -6,6 +6,7 @@ fun StyleScope.fontFamily(value: String) {
     property("font-family", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
 class FontStyle private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
 
@@ -28,6 +29,7 @@ fun StyleScope.fontStyle(style: FontStyle) {
     property("font-style", style)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
 class FontWeight private constructor(private val value: String): CSSStyleValue {
     override fun toString() = value
 
