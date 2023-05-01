@@ -2,6 +2,8 @@ package com.varabyte.kobweb.silk.components.text
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.modifiers.whiteSpace
@@ -11,6 +13,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
+import org.w3c.dom.HTMLSpanElement
 
 // Normally, the color of the text is inherited from its parent (see SurfaceStyle), but users may still want to
 // override text styles globally in their own app, so we still register a style here even if it's empty
@@ -38,7 +41,8 @@ val SpanTextStyle by ComponentStyle(prefix = "silk-") { }
 fun SpanText(
     text: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null
+    variant: ComponentVariant? = null,
+    ref: ElementRefScope<HTMLSpanElement>? = null,
 ) {
     val finalModifier = SpanTextStyle
         .toModifier(variant)
@@ -48,6 +52,7 @@ fun SpanText(
         }
 
     Span(attrs = finalModifier.toAttrs()) {
+        registerRefScope(ref)
         Text(text)
     }
 }
