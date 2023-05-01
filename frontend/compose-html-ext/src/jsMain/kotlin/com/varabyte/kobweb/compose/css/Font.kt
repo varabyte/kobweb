@@ -64,3 +64,33 @@ class FontWeight private constructor(private val value: String): CSSStyleValue {
 fun StyleScope.fontWeight(weight: FontWeight) {
     property("font-weight", weight)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font-size
+class FontSize private constructor(private val value: String): CSSStyleValue {
+    override fun toString() = value
+
+    companion object {
+        // Absolute keywords
+        val XXSmall get() = FontSize("xx-small")
+        val XSmall get() = FontSize("x-small")
+        val Small get() = FontSize("small")
+        val Medium get() = FontSize("medium")
+        val Large get() = FontSize("large")
+        val XLarge get() = FontSize("x-large")
+        val XXLarge get() = FontSize("xx-large")
+
+        // Relative keywords
+        val Smaller get() = FontSize("smaller")
+        val Larger get() = FontSize("larger")
+
+        // Global
+        val Inherit get() = FontSize("inherit")
+        val Initial get() = FontSize("initial")
+        val Revert get() = FontSize("revert")
+        val Unset get() = FontSize("unset")
+    }
+}
+
+fun StyleScope.fontSize(size: FontSize) {
+    property("font-size", size)
+}
