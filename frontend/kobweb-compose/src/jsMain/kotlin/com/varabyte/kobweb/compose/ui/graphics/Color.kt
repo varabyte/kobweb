@@ -178,9 +178,9 @@ sealed interface Color : CSSColorValue {
             val saturationPercent = (saturation * 1000).roundToInt() / 10f
             val lightnessPercent = (lightness * 1000).roundToInt() / 10f
             return if (alpha == 1.0f)
-                "hsl($hueRounded°, $saturationPercent%, $lightnessPercent%)"
+                "hsl($hueRounded, $saturationPercent%, $lightnessPercent%)"
             else
-                "hsla($hueRounded°, $saturationPercent%, $lightnessPercent%, $alpha)"
+                "hsla($hueRounded, $saturationPercent%, $lightnessPercent%, $alpha)"
         }
 
         override fun equals(other: Any?): Boolean {
