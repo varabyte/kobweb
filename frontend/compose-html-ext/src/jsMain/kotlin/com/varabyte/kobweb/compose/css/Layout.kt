@@ -242,7 +242,7 @@ fun StyleScope.aspectRatio(ratio: Number) {
     property("aspect-ratio", ratio)
 }
 
-fun StyleScope.aspectRatio(width: Number, height: Height) {
+fun StyleScope.aspectRatio(width: Number, height: Number) {
     property("aspect-ratio", "$width / $height")
 }
 

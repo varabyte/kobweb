@@ -13,7 +13,7 @@ fun Modifier.aspectRatio(ratio: Number) = styleModifier {
     aspectRatio(ratio)
 }
 
-fun Modifier.aspectRatio(width: Number, height: Height) = styleModifier {
+fun Modifier.aspectRatio(width: Number, height: Number) = styleModifier {
     aspectRatio(width, height)
 }
 
