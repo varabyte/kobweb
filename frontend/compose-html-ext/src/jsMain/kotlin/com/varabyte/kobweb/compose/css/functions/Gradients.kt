@@ -225,3 +225,56 @@ fun radialGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition
 }
 
 // endregion
+
+// region conic gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/conic-gradient
+
+sealed class ConicGradient(private val gradientStr: String) : Gradient {
+    override fun toString() = "conic-gradient($gradientStr)"
+
+    internal class Default internal constructor(position: CSSPosition?, vararg entries: Gradient.ColorStopsBuilder.Entry) :
+        ConicGradient(buildString {
+            if (position != null) {
+                append("at $position")
+            }
+            if (this.isNotEmpty()) {
+                append(", ")
+            }
+            append(entries.joinToString())
+        })
+
+    internal class ByAngle internal constructor(angle: CSSAngleValue, position: CSSPosition?, vararg entries: Gradient.ColorStopsBuilder.Entry) :
+        ConicGradient(buildString {
+            append("from $angle")
+            if (position != null) {
+                append(" at $position")
+            }
+            append(", ")
+            append(entries.joinToString())
+        })
+}
+
+fun conicGradient(angle: CSSAngleValue, position: CSSPosition? = null, init: Gradient.ColorStopsBuilder.() -> Unit): ConicGradient {
+    return Gradient.ColorStopsBuilder().apply(init).let {
+        ConicGradient.ByAngle(angle, position, *it.verifiedEntries())
+    }
+}
+
+fun conicGradient(position: CSSPosition? = null, init: Gradient.ColorStopsBuilder.() -> Unit): ConicGradient {
+    return Gradient.ColorStopsBuilder().apply(init).let {
+        ConicGradient.Default(position, *it.verifiedEntries())
+    }
+}
+
+// Using the builder is flexible, but provide some useful defaults for common cases
+
+fun conicGradient(angle: CSSAngleValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = conicGradient(angle, position) {
+    add(from)
+    add(to)
+}
+
+fun conicGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = conicGradient(position) {
+    add(from)
+    add(to)
+}
+
+// endregion
