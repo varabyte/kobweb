@@ -279,3 +279,11 @@ fun StyleScope.resize(resize: Resize) {
 }
 
 // endregion
+
+// region z-index See: https://developer.mozilla.org/en-US/docs/Web/CSS/z-index
+
+fun StyleScope.zIndex(value: Number) {
+    property("z-index", value)
+}
+
+// endregion

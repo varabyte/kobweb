@@ -242,5 +242,5 @@ fun Modifier.verticalAlign(value: CSSNumeric) = styleModifier {
 }
 
 fun Modifier.zIndex(value: Number) = styleModifier {
-    property("z-index", value)
+    zIndex(value)
 }
