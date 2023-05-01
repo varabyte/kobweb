@@ -211,9 +211,11 @@ private class PopupStateController(
         window.clearTimeout(hideTimeoutId)
     }
 
-    fun resetToFoundElements(elements: PopupElements) {
+    fun resetToFoundElements() {
+        val state = _state
+        check(state is PopupState.Initialized)
         resetTimers()
-        _state = PopupState.FoundElements(elements)
+        _state = PopupState.FoundElements(state.elements)
     }
 
     fun updateElements(elements: PopupElements) {
@@ -427,7 +429,7 @@ fun Popup(
                     popupStateController.finishShowing(popupElement)
                     onDispose {
                         popupStateController.clearPopupElement()
-                        popupStateController.resetToFoundElements(visiblePopupState.elements)
+                        popupStateController.resetToFoundElements()
                     }
                 }
                 add(ref)
