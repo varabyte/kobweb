@@ -10,6 +10,9 @@ class CSSColor private constructor(private val value: String): StylePropertyValu
     override fun toString() = value
 
     companion object {
+        // Keywords
+        val CurrentColor get() = CSSColor("currentColor")
+
         // Global values
         val Inherit get() = Color("inherit")
         val Initial get() = Color("initial")
