@@ -15,6 +15,8 @@ class Visibility private constructor(private val value: String): StylePropertyVa
         // Global
         val Inherit get() = Visibility("inherit")
         val Initial get() = Visibility("initial")
+        val Revert get() = Visibility("revert")
+        val Unset get() = Visibility("unset")
     }
 }
 
