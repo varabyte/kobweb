@@ -252,6 +252,29 @@ fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
 
 // endregion
 
+// region line height See: https://developer.mozilla.org/en-US/docs/Web/CSS/line-height
+
+class LineHeight(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val Normal get() = LineHeight("normal")
+
+        // Global values
+        val Inherit get() = LineHeight("inherit")
+        val Initial get() = LineHeight("initial")
+        val Revert get() = LineHeight("revert")
+        val Unset get() = LineHeight("unset")
+    }
+}
+
+fun StyleScope.lineHeight(lineHeight: LineHeight) {
+    property("line-height", lineHeight)
+}
+
+// endregion
+
 // region resize See: https://developer.mozilla.org/en-US/docs/Web/CSS/resize
 
 class Resize private constructor(private val value: String): StylePropertyValue {

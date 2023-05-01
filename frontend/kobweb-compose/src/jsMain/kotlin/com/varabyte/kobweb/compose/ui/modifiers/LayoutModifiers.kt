@@ -29,6 +29,10 @@ fun Modifier.lineHeight(value: Number): Modifier = styleModifier {
     lineHeight(value.toString())
 }
 
+fun Modifier.lineHeight(lineHeight: LineHeight): Modifier = styleModifier {
+    lineHeight(lineHeight)
+}
+
 fun Modifier.fillMaxWidth(percent: CSSPercentageValue = 100.percent) = styleModifier {
     width(percent)
 }
