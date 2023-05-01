@@ -46,6 +46,10 @@ fun Modifier.tabIndex(value: Int) = attrsModifier {
     tabIndex(value)
 }
 
+fun Modifier.touchAction(touchAction: TouchAction) = styleModifier {
+    touchAction(touchAction)
+}
+
 // region mouse events
 
 fun Modifier.onClick(listener: (SyntheticMouseEvent) -> Unit): Modifier = attrsModifier {
