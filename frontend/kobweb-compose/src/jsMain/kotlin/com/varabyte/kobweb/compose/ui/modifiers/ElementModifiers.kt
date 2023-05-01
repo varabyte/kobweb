@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
+import com.varabyte.kobweb.compose.css.Content
 import com.varabyte.kobweb.compose.css.content
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
@@ -7,6 +8,18 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 
 fun Modifier.classNames(vararg classes: String) = attrsModifier {
     classes(*classes)
+}
+
+fun Modifier.content(content: Content.Restricted) = styleModifier {
+    content(content)
+}
+
+fun Modifier.content(vararg contents: Content.Unrestricted) = styleModifier {
+    content(*contents)
+}
+
+fun Modifier.content(altText: String, vararg contents: Content.Unrestricted) = styleModifier {
+    content(altText, *contents)
 }
 
 fun Modifier.content(value: String) = styleModifier {
