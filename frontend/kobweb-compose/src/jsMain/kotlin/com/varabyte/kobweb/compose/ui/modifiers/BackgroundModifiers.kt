@@ -78,6 +78,10 @@ fun Modifier.backgroundColor(color: CSSColorValue) = styleModifier {
     backgroundColor(color)
 }
 
+fun Modifier.backgroundColor(backgroundColor: BackgroundColor) = styleModifier {
+    backgroundColor(backgroundColor)
+}
+
 fun Modifier.backgroundImage(backgroundImage: BackgroundImage) = styleModifier {
     backgroundImage(backgroundImage)
 }

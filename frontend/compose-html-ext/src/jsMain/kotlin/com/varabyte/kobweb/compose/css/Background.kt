@@ -55,6 +55,27 @@ fun StyleScope.backgroundClip(backgroundClip: BackgroundClip) {
     backgroundClip(backgroundClip.toString())
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-color
+class BackgroundColor private constructor(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val CurrentColor get() = BackgroundColor("currentcolor")
+        val Transparent get() = BackgroundColor("transparent")
+
+        // Global values
+        val Inherit get() = BackgroundColor("inherit")
+        val Initial get() = BackgroundColor("initial")
+        val Revert get() = BackgroundColor("revert")
+        val Unset get() = BackgroundColor("unset")
+    }
+}
+
+fun StyleScope.backgroundColor(backgroundColor: BackgroundColor) {
+    property("background-color", backgroundColor)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
 sealed class BackgroundImage private constructor(private val value: String): StylePropertyValue {
     override fun toString() = value
