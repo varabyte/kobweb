@@ -9,6 +9,18 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
+fun Modifier.aspectRatio(ratio: Number) = styleModifier {
+    aspectRatio(ratio)
+}
+
+fun Modifier.aspectRatio(width: Number, height: Height) = styleModifier {
+    aspectRatio(width, height)
+}
+
+fun Modifier.aspectRatio(ratio: AspectRatio): Modifier = styleModifier {
+    aspectRatio(ratio)
+}
+
 fun Modifier.lineHeight(value: CSSNumeric): Modifier = styleModifier {
     lineHeight(value)
 }

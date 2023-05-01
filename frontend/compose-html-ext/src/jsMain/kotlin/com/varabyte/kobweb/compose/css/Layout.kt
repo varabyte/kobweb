@@ -221,6 +221,37 @@ fun StyleScope.verticalAlign(value: CSSNumeric) {
 
 // endregion
 
+// region aspect ratio See: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
+
+class AspectRatio(private val value: String): StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val Auto get() = AspectRatio("auto")
+
+        // Global values
+        val Inherit get() = AspectRatio("inherit")
+        val Initial get() = AspectRatio("initial")
+        val Revert get() = AspectRatio("revert")
+        val Unset get() = AspectRatio("unset")
+    }
+}
+
+fun StyleScope.aspectRatio(ratio: Number) {
+    property("aspect-ratio", ratio)
+}
+
+fun StyleScope.aspectRatio(width: Number, height: Height) {
+    property("aspect-ratio", "$width / $height")
+}
+
+fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
+    property("aspect-ratio", aspectRatio)
+}
+
+// endregion
+
 // region resize See: https://developer.mozilla.org/en-US/docs/Web/CSS/resize
 
 class Resize private constructor(private val value: String): StylePropertyValue {
