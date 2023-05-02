@@ -51,8 +51,12 @@ abstract class StayOpenStrategy(private val defaultValue: Boolean = false) {
      * This will be called whenever the popup is closed.
      */
     fun reset() {
+        onResetting()
         emitShouldStayOpen(defaultValue)
     }
+
+    /** Method triggered right before a [reset] happens, provided in case implementors need to prepare for it. */
+    protected open fun onResetting() = Unit
 }
 
 /** A readable convenience property that queries the underlying state flow. */
@@ -127,5 +131,9 @@ class CompositeStayOpenStrategy(private vararg val strategies: StayOpenStrategy)
 
     override fun init(popupElement: HTMLElement) {
         strategies.forEach { it.init(popupElement) }
+    }
+
+    override fun onResetting() {
+        strategies.forEach { it.reset() }
     }
 }
