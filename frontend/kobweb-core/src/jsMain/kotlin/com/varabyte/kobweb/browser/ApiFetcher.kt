@@ -51,10 +51,21 @@ class ApiFetcher {
         return try {
             fetch(method, apiPath, autoPrefix, body)
         } catch (t: Throwable) {
-            console.log("Error fetching API endpoint \"$apiPath\"\n\n$t")
+            if (logOnError) {
+                console.log("Error fetching API endpoint \"$apiPath\"\n\n$t")
+            }
             null
         }
     }
+
+    /**
+     * If true, when using any of the "try" methods, log any errors, if they occur, to the console.
+     *
+     * This is a useful way to debug what happened because otherwise the exception will be silently swallowed.
+     *
+     * This value will be set to true if you are running on a debug build, but it will default to false otherwise.
+     */
+    var logOnError: Boolean = false
 
     /**
      * Call DELETE on a target API path.
@@ -70,7 +81,10 @@ class ApiFetcher {
     suspend fun delete(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("DELETE", apiPath, autoPrefix)
 
     /**
-     * Like [delete], but returns null (and logs the error to the console) if the request failed for any reason.
+     * Like [delete], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryDelete(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("DELETE", apiPath, autoPrefix)
 
@@ -88,7 +102,10 @@ class ApiFetcher {
     suspend fun get(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("GET", apiPath, autoPrefix)
 
     /**
-     * Like [get], but returns null (and logs the error to the console) if the request failed for any reason.
+     * Like [get], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryGet(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("GET", apiPath, autoPrefix)
 
@@ -106,7 +123,10 @@ class ApiFetcher {
     suspend fun head(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("HEAD", apiPath, autoPrefix)
 
     /**
-     * Like [head], but returns null (and logs the error to the console) if the request failed for any reason.
+     * Like [head], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryHead(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("HEAD", apiPath, autoPrefix)
 
@@ -124,7 +144,10 @@ class ApiFetcher {
     suspend fun options(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("OPTIONS", apiPath, autoPrefix)
 
     /**
-     * Like [options], but returns null (and logs the error to the console) if the request failed for any reason.
+     * Like [options], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryOptions(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("OPTIONS", apiPath, autoPrefix)
 
@@ -142,7 +165,10 @@ class ApiFetcher {
     suspend fun patch(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray = fetch("PATCH", apiPath, autoPrefix, body)
 
     /**
-     * Like [patch], but returns null (and logs the error to the console) if the request failed for any reason.
+     * Like [patch], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryPatch(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray? = tryFetch("PATCH", apiPath, autoPrefix, body)
 
@@ -160,7 +186,10 @@ class ApiFetcher {
     suspend fun post(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray = fetch("POST", apiPath, autoPrefix, body)
 
     /**
-     * Like [post], but returns null (and logs the error to the console) if the request failed for any reason.
+     * Like [post], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryPost(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray? = tryFetch("POST", apiPath, autoPrefix, body)
 
@@ -178,7 +207,10 @@ class ApiFetcher {
     suspend fun put(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray = fetch("PUT", apiPath, autoPrefix, body)
 
     /**
-     * Like [put], but returns null (and logs the error to the console) if the request failed for any reason.
+     * Like [put], but returns null if the request failed for any reason.
+     *
+     * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
+     * be true for debug builds and false for release builds.
      */
     suspend fun tryPut(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray? = tryFetch("PUT", apiPath, autoPrefix, body)
 }

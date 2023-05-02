@@ -35,6 +35,7 @@ fun createMainFunction(
         "org.jetbrains.compose.web.renderComposable",
     ).apply {
         if (target == BuildTarget.DEBUG) {
+            add("com.varabyte.kobweb.browser.api")
             add("kotlinx.dom.hasClass")
             add("kotlinx.dom.removeClass")
             add("org.w3c.dom.EventSource")
@@ -135,6 +136,8 @@ fun createMainFunction(
         FunSpec.builder("main").apply {
             if (target == BuildTarget.DEBUG) {
                 addStatement("handleServerStatusEvents()")
+                addStatement("")
+                addStatement("window.api.logOnError = true")
                 addStatement("")
             }
 
