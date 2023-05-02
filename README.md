@@ -1421,13 +1421,16 @@ fun ApiDemoPage() {
 
   Button(onClick = {
     coroutineScope.launch {
-      println("Echoed: " + window.api.get("echo?message=hello")!!.decodeToString())
+      println("Echoed: " + window.api.get("echo?message=hello").decodeToString())
     }
   })
 }
 ```
 
 All the HTTP methods are supported (`post`, `put`, etc.).
+
+These methods will throw an exception if the request fails for any reason. Note that for every HTTP method, there's a
+corresponding "try" version that will return null instead (`tryPost`, `tryPut`, etc.).
 
 If you know what you're doing, you can of course always use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
 directly.
