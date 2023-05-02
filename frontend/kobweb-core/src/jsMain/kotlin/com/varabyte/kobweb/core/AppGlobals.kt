@@ -9,9 +9,11 @@ import androidx.compose.runtime.*
  *
  * ```
  * kobweb {
- *   appGlobals.putAll(
- *     "author" to "bitspittle",
- *     "version" to "v1234.5678"
+ *   app {
+ *     globals.putAll(
+ *       "author" to "bitspittle",
+ *       "version" to "v1234.5678"
+ *     )
  *   )
  * }
  * ```
