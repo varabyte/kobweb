@@ -2,7 +2,6 @@ package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.navigation.Router
-import kotlinx.browser.window
 
 /**
  * Various contextual information useful for a page.
@@ -18,19 +17,34 @@ import kotlinx.browser.window
  *    ...
  * }
  */
-class PageContext(val router: Router) {
+// Don't put properties in constructors so their header comments have room to breathe.
+@Suppress("CanBePrimaryConstructorProperty")
+class PageContext internal constructor(val router: Router, route: String, params: Map<String, String>, fragment: String? = null) {
     companion object {
-        internal val active by lazy { mutableStateOf<PageContext?>(null) }
+        internal val active = mutableStateOf<PageContext?>(null)
     }
-
-    internal val mutableParams = mutableMapOf<String, String>()
 
     /**
      * The slug for the current page.
      *
      * In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", the slug is "slug"
      */
-    val slug: String get() = window.location.pathname.substringAfterLast('/')
+    val slug: String = route.substringAfterLast('/')
+
+    /**
+     * The current route.
+     *
+     * This property is equivalent to `window.location.pathname` but provided here as a convenience property.
+     *
+     * It makes for a very useful key to use in, say, a `LaunchedEffect`, if you want to trigger some logic that should
+     * be fired when the current page changes but not if query parameters or the hash fragments change:
+     *
+     * ```
+     * val ctx = rememberPageContext()
+     * LaunchedEffect(ctx.route) { ... }
+     * ```
+     */
+    val route: String = route
 
     /**
      * Params extracted either from the URL's query parameters OR from a dynamic route
@@ -51,15 +65,36 @@ class PageContext(val router: Router) {
      *
      * will generate a mapping of "user" to 123 and "post" to 11
      */
-    val params: Map<String, String> = mutableParams
+    val params: Map<String, String> = params
 
     /**
      * The post-hash fragment of a URL, if specified.
      *
      * For example, `/a/b/c/#fragment-id` will be the value `fragment-id`
      */
-    var fragment: String? = null
-        internal set
+    val fragment: String? = fragment
+
+    override fun equals(other: Any?): Boolean {
+        return (other is PageContext
+                && other.router === router
+                // Note: No need to check slug, it's a subset of route
+                && other.route == route
+                && other.params == params
+                && other.fragment == fragment
+                )
+    }
+
+    override fun hashCode(): Int {
+        var result = router.hashCode()
+        result = 31 * result + route.hashCode()
+        result = 31 * result + params.hashCode()
+        result = 31 * result + fragment.hashCode()
+        return result
+    }
+
+    fun copy(route: String = this.route, params: Map<String, String> = this.params, fragment: String? = this.fragment): PageContext {
+        return PageContext(router, route, params, fragment)
+    }
 }
 
 /**
@@ -76,4 +111,4 @@ val PageContext.isExporting: Boolean get() = params.containsKey("_kobwebIsExport
  * This will throw an exception if not called within the scope of a `@Page` annotated composable.
  */
 @Composable
-fun rememberPageContext(): PageContext = remember { PageContext.active.value ?: error("`rememberPageContext` called outside of the scope of a `@Page` annotated method.") }
+fun rememberPageContext() = remember { derivedStateOf { PageContext.active.value ?: error("`rememberPageContext` called outside of the scope of a `@Page` annotated method.") } }.value

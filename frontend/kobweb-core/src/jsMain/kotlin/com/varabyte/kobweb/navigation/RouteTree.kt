@@ -129,30 +129,19 @@ internal class RouteTree {
         return true
     }
 
-    /**
-     * Create [PageData] from incoming parts of a URL.
-     *
-     * @param route "/a/b/c" from "/a/b/c?x=1&y=2#fragment"
-     * @param query "x=1&y=2" from "/a/b/c?x=1&y=2#fragment"
-     * @param fragment "fragment" from "/a/b/c?x=1&y=2#fragment"
-     */
     internal fun createPageData(router: Router, route: Route): PageData {
         val resolvedEntries = resolve(route.path)
         val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
 
-        val ctx = PageContext(router).apply {
-            this.fragment = route.fragment
-        }
-
+        val params = mutableMapOf<String, String>()
         resolvedEntries?.forEach { resolvedEntry ->
             if (resolvedEntry.node is DynamicNode) {
-                ctx.mutableParams[resolvedEntry.node.name] = resolvedEntry.routePart
+                params[resolvedEntry.node.name] = resolvedEntry.routePart
             }
         }
+        params.putAll(route.queryParams)
 
-        ctx.mutableParams.putAll(route.queryParams)
-
-        return PageData(pageMethod, ctx)
+        return PageData(pageMethod, PageContext(router, route.path, params, route.fragment))
     }
 
     /**

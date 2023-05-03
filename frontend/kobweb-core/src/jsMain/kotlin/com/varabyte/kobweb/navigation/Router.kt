@@ -72,7 +72,14 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
  * The class responsible for navigating to different pages in a user's app.
 */
 class Router {
-    private val activePageData = mutableStateOf<PageData?>(null)
+    private val _activePageData = mutableStateOf<PageData?>(null)
+    private var activePageData: PageData?
+        get() = _activePageData.value
+        set(value) {
+            _activePageData.value = value
+            PageContext.active.value = value?.pageContext
+        }
+
     private val routeTree = RouteTree()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
 
@@ -92,13 +99,21 @@ class Router {
         // Special case - sometimes the value passed in here is simply a fragment, which means the browser
         // should scroll to an element on the same page
         if (pathQueryAndFragment.startsWith("#")) {
-            activePageData.value?.pageContext?.fragment = pathQueryAndFragment.removePrefix("#")
-            return activePageData.value != null
+            activePageData?.let { pageData ->
+                activePageData = PageData(
+                    pageData.pageMethod,
+                    pageData.pageContext.copy(fragment = pathQueryAndFragment.removePrefix("#"))
+                )
+
+                return true
+            } ?: run {
+                return false
+            }
         }
 
         val route = Route.tryCreate(pathQueryAndFragment)
         return if (route != null) {
-            activePageData.value = routeTree.createPageData(this, route)
+            activePageData = routeTree.createPageData(this, route)
             true
         }
         else {
@@ -109,10 +124,9 @@ class Router {
     @Suppress("unused") // Called by generated code
     @Composable
     fun renderActivePage() {
-        val data = activePageData.value
+        val data = activePageData
             ?: error("Call 'navigateTo' at least once before calling 'renderActivePage'")
 
-        PageContext.active.value = data.pageContext
         data.pageMethod.invoke()
     }
 
