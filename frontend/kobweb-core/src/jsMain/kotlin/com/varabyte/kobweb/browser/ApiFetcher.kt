@@ -5,12 +5,38 @@ import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.prependIf
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
 import org.w3c.dom.Window
 import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
+/**
+ * A class which can be used to abort an API request after it was made.
+ *
+ * All [ApiFetcher] HTTP methods accept one. You can use it like so:
+ *
+ * ```
+ * val abortController: AbortController? by remember { mutableStateOf(null) }
+ * LaunchedEffect(Unit) {
+ *   abortController = AbortController()
+ *   val result = window.api.get("/some/api/path", abortController = abortController)
+ *   abortController = null
+ * }
+ *
+ * Button(onClick = { abortController?.abort() }) {
+ *   Text("Abort")
+ * }
+ * ```
+ *
+ * Note that if you re-use the same abort controller across multiple requests, one abort call will abort them all. And
+ * if you pass an already aborted controller into a new request, it will fail immediately.
+ */
 class AbortController {
     private val controller = js("new AbortController()")
 
@@ -25,6 +51,36 @@ class AbortController {
  * A class which makes it easier to access a Kobweb API endpoint, instead of using [Window.fetch] directly.
  */
 class ApiFetcher {
+    /**
+     * Returns the current body of the target [Response].
+     *
+     * Note that the returned bytes could be an empty array, which could mean the body wasn't set OR that it was set to
+     * the empty string.
+     */
+    private suspend fun Response.getBodyBytes(): ByteArray {
+        return suspendCoroutine { cont ->
+            this.arrayBuffer().then { responseBuffer ->
+                val int8Array = Int8Array(responseBuffer)
+                cont.resume(ByteArray(int8Array.length) { i -> int8Array[i] })
+            }.catch {
+                cont.resume(ByteArray(0))
+            }
+        }
+    }
+
+    private fun Response.getBodyBytesAsync(result: (ByteArray) -> Unit) {
+        CoroutineScope(window.asCoroutineDispatcher()).launch {
+            result(getBodyBytes())
+        }
+    }
+
+    /**
+     * An exception that gets thrown if we receive a response whose code is not in the 200 (OK) range.
+     *
+     * @property bodyBytes The raw bytes of the response body, if any. They are passed in directly instead of queried
+     *   from the [Response] object because that needs to happen asynchronously, and we need to create the exception
+     *   message immediately.
+     */
     class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exception(
         buildString {
             append("URL = ${response.url}, Status = ${response.status}, Status Text = ${response.statusText}")
@@ -66,22 +122,14 @@ class ApiFetcher {
         window.fetch(RoutePrefix.prependIf(autoPrefix, "/api/$apiPath"), requestInit).then(
             onFulfilled = { res ->
                 if (res.ok) {
-                    res.arrayBuffer().then { responseBuffer ->
-                        val int8Array = Int8Array(responseBuffer)
-                        responseBytesDeferred.complete(ByteArray(int8Array.length) { i -> int8Array[i] })
-                    }
+                    res.getBodyBytesAsync { bodyBytes -> responseBytesDeferred.complete(bodyBytes) }
                 } else {
-                    res.arrayBuffer().then { responseBuffer ->
-                        val int8Array = Int8Array(responseBuffer)
-                        responseBytesDeferred.completeExceptionally(
-                            ResponseException(res, ByteArray(int8Array.length) { i -> int8Array[i] })
-                        )
+                    res.getBodyBytesAsync { bodyBytes ->
+                        responseBytesDeferred.completeExceptionally(ResponseException(res, bodyBytes))
                     }
                 }
             },
-            onRejected = {
-                responseBytesDeferred.completeExceptionally(it)
-            })
+            onRejected = { t -> responseBytesDeferred.completeExceptionally(t) })
 
         return responseBytesDeferred.await()
     }
