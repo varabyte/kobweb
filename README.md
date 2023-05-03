@@ -1429,7 +1429,8 @@ fun ApiDemoPage() {
 
 All the HTTP methods are supported (`post`, `put`, etc.).
 
-If you know what you're doing, you can also use `window.fetch(...)` directly.
+If you know what you're doing, you can of course always use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
+directly.
 
 ### Markdown
 
