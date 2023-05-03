@@ -9,15 +9,44 @@ import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
 import org.w3c.dom.Window
 import org.w3c.fetch.RequestInit
+import org.w3c.fetch.Response
+
+class AbortController {
+    private val controller = js("new AbortController()")
+
+    internal val signal = controller.signal
+
+    fun abort() {
+        controller.abort()
+    }
+}
 
 /**
  * A class which makes it easier to access a Kobweb API endpoint, instead of using [Window.fetch] directly.
  */
 class ApiFetcher {
-    private class UnknownException : Exception()
+    class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exception(
+        buildString {
+            append("URL = ${response.url}, Status = ${response.status}, Status Text = ${response.statusText}")
+
+            val bodyString = bodyBytes?.decodeToString()?.trim()?.takeIf { it.isNotBlank() }
+            if (bodyString != null) {
+                appendLine()
+                val lines = bodyString.split("\n")
+                val longestLineLength = lines.maxOfOrNull { it.length } ?: 0
+                val indent = "  "
+                val boundary = indent + "-".repeat(longestLineLength)
+                appendLine(boundary)
+                lines.forEach { line ->
+                    appendLine(indent + line)
+                }
+                appendLine(boundary)
+            }
+        }
+    )
 
     @NoLiveLiterals // <-- We seemed to have confused the Compose compiler. Used this to make a warning go away.
-    private suspend fun fetch(method: String, apiPath: String, autoPrefix: Boolean, body: ByteArray? = null): ByteArray {
+    private suspend fun fetch(method: String, apiPath: String, autoPrefix: Boolean, body: ByteArray? = null, abortController: AbortController? = null): ByteArray {
         val responseBytesDeferred = CompletableDeferred<ByteArray>()
         val requestInit = RequestInit(
             method = method,
@@ -28,6 +57,11 @@ class ApiFetcher {
             } else undefined,
             body = body ?: undefined,
         )
+        if (abortController != null) {
+            // Hack: Workaround since Compose HTML's `RequestInit` doesn't have a `signal` property
+            val requestInitDynamic: dynamic = requestInit
+            requestInitDynamic["signal"] = abortController.signal
+        }
 
         window.fetch(RoutePrefix.prependIf(autoPrefix, "/api/$apiPath"), requestInit).then(
             onFulfilled = { res ->
@@ -37,9 +71,12 @@ class ApiFetcher {
                         responseBytesDeferred.complete(ByteArray(int8Array.length) { i -> int8Array[i] })
                     }
                 } else {
-                    var msg: String? = null
-                    res.text().then { msg = it.takeUnless { it.isNotBlank() } }
-                    responseBytesDeferred.completeExceptionally(if (msg != null) Exception(msg) else UnknownException())
+                    res.arrayBuffer().then { responseBuffer ->
+                        val int8Array = Int8Array(responseBuffer)
+                        responseBytesDeferred.completeExceptionally(
+                            ResponseException(res, ByteArray(int8Array.length) { i -> int8Array[i] })
+                        )
+                    }
                 }
             },
             onRejected = {
@@ -49,17 +86,12 @@ class ApiFetcher {
         return responseBytesDeferred.await()
     }
 
-    private suspend fun tryFetch(method: String, apiPath: String, autoPrefix: Boolean, body: ByteArray? = null): ByteArray? {
+    private suspend fun tryFetch(method: String, apiPath: String, autoPrefix: Boolean, body: ByteArray? = null, abortController: AbortController? = null): ByteArray? {
         return try {
-            fetch(method, apiPath, autoPrefix, body)
+            fetch(method, apiPath, autoPrefix, body, abortController)
         } catch (t: Throwable) {
             if (logOnError) {
-                console.log(buildString {
-                    append("Error fetching API endpoint \"$apiPath\"")
-                    if (t !is UnknownException) {
-                        append("\n\n$t")
-                    }
-                })
+                console.log("Error fetching API endpoint \"$apiPath\"\n\n$t")
             }
             null
         }
@@ -85,7 +117,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun delete(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("DELETE", apiPath, autoPrefix)
+    suspend fun delete(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = fetch("DELETE", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Like [delete], but returns null if the request failed for any reason.
@@ -93,7 +125,7 @@ class ApiFetcher {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryDelete(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("DELETE", apiPath, autoPrefix)
+    suspend fun tryDelete(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = tryFetch("DELETE", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Call GET on a target API path.
@@ -106,7 +138,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun get(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("GET", apiPath, autoPrefix)
+    suspend fun get(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = fetch("GET", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Like [get], but returns null if the request failed for any reason.
@@ -114,7 +146,7 @@ class ApiFetcher {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryGet(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("GET", apiPath, autoPrefix)
+    suspend fun tryGet(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = tryFetch("GET", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Call HEAD on a target API path.
@@ -127,7 +159,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun head(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("HEAD", apiPath, autoPrefix)
+    suspend fun head(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = fetch("HEAD", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Like [head], but returns null if the request failed for any reason.
@@ -135,7 +167,7 @@ class ApiFetcher {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryHead(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("HEAD", apiPath, autoPrefix)
+    suspend fun tryHead(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = tryFetch("HEAD", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Call OPTIONS on a target API path.
@@ -148,7 +180,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun options(apiPath: String, autoPrefix: Boolean = true): ByteArray = fetch("OPTIONS", apiPath, autoPrefix)
+    suspend fun options(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = fetch("OPTIONS", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Like [options], but returns null if the request failed for any reason.
@@ -156,7 +188,7 @@ class ApiFetcher {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryOptions(apiPath: String, autoPrefix: Boolean = true): ByteArray? = tryFetch("OPTIONS", apiPath, autoPrefix)
+    suspend fun tryOptions(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = tryFetch("OPTIONS", apiPath, autoPrefix, abortController = abortController)
 
     /**
      * Call PATCH on a target API path.
@@ -169,7 +201,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun patch(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray = fetch("PATCH", apiPath, autoPrefix, body)
+    suspend fun patch(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = fetch("PATCH", apiPath, autoPrefix, body, abortController)
 
     /**
      * Like [patch], but returns null if the request failed for any reason.
@@ -177,7 +209,7 @@ class ApiFetcher {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryPatch(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray? = tryFetch("PATCH", apiPath, autoPrefix, body)
+    suspend fun tryPatch(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = tryFetch("PATCH", apiPath, autoPrefix, body, abortController)
 
     /**
      * Call POST on a target API path.
@@ -190,7 +222,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun post(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray = fetch("POST", apiPath, autoPrefix, body)
+    suspend fun post(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = fetch("POST", apiPath, autoPrefix, body, abortController)
 
     /**
      * Like [post], but returns null if the request failed for any reason.
@@ -198,7 +230,7 @@ class ApiFetcher {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryPost(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray? = tryFetch("POST", apiPath, autoPrefix, body)
+    suspend fun tryPost(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = tryFetch("POST", apiPath, autoPrefix, body, abortController)
 
     /**
      * Call PUT on a target API path.
@@ -211,7 +243,7 @@ class ApiFetcher {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun put(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray = fetch("PUT", apiPath, autoPrefix, body)
+    suspend fun put(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = fetch("PUT", apiPath, autoPrefix, body, abortController)
 
     /**
      * Like [put], but returns null if the request failed for any reason.
@@ -219,7 +251,7 @@ class ApiFetcher {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryPut(apiPath: String, autoPrefix: Boolean = true, body: ByteArray? = null): ByteArray? = tryFetch("PUT", apiPath, autoPrefix, body)
+    suspend fun tryPut(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = tryFetch("PUT", apiPath, autoPrefix, body, abortController)
 }
 
 private val apiFetcherInstance = ApiFetcher()
