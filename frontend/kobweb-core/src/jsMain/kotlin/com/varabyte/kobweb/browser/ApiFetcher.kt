@@ -14,6 +14,8 @@ import org.w3c.fetch.RequestInit
  * A class which makes it easier to access a Kobweb API endpoint, instead of using [Window.fetch] directly.
  */
 class ApiFetcher {
+    private class UnknownException : Exception()
+
     @NoLiveLiterals // <-- We seemed to have confused the Compose compiler. Used this to make a warning go away.
     private suspend fun fetch(method: String, apiPath: String, autoPrefix: Boolean, body: ByteArray? = null): ByteArray {
         val responseBytesDeferred = CompletableDeferred<ByteArray>()
@@ -37,7 +39,7 @@ class ApiFetcher {
                 } else {
                     var msg: String? = null
                     res.text().then { msg = it.takeUnless { it.isNotBlank() } }
-                    responseBytesDeferred.completeExceptionally(Exception(msg ?: "Unknown error"))
+                    responseBytesDeferred.completeExceptionally(if (msg != null) Exception(msg) else UnknownException())
                 }
             },
             onRejected = {
@@ -52,7 +54,12 @@ class ApiFetcher {
             fetch(method, apiPath, autoPrefix, body)
         } catch (t: Throwable) {
             if (logOnError) {
-                console.log("Error fetching API endpoint \"$apiPath\"\n\n$t")
+                console.log(buildString {
+                    append("Error fetching API endpoint \"$apiPath\"")
+                    if (t !is UnknownException) {
+                        append("\n\n$t")
+                    }
+                })
             }
             null
         }
