@@ -9,8 +9,8 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun PostPage() {
     val ctx = rememberPageContext()
-    val userId = ctx.params.getValue("user").toIntOrNull()
-    val postId = ctx.params.getValue("post").toIntOrNull()
+    val userId = ctx.route.params.getValue("user").toIntOrNull()
+    val postId = ctx.route.params.getValue("post").toIntOrNull()
 
     if (userId != null && postId != null) {
         Text("Imagine that this page was rendering content for user $userId and post $postId...")
