@@ -131,4 +131,6 @@ val PageContext.isExporting: Boolean get() = route.params.containsKey("_kobwebIs
  * This will throw an exception if not called within the scope of a `@Page` annotated composable.
  */
 @Composable
+// Note: Technically we don't need to remember a global instance, but we leave the remember here to express our intent.
+// Also, this implementation may change in the future, but a remember should always be in here somewhere.
 fun rememberPageContext() = remember { PageContext.instance }
