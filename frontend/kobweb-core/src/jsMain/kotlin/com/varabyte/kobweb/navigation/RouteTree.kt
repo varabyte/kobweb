@@ -27,7 +27,7 @@ private fun ErrorPage(errorCode: Int) {
 
 internal class PageData(
     val pageMethod: PageMethod,
-    val pageContext: PageContext,
+    val routeInfo: PageContext.RouteInfo,
 )
 
 /**
@@ -129,7 +129,7 @@ internal class RouteTree {
         return true
     }
 
-    internal fun createPageData(router: Router, route: Route): PageData {
+    internal fun createPageData(route: Route): PageData {
         val resolvedEntries = resolve(route.path)
         val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
 
@@ -139,7 +139,7 @@ internal class RouteTree {
                 dynamicParams[resolvedEntry.node.name] = resolvedEntry.routePart
             }
         }
-        return PageData(pageMethod, PageContext(router, PageContext.RouteInfo(route, dynamicParams)))
+        return PageData(pageMethod, PageContext.RouteInfo(route, dynamicParams))
     }
 
     /**

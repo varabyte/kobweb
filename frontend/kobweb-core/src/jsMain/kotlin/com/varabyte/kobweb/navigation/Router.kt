@@ -72,20 +72,14 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
  * The class responsible for navigating to different pages in a user's app.
 */
 class Router {
-    private val _activePageData = mutableStateOf<PageData?>(null)
-    private var activePageData: PageData?
-        get() = _activePageData.value
-        set(value) {
-            _activePageData.value = value
-            PageContext.active.value = value?.pageContext
-        }
-
+    private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
 
     init {
+        PageContext.init(this)
         window.onpopstate = {
-            updateActiveRoute(document.location!!.pathname)
+            PageContext.instance.updatePageContext(document.location!!.pathname)
         }
     }
 
@@ -95,13 +89,12 @@ class Router {
      * Returns true if we were able to navigate to a route that's internal to this site; false otherwise, e.g. if the
      * path targets some external website.
      */
-    private fun updateActiveRoute(pathQueryAndFragment: String): Boolean {
+    private fun PageContext.updatePageContext(pathQueryAndFragment: String): Boolean {
         // Special case - sometimes the value passed in here is simply a fragment, which means the browser
         // should scroll to an element on the same page
         if (pathQueryAndFragment.startsWith("#")) {
-            activePageData?.let { pageData ->
-                pageData.pageContext.route =
-                    pageData.pageContext.route.copy(fragment = pathQueryAndFragment.removePrefix("#"))
+            routeState.value?.let { routeInfo ->
+                routeState.value = routeInfo.copy(fragment = pathQueryAndFragment.removePrefix("#"))
                 return true
             } ?: run {
                 return false
@@ -110,7 +103,9 @@ class Router {
 
         val route = Route.tryCreate(pathQueryAndFragment)
         return if (route != null) {
-            activePageData = routeTree.createPageData(this, route)
+            val data = routeTree.createPageData(route)
+            activePageMethod = data.pageMethod
+            this.route = data.routeInfo
             true
         }
         else {
@@ -121,10 +116,10 @@ class Router {
     @Suppress("unused") // Called by generated code
     @Composable
     fun renderActivePage() {
-        val data = activePageData
+        val pageMethod = activePageMethod
             ?: error("Call 'navigateTo' at least once before calling 'renderActivePage'")
 
-        data.pageMethod.invoke()
+        pageMethod.invoke()
     }
 
     /**
@@ -284,7 +279,7 @@ class Router {
             return true
         }
 
-        return if (updateActiveRoute(pathQueryAndFragment)) {
+        return if (PageContext.instance.updatePageContext(pathQueryAndFragment)) {
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->
                 if (window.location.href != url) {

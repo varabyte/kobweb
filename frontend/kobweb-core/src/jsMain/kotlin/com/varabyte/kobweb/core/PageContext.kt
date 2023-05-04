@@ -18,16 +18,10 @@ import com.varabyte.kobweb.navigation.Router
  *    ...
  * }
  */
-class PageContext internal constructor(val router: Router, routeInfo: RouteInfo? = null) {
-    private val routeState: MutableState<RouteInfo?> = mutableStateOf(null)
+class PageContext internal constructor(val router: Router) {
+    internal val routeState: MutableState<RouteInfo?> = mutableStateOf(null)
     var route get() = routeState.value ?: error("PageContext route info is only valid within a @Page composable")
         internal set(value) { routeState.value = value }
-
-    init {
-        if (routeInfo != null) {
-            routeState.value = routeInfo
-        }
-    }
 
     class RouteInfo internal constructor(private val route: Route, private val dynamicParams: Map<String, String>) {
         /**
@@ -80,6 +74,8 @@ class PageContext internal constructor(val router: Router, routeInfo: RouteInfo?
          */
         val fragment: String? = route.fragment
 
+        override fun toString() = route.toString()
+
         override fun equals(other: Any?): Boolean {
             return (other is RouteInfo
                     && other.path == path
@@ -100,8 +96,14 @@ class PageContext internal constructor(val router: Router, routeInfo: RouteInfo?
     }
 
     companion object {
-        internal val active = mutableStateOf<PageContext?>(null)
+        internal lateinit var instance: PageContext
+        internal fun init(router: Router) { instance = PageContext(router) }
     }
+
+    // region deprecated route properties
+
+    // We moved the following properties under the `route` property to limit unnecessary recompositions for users who
+    // just want to access the router property.
 
     @Deprecated("Use `route.slug` instead", ReplaceWith("route.slug"))
     val slug: String get() = route.slug
@@ -111,6 +113,8 @@ class PageContext internal constructor(val router: Router, routeInfo: RouteInfo?
 
     @Deprecated("Use `route.fragment` instead", ReplaceWith("route.params"))
     val fragment: String? get() = route.fragment
+
+    // endregion
 }
 
 /**
@@ -127,4 +131,4 @@ val PageContext.isExporting: Boolean get() = route.params.containsKey("_kobwebIs
  * This will throw an exception if not called within the scope of a `@Page` annotated composable.
  */
 @Composable
-fun rememberPageContext() = remember { derivedStateOf { PageContext.active.value ?: error("`rememberPageContext` called outside of the scope of a `@Page` annotated method.") } }.value
+fun rememberPageContext() = remember { PageContext.instance }
