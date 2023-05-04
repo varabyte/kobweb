@@ -133,15 +133,13 @@ internal class RouteTree {
         val resolvedEntries = resolve(route.path)
         val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
 
-        val params = mutableMapOf<String, String>()
+        val dynamicParams = mutableMapOf<String, String>()
         resolvedEntries?.forEach { resolvedEntry ->
             if (resolvedEntry.node is DynamicNode) {
-                params[resolvedEntry.node.name] = resolvedEntry.routePart
+                dynamicParams[resolvedEntry.node.name] = resolvedEntry.routePart
             }
         }
-        params.putAll(route.queryParams)
-
-        return PageData(pageMethod, PageContext(router, route.path, params, route.fragment))
+        return PageData(pageMethod, PageContext(router, PageContext.RouteInfo(route, dynamicParams)))
     }
 
     /**

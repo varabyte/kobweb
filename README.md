@@ -434,7 +434,7 @@ better than `site.com/blog/_2022/mypost`.
 
 ### Page context
 
-Every page method provides access to its `PageContent` via the `rememberPageContext()` method.
+Every page method provides access to its `PageContext` via the `rememberPageContext()` method.
 
 A page's context provides it access to a router, allowing you to navigate to other pages, as well as other dynamic
 information about the current page's URL (discussed in the following sections).
@@ -463,8 +463,8 @@ fun Posts() {
     val ctx = rememberPageContext()
     // Here, I'm assuming these params are always present, but you can
     // use `get` instead of `getValue` to handle the nullable case.
-    val postId = ctx.params.getValue("id").toInt()
-    val mode = EditMode.from(ctx.params.getValue("mode"))
+    val postId = ctx.route.params.getValue("id").toInt()
+    val mode = EditMode.from(ctx.route.params.getValue("mode"))
     /* ... */
 }
 ```
@@ -539,7 +539,7 @@ You query dynamic route values exactly the same as if you were requesting query 
 @Composable
 fun PostPage() {
     val ctx = rememberPageContext()
-    val postId = ctx.params.getValue("post")
+    val postId = ctx.route.params.getValue("post")
     /* ... */
 }
 ```

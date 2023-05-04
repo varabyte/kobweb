@@ -100,11 +100,8 @@ class Router {
         // should scroll to an element on the same page
         if (pathQueryAndFragment.startsWith("#")) {
             activePageData?.let { pageData ->
-                activePageData = PageData(
-                    pageData.pageMethod,
-                    pageData.pageContext.copy(fragment = pathQueryAndFragment.removePrefix("#"))
-                )
-
+                pageData.pageContext.route =
+                    pageData.pageContext.route.copy(fragment = pathQueryAndFragment.removePrefix("#"))
                 return true
             } ?: run {
                 return false
