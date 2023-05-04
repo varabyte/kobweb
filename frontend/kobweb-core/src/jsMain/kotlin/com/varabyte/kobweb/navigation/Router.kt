@@ -2,6 +2,7 @@ package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.PageContextLocal
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.url.URL
@@ -119,7 +120,11 @@ class Router {
         val pageMethod = activePageMethod
             ?: error("Call 'navigateTo' at least once before calling 'renderActivePage'")
 
-        pageMethod.invoke()
+        CompositionLocalProvider(
+            PageContextLocal provides PageContext.instance
+        ) {
+            pageMethod.invoke()
+        }
     }
 
     /**

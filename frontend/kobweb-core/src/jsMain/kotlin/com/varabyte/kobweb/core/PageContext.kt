@@ -35,14 +35,6 @@ class PageContext internal constructor(val router: Router) {
          * The current route path.
          *
          * This property is equivalent to `window.location.pathname` but provided here as a convenience property.
-         *
-         * It makes for a very useful key to use in, say, a `LaunchedEffect`, if you want to trigger some logic that should
-         * be fired when the current page changes but not if query parameters or the hash fragments change:
-         *
-         * ```
-         * val ctx = rememberPageContext()
-         * LaunchedEffect(ctx.route.path) { ... }
-         * ```
          */
         val path: String = route.path
 
@@ -125,12 +117,18 @@ class PageContext internal constructor(val router: Router) {
  */
 val PageContext.isExporting: Boolean get() = route.params.containsKey("_kobwebIsExporting")
 
+// Note: PageContext is technically a global, but we wrap it in a `PageContextLocal` as a way to ensure it is only
+// accessible when under a `@Page` composable.
+internal val PageContextLocal = staticCompositionLocalOf<PageContext?> { null }
+
 /**
  * Returns the active page's context.
  *
  * This will throw an exception if not called within the scope of a `@Page` annotated composable.
  */
 @Composable
-// Note: Technically we don't need to remember a global instance, but we leave the remember here to express our intent.
-// Also, this implementation may change in the future, but a remember should always be in here somewhere.
-fun rememberPageContext() = remember { PageContext.instance }
+// Note: Technically this isn't a real "remember", as the page context is really just a composition local, but we leave
+// the API like this because user's mental model should think of it like a normal remember call. After all, they
+// shouldn't wrap the return value in a remember themselves. It's possible we may revisit this approach in the future,
+// as well.
+fun rememberPageContext() = PageContextLocal.current ?: error("PageContext is only valid within a @Page composable")
