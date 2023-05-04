@@ -26,7 +26,7 @@ import org.w3c.dom.events.EventListener
  *
  * ```
  * // Using rememberBreakpoint (acceptable)
- * val bp by rememberBreakpoint()
+ * val bp = rememberBreakpoint()
  * if (bp >= Breakpoint.MD) {
  *   Widget(...)
  * }
@@ -43,4 +43,4 @@ fun rememberBreakpoint() = produceState(window.breakpointFloor) {
     awaitDispose {
         window.removeEventListener("resize", resizeListener)
     }
-}
+}.value
