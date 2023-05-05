@@ -114,16 +114,30 @@ class Router {
         }
     }
 
+    /**
+     * Render the active page composable.
+     *
+     * This is the composable from the user's code tagged with `@Page` that is associated with the browser's currently
+     * active url.
+     *
+     * @param pageWrapper A wrapper composable which, if provided, should wrap the page composable. The page composable
+     *   will be passed to the wrapper as an `it` parameter, and the wrapper is expected to call it. The reason
+     *   `pageWrapper` is passed in as a parameter rather than simply being called outside of this method is that the
+     *   wrapper, along with the page itself, will get scoped underneath some composition local values that are tied to
+     *   the lifetime of the page.
+     */
     @Suppress("unused") // Called by generated code
     @Composable
-    fun renderActivePage() {
+    fun renderActivePage(pageWrapper: @Composable (@Composable () -> Unit) -> Unit = { it() }) {
         val pageMethod = activePageMethod
             ?: error("Call 'navigateTo' at least once before calling 'renderActivePage'")
 
         CompositionLocalProvider(
             PageContextLocal provides PageContext.instance
         ) {
-            pageMethod.invoke()
+            pageWrapper {
+                pageMethod.invoke()
+            }
         }
     }
 

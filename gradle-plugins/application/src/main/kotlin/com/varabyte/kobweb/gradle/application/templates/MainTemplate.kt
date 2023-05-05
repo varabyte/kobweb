@@ -52,6 +52,10 @@ fun createMainFunction(
             add("com.varabyte.kobweb.silk.components.animation.registerKeyframes")
         }
 
+        if (usingSilk) {
+            add("com.varabyte.kobweb.silk.defer.renderWithDeferred")
+        }
+
         sort()
     }.forEach { import -> fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.')) }
 
@@ -202,9 +206,8 @@ fun createMainFunction(
                     CompositionLocalProvider(
                         AppGlobalsLocal provides mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()})
                     ) { $appFqn {
-                            ${if (usingSilk) "com.varabyte.kobweb.silk.defer.renderWithDeferred { router.renderActivePage() }" else "router.renderActivePage()" }
-                        }
-                    }
+                          ${if (usingSilk) "router.renderActivePage { renderWithDeferred { it() } }" else "router.renderActivePage()"}
+                    } }
                 }
             """.trimIndent(),
                 *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
