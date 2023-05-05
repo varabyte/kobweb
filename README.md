@@ -1076,14 +1076,37 @@ property values from variables declared within your CSS styles. It does this thr
 
 ***Note:** You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).*
 
-Using variables is fairly simple. You first declare one without a value (but lock it down to a type), and later you can
-set the variable using `Modifier.setVariable(...)` and reference it using the `CSSVariable.value()` method.
+Using variables is fairly simple. You first declare one without a value (but lock it down to a type) and later you can
+initialize it within a style using `Modifier.setVariable(...)`:
 
-You set a variable within the scope of some element, at which point it can be referenced by that element or any of its
-children. Therefore, CSS variables are only allowed to be set within a style block.
+```kotlin
+val dialogWidth by StyleVariable<CSSLengthValue>()
 
-Below, we declare a background color, create a root container scope which sets it, a child style that uses it,
-and, finally, a child style variant that overrides it:
+// This style will be applied to a div that wraps the whole page
+val RootStyle by ComponentStyle {
+  base { Modifier.setVariable(dialogWidth, 600.px) }
+}
+```
+
+You can later use variables that were previously set, using the `value()` method to extract their current value:
+
+```kotlin
+val DialogStyle by ComponentStyle {
+  base { Modifier.width(dialogWidth.value()) }
+}
+```
+
+You can also provide a fallback value, which, if present, would be used in the case that a variable hadn't already been
+set previously:
+
+```kotlin
+val DialogStyle by ComponentStyle {
+  base { Modifier.width(dialogWidth.value(500.px)) }
+}
+```
+
+To demonstrate these concepts all together, below we declare a background color variable, create a root container scope
+which sets it, a child style that uses it, and, finally, a child style variant that overrides it:
 
 ```kotlin
 val bgColor by StyleVariable<CSSColorValue>()
