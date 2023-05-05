@@ -1105,11 +1105,35 @@ val DialogStyle by ComponentStyle {
 }
 ```
 
+Additionally, you can also provide a default fallback value when declaring the variable:
+
+```kotlin
+val dialogWidth by StyleVariable<CSSLengthValue>(100.px)
+
+// This style will be applied to a div that wraps the whole page
+val DialogStyle100 by ComponentStyle {
+  // Uses default fallback. width = 100px
+  base { Modifier.width(dialogWidth.value()) } 
+}
+val DialogStyle200 by ComponentStyle {
+  // Uses specific fallback. width = 200px 
+  base { Modifier.width(dialogWidth.value(200.px)) } // Uses fallback = 200.px
+}
+val DialogStyle300 by ComponentStyle {
+  // Fallback ignored because variable is set explicitly. width = 300px 
+  base { Modifier.setVariable(dialogWidth, 300.px).width(dialogWidth.value(400.px)) }
+}
+```
+***NOTE:** In the above example, we have one line where set a variable and query it in the same style, which we did
+purely for demonstration purposes. In practice, you would probably never do this -- the variable should have been set
+separately earlier.*
+
 To demonstrate these concepts all together, below we declare a background color variable, create a root container scope
 which sets it, a child style that uses it, and, finally, a child style variant that overrides it:
 
 ```kotlin
-val bgColor by StyleVariable<CSSColorValue>()
+// Default to a debug color, so if we see it, it indicates we forgot to set it later
+val bgColor by StyleVariable<CSSColorValue>(Colors.Magenta)
 
 val ContainerStyle by ComponentStyle {
     base { Modifier.setVariable(bgColor, Colors.Blue) }
