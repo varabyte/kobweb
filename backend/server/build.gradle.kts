@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.kaml)
 
     implementation(project(":backend:kobweb-api"))
+    implementation(project(":backend:server-plugin"))
     implementation(project(":common:kobweb-common"))
 
     testImplementation(libs.truthish)
@@ -50,16 +51,18 @@ tasks.withType<ShadowJar> {
     // would live in the common classloader, and otherwise the user's classloader and our server's classloader would be
     // totally separate. After a day fighting code, I couldn't figure out how to get this to work.
     relocate("com", "relocated.com") {
-        // Leave varabyte code in place. Anything the user is using in their code should be
-        // provided by the server
+        // Leave varabyte code in place. If the user is referencing any varabyte classes in their server APIs, the
+        // versions should be synced up with anything also referenced in the server (since the server is versioned the
+        // same as varabyte artifacts).
         exclude("com.varabyte.**")
     }
     relocate("org", "relocated.org") {
-        // Need to exclude this or else we get an exception at runtime
-        exclude("org.xml.sax.**")
+        exclude("org.xml.sax.**") // Need to exclude this or else we get an exception at runtime
+        exclude("org.slf4j.**") // Don't relocate ktor; might be referenced by Kobweb server plugins
     }
     relocate("io", "relocated.io") {
         exclude("io.netty.**") // Relocating io.netty causes exceptions to happen on server startup
+        exclude("io.ktor.**") // Don't relocate ktor; might be referenced by Kobweb server plugins
     }
     relocate("kotlinx", "relocated.kotlinx")
 }

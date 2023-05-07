@@ -5,6 +5,7 @@ import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.*
 import com.varabyte.kobweb.server.io.ServerStateFile
+import com.varabyte.kobweb.server.plugin.KobwebServerPlugin
 import com.varabyte.kobweb.server.plugins.configureHTTP
 import com.varabyte.kobweb.server.plugins.configureRouting
 import com.varabyte.kobweb.server.plugins.configureSerialization
@@ -14,6 +15,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.net.ServerSocket
+import java.net.URLClassLoader
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.*
 
@@ -81,12 +84,28 @@ fun main() = runBlocking {
             throw KobwebException("Production server can't start as port $port is already occupied. If you need a different port number, consider modifying ${confFile.path}")
         }
     }
+
+    // Prepare classloader for plugin jars
+    val pluginClassloader = URLClassLoader(
+        try {
+            folder.resolve("server/plugins")
+                .listDirectoryEntries("*.jar")
+                .map { it.toUri().toURL() }
+                .toTypedArray()
+        } catch (_: IOException) {
+            emptyArray()
+        },
+    )
+
     val globals = ServerGlobals()
     val siteLayout = SiteLayout.get()
     val engine = embeddedServer(Netty, port) {
         configureRouting(env, siteLayout, conf, globals)
         configureSerialization()
         configureHTTP(conf)
+
+        val loader = ServiceLoader.load(KobwebServerPlugin::class.java, pluginClassloader)
+        loader.forEach { kobwebServerPlugin -> kobwebServerPlugin.configure(this) }
     }
 
     engine.start()
