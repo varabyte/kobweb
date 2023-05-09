@@ -1868,6 +1868,119 @@ Some notes...
 
 For a simple site, the above workflow should take about 2 minutes to run.
 
+## Kobweb Server Plugins
+
+Many users who create a full stack application generally expect to completely own both the client- and server-side code.
+
+However, being an opionated framework, Kobweb provides a custom Ktor server in order to deliver some of its features.
+For example, it implements logic for handling [server API routes▲](#define-api-routes) as well as some live reloading
+functionality.
+
+It would not be trivial to refactor this behavior into some library that users could import into their own backend
+server. As a compromise, some server configuration is exposed by the `.kobweb/conf.yaml` file, and this has been the
+main way users could affect the server's behavior.
+
+That said, there will always be some use-cases that Kobweb won't anticipate. So as an escape hatch, Kobweb allows users
+who know what they're doing to write their own plugins to extend the server.
+
+***NOTE:** The Kobweb Server plugin feature is still fairly new. If you use it, please consider
+[filing issues](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
+for any missing features and [connecting with us▼](#connecting-with-us) to share any feedback you have about your
+experience.*
+
+Creating a Kobweb server plugin is relatively straightforward. You'll need to:
+
+* Create a new module in your project that produces a JAR file which bundles an implementation of
+  the `KobwebServerPlugin` interface.
+* Move a copy of that jar under your project's `.kobweb/server/plugins` directory.
+
+### Create a Kobweb Server Plugin
+
+The following instructions are based on a Kobweb multimodule setup, like the one created by `kobweb create app`.
+
+* Create a new module in your project.
+  * For example, name it "demo-server-plugin".
+  * Be sure to update your `settings.gradle.kts` file to include the new project.
+* Add a new entry for the `kobweb-server-project` library in `.gradle/libs.versions.toml`:
+  ```toml
+  [libraries]
+  kobweb-server-plugin = { module = "com.varabyte.kobweb:kobweb-server-plugin", version.ref = "kobweb" }
+  ```
+* **For all remaining steps, create all files / directories under your new module's directory (e.g. `demo-server-plugin/`).**
+* Create `build.gradle.kts`:
+  ```kotlin
+    plugins {
+      kotlin("jvm")
+    }
+    group = "org.example.app" // update to your own project's group
+    version = "1.0-SNAPSHOT"
+
+    tasks.jar {
+      // Remove the version number
+      archiveFileName.set("${project.name}.jar")
+    }
+
+    dependencies {
+      compileOnly(libs.kobweb.server.plugin)
+    }
+  ```
+  * We omit the version number to prevent the accumulation of multiple versioned copies of the same plugin ended up in
+    the Kobweb server. Instead, each new version should replace the previous one.
+* Create `src/main/kotlin/DemoKobwebServerPlugin.kt`:
+  ```kotlin
+  import com.varabyte.kobweb.server.plugin.KobwebServerPlugin
+  import io.ktor.server.application.Application
+  import io.ktor.server.application.log
+
+  class DemoKobwebServerPlugin : KobwebServerPlugin {
+    override fun configure(application: Application) {
+      application.log.info("REPLACE ME WITH REAL CONFIGURATION")
+    }
+  }
+  ```
+  * As the Kobweb server is written in Ktor, you should familiarize yourself
+    with [Ktor's documentation](https://ktor.io/docs/plugins.html).
+* Create `src/main/resources/META-INF/services/com.varabyte.kobweb.server.plugin.KobwebServerPlugin`:
+  ```text
+  org.example.app.DemoKobwebServerPlugin
+  ```
+  * This helps the JDK discover service implementations bundled within a JAR. You can
+    read [this helpful article](https://www.baeldung.com/java-spi) to learn more about this useful Java feature.
+
+### Copy your plugin jar manually
+
+After building your JAR (`./gradlew :demo-server-plugin:jar`), manually copy it from `build/libs/` to your Kobweb
+project's `.kobweb/server/plugins` directory.
+
+Upon the next Kobweb server run (e.g. via `kobweb run`), if you check the logs, you should see something like this:
+
+```text
+[main] INFO  ktor.application - Autoreload is disabled because the development mode is off.
+[main] INFO  ktor.application - REPLACE ME WITH REAL CONFIGURATION
+[main] INFO  ktor.application - Application started in 0.112 seconds.
+[main] INFO  ktor.application - Responding at http://0.0.0.0:8080
+```
+
+### Copy your plugin jar automatically
+
+For convenience, the Kobweb Gradle Application plugin provides a way to notify it about your JAR task, and it will build
+and copy it over for you automatically.
+
+In your Kobweb's build script, include the following `notify...` line:
+
+```kotlin
+// site/build.gradle.kts
+
+kobweb { /* ... */ }
+
+notifyKobwebAboutServerPluginTask(project(":demo-server-plugin").tasks.named("jar", Jar::class))
+
+kotlin { /* ... */ }
+```
+
+Once this is set up, you can modify your Kobweb server plugin, quit the server if one is running, and then rerun
+`kobweb run` to have it pick up your changes automatically.
+
 <!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
 ## <span id="what-about-multiplatform-widgets"><span id="what-about-compose-for-web-canvas">What about Compose Multiplatform for Web?</span></span>
 
