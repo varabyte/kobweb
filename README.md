@@ -1113,14 +1113,14 @@ val dialogWidth by StyleVariable<CSSLengthValue>(100.px)
 // This style will be applied to a div that wraps the whole page
 val DialogStyle100 by ComponentStyle {
   // Uses default fallback. width = 100px
-  base { Modifier.width(dialogWidth.value()) } 
+  base { Modifier.width(dialogWidth.value()) }
 }
 val DialogStyle200 by ComponentStyle {
-  // Uses specific fallback. width = 200px 
+  // Uses specific fallback. width = 200px
   base { Modifier.width(dialogWidth.value(200.px)) } // Uses fallback = 200.px
 }
 val DialogStyle300 by ComponentStyle {
-  // Fallback ignored because variable is set explicitly. width = 300px 
+  // Fallback ignored because variable is set explicitly. width = 300px
   base { Modifier.setVariable(dialogWidth, 300.px).width(dialogWidth.value(400.px)) }
 }
 ```
