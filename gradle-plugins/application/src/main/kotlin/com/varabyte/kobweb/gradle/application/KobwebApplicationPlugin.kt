@@ -4,6 +4,7 @@ import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
 import com.varabyte.kobweb.gradle.application.tasks.*
+import com.varabyte.kobweb.gradle.application.util.kebabCaseToTitleCamelCase
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
@@ -14,8 +15,10 @@ import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.*
 import org.gradle.api.*
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.tooling.events.FailureResult
@@ -275,6 +278,31 @@ fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
 
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: TaskProvider<*>) {
     kobwebGenBackendMetadata { dependsOn(task) }
+}
+
+/**
+ * Inform Kobweb about a task that generates a jar that should be copied into the server's plugins directory.
+ *
+ * Users can always manually copy over server jars into their .kobweb/server/plugins directory, but this method
+ * automates a common use case where the user is developing the plugin locally, and it would be frustrating to remember
+ * to copy the new jar over each time something has changed.
+ *
+ * This method will create an intermediate task that copies the jar into the plugins directory, and then hooks up task
+ * dependencies so that it will be called automatically before the Kobweb server runs.
+ *
+ * @param name An optional name you can provide for the intermediate "copy jar to plugins dir" task. You normally don't
+ *   have to provide a name, but providing your own may be slightly more performant (since the task name I generate
+ *   requires realizing the task, which may slightly slow down the configuration phase).
+ */
+fun Project.notifyKobwebAboutServerPluginTask(jarTask: TaskProvider<Jar>, name: String = "copy${project.name.kebabCaseToTitleCamelCase()}JarToKobwebServerPluginsDir") {
+    val copyKobwebServerPluginTask = tasks.register(name, Copy::class.java) {
+        from(jarTask)
+        destinationDir = project.projectDir.resolve(".kobweb/server/plugins")
+    }
+
+    tasks.named("kobwebStart") {
+        dependsOn(copyKobwebServerPluginTask)
+    }
 }
 
 val Project.kobwebBuildTarget get() = project.extra["kobwebBuildTarget"] as BuildTarget
