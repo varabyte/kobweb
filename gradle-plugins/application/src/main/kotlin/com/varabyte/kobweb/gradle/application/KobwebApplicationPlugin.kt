@@ -12,11 +12,9 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.*
-import org.gradle.api.GradleException
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.api.Task
+import org.gradle.api.*
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
@@ -250,13 +248,20 @@ class KobwebApplicationPlugin @Inject constructor(
     }
 }
 
+private fun Project.kobwebGenFrontendMetadata(action: Action<Task>) = tasks.named("kobwebGenFrontendMetadata", action)
+private fun Project.kobwebGenBackendMetadata(action: Action<Task>) = tasks.named("kobwebGenBackendMetadata", action)
+
 /**
  * Method provided for users to call if they generate their own Gradle task that generates some JS (frontend) code.
  *
  * Calling this ensures that their task will be triggered before the relevant Kobweb compilation task.
  */
 fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
-    tasks.named("kobwebGenFrontendMetadata") { dependsOn(task) }
+    kobwebGenFrontendMetadata { dependsOn(task) }
+}
+
+fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: TaskProvider<*>) {
+    kobwebGenFrontendMetadata { dependsOn(task) }
 }
 
 /**
@@ -265,7 +270,11 @@ fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
  * Calling this ensures that their task will be triggered before the relevant Kobweb compilation task.
  */
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
-    tasks.named("kobwebGenBackendMetadata") { dependsOn(task) }
+    kobwebGenBackendMetadata { dependsOn(task) }
+}
+
+fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: TaskProvider<*>) {
+    kobwebGenBackendMetadata { dependsOn(task) }
 }
 
 val Project.kobwebBuildTarget get() = project.extra["kobwebBuildTarget"] as BuildTarget
