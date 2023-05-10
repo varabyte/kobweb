@@ -25,8 +25,7 @@ import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.EventListener
 
-// A small but comfortable amount of space. Also allows the Tooltip composable to extend up a bit with an arrow while
-// still leaving a bit of space to go.
+/** A small but comfortable amount of space between a popup and its target. */
 const val DEFAULT_POPUP_OFFSET_PX = 15
 
 /**
