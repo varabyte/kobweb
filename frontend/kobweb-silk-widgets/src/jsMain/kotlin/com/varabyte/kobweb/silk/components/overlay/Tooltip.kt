@@ -169,7 +169,7 @@ val TooltipTextContainerStyle = ComponentStyle.base("tooltip-text") {
 /**
  * A widget for displaying information inside a sort of chat bubble with an (optional) arrow on it.
  *
- * See also: [Popup], which shows information without any outer decoration.
+ * See also: [Popover], which shows information without any outer decoration.
  *
  * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
  * first, as a parent method that this lives under. See the method for more details.
@@ -194,7 +194,7 @@ fun Tooltip(
 ) {
     @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember(stayOpenStrategy) { stayOpenStrategy ?: NeverStayOpenStrategy() }
 
-    Popup(
+    Popover(
         target,
         TooltipStyle.toModifier(variant).then(modifier),
         placement,

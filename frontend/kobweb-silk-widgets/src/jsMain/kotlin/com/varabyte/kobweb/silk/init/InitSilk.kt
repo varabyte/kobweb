@@ -39,7 +39,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(ImageStyle)
     mutableTheme.registerComponentStyle(LinkStyle)
     mutableTheme.registerComponentStyle(OverlayStyle)
-    mutableTheme.registerComponentStyle(PopupStyle)
+    mutableTheme.registerComponentStyle(PopoverStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SmoothColorStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
