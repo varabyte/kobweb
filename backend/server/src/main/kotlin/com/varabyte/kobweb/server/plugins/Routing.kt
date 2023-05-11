@@ -18,6 +18,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -232,12 +233,14 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
         get("/api/kobweb-status") {
-            logger.debug("Client connected and is requesting kobweb status events")
+            logger.debug("Client connected and is requesting kobweb status events.")
 
             call.response.cacheControl(CacheControl.NoCache(null))
             try {
                 call.respondTextWriter(contentType = ContentType.Text.EventStream) {
-                    try {
+                    // If we don't swallow exceptions, sometimes the server freaks out when things are shutting down
+                    val swallowExceptionHandler = CoroutineExceptionHandler { _, _ -> }
+                    withContext(Dispatchers.IO + swallowExceptionHandler) {
                         var lastVersion: Int? = null
                         var lastStatus: String? = null
                         while (true) {
@@ -265,14 +268,10 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
                             flush()
                             delay(300)
                         }
-                    } catch (_: Throwable) {
-                        // An exception is eventually expected - it is thrown when the client disconnects. We catch it
-                        // here because if we let it bubble up, we sometimes get a fatal error when the server is trying
-                        // to shut down. This same throwable event will be logged by the catch statement below.
                     }
                 }
             } catch (t: Throwable) {
-                logger.debug("Stopped sending kobweb status events, probably because client disconnected or server is shutting down. (${t.message})")
+                logger.debug("Stopped sending kobweb status events, probably because client disconnected or server is shutting down. (${t::class.simpleName}: ${t.message})")
             }
         }
         val routePrefix = conf.site.routePrefixNormalized
