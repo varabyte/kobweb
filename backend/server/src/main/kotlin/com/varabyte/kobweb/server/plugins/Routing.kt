@@ -104,7 +104,6 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
             }
         } catch (t: Throwable) {
             val fullErrorString = t.stackTraceToString()
-            println(fullErrorString)
             logger.error(fullErrorString)
             when {
                 // Show the stack trace of the user's code but no need to share anything outside of that.
@@ -233,7 +232,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
         get("/api/kobweb-status") {
-            println("Client connected requesting kobweb status events")
+            logger.info("Client connected and requesting kobweb status events")
 
             try {
                 call.response.cacheControl(CacheControl.NoCache(null))
@@ -267,10 +266,12 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
                     }
                 }
             } catch (ex: Exception) {
-                // Use println instead of log because logging may cause issues if this is disconnecting due to the
-                // server shutting down
-                println("Closing socket because client disconnected (probably). Exception:")
-                println("  $ex")
+                logger.debug(
+                    """
+                    Closing socket because client disconnected (probably). Exception:
+                      $ex
+                    """.trimIndent()
+                )
                 // Expected eventually - client connection closed
             }
         }
