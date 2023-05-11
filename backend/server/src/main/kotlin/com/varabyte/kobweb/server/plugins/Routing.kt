@@ -232,50 +232,49 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
         get("/api/kobweb-status") {
-            logger.info("Client connected and requesting kobweb status events")
+            logger.debug("Client connected and is requesting kobweb status events")
 
+            call.response.cacheControl(CacheControl.NoCache(null))
             try {
-                call.response.cacheControl(CacheControl.NoCache(null))
                 call.respondTextWriter(contentType = ContentType.Text.EventStream) {
-                    var lastVersion: Int? = null
-                    var lastStatus: String? = null
-                    while (true) {
-                        write(": keepalive\n")
-                        write("\n")
-
-                        if (lastVersion != globals.version) {
-                            lastVersion = globals.version
-                            write("event: version\n")
-                            write("data: $lastVersion\n")
+                    try {
+                        var lastVersion: Int? = null
+                        var lastStatus: String? = null
+                        while (true) {
+                            write(": keepalive\n")
                             write("\n")
-                        }
 
-                        if (lastStatus != globals.status) {
-                            lastStatus = globals.status
-                            val statusData = mapOf(
-                                "text" to globals.status.orEmpty(),
-                                "isError" to globals.isStatusError.toString(),
-                            )
-                            write("event: status\n")
-                            write("data: ${Json.encodeToString(statusData)}\n")
-                            write("\n")
-                        }
+                            if (lastVersion != globals.version) {
+                                lastVersion = globals.version
+                                write("event: version\n")
+                                write("data: $lastVersion\n")
+                                write("\n")
+                            }
 
-                        flush()
-                        delay(300)
+                            if (lastStatus != globals.status) {
+                                lastStatus = globals.status
+                                val statusData = mapOf(
+                                    "text" to globals.status.orEmpty(),
+                                    "isError" to globals.isStatusError.toString(),
+                                )
+                                write("event: status\n")
+                                write("data: ${Json.encodeToString(statusData)}\n")
+                                write("\n")
+                            }
+
+                            flush()
+                            delay(300)
+                        }
+                    } catch (_: Throwable) {
+                        // An exception is eventually expected - it is thrown when the client disconnects. We catch it
+                        // here because if we let it bubble up, we sometimes get a fatal error when the server is trying
+                        // to shut down. This same throwable event will be logged by the catch statement below.
                     }
                 }
-            } catch (ex: Exception) {
-                logger.debug(
-                    """
-                    Closing socket because client disconnected (probably). Exception:
-                      $ex
-                    """.trimIndent()
-                )
-                // Expected eventually - client connection closed
+            } catch (t: Throwable) {
+                logger.debug("Stopped sending kobweb status events, probably because client disconnected or server is shutting down. (${t.message})")
             }
         }
-
         val routePrefix = conf.site.routePrefixNormalized
 
         if (apiJar != null) {
