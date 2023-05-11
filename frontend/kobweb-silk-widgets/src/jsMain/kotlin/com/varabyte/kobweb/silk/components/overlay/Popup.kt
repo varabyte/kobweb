@@ -4,26 +4,30 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
-import com.varabyte.kobweb.compose.dom.disposableRef
-import com.varabyte.kobweb.compose.dom.refScope
-import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
+import com.varabyte.kobweb.compose.style.toClassName
+import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.attrsModifier
+import com.varabyte.kobweb.compose.ui.modifiers.opacity
+import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.defer.deferRender
+import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import kotlinx.browser.window
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.CSSLengthValue
+import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.css.px
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.EventListener
+
+val PopupStyle by ComponentStyle.base(prefix = "silk-") {
+    // NOTE: If any user replaces this style in their own project, they should make sure they still keep this "opacity"
+    // transition in their version, even if they change the duration. Otherwise, the popup will break, as it currently
+    // uses the "opacity" transition event to detect when it should close.
+    Modifier.transition(CSSTransition("opacity", 150.ms))
+}
 
 /** A small but comfortable amount of space between a popup and its target. */
 const val DEFAULT_POPUP_OFFSET_PX = 15
@@ -60,11 +64,154 @@ enum class PopupPlacement {
     BottomRight,
 }
 
-@Deprecated("PopupStyle has been renamed to PopoverStyle", ReplaceWith("PopoverStyle"))
-val PopupStyle get() = PopoverStyle
+/**
+ * The scope for the content of a popup.
+ *
+ * Note that this is essentially a [BoxScope] with some extra information added to it relevant to popups.
+ */
+class PopupScope(val placement: PopupPlacement?) {
+    fun Modifier.align(alignment: Alignment) = BoxScope().apply { align(alignment) }
+}
 
 /**
- * Render a general, undecorated composable in a location above and outside of some target element.
+ * A contract to control how a popup should be placed relative to some placement element.
+ *
+ * See [calculate], which must be implemented by any implementing classes.
+ */
+abstract class PopupPlacementStrategy {
+    class Position(val top: CSSLengthValue, val left: CSSLengthValue)
+    class PlacementAndPosition(val placement: PopupPlacement, val position: Position)
+
+    /**
+     * Calculates the absolute position of a popup given its placement, returning a Modifier for positioning.
+     */
+    protected fun calculatePosition(
+        placement: PopupPlacement,
+        popupWidth: Double, popupHeight: Double,
+        placementBounds: DOMRect,
+        offsetPixels: Number,
+    ): Position {
+        @Suppress("NAME_SHADOWING") val offsetPixels = offsetPixels.toDouble()
+        return when (placement) {
+            PopupPlacement.TopLeft -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
+                    left = (window.pageXOffset + placementBounds.left).px,
+                )
+            }
+
+            PopupPlacement.Top -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
+                    left = (window.pageXOffset + placementBounds.left - (popupWidth - placementBounds.width) / 2).px,
+                )
+            }
+
+            PopupPlacement.TopRight -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
+                    left = (window.pageXOffset + placementBounds.left + (placementBounds.width - popupWidth)).px,
+                )
+            }
+
+            PopupPlacement.LeftTop -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top).px,
+                    left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
+                )
+            }
+
+            PopupPlacement.RightTop -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top).px,
+                    left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
+                )
+            }
+
+            PopupPlacement.Left -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top - (popupHeight - placementBounds.height) / 2).px,
+                    left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
+                )
+            }
+
+            PopupPlacement.Right -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top - (popupHeight - placementBounds.height) / 2).px,
+                    left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
+                )
+            }
+
+            PopupPlacement.LeftBottom -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top + (placementBounds.height - popupHeight)).px,
+                    left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
+                )
+            }
+
+            PopupPlacement.RightBottom -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.top + (placementBounds.height - popupHeight)).px,
+                    left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
+                )
+            }
+
+            PopupPlacement.BottomLeft -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
+                    left = (window.pageXOffset + placementBounds.left).px,
+                )
+            }
+
+            PopupPlacement.Bottom -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
+                    left = (window.pageXOffset + placementBounds.left - (popupWidth - placementBounds.width) / 2).px,
+                )
+            }
+
+            PopupPlacement.BottomRight -> {
+                Position(
+                    top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
+                    left = (window.pageXOffset + placementBounds.left + (placementBounds.width - popupWidth)).px,
+                )
+            }
+        }
+    }
+
+    /**
+     * Returns the placement and absolute position that a popup should be placed at.
+     *
+     * The absolute position is very important, as it is used to position the popup on screen, while the placement
+     * is a property which will be exposed to popup classes to use if it wants to. For example, tooltips will use the
+     * placement in order to control where the tooltip arrow should be placed.
+     */
+    abstract fun calculate(
+        popupWidth: Double, popupHeight: Double,
+        placementBounds: DOMRect,
+    ): PlacementAndPosition
+
+    companion object {
+        /**
+         * Returns the general strategy of placing a popup in a particular location based on a desired [PopupPlacement].
+         */
+        fun of(placement: PopupPlacement, offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX) = object : PopupPlacementStrategy() {
+            override fun calculate(
+                popupWidth: Double,
+                popupHeight: Double,
+                placementBounds: DOMRect,
+            ): PlacementAndPosition {
+                return PlacementAndPosition(
+                    placement,
+                    calculatePosition(placement, popupWidth, popupHeight, placementBounds, offsetPixels)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Render a general, undecorated composable in a location above and outside some target element.
  *
  * See also [Tooltip], which wraps your composable in a sort of chat bubble, making it particularly well-suited for
  * text tooltips.
@@ -95,7 +242,7 @@ fun Popup(
     stayOpenStrategy: StayOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    content: @Composable BoxScope.() -> Unit,
+    content: @Composable PopupScope.() -> Unit,
 ) {
     Popover(
         target = target,

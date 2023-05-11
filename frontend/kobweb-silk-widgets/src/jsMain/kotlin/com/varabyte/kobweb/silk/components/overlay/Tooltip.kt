@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.foundation.layout.Box
-import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
@@ -169,6 +168,9 @@ val TooltipTextContainerStyle = ComponentStyle.base("tooltip-text") {
 /**
  * A widget for displaying information inside a sort of chat bubble with an (optional) arrow on it.
  *
+ * This method should be configurable enough for a majority of cases, but [AdvancedTooltip] is also provided for people
+ * who need even more control.
+ *
  * See also: [Popover], which shows information without any outer decoration.
  *
  * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
@@ -190,23 +192,107 @@ fun Tooltip(
     stayOpenStrategy: StayOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    content: @Composable BoxScope.() -> Unit,
+    content: @Composable PopupScope.() -> Unit,
+) {
+    val placementStrategy = remember(placement) { PopupPlacementStrategy.of(placement, offsetPixels) }
+
+    AdvancedTooltip(
+        target,
+        modifier,
+        hiddenModifier = Modifier,
+        hasArrow,
+        showDelayMs,
+        hideDelayMs,
+        openCloseStrategy = null,
+        placementTarget,
+        placementStrategy,
+        stayOpenStrategy,
+        variant,
+        ref,
+        content
+    )
+}
+
+/**
+ * A convenience [Tooltip] making it trivial to display some text message.
+ *
+ * You can use newlines in your text to split it across multiple lines.
+ *
+ * This method should be configurable enough for a majority of cases, but [AdvancedTooltip] is also provided for people
+ * who need even more control.
+  */
+@Composable
+fun Tooltip(
+    target: ElementTarget,
+    text: String,
+    modifier: Modifier = Modifier,
+    placement: PopupPlacement = PopupPlacement.Bottom,
+    hasArrow: Boolean = true,
+    offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
+    placementTarget: ElementTarget? = null,
+    showDelayMs: Int = 0,
+    hideDelayMs: Int = 0,
+    stayOpenStrategy: StayOpenStrategy? = null,
+    variant: ComponentVariant? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
+) {
+    val placementStrategy = remember(placement) { PopupPlacementStrategy.of(placement, offsetPixels) }
+
+    AdvancedTooltip(
+        target,
+        text,
+        modifier,
+        hiddenModifier = Modifier,
+        hasArrow,
+        showDelayMs,
+        hideDelayMs,
+        openCloseStrategy = null,
+        placementTarget,
+        placementStrategy,
+        stayOpenStrategy,
+        variant,
+        ref
+    )
+}
+
+/**
+ * A version of [Tooltip] that allows for more control over the tooltip's behavior.
+ *
+ * See also: [AdvancedPopover], which documents many of the parameters used here.
+ */
+@Composable
+fun AdvancedTooltip(
+    target: ElementTarget,
+    modifier: Modifier = Modifier,
+    hiddenModifier: Modifier = Modifier,
+    hasArrow: Boolean = true,
+    showDelayMs: Int = 0,
+    hideDelayMs: Int = 0,
+    openCloseStrategy: OpenCloseStrategy? = null,
+    placementTarget: ElementTarget? = null,
+    placementStrategy: PopupPlacementStrategy? = null,
+    stayOpenStrategy: StayOpenStrategy? = null,
+    variant: ComponentVariant? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
+    content: @Composable PopupScope.() -> Unit,
 ) {
     @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember(stayOpenStrategy) { stayOpenStrategy ?: NeverStayOpenStrategy() }
 
-    Popover(
+    AdvancedPopover(
         target,
         TooltipStyle.toModifier(variant).then(modifier),
-        placement,
-        offsetPixels,
+        hiddenModifier,
+        showDelayMs, hideDelayMs,
+        openCloseStrategy,
         placementTarget,
-        showDelayMs,
-        hideDelayMs,
+        placementStrategy,
         stayOpenStrategy,
-        ref = ref
+        variant,
+        ref
     ) {
         content()
-        if (hasArrow) {
+        val placement = placement
+        if (hasArrow && placement != null) {
             Box(
                 // e.g. if tooltip is below the target, arrow points up
                 TooltipArrowStyle.toModifier(
@@ -231,34 +317,36 @@ fun Tooltip(
 }
 
 /**
- * A convenience [Tooltip] used for displaying some text message.
+ * A version of [Tooltip] that allows for more control over the tooltip's behavior.
  *
- * You can use newlines in your text to split it across multiple lines.
+ * See also: [AdvancedPopover], which documents many of the parameters used here.
  */
 @Composable
-fun Tooltip(
+fun AdvancedTooltip(
     target: ElementTarget,
     text: String,
     modifier: Modifier = Modifier,
-    placement: PopupPlacement = PopupPlacement.Bottom,
+    hiddenModifier: Modifier = Modifier,
     hasArrow: Boolean = true,
-    offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
-    placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
+    openCloseStrategy: OpenCloseStrategy? = null,
+    placementTarget: ElementTarget? = null,
+    placementStrategy: PopupPlacementStrategy? = null,
     stayOpenStrategy: StayOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
-    Tooltip(
+    AdvancedTooltip(
         target,
         modifier,
-        placement,
+        hiddenModifier,
         hasArrow,
-        offsetPixels,
-        placementTarget,
         showDelayMs,
         hideDelayMs,
+        openCloseStrategy,
+        placementTarget,
+        placementStrategy,
         stayOpenStrategy,
         variant,
         ref

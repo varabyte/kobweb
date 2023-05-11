@@ -1,16 +1,13 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.dom.disposableRef
 import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
-import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
@@ -20,15 +17,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.jetbrains.compose.web.css.*
-import org.w3c.dom.DOMRect
+import org.jetbrains.compose.web.css.DisplayStyle
+import org.jetbrains.compose.web.css.Position
+import org.jetbrains.compose.web.css.percent
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.EventListener
 
-val PopoverStyle by ComponentStyle(prefix = "silk-") {
-    base {
-        Modifier.transition(CSSTransition("opacity", 150.ms))
-    }
+// Convenience class to collect a bunch of parameters into a single place
+private class PopoverShowHideSettings(
+    hiddenModifier: Modifier,
+    showDelayMs: Int,
+    hideDelayMs: Int,
+) {
+    val showDelayMs = showDelayMs.coerceAtLeast(0)
+    val hideDelayMs = hideDelayMs.coerceAtLeast(0)
+    val hiddenModifier = hiddenModifier.opacity(0)
 }
 
 // When first declared, popups need to make several passes to set themselves up. First, they need to find the raw
@@ -44,124 +46,56 @@ private sealed interface PopoverState {
     class FoundElements(override var elements: PopoverElements) : Initialized
 
     sealed interface Visible : Initialized {
+        val placement: PopupPlacement?
         val modifier: Modifier
     }
 
     sealed interface Showing : Visible
 
     /** State for when we're about to show the popup, but we need a bit of time to calculate its width. */
-    class Calculating(override var elements: PopoverElements) : Showing {
-        override val modifier = Modifier
+    class Calculating(override var elements: PopoverElements, showHideSettings: PopoverShowHideSettings) : Showing {
+        override val modifier = showHideSettings.hiddenModifier
             // Hack - move the popup out of the way while we calculate its width, or else it can block the cursor
             // causing focus to be gained and lost
             .top((-100).percent).left((-100).percent)
-            .opacity(0)
+
+        override val placement = null
     }
-    class Shown(override var elements: PopoverElements, placement: PopupPlacement, bounds: DOMRect, offsetPixels: Number) : Showing {
-        private fun getAbsModifier(
-            placement: PopupPlacement,
-            popupBounds: DOMRect,
-            targetBounds: DOMRect,
-            offsetPixels: Double,
-        ): Modifier {
-            return when (placement) {
-                PopupPlacement.TopLeft -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left).px)
-                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-                }
 
-                PopupPlacement.Top -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-                }
+    class Shown(
+        override var elements: PopoverElements,
+        placementStrategy: PopupPlacementStrategy,
+        popupWidth: Double,
+        popupHeight: Double
+    ) : Showing {
+        private fun PopupPlacementStrategy.Position.toModifier() = Modifier.top(top).left(left)
 
-                PopupPlacement.TopRight -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
-                        .top((window.pageYOffset + targetBounds.top - offsetPixels - popupBounds.height).px)
-                }
-
-                PopupPlacement.LeftTop -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                        .top((window.pageYOffset + targetBounds.top).px)
-
-                }
-
-                PopupPlacement.RightTop -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                        .top((window.pageYOffset + targetBounds.top).px)
-
-                }
-
-                PopupPlacement.Left -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                }
-
-                PopupPlacement.Right -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                        .top((window.pageYOffset + targetBounds.top - (popupBounds.height - targetBounds.height) / 2).px)
-                }
-
-                PopupPlacement.LeftBottom -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - offsetPixels - popupBounds.width).px)
-                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
-                }
-
-                PopupPlacement.RightBottom -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.right + offsetPixels).px)
-                        .top((window.pageYOffset + targetBounds.top + (targetBounds.height - popupBounds.height)).px)
-                }
-
-                PopupPlacement.BottomLeft -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left).px)
-                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-                }
-
-                PopupPlacement.Bottom -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left - (popupBounds.width - targetBounds.width) / 2).px)
-                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-                }
-
-                PopupPlacement.BottomRight -> {
-                    Modifier
-                        .left((window.pageXOffset + targetBounds.left + (targetBounds.width - popupBounds.width)).px)
-                        .top((window.pageYOffset + targetBounds.bottom + offsetPixels).px)
-                }
-            }
-        }
-
-        override val modifier = run {
-            val targetBounds = elements.placementElement.getBoundingClientRect()
-            getAbsModifier(
-                placement,
-                bounds,
-                targetBounds,
-                offsetPixels.toDouble()
+        private val placementAndPosition = run {
+            val placementBounds = elements.placementElement.getBoundingClientRect()
+            placementStrategy.calculate(
+                popupWidth, popupHeight,
+                placementBounds,
             )
         }
 
+        override val placement = placementAndPosition.placement
+
+        override val modifier = placementAndPosition.position.toModifier()
     }
-    class Hiding(override var elements: PopoverElements, modifier: Modifier) : Visible {
-        override val modifier = modifier.opacity(0)
+    class Hiding(
+        override var elements: PopoverElements,
+        showHideSettings: PopoverShowHideSettings,
+        override val placement: PopupPlacement?,
+        modifier: Modifier
+    ) : Visible {
+        override val modifier = modifier.then(showHideSettings.hiddenModifier)
     }
 }
 
 private class PopoverStateController(
-    private val placement: PopupPlacement,
-    private val offsetPixels: Number,
-    private val showDelayMs: Int,
-    private val hideDelayMs: Int,
+    openCloseStrategy: OpenCloseStrategy,
+    private val showHideSettings: PopoverShowHideSettings,
+    private val placementStrategy: PopupPlacementStrategy,
     private val stayOpenStrategy: StayOpenStrategy,
 ) {
     private var _state by mutableStateOf<PopoverState>(PopoverState.Uninitialized)
@@ -197,14 +131,14 @@ private class PopoverStateController(
 
         resetTimers()
         showTimeoutId = window.setTimeout({
-            this._state = PopoverState.Calculating(state.elements)
+            this._state = PopoverState.Calculating(state.elements, showHideSettings)
             // Sometimes, we can end up having a show request happen before a hiding finishes. In that case, we can
             // bypass the calculation step and jump straight into showing the popup
             state.elements.popupElement
                 // If the popup element was disposed and recreated at some point, its size will need to be recalculated.
                 ?.takeIf { it.getBoundingClientRect().let { rect -> rect.width * rect.height } > 0 }
                 ?.let { finishShowing(it) }
-        }, showDelayMs)
+        }, showHideSettings.showDelayMs)
     }
 
     fun updatePopupElement(popupElement: HTMLElement) {
@@ -227,12 +161,8 @@ private class PopoverStateController(
         val state = _state
         if(state !is PopoverState.Calculating) return
 
-        _state = PopoverState.Shown(
-            state.elements,
-            placement,
-            popupElement.getBoundingClientRect(),
-            offsetPixels
-        )
+        val popupBounds = popupElement.getBoundingClientRect()
+        _state = PopoverState.Shown(state.elements, placementStrategy, popupBounds.width, popupBounds.height)
     }
 
     fun requestHidePopup() {
@@ -247,13 +177,17 @@ private class PopoverStateController(
         hideTimeoutId = window.setTimeout({
             if (!stayOpenStrategy.shouldStayOpen) {
                 val currentOpacity = state.elements.popupElement?.let { window.getComputedStyle(it).getPropertyValue("opacity").toDouble() }
-                this._state = PopoverState.Hiding(state.elements, state.modifier)
+                this._state = PopoverState.Hiding(
+                    state.elements,
+                    showHideSettings,
+                    state.placement,
+                    state.modifier)
                 // Normally, the "hiding" state is marked finished once the "onTransitionEnd" event is reached (see
                 // later in this file). However, if the following condition is true, it means we're in a state that the
                 // event would never fire, so just fire the "finish hiding" event directly.
                 if (currentOpacity == null || currentOpacity == 0.0) finishHiding(state.elements)
             } // else a new hide request will be issued automatically when shouldStayOpen is false
-        }, hideDelayMs)
+        }, showHideSettings.hideDelayMs)
     }
 
     fun finishHiding(elements: PopoverElements) {
@@ -265,9 +199,18 @@ private class PopoverStateController(
     }
 
     init {
+        val scope = CoroutineScope(window.asCoroutineDispatcher())
+
         stayOpenStrategy.stayOpenFlow.onEach { stayOpen ->
             if (!stayOpen) requestHidePopup()
-        }.launchIn(CoroutineScope(window.asCoroutineDispatcher()))
+        }.launchIn(scope)
+
+        openCloseStrategy.requestFlow.onEach { request ->
+            when (request) {
+                OpenCloseRequest.OPEN -> requestShowPopup()
+                OpenCloseRequest.CLOSE -> requestHidePopup()
+            }
+        }.launchIn(scope)
     }
 }
 
@@ -292,9 +235,12 @@ private class PopoverElements(
 }
 
 /**
- * Render a general, undecorated composable in a location above and outside of some target element.
+ * Render a general, undecorated composable in a location above and outside some target element.
  *
- * See also [Tooltip], which wraps your composable in a sort of chat bubble, making it particularly well-suited for
+ * This method should be configurable enough for a majority of cases, but [AdvancedPopover] is also provided for people
+ * who need even more control.
+ *
+ * See also: [Tooltip], which wraps your composable in a sort of chat bubble, making it particularly well-suited for
  * text tooltips.
  *
  * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
@@ -322,8 +268,63 @@ fun Popover(
     stayOpenStrategy: StayOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    content: @Composable BoxScope.() -> Unit,
+    content: @Composable PopupScope.() -> Unit,
 ) {
+    val placementStrategy = remember(placement, offsetPixels) { PopupPlacementStrategy.of(placement, offsetPixels) }
+
+    AdvancedPopover(
+        target = target,
+        modifier = modifier,
+        showDelayMs = showDelayMs,
+        hideDelayMs = hideDelayMs,
+        placementTarget = placementTarget,
+        placementStrategy = placementStrategy,
+        stayOpenStrategy = stayOpenStrategy,
+        variant = variant,
+        ref = ref,
+        content = content
+    )
+}
+
+/**
+ * A more generally configurable version of [Popover], with more control at the cost of more verbosity.
+ *
+ * Please see the header docs for the other Popover method. Only new parameters will be documented here.
+ *
+ * @param hiddenModifier An additional modifier to apply when the popup is in its hidden state. You can use this to
+ *   create contrasting animations between when the popup is hidden and visible, e.g. by adding a scaling or panning
+ *   effect. Note that popups will always have their opacity set to 0 when hidden, so you don't need to specify that.
+ * @param openCloseStrategy A strategy to control when the popup should open and close. If not specified, the popup
+ *   will open when the user either hovers over or sets focus to the target element.
+ * @param placementStrategy A strategy to control the popup's final placement and position. If not specified, the popup
+ *   will use a default strategy that places the popover below the target element.
+ */
+@Composable
+fun AdvancedPopover(
+    target: ElementTarget,
+    modifier: Modifier = Modifier,
+    hiddenModifier: Modifier = Modifier,
+    showDelayMs: Int = 0,
+    hideDelayMs: Int = 0,
+    openCloseStrategy: OpenCloseStrategy? = null,
+    placementTarget: ElementTarget? = null,
+    placementStrategy: PopupPlacementStrategy? = null,
+    stayOpenStrategy: StayOpenStrategy? = null,
+    variant: ComponentVariant? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
+    content: @Composable PopupScope.() -> Unit,
+) {
+    @Suppress("NAME_SHADOWING")
+    val openCloseStrategy = remember(openCloseStrategy) {
+        openCloseStrategy ?: CompositeOpenCloseStrategy(IsMouseOverOpenCloseStrategy(), HasFocusOpenCloseStrategy())
+    }
+
+    val showHideSettings =
+        remember(hiddenModifier, showDelayMs, hideDelayMs) { PopoverShowHideSettings(hiddenModifier, showDelayMs, hideDelayMs) }
+
+    @Suppress("NAME_SHADOWING")
+    val placementStrategy = remember(placementStrategy) { placementStrategy ?: PopupPlacementStrategy.of(PopupPlacement.Bottom) }
+
     @Suppress("NAME_SHADOWING")
     val stayOpenStrategy = remember(stayOpenStrategy) {
         stayOpenStrategy ?: CompositeStayOpenStrategy(
@@ -332,44 +333,24 @@ fun Popover(
         )
     }
     val popoverStateController =
-        remember(placement, offsetPixels, showDelayMs, hideDelayMs, stayOpenStrategy) {
-            PopoverStateController(
-                placement, offsetPixels,
-                showDelayMs.coerceAtLeast(0), hideDelayMs.coerceAtLeast(0),
-                stayOpenStrategy
-            )
+        remember(openCloseStrategy, showHideSettings, placementStrategy, stayOpenStrategy) {
+            PopoverStateController(openCloseStrategy, showHideSettings, placementStrategy, stayOpenStrategy)
         }
 
     // Create a dummy element whose purpose is to search for the target element that we want to attach a popup to.
     Box(
         Modifier.display(DisplayStyle.None),
         ref = disposableRef(popoverStateController, target, placementTarget) { element ->
-            val requestShowPopupListener = EventListener { popoverStateController.requestShowPopup() }
-            val requestHidePopupListener = EventListener { popoverStateController.requestHidePopup() }
-
-            var popoverElements: PopoverElements? = null
             try {
-                popoverElements = PopoverElements(element, target, placementTarget).apply {
+                val popoverElements = PopoverElements(element, target, placementTarget).apply {
                     // The popupElement is created in the deferRender block and it should carry over across this
                     // "element finder" element being recreated.
                     popupElement = (popoverStateController.state as? PopoverState.Initialized)?.elements?.popupElement
                 }
-                popoverElements.targetElement.apply {
-                    addEventListener("mouseenter", requestShowPopupListener)
-                    addEventListener("mouseleave", requestHidePopupListener)
-                    addEventListener("focusin", requestShowPopupListener)
-                    addEventListener("focusout", requestHidePopupListener)
-                }
+                popoverElements.targetElement.apply { openCloseStrategy.init(this) }
                 popoverStateController.updateElements(popoverElements)
             } catch (_: IllegalStateException) {}
-            onDispose {
-                popoverElements?.targetElement?.apply {
-                    removeEventListener("mouseenter", requestShowPopupListener)
-                    removeEventListener("mouseleave", requestHidePopupListener)
-                    removeEventListener("focusin", requestShowPopupListener)
-                    removeEventListener("focusout", requestHidePopupListener)
-                }
-            }
+            onDispose { openCloseStrategy.dispose() }
         }
     )
 
@@ -377,7 +358,7 @@ fun Popover(
     deferRender {
         val visiblePopoverState = (popoverStateController.state as? PopoverState.Visible) ?: return@deferRender
         Box(
-            PopoverStyle.toModifier(variant)
+            PopupStyle.toModifier(variant)
                 .position(Position.Absolute)
                 .then(visiblePopoverState.modifier)
                 .then(modifier)
@@ -398,7 +379,8 @@ fun Popover(
                 }
                 add(ref)
             },
-            content = content
-        )
+        ) {
+            PopupScope(placement = visiblePopoverState.placement).content()
+        }
     }
 }
