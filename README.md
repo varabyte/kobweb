@@ -1275,6 +1275,8 @@ environments. But here are some situations that might benefit from CSS variables
 * You have a site which allows users to choose from a list of several themes (e.g. primary and secondary colors). It
   would be trivial enough to add CSS variables for `themePrimary` and `themeSecondary` (applied at the site's root)
   which you can then reference throughout your styles.
+* You need more control for colors in your theming than can be provided for by the simple light / dark color mode. For
+  example, Wordle has light / dark + normal / contrast modes.
 * You want to create a widget which dynamically changes its behavior based on the context it is added within. For
   example, maybe your site has a dark area and a light area, and the widget should use white outlines in the dark area
   and black outlines in the light. This can be accomplished by exposing an outline color variable, which each area of
