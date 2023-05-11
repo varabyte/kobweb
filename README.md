@@ -1874,7 +1874,7 @@ For a simple site, the above workflow should take about 2 minutes to run.
 
 Many users who create a full stack application generally expect to completely own both the client- and server-side code.
 
-However, being an opionated framework, Kobweb provides a custom Ktor server in order to deliver some of its features.
+However, being an opinionated framework, Kobweb provides a custom Ktor server in order to deliver some of its features.
 For example, it implements logic for handling [server API routes▲](#define-api-routes) as well as some live reloading
 functionality.
 
