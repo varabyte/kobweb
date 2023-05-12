@@ -225,10 +225,22 @@ private fun Routing.configureCatchAllRouting(script: Path, index: Path, routePre
     }
 }
 
+private fun Path?.createApiJar(logger: Logger): ApiJarFile? {
+    when {
+        this == null -> logger.info("No API jar file specified in conf.yaml. Server API routes will not be available.")
+        !this.exists() -> logger.warn("API jar specified but does not exist! Please fix conf.yaml. Invalid path: \"$this\"")
+        else -> {
+            logger.info("API jar found and will be loaded: \"$this\"")
+            return ApiJarFile(this, logger)
+        }
+    }
+    return null
+}
+
 private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, logger: Logger) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
-    val apiJar = conf.server.files.dev.api?.let { ApiJarFile(Path(it), logger) }
+    val apiJar = conf.server.files.dev.api?.let { Path(it) }.createApiJar(logger)
 
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
@@ -314,7 +326,8 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
     val fallbackIndex = systemRoot.resolve("index.html")
     val apiJar = conf.server.files.dev.api
         ?.substringAfterLast("/")
-        ?.let { ApiJarFile(systemRoot.resolve(it), logger) }
+        ?.let { systemRoot.resolve(it) }
+        .createApiJar(logger)
 
     routing {
         val routePrefix = conf.site.routePrefixNormalized
