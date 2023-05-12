@@ -20,6 +20,7 @@ import java.net.URLClassLoader
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.*
+import kotlin.system.exitProcess
 
 private fun isPortInUse(port: Int): Boolean {
     try {
@@ -31,7 +32,7 @@ private fun isPortInUse(port: Int): Boolean {
     }
 }
 
-fun main() = runBlocking {
+fun main(): Unit = runBlocking {
     val folder = KobwebFolder.inWorkingDirectory()
         ?: throw KobwebException("Server must be started in the root of a Kobweb project")
 
@@ -153,4 +154,18 @@ fun main() = runBlocking {
     requestsFile.path.deleteIfExists()
     stateFile.content = null
     log.info("Server finished shutting down.")
+
+    // Hack??? Somehow, due to the hanging get for streaming Kobweb status events in dev mode, occasionally the server
+    // won't finish exiting. It seems like something about our coroutines is keeping the process alive. To repro:
+    //  * Remove / comment out the exitProcess call below
+    //  * Use `kobweb run` in a Kobweb project
+    //  * When the URL comes up (e.g. http://localhost:8080), ctrl click on it many times (5-6?)
+    //  * While the pages are opening up, press Q to start canceling the server
+    //  * Use jps to see that the server process is still alive
+    // I'm not sure if I'm doing anything wrong with how I'm handling stream events, but it seems like `engine.stop`
+    // above doesn't finish cleaning up some live coroutine resource if things are still being cancelled while they are
+    // shutting down. This, in turn, leaves the process alive (which keeps the log file open too).
+    // Exiting may be a hack, but worst case it does nothing and best case it helps us avoid a hanging process that may
+    // or may not be caused by a bug in ktor.
+    exitProcess(0)
 }
