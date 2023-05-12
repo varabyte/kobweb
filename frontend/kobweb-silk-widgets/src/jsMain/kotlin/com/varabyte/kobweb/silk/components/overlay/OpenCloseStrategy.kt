@@ -112,7 +112,7 @@ class ManualOpenCloseStrategy internal constructor(): OpenCloseStrategy() {
 fun OpenCloseStrategy.Companion.manual() = ManualOpenCloseStrategy()
 
 /**
- * A [StayOpenStrategy] that combines multiple orthogonal strategies into one.
+ * A [KeepOpenStrategy] that combines multiple orthogonal strategies into one.
  *
  * If any single strategy requests that the popup should open, then the popup will open. If any strategy requests that
  * the popup should close, then it will close. In other words, this is not a democratic strategy but rather a

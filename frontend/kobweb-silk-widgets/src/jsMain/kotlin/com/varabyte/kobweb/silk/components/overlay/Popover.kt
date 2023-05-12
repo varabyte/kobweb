@@ -95,7 +95,7 @@ private class PopoverStateController(
     openCloseStrategy: OpenCloseStrategy,
     private val showHideSettings: PopoverShowHideSettings,
     private val placementStrategy: PopupPlacementStrategy,
-    private val stayOpenStrategy: StayOpenStrategy,
+    private val keepOpenStrategy: KeepOpenStrategy,
 ) {
     private var _state by mutableStateOf<PopoverState>(PopoverState.Uninitialized)
     val state get() = _state
@@ -144,7 +144,7 @@ private class PopoverStateController(
         val state = _state
         check(state is PopoverState.Initialized)
 
-        stayOpenStrategy.init(popupElement)
+        keepOpenStrategy.init(popupElement)
         state.elements.popupElement = popupElement
     }
 
@@ -152,7 +152,7 @@ private class PopoverStateController(
         val state = _state
         check(state is PopoverState.Initialized)
 
-        stayOpenStrategy.reset()
+        keepOpenStrategy.reset()
         state.elements.popupElement = null
     }
 
@@ -174,7 +174,7 @@ private class PopoverStateController(
 
         resetTimers()
         hideTimeoutId = window.setTimeout({
-            if (!stayOpenStrategy.shouldStayOpen) {
+            if (!keepOpenStrategy.shouldKeepOpen) {
                 val currentOpacity = state.elements.popupElement?.let { window.getComputedStyle(it).getPropertyValue("opacity").toDouble() }
                 this._state = PopoverState.Hiding(
                     state.elements,
@@ -185,7 +185,7 @@ private class PopoverStateController(
                 // later in this file). However, if the following condition is true, it means we're in a state that the
                 // event would never fire, so just fire the "finish hiding" event directly.
                 if (currentOpacity == null || currentOpacity == 0.0) finishHiding(state.elements)
-            } // else a new hide request will be issued automatically when shouldStayOpen is false
+            } // else a new hide request will be issued automatically when shouldKeepOpen is false
         }, showHideSettings.hideDelayMs)
     }
 
@@ -200,8 +200,8 @@ private class PopoverStateController(
     init {
         val scope = CoroutineScope(window.asCoroutineDispatcher())
 
-        stayOpenStrategy.stayOpenFlow.onEach { stayOpen ->
-            if (!stayOpen) requestHidePopup()
+        keepOpenStrategy.keepOpenFlow.onEach { keepOpen ->
+            if (!keepOpen) requestHidePopup()
         }.launchIn(scope)
 
         openCloseStrategy.requestFlow.onEach { request ->
@@ -251,9 +251,9 @@ private class PopoverElements(
  *   original [target] will be used.
  * @param showDelayMs If set, there will be a delay before the popup is shown after the mouse enters the target.
  * @param hideDelayMs If set, there will be a delay before the popup is hidden after the mouse leaves the target.
- * @param stayOpenStrategy Once a popup is open, this strategy controls how it should decide to stay open. If no
+ * @param keepOpenStrategy Once a popup is open, this strategy controls how it should decide to stay open. If no
  *   strategy is passed in, the popup will stay open as long as the mouse is over it or if any child inside of it has
- *   focus. See also: [StayOpenStrategy].
+ *   focus. See also: [KeepOpenStrategy].
  */
 @Composable
 fun Popover(
@@ -264,7 +264,7 @@ fun Popover(
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    stayOpenStrategy: StayOpenStrategy? = null,
+    keepOpenStrategy: KeepOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
@@ -278,7 +278,7 @@ fun Popover(
         hideDelayMs = hideDelayMs,
         placementTarget = placementTarget,
         placementStrategy = placementStrategy,
-        stayOpenStrategy = stayOpenStrategy,
+        keepOpenStrategy = keepOpenStrategy,
         variant = variant,
         ref = ref,
         content = content
@@ -308,7 +308,7 @@ fun AdvancedPopover(
     openCloseStrategy: OpenCloseStrategy? = null,
     placementTarget: ElementTarget? = null,
     placementStrategy: PopupPlacementStrategy? = null,
-    stayOpenStrategy: StayOpenStrategy? = null,
+    keepOpenStrategy: KeepOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
@@ -325,12 +325,12 @@ fun AdvancedPopover(
     val placementStrategy = remember(placementStrategy) { placementStrategy ?: PopupPlacementStrategy.of(PopupPlacement.Bottom) }
 
     @Suppress("NAME_SHADOWING")
-    val stayOpenStrategy = remember(stayOpenStrategy) {
-        stayOpenStrategy ?: (StayOpenStrategy.onHover() + StayOpenStrategy.onFocus())
+    val keepOpenStrategy = remember(keepOpenStrategy) {
+        keepOpenStrategy ?: (KeepOpenStrategy.onHover() + KeepOpenStrategy.onFocus())
     }
     val popoverStateController =
-        remember(openCloseStrategy, showHideSettings, placementStrategy, stayOpenStrategy) {
-            PopoverStateController(openCloseStrategy, showHideSettings, placementStrategy, stayOpenStrategy)
+        remember(openCloseStrategy, showHideSettings, placementStrategy, keepOpenStrategy) {
+            PopoverStateController(openCloseStrategy, showHideSettings, placementStrategy, keepOpenStrategy)
         }
 
     // Create a dummy element whose purpose is to search for the target element that we want to attach a popup to.

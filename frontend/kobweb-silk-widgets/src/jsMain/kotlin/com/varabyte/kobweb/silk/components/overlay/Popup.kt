@@ -222,11 +222,11 @@ abstract class PopupPlacementStrategy {
  *   original [target] will be used.
  * @param showDelayMs If set, there will be a delay before the popup is shown after the mouse enters the target.
  * @param hideDelayMs If set, there will be a delay before the popup is hidden after the mouse leaves the target.
- * @param stayOpenStrategy Once a popup is open, this strategy controls how it should decide to stay open. If no
+ * @param keepOpenStrategy Once a popup is open, this strategy controls how it should decide to stay open. If no
  *   strategy is passed in, the popup will stay open as long as the mouse is over it or if any child inside of it has
- *   focus. See also: [StayOpenStrategy].
+ *   focus. See also: [KeepOpenStrategy].
  */
-@Deprecated("Popup has been renamed to Popover", ReplaceWith("Popover(target, modifier, placement, offsetPixels, placementTarget, showDelayMs, hideDelayMs, stayOpenStrategy, variant, ref, content)"))
+@Deprecated("Popup has been renamed to Popover", ReplaceWith("Popover(target, modifier, placement, offsetPixels, placementTarget, showDelayMs, hideDelayMs, keepOpenStrategy, variant, ref, content)"))
 @Composable
 fun Popup(
     target: ElementTarget,
@@ -236,7 +236,7 @@ fun Popup(
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    stayOpenStrategy: StayOpenStrategy? = null,
+    keepOpenStrategy: KeepOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
@@ -249,7 +249,7 @@ fun Popup(
         placementTarget = placementTarget,
         showDelayMs = showDelayMs,
         hideDelayMs = hideDelayMs,
-        stayOpenStrategy = stayOpenStrategy,
+        keepOpenStrategy = keepOpenStrategy,
         variant = variant,
         ref = ref,
         content = content

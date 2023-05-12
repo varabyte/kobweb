@@ -176,7 +176,7 @@ val TooltipTextContainerStyle = ComponentStyle.base("tooltip-text") {
  * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
  * first, as a parent method that this lives under. See the method for more details.
  *
- * @param stayOpenStrategy The strategy for how to keep the tooltip open. If nothing is specified, then the tooltip
+ * @param keepOpenStrategy The strategy for how to keep the tooltip open. If nothing is specified, then the tooltip
  *   will close whenever the user moves the mouse away from the target element.
  */
 @Composable
@@ -189,7 +189,7 @@ fun Tooltip(
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    stayOpenStrategy: StayOpenStrategy? = null,
+    keepOpenStrategy: KeepOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
@@ -206,7 +206,7 @@ fun Tooltip(
         openCloseStrategy = null,
         placementTarget,
         placementStrategy,
-        stayOpenStrategy,
+        keepOpenStrategy,
         variant,
         ref,
         content
@@ -232,7 +232,7 @@ fun Tooltip(
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    stayOpenStrategy: StayOpenStrategy? = null,
+    keepOpenStrategy: KeepOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
@@ -249,7 +249,7 @@ fun Tooltip(
         openCloseStrategy = null,
         placementTarget,
         placementStrategy,
-        stayOpenStrategy,
+        keepOpenStrategy,
         variant,
         ref
     )
@@ -271,12 +271,12 @@ fun AdvancedTooltip(
     openCloseStrategy: OpenCloseStrategy? = null,
     placementTarget: ElementTarget? = null,
     placementStrategy: PopupPlacementStrategy? = null,
-    stayOpenStrategy: StayOpenStrategy? = null,
+    keepOpenStrategy: KeepOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
 ) {
-    @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember(stayOpenStrategy) { stayOpenStrategy ?: StayOpenStrategy.never() }
+    @Suppress("NAME_SHADOWING") val keepOpenStrategy = remember(keepOpenStrategy) { keepOpenStrategy ?: KeepOpenStrategy.never() }
 
     AdvancedPopover(
         target,
@@ -286,7 +286,7 @@ fun AdvancedTooltip(
         openCloseStrategy,
         placementTarget,
         placementStrategy,
-        stayOpenStrategy,
+        keepOpenStrategy,
         variant,
         ref
     ) {
@@ -333,7 +333,7 @@ fun AdvancedTooltip(
     openCloseStrategy: OpenCloseStrategy? = null,
     placementTarget: ElementTarget? = null,
     placementStrategy: PopupPlacementStrategy? = null,
-    stayOpenStrategy: StayOpenStrategy? = null,
+    keepOpenStrategy: KeepOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
@@ -347,7 +347,7 @@ fun AdvancedTooltip(
         openCloseStrategy,
         placementTarget,
         placementStrategy,
-        stayOpenStrategy,
+        keepOpenStrategy,
         variant,
         ref
     ) {
