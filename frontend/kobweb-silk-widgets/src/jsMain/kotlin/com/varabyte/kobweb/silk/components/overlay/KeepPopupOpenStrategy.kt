@@ -12,17 +12,27 @@ import org.w3c.dom.events.FocusEvent
 /**
  * A contract for a strategy that determines whether a popup should stay open or not.
  *
+ * The strategy will be informed about some popup element, which it can query / listen to its events to determine if
+ * it should be kept open or not.
+ *
  * If users want to provide their own strategy, they should instantiate a class that implements this class and
  * `remember` it somewhere:
  *
  * ```
- * val manualStrategy = remember { KeepOpenStrategy.manual() }
+ * val manualStrategy = remember { KeepPopupOpenStrategy.manual() }
  * Popup(..., keepOpenStrategy = manualStrategy) {
  *   Button(onClick = { manualStrategy.shouldKeepOpen = false }) { Text("Close") }
  * }
  * ```
+ *
+ * Children classes should implement this and fire [emitShouldKeepOpen] when they detect some change that determines if
+ * the popup should stay open or not.
+ *
+ * @param defaultValue The initial "keep open" value for this strategy. Defaults to `false`. Note that the same strategy
+ *   can be reused for multiple lifecycles of a popup opening and closing, so each time it is reset, it will use set
+ *   its state back to this default value.
  */
-abstract class KeepOpenStrategy(private val defaultValue: Boolean = false) {
+abstract class KeepPopupOpenStrategy(private val defaultValue: Boolean = false) {
     companion object; // Declared so we can extend it with strategies
 
     private val _keepOpenFlow = MutableStateFlow(defaultValue)
@@ -62,12 +72,12 @@ abstract class KeepOpenStrategy(private val defaultValue: Boolean = false) {
 }
 
 /** A readable convenience property that queries the underlying state flow. */
-val KeepOpenStrategy.shouldKeepOpen: Boolean get() = keepOpenFlow.value
+val KeepPopupOpenStrategy.shouldKeepOpen: Boolean get() = keepOpenFlow.value
 
 /**
- * A [KeepOpenStrategy] that keeps the popup open as long as the mouse cursor is inside the popup somewhere.
+ * A [KeepPopupOpenStrategy] that keeps the popup open as long as the mouse cursor is inside the popup somewhere.
  */
-fun KeepOpenStrategy.Companion.onHover() = object : KeepOpenStrategy() {
+fun KeepPopupOpenStrategy.Companion.onHover() = object : KeepPopupOpenStrategy() {
     override fun init(popupElement: HTMLElement) {
         popupElement.addEventListener("mouseenter", EventListener { emitShouldKeepOpen(true) })
         popupElement.addEventListener("mouseleave", EventListener { emitShouldKeepOpen(false) })
@@ -75,9 +85,9 @@ fun KeepOpenStrategy.Companion.onHover() = object : KeepOpenStrategy() {
 }
 
 /**
- * A [KeepOpenStrategy] that keeps the popup open as long as any elements within the popup have focus.
+ * A [KeepPopupOpenStrategy] that keeps the popup open as long as any elements within the popup have focus.
  */
-fun KeepOpenStrategy.Companion.onFocus() = object : KeepOpenStrategy() {
+fun KeepPopupOpenStrategy.Companion.onFocus() = object : KeepPopupOpenStrategy() {
     override fun init(popupElement: HTMLElement) {
         popupElement.addEventListener("focusin", { emitShouldKeepOpen(true) })
         popupElement.addEventListener("focusout", { evt ->
@@ -88,23 +98,23 @@ fun KeepOpenStrategy.Companion.onFocus() = object : KeepOpenStrategy() {
     }
 }
 
-class ManualKeepOpenStrategy internal constructor(): KeepOpenStrategy(defaultValue = true) {
+class ManualKeepPopupOpenStrategy internal constructor(): KeepPopupOpenStrategy(defaultValue = true) {
     var shouldKeepOpen: Boolean
         get() = keepOpenFlow.value
         set(value) { emitShouldKeepOpen(value) }
 }
 
 /**
- * A [KeepOpenStrategy] that allows the user to manually control whether the popup should stay open or not.
+ * A [KeepPopupOpenStrategy] that allows the user to manually control whether the popup should stay open or not.
  *
  * This strategy will always be defaulted to `true`, so if you want to close the popup, you must explicitly set
  * [shouldKeepOpen] to false. A common use-case here is that your popup has a close button that the user can click to
  * close the popup. Another approach could be a popup that closes when a timer runs down, etc.
  */
-fun KeepOpenStrategy.Companion.manual() = ManualKeepOpenStrategy()
+fun KeepPopupOpenStrategy.Companion.manual() = ManualKeepPopupOpenStrategy()
 
 /**
- * A [KeepOpenStrategy] which asks to never keep the popup open.
+ * A [KeepPopupOpenStrategy] which asks to never keep the popup open.
  *
  * As widgets default to a behavior that tries to keep the popup open if no strategy is explicitly provided, this can be
  * used to explicitly reject that behavior.
@@ -112,15 +122,15 @@ fun KeepOpenStrategy.Companion.manual() = ManualKeepOpenStrategy()
  * If this is the strategy that is used, then a popup will only stay open as long as the mouse cursor is over the
  * original element that owns the popup.
  */
-fun KeepOpenStrategy.Companion.never() = object : KeepOpenStrategy() {}
+fun KeepPopupOpenStrategy.Companion.never() = object : KeepPopupOpenStrategy() {}
 
 /**
- * A [KeepOpenStrategy] that combines multiple orthogonal strategies into one.
+ * A [KeepPopupOpenStrategy] that combines multiple orthogonal strategies into one.
  *
  * As long as any of the strategies want to keep the popup open, this will treat that as a request to keep the popup
  * open.
  */
-fun KeepOpenStrategy.Companion.combine(vararg strategies: KeepOpenStrategy) = object : KeepOpenStrategy() {
+fun KeepPopupOpenStrategy.Companion.combine(vararg strategies: KeepPopupOpenStrategy) = object : KeepPopupOpenStrategy() {
     init {
         strategies
             .map { it.keepOpenFlow }
@@ -143,4 +153,4 @@ fun KeepOpenStrategy.Companion.combine(vararg strategies: KeepOpenStrategy) = ob
 }
 
 
-operator fun KeepOpenStrategy.plus(other: KeepOpenStrategy) = KeepOpenStrategy.combine(this, other)
+operator fun KeepPopupOpenStrategy.plus(other: KeepPopupOpenStrategy) = KeepPopupOpenStrategy.combine(this, other)

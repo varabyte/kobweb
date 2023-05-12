@@ -224,7 +224,7 @@ abstract class PopupPlacementStrategy {
  * @param hideDelayMs If set, there will be a delay before the popup is hidden after the mouse leaves the target.
  * @param keepOpenStrategy Once a popup is open, this strategy controls how it should decide to stay open. If no
  *   strategy is passed in, the popup will stay open as long as the mouse is over it or if any child inside of it has
- *   focus. See also: [KeepOpenStrategy].
+ *   focus. See also: [KeepPopupOpenStrategy].
  */
 @Deprecated("Popup has been renamed to Popover", ReplaceWith("Popover(target, modifier, placement, offsetPixels, placementTarget, showDelayMs, hideDelayMs, keepOpenStrategy, variant, ref, content)"))
 @Composable
@@ -236,7 +236,7 @@ fun Popup(
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    keepOpenStrategy: KeepOpenStrategy? = null,
+    keepOpenStrategy: KeepPopupOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,

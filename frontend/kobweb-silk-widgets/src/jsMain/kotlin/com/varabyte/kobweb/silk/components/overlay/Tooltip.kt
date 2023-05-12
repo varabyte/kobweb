@@ -189,7 +189,7 @@ fun Tooltip(
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    keepOpenStrategy: KeepOpenStrategy? = null,
+    keepOpenStrategy: KeepPopupOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
@@ -232,7 +232,7 @@ fun Tooltip(
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    keepOpenStrategy: KeepOpenStrategy? = null,
+    keepOpenStrategy: KeepPopupOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
@@ -268,15 +268,15 @@ fun AdvancedTooltip(
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    openCloseStrategy: OpenCloseStrategy? = null,
+    openCloseStrategy: OpenClosePopupStrategy? = null,
     placementTarget: ElementTarget? = null,
     placementStrategy: PopupPlacementStrategy? = null,
-    keepOpenStrategy: KeepOpenStrategy? = null,
+    keepOpenStrategy: KeepPopupOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
 ) {
-    @Suppress("NAME_SHADOWING") val keepOpenStrategy = remember(keepOpenStrategy) { keepOpenStrategy ?: KeepOpenStrategy.never() }
+    @Suppress("NAME_SHADOWING") val keepOpenStrategy = remember(keepOpenStrategy) { keepOpenStrategy ?: KeepPopupOpenStrategy.never() }
 
     AdvancedPopover(
         target,
@@ -330,10 +330,10 @@ fun AdvancedTooltip(
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
-    openCloseStrategy: OpenCloseStrategy? = null,
+    openCloseStrategy: OpenClosePopupStrategy? = null,
     placementTarget: ElementTarget? = null,
     placementStrategy: PopupPlacementStrategy? = null,
-    keepOpenStrategy: KeepOpenStrategy? = null,
+    keepOpenStrategy: KeepPopupOpenStrategy? = null,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {

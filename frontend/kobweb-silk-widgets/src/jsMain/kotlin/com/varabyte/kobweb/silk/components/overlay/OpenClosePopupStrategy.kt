@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.EventListener
 
-enum class OpenCloseRequest {
+enum class OpenClose {
     OPEN,
     CLOSE,
 }
@@ -15,14 +15,17 @@ enum class OpenCloseRequest {
 /**
  * A contract for a strategy that determines when a popup should open or close.
  *
- * Children classes should implement this and fire [emitRequest] when they want to open or close the popup.
+ * The strategy will be informed about some target element, which represents the element that the popup is anchored to.
+ * In other words, interaction with that element is what should trigger the popup to open or close.
+ *
+ * Children classes should implement this and fire [emitRequest] when they want to request opening or closing the popup.
  */
-abstract class OpenCloseStrategy {
+abstract class OpenClosePopupStrategy {
     companion object; // Declared so we can extend it with strategies
 
-    private val _requestFlow = MutableStateFlow(OpenCloseRequest.CLOSE)
+    private val _requestFlow = MutableStateFlow(OpenClose.CLOSE)
 
-    val requestFlow: StateFlow<OpenCloseRequest> = _requestFlow.asStateFlow()
+    val requestFlow: StateFlow<OpenClose> = _requestFlow.asStateFlow()
 
     /**
      * Initialize this strategy with some target element.
@@ -36,13 +39,13 @@ abstract class OpenCloseStrategy {
      */
     open fun reset() = Unit
 
-    protected fun emitRequest(request: OpenCloseRequest) {
+    protected fun emitRequest(request: OpenClose) {
         _requestFlow.tryEmit(request)
     }
 }
 
 /** A readable convenience property that queries the underlying state flow. */
-val OpenCloseStrategy.isOpen: Boolean get() = requestFlow.value == OpenCloseRequest.OPEN
+val OpenClosePopupStrategy.isOpen: Boolean get() = requestFlow.value == OpenClose.OPEN
 
 private class EventListenerManager(private val element: HTMLElement) {
     private val listeners = mutableMapOf<String, EventListener>()
@@ -63,13 +66,13 @@ private class EventListenerManager(private val element: HTMLElement) {
 /**
  * A strategy that opens the popup when the cursor enters some target element and closes it when the cursor leaves.
  */
-fun OpenCloseStrategy.Companion.onHover() = object : OpenCloseStrategy() {
+fun OpenClosePopupStrategy.Companion.onHover() = object : OpenClosePopupStrategy() {
     private var manager: EventListenerManager? = null
 
     override fun init(targetElement: HTMLElement) {
         manager = EventListenerManager(targetElement).apply {
-            addEventListener("mouseenter", EventListener { emitRequest(OpenCloseRequest.OPEN) })
-            addEventListener("mouseleave", EventListener { emitRequest(OpenCloseRequest.CLOSE) })
+            addEventListener("mouseenter", EventListener { emitRequest(OpenClose.OPEN) })
+            addEventListener("mouseleave", EventListener { emitRequest(OpenClose.CLOSE) })
         }
     }
 
@@ -82,13 +85,13 @@ fun OpenCloseStrategy.Companion.onHover() = object : OpenCloseStrategy() {
 /**
  * A strategy that opens the popup when an element gains focus and closes it when it loses focus.
  */
-fun OpenCloseStrategy.Companion.onFocus() = object : OpenCloseStrategy() {
+fun OpenClosePopupStrategy.Companion.onFocus() = object : OpenClosePopupStrategy() {
     private var manager: EventListenerManager? = null
 
     override fun init(targetElement: HTMLElement) {
         manager = EventListenerManager(targetElement).apply {
-            addEventListener("focusin", EventListener { emitRequest(OpenCloseRequest.OPEN) })
-            addEventListener("focusout", EventListener { emitRequest(OpenCloseRequest.CLOSE) })
+            addEventListener("focusin", EventListener { emitRequest(OpenClose.OPEN) })
+            addEventListener("focusout", EventListener { emitRequest(OpenClose.CLOSE) })
         }
     }
 
@@ -98,27 +101,27 @@ fun OpenCloseStrategy.Companion.onFocus() = object : OpenCloseStrategy() {
     }
 }
 
-class ManualOpenCloseStrategy internal constructor(): OpenCloseStrategy() {
+class ManualOpenClosePopupStrategy internal constructor(): OpenClosePopupStrategy() {
     var isOpen: Boolean
-        get() = requestFlow.value == OpenCloseRequest.OPEN
+        get() = requestFlow.value == OpenClose.OPEN
         set(value) {
-            emitRequest(if (value) OpenCloseRequest.OPEN else OpenCloseRequest.CLOSE)
+            emitRequest(if (value) OpenClose.OPEN else OpenClose.CLOSE)
         }
 }
 
 /**
  * A strategy that allows the user to manually control when a popup should open or close.
  */
-fun OpenCloseStrategy.Companion.manual() = ManualOpenCloseStrategy()
+fun OpenClosePopupStrategy.Companion.manual() = ManualOpenClosePopupStrategy()
 
 /**
- * A [KeepOpenStrategy] that combines multiple orthogonal strategies into one.
+ * A [KeepPopupOpenStrategy] that combines multiple orthogonal strategies into one.
  *
  * If any single strategy requests that the popup should open, then the popup will open. If any strategy requests that
  * the popup should close, then it will close. In other words, this is not a democratic strategy but rather a
  * dictatorial one.
  */
-fun OpenCloseStrategy.Companion.combine(vararg strategies: OpenCloseStrategy) = object : OpenCloseStrategy() {
+fun OpenClosePopupStrategy.Companion.combine(vararg strategies: OpenClosePopupStrategy) = object : OpenClosePopupStrategy() {
     init {
         strategies
             .map { it.requestFlow }
@@ -136,4 +139,4 @@ fun OpenCloseStrategy.Companion.combine(vararg strategies: OpenCloseStrategy) = 
     }
 }
 
-operator fun OpenCloseStrategy.plus(other: OpenCloseStrategy) = OpenCloseStrategy.combine(this, other)
+operator fun OpenClosePopupStrategy.plus(other: OpenClosePopupStrategy) = OpenClosePopupStrategy.combine(this, other)
