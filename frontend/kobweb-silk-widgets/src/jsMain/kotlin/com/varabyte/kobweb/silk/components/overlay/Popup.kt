@@ -5,11 +5,8 @@ import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
-import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.attrsModifier
-import com.varabyte.kobweb.compose.ui.modifiers.opacity
 import com.varabyte.kobweb.compose.ui.modifiers.transition
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -80,130 +77,130 @@ class PopupScope(val placement: PopupPlacement?) {
  */
 abstract class PopupPlacementStrategy {
     class Position(val top: CSSLengthValue, val left: CSSLengthValue)
-    class PlacementAndPosition(val placement: PopupPlacement, val position: Position)
+    class PositionAndPlacement(val position: Position, val placement: PopupPlacement? = null)
 
     /**
-     * Calculates the absolute position of a popup given its placement, returning a Modifier for positioning.
-     */
-    protected fun calculatePosition(
-        placement: PopupPlacement,
-        popupWidth: Double, popupHeight: Double,
-        placementBounds: DOMRect,
-        offsetPixels: Number,
-    ): Position {
-        @Suppress("NAME_SHADOWING") val offsetPixels = offsetPixels.toDouble()
-        return when (placement) {
-            PopupPlacement.TopLeft -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
-                    left = (window.pageXOffset + placementBounds.left).px,
-                )
-            }
-
-            PopupPlacement.Top -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
-                    left = (window.pageXOffset + placementBounds.left - (popupWidth - placementBounds.width) / 2).px,
-                )
-            }
-
-            PopupPlacement.TopRight -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
-                    left = (window.pageXOffset + placementBounds.left + (placementBounds.width - popupWidth)).px,
-                )
-            }
-
-            PopupPlacement.LeftTop -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top).px,
-                    left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
-                )
-            }
-
-            PopupPlacement.RightTop -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top).px,
-                    left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
-                )
-            }
-
-            PopupPlacement.Left -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top - (popupHeight - placementBounds.height) / 2).px,
-                    left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
-                )
-            }
-
-            PopupPlacement.Right -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top - (popupHeight - placementBounds.height) / 2).px,
-                    left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
-                )
-            }
-
-            PopupPlacement.LeftBottom -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top + (placementBounds.height - popupHeight)).px,
-                    left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
-                )
-            }
-
-            PopupPlacement.RightBottom -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.top + (placementBounds.height - popupHeight)).px,
-                    left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
-                )
-            }
-
-            PopupPlacement.BottomLeft -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
-                    left = (window.pageXOffset + placementBounds.left).px,
-                )
-            }
-
-            PopupPlacement.Bottom -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
-                    left = (window.pageXOffset + placementBounds.left - (popupWidth - placementBounds.width) / 2).px,
-                )
-            }
-
-            PopupPlacement.BottomRight -> {
-                Position(
-                    top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
-                    left = (window.pageXOffset + placementBounds.left + (placementBounds.width - popupWidth)).px,
-                )
-            }
-        }
-    }
-
-    /**
-     * Returns the placement and absolute position that a popup should be placed at.
+     * Returns the absolute position and placement that a popup should be placed at.
      *
-     * The absolute position is very important, as it is used to position the popup on screen, while the placement
-     * is a property which will be exposed to popup classes to use if it wants to. For example, tooltips will use the
-     * placement in order to control where the tooltip arrow should be placed.
+     * The absolute position is very important, as it is used to position the popup on screen.
+     *
+     * Specifying the placement is optional. Some widgets may use it to decorate themselves, like tooltips using it to
+     * add an appropriate arrow (e.g. left placements result in an arrow on the right), but is it not always required.
      */
     abstract fun calculate(
         popupWidth: Double, popupHeight: Double,
         placementBounds: DOMRect,
-    ): PlacementAndPosition
+    ): PositionAndPlacement
 
     companion object {
         /**
          * Returns the general strategy of placing a popup in a particular location based on a desired [PopupPlacement].
          */
         fun of(placement: PopupPlacement, offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX) = object : PopupPlacementStrategy() {
+            private fun calculatePosition(
+                placement: PopupPlacement,
+                popupWidth: Double, popupHeight: Double,
+                placementBounds: DOMRect,
+                offsetPixels: Number,
+            ): Position {
+                @Suppress("NAME_SHADOWING") val offsetPixels = offsetPixels.toDouble()
+                return when (placement) {
+                    PopupPlacement.TopLeft -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
+                            left = (window.pageXOffset + placementBounds.left).px,
+                        )
+                    }
+
+                    PopupPlacement.Top -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
+                            left = (window.pageXOffset + placementBounds.left - (popupWidth - placementBounds.width) / 2).px,
+                        )
+                    }
+
+                    PopupPlacement.TopRight -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top - offsetPixels - popupHeight).px,
+                            left = (window.pageXOffset + placementBounds.left + (placementBounds.width - popupWidth)).px,
+                        )
+                    }
+
+                    PopupPlacement.LeftTop -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top).px,
+                            left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
+                        )
+                    }
+
+                    PopupPlacement.RightTop -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top).px,
+                            left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
+                        )
+                    }
+
+                    PopupPlacement.Left -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top - (popupHeight - placementBounds.height) / 2).px,
+                            left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
+                        )
+                    }
+
+                    PopupPlacement.Right -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top - (popupHeight - placementBounds.height) / 2).px,
+                            left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
+                        )
+                    }
+
+                    PopupPlacement.LeftBottom -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top + (placementBounds.height - popupHeight)).px,
+                            left = (window.pageXOffset + placementBounds.left - offsetPixels - popupWidth).px,
+                        )
+                    }
+
+                    PopupPlacement.RightBottom -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.top + (placementBounds.height - popupHeight)).px,
+                            left = (window.pageXOffset + placementBounds.right + offsetPixels).px,
+                        )
+                    }
+
+                    PopupPlacement.BottomLeft -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
+                            left = (window.pageXOffset + placementBounds.left).px,
+                        )
+                    }
+
+                    PopupPlacement.Bottom -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
+                            left = (window.pageXOffset + placementBounds.left - (popupWidth - placementBounds.width) / 2).px,
+                        )
+                    }
+
+                    PopupPlacement.BottomRight -> {
+                        Position(
+                            top = (window.pageYOffset + placementBounds.bottom + offsetPixels).px,
+                            left = (window.pageXOffset + placementBounds.left + (placementBounds.width - popupWidth)).px,
+                        )
+                    }
+                }
+            }
+
             override fun calculate(
                 popupWidth: Double,
                 popupHeight: Double,
                 placementBounds: DOMRect,
-            ): PlacementAndPosition {
-                return PlacementAndPosition(
-                    placement,
-                    calculatePosition(placement, popupWidth, popupHeight, placementBounds, offsetPixels)
+            ): PositionAndPlacement {
+                // TODO: Add fallback behavior, so if the requested placement ends up with the popup off the screen,
+                //  try opposite sides so the final placement is always on screen.
+                return PositionAndPlacement(
+                    calculatePosition(placement, popupWidth, popupHeight, placementBounds, offsetPixels),
+                    placement
                 )
             }
         }

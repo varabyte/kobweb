@@ -70,7 +70,7 @@ private sealed interface PopoverState {
     ) : Showing {
         private fun PopupPlacementStrategy.Position.toModifier() = Modifier.top(top).left(left)
 
-        private val placementAndPosition = run {
+        private val positionAndPlacement = run {
             val placementBounds = elements.placementElement.getBoundingClientRect()
             placementStrategy.calculate(
                 popupWidth, popupHeight,
@@ -78,9 +78,8 @@ private sealed interface PopoverState {
             )
         }
 
-        override val placement = placementAndPosition.placement
-
-        override val modifier = placementAndPosition.position.toModifier()
+        override val placement = positionAndPlacement.placement
+        override val modifier = positionAndPlacement.position.toModifier()
     }
     class Hiding(
         override var elements: PopoverElements,
@@ -316,7 +315,7 @@ fun AdvancedPopover(
 ) {
     @Suppress("NAME_SHADOWING")
     val openCloseStrategy = remember(openCloseStrategy) {
-        openCloseStrategy ?: CompositeOpenCloseStrategy(IsMouseOverOpenCloseStrategy(), HasFocusOpenCloseStrategy())
+        openCloseStrategy ?: (OpenCloseStrategy.onHover() + OpenCloseStrategy.onFocus())
     }
 
     val showHideSettings =
@@ -327,10 +326,7 @@ fun AdvancedPopover(
 
     @Suppress("NAME_SHADOWING")
     val stayOpenStrategy = remember(stayOpenStrategy) {
-        stayOpenStrategy ?: CompositeStayOpenStrategy(
-            IsMouseOverStayOpenStrategy(),
-            HasFocusStayOpenStrategy()
-        )
+        stayOpenStrategy ?: (StayOpenStrategy.onHover() + StayOpenStrategy.onFocus())
     }
     val popoverStateController =
         remember(openCloseStrategy, showHideSettings, placementStrategy, stayOpenStrategy) {
@@ -350,7 +346,7 @@ fun AdvancedPopover(
                 popoverElements.targetElement.apply { openCloseStrategy.init(this) }
                 popoverStateController.updateElements(popoverElements)
             } catch (_: IllegalStateException) {}
-            onDispose { openCloseStrategy.dispose() }
+            onDispose { openCloseStrategy.reset() }
         }
     )
 

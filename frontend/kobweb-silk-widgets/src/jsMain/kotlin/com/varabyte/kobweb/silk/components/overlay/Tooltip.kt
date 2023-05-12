@@ -276,7 +276,7 @@ fun AdvancedTooltip(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
 ) {
-    @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember(stayOpenStrategy) { stayOpenStrategy ?: NeverStayOpenStrategy() }
+    @Suppress("NAME_SHADOWING") val stayOpenStrategy = remember(stayOpenStrategy) { stayOpenStrategy ?: StayOpenStrategy.never() }
 
     AdvancedPopover(
         target,
