@@ -85,7 +85,7 @@ abstract class PopupPlacementStrategy {
      * The absolute position is very important, as it is used to position the popup on screen.
      *
      * Specifying the placement is optional. Some widgets may use it to decorate themselves, like tooltips using it to
-     * add an appropriate arrow (e.g. left placements result in an arrow on the right), but is it not always required.
+     * add an appropriate arrow (e.g. left placements result in an arrow on the right), but it is not always required.
      */
     abstract fun calculate(
         popupWidth: Double, popupHeight: Double,
