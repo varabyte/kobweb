@@ -86,11 +86,15 @@ abstract class PopupPlacementStrategy {
      *
      * Specifying the placement is optional. Some widgets may use it to decorate themselves, like tooltips using it to
      * add an appropriate arrow (e.g. left placements result in an arrow on the right), but it is not always required.
+     *
+     * This method is given two HTML elements to use for the final calculation. These should be treated as read-only,
+     * and final results should be considered unexpected if you modify them.
+     *
+     * @param placementElement The element in the DOM that this popup should be placed relative to.
+     * @param popupElement The backing element for the popup itself. Its position at this point is not yet finalized,
+     *   so you should usually just need to check its size values (i.e. width and height).
      */
-    abstract fun calculate(
-        popupWidth: Double, popupHeight: Double,
-        placementBounds: DOMRect,
-    ): PositionAndPlacement
+    abstract fun calculate(placementElement: HTMLElement, popupElement: HTMLElement): PositionAndPlacement
 
     companion object {
         /**
@@ -191,11 +195,12 @@ abstract class PopupPlacementStrategy {
                 }
             }
 
-            override fun calculate(
-                popupWidth: Double,
-                popupHeight: Double,
-                placementBounds: DOMRect,
-            ): PositionAndPlacement {
+            override fun calculate(placementElement: HTMLElement, popupElement: HTMLElement): PositionAndPlacement {
+                val placementBounds = placementElement.getBoundingClientRect()
+                val popupBounds = popupElement.getBoundingClientRect()
+                val popupWidth = popupBounds.width
+                val popupHeight = popupBounds.height
+
                 // TODO: Add fallback behavior, so if the requested placement ends up with the popup off the screen,
                 //  try opposite sides so the final placement is always on screen.
                 return PositionAndPlacement(

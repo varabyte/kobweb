@@ -65,18 +65,11 @@ private sealed interface PopoverState {
     class Shown(
         override var elements: PopoverElements,
         placementStrategy: PopupPlacementStrategy,
-        popupWidth: Double,
-        popupHeight: Double
     ) : Showing {
         private fun PopupPlacementStrategy.Position.toModifier() = Modifier.top(top).left(left)
 
-        private val positionAndPlacement = run {
-            val placementBounds = elements.placementElement.getBoundingClientRect()
-            placementStrategy.calculate(
-                popupWidth, popupHeight,
-                placementBounds,
-            )
-        }
+        private val positionAndPlacement =
+            placementStrategy.calculate(elements.placementElement, elements.popupElement!!)
 
         override val placement = positionAndPlacement.placement
         override val modifier = positionAndPlacement.position.toModifier()
@@ -136,7 +129,7 @@ private class PopoverStateController(
             state.elements.popupElement
                 // If the popup element was disposed and recreated at some point, its size will need to be recalculated.
                 ?.takeIf { it.getBoundingClientRect().let { rect -> rect.width * rect.height } > 0 }
-                ?.let { finishShowing(it) }
+                ?.let { finishShowing() }
         }, showHideSettings.showDelayMs)
     }
 
@@ -156,12 +149,14 @@ private class PopoverStateController(
         state.elements.popupElement = null
     }
 
-    fun finishShowing(popupElement: HTMLElement) {
+    fun finishShowing() {
         val state = _state
         if(state !is PopoverState.Calculating) return
 
-        val popupBounds = popupElement.getBoundingClientRect()
-        _state = PopoverState.Shown(state.elements, placementStrategy, popupBounds.width, popupBounds.height)
+        val popupElement = state.elements.popupElement
+        check (popupElement != null)
+
+        _state = PopoverState.Shown(state.elements, placementStrategy)
     }
 
     fun requestHidePopup() {
@@ -367,7 +362,7 @@ fun AdvancedPopover(
             ref = refScope {
                 disposableRef { popupElement ->
                     popoverStateController.updatePopupElement(popupElement)
-                    popoverStateController.finishShowing(popupElement)
+                    popoverStateController.finishShowing()
                     onDispose {
                         popoverStateController.clearPopupElement()
                         popoverStateController.resetToFoundElements()
