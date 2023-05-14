@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.onEach
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.px
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.EventListener
 
@@ -42,11 +41,6 @@ private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position
     style.left = "${position.left}"
 }
 
-private fun HTMLElement.toPosition(): PopupPlacementStrategy.Position {
-    val bounds = getBoundingClientRect()
-    return PopupPlacementStrategy.Position(top = bounds.top.px, left = bounds.left.px)
-}
-
 // When first declared, popups need to make several passes to set themselves up. First, they need to find the raw
 // html elements that will be associated with the popup's location. Then, they need to calculate the width of the popup,
 // which requires the raw element of the popup itself.
@@ -60,6 +54,11 @@ private sealed interface PopoverState {
     class FoundElements(override var elements: PopoverElements) : Initialized
 
     sealed interface Visible : Initialized {
+        // Note: `elements.placementElement` also exists but can be changed by the user while a popover is up. However,
+        // once a popover is showing, we don't want it to snap into a new location. Therefore, we need to capture a copy
+        // of the placement element at the time the popover is first shown and keep a reference to it through the
+        // popover's lifetime.
+        val placementElement: HTMLElement
         val placement: PopupPlacement?
         val modifier: Modifier
     }
@@ -73,17 +72,19 @@ private sealed interface PopoverState {
             // causing focus to be gained and lost
             .top((-100).percent).left((-100).percent)
 
+        override val placementElement = elements.placementElement
         override val placement = null
     }
 
     class Shown(
         override var elements: PopoverElements,
+        override val placementElement: HTMLElement,
         placementStrategy: PopupPlacementStrategy,
     ) : Showing {
         private val popupElement = elements.popupElement!!
 
         private val positionAndPlacement =
-            placementStrategy.calculate(elements.placementElement, popupElement)
+            placementStrategy.calculate(placementElement, popupElement)
 
         override val modifier = Modifier.then(positionAndPlacement.position.toModifier())
         override val placement = positionAndPlacement.placement
@@ -91,11 +92,18 @@ private sealed interface PopoverState {
 
     class Hiding(
         override var elements: PopoverElements,
+        override val placementElement: HTMLElement,
+        placementStrategy: PopupPlacementStrategy,
         showHideSettings: PopoverShowHideSettings,
         override val placement: PopupPlacement?,
     ) : Visible {
         override val modifier = showHideSettings.hiddenModifier.then(
-            elements.popupElement?.toPosition()?.toModifier() ?: Modifier
+            elements.popupElement?.let { popupElement ->
+                placementStrategy.calculate(
+                    placementElement,
+                    popupElement
+                ).position.toModifier()
+            } ?: Modifier
         )
     }
 }
@@ -172,7 +180,7 @@ private class PopoverStateController(
         val popupElement = state.elements.popupElement
         check (popupElement != null)
 
-        _state = PopoverState.Shown(state.elements, placementStrategy)
+        _state = PopoverState.Shown(state.elements, state.placementElement, placementStrategy)
     }
 
     fun requestHidePopup() {
@@ -187,7 +195,7 @@ private class PopoverStateController(
         hideTimeoutId = window.setTimeout({
             if (!keepOpenStrategy.shouldKeepOpen) {
                 val currentOpacity = state.elements.popupElement?.let { window.getComputedStyle(it).getPropertyValue("opacity").toDouble() }
-                this._state = PopoverState.Hiding(state.elements, showHideSettings, state.placement)
+                this._state = PopoverState.Hiding(state.elements, state.placementElement, placementStrategy, showHideSettings, state.placement)
                 // Normally, the "hiding" state is marked finished once the "onTransitionEnd" event is reached (see
                 // later in this file). However, if the following condition is true, it means we're in a state that the
                 // event would never fire, so just fire the "finish hiding" event directly.
