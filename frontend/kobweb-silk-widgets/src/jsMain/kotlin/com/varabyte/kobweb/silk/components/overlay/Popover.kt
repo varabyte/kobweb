@@ -335,8 +335,8 @@ fun AdvancedPopover(
         ref = disposableRef(popoverStateController, target, placementTarget) { element ->
             try {
                 val popoverElements = PopoverElements(element, target, placementTarget).apply {
-                    // The popupElement is created in the deferRender block and it should carry over across this
-                    // "element finder" element being recreated.
+                    // The popupElement is created in the deferRender block below with its own lifecycle, and it should
+                    // carry over across this "element finder" element being disposed and recreated.
                     popupElement = (popoverStateController.state as? PopoverState.Initialized)?.elements?.popupElement
                 }
                 popoverElements.targetElement.apply { openCloseStrategy.init(this) }
