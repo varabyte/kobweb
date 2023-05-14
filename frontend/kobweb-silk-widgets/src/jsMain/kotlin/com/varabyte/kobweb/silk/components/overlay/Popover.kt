@@ -20,7 +20,9 @@ import kotlinx.coroutines.flow.onEach
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.px
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.events.EventListener
 
 // Convenience class to collect a bunch of parameters into a single place
 private class PopoverShowHideSettings(
@@ -31,6 +33,18 @@ private class PopoverShowHideSettings(
     val showDelayMs = showDelayMs.coerceAtLeast(0)
     val hideDelayMs = hideDelayMs.coerceAtLeast(0)
     val hiddenModifier = hiddenModifier.opacity(0)
+}
+
+private fun PopupPlacementStrategy.Position.toModifier() = Modifier.top(top).left(left)
+
+private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position) {
+    style.top = "${position.top}"
+    style.left = "${position.left}"
+}
+
+private fun HTMLElement.toPosition(): PopupPlacementStrategy.Position {
+    val bounds = getBoundingClientRect()
+    return PopupPlacementStrategy.Position(top = bounds.top.px, left = bounds.left.px)
 }
 
 // When first declared, popups need to make several passes to set themselves up. First, they need to find the raw
@@ -66,21 +80,23 @@ private sealed interface PopoverState {
         override var elements: PopoverElements,
         placementStrategy: PopupPlacementStrategy,
     ) : Showing {
-        private fun PopupPlacementStrategy.Position.toModifier() = Modifier.top(top).left(left)
+        private val popupElement = elements.popupElement!!
 
         private val positionAndPlacement =
-            placementStrategy.calculate(elements.placementElement, elements.popupElement!!)
+            placementStrategy.calculate(elements.placementElement, popupElement)
 
+        override val modifier = Modifier.then(positionAndPlacement.position.toModifier())
         override val placement = positionAndPlacement.placement
-        override val modifier = positionAndPlacement.position.toModifier()
     }
+
     class Hiding(
         override var elements: PopoverElements,
         showHideSettings: PopoverShowHideSettings,
         override val placement: PopupPlacement?,
-        modifier: Modifier
     ) : Visible {
-        override val modifier = modifier.then(showHideSettings.hiddenModifier)
+        override val modifier = showHideSettings.hiddenModifier.then(
+            elements.popupElement?.toPosition()?.toModifier() ?: Modifier
+        )
     }
 }
 
@@ -171,11 +187,7 @@ private class PopoverStateController(
         hideTimeoutId = window.setTimeout({
             if (!keepOpenStrategy.shouldKeepOpen) {
                 val currentOpacity = state.elements.popupElement?.let { window.getComputedStyle(it).getPropertyValue("opacity").toDouble() }
-                this._state = PopoverState.Hiding(
-                    state.elements,
-                    showHideSettings,
-                    state.placement,
-                    state.modifier)
+                this._state = PopoverState.Hiding(state.elements, showHideSettings, state.placement)
                 // Normally, the "hiding" state is marked finished once the "onTransitionEnd" event is reached (see
                 // later in this file). However, if the following condition is true, it means we're in a state that the
                 // event would never fire, so just fire the "finish hiding" event directly.
@@ -351,7 +363,7 @@ fun AdvancedPopover(
         val visiblePopoverState = (popoverStateController.state as? PopoverState.Visible) ?: return@deferRender
         Box(
             PopupStyle.toModifier(variant)
-                .position(Position.Absolute)
+                .position(Position.Fixed)
                 .then(visiblePopoverState.modifier)
                 .then(modifier)
                 .onTransitionEnd { evt ->
@@ -364,9 +376,24 @@ fun AdvancedPopover(
                 disposableRef { popupElement ->
                     popoverStateController.updatePopupElement(popupElement)
                     popoverStateController.finishShowing()
+
+                    val updatePopupPositionListener = EventListener {
+                        popupElement.updatePosition(
+                            placementStrategy.calculate(
+                                visiblePopoverState.elements.placementElement,
+                                popupElement
+                            ).position
+                        )
+                    }
+                    window.addEventListener("scroll", updatePopupPositionListener)
+                    window.addEventListener("resize", updatePopupPositionListener)
+
                     onDispose {
                         popoverStateController.clearPopupElement()
                         popoverStateController.resetToFoundElements()
+
+                        window.removeEventListener("scroll", updatePopupPositionListener)
+                        window.removeEventListener("resize", updatePopupPositionListener)
                     }
                 }
                 add(ref)
