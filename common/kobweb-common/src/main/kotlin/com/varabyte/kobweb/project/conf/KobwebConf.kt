@@ -30,6 +30,7 @@ class Server(
     val port: Int = 8080,
     val logging: Logging = Logging(),
     val cors: Cors = Cors(),
+    val nativeLibraries: List<NativeLibrary> = emptyList(),
 ) {
     /**
      * A collection of files and paths needed by the Kobweb server to serve its files.
@@ -118,6 +119,34 @@ class Server(
     @Serializable
     class Cors(
         val hosts: List<Host> = listOf(),
+    )
+
+    /**
+     * A name-to-path mapping provided as a way for users to explicitly tell Kobweb which native library file to load.
+     *
+     * It is not expected that a users will ever need to use this, but essentially, if you use a native library in your
+     * Kobweb API route logic, the JVM will kick off a request to load it, starting with a vague, generic name. We do
+     * our best to use heuristics to load the right file, but we provide a way for users to explicitly tell us which
+     * file to load if they need to.
+     *
+     * For example, a request to load a library called "test" might result in a request to load a file called
+     * "libtest.so", "libtest.dylib", or "test.dll", depending on the platform. Also, if you've managed to package two
+     * different libraries which each contain a "test.dll" somewhere in their dependencies, the user can use this
+     * mapping to tell Kobweb exactly which one you want to load when a request for "test" comes in.
+     *
+     * For an example of how to use this:
+     *
+     * ```
+     * server:
+     *   nativeLibraries:
+     *   - name: test
+     *     path: jni/linux/libtest.so
+     * ```
+     */
+    @Serializable
+    class NativeLibrary(
+        val name: String,
+        val path: String,
     )
 
     /**

@@ -6,6 +6,7 @@ import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.project.conf.Server
 import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -225,13 +226,13 @@ private fun Routing.configureCatchAllRouting(script: Path, index: Path, routePre
     }
 }
 
-private fun Path?.createApiJar(logger: Logger): ApiJarFile? {
+private fun Path?.createApiJar(logger: Logger, nativeLibraryMappings: Map<String, String>): ApiJarFile? {
     when {
         this == null -> logger.info("No API jar file specified in conf.yaml. Server API routes will not be available.")
         !this.exists() -> logger.warn("API jar specified but does not exist! Please fix conf.yaml. Invalid path: \"$this\"")
         else -> {
             logger.info("API jar found and will be loaded: \"$this\"")
-            return ApiJarFile(this, logger)
+            return ApiJarFile(this, logger, nativeLibraryMappings)
         }
     }
     return null
@@ -240,7 +241,9 @@ private fun Path?.createApiJar(logger: Logger): ApiJarFile? {
 private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, logger: Logger) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
-    val apiJar = conf.server.files.dev.api?.let { Path(it) }.createApiJar(logger)
+    val apiJar = conf.server.files.dev.api
+        ?.let { Path(it) }
+        .createApiJar(logger, conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
@@ -327,7 +330,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
     val apiJar = conf.server.files.dev.api
         ?.substringAfterLast("/")
         ?.let { systemRoot.resolve(it) }
-        .createApiJar(logger)
+        .createApiJar(logger, conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         val routePrefix = conf.site.routePrefixNormalized

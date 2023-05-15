@@ -22,8 +22,12 @@ import java.util.zip.ZipFile
  *
  * @param path The path to the api.jar itself
  */
-class ApiJarFile(path: Path, private val logger: Logger) {
-    private class DynamicClassLoader(private val content: ByteArray) : ClassLoader(ApiJarFile::class.java.classLoader) {
+class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibraryMappings: Map<String, String>) {
+    private class DynamicClassLoader(
+        private val content: ByteArray,
+        private val logger: Logger,
+        private val nativeLibraryMappings: Map<String, String>
+    ) : ClassLoader(ApiJarFile::class.java.classLoader) {
         private val zipFile: ZipFile = run {
             val file = File.createTempFile("KobwebApiJar", ".jar").also { it.deleteOnExit() }
             ByteArrayInputStream(content).use { stream -> file.writeBytes(stream.readBytes()) }
@@ -60,13 +64,13 @@ class ApiJarFile(path: Path, private val logger: Logger) {
         }
 
         override fun findResource(name: String): URL {
-            return findFileInZip(name)
+            return findFileInZipByPath(name)
                 ?.toInMemoryUrl()
                 ?: super.findResource(name)
         }
 
         override fun findResources(name: String): Enumeration<URL> {
-            val ourResource = findFileInZip(name)
+            val ourResource = findFileInZipByPath(name)
                 ?.toInMemoryUrl()
                 ?.let { listOf(it) }
                 ?: emptyList()
@@ -74,12 +78,60 @@ class ApiJarFile(path: Path, private val logger: Logger) {
             return Collections.enumeration(ourResource + super.findResources(name).toList())
         }
 
-        // Convert a class name (e.g. "com.example.Demo") to its path form ("com/example/Demo.class")
-        private fun findClassInZip(name: String) = findFileInZip("${name.replace('.', '/')}.class")
+        override fun findLibrary(libname: String): String? {
+            val sysLibName = System.mapLibraryName(libname)
 
-        private fun findFileInZip(name: String): InputStream? {
+            logger.debug("Kobweb server got a request to load native library: \"$libname\" (system mapped to \"$sysLibName\")")
+            val path =
+                (nativeLibraryMappings[libname]
+                    ?: nativeLibraryMappings[sysLibName]
+                    ?: findPathsInZipByName(sysLibName)
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { paths ->
+                            if (paths.size > 1) {
+                                logger.info(
+                                    "... multiple copies of $sysLibName found in the jar: [${paths.joinToString(",") { path -> "\"$path\"" }}]. Using the first match. Consider registering \"$libname\" explicitly in your conf.yaml."
+                                )
+                            }
+                            paths.first()
+                        }
+                        )
+
+            if (path != null) {
+                val stream = findFileInZipByPath(path)
+                if (stream != null) {
+                    logger.debug("... found it in the jar at: $path")
+                } else {
+                    logger.debug("... could not find it in the jar at: $path")
+                }
+
+                stream?.use {
+                    val bytes = stream.readBytes()
+                    val ext = path.substringAfterLast('.', "")
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { ".$it" }
+                        ?: ""
+                    val base = sysLibName.removeSuffix(ext)
+                    val file = File.createTempFile("${base}_", ext.takeIf { it.isNotEmpty() }).also { it.deleteOnExit() }
+                    file.writeBytes(bytes)
+                    logger.debug("... created a copy at: ${file.absolutePath}")
+                    return file.absolutePath
+                }
+            } else {
+                logger.debug("... could not find it in the jar.")
+            }
+
+            logger.debug("... falling back to system library searching logic.")
+            return super.findLibrary(sysLibName)
+        }
+
+        // Convert a class name (e.g. "com.example.Demo") to its path form ("com/example/Demo.class")
+        private fun findClassInZip(name: String) = findFileInZipByPath("${name.replace('.', '/')}.class")
+
+        // Find a file in the zip by its exact path (e.g. "com/example/Demo.class")
+        private fun findFileInZipByPath(path: String): InputStream? {
             // Convert a class name (e.g. "com.example.Demo") to its path form ("com/example/Demo.class")
-            val entry: ZipEntry? = zipFile.getEntry(name)
+            val entry: ZipEntry? = zipFile.getEntry(path)
             return entry
                 ?.let {
                     try {
@@ -89,11 +141,23 @@ class ApiJarFile(path: Path, private val logger: Logger) {
                     }
                 }
         }
+
+        // Find all paths in the zip ending with the specified file name (e.g. "test.dll" -> ["lib/test.dll"]). This
+        // requires running through the entire zip file, so calling findFileInZipByPath directly is preferred.
+        private fun findPathsInZipByName(name: String): List<String> {
+            val paths = mutableListOf<String>()
+            zipFile.entries().asSequence().forEach { entry ->
+                if (entry.name.substringAfterLast('/') == name) {
+                    paths.add(entry.name)
+                }
+            }
+            return paths
+        }
     }
 
-    private class Cache(val content: ByteArray, logger: Logger) {
+    private class Cache(val content: ByteArray, logger: Logger, nativeLibraryMappings: Map<String, String>) {
         val apis: Apis = run {
-            val classLoader = DynamicClassLoader(content)
+            val classLoader = DynamicClassLoader(content, logger, nativeLibraryMappings)
             val startMs = getTimeMillis()
 
             try {
@@ -116,7 +180,7 @@ class ApiJarFile(path: Path, private val logger: Logger) {
 
             var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
             if (cache == null || cache.content !== delegateFile.content) {
-                cache = Cache(currContent, logger)
+                cache = Cache(currContent, logger, nativeLibraryMappings)
                 this.cache = cache
             }
 
