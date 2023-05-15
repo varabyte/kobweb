@@ -4,6 +4,8 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
+import com.varabyte.kobweb.compose.foundation.layout.BoxScope
+import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -51,12 +53,14 @@ val AnimatedColorSurfaceVariant = SurfaceStyle.addVariant("animated-color") {
 @Composable
 fun Surface(
     modifier: Modifier = Modifier.fillMaxSize(),
+    contentAlignment: Alignment = Alignment.TopStart,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     Box(
         SurfaceStyle.toModifier(variant).then(modifier),
+        contentAlignment = contentAlignment,
         ref = ref,
     ) {
         content()
