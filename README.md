@@ -1000,17 +1000,16 @@ Box(
 }
 ```
 
-All callbacks (discussed shortly) will receive an `org.w3c.dom.Element` subclass. You can check out the
+All `ref` callbacks (discussed more below) will receive an `org.w3c.dom.Element` subclass. You can check out the
 [Element](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-element/) class (and its often more
 relevant [HTMLElement](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-h-t-m-l-element/) inheritor) to see the
 methods and properties that are available on it.
 
-For example, you could use this to set initial focus on one element in your DOM.
+Raw HTML elements expose a lot of functionality not available through the higher level Compose HTML APIs.
 
 #### `ref`
 
-Additionally, Silk provides a `ref` method which takes a callback and whose output can be passed into the `ref`
-parameter:
+For a trivial but common example, we can use the raw element to capture focus:
 
 ```kotlin
 Box(
@@ -1068,6 +1067,45 @@ Box(
         dispoasbleRef(isFeature2Enabled) { element -> /* ... */; onDispose { /* ... */ } }
     }
 )
+```
+
+#### Compose HTML refs
+
+You may occasionally want the backing element of a normal Compose HTML widget, such as a `Div` or `Span`. However, these
+widgets don't have a `ref` callback, as that's a convenience feature provided by Silk.
+
+You still have a few options in this case.
+
+The official way to retrieve a reference is by using a `ref` block inside an `attrs` block. This version of `ref` is
+actually more similar to Silk's `disposableRef` concept than its `ref` one, as it requires an `onDispose` block:
+
+```kotlin
+Div(attrs = {
+    ref { element -> /* ... */; onDispose { /* ... */ } }
+})
+```
+
+*The above snippet was adapted from [the official tutorials](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/HTML/Using_Effects#ref-in-attrsbuilder).*
+
+You could put that exact same logic inside the `Modifier.toAttrs` block, if you're terminating some modifier chain:
+
+```kotlin
+Div(attrs = Modifier.toAttrs {
+  ref { element -> /* ... */; onDispose { /* ... */ } }
+})
+```
+
+Unlike Silk's version of `ref`, Compose HTML's version does not accept keys. If you need this behavior and if the
+Compose HTML widget accepts a content block (many of them do), you can call Silk's `registerRefScope` method directly
+within it:
+
+```kotlin
+Div {
+  registerRefScope(
+    disposableRef { element -> /* ... */; onDispose { /* ... */ } }
+    // or ref { element -> /* ... */ }
+  )
+}
 ```
 
 ### CSS Variables
