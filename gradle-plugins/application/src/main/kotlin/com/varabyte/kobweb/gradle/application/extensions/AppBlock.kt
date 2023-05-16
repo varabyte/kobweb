@@ -65,8 +65,17 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf) {
      */
     abstract val globals: MapProperty<String, String>
 
+    /**
+     * When `true`, all URLs will have their `.htm` and `.html` suffix automatically removed when the user types it in.
+     *
+     * Defaults to `true`.
+     */
+    abstract val cleanUrls: Property<Boolean>
+
     init {
         globals.set(mapOf("title" to conf.site.title))
+        cleanUrls.convention(true)
+
         (this as ExtensionAware).extensions.create("index", IndexBlock::class.java, RoutePrefix(conf.site.routePrefix))
     }
 

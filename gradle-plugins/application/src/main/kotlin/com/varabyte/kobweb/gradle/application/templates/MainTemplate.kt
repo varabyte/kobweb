@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.withIndent
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
 import com.varabyte.kobweb.gradle.core.project.frontend.merge
@@ -15,7 +16,7 @@ fun createMainFunction(
     appData: AppData,
     libData: List<FrontendData>,
     usingSilk: Boolean,
-    appGlobals: Map<String, String>,
+    appBlock: AppBlock,
     routePrefix: RoutePrefix,
     target: BuildTarget
 ): String {
@@ -161,6 +162,14 @@ fun createMainFunction(
                     }
                 }
                 addStatement("}")
+                if (appBlock.cleanUrls.get()) {
+                    addStatement("router.addRouteInterceptor {")
+                    withIndent {
+                        addStatement("path = path.removeSuffix(\".html\").removeSuffix(\".htm\")")
+                    }
+                    addStatement("}")
+                }
+                addStatement("")
             }.build())
 
             if (usingSilk &&
@@ -187,6 +196,8 @@ fun createMainFunction(
                 }.build())
                 addStatement("")
             }
+
+            val appGlobals = appBlock.globals.get()
 
             // Note: Below, we use %S when specifying key/value pairs. This prevents KotlinPoet from breaking
             // our text in the middle of a String.

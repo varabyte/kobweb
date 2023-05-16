@@ -60,7 +60,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                 appData,
                 libData,
                 project.hasTransitiveJsDependencyNamed("kobweb-silk"),
-                kobwebBlock.app.globals.get(),
+                kobwebBlock.app,
                 routePrefix,
                 buildTarget
             )
