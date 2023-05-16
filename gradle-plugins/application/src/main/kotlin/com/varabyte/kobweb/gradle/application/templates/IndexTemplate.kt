@@ -1,20 +1,10 @@
 package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
-import kotlinx.html.BODY
-import kotlinx.html.HEAD
-import kotlinx.html.body
-import kotlinx.html.div
+import kotlinx.html.*
 import kotlinx.html.dom.append
 import kotlinx.html.dom.document
 import kotlinx.html.dom.serialize
-import kotlinx.html.head
-import kotlinx.html.html
-import kotlinx.html.id
-import kotlinx.html.lang
-import kotlinx.html.script
-import kotlinx.html.title
-import kotlinx.html.unsafe
 
 private fun BODY.buildIndicator() {
     unsafe {
@@ -82,6 +72,8 @@ fun createIndexFile(title: String, headElements: Iterable<HEAD.() -> Unit>, src:
                 body {
                     div {
                         id = "root"
+                        // Fill max size just in case user sets html / body size
+                        style = "width: 100%; height: 100%;"
                     }
 
                     if (buildTarget == BuildTarget.DEBUG) {
