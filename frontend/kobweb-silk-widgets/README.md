@@ -26,7 +26,7 @@ fun main() {
         ctx.config.initialColorMode = ColorMode.DARK
         ctx.theme.palettes = ...
     }
-    ...
+    /* ... */
 }
 ```
 
@@ -36,14 +36,13 @@ have to remember to register them explicitly (another thing the Kobweb plugin no
 ```kotlin
 // File: CustomWidget.kt
 
-val CustomStyle = ComponentStyle("custom-widget") {
-    hover = Modifier.background(...)
-}
-
-@Composable
-fun Custom(modifier: Modifier, ...) {
-    val finalModifier = CustomStyle.toModifier().then(modifier)
-    ...
+val CustomStyle by ComponentStyle {
+    base {
+        Modifier.background(...)
+    }
+    hover {
+        Modifier.background(...)
+    }
 }
 
 // File: main.kt
@@ -52,6 +51,6 @@ fun main() {
     initSilk { ctx ->
         ctx.theme.registerComponentStyle(CustomStyle)
     }
-    ...
+    /* ... */
 }
 ```
