@@ -242,13 +242,13 @@ abstract class PopupPlacementStrategy {
 fun Popup(
     target: ElementTarget,
     modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     placementTarget: ElementTarget? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
     keepOpenStrategy: KeepPopupOpenStrategy? = null,
-    variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
 ) {

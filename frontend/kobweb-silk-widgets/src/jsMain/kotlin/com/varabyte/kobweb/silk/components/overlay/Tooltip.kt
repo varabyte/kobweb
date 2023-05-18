@@ -183,6 +183,7 @@ val TooltipTextContainerStyle = ComponentStyle.base("tooltip-text") {
 fun Tooltip(
     target: ElementTarget,
     modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
@@ -190,7 +191,6 @@ fun Tooltip(
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
     keepOpenStrategy: KeepPopupOpenStrategy? = null,
-    variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
 ) {
@@ -200,6 +200,7 @@ fun Tooltip(
         target,
         modifier,
         hiddenModifier = Modifier,
+        variant,
         hasArrow,
         showDelayMs,
         hideDelayMs,
@@ -207,7 +208,6 @@ fun Tooltip(
         placementTarget,
         placementStrategy,
         keepOpenStrategy,
-        variant,
         ref,
         content
     )
@@ -226,6 +226,7 @@ fun Tooltip(
     target: ElementTarget,
     text: String,
     modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
@@ -233,7 +234,6 @@ fun Tooltip(
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
     keepOpenStrategy: KeepPopupOpenStrategy? = null,
-    variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
     val placementStrategy = remember(placement) { PopupPlacementStrategy.of(placement, offsetPixels) }
@@ -243,6 +243,7 @@ fun Tooltip(
         text,
         modifier,
         hiddenModifier = Modifier,
+        variant,
         hasArrow,
         showDelayMs,
         hideDelayMs,
@@ -250,7 +251,6 @@ fun Tooltip(
         placementTarget,
         placementStrategy,
         keepOpenStrategy,
-        variant,
         ref
     )
 }
@@ -265,6 +265,7 @@ fun AdvancedTooltip(
     target: ElementTarget,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
@@ -272,7 +273,6 @@ fun AdvancedTooltip(
     placementTarget: ElementTarget? = null,
     placementStrategy: PopupPlacementStrategy? = null,
     keepOpenStrategy: KeepPopupOpenStrategy? = null,
-    variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
 ) {
@@ -280,14 +280,13 @@ fun AdvancedTooltip(
 
     AdvancedPopover(
         target,
-        TooltipStyle.toModifier(variant).then(modifier),
-        hiddenModifier,
+        TooltipStyle.toModifier(variant).then(modifier), hiddenModifier,
+        variant,
         showDelayMs, hideDelayMs,
         openCloseStrategy,
         placementTarget,
         placementStrategy,
         keepOpenStrategy,
-        variant,
         ref
     ) {
         content()
@@ -327,6 +326,7 @@ fun AdvancedTooltip(
     text: String,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
@@ -334,13 +334,13 @@ fun AdvancedTooltip(
     placementTarget: ElementTarget? = null,
     placementStrategy: PopupPlacementStrategy? = null,
     keepOpenStrategy: KeepPopupOpenStrategy? = null,
-    variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
     AdvancedTooltip(
         target,
         modifier,
         hiddenModifier,
+        variant,
         hasArrow,
         showDelayMs,
         hideDelayMs,
@@ -348,7 +348,6 @@ fun AdvancedTooltip(
         placementTarget,
         placementStrategy,
         keepOpenStrategy,
-        variant,
         ref
     ) {
         Column(TooltipTextContainerStyle.toModifier()) {
