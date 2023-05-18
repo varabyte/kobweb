@@ -237,6 +237,58 @@ fun MyWidget(modifier: Modifier = Modifier, ref: ElementRefScope<HTMLElement>? =
 }
 ```
 
+#### Handling the disabled state
+
+If relevant to the target widget, you SHOULD handle the disabled state in a consistent manner, by:
+
+* taking in an `enabled` parameter (defaulting to true)
+* applying the disabled style to the modifier chain when `enabled` is false
+* adding `+ not(ariaDisabled)` to the various styles defined for this widget.
+
+*Do*
+
+```kotlin
+val ButtonStyle by ComponentStyle(prefix = "silk-") {
+
+    base { /* ... */ }
+
+    (hover + not(ariaDisabled)) { /* ... */ }
+    (focusVisible + not(ariaDisabled)) { /* ... */ }
+    (active + not(ariaDisabled)) { /* ... */ }
+}
+
+@Composable
+fun Button(..., enabled: Boolean = true, ...) {
+    JbButton(
+        attrs = ButtonStyle.toModifier(variant)
+            .thenIf(!enabled, DisabledStyle.toModifier().tabIndex(-1))
+            ...
+    )
+}
+```
+
+*Don't*
+
+```kotlin
+val ButtonStyle by ComponentStyle(prefix = "silk-") {
+
+    base { /* ... */ }
+
+    hover { /* ... */ }
+    focusVisible { /* ... */ }
+    active { /* ... */ }
+}
+
+@Composable
+fun Button(..., disabled: Boolean = false, ...) {
+    JbButton(
+        attrs = ButtonStyle.toModifier(variant)
+            .thenIf(disabled, Modifier.opacity(0.5f))
+            ...
+    )
+}
+```
+
 ---
 
 This is a living document. Note that we may add additional requirements throughout the course of development as we
