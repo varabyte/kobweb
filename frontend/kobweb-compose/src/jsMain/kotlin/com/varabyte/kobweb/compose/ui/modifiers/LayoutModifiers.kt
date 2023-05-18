@@ -134,6 +134,16 @@ fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
     maxHeight(maxHeight)
 }
 
+fun Modifier.minSize(size: CSSNumeric): Modifier = styleModifier {
+    minWidth(size)
+    minHeight(size)
+}
+
+fun Modifier.maxSize(size: CSSNumeric): Modifier = styleModifier {
+    maxWidth(size)
+    maxHeight(size)
+}
+
 fun Modifier.margin(all: CSSNumeric): Modifier = styleModifier {
     margin(all)
 }
