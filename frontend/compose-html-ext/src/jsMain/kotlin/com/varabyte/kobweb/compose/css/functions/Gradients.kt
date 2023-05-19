@@ -19,7 +19,7 @@ interface Gradient : CSSStyleValue {
 
         private val entries = mutableListOf<Entry<T>>()
         internal fun verifiedEntries(): Array<Entry<T>> {
-            check(entries.count { it is Entry.Color } >= 2) { "A linear gradient should consistent of at least two color entries (an initial color and an end color)"}
+            check(entries.count { it is Entry.Color } >= 2) { "A gradient should consistent of at least two color entries (an initial color and an end color)"}
             entries.forEachIndexed { i, entry ->
                 if (entry is Entry.Hint) {
                     check(entries.getOrNull(i - 1) is Entry.Color && entries.getOrNull(i + 1) is Entry.Color) {
@@ -113,7 +113,7 @@ fun linearGradient(from: CSSColorValue, to: CSSColorValue) = linearGradient {
 
 // endregion
 
-// region linear gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/radial-gradient
+// region radial gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/radial-gradient
 
 sealed class RadialGradient(private val gradientStr: String) : Gradient {
     sealed class Shape(private val value: String) {
