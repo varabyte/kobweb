@@ -31,15 +31,20 @@ application {
 }
 
 tasks.withType<ShadowJar> {
-    minimize {
-        // Leave all kotlin-reflect bits in, as many libraries expect it to be there. When users register
-        // server API routes, their code should be able to use it.
-        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:.*"))
-        // Code may end up getting referenced via reflection
-        exclude(project(":backend:kobweb-api"))
-        // Logger classes are accessed at runtime
-        exclude(dependency("ch.qos.logback:.*:.*"))
-    }
+// NOTE: We used to minimize the jar but we had to keep making exceptions for things that got stripped that we needed at
+// runtime. Last check, the minimized jar was 15M vs. 18M not minimized, but with the added danger that things could
+// break at any time in the future. It just wasn't worth it.
+// However, we leave a record of what we were excluding from minimization before. Additionaly, we'd probably have to
+// exclude some ktor stuff, because a service loader started crashing with v2.3.0
+//    minimize {
+//        // Leave all kotlin-reflect bits in, as many libraries expect it to be there. When users register
+//        // server API routes, their code should be able to use it.
+//        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect:.*"))
+//        // Code may end up getting referenced via reflection
+//        exclude(project(":backend:kobweb-api"))
+//        // Logger classes are accessed at runtime
+//        exclude(dependency("ch.qos.logback:.*:.*"))
+//    }
 
     // Move as much as we can out of the way, to avoid the change that we have our own dependency that conflicts with
     // any code registered by the user in the uber jar they provide for handling server API routes.
