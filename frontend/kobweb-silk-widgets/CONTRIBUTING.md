@@ -120,7 +120,7 @@ fun Tooltip(
 )
 ```
 
-#### Ordering the modifier chain
+#### Proper modifier chain order
 
 You MUST build your modifier chain in a way that the user's passed-in modifier will overwrite anything from the base
 style.
@@ -237,7 +237,7 @@ fun MyWidget(modifier: Modifier = Modifier, ref: ElementRefScope<HTMLElement>? =
 }
 ```
 
-#### Handling the disabled state
+#### Handle the disabled state
 
 If relevant to the target widget, you SHOULD handle the disabled state in a consistent manner, by:
 
