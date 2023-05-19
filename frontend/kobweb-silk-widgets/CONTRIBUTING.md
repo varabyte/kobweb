@@ -289,6 +289,94 @@ fun Button(..., disabled: Boolean = false, ...) {
 }
 ```
 
+#### Add palette entries
+
+
+**NOTE**: The code suggestions here may change as we consider transitioning to CSS variables, but you will still want to add palette entries even then.*
+
+If relevant to the target widget, you SHOULD add all additional colors to the `SilkPalette` interface. If done, you MUST
+set values in the dark and light `MutableSilkPalette` implementation.
+
+Using palettes makes it easier for Kobweb users to globally change the colors of their whole app without needing to
+override any component styles.
+
+*Do*
+
+```kotlin
+val ButtonStyle by ComponentStyle(prefix = "silk-") {
+    val palette = colorMode.toSilkPalette()
+    val buttonColors = palette.button
+
+    base {
+        Modifier
+            .color(palette.color)
+            .backgroundColor(buttonColors.default)
+    }
+
+    (hover + not(ariaDisabled)) {
+        Modifier .backgroundColor(buttonColors.hover)
+    }
+
+    (focusVisible + not(ariaDisabled)) {
+        Modifier.boxShadow(spreadRadius = 3.px, color = buttonColors.focus)
+    }
+
+    (active + not(ariaDisabled)) {
+        Modifier.backgroundColor(buttonColors.pressed)
+    }
+}
+
+interface SilkPalette {
+    val button: Button
+
+    interface Button {
+        val default: Color
+        val hover: Color
+        val focus: Color
+        val pressed: Color
+    }
+}
+
+class MutableSilkPalettes(
+  override val light: MutableSilkPalette = run {
+    MutableSilkPalette(
+      button = MutableSilkPalette.Button(
+        default = ...,
+        hover = ...,
+        focus = ...,
+        pressed = ...
+      )
+    )
+  },
+  override val dark: MutableSilkPalette = run {
+    MutableSilkPalette(
+      button = MutableSilkPalette.Button(
+        default = ...,
+        hover = ...,
+        focus = ...,
+        pressed = ...
+      )
+    )
+  }
+) : SilkPalettes
+```
+
+*Don't*
+
+Short version: If you're hardcoding any colors in your Silk widget styles, that will need to be fixed.
+
+```kotlin
+val ButtonStyle by ComponentStyle(prefix = "silk-") {
+    base {
+        Modifier
+            .color(Colors.Red)
+            .backgroundColor(Colors.Green)
+    }
+
+    ...
+}
+```
+
 ---
 
 This is a living document. Note that we may add additional requirements throughout the course of development as we
