@@ -21,7 +21,7 @@ import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
-val OverlayStyle by ComponentStyle.base(prefix = "silk-") {
+val OverlayStyle by ComponentStyle.base(prefix = "silk") {
     Modifier.backgroundColor(colorMode.toSilkPalette().overlay)
 }
 

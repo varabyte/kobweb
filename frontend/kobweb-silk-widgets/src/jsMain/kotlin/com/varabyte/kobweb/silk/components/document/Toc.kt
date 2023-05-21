@@ -21,7 +21,7 @@ import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.get
 
-val TocStyle by ComponentStyle.base(prefix = "silk-") {
+val TocStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .listStyle(ListStyleType.None)
         .textAlign(TextAlign.Start)

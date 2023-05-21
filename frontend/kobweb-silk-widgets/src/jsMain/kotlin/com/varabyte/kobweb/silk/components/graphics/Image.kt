@@ -12,7 +12,7 @@ import org.jetbrains.compose.web.css.*
 // However, the styles are defined here, since this module is responsible for registering them, and it can still be
 // useful to use them even without Kobweb.
 
-val ImageStyle by ComponentStyle(prefix = "silk-") {}
+val ImageStyle by ComponentStyle(prefix = "silk") {}
 
 val FitWidthImageVariant by ImageStyle.addVariantBase {
     Modifier

@@ -299,7 +299,7 @@ private sealed interface StyleGroup {
  *   style name collisions. (Note: unless you are a library author, it's not expected you'll set this.) Why not just put
  *   the prefix directly in the name itself? We allow separating it out since you can use delegation to create a style,
  *   at which point the name will be derived from the style's property name. In contrast, a prefix will be manually
- *   chosen. For a concrete example, `val ButtonStyle by ComponentStyle(prefix = "silk-")` creates the full name
+ *   chosen. For a concrete example, `val ButtonStyle by ComponentStyle(prefix = "silk")` creates the full name
  *   `"silk-button"`). Also, when creating a variant by delegation, it is useful to know the non-prefixed name of the
  *   style it is based on when creating a name for it.
  */
@@ -314,7 +314,7 @@ class ComponentStyle(
     }
 
     internal val nameWithoutPrefix = name
-    val name = "${prefix.orEmpty()}$name"
+    val name = prefix?.let { "$it-$name" } ?: name
 
     constructor(name: String, extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit)
             : this(name, { extraModifiers }, prefix, init)

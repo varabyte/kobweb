@@ -19,8 +19,8 @@ import org.jetbrains.compose.web.css.ms
 // columns, which act on their direct children and *not* children of children (e.g. missing a `flex-grow` setting on
 // an element just because you wrapped it with a tooltip).
 // Instead, we just immitate disabled behavior ourselves in silk.
-val DisabledStyle = ComponentStyle.base(
-    "silk-disabled",
+val DisabledStyle by ComponentStyle.base(
+    prefix = "silk",
     extraModifiers = Modifier.ariaDisabled()
 ) {
     Modifier.opacity(0.5).cursor(Cursor.NotAllowed)
@@ -60,6 +60,6 @@ val StyleModifiers.ariaDisabled get() = CssRule.OfAttributeSelector(this, """ari
  * Note: This is shared as a style instead of a simple modifier so that a user can tweak the timing in their own site by
  * overriding the style if they'd like.
  */
-val SmoothColorStyle by ComponentStyle.base(prefix = "silk-") {
+val SmoothColorStyle by ComponentStyle.base(prefix = "silk") {
     Modifier.transition(CSSTransition("background-color", 200.ms))
 }

@@ -17,7 +17,7 @@ import org.w3c.dom.HTMLSpanElement
 
 // Normally, the color of the text is inherited from its parent (see SurfaceStyle), but users may still want to
 // override text styles globally in their own app, so we still register a style here even if it's empty
-val SpanTextStyle by ComponentStyle(prefix = "silk-") { }
+val SpanTextStyle by ComponentStyle(prefix = "silk") { }
 
 /**
  * A span of text, which can be styled based on a passed-in `Modifier`.

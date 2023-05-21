@@ -26,7 +26,7 @@ import kotlin.js.Date
 import kotlin.math.max
 import kotlin.math.min
 
-val CanvasStyle by ComponentStyle(prefix = "silk-") {}
+val CanvasStyle by ComponentStyle(prefix = "silk") {}
 
 /**
  * Arguments passed to the user's `render` callback.

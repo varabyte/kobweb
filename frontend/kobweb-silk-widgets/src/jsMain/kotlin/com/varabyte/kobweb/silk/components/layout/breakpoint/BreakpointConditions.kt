@@ -17,35 +17,35 @@ private fun CSSMediaQuery.invert(): CSSMediaQuery {
     return CSSMediaQuery.Raw("not all and $this")
 }
 
-internal val DisplayIfSmStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayIfSmStyle by ComponentStyle(prefix = "silk") {
     cssRule(Breakpoint.SM.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
-internal val DisplayIfMdStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayIfMdStyle by ComponentStyle(prefix = "silk") {
     cssRule(Breakpoint.MD.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
-internal val DisplayIfLgStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayIfLgStyle by ComponentStyle(prefix = "silk") {
     cssRule(Breakpoint.LG.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
-internal val DisplayIfXlStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayIfXlStyle by ComponentStyle(prefix = "silk") {
     cssRule(Breakpoint.XL.toMinWidthQuery().invert()) { Modifier.display(DisplayStyle.None) }
 }
 
-internal val DisplayUntilSmStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayUntilSmStyle by ComponentStyle(prefix = "silk") {
     Breakpoint.SM { Modifier.display(DisplayStyle.None) }
 }
 
-internal val DisplayUntilMdStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayUntilMdStyle by ComponentStyle(prefix = "silk") {
     Breakpoint.MD { Modifier.display(DisplayStyle.None) }
 }
 
-internal val DisplayUntilLgStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayUntilLgStyle by ComponentStyle(prefix = "silk") {
     Breakpoint.LG { Modifier.display(DisplayStyle.None) }
 }
 
-internal val DisplayUntilXlStyle by ComponentStyle(prefix = "silk-") {
+internal val DisplayUntilXlStyle by ComponentStyle(prefix = "silk") {
     Breakpoint.XL { Modifier.display(DisplayStyle.None) }
 }
 

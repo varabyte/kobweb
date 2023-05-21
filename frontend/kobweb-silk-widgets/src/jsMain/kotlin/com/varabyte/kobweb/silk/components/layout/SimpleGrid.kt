@@ -22,11 +22,10 @@ import org.w3c.dom.HTMLElement
 // (num breakpoints) * (num columns) style variants (and num breakpoints is 5).
 // I'm trying to be conservative for now, but if your project needs more than this, consider pinging me at
 // https://github.com/varabyte/kobweb/issues/154
-// In a pinch, you can fork this file into your own code, rename the base style from "silk-simple-grid" to your own name,
-// and increase the column count.
+// In a pinch, you can fork this file into your own code and increase the column count in that version.
 private const val MAX_COLUMN_COUNT = 5
 
-val SimpleGridStyle by ComponentStyle.base(prefix = "silk-") {
+val SimpleGridStyle by ComponentStyle.base(prefix = "silk") {
     Modifier.display(DisplayStyle.Grid)
 }
 
