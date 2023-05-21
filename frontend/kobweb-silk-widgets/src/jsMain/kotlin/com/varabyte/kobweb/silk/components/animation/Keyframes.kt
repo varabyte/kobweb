@@ -129,7 +129,8 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  *
  * Otherwise, the Kobweb Gradle plugin will do this for you.
  */
-class Keyframes(val name: String, internal val init: KeyframesBuilder.() -> Unit) {
+class Keyframes(name: String, prefix: String? = null, internal val init: KeyframesBuilder.() -> Unit) {
+    val name = prefix?.let { "$it-$name" } ?: name
     companion object {
         internal fun isColorModeAgnostic(build: KeyframesBuilder.() -> Unit): Boolean {
             // A user can use colorMode checks to change the keyframes builder, either by completely changing what sort
@@ -149,10 +150,10 @@ class Keyframes(val name: String, internal val init: KeyframesBuilder.() -> Unit
 /**
  * A delegate provider class which allows you to create a [Keyframes] instance via the `by` keyword.
  */
-class KeyframesProvider internal constructor(private val init: KeyframesBuilder.() -> Unit) : CacheByPropertyNameDelegate<Keyframes>() {
+class KeyframesProvider internal constructor(private val prefix: String?, private val init: KeyframesBuilder.() -> Unit) : CacheByPropertyNameDelegate<Keyframes>() {
     override fun create(propertyName: String): Keyframes {
         val name = propertyName.titleCamelCaseToKebabCase()
-        return Keyframes(name, init)
+        return Keyframes(name, prefix, init)
     }
 }
 
@@ -180,11 +181,11 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
  * ```
  */
 @Suppress("FunctionName") // name chosen to look like a constructor intentionally
-fun Keyframes(init: KeyframesBuilder.() -> Unit) = KeyframesProvider(init)
+fun Keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = KeyframesProvider(prefix, init)
 
 // TODO(#168): Delete this before 1.0
 @Deprecated("`keyframes` has been replaced with `Keyframes` (capitalized) for consistency with `ComponentStyle` behavior.", ReplaceWith("Keyframes(init)"))
-fun keyframes(init: KeyframesBuilder.() -> Unit) = Keyframes(init)
+fun keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = Keyframes(prefix, init)
 
 /**
  * A convenience method to convert this [Keyframes] instance into an object that can be passed into [Modifier.animation].
