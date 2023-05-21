@@ -62,7 +62,7 @@ class StyleVariableProvider<T: StylePropertyValue> internal constructor(private 
         thisRef: Any?,
         property: KProperty<*>
     ): StyleVariable<T> {
-        val name = property.name.titleCamelCaseToKebabCase()
+        val name = property.name.titleCamelCaseToKebabCase().removeSuffix("-var").removeSuffix("-variable")
         return StyleVariable(name, defaultFallback, prefix)
     }
 }
