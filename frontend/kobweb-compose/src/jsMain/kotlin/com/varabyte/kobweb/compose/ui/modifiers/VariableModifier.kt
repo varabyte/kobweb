@@ -37,7 +37,9 @@ import kotlin.reflect.KProperty
  * @param defaultFallback When you query a variable, you can specify a fallback at that time. However, if not specified,
  *   then you can provide this default fallback to be used instead. See also: [value].
  */
-class StyleVariable<T : StylePropertyValue>(override val name: String, private val defaultFallback: T? = null) : CSSVariable {
+class StyleVariable<T : StylePropertyValue>(name: String, private val defaultFallback: T? = null, prefix: String? = null) : CSSVariable {
+    override val name = prefix?.let { "$it-$name" } ?: name
+
     /**
      * Query this variable's current value.
      *
@@ -54,18 +56,18 @@ class StyleVariable<T : StylePropertyValue>(override val name: String, private v
 /**
  * A delegate provider class which allows you to create a [StyleVariable] instance via the `by` keyword.
  */
-class StyleVariableProvider<T: StylePropertyValue> internal constructor(private val defaultFallback: T?) {
+class StyleVariableProvider<T: StylePropertyValue> internal constructor(private val defaultFallback: T?, private val prefix: String?) {
     operator fun getValue(
         thisRef: Any?,
         property: KProperty<*>
     ): StyleVariable<T> {
         val name = property.name.titleCamelCaseToKebabCase()
-        return StyleVariable(name, defaultFallback)
+        return StyleVariable(name, defaultFallback, prefix)
     }
 }
 
 /** Helper method for declaring a [StyleVariable] instance via the `by` keyword. */
-fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null) = StyleVariableProvider(defaultFallback)
+fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) = StyleVariableProvider(defaultFallback, prefix)
 
 fun <T : StylePropertyValue> Modifier.setVariable(variable: StyleVariable<T>, value: T) = styleModifier {
     // NOTE: This should just be `variable.invoke(value)`, but it seems broken for inline styles.
