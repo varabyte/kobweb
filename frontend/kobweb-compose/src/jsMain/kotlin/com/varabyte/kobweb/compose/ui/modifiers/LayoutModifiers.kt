@@ -64,6 +64,17 @@ fun Modifier.size(size: CSSNumeric): Modifier = styleModifier {
     height(size)
 }
 
+fun Modifier.minSize(size: CSSNumeric): Modifier = styleModifier {
+    minWidth(size)
+    minHeight(size)
+}
+
+fun Modifier.maxSize(size: CSSNumeric): Modifier = styleModifier {
+    maxWidth(size)
+    maxHeight(size)
+}
+
+
 // TODO(#168): Remove before v1.0
 @Deprecated("This method will be removed before v1.0. If targeting styles, just use `width` without the type argument. Otherwise, call `attrsModifier { width(...) }`.")
 fun Modifier.width(size: CSSNumeric, type: WebModifierType): Modifier = when (type) {
