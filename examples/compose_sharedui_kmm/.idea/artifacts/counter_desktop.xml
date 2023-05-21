@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="counter-desktop">
+    <output-path>$PROJECT_DIR$/feature/counter/build/libs</output-path>
+    <root id="archive" name="counter-desktop.jar">
+      <element id="module-output" name="BallastSharedUI.feature.counter.desktopMain" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="home-js">
+    <output-path>$PROJECT_DIR$/feature/home/build/libs</output-path>
+    <root id="archive" name="home-js.jar">
+      <element id="module-output" name="BallastSharedUI.feature.home.jsMain" />
+    </root>
+  </artifact>
+</component>

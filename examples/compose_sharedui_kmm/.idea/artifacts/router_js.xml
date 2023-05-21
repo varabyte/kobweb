@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="router-js">
+    <output-path>$PROJECT_DIR$/feature/router/build/libs</output-path>
+    <root id="archive" name="router-js.jar">
+      <element id="module-output" name="BallastSharedUI.feature.router.jsMain" />
+    </root>
+  </artifact>
+</component>

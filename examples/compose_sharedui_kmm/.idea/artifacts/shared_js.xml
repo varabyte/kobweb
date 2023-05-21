@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="shared-js">
+    <output-path>$PROJECT_DIR$/shared/build/libs</output-path>
+    <root id="archive" name="shared-js.jar">
+      <element id="module-output" name="BallastSharedUI.shared.jsMain" />
+    </root>
+  </artifact>
+</component>

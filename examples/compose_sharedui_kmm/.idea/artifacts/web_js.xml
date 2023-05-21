@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="web-js">
+    <output-path>$PROJECT_DIR$/web/build/libs</output-path>
+    <root id="archive" name="web-js.jar">
+      <element id="module-output" name="BallastSharedUI.web.jsMain" />
+    </root>
+  </artifact>
+</component>
