@@ -107,28 +107,6 @@ class MutableSilkTheme {
      * Register variants associated with a base style.
      *
      * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
-     * Additionally, any variants created by [ComponentStyle.addVariant] will be automatically registered when
-     * [registerComponentStyle] is called (in which case, calling this is essentially a no-op).
-     *
-     * However, if you are defining variants on top of base Silk styles, e.g. maybe some new button variants, then they
-     * would normally be missed so you'll have to register them yourself in that case:
-     *
-     * ```
-     * package not.in.silk
-     * import silk.ButtonStyle
-     *
-     * val MyButtonVariant = ButtonStyle.addVariant(...)
-     *
-     * @InitSilk
-     * fun initCustomStyle(ctx: InitSilkContext) {
-     *   ctx.theme.registerComponentVariants(MyButtonVariant)
-     * }
-     *
-     * @Composable
-     * fun CustomWidget(...) {
-     *   Button(..., variant = MyButtonVariant, ...)
-     * }
-     * ```
      */
     fun registerComponentVariants(vararg variants: ComponentVariant) {
         variants.filterIsInstance<SimpleComponentVariant>().forEach { variant ->

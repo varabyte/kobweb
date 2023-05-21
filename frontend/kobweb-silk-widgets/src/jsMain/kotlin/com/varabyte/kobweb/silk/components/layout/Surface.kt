@@ -8,10 +8,7 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
@@ -35,7 +32,7 @@ val SurfaceStyle by ComponentStyle(prefix = "silk-") {
 @Deprecated(
     "Use `SmoothColorStyle` instead, e.g. `Surface(SmoothColorStyle.toModifer())`. The approach used by `AnimatedColorSurfaceVariant` is problematic and conflicts with people trying to set transitions on their own elements."
 )
-val AnimatedColorSurfaceVariant = SurfaceStyle.addVariant("animated-color") {
+val AnimatedColorSurfaceVariant by SurfaceStyle.addVariant {
     val backgroundColorTransition = Modifier.transition(CSSTransition("background-color", 200.ms))
 
     base { backgroundColorTransition }

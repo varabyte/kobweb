@@ -4,10 +4,7 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.color
 import com.varabyte.kobweb.compose.ui.modifiers.textDecorationLine
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.link
-import com.varabyte.kobweb.silk.components.style.visited
+import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.dom.A
 
@@ -35,13 +32,13 @@ val LinkStyle by ComponentStyle(prefix = "silk-") {
     }
 }
 
-val UndecoratedLinkVariant = LinkStyle.addVariant("undecorated") {
+val UndecoratedLinkVariant by LinkStyle.addVariant {
     hover {
         Modifier.textDecorationLine(TextDecorationLine.None)
     }
 }
 
-val UncoloredLinkVariant = LinkStyle.addVariant("uncolored") {
+val UncoloredLinkVariant by LinkStyle.addVariant {
     val textColor = colorMode.toSilkPalette().color
     link { Modifier.color(textColor) }
     visited { Modifier.color(textColor) }

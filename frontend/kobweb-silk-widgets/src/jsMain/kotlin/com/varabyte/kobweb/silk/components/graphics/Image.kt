@@ -14,7 +14,7 @@ import org.jetbrains.compose.web.css.*
 
 val ImageStyle by ComponentStyle(prefix = "silk-") {}
 
-val FitWidthImageVariant = ImageStyle.addVariantBase("fit") {
+val FitWidthImageVariant by ImageStyle.addVariantBase {
     Modifier
         .width(100.percent)
         .objectFit(ObjectFit.ScaleDown)

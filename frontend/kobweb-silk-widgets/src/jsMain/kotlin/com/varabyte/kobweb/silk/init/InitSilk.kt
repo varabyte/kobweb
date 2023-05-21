@@ -3,12 +3,16 @@ package com.varabyte.kobweb.silk.init
 import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
+import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
+import com.varabyte.kobweb.silk.components.layout.AnimatedColorSurfaceVariant
 import com.varabyte.kobweb.silk.components.layout.DividerStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.*
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
+import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
+import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.overlay.*
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
@@ -37,14 +41,31 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(DividerStyle)
     mutableTheme.registerComponentStyle(DivTextStyle)
     mutableTheme.registerComponentStyle(ImageStyle)
+    mutableTheme.registerComponentVariants(FitWidthImageVariant)
     mutableTheme.registerComponentStyle(LinkStyle)
+    mutableTheme.registerComponentVariants(UncoloredLinkVariant, UndecoratedLinkVariant)
     mutableTheme.registerComponentStyle(OverlayStyle)
     mutableTheme.registerComponentStyle(PopupStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SmoothColorStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
+    @Suppress("DEPRECATION") mutableTheme.registerComponentVariants(AnimatedColorSurfaceVariant)
     mutableTheme.registerComponentStyle(SpanTextStyle)
     mutableTheme.registerComponentStyle(TooltipArrowStyle)
+    mutableTheme.registerComponentVariants(
+        TopLeftTooltipArrowVariant,
+        TopTooltipArrowVariant,
+        TopRightTooltipArrowVariant,
+        LeftTopTooltipArrowVariant,
+        LeftTooltipArrowVariant,
+        LeftBottomTooltipArrowVariant,
+        RightTopTooltipArrowVariant,
+        RightTooltipArrowVariant,
+        RightBottomTooltipArrowVariant,
+        BottomLeftTooltipArrowVariant,
+        BottomTooltipArrowVariant,
+        BottomRightTooltipArrowVariant
+    )
     mutableTheme.registerComponentStyle(TooltipStyle)
     mutableTheme.registerComponentStyle(TooltipTextContainerStyle)
 
