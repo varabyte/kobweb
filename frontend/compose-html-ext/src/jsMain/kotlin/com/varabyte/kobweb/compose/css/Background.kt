@@ -1,7 +1,9 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.functions.CSSImage
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.Gradient
+import com.varabyte.kobweb.compose.css.functions.toImage
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
@@ -77,30 +79,7 @@ fun StyleScope.backgroundColor(backgroundColor: BackgroundColor) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
-sealed class BackgroundImage private constructor(private val value: String): StylePropertyValue {
-    override fun toString() = value
-
-    private class Keyword(value: String) : BackgroundImage(value)
-    private class Url(url: CSSUrl) : BackgroundImage(url.toString())
-    private class Gradient(gradient: com.varabyte.kobweb.compose.css.functions.Gradient) :
-        BackgroundImage(gradient.toString())
-
-
-    companion object {
-        fun of(url: CSSUrl): BackgroundImage = Url(url)
-
-        /**
-         * See also: [com.varabyte.kobweb.compose.css.functions.Gradient.toBackgroundImage]
-         */
-        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): BackgroundImage = Gradient(gradient)
-
-        // Global values
-        val Inherit get(): BackgroundImage = Keyword("inherit")
-        val Initial get(): BackgroundImage = Keyword("initial")
-        val Revert get(): BackgroundImage = Keyword("revert")
-        val Unset get(): BackgroundImage = Keyword("unset")
-    }
-}
+typealias BackgroundImage = CSSImage
 
 fun StyleScope.backgroundImage(backgroundImage: BackgroundImage) {
     backgroundImage(backgroundImage.toString())
@@ -111,33 +90,11 @@ fun StyleScope.backgroundImage(backgroundImage: BackgroundImage) {
 fun StyleScope.backgroundImage(url: CSSUrl) = backgroundImage(BackgroundImage.of(url))
 fun StyleScope.backgroundImage(gradient: Gradient) = backgroundImage(BackgroundImage.of(gradient))
 
-/**
- * Convenience method for converting a gradient into a background image.
- *
- * As gradients often span multiple lines, using this method can help avoid some indentations.
- *
- * For example, the normal way:
- *
- * ```
- * BackgroundImage.of(
- *     radialGradient(/*...*/) {
- *         addColor(Colors.Red)
- *         addColor(Colors.Blue)
- *     }
- * )
- * ```
- *
- * And the same code using this helper method:
- *
- * ```
- * radialGradient(/*...*/) {
- *     addColor(Colors.Red)
- *     addColor(Colors.Blue)
- * }.toBackgroundImage()
- * ```
- */
-fun Gradient.toBackgroundImage() = BackgroundImage.of(this)
-
+// Provided for backwards compatibility. We've since refactored out a common CSSImage class, so use that instead.
+@Deprecated("Use Gradient.toImage() instead",
+    ReplaceWith("this.toImage()", "com.varabyte.kobweb.compose.css.functions.toImage")
+)
+fun Gradient.toBackgroundImage() = this.toImage()
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
 class BackgroundOrigin private constructor(private val value: String): StylePropertyValue {

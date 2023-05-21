@@ -2,17 +2,9 @@ package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.Gradient
+import com.varabyte.kobweb.compose.util.wrapQuotesIfNecessary
 import org.jetbrains.compose.web.css.StylePropertyValue
 import org.jetbrains.compose.web.css.StyleScope
-
-// CSS text content should always be surrounded by quotes, but this is a pretty subtle requirement that's easy to miss
-// and causes silent failures. The person is passing in a String so their intention is clear. Let's just quote it
-// for them if they don't have it!
-private fun String.wrapQuotesIfNecessary() = if (this.length >= 2 && this.first() == '"' && this.last() == '"') {
-    this
-} else {
-    "\"${this.replace("\"", "\\\"")}\""
-}
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/content
 sealed class Content(private val value: String): StylePropertyValue {
