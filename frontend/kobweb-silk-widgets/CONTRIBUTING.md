@@ -248,7 +248,7 @@ If relevant to the target widget, you SHOULD handle the disabled state in a cons
 *Do*
 
 ```kotlin
-val ButtonStyle by ComponentStyle(prefix = "silk-") {
+val ButtonStyle by ComponentStyle(prefix = "silk") {
 
     base { /* ... */ }
 
@@ -270,7 +270,7 @@ fun Button(..., enabled: Boolean = true, ...) {
 *Don't*
 
 ```kotlin
-val ButtonStyle by ComponentStyle(prefix = "silk-") {
+val ButtonStyle by ComponentStyle(prefix = "silk") {
 
     base { /* ... */ }
 
@@ -289,27 +289,33 @@ fun Button(..., disabled: Boolean = false, ...) {
 }
 ```
 
-#### Add palette entries
+#### Add palette entries and style variables
 
-
-**NOTE**: The code suggestions here may change as we consider transitioning to CSS variables, but you will still want to add palette entries even then.*
-
-If relevant to the target widget, you SHOULD add all additional colors to the `SilkPalette` interface. If done, you MUST
-set values in the dark and light `MutableSilkPalette` implementation.
+If you are defining a target widget that requires new colors, you MUST add all them to the `SilkPalette` interface. If
+done, you MUST set values in the dark and light `MutableSilkPalette` implementation. Finally, you MUST create
+StyleVariable entries for each color and hook those variables up to the right palette colors in `setSilkVariables` in
+`InitSilk.kt`.
 
 Using palettes makes it easier for Kobweb users to globally change the colors of their whole app without needing to
 override any component styles.
 
+Using variables allows users to override color values for a targeted subset of buttons, if necessary, by using
+`Modifier.setVariable(...)` on either a specific button or a parent container that the button is a child of.
+
 *Do*
 
 ```kotlin
-val ButtonStyle by ComponentStyle(prefix = "silk-") {
-    val palette = colorMode.toSilkPalette()
-    val buttonColors = palette.button
+// Button.kt -------------------------------------------------
+val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
+val ButtonStyle by ComponentStyle(prefix = "silk") {
     base {
         Modifier
-            .color(palette.color)
+            .color(ButtonBackgroundDefaultColorVar)
             .backgroundColor(buttonColors.default)
     }
 
@@ -326,6 +332,7 @@ val ButtonStyle by ComponentStyle(prefix = "silk-") {
     }
 }
 
+// SilkPalette.kt -------------------------------------------------
 interface SilkPalette {
     val button: Button
 
@@ -359,6 +366,13 @@ class MutableSilkPalettes(
     )
   }
 ) : SilkPalettes
+
+// InitSilk.kt -------------------------------------------------
+setVariable(ButtonBackgroundDefaultColorVar, palette.button.default)
+setVariable(ButtonBackgroundFocusColorVar, palette.button.focus)
+setVariable(ButtonBackgroundHoverColorVar, palette.button.hover)
+setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
+setVariable(ButtonColorVar, palette.color)
 ```
 
 *Don't*
@@ -366,7 +380,7 @@ class MutableSilkPalettes(
 Short version: If you're hardcoding any colors in your Silk widget styles, that will need to be fixed.
 
 ```kotlin
-val ButtonStyle by ComponentStyle(prefix = "silk-") {
+val ButtonStyle by ComponentStyle(prefix = "silk") {
     base {
         Modifier
             .color(Colors.Red)

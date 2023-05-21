@@ -5,20 +5,25 @@ use just the widgets -- for example, maybe they have their own existing Compose 
 ported to Kobweb, but they still want to use our fancy color mode support or widgest like SimpleGrid.
 
 When using this widget library on its own, you must initialize it yourself, since that's normally something the Kobweb
-plugin does for you. To do that, call `initSilk` before your Compose HTML entry point and then `Style(SilkStyleSheet)`
-within it!
+plugin does for you. To do that:
+* call `initSilk` before your Compose HTML entry point
+* call `setSilkVariables` within the Compose render block
+* call `Style(SilkStyleSheet)` as well
 
 ```kotlin
 fun main() {
     initSilk() // <-- MUST DO #1
     renderComposable(rootElementId = "root") {
-        Style(SilkStyleSheet) // <-- MUST DO #2
+        val root = remember { document.getElementById("root") as HTMLElement }
+        root.setSilkVariables() // <-- MUST DO #2
+        Style(SilkStyleSheet) // <-- MUST DO #3
         /* ... */
     }
 }
 ```
 
-You can optionally tweak Silk configurations (such as palette colors) by using a passed-in callback:
+In the `initSilk` block, you can optionally tweak Silk configurations (such as palette colors) by using a passed-in
+callback:
 
 ```kotlin
 fun main() {

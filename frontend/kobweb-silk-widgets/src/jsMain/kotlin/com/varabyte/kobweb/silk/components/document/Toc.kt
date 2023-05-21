@@ -1,7 +1,9 @@
 package com.varabyte.kobweb.silk.components.document
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.ListStyleType
+import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.TextAlign
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -9,17 +11,12 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
-import com.varabyte.kobweb.silk.theme.toSilkPalette
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Ul
-import org.w3c.dom.Element
-import org.w3c.dom.HTMLAnchorElement
-import org.w3c.dom.HTMLCollection
-import org.w3c.dom.HTMLHeadingElement
-import org.w3c.dom.HTMLLIElement
-import org.w3c.dom.HTMLUListElement
-import org.w3c.dom.get
+import org.w3c.dom.*
+
+val TocBorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 val TocStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
@@ -30,7 +27,7 @@ val TocStyle by ComponentStyle.base(prefix = "silk") {
 val TocBorderedVariant by TocStyle.addVariantBase {
     Modifier
         .borderRadius(5.px)
-        .border(1.px, LineStyle.Solid, colorMode.toSilkPalette().border)
+        .border(1.px, LineStyle.Solid, TocBorderColorVar.value())
         .padding(1.cssRem)
 }
 

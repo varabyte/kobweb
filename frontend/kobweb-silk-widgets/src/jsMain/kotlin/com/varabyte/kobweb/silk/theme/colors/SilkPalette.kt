@@ -1,8 +1,17 @@
 package com.varabyte.kobweb.silk.theme.colors
 
+import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
+import org.jetbrains.compose.web.css.CSSColorValue
+
+// Misc. general color vars not used directly by Silk but provided for users for their own widgets if they want to use
+// them.
+
+val BackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val BorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 /**
  * Colors used by all widgets in the Silk library.

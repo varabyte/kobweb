@@ -1,35 +1,34 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
-import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Br
 import org.w3c.dom.HTMLElement
 
-private fun Modifier.triangleUp(color: Color) = styleModifier {
+private fun Modifier.triangleUp(color: CSSColorValue) = styleModifier {
     property("border-color", "$color transparent transparent transparent")
 }
 
-private fun Modifier.triangleLeft(color: Color) = styleModifier {
+private fun Modifier.triangleLeft(color: CSSColorValue) = styleModifier {
     property("border-color", "transparent $color transparent transparent")
 }
 
-private fun Modifier.triangleDown(color: Color) = styleModifier {
+private fun Modifier.triangleDown(color: CSSColorValue) = styleModifier {
     property("border-color", "transparent transparent $color transparent")
 }
 
-private fun Modifier.triangleRight(color: Color) = styleModifier {
+private fun Modifier.triangleRight(color: CSSColorValue) = styleModifier {
     property("border-color", "transparent transparent transparent $color")
 }
 
@@ -49,13 +48,14 @@ private val TRIANGLE_WIDTH = 5.px
 // from separating.
 private val TRIANGLE_WIDTH_2X = 9.px
 
-val TooltipStyle by ComponentStyle.base(prefix = "silk") {
-    val palette = colorMode.toSilkPalette()
+val TooltipBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TooltipColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
+val TooltipStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .position(Position.Relative) // So arrow is positioned relative to tooltip area
-        .backgroundColor(palette.tooltip.background)
-        .color(palette.tooltip.color)
+        .backgroundColor(TooltipBackgroundColorVar.value())
+        .color(TooltipColorVar.value())
         .borderRadius(6.px)
 }
 
@@ -70,7 +70,7 @@ val TopLeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(left = TRIANGLE_WIDTH_2X, top = -TRIANGLE_WIDTH_2X)
         .top(0.px)
-        .triangleDown(colorMode.toSilkPalette().tooltip.background)
+        .triangleDown(TooltipBackgroundColorVar.value())
 }
 
 val TopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -78,7 +78,7 @@ val TopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(left = -TRIANGLE_WIDTH, top = -TRIANGLE_WIDTH_2X)
         .left(50.percent)
         .top(0.px)
-        .triangleDown(colorMode.toSilkPalette().tooltip.background)
+        .triangleDown(TooltipBackgroundColorVar.value())
 }
 
 val TopRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -86,7 +86,7 @@ val TopRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(right = TRIANGLE_WIDTH_2X, top = -TRIANGLE_WIDTH_2X)
         .right(0.px)
         .top(0.px)
-        .triangleDown(colorMode.toSilkPalette().tooltip.background)
+        .triangleDown(TooltipBackgroundColorVar.value())
 }
 
 val LeftTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -94,7 +94,7 @@ val LeftTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(top = TRIANGLE_WIDTH_2X, left = -TRIANGLE_WIDTH_2X)
         .left(0.px)
         .top(0.px)
-        .triangleLeft(colorMode.toSilkPalette().tooltip.background)
+        .triangleLeft(TooltipBackgroundColorVar.value())
 }
 
 val LeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -102,7 +102,7 @@ val LeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(top = -TRIANGLE_WIDTH, left = -TRIANGLE_WIDTH_2X)
         .left(0.px)
         .top(50.percent)
-        .triangleLeft(colorMode.toSilkPalette().tooltip.background)
+        .triangleLeft(TooltipBackgroundColorVar.value())
 }
 
 val LeftBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -110,7 +110,7 @@ val LeftBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(bottom = TRIANGLE_WIDTH_2X, left = -TRIANGLE_WIDTH_2X)
         .left(0.px)
         .bottom(0.px)
-        .triangleLeft(colorMode.toSilkPalette().tooltip.background)
+        .triangleLeft(TooltipBackgroundColorVar.value())
 }
 
 val RightTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -118,7 +118,7 @@ val RightTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(top = TRIANGLE_WIDTH_2X, right = -TRIANGLE_WIDTH_2X)
         .right(0.px)
         .top(0.px)
-        .triangleRight(colorMode.toSilkPalette().tooltip.background)
+        .triangleRight(TooltipBackgroundColorVar.value())
 }
 
 val RightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -126,7 +126,7 @@ val RightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(top = -TRIANGLE_WIDTH, right = -TRIANGLE_WIDTH_2X)
         .right(0.px)
         .top(50.percent)
-        .triangleRight(colorMode.toSilkPalette().tooltip.background)
+        .triangleRight(TooltipBackgroundColorVar.value())
 }
 
 val RightBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -134,7 +134,7 @@ val RightBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(bottom = TRIANGLE_WIDTH_2X, right = -TRIANGLE_WIDTH_2X)
         .right(0.px)
         .bottom(0.px)
-        .triangleRight(colorMode.toSilkPalette().tooltip.background)
+        .triangleRight(TooltipBackgroundColorVar.value())
 }
 
 val BottomLeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -142,7 +142,7 @@ val BottomLeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(left = TRIANGLE_WIDTH_2X, bottom = -TRIANGLE_WIDTH_2X)
         .left(0.px)
         .bottom(0.px)
-        .triangleUp(colorMode.toSilkPalette().tooltip.background)
+        .triangleUp(TooltipBackgroundColorVar.value())
 }
 
 val BottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -150,7 +150,7 @@ val BottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(left = -TRIANGLE_WIDTH, bottom = -TRIANGLE_WIDTH_2X)
         .left(50.percent)
         .bottom(0.px)
-        .triangleUp(colorMode.toSilkPalette().tooltip.background)
+        .triangleUp(TooltipBackgroundColorVar.value())
 }
 
 val BottomRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
@@ -158,7 +158,7 @@ val BottomRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .margin(right = TRIANGLE_WIDTH_2X, bottom = -TRIANGLE_WIDTH_2X)
         .right(0.px)
         .bottom(0.px)
-        .triangleUp(colorMode.toSilkPalette().tooltip.background)
+        .triangleUp(TooltipBackgroundColorVar.value())
 }
 
 val TooltipTextContainerStyle = ComponentStyle.base("tooltip-text") {

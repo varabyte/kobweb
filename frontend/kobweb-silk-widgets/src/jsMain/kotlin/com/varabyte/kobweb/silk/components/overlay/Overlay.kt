@@ -1,28 +1,27 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.backgroundColor
-import com.varabyte.kobweb.compose.ui.modifiers.bottom
-import com.varabyte.kobweb.compose.ui.modifiers.left
-import com.varabyte.kobweb.compose.ui.modifiers.position
-import com.varabyte.kobweb.compose.ui.modifiers.right
-import com.varabyte.kobweb.compose.ui.modifiers.top
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
-import com.varabyte.kobweb.silk.theme.toSilkPalette
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.CSSColorValue
+import org.jetbrains.compose.web.css.Position
+import org.jetbrains.compose.web.css.px
 import org.w3c.dom.HTMLElement
 
+val OverlayBackgroundColorVar by StyleVariable<CSSColorValue>()
+
 val OverlayStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier.backgroundColor(colorMode.toSilkPalette().overlay)
+    Modifier.backgroundColor(OverlayBackgroundColorVar.value())
 }
 
 /**

@@ -1,26 +1,32 @@
 package com.varabyte.kobweb.silk.init
 
+import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.setVariable
 import com.varabyte.kobweb.silk.SilkStyleSheet
+import com.varabyte.kobweb.silk.components.document.TocBorderColorVar
 import com.varabyte.kobweb.silk.components.document.TocBorderedVariant
 import com.varabyte.kobweb.silk.components.document.TocStyle
-import com.varabyte.kobweb.silk.components.forms.ButtonStyle
+import com.varabyte.kobweb.silk.components.forms.*
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
-import com.varabyte.kobweb.silk.components.layout.AnimatedColorSurfaceVariant
-import com.varabyte.kobweb.silk.components.layout.DividerStyle
-import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
-import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
+import com.varabyte.kobweb.silk.components.layout.*
 import com.varabyte.kobweb.silk.components.layout.breakpoint.*
-import com.varabyte.kobweb.silk.components.navigation.LinkStyle
-import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
-import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
+import com.varabyte.kobweb.silk.components.navigation.*
 import com.varabyte.kobweb.silk.components.overlay.*
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
 import com.varabyte.kobweb.silk.components.text.DivTextStyle
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.theme.*
+import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
+import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
+import com.varabyte.kobweb.silk.theme.colors.ColorVar
+import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
+import kotlinx.browser.document
+import org.jetbrains.compose.web.css.CSSColorValue
+import org.w3c.dom.HTMLElement
 
 /**
  * Various classes passed to the user in a method annotated by `@InitSilk` which they can use to for initializing Silk
@@ -89,4 +95,39 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     _SilkTheme = ImmutableSilkTheme(mutableTheme)
     SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
     SilkTheme.registerStyles(SilkStyleSheet)
+}
+
+@Composable
+fun HTMLElement.setSilkVariables() {
+    val colorMode by rememberColorMode()
+    val palette = colorMode.toSilkPalette()
+
+    // region General color vars
+    setVariable(BackgroundColorVar, palette.background)
+    setVariable(ColorVar, palette.color)
+    setVariable(BorderColorVar, palette.border)
+    // endregion
+
+    // region Widget color vars
+    setVariable(ButtonBackgroundDefaultColorVar, palette.button.default)
+    setVariable(ButtonBackgroundFocusColorVar, palette.button.focus)
+    setVariable(ButtonBackgroundHoverColorVar, palette.button.hover)
+    setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
+    setVariable(ButtonColorVar, palette.color)
+
+    setVariable(DividerColorVar, palette.border)
+
+    setVariable(LinkDefaultColorVar, palette.link.default)
+    setVariable(LinkVisitedColorVar, palette.link.visited)
+
+    setVariable(OverlayBackgroundColorVar, palette.overlay)
+
+    setVariable(SurfaceBackgroundColorVar, palette.background)
+    setVariable(SurfaceColorVar, palette.color)
+
+    setVariable(TocBorderColorVar, palette.border)
+
+    setVariable(TooltipBackgroundColorVar, palette.tooltip.background)
+    setVariable(TooltipColorVar, palette.tooltip.color)
+    // endregion
 }

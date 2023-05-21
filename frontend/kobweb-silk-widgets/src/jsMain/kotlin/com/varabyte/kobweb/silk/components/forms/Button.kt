@@ -2,7 +2,9 @@ package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
 import androidx.compose.web.events.SyntheticMouseEvent
-import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
@@ -16,21 +18,23 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.*
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
-import com.varabyte.kobweb.silk.theme.toSilkPalette
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.CSSColorValue
+import org.jetbrains.compose.web.css.px
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.jetbrains.compose.web.dom.Button as JbButton
 
+val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 val ButtonStyle by ComponentStyle(prefix = "silk") {
-    val palette = colorMode.toSilkPalette()
-    val buttonColors = palette.button
-
     base {
         Modifier
-            .color(palette.color)
-            .backgroundColor(buttonColors.default)
+            .color(ButtonColorVar.value())
+            .backgroundColor(ButtonBackgroundDefaultColorVar.value())
             .lineHeight(1.2)
             .fontSize(16.px)
             .padding(topBottom = 8.px, leftRight = 16.px)
@@ -44,16 +48,16 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
 
     (hover + not(ariaDisabled)) {
         Modifier
-            .backgroundColor(buttonColors.hover)
+            .backgroundColor(ButtonBackgroundHoverColorVar.value())
             .cursor(Cursor.Pointer)
     }
 
     (focusVisible + not(ariaDisabled)) {
-        Modifier.boxShadow(spreadRadius = 3.px, color = buttonColors.focus)
+        Modifier.boxShadow(spreadRadius = 3.px, color = ButtonBackgroundFocusColorVar.value())
     }
 
     (active + not(ariaDisabled)) {
-        Modifier.backgroundColor(buttonColors.pressed)
+        Modifier.backgroundColor(ButtonBackgroundPressedColorVar.value())
     }
 }
 
