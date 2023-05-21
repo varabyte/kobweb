@@ -44,7 +44,7 @@ val NavLinkVariant by LinkStyle.addVariant {
     visited { Modifier.color(linkColor) }
 }
 
-val NavButtonVariant by NavItemStyle.addVariant {
+val NavButtonVariant = NavItemStyle.addVariant("button") {
     base { Modifier.padding(0.px).borderRadius(50.percent) }
 }
 
