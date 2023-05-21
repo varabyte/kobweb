@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.silk.init
 
 import com.varabyte.kobweb.silk.SilkStyleSheet
+import com.varabyte.kobweb.silk.components.document.TocBorderedVariant
+import com.varabyte.kobweb.silk.components.document.TocStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
@@ -51,6 +53,8 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(SurfaceStyle)
     @Suppress("DEPRECATION") mutableTheme.registerComponentVariants(AnimatedColorSurfaceVariant)
     mutableTheme.registerComponentStyle(SpanTextStyle)
+    mutableTheme.registerComponentStyle(TocStyle)
+    mutableTheme.registerComponentVariants(TocBorderedVariant)
     mutableTheme.registerComponentStyle(TooltipArrowStyle)
     mutableTheme.registerComponentVariants(
         TopLeftTooltipArrowVariant,
