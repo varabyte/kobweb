@@ -10,6 +10,9 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.*
 import java.io.File
 
+private fun KtAnnotated.shouldSuppress(label: String) =
+    annotationEntries.any { it.shortName?.asString() == "Suppress" && it.text.contains("\"$label\"") }
+
 private fun processComponentStyle(
     file: File,
     filePackage: String,
@@ -21,7 +24,9 @@ private fun processComponentStyle(
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
     if (property.parent !is KtFile) {
-        reporter.warn("${file.absolutePath}: Not registering component style `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your component style inside an @InitSilk block instead (`ctx.theme.registerComponentStyle($propertyName)`).")
+        if (!property.shouldSuppress("TOP_LEVEL_COMPONENT_STYLE")) {
+            reporter.error("${file.absolutePath}: Not registering component style `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your component style inside an @InitSilk block instead (`ctx.theme.registerComponentStyle($propertyName)`). Suppress this message by adding a `@Suppress(\"TOP_LEVEL_COMPONENT_STYLE\")` annotation.")
+        }
         return false
     }
 
@@ -29,7 +34,9 @@ private fun processComponentStyle(
         silkStyles.add(ComponentStyleEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
-        reporter.warn("${file.absolutePath}: Not registering component style `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your component style inside an @InitSilk block instead (`ctx.theme.registerComponentStyle($propertyName)`).")
+        if (!property.shouldSuppress("PRIVATE_COMPONENT_STYLE")) {
+            reporter.error("${file.absolutePath}: Not registering component style `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your component style inside an @InitSilk block instead (`ctx.theme.registerComponentStyle($propertyName)`). Suppress this message by adding a `@Suppress(\"PRIVATE_COMPONENT_STYLE\")` annotation.")
+        }
         false
     }
 }
@@ -104,7 +111,9 @@ private fun processComponentVariant(
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
     if (property.parent !is KtFile) {
-        reporter.warn("${file.absolutePath}: Not registering component variant `val $propertyName`, as only top-level component variants are supported at this time. Although fixing this is recommended, you can manually register your component variant inside an @InitSilk block instead (`ctx.theme.registerComponentVariants($propertyName)`).")
+        if (!property.shouldSuppress("TOP_LEVEL_COMPONENT_VARIANT")) {
+            reporter.error("${file.absolutePath}: Not registering component variant `val $propertyName`, as only top-level component variants are supported at this time. Although fixing this is recommended, you can manually register your component variant inside an @InitSilk block instead (`ctx.theme.registerComponentVariants($propertyName)`). Suppress this message by adding a `@Suppress(\"TOP_LEVEL_COMPONENT_VARIANT\")` annotation.")
+        }
         return false
     }
 
@@ -112,7 +121,9 @@ private fun processComponentVariant(
         silkVariants.add(ComponentVariantEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
-        reporter.warn("${file.absolutePath}: Not registering component variant `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your component variant inside an @InitSilk block instead (`ctx.theme.registerComponentVariants($propertyName)`).")
+        if (!property.shouldSuppress("PRIVATE_COMPONENT_VARIANT")) {
+            reporter.error("${file.absolutePath}: Not registering component variant `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your component variant inside an @InitSilk block instead (`ctx.theme.registerComponentVariants($propertyName)`). Suppress this message by adding a `@Suppress(\"PRIVATE_COMPONENT_VARIANT\")` annotation.")
+        }
         false
     }
 }
@@ -168,10 +179,10 @@ private fun processKeyframes(
             val isInsideStylesheet = propertyDelegate.parents.filterIsInstance<KtClassOrObject>().any {
                 it.getSuperNames().contains("StyleSheet")
             }
-            showWarning = !isInsideStylesheet
+            showWarning = !isInsideStylesheet && !property.shouldSuppress("TOP_LEVEL_KEYFRAMES")
         }
         if (showWarning) {
-            reporter.warn("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as only top-level definitions are supported at this time. Although fixing this is recommended, you can manually register your keyframes inside an @InitSilk block instead (`ctx.stylesheet.registerKeyframes($propertyName)`).")
+            reporter.error("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as only top-level definitions are supported at this time. Although fixing this is recommended, you can manually register your keyframes inside an @InitSilk block instead (`ctx.stylesheet.registerKeyframes($propertyName)`). Suppress this message by adding a `@Suppress(\"TOP_LEVEL_KEYFRAMES\")` annotation.")
         }
         return false
     }
@@ -181,7 +192,9 @@ private fun processKeyframes(
         keyframesList.add(KeyframesEntry(prefixQualifiedPath(filePackage, propertyName)))
         true
     } else {
-        reporter.warn("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your keyframes inside an @InitSilk block instead (`ctx.stylesheet.registerKeyframes($propertyName)`).")
+        if (!property.shouldSuppress("PRIVATE_KEYFRAMES")) {
+            reporter.error("${file.absolutePath}: Not registering keyframes definition `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your keyframes inside an @InitSilk block instead (`ctx.stylesheet.registerKeyframes($propertyName)`). Suppress this message by adding a `@Suppress(\"PRIVATE_KEYFRAMES\")` annotation.")
+        }
         false
     }
 }
