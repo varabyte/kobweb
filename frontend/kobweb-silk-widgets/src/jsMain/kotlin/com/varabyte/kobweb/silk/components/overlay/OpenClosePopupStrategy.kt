@@ -117,6 +117,45 @@ class ManualOpenClosePopupStrategy internal constructor(): OpenClosePopupStrateg
  */
 fun OpenClosePopupStrategy.Companion.manual() = ManualOpenClosePopupStrategy()
 
+class TimedOpenClosePopupStrategy(val timeoutMs: Int) : OpenClosePopupStrategy() {
+    private var timeoutHandle: Int? = null
+
+    /**
+     * Show the popup and kick off a timer.
+     *
+     * If a second call to this method is made before the timer expires, the timer will be reset.
+     *
+     * The user can also call [stopEarly] to stop the timer early and hide the popup immediately.
+     */
+    fun showAndStartTimer() {
+        timeoutHandle?.let { window.clearTimeout(it) }
+        emitRequest(OpenClose.OPEN)
+        timeoutHandle = window.setTimeout({
+            emitRequest(OpenClose.CLOSE)
+            timeoutHandle = null
+        }, timeoutMs)
+    }
+
+    /**
+     * Interrupt the timer, if running, and hide the popup immediately.
+     *
+     * If the popup is already hidden, this method is a no-op.
+     */
+    fun stopEarly() {
+        if (timeoutHandle != null) {
+            window.clearTimeout(timeoutHandle!!)
+            emitRequest(OpenClose.CLOSE)
+            timeoutHandle = null
+        }
+    }
+}
+
+/**
+ * A strategy that opens when the user starts a timer and then closes when the timer expires.
+ */
+fun OpenClosePopupStrategy.Companion.timed(timeoutMs: Int) = TimedOpenClosePopupStrategy(timeoutMs)
+
+
 /**
  * A [KeepPopupOpenStrategy] that combines multiple orthogonal strategies into one.
  *
