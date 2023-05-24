@@ -80,7 +80,7 @@ class Router {
     init {
         PageContext.init(this)
         window.onpopstate = {
-            PageContext.instance.updatePageContext(document.location!!.pathname)
+            PageContext.instance.updatePageContext(document.location!!.let { it.href.removePrefix(it.origin) })
         }
     }
 
