@@ -1,10 +1,8 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.dom.ElementRefScope
-import com.varabyte.kobweb.compose.dom.ElementTarget
-import com.varabyte.kobweb.compose.dom.disposableRef
-import com.varabyte.kobweb.compose.dom.refScope
+import com.varabyte.kobweb.compose.dom.*
+import com.varabyte.kobweb.compose.dom.observers.ResizeObserver
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -385,7 +383,7 @@ fun AdvancedPopover(
                     popoverStateController.updatePopupElement(popupElement)
                     popoverStateController.finishShowing()
 
-                    val updatePopupPositionListener = EventListener {
+                    fun updatePopupPosition() {
                         popupElement.updatePosition(
                             placementStrategy.calculate(
                                 visiblePopoverState.elements.placementElement,
@@ -393,6 +391,10 @@ fun AdvancedPopover(
                             ).position
                         )
                     }
+                    val updatePopupPositionListener = EventListener { updatePopupPosition() }
+                    val resizeObserver = ResizeObserver { _ -> updatePopupPosition() }
+
+                    resizeObserver.observe(popupElement)
                     window.addEventListener("scroll", updatePopupPositionListener)
                     window.addEventListener("resize", updatePopupPositionListener)
 
@@ -400,6 +402,7 @@ fun AdvancedPopover(
                         popoverStateController.clearPopupElement()
                         popoverStateController.resetToFoundElements()
 
+                        resizeObserver.unobserve(popupElement)
                         window.removeEventListener("scroll", updatePopupPositionListener)
                         window.removeEventListener("resize", updatePopupPositionListener)
                     }

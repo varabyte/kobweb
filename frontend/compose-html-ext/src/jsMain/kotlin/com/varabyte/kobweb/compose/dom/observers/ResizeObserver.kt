@@ -1,0 +1,54 @@
+package com.varabyte.kobweb.compose.dom.observers
+
+import com.varabyte.kobweb.compose.dom.observers.externals.ResizeObserverEntry
+import com.varabyte.kobweb.compose.dom.observers.externals.ResizeObserverSize
+import org.w3c.dom.DOMRectReadOnly
+import org.w3c.dom.Element
+import com.varabyte.kobweb.compose.dom.observers.externals.ResizeObserver as ActualResizeObserver
+
+/**
+ * A performant mechanism by which code can monitor an element for changes to its size.
+ *
+ * See https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API
+ */
+class ResizeObserver(resized: (List<Entry>, ResizeObserver) -> Unit) {
+    constructor(resized: (List<Entry>) -> Unit) : this({ entries, _ -> resized.invoke(entries) })
+
+    private val _actualObserver = ActualResizeObserver { actualEntries, _ ->
+        resized.invoke(actualEntries.map { Entry.from(it) }, this)
+    }
+
+    class Size(
+        val blockSize: Double,
+        val inlineSize: Double,
+    ) {
+        companion object {
+            internal fun from(actualSize: ResizeObserverSize) = Size(
+                actualSize.blockSize,
+                actualSize.inlineSize
+            )
+        }
+    }
+
+    class Entry(
+        val target: Element,
+        val borderBoxSize: List<Size>,
+        val contentBoxSize: List<Size>,
+        val contentRect: DOMRectReadOnly,
+        val devicePixelContentBoxSize: List<Size>,
+    ) {
+        companion object {
+            internal fun from(actualEntry: ResizeObserverEntry) = Entry(
+                actualEntry.target,
+                actualEntry.borderBoxSize.map { Size.from(it) },
+                actualEntry.contentBoxSize.map { Size.from(it) },
+                actualEntry.contentRect,
+                actualEntry.devicePixelContentBoxSize.map { Size.from(it) },
+            )
+        }
+    }
+
+    fun observe(element: Element): Unit = _actualObserver.observe(element)
+    fun unobserve(element: Element): Unit = _actualObserver.unobserve(element)
+    fun disconnect(): Unit = _actualObserver.disconnect()
+}
