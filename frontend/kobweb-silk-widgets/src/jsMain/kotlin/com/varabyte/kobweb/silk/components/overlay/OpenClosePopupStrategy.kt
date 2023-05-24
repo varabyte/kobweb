@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.components.overlay
 
+import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -73,6 +74,7 @@ fun OpenClosePopupStrategy.Companion.onHover() = object : OpenClosePopupStrategy
         manager = EventListenerManager(targetElement).apply {
             addEventListener("mouseenter", EventListener { emitRequest(OpenClose.OPEN) })
             addEventListener("mouseleave", EventListener { emitRequest(OpenClose.CLOSE) })
+            if (targetElement.matches(":hover")) emitRequest(OpenClose.OPEN)
         }
     }
 
@@ -92,6 +94,7 @@ fun OpenClosePopupStrategy.Companion.onFocus() = object : OpenClosePopupStrategy
         manager = EventListenerManager(targetElement).apply {
             addEventListener("focusin", EventListener { emitRequest(OpenClose.OPEN) })
             addEventListener("focusout", EventListener { emitRequest(OpenClose.CLOSE) })
+            if (targetElement.contains(document.activeElement)) emitRequest(OpenClose.OPEN)
         }
     }
 
