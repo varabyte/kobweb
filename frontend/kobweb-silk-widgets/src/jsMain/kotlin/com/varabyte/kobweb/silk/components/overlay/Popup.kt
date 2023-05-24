@@ -215,6 +215,11 @@ abstract class PopupPlacementStrategy {
                 )
             }
         }
+
+        /**
+         * A helper method when you care about the offset of the placement but not the direction.
+         */
+        fun of(offsetPixels: Number) = of(PopupPlacement.Bottom, offsetPixels)
     }
 }
 
