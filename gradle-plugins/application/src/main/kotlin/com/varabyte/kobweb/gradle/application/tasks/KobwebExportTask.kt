@@ -131,7 +131,7 @@ abstract class KobwebExportTask @Inject constructor(
             val browser = kobwebBlock.export.browser.get()
             PlaywrightCache().install(browser)
             Playwright.create(Playwright.CreateOptions().setEnv(mapOf(
-                // Should have been downloaded above, by updatePlaywrightCacheIfNecessary()
+                // Should have been downloaded above, by PlaywrightCache()
                 "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
             ))).use { playwright ->
                 val browserType = when(browser) {
