@@ -7,5 +7,6 @@ internal fun String.addSuffix(suffix: String): String {
 // e.g. "example-text" to "ExampleText"
 internal fun String.kebabCaseToTitleCamelCase(): String {
     require(this.isNotBlank())
-    return this.split("-").joinToString("") { it.capitalize() }
+    // The suggested replacement for "capitalize" is awful
+    @Suppress("DEPRECATION") return this.split("-").joinToString("") { it.capitalize() }
 }

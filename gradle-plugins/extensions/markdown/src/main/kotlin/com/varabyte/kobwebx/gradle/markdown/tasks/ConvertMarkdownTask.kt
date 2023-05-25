@@ -104,6 +104,8 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     kobwebBlock.pagesPackage.get().packageConcat(packageParts.joinToString("."))
                 )
 
+                // The suggested replacement for "capitalize" is awful
+                @Suppress("DEPRECATION")
                 val funName = "${ktFileName.capitalize()}Page"
                 val ktRenderer = KotlinRenderer(project, mdPathRel, markdownComponents, mdPackage, funName)
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))

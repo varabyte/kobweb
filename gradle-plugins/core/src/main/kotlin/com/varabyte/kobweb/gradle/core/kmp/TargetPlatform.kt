@@ -13,6 +13,8 @@ abstract class TargetPlatform<T : KotlinTarget> {
     val srcSuffix: String get() = "/src/${mainSourceSet}/kotlin"
     val resourceSuffix: String get() = "/src/${mainSourceSet}/resources"
 
+    // The suggested replacement for "capitalize" is awful
+    @Suppress("DEPRECATION")
     val compileKotlin: String get() = "compileKotlin${name.capitalize()}"
     val compileClasspath: String get() = "${name}CompileClasspath"
     val runtimeClasspath: String get() = "${name}RuntimeClasspath"
@@ -21,6 +23,8 @@ abstract class TargetPlatform<T : KotlinTarget> {
     val processResources get() = "${name}ProcessResources"
 }
 
+// The suggested replacement for "capitalize" is awful
+@Suppress("DEPRECATION")
 class JsTarget(val kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTarget>() {
     override val name: String = kotlinTarget.name
 

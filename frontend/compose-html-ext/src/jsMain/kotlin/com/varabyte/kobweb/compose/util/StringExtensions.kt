@@ -22,7 +22,8 @@ fun String.titleCamelCaseToKebabCase(): String {
     }
     words.add(currentWord.toString())
 
-    return words.joinToString("-") { it.decapitalize() }
+    // The suggested replacement for "decapitalize" is awful
+    @Suppress("DEPRECATION") return words.joinToString("-") { it.decapitalize() }
 }
 
 /**
