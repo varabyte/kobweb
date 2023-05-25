@@ -2,6 +2,7 @@ package com.varabyte.kobweb.compose.dom.observers.externals
 
 import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
+import kotlin.js.Json
 
 internal external class ResizeObserverSize {
     val blockSize: Double
@@ -17,7 +18,7 @@ internal external class ResizeObserverEntry {
 }
 
 internal external class ResizeObserver(callback: (Array<ResizeObserverEntry>, ResizeObserver) -> Unit) {
-    fun observe(element: Element): Unit
-    fun unobserve(element: Element): Unit
-    fun disconnect(): Unit
+    fun observe(element: Element, options: Json = definedExternally)
+    fun unobserve(element: Element)
+    fun disconnect()
 }

@@ -2,8 +2,10 @@ package com.varabyte.kobweb.compose.dom.observers
 
 import com.varabyte.kobweb.compose.dom.observers.externals.ResizeObserverEntry
 import com.varabyte.kobweb.compose.dom.observers.externals.ResizeObserverSize
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
+import kotlin.js.json
 import com.varabyte.kobweb.compose.dom.observers.externals.ResizeObserver as ActualResizeObserver
 
 /**
@@ -45,6 +47,18 @@ class ResizeObserver(resized: (List<Entry>, ResizeObserver) -> Unit) {
                 actualEntry.contentRect,
                 actualEntry.devicePixelContentBoxSize.map { Size.from(it) },
             )
+        }
+    }
+
+    enum class BoxType {
+        ContentBox,
+        BorderBox,
+        DevicePixelContentBox
+    }
+
+    class ObserveOptions(val boxType: BoxType? = null) {
+        internal fun toJson() = json().apply {
+            boxType?.let { this["box"] = it.name.titleCamelCaseToKebabCase() }
         }
     }
 
