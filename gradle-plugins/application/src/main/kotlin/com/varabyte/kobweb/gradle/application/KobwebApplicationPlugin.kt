@@ -110,8 +110,8 @@ class KobwebApplicationPlugin @Inject constructor(
                 project.delete(kobwebConf.server.files.prod.siteRoot)
             }
         }
-        val kobwebCleanFolder = project.tasks.register("kobwebCleanFolder", KobwebTask::class.java, "Cleans all transient files that live in the .kobweb folder")
-        kobwebCleanFolder.configure {
+        val kobwebCleanFolderTask = project.tasks.register("kobwebCleanFolder", KobwebTask::class.java, "Cleans all transient files that live in the .kobweb folder")
+        kobwebCleanFolderTask.configure {
             dependsOn(kobwebCleanSiteTask)
             doLast {
                 project.delete(kobwebFolder.resolve("server"))
