@@ -13,6 +13,7 @@ import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.js.json
 
 enum class HttpMethod {
     DELETE,
@@ -22,7 +23,6 @@ enum class HttpMethod {
     PATCH,
     POST,
     PUT,
-    UPDATE
 }
 
 /**
@@ -75,17 +75,34 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
     }
 )
 
+/**
+ * A Kotlin-idiomatic version of the standard library's [Window.fetch] function.
+ *
+ * @param headers An optional map of headers to send with the request. Note: If a body is specified, the
+ *   `Content-Length` and `Content-Type` headers will be automatically set. Setting them manually here will result in
+ *   those values getting overridden.
+ */
 // Needed to calm down the Compose compiler for some reason: "Duplicate live literal key found"
 @NoLiveLiterals
-suspend fun Window.fetch(method: HttpMethod, resource: String, body: ByteArray? = null, abortController: AbortController? = null): ByteArray {
+suspend fun Window.fetch(method: HttpMethod, resource: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null): ByteArray {
     val responseBytesDeferred = CompletableDeferred<ByteArray>()
+    val headersJson = if (!headers.isNullOrEmpty() || body != null) {
+        json().apply {
+            if (body != null) {
+                this["Content-Length"] = body.size
+                this["Content-Type"] = "application/octet-stream"
+            }
+            headers?.let { headers ->
+                for ((key, value) in headers) {
+                    this[key] = value
+                }
+            }
+        }
+    } else null
+
     val requestInit = RequestInit(
         method = method.name,
-        headers = if (body != null) {
-            val headers = js("{}")
-            headers["Content-Length"] = body.size
-            headers["Content-Type"] = "application/octet-stream"
-        } else undefined,
+        headers = headersJson ?: undefined,
         body = body ?: undefined,
     )
     if (abortController != null) {
@@ -109,9 +126,9 @@ suspend fun Window.fetch(method: HttpMethod, resource: String, body: ByteArray? 
     return responseBytesDeferred.await()
 }
 
-suspend fun Window.tryFetch(method: HttpMethod, resource: String, body: ByteArray? = null, logOnError: Boolean = false, abortController: AbortController? = null): ByteArray? {
+suspend fun Window.tryFetch(method: HttpMethod, resource: String, headers: Map<String, Any>? = null, body: ByteArray? = null, logOnError: Boolean = false, abortController: AbortController? = null): ByteArray? {
     return try {
-        fetch(method, resource, body, abortController)
+        fetch(method, resource, headers, body, abortController)
     } catch (t: Throwable) {
         if (logOnError) {
             console.log("Error fetching resource \"$resource\"\n\n$t")

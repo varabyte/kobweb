@@ -39,7 +39,7 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun delete(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.DELETE, toResource(apiPath, autoPrefix), body = null, abortController)
+    suspend fun delete(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.DELETE, toResource(apiPath, autoPrefix), headers, body = null, abortController)
 
     /**
      * Like [delete], but returns null if the request failed for any reason.
@@ -47,7 +47,7 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryDelete(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.DELETE, toResource(apiPath, autoPrefix), body = null, logOnError, abortController)
+    suspend fun tryDelete(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.DELETE, toResource(apiPath, autoPrefix), headers, body = null, logOnError, abortController)
 
     /**
      * Call GET on a target API path.
@@ -60,7 +60,7 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun get(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.GET, toResource(apiPath, autoPrefix), body = null, abortController)
+    suspend fun get(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.GET, toResource(apiPath, autoPrefix), headers, body = null, abortController)
 
     /**
      * Like [get], but returns null if the request failed for any reason.
@@ -68,7 +68,7 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryGet(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.GET, toResource(apiPath, autoPrefix), body = null, logOnError, abortController)
+    suspend fun tryGet(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.GET, toResource(apiPath, autoPrefix), headers, body = null, logOnError, abortController)
 
     /**
      * Call HEAD on a target API path.
@@ -81,7 +81,7 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun head(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.HEAD, toResource(apiPath, autoPrefix), body = null, abortController)
+    suspend fun head(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.HEAD, toResource(apiPath, autoPrefix), headers, body = null, abortController)
 
     /**
      * Like [head], but returns null if the request failed for any reason.
@@ -89,7 +89,7 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryHead(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.HEAD, toResource(apiPath, autoPrefix), body = null, logOnError, abortController)
+    suspend fun tryHead(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.HEAD, toResource(apiPath, autoPrefix), headers, body = null, logOnError, abortController)
 
     /**
      * Call OPTIONS on a target API path.
@@ -102,7 +102,7 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun options(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.OPTIONS, toResource(apiPath, autoPrefix), body = null, abortController)
+    suspend fun options(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.OPTIONS, toResource(apiPath, autoPrefix), headers, body = null, abortController)
 
     /**
      * Like [options], but returns null if the request failed for any reason.
@@ -110,7 +110,7 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryOptions(apiPath: String, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.OPTIONS, toResource(apiPath, autoPrefix), body = null, logOnError, abortController)
+    suspend fun tryOptions(apiPath: String, headers: Map<String, Any>? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.OPTIONS, toResource(apiPath, autoPrefix), headers, body = null, logOnError, abortController)
 
     /**
      * Call PATCH on a target API path.
@@ -123,7 +123,7 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun patch(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.PATCH, toResource(apiPath, autoPrefix), body, abortController)
+    suspend fun patch(apiPath: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.PATCH, toResource(apiPath, autoPrefix), headers, body, abortController)
 
     /**
      * Like [patch], but returns null if the request failed for any reason.
@@ -131,7 +131,7 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryPatch(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.PATCH, toResource(apiPath, autoPrefix), body, logOnError, abortController)
+    suspend fun tryPatch(apiPath: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.PATCH, toResource(apiPath, autoPrefix), headers, body, logOnError, abortController)
 
     /**
      * Call POST on a target API path.
@@ -144,7 +144,7 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun post(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.POST, toResource(apiPath, autoPrefix), body, abortController)
+    suspend fun post(apiPath: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.POST, toResource(apiPath, autoPrefix), headers, body, abortController)
 
     /**
      * Like [post], but returns null if the request failed for any reason.
@@ -152,7 +152,7 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryPost(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.POST, toResource(apiPath, autoPrefix), body, logOnError, abortController)
+    suspend fun tryPost(apiPath: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.POST, toResource(apiPath, autoPrefix), headers, body, logOnError, abortController)
 
     /**
      * Call PUT on a target API path.
@@ -165,7 +165,7 @@ class ApiFetcher(private val window: Window) {
      *
      * Note: you should NOT prepend your path with "api/", as that will be added automatically.
      */
-    suspend fun put(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.PUT, toResource(apiPath, autoPrefix), body, abortController)
+    suspend fun put(apiPath: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray = window.fetch(HttpMethod.PUT, toResource(apiPath, autoPrefix), headers, body, abortController)
 
     /**
      * Like [put], but returns null if the request failed for any reason.
@@ -173,7 +173,7 @@ class ApiFetcher(private val window: Window) {
      * Additionally, if [logOnError] is set to true, any failure will be logged to the console. By default, this will
      * be true for debug builds and false for release builds.
      */
-    suspend fun tryPut(apiPath: String, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.PUT, toResource(apiPath, autoPrefix), body, logOnError, abortController)
+    suspend fun tryPut(apiPath: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null, autoPrefix: Boolean = true): ByteArray? = window.tryFetch(HttpMethod.PUT, toResource(apiPath, autoPrefix), headers, body, logOnError, abortController)
 }
 
 @Suppress("unused") // We tie our class to the "Window" class on purpose, so it can be used instead of `fetch`
