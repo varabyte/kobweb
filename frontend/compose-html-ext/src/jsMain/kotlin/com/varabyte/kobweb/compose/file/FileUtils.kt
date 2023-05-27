@@ -17,13 +17,18 @@ import org.w3c.dom.url.URL as DomURL // to avoid ambiguity with Document.URL
  * Save some content to disk, presenting the user with a dialog to choose the file location.
  *
  * @param filename The suggested name of the file to save (users will be given a chance to override it).
- * @param content The content to save
+ * @param content The content to save.
+ * @param mimeType Optional mime type information you can save about the file. For example, if you're saving a PNG image, you
+ *   could pass in "image/png" here. This information may not be necessary if you're just saving / loading binary or
+ *   text contents, but it can be useful if you expect something else might consume this file. It will be made available
+ *   in [LoadContext] when the file is loaded and will be embedded into the URL returned by [loadDataUrlFromDisk]..
  */
 fun Document.saveToDisk(
     filename: String,
     content: ByteArray,
+    mimeType: String? = null,
 ) {
-    val snapshotBlob = Blob(arrayOf(content), BlobPropertyBag())
+    val snapshotBlob = Blob(arrayOf(content), BlobPropertyBag(mimeType.orEmpty()))
     val url = DomURL.createObjectURL(snapshotBlob)
     val tempAnchor = (createElement("a") as HTMLAnchorElement).apply {
         style.display = "none"
@@ -37,7 +42,7 @@ fun Document.saveToDisk(
 }
 
 /** A convenience method to call [saveToDisk] with a String instead of a ByteArray. */
-fun Document.saveTextTDisk(
+fun Document.saveTextToDisk(
     filename: String,
     content: String,
 ) {
@@ -46,17 +51,16 @@ fun Document.saveTextTDisk(
 
 class LoadContext(
     val filename: String,
+    val mimeType: String?,
 )
 
-/**
- * Load some content from disk, presenting the user with a dialog to choose the file to load.
- *
- * @param accept A comma-separated list of extensions to filter by (e.g. ".txt,*.sav")
- * @param onLoaded A callback which will contain the contents of your file, if successfully loaded.
- */
-fun Document.loadFromDisk(
+// I = input type (from the disk)
+// O = output type (produced for users)
+private fun <I, O> Document.loadFromDisk(
     accept: String = "",
-    onLoaded: LoadContext.(ByteArray) -> Unit,
+    triggerLoad: FileReader.(Blob) -> Unit,
+    deserialize: (I) -> O,
+    onLoading: LoadContext.(O) -> Unit,
 ) {
     val tempInput = (createElement("input") as HTMLInputElement).apply {
         type = "file"
@@ -70,12 +74,10 @@ fun Document.loadFromDisk(
 
         val reader = FileReader()
         reader.onload = { loadEvt ->
-            val buffer = loadEvt.target.asDynamic().result as ArrayBuffer
-            val intArray = Int8Array(buffer)
-
-            onLoaded(LoadContext(file.name), ByteArray(intArray.length) { i -> intArray[i] })
+            val result = loadEvt.target.asDynamic().result as I
+            onLoading(LoadContext(file.name, file.type.takeIf { it.isNotBlank() }), deserialize(result))
         }
-        reader.readAsArrayBuffer(file)
+        reader.triggerLoad(file)
     }
 
     body!!.append(tempInput)
@@ -83,10 +85,61 @@ fun Document.loadFromDisk(
     tempInput.remove()
 }
 
-/** A convenience method to call [loadFromDisk] with a String instead of a ByteArray. */
+/**
+ * Load some binary content from disk, presenting the user with a dialog to choose the file to load.
+ *
+ * @param accept A comma-separated list of extensions to filter by (e.g. ".txt,*.sav")
+ * @param onLoaded A callback which will contain the contents of your file, if successfully loaded.
+ */
+fun Document.loadFromDisk(
+    accept: String = "",
+    onLoaded: LoadContext.(ByteArray) -> Unit,
+) {
+    loadFromDisk<ArrayBuffer, ByteArray>(
+        accept,
+        FileReader::readAsArrayBuffer,
+        { result ->
+            val intArray = Int8Array(result)
+            ByteArray(intArray.byteLength) { i -> intArray[i] }
+        },
+        onLoaded
+    )
+}
+
+/**
+ * Like [loadFromDisk] but specifically loads some content from disk as a URL with base64-encoded data.
+ *
+ * This is useful (necessary?) for loading images in a format that image elements can consume.
+ *
+ * See [loadFromDisk] for details about the parameters.
+ */
+fun Document.loadDataUrlFromDisk(
+    accept: String = "",
+    onLoaded: LoadContext.(String) -> Unit,
+) {
+    loadFromDisk<String, String>(
+        accept,
+        FileReader::readAsDataURL,
+        { result -> result },
+        onLoaded
+    )
+}
+
+/**
+ * Like [loadFromDisk] but convenient for dealing with text files.
+ *
+ * See [loadFromDisk] for details about the parameters.
+ *
+ * See also: [saveTextToDisk].
+ */
 fun Document.loadTextFromDisk(
     accept: String = "",
     onLoaded: LoadContext.(String) -> Unit,
 ) {
-    loadFromDisk(accept) { bytes -> onLoaded(bytes.decodeToString()) }
+    loadFromDisk<String, String>(
+        accept,
+        { file -> this.readAsText(file, "UTF-8") },
+        { result -> result },
+        onLoaded
+    )
 }
