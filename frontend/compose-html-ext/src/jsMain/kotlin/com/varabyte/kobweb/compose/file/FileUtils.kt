@@ -91,6 +91,8 @@ private fun <I, O> Document.loadFromDisk(
  *
  * @param accept A comma-separated list of extensions to filter by (e.g. ".txt,*.sav")
  * @param onLoaded A callback which will contain the contents of your file, if successfully loaded.
+ *
+ * See also: [FileReader.readAsArrayBuffer]
  */
 fun Document.loadFromDisk(
     accept: String = "",
@@ -113,6 +115,8 @@ fun Document.loadFromDisk(
  * This is useful (necessary?) for loading images in a format that image elements can consume.
  *
  * See [loadFromDisk] for details about the parameters.
+ *
+ * See also: [FileReader.readAsDataURL]
  */
 fun Document.loadDataUrlFromDisk(
     accept: String = "",
@@ -131,7 +135,9 @@ fun Document.loadDataUrlFromDisk(
  *
  * See [loadFromDisk] for details about the parameters.
  *
- * See also: [saveTextToDisk].
+ * See also: [FileReader.readAsText]
+ *
+ * See also: [saveTextToDisk]
  */
 fun Document.loadTextFromDisk(
     accept: String = "",
