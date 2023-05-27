@@ -45,8 +45,9 @@ fun Document.saveToDisk(
 fun Document.saveTextToDisk(
     filename: String,
     content: String,
+    mimeType: String? = null,
 ) {
-    saveToDisk(filename, content.encodeToByteArray())
+    saveToDisk(filename, content.encodeToByteArray(), mimeType)
 }
 
 class LoadContext(
