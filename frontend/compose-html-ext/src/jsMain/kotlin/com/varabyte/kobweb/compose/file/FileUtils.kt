@@ -1,6 +1,9 @@
 package com.varabyte.kobweb.compose.file
 
 import kotlinx.browser.document
+import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Int8Array
+import org.khronos.webgl.get
 import org.w3c.dom.Document
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLInputElement
@@ -18,7 +21,7 @@ import org.w3c.dom.url.URL as DomURL // to avoid ambiguity with Document.URL
  */
 fun Document.saveToDisk(
     filename: String,
-    content: String,
+    content: ByteArray,
 ) {
     val snapshotBlob = Blob(arrayOf(content), BlobPropertyBag())
     val url = DomURL.createObjectURL(snapshotBlob)
@@ -33,6 +36,18 @@ fun Document.saveToDisk(
     tempAnchor.remove()
 }
 
+/** A convenience method to call [saveToDisk] with a String instead of a ByteArray. */
+fun Document.saveTextTDisk(
+    filename: String,
+    content: String,
+) {
+    saveToDisk(filename, content.encodeToByteArray())
+}
+
+class LoadContext(
+    val filename: String,
+)
+
 /**
  * Load some content from disk, presenting the user with a dialog to choose the file to load.
  *
@@ -41,7 +56,7 @@ fun Document.saveToDisk(
  */
 fun Document.loadFromDisk(
     accept: String = "",
-    onLoaded: (String) -> Unit,
+    onLoaded: LoadContext.(ByteArray) -> Unit,
 ) {
     val tempInput = (createElement("input") as HTMLInputElement).apply {
         type = "file"
@@ -55,13 +70,23 @@ fun Document.loadFromDisk(
 
         val reader = FileReader()
         reader.onload = { loadEvt ->
-            val content = loadEvt.target.asDynamic().result as String
-            onLoaded(content)
+            val buffer = loadEvt.target.asDynamic().result as ArrayBuffer
+            val intArray = Int8Array(buffer)
+
+            onLoaded(LoadContext(file.name), ByteArray(intArray.length) { i -> intArray[i] })
         }
-        reader.readAsText(file, "UTF-8")
+        reader.readAsArrayBuffer(file)
     }
 
     body!!.append(tempInput)
     tempInput.click()
     tempInput.remove()
+}
+
+/** A convenience method to call [loadFromDisk] with a String instead of a ByteArray. */
+fun Document.loadTextFromDisk(
+    accept: String = "",
+    onLoaded: LoadContext.(String) -> Unit,
+) {
+    loadFromDisk(accept) { bytes -> onLoaded(bytes.decodeToString()) }
 }
