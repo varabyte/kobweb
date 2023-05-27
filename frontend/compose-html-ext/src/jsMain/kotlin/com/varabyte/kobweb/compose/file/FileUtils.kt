@@ -135,11 +135,12 @@ fun Document.loadDataUrlFromDisk(
  */
 fun Document.loadTextFromDisk(
     accept: String = "",
+    encoding: String = "UTF-8",
     onLoaded: LoadContext.(String) -> Unit,
 ) {
     loadFromDisk<String, String>(
         accept,
-        { file -> this.readAsText(file, "UTF-8") },
+        { file -> this.readAsText(file, encoding) },
         { result -> result },
         onLoaded
     )
