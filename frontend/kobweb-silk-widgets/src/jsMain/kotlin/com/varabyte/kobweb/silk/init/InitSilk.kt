@@ -1,9 +1,9 @@
 package com.varabyte.kobweb.silk.init
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.css.setVariable
 import com.varabyte.kobweb.silk.SilkStyleSheet
+import com.varabyte.kobweb.silk.components.disclosure.*
 import com.varabyte.kobweb.silk.components.document.TocBorderColorVar
 import com.varabyte.kobweb.silk.components.document.TocBorderedVariant
 import com.varabyte.kobweb.silk.components.document.TocStyle
@@ -24,8 +24,6 @@ import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
-import kotlinx.browser.document
-import org.jetbrains.compose.web.css.CSSColorValue
 import org.w3c.dom.HTMLElement
 
 /**
@@ -59,6 +57,12 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(SurfaceStyle)
     @Suppress("DEPRECATION") mutableTheme.registerComponentVariants(AnimatedColorSurfaceVariant)
     mutableTheme.registerComponentStyle(SpanTextStyle)
+
+    mutableTheme.registerComponentStyle(TabsStyle)
+    mutableTheme.registerComponentStyle(TabsTabRowStyle)
+    mutableTheme.registerComponentStyle(TabsTabStyle)
+    mutableTheme.registerComponentStyle(TabsPanelStyle)
+
     mutableTheme.registerComponentStyle(TocStyle)
     mutableTheme.registerComponentVariants(TocBorderedVariant)
     mutableTheme.registerComponentStyle(TooltipArrowStyle)
@@ -124,6 +128,13 @@ fun HTMLElement.setSilkVariables() {
 
     setVariable(SurfaceBackgroundColorVar, palette.background)
     setVariable(SurfaceColorVar, palette.color)
+
+    setVariable(TabColorVar, palette.tab.color)
+    setVariable(TabBackgroundColorVar, palette.tab.background)
+    setVariable(TabBorderColorVar, palette.border)
+    setVariable(TabDisabledBackgroundColorVar, palette.tab.disabled)
+    setVariable(TabHoverBackgroundColorVar, palette.tab.hover)
+    setVariable(TabPressedBackgroundColorVar, palette.tab.pressed)
 
     setVariable(TocBorderColorVar, palette.border)
 

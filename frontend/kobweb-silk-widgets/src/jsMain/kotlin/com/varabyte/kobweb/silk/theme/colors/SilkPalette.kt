@@ -31,6 +31,7 @@ interface SilkPalette {
 
     val button: Button
     val link: Link
+    val tab: Tab
     val tooltip: Tooltip
 
     interface Button {
@@ -51,6 +52,17 @@ interface SilkPalette {
         val visited: Color
     }
 
+    interface Tab {
+        val color: Color
+        val background: Color
+        val activeColor: Color
+        val activeBackground: Color
+        val activeBorder: Color
+        val hover: Color
+        val pressed: Color
+        val disabled: Color
+    }
+
     interface Tooltip {
         val background: Color
         val color: Color
@@ -60,13 +72,14 @@ interface SilkPalette {
 class MutableSilkPalette(
     override var background: Color,
     override var color: Color,
-    override var link: Link,
     override var button: Button,
+    override var link: Link,
+    override var tab: Tab,
     override var border: Color = color,
     // Intentionally invert backdrop from normal background
     override var overlay: Color = color.toRgb().copyf(alpha = 0.5f),
     override var tooltip: Tooltip = Tooltip(
-        // Intentionally inversed from main colors, for contrast.
+        // Intentionally inverted from main colors, for contrast.
         background = color,
         color = background,
     ),
@@ -82,6 +95,17 @@ class MutableSilkPalette(
         override var focus: Color,
         override var pressed: Color,
     ) : SilkPalette.Button
+
+    class Tab(
+        override var color: Color,
+        override var background: Color,
+        override var activeColor: Color,
+        override var hover: Color,
+        override var pressed: Color,
+        override var disabled: Color,
+        override var activeBackground: Color = background,
+        override var activeBorder: Color = activeColor,
+    ) : SilkPalette.Tab
 
     class Tooltip(
         override var background: Color,
@@ -105,16 +129,24 @@ class MutableSilkPalettes(
         MutableSilkPalette(
             background = Colors.White,
             color = Colors.Black,
-            link = MutableSilkPalette.Link(
-                default = Colors.Blue,
-                visited = Colors.Purple,
-            ),
             button = MutableSilkPalette.Button(
                 default = buttonBase,
                 hover = buttonBase.darkened(byPercent = 0.2f),
                 focus = Colors.CornflowerBlue,
                 pressed = buttonBase.darkened(byPercent = 0.4f)
-            )
+            ),
+            link = MutableSilkPalette.Link(
+                default = Colors.Blue,
+                visited = Colors.Purple,
+            ),
+            tab = MutableSilkPalette.Tab(
+                color = Colors.Black,
+                background = Colors.White,
+                activeColor = Colors.CornflowerBlue,
+                hover = Colors.LightGray,
+                pressed = Colors.WhiteSmoke,
+                disabled = Colors.Gray,
+            ),
         )
     },
     override val dark: MutableSilkPalette = run {
@@ -122,16 +154,24 @@ class MutableSilkPalettes(
         MutableSilkPalette(
             background = Colors.Black,
             color = Colors.White,
-            link = MutableSilkPalette.Link(
-                default = Colors.Cyan,
-                visited = Colors.Violet,
-            ),
             button = MutableSilkPalette.Button(
                 default = buttonBase,
                 hover = buttonBase.lightened(byPercent = 0.2f),
                 focus = Colors.LightSkyBlue,
                 pressed = buttonBase.lightened(byPercent = 0.4f)
-            )
+            ),
+            link = MutableSilkPalette.Link(
+                default = Colors.Cyan,
+                visited = Colors.Violet,
+            ),
+            tab = MutableSilkPalette.Tab(
+                color = Colors.White,
+                background = Colors.Black,
+                activeColor = Colors.LightSkyBlue,
+                hover = Colors.DarkSlateGray,
+                pressed = Colors.DarkGray,
+                disabled = Colors.Gray,
+            ),
         )
     }
 ) : SilkPalettes

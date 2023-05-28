@@ -1,0 +1,253 @@
+package com.varabyte.kobweb.silk.components.disclosure
+
+import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.CSSTransition
+import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.UserSelect
+import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.foundation.layout.Box
+import com.varabyte.kobweb.compose.foundation.layout.BoxScope
+import com.varabyte.kobweb.compose.foundation.layout.Column
+import com.varabyte.kobweb.compose.foundation.layout.Row
+import com.varabyte.kobweb.compose.ui.Alignment
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.compose.ui.thenIf
+import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
+import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
+import com.varabyte.kobweb.silk.theme.colors.getColorMode
+import com.varabyte.kobweb.silk.theme.toSilkPalette
+import org.jetbrains.compose.web.css.*
+import org.w3c.dom.HTMLElement
+
+val TabColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TabBorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TabBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TabDisabledBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TabHoverBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TabPressedBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TabBorderThickness by StyleVariable<CSSLengthValue>(2.px, prefix = "silk")
+
+val TabsStyle by ComponentStyle {}
+val TabsTabRowStyle by ComponentStyle.base {
+    Modifier
+        .fillMaxWidth()
+        .borderBottom(TabBorderThickness.value(), LineStyle.Solid, TabBorderColorVar.value())
+}
+val TabsTabStyle by ComponentStyle(extraModifiers = { Modifier.tabIndex(0) }) {
+    base {
+        Modifier
+            .cursor(Cursor.Pointer)
+            .transition(*CSSTransition.group(listOf("background-color", "color", "border-color"), 200.ms))
+            .backgroundColor(TabBackgroundColorVar.value())
+            .color(TabColorVar.value())
+            .userSelect(UserSelect.None)
+            .padding(0.5.cssRem)
+            .styleModifier {
+                property("margin-bottom", "calc(-1 * ${TabBorderThickness.value()})")
+            }
+            .borderBottom(TabBorderThickness.value(), LineStyle.Solid, TabBorderColorVar.value())
+    }
+
+    ariaDisabled {
+        Modifier.backgroundColor(TabDisabledBackgroundColorVar.value()).cursor(Cursor.NotAllowed)
+    }
+
+    (hover + not(ariaDisabled)) {
+        Modifier.backgroundColor(TabHoverBackgroundColorVar.value())
+    }
+
+    (active + not(ariaDisabled)) {
+        Modifier.backgroundColor(TabPressedBackgroundColorVar.value())
+    }
+}
+
+val TabsPanelStyle by ComponentStyle.base {
+    Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflowY(Overflow.Auto)
+}
+
+internal data class TabData(
+    val modifier: Modifier = Modifier,
+    val content: @Composable BoxScope.() -> Unit,
+)
+
+internal data class PanelData(
+    val modifier: Modifier = Modifier,
+    val content: @Composable BoxScope.() -> Unit,
+)
+
+internal data class TabPanelData(
+    val isEnabled: Boolean = true,
+    val isDefault: Boolean = false,
+    val tab: TabData,
+    val panel: PanelData
+)
+
+class TabPanelScope {
+    internal var tab: TabData? = null
+    internal var panel: PanelData? = null
+
+    fun Tab(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+        check(tab == null) { "Attempting to define two tabs for a single TabPanel"}
+        tab = TabData(modifier, content)
+    }
+
+    fun Panel(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+        check(panel == null) { "Attempting to define two panels for a single TabPanel"}
+        panel = PanelData(modifier, content)
+    }
+}
+
+class TabsScope {
+    private val _tabPanels = mutableListOf<TabPanelData>()
+    internal val tabPanels: List<TabPanelData> = _tabPanels
+
+    fun TabPanel(isEnabled: Boolean = true, isDefault: Boolean = false, block: TabPanelScope.() -> Unit) {
+        val scope = TabPanelScope().apply(block)
+        check(scope.tab != null) { "TabPanel did not declare Tab"}
+        check(scope.panel != null) { "TabPanel did not declare Panel"}
+
+        _tabPanels.add(TabPanelData(isEnabled, isDefault, scope.tab!!, scope.panel!!))
+    }
+}
+
+/**
+ * A set of tabs, where each tab is associated with a single panel.
+ *
+ * A very basic tab declaration looks something like this:
+ *
+ * ```
+ * Tabs {
+ *     TabPanel {
+ *         Tab { Text("Tab 1") }
+ *         Panel { Text("Panel 1") }
+ *     }
+ *     TabPanel {
+ *         Tab { Text("Tab 2") }
+ *         Panel { Text("Panel 2") }
+ *     }
+ * }
+ * ```
+ *
+ * In other words, `Tabs` is a collection of `TabPanel`s, and each `TabPanel` MUST define exactly one tab and one
+ * associated panel.
+ *
+ * Each `TabPanel` can also be configured to be disabled, and/or to be the default tab that is selected when the widget
+ * first composes.
+ *
+ * For example, here's a collection of three tabs, with the first disabled and the third set to be selected by default:
+ *
+ * ```
+ * Tabs {
+ *     TabPanel(isEnabled = false) {
+ *         Tab { Text("Tab 1") }; Panel { Text("Panel 1") }
+ *     }
+ *     TabPanel {
+ *         Tab { Text("Tab 2") }; Panel { Text("Panel 2") }
+ *     }
+ *     TabPanel(isDefault = true) {
+ *         Tab { Text("Tab 3") }; Panel { Text("Panel 3") }
+ *     }
+ * }
+ * ```
+ *
+ * When first composed, the initially active tab will be the first non-disabled tab that is marked as default, or the
+ * first non-disabled tab if none are marked as default. (If there are no tabs or all tabs are disabled, an exception
+ * will be thrown).
+ *
+ * While each `Tab` and `Panel` call can take their own individual modifiers, you can specify common modifiers that
+ * apply across all of them.
+ *
+ * For example, if you want to have all your tabs stretch equally to fill all available space, you can do this:
+ *
+ * ```
+ * Tabs(commonTabModifier = Modifier.flexGrow(1)) { /* ... */ }
+ * ```
+ *
+ * and you can always exclude an individual tab using its individual modifier:
+ *
+ * ```
+ * Tabs(commonTabModifier = Modifier.flexGrow(1)) {
+ *   TabPanel { /* ... */ } // Tab 1
+ *   TabPanel { /* ... */ } // Tab 2
+ *   TabPanel { Tab(Modifier.flexGrow(0)) { Text("Tab 3") }; /* ... */ }
+ * }
+ * ```
+ *
+ * @param commonTabModifier A modifier that will get applied to all tabs. You can override and/or extend this on a
+ *   per-tab basis using [TabPanelScope.Tab]'s `modifier` parameter.
+ *
+ * @param commonPanelModifier Like `commonTabModifier`, but for the panel sections.
+ *
+ * @param onTabSelected A callback that will be invoked when the user selects a tab. The callback will be passed the
+ *   index of the selected tab.
+ */
+@Composable
+fun Tabs(
+    modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
+    tabVariant: ComponentVariant? = null,
+    panelVariant: ComponentVariant? = null,
+    commonTabModifier: Modifier = Modifier,
+    commonPanelModifier: Modifier = Modifier,
+    onTabSelected: (Int) -> Unit = {},
+    ref: ElementRefScope<HTMLElement>? = null,
+    block: TabsScope.() -> Unit
+) {
+    val tabPanels = TabsScope().apply(block).tabPanels
+    var selectedTabIndex by remember(tabPanels) {
+        mutableStateOf(
+            tabPanels.indexOfFirst { it.isDefault && it.isEnabled }.takeIf { it >= 0 }
+                ?: tabPanels.indexOfFirst { it.isEnabled }.takeIf { it >= 0 }
+                ?: error("All tabs are disabled")
+        )
+    }
+
+    Column(TabsStyle.toModifier(variant).then(modifier), ref = ref) {
+        Row(TabsTabRowStyle.toModifier()) {
+            val tabPalette = getColorMode().toSilkPalette().tab
+            tabPanels.forEachIndexed { i, tabPanel ->
+                val isActive = (i == selectedTabIndex)
+
+                fun selectTab() {
+                    if (tabPanel.isEnabled) {
+                        selectedTabIndex = i
+                        onTabSelected(i)
+                    }
+                }
+
+                Box(
+                    Modifier
+                        .thenIf(isActive) {
+                            Modifier
+                                .setVariable(TabColorVar, tabPalette.activeColor)
+                                .setVariable(TabBackgroundColorVar, tabPalette.activeBackground)
+                                .setVariable(TabBorderColorVar, tabPalette.activeColor)
+                        }
+                        .then(TabsTabStyle.toModifier(tabVariant))
+                        .then(commonTabModifier)
+                        .then(tabPanel.tab.modifier)
+                        .thenIf(!tabPanel.isEnabled, DisabledStyle.toModifier())
+                        .onClick { selectTab() }
+                        .onKeyDown { if (it.code == "Space") selectTab() },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    tabPanel.tab.content(this)
+                }
+            }
+        }
+
+        val currTabPanel = tabPanels[selectedTabIndex]
+        Box(
+            TabsPanelStyle.toModifier(panelVariant)
+                .then(commonPanelModifier)
+                .then(currTabPanel.panel.modifier)
+        ) {
+            currTabPanel.panel.content(this)
+        }
+    }
+}
