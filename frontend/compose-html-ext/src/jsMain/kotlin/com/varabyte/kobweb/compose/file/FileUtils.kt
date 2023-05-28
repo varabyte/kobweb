@@ -41,7 +41,11 @@ fun Document.saveToDisk(
     tempAnchor.remove()
 }
 
-/** A convenience method to call [saveToDisk] with a String instead of a ByteArray. */
+/**
+ * A convenience method to call [saveToDisk] with a String instead of a ByteArray.
+ *
+ * Note that this always encodes text in UTF-8 format.
+ */
 fun Document.saveTextToDisk(
     filename: String,
     content: String,
