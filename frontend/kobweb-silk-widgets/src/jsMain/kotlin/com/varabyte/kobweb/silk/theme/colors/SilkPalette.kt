@@ -25,19 +25,13 @@ interface SilkPalette {
     val background: Color
     /** Color used for the foreground (e.g. text) of HTML elements on this page. */
     val color: Color
-    val link: Link
-    val button: Button
     /** Color used for Silk borders, i.e. lines drawn around or between elements. */
     val border: Color
     val overlay: Color
-    val tooltip: Tooltip
 
-    interface Link {
-        /** Color used for links that the user has never clicked on before. */
-        val default: Color
-        /** Color used for links that have been visited before. */
-        val visited: Color
-    }
+    val button: Button
+    val link: Link
+    val tooltip: Tooltip
 
     interface Button {
         /** Color used for buttons in a normal state. */
@@ -48,6 +42,13 @@ interface SilkPalette {
         val focus: Color
         /** Color used for buttons when they are being depressed by the user. */
         val pressed: Color
+    }
+
+    interface Link {
+        /** Color used for links that the user has never clicked on before. */
+        val default: Color
+        /** Color used for links that have been visited before. */
+        val visited: Color
     }
 
     interface Tooltip {
