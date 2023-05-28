@@ -107,6 +107,15 @@ class TabPanelScope {
 
 /**
  * Convenience method for creating a [Tab] that is just text.
+ *
+ * Using it looks like this:
+ *
+ * ```
+ * TabPanel {
+ *   Tab("Tab")
+ *   Panel { /* ... */ }
+ * }
+ * ```
  */
 @Suppress("FunctionName") // Composable style
 fun TabPanelScope.Tab(text: String, modifier: Modifier = Modifier) {
@@ -131,6 +140,14 @@ class TabsScope {
 
 /**
  * Convenience method for creating a tab panel whose tab is just text.
+ *
+ * Using it looks like this:
+ *
+ * ```
+ * TabPanel("Tab") {
+ *   /* ... panel definition here ... */
+ * }
+ * ```
  */
 @Suppress("FunctionName") // Composable style
 fun TabsScope.TabPanel(tabText: String, tabModifier: Modifier = Modifier, panelModifier: Modifier = Modifier, isEnabled: Boolean = true, isDefault: Boolean = false, content: @Composable BoxScope.() -> Unit) {
