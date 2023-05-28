@@ -22,6 +22,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 
 val TabColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -91,14 +92,26 @@ class TabPanelScope {
     internal var tab: TabData? = null
     internal var panel: PanelData? = null
 
+    @Suppress("FunctionName") // Composable style
     fun Tab(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
         check(tab == null) { "Attempting to define two tabs for a single TabPanel"}
         tab = TabData(modifier, content)
     }
 
+    @Suppress("FunctionName") // Composable style
     fun Panel(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
         check(panel == null) { "Attempting to define two panels for a single TabPanel"}
         panel = PanelData(modifier, content)
+    }
+}
+
+/**
+ * Convenience method for creating a [Tab] that is just text.
+ */
+@Suppress("FunctionName") // Composable style
+fun TabPanelScope.Tab(text: String, modifier: Modifier = Modifier) {
+    Tab(modifier) {
+        Text(text)
     }
 }
 
@@ -106,12 +119,24 @@ class TabsScope {
     private val _tabPanels = mutableListOf<TabPanelData>()
     internal val tabPanels: List<TabPanelData> = _tabPanels
 
+    @Suppress("FunctionName") // Composable style
     fun TabPanel(isEnabled: Boolean = true, isDefault: Boolean = false, block: TabPanelScope.() -> Unit) {
         val scope = TabPanelScope().apply(block)
         check(scope.tab != null) { "TabPanel did not declare Tab"}
         check(scope.panel != null) { "TabPanel did not declare Panel"}
 
         _tabPanels.add(TabPanelData(isEnabled, isDefault, scope.tab!!, scope.panel!!))
+    }
+}
+
+/**
+ * Convenience method for creating a tab panel whose tab is just text.
+ */
+@Suppress("FunctionName") // Composable style
+fun TabsScope.TabPanel(tabText: String, tabModifier: Modifier = Modifier, panelModifier: Modifier = Modifier, isEnabled: Boolean = true, isDefault: Boolean = false, content: @Composable BoxScope.() -> Unit) {
+    TabPanel(isEnabled, isDefault) {
+        Tab(tabText, tabModifier)
+        Panel(panelModifier, content)
     }
 }
 
