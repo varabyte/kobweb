@@ -11,7 +11,9 @@ class Width private constructor(private val value: String): StylePropertyValue {
     companion object {
         // Keyword
         val FitContent = Width("fit-content")
-        val MaxContext = Width("max-content")
+        val MaxContent = Width("max-content")
+        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+        val MaxContext get() = MaxContent
         val MinContent = Width("min-content")
 
         // Global
@@ -45,7 +47,10 @@ class Height private constructor(private val value: String): StylePropertyValue 
     companion object {
         // Keyword
         val FitContent = Height("fit-content")
-        val MaxContext = Height("max-content")
+        val MaxContent = Height("max-content")
+        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+        val MaxContext get() = MaxContent
+
         val MinContent = Height("min-content")
 
         // Global
@@ -79,7 +84,10 @@ class MaxWidth private constructor(private val value: String): StylePropertyValu
     companion object {
         // Keyword
         val FitContent = MaxWidth("fit-content")
-        val MaxContext = MaxWidth("max-content")
+        val MaxContent = MaxWidth("max-content")
+        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+        val MaxContext get() = MaxContent
+
         val MinContent = MaxWidth("min-content")
         val None = MaxWidth("none")
 
@@ -105,7 +113,10 @@ class MaxHeight private constructor(private val value: String): StylePropertyVal
     companion object {
         // Keyword
         val FitContent = MaxHeight("fit-content")
-        val MaxContext = MaxHeight("max-content")
+        val MaxContent = MaxHeight("max-content")
+        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+        val MaxContext get() = MaxContent
+
         val MinContent = MaxHeight("min-content")
         val None = MaxHeight("none")
 
