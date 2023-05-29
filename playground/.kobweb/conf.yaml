@@ -1,0 +1,14 @@
+site:
+  title: "Playground"
+
+server:
+  files:
+    dev:
+      contentRoot: "build/processedResources/js/main/public"
+      script: "build/developmentExecutable/playground.js"
+      api: "build/libs/playground.jar"
+    prod:
+      script: "build/distributions/playground.js"
+      siteRoot: ".kobweb/site"
+
+  port: 8080
