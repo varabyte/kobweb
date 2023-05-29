@@ -8,14 +8,14 @@ class BoxDecorationBreak private constructor(private val value: String): StylePr
 
     companion object {
         // Keyword
-        val Slice = BoxDecorationBreak("slice")
-        val Clone = BoxDecorationBreak("clone")
+        val Slice get() = BoxDecorationBreak("slice")
+        val Clone get() = BoxDecorationBreak("clone")
 
         // Global
-        val Inherit = BoxDecorationBreak("inherit")
-        val Initial = BoxDecorationBreak("initial")
-        val Revert = BoxDecorationBreak("revert")
-        val Unset = BoxDecorationBreak("unset")
+        val Inherit get() = BoxDecorationBreak("inherit")
+        val Initial get() = BoxDecorationBreak("initial")
+        val Revert get() = BoxDecorationBreak("revert")
+        val Unset get() = BoxDecorationBreak("unset")
     }
 }
 
@@ -29,14 +29,14 @@ class BoxSizing private constructor(private val value: String): StylePropertyVal
 
     companion object {
         // Keyword
-        val BorderBox = BoxSizing("border-box")
-        val ContentBox = BoxSizing("content-box")
+        val BorderBox get() = BoxSizing("border-box")
+        val ContentBox get() = BoxSizing("content-box")
 
         // Global
-        val Inherit = BoxSizing("inherit")
-        val Initial = BoxSizing("initial")
-        val Revert = BoxSizing("revert")
-        val Unset = BoxSizing("unset")
+        val Inherit get() = BoxSizing("inherit")
+        val Initial get() = BoxSizing("initial")
+        val Revert get() = BoxSizing("revert")
+        val Unset get() = BoxSizing("unset")
     }
 }
 

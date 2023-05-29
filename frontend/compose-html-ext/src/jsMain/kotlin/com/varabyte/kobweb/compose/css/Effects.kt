@@ -11,13 +11,13 @@ class Filter private constructor(private val value: String): StylePropertyValue 
 
     companion object {
         // Keyword
-        val None = Filter("none")
+        val None get() = Filter("none")
 
         // Global
-        val Inherit = Filter("inherit")
-        val Initial = Filter("initial")
-        val Revert = Filter("revert")
-        val Unset = Filter("unset")
+        val Inherit get() = Filter("inherit")
+        val Initial get() = Filter("initial")
+        val Revert get() = Filter("revert")
+        val Unset get() = Filter("unset")
     }
 }
 

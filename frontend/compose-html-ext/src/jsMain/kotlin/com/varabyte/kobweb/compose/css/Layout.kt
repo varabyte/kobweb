@@ -10,17 +10,17 @@ class Width private constructor(private val value: String): StylePropertyValue {
 
     companion object {
         // Keyword
-        val FitContent = Width("fit-content")
-        val MaxContent = Width("max-content")
+        val FitContent get() = Width("fit-content")
+        val MaxContent get() = Width("max-content")
         @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
         val MaxContext get() = MaxContent
-        val MinContent = Width("min-content")
+        val MinContent get() = Width("min-content")
 
         // Global
-        val Inherit = Width("inherit")
-        val Initial = Width("initial")
-        val Revert = Width("revert")
-        val Unset = Width("unset")
+        val Inherit get() = Width("inherit")
+        val Initial get() = Width("initial")
+        val Revert get() = Width("revert")
+        val Unset get() = Width("unset")
     }
 }
 typealias MinWidth = Width
@@ -46,18 +46,18 @@ class Height private constructor(private val value: String): StylePropertyValue 
 
     companion object {
         // Keyword
-        val FitContent = Height("fit-content")
-        val MaxContent = Height("max-content")
+        val FitContent get() = Height("fit-content")
+        val MaxContent get() = Height("max-content")
         @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
         val MaxContext get() = MaxContent
 
-        val MinContent = Height("min-content")
+        val MinContent get() = Height("min-content")
 
         // Global
-        val Inherit = Height("inherit")
-        val Initial = Height("initial")
-        val Revert = Height("revert")
-        val Unset = Height("unset")
+        val Inherit get() = Height("inherit")
+        val Initial get() = Height("initial")
+        val Revert get() = Height("revert")
+        val Unset get() = Height("unset")
     }
 }
 typealias MinHeight = Height
@@ -83,19 +83,19 @@ class MaxWidth private constructor(private val value: String): StylePropertyValu
 
     companion object {
         // Keyword
-        val FitContent = MaxWidth("fit-content")
-        val MaxContent = MaxWidth("max-content")
+        val FitContent get() = MaxWidth("fit-content")
+        val MaxContent get() = MaxWidth("max-content")
         @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
         val MaxContext get() = MaxContent
 
-        val MinContent = MaxWidth("min-content")
-        val None = MaxWidth("none")
+        val MinContent get() = MaxWidth("min-content")
+        val None get() = MaxWidth("none")
 
         // Global
-        val Inherit = MaxWidth("inherit")
-        val Initial = MaxWidth("initial")
-        val Revert = MaxWidth("revert")
-        val Unset = MaxWidth("unset")
+        val Inherit get() = MaxWidth("inherit")
+        val Initial get() = MaxWidth("initial")
+        val Revert get() = MaxWidth("revert")
+        val Unset get() = MaxWidth("unset")
     }
 }
 
@@ -112,19 +112,19 @@ class MaxHeight private constructor(private val value: String): StylePropertyVal
 
     companion object {
         // Keyword
-        val FitContent = MaxHeight("fit-content")
-        val MaxContent = MaxHeight("max-content")
+        val FitContent get() = MaxHeight("fit-content")
+        val MaxContent get() = MaxHeight("max-content")
         @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
         val MaxContext get() = MaxContent
 
-        val MinContent = MaxHeight("min-content")
-        val None = MaxHeight("none")
+        val MinContent get() = MaxHeight("min-content")
+        val None get() = MaxHeight("none")
 
         // Global
-        val Inherit = MaxHeight("inherit")
-        val Initial = MaxHeight("initial")
-        val Revert = MaxHeight("revert")
-        val Unset = MaxHeight("unset")
+        val Inherit get() = MaxHeight("inherit")
+        val Initial get() = MaxHeight("initial")
+        val Revert get() = MaxHeight("revert")
+        val Unset get() = MaxHeight("unset")
     }
 }
 
