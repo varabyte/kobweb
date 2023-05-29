@@ -48,7 +48,7 @@ class Height private constructor(private val value: String): StylePropertyValue 
         // Keyword
         val FitContent get() = Height("fit-content")
         val MaxContent get() = Height("max-content")
-        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Height.MaxContent", "com.varabyte.kobweb.compose.css.Height"))
         val MaxContext get() = MaxContent
 
         val MinContent get() = Height("min-content")
@@ -85,7 +85,7 @@ class MaxWidth private constructor(private val value: String): StylePropertyValu
         // Keyword
         val FitContent get() = MaxWidth("fit-content")
         val MaxContent get() = MaxWidth("max-content")
-        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("MaxWidth.MaxContent", "com.varabyte.kobweb.compose.css.MaxWidth"))
         val MaxContext get() = MaxContent
 
         val MinContent get() = MaxWidth("min-content")
@@ -114,7 +114,7 @@ class MaxHeight private constructor(private val value: String): StylePropertyVal
         // Keyword
         val FitContent get() = MaxHeight("fit-content")
         val MaxContent get() = MaxHeight("max-content")
-        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("MaxHeight.MaxContent", "com.varabyte.kobweb.compose.css.MaxHeight"))
         val MaxContext get() = MaxContent
 
         val MinContent get() = MaxHeight("min-content")
