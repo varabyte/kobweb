@@ -119,33 +119,38 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
     sealed class Shape(private val value: String) {
         override fun toString() = value
 
-        class Circle(radius: CSSLengthValue? = null) : Shape(buildString {
-            append("circle")
-            if (radius != null) {
+        class Circle private constructor(args: String) : Shape(buildString {
+            append("circle"); append(args)
+        }) {
+            constructor() : this("")
+            constructor(radius: CSSLengthValue) : this(buildString {
                 append(' ')
                 append(radius)
-            }
-        })
+            })
 
-        class Ellipse private constructor(
-            radiusX: CSSLengthOrPercentageValue? = null,
-            radiusY: CSSLengthOrPercentageValue? = null
-        ) : Shape(buildString {
-            append("ellipse")
-            if (radiusX != null && radiusY != null) {
+            constructor(extent: Extent) : this(buildString {
+                append(' ')
+                append(extent)
+            })
+        }
+
+        class Ellipse private constructor(args: String) : Shape(buildString {
+            append("ellipse"); append(args)
+        }) {
+            constructor() : this("")
+            constructor(
+                radiusX: CSSLengthOrPercentageValue,
+                radiusY: CSSLengthOrPercentageValue
+            ) : this(buildString {
                 append(' ')
                 append(radiusX)
                 append(' ')
                 append(radiusY)
-            }
-        }) {
-            @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE") // Cast is done so constructor avoids calling itself
-            constructor(
-                radiusX: CSSLengthOrPercentageValue,
-                radiusY: CSSLengthOrPercentageValue
-            ) : this(radiusX as CSSLengthOrPercentageValue?, radiusY as CSSLengthOrPercentageValue?)
-
-            constructor() : this(null, null)
+            })
+            constructor(extent: Extent) : this(buildString {
+                append(' ')
+                append(extent)
+            })
         }
 
         companion object {
@@ -175,11 +180,8 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
 
     override fun toString() = "radial-gradient($gradientStr)"
 
-    internal class Default internal constructor(position: CSSPosition?, extent: Extent?, vararg entries: LengthColorStopsBuilderEntry) :
+    internal class Default internal constructor(position: CSSPosition?, vararg entries: LengthColorStopsBuilderEntry) :
         RadialGradient(buildString {
-            if (extent != null) {
-                append(extent.toString())
-            }
             if (position != null) {
                 if (this.isNotEmpty()) append(' ')
 
@@ -191,13 +193,9 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
             append(entries.joinToString())
         })
 
-    internal class ByShape internal constructor(shape: Shape, position: CSSPosition?, extent: Extent?, vararg entries: LengthColorStopsBuilderEntry) :
+    internal class ByShape internal constructor(shape: Shape, position: CSSPosition?, vararg entries: LengthColorStopsBuilderEntry) :
         RadialGradient(buildString {
             append(shape.toString())
-            if (extent != null) {
-                append(' ')
-                append(extent.toString())
-            }
             if (position != null) {
                 append(" at $position")
             }
@@ -206,26 +204,26 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
         })
 }
 
-fun radialGradient(shape: RadialGradient.Shape, position: CSSPosition? = null, extent: RadialGradient.Extent? = null, init: LengthColorStopsBuilder.() -> Unit): RadialGradient {
+fun radialGradient(shape: RadialGradient.Shape, position: CSSPosition? = null, init: LengthColorStopsBuilder.() -> Unit): RadialGradient {
     return LengthColorStopsBuilder().apply(init).let {
-        RadialGradient.ByShape(shape, position, extent, *it.verifiedEntries())
+        RadialGradient.ByShape(shape, position, *it.verifiedEntries())
     }
 }
 
-fun radialGradient(position: CSSPosition? = null, extent: RadialGradient.Extent? = null, init: LengthColorStopsBuilder.() -> Unit): RadialGradient {
+fun radialGradient(position: CSSPosition? = null, init: LengthColorStopsBuilder.() -> Unit): RadialGradient {
     return LengthColorStopsBuilder().apply(init).let {
-        RadialGradient.Default(position, extent, *it.verifiedEntries())
+        RadialGradient.Default(position, *it.verifiedEntries())
     }
 }
 
 // Using the builder is flexible, but provide some useful defaults for common cases
 
-fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null, extent: RadialGradient.Extent? = null) = radialGradient(shape, position, extent) {
+fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = radialGradient(shape, position) {
     add(from)
     add(to)
 }
 
-fun radialGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null, extent: RadialGradient.Extent? = null) = radialGradient(position, extent) {
+fun radialGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = radialGradient(position) {
     add(from)
     add(to)
 }
