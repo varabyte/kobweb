@@ -286,11 +286,17 @@ fun StyleScope.background(vararg backgrounds: CSSBackground) {
 }
 
 /**
- * Specifies data to be fed to the CSS `background` property.
+ * A Kotlin-idiomatic API to configure the `background` CSS property.
  *
- * Backgrounds are specified in bottom-to-top order. Note that this is the *opposite* of how CSS does it, which
- * (inexplicably) takes images in top-to-bottom order. However, we decided to make an exception here because everything
- * else in HTML works in bottom-to-top order (e.g. declaring elements on a page).
+ * Background layers are specified in bottom-to-top order. Note that this is the *opposite* of how CSS does it, which
+ * for this property expects a top-to-bottom order. However, we decided to deviate from the standard here for the
+ * following reasons:
+ *
+ * * Everything else in HTML uses a bottom-to-top order (e.g. declaring elements on a page).
+ * * This method accepts a color parameter first (in front of the vararg background layers), which renders on the bottom
+ *   of everything else. This sets the expectation that "bottom" values come first.
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/background
  */
 fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) {
     if (backgrounds.isNotEmpty()) {

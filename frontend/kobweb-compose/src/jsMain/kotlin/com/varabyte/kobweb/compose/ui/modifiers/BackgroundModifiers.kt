@@ -11,6 +11,19 @@ fun Modifier.background(vararg backgrounds: CSSBackground) = styleModifier {
     background(*backgrounds)
 }
 
+/**
+ * Configure an element's background appearance.
+ *
+ * Background layers are specified in bottom-to-top order. Note that this is the *opposite* of how CSS does it, which
+ * for this property expects a top-to-bottom order. However, we decided to deviate from the standard here for the
+ * following reasons:
+ *
+ * * Everything else in HTML uses a bottom-to-top order (e.g. declaring elements on a page).
+ * * This method accepts a color parameter first (in front of the vararg background layers), which renders on the bottom
+ *   of everything else. This sets the expectation that "bottom" values come first.
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/background
+ */
 fun Modifier.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) = styleModifier {
     background(color, *backgrounds)
 }
