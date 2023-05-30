@@ -248,10 +248,10 @@ fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
 //   (probably for legacy reasons?) the `background` property does not accept it.
 data class CSSBackground(
     val image: BackgroundImage? = null,
-    val blend: BackgroundBlendMode? = null,
     val repeat: BackgroundRepeat? = null,
     val size: BackgroundSize? = null,
     val position: BackgroundPosition? = null,
+    val blend: BackgroundBlendMode? = null,
     val origin: BackgroundOrigin? = null,
     val clip: BackgroundClip? = null,
     val attachment: BackgroundAttachment? = null,
