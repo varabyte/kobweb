@@ -182,8 +182,11 @@ sealed class BackgroundRepeat private constructor(private val value: String): St
 
     open class Keyword internal constructor(value: String) : BackgroundRepeat(value)
     class RepeatStyle internal constructor(value: String) : Keyword(value)
+    internal class TwoValue internal constructor(horizontal: RepeatStyle, vertical: RepeatStyle) : BackgroundRepeat("$horizontal $vertical")
 
     companion object {
+        fun of(horizontal: RepeatStyle, vertical: RepeatStyle): BackgroundRepeat = TwoValue(horizontal, vertical)
+
         // Keywords
         val RepeatX get(): BackgroundRepeat = Keyword("repeat-x")
         val RepeatY get(): BackgroundRepeat = Keyword("repeat-y")
@@ -206,7 +209,7 @@ fun StyleScope.backgroundRepeat(backgroundRepeat: BackgroundRepeat) {
 }
 
 fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertical: BackgroundRepeat.RepeatStyle) {
-    backgroundRepeat("$horizontal $vertical")
+    backgroundRepeat(BackgroundRepeat.of(horizontal, vertical))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
