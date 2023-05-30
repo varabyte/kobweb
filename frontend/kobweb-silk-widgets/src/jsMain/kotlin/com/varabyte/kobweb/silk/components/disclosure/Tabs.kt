@@ -241,6 +241,9 @@ fun Tabs(
     block: TabsScope.() -> Unit
 ) {
     val tabPanels = TabsScope().apply(block).tabPanels
+    if (tabPanels.isEmpty()) {
+        error("Tabs must declare at least one TabPanel")
+    }
     var selectedTabIndex by remember(tabPanels) {
         mutableStateOf(
             tabPanels.indexOfFirst { it.isDefault && it.isEnabled }.takeIf { it >= 0 }
