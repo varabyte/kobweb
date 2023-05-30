@@ -88,10 +88,26 @@ data class ElementRefScope<in TElement : Element> internal constructor(
 @NonRestartableComposable
 @Composable
 fun <TElement : Element> ElementScope<TElement>.registerRefScope(scope: ElementRefScope<TElement>?) {
+    registerRefScope(scope) { it }
+}
+
+/**
+ * A more flexible version of [registerRefScope] which allows you to transform the element type of the scope.
+ *
+ * This can be useful in some cases where you can't get access to the raw element you want directly (e.g. because the
+ * JB widget doesn't expose a content block, like TextArea), but you can create a different element and register an
+ * [ElementRefScope] against that with a transformation step to get around it.
+ */
+@NonRestartableComposable
+@Composable
+fun <TElementSrc : Element, TElementDst : Element> ElementScope<TElementSrc>.registerRefScope(
+    scope: ElementRefScope<TElementDst>?,
+    transform: (TElementSrc) -> TElementDst
+) {
     if (scope == null) return
     scope.keyedCallbacks.forEach { keyedCallback ->
         DisposableEffect(*keyedCallback.keys.toTypedArray()) {
-            keyedCallback.refCallback.invoke(this, scopeElement)
+            keyedCallback.refCallback.invoke(this, transform(scopeElement))
         }
     }
 }
