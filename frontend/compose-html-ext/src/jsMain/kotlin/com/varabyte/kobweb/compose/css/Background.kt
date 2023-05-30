@@ -30,7 +30,9 @@ fun StyleScope.backgroundAttachment(backgroundAttachment: BackgroundAttachment) 
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode
-fun StyleScope.backgroundBlendMode(blendMode: MixBlendMode) {
+typealias BackgroundBlendMode = MixBlendMode
+
+fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
     property("background-blend-mode", blendMode)
 }
 
@@ -238,19 +240,21 @@ fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
+// Note: Color is actually a separate property and intentionally not included here.
+// Note: blend mode *is* specified here but needs to be handled externally, since
+//   (probably for legacy reasons?) the `background` property does not accept it.
 data class CSSBackground(
     val image: BackgroundImage? = null,
-    val color: CSSColorValue? = null,
+    val blend: BackgroundBlendMode? = null,
     val repeat: BackgroundRepeat? = null,
-    val position: BackgroundPosition? = null,
     val size: BackgroundSize? = null,
+    val position: BackgroundPosition? = null,
     val origin: BackgroundOrigin? = null,
     val clip: BackgroundClip? = null,
-    val attachment: BackgroundAttachment? = null
+    val attachment: BackgroundAttachment? = null,
 ) : CSSStyleValue {
     override fun toString() = buildList {
         image?.let { add(it.toString()) }
-        color?.let { add(it.toString()) }
         repeat?.let { add(it) }
         position?.let { add(it.toString()) }
         this@CSSBackground.size?.let {
@@ -275,7 +279,39 @@ data class CSSBackground(
 }
 
 fun StyleScope.background(vararg backgrounds: CSSBackground) {
+    background(null, *backgrounds)
+}
+
+/**
+ * Specifies data to be fed to the CSS `background` property.
+ *
+ * Backgrounds are specified in bottom-to-top order. Note that this is the *opposite* of how CSS does it, which
+ * (inexplicably) takes images in top-to-bottom order. However, we decided to make an exception here because everything
+ * else in HTML works in bottom-to-top order (e.g. declaring elements on a page).
+ */
+fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) {
     if (backgrounds.isNotEmpty()) {
-        property("background", backgrounds.joinToString(", "))
+        // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
+        @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
+        property("background",
+            buildString {
+                append(backgrounds.joinToString(", "))
+                // backgrounds only allow you to specify a single color. If provided, it must be included with
+                // the final layer.
+                if (color != null) {
+                    append(' ')
+                    append(color)
+                }
+            })
+        val blendModes = backgrounds
+            .map { it.blend ?: BackgroundBlendMode.Normal }
+            .takeIf { blendModes -> blendModes.any { it != MixBlendMode.Normal } }
+        if (blendModes != null) {
+            property("background-blend-mode", blendModes.joinToString())
+        }
+    } else {
+        if (color != null) {
+            property("background-color", color)
+        }
     }
 }

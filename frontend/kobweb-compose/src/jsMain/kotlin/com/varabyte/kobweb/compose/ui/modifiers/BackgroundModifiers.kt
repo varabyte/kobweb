@@ -11,6 +11,10 @@ fun Modifier.background(vararg backgrounds: CSSBackground) = styleModifier {
     background(*backgrounds)
 }
 
+fun Modifier.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) = styleModifier {
+    background(color, *backgrounds)
+}
+
 // TODO(#168): Remove before v1.0
 @Deprecated(
     "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
@@ -41,7 +45,7 @@ fun Modifier.backgroundAttachment(value: String) = styleModifier {
     backgroundAttachment(value)
 }
 
-fun Modifier.backgroundBlendMode(blendMode: MixBlendMode) = styleModifier {
+fun Modifier.backgroundBlendMode(blendMode: BackgroundBlendMode) = styleModifier {
     backgroundBlendMode(blendMode)
 }
 
