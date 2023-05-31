@@ -55,9 +55,10 @@ interface SilkPalette {
     interface Tab {
         val color: Color
         val background: Color
-        val activeColor: Color
-        val activeBackground: Color
-        val activeBorder: Color
+        val border: Color
+        val selectedColor: Color
+        val selectedBackground: Color
+        val selectedBorder: Color
         val hover: Color
         val pressed: Color
         val disabled: Color
@@ -99,12 +100,13 @@ class MutableSilkPalette(
     class Tab(
         override var color: Color,
         override var background: Color,
-        override var activeColor: Color,
+        override var selectedColor: Color,
         override var hover: Color,
         override var pressed: Color,
         override var disabled: Color,
-        override var activeBackground: Color = background,
-        override var activeBorder: Color = activeColor,
+        override var border: Color = color.toRgb().copyf(alpha = 0.2f),
+        override var selectedBackground: Color = background,
+        override var selectedBorder: Color = selectedColor,
     ) : SilkPalette.Tab
 
     class Tooltip(
@@ -142,10 +144,10 @@ class MutableSilkPalettes(
             tab = MutableSilkPalette.Tab(
                 color = Colors.Black,
                 background = Colors.White,
-                activeColor = Colors.CornflowerBlue,
+                selectedColor = Colors.CornflowerBlue,
                 hover = Colors.LightGray,
                 pressed = Colors.WhiteSmoke,
-                disabled = Colors.Gray,
+                disabled = Colors.White,
             ),
         )
     },
@@ -167,10 +169,10 @@ class MutableSilkPalettes(
             tab = MutableSilkPalette.Tab(
                 color = Colors.White,
                 background = Colors.Black,
-                activeColor = Colors.LightSkyBlue,
+                selectedColor = Colors.LightSkyBlue,
                 hover = Colors.DarkSlateGray,
                 pressed = Colors.DarkGray,
-                disabled = Colors.Gray,
+                disabled = Colors.Black,
             ),
         )
     }

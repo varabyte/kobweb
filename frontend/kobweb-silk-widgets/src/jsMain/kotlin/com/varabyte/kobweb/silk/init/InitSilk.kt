@@ -131,7 +131,7 @@ fun HTMLElement.setSilkVariables() {
 
     setVariable(TabColorVar, palette.tab.color)
     setVariable(TabBackgroundColorVar, palette.tab.background)
-    setVariable(TabBorderColorVar, palette.border)
+    setVariable(TabBorderColorVar, palette.tab.border)
     setVariable(TabDisabledBackgroundColorVar, palette.tab.disabled)
     setVariable(TabHoverBackgroundColorVar, palette.tab.hover)
     setVariable(TabPressedBackgroundColorVar, palette.tab.pressed)

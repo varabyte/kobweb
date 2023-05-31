@@ -269,9 +269,9 @@ fun Tabs(
                     Modifier
                         .thenIf(isActive) {
                             Modifier
-                                .setVariable(TabColorVar, tabPalette.activeColor)
-                                .setVariable(TabBackgroundColorVar, tabPalette.activeBackground)
-                                .setVariable(TabBorderColorVar, tabPalette.activeColor)
+                                .setVariable(TabColorVar, tabPalette.selectedColor)
+                                .setVariable(TabBackgroundColorVar, tabPalette.selectedBackground)
+                                .setVariable(TabBorderColorVar, tabPalette.selectedBorder)
                         }
                         .then(TabsTabStyle.toModifier(tabVariant))
                         .then(commonTabModifier)
