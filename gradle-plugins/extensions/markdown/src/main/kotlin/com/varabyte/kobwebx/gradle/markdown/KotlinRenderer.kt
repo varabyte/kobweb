@@ -291,6 +291,7 @@ class KotlinRenderer(
                 val root = yamlVisitor.data["root"]?.single() ?: defaultRoot
                 if (root != null) {
                     visit(KobwebCall(root, appendBrace = true))
+                    ++indentCount
                 }
 
                 onFinish += {
