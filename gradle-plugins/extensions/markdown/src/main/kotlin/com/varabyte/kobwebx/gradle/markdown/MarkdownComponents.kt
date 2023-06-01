@@ -285,13 +285,14 @@ abstract class MarkdownComponents @Inject constructor(project: Project) {
         }
 
         inlineTag.set { htmlInline ->
+            val voidElements = setOf("br", "hr", "img")
             val tag = htmlInline.literal
 
             val scope = this
             buildString {
                 if (!tag.startsWith("</")) {
                     append(rawTag.get().invoke(scope, tag))
-                    if (!tag.endsWith("/>")) {
+                    if (!tag.endsWith("/>") && tag.stripTagBrackets() !in voidElements) {
                         append(" {")
                     }
                 } else {
