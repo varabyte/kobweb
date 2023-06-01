@@ -2,7 +2,9 @@
 
 package com.varabyte.kobwebx.gradle.markdown
 
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.get
 
 abstract class MarkdownConfig {
     /**
@@ -14,5 +16,13 @@ abstract class MarkdownConfig {
 
     init {
         markdownPath.convention("markdown")
+    }
+
+    @Deprecated(
+        "Use `handlers { ... }` instead. This property was renamed to avoid a naming conflict with Gradle project components.",
+    )
+    fun components(configure: MarkdownHandlers.() -> Unit) {
+        val handlers = ((this as ExtensionAware).extensions["handlers"] as MarkdownHandlers)
+        handlers.configure()
     }
 }

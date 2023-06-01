@@ -17,7 +17,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
         val markdownConfig = (kobwebBlock as ExtensionAware).extensions.create("markdown", MarkdownConfig::class.java)
         (markdownConfig as ExtensionAware).extensions.apply {
-            create("components", MarkdownComponents::class.java, project)
+            create("handlers", MarkdownHandlers::class.java, project)
             create("features", MarkdownFeatures::class.java)
         }
 

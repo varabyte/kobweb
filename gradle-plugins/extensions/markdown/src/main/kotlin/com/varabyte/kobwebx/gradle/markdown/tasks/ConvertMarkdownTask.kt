@@ -10,7 +10,7 @@ import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.core.util.getResourceRoots
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
-import com.varabyte.kobwebx.gradle.markdown.MarkdownComponents
+import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import org.gradle.api.DefaultTask
@@ -29,8 +29,8 @@ abstract class ConvertMarkdownTask @Inject constructor(
         description = "Convert markdown files found in the project's resources path to source code in the final project"
     }
 
-    private val markdownComponents =
-        (markdownConfig as ExtensionAware).extensions.getByName("components") as MarkdownComponents
+    private val markdownHandlers =
+        (markdownConfig as ExtensionAware).extensions.getByName("handlers") as MarkdownHandlers
     private val markdownFeatures =
         (markdownConfig as ExtensionAware).extensions.getByName("features") as MarkdownFeatures
 
@@ -107,7 +107,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 // The suggested replacement for "capitalize" is awful
                 @Suppress("DEPRECATION")
                 val funName = "${ktFileName.capitalize()}Page"
-                val ktRenderer = KotlinRenderer(project, mdPathRel, markdownComponents, mdPackage, funName)
+                val ktRenderer = KotlinRenderer(project, mdPathRel, markdownHandlers, mdPackage, funName)
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }
         }

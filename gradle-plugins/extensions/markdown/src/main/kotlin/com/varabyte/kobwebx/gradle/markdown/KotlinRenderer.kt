@@ -16,11 +16,11 @@ import java.util.*
 class KotlinRenderer(
     private val project: Project,
     private val filePath: String,
-    private val components: MarkdownComponents,
+    private val handlers: MarkdownHandlers,
     private val pkg: String,
     private val funName: String,
 ) : Renderer {
-    private val defaultRoot: String? = components.defaultRoot.get().takeIf { it.isNotBlank() }
+    private val defaultRoot: String? = handlers.defaultRoot.get().takeIf { it.isNotBlank() }
     private var indentCount = 0
     private val indent get() = "    ".repeat(indentCount)
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
@@ -154,43 +154,43 @@ class KotlinRenderer(
         }
 
         override fun visit(blockQuote: BlockQuote) {
-            doVisit(blockQuote, components.blockquote)
+            doVisit(blockQuote, handlers.blockquote)
         }
 
         override fun visit(code: Code) {
-            doVisit(code, components.inlineCode)
+            doVisit(code, handlers.inlineCode)
         }
 
         override fun visit(emphasis: Emphasis) {
-            doVisit(emphasis, components.em)
+            doVisit(emphasis, handlers.em)
         }
 
         override fun visit(fencedCodeBlock: FencedCodeBlock) {
-            doVisit(fencedCodeBlock, components.code)
+            doVisit(fencedCodeBlock, handlers.code)
         }
 
         override fun visit(hardLineBreak: HardLineBreak) {
-            doVisit(hardLineBreak, components.br)
+            doVisit(hardLineBreak, handlers.br)
         }
 
         override fun visit(heading: Heading) {
-            doVisit(heading, components.heading)
+            doVisit(heading, handlers.heading)
         }
 
         override fun visit(thematicBreak: ThematicBreak) {
-            doVisit(thematicBreak, components.hr)
+            doVisit(thematicBreak, handlers.hr)
         }
 
         override fun visit(htmlInline: HtmlInline) {
-            doVisit(htmlInline, components.inlineTag)
+            doVisit(htmlInline, handlers.inlineTag)
         }
 
         override fun visit(htmlBlock: HtmlBlock) {
-            doVisit(htmlBlock, components.html)
+            doVisit(htmlBlock, handlers.html)
         }
 
         override fun visit(image: Image) {
-            doVisit(image, components.img)
+            doVisit(image, handlers.img)
         }
 
         override fun visit(indentedCodeBlock: IndentedCodeBlock) {
@@ -200,19 +200,19 @@ class KotlinRenderer(
         }
 
         override fun visit(link: Link) {
-            doVisit(link, components.a)
+            doVisit(link, handlers.a)
         }
 
         override fun visit(listItem: ListItem) {
-            doVisit(listItem, components.li)
+            doVisit(listItem, handlers.li)
         }
 
         override fun visit(bulletList: BulletList) {
-            doVisit(bulletList, components.ul)
+            doVisit(bulletList, handlers.ul)
         }
 
         override fun visit(orderedList: OrderedList) {
-            doVisit(orderedList, components.ol)
+            doVisit(orderedList, handlers.ol)
         }
 
         override fun visit(paragraph: Paragraph) {
@@ -224,16 +224,16 @@ class KotlinRenderer(
                 visitChildren(paragraph)
             }
             else {
-                doVisit(paragraph, components.p)
+                doVisit(paragraph, handlers.p)
             }
         }
 
         override fun visit(strongEmphasis: StrongEmphasis) {
-            doVisit(strongEmphasis, components.strong)
+            doVisit(strongEmphasis, handlers.strong)
         }
 
         override fun visit(text: Text) {
-            doVisit(text, components.text)
+            doVisit(text, handlers.text)
         }
 
         override fun visit(customNode: CustomNode) {
