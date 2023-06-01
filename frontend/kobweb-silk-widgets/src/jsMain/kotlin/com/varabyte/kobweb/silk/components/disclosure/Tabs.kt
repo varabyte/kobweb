@@ -82,7 +82,7 @@ internal data class PanelData(
 )
 
 internal data class TabPanelData(
-    val isEnabled: Boolean = true,
+    val enabled: Boolean = true,
     val isDefault: Boolean = false,
     val tab: TabData,
     val panel: PanelData
@@ -129,12 +129,12 @@ class TabsScope {
     internal val tabPanels: List<TabPanelData> = _tabPanels
 
     @Suppress("FunctionName") // Composable style
-    fun TabPanel(isEnabled: Boolean = true, isDefault: Boolean = false, block: TabPanelScope.() -> Unit) {
+    fun TabPanel(enabled: Boolean = true, isDefault: Boolean = false, block: TabPanelScope.() -> Unit) {
         val scope = TabPanelScope().apply(block)
         check(scope.tab != null) { "TabPanel did not declare Tab"}
         check(scope.panel != null) { "TabPanel did not declare Panel"}
 
-        _tabPanels.add(TabPanelData(isEnabled, isDefault, scope.tab!!, scope.panel!!))
+        _tabPanels.add(TabPanelData(enabled, isDefault, scope.tab!!, scope.panel!!))
     }
 }
 
@@ -150,8 +150,8 @@ class TabsScope {
  * ```
  */
 @Suppress("FunctionName") // Composable style
-fun TabsScope.TabPanel(tabText: String, tabModifier: Modifier = Modifier, panelModifier: Modifier = Modifier, isEnabled: Boolean = true, isDefault: Boolean = false, content: @Composable BoxScope.() -> Unit) {
-    TabPanel(isEnabled, isDefault) {
+fun TabsScope.TabPanel(tabText: String, tabModifier: Modifier = Modifier, panelModifier: Modifier = Modifier, enabled: Boolean = true, isDefault: Boolean = false, content: @Composable BoxScope.() -> Unit) {
+    TabPanel(enabled, isDefault) {
         Tab(tabText, tabModifier)
         Panel(panelModifier, content)
     }
@@ -185,7 +185,7 @@ fun TabsScope.TabPanel(tabText: String, tabModifier: Modifier = Modifier, panelM
  *
  * ```
  * Tabs {
- *     TabPanel(isEnabled = false) {
+ *     TabPanel(enabled = false) {
  *         Tab { Text("Tab 1") }; Panel { Text("Panel 1") }
  *     }
  *     TabPanel {
@@ -246,8 +246,8 @@ fun Tabs(
     }
     var selectedTabIndex by remember(tabPanels) {
         mutableStateOf(
-            tabPanels.indexOfFirst { it.isDefault && it.isEnabled }.takeIf { it >= 0 }
-                ?: tabPanels.indexOfFirst { it.isEnabled }.takeIf { it >= 0 }
+            tabPanels.indexOfFirst { it.isDefault && it.enabled }.takeIf { it >= 0 }
+                ?: tabPanels.indexOfFirst { it.enabled }.takeIf { it >= 0 }
                 ?: error("All tabs are disabled")
         )
     }
@@ -259,7 +259,7 @@ fun Tabs(
                 val isActive = (i == selectedTabIndex)
 
                 fun selectTab() {
-                    if (tabPanel.isEnabled) {
+                    if (tabPanel.enabled) {
                         selectedTabIndex = i
                         onTabSelected(i)
                     }
@@ -276,7 +276,7 @@ fun Tabs(
                         .then(TabsTabStyle.toModifier(tabVariant))
                         .then(commonTabModifier)
                         .then(tabPanel.tab.modifier)
-                        .thenIf(!tabPanel.isEnabled, DisabledStyle.toModifier())
+                        .thenIf(!tabPanel.enabled, DisabledStyle.toModifier())
                         .onClick { selectTab() }
                         .onKeyDown { if (it.code == "Space") selectTab() },
                     contentAlignment = Alignment.Center,
