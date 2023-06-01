@@ -312,9 +312,11 @@ fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackgrou
                     append(color)
                 }
             })
+        val defaultBlendMode = BackgroundBlendMode.Normal
         val blendModes = backgrounds
-            .map { it.blend ?: BackgroundBlendMode.Normal }
-            .takeIf { blendModes -> blendModes.any { it != MixBlendMode.Normal } }
+            .map { it.blend ?: defaultBlendMode }
+            // Use toString comparison because otherwise equality checks are against instance
+            .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
         if (blendModes != null) {
             property("background-blend-mode", blendModes.joinToString())
         }
