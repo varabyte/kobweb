@@ -19,6 +19,8 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.percent
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.MutationObserver
+import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.events.EventListener
 
 // Convenience class to collect a bunch of parameters into a single place
@@ -386,15 +388,19 @@ fun AdvancedPopover(
                     fun updatePopupPosition() {
                         popupElement.updatePosition(
                             placementStrategy.calculate(
-                                visiblePopoverState.elements.placementElement,
+                                visiblePopoverState.placementElement,
                                 popupElement
                             ).position
                         )
                     }
                     val updatePopupPositionListener = EventListener { updatePopupPosition() }
                     val resizeObserver = ResizeObserver { _ -> updatePopupPosition() }
+                    val mutationObserver = MutationObserver { _, _ -> updatePopupPosition() }
 
                     resizeObserver.observe(popupElement)
+                    resizeObserver.observe(visiblePopoverState.placementElement)
+                    // Follow placement element if it moves around (e.g. margin changes)
+                    mutationObserver.observe(visiblePopoverState.placementElement, MutationObserverInit(attributes = true, attributeFilter = arrayOf("style")))
                     window.addEventListener("scroll", updatePopupPositionListener)
                     window.addEventListener("resize", updatePopupPositionListener)
 
@@ -402,7 +408,9 @@ fun AdvancedPopover(
                         popoverStateController.clearPopupElement()
                         popoverStateController.resetToFoundElements()
 
-                        resizeObserver.unobserve(popupElement)
+                        resizeObserver.disconnect()
+                        mutationObserver.disconnect()
+
                         window.removeEventListener("scroll", updatePopupPositionListener)
                         window.removeEventListener("resize", updatePopupPositionListener)
                     }
