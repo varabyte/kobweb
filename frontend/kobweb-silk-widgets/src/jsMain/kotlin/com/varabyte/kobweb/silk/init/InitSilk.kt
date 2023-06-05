@@ -58,6 +58,10 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     @Suppress("DEPRECATION") mutableTheme.registerComponentVariants(AnimatedColorSurfaceVariant)
     mutableTheme.registerComponentStyle(SpanTextStyle)
 
+    mutableTheme.registerComponentStyle(SwitchStyle)
+    mutableTheme.registerComponentStyle(SwitchTrackStyle)
+    mutableTheme.registerComponentStyle(SwitchThumbStyle)
+
     mutableTheme.registerComponentStyle(TabsStyle)
     mutableTheme.registerComponentStyle(TabsTabRowStyle)
     mutableTheme.registerComponentStyle(TabsTabStyle)
@@ -128,6 +132,8 @@ fun HTMLElement.setSilkVariables() {
 
     setVariable(SurfaceBackgroundColorVar, palette.background)
     setVariable(SurfaceColorVar, palette.color)
+
+    setVariable(SwitchThumbColorVar, palette.switch.thumb)
 
     setVariable(TabColorVar, palette.tab.color)
     setVariable(TabBackgroundColorVar, palette.tab.background)

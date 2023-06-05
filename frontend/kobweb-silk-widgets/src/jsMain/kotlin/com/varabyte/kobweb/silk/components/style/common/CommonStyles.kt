@@ -3,10 +3,7 @@ package com.varabyte.kobweb.silk.components.style.common
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.css.Cursor
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.ariaDisabled
-import com.varabyte.kobweb.compose.ui.modifiers.cursor
-import com.varabyte.kobweb.compose.ui.modifiers.opacity
-import com.varabyte.kobweb.compose.ui.modifiers.transition
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.CssRule
 import com.varabyte.kobweb.silk.components.style.StyleModifiers
@@ -21,7 +18,7 @@ import org.jetbrains.compose.web.css.ms
 // Instead, we just immitate disabled behavior ourselves in silk.
 val DisabledStyle by ComponentStyle.base(
     prefix = "silk",
-    extraModifiers = Modifier.ariaDisabled()
+    extraModifiers = { Modifier.ariaDisabled().tabIndex(-1) }
 ) {
     Modifier.opacity(0.5).cursor(Cursor.NotAllowed)
 }

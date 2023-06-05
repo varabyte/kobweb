@@ -31,6 +31,7 @@ interface SilkPalette {
 
     val button: Button
     val link: Link
+    val switch: Switch
     val tab: Tab
     val tooltip: Tooltip
 
@@ -50,6 +51,12 @@ interface SilkPalette {
         val default: Color
         /** Color used for links that have been visited before. */
         val visited: Color
+    }
+
+    interface Switch {
+        val backgroundOn: Color
+        val backgroundOff: Color
+        val thumb: Color
     }
 
     interface Tab {
@@ -75,6 +82,7 @@ class MutableSilkPalette(
     override var color: Color,
     override var button: Button,
     override var link: Link,
+    override var switch: Switch,
     override var tab: Tab,
     override var border: Color = color,
     // Intentionally invert backdrop from normal background
@@ -96,6 +104,12 @@ class MutableSilkPalette(
         override var focus: Color,
         override var pressed: Color,
     ) : SilkPalette.Button
+
+    class Switch(
+        override var backgroundOn: Color,
+        override var backgroundOff: Color,
+        override var thumb: Color = Colors.White,
+    ) : SilkPalette.Switch
 
     class Tab(
         override var color: Color,
@@ -141,6 +155,10 @@ class MutableSilkPalettes(
                 default = Colors.Blue,
                 visited = Colors.Purple,
             ),
+            switch = MutableSilkPalette.Switch(
+                backgroundOn = Colors.DodgerBlue,
+                backgroundOff = Colors.LightGray,
+            ),
             tab = MutableSilkPalette.Tab(
                 color = Colors.Black,
                 background = Colors.White,
@@ -165,6 +183,10 @@ class MutableSilkPalettes(
             link = MutableSilkPalette.Link(
                 default = Colors.Cyan,
                 visited = Colors.Violet,
+            ),
+            switch = MutableSilkPalette.Switch(
+                backgroundOn = Colors.LightSkyBlue,
+                backgroundOff = Colors.DarkGray,
             ),
             tab = MutableSilkPalette.Tab(
                 color = Colors.White,

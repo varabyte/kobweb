@@ -76,7 +76,7 @@ fun Button(
     var backingElement: HTMLButtonElement? by remember { mutableStateOf(null) }
     JbButton(
         attrs = ButtonStyle.toModifier(variant)
-            .thenIf(!enabled, DisabledStyle.toModifier().tabIndex(-1))
+            .thenIf(!enabled, DisabledStyle.toModifier())
             .then(modifier)
             .thenIf(enabled) {
                 Modifier
