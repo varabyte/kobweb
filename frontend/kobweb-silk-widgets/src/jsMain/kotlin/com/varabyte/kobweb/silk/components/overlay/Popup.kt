@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.CSSTransition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
+import com.varabyte.kobweb.compose.dom.observers.ResizeObserver
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -12,11 +13,15 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import kotlinx.browser.window
 import org.jetbrains.compose.web.css.CSSLengthValue
 import org.jetbrains.compose.web.css.ms
 import org.jetbrains.compose.web.css.px
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.MutationObserver
+import org.w3c.dom.MutationObserverInit
+import org.w3c.dom.events.EventListener
 
 val PopupStyle by ComponentStyle.base(prefix = "silk") {
     // NOTE: If any user replaces this style in their own project, they should make sure they still keep this "opacity"
@@ -69,6 +74,11 @@ class PopupScope(val placement: PopupPlacement?) {
     fun Modifier.align(alignment: Alignment) = BoxScope().apply { align(alignment) }
 }
 
+private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position) {
+    style.top = "${position.top}"
+    style.left = "${position.left}"
+}
+
 /**
  * A contract to control how a popup should be placed relative to some placement element.
  *
@@ -79,6 +89,15 @@ abstract class PopupPlacementStrategy {
     class PositionAndPlacement(val position: Position, val placement: PopupPlacement? = null)
 
     /**
+     * Initialize this strategy with values it needs to calculate the final position and placement of a popup.
+     *
+     * @param placementElement The element in the DOM that this popup should be placed relative to.
+     * @param popupElement The backing element for the popup itself. Its position at this point is not yet finalized,
+     *   so you should usually just need to check its size values (i.e. width and height).
+     */
+    abstract fun init(placementElement: HTMLElement, popupElement: HTMLElement)
+
+    /**
      * Returns the absolute position and placement that a popup should be placed at.
      *
      * The absolute position is very important, as it is used to position the popup on screen.
@@ -86,14 +105,15 @@ abstract class PopupPlacementStrategy {
      * Specifying the placement is optional. Some widgets may use it to decorate themselves, like tooltips using it to
      * add an appropriate arrow (e.g. left placements result in an arrow on the right), but it is not always required.
      *
-     * This method is given two HTML elements to use for the final calculation. These should be treated as read-only,
-     * and final results should be considered unexpected if you modify them.
-     *
-     * @param placementElement The element in the DOM that this popup should be placed relative to.
-     * @param popupElement The backing element for the popup itself. Its position at this point is not yet finalized,
-     *   so you should usually just need to check its size values (i.e. width and height).
+     * This method will always be called after [init] and is expected to use the two elements provided to it as part of
+     * this calculation.
      */
-    abstract fun calculate(placementElement: HTMLElement, popupElement: HTMLElement): PositionAndPlacement
+    abstract fun calculate(): PositionAndPlacement
+
+    /**
+     * Clear any state that this strategy may have been holding onto, called when the popup closes.
+     */
+    abstract fun reset()
 
     /**
      * A method that provides a reasonable position calculation for a popup.
@@ -201,9 +221,37 @@ abstract class PopupPlacementStrategy {
          * Returns the general strategy of placing a popup in a particular location based on a desired [PopupPlacement].
          */
         fun of(placement: PopupPlacement, offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX) = object : PopupPlacementStrategy() {
-            override fun calculate(placementElement: HTMLElement, popupElement: HTMLElement): PositionAndPlacement {
-                val placementBounds = placementElement.getBoundingClientRect()
-                val popupBounds = popupElement.getBoundingClientRect()
+            private var placementElement: HTMLElement? = null
+            private var popupElement: HTMLElement? = null
+
+            private var resizeObserver: ResizeObserver? = null
+            private var mutationObserver: MutationObserver? = null
+
+            private fun updatePopupPosition() {
+                popupElement!!.updatePosition(calculate().position)
+            }
+            private val updatePopupPositionListener = EventListener { updatePopupPosition() }
+
+            override fun init(placementElement: HTMLElement, popupElement: HTMLElement) {
+                this.placementElement = placementElement
+                this.popupElement = popupElement
+
+                resizeObserver = ResizeObserver { _ -> updatePopupPosition() }.apply {
+                    observe(popupElement)
+                    observe(placementElement)
+                }
+                // Follow placement element if it moves around (e.g. margin changes)
+                mutationObserver = MutationObserver { _, _ -> updatePopupPosition() }.apply {
+                    observe(placementElement, MutationObserverInit(attributes = true, attributeFilter = arrayOf("style")))
+                }
+
+                window.addEventListener("scroll", updatePopupPositionListener)
+                window.addEventListener("resize", updatePopupPositionListener)
+            }
+
+            override fun calculate(): PositionAndPlacement {
+                val placementBounds = placementElement!!.getBoundingClientRect()
+                val popupBounds = popupElement!!.getBoundingClientRect()
                 val popupWidth = popupBounds.width
                 val popupHeight = popupBounds.height
 
@@ -213,6 +261,18 @@ abstract class PopupPlacementStrategy {
                     calculateDefaultPosition(placement, popupWidth, popupHeight, placementBounds, offsetPixels),
                     placement
                 )
+            }
+
+            override fun reset() {
+                placementElement = null
+                popupElement = null
+
+                resizeObserver!!.disconnect(); resizeObserver = null
+                mutationObserver!!.disconnect(); mutationObserver = null
+
+                window.removeEventListener("scroll", updatePopupPositionListener)
+                window.removeEventListener("resize", updatePopupPositionListener)
+
             }
         }
 

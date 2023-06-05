@@ -2,7 +2,6 @@ package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.*
-import com.varabyte.kobweb.compose.dom.observers.ResizeObserver
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -19,9 +18,6 @@ import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.percent
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.MutationObserver
-import org.w3c.dom.MutationObserverInit
-import org.w3c.dom.events.EventListener
 
 // Convenience class to collect a bunch of parameters into a single place
 private class PopoverShowHideSettings(
@@ -36,11 +32,6 @@ private class PopoverShowHideSettings(
 
 private fun PopupPlacementStrategy.Position.toModifier() = Modifier.top(top).left(left)
 
-private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position) {
-    style.top = "${position.top}"
-    style.left = "${position.left}"
-}
-
 // When first declared, popups need to make several passes to set themselves up. First, they need to find the raw
 // html elements that will be associated with the popup's location. Then, they need to calculate the width of the popup,
 // which requires the raw element of the popup itself.
@@ -54,11 +45,6 @@ private sealed interface PopoverState {
     class FoundElements(override var elements: PopoverElements) : Initialized
 
     sealed interface Visible : Initialized {
-        // Note: `elements.placementElement` also exists but can be changed by the user while a popover is up. However,
-        // once a popover is showing, we don't want it to snap into a new location. Therefore, we need to capture a copy
-        // of the placement element at the time the popover is first shown and keep a reference to it through the
-        // popover's lifetime.
-        val placementElement: HTMLElement
         val placement: PopupPlacement?
         val modifier: Modifier
     }
@@ -72,19 +58,14 @@ private sealed interface PopoverState {
             // causing focus to be gained and lost
             .top((-100).percent).left((-100).percent)
 
-        override val placementElement = elements.placementElement
         override val placement = null
     }
 
     class Shown(
         override var elements: PopoverElements,
-        override val placementElement: HTMLElement,
         placementStrategy: PopupPlacementStrategy,
     ) : Showing {
-        private val popupElement = elements.popupElement!!
-
-        private val positionAndPlacement =
-            placementStrategy.calculate(placementElement, popupElement)
+        private val positionAndPlacement = placementStrategy.calculate()
 
         override val modifier = Modifier.then(positionAndPlacement.position.toModifier())
         override val placement = positionAndPlacement.placement
@@ -92,19 +73,13 @@ private sealed interface PopoverState {
 
     class Hiding(
         override var elements: PopoverElements,
-        override val placementElement: HTMLElement,
         placementStrategy: PopupPlacementStrategy,
         showHideSettings: PopoverShowHideSettings,
         override val placement: PopupPlacement?,
     ) : Visible {
-        override val modifier = showHideSettings.hiddenModifier.then(
-            elements.popupElement?.let { popupElement ->
-                placementStrategy.calculate(
-                    placementElement,
-                    popupElement
-                ).position.toModifier()
-            } ?: Modifier
-        )
+        override val modifier = showHideSettings
+            .hiddenModifier
+            .then(placementStrategy.calculate().position.toModifier())
     }
 }
 
@@ -180,7 +155,7 @@ private class PopoverStateController(
         val popupElement = state.elements.popupElement
         check (popupElement != null)
 
-        _state = PopoverState.Shown(state.elements, state.placementElement, placementStrategy)
+        _state = PopoverState.Shown(state.elements, placementStrategy)
     }
 
     fun requestHidePopup() {
@@ -195,7 +170,7 @@ private class PopoverStateController(
         hideTimeoutId = window.setTimeout({
             if (!keepOpenStrategy.shouldKeepOpen) {
                 val currentOpacity = state.elements.popupElement?.let { window.getComputedStyle(it).getPropertyValue("opacity").toDouble() }
-                this._state = PopoverState.Hiding(state.elements, state.placementElement, placementStrategy, showHideSettings, state.placement)
+                this._state = PopoverState.Hiding(state.elements, placementStrategy, showHideSettings, state.placement)
                 // Normally, the "hiding" state is marked finished once the "onTransitionEnd" event is reached (see
                 // later in this file). However, if the following condition is true, it means we're in a state that the
                 // event would never fire, so just fire the "finish hiding" event directly.
@@ -382,37 +357,16 @@ fun AdvancedPopover(
                 },
             ref = refScope {
                 disposableRef { popupElement ->
+                    placementStrategy.init(visiblePopoverState.elements.placementElement, popupElement)
                     popoverStateController.updatePopupElement(popupElement)
+
                     popoverStateController.finishShowing()
 
-                    fun updatePopupPosition() {
-                        popupElement.updatePosition(
-                            placementStrategy.calculate(
-                                visiblePopoverState.placementElement,
-                                popupElement
-                            ).position
-                        )
-                    }
-                    val updatePopupPositionListener = EventListener { updatePopupPosition() }
-                    val resizeObserver = ResizeObserver { _ -> updatePopupPosition() }
-                    val mutationObserver = MutationObserver { _, _ -> updatePopupPosition() }
-
-                    resizeObserver.observe(popupElement)
-                    resizeObserver.observe(visiblePopoverState.placementElement)
-                    // Follow placement element if it moves around (e.g. margin changes)
-                    mutationObserver.observe(visiblePopoverState.placementElement, MutationObserverInit(attributes = true, attributeFilter = arrayOf("style")))
-                    window.addEventListener("scroll", updatePopupPositionListener)
-                    window.addEventListener("resize", updatePopupPositionListener)
-
                     onDispose {
+                        placementStrategy.reset()
+
                         popoverStateController.clearPopupElement()
                         popoverStateController.resetToFoundElements()
-
-                        resizeObserver.disconnect()
-                        mutationObserver.disconnect()
-
-                        window.removeEventListener("scroll", updatePopupPositionListener)
-                        window.removeEventListener("resize", updatePopupPositionListener)
                     }
                 }
                 add(ref)
