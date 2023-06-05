@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import kotlinx.browser.document
+import org.jetbrains.compose.web.css.cssRem
 import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Text
 import playground.components.sections.NavHeader
