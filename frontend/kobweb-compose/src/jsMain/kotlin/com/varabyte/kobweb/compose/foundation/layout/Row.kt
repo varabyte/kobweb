@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.attrsModifier
+import com.varabyte.kobweb.compose.ui.modifiers.flexGrow
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 
@@ -15,6 +16,9 @@ class RowScope {
     fun Modifier.align(alignment: Alignment.Vertical) = attrsModifier {
         classes("${alignment.toClassName()}-self")
     }
+
+    // Convenient remapping to "flexGrow" for users coming from the world of Android
+    fun Modifier.weight(value: Number) = this.flexGrow(value)
 }
 
 @Composable
