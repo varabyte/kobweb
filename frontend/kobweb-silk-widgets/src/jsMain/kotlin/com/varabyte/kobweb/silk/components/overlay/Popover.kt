@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.dom.*
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
@@ -79,7 +80,11 @@ private sealed interface PopoverState {
     ) : Visible {
         override val modifier = showHideSettings
             .hiddenModifier
-            .then(placementStrategy.calculate().position.toModifier())
+            // If the popup element is null, that means the popup is closed and our placementStrategy should be
+            // considered uninitialized. We can get here in this case if the popup is hidden before it has a chance to
+            // show. In that case, it will still be invisible so the placement strategy doesn't need to be consulted in
+            // that case anyway.
+            .thenIf(elements.popupElement != null) { placementStrategy.calculate().position.toModifier() }
     }
 }
 
@@ -359,14 +364,12 @@ fun AdvancedPopover(
                 disposableRef { popupElement ->
                     placementStrategy.init(visiblePopoverState.elements.placementElement, popupElement)
                     popoverStateController.updatePopupElement(popupElement)
-
                     popoverStateController.finishShowing()
 
                     onDispose {
-                        placementStrategy.reset()
-
                         popoverStateController.clearPopupElement()
                         popoverStateController.resetToFoundElements()
+                        placementStrategy.reset()
                     }
                 }
                 add(ref)
