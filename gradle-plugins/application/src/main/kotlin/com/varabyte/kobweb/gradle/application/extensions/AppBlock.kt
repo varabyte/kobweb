@@ -3,6 +3,7 @@
 package com.varabyte.kobweb.gradle.application.extensions
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.HEAD
@@ -33,11 +34,29 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf) {
 
         /**
          * The default description to set in the meta tag.
+         *
+         * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), this value
+         * will not be used.
          */
         abstract val description: Property<String>
 
+        /**
+         * The path to use for the favicon in the link tag.
+         *
+         * For example, "/favicon.ico" (which is the default value) will refer to the icon file located at
+         * "jsMain/resources/public/favicon.ico".
+         *
+         * You are expected to begin your path with a '/' to explicitly indicate that the path will always be rooted
+         * regardless of which URL on your site you visit. If you do not, a leading slash will be added for you.
+         *
+         * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), this value
+         * will not be used.
+         */
+        abstract val faviconPath: Property<String>
+
         init {
             description.convention("Powered by Kobweb")
+            faviconPath.convention("/favicon.ico")
 
             head.set(listOf {
                 meta {
@@ -46,7 +65,7 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf) {
                 }
                 link {
                     rel = "icon"
-                    href = routePrefix.prependTo("/favicon.ico")
+                    href = routePrefix.prependTo(faviconPath.get().prefixIfNot("/"))
                 }
 
                 // Viewport content chosen for a good mobile experience.
