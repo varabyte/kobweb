@@ -546,8 +546,9 @@ fun PostPage() {
 ```
 
 **Note:** You should avoid creating URL paths where the dynamic path and the query parameters have the same name, as in
-`mysite.com/posts/{post}?post=...`, as there are no guarantees about which value will win out. Either way, one will be
-overwritten by the other.
+`mysite.com/posts/{post}?post=...`, as this could be really tricky to debug in a complex project. If there is a
+conflict, then the dynamic route parameters will take precedence. (You can still access the query parameter value via
+`ctx.route.queryParams` in this case if necessary.)
 
 ## Silk
 

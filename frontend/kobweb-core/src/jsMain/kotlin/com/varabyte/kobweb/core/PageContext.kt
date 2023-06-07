@@ -55,9 +55,29 @@ class PageContext internal constructor(val router: Router) {
          * # for a URL registered as "/users/{user}/posts/{post}"
          * ```
          *
-         * will generate a mapping of "user" to 123 and "post" to 11
+         * will generate a mapping of "user" to 123 and "post" to 11.
+         *
+         * If the same key is specified in both the query parameters and the dynamic route, the dynamic route will take
+         * precedence.
          */
-        val params: Map<String, String> = dynamicParams + route.queryParams
+        val params: Map<String, String> = route.queryParams + dynamicParams
+
+        /**
+         * The query parameters of a URL, if any.
+         *
+         * For example:
+         *
+         * ```
+         * /users/posts?user=123&post=11
+         * ```
+         *
+         * will generate a mapping of "user" to 123 and "post" to 11.
+         *
+         * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
+         * where perhaps you want to explicitly exclude dynamic route params from the list of results, or you want to
+         * make sure you get the query param value even if an identically named dynamic route param exists.
+         */
+        val queryParams: Map<String, String> = route.queryParams
 
         /**
          * The post-hash fragment of a URL, if specified.
