@@ -320,7 +320,7 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
     }
 
     (hover + not(ariaDisabled)) {
-        Modifier .backgroundColor(buttonColors.hover)
+        Modifier.backgroundColor(buttonColors.hover)
     }
 
     (focusVisible + not(ariaDisabled)) {
@@ -345,26 +345,26 @@ interface SilkPalette {
 }
 
 class MutableSilkPalettes(
-  override val light: MutableSilkPalette = run {
-    MutableSilkPalette(
-      button = MutableSilkPalette.Button(
-        default = ...,
-        hover = ...,
-        focus = ...,
-        pressed = ...
-      )
-    )
-  },
-  override val dark: MutableSilkPalette = run {
-    MutableSilkPalette(
-      button = MutableSilkPalette.Button(
-        default = ...,
-        hover = ...,
-        focus = ...,
-        pressed = ...
-      )
-    )
-  }
+    override val light: MutableSilkPalette = run {
+        MutableSilkPalette(
+            button = MutableSilkPalette.Button(
+                default = ...,
+                hover = ...,
+                focus = ...,
+                pressed = ...
+            )
+        )
+    },
+    override val dark: MutableSilkPalette = run {
+        MutableSilkPalette(
+            button = MutableSilkPalette.Button(
+                default = ...,
+                hover = ...,
+                focus = ...,
+                pressed = ...
+            )
+        )
+    }
 ) : SilkPalettes
 
 // InitSilk.kt -------------------------------------------------
