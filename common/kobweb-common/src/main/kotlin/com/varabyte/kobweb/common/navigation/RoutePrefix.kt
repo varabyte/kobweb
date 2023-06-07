@@ -10,7 +10,7 @@ class RoutePrefix(value: String) {
      *
      * If the path is a relative path, it will be return unchanged.
      */
-    fun prepend(path: String): String {
+    fun prependTo(path: String): String {
         if (value.isBlank()) return path
         if (!path.startsWith("/")) return path
 

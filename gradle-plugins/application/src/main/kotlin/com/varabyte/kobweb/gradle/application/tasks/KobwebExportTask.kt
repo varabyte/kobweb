@@ -150,7 +150,7 @@ abstract class KobwebExportTask @Inject constructor(
                         .forEach { route ->
                             logger.lifecycle("\nSnapshotting html for \"$route\"...")
 
-                            val prefixedRoute = routePrefix.prepend(route)
+                            val prefixedRoute = routePrefix.prependTo(route)
 
                             val snapshot: String
                             val elapsedMs = measureTimeMillis {

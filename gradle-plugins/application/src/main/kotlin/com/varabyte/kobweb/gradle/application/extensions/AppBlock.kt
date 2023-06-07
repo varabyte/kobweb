@@ -46,7 +46,7 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf) {
                 }
                 link {
                     rel = "icon"
-                    href = routePrefix.prepend("/favicon.ico")
+                    href = routePrefix.prependTo("/favicon.ico")
                 }
 
                 // Viewport content chosen for a good mobile experience.

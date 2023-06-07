@@ -78,7 +78,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                     // Our script will always exist at the root folder, so be sure to ground it,
                     // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                     // a subdirectory.
-                    routePrefix.prepend(kobwebConf.server.files.dev.script.substringAfterLast("/").prefixIfNot("/")),
+                    routePrefix.prependTo(kobwebConf.server.files.dev.script.substringAfterLast("/").prefixIfNot("/")),
                     buildTarget
                 )
             )
