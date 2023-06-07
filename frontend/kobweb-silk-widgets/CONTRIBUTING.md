@@ -391,6 +391,38 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
 }
 ```
 
+#### evt.stopPropagation
+
+If you handle events, you SHOULD call `evt.stopPropagation()` to prevent the event from bubbling up to parent elements
+(unless there's an intentional reason not to).
+
+Otherwise, users may find that their interactions with the widget may unexpectedly interact with one of its containers
+as well.
+
+*Do*
+
+```kotlin
+Modifier
+    .onClick { evt ->
+        evt.stopPropagation()
+        handleAction()
+    }
+    .onKeyDown { evt ->
+        if (evt.key == "Enter") {
+            evt.stopPropagation()
+            handleAction()
+        }
+    }
+```
+
+*Don't*
+
+```kotlin
+Modifier
+    .onClick { handleClick() }
+    .onKeyDown { evt -> if (evt.key == "Enter") { handleAction() } }
+```
+
 ---
 
 This is a living document. Note that we may add additional requirements throughout the course of development as we

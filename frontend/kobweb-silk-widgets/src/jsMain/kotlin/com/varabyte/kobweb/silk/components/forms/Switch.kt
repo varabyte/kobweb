@@ -148,8 +148,8 @@ fun Switch(
                 .then(modifier)
                 .thenIf(enabled) {
                     Modifier
-                        .onClick { onCheckedChange(!checked) }
-                        .onKeyDown { if (it.key == "Enter" || it.key == " ") onCheckedChange(!checked) }
+                        .onClick { evt -> onCheckedChange(!checked); evt.stopPropagation() }
+                        .onKeyDown { evt -> if (evt.key == "Enter" || evt.key == " ") onCheckedChange(!checked); evt.stopPropagation() }
                 }
         ) {
             Box(
