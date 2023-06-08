@@ -1,6 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
+import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
@@ -12,6 +13,17 @@ import org.commonmark.renderer.Renderer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import java.util.*
+
+private fun String.yamlStringToKotlinString(): String {
+    val result = if (this.isSurrounded("\"")) {
+        this.removeSurrounding("\"")
+    } else if (this.isSurrounded("'")) {
+        this.removeSurrounding("'")
+    } else {
+        this
+    }
+    return result.unescapeQuotes()
+}
 
 class KotlinRenderer(
     private val project: Project,
@@ -269,11 +281,9 @@ class KotlinRenderer(
 
                 var contextCreated = false
                 if (dependsOnMarkdownArtifact) {
-                    // "root" if present is a special value and not something that should be exposed to users. This
-                    // lets us avoid worrying about nasty escape / slash issues, since it's possible you'll
-                    // pass String values into the root (e.g. `PageLayout(title = "\"Hello\" they said")`) that
-                    // already have escaped characters in it. This makes the `serialize` call below less complex.
+                    // "root" if present is a special value and not something that should be exposed to users.
                     val dataWithoutRoot = yamlVisitor.data.minus("root")
+                        .mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
                     if (dataWithoutRoot.isNotEmpty()) {
                         val mdCtx = buildString {
                             append("MarkdownContext(")

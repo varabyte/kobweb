@@ -9,6 +9,13 @@ package com.varabyte.kobwebx.gradle.markdown
 internal fun String.escapeQuotes() = this.replace("\"", "\\\"")
 
 /**
+ * Unescape quote characters in Strings.
+ *
+ * For example, convert \"Hello there\" into "Hello there".
+ * */
+internal fun String.unescapeQuotes() = this.replace("\\\"","\"")
+
+/**
  * Escape $ characters in strings, useful if they're going to be converted to code where Kotlin might interpret them as
  * the start of some expression.
  *
