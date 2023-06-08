@@ -35,7 +35,7 @@ However, sometimes a boolean parameter name is a noun, and in that case, we do u
 
 #### Define a ComponentStyle
 
-You MUST define a `ComponentStyle` for it, even if empty, and set its prefix to `"silk"`
+You MUST define a `ComponentStyle` for your widget, even if empty, and set its prefix to `"silk"`
 
 ```kotlin
 val MyWidgetStyle by ComponentStyle(prefix = "silk") { /* ... */ }
