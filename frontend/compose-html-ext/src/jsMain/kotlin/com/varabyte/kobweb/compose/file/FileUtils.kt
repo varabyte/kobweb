@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.compose.file
 
-import kotlinx.browser.document
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
@@ -15,6 +14,12 @@ import org.w3c.dom.url.URL as DomURL // to avoid ambiguity with Document.URL
 
 /**
  * Save some content to disk, presenting the user with a dialog to choose the file location.
+ *
+ * This method extends the global `document` variable, so you can use it like this:
+ *
+ * ```
+ * document.saveToDisk("picture.png", bytes, "image/png")
+ * ```
  *
  * @param filename The suggested name of the file to save (users will be given a chance to override it).
  * @param content The content to save.
@@ -35,7 +40,7 @@ fun Document.saveToDisk(
         href = url
         download = filename
     }
-    document.body!!.append(tempAnchor)
+    body!!.append(tempAnchor)
     tempAnchor.click()
     DomURL.revokeObjectURL(url)
     tempAnchor.remove()
@@ -93,8 +98,15 @@ private fun <I, O> Document.loadFromDisk(
 /**
  * Load some binary content from disk, presenting the user with a dialog to choose the file to load.
  *
+ * This method extends the global `document` variable, so you can use it like this:
+ *
+ * ```
+ * document.loadFromDisk("*.png") { bytes -> /* ... */ }
+ * ```
+ *
  * @param accept A comma-separated list of extensions to filter by (e.g. ".txt,*.sav")
- * @param onLoaded A callback which will contain the contents of your file, if successfully loaded.
+ * @param onLoaded A callback which will contain the contents of your file, if successfully loaded. The callback is
+ *   scoped by a [LoadContext] which contains additional information about the file, such as its name and mime type.
  *
  * See also: [FileReader.readAsArrayBuffer]
  */
