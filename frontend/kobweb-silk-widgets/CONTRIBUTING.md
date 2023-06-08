@@ -1,4 +1,11 @@
-If you want to add a widget to Silk, you must ensure that it meets the following requirements:
+This document describes requirements to be aware of when creating new widgets for Silk.
+
+Once set up correctly, Silk widgets provide unparalleled amounts of customization for users. Also, it is important to
+aim for a feeling of consistency across widgets for the best user experience. However, there are a lot of little things
+to get right, so we're documenting them here.
+
+| NOTE: This is a living document. We may add additional requirements as we discover them. Thanks for your patience if you end up working on a widget that requires adjusting this document. |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 #### Base requirements
 
@@ -422,8 +429,3 @@ Modifier
     .onClick { handleClick() }
     .onKeyDown { evt -> if (evt.key == "Enter") { handleAction() } }
 ```
-
----
-
-This is a living document. Note that we may add additional requirements throughout the course of development as we
-discover them. Thanks for your patience if you end up working on a widget that requires rethinking this document.
