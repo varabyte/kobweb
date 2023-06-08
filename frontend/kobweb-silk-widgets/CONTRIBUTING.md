@@ -61,6 +61,15 @@ LabeledBox("User text", Modifier.fillMaxWidth()) {
 }
 ```
 
+```kotlin
+Tabs(tabsModifier) {
+    TabPanel {
+        Tab(tabModifier) { /* ... */ }
+        Panel(panelModifier) { /* ... */ }
+    }
+}
+```
+
 *Don't*
 
 ```kotlin
@@ -72,9 +81,20 @@ LabeledTextArea(
 )
 ```
 
+```kotlin
+Tabs {
+    TabPanel(tabModifier, panelModifier) { /* ... */ }
+}
+```
+
 *Exception*
 
-It should be rare, but we have found a case where it is acceptable to take an additional `Modifier` parameter that is
+Ultimately, there may be a handful of cases where additional modifiers are acceptable, but they should be rare, and
+there should always be a single `modifier: Modifier` parameter where it's not confusing what it applies to.
+
+##### Additional modification
+
+One case where it is acceptable to take an additional `Modifier` parameter that is
 used conditionally and applied on top of the base `Modifier` parameter:
 
 ```kotlin
@@ -88,6 +108,36 @@ Tooltip(
 In `Tooltip`, this extra modifier is applied on top of the base `modifier` parameter only when the tooltip is in an
 initial hidden state, a state which is not easily exposed to the user. Most users won't even ever set this value, so its
 addition shouldn't make the widget that much harder to understand or use.
+
+##### Convenience methods
+
+The `Tabs` widget is designed in a way that the outer `Tabs` method and inner `Tab` and `Panel` methods each take a
+single modifier. However, there are some common cases (where a tab is just some text) where code can be compressed a
+lot and, therefore, more readable. In these cases, it is acceptable to provide a convenience extension method that takes
+multiple modifiers and delegates to the standard `Tab` and `Panel` methods:
+
+```kotlin
+val tm = Modifier.flexGrow(1)
+val pm = Modifier.fillMaxSize().padding(20.px)
+
+Tabs {
+    TabPanel("Tab", tabModifier = tm, panelModifier = pm) {
+        /* ... panel definition here ... */
+    }
+}
+
+// The above is shorthand for:
+// Tabs {
+//     TabPanel {
+//         Tab(modifier = tm) {
+//             Text("Tab")
+//         }
+//         Panel(modifier = pm) {
+//             /* ... panel definition here ... */
+//         }
+//     }
+// }
+```
 
 #### The `ComponentVariant` parameter
 
