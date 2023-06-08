@@ -23,6 +23,16 @@ To extract a few key points:
   type `@Composable () -> Unit`
     * The callback can be scoped, e.g. `@Composable PopupScope.() -> Unit`
 
+#### Boolean naming
+
+When naming booleans, we try to stick with the convention used Compose API widgets, which is to avoid using the `is`
+prefix for words that are already adjectives.
+
+For example, `enabled` and `checked`, not `isEnabled` and `isChecked`.
+
+However, sometimes a boolean parameter name is a noun, and in that case, we do use the `is` prefix. For example,
+`isDefault` and not `default`.
+
 #### Define a ComponentStyle
 
 You MUST define a `ComponentStyle` for it, even if empty, and set its prefix to `"silk"`
