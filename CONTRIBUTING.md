@@ -6,12 +6,16 @@ your time and that you're giving some of it to this project.
 As it's still very early in the life of the project, the requirements set out for now will be pretty minimal, but I
 expect to tighten them over time as the project stabilizes.
 
+## Code of Conduct
+
 First of all, **be aware of our code of conduct**
 
 * For now, we're borrowing almost wholesale from the
   [Rust Code of conduct](https://www.rust-lang.org/policies/code-of-conduct)
 * TL;DR - debate is welcome to generate the best ideas, but respect each other. We'll never tolerate behavior where
   someone is affecting the community negatively or attacking people and not ideas.
+
+## Additional Rules
 
 Other than that, just a few rules:
 
@@ -30,5 +34,33 @@ Other than that, just a few rules:
       there are no guarantees we'll take the change
 
 These rules are NOT dogma. I am always open to exceptions, but be ready to explain why your situation is special!
+
+## Kobweb Playground
+
+When developing on Kobweb, instead of opening the `kobweb` proejct directly, you may prefer opening the
+`kobweb/playground` project instead.
+
+This module is a simple Kobweb project which is connected to the base project so that you can make changes to the base
+project and see them reflected immediately in the output of a playground run.
+
+Running the playground is simple! In the terminal:
+
+```bash
+$ cd playground
+$ kobweb run
+```
+
+Feel free to aggressively change the playground on your own local machine. Checking changes in for the playground will
+probably be fairly rare, but I'm open to it if you think they will be useful for future devs as well.
+
+### Development Server
+
+If you want to get a breakpoint in a Kobweb server, then instead of using `kobweb run` in the playground folder,
+run the "Playground Server" run configuration provided in the Playground project instead.
+
+You'll lose the convenient live reloading experience with this approach, but it can be very useful when you're focusing
+on server development. (See the `backend/server` module for the relevant code.)
+
+## Thanks!!
 
 Thank you, again, for choosing to help out on Kobweb.

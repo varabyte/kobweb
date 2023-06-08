@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Playground Server" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="com.varabyte.kobweb.server.ApplicationKt" />
+    <module name="kobweb.backend.server.main" />
+    <shortenClasspath name="NONE" />
+    <option name="VM_PARAMETERS" value="-Dkobweb.server.environment=DEV" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
