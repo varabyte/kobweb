@@ -717,14 +717,16 @@ Box(CustomStyle.toModifier()) { /* ... */}
 
 #### ComponentStyle name
 
-Note above we used the `by` keyword here to create a component style. This automatically generates a name
-for your style under the hood using [Kebab Case](https://www.freecodecamp.org/news/snake-case-vs-camel-case-vs-pascal-case-vs-kebab-case-whats-the-difference/#kebab-case).
-So, here, the style's name will be "custom", and if you wrote `val TitleTextStyle by ComponentStyle`, its name would be
-"title-text". You usually won't need to care about this name, but there are niche cases where it can be useful to
-understand that is what's going on.
+Note above we used the `by` keyword above to create a component style. This automatically generates a name for your
+style under the hood, derived from the property name itself but using [Kebab Case](https://www.freecodecamp.org/news/snake-case-vs-camel-case-vs-pascal-case-vs-kebab-case-whats-the-difference/#kebab-case).
 
-If you need to set a name manually, there's an alternate constructor version you can use for that, where you use
-assignment instead of `by` delegation:
+For example, if you write `val TitleTextStyle by ComponentStyle`, its name behind the scenes will be "title-text".
+
+You usually won't need to care about this name, but there are niche cases where it can be useful to understand that is
+what's going on.
+
+If you need to set a name manually, there's an alternate constructor version (notice the use of assignment instead of
+the `by` keyword):
 
 ```kotlin
 val CustomStyle = ComponentStyle("my-custom-name") {
