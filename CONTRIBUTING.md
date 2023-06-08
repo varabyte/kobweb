@@ -35,7 +35,16 @@ Other than that, just a few rules:
 
 These rules are NOT dogma. I am always open to exceptions, but be ready to explain why your situation is special!
 
-## Kobweb Playground
+## Kobweb Development
+
+### Latest Branch
+
+Kobweb development does *NOT* happen on `main`. You should consider the `main` branch as effectively read-only.
+
+Instead, work is done on the latest version branch. For example, if the current version of Kobweb is "1.2.3", then look
+for an active branch named "1.2.4" *or* "1.3.0".
+
+### Kobweb Playground
 
 When developing on Kobweb, instead of opening the `kobweb` proejct directly, you may prefer opening the
 `kobweb/playground` project instead.
@@ -53,13 +62,37 @@ $ kobweb run
 Feel free to aggressively change the playground on your own local machine. Checking changes in for the playground will
 probably be fairly rare, but I'm open to it if you think they will be useful for future devs as well.
 
-### Development Server
+#### Development Server
 
 If you want to get a breakpoint in a Kobweb server, then instead of using `kobweb run` in the playground folder,
 run the "Playground Server" run configuration provided in the Playground project instead.
 
 You'll lose the convenient live reloading experience with this approach, but it can be very useful when you're focusing
 on server development. (See the `backend/server` module for the relevant code.)
+
+### Publish to Maven Local
+
+If you want to build Kobweb and test it out in a totally separate project, you can publish it to your local Maven
+repository:
+
+```bash
+# In the root folder
+$ ./gradlew publishToMavenLocal
+```
+
+Then, in the project you want to test it out in, search for all occurrences of the line
+`maven("https://us-central1-maven.pkg.dev/varabyte-repos/public")` and declare a `mavenLocal` declaration right above it
+(to make sure the local publication will be found first).
+
+Finally, (and optionally), I like to restrict my maven local declaration to just Kobweb stuff:
+
+```kotlin
+mavenLocal {
+    content {
+        includeGroupAndSubgroups("com.varabyte.kobweb")
+    }
+}
+```
 
 ## Thanks!!
 
