@@ -643,8 +643,13 @@ Silk introduces the `Modifier` class, in order to provide an experience similar 
 (You can read [more about them here](https://developer.android.com/jetpack/compose/modifiers) if you're unfamiliar with
 the concept).
 
-In the world of Compose HTML, you can think of a `Modifier` as a wrapper on top of CSS styles and attributes. So
-this:
+In the world of Compose HTML, you can think of a `Modifier` as a wrapper on top of CSS styles and attributes.
+
+*Please refer to official documentation if you are not familiar with HTML
+[attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes) and/or
+[styles](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style)*.
+
+So this:
 
 ```kotlin
 Modifier.backgroundColor(Colors.Red).color(Colors.Green).padding(200.px)
@@ -666,17 +671,19 @@ There are a bunch of modifier extensions (and they're growing) provided by Kobwe
 `padding` above. But there are also two escape hatches anytime you run into a modifier that's missing:
 `attrsModifier` and `styleModifier`.
 
+At this point, you are interacting with Compose HTML, one layer underneath Kobweb.
+
 Using them looks like this:
 
 ```kotlin
 // Modify attributes of an element tag
 // e.g. the "a", "b", and "c" in <tag a="..." b="..." c="..." />
 Modifier.attrsModifier {
-    onMouseDown { /* ... */ }
+    id("example")
 }
 
 // Modify styles of an element tag
-// e.g. the "a", "b", and "c" in `<tag style="a:...;b:...;c:..." />
+// e.g. the "x", "y", and "z" in `<tag a="..." b="..." c="..." style="x:...;y:...;z:..." />
 Modifier.styleModifier {
     width(100.percent)
     height(50.percent)
@@ -684,6 +691,7 @@ Modifier.styleModifier {
 
 // Note: Because "style" itself is an attribute, you can define styles in an attrsModifier:
 Modifier.attrsModifier {
+    id("example")
     style {
         width(100.percent)
         height(50.percent)
@@ -691,6 +699,29 @@ Modifier.attrsModifier {
 }
 // ... but in the above case, you should use a styleModifier for simplicity
 ```
+
+In the occasional (and hopefully rare!) case where Kobweb doesn't provide a modifier and Compose HTML doesn't provide
+the attribute or style support you need, you can use `attrsModifier` plus the `attr` method or `styleModifier` plus the
+`property` method. This escape hatch within an escape hatch allows you to provide any custom value you need.
+
+The above cases can be rewritten as:
+
+```kotlin
+Modifier.attrsModifier {
+    attr("id", "example")
+}
+
+Modifier.styleModifier {
+    property("width", 100.percent)
+    // Or even raw CSS:
+    // property("width", "100%")
+    property("height", 50.percent)
+}
+```
+
+If you end up needing to use `attr` or `property` in your own codebase, consider
+[filing an issue](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
+with us so that we can add the missing modifier to the library.
 
 ### ComponentStyle
 
