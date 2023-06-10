@@ -2101,9 +2101,11 @@ for that case.
 
 Current state: **Foundations are in place! You may encounter API gaps.**
 
+You may wish to refer to our [Kobweb 1.0 roadmap document](https://docs.google.com/document/d/1n2Jd02yzuxaatpT7gOhEuijzfaSu9UIaQTV2t4EPcPk).
+
 Kobweb is becoming quite functional. We are already using it to build https://kobweb.varabyte.com and
-https://bitspittle.dev (depending on when you're reading this, they may still be fairly barebones, but these sites will
-get more of our full attention as Kobweb is finally stabilizing).
+https://bitspittle.dev. Several users have created working portfolio sites already, and I'm aware of at least two cases
+where Kobweb was used in a project for a client.
 
 At this point:
 
@@ -2113,11 +2115,14 @@ At this point:
 * While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
 * You can use the `Modifier` builder for a growing number of css properties.
 * Silk components are color mode aware and support responsive behavior.
+* There are quite a few widgets available, and it's easy to create your own.
+* A huge range of CSS properties are supported, along with support for style variables and animations.
 
 However, there's always more to do.
 
 * I'm trying to add support for every stabilized CSS property, but some are still missing, especially less
   common ones. (You can use a fallback for such cases in the meanwhile).
+* There are still a handful of widgets planned to be added.
 * A lot of detailed documentation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
 
 I think there's enough there now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
