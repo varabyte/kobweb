@@ -53,10 +53,10 @@ data class BreakpointValues<out T: CSSUnitValue>(
  * A convenience class for constructing an association of breakpoints to CSS pixel sizes.
  */
 fun BreakpointSizes(
-    sm: CSSpxValue = 0.px,
-    md: CSSpxValue = sm,
-    lg: CSSpxValue = md,
-    xl: CSSpxValue = lg,
+    sm: CSSpxValue,
+    md: CSSpxValue,
+    lg: CSSpxValue,
+    xl: CSSpxValue,
 ) = BreakpointValues(
     BreakpointUnitValue.Px(sm),
     BreakpointUnitValue.Px(md),
@@ -68,10 +68,10 @@ fun BreakpointSizes(
  * A convenience class for constructing an association of breakpoints to CSS em sizes.
  */
 fun BreakpointSizes(
-    sm: CSSSizeValue<CSSUnit.em> = 0.em,
-    md: CSSSizeValue<CSSUnit.em> = sm,
-    lg: CSSSizeValue<CSSUnit.em> = md,
-    xl: CSSSizeValue<CSSUnit.em> = lg,
+    sm: CSSSizeValue<CSSUnit.em>,
+    md: CSSSizeValue<CSSUnit.em>,
+    lg: CSSSizeValue<CSSUnit.em>,
+    xl: CSSSizeValue<CSSUnit.em>,
 ) = BreakpointValues(
     BreakpointUnitValue.Em(sm),
     BreakpointUnitValue.Em(md),
