@@ -122,7 +122,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                                 if (lastThrowable != null) append("caused by: ")
                                 appendLine(currThrowable.toString())
 
-                                // If we're handling a "caused by" stack track, make sure the first stack trace doesn't
+                                // If we're handling a "caused by" stack trace, make sure the first stack trace doesn't
                                 // get repeated it in.
                                 val lastThrowableFirstStackTrace = lastThrowable?.stackTrace?.firstOrNull()?.toString()
                                 currThrowable.stackTrace.takeWhile {
