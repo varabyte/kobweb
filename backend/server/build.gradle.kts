@@ -69,5 +69,8 @@ tasks.withType<ShadowJar> {
         exclude("io.netty.**") // Relocating io.netty causes exceptions to happen on server startup
         exclude("io.ktor.**") // Don't relocate ktor; might be referenced by Kobweb server plugins
     }
-    relocate("kotlinx", "relocated.kotlinx")
+    relocate("kotlinx", "relocated.kotlinx") {
+        // Coroutines are provided by ktor, so let's leave them in place
+        exclude("kotlinx.coroutines.**")
+    }
 }
