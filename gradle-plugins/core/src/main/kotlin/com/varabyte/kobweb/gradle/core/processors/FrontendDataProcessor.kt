@@ -309,7 +309,7 @@ class FrontendDataProcessor(
                                             PageToProcess(
                                                 funName = element.name!!.toString(),
                                                 pkg = currPackage,
-                                                slugFromFile = file.nameWithoutExtension.toLowerCase(),
+                                                slugFromFile = file.nameWithoutExtension.lowercase(),
                                                 routeOverride = routeOverride
                                             )
                                         )

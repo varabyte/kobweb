@@ -115,7 +115,7 @@ class BackendDataProcessor(
                                         ApiToProcess(
                                             funName = element.name!!.toString(),
                                             pkg = currPackage,
-                                            slugFromFile = file.nameWithoutExtension.toLowerCase(),
+                                            slugFromFile = file.nameWithoutExtension.lowercase(),
                                             routeOverride = routeOverride
                                         )
                                     )

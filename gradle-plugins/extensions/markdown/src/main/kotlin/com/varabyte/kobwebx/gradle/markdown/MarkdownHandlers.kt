@@ -166,7 +166,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             val mergedText = text
                 .map { c ->
                     when {
-                        c.isLetterOrDigit() -> c.toLowerCase()
+                        c.isLetterOrDigit() -> c.lowercase()
                         else -> '-'
                     }
                 }
