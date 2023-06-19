@@ -1694,6 +1694,14 @@ landing site.
 To read more about the feature, please check out the
 [official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
 
+#### Upgrading Kobweb
+
+The latest available version of Kobweb is declared at the top of this README. If a new version has come out, you can
+update your own project by visiting `libs.version.toml` and updating the `kobweb` version there.
+
+You should also double-check [COMPATIBILITY.md](COMPATIBILITY.md) to see if you also need to update your `kotlin` and
+`jetbrains-compose` versions at the same time.
+
 # Advanced topics
 
 ## Multimodule
