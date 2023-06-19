@@ -107,7 +107,7 @@ internal class RouteTree {
      * Return true if the route was previously registered via [register], false otherwise.
      */
     fun isRegistered(route: String): Boolean {
-        return resolve(route)?.last()?.node?.method != null
+        return resolve(route)?.lastOrNull()?.node?.method != null
     }
 
     /**
