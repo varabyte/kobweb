@@ -20,8 +20,8 @@ object Arrangement {
      * For example:
      *
      * ```
-     * // We want to use componentstyle + breakpoints to control the layout of our row
-     * val ResponsiveStyle = ComponentStyle("responsive") {
+     * // We want to use ComponentStyle + breakpoints to control the layout of our row
+     * val ResponsiveStyle by ComponentStyle {
      *   base { Modifier.justifyContent(Start) }
      *   Breakpoints.MD { Modifier.justifyContent(SpaceEvenly) }
      * }
@@ -31,8 +31,8 @@ object Arrangement {
      * Row(ResponsiveStyle.toModifier(), horizontalArrangement = Arrangement.FromStyle)
      * ```
      *
-     * Using this means you know what you are doing! And that you understand that the underlying element is using
-     * flexbox display, and that you understand what that even means! It will be up to you to use the right
+     * Using this means you know what you are doing! And that you understand which display type is powering the
+     * underlying element (grid for boxes, flexbox for rows and columns). It will be up to you to use the right
      * `justify` / `align` modifier methods to get the behavior you want.
      */
     object FromStyle : HorizontalOrVertical

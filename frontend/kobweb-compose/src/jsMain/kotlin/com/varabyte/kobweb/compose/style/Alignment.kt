@@ -19,10 +19,12 @@ fun Alignment.Vertical.toClassName() = when(this) {
     Alignment.Top -> "kobweb-align-top"
     Alignment.CenterVertically -> "kobweb-align-center-vert"
     Alignment.Bottom -> "kobweb-align-bottom"
+    Alignment.FromStyle -> "kobweb-align-from-style-vert"
 }
 
 fun Alignment.Horizontal.toClassName() = when(this) {
     Alignment.Start -> "kobweb-align-start"
     Alignment.CenterHorizontally -> "kobweb-align-center-horiz"
     Alignment.End -> "kobweb-align-end"
+    Alignment.FromStyle -> "kobweb-align-from-style-horiz"
 }
