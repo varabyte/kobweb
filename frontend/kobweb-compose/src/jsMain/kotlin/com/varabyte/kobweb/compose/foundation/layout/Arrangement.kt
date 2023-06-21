@@ -32,8 +32,8 @@ object Arrangement {
      * ```
      *
      * Using this means you know what you are doing! And that you understand which display type is powering the
-     * underlying element (grid for boxes, flexbox for rows and columns). It will be up to you to use the right
-     * `justify` / `align` modifier methods to get the behavior you want.
+     * underlying element (flexbox for rows and columns). It will be up to you to use the right `justify` / `align`
+     * modifier methods to get the behavior you want.
      */
     object FromStyle : HorizontalOrVertical
 }
