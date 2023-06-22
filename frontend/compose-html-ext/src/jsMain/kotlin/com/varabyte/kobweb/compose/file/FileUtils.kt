@@ -26,7 +26,7 @@ import org.w3c.dom.url.URL as DomURL // to avoid ambiguity with Document.URL
  * @param mimeType Optional mime type information you can save about the file. For example, if you're saving a PNG image, you
  *   could pass in "image/png" here. This information may not be necessary if you're just saving / loading binary or
  *   text contents, but it can be useful if you expect something else might consume this file. It will be made available
- *   in [LoadContext] when the file is loaded and will be embedded into the URL returned by [loadDataUrlFromDisk]..
+ *   in [LoadContext] when the file is loaded and will be embedded into the URL returned by [loadDataUrlFromDisk].
  */
 fun Document.saveToDisk(
     filename: String,

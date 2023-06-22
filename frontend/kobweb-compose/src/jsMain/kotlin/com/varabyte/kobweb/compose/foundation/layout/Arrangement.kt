@@ -23,7 +23,7 @@ object Arrangement {
      * // We want to use ComponentStyle + breakpoints to control the layout of our row
      * val ResponsiveStyle by ComponentStyle {
      *   base { Modifier.justifyContent(Start) }
-     *   Breakpoints.MD { Modifier.justifyContent(SpaceEvenly) }
+     *   Breakpoint.MD { Modifier.justifyContent(SpaceEvenly) }
      * }
      *
      * /* ... later ... */

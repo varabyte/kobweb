@@ -10,13 +10,13 @@ import org.jetbrains.compose.web.css.selectors.CSSSelector
  * A class which can be used to set CSS rules on a target [StyleModifiers] instance using types to prevent
  * invalid combinations.
  *
- * A CSS rule can consist of an optional breakpoint, zero or more pseudo classes, and an optional trailing pseudo
- * element.
+ * A CSS rule can consist of an optional breakpoint, zero or more pseudo-classes, and an optional trailing
+ * pseudo-element.
  *
  * For example, this class enables:
  *
  * ```
- * ComponentStyle("css-rule-example") {
+ * ComponentStyle {
  *   hover { ... } // Creates CssRule(this, ":hover") under the hood
  *   (hover + after) { ... } // Creates CssRule(this, ":hover::after)
  *   (Breakpoint.MD + hover) { ... } // Creates ":hover" style within a medium-sized media query
@@ -29,12 +29,12 @@ import org.jetbrains.compose.web.css.selectors.CSSSelector
 sealed class CssRule(val target: StyleModifiers) {
     companion object {
         /**
-         * A CSS rule that represents a functional psuedo-class.
+         * A CSS rule that represents a functional pseudo-class.
          *
          * For example, passing in "not" would result in: `:not(...)`
          */
-        fun OfFunctionalPseudoClass(target: StyleModifiers, psuedoClass: String, vararg params: NonMediaCssRule)
-            = OfPseudoClass(target, "$psuedoClass(${params.mapNotNull { it.toSelectorText() }.joinToString() })")
+        fun OfFunctionalPseudoClass(target: StyleModifiers, pseudoClass: String, vararg params: NonMediaCssRule)
+            = OfPseudoClass(target, "$pseudoClass(${params.mapNotNull { it.toSelectorText() }.joinToString() })")
     }
 
     operator fun invoke(createModifier: () -> Modifier) {
@@ -74,7 +74,7 @@ sealed class CssRule(val target: StyleModifiers) {
     sealed class NonMediaCssRule(target: StyleModifiers) : CssRule(target)
 
     /**
-     * A CSS rule that represents an attribute selector
+     * A CSS rule that represents an attribute selector.
      *
      * For example, passing in "aria-disabled" would result in: `[aria-disabled]`
      */
@@ -93,7 +93,7 @@ sealed class CssRule(val target: StyleModifiers) {
     }
 
     /**
-     * A CSS rule that represents a psuedo-class selector.
+     * A CSS rule that represents a pseudo-class selector.
      *
      * For example, passing in "hover" would result in: `:hover`
      */
@@ -108,7 +108,7 @@ sealed class CssRule(val target: StyleModifiers) {
     }
 
     /**
-     * A CSS rule that represents a psuedo-element selector.
+     * A CSS rule that represents a pseudo-element selector.
      *
      * For example, passing in "after" would result in: `::after`
      */
@@ -117,8 +117,8 @@ sealed class CssRule(val target: StyleModifiers) {
     }
 
     /**
-     * A composite CSS rule that is a chain of subparts and still open to accepting more pseudo classes and/or a
-     * pseudo element.
+     * A composite CSS rule that is a chain of subparts and still open to accepting more pseudo-classes and/or a
+     * pseudo-element.
      */
     class CompositeOpen(
         target: StyleModifiers,
@@ -140,7 +140,7 @@ sealed class CssRule(val target: StyleModifiers) {
 
     /**
      * A composite CSS rule that is a chain of subparts which is terminated - it cannot grow any further but can only
-     * be invoked at this point
+     * be invoked at this point.
      */
     class CompositeClosed(
         target: StyleModifiers,

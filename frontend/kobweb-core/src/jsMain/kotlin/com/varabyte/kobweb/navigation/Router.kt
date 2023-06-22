@@ -213,10 +213,10 @@ class Router {
      * @InitKobweb
      * fun initKobweb(ctx: InitKobwebContext) {
      *   ctx.router.addRouteInterceptor {
-     *     if (path == "admin") {
+     *     if (path == "/admin") {
      *       // The old admin has grown and is being split up into multiple pages.
      *       // Send people to the dashboard by default.
-     *       path = "admin/dashboard"
+     *       path = "/admin/dashboard"
      *     }
      *   }
      * }

@@ -10,7 +10,7 @@ import org.w3c.fetch.Headers
  * A class which can be used to abort an API request after it was made.
  *
  * ```
- * val abortController: AbortController? by remember { mutableStateOf(null) }
+ * var abortController: AbortController? by remember { mutableStateOf(null) }
  * LaunchedEffect(Unit) {
  *   abortController = AbortController()
  *   val result = window.http.get("/some/api/path", abortController = abortController)
@@ -42,12 +42,12 @@ class AbortController {
  *
  * ```
  * // Without HttpFetcher
- * window.fetch(HttpMethod.GET, "/some/api/path").then { response -> ... }
+ * window.fetch(HttpMethod.GET, "/some/api/path")
  *
  * // With HttpFetcher
- * window.http.get("/some/api/path").then { response -> ... }
+ * window.http.get("/some/api/path")
  * // ... or a version that won't throw exceptions
- * // window.http.tryGet("/some/api/path")?.then { response -> ... }
+ * // window.http.tryGet("/some/api/path")
  * ```
  *
  * The class additionally exposes a `logOnError` field which globally applies to all `try...` methods.

@@ -105,10 +105,10 @@ data class CSSTransition(
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
          *
-         * Returns an array so you can use feed it into [transition] as vararg parameters using the spread operator:
+         * Returns an array, so you can use feed it into [transition] as vararg parameters using the spread operator:
          *
          * ```
-         * transition(*CSSTrasition.group(listOf("width", "height"), ...))
+         * transition(*CSSTransition.group(listOf("width", "height"), ...))
          * ```
          */
         fun group(
@@ -121,10 +121,10 @@ data class CSSTransition(
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
          *
-         * Returns an array so you can use feed it into [transition] as vararg parameters using the spread operator:
+         * Returns an array, so you can use feed it into [transition] as vararg parameters using the spread operator:
          *
          * ```
-         * transition(*CSSTrasition.group(listOf("width", "height"), ...))
+         * transition(*CSSTransition.group(listOf(TransitionProperty.of("width"), ...), ...))
          * ```
          */
         fun group(

@@ -48,7 +48,7 @@ class MutableSilkTheme {
      * fun SomeWidget(modifier: Modifier = Modifier) { ... }
      *
      * // Your view code:
-     * val SomeStyle = ComponentStyle(...) { // Registered automatically by Kobweb
+     * val SomeStyle by ComponentStyle { // Registered automatically by Kobweb
      *   base { Modifier.background(Colors.Grey) }
      * }
      *
@@ -79,7 +79,7 @@ class MutableSilkTheme {
      * @InitSilk
      * fun initSilk(ctx: InitSilkContext) {
      *   // TextStyle comes from Silk
-     *   ctx.theme.replaceComponentStyle(TextStyle) {
+     *   ctx.theme.replaceComponentStyle(SpanTextStyle) {
      *     base { Modifier.lineHeight(2) }
      *   }
      * }
@@ -211,7 +211,7 @@ fun MutableSilkTheme.replaceComponentVariantBase(
 }
 
 /**
- * Use this method to tweak a style previously registered using [registerComponentStyle].
+ * Use this method to tweak a style previously registered using [MutableSilkTheme.registerComponentStyle].
  *
  * This is particularly useful if you want to supplement changes to styles provided by Silk.
  *
@@ -219,7 +219,7 @@ fun MutableSilkTheme.replaceComponentVariantBase(
  * @InitSilk
  * fun initSilk(ctx: InitSilkContext) {
  *   // TextStyle comes from Silk
- *   ctx.theme.modifyComponentStyle(TextStyle) {
+ *   ctx.theme.modifyComponentStyle(SpanTextStyle) {
  *     base { Modifier.fontWeight(FontWeight.Bold) }
  *   }
  * }

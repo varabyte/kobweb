@@ -65,10 +65,10 @@ interface Shape {
  * Create a rectangle via inset values.
  *
  * That is...
- * - `Rect(10, 20.dp)` means a rectangle inset by 10% on each side, with corners that have a 20.dp radius.
+ * - `Rect(10, 20.px)` means a rectangle inset by 10% on each side, with corners that have a 20px radius.
  * - `Rect(20, 10)` means a rectangle with 20% cut off from top and bottom, 10% cut off from left and right
  * - `Rect(10 to 15, 20 to 25)` means a rectangle with the top left corner at (10% x 15%) and bottom right corner at (20% x 25%)
- * - `Rect(20.dp)` means a full sized rectangle with corners that have a 20.dp radius
+ * - `Rect(20.px)` means a full sized rectangle with corners that have a 20px radius
  */
 class RectF(
     val topLeft: Pair<Float, Float>,

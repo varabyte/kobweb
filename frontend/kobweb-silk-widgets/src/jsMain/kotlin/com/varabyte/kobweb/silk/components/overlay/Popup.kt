@@ -45,7 +45,7 @@ const val DEFAULT_POPUP_OFFSET_PX = 15
  *       BL  B  BR
  *
  * Note the difference between e.g. [PopupPlacement.TopLeft] and [PopupPlacement.LeftTop]. The former will place the popup above the target, with
- * left edges aligned, while the latter will place to popup to the left of the target, with top edges aligned.
+ * left edges aligned, while the latter will place the popup to the left of the target, with top edges aligned.
  *
  * Note that popups should avoid covering the element itself (as that would make the popup go away since it would cause
  * the mouseleave event to fire, removing the popup), so there is no option for `Center` placement.

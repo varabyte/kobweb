@@ -20,15 +20,15 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint.XL
  * add any breakpoints, then the page you get will be styled the same on your phone as well as the widest-screen
  * monitor.
  *
- * Some default breakpoint sizes are defined by Silk but you can override them by marking a method with `@InitSilk` and
- * updating the `ctx.config.breakpoints` map inside it.
+ * Some default breakpoint sizes are defined by Silk, but you can override them by marking a method with `@InitSilk` and
+ * updating `ctx.theme.breakpoints` inside it.
  *
  * For more information about breakpoints, see also: https://www.w3schools.com/howto/howto_css_media_query_breakpoints.asp
  */
 enum class Breakpoint {
     /**
      * Special value which always means 0-width, useful for querying the current breakpoint of a screen that's smaller
-     * than "small" (which usually indicates a mobile device)
+     * than "small" (which usually indicates a mobile device).
      */
     ZERO,
 

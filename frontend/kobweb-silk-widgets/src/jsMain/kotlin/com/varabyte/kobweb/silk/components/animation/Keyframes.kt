@@ -47,7 +47,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
      * to change again.
      *
      * ```
-     * val Example by keyframes {
+     * val Example by Keyframes {
      *    from { Modifier.opacity(0) }
      *    each(20.percent, 80.percent) { Modifier.opacity(1) }
      *    to { Modifier.opacity(1) }
@@ -110,7 +110,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  * property name, e.g.
  *
  * ```
- * val Bounce by keyframes {
+ * val Bounce by Keyframes {
  *   from { Modifier.translateX((-50).percent) }
  *   to { Modifier.translateX((50).percent) }
  * }
@@ -123,7 +123,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  * val Bounce = Keyframes("bounce") { ... }
  * @InitSilk
  * fun initSilk(ctx: InitSilkContext) {
- *   ctx.config.registerKeyframes(Bounce)
+ *   ctx.stylesheet.registerKeyframes(Bounce)
  * }
  * ```
  *
@@ -165,7 +165,7 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
  * For example,
  *
  * ```
- * val Bounce by keyframes { ... }
+ * val Bounce by Keyframes { ... }
  * ```
  *
  * creates a keyframe entry into the site stylesheet (provided by Silk) with the name "bounce".

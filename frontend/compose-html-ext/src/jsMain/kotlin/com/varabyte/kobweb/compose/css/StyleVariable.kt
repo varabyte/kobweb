@@ -16,13 +16,13 @@ import kotlin.reflect.KProperty
  * You can declare one, set it, and use it in your styles like this:
  *
  * ```
- * val bgColor by StyleVariable()
+ * val bgColor by StyleVariable<Color>()
  * val MainAreaStyle by ComponentStyle.base {
- *   Modifier.setValue(bgColor, Colors.Black)
+ *   Modifier.setVariable(bgColor, Colors.Black)
  * }
  *
  * val InvertedAreaStyle by ComponentStyle.base {
- *   Modifier.setValue(bgColor, Colors.White)
+ *   Modifier.setVariable(bgColor, Colors.White)
  * }
  *
  * // Box style is expected to be applied underneath a root element using either MainAreaStyle or InvertedAreaStyle

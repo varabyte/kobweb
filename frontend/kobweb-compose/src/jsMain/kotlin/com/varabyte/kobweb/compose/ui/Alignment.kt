@@ -31,7 +31,7 @@ sealed interface Alignment {
      * // We want to use ComponentStyle + breakpoints to control the layout of our row
      * val ResponsiveStyle by ComponentStyle {
      *   base { Modifier.alignItems(Top) }
-     *   Breakpoints.MD { Modifier.alignItems(Center) }
+     *   Breakpoint.MD { Modifier.alignItems(Center) }
      * }
      *
      * /* ... later ... */

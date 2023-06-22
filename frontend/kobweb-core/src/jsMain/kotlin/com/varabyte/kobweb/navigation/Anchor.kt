@@ -39,7 +39,7 @@ fun Link(
  *   domain). If not set, this behavior will default to in a new tab. Note that this behavior may be overridden by the
  *   browser based on keyboard/mouse shortcuts.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front.For example,
+ * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. For example,
  *   if the [href] parameter was set to "example/path" and the site's route prefix was set to "parent-site/nested", then
  *   the `href` value will be converted to "parent-site/nested/example/path". You usually want this to be true, unless
  *   you are intentionally linking outside this site's root folder while still staying in the same domain, e.g. you are

@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.theme.breakpoint
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.layout.breakpoint.displayBetween
-import com.varabyte.kobweb.silk.components.layout.breakpoint.displayIf
+import com.varabyte.kobweb.silk.components.layout.breakpoint.displayIfAtLeast
 import com.varabyte.kobweb.silk.components.layout.breakpoint.displayUntil
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import kotlinx.browser.window
@@ -20,8 +20,8 @@ import org.w3c.dom.events.EventListener
  * [Breakpoint.SM], this will return [Breakpoint.ZERO].
  *
  * This method can be useful to branch logic based on screen width, although it should be noted that
- * [Modifier.displayIf], [Modifier.displayBetween], and [Modifier.displayUntil] should be preferred if possible as those
- * approaches will be easier to debug via your browser tools, does not require adding an event listener behind the
+ * [Modifier.displayIfAtLeast], [Modifier.displayBetween], and [Modifier.displayUntil] should be preferred if possible as those
+ * approaches will be easier to debug via your browser tools, do not require adding an event listener behind the
  * scenes, and will avoid an extra recomposition as the screen is resized.
  *
  * ```
@@ -31,8 +31,8 @@ import org.w3c.dom.events.EventListener
  *   Widget(...)
  * }
  *
- * // Using Modifier.displayIf (preferred)
- * Widget(Modifier.displayIf(Breakpoint.MD))
+ * // Using Modifier.displayIfAtLeast (preferred)
+ * Widget(Modifier.displayIfAtLeast(Breakpoint.MD))
  * ```
  */
 @Composable

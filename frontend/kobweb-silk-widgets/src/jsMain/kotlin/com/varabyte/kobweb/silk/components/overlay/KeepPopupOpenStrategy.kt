@@ -20,7 +20,7 @@ import org.w3c.dom.events.FocusEvent
  *
  * ```
  * val manualStrategy = remember { KeepPopupOpenStrategy.manual() }
- * Popup(..., keepOpenStrategy = manualStrategy) {
+ * Popover(..., keepOpenStrategy = manualStrategy) {
  *   Button(onClick = { manualStrategy.shouldKeepOpen = false }) { Text("Close") }
  * }
  * ```
@@ -29,7 +29,7 @@ import org.w3c.dom.events.FocusEvent
  * the popup should stay open or not.
  *
  * @param defaultValue The initial "keep open" value for this strategy. Defaults to `false`. Note that the same strategy
- *   can be reused for multiple lifecycles of a popup opening and closing, so each time it is reset, it will use set
+ *   can be reused for multiple lifecycles of a popup opening and closing, so each time it is reset, it will set
  *   its state back to this default value.
  */
 abstract class KeepPopupOpenStrategy(private val defaultValue: Boolean = false) {

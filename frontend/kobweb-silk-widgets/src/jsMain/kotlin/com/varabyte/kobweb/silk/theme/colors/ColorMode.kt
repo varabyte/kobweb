@@ -46,7 +46,7 @@ fun Color.shifted(colorMode: ColorMode, byPercent: Float = Color.DEFAULT_SHIFTIN
 }
 
 /**
- * Convenience function for when you're inside a `Composable` context within which you can grab the current color mode
+ * Convenience function for when you're inside a `Composable` context, within which you can grab the current color mode.
  */
 @Composable
 @ReadOnlyComposable

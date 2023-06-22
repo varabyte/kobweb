@@ -31,10 +31,10 @@ val CanvasStyle by ComponentStyle(prefix = "silk") {}
 /**
  * Arguments passed to the user's `render` callback.
  *
- * @param ctx The canvas context which provides drawing functionality
- * @param width The width (in pixels) of this canvas
- * @param height The height (in pixels) of this canvas
- * @param colorMode The active color mode used by the site
+ * @param ctx The canvas context which provides drawing functionality.
+ * @param width The width (in pixels) of this canvas.
+ * @param height The height (in pixels) of this canvas.
+ * @param colorMode The active color mode used by the site.
  * @param elapsedMs Time elapsed since last frame.
  *
  * @param C The type of the canvas context
