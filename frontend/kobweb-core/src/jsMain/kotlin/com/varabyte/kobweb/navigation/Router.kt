@@ -158,7 +158,7 @@ class Router {
         // By design, whether a site has a route prefix or not should be invisible to the user. So here, we remove a
         // prefix if it is present only to put it back again (in the case that we removed it) after the interceptors
         // all have their pass.
-        val withoutPrefix = RoutePrefix.remove(hrefResolved)
+        val withoutPrefix = RoutePrefix.remove(hrefResolved).takeIf { it.isNotEmpty() } ?: "/"
         val hadPrefix = withoutPrefix != hrefResolved
 
         return RoutePrefix.prependIf(hadPrefix, interceptors.fold(Route(withoutPrefix).toString()) { acc, intercept ->
