@@ -31,6 +31,7 @@ fun createMainFunction(
         "com.varabyte.kobweb.core.AppGlobalsLocal",
         "com.varabyte.kobweb.navigation.RoutePrefix",
         "com.varabyte.kobweb.navigation.Router",
+        "com.varabyte.kobweb.navigation.UpdateHistoryMode",
         "kotlinx.browser.document",
         "kotlinx.browser.window",
         "org.jetbrains.compose.web.renderComposable",
@@ -202,7 +203,7 @@ fun createMainFunction(
             // Note: Below, we use %S when specifying key/value pairs. This prevents KotlinPoet from breaking
             // our text in the middle of a String.
             addCode("""
-                router.navigateTo(window.location.href.removePrefix(window.location.origin))
+                router.navigateTo(window.location.href.removePrefix(window.location.origin), UpdateHistoryMode.REPLACE)
 
                 // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them
                 // the first time we render this page with their composable, dynamic versions. Think of this as
