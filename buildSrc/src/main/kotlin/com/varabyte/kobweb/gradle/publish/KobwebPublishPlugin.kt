@@ -6,6 +6,7 @@ import org.gradle.api.Task
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.withType
 
 // In some cases, we aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
 // libraries, but they need to be defined in a multiplatform module because it does extra Compose-related
@@ -82,7 +83,7 @@ class KobwebPublishPlugin : Plugin<Project> {
             configurePublishing(config)
 
             // AbstractPublishToMaven configured both maven local and remote maven publish tasks
-            tasks.withType(AbstractPublishToMaven::class.java) {
+            tasks.withType<AbstractPublishToMaven>().configureEach {
                 onlyIf {
                     config.filter.get().invoke(this)
                 }

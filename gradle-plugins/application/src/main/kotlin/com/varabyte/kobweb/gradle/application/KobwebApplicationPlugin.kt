@@ -18,9 +18,11 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
 import com.varabyte.kobweb.gradle.application.util.kebabCaseToTitleCamelCase
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
-import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
+import com.varabyte.kobweb.gradle.core.kmp.JsTarget
+import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
+import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
+import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -40,8 +42,12 @@ import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.withType
 import org.gradle.tooling.events.FailureResult
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import javax.inject.Inject
 
 val Project.kobwebFolder: KobwebFolder
@@ -146,7 +152,7 @@ class KobwebApplicationPlugin @Inject constructor(
             KobwebTask::class.java,
             "The umbrella task that combines all frontend and backend Kobweb generation tasks"
         )
-        // Note: Configured below, in `afterEvaluate`
+        // Note: Configured below
 
         val kobwebUnpackServerJarTask =
             project.tasks.register("kobwebUnpackServerJar", KobwebUnpackServerJarTask::class.java)
@@ -234,8 +240,9 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
-        project.afterEvaluate {
-            hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
+        project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
+            val jsTarget = JsTarget(this)
+            project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
 
             val jsRunTasks = listOf(
                 jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun,
@@ -246,25 +253,24 @@ class KobwebApplicationPlugin @Inject constructor(
             // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
             // the Kobweb commands instead.
             jsRunTasks
-                .mapNotNull { taskName -> project.tasks.findByName(taskName) }
+                .mapNotNull { taskName -> project.tasks.namedOrNull(taskName) }
                 .forEach { task ->
-                    task.doFirst {
-                        logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
+                    task.configure {
+                        doFirst {
+                            logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
+                        }
                     }
                 }
 
             val jsSourceTasks = listOf(jsTarget.compileKotlin, jsTarget.sourcesJar)
             jsSourceTasks
-                .mapNotNull { taskName -> project.tasks.findByName(taskName) }
+                .mapNotNull { taskName -> project.tasks.namedOrNull(taskName) }
                 .forEach { task ->
-                    task.dependsOn(kobwebGenSiteEntryTask)
+                    task.configure { dependsOn(kobwebGenSiteEntryTask) }
                 }
 
             kobwebGenTask.configure {
                 dependsOn(kobwebGenFrontendTask)
-                if (jvmTarget != null) {
-                    dependsOn(kobwebGenBackendTask)
-                }
             }
 
             project.tasks.named(jsTarget.processResources) {
@@ -272,20 +278,14 @@ class KobwebApplicationPlugin @Inject constructor(
                 dependsOn(kobwebCopyDependencyResourcesTask)
             }
 
-            // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
-            jvmTarget?.let { jvm ->
-                project.tasks.findByName(jvm.compileKotlin)?.dependsOn(kobwebGenBackendTask)
-                project.tasks.findByName(jvm.jar)?.dependsOn(kobwebGenBackendTask)
-            }
-
             // When exporting, both dev + production webpack actions are triggered - dev for the temporary server
-            // that runs, and production for generating the final JS file for the site. The following order declarations
-            // prevent Gradle from getting confused when both tasks are run at the same time.
-            run {
-                project.tasks.named(jsTarget.browserProductionWebpack) {
-                    mustRunAfter(kobwebStartTask)
-                }
-                project.tasks.named(jsTarget.compileProductionExecutableKotlin) {
+            // that runs, and production for generating the final JS file for the site. However, these tasks share some
+            // output directories (see https://youtrack.jetbrains.com/issue/KT-56305), so the following order
+            // declaration is needed for gradle to be happy. Note also that we don't configure the task directly by its
+            // name, as it may not yet exist (for some reason). Pending https://github.com/gradle/gradle/issues/16543,
+            // we simply match it by its name amongst all tasks of its type.
+            project.tasks.withType<KotlinJsIrLink>().configureEach {
+                if (name == jsTarget.compileProductionExecutableKotlin) {
                     mustRunAfter(kobwebStartTask)
                 }
             }
@@ -294,11 +294,8 @@ class KobwebApplicationPlugin @Inject constructor(
                 // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
                 // much.
                 if (env == ServerEnvironment.DEV) {
-                    // If this site has server routes, make sure we built the jar that our servers can load
-                    jvmTarget?.let { jvm -> dependsOn(project.tasks.findByName(jvm.jar)) }
-
                     dependsOn(kobwebGenTask)
-                    val webpackTask = project.tasks.findByName(jsTarget.browserDevelopmentWebpack) as KotlinWebpack
+                    val webpackTask = project.tasks.named(jsTarget.browserDevelopmentWebpack)
                     dependsOn(webpackTask)
                 }
             }
@@ -311,7 +308,27 @@ class KobwebApplicationPlugin @Inject constructor(
                 dependsOn(kobwebCleanSiteTask)
                 dependsOn(kobwebCreateServerScriptsTask)
                 dependsOn(kobwebStartTask)
-                dependsOn(project.tasks.findByName(jsTarget.browserProductionWebpack))
+                dependsOn(project.tasks.namedOrNull(jsTarget.browserProductionWebpack))
+            }
+        }
+        project.buildTargets.withType<KotlinJvmTarget>().configureEach {
+            val jvmTarget = JvmTarget(this)
+
+            // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
+            project.tasks.namedOrNull(jvmTarget.compileKotlin)?.configure { dependsOn(kobwebGenBackendTask) }
+            project.tasks.namedOrNull(jvmTarget.jar)?.configure { dependsOn(kobwebGenBackendTask) }
+
+            // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
+            // much.
+            kobwebStartTask.configure {
+                if (env == ServerEnvironment.DEV) {
+                    // If this site has server routes, make sure we built the jar that our servers can load
+                    dependsOn(project.tasks.namedOrNull(jvmTarget.jar))
+                }
+            }
+
+            kobwebGenTask.configure {
+                dependsOn(kobwebGenBackendTask)
             }
         }
     }
@@ -385,15 +402,15 @@ val Project.kobwebBuildTarget get() = project.extra["kobwebBuildTarget"] as Buil
 // Basically, we're setting this value to always be false:
 // https://github.com/JetBrains/kotlin/blob/4af0f110c7053d753c92fd9caafb4be138fdafba/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/targets/js/webpack/KotlinWebpack.kt#L276
 private fun Project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode() {
-    tasks.withType(KotlinWebpack::class.java).forEach { webpackTask ->
+    tasks.withType<KotlinWebpack>().configureEach {
         // Gradle generates subclasses via bytecode generation magic. Here, we need to grab the superclass to find
         // the private field we want.
-        webpackTask::class.java.superclass.declaredFields
+        this::class.java.superclass.declaredFields
             // Note: Isn't ever null for now but checking protects us against future changes to KotlinWebpack
             .firstOrNull { it.name == "isContinuous" }
             ?.let { isContinuousField ->
                 isContinuousField.isAccessible = true
-                isContinuousField.setBoolean(webpackTask, false)
+                isContinuousField.setBoolean(this, false)
             }
     }
 }

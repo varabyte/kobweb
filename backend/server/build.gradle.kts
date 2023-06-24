@@ -30,7 +30,7 @@ application {
     mainClass.set(applicationClass)
 }
 
-tasks.withType<ShadowJar> {
+tasks.withType<ShadowJar>().configureEach {
 // NOTE: We used to minimize the jar but we had to keep making exceptions for things that got stripped that we needed at
 // runtime. Last check, the minimized jar was 15M vs. 18M not minimized, but with the added danger that things could
 // break at any time in the future. It just wasn't worth it.

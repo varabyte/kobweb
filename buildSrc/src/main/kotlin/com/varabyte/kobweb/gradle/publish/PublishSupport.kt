@@ -9,6 +9,7 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.http.BasicAuthentication
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 import java.io.File
 
@@ -62,7 +63,7 @@ internal fun PublishingExtension.addVarabyteArtifact(
     // kotlin("jvm") projects don't automatically declare a maven publication
     if (publications.none { it is MavenPublication }) {
         check(javaComponent != null) // This seems to always be true so far
-        publications.create("maven", MavenPublication::class.java) {
+        publications.register("maven", MavenPublication::class.java) {
             groupId = project.group.toString()
             if (artifactId != null) {
                 this.artifactId = artifactId.invoke(this.name)
@@ -73,7 +74,7 @@ internal fun PublishingExtension.addVarabyteArtifact(
         }
     }
 
-    publications.withType(MavenPublication::class.java) {
+    publications.withType<MavenPublication>().configureEach {
         if (artifactId != null) {
             this.artifactId = artifactId.invoke(this.name)
         }

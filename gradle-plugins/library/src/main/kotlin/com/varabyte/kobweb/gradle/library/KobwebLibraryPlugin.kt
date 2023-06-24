@@ -2,13 +2,18 @@ package com.varabyte.kobweb.gradle.library
 
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
-import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
+import com.varabyte.kobweb.gradle.core.kmp.JsTarget
+import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
+import com.varabyte.kobweb.gradle.core.kmp.buildTargets
+import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateMetadataBackendTask
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateMetadataFrontendTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebLibraryPlugin : Plugin<Project> {
@@ -30,15 +35,18 @@ class KobwebLibraryPlugin : Plugin<Project> {
                 kobwebBlock
             )
 
-        project.afterEvaluate {
-            project.tasks.findByName(jsTarget.processResources)?.dependsOn(kobwebGenFrontendMetadata)
-            project.tasks.findByName(jsTarget.jar)?.dependsOn(kobwebGenFrontendMetadata)
+        project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
+            val jsTarget = JsTarget(this)
+
+            project.tasks.namedOrNull(jsTarget.processResources)?.configure { dependsOn(kobwebGenFrontendMetadata) }
+            project.tasks.namedOrNull(jsTarget.jar)?.configure { dependsOn(kobwebGenFrontendMetadata) }
+        }
+        project.buildTargets.withType<KotlinJvmTarget>().configureEach {
+            val jvmTarget = JvmTarget(this)
 
             // NOTE: JVM-related tasks are not always available. If they are, it means this project exports an API jar.
-            jvmTarget?.let { jvmTarget ->
-                project.tasks.findByName(jvmTarget.processResources)?.dependsOn(kobwebGenBackendMetadata)
-                project.tasks.findByName(jvmTarget.jar)?.dependsOn(kobwebGenBackendMetadata)
-            }
+            project.tasks.namedOrNull(jvmTarget.processResources)?.configure { dependsOn(kobwebGenBackendMetadata) }
+            project.tasks.namedOrNull(jvmTarget.jar)?.configure { dependsOn(kobwebGenBackendMetadata) }
         }
     }
 }
