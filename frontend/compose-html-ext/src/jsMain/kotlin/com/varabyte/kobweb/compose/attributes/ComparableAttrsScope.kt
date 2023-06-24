@@ -21,7 +21,7 @@ private class DummyAttrsScope<E: Element> : AttrsScope<E> {
 }
 
 /**
- * A wrapper around an internal [AttrsScope] where equality / hashcode has meaning
+ * A wrapper around an internal [AttrsScope] where equality / hashcode has meaning.
  */
 class ComparableAttrsScope<E: Element>(private val wrapped: AttrsScope<E>) : AttrsScope<E> {
     constructor(): this(DummyAttrsScope())

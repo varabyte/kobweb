@@ -19,15 +19,15 @@ private fun CSSAngleValue.toDegrees() = when (this.unit.toString()) {
 } % 360f
 
 /**
- * A base class for colors which provide additional functionality on top of the color class included in Compose HTML.
+ * A base class for colors which provides additional functionality on top of the color class included in Compose HTML.
  */
 sealed interface Color : CSSColorValue {
     fun inverted(): Color
     /**
-     * Darken this color by some target percent value
+     * Darken this color by some target percent value.
      *
      * @param byPercent A value between 0 (no change) and 1 (will result in black). Otherwise, darken the current
-     *   color rgb values by some percent amount (meaning the final result depends upon initial values)
+     *   color rgb values by some percent amount (meaning the final result depends upon the initial values).
      */
     fun darkened(byPercent: Float = DEFAULT_SHIFTING_PERCENT): Color
 
@@ -113,9 +113,9 @@ sealed interface Color : CSSColorValue {
      * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
      *
      * @property hue An angle (0-360) representing the color based on its location in a color wheel.
-     * @property saturation A percentage value (0-1) representing how grey the color is
-     * @property lightness A percentage value (0-1) representing how bright the color is.`
-     * @property alpha A percentage value (0-1) representing how transparent the color is
+     * @property saturation A percentage value (0-1) representing how grey the color is.
+     * @property lightness A percentage value (0-1) representing how bright the color is.
+     * @property alpha A percentage value (0-1) representing how transparent the color is.
      */
     class Hsl internal constructor(val hue: Float, val saturation: Float, val lightness: Float, val alpha: Float) : Color {
         override fun inverted() = toRgb().inverted()
@@ -259,10 +259,10 @@ sealed interface Color : CSSColorValue {
 }
 
 /**
- * Lighten this color by some target percent value
+ * Lighten this color by some target percent value.
  *
  * @param byPercent A value between 0 (no change) and 1 (will result in white). Otherwise, lighten the current
- *   color rgb values by some percent amount (so the final result depends upon initial values)
+ *   color rgb values by some percent amount (so the final result depends upon the initial values).
  */
 fun Color.lightened(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = inverted().darkened(byPercent).inverted()
 

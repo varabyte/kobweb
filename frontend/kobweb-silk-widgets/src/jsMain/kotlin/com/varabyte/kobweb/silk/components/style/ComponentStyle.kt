@@ -158,7 +158,7 @@ abstract class StyleModifiers {
  * For example, color mode is supported here:
  *
  * ```
- * val MyWidgetStyle = ComponentStyle("my-widget") {
+ * val MyWidgetStyle by ComponentStyle {
  *    ...
  * }
  * ```
@@ -168,7 +168,7 @@ abstract class StyleModifiers {
  * ```
  * @InitSilk
  * fun initSilk(ctx: InitSilkContext) {
- *   ctx.config.registerStyle("body") {
+ *   ctx.stylesheet.registerStyle("body") {
  *     ...
  *   }
  * }
@@ -214,7 +214,7 @@ class ImmutableComponentStyle internal constructor(
  * So this:
  *
  * ```
- * ComponentStyle.base("custom-widget") {
+ * ComponentStyle.base {
  *   Modifier.fontSize(48.px)
  * }
  * ```
@@ -222,7 +222,7 @@ class ImmutableComponentStyle internal constructor(
  * replaces this:
  *
  * ```
- * ComponentStyle("custom-widget") {
+ * ComponentStyle {
  *   base {
  *     Modifier.fontSize(48.px)
  *   }
@@ -278,7 +278,7 @@ private sealed interface StyleGroup {
  * A class which allows a user to define styles that get added to the page's stylesheet, instead of inline styles.
  *
  * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
- * media queries, and psuedo classes.
+ * media queries, and pseudo classes.
  *
  * If defining a style for a custom widget, you should call the [toModifier] method to apply it:
  *

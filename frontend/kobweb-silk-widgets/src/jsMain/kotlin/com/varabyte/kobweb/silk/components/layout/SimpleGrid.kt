@@ -66,7 +66,7 @@ fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = 
  * A widget making it easy to create a common case of responsive grids, specifically one where you simply specify the
  * number of columns and then its contents will flow to a new row automatically.
  *
- * Children of the Grid will be auto-slotted based on how many columns you specified
+ * Children of the Grid will be auto-slotted based on how many columns you specified:
  *
  * ```
  * SimpleGrid(numColumns(2)) {
@@ -76,7 +76,7 @@ fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = 
  * }
  * ```
  *
- * The [numColumns] parameter actually takes accepts responsive values, so that the behavior can change as the
+ * The [numColumns] parameter accepts responsive values, so that the behavior can change as the
  * screen size changes:
  *
  * ```

@@ -18,15 +18,11 @@ interface ColorScheme {
     val _800: Color
     val _900: Color
 }
-
 /**
  * A veritable rainbow of color schemes to choose from.
  *
- * Special thanks to Chakra UI here:
- * https://github.com/chakra-ui/chakra-ui/blob/main/packages/theme/src/foundations/colors.ts
- *
- * and Material design:
- * https://material.io/design/color/the-color-system.html#tools-for-picking-colors
+ * Special thanks to Chakra UI [here](https://github.com/chakra-ui/chakra-ui/blob/3c946c4b47f36b09d219555ba185e58a62bd2378/packages/components/theme/src/foundations/colors.ts)
+ * and Material design [here](https://material.io/design/color/the-color-system.html#tools-for-picking-colors).
  */
 @Suppress("unused")
 object ColorSchemes {

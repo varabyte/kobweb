@@ -141,7 +141,7 @@ fun <TElement : Element> ref(vararg keys: Any?, handle: (TElement) -> Unit) = re
  * ```
  * disposableRef { element ->
  *   println("${element.localName} was added to the dom.")
- *   onDispose { println("${element.localName} was added to the dom.") }
+ *   onDispose { println("${element.localName} was removed from the dom.") }
  * }
  * ```
  *

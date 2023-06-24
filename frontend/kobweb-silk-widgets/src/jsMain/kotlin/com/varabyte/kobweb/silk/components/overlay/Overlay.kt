@@ -36,7 +36,7 @@ val OverlayStyle by ComponentStyle.base(prefix = "silk") {
  * ```
  * var showModal by remember { mutableStateOf(true) }
  * if (showModal) {
- *   Overlay(Modifer.onClick { showModal = false }) {
+ *   Overlay(Modifier.onClick { showModal = false }) {
  *     Dialog {
  *        // ... your modal content here ...
  *     }

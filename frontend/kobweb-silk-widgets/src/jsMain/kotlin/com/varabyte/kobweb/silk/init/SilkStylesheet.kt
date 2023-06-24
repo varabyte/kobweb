@@ -43,8 +43,8 @@ interface SilkStylesheet {
      *     "*" style {
      *       fontSize(48.px)
      *
-     *       media(minWidth(...)) {
-     *         self style {
+     *       media(mediaMinWidth(...)) {
+     *         style {
      *           ...
      *         }
      *       }
@@ -87,11 +87,9 @@ interface SilkStylesheet {
      *
      * ```
      * object MyStyleSheet : StyleSheet() {
-     *   init {
-     *     val pulse by Keyframes {
-     *       from { property("transform", "translateX(-50%)")
-     *       to { property("transform", "translateX(50%)")
-     *     }
+     *   val pulse by keyframes {
+     *     from { property("transform", "translateX(-50%)") }
+     *     to { property("transform", "translateX(50%)") }
      *   }
      * }
      *
@@ -122,7 +120,7 @@ interface SilkStylesheet {
  * replaces this:
  *
  * ```
- * config.stylesheet.registerStyle("*") {
+ * ctx.stylesheet.registerStyle("*") {
  *   base {
  *     Modifier.fontSize(48.px)
  *   }

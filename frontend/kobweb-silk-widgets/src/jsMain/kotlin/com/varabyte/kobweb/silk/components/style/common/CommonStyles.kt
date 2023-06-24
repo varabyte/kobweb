@@ -26,7 +26,7 @@ val DisabledStyle by ComponentStyle.base(
 /**
  * A way to select elements that have been tagged with an `aria-disabled` attribute.
  *
- * This is different from the `:disabled` psuedo-class selector! There are various reasons to use the ARIA version over
+ * This is different from the `:disabled` pseudo-class selector! There are various reasons to use the ARIA version over
  * the HTML version; for example, some elements don't support `disabled` and also `disabled` elements don't fire
  * mouse events, which can be useful e.g. when implementing tooltips.
  */

@@ -241,7 +241,7 @@ private class PopoverElements(
  * first, as a parent method that this lives under. See the method for more details.
  *
  * @param target Indicates which element should listen for mouse enter and leave events in order to cause this popup to
- *   show up.
+ *   show up and hide.
  * @param offsetPixels How many pixels the popup should be offset from the target element.
  * @param placementTarget If set, indicates which element the popup should be shown relative to. If not set, the
  *   original [target] will be used.

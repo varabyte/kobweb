@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.compose.util
 
 /**
- * Convert a String for a name that is using TitleCamelCase and convert it to kebab case.
+ * Convert a String for a name that is using TitleCamelCase into kebab-case.
  *
  * For example, "ExampleText" to "example-text"
  */
@@ -33,7 +33,7 @@ fun String.titleCamelCaseToKebabCase(): String {
  * and causes silent failures.
  *
  * This method will investigate a string that is intended to be used as CSS text content and wrap it with quotes (unless
- * it is already properly wrapped.
+ * it is already properly wrapped).
  *
  * For example:
  * * `test` -> `"test"`

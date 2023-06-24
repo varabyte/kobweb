@@ -10,10 +10,10 @@ import androidx.compose.runtime.*
  * ```
  * kobweb {
  *   app {
- *     globals.putAll(
+ *     globals.putAll(mapOf(
  *       "author" to "bitspittle",
  *       "version" to "v1234.5678"
- *     )
+ *     ))
  *   )
  * }
  * ```
