@@ -1,0 +1,3 @@
+# Force \n even for Windows, to avoid noise when generating code
+# (e.g. see build.gradle.kts for generating font awesome icons)
+* text=lf
