@@ -12,6 +12,8 @@ import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
 import com.varabyte.kobweb.gradle.core.project.frontend.merge
 
+private const val KOBWEB_GROUP = "com.varabyte.kobweb"
+
 fun createMainFunction(
     appData: AppData,
     libData: List<FrontendData>,
@@ -21,44 +23,47 @@ fun createMainFunction(
     target: BuildTarget
 ): String {
     val appFqn = appData.appEntry?.fqn
-        ?: if (usingSilk) "com.varabyte.kobweb.silk.SilkApp" else "com.varabyte.kobweb.core.KobwebApp"
+        ?: (KOBWEB_GROUP + if (usingSilk) ".silk.SilkApp" else ".core.KobwebApp")
 
-    val frontendData = (mutableListOf(appData.frontendData) + libData).merge()
+    val frontendData = (listOf(appData.frontendData) + libData).merge()
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
-    mutableListOf(
-        "androidx.compose.runtime.CompositionLocalProvider",
-        "com.varabyte.kobweb.core.AppGlobalsLocal",
-        "com.varabyte.kobweb.navigation.RoutePrefix",
-        "com.varabyte.kobweb.navigation.Router",
-        "kotlinx.browser.document",
-        "kotlinx.browser.window",
-        "org.jetbrains.compose.web.renderComposable",
-    ).apply {
+    buildList {
+        val defaultImports = listOf(
+            "androidx.compose.runtime.CompositionLocalProvider",
+            "$KOBWEB_GROUP.core.AppGlobalsLocal",
+            "$KOBWEB_GROUP.navigation.RoutePrefix",
+            "$KOBWEB_GROUP.navigation.Router",
+            "$KOBWEB_GROUP.navigation.UpdateHistoryMode",
+            "kotlinx.browser.document",
+            "kotlinx.browser.window",
+            "org.jetbrains.compose.web.renderComposable",
+        )
+        addAll(defaultImports)
         if (target == BuildTarget.DEBUG) {
-            add("com.varabyte.kobweb.browser.api")
-            add("kotlinx.dom.hasClass")
-            add("kotlinx.dom.removeClass")
-            add("org.w3c.dom.EventSource")
-            add("org.w3c.dom.EventSourceInit")
-            add("org.w3c.dom.MessageEvent")
-            add("org.w3c.dom.get")
+            val debugImports = listOf(
+                "$KOBWEB_GROUP.browser.api",
+                "kotlinx.dom.hasClass",
+                "kotlinx.dom.removeClass",
+                "org.w3c.dom.EventSource",
+                "org.w3c.dom.EventSourceInit",
+                "org.w3c.dom.MessageEvent",
+                "org.w3c.dom.get",
+            )
+            addAll(debugImports)
         }
-
         if (frontendData.kobwebInits.any { it.acceptsContext }) {
-            add("com.varabyte.kobweb.core.init.InitKobwebContext")
+            add("$KOBWEB_GROUP.core.init.InitKobwebContext")
         }
-
         if (frontendData.keyframesList.isNotEmpty()) {
-            add("com.varabyte.kobweb.silk.components.animation.registerKeyframes")
+            add("$KOBWEB_GROUP.silk.components.animation.registerKeyframes")
         }
-
         if (usingSilk) {
-            add("com.varabyte.kobweb.silk.defer.renderWithDeferred")
+            add("$KOBWEB_GROUP.silk.defer.renderWithDeferred")
         }
-
-        sort()
-    }.forEach { import -> fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.')) }
+    }.sorted().forEach { import ->
+        fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.'))
+    }
 
     // region debug-only functions
     if (target == BuildTarget.DEBUG) {
@@ -149,7 +154,7 @@ fun createMainFunction(
             addCode(CodeBlock.builder().apply {
                 addStatement("RoutePrefix.set(\"$routePrefix\")")
                 addStatement("val router = Router()")
-                addStatement("com.varabyte.kobweb.core.init.initKobweb(router) { ctx ->")
+                addStatement("$KOBWEB_GROUP.core.init.initKobweb(router) { ctx ->")
                 withIndent {
                     frontendData.pages.sortedBy { it.route }.forEach { entry ->
                         addStatement("""ctx.router.register("${entry.route}") { ${entry.fqn}() }""")
@@ -172,12 +177,11 @@ fun createMainFunction(
                 addStatement("")
             }.build())
 
-            if (usingSilk &&
-                (frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty() || frontendData.silkVariants.isNotEmpty()
-                        || frontendData.keyframesList.isNotEmpty())
-            ) {
+            val needsSilkInit = frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty()
+                || frontendData.silkVariants.isNotEmpty() || frontendData.keyframesList.isNotEmpty()
+            if (usingSilk && needsSilkInit) {
                 addCode(CodeBlock.builder().apply {
-                    addStatement("com.varabyte.kobweb.silk.init.initSilkHook = { ctx ->")
+                    addStatement("$KOBWEB_GROUP.silk.init.initSilkHook = { ctx ->")
                     withIndent {
                         frontendData.silkStyles.forEach { entry ->
                             addStatement("ctx.theme.registerComponentStyle(${entry.fqcn})")
@@ -201,8 +205,9 @@ fun createMainFunction(
 
             // Note: Below, we use %S when specifying key/value pairs. This prevents KotlinPoet from breaking
             // our text in the middle of a String.
-            addCode("""
-                router.navigateTo(window.location.href.removePrefix(window.location.origin))
+            addCode(
+                """
+                router.navigateTo(window.location.href.removePrefix(window.location.origin), UpdateHistoryMode.REPLACE)
 
                 // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them
                 // the first time we render this page with their composable, dynamic versions. Think of this as
@@ -220,7 +225,7 @@ fun createMainFunction(
                           ${if (usingSilk) "router.renderActivePage { renderWithDeferred { it() } }" else "router.renderActivePage()"}
                     } }
                 }
-            """.trimIndent(),
+                """.trimIndent(),
                 *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
             )
         }.build()
