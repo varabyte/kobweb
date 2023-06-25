@@ -189,7 +189,7 @@ fun FaIcon(
 ${iconMethodEntries.joinToString("\n")}
     """.trimIndent()
 
-    println(dstFile.asFile.writeText(iconsCode))
+    dstFile.asFile.writeText(iconsCode)
 }
 
 tasks.named("compileKotlinJs") {
