@@ -4,6 +4,7 @@ package com.varabyte.kobweb.gradle.core.extensions
 
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
 
 /**
@@ -85,5 +86,5 @@ val KobwebBlock.yarn: YarnBlock
     get() = ((this as ExtensionAware).extensions["yarn"] as YarnBlock)
 
 internal fun KobwebBlock.createYarnBlock() {
-    (this as ExtensionAware).extensions.create("yarn", YarnBlock::class.java)
+    (this as ExtensionAware).extensions.create<YarnBlock>("yarn")
 }
