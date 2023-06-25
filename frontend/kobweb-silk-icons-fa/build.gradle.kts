@@ -98,6 +98,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
         .map { entry ->
             val rawName = entry.key
             // Convert e.g. "align-items" to "FaAlignItems"
+            @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
             val methodName = "Fa${rawName.split("-").joinToString("") { it.capitalize() }}"
             val categories = entry.value
 
