@@ -22,6 +22,7 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -121,7 +122,19 @@ abstract class KobwebExportTask @Inject constructor(
                     add(Json.decodeFromString(FrontendData.serializer(), bytes.decodeToString()))
                 }
             }
-        }.merge()
+        }
+            .merge()
+            .also { data ->
+                data.pages.toList().let { entries ->
+                    if (entries.isEmpty()) {
+                        throw GradleException("No pages were defined. You must tag at least one page with the `@Page` annotation!")
+                    } else if (entries.none { it.route == "/" }) {
+                        throw GradleException(
+                            "No root route was defined for your site. This means if people visit your website URL, they'll get a 404 error. Create a `@Page` in a root `pages/Index.kt` file to make this warning go away."
+                        )
+                    }
+                }
+            }
 
         val (pagesRoot, resourcesRoot, systemRoot) = when (siteLayout) {
             SiteLayout.KOBWEB -> Triple("pages", "resources", "system").map { getSiteDir().resolve(it) }

@@ -459,18 +459,6 @@ class FrontendDataProcessor(
             }
         }
 
-        if (pages.isEmpty()) {
-            reporter.error("No pages were defined. You must tag at least one page with the `@Page` annotation!")
-        } else if (pages.none { it.route == "/" }) {
-            reporter.warn(
-                "No root route was defined for your site. This means if people visit your website URL, they'll get a 404 error. Create a `@Page` at \"${
-                    (qualifiedPagesPackage.split(
-                        '.'
-                    ) + "Index.kt").joinToString("/")
-                }\" to make this warning go away."
-            )
-        }
-
         return FrontendData(
             pages,
             kobwebInits,
