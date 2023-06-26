@@ -11,7 +11,8 @@ import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.the
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
@@ -24,12 +25,12 @@ class KobwebCorePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // A `kobweb` block is not used directly here in the core plugin but is provided as a foundational building
         // block for both library and application plugins.
-        val kobwebBlock = project.extensions.create("kobweb", KobwebBlock::class.java)
+        val kobwebBlock = project.extensions.create<KobwebBlock>("kobweb")
         kobwebBlock.createYarnBlock()
 
         project.rootProject.plugins.withType<YarnPlugin>().configureEach {
             try {
-                with(project.rootProject.the<YarnRootExtension>()) {
+                project.rootProject.extensions.configure<YarnRootExtension> {
                     val yarnBlock = kobwebBlock.yarn
                     yarnLockMismatchReport = when (yarnBlock.lockChangedStrategy.get()) {
                         is YarnLockChangedStrategy.Fail -> YarnLockMismatchReport.FAIL

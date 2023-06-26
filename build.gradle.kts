@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 // Plugins declared here instead of settings.gradle.kts because otherwise I get an error saying the kotlin plugin was
@@ -17,15 +18,13 @@ subprojects {
 
     // Require Java 11 for a few APIs. A very important one is ProcessHandle, used for detecting if a
     // server is running in a cross-platform way.
-    val versionStr = JavaVersion.VERSION_11.toString()
+    val jvmTarget = JvmTarget.JVM_11
     tasks.withType<JavaCompile>().configureEach {
-        sourceCompatibility = versionStr
-        targetCompatibility = versionStr
+        sourceCompatibility = jvmTarget.target
+        targetCompatibility = jvmTarget.target
     }
 
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = versionStr
-        }
+        compilerOptions.jvmTarget.set(jvmTarget)
     }
 }
