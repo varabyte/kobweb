@@ -20,8 +20,8 @@ object KobwebComposeStyleSheet : StyleSheet() {
             // setting the current element to grid but then jam all of its children into its top-left (and only) cell.
             display(DisplayStyle.Grid)
             // See: https://github.com/w3c/csswg-drafts/issues/1777
-            gridTemplateColumns("minmax(0, 1fr)")
-            gridTemplateRows("minmax(0, 1fr)")
+            gridTemplateColumns(GridTrackSize.minmax(0.px, 1.fr))
+            gridTemplateRows(GridTrackSize.minmax(0.px, 1.fr))
         }
 
         // justify in grid means "row" while align means "col"
