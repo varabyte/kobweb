@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -16,9 +17,9 @@ repositories {
 // See also: https://handstandsam.com/2022/04/13/using-the-kotlin-dsl-gradle-plugin-forces-kotlin-1-4-compatibility/
 afterEvaluate {
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            apiVersion = "1.5"
-            languageVersion = "1.5"
+        compilerOptions {
+            apiVersion.set(KotlinVersion.KOTLIN_1_5)
+            languageVersion.set(KotlinVersion.KOTLIN_1_5)
         }
     }
 }
