@@ -48,7 +48,7 @@ for an active branch named "1.2.4" *or* "1.3.0".
 
 ### Kobweb Playground
 
-When developing on Kobweb, instead of opening the `kobweb` proejct directly, you may prefer opening the
+When developing on Kobweb, instead of opening the `kobweb` project directly, you may prefer opening the
 `kobweb/playground` project instead.
 
 This module is a simple Kobweb project which is connected to the base project so that you can make changes to the base
@@ -57,7 +57,7 @@ project and see them reflected immediately in the output of a playground run.
 Running the playground is simple! In the terminal:
 
 ```bash
-$ cd playground
+$ cd playground/site
 $ kobweb run
 ```
 

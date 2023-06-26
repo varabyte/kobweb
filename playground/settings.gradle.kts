@@ -8,3 +8,6 @@ pluginManagement {
 rootProject.name = "playground"
 
 includeBuild("../")
+
+include(":site")
+include(":sitelib")
