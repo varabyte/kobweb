@@ -92,6 +92,7 @@ Finally, (and optionally), I like to restrict my maven local declaration to just
 mavenLocal {
     content {
         includeGroupAndSubgroups("com.varabyte.kobweb")
+        includeGroupAndSubgroups("com.varabyte.kobwebx")
     }
 }
 ```
