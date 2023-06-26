@@ -8,7 +8,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.attributes.Draggable
-import org.jetbrains.compose.web.css.CSSColorValue
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.events.SyntheticFocusEvent
 import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 import org.jetbrains.compose.web.events.SyntheticTouchEvent

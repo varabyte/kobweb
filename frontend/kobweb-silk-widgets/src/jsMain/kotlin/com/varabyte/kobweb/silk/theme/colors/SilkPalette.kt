@@ -1,10 +1,10 @@
 package com.varabyte.kobweb.silk.theme.colors
 
-import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
-import org.jetbrains.compose.web.css.CSSColorValue
+import org.jetbrains.compose.web.css.*
 
 // Misc. general color vars not used directly by Silk but provided for users for their own widgets if they want to use
 // them.
@@ -23,8 +23,10 @@ val BorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 interface SilkPalette {
     /** Color used for the background of HTML elements on this page. */
     val background: Color
+
     /** Color used for the foreground (e.g. text) of HTML elements on this page. */
     val color: Color
+
     /** Color used for Silk borders, i.e. lines drawn around or between elements. */
     val border: Color
     val overlay: Color
@@ -38,10 +40,13 @@ interface SilkPalette {
     interface Button {
         /** Color used for buttons in a normal state. */
         val default: Color
+
         /** Color used for buttons when the mouse is over the button (but not clicked). */
         val hover: Color
+
         /** Color used for the outline of buttons that have been focused on (e.g. by keyboard nav). */
         val focus: Color
+
         /** Color used for buttons when they are being depressed by the user. */
         val pressed: Color
     }
@@ -49,6 +54,7 @@ interface SilkPalette {
     interface Link {
         /** Color used for links that the user has never clicked on before. */
         val default: Color
+
         /** Color used for links that have been visited before. */
         val visited: Color
     }

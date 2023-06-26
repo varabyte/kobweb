@@ -1,12 +1,10 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.*
 
 // region Caret Color, see https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color
 
-class CaretColor private constructor(private val value: String): StylePropertyValue {
+class CaretColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -35,15 +33,20 @@ fun StyleScope.caretColor(color: CSSColorValue) {
 
 // region Touch Action, see https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action
 
-sealed class TouchAction private constructor(private val value: String): StylePropertyValue {
+sealed class TouchAction private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class Keyword(value: String): TouchAction(value)
-    class PanHorizontal(value: String): Keyword(value)
-    class PanVertical(value: String): Keyword(value)
-    class PanGroup(horiz: PanHorizontal, vert: PanVertical, withPinchZoom: Boolean = false): TouchAction("$horiz $vert" + if (withPinchZoom) " pinch-zoom" else "")
-    class PanHoriz(horiz: PanHorizontal, withPinchZoom: Boolean = false): TouchAction("$horiz" + if (withPinchZoom) " pinch-zoom" else "")
-    class PanVert(vert: PanVertical, withPinchZoom: Boolean = false): TouchAction("$vert" + if (withPinchZoom) " pinch-zoom" else "")
+    open class Keyword(value: String) : TouchAction(value)
+    class PanHorizontal(value: String) : Keyword(value)
+    class PanVertical(value: String) : Keyword(value)
+    class PanGroup(horiz: PanHorizontal, vert: PanVertical, withPinchZoom: Boolean = false) :
+        TouchAction("$horiz $vert" + if (withPinchZoom) " pinch-zoom" else "")
+
+    class PanHoriz(horiz: PanHorizontal, withPinchZoom: Boolean = false) :
+        TouchAction("$horiz" + if (withPinchZoom) " pinch-zoom" else "")
+
+    class PanVert(vert: PanVertical, withPinchZoom: Boolean = false) :
+        TouchAction("$vert" + if (withPinchZoom) " pinch-zoom" else "")
 
     companion object {
         // Keyword

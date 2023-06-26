@@ -3,7 +3,12 @@ package com.varabyte.kobweb.silk.components.overlay
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.events.EventListener
@@ -98,10 +103,12 @@ fun KeepPopupOpenStrategy.Companion.onFocus() = object : KeepPopupOpenStrategy()
     }
 }
 
-class ManualKeepPopupOpenStrategy internal constructor(): KeepPopupOpenStrategy(defaultValue = true) {
+class ManualKeepPopupOpenStrategy internal constructor() : KeepPopupOpenStrategy(defaultValue = true) {
     var shouldKeepOpen: Boolean
         get() = keepOpenFlow.value
-        set(value) { emitShouldKeepOpen(value) }
+        set(value) {
+            emitShouldKeepOpen(value)
+        }
 }
 
 /**
@@ -130,27 +137,28 @@ fun KeepPopupOpenStrategy.Companion.never() = object : KeepPopupOpenStrategy() {
  * As long as any of the strategies want to keep the popup open, this will treat that as a request to keep the popup
  * open.
  */
-fun KeepPopupOpenStrategy.Companion.combine(vararg strategies: KeepPopupOpenStrategy) = object : KeepPopupOpenStrategy() {
-    init {
-        strategies
-            .map { it.keepOpenFlow }
-            .merge()
-            .onEach {
-                val anyKeepOpen = strategies.any { it.shouldKeepOpen }
-                if (anyKeepOpen != keepOpenFlow.value) {
-                    emitShouldKeepOpen(anyKeepOpen)
-                }
-            }.launchIn(CoroutineScope(window.asCoroutineDispatcher()))
-    }
+fun KeepPopupOpenStrategy.Companion.combine(vararg strategies: KeepPopupOpenStrategy) =
+    object : KeepPopupOpenStrategy() {
+        init {
+            strategies
+                .map { it.keepOpenFlow }
+                .merge()
+                .onEach {
+                    val anyKeepOpen = strategies.any { it.shouldKeepOpen }
+                    if (anyKeepOpen != keepOpenFlow.value) {
+                        emitShouldKeepOpen(anyKeepOpen)
+                    }
+                }.launchIn(CoroutineScope(window.asCoroutineDispatcher()))
+        }
 
-    override fun init(popupElement: HTMLElement) {
-        strategies.forEach { it.init(popupElement) }
-    }
+        override fun init(popupElement: HTMLElement) {
+            strategies.forEach { it.init(popupElement) }
+        }
 
-    override fun onResetting() {
-        strategies.forEach { it.reset() }
+        override fun onResetting() {
+            strategies.forEach { it.reset() }
+        }
     }
-}
 
 
 operator fun KeepPopupOpenStrategy.plus(other: KeepPopupOpenStrategy) = KeepPopupOpenStrategy.combine(this, other)

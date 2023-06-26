@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css.functions
 
 import org.jetbrains.compose.web.css.*
 
-sealed class CSSImage private constructor(private val value: String): StylePropertyValue {
+sealed class CSSImage private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class Keyword(value: String) : CSSImage(value)

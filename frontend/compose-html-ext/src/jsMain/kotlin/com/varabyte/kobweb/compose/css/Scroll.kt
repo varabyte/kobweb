@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class ScrollBehavior private constructor(private val value: String): StylePropertyValue {
+class ScrollBehavior private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -24,7 +24,7 @@ fun StyleScope.scrollBehavior(scrollBehavior: ScrollBehavior) {
 
 // region Scroll snap
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-type
-class ScrollSnapType private constructor(private val value: String): StylePropertyValue {
+class ScrollSnapType private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -38,7 +38,7 @@ class ScrollSnapType private constructor(private val value: String): StyleProper
     }
 }
 
-class ScrollSnapAxis private constructor(private val value: String): StylePropertyValue {
+class ScrollSnapAxis private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -51,7 +51,7 @@ class ScrollSnapAxis private constructor(private val value: String): StyleProper
     }
 }
 
-class ScrollSnapMode private constructor(private val value: String): StylePropertyValue {
+class ScrollSnapMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -137,7 +137,7 @@ fun StyleScope.scrollPaddingBlockEnd(value: CSSNumeric) {
 // region Scroll snap align
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-align
-class ScrollSnapAlign private constructor(private val value: String): StylePropertyValue {
+class ScrollSnapAlign private constructor(private val value: String) : StylePropertyValue {
     companion object {
         // Keyword
         val None get() = ScrollSnapAlign("none")
@@ -166,7 +166,7 @@ fun StyleScope.scrollSnapAlign(blockAxis: ScrollSnapAlign, inlineAxis: ScrollSna
 // region Scroll snap stop
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-stop
-class ScrollSnapStop private constructor(private val value: String): StylePropertyValue {
+class ScrollSnapStop private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

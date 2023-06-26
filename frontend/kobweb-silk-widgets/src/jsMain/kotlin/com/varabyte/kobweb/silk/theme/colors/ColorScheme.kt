@@ -18,6 +18,7 @@ interface ColorScheme {
     val _800: Color
     val _900: Color
 }
+
 /**
  * A veritable rainbow of color schemes to choose from.
  *

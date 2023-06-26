@@ -3,11 +3,10 @@
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.ComparableStyleScope
-import com.varabyte.kobweb.compose.css.isNotEmpty
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.StyleModifier
-import com.varabyte.kobweb.compose.ui.modifiers.classNames
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
@@ -75,6 +74,7 @@ internal class CssModifier(
         // We use this key to represent the base CSS rule, which is always applied first
         internal val BaseKey = Key(null, null)
     }
+
     data class Key(val mediaQuery: String?, val suffix: String?)
 
     /**
@@ -181,12 +181,13 @@ interface ComponentModifier {
     val colorMode: ColorMode
 }
 
-class ComponentModifiers(override val colorMode: ColorMode): ComponentModifier, StyleModifiers()
+class ComponentModifiers(override val colorMode: ColorMode) : ComponentModifier, StyleModifiers()
+
 /**
  * Class provided for cases where you only generate a single style (e.g. base), unlike [ComponentModifiers] where you
  * can define a collection of styles.
  */
-class ComponentBaseModifier(override val colorMode: ColorMode): ComponentModifier
+class ComponentBaseModifier(override val colorMode: ColorMode) : ComponentModifier
 
 /**
  * A [ComponentStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
@@ -232,11 +233,19 @@ class ImmutableComponentStyle internal constructor(
  * You may still wish to construct a [ComponentStyle] directly instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.Companion.base(className: String, extraModifiers: Modifier = Modifier, init: ComponentModifier.() -> Modifier): ComponentStyle {
+fun ComponentStyle.Companion.base(
+    className: String,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+): ComponentStyle {
     return base(className, { extraModifiers }, init)
 }
 
-fun ComponentStyle.Companion.base(className: String, extraModifiers: @Composable () -> Modifier, init: ComponentModifier.() -> Modifier): ComponentStyle {
+fun ComponentStyle.Companion.base(
+    className: String,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+): ComponentStyle {
     return ComponentStyle(className, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
@@ -316,8 +325,13 @@ class ComponentStyle(
     internal val nameWithoutPrefix = name
     val name = prefix?.let { "$it-$name" } ?: name
 
-    constructor(name: String, extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit)
-            : this(name, { extraModifiers }, prefix, init)
+    constructor(
+        name: String,
+        extraModifiers: Modifier = Modifier,
+        prefix: String? = null,
+        init: ComponentModifiers.() -> Unit
+    )
+        : this(name, { extraModifiers }, prefix, init)
 
     companion object {
         /**
@@ -404,7 +418,11 @@ class ComponentStyle(
      * Shared logic for using an initial selector name and triggering a callback with the final selector name and
      * CSS styles to be associated with it.
      */
-    private fun withFinalSelectorName(selectorBaseName: String, group: StyleGroup, handler: (String, ComparableStyleScope) -> Unit) {
+    private fun withFinalSelectorName(
+        selectorBaseName: String,
+        group: StyleGroup,
+        handler: (String, ComparableStyleScope) -> Unit
+    ) {
         when (group) {
             is StyleGroup.Light -> handler(selectorBaseName.suffixedWith(ColorMode.LIGHT), group.styles)
             is StyleGroup.Dark -> handler(selectorBaseName.suffixedWith(ColorMode.DARK), group.styles)
@@ -505,17 +523,26 @@ class ComponentStyleProvider internal constructor(
     }
 }
 
-fun ComponentStyle(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit)
-    = ComponentStyle({ extraModifiers }, prefix, init)
+fun ComponentStyle(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit) =
+    ComponentStyle({ extraModifiers }, prefix, init)
 
-fun ComponentStyle(extraModifiers: @Composable () -> Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit)
-    = ComponentStyleProvider(extraModifiers, prefix, init)
+fun ComponentStyle(
+    extraModifiers: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: ComponentModifiers.() -> Unit
+) = ComponentStyleProvider(extraModifiers, prefix, init)
 
-fun ComponentStyle.Companion.base(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentBaseModifier.() -> Modifier)
-    = base({ extraModifiers}, prefix, init)
+fun ComponentStyle.Companion.base(
+    extraModifiers: Modifier = Modifier,
+    prefix: String? = null,
+    init: ComponentBaseModifier.() -> Modifier
+) = base({ extraModifiers }, prefix, init)
 
-fun ComponentStyle.Companion.base(extraModifiers: @Composable () -> Modifier, prefix: String? = null, init: ComponentBaseModifier.() -> Modifier)
-    = ComponentStyleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) }})
+fun ComponentStyle.Companion.base(
+    extraModifiers: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: ComponentBaseModifier.() -> Modifier
+) = ComponentStyleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
 
 
 /**
@@ -545,17 +572,19 @@ class ComponentVariantProvider internal constructor(
     }
 }
 
-fun ComponentStyle.addVariant(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit)
-    = addVariant({ extraModifiers }, init)
+fun ComponentStyle.addVariant(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit) =
+    addVariant({ extraModifiers }, init)
 
-fun ComponentStyle.addVariant(extraModifiers: @Composable () -> Modifier, init: ComponentModifiers.() -> Unit)
-    = ComponentVariantProvider(this, extraModifiers, init)
+fun ComponentStyle.addVariant(extraModifiers: @Composable () -> Modifier, init: ComponentModifiers.() -> Unit) =
+    ComponentVariantProvider(this, extraModifiers, init)
 
-fun ComponentStyle.addVariantBase(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier)
-    = addVariantBase({ extraModifiers }, init)
+fun ComponentStyle.addVariantBase(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier) =
+    addVariantBase({ extraModifiers }, init)
 
-fun ComponentStyle.addVariantBase(extraModifiers: @Composable () -> Modifier, init: ComponentBaseModifier.() -> Modifier)
-    = ComponentVariantProvider(this, extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) }})
+fun ComponentStyle.addVariantBase(
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+) = ComponentVariantProvider(this, extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) } })
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
@@ -578,6 +607,7 @@ fun ComponentStyle.addVariantBase(
 sealed class ComponentVariant {
     object Empty : ComponentVariant() {
         override fun addStylesInto(styleSheet: StyleSheet) = Unit
+
         @Composable
         override fun toModifier() = Modifier
     }
@@ -589,6 +619,7 @@ sealed class ComponentVariant {
     }
 
     internal abstract fun addStylesInto(styleSheet: StyleSheet)
+
     @Composable
     internal abstract fun toModifier(): Modifier
 }
@@ -638,7 +669,8 @@ class SimpleComponentVariant(
     internal fun intoImmutableStyle() = style.intoImmutableStyle()
 }
 
-private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant): ComponentVariant() {
+private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant) :
+    ComponentVariant() {
     override fun addStylesInto(styleSheet: StyleSheet) {
         head.addStylesInto(styleSheet)
         tail.addStylesInto(styleSheet)
@@ -667,7 +699,10 @@ fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
  * This is useful if you need to convert a style into something directly consumable by a Compose HTML widget.
  */
 @Composable
-fun <T: Element, A: AttrsScope<T>> ComponentStyle.toAttrs(variant: ComponentVariant? = null, finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <T : Element, A : AttrsScope<T>> ComponentStyle.toAttrs(
+    variant: ComponentVariant? = null,
+    finalHandler: (A.() -> Unit)? = null
+): A.() -> Unit {
     return this.toModifier(variant).toAttrs(finalHandler)
 }
 
@@ -691,7 +726,7 @@ fun Iterable<ComponentStyle>.toModifier(): Modifier {
  * A convenience method for chaining a collection of styles into a single [AttrsScope] builder.
  */
 @Composable
-fun <T: Element, A: AttrsScope<T>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <T : Element, A : AttrsScope<T>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
 }
 

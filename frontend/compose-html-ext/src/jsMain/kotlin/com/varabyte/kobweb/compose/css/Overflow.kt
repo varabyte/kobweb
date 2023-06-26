@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
-class Overflow private constructor(private val value: String): StylePropertyValue {
+class Overflow private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -23,7 +23,7 @@ class Overflow private constructor(private val value: String): StylePropertyValu
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
-class OverflowWrap private constructor(private val value: String): StylePropertyValue {
+class OverflowWrap private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

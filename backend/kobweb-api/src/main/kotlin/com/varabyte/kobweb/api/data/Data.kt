@@ -42,4 +42,6 @@ class MutableData : Data {
     }
 }
 
-inline fun <reified T: Any> MutableData.add(value: T) { this[T::class.java] = value }
+inline fun <reified T : Any> MutableData.add(value: T) {
+    this[T::class.java] = value
+}

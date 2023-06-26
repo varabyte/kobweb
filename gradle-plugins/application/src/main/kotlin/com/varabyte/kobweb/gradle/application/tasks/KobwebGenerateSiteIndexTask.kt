@@ -56,20 +56,21 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             kobwebBlock.app.index.head.add {
                 link {
                     rel = "stylesheet"
-                    href = "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
+                    href =
+                        "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
                 }
             }
         }
 
         getResourceFilesJsWithRoots()
-                .mapNotNull{ rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.buildDir) && rootAndFile.relativeFile.toUnixSeparators() == "public/index.html"} }
-                .singleOrNull()
-                ?.let { indexFile ->
-                    project.logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
-                }
+            .mapNotNull { rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.buildDir) && rootAndFile.relativeFile.toUnixSeparators() == "public/index.html" } }
+            .singleOrNull()
+            ?.let { indexFile ->
+                project.logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
+            }
 
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
-         getGenIndexFile().let { indexFile ->
+        getGenIndexFile().let { indexFile ->
             indexFile.parentFile.mkdirs()
             indexFile.writeText(
                 createIndexFile(

@@ -50,8 +50,7 @@ class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockPar
 
             this.method = method
 
-        }
-        else {
+        } else {
             lines.add(line)
         }
     }

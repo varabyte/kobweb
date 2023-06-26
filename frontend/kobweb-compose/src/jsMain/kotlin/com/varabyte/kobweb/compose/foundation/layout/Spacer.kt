@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
 import androidx.compose.runtime.*
-import org.jetbrains.compose.web.css.flexGrow
 import org.jetbrains.compose.web.dom.Div
 
 /**

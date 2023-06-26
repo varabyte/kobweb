@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.silk.components.style
 
-import org.jetbrains.compose.web.css.CSSMediaQuery
+import org.jetbrains.compose.web.css.*
 
 //region Pseudo classes
 

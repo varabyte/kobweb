@@ -4,7 +4,12 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.EventListener
 
@@ -104,7 +109,7 @@ fun OpenClosePopupStrategy.Companion.onFocus() = object : OpenClosePopupStrategy
     }
 }
 
-class ManualOpenClosePopupStrategy internal constructor(): OpenClosePopupStrategy() {
+class ManualOpenClosePopupStrategy internal constructor() : OpenClosePopupStrategy() {
     var isOpen: Boolean
         get() = requestFlow.value == OpenClose.OPEN
         set(value) {
@@ -163,22 +168,23 @@ fun OpenClosePopupStrategy.Companion.timed(timeoutMs: Int) = TimedOpenClosePopup
  * the popup should close, then it will close. In other words, this is not a democratic strategy but rather a
  * dictatorial one.
  */
-fun OpenClosePopupStrategy.Companion.combine(vararg strategies: OpenClosePopupStrategy) = object : OpenClosePopupStrategy() {
-    init {
-        strategies
-            .map { it.requestFlow }
-            .merge()
-            .onEach { emitRequest(it) }
-            .launchIn(CoroutineScope(window.asCoroutineDispatcher()))
-    }
+fun OpenClosePopupStrategy.Companion.combine(vararg strategies: OpenClosePopupStrategy) =
+    object : OpenClosePopupStrategy() {
+        init {
+            strategies
+                .map { it.requestFlow }
+                .merge()
+                .onEach { emitRequest(it) }
+                .launchIn(CoroutineScope(window.asCoroutineDispatcher()))
+        }
 
-    override fun init(targetElement: HTMLElement) {
-        strategies.forEach { it.init(targetElement) }
-    }
+        override fun init(targetElement: HTMLElement) {
+            strategies.forEach { it.init(targetElement) }
+        }
 
-    override fun reset() {
-        strategies.forEach { it.reset() }
+        override fun reset() {
+            strategies.forEach { it.reset() }
+        }
     }
-}
 
 operator fun OpenClosePopupStrategy.plus(other: OpenClosePopupStrategy) = OpenClosePopupStrategy.combine(this, other)

@@ -2,9 +2,8 @@ package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
 import androidx.compose.web.events.SyntheticMouseEvent
-import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.StyleVariable
-import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
@@ -15,11 +14,16 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.active
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.px
+import com.varabyte.kobweb.silk.components.style.focusVisible
+import com.varabyte.kobweb.silk.components.style.hover
+import com.varabyte.kobweb.silk.components.style.not
+import com.varabyte.kobweb.silk.components.style.toModifier
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.jetbrains.compose.web.dom.Button as JbButton

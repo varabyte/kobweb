@@ -3,19 +3,22 @@ package com.varabyte.kobweb.silk.components.document
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.refScope
-import com.varabyte.kobweb.compose.dom.ref
 import com.varabyte.kobweb.compose.dom.registerRefScope
-import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.*
-import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
+import com.varabyte.kobweb.silk.components.navigation.Link
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.toModifier
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Ul
-import org.w3c.dom.*
+import org.w3c.dom.Element
+import org.w3c.dom.HTMLCollection
+import org.w3c.dom.HTMLHeadingElement
+import org.w3c.dom.HTMLUListElement
+import org.w3c.dom.get
 
 // Note: Styles defined in kobweb-silk-widgets
 
@@ -64,7 +67,7 @@ fun Toc(
     require(maxHeaderLevel in 1..6) { "Toc maxHeaderLevel must be in range 1..6, got $maxHeaderLevel" }
     require(maxHeaderLevel >= minHeaderLevel) { "Toc maxHeaderLevel must be >= minHeaderLevel, got $minHeaderLevel > $maxHeaderLevel" }
 
-    val inRangeHeaderNodeNames = (minHeaderLevel ..maxHeaderLevel).map { level -> "H$level" }
+    val inRangeHeaderNodeNames = (minHeaderLevel..maxHeaderLevel).map { level -> "H$level" }
 
     Ul(TocStyle.toModifier(variant).then(modifier).toAttrs()) {
         val tocEntries = remember { mutableStateListOf<TocEntry>() }

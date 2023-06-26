@@ -4,7 +4,6 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.io.consumeAsync
 import com.varabyte.kobweb.common.path.toUnixSeparators
-import com.varabyte.kobweb.gradle.application.KOBWEB_SERVER_JAR
 import com.varabyte.kobweb.gradle.application.util.getServerJar
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
@@ -15,8 +14,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.exists
 
 /**
  * Start a Kobweb web server.

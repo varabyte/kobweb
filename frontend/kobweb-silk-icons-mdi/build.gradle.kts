@@ -98,14 +98,17 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
                 styles.size == 1 -> {
                     "@Composable fun $methodName(modifier: Modifier = Modifier) = MdIcon(\"$rawName\", modifier, ${styles.first().name})"
                 }
+
                 styles.isEmpty() -> {
                     // This shouldn't be possible, but just in case...
                     throw GradleException("Unexpected icon entry with no styles: $entry")
                 }
+
                 styles.size == IconStyle.values().size -> {
                     // This icon supports all styles. No need to assert input parameters.
                     "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = FILLED) = MdIcon(\"$rawName\", modifier, style)"
                 }
+
                 else -> {
                     // Not all styles are valid. For now, we throw an exception to inform the user about this, but we
                     // can always decide to relax this later.
@@ -115,6 +118,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
         }
 
     val iconsCode = """
+//@formatter:off
 @file:Suppress("unused", "SpellCheckingInspection")
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

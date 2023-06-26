@@ -9,8 +9,8 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-abstract class KobwebGenerateMetadataTask<T>(kobwebBlock: KobwebBlock, desc: String)
-    : KobwebProcessSourcesTask(kobwebBlock, desc) {
+abstract class KobwebGenerateMetadataTask<T>(kobwebBlock: KobwebBlock, desc: String) :
+    KobwebProcessSourcesTask(kobwebBlock, desc) {
 
     @InputFiles
     abstract fun getSourceFiles(): List<File>

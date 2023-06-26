@@ -88,7 +88,11 @@ fun StyleScope.translate(tx: CSSLengthOrPercentageValue, ty: CSSLengthOrPercenta
     property("translate", "$tx $ty")
 }
 
-fun StyleScope.translate(tx: CSSLengthOrPercentageValue, ty: CSSLengthOrPercentageValue, tz: CSSLengthOrPercentageValue) {
+fun StyleScope.translate(
+    tx: CSSLengthOrPercentageValue,
+    ty: CSSLengthOrPercentageValue,
+    tz: CSSLengthOrPercentageValue
+) {
     property("translate", "$tx $ty $tz")
 }
 

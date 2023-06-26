@@ -2,8 +2,7 @@ package com.varabyte.kobweb.silk.theme.shapes
 
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.CSSNumeric
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 
 fun Modifier.clip(shape: Shape): Modifier = shape.path?.let { path ->
     styleModifier {

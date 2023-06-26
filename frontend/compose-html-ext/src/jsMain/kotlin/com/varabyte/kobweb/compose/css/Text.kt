@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-class TextAlign private constructor(private val value: String): StylePropertyValue {
+class TextAlign private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -22,7 +22,7 @@ fun StyleScope.textAlign(textAlign: TextAlign) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line
-class TextDecorationLine private constructor(private val value: String): StylePropertyValue {
+class TextDecorationLine private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -43,7 +43,7 @@ fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
-class TextOverflow private constructor(private val value: String): StylePropertyValue {
+class TextOverflow private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -65,7 +65,7 @@ fun StyleScope.textOverflow(textOverflow: TextOverflow) {
 
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
-class TextShadow private constructor(private val value: String): StylePropertyValue {
+class TextShadow private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -97,7 +97,12 @@ class CSSTextShadow(
     }
 }
 
-fun StyleScope.textShadow(offsetX: CSSLengthValue, offsetY: CSSLengthValue, blurRadius: CSSLengthValue? = null, color: CSSColorValue? = null) {
+fun StyleScope.textShadow(
+    offsetX: CSSLengthValue,
+    offsetY: CSSLengthValue,
+    blurRadius: CSSLengthValue? = null,
+    color: CSSColorValue? = null
+) {
     textShadow(CSSTextShadow(offsetX, offsetY, blurRadius, color))
 }
 
@@ -110,7 +115,7 @@ fun StyleScope.textShadow(textShadow: TextShadow) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
-class UserSelect private constructor(private val value: String): StylePropertyValue {
+class UserSelect private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -134,7 +139,7 @@ fun StyleScope.userSelect(userSelect: UserSelect) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
-class WhiteSpace private constructor(private val value: String): StylePropertyValue {
+class WhiteSpace private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -157,7 +162,7 @@ fun StyleScope.whiteSpace(whiteSpace: WhiteSpace) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode
-class WritingMode private constructor(private val value: String): StylePropertyValue {
+class WritingMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     // Keyword

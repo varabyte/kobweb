@@ -9,10 +9,11 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
-private class DummyAttrsScope<E: Element> : AttrsScope<E> {
+private class DummyAttrsScope<E : Element> : AttrsScope<E> {
     override fun attr(attr: String, value: String): AttrsScope<E> = this
     override fun classes(classes: Collection<String>) = Unit
     override fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V) = Unit
+
     @ComposeWebInternalApi
     override fun registerEventListener(listener: SyntheticEventListener<*>) = Unit
     override fun style(builder: StyleScope.() -> Unit) = Unit
@@ -23,8 +24,8 @@ private class DummyAttrsScope<E: Element> : AttrsScope<E> {
 /**
  * A wrapper around an internal [AttrsScope] where equality / hashcode has meaning.
  */
-class ComparableAttrsScope<E: Element>(private val wrapped: AttrsScope<E>) : AttrsScope<E> {
-    constructor(): this(DummyAttrsScope())
+class ComparableAttrsScope<E : Element>(private val wrapped: AttrsScope<E>) : AttrsScope<E> {
+    constructor() : this(DummyAttrsScope())
 
     val attributes = mutableMapOf<String, String>()
     val classes = mutableSetOf<String>()

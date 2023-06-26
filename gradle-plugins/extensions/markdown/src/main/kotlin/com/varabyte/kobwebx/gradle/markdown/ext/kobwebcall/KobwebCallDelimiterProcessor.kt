@@ -31,7 +31,7 @@ class KobwebCallDelimiterProcessor(private val delimiters: Pair<Char, Char>) : D
             val previousLiteral = previousText.literal ?: return 0
 
             val thisBeginsWithDollar = (previousLiteral == "$" ||
-                    (previousLiteral.length >= 2 && previousLiteral.takeLast(2) == " $"))
+                (previousLiteral.length >= 2 && previousLiteral.takeLast(2) == " $"))
 
             if (!thisBeginsWithDollar) return 0
 

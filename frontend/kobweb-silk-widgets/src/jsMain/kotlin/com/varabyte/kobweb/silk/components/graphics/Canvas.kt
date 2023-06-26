@@ -4,9 +4,8 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.compose.ui.modifiers.height
-import com.varabyte.kobweb.compose.ui.modifiers.width
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -39,7 +38,7 @@ val CanvasStyle by ComponentStyle(prefix = "silk") {}
  *
  * @param C The type of the canvas context
  */
-class RenderScope<C: RenderingContext>(
+class RenderScope<C : RenderingContext>(
     val ctx: C,
     val width: Int,
     val height: Int,
@@ -62,7 +61,7 @@ private class CanvasElementBuilder : ElementBuilder<HTMLCanvasElement> {
     override fun create() = canvas.cloneNode() as HTMLCanvasElement
 }
 
-private class RenderCallback<C: RenderingContext>(
+private class RenderCallback<C : RenderingContext>(
     private val ctx: C,
     private val width: Int,
     private val height: Int,
@@ -101,7 +100,7 @@ private class RenderCallback<C: RenderingContext>(
 // Note: This method is marked inline and made private currently to avoid issues with the Composable compiler
 // I'd like to say I completely understand crossinline / noinline tags but I just added those to make the compiler
 // happy.
-private inline fun <C: RenderingContext> Canvas(
+private inline fun <C : RenderingContext> Canvas(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,

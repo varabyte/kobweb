@@ -6,16 +6,19 @@ import org.w3c.dom.Window
 enum class OpenLinkStrategy {
     IN_PLACE,
     IN_NEW_TAB,
+
     @Deprecated(
         "Use IN_NEW_TAB instead. It turns out you cannot specify IN_NEW_TAB_BACKGROUND as a developer. Only users can control this behavior by pressing CTRL when clicking on a link.",
         ReplaceWith("IN_NEW_TAB")
     )
     IN_NEW_TAB_BACKGROUND,
+
     @Deprecated(
         "Use IN_NEW_TAB instead. It turns out you cannot specify IN_NEW_TAB_FOREGROUND as a developer. Only users can control this behavior by pressing CTRL+SHIFT when clicking on a link.",
         ReplaceWith("IN_NEW_TAB")
     )
     IN_NEW_TAB_FOREGROUND,
+
     @Deprecated(
         "Use IN_NEW_TAB or IN_PLACE instead. It turns out you cannot specify IN_NEW_WINDOW as a developer. Only users can control this behavior by pressing SHIFT when clicking on a link.",
         ReplaceWith("IN_NEW_TAB")

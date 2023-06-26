@@ -23,6 +23,7 @@ fun InputStream.consumeAsync(onLineRead: (String) -> Unit) {
                 val line = br.readLine()
                 if (line != null) onLineRead(line) else break
             }
-        } catch (ignored: IOException) { }
+        } catch (ignored: IOException) {
+        }
     }
 }

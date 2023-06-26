@@ -53,6 +53,7 @@ fun Modifier.size(size: CSSNumeric, type: WebModifierType): Modifier = when (typ
         width(size)
         height(size)
     }
+
     WebModifierType.STYLE -> styleModifier {
         width(size)
         height(size)

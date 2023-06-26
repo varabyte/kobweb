@@ -37,7 +37,9 @@ internal class RouteTree {
     sealed class Node(val name: String, var method: PageMethod?) {
         private val children = mutableListOf<Node>()
 
-        protected open fun matches(name: String): Boolean { return this.name == name }
+        protected open fun matches(name: String): Boolean {
+            return this.name == name
+        }
 
         fun createChild(routePart: String, method: PageMethod?): Node {
             val node = if (routePart.startsWith('{') && routePart.endsWith('}')) {
@@ -52,24 +54,25 @@ internal class RouteTree {
         fun findChild(routePart: String): Node? = children.firstOrNull { it.matches(routePart) }
 
         /** A sequence of all nodes from this node (including itself) in a breadth first order */
-        val nodes get() = sequence<List<Node>> {
-            val parents = mutableMapOf<Node, Node>()
+        val nodes
+            get() = sequence<List<Node>> {
+                val parents = mutableMapOf<Node, Node>()
 
-            val nodeQueue = mutableListOf(this@Node)
-            while (nodeQueue.isNotEmpty()) {
-                val node = nodeQueue.removeFirst()
-                val nodePath = mutableListOf<Node>()
-                nodePath.add(node)
-                var parent = parents[node]
-                while (parent != null) {
-                    nodePath.add(0, parent)
-                    parent = parents[parent]
+                val nodeQueue = mutableListOf(this@Node)
+                while (nodeQueue.isNotEmpty()) {
+                    val node = nodeQueue.removeFirst()
+                    val nodePath = mutableListOf<Node>()
+                    nodePath.add(node)
+                    var parent = parents[node]
+                    while (parent != null) {
+                        nodePath.add(0, parent)
+                        parent = parents[parent]
+                    }
+                    yield(nodePath)
+                    node.children.forEach { child -> parents[child] = node }
+                    nodeQueue.addAll(node.children)
                 }
-                yield(nodePath)
-                node.children.forEach { child -> parents[child] = node }
-                nodeQueue.addAll(node.children)
             }
-        }
     }
 
     class RootNode : Node("", null)

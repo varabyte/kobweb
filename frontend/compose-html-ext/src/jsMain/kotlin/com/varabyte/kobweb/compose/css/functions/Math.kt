@@ -16,6 +16,7 @@ data class CSSClamp<T : CSSUnit>(
 ) : CSSNumericValue<T> {
     override fun toString() = "clamp($min, $value, $max)"
 }
+
 fun clamp(
     min: CSSNumericValue<out CSSUnit>,
     value: CSSNumericValue<out CSSUnit>,
@@ -38,6 +39,7 @@ class CSSMin<T : CSSUnit>(vararg val values: CSSNumericValue<out T>) : CSSNumeri
 
     override fun hashCode() = values.contentHashCode()
 }
+
 fun min(vararg values: CSSNumericValue<out CSSUnit>) = CSSMin(*values)
 
 /**
@@ -55,4 +57,5 @@ class CSSMax<T : CSSUnit>(vararg val values: CSSNumericValue<out T>) : CSSNumeri
 
     override fun hashCode() = values.contentHashCode()
 }
+
 fun max(vararg values: CSSNumericValue<out CSSUnit>) = CSSMax(*values)

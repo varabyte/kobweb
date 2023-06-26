@@ -1,7 +1,10 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.dom.*
+import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.ElementTarget
+import com.varabyte.kobweb.compose.dom.disposableRef
+import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -15,9 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
 // Convenience class to collect a bunch of parameters into a single place
@@ -155,10 +156,10 @@ private class PopoverStateController(
 
     fun finishShowing() {
         val state = _state
-        if(state !is PopoverState.Calculating) return
+        if (state !is PopoverState.Calculating) return
 
         val popupElement = state.elements.popupElement
-        check (popupElement != null)
+        check(popupElement != null)
 
         _state = PopoverState.Shown(state.elements, placementStrategy)
     }
@@ -174,7 +175,9 @@ private class PopoverStateController(
         resetTimers()
         hideTimeoutId = window.setTimeout({
             if (!keepOpenStrategy.shouldKeepOpen) {
-                val currentOpacity = state.elements.popupElement?.let { window.getComputedStyle(it).getPropertyValue("opacity").toDouble() }
+                val currentOpacity = state.elements.popupElement?.let {
+                    window.getComputedStyle(it).getPropertyValue("opacity").toDouble()
+                }
                 this._state = PopoverState.Hiding(state.elements, placementStrategy, showHideSettings, state.placement)
                 // Normally, the "hiding" state is marked finished once the "onTransitionEnd" event is reached (see
                 // later in this file). However, if the following condition is true, it means we're in a state that the
@@ -315,10 +318,17 @@ fun AdvancedPopover(
     }
 
     val showHideSettings =
-        remember(hiddenModifier, showDelayMs, hideDelayMs) { PopoverShowHideSettings(hiddenModifier, showDelayMs, hideDelayMs) }
+        remember(hiddenModifier, showDelayMs, hideDelayMs) {
+            PopoverShowHideSettings(
+                hiddenModifier,
+                showDelayMs,
+                hideDelayMs
+            )
+        }
 
     @Suppress("NAME_SHADOWING")
-    val placementStrategy = remember(placementStrategy) { placementStrategy ?: PopupPlacementStrategy.of(PopupPlacement.Bottom) }
+    val placementStrategy =
+        remember(placementStrategy) { placementStrategy ?: PopupPlacementStrategy.of(PopupPlacement.Bottom) }
 
     @Suppress("NAME_SHADOWING")
     val keepOpenStrategy = remember(keepOpenStrategy) {
@@ -341,7 +351,8 @@ fun AdvancedPopover(
                 }
                 popoverElements.targetElement.apply { openCloseStrategy.init(this) }
                 popoverStateController.updateElements(popoverElements)
-            } catch (_: IllegalStateException) {}
+            } catch (_: IllegalStateException) {
+            }
             onDispose { openCloseStrategy.reset() }
         }
     )

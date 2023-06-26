@@ -5,14 +5,18 @@ import org.jetbrains.compose.web.css.*
 
 // region width See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
 
-class Width private constructor(private val value: String): StylePropertyValue {
+class Width private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
         // Keyword
         val FitContent get() = Width("fit-content")
         val MaxContent get() = Width("max-content")
-        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width"))
+
+        @Deprecated(
+            "Misspelling fixed. Please use `MaxContent` instead.",
+            ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width")
+        )
         val MaxContext get() = MaxContent
         val MinContent get() = Width("min-content")
 
@@ -41,14 +45,18 @@ fun StyleScope.minWidth(minWidth: MinWidth) {
 
 // region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 
-class Height private constructor(private val value: String): StylePropertyValue {
+class Height private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
         // Keyword
         val FitContent get() = Height("fit-content")
         val MaxContent get() = Height("max-content")
-        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("Height.MaxContent", "com.varabyte.kobweb.compose.css.Height"))
+
+        @Deprecated(
+            "Misspelling fixed. Please use `MaxContent` instead.",
+            ReplaceWith("Height.MaxContent", "com.varabyte.kobweb.compose.css.Height")
+        )
         val MaxContext get() = MaxContent
 
         val MinContent get() = Height("min-content")
@@ -78,14 +86,18 @@ fun StyleScope.minHeight(minHeight: MinHeight) {
 
 // region max-width See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
 
-class MaxWidth private constructor(private val value: String): StylePropertyValue {
+class MaxWidth private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
         // Keyword
         val FitContent get() = MaxWidth("fit-content")
         val MaxContent get() = MaxWidth("max-content")
-        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("MaxWidth.MaxContent", "com.varabyte.kobweb.compose.css.MaxWidth"))
+
+        @Deprecated(
+            "Misspelling fixed. Please use `MaxContent` instead.",
+            ReplaceWith("MaxWidth.MaxContent", "com.varabyte.kobweb.compose.css.MaxWidth")
+        )
         val MaxContext get() = MaxContent
 
         val MinContent get() = MaxWidth("min-content")
@@ -107,14 +119,18 @@ fun StyleScope.maxWidth(maxWidth: MaxWidth) {
 
 // region height See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
 
-class MaxHeight private constructor(private val value: String): StylePropertyValue {
+class MaxHeight private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
         // Keyword
         val FitContent get() = MaxHeight("fit-content")
         val MaxContent get() = MaxHeight("max-content")
-        @Deprecated("Misspelling fixed. Please use `MaxContent` instead.", ReplaceWith("MaxHeight.MaxContent", "com.varabyte.kobweb.compose.css.MaxHeight"))
+
+        @Deprecated(
+            "Misspelling fixed. Please use `MaxContent` instead.",
+            ReplaceWith("MaxHeight.MaxContent", "com.varabyte.kobweb.compose.css.MaxHeight")
+        )
         val MaxContext get() = MaxContent
 
         val MinContent get() = MaxHeight("min-content")
@@ -200,7 +216,7 @@ fun StyleScope.marginBlockEnd(value: CSSNumeric) {
 
 // region vertical-align See: https://developer.mozilla.org/en-US/docs/Web/CSS/vertical-align
 
-class VerticalAlign private constructor(private val value: String): StylePropertyValue {
+class VerticalAlign private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -234,7 +250,7 @@ fun StyleScope.verticalAlign(value: CSSNumeric) {
 
 // region aspect ratio See: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
 
-class AspectRatio(private val value: String): StylePropertyValue {
+class AspectRatio(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -265,7 +281,7 @@ fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
 
 // region line height See: https://developer.mozilla.org/en-US/docs/Web/CSS/line-height
 
-class LineHeight(private val value: String): StylePropertyValue {
+class LineHeight(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -288,7 +304,7 @@ fun StyleScope.lineHeight(lineHeight: LineHeight) {
 
 // region resize See: https://developer.mozilla.org/en-US/docs/Web/CSS/resize
 
-class Resize private constructor(private val value: String): StylePropertyValue {
+class Resize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

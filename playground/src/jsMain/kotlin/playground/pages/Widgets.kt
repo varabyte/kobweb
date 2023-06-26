@@ -18,12 +18,8 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
-import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.toSilkPalette
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Text
 import playground.components.layouts.PageLayout
 import playground.components.widgets.GoHomeLink

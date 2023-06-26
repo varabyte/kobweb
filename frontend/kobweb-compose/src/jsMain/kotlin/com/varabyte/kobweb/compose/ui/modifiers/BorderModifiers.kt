@@ -22,7 +22,7 @@ fun Modifier.border(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
-     border(width, style, color)
+    border(width, style, color)
 }
 
 fun Modifier.borderColor(color: CSSColorValue) = styleModifier {
@@ -47,7 +47,7 @@ fun Modifier.borderTop(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
-     borderTop(width, style, color)
+    borderTop(width, style, color)
 }
 
 // TODO(#168): Remove before v1.0
@@ -87,7 +87,7 @@ fun Modifier.borderLeft(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
-     borderLeft(width, style, color)
+    borderLeft(width, style, color)
 }
 
 // TODO(#168): Remove before v1.0
@@ -107,16 +107,17 @@ fun Modifier.borderRight(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
-     borderRight(width, style, color)
+    borderRight(width, style, color)
 }
 
 fun Modifier.borderRadius(r: CSSNumeric) = styleModifier {
     borderRadius(r)
 }
 
-fun Modifier.borderRadius(topLeftAndBottomRight: CSSNumeric = 0.px, topRightAndBottomLeft: CSSNumeric = 0.px) = styleModifier {
-    borderRadius(topLeftAndBottomRight, topRightAndBottomLeft)
-}
+fun Modifier.borderRadius(topLeftAndBottomRight: CSSNumeric = 0.px, topRightAndBottomLeft: CSSNumeric = 0.px) =
+    styleModifier {
+        borderRadius(topLeftAndBottomRight, topRightAndBottomLeft)
+    }
 
 fun Modifier.borderRadius(
     topLeft: CSSNumeric = 0.px,

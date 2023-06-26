@@ -1,8 +1,7 @@
 package com.varabyte.kobweb.silk.components.layout.breakpoint
 
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.classNames
-import com.varabyte.kobweb.compose.ui.modifiers.display
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
@@ -61,10 +60,15 @@ internal val DisplayUntilXlStyle by ComponentStyle(prefix = "silk") {
 
 @Deprecated("Method was renamed to `displayIfAtLeast` for clarity.", ReplaceWith("displayIfAtLeast(breakpoint)"))
 fun Modifier.displayIf(breakpoint: Breakpoint) = displayIfAtLeast(breakpoint)
-fun Modifier.displayIfAtLeast(breakpoint: Breakpoint) = this.classNames("silk-display-if-at-least-${breakpoint.name.lowercase()}")
+fun Modifier.displayIfAtLeast(breakpoint: Breakpoint) =
+    this.classNames("silk-display-if-at-least-${breakpoint.name.lowercase()}")
+
 fun Modifier.displayUntil(breakpoint: Breakpoint) = this.classNames("silk-display-until-${breakpoint.name.lowercase()}")
 fun Modifier.displayBetween(breakpointLower: Breakpoint, breakpointUpper: Breakpoint): Modifier {
     require(breakpointLower.ordinal < breakpointUpper.ordinal) { "displayBetween breakpoints passed in wrong order: $breakpointLower should be smaller than $breakpointUpper" }
 
-    return this.classNames("silk-display-if-${breakpointLower.name.lowercase()}", "silk-display-until-${breakpointUpper.name.lowercase()}")
+    return this.classNames(
+        "silk-display-if-${breakpointLower.name.lowercase()}",
+        "silk-display-until-${breakpointUpper.name.lowercase()}"
+    )
 }

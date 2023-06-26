@@ -13,9 +13,7 @@ import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
 val OverlayBackgroundColorVar by StyleVariable<CSSColorValue>()

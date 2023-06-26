@@ -84,7 +84,13 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
  */
 // Needed to calm down the Compose compiler for some reason: "Duplicate live literal key found"
 @NoLiveLiterals
-suspend fun Window.fetch(method: HttpMethod, resource: String, headers: Map<String, Any>? = null, body: ByteArray? = null, abortController: AbortController? = null): ByteArray {
+suspend fun Window.fetch(
+    method: HttpMethod,
+    resource: String,
+    headers: Map<String, Any>? = null,
+    body: ByteArray? = null,
+    abortController: AbortController? = null
+): ByteArray {
     val responseBytesDeferred = CompletableDeferred<ByteArray>()
     val headersJson = if (!headers.isNullOrEmpty() || body != null) {
         json().apply {
@@ -126,7 +132,14 @@ suspend fun Window.fetch(method: HttpMethod, resource: String, headers: Map<Stri
     return responseBytesDeferred.await()
 }
 
-suspend fun Window.tryFetch(method: HttpMethod, resource: String, headers: Map<String, Any>? = null, body: ByteArray? = null, logOnError: Boolean = false, abortController: AbortController? = null): ByteArray? {
+suspend fun Window.tryFetch(
+    method: HttpMethod,
+    resource: String,
+    headers: Map<String, Any>? = null,
+    body: ByteArray? = null,
+    logOnError: Boolean = false,
+    abortController: AbortController? = null
+): ByteArray? {
     return try {
         fetch(method, resource, headers, body, abortController)
     } catch (t: Throwable) {

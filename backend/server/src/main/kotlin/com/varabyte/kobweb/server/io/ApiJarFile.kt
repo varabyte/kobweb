@@ -95,7 +95,7 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
                             }
                             paths.first()
                         }
-                        )
+                    )
 
             if (path != null) {
                 val stream = findFileInZipByPath(path)
@@ -112,7 +112,8 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
                         ?.let { ".$it" }
                         ?: ""
                     val base = sysLibName.removeSuffix(ext)
-                    val file = File.createTempFile("${base}_", ext.takeIf { it.isNotEmpty() }).also { it.deleteOnExit() }
+                    val file =
+                        File.createTempFile("${base}_", ext.takeIf { it.isNotEmpty() }).also { it.deleteOnExit() }
                     file.writeBytes(bytes)
                     logger.debug("... created a copy at: ${file.absolutePath}")
                     return file.absolutePath

@@ -1,22 +1,20 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.CSSTransition
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.dom.observers.ResizeObserver
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.transition
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import kotlinx.browser.window
-import org.jetbrains.compose.web.css.CSSLengthValue
-import org.jetbrains.compose.web.css.ms
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.MutationObserver
@@ -220,61 +218,66 @@ abstract class PopupPlacementStrategy {
         /**
          * Returns the general strategy of placing a popup in a particular location based on a desired [PopupPlacement].
          */
-        fun of(placement: PopupPlacement, offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX) = object : PopupPlacementStrategy() {
-            private var placementElement: HTMLElement? = null
-            private var popupElement: HTMLElement? = null
+        fun of(placement: PopupPlacement, offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX) =
+            object : PopupPlacementStrategy() {
+                private var placementElement: HTMLElement? = null
+                private var popupElement: HTMLElement? = null
 
-            private var resizeObserver: ResizeObserver? = null
-            private var mutationObserver: MutationObserver? = null
+                private var resizeObserver: ResizeObserver? = null
+                private var mutationObserver: MutationObserver? = null
 
-            private fun updatePopupPosition() {
-                popupElement!!.updatePosition(calculate().position)
-            }
-            private val updatePopupPositionListener = EventListener { updatePopupPosition() }
-
-            override fun init(placementElement: HTMLElement, popupElement: HTMLElement) {
-                this.placementElement = placementElement
-                this.popupElement = popupElement
-
-                resizeObserver = ResizeObserver { _ -> updatePopupPosition() }.apply {
-                    observe(popupElement)
-                    observe(placementElement)
-                }
-                // Follow placement element if it moves around (e.g. margin changes)
-                mutationObserver = MutationObserver { _, _ -> updatePopupPosition() }.apply {
-                    observe(placementElement, MutationObserverInit(attributes = true, attributeFilter = arrayOf("style")))
+                private fun updatePopupPosition() {
+                    popupElement!!.updatePosition(calculate().position)
                 }
 
-                window.addEventListener("scroll", updatePopupPositionListener)
-                window.addEventListener("resize", updatePopupPositionListener)
+                private val updatePopupPositionListener = EventListener { updatePopupPosition() }
+
+                override fun init(placementElement: HTMLElement, popupElement: HTMLElement) {
+                    this.placementElement = placementElement
+                    this.popupElement = popupElement
+
+                    resizeObserver = ResizeObserver { _ -> updatePopupPosition() }.apply {
+                        observe(popupElement)
+                        observe(placementElement)
+                    }
+                    // Follow placement element if it moves around (e.g. margin changes)
+                    mutationObserver = MutationObserver { _, _ -> updatePopupPosition() }.apply {
+                        observe(
+                            placementElement,
+                            MutationObserverInit(attributes = true, attributeFilter = arrayOf("style"))
+                        )
+                    }
+
+                    window.addEventListener("scroll", updatePopupPositionListener)
+                    window.addEventListener("resize", updatePopupPositionListener)
+                }
+
+                override fun calculate(): PositionAndPlacement {
+                    val placementBounds = placementElement!!.getBoundingClientRect()
+                    val popupBounds = popupElement!!.getBoundingClientRect()
+                    val popupWidth = popupBounds.width
+                    val popupHeight = popupBounds.height
+
+                    // TODO: Add fallback behavior, so if the requested placement ends up with the popup off the screen,
+                    //  try opposite sides so the final placement is always on screen.
+                    return PositionAndPlacement(
+                        calculateDefaultPosition(placement, popupWidth, popupHeight, placementBounds, offsetPixels),
+                        placement
+                    )
+                }
+
+                override fun reset() {
+                    placementElement = null
+                    popupElement = null
+
+                    resizeObserver!!.disconnect(); resizeObserver = null
+                    mutationObserver!!.disconnect(); mutationObserver = null
+
+                    window.removeEventListener("scroll", updatePopupPositionListener)
+                    window.removeEventListener("resize", updatePopupPositionListener)
+
+                }
             }
-
-            override fun calculate(): PositionAndPlacement {
-                val placementBounds = placementElement!!.getBoundingClientRect()
-                val popupBounds = popupElement!!.getBoundingClientRect()
-                val popupWidth = popupBounds.width
-                val popupHeight = popupBounds.height
-
-                // TODO: Add fallback behavior, so if the requested placement ends up with the popup off the screen,
-                //  try opposite sides so the final placement is always on screen.
-                return PositionAndPlacement(
-                    calculateDefaultPosition(placement, popupWidth, popupHeight, placementBounds, offsetPixels),
-                    placement
-                )
-            }
-
-            override fun reset() {
-                placementElement = null
-                popupElement = null
-
-                resizeObserver!!.disconnect(); resizeObserver = null
-                mutationObserver!!.disconnect(); mutationObserver = null
-
-                window.removeEventListener("scroll", updatePopupPositionListener)
-                window.removeEventListener("resize", updatePopupPositionListener)
-
-            }
-        }
 
         /**
          * A helper method when you care about the offset of the placement but not the direction.
@@ -302,7 +305,10 @@ abstract class PopupPlacementStrategy {
  *   strategy is passed in, the popup will stay open as long as the mouse is over it or if any child inside of it has
  *   focus. See also: [KeepPopupOpenStrategy].
  */
-@Deprecated("Popup has been renamed to Popover", ReplaceWith("Popover(target, modifier, placement, offsetPixels, placementTarget, showDelayMs, hideDelayMs, keepOpenStrategy, variant, ref, content)"))
+@Deprecated(
+    "Popup has been renamed to Popover",
+    ReplaceWith("Popover(target, modifier, placement, offsetPixels, placementTarget, showDelayMs, hideDelayMs, keepOpenStrategy, variant, ref, content)")
+)
 @Composable
 fun Popup(
     target: ElementTarget,

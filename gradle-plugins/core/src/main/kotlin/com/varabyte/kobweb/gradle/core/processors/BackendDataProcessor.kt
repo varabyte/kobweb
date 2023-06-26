@@ -45,6 +45,7 @@ class BackendDataProcessor(
 
     // fqPkg to subdir, e.g. "api.id._as._int" to "int"
     private val packageMappings = mutableMapOf<String, String>()
+
     // We need to collect all package mappings before we start processing API routes, so we store them in this
     // intermediate structure for a while
     private val apisToProcess = mutableListOf<ApiToProcess>()
@@ -156,14 +157,14 @@ class BackendDataProcessor(
                     .removePrefix(qualifiedApiPackage.replace('.', '/'))
             }
 
-            val prefixExtra = if (routeOverride != null && !routeOverride.startsWith("/") && routeOverride.contains("/")) {
-                // If route override did NOT begin with slash, but contains at least one subdir, it means append
-                // subdir to base route
-                "/" + routeOverride.substringBeforeLast("/")
-            }
-            else {
-                ""
-            }
+            val prefixExtra =
+                if (routeOverride != null && !routeOverride.startsWith("/") && routeOverride.contains("/")) {
+                    // If route override did NOT begin with slash, but contains at least one subdir, it means append
+                    // subdir to base route
+                    "/" + routeOverride.substringBeforeLast("/")
+                } else {
+                    ""
+                }
 
             val slug = if (routeOverride != null && routeOverride.last() != '/') {
                 routeOverride.substringAfterLast("/")

@@ -4,12 +4,12 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.AlignContent as JbAlignContent
-import org.jetbrains.compose.web.css.alignContent as jbAlignContent
 import org.jetbrains.compose.web.css.AlignItems as JbAlignItems
-import org.jetbrains.compose.web.css.alignItems as jbAlignItems
 import org.jetbrains.compose.web.css.AlignSelf as JbAlignSelf
-import org.jetbrains.compose.web.css.alignSelf as jbAlignSelf
 import org.jetbrains.compose.web.css.JustifyContent as JbJustifyContent
+import org.jetbrains.compose.web.css.alignContent as jbAlignContent
+import org.jetbrains.compose.web.css.alignItems as jbAlignItems
+import org.jetbrains.compose.web.css.alignSelf as jbAlignSelf
 import org.jetbrains.compose.web.css.justifyContent as jbJustifyContent
 
 // region Legacy JB modifiers

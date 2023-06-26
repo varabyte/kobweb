@@ -12,16 +12,18 @@ interface ElementTarget {
         /**
          * A target which returns the current element's parent.
          */
-        val Parent get() = object : ElementTarget {
-            override fun invoke(startingFrom: HTMLElement) = startingFrom.parentElement as? HTMLElement
-        }
+        val Parent
+            get() = object : ElementTarget {
+                override fun invoke(startingFrom: HTMLElement) = startingFrom.parentElement as? HTMLElement
+            }
 
         /**
          * A target which returns the element's previous sibling.
          */
-        val PreviousSibling get() = object : ElementTarget {
-            override fun invoke(startingFrom: HTMLElement) = startingFrom.previousElementSibling as? HTMLElement
-        }
+        val PreviousSibling
+            get() = object : ElementTarget {
+                override fun invoke(startingFrom: HTMLElement) = startingFrom.previousElementSibling as? HTMLElement
+            }
 
         /**
          * A direct element target for when you happen to already have access to the target [HTMLElement].

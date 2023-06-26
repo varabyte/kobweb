@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-value class AnimationIterationCount private constructor(private val count: Number?): StylePropertyValue {
+value class AnimationIterationCount private constructor(private val count: Number?) : StylePropertyValue {
     companion object {
         fun of(count: Number) = AnimationIterationCount(count)
         val Infinite = AnimationIterationCount(null)

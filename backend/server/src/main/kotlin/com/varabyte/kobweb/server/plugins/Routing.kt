@@ -6,7 +6,6 @@ import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.conf.KobwebConf
-import com.varabyte.kobweb.project.conf.Server
 import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -34,7 +33,12 @@ import kotlin.io.path.name
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
 
-fun Application.configureRouting(env: ServerEnvironment, siteLayout: SiteLayout, conf: KobwebConf, globals: ServerGlobals) {
+fun Application.configureRouting(
+    env: ServerEnvironment,
+    siteLayout: SiteLayout,
+    conf: KobwebConf,
+    globals: ServerGlobals
+) {
     val logger = object : Logger {
         override fun trace(message: String) = log.trace(message)
         override fun debug(message: String) = log.debug(message)
@@ -44,13 +48,15 @@ fun Application.configureRouting(env: ServerEnvironment, siteLayout: SiteLayout,
     }
 
     if (siteLayout == SiteLayout.STATIC && env != ServerEnvironment.PROD) {
-        log.warn("""
+        log.warn(
+            """
             Static site layout is configured for a development server.
 
             This isn't expected, as development servers expect to read their values from the user's project. Static
             layouts are really only designed to be used in production. The server will still run in static mode as
             requested, but live-reloading, server APIs, etc. will not work with this configuration.
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     when (siteLayout) {
@@ -60,17 +66,19 @@ fun Application.configureRouting(env: ServerEnvironment, siteLayout: SiteLayout,
                 ServerEnvironment.PROD -> configureProdRouting(conf, logger)
             }
         }
+
         SiteLayout.STATIC -> configureStaticRouting(conf)
     }
 }
 
-val Site.routePrefixNormalized: String get() {
-    // While the URL externally may have a prefix, internally they do not. In other words, if this site has the
-    // prefix "a/b" and the user visits "a/b/nested/page", that means the local file we're going to serve is
-    // "nested/page.html"
-    // We remove any slashes here as it results in cleaner code as most routing code adds the slashes explicitly anyway
-    return routePrefix.removePrefix("/").removeSuffix("/")
-}
+val Site.routePrefixNormalized: String
+    get() {
+        // While the URL externally may have a prefix, internally they do not. In other words, if this site has the
+        // prefix "a/b" and the user visits "a/b/nested/page", that means the local file we're going to serve is
+        // "nested/page.html"
+        // We remove any slashes here as it results in cleaner code as most routing code adds the slashes explicitly anyway
+        return routePrefix.removePrefix("/").removeSuffix("/")
+    }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
     env: ServerEnvironment,
@@ -83,6 +91,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
             HttpMethod.PATCH, HttpMethod.POST, HttpMethod.PUT -> {
                 withContext(Dispatchers.IO) { call.receiveStream().readAllBytes() }.takeIf { it.isNotEmpty() }
             }
+
             else -> null
         }
         val bodyContentType = if (body != null) call.request.contentType().toString() else null
@@ -140,6 +149,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                         contentType = ContentType.Text.Plain,
                     )
                 }
+
                 else -> call.respondBytes(EMPTY_BODY, status = HttpStatusCode.InternalServerError)
             }
         }
@@ -147,7 +157,12 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
 }
 
 
-private fun Routing.configureApiRouting(env: ServerEnvironment, apiJar: ApiJarFile, routePrefix: String, logger: Logger) {
+private fun Routing.configureApiRouting(
+    env: ServerEnvironment,
+    apiJar: ApiJarFile,
+    routePrefix: String,
+    logger: Logger
+) {
     val path = "$routePrefix/api/{$KOBWEB_PARAMS...}"
     HttpMethod.values().forEach { httpMethod ->
         when (httpMethod) {
@@ -165,7 +180,13 @@ private fun Routing.configureApiRouting(env: ServerEnvironment, apiJar: ApiJarFi
 /**
  * Common handler used by [configureCatchAllRouting] since we have multiple route patterns which need the same handling
  */
-private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(script: Path, scriptMap: Path, index: Path, pathParts: List<String>, extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean) {
+private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(
+    script: Path,
+    scriptMap: Path,
+    index: Path,
+    pathParts: List<String>,
+    extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean
+) {
     var handled = false
     val filename = pathParts.lastOrNull()
 
@@ -210,7 +231,12 @@ private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(sc
  * @param index The path to the index.html file, which may be in a custom location depending on server configuration
  * @param extraHandler An optional handler so callers can configure additional, one-off handling.
  */
-private fun Routing.configureCatchAllRouting(script: Path, index: Path, routePrefix: String, extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean = { false }) {
+private fun Routing.configureCatchAllRouting(
+    script: Path,
+    index: Path,
+    routePrefix: String,
+    extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean = { false }
+) {
     val scriptMap = Path("$script.map")
 
     // Catch URLs which end in a trailing slash (e.g. a/b/c/)

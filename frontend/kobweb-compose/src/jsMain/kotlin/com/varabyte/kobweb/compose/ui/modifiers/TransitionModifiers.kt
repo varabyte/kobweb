@@ -11,9 +11,7 @@ import com.varabyte.kobweb.compose.events.SyntheticTransitionEvent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.AnimationTimingFunction
-import org.jetbrains.compose.web.css.CSSSizeValue
-import org.jetbrains.compose.web.css.CSSUnitTime
+import org.jetbrains.compose.web.css.*
 
 // TODO(#168): Remove in v1.0
 @Deprecated(

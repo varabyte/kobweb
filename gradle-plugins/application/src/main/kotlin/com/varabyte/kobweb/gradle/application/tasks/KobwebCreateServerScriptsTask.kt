@@ -2,7 +2,6 @@
 
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.KOBWEB_SERVER_JAR
 import com.varabyte.kobweb.gradle.application.KOBWEB_SERVER_START_BAT_FILE
 import com.varabyte.kobweb.gradle.application.KOBWEB_SERVER_START_SHELL_SCRIPT
 import com.varabyte.kobweb.gradle.application.util.getServerJar
@@ -15,7 +14,8 @@ import org.gradle.api.tasks.TaskAction
 /**
  * A simple task for creating scripts which can be use to run the Kobweb server in production mode.
  */
-abstract class KobwebCreateServerScriptsTask : KobwebTask("Create scripts which can be used to start the Kobweb server in production mode") {
+abstract class KobwebCreateServerScriptsTask :
+    KobwebTask("Create scripts which can be used to start the Kobweb server in production mode") {
     @OutputFile
     fun getServerStartShellScript() = kobwebApplication.kobwebFolder.resolve(KOBWEB_SERVER_START_SHELL_SCRIPT).toFile()
 
@@ -35,7 +35,8 @@ abstract class KobwebCreateServerScriptsTask : KobwebTask("Create scripts which 
             }
         ).joinToString(" ")
 
-        getServerStartBatFile().writeText("""
+        getServerStartBatFile().writeText(
+            """
             @echo off
             
             :: Find the kobweb project folder, using this file's location to start form
@@ -52,10 +53,12 @@ abstract class KobwebCreateServerScriptsTask : KobwebTask("Create scripts which 
             
             :: Run the java command with the common parameters
             %java_cmd% $javaArgs
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         getServerStartShellScript().apply {
-            writeText("""
+            writeText(
+                """
                 #!/bin/bash
 
                 # Find the kobweb project folder, using this file's location to start form
@@ -71,7 +74,8 @@ abstract class KobwebCreateServerScriptsTask : KobwebTask("Create scripts which 
                 else
                     java ${'$'}args
                 fi
-            """.trimIndent())
+            """.trimIndent()
+            )
             setExecutable(true)
         }
     }

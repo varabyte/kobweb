@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.compose.dom.observers
 
-import com.varabyte.kobweb.compose.css.CSSMargin
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.observers.externals.IntersectionObserverEntry
 import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
@@ -13,7 +13,9 @@ import com.varabyte.kobweb.compose.dom.observers.externals.IntersectionObserver 
  * See https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
  */
 class IntersectionObserver(options: Options? = null, resized: (List<Entry>, IntersectionObserver) -> Unit) {
-    constructor(options: Options? = null, resized: (List<Entry>) -> Unit) : this(options, { entries, _ -> resized(entries) })
+    constructor(options: Options? = null, resized: (List<Entry>) -> Unit) : this(
+        options,
+        { entries, _ -> resized(entries) })
 
     private val _actualObserver = ActualIntersectionObserver({ actualEntries, _ ->
         resized.invoke(actualEntries.map { Entry.from(it) }, this)

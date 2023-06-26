@@ -3,22 +3,21 @@ package com.varabyte.kobweb.compose.css
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.Gradient
 import com.varabyte.kobweb.compose.util.wrapQuotesIfNecessary
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/content
-sealed class Content(private val value: String): StylePropertyValue {
+sealed class Content(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     /** Content keywords that cannot be used in combination with any others. */
-    sealed class Restricted(value: String): Content(value)
+    sealed class Restricted(value: String) : Content(value)
 
     /** Content keywords that can be used in combination with others. */
-    sealed class Unrestricted(value: String): Content(value)
+    sealed class Unrestricted(value: String) : Content(value)
 
-    private class Keyword(value: String): Unrestricted(value)
-    private class RestrictedKeyword(value: String): Restricted(value)
-    private class Text(value: String): Unrestricted(value.wrapQuotesIfNecessary())
+    private class Keyword(value: String) : Unrestricted(value)
+    private class RestrictedKeyword(value: String) : Restricted(value)
+    private class Text(value: String) : Unrestricted(value.wrapQuotesIfNecessary())
 
     private class Url(url: CSSUrl) : Unrestricted(url.toString())
     private class Gradient(gradient: com.varabyte.kobweb.compose.css.functions.Gradient) :

@@ -20,8 +20,11 @@ import com.varabyte.kobweb.navigation.Router
  */
 class PageContext internal constructor(val router: Router) {
     internal val routeState: MutableState<RouteInfo?> = mutableStateOf(null)
-    var route get() = routeState.value ?: error("PageContext route info is only valid within a @Page composable")
-        internal set(value) { routeState.value = value }
+    var route
+        get() = routeState.value ?: error("PageContext route info is only valid within a @Page composable")
+        internal set(value) {
+            routeState.value = value
+        }
 
     class RouteInfo internal constructor(private val route: Route, private val dynamicParams: Map<String, String>) {
         /**
@@ -90,10 +93,10 @@ class PageContext internal constructor(val router: Router) {
 
         override fun equals(other: Any?): Boolean {
             return (other is RouteInfo
-                    && other.path == path
-                    && other.params == params
-                    && other.fragment == fragment
-                    )
+                && other.path == path
+                && other.params == params
+                && other.fragment == fragment
+                )
         }
 
         override fun hashCode(): Int {
@@ -103,13 +106,20 @@ class PageContext internal constructor(val router: Router) {
             return result
         }
 
-        fun copy(path: String = route.path, queryParams: Map<String, String> = route.queryParams, fragment: String? = route.fragment, dynamicParams: Map<String, String> = this.dynamicParams) =
+        fun copy(
+            path: String = route.path,
+            queryParams: Map<String, String> = route.queryParams,
+            fragment: String? = route.fragment,
+            dynamicParams: Map<String, String> = this.dynamicParams
+        ) =
             RouteInfo(Route(path, queryParams, fragment), dynamicParams)
     }
 
     companion object {
         internal lateinit var instance: PageContext
-        internal fun init(router: Router) { instance = PageContext(router) }
+        internal fun init(router: Router) {
+            instance = PageContext(router)
+        }
     }
 
     // region deprecated route properties

@@ -71,7 +71,7 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
 
 /**
  * The class responsible for navigating to different pages in a user's app.
-*/
+ */
 class Router {
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree()
@@ -108,8 +108,7 @@ class Router {
             activePageMethod = data.pageMethod
             this.route = data.routeInfo
             true
-        }
-        else {
+        } else {
             false
         }
     }
@@ -194,7 +193,12 @@ class Router {
     @Suppress("unused") // Called by generated code
     fun register(route: String, autoPrefix: Boolean = true, pageMethod: PageMethod) {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
-        require(routeTree.register(RoutePrefix.prependIf(autoPrefix, route), pageMethod)) { "Registration failure. Path is already registered: $route" }
+        require(
+            routeTree.register(
+                RoutePrefix.prependIf(autoPrefix, route),
+                pageMethod
+            )
+        ) { "Registration failure. Path is already registered: $route" }
     }
 
     fun setErrorHandler(errorHandler: ErrorPageMethod) {
@@ -231,13 +235,15 @@ class Router {
         interceptors.add(interceptor)
     }
 
-    @Deprecated("\"routeTo\" has been renamed to \"tryRoutingTo\".",
+    @Deprecated(
+        "\"routeTo\" has been renamed to \"tryRoutingTo\".",
         ReplaceWith("tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)")
     )
     fun routeTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
-        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
+        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE
+    ): Boolean {
         return tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)
     }
 
@@ -267,7 +273,8 @@ class Router {
     fun tryRoutingTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
-        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE): Boolean {
+        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE
+    ): Boolean {
 
         @Suppress("NAME_SHADOWING") // Intentionally transformed
         var pathQueryAndFragment = pathQueryAndFragment

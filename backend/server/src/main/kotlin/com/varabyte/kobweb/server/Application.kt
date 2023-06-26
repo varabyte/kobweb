@@ -3,7 +3,11 @@ package com.varabyte.kobweb.server
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
-import com.varabyte.kobweb.server.api.*
+import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.ServerRequest
+import com.varabyte.kobweb.server.api.ServerRequestsFile
+import com.varabyte.kobweb.server.api.ServerState
+import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.io.ServerStateFile
 import com.varabyte.kobweb.server.plugin.KobwebServerPlugin
 import com.varabyte.kobweb.server.plugins.configureHTTP
@@ -19,7 +23,12 @@ import java.net.ServerSocket
 import java.net.URLClassLoader
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.io.path.*
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.deleteExisting
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
 import kotlin.system.exitProcess
 
 private fun isPortInUse(port: Int): Boolean {
@@ -38,7 +47,7 @@ fun main(): Unit = runBlocking {
 
     val confFile = KobwebConfFile(folder)
     val conf = confFile.content
-            ?: throw KobwebException("Server cannot start without configuration: ${confFile.path} is missing")
+        ?: throw KobwebException("Server cannot start without configuration: ${confFile.path} is missing")
 
     val env = ServerEnvironment.get()
 
@@ -62,7 +71,10 @@ fun main(): Unit = runBlocking {
         // For some reason, logback ignores size capacity if max files are left unbounded. This doesn't make sense in my
         // opinion -- it can be useful to have unbounded files but still have a size cap. So we trick logback here if
         // the user sets a size cap but not a max file count.
-        System.setProperty("LOG_MAX_HISTORY", maxFileCount?.takeIf { it > 0 }?.toString() ?: if (totalSizeCap?.takeIf { it.inWholeBytes > 0 } == null) "0" else Int.MAX_VALUE.toString())
+        System.setProperty(
+            "LOG_MAX_HISTORY",
+            maxFileCount?.takeIf { it > 0 }?.toString()
+                ?: if (totalSizeCap?.takeIf { it.inWholeBytes > 0 } == null) "0" else Int.MAX_VALUE.toString())
         System.setProperty("LOG_SIZE_CAP", totalSizeCap?.inWholeBytes?.toString() ?: "0")
     }
 
@@ -79,8 +91,7 @@ fun main(): Unit = runBlocking {
         while (isPortInUse(port)) {
             ++port
         }
-    }
-    else {
+    } else {
         assert(env == ServerEnvironment.PROD)
         if (isPortInUse(port)) {
             throw KobwebException("Production server can't start as port $port is already occupied. If you need a different port number, consider modifying ${confFile.path}")
@@ -133,6 +144,7 @@ fun main(): Unit = runBlocking {
                     globals.isStatusError = request.isError
                     globals.timeout = request.timeoutMs?.let { System.currentTimeMillis() + it } ?: Long.MAX_VALUE
                 }
+
                 is ServerRequest.ClearStatus -> {
                     globals.status = null
                     globals.isStatusError = false

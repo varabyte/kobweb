@@ -14,7 +14,8 @@ import javax.inject.Inject
  *
  * You can use this value, for example, when [creating a cache key](https://github.com/actions/cache#creating-a-cache-key).
  */
-abstract class KobwebBrowserCacheIdTask @Inject constructor(kobwebBlock: KobwebBlock) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
+abstract class KobwebBrowserCacheIdTask @Inject constructor(kobwebBlock: KobwebBlock) :
+    KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
     @TaskAction
     fun execute() {
         println("${kobwebBlock.export.browser.get().playwrightName}-${PlaywrightCache().version}")

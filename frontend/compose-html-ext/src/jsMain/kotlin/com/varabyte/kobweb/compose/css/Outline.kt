@@ -38,7 +38,7 @@ fun StyleScope.outline(
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color
-class OutlineColor private constructor(private val value: String): StylePropertyValue {
+class OutlineColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -73,7 +73,7 @@ fun StyleScope.outlineStyle(value: LineStyle) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
-class OutlineWidth private constructor(private val value: String): StylePropertyValue {
+class OutlineWidth private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

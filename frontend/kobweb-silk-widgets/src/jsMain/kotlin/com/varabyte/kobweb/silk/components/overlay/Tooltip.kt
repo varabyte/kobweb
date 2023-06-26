@@ -9,7 +9,11 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.addVariantBase
+import com.varabyte.kobweb.silk.components.style.base
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import org.jetbrains.compose.web.css.*
@@ -33,6 +37,7 @@ private fun Modifier.triangleRight(color: CSSColorValue) = styleModifier {
 }
 
 private val TRIANGLE_WIDTH = 5.px
+
 // Note: This following constant is used to shift the triangle into view. For example, a "down" arrow is actually the
 // top half of a border where only one of the three sides is not transparent. Imaging the following triangles were all
 // jammed together into a single solid box (which I can't capture well in ascii art), where left, right, and bottom
@@ -220,7 +225,7 @@ fun Tooltip(
  *
  * This method should be configurable enough for a majority of cases, but [AdvancedTooltip] is also provided for people
  * who need even more control.
-  */
+ */
 @Composable
 fun Tooltip(
     target: ElementTarget,
@@ -276,7 +281,8 @@ fun AdvancedTooltip(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable PopupScope.() -> Unit,
 ) {
-    @Suppress("NAME_SHADOWING") val keepOpenStrategy = remember(keepOpenStrategy) { keepOpenStrategy ?: KeepPopupOpenStrategy.never() }
+    @Suppress("NAME_SHADOWING") val keepOpenStrategy =
+        remember(keepOpenStrategy) { keepOpenStrategy ?: KeepPopupOpenStrategy.never() }
 
     AdvancedPopover(
         target,

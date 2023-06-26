@@ -13,7 +13,7 @@ internal fun String.escapeQuotes() = this.replace("\"", "\\\"")
  *
  * For example, convert \"Hello there\" into "Hello there".
  * */
-internal fun String.unescapeQuotes() = this.replace("\\\"","\"")
+internal fun String.unescapeQuotes() = this.replace("\\\"", "\"")
 
 /**
  * Escape $ characters in strings, useful if they're going to be converted to code where Kotlin might interpret them as

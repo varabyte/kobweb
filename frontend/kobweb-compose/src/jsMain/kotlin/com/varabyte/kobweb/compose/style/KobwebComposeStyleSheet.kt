@@ -1,10 +1,10 @@
 package com.varabyte.kobweb.compose.style
 
-import com.varabyte.kobweb.compose.css.JustifyItems
-import com.varabyte.kobweb.compose.css.JustifySelf
-import com.varabyte.kobweb.compose.css.justifyItems
-import com.varabyte.kobweb.compose.css.justifySelf
+import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.AlignItems
+import org.jetbrains.compose.web.css.AlignSelf
+import org.jetbrains.compose.web.css.JustifyContent
 
 object KobwebComposeStyleSheet : StyleSheet() {
     init {

@@ -5,7 +5,6 @@ import com.varabyte.kobweb.gradle.core.util.suggestKobwebProjectName
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.util.PatternSet
 import org.gradle.jvm.tasks.Jar
-import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 /**

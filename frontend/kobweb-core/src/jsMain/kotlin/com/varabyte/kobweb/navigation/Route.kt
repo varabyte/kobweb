@@ -2,7 +2,8 @@ package com.varabyte.kobweb.navigation
 
 import org.w3c.dom.url.URL
 
-class RouteException(value: String) : Exception("Failed to create a route. Routes should be valid URLs without a leading domain. Got: $value")
+class RouteException(value: String) :
+    Exception("Failed to create a route. Routes should be valid URLs without a leading domain. Got: $value")
 
 /**
  * A path component to a relative or absolute URL string without a domain, e.g. "/example/path" or "example/path".
@@ -19,25 +20,25 @@ class Route(pathQueryAndFragment: String) {
      *   Note that the empty-string fragment is a valid case which tells the browser to navigate to the top of the page.
      */
     constructor(path: String, queryParams: Map<String, String>, fragment: String?) :
-            this(buildString {
-                append(path)
-                if (queryParams.isNotEmpty()) {
-                    append('?')
-                    append(queryParams.map { (key, value) ->
-                        buildString {
-                            append(key)
-                            if (value.isNotEmpty()) {
-                                append('=')
-                                append(value)
-                            }
+        this(buildString {
+            append(path)
+            if (queryParams.isNotEmpty()) {
+                append('?')
+                append(queryParams.map { (key, value) ->
+                    buildString {
+                        append(key)
+                        if (value.isNotEmpty()) {
+                            append('=')
+                            append(value)
                         }
-                    }.joinToString("&"))
-                }
-                if (fragment != null) {
-                    append('#')
-                    append(fragment)
-                }
-            })
+                    }
+                }.joinToString("&"))
+            }
+            if (fragment != null) {
+                append('#')
+                append(fragment)
+            }
+        })
 
     companion object {
         /** Returns true if a route, i.e. a path without an origin */
@@ -66,8 +67,7 @@ class Route(pathQueryAndFragment: String) {
         val isValidRoute = try {
             URL(pathQueryAndFragment)
             false // If here, we have a value like "https://a/b/c", bad!
-        }
-        catch (ex: Throwable) {
+        } catch (ex: Throwable) {
             true // If here, we have a value like "/a/b/c", good!
         }
 

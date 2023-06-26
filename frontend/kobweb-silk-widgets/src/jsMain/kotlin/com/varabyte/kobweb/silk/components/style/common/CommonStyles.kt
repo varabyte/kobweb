@@ -1,14 +1,13 @@
 package com.varabyte.kobweb.silk.components.style.common
 
-import com.varabyte.kobweb.compose.css.CSSTransition
-import com.varabyte.kobweb.compose.css.Cursor
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.CssRule
 import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.components.style.base
-import org.jetbrains.compose.web.css.ms
+import org.jetbrains.compose.web.css.*
 
 // Note: CSS provides a `disabled` selector, but disabling elements using HTML properties prevents mouse events from
 // firing, and this is bad because you might want to show tooltips even for a disabled element. Some solutions online

@@ -5,7 +5,7 @@ import org.jetbrains.compose.web.css.*
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
-class TransitionProperty private constructor(private val value: String): StylePropertyValue {
+class TransitionProperty private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -41,7 +41,7 @@ fun StyleScope.transitionProperty(vararg properties: String) {
 /**
  * Special values for Transition Duration Property.
  */
-class TransitionDuration private constructor(private val value: String): StylePropertyValue {
+class TransitionDuration private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -65,7 +65,7 @@ fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>
 /**
  * Special values for Transition Delay Property.
  */
-class TransitionDelay private constructor(private val value: String): StylePropertyValue {
+class TransitionDelay private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

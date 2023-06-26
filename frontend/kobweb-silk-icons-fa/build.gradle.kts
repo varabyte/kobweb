@@ -106,20 +106,25 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
                 categories.size == 2 -> {
                     "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = IconStyle.OUTLINE, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, style.category, size)"
                 }
+
                 categories.contains(IconCategory.SOLID) -> {
                     "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.SOLID, size)"
                 }
+
                 categories.contains(IconCategory.REGULAR) -> {
                     "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.REGULAR, size)"
                 }
+
                 categories.contains(IconCategory.BRAND) -> {
                     "@Composable fun $methodName(modifier: Modifier = Modifier, size: IconSize? = null) = FaIcon(\"$rawName\", modifier, IconCategory.BRAND, size)"
                 }
+
                 else -> GradleException("Unhandled icon entry: $entry")
             }
         }
 
     val iconsCode = """
+//@formatter:off
 @file:Suppress("unused", "SpellCheckingInspection")
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

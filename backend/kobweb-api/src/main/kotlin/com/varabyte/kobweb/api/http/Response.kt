@@ -25,7 +25,9 @@ class Response {
     /** See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status */
     var status: Int
         get() = _status ?: 400
-        set(value) { _status = value }
+        set(value) {
+            _status = value
+        }
 
     /** The body payload to send back */
     var body: ByteArray

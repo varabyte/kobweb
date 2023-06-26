@@ -132,7 +132,11 @@ fun SilkStylesheet.registerBaseStyle(cssSelector: String, extraModifiers: Modifi
 
 }
 
-fun SilkStylesheet.registerBaseStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: () -> Modifier) {
+fun SilkStylesheet.registerBaseStyle(
+    cssSelector: String,
+    extraModifiers: @Composable () -> Modifier,
+    init: () -> Modifier
+) {
     registerStyle(cssSelector, extraModifiers) {
         base {
             init()
@@ -144,12 +148,16 @@ internal object SilkStylesheetInstance : SilkStylesheet {
     private val styles = mutableListOf<ComponentStyle>()
     private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
 
-    override fun registerStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: StyleModifiers.() -> Unit) {
+    override fun registerStyle(
+        cssSelector: String,
+        extraModifiers: @Composable () -> Modifier,
+        init: StyleModifiers.() -> Unit
+    ) {
         styles.add(ComponentStyle(cssSelector, extraModifiers, prefix = null, init))
     }
 
     override fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit) {
-        require(!keyframes.contains(name)) { "User is registering duplicate keyframe name: $name"}
+        require(!keyframes.contains(name)) { "User is registering duplicate keyframe name: $name" }
         keyframes[name] = build
     }
 

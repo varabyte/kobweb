@@ -1,13 +1,16 @@
 package com.varabyte.kobweb.silk.components.navigation
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.color
-import com.varabyte.kobweb.compose.ui.modifiers.textDecorationLine
-import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.addVariant
+import com.varabyte.kobweb.silk.components.style.hover
+import com.varabyte.kobweb.silk.components.style.link
+import com.varabyte.kobweb.silk.components.style.visited
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
-import com.varabyte.kobweb.silk.theme.toSilkPalette
-import org.jetbrains.compose.web.css.CSSColorValue
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.A
 
 // Note: The Silk `Link` widget itself is defined in the kobweb-silk module since it has dependencies on kobweb-core

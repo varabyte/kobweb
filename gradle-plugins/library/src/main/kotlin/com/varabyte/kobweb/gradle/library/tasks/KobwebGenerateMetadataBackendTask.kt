@@ -11,11 +11,13 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateMetadataTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebGenerateMetadataBackendTask @Inject constructor(kobwebBlock: KobwebBlock)
-    : KobwebGenerateMetadataTask<BackendData>(kobwebBlock, "Generate Kobweb metadata about this project's backend structure that can be consumed later by a Kobweb app.") {
+abstract class KobwebGenerateMetadataBackendTask @Inject constructor(kobwebBlock: KobwebBlock) :
+    KobwebGenerateMetadataTask<BackendData>(
+        kobwebBlock,
+        "Generate Kobweb metadata about this project's backend structure that can be consumed later by a Kobweb app."
+    ) {
 
     override fun getSourceFiles() = getSourceFilesJvm()
     override fun getGeneratedMetadataFile() = kobwebBlock.getGenJvmResRoot(project).resolve(KOBWEB_METADATA_BACKEND)

@@ -8,7 +8,31 @@ import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
-import org.commonmark.node.*
+import org.commonmark.node.AbstractVisitor
+import org.commonmark.node.BlockQuote
+import org.commonmark.node.BulletList
+import org.commonmark.node.Code
+import org.commonmark.node.CustomBlock
+import org.commonmark.node.CustomNode
+import org.commonmark.node.Document
+import org.commonmark.node.Emphasis
+import org.commonmark.node.FencedCodeBlock
+import org.commonmark.node.HardLineBreak
+import org.commonmark.node.Heading
+import org.commonmark.node.HtmlBlock
+import org.commonmark.node.HtmlInline
+import org.commonmark.node.Image
+import org.commonmark.node.IndentedCodeBlock
+import org.commonmark.node.Link
+import org.commonmark.node.ListBlock
+import org.commonmark.node.ListItem
+import org.commonmark.node.Node
+import org.commonmark.node.OrderedList
+import org.commonmark.node.Paragraph
+import org.commonmark.node.SoftLineBreak
+import org.commonmark.node.StrongEmphasis
+import org.commonmark.node.Text
+import org.commonmark.node.ThematicBreak
 import org.commonmark.renderer.Renderer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -35,6 +59,7 @@ class KotlinRenderer(
     private val defaultRoot: String? = handlers.defaultRoot.get().takeIf { it.isNotBlank() }
     private var indentCount = 0
     private val indent get() = "    ".repeat(indentCount)
+
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact = project.hasJsDependencyNamed("kobwebx-markdown")
 
@@ -234,8 +259,7 @@ class KotlinRenderer(
             fun Paragraph.isInTightList() = (parent?.parent as? ListBlock)?.isTight ?: false
             if (paragraph.isInTightList()) {
                 visitChildren(paragraph)
-            }
-            else {
+            } else {
                 doVisit(paragraph, handlers.p)
             }
         }
@@ -257,7 +281,7 @@ class KotlinRenderer(
         private fun List<String>.serialize(): String {
             return buildString {
                 append("listOf(")
-                append(joinToString { "\"${it.escapeQuotes()}\""})
+                append(joinToString { "\"${it.escapeQuotes()}\"" })
                 append(")")
             }
         }

@@ -7,7 +7,7 @@ fun StyleScope.fontFamily(value: String) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
-class FontStyle private constructor(private val value: String): StylePropertyValue {
+class FontStyle private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -22,7 +22,8 @@ class FontStyle private constructor(private val value: String): StylePropertyVal
         val Inherit get() = FontStyle("inherit")
         val Initial get() = FontStyle("initial")
         val Revert get() = FontStyle("revert")
-        val Unset get() = FontStyle("unset")    }
+        val Unset get() = FontStyle("unset")
+    }
 }
 
 fun StyleScope.fontStyle(style: FontStyle) {
@@ -30,7 +31,7 @@ fun StyleScope.fontStyle(style: FontStyle) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
-class FontWeight private constructor(private val value: String): CSSStyleValue {
+class FontWeight private constructor(private val value: String) : CSSStyleValue {
     override fun toString() = value
 
     companion object {
@@ -39,9 +40,11 @@ class FontWeight private constructor(private val value: String): CSSStyleValue {
         val Thin get() = FontWeight("100")
         val ExtraLight get() = FontWeight("200")
         val Light get() = FontWeight("300")
+
         // val Normal get() = FontWeight("400") // Same as "Normal" keyword"
         val Medium get() = FontWeight("500")
         val SemiBold get() = FontWeight("600")
+
         // val Bold get() = FontWeight("700") // Same as "Bold" keyword"
         val ExtraBold get() = FontWeight("800")
         val Black get() = FontWeight("900")
@@ -68,7 +71,7 @@ fun StyleScope.fontWeight(weight: FontWeight) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-size
-class FontSize private constructor(private val value: String): CSSStyleValue {
+class FontSize private constructor(private val value: String) : CSSStyleValue {
     override fun toString() = value
 
     companion object {

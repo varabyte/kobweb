@@ -27,6 +27,8 @@ Other than that, just a few rules:
       changes will be run against example code.
 * **Pull requests should be associated with a bug that you have assigned to yourself**
     * This ensures that we won't have multiple people working on the same issue at the same time
+* **Use the IDE version control to commit code.**
+    * This adds some hooks that ensure code is properly formatted when committed.
 * **New features should be discussed with us first** (see the
   [contacting us](https://github.com/varabyte/kobweb#connecting-with-us) section in the main README)
     * This ensures that you won't waste your time on something we may have reasons to reject

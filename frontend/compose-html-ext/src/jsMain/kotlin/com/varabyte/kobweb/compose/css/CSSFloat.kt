@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.css.*
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/CSS/float
  */
-class CSSFloat private constructor(private val value: String): StylePropertyValue {
+class CSSFloat private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

@@ -1,11 +1,10 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
-import com.varabyte.kobweb.compose.css.FlexBasis
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.flexBasis
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.flexWrap
 
 // TODO(#168): Remove before v1.0
 @Deprecated(

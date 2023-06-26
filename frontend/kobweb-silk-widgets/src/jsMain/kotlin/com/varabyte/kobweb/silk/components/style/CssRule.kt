@@ -4,7 +4,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.CSSSelector
 
 /**
  * A class which can be used to set CSS rules on a target [StyleModifiers] instance using types to prevent
@@ -33,13 +32,14 @@ sealed class CssRule(val target: StyleModifiers) {
          *
          * For example, passing in "not" would result in: `:not(...)`
          */
-        fun OfFunctionalPseudoClass(target: StyleModifiers, pseudoClass: String, vararg params: NonMediaCssRule)
-            = OfPseudoClass(target, "$pseudoClass(${params.mapNotNull { it.toSelectorText() }.joinToString() })")
+        fun OfFunctionalPseudoClass(target: StyleModifiers, pseudoClass: String, vararg params: NonMediaCssRule) =
+            OfPseudoClass(target, "$pseudoClass(${params.mapNotNull { it.toSelectorText() }.joinToString()})")
     }
 
     operator fun invoke(createModifier: () -> Modifier) {
         target.cssRule(mediaQuery, toSelectorText(), createModifier)
     }
+
     protected open val mediaQuery: CSSMediaQuery? = null
     protected open fun toSelectorText(): String? = null
 
@@ -154,5 +154,8 @@ sealed class CssRule(val target: StyleModifiers) {
 }
 
 // Breakpoint extensions to allow adding styles to normal breakpoint values, e.g. "Breakpoint.MD + hover"
-operator fun Breakpoint.plus(other: CssRule.OfPseudoClass) = CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
-operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) = CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
+operator fun Breakpoint.plus(other: CssRule.OfPseudoClass) =
+    CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
+
+operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) =
+    CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other

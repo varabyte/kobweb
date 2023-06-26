@@ -9,6 +9,7 @@ interface SilkConfig {
     companion object {
         val Instance: SilkConfig get() = MutableSilkConfigInstance
     }
+
     val initialColorMode: ColorMode
 }
 

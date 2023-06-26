@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
-class FlexBasis private constructor(private val value: String): StylePropertyValue {
+class FlexBasis private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

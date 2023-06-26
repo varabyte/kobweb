@@ -1,7 +1,7 @@
 package playground
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.TextAlign
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -17,10 +17,7 @@ import com.varabyte.kobweb.silk.init.registerBaseStyle
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import kotlinx.browser.localStorage
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.em
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.vh
+import org.jetbrains.compose.web.css.*
 
 private const val COLOR_MODE_KEY = "playground:app:colorMode"
 

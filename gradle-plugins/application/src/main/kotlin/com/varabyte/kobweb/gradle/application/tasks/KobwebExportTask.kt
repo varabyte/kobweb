@@ -106,7 +106,8 @@ abstract class KobwebExportTask @Inject constructor(
     }
 
     private fun <T> T.toTriple() = Triple(this, this, this)
-    private fun <T, S> Triple<T, T, T>.map(transform: (T) -> S) = Triple(transform(first), transform(second), transform(third))
+    private fun <T, S> Triple<T, T, T>.map(transform: (T) -> S) =
+        Triple(transform(first), transform(second), transform(third))
 
     @TaskAction
     fun execute() {
@@ -122,7 +123,7 @@ abstract class KobwebExportTask @Inject constructor(
             }
         }.merge()
 
-        val (pagesRoot, resourcesRoot, systemRoot) = when(siteLayout) {
+        val (pagesRoot, resourcesRoot, systemRoot) = when (siteLayout) {
             SiteLayout.KOBWEB -> Triple("pages", "resources", "system").map { getSiteDir().resolve(it) }
             SiteLayout.STATIC -> getSiteDir().toTriple()
         }
@@ -130,11 +131,15 @@ abstract class KobwebExportTask @Inject constructor(
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
             val browser = kobwebBlock.export.browser.get()
             PlaywrightCache().install(browser)
-            Playwright.create(Playwright.CreateOptions().setEnv(mapOf(
-                // Should have been downloaded above, by PlaywrightCache()
-                "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
-            ))).use { playwright ->
-                val browserType = when(browser) {
+            Playwright.create(
+                Playwright.CreateOptions().setEnv(
+                    mapOf(
+                        // Should have been downloaded above, by PlaywrightCache()
+                        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD" to "1"
+                    )
+                )
+            ).use { playwright ->
+                val browserType = when (browser) {
                     KobwebBrowser.Chromium -> playwright.chromium()
                     KobwebBrowser.Firefox -> playwright.firefox()
                     KobwebBrowser.WebKit -> playwright.webkit()

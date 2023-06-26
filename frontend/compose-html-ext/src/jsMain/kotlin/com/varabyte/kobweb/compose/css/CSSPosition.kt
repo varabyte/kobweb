@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.CSSLengthOrPercentageValue
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.*
 
 sealed class Edge(private val value: String) {
     override fun toString() = value
@@ -17,18 +15,22 @@ sealed class Edge(private val value: String) {
         val CenterY get() = CenterY()
     }
 }
+
 sealed class EdgeXOrCenter(value: String) : Edge(value)
 class EdgeX internal constructor(value: String) : EdgeXOrCenter(value) {
     operator fun invoke(offset: CSSLengthOrPercentageValue) = EdgeXOffset(this, offset)
 }
+
 class CenterX internal constructor() : EdgeXOrCenter("center")
 class EdgeXOffset internal constructor(val edgeX: EdgeX, val offset: CSSLengthOrPercentageValue) {
     override fun toString() = "$edgeX $offset"
 }
+
 sealed class EdgeYOrCenter(value: String) : Edge(value)
 class EdgeY internal constructor(value: String) : EdgeYOrCenter(value) {
     operator fun invoke(offset: CSSLengthOrPercentageValue) = EdgeYOffset(this, offset)
 }
+
 class CenterY internal constructor() : EdgeYOrCenter("center")
 class EdgeYOffset internal constructor(val edgeY: EdgeY, val offset: CSSLengthOrPercentageValue) {
     override fun toString() = "$edgeY $offset"
@@ -50,6 +52,7 @@ private fun EdgeXOrCenter.toOffset(): EdgeXOffset {
         is CenterX -> Edge.Left(50.percent)
     }
 }
+
 private fun EdgeYOrCenter.toOffset(): EdgeYOffset {
     return when (this) {
         is EdgeY -> this(0.percent)
@@ -69,7 +72,7 @@ private fun EdgeYOrCenter.toOffset(): EdgeYOffset {
  *
  * For more information about position values and what they mean, see: https://developer.mozilla.org/en-US/docs/Web/CSS/position_value
  */
-class CSSPosition internal constructor(private val value: String): StylePropertyValue {
+class CSSPosition internal constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     constructor(x: CSSLengthOrPercentageValue = 50.percent, y: CSSLengthOrPercentageValue = 50.percent) : this("$x $y")
@@ -78,27 +81,57 @@ class CSSPosition internal constructor(private val value: String): StyleProperty
     constructor(yAnchor: EdgeYOrCenter) : this("${Edge.CenterX.toOffset()} ${yAnchor.toOffset()}")
     constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this(xAnchor.toOffset(), yAnchor.toOffset())
 
-    @Deprecated("Create an offset directly instead (by invoking `Edge(offset)`).", replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset))"))
+    @Deprecated(
+        "Create an offset directly instead (by invoking `Edge(offset)`).",
+        replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset))")
+    )
     constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageValue) : this(xAnchor(xOffset))
     constructor(xOffset: EdgeXOffset) : this(xOffset, Edge.CenterY.toOffset())
-    @Deprecated("Create an offset directly instead (by invoking `Edge(offset)`).", replaceWith = ReplaceWith("CSSPosition(yAnchor(yOffset))"))
+
+    @Deprecated(
+        "Create an offset directly instead (by invoking `Edge(offset)`).",
+        replaceWith = ReplaceWith("CSSPosition(yAnchor(yOffset))")
+    )
     constructor(yAnchor: EdgeY, yOffset: CSSLengthOrPercentageValue) : this(yAnchor(yOffset))
     constructor(yOffset: EdgeYOffset) : this(Edge.CenterX.toOffset(), yOffset)
 
     constructor(xCenter: CenterX, y: CSSLengthOrPercentageValue) : this("$xCenter $y")
     constructor(x: CSSLengthOrPercentageValue, yCenter: CenterY) : this("$x $yCenter")
 
-    @Deprecated("Create an offset directly instead (by invoking `Edge(offset)`).", replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset), yAnchor)"))
-    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageValue, yAnchor: EdgeYOrCenter) : this(xAnchor(xOffset), yAnchor)
+    @Deprecated(
+        "Create an offset directly instead (by invoking `Edge(offset)`).",
+        replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset), yAnchor)")
+    )
+    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageValue, yAnchor: EdgeYOrCenter) : this(
+        xAnchor(xOffset),
+        yAnchor
+    )
+
     constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this(xOffset, yAnchor.toOffset())
 
-    @Deprecated("Create an offset directly instead (by invoking `Edge(offset)`).", replaceWith = ReplaceWith("CSSPosition(xAnchor, yAnchor(yOffset))"))
-    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeY, yOffset: CSSLengthOrPercentageValue) : this(xAnchor, yAnchor(yOffset))
+    @Deprecated(
+        "Create an offset directly instead (by invoking `Edge(offset)`).",
+        replaceWith = ReplaceWith("CSSPosition(xAnchor, yAnchor(yOffset))")
+    )
+    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeY, yOffset: CSSLengthOrPercentageValue) : this(
+        xAnchor,
+        yAnchor(yOffset)
+    )
+
     constructor(xAnchor: EdgeXOrCenter, yOffset: EdgeYOffset) : this(xAnchor.toOffset(), yOffset)
 
-    @Deprecated("Create an offset directly instead (by invoking `Edge(offset)`).", replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset), yAnchor(yOffset))"))
-    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageValue, yAnchor: EdgeY, yOffset: CSSLengthOrPercentageValue) :
+    @Deprecated(
+        "Create an offset directly instead (by invoking `Edge(offset)`).",
+        replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset), yAnchor(yOffset))")
+    )
+    constructor(
+        xAnchor: EdgeX,
+        xOffset: CSSLengthOrPercentageValue,
+        yAnchor: EdgeY,
+        yOffset: CSSLengthOrPercentageValue
+    ) :
         this(xAnchor(xOffset), yAnchor(yOffset))
+
     constructor(xAnchor: EdgeXOffset, yAnchor: EdgeYOffset) : this("$xAnchor $yAnchor")
 
     companion object {

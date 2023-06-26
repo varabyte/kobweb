@@ -1,11 +1,10 @@
 package com.varabyte.kobweb.silk.components.animation
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.AnimationIterationCount
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.CSSAnimation
-import com.varabyte.kobweb.compose.css.ComparableStyleScope
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.modifiers.animation
+import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -16,11 +15,12 @@ import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
 
-private val KeyframesBuilder.comparableKeyframeStyles get() = keyframeStyles.mapValues { (_, create) ->
-    ComparableStyleScope().apply {
-        create().toStyles().invoke(this)
+private val KeyframesBuilder.comparableKeyframeStyles
+    get() = keyframeStyles.mapValues { (_, create) ->
+        ComparableStyleScope().apply {
+            create().toStyles().invoke(this)
+        }
     }
-}
 
 class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
     internal val keyframeStyles = mutableMapOf<CSSKeyframe, () -> Modifier>()
@@ -131,6 +131,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  */
 class Keyframes(name: String, prefix: String? = null, internal val init: KeyframesBuilder.() -> Unit) {
     val name = prefix?.let { "$it-$name" } ?: name
+
     companion object {
         internal fun isColorModeAgnostic(build: KeyframesBuilder.() -> Unit): Boolean {
             // A user can use colorMode checks to change the keyframes builder, either by completely changing what sort
@@ -150,7 +151,10 @@ class Keyframes(name: String, prefix: String? = null, internal val init: Keyfram
 /**
  * A delegate provider class which allows you to create a [Keyframes] instance via the `by` keyword.
  */
-class KeyframesProvider internal constructor(private val prefix: String?, private val init: KeyframesBuilder.() -> Unit) : CacheByPropertyNameDelegate<Keyframes>() {
+class KeyframesProvider internal constructor(
+    private val prefix: String?,
+    private val init: KeyframesBuilder.() -> Unit
+) : CacheByPropertyNameDelegate<Keyframes>() {
     override fun create(propertyName: String): Keyframes {
         val name = propertyName.titleCamelCaseToKebabCase()
         return Keyframes(name, prefix, init)
@@ -184,7 +188,10 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
 fun Keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = KeyframesProvider(prefix, init)
 
 // TODO(#168): Delete this before 1.0
-@Deprecated("`keyframes` has been replaced with `Keyframes` (capitalized) for consistency with `ComponentStyle` behavior.", ReplaceWith("Keyframes(init)"))
+@Deprecated(
+    "`keyframes` has been replaced with `Keyframes` (capitalized) for consistency with `ComponentStyle` behavior.",
+    ReplaceWith("Keyframes(init)")
+)
 fun keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = Keyframes(prefix, init)
 
 /**
@@ -203,8 +210,7 @@ fun Keyframes.toAnimation(
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null
-): CSSAnimation
-{
+): CSSAnimation {
     val colorMode = if (this.usesColorMode) rememberColorMode().value else null
     return toAnimation(colorMode, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 }
@@ -238,8 +244,7 @@ fun Keyframes.toAnimation(
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null,
-): CSSAnimation
-{
+): CSSAnimation {
     @Suppress("NAME_SHADOWING")
     val colorMode = if (this.usesColorMode) {
         colorMode ?: error("Animation $name depends on the site's color mode but no color mode was specified.")

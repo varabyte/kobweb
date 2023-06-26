@@ -34,53 +34,75 @@ sealed class DataSize(val amount: Long, private val factor: Int) {
 
     override fun equals(other: Any?): Boolean {
         return other is DataSize
-                && this::class == other::class // 1000B != 1KB
-                && this.amount == other.amount
+            && this::class == other::class // 1000B != 1KB
+            && this.amount == other.amount
     }
+
     override fun hashCode() = (amount * factor).hashCode()
 
     @Serializable(with = DataSizeSerializer::class)
     class Bytes(amount: Long) : DataSize(amount, 1) {
-        companion object { const val Unit = "B" }
+        companion object {
+            const val Unit = "B"
+        }
+
         override fun toString() = "$amount$Unit"
     }
+
     @Serializable(with = DataSizeSerializer::class)
     class Kilobytes(amount: Long) : DataSize(amount, 1 * 1000) {
         companion object {
             const val Unit = "KB"
             const val UnitAlt = "K"
         }
+
         override fun toString() = "$amount$Unit"
     }
+
     @Serializable(with = DataSizeSerializer::class)
     class Kibibytes(amount: Long) : DataSize(amount, 1 * 1024) {
-        companion object { const val Unit = "KiB" }
+        companion object {
+            const val Unit = "KiB"
+        }
+
         override fun toString() = "$amount$Unit"
     }
+
     @Serializable(with = DataSizeSerializer::class)
     class Megabytes(amount: Long) : DataSize(amount, 1 * 1000 * 1000) {
         companion object {
             const val Unit = "MB"
             const val UnitAlt = "M"
         }
+
         override fun toString() = "$amount$Unit"
     }
+
     @Serializable(with = DataSizeSerializer::class)
     class Mebibytes(amount: Long) : DataSize(amount, 1 * 1024 * 1024) {
-        companion object { const val Unit = "MiB" }
+        companion object {
+            const val Unit = "MiB"
+        }
+
         override fun toString() = "$amount$Unit"
     }
+
     @Serializable(with = DataSizeSerializer::class)
     class Gigabytes(amount: Long) : DataSize(amount, 1 * 1000 * 1000 * 1000) {
         companion object {
             const val Unit = "GB"
             const val UnitAlt = "G"
         }
+
         override fun toString() = "$amount$Unit"
     }
+
     @Serializable(with = DataSizeSerializer::class)
     class Gibibytes(amount: Long) : DataSize(amount, 1 * 1024 * 1024 * 1024) {
-        companion object { const val Unit = "GiB" }
+        companion object {
+            const val Unit = "GiB"
+        }
+
         override fun toString() = "$amount$Unit"
     }
 
@@ -138,21 +160,24 @@ sealed class DataSize(val amount: Long, private val factor: Int) {
                 unitStr.equals(Bytes.Unit, ignoreCase = true) -> Bytes(amount)
 
                 unitStr.equals(Kilobytes.Unit, ignoreCase = true)
-                        || unitStr.equals(Kilobytes.UnitAlt, ignoreCase = true) -> {
+                    || unitStr.equals(Kilobytes.UnitAlt, ignoreCase = true) -> {
                     if (forceBinarySize) Kibibytes(amount) else Kilobytes(amount)
                 }
+
                 unitStr.equals(Kibibytes.Unit, ignoreCase = true) -> Kibibytes(amount)
 
                 unitStr.equals(Megabytes.Unit, ignoreCase = true)
-                        || unitStr.equals(Megabytes.UnitAlt, ignoreCase = true) -> {
+                    || unitStr.equals(Megabytes.UnitAlt, ignoreCase = true) -> {
                     if (forceBinarySize) Mebibytes(amount) else Megabytes(amount)
                 }
+
                 unitStr.equals(Mebibytes.Unit, ignoreCase = true) -> Mebibytes(amount)
 
                 unitStr.equals(Gigabytes.Unit, ignoreCase = true)
-                        || unitStr.equals(Gigabytes.UnitAlt, ignoreCase = true) -> {
+                    || unitStr.equals(Gigabytes.UnitAlt, ignoreCase = true) -> {
                     if (forceBinarySize) Gibibytes(amount) else Gigabytes(amount)
                 }
+
                 unitStr.equals(Gibibytes.Unit, ignoreCase = true) -> Gibibytes(amount)
 
                 else -> null

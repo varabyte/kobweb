@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit
-class ObjectFit private constructor(private val value: String): StylePropertyValue {
+class ObjectFit private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -27,7 +27,7 @@ fun StyleScope.objectFit(objectFit: ObjectFit) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode
-class MixBlendMode private constructor(private val value: String): StylePropertyValue {
+class MixBlendMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

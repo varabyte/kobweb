@@ -24,7 +24,9 @@ data class ElementRefScope<in TElement : Element> internal constructor(
                 return scope.onDispose {}
             }
         }
-        class Disposable<TElement : Element>(val effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) : RefCallback<TElement>() {
+
+        class Disposable<TElement : Element>(val effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) :
+            RefCallback<TElement>() {
             override fun invoke(scope: DisposableEffectScope, element: TElement): DisposableEffectResult {
                 return scope.effect(element)
             }
@@ -149,7 +151,10 @@ fun <TElement : Element> ref(vararg keys: Any?, handle: (TElement) -> Unit) = re
  *
  * @param keys Any number of keys which, if any change, will cause the effect to be disposed and restarted.
  */
-fun <TElement : Element> disposableRef(vararg keys: Any?, effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) = refScope {
+fun <TElement : Element> disposableRef(
+    vararg keys: Any?,
+    effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
+) = refScope {
     disposableRef(*keys, effect = effect)
 }
 

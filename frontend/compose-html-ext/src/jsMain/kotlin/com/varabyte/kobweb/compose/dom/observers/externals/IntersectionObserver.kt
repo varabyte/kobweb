@@ -13,7 +13,10 @@ internal external class IntersectionObserverEntry {
     val target: Element
 }
 
-internal external class IntersectionObserver(callback: (Array<IntersectionObserverEntry>, ResizeObserver) -> Unit, options: Json?) {
+internal external class IntersectionObserver(
+    callback: (Array<IntersectionObserverEntry>, ResizeObserver) -> Unit,
+    options: Json?
+) {
     val root: dynamic
     val rootMargin: String
     val thresholds: Array<Double>

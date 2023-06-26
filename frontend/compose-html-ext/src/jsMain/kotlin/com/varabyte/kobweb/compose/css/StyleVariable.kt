@@ -1,9 +1,7 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
-import org.jetbrains.compose.web.css.CSSVariable
-import org.jetbrains.compose.web.css.CSSVariableValue
-import org.jetbrains.compose.web.css.StylePropertyValue
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 import kotlin.reflect.KProperty
 
@@ -37,7 +35,11 @@ import kotlin.reflect.KProperty
  * @param defaultFallback When you query a variable, you can specify a fallback at that time. However, if not specified,
  *   then you can provide this default fallback to be used instead. See also: [value].
  */
-class StyleVariable<T : StylePropertyValue>(name: String, private val defaultFallback: T? = null, prefix: String? = null) :
+class StyleVariable<T : StylePropertyValue>(
+    name: String,
+    private val defaultFallback: T? = null,
+    prefix: String? = null
+) :
     CSSVariable {
     override val name = prefix?.let { "$it-$name" } ?: name
 
@@ -57,7 +59,10 @@ class StyleVariable<T : StylePropertyValue>(name: String, private val defaultFal
 /**
  * A delegate provider class which allows you to create a [StyleVariable] instance via the `by` keyword.
  */
-class StyleVariableProvider<T: StylePropertyValue> internal constructor(private val defaultFallback: T?, private val prefix: String?) {
+class StyleVariableProvider<T : StylePropertyValue> internal constructor(
+    private val defaultFallback: T?,
+    private val prefix: String?
+) {
     operator fun getValue(
         thisRef: Any?,
         property: KProperty<*>
@@ -68,7 +73,8 @@ class StyleVariableProvider<T: StylePropertyValue> internal constructor(private 
 }
 
 /** Helper method for declaring a [StyleVariable] instance via the `by` keyword. */
-fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) = StyleVariableProvider(defaultFallback, prefix)
+fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariableProvider(defaultFallback, prefix)
 
 /**
  * Helper method for setting a [StyleVariable] onto a raw HTML element.
@@ -76,6 +82,6 @@ fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: S
  * Most users will use `Modifier.setVariable` instead, but there are cases where this approach can be useful, like
  * grabbing the root element from the DOM and adding the variables onto it.
  */
-fun <T: StylePropertyValue> HTMLElement.setVariable(variable: StyleVariable<T>, value: T) {
+fun <T : StylePropertyValue> HTMLElement.setVariable(variable: StyleVariable<T>, value: T) {
     this.style.setProperty("--${variable.name}", value.toString())
 }

@@ -9,7 +9,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 /**
  * A build service which listens to task states and communicates information to a running Kobweb server about them
  */
-abstract class KobwebTaskListener : BuildService<BuildServiceParameters.None>, OperationCompletionListener, AutoCloseable {
+abstract class KobwebTaskListener : BuildService<BuildServiceParameters.None>, OperationCompletionListener,
+    AutoCloseable {
     val onFinishCallbacks = CopyOnWriteArrayList<(FinishEvent) -> Unit>()
 
     override fun onFinish(event: FinishEvent) {

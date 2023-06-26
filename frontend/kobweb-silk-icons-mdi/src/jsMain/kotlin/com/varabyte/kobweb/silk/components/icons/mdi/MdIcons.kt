@@ -1,3 +1,4 @@
+//@formatter:off
 @file:Suppress("unused", "SpellCheckingInspection")
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -12,7 +13,11 @@ package com.varabyte.kobweb.silk.components.icons.mdi
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.*
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.FILLED
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.OUTLINED
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.ROUNDED
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.SHARP
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle.TWO_TONED
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 

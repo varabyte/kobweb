@@ -8,7 +8,7 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
-class BackgroundAttachment private constructor(private val value: String): StylePropertyValue {
+class BackgroundAttachment private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -37,7 +37,7 @@ fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip
-class BackgroundClip private constructor(private val value: String): StylePropertyValue {
+class BackgroundClip private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -60,7 +60,7 @@ fun StyleScope.backgroundClip(backgroundClip: BackgroundClip) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-color
-class BackgroundColor private constructor(private val value: String): StylePropertyValue {
+class BackgroundColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -93,13 +93,14 @@ fun StyleScope.backgroundImage(url: CSSUrl) = backgroundImage(BackgroundImage.of
 fun StyleScope.backgroundImage(gradient: Gradient) = backgroundImage(BackgroundImage.of(gradient))
 
 // Provided for backwards compatibility. We've since refactored out a common CSSImage class, so use that instead.
-@Deprecated("Use Gradient.toImage() instead",
+@Deprecated(
+    "Use Gradient.toImage() instead",
     ReplaceWith("this.toImage()", "com.varabyte.kobweb.compose.css.functions.toImage")
 )
 fun Gradient.toBackgroundImage() = this.toImage()
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
-class BackgroundOrigin private constructor(private val value: String): StylePropertyValue {
+class BackgroundOrigin private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -124,7 +125,7 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
 // Suppress: We only have deprecated methods calling deprecated methods, so no need to warn about them. They'll all get
 // removed at the same time.
 @Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
-sealed class BackgroundPosition private constructor(private val value: String): StylePropertyValue {
+sealed class BackgroundPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class Keyword internal constructor(value: String) : BackgroundPosition(value)
@@ -134,17 +135,27 @@ sealed class BackgroundPosition private constructor(private val value: String): 
     sealed class LegacyEdge(value: String) : BackgroundPosition(value)
     class LegacyEdgeX internal constructor(value: String) : LegacyEdge(value)
     class LegacyEdgeY internal constructor(value: String) : LegacyEdge(value)
-    private class LegacyEdgeOffset(edge: LegacyEdge? = null, offset: CSSLengthOrPercentageValue) : BackgroundPosition("$edge $offset")
+    private class LegacyEdgeOffset(edge: LegacyEdge? = null, offset: CSSLengthOrPercentageValue) :
+        BackgroundPosition("$edge $offset")
+
     private class LegacyPosition(x: LegacyEdgeOffset, y: LegacyEdgeOffset) : BackgroundPosition("$x $y")
 
     companion object {
         @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Left, 50.px)))")
         fun of(xAnchor: LegacyEdgeX, x: CSSLengthOrPercentageValue): BackgroundPosition = LegacyEdgeOffset(xAnchor, x)
+
         @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Top, 20.percent)))")
         fun of(yAnchor: LegacyEdgeY, y: CSSLengthOrPercentageValue): BackgroundPosition = LegacyEdgeOffset(yAnchor, y)
+
         @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Left, 50.px, Top, 20.percent)))")
-        fun of(xAnchor: LegacyEdgeX, x: CSSLengthOrPercentageValue, yAnchor: LegacyEdgeY, y: CSSLengthOrPercentageValue): BackgroundPosition =
+        fun of(
+            xAnchor: LegacyEdgeX,
+            x: CSSLengthOrPercentageValue,
+            yAnchor: LegacyEdgeY,
+            y: CSSLengthOrPercentageValue
+        ): BackgroundPosition =
             LegacyPosition(LegacyEdgeOffset(xAnchor, x), LegacyEdgeOffset(yAnchor, y))
+
         @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(50.px, 20.percent)))")
         fun of(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) = this.of(Left, x, Top, y)
 
@@ -153,10 +164,13 @@ sealed class BackgroundPosition private constructor(private val value: String): 
         // Edges
         @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Top)")
         val Top get() = LegacyEdgeY("top")
+
         @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Bottom)")
         val Bottom get() = LegacyEdgeY("bottom")
+
         @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Left)")
         val Left get() = LegacyEdgeX("left")
+
         @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Right)")
         val Right get() = LegacyEdgeX("right")
 
@@ -177,12 +191,13 @@ fun StyleScope.backgroundPosition(backgroundPosition: BackgroundPosition) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
-sealed class BackgroundRepeat private constructor(private val value: String): StylePropertyValue {
+sealed class BackgroundRepeat private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     open class Keyword internal constructor(value: String) : BackgroundRepeat(value)
     class RepeatStyle internal constructor(value: String) : Keyword(value)
-    internal class TwoValue internal constructor(horizontal: RepeatStyle, vertical: RepeatStyle) : BackgroundRepeat("$horizontal $vertical")
+    internal class TwoValue internal constructor(horizontal: RepeatStyle, vertical: RepeatStyle) :
+        BackgroundRepeat("$horizontal $vertical")
 
     companion object {
         fun of(horizontal: RepeatStyle, vertical: RepeatStyle): BackgroundRepeat = TwoValue(horizontal, vertical)
@@ -213,7 +228,7 @@ fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertic
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
-sealed class BackgroundSize private constructor(private val value: String): StylePropertyValue {
+sealed class BackgroundSize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class Keyword internal constructor(value: String) : BackgroundSize(value)
@@ -222,7 +237,9 @@ sealed class BackgroundSize private constructor(private val value: String): Styl
     companion object {
         fun of(width: CSSLengthOrPercentageValue): BackgroundSize = Size("$width")
         fun of(width: CSSAutoKeyword): BackgroundSize = Size("$width")
-        fun of(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue): BackgroundSize = Size("$width $height")
+        fun of(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue): BackgroundSize =
+            Size("$width $height")
+
         fun of(width: CSSAutoKeyword, height: CSSLengthOrPercentageValue): BackgroundSize = Size("$width $height")
         fun of(width: CSSLengthOrPercentageValue, height: CSSAutoKeyword): BackgroundSize = Size("$width $height")
 

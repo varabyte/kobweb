@@ -1,12 +1,11 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSFilter
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
 // See also: CSSFilter
-class Filter private constructor(private val value: String): StylePropertyValue {
+class Filter private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

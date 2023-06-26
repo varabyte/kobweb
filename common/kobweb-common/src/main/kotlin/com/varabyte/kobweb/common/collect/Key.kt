@@ -8,7 +8,7 @@ class Key<T> private constructor(val name: String) {
     companion object {
         private val registeredKeys = mutableMapOf<String, Key<*>>()
         fun <T> create(name: String): Key<T> {
-            require(!registeredKeys.containsKey(name)) { "Attempting to create with a name that was already registered earlier: $name"}
+            require(!registeredKeys.containsKey(name)) { "Attempting to create with a name that was already registered earlier: $name" }
             val key = Key<T>(name)
             registeredKeys[name] = key
             return key

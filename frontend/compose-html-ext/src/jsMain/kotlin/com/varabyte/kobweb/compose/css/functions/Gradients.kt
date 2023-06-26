@@ -1,25 +1,26 @@
 package com.varabyte.kobweb.compose.css.functions
 
-import com.varabyte.kobweb.compose.css.CSSPosition
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 
 interface Gradient : CSSStyleValue {
-    class ColorStopsBuilder<T: CSSSizeValue<*>> {
-        internal sealed class Entry<T: CSSSizeValue<*>>(private val entryStr: String) {
+    class ColorStopsBuilder<T : CSSSizeValue<*>> {
+        internal sealed class Entry<T : CSSSizeValue<*>>(private val entryStr: String) {
             override fun toString() = entryStr
-            open class Color<T: CSSSizeValue<*>>(val value: String) : Entry<T>(value) {
-                class Simple<T: CSSSizeValue<*>>(value: CSSColorValue) : Color<T>("$value")
-                class Stop<T: CSSSizeValue<*>>(color: CSSColorValue, stop: T) : Color<T>("$color $stop")
-                class StopRange<T: CSSSizeValue<*>>(color: CSSColorValue, from: T, to: T) :
+            open class Color<T : CSSSizeValue<*>>(val value: String) : Entry<T>(value) {
+                class Simple<T : CSSSizeValue<*>>(value: CSSColorValue) : Color<T>("$value")
+                class Stop<T : CSSSizeValue<*>>(color: CSSColorValue, stop: T) : Color<T>("$color $stop")
+                class StopRange<T : CSSSizeValue<*>>(color: CSSColorValue, from: T, to: T) :
                     Color<T>("$color $from $to")
             }
-            class Hint<T: CSSSizeValue<*>>(val value: T) : Entry<T>("$value")
+
+            class Hint<T : CSSSizeValue<*>>(val value: T) : Entry<T>("$value")
         }
 
         private val entries = mutableListOf<Entry<T>>()
         internal fun verifiedEntries(): Array<Entry<T>> {
-            check(entries.count { it is Entry.Color } >= 2) { "A gradient should consistent of at least two color entries (an initial color and an end color)"}
+            check(entries.count { it is Entry.Color } >= 2) { "A gradient should consistent of at least two color entries (an initial color and an end color)" }
             entries.forEachIndexed { i, entry ->
                 if (entry is Entry.Hint) {
                     check(entries.getOrNull(i - 1) is Entry.Color && entries.getOrNull(i + 1) is Entry.Color) {
@@ -35,6 +36,7 @@ interface Gradient : CSSStyleValue {
         fun add(color: CSSColorValue, from: T, to: T) = entries.add(
             Entry.Color.StopRange(color, from, to)
         )
+
         fun setMidpoint(hint: T) = entries.add(Entry.Hint(hint))
     }
 }
@@ -57,7 +59,7 @@ sealed class LinearGradient(private val gradientStr: String) : Gradient {
         ToLeft,
         ToTopLeft;
 
-        override fun toString() = when(this) {
+        override fun toString() = when (this) {
             ToTop -> "to top"
             ToTopRight -> "to top right"
             ToRight -> "to right"
@@ -71,9 +73,14 @@ sealed class LinearGradient(private val gradientStr: String) : Gradient {
 
     override fun toString() = "linear-gradient($gradientStr)"
 
-    internal class Default internal constructor(vararg entries: LengthColorStopsBuilderEntry) : LinearGradient(entries.joinToString())
-    internal class ByDirection internal constructor(dir: Direction, vararg entries: LengthColorStopsBuilderEntry) : LinearGradient("$dir, ${entries.joinToString()}")
-    internal class ByAngle internal constructor(angle: CSSAngleValue, vararg entries: LengthColorStopsBuilderEntry) : LinearGradient("$angle, ${entries.joinToString()}")
+    internal class Default internal constructor(vararg entries: LengthColorStopsBuilderEntry) :
+        LinearGradient(entries.joinToString())
+
+    internal class ByDirection internal constructor(dir: Direction, vararg entries: LengthColorStopsBuilderEntry) :
+        LinearGradient("$dir, ${entries.joinToString()}")
+
+    internal class ByAngle internal constructor(angle: CSSAngleValue, vararg entries: LengthColorStopsBuilderEntry) :
+        LinearGradient("$angle, ${entries.joinToString()}")
 }
 
 fun linearGradient(dir: LinearGradient.Direction, init: LengthColorStopsBuilder.() -> Unit): LinearGradient {
@@ -147,6 +154,7 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
                 append(' ')
                 append(radiusY)
             })
+
             constructor(extent: Extent) : this(buildString {
                 append(' ')
                 append(extent)
@@ -193,7 +201,11 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
             append(entries.joinToString())
         })
 
-    internal class ByShape internal constructor(shape: Shape, position: CSSPosition?, vararg entries: LengthColorStopsBuilderEntry) :
+    internal class ByShape internal constructor(
+        shape: Shape,
+        position: CSSPosition?,
+        vararg entries: LengthColorStopsBuilderEntry
+    ) :
         RadialGradient(buildString {
             append(shape.toString())
             if (position != null) {
@@ -204,7 +216,11 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
         })
 }
 
-fun radialGradient(shape: RadialGradient.Shape, position: CSSPosition? = null, init: LengthColorStopsBuilder.() -> Unit): RadialGradient {
+fun radialGradient(
+    shape: RadialGradient.Shape,
+    position: CSSPosition? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RadialGradient {
     return LengthColorStopsBuilder().apply(init).let {
         RadialGradient.ByShape(shape, position, *it.verifiedEntries())
     }
@@ -218,10 +234,11 @@ fun radialGradient(position: CSSPosition? = null, init: LengthColorStopsBuilder.
 
 // Using the builder is flexible, but provide some useful defaults for common cases
 
-fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = radialGradient(shape, position) {
-    add(from)
-    add(to)
-}
+fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
+    radialGradient(shape, position) {
+        add(from)
+        add(to)
+    }
 
 fun radialGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = radialGradient(position) {
     add(from)
@@ -246,7 +263,11 @@ sealed class ConicGradient(private val gradientStr: String) : Gradient {
             append(entries.joinToString())
         })
 
-    internal class ByAngle internal constructor(angle: CSSAngleValue, position: CSSPosition?, vararg entries: AngleColorStopsBuilderEntry) :
+    internal class ByAngle internal constructor(
+        angle: CSSAngleValue,
+        position: CSSPosition?,
+        vararg entries: AngleColorStopsBuilderEntry
+    ) :
         ConicGradient(buildString {
             append("from $angle")
             if (position != null) {
@@ -257,7 +278,11 @@ sealed class ConicGradient(private val gradientStr: String) : Gradient {
         })
 }
 
-fun conicGradient(angle: CSSAngleValue, position: CSSPosition? = null, init: AngleColorStopsBuilder.() -> Unit): ConicGradient {
+fun conicGradient(
+    angle: CSSAngleValue,
+    position: CSSPosition? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): ConicGradient {
     return AngleColorStopsBuilder().apply(init).let {
         ConicGradient.ByAngle(angle, position, *it.verifiedEntries())
     }
@@ -271,10 +296,11 @@ fun conicGradient(position: CSSPosition? = null, init: AngleColorStopsBuilder.()
 
 // Using the builder is flexible, but provide some useful defaults for common cases
 
-fun conicGradient(angle: CSSAngleValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = conicGradient(angle, position) {
-    add(from)
-    add(to)
-}
+fun conicGradient(angle: CSSAngleValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
+    conicGradient(angle, position) {
+        add(from)
+        add(to)
+    }
 
 fun conicGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = conicGradient(position) {
     add(from)

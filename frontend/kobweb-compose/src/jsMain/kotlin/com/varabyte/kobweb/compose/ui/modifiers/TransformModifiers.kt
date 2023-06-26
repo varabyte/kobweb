@@ -31,7 +31,7 @@ fun Modifier.rotateZ(az: CSSAngleValue) = styleModifier {
     rotateZ(az)
 }
 
-fun Modifier.scale(s: Number) = styleModifier{
+fun Modifier.scale(s: Number) = styleModifier {
     scale(s)
 }
 
@@ -87,9 +87,10 @@ fun Modifier.translate(tx: CSSLengthOrPercentageValue, ty: CSSLengthOrPercentage
     translate(tx, ty)
 }
 
-fun Modifier.translate(tx: CSSLengthOrPercentageValue, ty: CSSLengthOrPercentageValue, tz: CSSLengthOrPercentageValue) = styleModifier {
-    translate(tx, ty, tz)
-}
+fun Modifier.translate(tx: CSSLengthOrPercentageValue, ty: CSSLengthOrPercentageValue, tz: CSSLengthOrPercentageValue) =
+    styleModifier {
+        translate(tx, ty, tz)
+    }
 
 fun Modifier.translateX(tx: CSSLengthOrPercentageValue) = styleModifier {
     translateX(tx)

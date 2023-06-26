@@ -1,13 +1,7 @@
 package com.varabyte.kobweb.silk.components.style.breakpoint
 
 import kotlinx.browser.window
-import org.jetbrains.compose.web.css.CSSSizeValue
-import org.jetbrains.compose.web.css.CSSUnit
-import org.jetbrains.compose.web.css.CSSUnitValue
-import org.jetbrains.compose.web.css.CSSpxValue
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.em
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Window
 
 private val Window.bodyFontSize: Number
@@ -19,7 +13,7 @@ private val Window.bodyFontSize: Number
     }
 
 
-sealed class BreakpointUnitValue<out T: CSSUnitValue>(val width: T) {
+sealed class BreakpointUnitValue<out T : CSSUnitValue>(val width: T) {
     abstract fun toPx(): CSSpxValue
 
     class Px(value: CSSpxValue) : BreakpointUnitValue<CSSpxValue>(value) {
@@ -27,11 +21,13 @@ sealed class BreakpointUnitValue<out T: CSSUnitValue>(val width: T) {
             return width
         }
     }
+
     class Em(value: CSSSizeValue<CSSUnit.em>) : BreakpointUnitValue<CSSSizeValue<CSSUnit.em>>(value) {
         override fun toPx(): CSSpxValue {
             return (width.value.toDouble() * window.bodyFontSize.toDouble()).px
         }
     }
+
     class Rem(value: CSSSizeValue<CSSUnit.rem>) : BreakpointUnitValue<CSSSizeValue<CSSUnit.rem>>(value) {
         override fun toPx(): CSSpxValue {
             return (width.value.toDouble() * window.bodyFontSize.toDouble()).px
@@ -42,7 +38,7 @@ sealed class BreakpointUnitValue<out T: CSSUnitValue>(val width: T) {
 /**
  * A class used for storing generic values associated with breakpoints.
  */
-data class BreakpointValues<out T: CSSUnitValue>(
+data class BreakpointValues<out T : CSSUnitValue>(
     val sm: BreakpointUnitValue<T>,
     val md: BreakpointUnitValue<T>,
     val lg: BreakpointUnitValue<T>,

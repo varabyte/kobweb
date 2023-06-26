@@ -3,7 +3,18 @@ package com.varabyte.kobweb.gradle.application
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
-import com.varabyte.kobweb.gradle.application.tasks.*
+import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyDependencyResourcesTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateMetadataBackendTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateMetadataFrontendTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteEntryTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
 import com.varabyte.kobweb.gradle.application.util.kebabCaseToTitleCamelCase
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
@@ -12,8 +23,16 @@ import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
-import com.varabyte.kobweb.server.api.*
-import org.gradle.api.*
+import com.varabyte.kobweb.server.api.ServerEnvironment
+import com.varabyte.kobweb.server.api.ServerRequest
+import com.varabyte.kobweb.server.api.ServerRequestsFile
+import com.varabyte.kobweb.server.api.ServerStateFile
+import com.varabyte.kobweb.server.api.SiteLayout
+import org.gradle.api.Action
+import org.gradle.api.GradleException
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
@@ -37,7 +56,8 @@ class KobwebApplicationPlugin @Inject constructor(
         project.pluginManager.apply(KobwebCorePlugin::class.java)
 
         val kobwebFolder = project.kobwebFolder
-        val kobwebConf = KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
+        val kobwebConf =
+            KobwebConfFile(kobwebFolder).content ?: throw GradleException("Missing conf.yaml file from Kobweb folder")
         val kobwebBlock = ((project as ExtensionAware).extensions["kobweb"] as KobwebBlock).apply {
             createAppBlock(kobwebConf)
             createExportBlock()
@@ -50,51 +70,88 @@ class KobwebApplicationPlugin @Inject constructor(
         val exportLayout =
             project.findProperty("kobwebExportLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.KOBWEB
 
-        project.extra["kobwebBuildTarget"] = project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
-            ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
+        project.extra["kobwebBuildTarget"] =
+            project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
+                ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
         val buildTarget = project.kobwebBuildTarget
 
         val kobwebGenFrontendMetadata =
-            project.tasks.register("kobwebGenFrontendMetadata", KobwebGenerateMetadataFrontendTask::class.java, kobwebBlock)
+            project.tasks.register(
+                "kobwebGenFrontendMetadata",
+                KobwebGenerateMetadataFrontendTask::class.java,
+                kobwebBlock
+            )
 
         val kobwebGenBackendMetadata =
-            project.tasks.register("kobwebGenBackendMetadata", KobwebGenerateMetadataBackendTask::class.java, kobwebBlock)
+            project.tasks.register(
+                "kobwebGenBackendMetadata",
+                KobwebGenerateMetadataBackendTask::class.java,
+                kobwebBlock
+            )
 
         val kobwebGenSiteEntryTask =
-            project.tasks.register("kobwebGenSiteEntry", KobwebGenerateSiteEntryTask::class.java, kobwebConf, kobwebBlock, buildTarget)
+            project.tasks.register(
+                "kobwebGenSiteEntry",
+                KobwebGenerateSiteEntryTask::class.java,
+                kobwebConf,
+                kobwebBlock,
+                buildTarget
+            )
         kobwebGenSiteEntryTask.configure {
             dependsOn(kobwebGenFrontendMetadata)
         }
 
-        val kobwebCopyDependencyResourcesTask = project.tasks.register("kobwebCopyDepResources", KobwebCopyDependencyResourcesTask::class.java, kobwebBlock)
+        val kobwebCopyDependencyResourcesTask =
+            project.tasks.register("kobwebCopyDepResources", KobwebCopyDependencyResourcesTask::class.java, kobwebBlock)
         val kobwebGenSiteIndexTask =
-            project.tasks.register("kobwebGenSiteIndex", KobwebGenerateSiteIndexTask::class.java, kobwebConf, kobwebBlock, buildTarget)
+            project.tasks.register(
+                "kobwebGenSiteIndex",
+                KobwebGenerateSiteIndexTask::class.java,
+                kobwebConf,
+                kobwebBlock,
+                buildTarget
+            )
 
         kobwebGenSiteIndexTask.configure {
             // Make sure copy resources occurs first, so that our index.html file doesn't get overwritten
             dependsOn(kobwebCopyDependencyResourcesTask)
         }
 
-        val kobwebGenApisFactoryTask = project.tasks.register("kobwebGenApisFactory", KobwebGenerateApisFactoryTask::class.java, kobwebBlock)
+        val kobwebGenApisFactoryTask =
+            project.tasks.register("kobwebGenApisFactory", KobwebGenerateApisFactoryTask::class.java, kobwebBlock)
         kobwebGenApisFactoryTask.configure {
             dependsOn(kobwebGenBackendMetadata)
         }
 
         // Umbrella tasks for all other gen tasks
-        val kobwebGenFrontendTask = project.tasks.register("kobwebGenFrontend", KobwebTask::class.java, "The umbrella task that combines all Kobweb frontend generation tasks")
+        val kobwebGenFrontendTask = project.tasks.register(
+            "kobwebGenFrontend",
+            KobwebTask::class.java,
+            "The umbrella task that combines all Kobweb frontend generation tasks"
+        )
         kobwebGenFrontendTask.configure {
             dependsOn(kobwebGenSiteIndexTask)
             dependsOn(kobwebGenSiteEntryTask)
         }
-        val kobwebGenBackendTask = project.tasks.register("kobwebGenBackend", KobwebTask::class.java, "The umbrella task that combines all Kobweb backend generation tasks")
+        val kobwebGenBackendTask = project.tasks.register(
+            "kobwebGenBackend",
+            KobwebTask::class.java,
+            "The umbrella task that combines all Kobweb backend generation tasks"
+        )
         kobwebGenBackendTask.configure {
             dependsOn(kobwebGenApisFactoryTask)
         }
-        val kobwebGenTask = project.tasks.register("kobwebGen", KobwebTask::class.java, "The umbrella task that combines all frontend and backend Kobweb generation tasks")
+        val kobwebGenTask = project.tasks.register(
+            "kobwebGen",
+            KobwebTask::class.java,
+            "The umbrella task that combines all frontend and backend Kobweb generation tasks"
+        )
         // Note: Configured below, in `afterEvaluate`
 
-        val kobwebUnpackServerJarTask = project.tasks.register("kobwebUnpackServerJar", KobwebUnpackServerJarTask::class.java)
-        val kobwebCreateServerScriptsTask = project.tasks.register("kobwebCreateServerScripts", KobwebCreateServerScriptsTask::class.java)
+        val kobwebUnpackServerJarTask =
+            project.tasks.register("kobwebUnpackServerJar", KobwebUnpackServerJarTask::class.java)
+        val kobwebCreateServerScriptsTask =
+            project.tasks.register("kobwebCreateServerScripts", KobwebCreateServerScriptsTask::class.java)
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
             project.tasks.register("kobwebStart", KobwebStartTask::class.java, env, runLayout, reuseServer)
@@ -104,13 +161,21 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
 
-        val kobwebCleanSiteTask = project.tasks.register("kobwebCleanSite", KobwebTask::class.java, "Cleans all site artifacts generated by a previous export")
+        val kobwebCleanSiteTask = project.tasks.register(
+            "kobwebCleanSite",
+            KobwebTask::class.java,
+            "Cleans all site artifacts generated by a previous export"
+        )
         kobwebCleanSiteTask.configure {
             doLast {
                 project.delete(kobwebConf.server.files.prod.siteRoot)
             }
         }
-        val kobwebCleanFolderTask = project.tasks.register("kobwebCleanFolder", KobwebTask::class.java, "Cleans all transient files that live in the .kobweb folder")
+        val kobwebCleanFolderTask = project.tasks.register(
+            "kobwebCleanFolder",
+            KobwebTask::class.java,
+            "Cleans all transient files that live in the .kobweb folder"
+        )
         kobwebCleanFolderTask.configure {
             dependsOn(kobwebCleanSiteTask)
             doLast {
@@ -124,7 +189,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
-        val taskListenerService = project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
+        val taskListenerService =
+            project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
         run {
             var isBuilding = false
             var isServerRunning = run {
@@ -294,7 +360,10 @@ fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: TaskProvider<*>) {
  *   have to provide a name, but providing your own may be slightly more performant (since the task name I generate
  *   requires realizing the task, which may slightly slow down the configuration phase).
  */
-fun Project.notifyKobwebAboutServerPluginTask(jarTask: TaskProvider<Jar>, name: String = "copy${project.name.kebabCaseToTitleCamelCase()}JarToKobwebServerPluginsDir") {
+fun Project.notifyKobwebAboutServerPluginTask(
+    jarTask: TaskProvider<Jar>,
+    name: String = "copy${project.name.kebabCaseToTitleCamelCase()}JarToKobwebServerPluginsDir"
+) {
     val copyKobwebServerPluginTask = tasks.register(name, Copy::class.java) {
         from(jarTask)
         destinationDir = project.projectDir.resolve(".kobweb/server/plugins")

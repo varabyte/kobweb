@@ -11,11 +11,13 @@ import org.w3c.dom.Element
 class GenericElementBuilder private constructor(private val name: String) : ElementBuilder<Element> {
     companion object {
         private val cachedBuilders = mutableMapOf<String, GenericElementBuilder>()
+
         /** Create a new builder, caching it by type. */
         fun create(name: String): GenericElementBuilder {
             return cachedBuilders.getOrPut(name) { GenericElementBuilder(name) }
         }
     }
+
     private val element by lazy { document.createElement(name) }
     override fun create() = element.cloneNode() as Element
 }
@@ -55,6 +57,7 @@ fun GenericTag(
                             insideQuotes = !insideQuotes
                             sb.append(c)
                         }
+
                         ' ' -> {
                             if (insideQuotes) {
                                 sb.append(c)
@@ -63,6 +66,7 @@ fun GenericTag(
                                 sb.clear()
                             }
                         }
+
                         else -> sb.append(c)
                     }
                 }

@@ -162,7 +162,10 @@ fun Modifier.backgroundRepeat(backgroundRepeat: BackgroundRepeat) = styleModifie
     backgroundRepeat(backgroundRepeat)
 }
 
-fun Modifier.backgroundRepeat(horizontalRepeat: BackgroundRepeat.RepeatStyle, verticalRepeat: BackgroundRepeat.RepeatStyle) = styleModifier {
+fun Modifier.backgroundRepeat(
+    horizontalRepeat: BackgroundRepeat.RepeatStyle,
+    verticalRepeat: BackgroundRepeat.RepeatStyle
+) = styleModifier {
     backgroundRepeat(horizontalRepeat, verticalRepeat)
 }
 

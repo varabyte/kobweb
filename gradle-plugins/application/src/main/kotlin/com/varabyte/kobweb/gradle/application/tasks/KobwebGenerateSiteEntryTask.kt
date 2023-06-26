@@ -22,7 +22,6 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import javax.inject.Inject
 
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(

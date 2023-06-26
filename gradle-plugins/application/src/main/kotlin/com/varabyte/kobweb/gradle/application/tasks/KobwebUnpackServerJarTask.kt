@@ -21,14 +21,18 @@ import java.util.*
  * 2. This allows the .kobweb folder to be self-contained, which can be very useful for people who want to deploy their
  *    Kobweb site on some external hosting service.
  */
-abstract class KobwebUnpackServerJarTask : KobwebTask("Extract a server.jar resource from the Gradle plugin and move it into the .kobweb folder") {
-    private val serverJarResource = KobwebUnpackServerJarTask::class.java.getResourceAsStream("/server.jar")!!.readAllBytes()
+abstract class KobwebUnpackServerJarTask :
+    KobwebTask("Extract a server.jar resource from the Gradle plugin and move it into the .kobweb folder") {
+    private val serverJarResource =
+        KobwebUnpackServerJarTask::class.java.getResourceAsStream("/server.jar")!!.readAllBytes()
 
     @Input
     fun getServerJarResourceHash(): String {
-        return String(Base64.getEncoder().encode(
-            MessageDigest.getInstance("SHA-256").digest(serverJarResource)!!
-        ))
+        return String(
+            Base64.getEncoder().encode(
+                MessageDigest.getInstance("SHA-256").digest(serverJarResource)!!
+            )
+        )
     }
 
     @OutputFile

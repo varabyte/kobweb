@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import org.jetbrains.compose.web.css.CSSNumeric
-import org.jetbrains.compose.web.css.CSSNumericValue
-import org.jetbrains.compose.web.css.CSSUnit
+import org.jetbrains.compose.web.css.*
 
 /**
  * A CSS value that represents the "auto" keyword and can be used anywhere that accepts a numeric argument.

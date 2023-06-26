@@ -1,11 +1,8 @@
 package com.varabyte.kobweb.silk.components.disclosure
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.CSSTransition
-import com.varabyte.kobweb.compose.css.Cursor
-import com.varabyte.kobweb.compose.css.Overflow
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.StyleVariable
-import com.varabyte.kobweb.compose.css.UserSelect
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -16,9 +13,15 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.thenIf
-import com.varabyte.kobweb.silk.components.style.*
+import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.active
+import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
+import com.varabyte.kobweb.silk.components.style.hover
+import com.varabyte.kobweb.silk.components.style.not
+import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
@@ -94,13 +97,13 @@ class TabPanelScope {
 
     @Suppress("FunctionName") // Composable style
     fun Tab(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
-        check(tab == null) { "Attempting to define two tabs for a single TabPanel"}
+        check(tab == null) { "Attempting to define two tabs for a single TabPanel" }
         tab = TabData(modifier, content)
     }
 
     @Suppress("FunctionName") // Composable style
     fun Panel(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
-        check(panel == null) { "Attempting to define two panels for a single TabPanel"}
+        check(panel == null) { "Attempting to define two panels for a single TabPanel" }
         panel = PanelData(modifier, content)
     }
 }
@@ -131,8 +134,8 @@ class TabsScope {
     @Suppress("FunctionName") // Composable style
     fun TabPanel(enabled: Boolean = true, isDefault: Boolean = false, block: TabPanelScope.() -> Unit) {
         val scope = TabPanelScope().apply(block)
-        check(scope.tab != null) { "TabPanel did not declare Tab"}
-        check(scope.panel != null) { "TabPanel did not declare Panel"}
+        check(scope.tab != null) { "TabPanel did not declare Tab" }
+        check(scope.panel != null) { "TabPanel did not declare Panel" }
 
         _tabPanels.add(TabPanelData(enabled, isDefault, scope.tab!!, scope.panel!!))
     }
@@ -150,7 +153,14 @@ class TabsScope {
  * ```
  */
 @Suppress("FunctionName") // Composable style
-fun TabsScope.TabPanel(tabText: String, tabModifier: Modifier = Modifier, panelModifier: Modifier = Modifier, enabled: Boolean = true, isDefault: Boolean = false, content: @Composable BoxScope.() -> Unit) {
+fun TabsScope.TabPanel(
+    tabText: String,
+    tabModifier: Modifier = Modifier,
+    panelModifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    isDefault: Boolean = false,
+    content: @Composable BoxScope.() -> Unit
+) {
     TabPanel(enabled, isDefault) {
         Tab(tabText, tabModifier)
         Panel(panelModifier, content)

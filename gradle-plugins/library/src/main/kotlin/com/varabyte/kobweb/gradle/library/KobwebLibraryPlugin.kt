@@ -17,10 +17,18 @@ class KobwebLibraryPlugin : Plugin<Project> {
         val kobwebBlock = project.kobwebBlock
 
         val kobwebGenFrontendMetadata =
-            project.tasks.register("kobwebGenFrontendMetadata", KobwebGenerateMetadataFrontendTask::class.java, kobwebBlock)
+            project.tasks.register(
+                "kobwebGenFrontendMetadata",
+                KobwebGenerateMetadataFrontendTask::class.java,
+                kobwebBlock
+            )
 
         val kobwebGenBackendMetadata =
-            project.tasks.register("kobwebGenBackendMetadata", KobwebGenerateMetadataBackendTask::class.java, kobwebBlock)
+            project.tasks.register(
+                "kobwebGenBackendMetadata",
+                KobwebGenerateMetadataBackendTask::class.java,
+                kobwebBlock
+            )
 
         project.afterEvaluate {
             project.tasks.findByName(jsTarget.processResources)?.dependsOn(kobwebGenFrontendMetadata)

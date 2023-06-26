@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.compose.ui.graphics
 
-import org.jetbrains.compose.web.css.CSSAngleValue
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.CSSPercentageValue
+import org.jetbrains.compose.web.css.*
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -23,6 +21,7 @@ private fun CSSAngleValue.toDegrees() = when (this.unit.toString()) {
  */
 sealed interface Color : CSSColorValue {
     fun inverted(): Color
+
     /**
      * Darken this color by some target percent value.
      *
@@ -50,7 +49,7 @@ sealed interface Color : CSSColorValue {
 
         override fun inverted(): Color = rgba(255 - red, 255 - green, 255 - blue, alpha)
         override fun darkened(byPercent: Float): Color {
-            require(byPercent in (0f..1f)) { "Invalid color shifting percent. Expected between 0 and 1, got $byPercent"}
+            require(byPercent in (0f..1f)) { "Invalid color shifting percent. Expected between 0 and 1, got $byPercent" }
             if (byPercent == 0f) return this
 
             val darkeningMultiplier = 1.0f - byPercent // e.g. reduce by 20% means take 80% of the current value
@@ -74,7 +73,7 @@ sealed interface Color : CSSColorValue {
             val chromaDelta = chromaMax - chromaMin
 
             val lightness = (chromaMin + chromaMax) / 2f
-            val saturation = chromaDelta / (1f - abs(2f*lightness - 1f))
+            val saturation = chromaDelta / (1f - abs(2f * lightness - 1f))
             val hue = if (chromaDelta == 0f) {
                 0f
             } else {
@@ -117,11 +116,17 @@ sealed interface Color : CSSColorValue {
      * @property lightness A percentage value (0-1) representing how bright the color is.
      * @property alpha A percentage value (0-1) representing how transparent the color is.
      */
-    class Hsl internal constructor(val hue: Float, val saturation: Float, val lightness: Float, val alpha: Float) : Color {
+    class Hsl internal constructor(val hue: Float, val saturation: Float, val lightness: Float, val alpha: Float) :
+        Color {
         override fun inverted() = toRgb().inverted()
         override fun darkened(byPercent: Float) = toRgb().darkened(byPercent)
 
-        fun copy(hue: Float = this.hue, saturation: Float = this.saturation, lightness: Float = this.lightness, alpha: Float = this.alpha) =
+        fun copy(
+            hue: Float = this.hue,
+            saturation: Float = this.saturation,
+            lightness: Float = this.lightness,
+            alpha: Float = this.alpha
+        ) =
             hsla(hue, saturation, lightness, alpha)
 
         override fun toRgb(): Rgb {
@@ -129,33 +134,40 @@ sealed interface Color : CSSColorValue {
             val chroma = (1 - abs(2 * lightness - 1)) * saturation
             val intermediateValue = chroma * (1 - abs(((hue / 60) % 2) - 1))
             val hueSection = (hue.toInt() % 360) / 60
-            val r: Float; val g: Float; val b: Float;
+            val r: Float;
+            val g: Float;
+            val b: Float;
             when (hueSection) {
                 0 -> {
                     r = chroma
                     g = intermediateValue
                     b = 0f
                 }
+
                 1 -> {
                     r = intermediateValue
                     g = chroma
                     b = 0f
                 }
+
                 2 -> {
                     r = 0f
                     g = chroma
                     b = intermediateValue
                 }
+
                 3 -> {
                     r = 0f
                     g = intermediateValue
                     b = chroma
                 }
+
                 4 -> {
                     r = intermediateValue
                     g = 0f
                     b = chroma
                 }
+
                 else -> {
                     check(hueSection == 5)
                     r = chroma
@@ -207,9 +219,14 @@ sealed interface Color : CSSColorValue {
             // We accept Long here because Kotlin treats 0xFF000000 and such values as a Long, even though that can
             // still fit into 4 bytes and be represented by an Int. Therefore, let's accept Longs but fail at runtime if
             // the user passes in something with a higher bit set.
-            check(0xFFFFFFFF.inv().and(value) == 0L) { "Got an invalid hex color (0x${value.toString(16).uppercase()}) value larger than 0xFFFFFFFF" }
+            check(0xFFFFFFFF.inv().and(value) == 0L) {
+                "Got an invalid hex color (0x${
+                    value.toString(16).uppercase()
+                }) value larger than 0xFFFFFFFF"
+            }
             argb(value.toInt())
         }
+
         @Deprecated(
             "`rgba` was incorrectly named. Please use `argb` instead, since the first 8 bits of the hex value are for alpha. In a future version, `rgba` may be reintroduced with the correct implementation.",
             ReplaceWith("Color.argb(value)")
@@ -223,11 +240,13 @@ sealed interface Color : CSSColorValue {
                 .or(b.and(0xFF).shl(0))
                 .or(a.and(0xFF).shl(24))
         )
+
         fun argb(a: Int, r: Int, g: Int, b: Int) = rgba(r, g, b, a)
 
         fun rgb(r: Float, g: Float, b: Float) = rgb(r.toColorInt(), g.toColorInt(), b.toColorInt())
         fun rgba(r: Float, g: Float, b: Float, a: Float) =
             rgba(r.toColorInt(), g.toColorInt(), b.toColorInt(), a.toColorInt())
+
         fun argb(a: Float, r: Float, g: Float, b: Float) = rgba(r, g, b, a)
 
         fun rgba(r: Int, g: Int, b: Int, a: Float) = rgba(r, g, b, a.toColorInt())
@@ -243,16 +262,20 @@ sealed interface Color : CSSColorValue {
         fun rgb(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) = rgba(r, g, b, 1f)
         fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: CSSPercentageValue) =
             rgba(r.value / 100f, g.value / 100f, b.value / 100f, a.value / 100f)
+
         fun rgba(r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue, a: Float) =
             rgba(r.value / 100f, g.value / 100f, b.value / 100f, a)
+
         fun argb(a: CSSPercentageValue, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) =
             argb(a.value / 100f, r.value / 100f, g.value / 100f, b.value / 100f)
+
         fun argb(a: Float, r: CSSPercentageValue, g: CSSPercentageValue, b: CSSPercentageValue) =
             argb(a, r.value / 100f, g.value / 100f, b.value / 100f)
 
         fun hsl(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue) = hsla(h, s, l, 1f)
         fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: Float) =
             hsla(h.toDegrees(), s.value / 100f, l.value / 100f, alpha)
+
         fun hsla(h: CSSAngleValue, s: CSSPercentageValue, l: CSSPercentageValue, alpha: CSSPercentageValue) =
             hsla(h, s, l, alpha.value / 100f)
     }

@@ -1,16 +1,12 @@
 package com.varabyte.kobweb.silk.components.document
 
-import com.varabyte.kobweb.compose.css.ListStyleType
-import com.varabyte.kobweb.compose.css.TextAlign
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.addVariantBase
 import com.varabyte.kobweb.silk.components.style.base
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 
 // Note: The Silk `Toc` widget itself is defined in the kobweb-silk module since it has dependencies on kobweb-core
 // indirectly, via `Link`.

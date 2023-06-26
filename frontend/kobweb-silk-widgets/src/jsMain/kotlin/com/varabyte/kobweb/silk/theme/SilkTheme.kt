@@ -375,7 +375,9 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
 
 internal var _SilkTheme: ImmutableSilkTheme? = null
 val SilkTheme: ImmutableSilkTheme
-    get() { return _SilkTheme ?: error("You can't access SilkTheme before first calling SilkApp") }
+    get() {
+        return _SilkTheme ?: error("You can't access SilkTheme before first calling SilkApp")
+    }
 
 /**
  * Convenience method for fetching the silk palette associated with the target color mode, useful for when you aren't

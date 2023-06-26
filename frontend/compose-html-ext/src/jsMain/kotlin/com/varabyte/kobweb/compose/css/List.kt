@@ -1,15 +1,12 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSImage
-import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.util.wrapQuotesIfNecessary
-import org.jetbrains.compose.web.css.CSSColorValue
-import org.jetbrains.compose.web.css.StylePropertyValue
-import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.*
 
 typealias ListStyleImage = CSSImage
 
-class ListStyleType private constructor(private val value: String): StylePropertyValue {
+class ListStyleType private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -82,7 +79,7 @@ class ListStyleType private constructor(private val value: String): StylePropert
     }
 }
 
-class ListStylePosition private constructor(private val value: String): StylePropertyValue {
+class ListStylePosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -98,7 +95,11 @@ class ListStylePosition private constructor(private val value: String): StylePro
     }
 }
 
-fun StyleScope.listStyle(type: ListStyleType? = null, position: ListStylePosition? = null, image: ListStyleImage? = null) {
+fun StyleScope.listStyle(
+    type: ListStyleType? = null,
+    position: ListStylePosition? = null,
+    image: ListStyleImage? = null
+) {
     type?.let { property("list-style-type", it) }
     position?.let { property("list-style-position", it) }
     image?.let { property("list-style-image", it) }

@@ -12,12 +12,14 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
-import java.util.zip.ZipException
 import javax.inject.Inject
 
 abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
     kobwebBlock: KobwebBlock,
-) : KobwebModuleTask(kobwebBlock, "Copy and make available all public/ resources from the application and any libraries to the final site") {
+) : KobwebModuleTask(
+    kobwebBlock,
+    "Copy and make available all public/ resources from the application and any libraries to the final site"
+) {
 
     @InputFiles
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
@@ -69,7 +71,8 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
                     }
                 }
             }.forEach { (jar, rootAndFile) ->
-                val targetFile = getGenPublicRoot().resolve(rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
+                val targetFile =
+                    getGenPublicRoot().resolve(rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
                 if (targetFile.exists() && !rootAndFile.file.readBytes().contentEquals(targetFile.readBytes())) {
                     project.logger.warn("Overwriting ${rootAndFile.relativeFile} with the public resource found in ${jar.name}")
                 }

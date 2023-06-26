@@ -59,7 +59,12 @@ fun Modifier.textOverflow(textOverflow: TextOverflow): Modifier = styleModifier 
     textOverflow(textOverflow)
 }
 
-fun Modifier.textShadow(offsetX: CSSLengthValue, offsetY: CSSLengthValue, blurRadius: CSSLengthValue? = null, color: CSSColorValue? = null) = styleModifier {
+fun Modifier.textShadow(
+    offsetX: CSSLengthValue,
+    offsetY: CSSLengthValue,
+    blurRadius: CSSLengthValue? = null,
+    color: CSSColorValue? = null
+) = styleModifier {
     textShadow(offsetX, offsetY, blurRadius, color)
 }
 

@@ -3,11 +3,40 @@ package com.varabyte.kobweb.gradle.core.processors
 import com.varabyte.kobweb.gradle.core.project.common.PackageUtils.prefixQualifiedPath
 import com.varabyte.kobweb.gradle.core.project.common.RouteUtils
 import com.varabyte.kobweb.gradle.core.project.common.getStringValue
-import com.varabyte.kobweb.gradle.core.project.frontend.*
+import com.varabyte.kobweb.gradle.core.project.frontend.ComponentStyleEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.ComponentVariantEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
+import com.varabyte.kobweb.gradle.core.project.frontend.INIT_KOBWEB_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.INIT_KOBWEB_SIMPLE_NAME
+import com.varabyte.kobweb.gradle.core.project.frontend.INIT_SILK_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.INIT_SILK_SIMPLE_NAME
+import com.varabyte.kobweb.gradle.core.project.frontend.InitKobwebEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.InitSilkEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.KeyframesEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.PACKAGE_MAPPING_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.PACKAGE_MAPPING_SIMPLE_NAME
+import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_SIMPLE_NAME
+import com.varabyte.kobweb.gradle.core.project.frontend.PageEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.assertValid
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.visitAllChildren
-import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.psiUtil.*
+import org.jetbrains.kotlin.psi.KtAnnotated
+import org.jetbrains.kotlin.psi.KtAnnotationEntry
+import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtFileAnnotationList
+import org.jetbrains.kotlin.psi.KtImportDirective
+import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtPackageDirective
+import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtPropertyDelegate
+import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+import org.jetbrains.kotlin.psi.psiUtil.getSuperNames
+import org.jetbrains.kotlin.psi.psiUtil.isPublic
+import org.jetbrains.kotlin.psi.psiUtil.parents
 import java.io.File
 
 private fun KtAnnotated.shouldSuppress(label: String) =
@@ -141,7 +170,7 @@ private fun processComponentVariant(
     val property = qualifiedExpression.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
 
     assertUsingPropertyDelegateIfNecessary(file, callExpr, property, reporter)
-    return processComponentVariant(file, filePackage, property,silkVariants, reporter)
+    return processComponentVariant(file, filePackage, property, silkVariants, reporter)
 }
 
 /** Process a line like `val CustomVariant = CustomStyle.addVariantBase("variant") { ... }` */
@@ -433,9 +462,22 @@ class FrontendDataProcessor(
         if (pages.isEmpty()) {
             reporter.error("No pages were defined. You must tag at least one page with the `@Page` annotation!")
         } else if (pages.none { it.route == "/" }) {
-            reporter.warn("No root route was defined for your site. This means if people visit your website URL, they'll get a 404 error. Create a `@Page` at \"${(qualifiedPagesPackage.split('.') + "Index.kt").joinToString("/") }\" to make this warning go away.")
+            reporter.warn(
+                "No root route was defined for your site. This means if people visit your website URL, they'll get a 404 error. Create a `@Page` at \"${
+                    (qualifiedPagesPackage.split(
+                        '.'
+                    ) + "Index.kt").joinToString("/")
+                }\" to make this warning go away."
+            )
         }
 
-        return FrontendData(pages, kobwebInits, silkInits, silkStyles, silkVariants, keyframesList).also { it.assertValid() }
+        return FrontendData(
+            pages,
+            kobwebInits,
+            silkInits,
+            silkStyles,
+            silkVariants,
+            keyframesList
+        ).also { it.assertValid() }
     }
 }

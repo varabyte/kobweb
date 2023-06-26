@@ -10,9 +10,9 @@ import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.core.util.getResourceRoots
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
-import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
+import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.InputFiles
@@ -84,16 +84,22 @@ abstract class ConvertMarkdownTask @Inject constructor(
                         .takeIf { !it.exists() }
                         ?.let { mappingFile ->
                             mappingFile.parentFile.mkdirs()
-                            mappingFile.writeText("""
+                            mappingFile.writeText(
+                                """
                                 @file:PackageMapping("${dirParts[i]}")
 
-                                package ${project.prefixQualifiedPackage(kobwebBlock.pagesPackage.get().packageConcat(
-                                subpackage.joinToString(".")
-                            )) }
+                                package ${
+                                    project.prefixQualifiedPackage(
+                                        kobwebBlock.pagesPackage.get().packageConcat(
+                                            subpackage.joinToString(".")
+                                        )
+                                    )
+                                }
 
                                 import com.varabyte.kobweb.core.PackageMapping
-                            """.trimIndent())
-                    }
+                            """.trimIndent()
+                            )
+                        }
                 }
             }
 

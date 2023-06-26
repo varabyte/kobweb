@@ -15,8 +15,10 @@ import kotlinx.serialization.json.Json
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.provider.DefaultProvider
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
-import java.io.File
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: KobwebBlock) :
@@ -36,13 +38,14 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
 
     @TaskAction
     fun execute() {
-        val backendData = mutableListOf(Json.decodeFromString(BackendData.serializer(), getAppBackendMetadata().readText())).apply {
-            getCompileClasspath().get().files.forEach { file ->
-                file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
-                    add(Json.decodeFromString(BackendData.serializer(), bytes.decodeToString()))
+        val backendData =
+            mutableListOf(Json.decodeFromString(BackendData.serializer(), getAppBackendMetadata().readText())).apply {
+                getCompileClasspath().get().files.forEach { file ->
+                    file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
+                        add(Json.decodeFromString(BackendData.serializer(), bytes.decodeToString()))
+                    }
                 }
-            }
-        }.merge()
+            }.merge()
 
         val apisFactoryFile = getGenApisFactoryFile()
         apisFactoryFile.parentFile.mkdirs()

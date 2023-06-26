@@ -4,9 +4,11 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.style.toClassName
-import com.varabyte.kobweb.compose.ui.*
-import com.varabyte.kobweb.compose.ui.modifiers.flexGrow
-import org.jetbrains.compose.web.css.flexGrow
+import com.varabyte.kobweb.compose.ui.Alignment
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.attrsModifier
+import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 

@@ -17,17 +17,17 @@ package com.varabyte.kobweb.common.collect
 class TypedMap {
     private val innerMap = mutableMapOf<String, Any>()
 
-    operator fun <T: Any> set(key: Key<T>, value: T) {
+    operator fun <T : Any> set(key: Key<T>, value: T) {
         innerMap[key.name] = value
     }
 
-    fun <T: Any> computeIfAbsent(key: Key<T>, compute: () -> T): T {
+    fun <T : Any> computeIfAbsent(key: Key<T>, compute: () -> T): T {
         return innerMap.computeIfAbsent(key.name) { compute() } as T
     }
 
-    operator fun <T: Any> get(key: Key<T>): T? {
+    operator fun <T : Any> get(key: Key<T>): T? {
         return innerMap[key.name] as? T
     }
 
-    fun <T: Any> getValue(key: Key<T>): T = this[key]!!
+    fun <T : Any> getValue(key: Key<T>): T = this[key]!!
 }

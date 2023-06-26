@@ -16,6 +16,7 @@ interface KobwebConfig {
     companion object {
         val Instance: KobwebConfig get() = MutableKobwebConfigInstance
     }
+
     val openLinkStrategies: OpenLinkStrategies
 }
 
@@ -23,4 +24,4 @@ class MutableKobwebConfig : KobwebConfig {
     override val openLinkStrategies = MutableOpenLinkStrategies()
 }
 
-internal var MutableKobwebConfigInstance : MutableKobwebConfig = MutableKobwebConfig()
+internal var MutableKobwebConfigInstance: MutableKobwebConfig = MutableKobwebConfig()

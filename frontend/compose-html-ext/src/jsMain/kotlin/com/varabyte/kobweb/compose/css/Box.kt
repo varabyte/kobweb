@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
-class BoxDecorationBreak private constructor(private val value: String): StylePropertyValue {
+class BoxDecorationBreak private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -24,7 +24,7 @@ fun StyleScope.boxDecorationBreak(boxDecorationBreak: BoxDecorationBreak) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-class BoxSizing private constructor(private val value: String): StylePropertyValue {
+class BoxSizing private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

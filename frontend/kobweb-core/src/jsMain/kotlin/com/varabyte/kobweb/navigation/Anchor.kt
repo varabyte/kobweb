@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
-import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.core.init.KobwebConfig
 import com.varabyte.kobweb.core.rememberPageContext
 import org.jetbrains.compose.web.dom.A
@@ -9,7 +8,8 @@ import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.w3c.dom.HTMLAnchorElement
 
-@Deprecated("Kobweb core's Link class has been renamed to Anchor",
+@Deprecated(
+    "Kobweb core's Link class has been renamed to Anchor",
     ReplaceWith("Anchor(href, attrs, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, content)")
 )
 @Composable
@@ -66,9 +66,15 @@ fun Anchor(
             }
             @Suppress("NAME_SHADOWING") // Intentional shadowing - nullable to non-null
             onClick { evt ->
-                val openInternalLinksStrategy = openInternalLinksStrategy ?: evt.toOpenLinkStrategy(KobwebConfig.Instance.openLinkStrategies.internal)
-                val openExternalLinksStrategy = openExternalLinksStrategy ?: evt.toOpenLinkStrategy(KobwebConfig.Instance.openLinkStrategies.external)
-                ctx.router.navigateTo(href, openInternalLinksStrategy = openInternalLinksStrategy, openExternalLinksStrategy = openExternalLinksStrategy)
+                val openInternalLinksStrategy = openInternalLinksStrategy
+                    ?: evt.toOpenLinkStrategy(KobwebConfig.Instance.openLinkStrategies.internal)
+                val openExternalLinksStrategy = openExternalLinksStrategy
+                    ?: evt.toOpenLinkStrategy(KobwebConfig.Instance.openLinkStrategies.external)
+                ctx.router.navigateTo(
+                    href,
+                    openInternalLinksStrategy = openInternalLinksStrategy,
+                    openExternalLinksStrategy = openExternalLinksStrategy
+                )
                 evt.preventDefault()
                 evt.stopPropagation()
             }

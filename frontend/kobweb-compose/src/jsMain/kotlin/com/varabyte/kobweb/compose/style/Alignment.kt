@@ -2,7 +2,7 @@ package com.varabyte.kobweb.compose.style
 
 import com.varabyte.kobweb.compose.ui.Alignment
 
-fun Alignment.toClassName() = when(this) {
+fun Alignment.toClassName() = when (this) {
     Alignment.TopStart -> "kobweb-align-top-start"
     Alignment.TopCenter -> "kobweb-align-top-center"
     Alignment.TopEnd -> "kobweb-align-top-end"
@@ -15,14 +15,14 @@ fun Alignment.toClassName() = when(this) {
     Alignment.FromStyle -> "kobweb-align-from-style"
 }
 
-fun Alignment.Vertical.toClassName() = when(this) {
+fun Alignment.Vertical.toClassName() = when (this) {
     Alignment.Top -> "kobweb-align-top"
     Alignment.CenterVertically -> "kobweb-align-center-vert"
     Alignment.Bottom -> "kobweb-align-bottom"
     Alignment.FromStyle -> "kobweb-align-from-style-vert"
 }
 
-fun Alignment.Horizontal.toClassName() = when(this) {
+fun Alignment.Horizontal.toClassName() = when (this) {
     Alignment.Start -> "kobweb-align-start"
     Alignment.CenterHorizontally -> "kobweb-align-center-horiz"
     Alignment.End -> "kobweb-align-end"
