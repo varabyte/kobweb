@@ -11,8 +11,10 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateMetadataTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.gradle.api.tasks.CacheableTask
 import javax.inject.Inject
 
+@CacheableTask
 abstract class KobwebGenerateMetadataFrontendTask @Inject constructor(kobwebBlock: KobwebBlock) :
     KobwebGenerateMetadataTask<FrontendData>(
         kobwebBlock,
