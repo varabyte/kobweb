@@ -11,6 +11,8 @@ import com.varabyte.kobweb.gradle.core.util.getSourceFiles
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import java.io.File
 
 /**
@@ -18,6 +20,7 @@ import java.io.File
  */
 abstract class KobwebModuleTask(@get:Internal val kobwebBlock: KobwebBlock, desc: String) : KobwebTask(desc) {
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE) // rerun if contents or path relative to project root changes
     fun getBuildScripts(): List<File> = project.getBuildScripts().toList()
 
     @Internal
