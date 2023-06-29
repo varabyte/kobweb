@@ -145,6 +145,13 @@ class NamedGridTrackSize(
         size,
         startName?.let { listOf(it) },
         endName?.let { listOf(it) })
+
+    fun addNames(startNames: List<String>? = null, endNames: List<String>? = null) =
+        NamedGridTrackSize(
+            size,
+            startNames?.let { this.startNames?.plus(it) ?: it } ?: this.startNames,
+            endNames?.let { this.endNames?.plus(it) ?: it } ?: this.endNames
+        )
 }
 
 fun GridTrackSize.named(startNames: List<String>? = null, endNames: List<String>? = null) =
@@ -319,6 +326,52 @@ class GridBuilder {
 
         fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue): TrackScope {
             return add(GridTrackSize.minmax(min, max))
+        }
+
+        private fun nameLastTrack(startNames: List<String>?, endNames: List<String>?): TrackScope {
+            check(tracks.isNotEmpty()) { "You must add at least one track before calling this method" }
+
+            val lastTrack = tracks.removeLast()
+            tracks.add(
+                when (lastTrack) {
+                    is NamedGridTrackSize -> lastTrack.addNames(startNames, endNames)
+                    is GridTrackSize -> lastTrack.named(startNames, endNames)
+                }
+            )
+
+            return this
+        }
+
+        fun named(start: String, end: String): TrackScope {
+            return nameLastTrack(listOf(start), listOf(end))
+        }
+
+        fun named(start: String, end: List<String>): TrackScope {
+            return nameLastTrack(listOf(start), end)
+        }
+
+        fun named(start: List<String>, end: String): TrackScope {
+            return nameLastTrack(start, listOf(end))
+        }
+
+        fun named(start: List<String>, end: List<String>): TrackScope {
+            return nameLastTrack(start, end)
+        }
+
+        fun startName(name: String): TrackScope {
+            return nameLastTrack(listOf(name), null)
+        }
+
+        fun startNames(names: List<String>): TrackScope {
+            return nameLastTrack(names, null)
+        }
+
+        fun endName(endName: String): TrackScope {
+            return nameLastTrack(null, listOf(endName))
+        }
+
+        fun endNames(endNames: List<String>): TrackScope {
+            return nameLastTrack(null, endNames)
         }
     }
 
