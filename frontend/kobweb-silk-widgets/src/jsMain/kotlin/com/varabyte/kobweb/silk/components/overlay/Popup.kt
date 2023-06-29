@@ -69,7 +69,7 @@ enum class PopupPlacement {
  * Note that this is essentially a [BoxScope] with some extra information added to it relevant to popups.
  */
 class PopupScope(val placement: PopupPlacement?) {
-    fun Modifier.align(alignment: Alignment) = BoxScope().apply { align(alignment) }
+    fun Modifier.align(alignment: Alignment) = with(BoxScope()) { align(alignment) }
 }
 
 private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position) {
