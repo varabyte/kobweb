@@ -1,8 +1,63 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
+
+// region grid container
+
+// TODO(#168): Remove before v1.0
+@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
+)
+fun Modifier.gridTemplateColumns(value: String) = styleModifier {
+    gridTemplateColumns(value)
+}
+
+// TODO(#168): Remove before v1.0
+@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
+)
+fun Modifier.gridAutoColumns(value: String) = styleModifier {
+    gridAutoColumns(value)
+}
+
+fun Modifier.gridAutoFlow(value: GridAutoFlow) = styleModifier {
+    gridAutoFlow(value)
+}
+
+// TODO(#168): Remove before v1.0
+@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
+)
+fun Modifier.gridTemplateRows(value: String) = styleModifier {
+    gridTemplateRows(value)
+}
+
+// TODO(#168): Remove before v1.0
+@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
+@Deprecated(
+    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
+)
+fun Modifier.gridAutoRows(value: String) = styleModifier {
+    gridAutoRows(value)
+}
+
+fun Modifier.gridTemplateAreas(vararg rows: String) = styleModifier {
+    gridTemplateAreas(*rows)
+}
+
+fun Modifier.grid(block: GridBuilder.() -> Unit) = styleModifier {
+    grid(block)
+}
+
+// endregion grid container
+
+// region grid items
 
 fun Modifier.gridColumn(value: String) = styleModifier {
     gridColumn(value)
@@ -76,26 +131,6 @@ fun Modifier.gridRowEnd(value: Int) = styleModifier {
     gridRowEnd(value)
 }
 
-fun Modifier.gridTemplateColumns(value: String) = styleModifier {
-    gridTemplateColumns(value)
-}
-
-fun Modifier.gridAutoColumns(value: String) = styleModifier {
-    gridAutoColumns(value)
-}
-
-fun Modifier.gridAutoFlow(value: GridAutoFlow) = styleModifier {
-    gridAutoFlow(value)
-}
-
-fun Modifier.gridTemplateRows(value: String) = styleModifier {
-    gridTemplateRows(value)
-}
-
-fun Modifier.gridAutoRows(value: String) = styleModifier {
-    gridAutoRows(value)
-}
-
 fun Modifier.gridArea(rowStart: String) = styleModifier {
     gridArea(rowStart)
 }
@@ -112,6 +147,4 @@ fun Modifier.gridArea(rowStart: String, columnStart: String, rowEnd: String, col
     gridArea(rowStart, columnStart, rowEnd, columnEnd)
 }
 
-fun Modifier.gridTemplateAreas(vararg rows: String) = styleModifier {
-    gridTemplateAreas(*rows)
-}
+// endregion grid items

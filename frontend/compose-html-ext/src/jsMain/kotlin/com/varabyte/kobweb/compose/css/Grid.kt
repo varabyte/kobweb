@@ -225,3 +225,122 @@ fun StyleScope.gridTemplateRows(gridTemplateRows: GridTemplate.Keyword) {
 fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridTrackSizeEntry) {
     gridTemplateRows(gridTemplateRows.toTrackListString())
 }
+
+class GridBuilder {
+    val auto get() = GridTrackSize.Auto
+    val minContent get() = GridTrackSize.MinContent
+    val maxContent get() = GridTrackSize.MaxContent
+    val autoFit get() = GridTrackSize.AutoRepeat.Type.AutoFit
+    val autoFill get() = GridTrackSize.AutoRepeat.Type.AutoFill
+
+    private var cols: List<GridTrackSizeEntry>? = null
+    private var rows: List<GridTrackSizeEntry>? = null
+    private var autoBuilder: GridBuilder? = null
+
+    class TrackScope {
+        internal val tracks = mutableListOf<GridTrackSizeEntry>()
+
+        fun add(track: GridTrackSizeEntry): TrackScope {
+            tracks.add(track)
+            return this
+        }
+
+        fun add(value: CSSLengthOrPercentageValue): TrackScope {
+            return add(GridTrackSize(value))
+        }
+
+        fun add(value: CSSFlexValue): TrackScope {
+            return add(GridTrackSize(value))
+        }
+
+        fun repeat(count: Int, block: TrackScope.() -> Unit): TrackScope {
+            val repeatTracks = TrackScope().apply(block).tracks.toTypedArray()
+            return add(GridTrackSize.repeat(count, *repeatTracks))
+        }
+
+        fun repeat(type: GridTrackSize.AutoRepeat.Type, block: TrackScope.() -> Unit): TrackScope {
+            val repeatTracks = TrackScope().apply(block).tracks.toTypedArray()
+            return add(GridTrackSize.repeat(type, *repeatTracks))
+        }
+
+        fun fitContent(value: CSSPercentageValue): TrackScope {
+            return add(GridTrackSize.fitContent(value))
+        }
+
+        fun minmax(min: GridTrackSize.InflexibleBreadth, max: GridTrackSize.TrackBreadth): TrackScope {
+            return add(GridTrackSize.minmax(min, max))
+        }
+
+        fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSFlexValue): TrackScope {
+            return add(GridTrackSize.minmax(min, max))
+        }
+
+        fun minmax(min: GridTrackSize.FixedBreadth, max: GridTrackSize.TrackBreadth): TrackScope {
+            return add(GridTrackSize.minmax(min, max))
+        }
+
+        fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSLengthOrPercentageValue): TrackScope {
+            return add(GridTrackSize.minmax(min, max))
+        }
+
+        fun minmax(min: CSSLengthOrPercentageValue, max: GridTrackSize.TrackBreadth): TrackScope {
+            return add(GridTrackSize.minmax(min, max))
+        }
+
+        fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue): TrackScope {
+            return add(GridTrackSize.minmax(min, max))
+        }
+
+        fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue): TrackScope {
+            return add(GridTrackSize.minmax(min, max))
+        }
+    }
+
+    fun col(value: CSSLengthOrPercentageValue): GridBuilder {
+        cols = TrackScope().add(value).tracks
+        return this
+    }
+
+    fun col(value: CSSFlexValue): GridBuilder {
+        cols = TrackScope().add(value).tracks
+        return this
+    }
+
+    fun row(value: CSSLengthOrPercentageValue): GridBuilder {
+        rows = TrackScope().add(value).tracks
+        return this
+    }
+
+    fun row(value: CSSFlexValue): GridBuilder {
+        rows = TrackScope().add(value).tracks
+        return this
+    }
+
+    fun cols(block: TrackScope.() -> Unit): GridBuilder {
+        cols = TrackScope().apply(block).tracks
+        return this
+    }
+
+    fun rows(block: TrackScope.() -> Unit): GridBuilder {
+        rows = TrackScope().apply(block).tracks
+        return this
+    }
+
+    fun auto(block: GridBuilder.() -> Unit): GridBuilder {
+        autoBuilder = GridBuilder().apply(block)
+        return this
+    }
+
+    internal fun buildInto(scope: StyleScope) {
+        cols?.let { scope.gridTemplateColumns(it.toTypedArray().toTrackListString()) }
+        rows?.let { scope.gridTemplateRows(it.toTypedArray().toTrackListString()) }
+        autoBuilder?.let { autoBuilder ->
+            autoBuilder.cols?.let { scope.gridAutoColumns(it.toTypedArray().toTrackListString()) }
+            autoBuilder.rows?.let { scope.gridAutoRows(it.toTypedArray().toTrackListString()) }
+        }
+    }
+}
+
+fun StyleScope.grid(block: GridBuilder.() -> Unit) {
+    GridBuilder().apply(block).buildInto(this)
+}
