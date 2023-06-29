@@ -135,11 +135,11 @@ class NamedGridTrackSize(
         startName?.let { listOf(it) },
         endName?.let { listOf(it) })
 
-    fun addNames(startNames: List<String>? = null, endNames: List<String>? = null) =
+    fun replaceNames(startNames: List<String>? = null, endNames: List<String>? = null) =
         NamedGridTrackSize(
             size,
-            startNames?.let { this.startNames?.plus(it) ?: it } ?: this.startNames,
-            endNames?.let { this.endNames?.plus(it) ?: it } ?: this.endNames
+            startNames ?: this.startNames,
+            endNames ?: this.endNames
         )
 }
 
@@ -323,7 +323,7 @@ class GridBuilder {
             val lastTrack = tracks.removeLast()
             tracks.add(
                 when (lastTrack) {
-                    is NamedGridTrackSize -> lastTrack.addNames(startNames, endNames)
+                    is NamedGridTrackSize -> lastTrack.replaceNames(startNames, endNames)
                     is GridTrackSize -> lastTrack.named(startNames, endNames)
                 }
             )
