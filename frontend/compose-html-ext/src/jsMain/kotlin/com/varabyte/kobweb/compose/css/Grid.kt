@@ -63,9 +63,6 @@ sealed class GridTrackSize private constructor(private val value: String) : Styl
     /** Represents a track size which is fixed, either a pixel or percentage value (e.g. `100px`, `40%`) */
     class FixedBreadth internal constructor(value: String) : InflexibleBreadth(value), FixedSize
 
-    /** A special min-max value which excludes flex values (e.g. `1fr`) */
-    class FixedMinMax internal constructor(min: Any, max: Any) : MinMax(min, max), FixedSize
-
     companion object {
         val Auto get() = InflexibleBreadth("auto")
         val MinContent get() = InflexibleBreadth("min-content")
@@ -74,20 +71,12 @@ sealed class GridTrackSize private constructor(private val value: String) : Styl
         operator fun invoke(value: CSSLengthOrPercentageValue) = FixedBreadth(value.toString())
         operator fun invoke(value: CSSFlexValue) = TrackBreadth(value.toString())
 
-        fun minmax(min: InflexibleBreadth, max: TrackBreadth): GridTrackSizeEntry = MinMax(min, max)
-        fun minmax(min: InflexibleBreadth, max: CSSFlexValue): GridTrackSizeEntry = minmax(min, invoke(max))
-        fun minmax(min: FixedBreadth, max: TrackBreadth): FixedMinMax = FixedMinMax(min, max)
-        fun minmax(min: InflexibleBreadth, max: CSSLengthOrPercentageValue): FixedMinMax = FixedMinMax(min, max)
-        fun minmax(min: CSSLengthOrPercentageValue, max: TrackBreadth): FixedMinMax = minmax(invoke(min), max)
-        fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue): FixedMinMax =
-            minmax(min, invoke(max))
-
-        fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue): FixedMinMax = minmax(min, invoke(max))
+        fun minmax(min: InflexibleBreadth, max: TrackBreadth) = MinMax(min, max)
 
         fun fitContent(value: CSSLengthOrPercentageValue) = FitContent(value)
 
-        fun repeat(count: Int, vararg entries: GridTrackSizeEntry) = TrackRepeat(count, *entries)
-        fun repeat(type: AutoRepeat.Type, vararg entries: GridTrackSizeEntry) = AutoRepeat(type, *entries)
+        fun repeat(count: Int, vararg entries: GridTrackSizeEntry): Repeat = TrackRepeat(count, *entries)
+        fun repeat(type: AutoRepeat.Type, vararg entries: GridTrackSizeEntry): Repeat = AutoRepeat(type, *entries)
     }
 }
 
@@ -305,7 +294,7 @@ class GridBuilder {
         }
 
         fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSFlexValue): TrackScope {
-            return add(GridTrackSize.minmax(min, max))
+            return add(GridTrackSize.minmax(min, GridTrackSize(max)))
         }
 
         fun minmax(min: GridTrackSize.FixedBreadth, max: GridTrackSize.TrackBreadth): TrackScope {
@@ -313,19 +302,19 @@ class GridBuilder {
         }
 
         fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSLengthOrPercentageValue): TrackScope {
-            return add(GridTrackSize.minmax(min, max))
+            return add(GridTrackSize.minmax(min, GridTrackSize(max)))
         }
 
         fun minmax(min: CSSLengthOrPercentageValue, max: GridTrackSize.TrackBreadth): TrackScope {
-            return add(GridTrackSize.minmax(min, max))
+            return add(GridTrackSize.minmax(GridTrackSize(min), max))
         }
 
         fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue): TrackScope {
-            return add(GridTrackSize.minmax(min, max))
+            return add(GridTrackSize.minmax(GridTrackSize(min), GridTrackSize(max)))
         }
 
         fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue): TrackScope {
-            return add(GridTrackSize.minmax(min, max))
+            return add(GridTrackSize.minmax(GridTrackSize(min), GridTrackSize(max)))
         }
 
         private fun nameLastTrack(startNames: List<String>?, endNames: List<String>?): TrackScope {
