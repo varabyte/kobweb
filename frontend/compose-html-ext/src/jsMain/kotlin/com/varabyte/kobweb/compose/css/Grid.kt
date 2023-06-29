@@ -351,16 +351,16 @@ class GridBuilder {
             return nameLastTrack(listOf(name), null)
         }
 
-        fun startNames(names: List<String>): TrackScope {
-            return nameLastTrack(names, null)
+        fun startNames(vararg names: String): TrackScope {
+            return nameLastTrack(names.toList(), null)
         }
 
-        fun endName(endName: String): TrackScope {
-            return nameLastTrack(null, listOf(endName))
+        fun endName(name: String): TrackScope {
+            return nameLastTrack(null, listOf(name))
         }
 
-        fun endNames(endNames: List<String>): TrackScope {
-            return nameLastTrack(null, endNames)
+        fun endNames(vararg names: String): TrackScope {
+            return nameLastTrack(null, names.toList())
         }
     }
 
