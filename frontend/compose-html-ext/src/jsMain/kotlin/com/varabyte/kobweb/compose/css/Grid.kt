@@ -411,6 +411,7 @@ class GridBuilder {
     }
 
     internal fun buildInto(scope: StyleScope) {
+        scope.display(DisplayStyle.Grid)
         cols?.let { scope.gridTemplateColumns(it.toTypedArray().toTrackListString()) }
         rows?.let { scope.gridTemplateRows(it.toTypedArray().toTrackListString()) }
         autoBuilder?.let { autoBuilder ->
