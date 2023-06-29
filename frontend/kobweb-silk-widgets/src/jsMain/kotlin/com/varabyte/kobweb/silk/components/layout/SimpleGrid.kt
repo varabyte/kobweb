@@ -1,12 +1,10 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -15,7 +13,6 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.ResponsiveValues
 import com.varabyte.kobweb.silk.components.style.toModifier
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.gridTemplateColumns
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 
@@ -39,9 +36,8 @@ private val SimpleGridColumnVariants: Map<Breakpoint, Map<Int, ComponentVariant>
             val variants = (0 until MAX_COLUMN_COUNT)
                 .associate { i ->
                     val numColumns = i + 1
-                    val gridModifier = Modifier.styleModifier {
-                        gridTemplateColumns(GridTrackSize.repeat(numColumns, GridTrackSize(1.fr)))
-                    }
+                    val gridModifier = Modifier.gridTemplateColumns { repeat(numColumns) { add(1.fr) } }
+
                     numColumns to SimpleGridStyle.addVariant("$name-$numColumns") {
                         if (isBaseVariant) {
                             base { gridModifier }

@@ -18,10 +18,11 @@ object KobwebComposeStyleSheet : StyleSheet() {
         ".kobweb-box" {
             // The Compose "Box" concept means: all children should be stacked one of top of the other. We do this by
             // setting the current element to grid but then jam all of its children into its top-left (and only) cell.
-            display(DisplayStyle.Grid)
-            // See: https://github.com/w3c/csswg-drafts/issues/1777
-            gridTemplateColumns(GridTrackSize.minmax(0.px, 1.fr))
-            gridTemplateRows(GridTrackSize.minmax(0.px, 1.fr))
+            grid {
+                // Why minmax? See: https://github.com/w3c/csswg-drafts/issues/1777
+                cols { minmax(0.px, 1.fr) }
+                rows { minmax(0.px, 1.fr) }
+            }
         }
 
         // justify in grid means "row" while align means "col"

@@ -122,6 +122,8 @@ private fun Array<out GridTrackSizeEntry>.toTrackListString(): String = buildStr
     appendNamesIfAny()
 }
 
+private fun List<GridTrackSizeEntry>.toTrackListString() = toTypedArray().toTrackListString()
+
 /**
  * A CSS grid track size tagged with names.
  */
@@ -149,6 +151,114 @@ fun GridTrackSize.named(startNames: List<String>? = null, endNames: List<String>
 fun GridTrackSize.named(startName: String? = null, endName: String? = null) =
     NamedGridTrackSize(this, startName, endName)
 
+/**
+ * A builder for simplifying the creation of grid track lists.
+ */
+class GridTrackBuilder {
+    internal val tracks = mutableListOf<GridTrackSizeEntry>()
+
+    fun add(track: GridTrackSizeEntry): GridTrackBuilder {
+        tracks.add(track)
+        return this
+    }
+
+    fun add(value: CSSLengthOrPercentageValue): GridTrackBuilder {
+        return add(GridTrackSize(value))
+    }
+
+    fun add(value: CSSFlexValue): GridTrackBuilder {
+        return add(GridTrackSize(value))
+    }
+
+    fun repeat(count: Int, block: GridTrackBuilder.() -> Unit): GridTrackBuilder {
+        val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
+        return add(GridTrackSize.repeat(count, *repeatTracks))
+    }
+
+    fun repeat(type: GridTrackSize.AutoRepeat.Type, block: GridTrackBuilder.() -> Unit): GridTrackBuilder {
+        val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
+        return add(GridTrackSize.repeat(type, *repeatTracks))
+    }
+
+    fun fitContent(value: CSSPercentageValue): GridTrackBuilder {
+        return add(GridTrackSize.fitContent(value))
+    }
+
+    fun minmax(min: GridTrackSize.InflexibleBreadth, max: GridTrackSize.TrackBreadth): GridTrackBuilder {
+        return add(GridTrackSize.minmax(min, max))
+    }
+
+    fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSFlexValue): GridTrackBuilder {
+        return add(GridTrackSize.minmax(min, GridTrackSize(max)))
+    }
+
+    fun minmax(min: GridTrackSize.FixedBreadth, max: GridTrackSize.TrackBreadth): GridTrackBuilder {
+        return add(GridTrackSize.minmax(min, max))
+    }
+
+    fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSLengthOrPercentageValue): GridTrackBuilder {
+        return add(GridTrackSize.minmax(min, GridTrackSize(max)))
+    }
+
+    fun minmax(min: CSSLengthOrPercentageValue, max: GridTrackSize.TrackBreadth): GridTrackBuilder {
+        return add(GridTrackSize.minmax(GridTrackSize(min), max))
+    }
+
+    fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue): GridTrackBuilder {
+        return add(GridTrackSize.minmax(GridTrackSize(min), GridTrackSize(max)))
+    }
+
+    fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue): GridTrackBuilder {
+        return add(GridTrackSize.minmax(GridTrackSize(min), GridTrackSize(max)))
+    }
+
+    private fun nameLastTrack(startNames: List<String>?, endNames: List<String>?): GridTrackBuilder {
+        check(tracks.isNotEmpty()) { "You must add at least one track before calling this method" }
+
+        val lastTrack = tracks.removeLast()
+        tracks.add(
+            when (lastTrack) {
+                is NamedGridTrackSize -> lastTrack.replaceNames(startNames, endNames)
+                is GridTrackSize -> lastTrack.named(startNames, endNames)
+            }
+        )
+
+        return this
+    }
+
+    fun named(start: String, end: String): GridTrackBuilder {
+        return nameLastTrack(listOf(start), listOf(end))
+    }
+
+    fun named(start: String, end: List<String>): GridTrackBuilder {
+        return nameLastTrack(listOf(start), end)
+    }
+
+    fun named(start: List<String>, end: String): GridTrackBuilder {
+        return nameLastTrack(start, listOf(end))
+    }
+
+    fun named(start: List<String>, end: List<String>): GridTrackBuilder {
+        return nameLastTrack(start, end)
+    }
+
+    fun startName(name: String): GridTrackBuilder {
+        return nameLastTrack(listOf(name), null)
+    }
+
+    fun startNames(vararg names: String): GridTrackBuilder {
+        return nameLastTrack(names.toList(), null)
+    }
+
+    fun endName(name: String): GridTrackBuilder {
+        return nameLastTrack(null, listOf(name))
+    }
+
+    fun endNames(vararg names: String): GridTrackBuilder {
+        return nameLastTrack(null, names.toList())
+    }
+}
+
 sealed class GridAuto private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
@@ -174,6 +284,10 @@ fun StyleScope.gridAutoColumns(vararg gridAutoColumns: GridTrackSizeEntry) {
     gridAutoColumns(gridAutoColumns.toTrackListString())
 }
 
+fun StyleScope.gridAutoColumns(block: GridTrackBuilder.() -> Unit) {
+    gridAutoColumns(GridTrackBuilder().apply(block).tracks.toTrackListString())
+}
+
 fun StyleScope.gridAutoRows(gridAutoRows: GridAuto.Keyword) {
     gridAutoRows(gridAutoRows.toString())
 }
@@ -181,6 +295,11 @@ fun StyleScope.gridAutoRows(gridAutoRows: GridAuto.Keyword) {
 fun StyleScope.gridAutoRows(vararg gridAutoRows: GridTrackSizeEntry) {
     gridAutoRows(gridAutoRows.toTrackListString())
 }
+
+fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
+    gridAutoRows(GridTrackBuilder().apply(block).tracks.toTrackListString())
+}
+
 
 /**
  * Represents all possible values that can be passed into a CSS grid property.
@@ -214,6 +333,10 @@ fun StyleScope.gridTemplateColumns(vararg gridTemplateColumns: GridTrackSizeEntr
     gridTemplateColumns(gridTemplateColumns.toTrackListString())
 }
 
+fun StyleScope.gridTemplateColumns(block: GridTrackBuilder.() -> Unit) {
+    gridTemplateColumns(GridTrackBuilder().apply(block).tracks.toTrackListString())
+}
+
 fun StyleScope.gridTemplateRows(gridTemplateRows: GridTemplate.Keyword) {
     gridTemplateRows(gridTemplateRows.toString())
 }
@@ -222,13 +345,18 @@ fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridTrackSizeEntry) {
     gridTemplateRows(gridTemplateRows.toTrackListString())
 }
 
+fun StyleScope.gridTemplateRows(block: GridTrackBuilder.() -> Unit) {
+    gridTemplateRows(GridTrackBuilder().apply(block).tracks.toTrackListString())
+}
+
 /**
- * A class which allows for a more concise way of declaring a grid template.
+ * A class which allows for a more concise way of declaring a grid.
  *
  * For example:
  *
  * ```
  * // Without the builder
+ * Modifier.
  *  gridTemplateColumns(
  *     GridTrackSize(40.px),
  *     GridTrackSize(1.fr),
@@ -241,7 +369,7 @@ fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridTrackSizeEntry) {
  *  gridAutoColumns(GridTrackSize(50.px))
  *
  * // With the builder
- * grid {
+ * Modifier.grid {
  *   cols { add(40.px); add(1.fr); repeat(3) { add(200.px) } }
  *   rows { add(1.fr); add(1.fr) }
  *   auto { col(50.px) }
@@ -259,138 +387,33 @@ class GridBuilder {
     private var rows: List<GridTrackSizeEntry>? = null
     private var autoBuilder: GridBuilder? = null
 
-    class TrackScope {
-        internal val tracks = mutableListOf<GridTrackSizeEntry>()
-
-        fun add(track: GridTrackSizeEntry): TrackScope {
-            tracks.add(track)
-            return this
-        }
-
-        fun add(value: CSSLengthOrPercentageValue): TrackScope {
-            return add(GridTrackSize(value))
-        }
-
-        fun add(value: CSSFlexValue): TrackScope {
-            return add(GridTrackSize(value))
-        }
-
-        fun repeat(count: Int, block: TrackScope.() -> Unit): TrackScope {
-            val repeatTracks = TrackScope().apply(block).tracks.toTypedArray()
-            return add(GridTrackSize.repeat(count, *repeatTracks))
-        }
-
-        fun repeat(type: GridTrackSize.AutoRepeat.Type, block: TrackScope.() -> Unit): TrackScope {
-            val repeatTracks = TrackScope().apply(block).tracks.toTypedArray()
-            return add(GridTrackSize.repeat(type, *repeatTracks))
-        }
-
-        fun fitContent(value: CSSPercentageValue): TrackScope {
-            return add(GridTrackSize.fitContent(value))
-        }
-
-        fun minmax(min: GridTrackSize.InflexibleBreadth, max: GridTrackSize.TrackBreadth): TrackScope {
-            return add(GridTrackSize.minmax(min, max))
-        }
-
-        fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSFlexValue): TrackScope {
-            return add(GridTrackSize.minmax(min, GridTrackSize(max)))
-        }
-
-        fun minmax(min: GridTrackSize.FixedBreadth, max: GridTrackSize.TrackBreadth): TrackScope {
-            return add(GridTrackSize.minmax(min, max))
-        }
-
-        fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSLengthOrPercentageValue): TrackScope {
-            return add(GridTrackSize.minmax(min, GridTrackSize(max)))
-        }
-
-        fun minmax(min: CSSLengthOrPercentageValue, max: GridTrackSize.TrackBreadth): TrackScope {
-            return add(GridTrackSize.minmax(GridTrackSize(min), max))
-        }
-
-        fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue): TrackScope {
-            return add(GridTrackSize.minmax(GridTrackSize(min), GridTrackSize(max)))
-        }
-
-        fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue): TrackScope {
-            return add(GridTrackSize.minmax(GridTrackSize(min), GridTrackSize(max)))
-        }
-
-        private fun nameLastTrack(startNames: List<String>?, endNames: List<String>?): TrackScope {
-            check(tracks.isNotEmpty()) { "You must add at least one track before calling this method" }
-
-            val lastTrack = tracks.removeLast()
-            tracks.add(
-                when (lastTrack) {
-                    is NamedGridTrackSize -> lastTrack.replaceNames(startNames, endNames)
-                    is GridTrackSize -> lastTrack.named(startNames, endNames)
-                }
-            )
-
-            return this
-        }
-
-        fun named(start: String, end: String): TrackScope {
-            return nameLastTrack(listOf(start), listOf(end))
-        }
-
-        fun named(start: String, end: List<String>): TrackScope {
-            return nameLastTrack(listOf(start), end)
-        }
-
-        fun named(start: List<String>, end: String): TrackScope {
-            return nameLastTrack(start, listOf(end))
-        }
-
-        fun named(start: List<String>, end: List<String>): TrackScope {
-            return nameLastTrack(start, end)
-        }
-
-        fun startName(name: String): TrackScope {
-            return nameLastTrack(listOf(name), null)
-        }
-
-        fun startNames(vararg names: String): TrackScope {
-            return nameLastTrack(names.toList(), null)
-        }
-
-        fun endName(name: String): TrackScope {
-            return nameLastTrack(null, listOf(name))
-        }
-
-        fun endNames(vararg names: String): TrackScope {
-            return nameLastTrack(null, names.toList())
-        }
-    }
-
     fun col(value: CSSLengthOrPercentageValue): GridBuilder {
-        cols = TrackScope().add(value).tracks
+        cols = GridTrackBuilder().add(value).tracks
         return this
     }
 
     fun col(value: CSSFlexValue): GridBuilder {
-        cols = TrackScope().add(value).tracks
+        cols = GridTrackBuilder().add(value).tracks
         return this
     }
 
     fun row(value: CSSLengthOrPercentageValue): GridBuilder {
-        rows = TrackScope().add(value).tracks
+        rows = GridTrackBuilder().add(value).tracks
         return this
     }
 
     fun row(value: CSSFlexValue): GridBuilder {
-        rows = TrackScope().add(value).tracks
+        rows = GridTrackBuilder().add(value).tracks
         return this
     }
 
-    fun cols(block: TrackScope.() -> Unit): GridBuilder {
-        cols = TrackScope().apply(block).tracks
+    fun cols(block: GridTrackBuilder.() -> Unit): GridBuilder {
+        cols = GridTrackBuilder().apply(block).tracks
         return this
     }
 
-    fun rows(block: TrackScope.() -> Unit): GridBuilder {
-        rows = TrackScope().apply(block).tracks
+    fun rows(block: GridTrackBuilder.() -> Unit): GridBuilder {
+        rows = GridTrackBuilder().apply(block).tracks
         return this
     }
 
@@ -401,11 +424,11 @@ class GridBuilder {
 
     internal fun buildInto(scope: StyleScope) {
         scope.display(DisplayStyle.Grid)
-        cols?.let { scope.gridTemplateColumns(it.toTypedArray().toTrackListString()) }
-        rows?.let { scope.gridTemplateRows(it.toTypedArray().toTrackListString()) }
+        cols?.let { scope.gridTemplateColumns(it.toTrackListString()) }
+        rows?.let { scope.gridTemplateRows(it.toTrackListString()) }
         autoBuilder?.let { autoBuilder ->
-            autoBuilder.cols?.let { scope.gridAutoColumns(it.toTypedArray().toTrackListString()) }
-            autoBuilder.rows?.let { scope.gridAutoRows(it.toTypedArray().toTrackListString()) }
+            autoBuilder.cols?.let { scope.gridAutoColumns(it.toTrackListString()) }
+            autoBuilder.rows?.let { scope.gridAutoRows(it.toTrackListString()) }
         }
     }
 }
