@@ -226,6 +226,32 @@ fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridTrackSizeEntry) {
     gridTemplateRows(gridTemplateRows.toTrackListString())
 }
 
+/**
+ * A class which allows for a more concise way of declaring a grid template.
+ *
+ * For example:
+ *
+ * ```
+ * // Without the builder
+ *  gridTemplateColumns(
+ *     GridTrackSize(40.px),
+ *     GridTrackSize(1.fr),
+ *     GridTrackSize.repeat(3, GridTrackSize(200.px))
+ *  )
+ *  gridTemplateRows(
+ *    GridTrackSize(1.fr),
+ *    GridTrackSize(1.fr),
+ *  )
+ *  gridAutoColumns(GridTrackSize(50.px))
+ *
+ * // With the builder
+ * grid {
+ *   cols { add(40.px); add(1.fr); repeat(3) { add(200.px) } }
+ *   rows { add(1.fr); add(1.fr) }
+ *   auto { col(50.px) }
+ * }
+ * ```
+ */
 class GridBuilder {
     val auto get() = GridTrackSize.Auto
     val minContent get() = GridTrackSize.MinContent
