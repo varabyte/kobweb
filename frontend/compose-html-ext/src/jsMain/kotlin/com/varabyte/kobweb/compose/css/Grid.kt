@@ -34,7 +34,8 @@ sealed class GridTrackSize private constructor(private val value: String) : Styl
     /** A size which tells the track to be as small as possible while still fitting all of its contents. */
     class FitContent internal constructor(value: Any) : TrackBreadth("fit-content($value)")
 
-    abstract class Repeat protected constructor(value: Any, entries: Array<out GridTrackSizeEntry>) : GridTrackSize("repeat($value, ${entries.toTrackListString()})"), GridTrackSizeEntry {
+    abstract class Repeat protected constructor(value: Any, entries: Array<out GridTrackSizeEntry>) :
+        GridTrackSize("repeat($value, ${entries.toTrackListString()})"), GridTrackSizeEntry {
         init {
             check(entries.none { it is Repeat }) { "Repeat calls cannot nest other repeat calls" }
         }
@@ -73,13 +74,14 @@ sealed class GridTrackSize private constructor(private val value: String) : Styl
         operator fun invoke(value: CSSLengthOrPercentageValue) = FixedBreadth(value.toString())
         operator fun invoke(value: CSSFlexValue) = TrackBreadth(value.toString())
 
-        fun minmax(min: InflexibleBreadth, max: TrackBreadth): GridTrackSize = MinMax(min, max)
-        fun minmax(min: InflexibleBreadth, max: CSSFlexValue) = minmax(min, invoke(max))
-        fun minmax(min: FixedBreadth, max: TrackBreadth) = FixedMinMax(min, max)
-        fun minmax(min: InflexibleBreadth, max: CSSLengthOrPercentageValue) = FixedMinMax(min, max)
+        fun minmax(min: InflexibleBreadth, max: TrackBreadth): GridTrackSizeEntry = MinMax(min, max)
+        fun minmax(min: InflexibleBreadth, max: CSSFlexValue): GridTrackSizeEntry = minmax(min, invoke(max))
+        fun minmax(min: FixedBreadth, max: TrackBreadth): FixedMinMax = FixedMinMax(min, max)
+        fun minmax(min: InflexibleBreadth, max: CSSLengthOrPercentageValue): FixedMinMax = FixedMinMax(min, max)
         fun minmax(min: CSSLengthOrPercentageValue, max: TrackBreadth): FixedMinMax = minmax(invoke(min), max)
         fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue): FixedMinMax =
             minmax(min, invoke(max))
+
         fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue): FixedMinMax = minmax(min, invoke(max))
 
         fun fitContent(value: CSSLengthOrPercentageValue) = FitContent(value)
