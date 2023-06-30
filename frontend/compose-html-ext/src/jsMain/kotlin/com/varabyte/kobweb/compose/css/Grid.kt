@@ -25,19 +25,33 @@ sealed interface GridTrackSizeEntry
 sealed class GridTrackSize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class Keyword private constructor(value: String) : GridTrackSize(value)
-
     /**
      * A numeric value (or sizing keyword) used for this track.
      *
      * This essentially excludes singleton keywords like "none", "inherit", etc.
      */
-    open class TrackBreadth internal constructor(value: String) : GridTrackSize(value), GridTrackSizeEntry
+    sealed class TrackBreadth(value: String) : GridTrackSize(value), GridTrackSizeEntry
 
     /** A size which tells the track to be as small as possible while still fitting all of its contents. */
-    class FitContent internal constructor(value: Any) : TrackBreadth("fit-content($value)")
+    class FitContent internal constructor(value: CSSLengthOrPercentageValue) : TrackBreadth("fit-content($value)")
 
-    abstract class Repeat protected constructor(value: Any, entries: Array<out GridTrackSizeEntry>) :
+    /** A size which represents a range of values this track can be. */
+    class MinMax internal constructor(internal val min: InflexibleBreadth, internal val max: TrackBreadth) :
+        TrackBreadth("minmax($min, $max)")
+
+    /** Represents a track size which is a flex value (e.g. `1fr`) */
+    class FlexBreadth internal constructor(value: String) : TrackBreadth(value)
+
+    /** Like [TrackBreadth] but excludes flex values (e.g. `1fr`). */
+    sealed class InflexibleBreadth(value: String) : TrackBreadth(value)
+
+    /** Represents a track size defined by a keyword (e.g. `auto`). */
+    class KeywordBreadth internal constructor(value: String) : InflexibleBreadth(value)
+
+    /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
+    class FixedBreadth internal constructor(value: String) : InflexibleBreadth(value)
+
+    sealed class Repeat(value: Any, internal val entries: Array<out GridTrackSizeEntry>) :
         GridTrackSize("repeat($value, ${entries.toTrackListString()})"), GridTrackSizeEntry {
         init {
             check(entries.none { it is Repeat }) { "Repeat calls cannot nest other repeat calls" }
@@ -54,25 +68,13 @@ sealed class GridTrackSize private constructor(private val value: String) : Styl
         }
     }
 
-    /** A size which represents a range of values this track can be. */
-    open class MinMax internal constructor(min: Any, max: Any) : TrackBreadth("minmax($min, $max)")
-
-    /** Like [TrackBreadth] but excludes flex values (e.g. `1fr`). */
-    open class InflexibleBreadth internal constructor(value: String) : TrackBreadth(value)
-
-    // these are used for grid-template-*
-    sealed interface FixedSize
-
-    /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
-    class FixedBreadth internal constructor(value: String) : InflexibleBreadth(value), FixedSize
-
     companion object {
-        val Auto get() = InflexibleBreadth("auto")
-        val MinContent get() = InflexibleBreadth("min-content")
-        val MaxContent get() = InflexibleBreadth("max-content")
+        val Auto get() = KeywordBreadth("auto")
+        val MinContent get() = KeywordBreadth("min-content")
+        val MaxContent get() = KeywordBreadth("max-content")
 
         operator fun invoke(value: CSSLengthOrPercentageValue) = FixedBreadth(value.toString())
-        operator fun invoke(value: CSSFlexValue) = TrackBreadth(value.toString())
+        operator fun invoke(value: CSSFlexValue) = FlexBreadth(value.toString())
 
         fun minmax(min: InflexibleBreadth, max: TrackBreadth) = MinMax(min, max)
 
@@ -83,10 +85,9 @@ sealed class GridTrackSize private constructor(private val value: String) : Styl
     }
 }
 
-// TODO: Runtime exception if person uses AutoRepeat and TrackRepeat withflexible sizes in the same list?
 private fun Array<out GridTrackSizeEntry>.toTrackListString(): String = buildString {
     val names = mutableListOf<String>()
-    val entries = this@toTrackListString
+    val entries = this@toTrackListString.also { it.validate() }
 
     fun appendWithLeadingSpace(value: Any) {
         if (isNotEmpty()) {
@@ -123,6 +124,50 @@ private fun Array<out GridTrackSizeEntry>.toTrackListString(): String = buildStr
         }
     }
     appendNamesIfAny()
+}
+
+private fun Array<out GridTrackSizeEntry>.validate() {
+    fun Array<out GridTrackSizeEntry>.foldOutNamed(): List<GridTrackSize> = map {
+        when (it) {
+            is NamedGridTrackSize -> it.size
+            is GridTrackSize.Repeat -> it
+            is GridTrackSize.TrackBreadth -> it
+        }
+    }
+
+    fun List<GridTrackSize>.foldOutRepeat(): List<GridTrackSize> = flatMap {
+        when (it) {
+            is GridTrackSize.Repeat -> it.entries.foldOutNamed()
+            else -> listOf(it)
+        }
+    }
+
+    val rawEntries = this.foldOutNamed()
+    val autoRepeatCount = rawEntries.count { it is GridTrackSize.AutoRepeat }
+
+    if (autoRepeatCount == 0) return
+
+    check(autoRepeatCount <= 1) { "Only one auto-repeat call is allowed per track list" }
+
+    rawEntries.foldOutRepeat().forEach {
+        when (it) {
+            is GridTrackSize.TrackBreadth -> {
+                when (it) {
+                    is GridTrackSize.FixedBreadth -> {} // OK
+                    is GridTrackSize.FlexBreadth -> error("Cannot use flex values with auto-repeat")
+                    is GridTrackSize.KeywordBreadth -> error("Cannot use keywords with auto-repeat")
+                    is GridTrackSize.FitContent -> error("Cannot use fit-content with auto-repeat")
+                    is GridTrackSize.MinMax -> {
+                        check(it.min is GridTrackSize.FixedBreadth || it.max is GridTrackSize.FixedBreadth) {
+                            "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
+                        }
+                    }
+                }
+            }
+
+            is GridTrackSize.AutoRepeat, is GridTrackSize.TrackRepeat -> error("Cannot nest repeat calls")
+        }
+    }
 }
 
 private fun List<GridTrackSizeEntry>.toTrackListString() = toTypedArray().toTrackListString()
