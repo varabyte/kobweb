@@ -174,7 +174,7 @@ abstract class GridTrackBuilderInRepeat {
 
     fun size(value: CSSFlexValue) = size(GridTrackSize(value))
 
-    fun fitContent(value: CSSPercentageValue) = size(GridTrackSize.fitContent(value))
+    fun fitContent(value: CSSLengthOrPercentageValue) = size(GridTrackSize.fitContent(value))
 
     fun minmax(min: GridTrackSize.InflexibleBreadth, max: GridTrackSize.TrackBreadth) =
         size(GridTrackSize.minmax(min, max))
