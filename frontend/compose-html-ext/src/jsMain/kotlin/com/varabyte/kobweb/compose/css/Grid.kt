@@ -111,11 +111,11 @@ private fun Array<out GridTrackSizeEntry>.toTrackListString(): String = buildStr
         when (entry) {
             is NamedGridTrackSize -> {
                 if (entry.startNames != null) {
-                    names.addAll(entry.startNames)
+                    names.addAll(entry.startNames.split(" "))
                 }
                 appendSize(entry.size)
                 if (entry.endNames != null) {
-                    names.addAll(entry.endNames)
+                    names.addAll(entry.endNames.split(" "))
                 }
             }
 
@@ -129,30 +129,28 @@ private fun List<GridTrackSizeEntry>.toTrackListString() = toTypedArray().toTrac
 
 /**
  * A CSS grid track size tagged with names.
+ *
+ * @param startNames Names to apply to the line that starts this track (left for columns, top for rows). If you want to
+ *   specify multiple names, use spaces between the words.
+ * @param endNames Names to apply to the line that ends this track (right for columns, bottom for rows). If you want to
+ *   specify multiple names, use spaces between the words.
  */
 class NamedGridTrackSize(
     val size: GridTrackSize,
-    val startNames: List<String>? = null,
-    val endNames: List<String>? = null
-) : GridTrackSizeEntry {
-    constructor(size: GridTrackSize, startName: String? = null, endName: String? = null) : this(
-        size,
-        startName?.let { listOf(it) },
-        endName?.let { listOf(it) })
+    val startNames: String? = null,
+    val endNames: String? = null
+) : GridTrackSizeEntry
 
-    fun replaceNames(startNames: List<String>? = null, endNames: List<String>? = null) =
-        NamedGridTrackSize(
-            size,
-            startNames ?: this.startNames,
-            endNames ?: this.endNames
-        )
-}
-
-fun GridTrackSize.named(startNames: List<String>? = null, endNames: List<String>? = null) =
+fun GridTrackSize.named(startNames: String? = null, endNames: String? = null) =
     NamedGridTrackSize(this, startNames, endNames)
 
-fun GridTrackSize.named(startName: String? = null, endName: String? = null) =
-    NamedGridTrackSize(this, startName, endName)
+class GridTrackBuilderHandle(private val tracks: MutableList<GridTrackSizeEntry>) {
+    fun named(startName: String? = null, endNames: String? = null) {
+        val last = tracks.last()
+        check(last is GridTrackSize)
+        tracks[tracks.lastIndex] = last.named(startName, endNames)
+    }
+}
 
 @GridDslMarker
 abstract class GridTrackBuilderInRepeat {
@@ -164,8 +162,9 @@ abstract class GridTrackBuilderInRepeat {
 
     internal val tracks = mutableListOf<GridTrackSizeEntry>()
 
-    fun add(track: GridTrackSizeEntry) {
+    fun add(track: GridTrackSizeEntry): GridTrackBuilderHandle {
         tracks.add(track)
+        return GridTrackBuilderHandle(tracks)
     }
 
     fun add(value: CSSLengthOrPercentageValue) = add(GridTrackSize(value))
@@ -190,48 +189,23 @@ abstract class GridTrackBuilderInRepeat {
         minmax(GridTrackSize(min), GridTrackSize(max))
 
     fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue) = minmax(GridTrackSize(min), GridTrackSize(max))
-
-    private fun nameLastTrack(startNames: List<String>?, endNames: List<String>?) {
-        check(tracks.isNotEmpty()) { "You must add at least one track before calling this method" }
-
-        val lastTrack = tracks.removeLast()
-        tracks.add(
-            when (lastTrack) {
-                is NamedGridTrackSize -> lastTrack.replaceNames(startNames, endNames)
-                is GridTrackSize -> lastTrack.named(startNames, endNames)
-            }
-        )
-    }
-
-    fun named(start: String, end: String) = nameLastTrack(listOf(start), listOf(end))
-
-    fun named(start: String, end: List<String>) = nameLastTrack(listOf(start), end)
-
-    fun named(start: List<String>, end: String) = nameLastTrack(start, listOf(end))
-
-    fun named(start: List<String>, end: List<String>) = nameLastTrack(start, end)
-
-    fun startName(name: String) = nameLastTrack(listOf(name), null)
-
-    fun startNames(vararg names: String) = nameLastTrack(names.toList(), null)
-
-    fun endName(name: String) = nameLastTrack(null, listOf(name))
-
-    fun endNames(vararg names: String) = nameLastTrack(null, names.toList())
 }
 
 /**
  * A builder for simplifying the creation of grid track lists.
  */
 class GridTrackBuilder : GridTrackBuilderInRepeat() {
-    fun repeat(count: Int, block: GridTrackBuilderInRepeat.() -> Unit) {
+    fun repeat(count: Int, block: GridTrackBuilderInRepeat.() -> Unit): GridTrackBuilderHandle {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        add(GridTrackSize.repeat(count, *repeatTracks))
+        return add(GridTrackSize.repeat(count, *repeatTracks))
     }
 
-    fun repeat(type: GridTrackSize.AutoRepeat.Type, block: GridTrackBuilderInRepeat.() -> Unit) {
+    fun repeat(
+        type: GridTrackSize.AutoRepeat.Type,
+        block: GridTrackBuilderInRepeat.() -> Unit
+    ): GridTrackBuilderHandle {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        add(GridTrackSize.repeat(type, *repeatTracks))
+        return add(GridTrackSize.repeat(type, *repeatTracks))
     }
 }
 
