@@ -19,8 +19,8 @@ sealed interface GridTrackSizeEntry
  *
  * A track is the space between two grid lines -- it can be used for rows or columns based on context.
  *
- * For example, "auto 100px minmax(0.px, 1fr)" can be represented in Kotlin as
- * `GridTrackSize.Auto, GridTrackSize(100.px), GridTrackSize.minmax(0.px, 1.fr)`.
+ * For example, "auto 100px minmax(0px, 1fr)" can be represented in Kotlin as
+ * `GridTrackSize.Auto, GridTrackSize(100.px), GridTrackSize.minmax(GridTrackSize(0.px), GridTrackSize(1.fr))`.
  */
 sealed class GridTrackSize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
@@ -57,13 +57,13 @@ sealed class GridTrackSize private constructor(private val value: String) : Styl
     /** A size which represents a range of values this track can be. */
     open class MinMax internal constructor(min: Any, max: Any) : TrackBreadth("minmax($min, $max)")
 
-    /** Like [TrackBreadth] but excludes flex values (e.g. `1fr`) */
+    /** Like [TrackBreadth] but excludes flex values (e.g. `1fr`). */
     open class InflexibleBreadth internal constructor(value: String) : TrackBreadth(value)
 
     // these are used for grid-template-*
     sealed interface FixedSize
 
-    /** Represents a track size which is fixed, either a pixel or percentage value (e.g. `100px`, `40%`) */
+    /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
     class FixedBreadth internal constructor(value: String) : InflexibleBreadth(value), FixedSize
 
     companion object {
@@ -136,9 +136,9 @@ private fun List<GridTrackSizeEntry>.toTrackListString() = toTypedArray().toTrac
  *   specify multiple names, use spaces between the words.
  */
 class NamedGridTrackSize(
-    val size: GridTrackSize,
-    val startNames: String? = null,
-    val endNames: String? = null
+    internal val size: GridTrackSize,
+    internal val startNames: String? = null,
+    internal val endNames: String? = null
 ) : GridTrackSizeEntry
 
 fun GridTrackSize.named(startNames: String? = null, endNames: String? = null) =
@@ -253,11 +253,11 @@ fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
     gridAutoRows(GridTrackBuilder().apply(block).tracks.toTrackListString())
 }
 
-
 /**
  * Represents all possible values that can be passed into a CSS grid property.
  *
- * Note: "masonry" purposely excluded as it is not supported in any major browsers
+ * Note: "subgrid" and "masonry" purposely excluded as they are not widely supported
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Masonry_layout
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template
