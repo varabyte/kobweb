@@ -144,11 +144,14 @@ class NamedGridTrackSize(
 fun GridTrackSize.named(startNames: String? = null, endNames: String? = null) =
     NamedGridTrackSize(this, startNames, endNames)
 
-class GridTrackBuilderHandle(private val tracks: MutableList<GridTrackSizeEntry>) {
+class GridTrackBuilderHandle internal constructor(
+    private val tracks: MutableList<GridTrackSizeEntry>,
+    private val trackIndex: Int = tracks.lastIndex
+) {
     fun named(startName: String? = null, endNames: String? = null) {
-        val last = tracks.last()
-        check(last is GridTrackSize)
-        tracks[tracks.lastIndex] = last.named(startName, endNames)
+        val track = tracks[trackIndex]
+        check(track is GridTrackSize) { "Using `named` on an invalid receiver. Expected `GridTrackSize`, got `${track::class.simpleName}`" }
+        tracks[trackIndex] = track.named(startName, endNames)
     }
 }
 
