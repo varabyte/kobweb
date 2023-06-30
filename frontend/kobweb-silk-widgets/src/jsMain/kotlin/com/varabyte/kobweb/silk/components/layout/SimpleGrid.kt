@@ -36,7 +36,7 @@ private val SimpleGridColumnVariants: Map<Breakpoint, Map<Int, ComponentVariant>
             val variants = (0 until MAX_COLUMN_COUNT)
                 .associate { i ->
                     val numColumns = i + 1
-                    val gridModifier = Modifier.gridTemplateColumns { repeat(numColumns) { add(1.fr) } }
+                    val gridModifier = Modifier.gridTemplateColumns { repeat(numColumns) { size(1.fr) } }
 
                     numColumns to SimpleGridStyle.addVariant("$name-$numColumns") {
                         if (isBaseVariant) {

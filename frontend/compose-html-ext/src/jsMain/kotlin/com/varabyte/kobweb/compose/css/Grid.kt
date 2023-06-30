@@ -162,22 +162,22 @@ abstract class GridTrackBuilderInRepeat {
 
     internal val tracks = mutableListOf<GridTrackSizeEntry>()
 
-    fun add(track: GridTrackSizeEntry): GridTrackBuilderHandle {
+    fun size(track: GridTrackSizeEntry): GridTrackBuilderHandle {
         tracks.add(track)
         return GridTrackBuilderHandle(tracks)
     }
 
-    fun add(value: CSSLengthOrPercentageValue) = add(GridTrackSize(value))
+    fun size(value: CSSLengthOrPercentageValue) = size(GridTrackSize(value))
 
-    fun add(value: CSSFlexValue) = add(GridTrackSize(value))
+    fun size(value: CSSFlexValue) = size(GridTrackSize(value))
 
-    fun fitContent(value: CSSPercentageValue) = add(GridTrackSize.fitContent(value))
+    fun fitContent(value: CSSPercentageValue) = size(GridTrackSize.fitContent(value))
 
     fun minmax(min: GridTrackSize.InflexibleBreadth, max: GridTrackSize.TrackBreadth) =
-        add(GridTrackSize.minmax(min, max))
+        size(GridTrackSize.minmax(min, max))
 
     fun minmax(min: GridTrackSize.FixedBreadth, max: GridTrackSize.TrackBreadth) =
-        add(GridTrackSize.minmax(min, max))
+        size(GridTrackSize.minmax(min, max))
 
     fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSFlexValue) = minmax(min, GridTrackSize(max))
 
@@ -197,7 +197,7 @@ abstract class GridTrackBuilderInRepeat {
 class GridTrackBuilder : GridTrackBuilderInRepeat() {
     fun repeat(count: Int, block: GridTrackBuilderInRepeat.() -> Unit): GridTrackBuilderHandle {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        return add(GridTrackSize.repeat(count, *repeatTracks))
+        return size(GridTrackSize.repeat(count, *repeatTracks))
     }
 
     fun repeat(
@@ -205,7 +205,7 @@ class GridTrackBuilder : GridTrackBuilderInRepeat() {
         block: GridTrackBuilderInRepeat.() -> Unit
     ): GridTrackBuilderHandle {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        return add(GridTrackSize.repeat(type, *repeatTracks))
+        return size(GridTrackSize.repeat(type, *repeatTracks))
     }
 }
 
@@ -306,19 +306,19 @@ abstract class GridBuilderInAuto {
     protected var autoBuilder: GridBuilder? = null
 
     fun col(value: CSSLengthOrPercentageValue) {
-        cols = GridTrackBuilder().apply { add(value) }.tracks
+        cols = GridTrackBuilder().apply { size(value) }.tracks
     }
 
     fun col(value: CSSFlexValue) {
-        cols = GridTrackBuilder().apply { add(value) }.tracks
+        cols = GridTrackBuilder().apply { size(value) }.tracks
     }
 
     fun row(value: CSSLengthOrPercentageValue) {
-        rows = GridTrackBuilder().apply { add(value) }.tracks
+        rows = GridTrackBuilder().apply { size(value) }.tracks
     }
 
     fun row(value: CSSFlexValue) {
-        rows = GridTrackBuilder().apply { add(value) }.tracks
+        rows = GridTrackBuilder().apply { size(value) }.tracks
     }
 
     fun cols(block: GridTrackBuilder.() -> Unit) {
@@ -361,8 +361,8 @@ abstract class GridBuilderInAuto {
  *
  * // With the builder
  * Modifier.grid {
- *   cols { add(40.px); add(1.fr); repeat(3) { add(200.px) } }
- *   rows { add(1.fr); add(1.fr) }
+ *   cols { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
+ *   rows { size(1.fr); size(1.fr) }
  *   auto { col(50.px) }
  * }
  * ```
