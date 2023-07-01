@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.util
 import kotlinx.browser.window
 import org.w3c.dom.Window
 
-class ActionHandle(id: Int, isInterval: Boolean = false) {
+class CancellableActionHandle(id: Int, isInterval: Boolean = false) {
     var id = id
         private set
 
@@ -19,7 +19,7 @@ class ActionHandle(id: Int, isInterval: Boolean = false) {
         id = 0
     }
 
-    fun setTo(other: ActionHandle) {
+    fun setTo(other: CancellableActionHandle) {
         this.id = other.id
         this.isInterval = other.isInterval
     }
@@ -35,30 +35,30 @@ class ActionHandle(id: Int, isInterval: Boolean = false) {
  * This is equivalent to `window.setTimeout(block, 0)` but with a parameter order that takes advantage of Kotlin's
  * lambda syntax.
  *
- * @return An [ActionHandle] to the action being invoked. Use [ActionHandle.cancel] to cancel the action.
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.invokeLater(block: () -> Unit): ActionHandle {
+fun Window.invokeLater(block: () -> Unit): CancellableActionHandle {
     return setTimeout(0, block)
 }
 
 /**
  * An alternate version of `window.setTimeout` in a more Kotlin-friendly form (with the lambda parameter last).
  *
- * @return An [ActionHandle] to the action being invoked. Use [ActionHandle.cancel] to cancel the action.
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setTimeout(timeout: Int, block: () -> Unit): ActionHandle {
+fun Window.setTimeout(timeout: Int, block: () -> Unit): CancellableActionHandle {
     val id = window.setTimeout(block, timeout)
-    return ActionHandle(id)
+    return CancellableActionHandle(id)
 }
 
 /**
  * An alternate version of `window.setInterval` in a more Kotlin-friendly form (with the lambda parameter last).
  *
- * @return An [ActionHandle] to the action being invoked. Use [ActionHandle.cancel] to cancel the action.
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(delay: Int, block: () -> Unit): ActionHandle {
+fun Window.setInterval(delay: Int, block: () -> Unit): CancellableActionHandle {
     val id = window.setInterval(block, delay)
-    return ActionHandle(id, isInterval = true)
+    return CancellableActionHandle(id, isInterval = true)
 }
 
 /**
@@ -67,10 +67,10 @@ fun Window.setInterval(delay: Int, block: () -> Unit): ActionHandle {
  * This can be useful if you need to fire something immediately but then have a different delay for subsequent
  * invocations.
  *
- * @return An [ActionHandle] to the action being invoked. Use [ActionHandle.cancel] to cancel the action.
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(initialDelay: Int, delay: Int, block: () -> Unit): ActionHandle {
-    lateinit var handle: ActionHandle
+fun Window.setInterval(initialDelay: Int, delay: Int, block: () -> Unit): CancellableActionHandle {
+    lateinit var handle: CancellableActionHandle
     handle = window.setTimeout(initialDelay) {
         block()
         handle.setTo(window.setInterval(delay, block))
@@ -85,9 +85,9 @@ fun Window.setInterval(initialDelay: Int, delay: Int, block: () -> Unit): Action
  * expresses a more explicit intent. Also, this version invokes the callback *immediately* unlike the
  * `setInterval(0)` method which invokes the callback on the next event loop at the earliest.
  *
- * @return An [ActionHandle] to the action being invoked. Use [ActionHandle.cancel] to cancel the action.
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.invokeThenInterval(delay: Int, block: () -> Unit): ActionHandle {
+fun Window.invokeThenInterval(delay: Int, block: () -> Unit): CancellableActionHandle {
     block()
     return setInterval(delay, block)
 }
