@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import org.jetbrains.compose.web.attributes.AutoComplete.Companion.name
 import org.jetbrains.compose.web.css.*
 
 @DslMarker
@@ -8,252 +9,183 @@ annotation class GridDslMarker
 typealias CSSFlexValue = CSSSizeValue<out CSSUnitFlex>
 
 /**
- * A common interface for a parameter that is either a single grid track size or a group of them.
+ * The base class for all values which can be used to configure a CSS grid's rows or columns.
  *
- * This allows a user to convert a CSS value like "1fr repeat(3, 100px) 1fr" into a list of [GridTrackSizeEntry]s.
+ * This allows a user to convert a CSS value like "1fr `[name]` repeat(3, 100px) 1fr" into a list of [GridEntry]s.
  */
-sealed interface GridTrackSizeEntry
-
-/**
- * Represents all possible size values that can be used to configure a CSS grid track.
- *
- * A track is the space between two grid lines -- it can be used for rows or columns based on context.
- *
- * For example, "auto 100px minmax(0px, 1fr)" can be represented in Kotlin as
- * `GridTrackSize.Auto, GridTrackSize(100.px), GridTrackSize.minmax(GridTrackSize(0.px), GridTrackSize(1.fr))`.
- */
-sealed class GridTrackSize private constructor(private val value: String) : StylePropertyValue {
+sealed class GridEntry(private val value: String) {
     override fun toString() = value
 
     /**
-     * A numeric value (or sizing keyword) used for this track.
+     * Represents all possible size values that can be used to configure a CSS grid track.
      *
-     * This essentially excludes singleton keywords like "none", "inherit", etc.
+     * A track is the space between two grid lines -- it can be used for rows or columns based on context.
      */
-    sealed class TrackBreadth(value: String) : GridTrackSize(value), GridTrackSizeEntry
+    sealed class TrackSize(value: String) : GridEntry(value) {
+        /** A size which tells the track to be as small as possible while still fitting all of its contents. */
+        class FitContent internal constructor(value: CSSLengthOrPercentageValue) : TrackSize("fit-content($value)")
 
-    /** A size which tells the track to be as small as possible while still fitting all of its contents. */
-    class FitContent internal constructor(value: CSSLengthOrPercentageValue) : TrackBreadth("fit-content($value)")
+        /** A size which represents a range of values this track can be. */
+        class MinMax internal constructor(internal val min: Inflexible, internal val max: TrackSize) :
+            TrackSize("minmax($min, $max)")
 
-    /** A size which represents a range of values this track can be. */
-    class MinMax internal constructor(internal val min: InflexibleBreadth, internal val max: TrackBreadth) :
-        TrackBreadth("minmax($min, $max)")
+        /** Represents a track size which is a flex value (e.g. `1fr`) */
+        class Flex internal constructor(value: String) : TrackSize(value)
 
-    /** Represents a track size which is a flex value (e.g. `1fr`) */
-    class FlexBreadth internal constructor(value: String) : TrackBreadth(value)
+        /** Like [TrackSize] but excludes flex values (e.g. `1fr`). */
+        sealed class Inflexible(value: String) : TrackSize(value)
 
-    /** Like [TrackBreadth] but excludes flex values (e.g. `1fr`). */
-    sealed class InflexibleBreadth(value: String) : TrackBreadth(value)
+        /** Represents a track size defined by a keyword (e.g. `auto`). */
+        class Keyword internal constructor(value: String) : Inflexible(value)
 
-    /** Represents a track size defined by a keyword (e.g. `auto`). */
-    class KeywordBreadth internal constructor(value: String) : InflexibleBreadth(value)
+        /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
+        class Fixed internal constructor(value: String) : Inflexible(value)
+    }
 
-    /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
-    class FixedBreadth internal constructor(value: String) : InflexibleBreadth(value)
+    /** Represents a repeated set of track sizes and line names for a CSS grid. */
+    sealed class Repeat(value: Any, internal val entries: Array<out GridEntry>) :
+        GridEntry("repeat($value, ${entries.toTrackListString()})") {
 
-    sealed class Repeat(value: Any, internal val entries: Array<out GridTrackSizeEntry>) :
-        GridTrackSize("repeat($value, ${entries.toTrackListString()})"), GridTrackSizeEntry {
-        init {
-            check(entries.none { it is Repeat }) { "Repeat calls cannot nest other repeat calls" }
+        /** A fixed count of repeated track sizes and line names. */
+        class Track internal constructor(count: Int, vararg entries: GridEntry) : Repeat(count, entries)
+
+        /**
+         * An automatically-determined repetition of track sizes and line names.
+         *
+         * Note that this supports limited types of sizing values.
+         */
+        class Auto internal constructor(type: Type, vararg entries: GridEntry) : Repeat(type, entries) {
+            enum class Type(private val value: String) {
+                AutoFill("auto-fill"),
+                AutoFit("auto-fit");
+
+                override fun toString() = value
+            }
         }
     }
 
-    class TrackRepeat(count: Int, vararg entries: GridTrackSizeEntry) : Repeat(count, entries)
-    class AutoRepeat(type: Type, vararg entries: GridTrackSizeEntry) : Repeat(type, entries) {
-        enum class Type(private val value: String) {
-            AutoFill("auto-fill"),
-            AutoFit("auto-fit");
-
-            override fun toString() = value
-        }
-    }
+    /** Represents a set of line names for a CSS grid line. */
+    class LineNames internal constructor(internal vararg val names: String) :
+        GridEntry(names.joinToString(" ", prefix = "[", postfix = "]"))
 
     companion object {
-        val Auto get() = KeywordBreadth("auto")
-        val MinContent get() = KeywordBreadth("min-content")
-        val MaxContent get() = KeywordBreadth("max-content")
+        val Auto get() = TrackSize.Keyword("auto")
+        val MinContent get() = TrackSize.Keyword("min-content")
+        val MaxContent get() = TrackSize.Keyword("max-content")
 
-        operator fun invoke(value: CSSLengthOrPercentageValue) = FixedBreadth(value.toString())
-        operator fun invoke(value: CSSFlexValue) = FlexBreadth(value.toString())
+        fun size(value: CSSLengthOrPercentageValue) = TrackSize.Fixed(value.toString())
+        fun size(value: CSSFlexValue) = TrackSize.Flex(value.toString())
 
-        fun minmax(min: InflexibleBreadth, max: TrackBreadth) = MinMax(min, max)
+        fun minmax(min: TrackSize.Inflexible, max: TrackSize) = TrackSize.MinMax(min, max)
 
-        fun fitContent(value: CSSLengthOrPercentageValue) = FitContent(value)
+        fun fitContent(value: CSSLengthOrPercentageValue) = TrackSize.FitContent(value)
 
-        fun repeat(count: Int, vararg entries: GridTrackSizeEntry): Repeat = TrackRepeat(count, *entries)
-        fun repeat(type: AutoRepeat.Type, vararg entries: GridTrackSizeEntry): Repeat = AutoRepeat(type, *entries)
+        fun repeat(count: Int, vararg entries: GridEntry): Repeat = Repeat.Track(count, *entries)
+        fun repeat(type: Repeat.Auto.Type, vararg entries: GridEntry): Repeat = Repeat.Auto(type, *entries)
+
+        fun lineNames(vararg names: String) = LineNames(*names)
     }
 }
 
-private fun Array<out GridTrackSizeEntry>.toTrackListString(): String = buildString {
-    val names = mutableListOf<String>()
+private fun Array<out GridEntry>.toTrackListString(): String {
     val entries = this@toTrackListString.also { it.validate() }
-
-    fun appendWithLeadingSpace(value: Any) {
-        if (isNotEmpty()) {
-            append(' ')
-        }
-        append(value)
-    }
-
-    fun appendNamesIfAny() {
-        if (names.isNotEmpty()) {
-            appendWithLeadingSpace(names.joinToString(" ", prefix = "[", postfix = "]"))
-            names.clear()
-        }
-    }
-
-    fun appendSize(value: Any) {
-        appendNamesIfAny()
-        appendWithLeadingSpace(value)
-    }
-
-    for (entry in entries) {
-        when (entry) {
-            is NamedGridTrackSize -> {
-                if (entry.startNames != null) {
-                    names.addAll(entry.startNames.split(" "))
-                }
-                appendSize(entry.size)
-                if (entry.endNames != null) {
-                    names.addAll(entry.endNames.split(" "))
-                }
-            }
-
-            is GridTrackSize -> appendSize(entry)
-        }
-    }
-    appendNamesIfAny()
+    return entries.joinToString(" ")
 }
 
-private fun Array<out GridTrackSizeEntry>.validate() {
-    fun Array<out GridTrackSizeEntry>.foldOutNamed(): List<GridTrackSize> = map {
+private fun Array<out GridEntry>.validate() {
+    val trackSizes = flatMap {
         when (it) {
-            is NamedGridTrackSize -> it.size
-            is GridTrackSize.Repeat -> it
-            is GridTrackSize.TrackBreadth -> it
+            is GridEntry.LineNames -> emptyList()
+            is GridEntry.TrackSize -> listOf(it)
+            is GridEntry.Repeat -> it.entries.filterIsInstance<GridEntry.TrackSize>()
+                .ifEmpty { error("repeat() must contain at least one track size") }
         }
     }
 
-    fun List<GridTrackSize>.foldOutRepeat(): List<GridTrackSize> = flatMap {
-        when (it) {
-            is GridTrackSize.Repeat -> it.entries.foldOutNamed()
-            else -> listOf(it)
-        }
-    }
+    check(trackSizes.isNotEmpty()) { "You must specify at least one track size" }
 
-    val rawEntries = this.foldOutNamed()
-    val autoRepeatCount = rawEntries.count { it is GridTrackSize.AutoRepeat }
-
+    val autoRepeatCount = this.count { it is GridEntry.Repeat.Auto }
     if (autoRepeatCount == 0) return
 
-    check(autoRepeatCount <= 1) { "Only one auto-repeat call is allowed per track list" }
+    check(autoRepeatCount == 1) { "Only one auto-repeat call is allowed per track list" }
 
-    rawEntries.foldOutRepeat().forEach {
+    trackSizes.forEach {
         when (it) {
-            is GridTrackSize.TrackBreadth -> {
-                when (it) {
-                    is GridTrackSize.FixedBreadth -> {} // OK
-                    is GridTrackSize.FlexBreadth -> error("Cannot use flex values with auto-repeat")
-                    is GridTrackSize.KeywordBreadth -> error("Cannot use keywords with auto-repeat")
-                    is GridTrackSize.FitContent -> error("Cannot use fit-content with auto-repeat")
-                    is GridTrackSize.MinMax -> {
-                        check(it.min is GridTrackSize.FixedBreadth || it.max is GridTrackSize.FixedBreadth) {
-                            "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
-                        }
-                    }
+            is GridEntry.TrackSize.Fixed -> {} // OK
+            is GridEntry.TrackSize.Flex -> error("Cannot use flex values with auto-repeat")
+            is GridEntry.TrackSize.Keyword -> error("Cannot use keywords with auto-repeat")
+            is GridEntry.TrackSize.FitContent -> error("Cannot use fit-content with auto-repeat")
+            is GridEntry.TrackSize.MinMax -> {
+                check(it.min is GridEntry.TrackSize.Fixed || it.max is GridEntry.TrackSize.Fixed) {
+                    "Cannot use minmax with auto-repeat unless at least one of the values is a fixed value (a length or percentage)"
                 }
             }
-
-            is GridTrackSize.AutoRepeat, is GridTrackSize.TrackRepeat -> error("Cannot nest repeat calls")
         }
     }
 }
 
-private fun List<GridTrackSizeEntry>.toTrackListString() = toTypedArray().toTrackListString()
-
-/**
- * A CSS grid track size tagged with names.
- *
- * @param startNames Names to apply to the line that starts this track (left for columns, top for rows). If you want to
- *   specify multiple names, use spaces between the words.
- * @param endNames Names to apply to the line that ends this track (right for columns, bottom for rows). If you want to
- *   specify multiple names, use spaces between the words.
- */
-class NamedGridTrackSize(
-    internal val size: GridTrackSize,
-    internal val startNames: String? = null,
-    internal val endNames: String? = null
-) : GridTrackSizeEntry
-
-fun GridTrackSize.named(startNames: String? = null, endNames: String? = null) =
-    NamedGridTrackSize(this, startNames, endNames)
-
-class GridTrackBuilderHandle internal constructor(
-    private val tracks: MutableList<GridTrackSizeEntry>,
-    private val trackIndex: Int = tracks.lastIndex
-) {
-    fun named(startName: String? = null, endNames: String? = null) {
-        val track = tracks[trackIndex]
-        check(track is GridTrackSize) { "Using `named` on an invalid receiver. Expected `GridTrackSize`, got `${track::class.simpleName}`" }
-        tracks[trackIndex] = track.named(startName, endNames)
-    }
-}
+private fun List<GridEntry>.toTrackListString() = toTypedArray().toTrackListString()
 
 @GridDslMarker
 abstract class GridTrackBuilderInRepeat {
-    val auto get() = GridTrackSize.Auto
-    val minContent get() = GridTrackSize.MinContent
-    val maxContent get() = GridTrackSize.MaxContent
-    val autoFit get() = GridTrackSize.AutoRepeat.Type.AutoFit
-    val autoFill get() = GridTrackSize.AutoRepeat.Type.AutoFill
+    val auto get() = GridEntry.Auto
+    val minContent get() = GridEntry.MinContent
+    val maxContent get() = GridEntry.MaxContent
+    val autoFit get() = GridEntry.Repeat.Auto.Type.AutoFit
+    val autoFill get() = GridEntry.Repeat.Auto.Type.AutoFill
 
-    internal val tracks = mutableListOf<GridTrackSizeEntry>()
+    internal val tracks = mutableListOf<GridEntry>()
 
-    fun size(track: GridTrackSizeEntry): GridTrackBuilderHandle {
+    fun size(track: GridEntry) {
         tracks.add(track)
-        return GridTrackBuilderHandle(tracks)
     }
 
-    fun size(value: CSSLengthOrPercentageValue) = size(GridTrackSize(value))
+    fun size(value: CSSLengthOrPercentageValue) = size(GridEntry.size(value))
 
-    fun size(value: CSSFlexValue) = size(GridTrackSize(value))
+    fun size(value: CSSFlexValue) = size(GridEntry.size(value))
 
-    fun fitContent(value: CSSLengthOrPercentageValue) = size(GridTrackSize.fitContent(value))
+    fun fitContent(value: CSSLengthOrPercentageValue) = size(GridEntry.fitContent(value))
 
-    fun minmax(min: GridTrackSize.InflexibleBreadth, max: GridTrackSize.TrackBreadth) =
-        size(GridTrackSize.minmax(min, max))
+    fun minmax(min: GridEntry.TrackSize.Inflexible, max: GridEntry.TrackSize) =
+        size(GridEntry.minmax(min, max))
 
-    fun minmax(min: GridTrackSize.FixedBreadth, max: GridTrackSize.TrackBreadth) =
-        size(GridTrackSize.minmax(min, max))
+    fun minmax(min: GridEntry.TrackSize.Fixed, max: GridEntry.TrackSize) =
+        size(GridEntry.minmax(min, max))
 
-    fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSFlexValue) = minmax(min, GridTrackSize(max))
+    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSFlexValue) = minmax(min, GridEntry.size(max))
 
-    fun minmax(min: GridTrackSize.InflexibleBreadth, max: CSSLengthOrPercentageValue) = minmax(min, GridTrackSize(max))
+    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSLengthOrPercentageValue) = minmax(min, GridEntry.size(max))
 
-    fun minmax(min: CSSLengthOrPercentageValue, max: GridTrackSize.TrackBreadth) = minmax(GridTrackSize(min), max)
+    fun minmax(min: CSSLengthOrPercentageValue, max: GridEntry.TrackSize) = minmax(GridEntry.size(min), max)
 
     fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue) =
-        minmax(GridTrackSize(min), GridTrackSize(max))
+        minmax(GridEntry.size(min), GridEntry.size(max))
 
-    fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue) = minmax(GridTrackSize(min), GridTrackSize(max))
+    fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue) = minmax(GridEntry.size(min), GridEntry.size(max))
+
+    fun lineNames(vararg names: String) {
+        // combine with previous line names if there is no track specified between them
+        val prev = tracks.lastOrNull()
+        if (prev is GridEntry.LineNames) {
+            tracks[tracks.lastIndex] = GridEntry.lineNames(*(prev.names + names))
+            return
+        }
+        tracks.add(GridEntry.lineNames(*names))
+    }
 }
 
 /**
  * A builder for simplifying the creation of grid track lists.
  */
 class GridTrackBuilder : GridTrackBuilderInRepeat() {
-    fun repeat(count: Int, block: GridTrackBuilderInRepeat.() -> Unit): GridTrackBuilderHandle {
+    fun repeat(count: Int, block: GridTrackBuilderInRepeat.() -> Unit) {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        return size(GridTrackSize.repeat(count, *repeatTracks))
+        size(GridEntry.repeat(count, *repeatTracks))
     }
 
-    fun repeat(
-        type: GridTrackSize.AutoRepeat.Type,
-        block: GridTrackBuilderInRepeat.() -> Unit
-    ): GridTrackBuilderHandle {
+    fun repeat(type: GridEntry.Repeat.Auto.Type, block: GridTrackBuilderInRepeat.() -> Unit) {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        return size(GridTrackSize.repeat(type, *repeatTracks))
+        size(GridEntry.repeat(type, *repeatTracks))
     }
 }
 
@@ -278,7 +210,7 @@ fun StyleScope.gridAutoColumns(gridAutoColumns: GridAuto.Keyword) {
     gridAutoColumns(gridAutoColumns.toString())
 }
 
-fun StyleScope.gridAutoColumns(vararg gridAutoColumns: GridTrackSizeEntry) {
+fun StyleScope.gridAutoColumns(vararg gridAutoColumns: GridEntry) {
     gridAutoColumns(gridAutoColumns.toTrackListString())
 }
 
@@ -290,7 +222,7 @@ fun StyleScope.gridAutoRows(gridAutoRows: GridAuto.Keyword) {
     gridAutoRows(gridAutoRows.toString())
 }
 
-fun StyleScope.gridAutoRows(vararg gridAutoRows: GridTrackSizeEntry) {
+fun StyleScope.gridAutoRows(vararg gridAutoRows: GridEntry) {
     gridAutoRows(gridAutoRows.toTrackListString())
 }
 
@@ -327,7 +259,7 @@ fun StyleScope.gridTemplateColumns(gridTemplateColumns: GridTemplate.Keyword) {
     gridTemplateColumns(gridTemplateColumns.toString())
 }
 
-fun StyleScope.gridTemplateColumns(vararg gridTemplateColumns: GridTrackSizeEntry) {
+fun StyleScope.gridTemplateColumns(vararg gridTemplateColumns: GridEntry) {
     gridTemplateColumns(gridTemplateColumns.toTrackListString())
 }
 
@@ -339,7 +271,7 @@ fun StyleScope.gridTemplateRows(gridTemplateRows: GridTemplate.Keyword) {
     gridTemplateRows(gridTemplateRows.toString())
 }
 
-fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridTrackSizeEntry) {
+fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridEntry) {
     gridTemplateRows(gridTemplateRows.toTrackListString())
 }
 
@@ -349,8 +281,8 @@ fun StyleScope.gridTemplateRows(block: GridTrackBuilder.() -> Unit) {
 
 @GridDslMarker
 abstract class GridBuilderInAuto {
-    protected var cols: List<GridTrackSizeEntry>? = null
-    protected var rows: List<GridTrackSizeEntry>? = null
+    protected var cols: List<GridEntry>? = null
+    protected var rows: List<GridEntry>? = null
     protected var autoBuilder: GridBuilder? = null
 
     fun col(value: CSSLengthOrPercentageValue) {
@@ -397,15 +329,15 @@ abstract class GridBuilderInAuto {
  * // Without the builder
  * Modifier.
  *  gridTemplateColumns(
- *     GridTrackSize(40.px),
- *     GridTrackSize(1.fr),
- *     GridTrackSize.repeat(3, GridTrackSize(200.px))
+ *     GridEntry.size(40.px),
+ *     GridEntry.size(1.fr),
+ *     GridEntry.repeat(3, GridEntry.size(200.px))
  *  )
  *  gridTemplateRows(
- *    GridTrackSize(1.fr),
- *    GridTrackSize(1.fr),
+ *    GridEntry.size(1.fr),
+ *    GridEntry.size(1.fr),
  *  )
- *  gridAutoColumns(GridTrackSize(50.px))
+ *  gridAutoColumns(GridEntry.size(50.px))
  *
  * // With the builder
  * Modifier.grid {
