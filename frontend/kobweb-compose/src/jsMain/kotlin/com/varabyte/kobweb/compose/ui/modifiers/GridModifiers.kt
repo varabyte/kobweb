@@ -20,6 +20,10 @@ fun Modifier.gridTemplateColumns(block: GridTrackBuilder.() -> Unit) = styleModi
     gridTemplateColumns(block)
 }
 
+fun Modifier.gridTemplateColumns(value: GridTemplate.Keyword) = styleModifier {
+    gridTemplateColumns(value)
+}
+
 // TODO(#168): Remove before v1.0
 @Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
 @Deprecated(
@@ -31,6 +35,10 @@ fun Modifier.gridAutoColumns(value: String) = styleModifier {
 
 fun Modifier.gridAutoColumns(block: GridTrackBuilder.() -> Unit) = styleModifier {
     gridAutoColumns(block)
+}
+
+fun Modifier.gridAutoColumns(value: GridAuto.Keyword) = styleModifier {
+    gridAutoColumns(value)
 }
 
 fun Modifier.gridAutoFlow(value: GridAutoFlow) = styleModifier {
@@ -50,6 +58,10 @@ fun Modifier.gridTemplateRows(block: GridTrackBuilder.() -> Unit) = styleModifie
     gridTemplateRows(block)
 }
 
+fun Modifier.gridTemplateRows(value: GridTemplate.Keyword) = styleModifier {
+    gridTemplateRows(value)
+}
+
 // TODO(#168): Remove before v1.0
 @Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
 @Deprecated(
@@ -61,6 +73,10 @@ fun Modifier.gridAutoRows(value: String) = styleModifier {
 
 fun Modifier.gridAutoRows(block: GridTrackBuilder.() -> Unit) = styleModifier {
     gridAutoRows(block)
+}
+
+fun Modifier.gridAutoRows(value: GridAuto.Keyword) = styleModifier {
+    gridAutoRows(value)
 }
 
 fun Modifier.gridTemplateAreas(vararg rows: String) = styleModifier {
