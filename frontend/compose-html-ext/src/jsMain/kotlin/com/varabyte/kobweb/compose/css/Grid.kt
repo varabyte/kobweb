@@ -8,6 +8,10 @@ annotation class GridDslMarker
 
 typealias CSSFlexValue = CSSSizeValue<out CSSUnitFlex>
 
+// TODO(#168): Remove before v1.0
+@Deprecated("Use GridEntry.TrackSize instead", ReplaceWith("GridEntry.TrackSize"))
+typealias GridTrackSize = GridEntry.TrackSize
+
 /**
  * The base class for all values which can be used to configure a CSS grid's rows or columns.
  *
@@ -40,6 +44,19 @@ sealed class GridEntry(private val value: String) {
 
         /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
         class Fixed internal constructor(value: String) : Inflexible(value)
+
+        companion object {
+            val Auto get() = Keyword("auto")
+            val MinContent get() = Keyword("min-content")
+            val MaxContent get() = Keyword("max-content")
+
+            operator fun invoke(value: CSSLengthOrPercentageValue) = Fixed(value.toString())
+            operator fun invoke(value: CSSFlexValue) = Flex(value.toString())
+
+            fun minmax(min: Inflexible, max: TrackSize) = MinMax(min, max)
+
+            fun fitContent(value: CSSLengthOrPercentageValue) = FitContent(value)
+        }
     }
 
     /** Represents a repeated set of track sizes and line names for a CSS grid. */
@@ -69,17 +86,6 @@ sealed class GridEntry(private val value: String) {
         GridEntry(names.joinToString(" ", prefix = "[", postfix = "]"))
 
     companion object {
-        val Auto get() = TrackSize.Keyword("auto")
-        val MinContent get() = TrackSize.Keyword("min-content")
-        val MaxContent get() = TrackSize.Keyword("max-content")
-
-        fun size(value: CSSLengthOrPercentageValue) = TrackSize.Fixed(value.toString())
-        fun size(value: CSSFlexValue) = TrackSize.Flex(value.toString())
-
-        fun minmax(min: TrackSize.Inflexible, max: TrackSize) = TrackSize.MinMax(min, max)
-
-        fun fitContent(value: CSSLengthOrPercentageValue) = TrackSize.FitContent(value)
-
         fun repeat(count: Int, vararg entries: GridEntry): Repeat = Repeat.Track(count, *entries)
         fun repeat(type: Repeat.Auto.Type, vararg entries: GridEntry): Repeat = Repeat.Auto(type, *entries)
 
@@ -128,40 +134,42 @@ private fun List<GridEntry>.toTrackListString() = toTypedArray().toTrackListStri
 
 @GridDslMarker
 abstract class GridTrackBuilderInRepeat {
-    val auto get() = GridEntry.Auto
-    val minContent get() = GridEntry.MinContent
-    val maxContent get() = GridEntry.MaxContent
+    val auto get() = GridEntry.TrackSize.Auto
+    val minContent get() = GridEntry.TrackSize.MinContent
+    val maxContent get() = GridEntry.TrackSize.MaxContent
     val autoFit get() = GridEntry.Repeat.Auto.Type.AutoFit
     val autoFill get() = GridEntry.Repeat.Auto.Type.AutoFill
 
     internal val tracks = mutableListOf<GridEntry>()
 
-    fun size(track: GridEntry) {
+    fun size(track: GridEntry.TrackSize) {
         tracks.add(track)
     }
 
-    fun size(value: CSSLengthOrPercentageValue) = size(GridEntry.size(value))
+    fun size(value: CSSLengthOrPercentageValue) = size(GridEntry.TrackSize(value))
 
-    fun size(value: CSSFlexValue) = size(GridEntry.size(value))
+    fun size(value: CSSFlexValue) = size(GridEntry.TrackSize(value))
 
-    fun fitContent(value: CSSLengthOrPercentageValue) = size(GridEntry.fitContent(value))
+    fun fitContent(value: CSSLengthOrPercentageValue) = size(GridEntry.TrackSize.fitContent(value))
 
     fun minmax(min: GridEntry.TrackSize.Inflexible, max: GridEntry.TrackSize) =
-        size(GridEntry.minmax(min, max))
+        size(GridEntry.TrackSize.minmax(min, max))
 
     fun minmax(min: GridEntry.TrackSize.Fixed, max: GridEntry.TrackSize) =
-        size(GridEntry.minmax(min, max))
+        size(GridEntry.TrackSize.minmax(min, max))
 
-    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSFlexValue) = minmax(min, GridEntry.size(max))
+    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSFlexValue) = minmax(min, GridEntry.TrackSize(max))
 
-    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSLengthOrPercentageValue) = minmax(min, GridEntry.size(max))
+    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSLengthOrPercentageValue) =
+        minmax(min, GridEntry.TrackSize(max))
 
-    fun minmax(min: CSSLengthOrPercentageValue, max: GridEntry.TrackSize) = minmax(GridEntry.size(min), max)
+    fun minmax(min: CSSLengthOrPercentageValue, max: GridEntry.TrackSize) = minmax(GridEntry.TrackSize(min), max)
 
     fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue) =
-        minmax(GridEntry.size(min), GridEntry.size(max))
+        minmax(GridEntry.TrackSize(min), GridEntry.TrackSize(max))
 
-    fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue) = minmax(GridEntry.size(min), GridEntry.size(max))
+    fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue) =
+        minmax(GridEntry.TrackSize(min), GridEntry.TrackSize(max))
 
     fun lineNames(vararg names: String) {
         // combine with previous line names if there is no track specified between them
@@ -180,12 +188,12 @@ abstract class GridTrackBuilderInRepeat {
 class GridTrackBuilder : GridTrackBuilderInRepeat() {
     fun repeat(count: Int, block: GridTrackBuilderInRepeat.() -> Unit) {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        size(GridEntry.repeat(count, *repeatTracks))
+        tracks.add(GridEntry.repeat(count, *repeatTracks))
     }
 
     fun repeat(type: GridEntry.Repeat.Auto.Type, block: GridTrackBuilderInRepeat.() -> Unit) {
         val repeatTracks = GridTrackBuilder().apply(block).tracks.toTypedArray()
-        size(GridEntry.repeat(type, *repeatTracks))
+        tracks.add(GridEntry.repeat(type, *repeatTracks))
     }
 }
 
@@ -329,15 +337,15 @@ abstract class GridBuilderInAuto {
  * // Without the builder
  * Modifier.
  *  gridTemplateColumns(
- *     GridEntry.size(40.px),
- *     GridEntry.size(1.fr),
- *     GridEntry.repeat(3, GridEntry.size(200.px))
+ *     GridEntry.TrackSize(40.px),
+ *     GridEntry.TrackSize(1.fr),
+ *     GridEntry.repeat(3, GridEntry.TrackSize(200.px))
  *  )
  *  gridTemplateRows(
- *    GridEntry.size(1.fr),
- *    GridEntry.size(1.fr),
+ *    GridEntry.TrackSize(1.fr),
+ *    GridEntry.TrackSize(1.fr),
  *  )
- *  gridAutoColumns(GridEntry.size(50.px))
+ *  gridAutoColumns(GridEntry.TrackSize(50.px))
  *
  * // With the builder
  * Modifier.grid {
