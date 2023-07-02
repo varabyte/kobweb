@@ -4,6 +4,7 @@
     <module name="kobweb.backend.server.main" />
     <shortenClasspath name="NONE" />
     <option name="VM_PARAMETERS" value="-Dkobweb.server.environment=DEV" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/site" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
