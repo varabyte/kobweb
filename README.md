@@ -2,7 +2,7 @@
 ![version: 0.9.12](https://img.shields.io/badge/kobweb_cli-0.9.12-blue)
 <br>
 ![kotlin: 1.8.20](https://img.shields.io/badge/kotlin-1.8.20-blue?logo=kotlin)
-![compose: 1.4.0](https://img.shields.io/badge/compose-1.4.0-blue?logo=jetpackcompose)
+![compose: 1.4.1](https://img.shields.io/badge/compose-1.4.1-blue?logo=jetpackcompose)
 ![ktor: 2.2.2](https://img.shields.io/badge/ktor-2.2.2-blue)
 <br>
 <a href="https://discord.gg/5NZ2GKV5Cs">
