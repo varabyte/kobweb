@@ -94,8 +94,17 @@ sealed class GridEntry(private val value: String) {
 }
 
 private fun Array<out GridEntry>.toTrackListString(): String {
-    val entries = this@toTrackListString.also { it.validate() }
-    return entries.joinToString(" ")
+    validate()
+    return fold(mutableListOf<GridEntry>()) { acc, entry ->
+        // combine with previous line names if there is no track specified between them
+        val prev = acc.lastOrNull()
+        if (prev is GridEntry.LineNames && entry is GridEntry.LineNames) {
+            acc[acc.lastIndex] = GridEntry.LineNames(*(prev.names + entry.names))
+        } else {
+            acc.add(entry)
+        }
+        acc
+    }.joinToString(" ")
 }
 
 private fun Array<out GridEntry>.validate() {
@@ -172,12 +181,6 @@ abstract class GridTrackBuilderInRepeat {
         minmax(GridEntry.TrackSize(min), GridEntry.TrackSize(max))
 
     fun lineNames(vararg names: String) {
-        // combine with previous line names if there is no track specified between them
-        val prev = tracks.lastOrNull()
-        if (prev is GridEntry.LineNames) {
-            tracks[tracks.lastIndex] = GridEntry.lineNames(*(prev.names + names))
-            return
-        }
         tracks.add(GridEntry.lineNames(*names))
     }
 }
