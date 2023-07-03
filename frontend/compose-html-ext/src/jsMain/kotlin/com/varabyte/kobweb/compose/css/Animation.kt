@@ -5,7 +5,7 @@ import org.jetbrains.compose.web.css.*
 value class AnimationIterationCount private constructor(private val count: Number?) : StylePropertyValue {
     companion object {
         fun of(count: Number) = AnimationIterationCount(count)
-        val Infinite = AnimationIterationCount(null)
+        val Infinite get() = AnimationIterationCount(null)
     }
 
     override fun toString() = count?.toString() ?: "infinite"

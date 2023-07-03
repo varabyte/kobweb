@@ -128,8 +128,8 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
 sealed class BackgroundPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    private class Keyword internal constructor(value: String) : BackgroundPosition(value)
-    private class Position internal constructor(position: CSSPosition) : BackgroundPosition("$position")
+    private class Keyword(value: String) : BackgroundPosition(value)
+    private class Position(position: CSSPosition) : BackgroundPosition("$position")
 
     // TODO(#168): Remove before v1.0, these were replaced by CSSPosition
     sealed class LegacyEdge(value: String) : BackgroundPosition(value)
@@ -194,9 +194,9 @@ fun StyleScope.backgroundPosition(backgroundPosition: BackgroundPosition) {
 sealed class BackgroundRepeat private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class Keyword internal constructor(value: String) : BackgroundRepeat(value)
-    class RepeatStyle internal constructor(value: String) : Keyword(value)
-    internal class TwoValue internal constructor(horizontal: RepeatStyle, vertical: RepeatStyle) :
+    private class Keyword(value: String) : BackgroundRepeat(value)
+    class RepeatStyle internal constructor(value: String) : BackgroundRepeat(value)
+    private class TwoValue(horizontal: RepeatStyle, vertical: RepeatStyle) :
         BackgroundRepeat("$horizontal $vertical")
 
     companion object {
@@ -231,8 +231,8 @@ fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertic
 sealed class BackgroundSize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    private class Keyword internal constructor(value: String) : BackgroundSize(value)
-    private class Size internal constructor(value: String) : BackgroundSize(value)
+    private class Keyword(value: String) : BackgroundSize(value)
+    private class Size(value: String) : BackgroundSize(value)
 
     companion object {
         fun of(width: CSSLengthOrPercentageValue): BackgroundSize = Size("$width")

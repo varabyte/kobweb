@@ -143,7 +143,7 @@ data class CSSTransition(
 
     override fun toString() = buildList {
         add(property.toString())
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/animation#syntax
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/transition#syntax
         duration?.let { add(it.toString()) }
         timingFunction?.let { add(it.toString()) }
         if (delay != null) {
