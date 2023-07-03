@@ -36,9 +36,9 @@ fun StyleScope.caretColor(color: CSSColorValue) {
 sealed class TouchAction private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class Keyword(value: String) : TouchAction(value)
-    class PanHorizontal(value: String) : Keyword(value)
-    class PanVertical(value: String) : Keyword(value)
+    private class Keyword(value: String) : TouchAction(value)
+    class PanHorizontal internal constructor(value: String) : TouchAction(value)
+    class PanVertical internal constructor(value: String) : TouchAction(value)
     class PanGroup(horiz: PanHorizontal, vert: PanVertical, withPinchZoom: Boolean = false) :
         TouchAction("$horiz $vert" + if (withPinchZoom) " pinch-zoom" else "")
 

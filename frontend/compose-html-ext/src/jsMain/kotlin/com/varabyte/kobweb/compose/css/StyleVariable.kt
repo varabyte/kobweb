@@ -39,8 +39,7 @@ class StyleVariable<T : StylePropertyValue>(
     name: String,
     private val defaultFallback: T? = null,
     prefix: String? = null
-) :
-    CSSVariable {
+) : CSSVariable {
     override val name = prefix?.let { "$it-$name" } ?: name
 
     /**

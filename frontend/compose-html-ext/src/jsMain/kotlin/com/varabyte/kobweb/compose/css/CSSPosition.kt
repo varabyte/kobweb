@@ -72,7 +72,7 @@ private fun EdgeYOrCenter.toOffset(): EdgeYOffset {
  *
  * For more information about position values and what they mean, see: https://developer.mozilla.org/en-US/docs/Web/CSS/position_value
  */
-class CSSPosition internal constructor(private val value: String) : StylePropertyValue {
+class CSSPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     constructor(x: CSSLengthOrPercentageValue = 50.percent, y: CSSLengthOrPercentageValue = 50.percent) : this("$x $y")

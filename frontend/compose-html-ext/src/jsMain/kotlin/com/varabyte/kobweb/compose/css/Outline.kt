@@ -4,7 +4,7 @@ import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline
 @Suppress("EqualsOrHashCode")
-class CSSOutline : CSSStyleValue {
+class CSSOutline internal constructor() : CSSStyleValue {
     var width: CSSLengthValue? = null
     var style: LineStyle? = null
     var color: CSSColorValue? = null
@@ -50,7 +50,6 @@ class OutlineColor private constructor(private val value: String) : StylePropert
         val Initial get() = OutlineColor("initial")
         val Revert get() = OutlineColor("revert")
         val Unset get() = OutlineColor("unset")
-
     }
 }
 

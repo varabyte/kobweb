@@ -34,6 +34,7 @@ class ScrollSnapType private constructor(private val value: String) : StylePrope
         // Global
         val Inherit get() = ScrollSnapType("inherit")
         val Initial get() = ScrollSnapType("initial")
+        val Revert get() = ScrollSnapType("revert")
         val Unset get() = ScrollSnapType("unset")
     }
 }
@@ -138,6 +139,8 @@ fun StyleScope.scrollPaddingBlockEnd(value: CSSNumeric) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-align
 class ScrollSnapAlign private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         // Keyword
         val None get() = ScrollSnapAlign("none")
