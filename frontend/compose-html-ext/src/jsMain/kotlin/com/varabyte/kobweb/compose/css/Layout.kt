@@ -250,7 +250,7 @@ fun StyleScope.verticalAlign(value: CSSNumeric) {
 
 // region aspect ratio See: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
 
-class AspectRatio(private val value: String) : StylePropertyValue {
+class AspectRatio private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
@@ -281,7 +281,7 @@ fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
 
 // region line height See: https://developer.mozilla.org/en-US/docs/Web/CSS/line-height
 
-class LineHeight(private val value: String) : StylePropertyValue {
+class LineHeight private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {

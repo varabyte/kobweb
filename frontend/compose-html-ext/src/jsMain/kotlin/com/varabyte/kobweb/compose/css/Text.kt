@@ -165,16 +165,18 @@ fun StyleScope.whiteSpace(whiteSpace: WhiteSpace) {
 class WritingMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    // Keyword
-    val HorizontalTb get() = WritingMode("horizontal-tb");
-    val VerticalRl get() = WritingMode("vertical-rl");
-    val VerticalLr get() = WritingMode("vertical-lr");
+    companion object {
+        // Keyword
+        val HorizontalTb get() = WritingMode("horizontal-tb");
+        val VerticalRl get() = WritingMode("vertical-rl");
+        val VerticalLr get() = WritingMode("vertical-lr");
 
-    // Global
-    val Inherit get() = WritingMode("inherit")
-    val Initial get() = WritingMode("initial")
-    val Revert get() = WritingMode("revert")
-    val Unset get() = WritingMode("unset")
+        // Global
+        val Inherit get() = WritingMode("inherit")
+        val Initial get() = WritingMode("initial")
+        val Revert get() = WritingMode("revert")
+        val Unset get() = WritingMode("unset")
+    }
 }
 
 fun StyleScope.writingMode(writingMode: WritingMode) {

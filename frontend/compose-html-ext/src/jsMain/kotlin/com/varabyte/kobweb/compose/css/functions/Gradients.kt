@@ -8,7 +8,7 @@ interface Gradient : CSSStyleValue {
     class ColorStopsBuilder<T : CSSSizeValue<*>> {
         internal sealed class Entry<T : CSSSizeValue<*>>(private val entryStr: String) {
             override fun toString() = entryStr
-            open class Color<T : CSSSizeValue<*>>(val value: String) : Entry<T>(value) {
+            sealed class Color<T : CSSSizeValue<*>>(val value: String) : Entry<T>(value) {
                 class Simple<T : CSSSizeValue<*>>(value: CSSColorValue) : Color<T>("$value")
                 class Stop<T : CSSSizeValue<*>>(color: CSSColorValue, stop: T) : Color<T>("$color $stop")
                 class StopRange<T : CSSSizeValue<*>>(color: CSSColorValue, from: T, to: T) :
@@ -33,9 +33,7 @@ interface Gradient : CSSStyleValue {
 
         fun add(color: CSSColorValue) = entries.add(Entry.Color.Simple(color))
         fun add(color: CSSColorValue, stop: T) = entries.add(Entry.Color.Stop(color, stop))
-        fun add(color: CSSColorValue, from: T, to: T) = entries.add(
-            Entry.Color.StopRange(color, from, to)
-        )
+        fun add(color: CSSColorValue, from: T, to: T) = entries.add(Entry.Color.StopRange(color, from, to))
 
         fun setMidpoint(hint: T) = entries.add(Entry.Hint(hint))
     }
@@ -162,8 +160,8 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
         }
 
         companion object {
-            val Circle = Circle()
-            val Ellipse = Ellipse()
+            val Circle get() = Circle()
+            val Ellipse get() = Ellipse()
         }
     }
 

@@ -15,7 +15,7 @@ import org.jetbrains.compose.web.css.*
 /**
  * Enumeration identifying which baseline set to apply additional alignment to.
  */
-enum class BaselineSet {
+internal enum class BaselineSet {
     FIRST,
     LAST
 }
@@ -23,7 +23,7 @@ enum class BaselineSet {
 /**
  * Enumeration for strategies of how to handle overflowing items.
  */
-enum class OverflowStrategy {
+internal enum class OverflowStrategy {
     SAFE,
     UNSAFE;
 }
@@ -52,14 +52,14 @@ private fun OverflowStrategy.toValue(position: StylePropertyValue) = "${name.low
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
-sealed class AlignContent private constructor(private val value: String) : StylePropertyValue {
+sealed class AlignContent(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class AlignContentKeyword(value: String) : AlignContent(value)
-    class AlignContentPosition(value: String) : AlignContentKeyword(value)
+    class AlignContentKeyword internal constructor(value: String) : AlignContent(value)
+    class AlignContentPosition internal constructor(value: String) : AlignContent(value)
 
-    class BaselineAlignment(baselineSet: BaselineSet?) : AlignContent(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: AlignContentPosition) :
+    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : AlignContent(baselineSet.toValue())
+    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: AlignContentPosition) :
         AlignContent(strategy.toValue(position))
 
     companion object {
@@ -92,7 +92,6 @@ sealed class AlignContent private constructor(private val value: String) : Style
         val Inherit get() = AlignContentKeyword("inherit")
         val Initial get() = AlignContentKeyword("initial")
         val Revert get() = AlignContentKeyword("revert")
-        val RevertLayer get() = AlignContentKeyword("revert-layer")
         val Unset get() = AlignContentKeyword("unset")
     }
 }
@@ -115,11 +114,11 @@ fun StyleScope.alignContent(alignContent: AlignContent) {
 sealed class AlignItems private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class AlignItemsKeyword(value: String) : AlignItems(value)
-    class AlignItemsPosition(value: String) : AlignItemsKeyword(value)
+    class AlignItemsKeyword internal constructor(value: String) : AlignItems(value)
+    class AlignItemsPosition internal constructor(value: String) : AlignItems(value)
 
-    class BaselineAlignment(baselineSet: BaselineSet?) : AlignItems(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: AlignItemsPosition) :
+    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : AlignItems(baselineSet.toValue())
+    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: AlignItemsPosition) :
         AlignItems(strategy.toValue(position))
 
     companion object {
@@ -171,11 +170,11 @@ fun StyleScope.alignItems(alignItems: AlignItems) {
 sealed class AlignSelf private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class AlignSelfKeyword(value: String) : AlignSelf(value)
-    class AlignSelfPosition(value: String) : AlignSelfKeyword(value)
+    class AlignSelfKeyword internal constructor(value: String) : AlignSelf(value)
+    class AlignSelfPosition internal constructor(value: String) : AlignSelf(value)
 
-    class BaselineAlignment(baselineSet: BaselineSet?) : AlignSelf(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: AlignSelfPosition) :
+    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : AlignSelf(baselineSet.toValue())
+    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: AlignSelfPosition) :
         AlignSelf(strategy.toValue(position))
 
     companion object {
@@ -229,10 +228,10 @@ fun StyleScope.alignSelf(alignSelf: AlignSelf) {
 sealed class JustifyContent private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class JustifyContentKeyword(value: String) : JustifyContent(value)
-    class JustifyContentPosition(value: String) : JustifyContentKeyword(value)
+    class JustifyContentKeyword internal constructor(value: String) : JustifyContent(value)
+    class JustifyContentPosition internal constructor(value: String) : JustifyContent(value)
 
-    class OverflowAlignment(strategy: OverflowStrategy, position: JustifyContentPosition) :
+    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: JustifyContentPosition) :
         JustifyContent(strategy.toValue(position))
 
     companion object {
@@ -253,6 +252,10 @@ sealed class JustifyContent private constructor(private val value: String) : Sty
         val SpaceAround get() = JustifyContentKeyword("space-around")
         val SpaceEvenly get() = JustifyContentKeyword("space-evenly")
         val Stretch get() = JustifyContentKeyword("stretch")
+
+        // Overflow
+        fun Safe(position: JustifyContentPosition) = OverflowAlignment(OverflowStrategy.SAFE, position)
+        fun Unsafe(position: JustifyContentPosition) = OverflowAlignment(OverflowStrategy.UNSAFE, position)
 
         // Global
         val Inherit get() = JustifyContentKeyword("inherit")
@@ -280,11 +283,11 @@ fun StyleScope.justifyContent(justifyContent: JustifyContent) {
 sealed class JustifyItems private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class JustifyItemsKeyword(value: String) : JustifyItems(value)
-    class JustifyItemsPosition(value: String) : JustifyItemsKeyword(value)
+    class JustifyItemsKeyword internal constructor(value: String) : JustifyItems(value)
+    class JustifyItemsPosition internal constructor(value: String) : JustifyItems(value)
 
-    class BaselineAlignment(baselineSet: BaselineSet?) : JustifyItems(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: JustifyItemsPosition) :
+    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : JustifyItems(baselineSet.toValue())
+    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: JustifyItemsPosition) :
         JustifyItems(strategy.toValue(position))
 
     companion object {
@@ -338,11 +341,11 @@ fun StyleScope.justifyItems(justifyItems: JustifyItems) {
 sealed class JustifySelf private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    open class JustifySelfKeyword(value: String) : JustifySelf(value)
-    class JustifySelfPosition(value: String) : JustifySelfKeyword(value)
+    class JustifySelfKeyword internal constructor(value: String) : JustifySelf(value)
+    class JustifySelfPosition internal constructor(value: String) : JustifySelf(value)
 
-    class BaselineAlignment(baselineSet: BaselineSet?) : JustifySelf(baselineSet.toValue())
-    class OverflowAlignment(strategy: OverflowStrategy, position: JustifySelfPosition) :
+    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : JustifySelf(baselineSet.toValue())
+    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: JustifySelfPosition) :
         JustifySelf(strategy.toValue(position))
 
     companion object {

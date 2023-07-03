@@ -24,13 +24,13 @@ sealed class Content(private val value: String) : StylePropertyValue {
         Unrestricted(gradient.toString())
 
     companion object {
-        fun of(url: CSSUrl): Content.Unrestricted = Url(url)
-        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): Content.Unrestricted = Gradient(gradient)
-        fun of(text: String): Content.Unrestricted = Text(text)
+        fun of(url: CSSUrl): Unrestricted = Url(url)
+        fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): Unrestricted = Gradient(gradient)
+        fun of(text: String): Unrestricted = Text(text)
 
         // Non-combinable keywords
-        val None get(): Content.Restricted = RestrictedKeyword("none")
-        val Normal get(): Content.Restricted = RestrictedKeyword("normal")
+        val None get(): Restricted = RestrictedKeyword("none")
+        val Normal get(): Restricted = RestrictedKeyword("normal")
 
         // Language / position-dependent keywords
         val CloseQuote get(): Content = Keyword("close-quote")
