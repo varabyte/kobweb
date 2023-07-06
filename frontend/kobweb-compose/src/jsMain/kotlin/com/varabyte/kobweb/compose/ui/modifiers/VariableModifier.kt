@@ -5,10 +5,10 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
-@Deprecated("StyleVariable has moved. Use com.varabyte.kobweb.compose.css.StyleVariable instead.")
-typealias StyleVariable<T> = com.varabyte.kobweb.compose.css.StyleVariable<T>
-@Deprecated("StyleVariableProvider has moved. Use com.varabyte.kobweb.compose.css.StyleVariableProvider instead.")
-typealias StyleVariableProvider<T> = com.varabyte.kobweb.compose.css.StyleVariableProvider<T>
+@Deprecated("StyleVariable has moved. Use com.varabyte.kobweb.compose.css.StyleVariable.PropertyValue instead.")
+typealias StyleVariable<T> = com.varabyte.kobweb.compose.css.StyleVariable.PropertyValue<T>
+@Deprecated("StyleVariableProvider has moved. Use com.varabyte.kobweb.compose.css.StyleVariablePropertyProvider instead.")
+typealias StyleVariableProvider<T> = StyleVariablePropertyProvider<T>
 
 @Deprecated(
     "StyleVariable has moved. Use com.varabyte.kobweb.compose.css.StyleVariable instead.",
@@ -18,16 +18,22 @@ fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: S
     com.varabyte.kobweb.compose.css.StyleVariable(defaultFallback, prefix)
 
 fun <T : StylePropertyValue> Modifier.setVariable(
-    variable: com.varabyte.kobweb.compose.css.StyleVariable<T>,
+    variable: com.varabyte.kobweb.compose.css.StyleVariable.PropertyValue<T>,
     value: T
 ) = styleModifier {
     setVariable(variable, value)
 }
 
-fun <T : Number> Modifier.setVariable(variable: StyleVariableNumber<T>, value: T) = styleModifier {
+fun <T : Number> Modifier.setVariable(
+    variable: com.varabyte.kobweb.compose.css.StyleVariable.NumberValue<T>,
+    value: T
+) = styleModifier {
     setVariable(variable, value)
 }
 
-fun Modifier.setVariable(variable: StyleVariableString, value: String) = styleModifier {
+fun Modifier.setVariable(
+    variable: com.varabyte.kobweb.compose.css.StyleVariable.StringValue,
+    value: String
+) = styleModifier {
     setVariable(variable, value)
 }
