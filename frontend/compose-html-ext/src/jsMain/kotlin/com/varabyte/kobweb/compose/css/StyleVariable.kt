@@ -8,6 +8,9 @@ import kotlin.reflect.KProperty
 // A reimplementation of org.jetbrains.compose.web.css.CSSStyleVariable, since that version uses `out` variance which
 // actually allowed invalid assignment to work.
 // See https://github.com/JetBrains/compose-jb/issues/2763 for more detail.
+// This version also provides first class support for Number and String values, internally delegating to
+// StylePropertyNumber and StylePropertyString, respectively.
+
 /**
  * A class for declaring a CSS style property (i.e. a variable value that can be used inside CSS styles).
  *
@@ -34,13 +37,18 @@ import kotlin.reflect.KProperty
  *
  * @param defaultFallback When you query a variable, you can specify a fallback at that time. However, if not specified,
  *   then you can provide this default fallback to be used instead. See also: [value].
+ *
+ * @param T The underlying type of the variable.
+ *
+ * @param V The type used for querying and setting the variable. This is especially useful for exposing direct
+ * `Number` and `String` values to the user, as these cannot be the underlying type.
  */
-class StyleVariable<T : StylePropertyValue>(
+sealed class StyleVariable<T : StylePropertyValue, V>(
     name: String,
-    private val defaultFallback: T? = null,
-    prefix: String? = null
+    private val defaultFallback: T?,
+    prefix: String?
 ) : CSSVariable {
-    override val name = prefix?.let { "$it-$name" } ?: name
+    final override val name = prefix?.let { "$it-$name" } ?: name
 
     /**
      * Query this variable's current value.
@@ -49,31 +57,93 @@ class StyleVariable<T : StylePropertyValue>(
      * an optional fallback value in case one was not. If this fallback and [defaultFallback] are both set, then the
      * fallback passed to this method will take precedence.
      */
-    fun value(fallback: T? = null) =
-        CSSVariableValue<T>(
-            "var(--$name${(fallback ?: defaultFallback)?.let<StylePropertyValue, String> { ", $it" } ?: ""})"
-        )
-}
+    abstract fun value(fallback: V? = null): V
 
-/**
- * A delegate provider class which allows you to create a [StyleVariable] instance via the `by` keyword.
- */
-class StyleVariableProvider<T : StylePropertyValue> internal constructor(
-    private val defaultFallback: T?,
-    private val prefix: String?
-) {
-    operator fun getValue(
-        thisRef: Any?,
-        property: KProperty<*>
-    ): StyleVariable<T> {
-        val name = property.name.titleCamelCaseToKebabCase().removeSuffix("-var").removeSuffix("-variable")
-        return StyleVariable(name, defaultFallback, prefix)
+    /** Query the underlying variable's value. */
+    protected fun variableValue(fallback: T?) =
+        CSSVariableValue<T>("var(--$name${(fallback ?: defaultFallback)?.let { ", $it" } ?: ""})")
+
+    /** Represents a [StyleVariable] of a custom type. */
+    class PropertyValue<T : StylePropertyValue>(
+        name: String,
+        defaultFallback: T? = null,
+        prefix: String? = null
+    ) : StyleVariable<T, T>(name, defaultFallback, prefix) {
+        override fun value(fallback: T?): T = variableValue(fallback)
+    }
+
+    /** Represents a [StyleVariable] of a number. */
+    class NumberValue<T : Number>(
+        name: String,
+        defaultFallback: T? = null,
+        prefix: String? = null
+    ) : StyleVariable<StylePropertyNumber, T>(name, defaultFallback?.let { StylePropertyValue(it) }, prefix) {
+        override fun value(fallback: T?): T = variableValue(fallback?.let { StylePropertyValue(it) }).unsafeCast<T>()
+    }
+
+    /** Represents a [StyleVariable] of a string. */
+    class StringValue(
+        name: String,
+        defaultFallback: String? = null,
+        prefix: String? = null
+    ) : StyleVariable<StylePropertyString, String>(name, defaultFallback?.let { StylePropertyValue(it) }, prefix) {
+        override fun value(fallback: String?): String =
+            variableValue(fallback?.let { StylePropertyValue(it) }).unsafeCast<String>()
     }
 }
 
-/** Helper method for declaring a [StyleVariable] instance via the `by` keyword. */
+/** Helper method for transforming a Kotlin property into a CSS variable name. */
+private fun provideVariableName(property: KProperty<*>) =
+    property.name.titleCamelCaseToKebabCase().removeSuffix("-var").removeSuffix("-variable")
+
+/**
+ * A delegate provider class which allows you to create a [StyleVariable.PropertyValue] instance via the `by` keyword.
+ */
+class StyleVariablePropertyProvider<T : StylePropertyValue> internal constructor(
+    private val defaultFallback: T?,
+    private val prefix: String?
+) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+        StyleVariable.PropertyValue(provideVariableName(property), defaultFallback, prefix)
+}
+
+/**
+ * A delegate provider class which allows you to create a [StyleVariable.NumberValue] instance via the `by` keyword.
+ */
+class StyleVariableNumberProvider<T : Number> internal constructor(
+    private val defaultFallback: T?,
+    private val prefix: String?
+) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+        StyleVariable.NumberValue(provideVariableName(property), defaultFallback, prefix)
+}
+
+/**
+ * A delegate provider class which allows you to create a [StyleVariable.StringValue] instance via the `by` keyword.
+ */
+class StyleVariableStringProvider internal constructor(
+    private val defaultFallback: String?,
+    private val prefix: String?
+) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+        StyleVariable.StringValue(provideVariableName(property), defaultFallback, prefix)
+}
+
+/** Helper method for declaring a [StyleVariable.PropertyValue] instance via the `by` keyword. */
+@Suppress("FunctionName")
 fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
-    StyleVariableProvider(defaultFallback, prefix)
+    StyleVariablePropertyProvider(defaultFallback, prefix)
+
+/** Helper method for declaring a [StyleVariable.NumberValue] instance via the `by` keyword. */
+@Suppress("FunctionName")
+fun <T : Number> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariableNumberProvider(defaultFallback, prefix)
+
+/** Helper method for declaring a [StyleVariable.StringValue] instance via the `by` keyword. */
+// ensure type always has to be explicitly `StyleVariable<String>()` or inferred `StyleVariable(..)`
+@Suppress("FunctionName", "FINAL_UPPER_BOUND")
+fun <T : String> StyleVariable(defaultFallback: T? = null, prefix: T? = null) =
+    StyleVariableStringProvider(defaultFallback, prefix)
 
 /**
  * Helper method for setting a [StyleVariable] onto a raw HTML element.
@@ -81,6 +151,21 @@ fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: S
  * Most users will use `Modifier.setVariable` instead, but there are cases where this approach can be useful, like
  * grabbing the root element from the DOM and adding the variables onto it.
  */
-fun <T : StylePropertyValue> HTMLElement.setVariable(variable: StyleVariable<T>, value: T) {
+fun <T> HTMLElement.setVariable(variable: StyleVariable<*, T>, value: T) {
     this.style.setProperty("--${variable.name}", value.toString())
+}
+
+// NOTE: These should just be `variable.invoke(value)`, but it seems broken for inline styles.
+// See also: https://github.com/JetBrains/compose-jb/issues/2702
+
+fun <T : StylePropertyValue> StyleScope.setVariable(variable: StyleVariable.PropertyValue<T>, value: T) {
+    property("--${variable.name}", value)
+}
+
+fun <T : Number> StyleScope.setVariable(variable: StyleVariable.NumberValue<T>, value: T) {
+    property("--${variable.name}", value)
+}
+
+fun StyleScope.setVariable(variable: StyleVariable.StringValue, value: String) {
+    property("--${variable.name}", value)
 }
