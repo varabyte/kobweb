@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -8,7 +9,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.ResponsiveValues
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -16,39 +16,19 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 
-// Note: We restrict the number of columns supported by this widget because we have to statically predefine
-// (num breakpoints) * (num columns) style variants (and num breakpoints is 5).
-// I'm trying to be conservative for now, but if your project needs more than this, consider pinging me at
-// https://github.com/varabyte/kobweb/issues/154
-// In a pinch, you can fork this file into your own code and increase the column count in that version.
-private const val MAX_COLUMN_COUNT = 5
-
-val SimpleGridStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier.display(DisplayStyle.Grid)
+private val columnVariables = Breakpoint.values().associateWith { breakpoint ->
+    StyleVariable.NumberValue<Int>("simple-grid-col-count-${breakpoint.name.lowercase()}", prefix = "silk")
 }
 
-private val SimpleGridColumnVariants: Map<Breakpoint, Map<Int, ComponentVariant>> = run {
-    Breakpoint.values()
-        .associateWith { breakpoint ->
-            val isBaseVariant = breakpoint == Breakpoint.ZERO
-            val name = if (isBaseVariant) "base" else breakpoint.toString().lowercase()
-
-            val variants = (0 until MAX_COLUMN_COUNT)
-                .associate { i ->
-                    val numColumns = i + 1
-                    val gridModifier = Modifier.gridTemplateColumns { repeat(numColumns) { size(1.fr) } }
-
-                    numColumns to SimpleGridStyle.addVariant("$name-$numColumns") {
-                        if (isBaseVariant) {
-                            base { gridModifier }
-                        } else {
-                            breakpoint { gridModifier }
-                        }
-                    }
-                }
-
-            variants
+val SimpleGridStyle by ComponentStyle(prefix = "silk") {
+    base {
+        Modifier.display(DisplayStyle.Grid)
+    }
+    columnVariables.forEach { (breakpoint, variable) ->
+        breakpoint {
+            Modifier.gridTemplateColumns { repeat(variable.value()) { size(1.fr) } }
         }
+    }
 }
 
 /**
@@ -91,31 +71,13 @@ fun SimpleGrid(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {
-    require(numColumns.base <= MAX_COLUMN_COUNT && numColumns.sm <= MAX_COLUMN_COUNT && numColumns.md <= MAX_COLUMN_COUNT && numColumns.lg <= MAX_COLUMN_COUNT && numColumns.xl <= MAX_COLUMN_COUNT) {
-        "SimpleGrid supports at most $MAX_COLUMN_COUNT columns. If you need more than this, consider pinging https://github.com/varabyte/kobweb/issues/154."
-    }
-
     Div(
-        attrs = SimpleGridStyle
-            .toModifier(
-                *buildList {
-                    add(variant)
-                    // Breakpoint.ZERO is special case used to mean "base" in this case
-                    add(SimpleGridColumnVariants.getValue(Breakpoint.ZERO).getValue(numColumns.base))
-                    if (numColumns.sm != numColumns.base) {
-                        add(SimpleGridColumnVariants.getValue(Breakpoint.SM).getValue(numColumns.sm))
-                    }
-                    if (numColumns.md != numColumns.sm) {
-                        add(SimpleGridColumnVariants.getValue(Breakpoint.MD).getValue(numColumns.md))
-                    }
-                    if (numColumns.lg != numColumns.md) {
-                        add(SimpleGridColumnVariants.getValue(Breakpoint.LG).getValue(numColumns.lg))
-                    }
-                    if (numColumns.xl != numColumns.lg) {
-                        add(SimpleGridColumnVariants.getValue(Breakpoint.XL).getValue(numColumns.xl))
-                    }
-                }.toTypedArray()
-            )
+        attrs = SimpleGridStyle.toModifier(variant)
+            .setVariable(columnVariables.getValue(Breakpoint.ZERO), numColumns.base)
+            .setVariable(columnVariables.getValue(Breakpoint.SM), numColumns.sm)
+            .setVariable(columnVariables.getValue(Breakpoint.MD), numColumns.md)
+            .setVariable(columnVariables.getValue(Breakpoint.LG), numColumns.lg)
+            .setVariable(columnVariables.getValue(Breakpoint.XL), numColumns.xl)
             .then(modifier)
             .toAttrs()
     ) {
