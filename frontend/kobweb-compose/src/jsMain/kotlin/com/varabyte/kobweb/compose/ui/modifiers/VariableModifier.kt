@@ -17,8 +17,17 @@ typealias StyleVariableProvider<T> = com.varabyte.kobweb.compose.css.StyleVariab
 fun <T : StylePropertyValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
     com.varabyte.kobweb.compose.css.StyleVariable(defaultFallback, prefix)
 
-fun <T> Modifier.setVariable(variable: KobwebCssVariable<*, T>, value: T) = styleModifier {
-    // NOTE: This should just be `variable.invoke(value)`, but it seems broken for inline styles.
-    // See also: https://github.com/JetBrains/compose-jb/issues/2702
-    property("--${variable.name}", value.toString())
+fun <T : StylePropertyValue> Modifier.setVariable(
+    variable: com.varabyte.kobweb.compose.css.StyleVariable<T>,
+    value: T
+) = styleModifier {
+    setVariable(variable, value)
+}
+
+fun <T : Number> Modifier.setVariable(variable: StyleVariableNumber<T>, value: T) = styleModifier {
+    setVariable(variable, value)
+}
+
+fun Modifier.setVariable(variable: StyleVariableString, value: String) = styleModifier {
+    setVariable(variable, value)
 }

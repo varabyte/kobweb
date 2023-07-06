@@ -136,3 +136,18 @@ fun <T : String> StyleVariable(defaultFallback: T? = null, prefix: T? = null) =
 fun <T> HTMLElement.setVariable(variable: KobwebCssVariable<*, T>, value: T) {
     this.style.setProperty("--${variable.name}", value.toString())
 }
+
+// NOTE: These should just be `variable.invoke(value)`, but it seems broken for inline styles.
+// See also: https://github.com/JetBrains/compose-jb/issues/2702
+
+fun <T : StylePropertyValue> StyleScope.setVariable(variable: StyleVariable<T>, value: T) {
+    property("--${variable.name}", value)
+}
+
+fun <T : Number> StyleScope.setVariable(variable: StyleVariableNumber<T>, value: T) {
+    property("--${variable.name}", value)
+}
+
+fun StyleScope.setVariable(variable: StyleVariableString, value: String) {
+    property("--${variable.name}", value)
+}
