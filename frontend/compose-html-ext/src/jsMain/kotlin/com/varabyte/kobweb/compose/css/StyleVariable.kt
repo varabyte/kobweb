@@ -8,6 +8,8 @@ import kotlin.reflect.KProperty
 // A reimplementation of org.jetbrains.compose.web.css.CSSStyleVariable, since that version uses `out` variance which
 // actually allowed invalid assignment to work.
 // See https://github.com/JetBrains/compose-jb/issues/2763 for more detail.
+// This version also provides first class support for Number and String values, internally delegating to
+// StylePropertyNumber and StylePropertyString, respectively.
 
 /**
  * A class for declaring a CSS style property (i.e. a variable value that can be used inside CSS styles).
@@ -35,6 +37,11 @@ import kotlin.reflect.KProperty
  *
  * @param defaultFallback When you query a variable, you can specify a fallback at that time. However, if not specified,
  *   then you can provide this default fallback to be used instead. See also: [value].
+ *
+ * @param T The underlying type of the variable.
+ *
+ * @param V The type used for querying and setting the variable. This is especially useful for exposing direct
+ * `Number` and `String` values to the user, as these cannot be the underlying type.
  */
 sealed class StyleVariable<T : StylePropertyValue, V>(
     name: String,
@@ -52,9 +59,11 @@ sealed class StyleVariable<T : StylePropertyValue, V>(
      */
     abstract fun value(fallback: V? = null): V
 
+    /** Query the underlying variable's value. */
     protected fun variableValue(fallback: T?) =
         CSSVariableValue<T>("var(--$name${(fallback ?: defaultFallback)?.let { ", $it" } ?: ""})")
 
+    /** Represents a [StyleVariable] of a custom type. */
     class PropertyValue<T : StylePropertyValue>(
         name: String,
         defaultFallback: T? = null,
@@ -63,6 +72,7 @@ sealed class StyleVariable<T : StylePropertyValue, V>(
         override fun value(fallback: T?): T = variableValue(fallback)
     }
 
+    /** Represents a [StyleVariable] of a number. */
     class NumberValue<T : Number>(
         name: String,
         defaultFallback: T? = null,
@@ -71,6 +81,7 @@ sealed class StyleVariable<T : StylePropertyValue, V>(
         override fun value(fallback: T?): T = variableValue(fallback?.let { StylePropertyValue(it) }).unsafeCast<T>()
     }
 
+    /** Represents a [StyleVariable] of a string. */
     class StringValue(
         name: String,
         defaultFallback: String? = null,
@@ -81,11 +92,12 @@ sealed class StyleVariable<T : StylePropertyValue, V>(
     }
 }
 
+/** Helper method for transforming a Kotlin property into a CSS variable name. */
 private fun provideVariableName(property: KProperty<*>) =
     property.name.titleCamelCaseToKebabCase().removeSuffix("-var").removeSuffix("-variable")
 
 /**
- * A delegate provider class which allows you to create a [StyleVariable] instance via the `by` keyword.
+ * A delegate provider class which allows you to create a [StyleVariable.PropertyValue] instance via the `by` keyword.
  */
 class StyleVariablePropertyProvider<T : StylePropertyValue> internal constructor(
     private val defaultFallback: T?,
@@ -95,6 +107,9 @@ class StyleVariablePropertyProvider<T : StylePropertyValue> internal constructor
         StyleVariable.PropertyValue(provideVariableName(property), defaultFallback, prefix)
 }
 
+/**
+ * A delegate provider class which allows you to create a [StyleVariable.NumberValue] instance via the `by` keyword.
+ */
 class StyleVariableNumberProvider<T : Number> internal constructor(
     private val defaultFallback: T?,
     private val prefix: String?
@@ -103,6 +118,9 @@ class StyleVariableNumberProvider<T : Number> internal constructor(
         StyleVariable.NumberValue(provideVariableName(property), defaultFallback, prefix)
 }
 
+/**
+ * A delegate provider class which allows you to create a [StyleVariable.StringValue] instance via the `by` keyword.
+ */
 class StyleVariableStringProvider internal constructor(
     private val defaultFallback: String?,
     private val prefix: String?
