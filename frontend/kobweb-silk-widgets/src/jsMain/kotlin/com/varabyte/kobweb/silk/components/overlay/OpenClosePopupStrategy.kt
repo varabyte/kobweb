@@ -122,7 +122,7 @@ class ManualOpenClosePopupStrategy internal constructor() : OpenClosePopupStrate
  */
 fun OpenClosePopupStrategy.Companion.manual() = ManualOpenClosePopupStrategy()
 
-class TimedOpenClosePopupStrategy(val timeoutMs: Int) : OpenClosePopupStrategy() {
+class TimedOpenClosePopupStrategy internal constructor(val timeoutMs: Int) : OpenClosePopupStrategy() {
     private var timeoutHandle: Int? = null
 
     /**
