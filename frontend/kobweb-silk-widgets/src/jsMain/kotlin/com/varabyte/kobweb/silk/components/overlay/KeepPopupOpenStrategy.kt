@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.components.overlay
 
+import com.varabyte.kobweb.compose.events.EventListenerManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -94,9 +95,18 @@ val KeepPopupOpenStrategy.shouldKeepOpen: Boolean get() = keepOpenFlow.value
  * A [KeepPopupOpenStrategy] that keeps the popup open as long as the mouse cursor is inside the popup somewhere.
  */
 fun KeepPopupOpenStrategy.Companion.onHover() = object : KeepPopupOpenStrategy() {
+    private var manager: EventListenerManager? = null
+
     override fun onInit(popupElement: HTMLElement) {
-        popupElement.addEventListener("mouseenter", EventListener { emitShouldKeepOpen(true) })
-        popupElement.addEventListener("mouseleave", EventListener { emitShouldKeepOpen(false) })
+        manager = EventListenerManager(popupElement).apply {
+            addEventListener("mouseenter", EventListener { emitShouldKeepOpen(true) })
+            addEventListener("mouseleave", EventListener { emitShouldKeepOpen(false) })
+        }
+    }
+
+    override fun onResetting() {
+        manager!!.clearAllListeners()
+        manager = null
     }
 }
 
@@ -104,13 +114,22 @@ fun KeepPopupOpenStrategy.Companion.onHover() = object : KeepPopupOpenStrategy()
  * A [KeepPopupOpenStrategy] that keeps the popup open as long as any elements within the popup have focus.
  */
 fun KeepPopupOpenStrategy.Companion.onFocus() = object : KeepPopupOpenStrategy() {
+    private var manager: EventListenerManager? = null
+
     override fun onInit(popupElement: HTMLElement) {
-        popupElement.addEventListener("focusin", { emitShouldKeepOpen(true) })
-        popupElement.addEventListener("focusout", { evt ->
-            val focusEvent = evt as FocusEvent
-            val newFocus = focusEvent.relatedTarget as? Node
-            emitShouldKeepOpen(if (newFocus != null) popupElement.contains(newFocus) else false)
-        })
+        manager = EventListenerManager(popupElement).apply {
+            addEventListener("focusin") { emitShouldKeepOpen(true) }
+            addEventListener("focusout") { evt ->
+                val focusEvent = evt as FocusEvent
+                val newFocus = focusEvent.relatedTarget as? Node
+                emitShouldKeepOpen(if (newFocus != null) popupElement.contains(newFocus) else false)
+            }
+        }
+    }
+
+    override fun onResetting() {
+        manager!!.clearAllListeners()
+        manager = null
     }
 }
 

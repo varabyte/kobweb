@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.components.overlay
 
+import com.varabyte.kobweb.compose.events.EventListenerManager
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
@@ -52,22 +53,6 @@ abstract class OpenClosePopupStrategy {
 
 /** A readable convenience property that queries the underlying state flow. */
 val OpenClosePopupStrategy.isOpen: Boolean get() = requestFlow.value == OpenClose.OPEN
-
-private class EventListenerManager(private val element: HTMLElement) {
-    private val listeners = mutableMapOf<String, EventListener>()
-
-    fun addEventListener(type: String, listener: EventListener) {
-        listeners[type] = listener
-        element.addEventListener(type, listener)
-    }
-
-    fun clearAllListeners() {
-        listeners.forEach { (type, listener) ->
-            element.removeEventListener(type, listener)
-        }
-        listeners.clear()
-    }
-}
 
 /**
  * A strategy that opens the popup when the cursor enters some target element and closes it when the cursor leaves.
