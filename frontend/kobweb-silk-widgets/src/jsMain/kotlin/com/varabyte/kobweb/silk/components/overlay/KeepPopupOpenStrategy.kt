@@ -103,7 +103,7 @@ fun KeepPopupOpenStrategy.Companion.onFocus() = object : KeepPopupOpenStrategy()
     }
 }
 
-class ManualKeepPopupOpenStrategy internal constructor() : KeepPopupOpenStrategy(defaultValue = true) {
+class ManualKeepPopupOpenStrategy internal constructor(defaultValue: Boolean) : KeepPopupOpenStrategy(defaultValue) {
     var shouldKeepOpen: Boolean
         get() = keepOpenFlow.value
         set(value) {
@@ -114,11 +114,11 @@ class ManualKeepPopupOpenStrategy internal constructor() : KeepPopupOpenStrategy
 /**
  * A [KeepPopupOpenStrategy] that allows the user to manually control whether the popup should stay open or not.
  *
- * This strategy will always be defaulted to `true`, so if you want to close the popup, you must explicitly set
- * [shouldKeepOpen] to false. A common use-case here is that your popup has a close button that the user can click to
- * close the popup. Another approach could be a popup that closes when a timer runs down, etc.
+ * This strategy defaults to `true`, meaning if you want to close the popup, you must explicitly set [shouldKeepOpen] to
+ * false. A common use-case here is that your popup has a close button that the user can click to close the popup.
+ * Another approach could be a popup that closes when a timer runs down, etc.
  */
-fun KeepPopupOpenStrategy.Companion.manual() = ManualKeepPopupOpenStrategy()
+fun KeepPopupOpenStrategy.Companion.manual(defaultValue: Boolean = true) = ManualKeepPopupOpenStrategy(defaultValue)
 
 /**
  * A [KeepPopupOpenStrategy] which asks to never keep the popup open.
