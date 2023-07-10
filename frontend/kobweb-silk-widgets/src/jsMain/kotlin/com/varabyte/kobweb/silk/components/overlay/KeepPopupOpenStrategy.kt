@@ -56,7 +56,9 @@ abstract class KeepPopupOpenStrategy(private val defaultValue: Boolean = false) 
      *
      * @param popupElement The raw DOM element that represents the popup. This is useful for attaching event listeners.
      */
-    open fun init(popupElement: HTMLElement) = Unit
+    open fun init(popupElement: HTMLElement) {
+        _keepOpenFlow.value = defaultValue
+    }
 
     protected fun emitShouldKeepOpen(shouldKeepOpen: Boolean) {
         _keepOpenFlow.tryEmit(shouldKeepOpen)
