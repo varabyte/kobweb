@@ -160,5 +160,24 @@ fun KeepPopupOpenStrategy.Companion.combine(vararg strategies: KeepPopupOpenStra
         }
     }
 
+/**
+ * A strategy that observes another strategy and reflects its state.
+ *
+ * Reset and init intentionally do nothing in this strategy, as it exists to be a read-only layer on top of another
+ * strategy.
+ *
+ * A useful case for this is if you have a primary popup that stays up as long as a secondary popup is open. In that
+ * case, the secondary popup would have its own strategy for staying open, and the primary popup can observe it.
+ */
+fun KeepPopupOpenStrategy.observed() = run {
+    val self = this
+    object : KeepPopupOpenStrategy(self.shouldKeepOpen) {
+        init {
+            self.keepOpenFlow
+                .onEach { emitShouldKeepOpen(it) }
+                .launchIn(CoroutineScope(window.asCoroutineDispatcher()))
+        }
+    }
+}
 
 operator fun KeepPopupOpenStrategy.plus(other: KeepPopupOpenStrategy) = KeepPopupOpenStrategy.combine(this, other)
