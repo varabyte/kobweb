@@ -42,6 +42,9 @@ abstract class KeepPopupOpenStrategy(private val defaultValue: Boolean = false) 
 
     private val _keepOpenFlow = MutableStateFlow(defaultValue)
 
+    /** Whether this strategy is tied to an actively open popup or not. */
+    private var isActive = false
+
     /**
      * A flow which represents a stream of decisions by this strategy on whether the popup should stay open or not.
      *
@@ -56,12 +59,17 @@ abstract class KeepPopupOpenStrategy(private val defaultValue: Boolean = false) 
      *
      * @param popupElement The raw DOM element that represents the popup. This is useful for attaching event listeners.
      */
-    open fun init(popupElement: HTMLElement) {
+    fun init(popupElement: HTMLElement) {
         _keepOpenFlow.value = defaultValue
+        onInit(popupElement)
+        isActive = true
     }
 
+    protected open fun onInit(popupElement: HTMLElement) = Unit
+
     protected fun emitShouldKeepOpen(shouldKeepOpen: Boolean) {
-        _keepOpenFlow.tryEmit(shouldKeepOpen)
+        // Avoid updating state when this strategy is not active, since it will just get overwritten on init anyway
+        if (isActive) _keepOpenFlow.value = shouldKeepOpen
     }
 
     /**
@@ -70,8 +78,9 @@ abstract class KeepPopupOpenStrategy(private val defaultValue: Boolean = false) 
      * This will be called whenever the popup is closed.
      */
     fun reset() {
+        isActive = false
         onResetting()
-        emitShouldKeepOpen(defaultValue)
+        _keepOpenFlow.value = defaultValue
     }
 
     /** Method triggered right before a [reset] happens, provided in case implementors need to prepare for it. */
@@ -85,7 +94,7 @@ val KeepPopupOpenStrategy.shouldKeepOpen: Boolean get() = keepOpenFlow.value
  * A [KeepPopupOpenStrategy] that keeps the popup open as long as the mouse cursor is inside the popup somewhere.
  */
 fun KeepPopupOpenStrategy.Companion.onHover() = object : KeepPopupOpenStrategy() {
-    override fun init(popupElement: HTMLElement) {
+    override fun onInit(popupElement: HTMLElement) {
         popupElement.addEventListener("mouseenter", EventListener { emitShouldKeepOpen(true) })
         popupElement.addEventListener("mouseleave", EventListener { emitShouldKeepOpen(false) })
     }
@@ -95,7 +104,7 @@ fun KeepPopupOpenStrategy.Companion.onHover() = object : KeepPopupOpenStrategy()
  * A [KeepPopupOpenStrategy] that keeps the popup open as long as any elements within the popup have focus.
  */
 fun KeepPopupOpenStrategy.Companion.onFocus() = object : KeepPopupOpenStrategy() {
-    override fun init(popupElement: HTMLElement) {
+    override fun onInit(popupElement: HTMLElement) {
         popupElement.addEventListener("focusin", { emitShouldKeepOpen(true) })
         popupElement.addEventListener("focusout", { evt ->
             val focusEvent = evt as FocusEvent
@@ -153,7 +162,7 @@ fun KeepPopupOpenStrategy.Companion.combine(vararg strategies: KeepPopupOpenStra
                 }.launchIn(CoroutineScope(window.asCoroutineDispatcher()))
         }
 
-        override fun init(popupElement: HTMLElement) {
+        override fun onInit(popupElement: HTMLElement) {
             strategies.forEach { it.init(popupElement) }
         }
 
