@@ -165,16 +165,6 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
         }
     }
 
-    enum class Position {
-        Top,
-        Bottom,
-        Left,
-        Right,
-        Center;
-
-        override fun toString() = name.lowercase()
-    }
-
     enum class Extent {
         ClosestSide,
         ClosestCorner,
