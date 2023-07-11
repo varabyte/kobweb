@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.EventListener
 
 enum class OpenClose {
     OPEN,
@@ -62,8 +61,8 @@ fun OpenClosePopupStrategy.Companion.onHover() = object : OpenClosePopupStrategy
 
     override fun init(targetElement: HTMLElement) {
         manager = EventListenerManager(targetElement).apply {
-            addEventListener("mouseenter", EventListener { emitRequest(OpenClose.OPEN) })
-            addEventListener("mouseleave", EventListener { emitRequest(OpenClose.CLOSE) })
+            addEventListener("mouseenter") { emitRequest(OpenClose.OPEN) }
+            addEventListener("mouseleave") { emitRequest(OpenClose.CLOSE) }
             if (targetElement.matches(":hover")) emitRequest(OpenClose.OPEN)
         }
     }
@@ -82,8 +81,8 @@ fun OpenClosePopupStrategy.Companion.onFocus() = object : OpenClosePopupStrategy
 
     override fun init(targetElement: HTMLElement) {
         manager = EventListenerManager(targetElement).apply {
-            addEventListener("focusin", EventListener { emitRequest(OpenClose.OPEN) })
-            addEventListener("focusout", EventListener { emitRequest(OpenClose.CLOSE) })
+            addEventListener("focusin") { emitRequest(OpenClose.OPEN) }
+            addEventListener("focusout") { emitRequest(OpenClose.CLOSE) }
             if (targetElement.contains(document.activeElement)) emitRequest(OpenClose.OPEN)
         }
     }

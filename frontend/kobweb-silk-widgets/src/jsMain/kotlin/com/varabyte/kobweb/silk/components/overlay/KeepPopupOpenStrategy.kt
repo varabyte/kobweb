@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
-import org.w3c.dom.events.EventListener
 import org.w3c.dom.events.FocusEvent
 
 /**
@@ -99,8 +98,8 @@ fun KeepPopupOpenStrategy.Companion.onHover() = object : KeepPopupOpenStrategy()
 
     override fun onInit(popupElement: HTMLElement) {
         manager = EventListenerManager(popupElement).apply {
-            addEventListener("mouseenter", EventListener { emitShouldKeepOpen(true) })
-            addEventListener("mouseleave", EventListener { emitShouldKeepOpen(false) })
+            addEventListener("mouseenter") { emitShouldKeepOpen(true) }
+            addEventListener("mouseleave") { emitShouldKeepOpen(false) }
         }
     }
 
