@@ -316,30 +316,23 @@ fun StyleScope.background(vararg backgrounds: CSSBackground) {
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/background
  */
 fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) {
-    if (backgrounds.isNotEmpty()) {
-        // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
-        @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
-        property("background",
-            buildString {
-                append(backgrounds.joinToString(", "))
-                // backgrounds only allow you to specify a single color. If provided, it must be included with
-                // the final layer.
-                if (color != null) {
-                    append(' ')
-                    append(color)
-                }
-            })
-        val defaultBlendMode = BackgroundBlendMode.Normal
-        val blendModes = backgrounds
-            .map { it.blend ?: defaultBlendMode }
-            // Use toString comparison because otherwise equality checks are against instance
-            .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
-        if (blendModes != null) {
-            property("background-blend-mode", blendModes.joinToString())
-        }
-    } else {
+    // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
+    @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
+    property("background", buildString {
+        append(backgrounds.joinToString(", "))
+        // backgrounds only allow you to specify a single color. If provided, it must be included with
+        // the final layer.
         if (color != null) {
-            property("background-color", color)
+            append(' ')
+            append(color)
         }
+    })
+    val defaultBlendMode = BackgroundBlendMode.Normal
+    val blendModes = backgrounds
+        .map { it.blend ?: defaultBlendMode }
+        // Use toString comparison because otherwise equality checks are against instance
+        .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
+    if (blendModes != null) {
+        property("background-blend-mode", blendModes.joinToString())
     }
 }
