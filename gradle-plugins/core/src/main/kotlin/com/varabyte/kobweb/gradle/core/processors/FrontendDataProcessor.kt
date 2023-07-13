@@ -70,11 +70,6 @@ private fun processComponentStyle(
     }
 }
 
-private fun String.elideLinesAfterFirst(): String {
-    val lines = this.split("\n")
-    return if (lines.size > 1) "${lines.first()}..." else this
-}
-
 /**
  * Ensure user is using a `by` keyword when working with delegate methods.
  *
