@@ -18,6 +18,8 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     //        val apis = Apis(data, logger)
     //        apis.register("/add") { ctx -> example.api.add(ctx) }
     //        apis.register("/remove") { ctx -> example.api.remove(ctx) }
+    //        apis.registerStream("/echo") { ctx -> example.api.echo }
+    //        apis.registerStream("/chat") { ctx -> example.api.chat }
     //        val initCtx = InitApiContext(apis, data, logger)
     //        example.init(initCtx)
     //        return apis
@@ -46,6 +48,9 @@ fun createApisFactoryImpl(backendData: BackendData): String {
                         addStatement("val apis = %T(data, logger)", classApis)
                         backendData.apiMethods.sortedBy { entry -> entry.route }.forEach { entry ->
                             addStatement("apis.register(%S) { ctx -> ${entry.fqn}(ctx) }", entry.route)
+                        }
+                        backendData.apiStreamMethods.sortedBy { entry -> entry.route }.forEach { entry ->
+                            addStatement("apis.registerStream(%S, ${entry.fqn})", entry.route)
                         }
                         if (backendData.initMethods.isNotEmpty()) {
                             addStatement("val initCtx = %T(apis, data, logger)", classInitApiContext)

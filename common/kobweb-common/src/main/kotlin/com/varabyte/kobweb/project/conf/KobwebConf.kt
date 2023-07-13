@@ -1,15 +1,20 @@
 @file:Suppress("unused") // Used by serializer
+@file:UseSerializers(DurationSerializer::class)
 
 package com.varabyte.kobweb.project.conf
 
 import com.charleskorn.kaml.Yaml
 import com.varabyte.kobweb.common.data.DataSize
 import com.varabyte.kobweb.common.data.DataSize.Companion.mebibytes
+import com.varabyte.kobweb.common.time.DurationSerializer
 import com.varabyte.kobweb.common.yaml.nonStrictDefault
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.Server.Logging.Level
 import com.varabyte.kobweb.project.io.KobwebReadableTextFile
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * @param title The title of the site. See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title
@@ -30,6 +35,7 @@ class Server(
     val port: Int = 8080,
     val logging: Logging = Logging(),
     val cors: Cors = Cors(),
+    val streaming: Streaming = Streaming(),
     val nativeLibraries: List<NativeLibrary> = emptyList(),
 ) {
     /**
@@ -75,7 +81,7 @@ class Server(
      * @param level The minimum level of log messages to show. If set to [Level.OFF], no logs will be shown. See the
      *   [Level] enum for more details.
      * @param logRoot The root directory where logs will be stored. If you change this to a directory that will contain
-     *   other files besides just logs, consider setting [clearLogsOnDevStart] to false.
+     *   other files besides just logs, consider setting [clearLogsOnStart] to false.
      * @param clearLogsOnStart If true, all existing files under the log root will be deleted when a server is
      *   started in dev mode. Be careful if you changed [logRoot] to a path with non-log files in it!
      * @param logFileBaseName The base name of the log file. A log suffix will automatically be added. Later, if the
@@ -119,6 +125,27 @@ class Server(
     @Serializable
     class Cors(
         val hosts: List<Host> = listOf(),
+    )
+
+    /**
+     * Configuration for Streaming APIs.
+     *
+     * Streaming APIs work through the WebSockets API, so configuring this section looks like configuring WebSockets.
+     * Therefore, you can refer to WebSockets documentation for more details.
+     *
+     * See also: https://ktor.io/docs/websocket.html
+     * See also: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+     *
+     * @param enabled Whether streaming APIs are enabled or not. If false, all other settings in this section are
+     *   ignored.
+     * @param pingPeriod The duration between pings or `0` to disable pings.
+     * @param timeout The write/ping timeout after that a connection will be closed.
+     */
+    @Serializable
+    class Streaming(
+        val enabled: Boolean = false,
+        val pingPeriod: Duration = Duration.ZERO,
+        val timeout: Duration = 15.seconds,
     )
 
     /**

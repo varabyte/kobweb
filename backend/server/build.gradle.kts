@@ -19,6 +19,9 @@ dependencies {
     implementation(project(":backend:server-plugin"))
     implementation(project(":common:kobweb-common"))
 
+    // Needed for the model object created and sent by the client
+    implementation(project(":frontend:kobweb-streams"))
+
     testImplementation(libs.truthish)
     testImplementation(libs.ktor.server.tests)
     testImplementation(kotlin("test"))

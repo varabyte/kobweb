@@ -4,6 +4,9 @@ import com.varabyte.kobweb.api.http.EMPTY_BODY
 import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
+import com.varabyte.kobweb.api.stream.Stream
+import com.varabyte.kobweb.api.stream.StreamEvent
+import com.varabyte.kobweb.api.stream.StreamerId
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Site
@@ -11,24 +14,30 @@ import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.io.ApiJarFile
+import com.varabyte.kobweb.streams.StreamMessage
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.nio.file.Path
+import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
+import kotlin.time.toJavaDuration
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
@@ -39,6 +48,13 @@ fun Application.configureRouting(
     conf: KobwebConf,
     globals: ServerGlobals
 ) {
+    if (conf.server.streaming.enabled) {
+        install(WebSockets) {
+            pingPeriod = conf.server.streaming.pingPeriod.toJavaDuration()
+            timeout = conf.server.streaming.timeout.toJavaDuration()
+        }
+    }
+
     val logger = object : Logger {
         override fun trace(message: String) = log.trace(message)
         override fun debug(message: String) = log.debug(message)
@@ -151,6 +167,72 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                 }
 
                 else -> call.respondBytes(EMPTY_BODY, status = HttpStatusCode.InternalServerError)
+            }
+        }
+    }
+}
+
+private class WebSocketSessionStreamData(val streamerId: StreamerId) {
+    val streams = mutableSetOf<String>()
+}
+
+private fun Routing.setupStreaming(
+    apiJar: ApiJarFile,
+    logger: Logger,
+) {
+    val sessions = Collections.synchronizedMap(mutableMapOf<WebSocketSession, WebSocketSessionStreamData>())
+    webSocket("/kobweb-streams") {
+        val id = StreamerId.next()
+        val session = this
+        val streamData = WebSocketSessionStreamData(id)
+        sessions[session] = streamData
+        try {
+            for (frame in incoming) {
+                if (frame is Frame.Text) {
+                    val incomingMessage = Json.decodeFromString<StreamMessage>(frame.readText())
+                    val streamImpl = object : Stream {
+                        private suspend fun WebSocketSession.sendMessage(message: StreamMessage) {
+                            send(Json.encodeToString(message))
+                        }
+
+                        override suspend fun send(text: String) {
+                            session.sendMessage(StreamMessage(incomingMessage.route, text))
+                        }
+
+                        override suspend fun broadcast(text: String, filter: (StreamerId) -> Boolean) {
+                            val message = StreamMessage(incomingMessage.route, text)
+                            sessions.entries.forEach { (currSession, currStreamData) ->
+                                // A user might have connected for a different stream channel, so don't waste
+                                // bandwidth sending them a message they don't care about.
+                                if (currStreamData.streams.contains(incomingMessage.route)) {
+                                    if (filter(currStreamData.streamerId)) {
+                                        currSession.sendMessage(message)
+                                    }
+                                }
+                            }
+                        }
+
+                        override suspend fun disconnect() {
+                            apiJar.apis.handle(incomingMessage.route, StreamEvent.Closed(id))
+                            val streams = sessions[session]!!.streams
+                            streams.remove(incomingMessage.route)
+                            if (streams.isEmpty()) {
+                                session.close()
+                            }
+                        }
+                    }
+
+                    if (streamData.streams.add(incomingMessage.route)) {
+                        apiJar.apis.handle(incomingMessage.route, StreamEvent.Opened(streamImpl, id))
+                    }
+                    apiJar.apis.handle(incomingMessage.route, StreamEvent.Text(streamImpl, id, incomingMessage.payload))
+                }
+            }
+        } catch (e: Throwable) {
+            logger.error("WebSocket (id = $id) closed with an exception: ${closeReason.await()}\n$e")
+        } finally {
+            sessions.remove(session)?.streams?.forEach { route ->
+                apiJar.apis.handle(route, StreamEvent.Closed(id))
             }
         }
     }
@@ -319,6 +401,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
 
         if (apiJar != null) {
             configureApiRouting(ServerEnvironment.DEV, apiJar, routePrefix, logger)
+            if (conf.server.streaming.enabled) setupStreaming(apiJar, logger)
         }
 
         val contentRootFile = contentRoot.toFile()
@@ -363,6 +446,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
 
         if (apiJar != null) {
             configureApiRouting(ServerEnvironment.PROD, apiJar, routePrefix, logger)
+            if (conf.server.streaming.enabled) setupStreaming(apiJar, logger)
         }
 
         resourcesRoot.toFile().let { resourcesRootFile ->

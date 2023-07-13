@@ -8,14 +8,20 @@ import org.gradle.api.GradleException
  *
  * @param initMethods A collection of methods annotated with `@InitApi` and relevant metadata.
  * @param apiMethods A collection of methods annotated with `@Api` and relevant metadata.
+ * @param apiStreamMethods A collection of ApiStream properties and relevant metadata.
  */
 @Serializable
-class BackendData(val initMethods: List<InitApiEntry>, val apiMethods: List<ApiEntry>)
+class BackendData(
+    val initMethods: List<InitApiEntry>,
+    val apiMethods: List<ApiEntry>,
+    val apiStreamMethods: List<ApiStreamEntry>
+)
 
 fun Iterable<BackendData>.merge(): BackendData {
     return BackendData(
         this.flatMap { it.initMethods },
         this.flatMap { it.apiMethods },
+        this.flatMap { it.apiStreamMethods },
     ).also { it.assertValid() }
 }
 
