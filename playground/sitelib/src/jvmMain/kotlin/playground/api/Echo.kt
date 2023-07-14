@@ -8,7 +8,7 @@ val echo = ApiStream { ctx ->
 
 // Or, if you need access to connect / disconnect messages:
 // val echo = object : ApiStream() {
-//    override suspend fun onUserConnected(ctx: UserConnectedContext) {}
+//    override suspend fun onClientConnected(ctx: ClientConnectedContext) {}
 //    override suspend fun onTextReceived(ctx: TextReceivedContext) {}
-//    override suspend fun onUserDisconnected(ctx: UserDisconnectedContext) {}
+//    override suspend fun onClientDisconnected(ctx: ClientDisconnectedContext) {}
 //}
