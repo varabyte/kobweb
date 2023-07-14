@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.set
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
@@ -32,6 +30,8 @@ kotlin {
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-streams")
+    artifactId.set {
+        "kobweb-streams" + if (it == "kotlinMultiplatform") "" else "-$it"
+    }
     description.set("Support for using Kobweb API streams from a Kobweb site.")
 }

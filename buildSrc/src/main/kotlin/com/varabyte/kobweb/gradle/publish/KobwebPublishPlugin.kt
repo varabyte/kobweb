@@ -19,6 +19,8 @@ abstract class KobwebPublicationConfig {
     /**
      * Provide an artifact ID given the name of the publication.
      *
+     * The string passed in will be the name of the current publication target, e.g. "js", "jvm", "kotlinMultiplatform"
+     *
      * The name can be useful for disambiguation in case a single project generates multiple publications (such as
      * multiplatform, js, and jvm artifacts).
      *
