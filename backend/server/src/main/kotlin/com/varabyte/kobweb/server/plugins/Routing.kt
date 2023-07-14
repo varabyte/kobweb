@@ -175,7 +175,7 @@ private fun Routing.setupStreaming(
     apiJar: ApiJarFile,
     logger: Logger,
 ) {
-    logger.info("Initializing Kobweb streams")
+    logger.info("Initializing Kobweb streams.")
 
     application.install(WebSockets) {
         pingPeriod = conf.server.streaming.pingPeriod.toJavaDuration()
