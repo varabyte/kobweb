@@ -57,7 +57,7 @@ value class StreamClientId private constructor(val id: Short) {
  *   stream itself, in other words.
  */
 sealed class StreamEvent(val clientId: StreamClientId) {
-    class Opened(val stream: Stream, clientId: StreamClientId) : StreamEvent(clientId)
+    class ClientConnected(val stream: Stream, clientId: StreamClientId) : StreamEvent(clientId)
     class Text(val stream: Stream, clientId: StreamClientId, val text: String) : StreamEvent(clientId)
-    class Closed(clientId: StreamClientId) : StreamEvent(clientId)
+    class ClientDisconnected(clientId: StreamClientId) : StreamEvent(clientId)
 }

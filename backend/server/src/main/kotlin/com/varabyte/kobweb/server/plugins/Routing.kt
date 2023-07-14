@@ -215,7 +215,7 @@ private fun Routing.setupStreaming(
                         }
 
                         override suspend fun disconnect() {
-                            apiJar.apis.handle(incomingMessage.route, StreamEvent.Closed(id))
+                            apiJar.apis.handle(incomingMessage.route, StreamEvent.ClientDisconnected(id))
                             val streams = sessions[session]!!.streams
                             streams.remove(incomingMessage.route)
                             if (streams.isEmpty()) {
@@ -229,7 +229,7 @@ private fun Routing.setupStreaming(
                             sessions[session]!!.streams.add(incomingMessage.route)
                             apiJar.apis.handle(
                                 incomingMessage.route,
-                                StreamEvent.Opened(streamImpl, id)
+                                StreamEvent.ClientConnected(streamImpl, id)
                             )
                         }
 
@@ -244,7 +244,7 @@ private fun Routing.setupStreaming(
             logger.error("WebSocket connection (with clientId = $id) closed with an exception: ${closeReason.await()}\n$e")
         } finally {
             sessions.remove(session)?.streams?.forEach { route ->
-                apiJar.apis.handle(route, StreamEvent.Closed(id))
+                apiJar.apis.handle(route, StreamEvent.ClientDisconnected(id))
             }
         }
     }

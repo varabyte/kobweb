@@ -36,7 +36,7 @@ class Apis(private val data: Data, private val logger: Logger) {
     suspend fun handle(path: String, event: StreamEvent) {
         apiStreamHandlers[path.removePrefix("/")]?.let { streamHandler ->
             when (event) {
-                is StreamEvent.Opened -> {
+                is StreamEvent.ClientConnected -> {
                     streamHandler.onClientConnected(
                         ApiStream.ClientConnectedContext(
                             event.stream,
@@ -59,7 +59,7 @@ class Apis(private val data: Data, private val logger: Logger) {
                     )
                 }
 
-                is StreamEvent.Closed -> {
+                is StreamEvent.ClientDisconnected -> {
                     streamHandler.onClientDisconnected(
                         ApiStream.ClientDisconnectedContext(
                             event.clientId,
