@@ -2,14 +2,8 @@ package com.varabyte.kobweb.api.stream
 
 import java.util.concurrent.atomic.AtomicInteger
 
-interface Stream {
-    /**
-     * Reply with a text message back to the client.
-     *
-     * Use [broadcast] if you want to send a message to all clients connected on this stream.
-     */
-    suspend fun send(text: String)
-
+// Some functionality is still available even after a stream has been disconnected
+interface DisconnectedStream {
     /**
      * Send a text message to all clients connected on this stream.
      *
@@ -17,6 +11,15 @@ interface Stream {
      *   The filter should return true to indicate that the client with the target ID should receive the message.
      */
     suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean = { true })
+}
+
+interface Stream : DisconnectedStream {
+    /**
+     * Reply with a text message back to the client.
+     *
+     * Use [broadcast] if you want to send a message to all clients connected on this stream.
+     */
+    suspend fun send(text: String)
 
     /**
      * Remove the user from this stream.
@@ -29,7 +32,7 @@ interface Stream {
 /**
  * Convenience method to broadcast a message to all clients by their IDs.
  */
-suspend fun Stream.broadcast(text: String, clientIds: Iterable<StreamClientId>) {
+suspend fun DisconnectedStream.broadcast(text: String, clientIds: Iterable<StreamClientId>) {
     val idSet = clientIds.toSet()
     broadcast(text) { it in idSet }
 }
@@ -67,5 +70,5 @@ value class StreamClientId private constructor(val id: Short) {
 sealed class StreamEvent(val clientId: StreamClientId) {
     class ClientConnected(val stream: Stream, clientId: StreamClientId) : StreamEvent(clientId)
     class Text(val stream: Stream, clientId: StreamClientId, val text: String) : StreamEvent(clientId)
-    class ClientDisconnected(val stream: Stream, clientId: StreamClientId) : StreamEvent(clientId)
+    class ClientDisconnected(val stream: DisconnectedStream, clientId: StreamClientId) : StreamEvent(clientId)
 }

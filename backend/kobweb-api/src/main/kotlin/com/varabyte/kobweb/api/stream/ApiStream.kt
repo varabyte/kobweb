@@ -69,7 +69,7 @@ abstract class ApiStream(val routeOverride: String = "") {
     )
 
     class ClientDisconnectedContext(
-        val stream: Stream,
+        val stream: DisconnectedStream,
         val clientId: StreamClientId,
         val data: Data,
         val logger: Logger
