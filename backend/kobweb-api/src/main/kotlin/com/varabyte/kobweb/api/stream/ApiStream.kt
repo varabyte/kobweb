@@ -68,7 +68,12 @@ abstract class ApiStream(val routeOverride: String = "") {
         val logger: Logger
     )
 
-    class ClientDisconnectedContext(val clientId: StreamClientId, val data: Data, val logger: Logger)
+    class ClientDisconnectedContext(
+        val stream: Stream,
+        val clientId: StreamClientId,
+        val data: Data,
+        val logger: Logger
+    )
 
     open suspend fun onClientConnected(ctx: ClientConnectedContext) = Unit
     abstract suspend fun onTextReceived(ctx: TextReceivedContext)

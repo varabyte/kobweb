@@ -62,6 +62,7 @@ class Apis(private val data: Data, private val logger: Logger) {
                 is StreamEvent.ClientDisconnected -> {
                     streamHandler.onClientDisconnected(
                         ApiStream.ClientDisconnectedContext(
+                            event.stream,
                             event.clientId,
                             data,
                             logger

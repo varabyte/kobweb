@@ -169,6 +169,45 @@ private class WebSocketSessionStreamData(val clientId: StreamClientId) {
     val streams = mutableSetOf<String>()
 }
 
+private class StreamImpl(
+    val sessions: Map<WebSocketSession, WebSocketSessionStreamData>,
+    val session: WebSocketSession,
+    val apiJar: ApiJarFile,
+    val route: String,
+    val id: StreamClientId
+) : Stream {
+    private suspend fun WebSocketSession.sendMessage(message: StreamMessage) {
+        send(Json.encodeToString(message))
+    }
+
+    override suspend fun send(text: String) {
+        session.sendMessage(StreamMessage.text(route, text))
+    }
+
+    override suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean) {
+        val message = StreamMessage.text(route, text)
+        sessions.entries.forEach { (currSession, currStreamData) ->
+            // A user might have connected for a different stream channel, so don't waste
+            // bandwidth sending them a message they don't care about.
+            if (currStreamData.streams.contains(route)) {
+                if (filter(currStreamData.clientId)) {
+                    currSession.sendMessage(message)
+                }
+            }
+        }
+    }
+
+    override suspend fun disconnect() {
+        apiJar.apis.handle(route, StreamEvent.ClientDisconnected(this, id))
+        val streams = sessions[session]!!.streams
+        streams.remove(route)
+        if (streams.isEmpty()) {
+            session.close()
+        }
+    }
+}
+
+
 private fun Routing.setupStreaming(
     application: Application,
     conf: KobwebConf,
@@ -192,37 +231,7 @@ private fun Routing.setupStreaming(
             for (frame in incoming) {
                 if (frame is Frame.Text) {
                     val incomingMessage = Json.decodeFromString<StreamMessage>(frame.readText())
-                    val streamImpl = object : Stream {
-                        private suspend fun WebSocketSession.sendMessage(message: StreamMessage) {
-                            send(Json.encodeToString(message))
-                        }
-
-                        override suspend fun send(text: String) {
-                            session.sendMessage(StreamMessage.text(incomingMessage.route, text))
-                        }
-
-                        override suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean) {
-                            val message = StreamMessage.text(incomingMessage.route, text)
-                            sessions.entries.forEach { (currSession, currStreamData) ->
-                                // A user might have connected for a different stream channel, so don't waste
-                                // bandwidth sending them a message they don't care about.
-                                if (currStreamData.streams.contains(incomingMessage.route)) {
-                                    if (filter(currStreamData.clientId)) {
-                                        currSession.sendMessage(message)
-                                    }
-                                }
-                            }
-                        }
-
-                        override suspend fun disconnect() {
-                            apiJar.apis.handle(incomingMessage.route, StreamEvent.ClientDisconnected(id))
-                            val streams = sessions[session]!!.streams
-                            streams.remove(incomingMessage.route)
-                            if (streams.isEmpty()) {
-                                session.close()
-                            }
-                        }
-                    }
+                    val streamImpl = StreamImpl(sessions, session, apiJar, incomingMessage.route, id)
 
                     when (val payload = incomingMessage.payload) {
                         StreamMessage.Payload.ClientConnect -> {
@@ -244,12 +253,12 @@ private fun Routing.setupStreaming(
             logger.error("WebSocket connection (with clientId = $id) closed with an exception: ${closeReason.await()}\n$e")
         } finally {
             sessions.remove(session)?.streams?.forEach { route ->
-                apiJar.apis.handle(route, StreamEvent.ClientDisconnected(id))
+                val streamImpl = StreamImpl(sessions, session, apiJar, route, id)
+                apiJar.apis.handle(route, StreamEvent.ClientDisconnected(streamImpl, id))
             }
         }
     }
 }
-
 
 private fun Routing.configureApiRouting(
     env: ServerEnvironment,
