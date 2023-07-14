@@ -27,6 +27,14 @@ interface Stream {
 }
 
 /**
+ * Convenience method to broadcast a message to all clients by their IDs.
+ */
+suspend fun Stream.broadcast(text: String, clientIds: Iterable<StreamClientId>) {
+    val idSet = clientIds.toSet()
+    broadcast(text) { it in idSet }
+}
+
+/**
  * Represents the ID of the user who is connected to this stream.
  *
  * For clarity, note that you might have multiple active streams flowing at the same time. This class does NOT represent
