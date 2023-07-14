@@ -48,13 +48,6 @@ fun Application.configureRouting(
     conf: KobwebConf,
     globals: ServerGlobals
 ) {
-    if (conf.server.streaming.enabled) {
-        install(WebSockets) {
-            pingPeriod = conf.server.streaming.pingPeriod.toJavaDuration()
-            timeout = conf.server.streaming.timeout.toJavaDuration()
-        }
-    }
-
     val logger = object : Logger {
         override fun trace(message: String) = log.trace(message)
         override fun debug(message: String) = log.debug(message)
@@ -177,11 +170,20 @@ private class WebSocketSessionStreamData(val clientId: StreamClientId) {
 }
 
 private fun Routing.setupStreaming(
+    application: Application,
+    conf: KobwebConf,
     apiJar: ApiJarFile,
     logger: Logger,
 ) {
+    logger.info("Initializing Kobweb streams")
+
+    application.install(WebSockets) {
+        pingPeriod = conf.server.streaming.pingPeriod.toJavaDuration()
+        timeout = conf.server.streaming.timeout.toJavaDuration()
+    }
+
     val sessions = Collections.synchronizedMap(mutableMapOf<WebSocketSession, WebSocketSessionStreamData>())
-    webSocket("/kobweb-streams") {
+    webSocket("/api/kobweb-streams") {
         val id = StreamClientId.next()
         val session = this
         val streamData = WebSocketSessionStreamData(id)
@@ -401,7 +403,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
 
         if (apiJar != null) {
             configureApiRouting(ServerEnvironment.DEV, apiJar, routePrefix, logger)
-            if (conf.server.streaming.enabled) setupStreaming(apiJar, logger)
+            setupStreaming(this@configureDevRouting, conf, apiJar, logger)
         }
 
         val contentRootFile = contentRoot.toFile()
@@ -446,7 +448,11 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
 
         if (apiJar != null) {
             configureApiRouting(ServerEnvironment.PROD, apiJar, routePrefix, logger)
-            if (conf.server.streaming.enabled) setupStreaming(apiJar, logger)
+            // Since prod doesn't have live reloading, we can avoid setting up streaming if there are no API streams
+            // declared at this point.
+            if (apiJar.apis.numApiStreams > 0) {
+                setupStreaming(this@configureProdRouting, conf, apiJar, logger)
+            }
         }
 
         resourcesRoot.toFile().let { resourcesRootFile ->

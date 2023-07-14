@@ -15,6 +15,8 @@ class Apis(private val data: Data, private val logger: Logger) {
     private val apiHandlers = mutableMapOf<String, suspend (ApiContext) -> Unit>()
     private val apiStreamHandlers = mutableMapOf<String, ApiStream>()
 
+    val numApiStreams get() = apiStreamHandlers.size
+
     fun register(path: String, handler: suspend (ApiContext) -> Unit) {
         apiHandlers[path] = handler
     }

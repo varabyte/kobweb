@@ -136,14 +136,11 @@ class Server(
      * See also: https://ktor.io/docs/websocket.html
      * See also: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
      *
-     * @param enabled Whether streaming APIs are enabled or not. If false, all other settings in this section are
-     *   ignored.
      * @param pingPeriod The duration between pings or `0` to disable pings.
      * @param timeout The write/ping timeout after that a connection will be closed.
      */
     @Serializable
     class Streaming(
-        val enabled: Boolean = false,
         val pingPeriod: Duration = Duration.ZERO,
         val timeout: Duration = 15.seconds,
     )

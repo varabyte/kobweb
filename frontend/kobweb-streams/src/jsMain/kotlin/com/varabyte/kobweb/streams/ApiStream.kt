@@ -57,7 +57,7 @@ class ApiStream(val route: String) {
         private val socket = run {
             val location = window.location
             val scheme = if (location.protocol == "https:") "wss" else "ws"
-            val webSocketUrl = scheme + "://" + location.host + "/kobweb-streams"
+            val webSocketUrl = scheme + "://" + location.host + "/api/kobweb-streams"
             WebSocket(webSocketUrl)
         }
 
