@@ -23,15 +23,15 @@ interface ApiStreamListener {
  * LaunchedEffect(Unit) {
  *     stream.connect(object : ApiStreamListener {
  *         override fun onConnected(ctx: ConnectedContext) { ... }
- *         override fun onMessageReceived(ctx: MessageReceivedContext) { ... }
- *         override fun onUserDisconnected(ctx: DisconnectedContext) { ... }
+ *         override fun onTextReceived(ctx: MessageReceivedContext) { ... }
+ *         override fun onDisconnected(ctx: DisconnectedContext) { ... }
  *     }
  * }
  * ```
- * Note that there's a shortcut for the case where you only need to handle the "onMessageReceived" event:
+ * Note that there's a shortcut for the case where you only need to handle the "onTextReceived" event:
  * ```
  * LaunchedEffect(Unit) {
- *     stream.connect { evt -> console.log("Got text from server: \"${evt.text}\"") }
+ *     stream.connect { text -> console.log("Got text from server: \"$text\"") }
  * }
  * ```
  *
@@ -145,7 +145,6 @@ class ApiStream(val route: String) {
                     }
                 }
                 enqueuedMessages.clear()
-
             }
 
             override fun onClose() {
@@ -202,6 +201,9 @@ class ApiStream(val route: String) {
 
         /**
          * If the stream is not connected at the time we want to send a message, do nothing.
+         *
+         * This can be useful for ignoring temporary messages like heartbeats or updates that only are worth sending at
+         * the exact moment in time they happen.
          */
         SKIP,
     }
