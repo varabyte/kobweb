@@ -5,8 +5,8 @@ import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.api.stream.Stream
+import com.varabyte.kobweb.api.stream.StreamClientId
 import com.varabyte.kobweb.api.stream.StreamEvent
-import com.varabyte.kobweb.api.stream.StreamerId
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Site
@@ -172,7 +172,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
     }
 }
 
-private class WebSocketSessionStreamData(val streamerId: StreamerId) {
+private class WebSocketSessionStreamData(val clientId: StreamClientId) {
     val streams = mutableSetOf<String>()
 }
 
@@ -182,7 +182,7 @@ private fun Routing.setupStreaming(
 ) {
     val sessions = Collections.synchronizedMap(mutableMapOf<WebSocketSession, WebSocketSessionStreamData>())
     webSocket("/kobweb-streams") {
-        val id = StreamerId.next()
+        val id = StreamClientId.next()
         val session = this
         val streamData = WebSocketSessionStreamData(id)
         sessions[session] = streamData
@@ -199,13 +199,13 @@ private fun Routing.setupStreaming(
                             session.sendMessage(StreamMessage(incomingMessage.route, text))
                         }
 
-                        override suspend fun broadcast(text: String, filter: (StreamerId) -> Boolean) {
+                        override suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean) {
                             val message = StreamMessage(incomingMessage.route, text)
                             sessions.entries.forEach { (currSession, currStreamData) ->
                                 // A user might have connected for a different stream channel, so don't waste
                                 // bandwidth sending them a message they don't care about.
                                 if (currStreamData.streams.contains(incomingMessage.route)) {
-                                    if (filter(currStreamData.streamerId)) {
+                                    if (filter(currStreamData.clientId)) {
                                         currSession.sendMessage(message)
                                     }
                                 }

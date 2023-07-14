@@ -59,20 +59,20 @@ import com.varabyte.kobweb.api.log.Logger
  *   header doc.
  */
 abstract class ApiStream(val routeOverride: String = "") {
-    class UserConnectedContext(val stream: Stream, val streamerId: StreamerId, val data: Data, val logger: Logger)
+    class ClientConnectedContext(val stream: Stream, val clientId: StreamClientId, val data: Data, val logger: Logger)
     class TextReceivedContext(
         val stream: Stream,
-        val streamerId: StreamerId,
+        val clientId: StreamClientId,
         val text: String,
         val data: Data,
         val logger: Logger
     )
 
-    class UserDisconnectedContext(val streamerId: StreamerId, val data: Data, val logger: Logger)
+    class ClientDisconnectedContext(val clientId: StreamClientId, val data: Data, val logger: Logger)
 
-    open suspend fun onUserConnected(ctx: UserConnectedContext) = Unit
+    open suspend fun onClientConnected(ctx: ClientConnectedContext) = Unit
     abstract suspend fun onTextReceived(ctx: TextReceivedContext)
-    open suspend fun onUserDisconnected(ctx: UserDisconnectedContext) = Unit
+    open suspend fun onClientDisconnected(ctx: ClientDisconnectedContext) = Unit
 }
 
 fun ApiStream(routeOverride: String = "", block: suspend (ApiStream.TextReceivedContext) -> Unit) =

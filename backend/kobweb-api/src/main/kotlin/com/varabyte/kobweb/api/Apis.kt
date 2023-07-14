@@ -35,10 +35,10 @@ class Apis(private val data: Data, private val logger: Logger) {
         apiStreamHandlers[path.removePrefix("/")]?.let { streamHandler ->
             when (event) {
                 is StreamEvent.Opened -> {
-                    streamHandler.onUserConnected(
-                        ApiStream.UserConnectedContext(
+                    streamHandler.onClientConnected(
+                        ApiStream.ClientConnectedContext(
                             event.stream,
-                            event.streamerId,
+                            event.clientId,
                             data,
                             logger
                         )
@@ -49,7 +49,7 @@ class Apis(private val data: Data, private val logger: Logger) {
                     streamHandler.onTextReceived(
                         ApiStream.TextReceivedContext(
                             event.stream,
-                            event.streamerId,
+                            event.clientId,
                             event.text,
                             data,
                             logger
@@ -58,7 +58,13 @@ class Apis(private val data: Data, private val logger: Logger) {
                 }
 
                 is StreamEvent.Closed -> {
-                    streamHandler.onUserDisconnected(ApiStream.UserDisconnectedContext(event.streamerId, data, logger))
+                    streamHandler.onClientDisconnected(
+                        ApiStream.ClientDisconnectedContext(
+                            event.clientId,
+                            data,
+                            logger
+                        )
+                    )
                 }
             }
         }
