@@ -3,7 +3,7 @@ package playground.api
 import com.varabyte.kobweb.api.stream.ApiStream
 
 val echo = ApiStream { evt ->
-    evt.stream.send("Echoed: ${evt.text}")
+    evt.stream.send(evt.text)
 }
 
 // Or, if you need access to connect / disconnect messages

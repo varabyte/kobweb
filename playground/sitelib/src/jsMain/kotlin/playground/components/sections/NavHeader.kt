@@ -67,6 +67,7 @@ fun NavHeader() {
         ) {
             NavLink("/", "HOME")
             NavLink("/widgets", "WIDGETS")
+            NavLink("/echo", "ECHO")
             NavLink("/markdown", "MARKDOWN")
             Spacer()
 
