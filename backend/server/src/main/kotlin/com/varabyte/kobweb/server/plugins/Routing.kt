@@ -241,7 +241,7 @@ private fun Routing.setupStreaming(
                 }
             }
         } catch (e: Throwable) {
-            logger.error("WebSocket (id = $id) closed with an exception: ${closeReason.await()}\n$e")
+            logger.error("WebSocket connection (with clientId = $id) closed with an exception: ${closeReason.await()}\n$e")
         } finally {
             sessions.remove(session)?.streams?.forEach { route ->
                 apiJar.apis.handle(route, StreamEvent.Closed(id))
