@@ -161,12 +161,18 @@ class ApiStream(val route: String) {
             }
         }
 
-        channel.addListener(listener)
-        isClosed.await()
-        channel.removeListener(listener)
-        disconnectChannel()
-        streamListener.onDisconnected()
-        this.channel = null
+        try {
+            channel.addListener(listener)
+            isClosed.await()
+        } finally {
+            // Might end up here without `isClosed` getting set explicitly if the user cancelled the coroutine, e.g. by
+            // navigating away from the page.
+            isClosed.complete(Unit)
+            channel.removeListener(listener)
+            disconnectChannel()
+            streamListener.onDisconnected()
+            this.channel = null
+        }
     }
 
     suspend fun connect(handleTextEvent: (String) -> Unit) {
