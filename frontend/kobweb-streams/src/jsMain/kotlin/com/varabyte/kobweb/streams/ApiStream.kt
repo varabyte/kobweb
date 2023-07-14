@@ -137,11 +137,12 @@ class ApiStream(val route: String) {
 
         val listener = object : WebSocketChannel.Listener {
             override fun onOpen() {
+                channel.send(StreamMessage.clientConnect(route))
                 streamListener.onConnected()
                 // Should be rare, but user can technically call `disconnect` in the `onConnected` handler
                 if (isConnected) {
                     enqueuedMessages.forEach { message ->
-                        channel.send(StreamMessage(route, message))
+                        channel.send(StreamMessage.text(route, message))
                     }
                 }
                 enqueuedMessages.clear()
@@ -156,7 +157,8 @@ class ApiStream(val route: String) {
                 // we'll get messages for all of them. Only respond to the client stream we are associated with.
                 if (message.route != route) return
 
-                streamListener.onTextReceived(message.payload)
+                val payload = message.payload as? StreamMessage.Payload.Text ?: return
+                streamListener.onTextReceived(payload.text)
             }
         }
 
@@ -167,6 +169,7 @@ class ApiStream(val route: String) {
             // Might end up here without `isClosed` getting set explicitly if the user cancelled the coroutine, e.g. by
             // navigating away from the page.
             isClosed.complete(Unit)
+            channel.send(StreamMessage.clientDisconnect(route))
             channel.removeListener(listener)
             disconnectChannel()
             streamListener.onDisconnected()
@@ -222,7 +225,7 @@ class ApiStream(val route: String) {
                 IfSentBeforeConnectedStrategy.SKIP -> {}
             }
         } else {
-            channel.send(StreamMessage(route, text))
+            channel.send(StreamMessage.text(route, text))
         }
     }
 

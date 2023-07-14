@@ -198,11 +198,11 @@ private fun Routing.setupStreaming(
                         }
 
                         override suspend fun send(text: String) {
-                            session.sendMessage(StreamMessage(incomingMessage.route, text))
+                            session.sendMessage(StreamMessage.text(incomingMessage.route, text))
                         }
 
                         override suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean) {
-                            val message = StreamMessage(incomingMessage.route, text)
+                            val message = StreamMessage.text(incomingMessage.route, text)
                             sessions.entries.forEach { (currSession, currStreamData) ->
                                 // A user might have connected for a different stream channel, so don't waste
                                 // bandwidth sending them a message they don't care about.
@@ -224,10 +224,20 @@ private fun Routing.setupStreaming(
                         }
                     }
 
-                    if (streamData.streams.add(incomingMessage.route)) {
-                        apiJar.apis.handle(incomingMessage.route, StreamEvent.Opened(streamImpl, id))
+                    when (val payload = incomingMessage.payload) {
+                        StreamMessage.Payload.ClientConnect -> {
+                            sessions[session]!!.streams.add(incomingMessage.route)
+                            apiJar.apis.handle(
+                                incomingMessage.route,
+                                StreamEvent.Opened(streamImpl, id)
+                            )
+                        }
+
+                        StreamMessage.Payload.ClientDisconnect -> streamImpl.disconnect()
+                        is StreamMessage.Payload.Text -> {
+                            apiJar.apis.handle(incomingMessage.route, StreamEvent.Text(streamImpl, id, payload.text))
+                        }
                     }
-                    apiJar.apis.handle(incomingMessage.route, StreamEvent.Text(streamImpl, id, incomingMessage.payload))
                 }
             }
         } catch (e: Throwable) {
