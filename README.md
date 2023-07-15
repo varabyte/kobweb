@@ -1836,7 +1836,7 @@ their default values:
 ```yaml
 server:
   logging:
-    level: DEBUG # ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
+    level: TRACE # ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
     logRoot: ".kobweb/server/logs"
     clearLogsOnStart: true # Warning - if true, wipes ALL files in logRoot, so don't put other files in there!
     logFileBaseName: "kobweb-server" # e.g. "kobweb-server.log", "kobweb-server.2023-04-13.log"

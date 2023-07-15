@@ -94,7 +94,7 @@ class Server(
      */
     @Serializable
     class Logging(
-        val level: Level = Level.DEBUG,
+        val level: Level = Level.TRACE,
         val logRoot: String = ".kobweb/server/logs",
         val clearLogsOnStart: Boolean = true,
         val logFileBaseName: String = "kobweb-server",
