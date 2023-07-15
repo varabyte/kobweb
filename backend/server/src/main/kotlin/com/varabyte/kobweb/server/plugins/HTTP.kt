@@ -21,6 +21,7 @@ fun Application.configureHTTP(conf: KobwebConf) {
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
         allowCredentials = true
+        allowNonSimpleContentTypes = true // Kobweb uses octet-streams
 
         conf.server.cors.hosts.forEach { host -> allowHost(host.name, host.schemes, host.subDomains) }
     }
