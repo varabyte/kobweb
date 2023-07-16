@@ -133,10 +133,10 @@ class ApiStream(val route: String) {
 
     suspend fun connect(streamListener: ApiStreamListener) {
         val channel = connectChannel()
-        this.channel = channel
 
         val listener = object : WebSocketChannel.Listener {
             override fun onOpen() {
+                this@ApiStream.channel = channel
                 channel.send(StreamMessage.clientConnect(route))
                 streamListener.onConnected()
                 // Should be rare, but user can technically call `disconnect` in the `onConnected` handler
