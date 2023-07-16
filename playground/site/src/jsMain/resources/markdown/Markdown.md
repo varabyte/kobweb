@@ -49,6 +49,6 @@ You can also use block tags, like `<a>` and `<pre>`. Here, we use html blocks to
 Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose HTML calls. In fact,
 the following link is actually provided by Kotlin code:
 
-{{{ .components.widgets.GoHomeLink }}}
+{{{ GoHomeLink }}}
 
 [id]: http://example.com/

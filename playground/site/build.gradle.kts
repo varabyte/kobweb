@@ -10,6 +10,12 @@ plugins {
 group = "playground"
 version = "1.0-SNAPSHOT"
 
+kobweb {
+    markdown {
+        imports.add(".components.widgets.*")
+    }
+}
+
 kotlin {
     configAsKobwebApplication(includeServer = true)
     jvmToolchain(11)
