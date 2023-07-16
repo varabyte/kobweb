@@ -113,7 +113,14 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 // The suggested replacement for "capitalize" is awful
                 @Suppress("DEPRECATION")
                 val funName = "${ktFileName.capitalize()}Page"
-                val ktRenderer = KotlinRenderer(project, mdPathRel, markdownHandlers, mdPackage, funName)
+                val ktRenderer = KotlinRenderer(
+                    project,
+                    markdownConfig.imports.get(),
+                    mdPathRel,
+                    markdownHandlers,
+                    mdPackage,
+                    funName
+                )
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }
         }

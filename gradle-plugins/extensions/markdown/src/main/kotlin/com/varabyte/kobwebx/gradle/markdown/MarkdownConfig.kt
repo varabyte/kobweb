@@ -3,6 +3,7 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.get
 
@@ -14,8 +15,27 @@ abstract class MarkdownConfig {
      */
     abstract val markdownPath: Property<String>
 
+    /**
+     * A list of imports that should be added to the top of every generated markdown file.
+     *
+     * If an import starts with a ".", it will be prepended with the current site's root package.
+     *
+     * Finally, you should NOT use the "import" keyword here.
+     *
+     * For example:
+     *
+     * ```kotlin
+     * markdown {
+     *    imports.add(".components.widgets.*")
+     * }
+     * ```
+     * will add `import com.mysite.components.widgets.*` to the top of every generated markdown file.
+     */
+    abstract val imports: ListProperty<String>
+
     init {
         markdownPath.convention("markdown")
+        imports.set(emptyList())
     }
 
     @Deprecated(

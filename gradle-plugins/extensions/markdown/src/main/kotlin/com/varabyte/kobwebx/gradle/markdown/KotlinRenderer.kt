@@ -3,6 +3,7 @@ package com.varabyte.kobwebx.gradle.markdown
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
@@ -51,6 +52,7 @@ private fun String.yamlStringToKotlinString(): String {
 
 class KotlinRenderer(
     private val project: Project,
+    private val imports: List<String>,
     private val filePath: String,
     private val handlers: MarkdownHandlers,
     private val pkg: String,
@@ -70,6 +72,11 @@ class KotlinRenderer(
         node.accept(SoftLineBreakConversionVisitor())
         node.accept(TextMergingVisitor())
 
+        val frontMatterData = with(FrontMatterVisitor()) {
+            node.accept(this)
+            this.data
+        }
+
         output.append(
             buildString {
                 appendLine("package $pkg")
@@ -78,6 +85,12 @@ class KotlinRenderer(
                 appendLine("import com.varabyte.kobweb.core.*")
                 if (dependsOnMarkdownArtifact) {
                     appendLine("import com.varabyte.kobwebx.markdown.*")
+                }
+                imports.forEach { importPath ->
+                    appendLine("import ${project.prefixQualifiedPackage(importPath)}")
+                }
+                frontMatterData?.imports?.forEach { importPath ->
+                    appendLine("import ${project.prefixQualifiedPackage(importPath)}")
                 }
 
                 appendLine()
@@ -88,7 +101,7 @@ class KotlinRenderer(
         )
 
         indentCount++
-        RenderVisitor(output).visitAndFinish(node)
+        RenderVisitor(output, frontMatterData).visitAndFinish(node)
         indentCount--
 
         assert(indentCount == 0)
@@ -116,7 +129,7 @@ class KotlinRenderer(
         }
     }
 
-    /** Avoid a bunch of unecessary calls to Text functions by merging all sibling text strings together. */
+    /** Avoid a bunch of unnecessary calls to Text functions by merging all sibling text strings together. */
     private inner class TextMergingVisitor : AbstractVisitor() {
         override fun visit(text: Text) {
             (text.previous as? Text)?.let { textPrev ->
@@ -129,10 +142,74 @@ class KotlinRenderer(
         }
     }
 
-    private inner class RenderVisitor(private val output: Appendable) : AbstractVisitor() {
+    private class FrontMatterData(val raw: Map<String, List<String>>) {
+        val root: String? get() = raw["root"]?.singleOrNull()
+        val imports: List<String>? get() = raw["imports"]
+
+        // Hide frontmatter data from the user that is meant to be consumed by the renderer
+        val user: Map<String, List<String>> get() = raw.filterKeys { it != "root" && it != "imports" }
+    }
+
+    /** Read data out of the front matter block (if present) */
+    private inner class FrontMatterVisitor : AbstractVisitor() {
+        var data: FrontMatterData? = null
+            private set
+
+        override fun visit(customBlock: CustomBlock) {
+            if (customBlock is YamlFrontMatterBlock) {
+                val yamlVisitor = YamlFrontMatterVisitor()
+                customBlock.accept(yamlVisitor)
+
+                data = FrontMatterData(yamlVisitor.data)
+            }
+        }
+    }
+
+    private inner class RenderVisitor(private val output: Appendable, frontMatterData: FrontMatterData?) :
+        AbstractVisitor() {
         private val onFinish = Stack<() -> Unit>()
         fun finish() {
             onFinish.forEach { action -> action() }
+        }
+
+        init {
+            if (frontMatterData != null) {
+                var contextCreated = false
+                if (dependsOnMarkdownArtifact) {
+                    val userData = frontMatterData.user
+                        .mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
+                    if (userData.isNotEmpty()) {
+                        val mdCtx = buildString {
+                            append("MarkdownContext(")
+                            append(listOf("\"$filePath\"", userData.serialize()).joinToString())
+                            append(")")
+                        }
+                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
+                        ++indentCount
+                        contextCreated = true
+                    }
+                }
+
+                // If "root" is set in the YAML block, that represents a top level composable which should wrap
+                // everything else.
+                val root = frontMatterData.root ?: defaultRoot
+                if (root != null) {
+                    visit(KobwebCall(root, appendBrace = true))
+                    ++indentCount
+                }
+
+                onFinish += {
+                    if (root != null) {
+                        --indentCount
+                        output.appendLine("$indent}")
+                    }
+
+                    if (contextCreated) {
+                        --indentCount
+                        output.appendLine("$indent}")
+                    }
+                }
+            }
         }
 
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
@@ -299,47 +376,7 @@ class KotlinRenderer(
         }
 
         override fun visit(customBlock: CustomBlock) {
-            if (customBlock is YamlFrontMatterBlock) {
-                val yamlVisitor = YamlFrontMatterVisitor()
-                customBlock.accept(yamlVisitor)
-
-                var contextCreated = false
-                if (dependsOnMarkdownArtifact) {
-                    // "root" if present is a special value and not something that should be exposed to users.
-                    val dataWithoutRoot = yamlVisitor.data.minus("root")
-                        .mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
-                    if (dataWithoutRoot.isNotEmpty()) {
-                        val mdCtx = buildString {
-                            append("MarkdownContext(")
-                            append(listOf("\"$filePath\"", dataWithoutRoot.serialize()).joinToString())
-                            append(")")
-                        }
-                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
-                        ++indentCount
-                        contextCreated = true
-                    }
-                }
-
-                // If "root" is set in the YAML block, that represents a top level composable which should wrap
-                // everything else.
-                val root = yamlVisitor.data["root"]?.single() ?: defaultRoot
-                if (root != null) {
-                    visit(KobwebCall(root, appendBrace = true))
-                    ++indentCount
-                }
-
-                onFinish += {
-                    if (root != null) {
-                        --indentCount
-                        output.appendLine("$indent}")
-                    }
-
-                    if (contextCreated) {
-                        --indentCount
-                        output.appendLine("$indent}")
-                    }
-                }
-            } else if (customBlock is KobwebCallBlock) {
+            if (customBlock is KobwebCallBlock) {
                 val visitor = KobwebCallVisitor()
                 customBlock.accept(visitor)
                 visitor.call?.let { call ->
