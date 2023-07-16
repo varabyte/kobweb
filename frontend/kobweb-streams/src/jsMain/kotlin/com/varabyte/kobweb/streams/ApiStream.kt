@@ -129,9 +129,13 @@ class ApiStream(val route: String) {
     private var channel: WebSocketChannel? = null
     private val isClosed = CompletableDeferred<Unit>()
 
+    private var wasConnectCalled = false
     val isConnected get() = channel?.isOpen ?: false
 
     suspend fun connect(streamListener: ApiStreamListener) {
+        check(!wasConnectCalled) { "It is an error to try to connect the same ApiStream twice." }
+        wasConnectCalled = true
+
         val channel = connectChannel()
 
         val listener = object : WebSocketChannel.Listener {
