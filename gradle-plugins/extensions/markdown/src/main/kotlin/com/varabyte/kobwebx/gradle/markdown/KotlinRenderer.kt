@@ -86,10 +86,7 @@ class KotlinRenderer(
                 if (dependsOnMarkdownArtifact) {
                     appendLine("import com.varabyte.kobwebx.markdown.*")
                 }
-                imports.forEach { importPath ->
-                    appendLine("import ${project.prefixQualifiedPackage(importPath)}")
-                }
-                frontMatterData?.imports?.forEach { importPath ->
+                (imports + frontMatterData?.imports.orEmpty()).forEach { importPath ->
                     appendLine("import ${project.prefixQualifiedPackage(importPath)}")
                 }
 
