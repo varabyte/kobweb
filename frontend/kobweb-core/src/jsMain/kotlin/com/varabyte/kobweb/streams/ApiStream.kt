@@ -33,7 +33,7 @@ interface ApiStreamListener {
  * LaunchedEffect(Unit) {
  *     stream.connect(object : ApiStreamListener {
  *         override fun onConnected(ctx: ConnectedContext) { ... }
- *         override fun onTextReceived(ctx: MessageReceivedContext) { ... }
+ *         override fun onTextReceived(ctx: TextReceivedContext) { ... }
  *         override fun onDisconnected(ctx: DisconnectedContext) { ... }
  *     }
  * }
