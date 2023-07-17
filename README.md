@@ -1678,6 +1678,62 @@ Press ${.components.widgets.ColorButton} to toggle the site's current color.
 **Warning:** Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole
 thing and leaves it as text.
 
+#### Imports
+
+You may wish to add imports to the code generated from your markdown. Kobweb Markdown supports registering both
+*global* imports (imports that will be added to every generated file) and *local* imports (those that will only apply
+to a single target file).
+
+##### Global Imports
+
+To register a global import, you configure the `markdown` block in your build script:
+
+```kotlin
+// site/build.gradle.kts
+
+kobweb {
+  markdown {
+    imports.add(".components.widgets.*")
+  }
+}
+```
+
+Notice that you can begin your path with a "." to tell the Kobweb Markdown plugin to prepend your site's package to it.
+The above would ensure that every markdown file generated would have the following import:
+
+```kotlin
+import com.mysite.components.widgets.*
+```
+
+Imports can help you simplify your Kobweb calls. Revisiting an example from just above:
+
+```markdown
+# Without imports
+
+Press ${.components.widgets.ColorButton} to toggle the site's current color.
+
+# With imports
+
+Press ${ColorButton} to toggle the site's current color.
+```
+
+##### Local Imports
+
+Local imports are specified in your markdown's Front Matter (and can even affect its root declaration!):
+
+```markdown
+---
+root: DocsLayout
+imports:
+  - .components.widgets.VisitorCounter
+  - .components.sections.DocsLayout
+---
+
+...
+
+{{{ VisitorCounter }}}
+```
+
 ### Version Catalogs
 
 The project templates created by Kobweb all embrace Gradle version catalogs, which are (at the time of writing this
