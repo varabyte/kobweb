@@ -67,7 +67,7 @@ Our goal is to provide:
 * support for responsive (i.e. mobile and desktop) design
 * shared, rich types between client and server
 * out-of-the-box Markdown support
-* a way to easily define server API routes
+* a way to easily define server API routes and persistent API streams
 * an open source foundation that the community can extend
 * and much, much more!
 
@@ -1506,7 +1506,9 @@ fun MyApp(content: @Composable () -> Unit) {
 You can only define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
 time.
 
-### Define API routes
+### Talking to the server
+
+#### Define API routes
 
 You can define and annotate methods which will generate server endpoints you can interact with. To add one:
 
@@ -1545,7 +1547,7 @@ fun ApiDemoPage() {
     coroutineScope.launch {
       println("Echoed: " + window.api.get("echo?message=hello").decodeToString())
     }
-  })
+  }) { Text("Click me") }
 }
 ```
 
@@ -1556,6 +1558,162 @@ corresponding "try" version that will return null instead (`tryPost`, `tryPut`, 
 
 If you know what you're doing, you can of course always use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
 directly.
+
+#### Define API streams
+
+Kobweb servers also support persistent connections via streams. Streams are essentially a named channel that allow the
+client and the server to stay in touch at which point either can send messages to the other at any time. This is
+especially useful if you want your server to be able to communicate updates to your client without needing to poll.
+
+Additionally, multiple clients can connect to the same stream. In this case, the server can choose not just to send a
+message back to your client, but it can broadcast messages to all users (or a filtered subset of users) on the same
+stream. You could use this, for example, to implement a chat server with rooms.
+
+Like API routes, API streams must be defined under the `api` package in your `jvmMain` source directory. By default, the
+name of the stream will be derived from the file name and path that it's declared in.
+
+Unlike API routes, API streams are defined as properties, not methods. This is because API streams need to be a bit more
+flexible than routes since streams consistent of multiple separate events: client connection, client messages, and
+client disconnection.
+
+Streams do not have to be annotated. The Kobweb Application plugin can automatically detect them.
+
+For example, here's a simple stream that echoes back any argument passed into it:
+
+```kotlin
+// jvmMain/kotlin/com/example/mysite/api/Echo.kt
+
+val echo = object : ApiStream {
+  override suspend fun onClientConnected(ctx: ClientConnectedContext) {
+    // Optional: ctx.stream.broadcast a message to all other clients that ctx.clientId connected
+    // Optional: Update ctx.data here, initializing data associated with ctx.clientId
+  }
+  override suspend fun onTextReceived(ctx: TextReceivedContext) {
+    ctx.stream.send(ctx.text)
+  }
+  override suspend fun onClientDisconnected(ctx: ClientDisconnectedContext) {
+    // Optional: ctx.stream.broadcast a message to all other clients that ctx.clientId disconnected
+    // Optional: Update ctx.data here, removing data associated with ctx.clientId
+  }
+} 
+```
+
+To communicate with an API stream from your site, you need to create a stream connection there:
+
+```kotlin
+@Page
+@Composable
+fun ApiStreamDemoPage() {
+  val echoStream = remember { ApiStream("echo") }
+  LaunchedEffect(Unit) {
+    echoStream.connect(object : ApiStreamListener {
+      override fun onConnected(ctx: ConnectedContext) {  }
+      override fun onTextReceived(ctx: TextReceivedContext) { console.log("Echoed: ${ctx.text}") }
+      override fun onDisconnected(ctx: DisconnectedContext) {  }
+    })    
+  }
+
+  Button(onClick = {
+      echoStream.send("hello!")
+  }) { Text("Click me") }
+}
+```
+
+After running your project, you can click on the button and check the console logs. If everything is working properly,
+you should see "Echoed: hello!" for each time you pressed the button.
+
+***NOTE:** The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
+reference that project for a more realistic example.*
+
+##### API stream conveniences
+
+The above example demonstrated API streams in their most verbose form. However, depending on your use-case, you can
+elide a fair bit of boilerplate.
+
+First of all, the connect and disconnect handlers are optional, so you can omit them if you don't need them. Let's
+simplify the echo example:
+
+```kotlin
+// Backend
+val echo = object : ApiStream {
+  override suspend fun onTextReceived(ctx: TextReceivedContext) { ctx.stream.send(ctx.text) }
+}
+
+// Frontend
+val echoStream = remember { ApiStream("echo") }
+LaunchedEffect(Unit) {
+  echoStream.connect(object : ApiStreamListener {
+    override fun onTextReceived(ctx: TextReceivedContext) { console.log("Echoed: ${ctx.text}") }
+  })
+}
+```
+
+Additionally, if you only care about the text event, there are convenience overrides for that:
+
+```kotlin
+// Backend
+val echo = ApiStream { ctx -> ctx.stream.send(ctx.text) }
+
+// Frontend
+val echoStream = remember { ApiStream("echo") }
+LaunchedEffect(Unit) {
+  echoStream.connect { ctx -> console.log("Echoed: ${ctx.text}") }
+}
+```
+
+And *finally*, you can simplify the frontend code even further by using the `rememberApiStream` composable:
+
+```kotlin
+// Frontend
+val echoStream = rememberApiStream("echo") { text -> console.log("Echoed: $text") }
+
+// ApiStreamListener version also available:
+// val echoStream = rememberApiStream("echo", object : ApiStreamListener { ... })
+```
+
+In practice, your API streams will probably be a bit more involved than the echo example, but it's nice to know that you
+can handle some cases only needing a one-liner on the server and another one on the client to create a persistent
+client-server connection!
+
+#### API routes vs. API streams
+
+When faced with a choice, use API routes as often as you can. They are conceptually simpler, and you can query API
+endpoints with a CLI program like curl and sometimes even visit the URL directly in your browser. They are great for
+handling queries of or updates to server resources in response to user-driven actions (like visiting a page or clicking
+on a button). Every operation you perform returns a clear response code in addition to some payload information.
+
+Meanwhile, API streams are very flexible and can be a natural choice to handle high-frequency communication. But they
+are also more complex. Unlike a simple request / response pattern, you are instead opting in to manage a potentially
+long lifetime during which you can receive any number of events. You may have to concern yourself about interactions
+between all the clients on the stream as well. API streams are fundamentally stateful.
+
+You often need to make a lot of decisions when using API streams. What should you do if a client disconnects earlier
+than expected? How do you want to communicate to the client that their last action succeeded or failed (and you need
+to be clear about exactly which action because they might have sent another one in the meantime)? What structure do you
+want to enforce, if any, between a client and server connection where both sides can send messages to each other at any
+time?
+
+Most importantly, API streams may not horizontally scale as well as API routes. At some point, you may find yourself in
+a situation where a new web server is spun up to handle some intense load.
+
+If you're using API routes, you're already probably delegating to a database service as your data backend, so this may
+just work seamlessly.
+
+But for API streams, you many naturally find yourself writing a bunch of broadcasting code. However, this only works to
+communicate between all clients that are connected to the same server. Two clients connected to the same stream on
+different servers are effectively in different, disconnected worlds.
+
+The above situation is often handled by using a pubsub service (like Redis). This feels somewhat equivalent to using a
+database as a service in the API route situation, but this code might not be as straightforward to migrate.
+
+API routes and API streams are not a you-must-use-one-or-the-other situation. Your project can use both! In general, try
+to imagine the case where a new server might get spun up, and design your code to handle that situation gracefully. API
+routes are generally safe to use, so use them often. However, if you have a situation where you need to communicate
+events in real-time, especially situations where you want your client to be continuously directed what to do by the
+server via events, API streams are a great choice.
+
+***NOTE:** You can also search online about REST vs WebSockets, as these are the technologies that API routes and API
+streams are implemented with. Any discussions about them should apply here as well.*
 
 ### Markdown
 
