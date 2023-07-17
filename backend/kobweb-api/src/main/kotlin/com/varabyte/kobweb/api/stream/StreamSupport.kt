@@ -30,9 +30,9 @@ interface Stream : DisconnectedStream {
 }
 
 /**
- * Convenience method to broadcast a message to all clients by their IDs.
+ * Convenience method to send a message to all clients with matching IDs.
  */
-suspend fun DisconnectedStream.broadcast(text: String, clientIds: Iterable<StreamClientId>) {
+suspend fun DisconnectedStream.sendTo(text: String, clientIds: Iterable<StreamClientId>) {
     val idSet = clientIds.toSet()
     broadcast(text) { it in idSet }
 }
