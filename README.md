@@ -350,7 +350,7 @@ Just from that, Kobweb will create a site entry for you automatically.
 For example, if I create the following file:
 
 ```kotlin
-// jsMain/kotlin/com/example/mysite/pages/admin/Settings.kt
+// jsMain/kotlin/com/mysite/pages/admin/Settings.kt
 
 @Page
 @Composable
@@ -374,7 +374,7 @@ under that URL. For example, a page defined in `.../pages/admin/Index.kt` will b
 If you ever need to change the route generated for a page, you can set the `Page` annotation's `routeOverride` field:
 
 ```kotlin
-// jsMain/kotlin/com/example/mysite/pages/admin/Settings.kt
+// jsMain/kotlin/com/mysite/pages/admin/Settings.kt
 
 @Page(routeOverride = "config")
 @Composable
@@ -1456,7 +1456,7 @@ These perform some minimal common work (e.g. applying CSS styles) that should be
 This means if you register a page:
 
 ```kotlin
-// jsMain/kotlin/com/example/mysite/pages/Index.kt
+// jsMain/kotlin/com/mysite/pages/Index.kt
 
 @Page
 @Composable
@@ -1520,7 +1520,7 @@ You can define and annotate methods which will generate server endpoints you can
 For example, here's a simple method that echoes back an argument passed into it:
 
 ```kotlin
-// jvmMain/kotlin/com/example/mysite/api/Echo.kt
+// jvmMain/kotlin/com/mysite/api/Echo.kt
 
 @Api
 fun echo(ctx: ApiContext) {
@@ -1581,7 +1581,7 @@ Streams do not have to be annotated. The Kobweb Application plugin can automatic
 For example, here's a simple stream that echoes back any argument passed into it:
 
 ```kotlin
-// jvmMain/kotlin/com/example/mysite/api/Echo.kt
+// jvmMain/kotlin/com/mysite/api/Echo.kt
 
 val echo = object : ApiStream {
   override suspend fun onClientConnected(ctx: ClientConnectedContext) {
