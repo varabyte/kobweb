@@ -15,8 +15,8 @@ import playground.components.layouts.PageLayout
 fun EchoPage() {
     PageLayout("Echo test") {
         var lastEchoedText by remember { mutableStateOf("") }
-        val stream = rememberApiStream("echo") {
-            lastEchoedText = it
+        val stream = rememberApiStream("echo") { ctx ->
+            lastEchoedText = ctx.text
         }
 
         Text("Please send some text to get echoed")

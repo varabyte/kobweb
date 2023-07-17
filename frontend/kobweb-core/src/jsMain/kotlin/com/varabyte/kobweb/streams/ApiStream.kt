@@ -191,10 +191,9 @@ class ApiStream(override val route: String) : ImmutableApiStream {
         }
     }
 
-    suspend fun connect(handleTextEvent: ApiStream.(String) -> Unit) {
+    suspend fun connect(handleTextEvent: (ApiStreamListener.TextReceivedContext) -> Unit) {
         connect(object : ApiStreamListener {
-            override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) =
-                ctx.stream.handleTextEvent(ctx.text)
+            override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) = handleTextEvent(ctx)
         })
     }
 
@@ -259,8 +258,8 @@ fun rememberApiStream(route: String, streamListener: ApiStreamListener): ApiStre
 }
 
 @Composable
-fun rememberApiStream(route: String, handleTextEvent: ApiStream.(String) -> Unit): ApiStream {
+fun rememberApiStream(route: String, handleTextEvent: (ApiStreamListener.TextReceivedContext) -> Unit): ApiStream {
     return rememberApiStream(route, object : ApiStreamListener {
-        override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) = ctx.stream.handleTextEvent(ctx.text)
+        override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) = handleTextEvent(ctx)
     })
 }
