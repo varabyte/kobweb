@@ -3,7 +3,7 @@ package playground.pages
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Button
-import com.varabyte.kobweb.streams.ApiStream
+import com.varabyte.kobweb.streams.rememberApiStream
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.P
@@ -14,10 +14,9 @@ import playground.components.layouts.PageLayout
 @Composable
 fun EchoPage() {
     PageLayout("Echo test") {
-        val stream = remember { ApiStream("echo") }
         var lastEchoedText by remember { mutableStateOf("") }
-        LaunchedEffect(Unit) {
-            stream.connect { lastEchoedText = it }
+        val stream = rememberApiStream("echo") {
+            lastEchoedText = it
         }
 
         Text("Please send some text to get echoed")

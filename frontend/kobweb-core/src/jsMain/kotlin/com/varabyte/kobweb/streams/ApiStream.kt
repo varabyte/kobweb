@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.streams
 
+import androidx.compose.runtime.*
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.decodeFromString
@@ -236,4 +237,20 @@ class ApiStream(val route: String) {
     fun disconnect() {
         isClosed.complete(Unit)
     }
+}
+
+@Composable
+fun rememberApiStream(route: String, streamListener: ApiStreamListener): ApiStream {
+    val stream = remember(route) { ApiStream(route) }
+    LaunchedEffect(Unit) {
+        stream.connect(streamListener)
+    }
+    return stream
+}
+
+@Composable
+fun rememberApiStream(route: String, handleTextEvent: (String) -> Unit): ApiStream {
+    return rememberApiStream(route, object : ApiStreamListener {
+        override fun onTextReceived(text: String) = handleTextEvent(text)
+    })
 }
