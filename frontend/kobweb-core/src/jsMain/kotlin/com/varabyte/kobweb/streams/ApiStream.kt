@@ -191,12 +191,6 @@ class ApiStream(override val route: String) : ImmutableApiStream {
         }
     }
 
-    suspend fun connect(handleTextEvent: (ApiStreamListener.TextReceivedContext) -> Unit) {
-        connect(object : ApiStreamListener {
-            override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) = handleTextEvent(ctx)
-        })
-    }
-
     private val enqueuedMessages = mutableListOf<String>()
 
     enum class IfSentBeforeConnectedStrategy {
@@ -246,6 +240,12 @@ class ApiStream(override val route: String) : ImmutableApiStream {
     fun disconnect() {
         isClosed.complete(Unit)
     }
+}
+
+suspend fun ApiStream.connect(handleTextEvent: (ApiStreamListener.TextReceivedContext) -> Unit) {
+    connect(object : ApiStreamListener {
+        override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) = handleTextEvent(ctx)
+    })
 }
 
 @Composable
