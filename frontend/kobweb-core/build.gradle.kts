@@ -22,7 +22,9 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
+                implementation(libs.kotlinx.serialization.json)
                 api(project(":frontend:compose-html-ext"))
+                implementation(project(":common:client-server-models"))
             }
         }
     }

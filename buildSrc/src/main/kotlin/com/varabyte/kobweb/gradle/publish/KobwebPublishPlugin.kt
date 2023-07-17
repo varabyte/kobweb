@@ -64,6 +64,15 @@ fun Property<(String) -> String>.set(value: String) {
 }
 
 /**
+ * Convenience setter for handling all artifact targets for a multiplatform module.
+ *
+ * A multiplatform target often generates N + 1 artficats given N targets (e.g. js, jvm, and multiplatform metadata).
+ */
+fun Property<(String) -> String>.setForMultiplatform(value: String) {
+    this.set { value + if (it == "kotlinMultiplatform") "" else "-$it" }
+}
+
+/**
  * An internal plugin that helps configure and publish Varabyte artifacts to our maven repository.
  *
  * By default, this will only publish to mavenLocal, unless you have "kobweb.gcloud.publish" set to true and

@@ -1,3 +1,5 @@
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
@@ -13,25 +15,17 @@ kotlin {
         browser()
     }
 
+    @Suppress("UNUSED_VARIABLE") // Suppress spurious warnings about sourceset variables not being used
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlinx.serialization.core)
             }
         }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(libs.kotlinx.serialization.json)
-                implementation(libs.kotlinx.coroutines)
-            }
-        }
     }
 }
 
 kobwebPublication {
-    artifactId.set {
-        "kobweb-streams" + if (it == "kotlinMultiplatform") "" else "-$it"
-    }
-    description.set("Support for using Kobweb API streams from a Kobweb site.")
+    artifactId.setForMultiplatform("kobweb-client-server-models")
+    description.set("Model classes that get shared between a Kobweb server (JVM) and client (JS) via serialization")
 }

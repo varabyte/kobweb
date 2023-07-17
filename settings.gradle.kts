@@ -8,13 +8,13 @@ pluginManagement {
 rootProject.name = "kobweb"
 
 include(":common:kobweb-common")
+include(":common:client-server-models")
 include(":frontend:kobweb-core")
 include(":frontend:kobweb-compose")
 include(":frontend:kobweb-silk")
 include(":frontend:kobweb-silk-widgets")
 include(":frontend:kobweb-silk-icons-fa")
 include(":frontend:kobweb-silk-icons-mdi")
-include(":frontend:kobweb-streams")
 include(":frontend:kobwebx-markdown")
 include(":frontend:compose-html-ext")
 include(":backend:kobweb-api")
