@@ -79,7 +79,7 @@ class ApiStream(val route: String) {
         }
 
         fun send(message: StreamMessage) {
-            socket.send(Json.encodeToString(message))
+            if (isOpen) socket.send(Json.encodeToString(message))
         }
 
         init {
