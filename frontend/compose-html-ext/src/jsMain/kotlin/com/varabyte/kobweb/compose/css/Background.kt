@@ -323,7 +323,7 @@ fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackgrou
         // backgrounds only allow you to specify a single color. If provided, it must be included with
         // the final layer.
         if (color != null) {
-            append(' ')
+            if (this.isNotEmpty()) append(' ')
             append(color)
         }
     })
