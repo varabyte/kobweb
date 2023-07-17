@@ -8,10 +8,19 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.WebSocket
 
+interface ImmutableApiStream {
+    val route: String
+    val isConnected: Boolean
+}
+
 interface ApiStreamListener {
-    fun onConnected() = Unit
-    fun onTextReceived(text: String)
-    fun onDisconnected() = Unit
+    class ConnectedContext(val stream: ApiStream)
+    class TextReceivedContext(val stream: ApiStream, val text: String)
+    class DisconnectedContext(val stream: ImmutableApiStream)
+
+    fun onConnected(ctx: ConnectedContext) = Unit
+    fun onTextReceived(ctx: TextReceivedContext)
+    fun onDisconnected(ctx: DisconnectedContext) = Unit
 }
 
 /**
@@ -42,7 +51,7 @@ interface ApiStreamListener {
  * If you call [send] BEFORE a stream finished connecting, what happens to the message (whether it gets enqueued or
  * dropped) is configurable. See its header docs for more details.
  */
-class ApiStream(val route: String) {
+class ApiStream(override val route: String) : ImmutableApiStream {
     internal class WebSocketChannel {
         internal interface Listener {
             fun onOpen()
@@ -131,7 +140,7 @@ class ApiStream(val route: String) {
     private val isClosed = CompletableDeferred<Unit>()
 
     private var wasConnectCalled = false
-    val isConnected get() = channel?.isOpen ?: false
+    override val isConnected get() = channel?.isOpen ?: false
 
     suspend fun connect(streamListener: ApiStreamListener) {
         check(!wasConnectCalled) { "It is an error to try to connect the same ApiStream twice." }
@@ -143,7 +152,7 @@ class ApiStream(val route: String) {
             override fun onOpen() {
                 this@ApiStream.channel = channel
                 channel.send(StreamMessage.clientConnect(route))
-                streamListener.onConnected()
+                streamListener.onConnected(ApiStreamListener.ConnectedContext(this@ApiStream))
                 // Should be rare, but user can technically call `disconnect` in the `onConnected` handler
                 if (isConnected) {
                     enqueuedMessages.forEach { message ->
@@ -163,7 +172,7 @@ class ApiStream(val route: String) {
                 if (message.route != route) return
 
                 val payload = message.payload as? StreamMessage.Payload.Text ?: return
-                streamListener.onTextReceived(payload.text)
+                streamListener.onTextReceived(ApiStreamListener.TextReceivedContext(this@ApiStream, payload.text))
             }
         }
 
@@ -177,14 +186,15 @@ class ApiStream(val route: String) {
             channel.send(StreamMessage.clientDisconnect(route))
             channel.removeListener(listener)
             disconnectChannel()
-            streamListener.onDisconnected()
+            streamListener.onDisconnected(ApiStreamListener.DisconnectedContext(this))
             this.channel = null
         }
     }
 
-    suspend fun connect(handleTextEvent: (String) -> Unit) {
+    suspend fun connect(handleTextEvent: ApiStream.(String) -> Unit) {
         connect(object : ApiStreamListener {
-            override fun onTextReceived(text: String) = handleTextEvent(text)
+            override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) =
+                ctx.stream.handleTextEvent(ctx.text)
         })
     }
 
@@ -249,8 +259,8 @@ fun rememberApiStream(route: String, streamListener: ApiStreamListener): ApiStre
 }
 
 @Composable
-fun rememberApiStream(route: String, handleTextEvent: (String) -> Unit): ApiStream {
+fun rememberApiStream(route: String, handleTextEvent: ApiStream.(String) -> Unit): ApiStream {
     return rememberApiStream(route, object : ApiStreamListener {
-        override fun onTextReceived(text: String) = handleTextEvent(text)
+        override fun onTextReceived(ctx: ApiStreamListener.TextReceivedContext) = ctx.stream.handleTextEvent(ctx.text)
     })
 }
