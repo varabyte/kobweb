@@ -1687,11 +1687,11 @@ are also more complex. Unlike a simple request / response pattern, you are inste
 long lifetime during which you can receive any number of events. You may have to concern yourself about interactions
 between all the clients on the stream as well. API streams are fundamentally stateful.
 
-You often need to make a lot of decisions when using API streams. What should you do if a client disconnects earlier
-than expected? How do you want to communicate to the client that their last action succeeded or failed (and you need
-to be clear about exactly which action because they might have sent another one in the meantime)? What structure do you
-want to enforce, if any, between a client and server connection where both sides can send messages to each other at any
-time?
+You often need to make a lot of decisions when using API streams. What should you do if a client or server disconnects
+earlier than expected? How do you want to communicate to the client that their last action succeeded or failed (and you
+need to be clear about exactly which action because they might have sent another one in the meantime)? What structure do
+you want to enforce, if any, between a client and server connection where both sides can send messages to each other at
+any time?
 
 Most importantly, API streams may not horizontally scale as well as API routes. At some point, you may find yourself in
 a situation where a new web server is spun up to handle some intense load.
