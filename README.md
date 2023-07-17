@@ -1883,8 +1883,8 @@ Local imports are specified in your markdown's Front Matter (and can even affect
 ---
 root: DocsLayout
 imports:
-  - .components.widgets.VisitorCounter
   - .components.sections.DocsLayout
+  - .components.widgets.VisitorCounter
 ---
 
 ...
