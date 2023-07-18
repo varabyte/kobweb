@@ -1561,19 +1561,19 @@ directly.
 
 #### Define API streams
 
-Kobweb servers also support persistent connections via streams. Streams are essentially a named channel that allow the
-client and the server to stay in touch at which point either can send messages to the other at any time. This is
+Kobweb servers also support persistent connections via streams. Streams are essentially named channels that maintain
+continuous contact between the client and the server, allowing either to send messages to the other at any time. This is
 especially useful if you want your server to be able to communicate updates to your client without needing to poll.
 
-Additionally, multiple clients can connect to the same stream. In this case, the server can choose not just to send a
-message back to your client, but it can broadcast messages to all users (or a filtered subset of users) on the same
+Additionally, multiple clients can connect to the same stream. In this case, the server can choose to not only send a
+message back to your client, but also to broadcast messages to all users (or a filtered subset of users) on the same
 stream. You could use this, for example, to implement a chat server with rooms.
 
 Like API routes, API streams must be defined under the `api` package in your `jvmMain` source directory. By default, the
 name of the stream will be derived from the file name and path that it's declared in.
 
 Unlike API routes, API streams are defined as properties, not methods. This is because API streams need to be a bit more
-flexible than routes since streams consistent of multiple separate events: client connection, client messages, and
+flexible than routes, since streams consist of multiple distinct events: client connection, client messages, and
 client disconnection.
 
 Streams do not have to be annotated. The Kobweb Application plugin can automatically detect them.
@@ -1672,7 +1672,7 @@ val echoStream = rememberApiStream("echo") { text -> console.log("Echoed: $text"
 ```
 
 In practice, your API streams will probably be a bit more involved than the echo example, but it's nice to know that you
-can handle some cases only needing a one-liner on the server and another one on the client to create a persistent
+can handle some cases only needing a one-liner on the server and another on the client to create a persistent
 client-server connection!
 
 #### API routes vs. API streams
