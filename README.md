@@ -730,7 +730,7 @@ With Silk, you can define a style like so, using the `base` block:
 ```kotlin
 val CustomStyle by ComponentStyle {
     base {
-        Modifier.backgroud(Colors.Red)
+        Modifier.background(Colors.Red)
     }
 }
 ```
@@ -742,8 +742,8 @@ which takes a `Modifier` parameter:
 // Approach #1 (uses inline styles)
 Box(Modifier.backgroundColor(Colors.Red)) { /* ... */ }
 
-// Appraoch #2 (uses stylesheets)
-Box(CustomStyle.toModifier()) { /* ... */}
+// Approach #2 (uses stylesheets)
+Box(CustomStyle.toModifier()) { /* ... */ }
 ```
 
 #### ComponentStyle name
@@ -762,7 +762,7 @@ the `by` keyword):
 ```kotlin
 val CustomStyle = ComponentStyle("my-custom-name") {
     base {
-        Modifier.backgroud(Colors.Red)
+        Modifier.background(Colors.Red)
     }
 }
 ```
@@ -998,7 +998,7 @@ div {
 }
 ```
 
-Kobweb lets you define your keyframes in code by using the `by keyframes` pattern:
+Kobweb lets you define your keyframes in code by using the `by Keyframes` pattern:
 
 ```kotlin
 val ShiftRight by Keyframes {
@@ -1061,7 +1061,7 @@ subsequent recomposition, the callback will be rerun:
 val colorMode by rememberColorMode()
 Box(
     // Callback will get triggered each time the color mode changes
-    ref = ref(colorMode) { element -> /* ... */}
+    ref = ref(colorMode) { element -> /* ... */ }
 )
 ```
 
@@ -1098,7 +1098,7 @@ val isFeature2Enabled: Boolean = /* ... */
 Box(
     ref = refScope {
         ref(isFeature1Enabled) { element -> /* ... */ }
-        dispoasbleRef(isFeature2Enabled) { element -> /* ... */; onDispose { /* ... */ } }
+        disposableRef(isFeature2Enabled) { element -> /* ... */; onDispose { /* ... */ } }
     }
 )
 ```
@@ -1197,7 +1197,7 @@ val DialogStyle300 by ComponentStyle {
   base { Modifier.setVariable(dialogWidth, 300.px).width(dialogWidth.value(400.px)) }
 }
 ```
-***NOTE:** In the above example, we have one line where set a variable and query it in the same style, which we did
+***NOTE:** In the above example, we have one line where we set a variable and query it in the same style, which we did
 purely for demonstration purposes. In practice, you would probably never do this -- the variable should have been set
 separately earlier.*
 
@@ -1278,7 +1278,7 @@ fun RainbowBackground() {
     Box(ScreenStyle.toModifier(), ref = ref { screenElement = it }) {
         Button(onClick = {
             // We have the backing HTML element, so use setProperty to set the variable value directly
-            screenElement!!.style.setProperty("--bgColor", roygbiv.random().toString())
+            screenElement!!.setVariable(bgColor, roygbiv.random())
         }) {
             Text("Click me")
         }
@@ -1341,7 +1341,7 @@ fun RainbowBackground() {
 ```
 
 Even though you should rarely need CSS variables, there may be occasions where they can be a useful tool in your
-toolbox. The above examples were artificial examples used as a way to show off CSS variables in relatively isolated
+toolbox. The above examples were artificial scenarios used as a way to show off CSS variables in relatively isolated
 environments. But here are some situations that might benefit from CSS variables:
 
 * You have a site which allows users to choose from a list of several themes (e.g. primary and secondary colors). It
@@ -1440,7 +1440,7 @@ around.
 First, as a sibling to pages, create a folder called **components**. Within it, add:
 
 * **layouts** - High-level composables that provide entire page layouts. Most (all?) of your `@Page` pages will start by
-  calling a page layout function first. You may only have a single layout for your entire site.
+  calling a page layout function first. You could only have a single layout for your entire site.
 * **sections** - Medium-level composables that represent compound areas inside your pages, organizing a collection of
   many children composables. If you have multiple layouts, it's likely sections would be shared across them. For
   example, nav headers and footers are great candidates for this subfolder.
@@ -1503,7 +1503,7 @@ fun MyApp(content: @Composable () -> Unit) {
 }
 ```
 
-You can only define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
+You can define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
 time.
 
 ### Talking to the server
@@ -1512,7 +1512,7 @@ time.
 
 You can define and annotate methods which will generate server endpoints you can interact with. To add one:
 
-1. Define your method (optionally `suspend`able) in a file somewhere under the `api` package your `jvmMain` source
+1. Define your method (optionally `suspend`able) in a file somewhere under the `api` package in your `jvmMain` source
    directory.
 1. The method should take exactly one argument, an `ApiContext`.
 1. Annotate it with `@Api`
@@ -2262,7 +2262,7 @@ Upon the next Kobweb server run (e.g. via `kobweb run`), if you check the logs, 
 For convenience, the Kobweb Gradle Application plugin provides a way to notify it about your JAR task, and it will build
 and copy it over for you automatically.
 
-In your Kobweb's build script, include the following `notify...` line:
+In your Kobweb project's build script, include the following `notify...` line:
 
 ```kotlin
 // site/build.gradle.kts
@@ -2361,7 +2361,7 @@ So, should you use Kobweb at this point? If you are...
     * **Worth a shot!** I think if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
       with us at our Discord if you try it and have questions or run into missing features.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
-    * **Maybe not?** Depending how much work you've done, it may not be a trivial refactor. You can review
+    * **Maybe not?** Depending on how much work you've done, it may not be a trivial refactor. You can review
       [this earlier section ▲](#adding-kobweb-to-an-existing-project) if you want to try anyway.
 * a company:
     * **Probably not?** I'm assuming a company is more risk-averse even to Compose HTML, which Kobweb is
