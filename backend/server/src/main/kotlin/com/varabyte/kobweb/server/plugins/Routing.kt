@@ -26,6 +26,7 @@ import io.ktor.util.pipeline.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -249,6 +250,8 @@ private fun Routing.setupStreaming(
                     }
                 }
             }
+        } catch (e: ClosedReceiveChannelException) {
+            logger.trace("WebSocket connection (with clientId = $id) closed: ${closeReason.await()}\n$e")
         } catch (e: Throwable) {
             logger.error("WebSocket connection (with clientId = $id) closed with an exception: ${closeReason.await()}\n$e")
         } finally {
