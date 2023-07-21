@@ -13,5 +13,5 @@ server:
 
   port: 8080
 
-  streaming:
-    enabled: true
+  logging:
+    level: "DEBUG"
