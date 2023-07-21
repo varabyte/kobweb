@@ -21,19 +21,22 @@ fun EchoPage() {
 
         Text("Please send some text to get echoed")
         var text by remember { mutableStateOf("") }
+        fun sendTextAndClear() {
+            stream.send(text)
+            text = ""
+        }
+
         Input(
             InputType.Text,
             attrs = {
                 value(text)
                 onInput { e -> text = e.value }
+                onKeyDown { e -> if (e.key == "Enter") sendTextAndClear() }
             }
         )
 
         P()
-        Button(onClick = {
-            stream.send(text)
-            text = ""
-        }, enabled = text.isNotBlank()) {
+        Button(onClick = { sendTextAndClear() }, enabled = text.isNotBlank()) {
             Text("Send")
         }
 
