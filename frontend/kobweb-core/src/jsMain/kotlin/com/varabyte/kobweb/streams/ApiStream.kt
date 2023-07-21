@@ -171,8 +171,23 @@ class ApiStream(override val route: String) : ImmutableApiStream {
                 // we'll get messages for all of them. Only respond to the client stream we are associated with.
                 if (message.route != route) return
 
-                val payload = message.payload as? StreamMessage.Payload.Text ?: return
-                streamListener.onTextReceived(ApiStreamListener.TextReceivedContext(this@ApiStream, payload.text))
+                when (val payload = message.payload as StreamMessage.Payload.Server) {
+                    is StreamMessage.Payload.Text -> streamListener.onTextReceived(
+                        ApiStreamListener.TextReceivedContext(
+                            this@ApiStream,
+                            payload.text
+                        )
+                    )
+
+                    is StreamMessage.Payload.Server.Error -> {
+                        console.error(buildString {
+                            append("API stream endpoint (\"${message.route}\") threw an exception")
+                            if (payload.callstack != null) {
+                                append(":\n${payload.callstack}")
+                            }
+                        })
+                    }
+                }
             }
         }
 
