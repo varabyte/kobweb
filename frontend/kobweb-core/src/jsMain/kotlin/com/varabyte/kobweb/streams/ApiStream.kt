@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.streams
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.streams.StreamMessage.Payload
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.decodeFromString
@@ -56,7 +57,7 @@ class ApiStream(override val route: String) : ImmutableApiStream {
         internal interface Listener {
             fun onOpen()
             fun onClose()
-            fun onMessage(message: StreamMessage)
+            fun onMessage(message: StreamMessage<Payload.Server>)
         }
 
         var isOpen = false
@@ -87,7 +88,7 @@ class ApiStream(override val route: String) : ImmutableApiStream {
             }
         }
 
-        fun send(message: StreamMessage) {
+        fun send(message: StreamMessage<Payload.Client>) {
             if (isOpen) socket.send(Json.encodeToString(message))
         }
 
@@ -104,7 +105,7 @@ class ApiStream(override val route: String) : ImmutableApiStream {
             }
 
             socket.onmessage = { event ->
-                val message = Json.decodeFromString<StreamMessage>(event.data.toString())
+                val message = Json.decodeFromString<StreamMessage<Payload.Server>>(event.data.toString())
                 listeners.forEach { it.onMessage(message) }
             }
         }
@@ -166,13 +167,28 @@ class ApiStream(override val route: String) : ImmutableApiStream {
                 isClosed.complete(Unit)
             }
 
-            override fun onMessage(message: StreamMessage) {
+            override fun onMessage(message: StreamMessage<Payload.Server>) {
                 // We have one websocket that can traffic multiple streams. If we're connected for multiple streams,
                 // we'll get messages for all of them. Only respond to the client stream we are associated with.
                 if (message.route != route) return
 
-                val payload = message.payload as? StreamMessage.Payload.Text ?: return
-                streamListener.onTextReceived(ApiStreamListener.TextReceivedContext(this@ApiStream, payload.text))
+                when (val payload = message.payload) {
+                    is Payload.Text -> streamListener.onTextReceived(
+                        ApiStreamListener.TextReceivedContext(
+                            this@ApiStream,
+                            payload.text
+                        )
+                    )
+
+                    is Payload.Server.Error -> {
+                        console.error(buildString {
+                            append("API stream endpoint (\"${message.route}\") threw an exception")
+                            if (payload.callstack != null) {
+                                append(":\n${payload.callstack}")
+                            }
+                        })
+                    }
+                }
             }
         }
 

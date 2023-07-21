@@ -54,8 +54,9 @@ value class StreamClientId private constructor(val id: Short) {
         // wrapping around is fine to guarantee uniqueness.
         fun next() = StreamClientId((nextId.getAndIncrement() % Short.MAX_VALUE).toShort())
     }
-}
 
+    override fun toString() = id.toString()
+}
 
 /**
  * A single event associated with the stream between the client and this server.
