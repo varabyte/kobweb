@@ -42,7 +42,7 @@ fun grayscale(amount: Number = 1) = CSSFilter("grayscale($amount)")
 fun grayscale(amount: CSSPercentageValue) = CSSFilter("grayscale($amount)")
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/hue-rotate
-fun hueRotate(angle: CSSAngleValue) = CSSFilter("hue-rotate($angle")
+fun hueRotate(angle: CSSAngleValue) = CSSFilter("hue-rotate($angle)")
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/invert
 fun invert(amount: Number = 1) = CSSFilter("invert($amount)")
