@@ -79,7 +79,10 @@ class Server(
      * By default, logs append to a single file and rollover at the end of each day.
      *
      * @param level The minimum level of log messages to show. If set to [Level.OFF], no logs will be shown. See the
-     *   [Level] enum for more details.
+     *   [Level] enum for more details. [Level.DEBUG] is a decent balance of verbosity and usefulness. [Level.TRACE]
+     *   is incredibly verbose, and is mostly intended for locally debugging. It probably shouldn't be used in
+     *   production, but it can be helpful when trying to debug a particularly tricky issue (such as a CORS
+     *   misconfiguration or a case where the ktor server is sending you back 403s).
      * @param logRoot The root directory where logs will be stored. If you change this to a directory that will contain
      *   other files besides just logs, consider setting [clearLogsOnStart] to false.
      * @param clearLogsOnStart If true, all existing files under the log root will be deleted when a server is
@@ -94,7 +97,7 @@ class Server(
      */
     @Serializable
     class Logging(
-        val level: Level = Level.TRACE,
+        val level: Level = Level.DEBUG,
         val logRoot: String = ".kobweb/server/logs",
         val clearLogsOnStart: Boolean = true,
         val logFileBaseName: String = "kobweb-server",

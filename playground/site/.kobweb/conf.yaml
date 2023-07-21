@@ -12,6 +12,3 @@ server:
       siteRoot: ".kobweb/site"
 
   port: 8080
-
-  logging:
-    level: "DEBUG"
