@@ -1,9 +1,11 @@
 package com.varabyte.kobweb.server.plugins
 
+import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.http.EMPTY_BODY
 import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
+import com.varabyte.kobweb.api.stream.ApiStream
 import com.varabyte.kobweb.api.stream.Stream
 import com.varabyte.kobweb.api.stream.StreamClientId
 import com.varabyte.kobweb.api.stream.StreamEvent
@@ -15,6 +17,7 @@ import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.io.ApiJarFile
 import com.varabyte.kobweb.streams.StreamMessage
+import com.varabyte.kobweb.streams.StreamMessage.Payload
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -39,9 +42,36 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
 import kotlin.time.toJavaDuration
+import java.lang.StackTraceElement as JavaStackTraceElement // Needed to disambiguiate from ktor `StackTraceElement`
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
+
+// A version of `stackTraceToString` that stops including traces once it hits a certain condition. This is a good way
+// to filter out traces that are not relevant to the user.
+private fun Throwable.stackTraceToString(includeUntil: (JavaStackTraceElement) -> Boolean): String {
+    return buildString {
+        var currThrowable: Throwable? = this@stackTraceToString
+        var lastThrowable: Throwable? = null
+        while (currThrowable != null) {
+            if (lastThrowable != null) append("caused by: ")
+            appendLine(currThrowable.toString())
+
+            // If we're handling a "caused by" stack trace, make sure the first stack trace doesn't
+            // get repeated in it.
+            val lastThrowableFirstStackTrace = lastThrowable?.stackTrace?.firstOrNull()?.toString()
+            currThrowable.stackTrace.takeWhile {
+                !includeUntil(it)
+                    && (lastThrowableFirstStackTrace == null || it.toString() != lastThrowableFirstStackTrace)
+            }.forEach {
+                appendLine("\tat $it")
+            }
+
+            lastThrowable = currThrowable
+            currThrowable = currThrowable.cause
+        }
+    }
+}
 
 fun Application.configureRouting(
     env: ServerEnvironment,
@@ -134,27 +164,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
                 // anonymous inner class, something like "ApisFactoryImpl$create$2"
                 env == ServerEnvironment.DEV && t.stackTrace.any { it.className.startsWith("ApisFactoryImpl") } -> {
                     call.respondText(
-                        buildString {
-                            var currThrowable: Throwable? = t
-                            var lastThrowable: Throwable? = null
-                            while (currThrowable != null) {
-                                if (lastThrowable != null) append("caused by: ")
-                                appendLine(currThrowable.toString())
-
-                                // If we're handling a "caused by" stack trace, make sure the first stack trace doesn't
-                                // get repeated it in.
-                                val lastThrowableFirstStackTrace = lastThrowable?.stackTrace?.firstOrNull()?.toString()
-                                currThrowable.stackTrace.takeWhile {
-                                    !it.className.startsWith("ApisFactoryImpl")
-                                        && (lastThrowableFirstStackTrace == null || it.toString() != lastThrowableFirstStackTrace)
-                                }.forEach {
-                                    appendLine("\tat $it")
-                                }
-
-                                lastThrowable = currThrowable
-                                currThrowable = currThrowable.cause
-                            }
-                        },
+                        t.stackTraceToString(includeUntil = { it.className.startsWith("ApisFactoryImpl") }),
                         status = HttpStatusCode.InternalServerError,
                         contentType = ContentType.Text.Plain,
                     )
@@ -177,7 +187,7 @@ private class StreamImpl(
     val route: String,
     val id: StreamClientId
 ) : Stream {
-    private suspend fun WebSocketSession.sendMessage(message: StreamMessage) {
+    private suspend fun WebSocketSession.sendMessage(message: StreamMessage<Payload.Server>) {
         send(Json.encodeToString(message))
     }
 
@@ -210,6 +220,7 @@ private class StreamImpl(
 
 
 private fun Routing.setupStreaming(
+    env: ServerEnvironment,
     application: Application,
     conf: KobwebConf,
     apiJar: ApiJarFile,
@@ -231,22 +242,48 @@ private fun Routing.setupStreaming(
         try {
             for (frame in incoming) {
                 if (frame is Frame.Text) {
-                    val incomingMessage = Json.decodeFromString<StreamMessage>(frame.readText())
+                    val incomingMessage = Json.decodeFromString<StreamMessage<Payload.Client>>(frame.readText())
                     val streamImpl = StreamImpl(sessions, session, apiJar, incomingMessage.route, id)
 
-                    when (val payload = incomingMessage.payload) {
-                        StreamMessage.Payload.ClientConnect -> {
-                            sessions[session]!!.streams.add(incomingMessage.route)
-                            apiJar.apis.handle(
-                                incomingMessage.route,
-                                StreamEvent.ClientConnected(streamImpl, id)
-                            )
-                        }
+                    try {
+                        when (val payload = incomingMessage.payload) {
+                            Payload.Client.Connect -> {
+                                sessions[session]!!.streams.add(incomingMessage.route)
+                                apiJar.apis.handle(
+                                    incomingMessage.route,
+                                    StreamEvent.ClientConnected(streamImpl, id)
+                                )
+                            }
 
-                        StreamMessage.Payload.ClientDisconnect -> streamImpl.disconnect()
-                        is StreamMessage.Payload.Text -> {
-                            apiJar.apis.handle(incomingMessage.route, StreamEvent.Text(streamImpl, id, payload.text))
+                            Payload.Client.Disconnect -> streamImpl.disconnect()
+                            is Payload.Text -> {
+                                apiJar.apis.handle(
+                                    incomingMessage.route,
+                                    StreamEvent.Text(streamImpl, id, payload.text)
+                                )
+                            }
                         }
+                    } catch (t: Throwable) {
+                        logger.error(
+                            """
+                            |API stream ("${incomingMessage.route}", clientId=${id}) crashed
+                            |payload: "${Json.encodeToString(incomingMessage.payload)}"
+                            |${t.stackTraceToString()}
+                            """.trimMargin()
+                        )
+
+                        // API streams can be created as objects or via `ApiStream` helper method. The
+                        // `includeUntil` block includes filtering logic for both cases.
+                        val callstack =
+                            if (env == ServerEnvironment.DEV) {
+                                t.stackTraceToString(includeUntil = {
+                                    it.className == Apis::class.qualifiedName ||
+                                        it.className.startsWith(ApiStream::class.qualifiedName!!)
+                                })
+                            } else null
+
+                        session.send(Json.encodeToString(StreamMessage.serverError(incomingMessage.route, callstack)))
+                        streamImpl.disconnect()
                     }
                 }
             }
@@ -425,7 +462,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
 
         if (apiJar != null) {
             configureApiRouting(ServerEnvironment.DEV, apiJar, routePrefix, logger)
-            setupStreaming(this@configureDevRouting, conf, apiJar, logger)
+            setupStreaming(ServerEnvironment.DEV, this@configureDevRouting, conf, apiJar, logger)
         }
 
         val contentRootFile = contentRoot.toFile()
@@ -473,7 +510,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
             // Since prod doesn't have live reloading, we can avoid setting up streaming if there are no API streams
             // declared at this point.
             if (apiJar.apis.numApiStreams > 0) {
-                setupStreaming(this@configureProdRouting, conf, apiJar, logger)
+                setupStreaming(ServerEnvironment.PROD, this@configureProdRouting, conf, apiJar, logger)
             }
         }
 
