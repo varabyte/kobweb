@@ -11,7 +11,25 @@ import io.ktor.server.plugins.defaultheaders.*
 
 fun Application.configureHTTP(conf: KobwebConf) {
     install(DefaultHeaders) {
-        header("X-Engine", "Ktor") // will send this header with each response
+        header("X-Engine", "Ktor")
+
+        // Ktor wants to report the "Server" header as "Ktor/$version" (e.g. "Ktor/2.3.0"), but it uses a manifest
+        // setting to get that version which is lost when we build the server as a fat jar. Instead, we create our own
+        // manifest setting and use that here, side-stepping the issue. If we don't do this, the ktor server runs fine
+        // but reports its version as "ktor/debug" which makes it look like Kobweb goofed up.
+        // See also: build.gradle.kts where it sets the version
+        // See also: the implementation for io.ktor.server.plugins.defaultheaders.DefaultHeaders that we're essentially
+        //   overriding here.
+        Application::class.java.classLoader.getResource("META-INF/MANIFEST.MF")?.let { manifest ->
+            manifest.openStream().use { inputString ->
+                val properties = java.util.Properties()
+                properties.load(inputString)
+                val version: String? = properties.getProperty("Ktor-Version")
+                if (version != null) {
+                    header(HttpHeaders.Server, "Ktor/$version")
+                }
+            }
+        }
     }
 
     install(CORS) {

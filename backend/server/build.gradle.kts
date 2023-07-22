@@ -32,6 +32,12 @@ application {
 }
 
 tasks.withType<ShadowJar>().configureEach {
+    manifest {
+        // Custom ktor version attribute to work around ktor's own way of getting the version that breaks when we
+        // build our fat jar. See also HTTP.kt where we read this attribute.
+        attributes["Ktor-Version"] = libs.versions.ktor.get()
+    }
+
 // NOTE: We used to minimize the jar but we had to keep making exceptions for things that got stripped that we needed at
 // runtime. Last check, the minimized jar was 15M vs. 18M not minimized, but with the added danger that things could
 // break at any time in the future. It just wasn't worth it.
