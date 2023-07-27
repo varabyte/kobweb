@@ -12,12 +12,11 @@ group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.libs.get()
 
 kotlin {
-    js(IR) {
+    js {
         browser()
         binaries.executable()
     }
 
-    @Suppress("UNUSED_VARIABLE") // Suppress spurious warnings about sourceset variables not being used
     sourceSets {
         val jsMain by getting {
             dependencies {
@@ -89,6 +88,7 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
             // TODO(194): Figure out how ligature fallbacks to work, if people report us breaking on legacy browsers.
             //  See also: https://developers.google.com/fonts/docs/material_icons#using_the_icons_in_html
             val rawName = entry.key
+
             @Suppress("DEPRECATION") // capitalize is way more readable than a direct replacement
             val methodName = "Mdi" + rawName.split("_").joinToString("") { it.capitalize() }
             val styles = entry.value
