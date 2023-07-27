@@ -34,14 +34,14 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
     @InputFile
-    fun getAppMetadataFrontend() = project.buildDir.resolve(KOBWEB_APP_METADATA_FRONTEND)
+    fun getAppMetadataFrontend() = project.layout.buildDirectory.file(KOBWEB_APP_METADATA_FRONTEND)
 
     @OutputFile
     fun getGenMainFile() = kobwebBlock.getGenJsSrcRoot(project).resolve("main.kt")
 
     @TaskAction
     fun execute() {
-        val appData = Json.decodeFromString(AppData.serializer(), getAppMetadataFrontend().readText())
+        val appData = Json.decodeFromString(AppData.serializer(), getAppMetadataFrontend().get().asFile.readText())
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
         val mainFile = getGenMainFile()
         mainFile.parentFile.mkdirs()

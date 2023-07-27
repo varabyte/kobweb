@@ -43,7 +43,7 @@ abstract class KobwebExportTask @Inject constructor(
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
     @InputFile
-    fun getAppFrontendMetadata() = project.buildDir.resolve(KOBWEB_APP_METADATA_FRONTEND)
+    fun getAppFrontendMetadata() = project.layout.buildDirectory.file(KOBWEB_APP_METADATA_FRONTEND)
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -115,7 +115,7 @@ abstract class KobwebExportTask @Inject constructor(
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 
-        val appData = Json.decodeFromString(AppData.serializer(), getAppFrontendMetadata().readText())
+        val appData = Json.decodeFromString(AppData.serializer(), getAppFrontendMetadata().get().asFile.readText())
         val frontendData = mutableListOf(appData.frontendData).apply {
             getCompileClasspath().get().files.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
