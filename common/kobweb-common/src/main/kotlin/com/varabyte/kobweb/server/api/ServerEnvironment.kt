@@ -11,8 +11,8 @@ enum class ServerEnvironment {
     companion object {
         fun get(): ServerEnvironment {
             val envValue: String = System.getProperty(PROPERTY_SERVER_ENVIRONMENT) ?: PROD.name
-            return values().firstOrNull { env -> env.name == envValue }
-                ?: throw KobwebException("Invalid server property: $envValue, expected one of [${values().joinToString()}]")
+            return entries.firstOrNull { env -> env.name == envValue }
+                ?: throw KobwebException("Invalid server property: $envValue, expected one of [${entries.joinToString()}]")
         }
     }
 

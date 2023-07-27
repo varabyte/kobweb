@@ -341,7 +341,7 @@ fun WidgetsPage() {
 
             WidgetSection("Switch") {
                 Column(Modifier.fillMaxWidth().gap(1.cssRem)) {
-                    SwitchShape.values().forEach { shape ->
+                    SwitchShape.entries.forEach { shape ->
                         Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
                             listOf(SwitchSize.SM, SwitchSize.MD, SwitchSize.LG).forEach { size ->
                                 var checked by remember { mutableStateOf(false) }

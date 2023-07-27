@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -16,7 +16,7 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 
-private val columnVariables = Breakpoint.values().associateWith { breakpoint ->
+private val columnVariables = Breakpoint.entries.associateWith { breakpoint ->
     StyleVariable.NumberValue<Int>("simple-grid-col-count-${breakpoint.name.lowercase()}", prefix = "silk")
 }
 
