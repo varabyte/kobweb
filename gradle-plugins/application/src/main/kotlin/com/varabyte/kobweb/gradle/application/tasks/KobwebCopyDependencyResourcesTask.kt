@@ -43,22 +43,16 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
                     fileTree.matching(patterns).files.map { file -> jar to RootAndFile(fileTree.dir, file) }
                 } else {
                     try {
-                        val unzipped = mutableListOf<Pair<File, RootAndFile>>()
-                        project.zipTree(jar).matching(patterns).visit {
-                            if (!this.isDirectory) {
-                                // relativePath always uses forward slash. Convert the absolute path to forward slashes,
-                                // therefore, before removing the suffix, or else Windows breaks.
-                                unzipped.add(
-                                    jar to RootAndFile(
-                                        File(
-                                            file.absolutePath.toUnixSeparators().removeSuffix(relativePath)
-                                        ), file
-                                    )
-                                )
+                        buildList {
+                            project.zipTree(jar).matching(patterns).visit {
+                                if (!this.isDirectory) {
+                                    // relativePath always uses forward slash. Convert the absolute path to forward slashes,
+                                    // therefore, before removing the suffix, or else Windows breaks.
+                                    val root = File(file.absolutePath.toUnixSeparators().removeSuffix(relativePath))
+                                    add(jar to RootAndFile(root, file))
+                                }
                             }
                         }
-
-                        unzipped
                     } catch (ex: Exception) {
                         // NOTE: I used to catch ZipException here, but it became GradleException at some point?? So
                         // let's just be safe and block all exceptions here. It sucks if this task crashes here because

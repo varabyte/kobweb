@@ -116,7 +116,8 @@ abstract class KobwebExportTask @Inject constructor(
         val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 
         val appData = Json.decodeFromString(AppData.serializer(), getAppFrontendMetadata().get().asFile.readText())
-        val frontendData = mutableListOf(appData.frontendData).apply {
+        val frontendData = buildList {
+            add(appData.frontendData)
             getCompileClasspath().get().files.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
                     add(Json.decodeFromString(FrontendData.serializer(), bytes.decodeToString()))

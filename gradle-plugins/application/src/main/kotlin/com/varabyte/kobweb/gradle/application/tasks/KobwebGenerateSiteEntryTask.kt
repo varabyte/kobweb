@@ -46,7 +46,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
         val mainFile = getGenMainFile()
         mainFile.parentFile.mkdirs()
 
-        val libData = mutableListOf<FrontendData>().apply {
+        val libData = buildList {
             getCompileClasspath().get().files.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
                     add(Json.decodeFromString(FrontendData.serializer(), bytes.decodeToString()))
