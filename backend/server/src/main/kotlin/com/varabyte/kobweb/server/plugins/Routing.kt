@@ -307,7 +307,7 @@ private fun Routing.configureApiRouting(
     logger: Logger
 ) {
     val path = "$routePrefix/api/{$KOBWEB_PARAMS...}"
-    HttpMethod.values().forEach { httpMethod ->
+    HttpMethod.entries.forEach { httpMethod ->
         when (httpMethod) {
             HttpMethod.DELETE -> delete(path) { handleApiCall(env, apiJar, httpMethod, logger) }
             HttpMethod.GET -> get(path) { handleApiCall(env, apiJar, httpMethod, logger) }

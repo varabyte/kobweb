@@ -33,10 +33,10 @@ enum class SiteLayout {
     companion object {
         fun get(): SiteLayout {
             val envValue: String = System.getProperty(PROPERTY_SITE_LAYOUT) ?: KOBWEB.name
-            return SiteLayout.values().firstOrNull { layout -> layout.name == envValue }
+            return SiteLayout.entries.firstOrNull { layout -> layout.name == envValue }
                 ?: throw KobwebException(
                     "Invalid export layout: $envValue, expected one of [${
-                        ServerEnvironment.values().joinToString()
+                        ServerEnvironment.entries.joinToString()
                     }]"
                 )
         }

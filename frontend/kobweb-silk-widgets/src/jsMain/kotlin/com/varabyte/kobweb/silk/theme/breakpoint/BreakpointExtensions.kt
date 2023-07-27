@@ -39,5 +39,5 @@ fun Breakpoint.toMinWidthQuery(): CSSMediaQuery = CSSMediaQuery.MediaFeature("mi
  */
 val Window.breakpointFloor: Breakpoint
     get() {
-        return Breakpoint.values().last { bp -> bp.toPx().value <= innerWidth }
+        return Breakpoint.entries.last { bp -> bp.toPx().value <= innerWidth }
     }
