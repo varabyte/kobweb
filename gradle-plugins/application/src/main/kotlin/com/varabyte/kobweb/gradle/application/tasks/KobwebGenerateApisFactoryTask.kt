@@ -38,19 +38,14 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
 
     @TaskAction
     fun execute() {
-        val backendData =
-            mutableListOf(
-                Json.decodeFromString(
-                    BackendData.serializer(),
-                    getAppBackendMetadata().get().asFile.readText()
-                )
-            ).apply {
-                getCompileClasspath().get().files.forEach { file ->
-                    file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
-                        add(Json.decodeFromString(BackendData.serializer(), bytes.decodeToString()))
-                    }
+        val backendData = buildList {
+            add(Json.decodeFromString(BackendData.serializer(), getAppBackendMetadata().get().asFile.readText()))
+            getCompileClasspath().get().files.forEach { file ->
+                file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
+                    add(Json.decodeFromString(BackendData.serializer(), bytes.decodeToString()))
                 }
-            }.merge()
+            }
+        }.merge()
 
         val apisFactoryFile = getGenApisFactoryFile()
         apisFactoryFile.parentFile.mkdirs()
