@@ -17,7 +17,7 @@ fun KotlinMultiplatformExtension.configAsKobwebLibrary(
     jsTargetName: String = "js",
     jvmTargetName: String = "jvm",
 ) {
-    js(jsTargetName, IR) {
+    js(jsTargetName) {
         kobwebLibraryBrowser()
     }
     if (includeServer) {
