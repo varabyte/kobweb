@@ -2,8 +2,6 @@ plugins {
     `kotlin-dsl`
     alias(libs.plugins.kotlin.jvm)
     id("com.varabyte.kobweb.internal.publish")
-    `java-library`
-    `java-gradle-plugin`
 }
 
 group = "com.varabyte.kobwebx.gradle"

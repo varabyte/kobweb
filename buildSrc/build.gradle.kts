@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `kotlin-dsl`
-    `java-gradle-plugin`
 }
 
 group = "com.varabyte.kobweb.gradle"
