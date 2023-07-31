@@ -1506,7 +1506,112 @@ fun MyApp(content: @Composable () -> Unit) {
 You can define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
 time.
 
+### Static layout vs. Full stack sites
+
+There are two flavors of Kobweb sites: *static* and *full stack*.
+
+A *static* site (or, more completely, a *static layout* site) is one where you export a bunch of frontend files (e.g.
+`html`, `js`, and public resources) into a single, organized folder that gets served in a direct way by
+a [static website hosting provider](https://en.wikipedia.org/wiki/Web_hosting_service#Static_page_hosting). In other
+words, the name *static* does not refer to the behavior of your site but rather that of your hosting provider solution.
+
+A *full stack* site is one where you write both the logic that runs on the frontend (i.e. on the user's machine) as well
+as the logic that runs on the backend (i.e. on a server somewhere). This custom server must serve requested files (much
+like a static web hosting service does) plus it should also define endpoints providing unique functionality tailored to
+your site's needs.
+
+***Note:** Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume.
+It was designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
+layout, to emphasize how tightly coupled it is to a Kobweb server.*
+
+When Kobweb was first written, it only provided the full stack solution, as being able to write your own server logic
+enabled a maximum amount of power and flexibility. The mental model for using Kobweb during this early time was simple
+and clear.
+
+However, in practice, most projects didn't need this power. A website can give users a very clean, dynamic experience
+simply by writing responsive frontend logic to make it look good, e.g. with animations and delightful user interactions.
+
+Additionally, many "*Feature* as a Service" solutions have popped up over the years, which can provide a ton of
+convenient functionality that used to require a custom server. These days, you can easily integrate auth, database, and
+analytics solutions all without writing a single line of backend code.
+
+The process for exporting a bunch of files in a way that can be consumed by a static web hosting provider tends to be
+*much* faster *and* cheaper than using a full stack solution. Therefore, you should prefer a static site layout unless
+you have a specific need for a full stack approach.
+
+Some possible reasons to use a custom server are:
+* needing to communicate with other, private backend services in your company.
+* intercepting requests as an intermediary for some third-party service where you own a very sensitive API key that you
+  don't want to leak (such as a service that delegates to ChatGPT).
+* acting as a hub to connect multiple clients together (such as a chat server).
+
+If you aren't sure which category you fall into, then you should probably be creating a static layout site. It's much
+easier to migrate from a static layout site to a full stack site later than the other way around.
+
+#### Exporting and running
+
+Both site flavors require an export. To export your site with a static layout, use the `kobweb export --layout static`
+command, while for full stack the command is `kobweb export --layout kobweb` (or just `kobweb export` since `kobweb` is
+the default layout as it originally was the only way).
+
+Once exported, you can test your site by running it locally before uploading. You run a static site with
+`kobweb run --env prod --layout static` and a full stack site with `kobweb run --env prod --layout kobweb` (or just
+`kobweb run --env prod`).
+
+#### Deploying
+
+A static site gets exported into `.kobweb/site` by default (you can configure this location in your `.kobweb/conf.yaml`
+file if you'd like). You can then upload the contents of that folder to the static web hosting provider of your choice.
+
+Deploying a full stack site is a bit more complex, as different providers have wildly varying setups, and some users may
+even decide to run their own web server themselves. However, when you export your Kobweb site, scripts are generated for
+running your server, both for *nix platforms (`.kobweb/server/start.sh`) and the Windows
+platform (`.kobweb/server/start.bat`). If the provider you are using speaks Dockerfile, you can set `ENTRYPOINT` to
+either of these scripts (depending on the server's platform).
+
+Going in more detail than this is outside the scope of this README. However, you can read my blog posts for a lot more
+information and some clear, concrete examples:
+
+* [Static site generation and deployment with Kobweb](https://bitspittle.dev/blog/2022/staticdeploy)
+* [Deploying Kobweb into the cloud](https://bitspittle.dev/blog/2023/clouddeploy)
+
 ### Talking to the server
+
+#### Declare a full stack project
+
+A Kobweb project will always at least have a JavaScript component, but if you declare a JVM target, that will be used to
+define custom server logic that can then be used by your Kobweb site.
+
+It's easiest to let Kobweb do it for you. In your site's build script, make sure you've declared
+`configAsKobwebApplication(includeServer = true)`:
+
+```kotlin
+// site/build.gradle.kts
+import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
+
+plugins {
+    alias(libs.plugins.kobweb.multiplatform)
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.kobweb.application)
+}
+
+/* ... */
+
+kotlin {
+    configAsKobwebApplication(includeServer = true)
+    /* ... */
+}
+```
+
+***NOTE:** `configAsKobwebApplication(includeServer = true)` declares and sets up both `js()` and `jvm()`
+[Kotlin Multiplatform targets](https://kotlinlang.org/docs/multiplatform-set-up-targets.html) for you. If you don't set
+`includeServer = true` explicitly, only the JS target will be declared.*
+
+The easy way to check if everything is set up correctly is to open your project inside IntelliJ IDEA, wait for it to
+finish indexing, and check that the `jvmMain` folder is detected as a module (if so, it will be given a special icon
+and look the same as the `jsMain` folder):
+
+![Kobweb JVM main set up correctly](https://github.com/varabyte/media/raw/main/kobweb/images/kobweb-jvm-main.png)
 
 #### Define API routes
 
