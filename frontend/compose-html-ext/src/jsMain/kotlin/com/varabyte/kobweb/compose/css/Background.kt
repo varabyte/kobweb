@@ -135,7 +135,7 @@ sealed class BackgroundPosition private constructor(private val value: String) :
     sealed class LegacyEdge(value: String) : BackgroundPosition(value)
     class LegacyEdgeX internal constructor(value: String) : LegacyEdge(value)
     class LegacyEdgeY internal constructor(value: String) : LegacyEdge(value)
-    private class LegacyEdgeOffset(edge: LegacyEdge? = null, offset: CSSLengthOrPercentageValue) :
+    private class LegacyEdgeOffset(edge: LegacyEdge, offset: CSSLengthOrPercentageValue) :
         BackgroundPosition("$edge $offset")
 
     private class LegacyPosition(x: LegacyEdgeOffset, y: LegacyEdgeOffset) : BackgroundPosition("$x $y")
