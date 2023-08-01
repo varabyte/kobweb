@@ -213,25 +213,29 @@ sealed interface Color : CSSColorValue {
     companion object {
         const val DEFAULT_SHIFTING_PERCENT = 0.3f
 
-        fun rgb(value: Int) = Rgb(0xFF.shl(24).or(value))
-        fun argb(value: Int) = Rgb(value)
-        fun argb(value: Long) = run {
-            // We accept Long here because Kotlin treats 0xFF000000 and such values as a Long, even though that can
+        private fun Long.toInRangeInt(): Int {
+            // We accept Long for colors because Kotlin treats 0xFF______ values as a Long, even though that can
             // still fit into 4 bytes and be represented by an Int. Therefore, let's accept Longs but fail at runtime if
             // the user passes in something with a higher bit set.
-            check(0xFFFFFFFF.inv().and(value) == 0L) {
+            check(0xFFFFFFFF.inv().and(this) == 0L) {
                 "Got an invalid hex color (0x${
-                    value.toString(16).uppercase()
+                    this.toString(16).uppercase()
                 }) value larger than 0xFFFFFFFF"
             }
-            argb(value.toInt())
+            return this.toInt()
         }
 
-        @Deprecated(
-            "`rgba` was incorrectly named. Please use `argb` instead, since the first 8 bits of the hex value are for alpha. In a future version, `rgba` may be reintroduced with the correct implementation.",
-            ReplaceWith("Color.argb(value)")
-        )
-        fun rgba(value: Int) = argb(value)
+        fun rgb(value: Int) = Rgb(0xFF.shl(24).or(value))
+        fun argb(value: Int) = Rgb(value)
+        fun argb(value: Long) = argb(value.toInRangeInt())
+
+        fun rgba(value: Int) = run {
+            // Convert RRGGBBAA to AARRGGBB
+            val alpha = value.and(0xFF).shl(24)
+            val rgb = value.shr(8)
+            argb(alpha.or(rgb))
+        }
+        fun rgba(value: Long) = rgba(value.toInRangeInt())
 
         fun rgb(r: Int, g: Int, b: Int) = rgba(r, g, b, 0xFF)
         fun rgba(r: Int, g: Int, b: Int, a: Int) = Rgb(
