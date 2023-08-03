@@ -34,15 +34,15 @@ val TabBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val TabDisabledBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val TabHoverBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val TabPressedBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val TabBorderThickness by StyleVariable<CSSLengthValue>(2.px, prefix = "silk")
+val TabBorderThicknessVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.px)
 
-val TabsStyle by ComponentStyle {}
-val TabsTabRowStyle by ComponentStyle.base {
+val TabsStyle by ComponentStyle(prefix = "silk") {}
+val TabsTabRowStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .fillMaxWidth()
-        .borderBottom(TabBorderThickness.value(), LineStyle.Solid, TabBorderColorVar.value())
+        .borderBottom(TabBorderThicknessVar.value(), LineStyle.Solid, TabBorderColorVar.value())
 }
-val TabsTabStyle by ComponentStyle(extraModifiers = { Modifier.tabIndex(0) }) {
+val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.tabIndex(0) }) {
     base {
         Modifier
             .cursor(Cursor.Pointer)
@@ -52,9 +52,9 @@ val TabsTabStyle by ComponentStyle(extraModifiers = { Modifier.tabIndex(0) }) {
             .userSelect(UserSelect.None)
             .padding(0.5.cssRem)
             .styleModifier {
-                property("margin-bottom", "calc(-1 * ${TabBorderThickness.value()})")
+                property("margin-bottom", "calc(-1 * ${TabBorderThicknessVar.value()})")
             }
-            .borderBottom(TabBorderThickness.value(), LineStyle.Solid, TabBorderColorVar.value())
+            .borderBottom(TabBorderThicknessVar.value(), LineStyle.Solid, TabBorderColorVar.value())
     }
 
     ariaDisabled {
@@ -70,7 +70,7 @@ val TabsTabStyle by ComponentStyle(extraModifiers = { Modifier.tabIndex(0) }) {
     }
 }
 
-val TabsPanelStyle by ComponentStyle.base {
+val TabsPanelStyle by ComponentStyle.base(prefix = "silk") {
     Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflowY(Overflow.Auto)
 }
 

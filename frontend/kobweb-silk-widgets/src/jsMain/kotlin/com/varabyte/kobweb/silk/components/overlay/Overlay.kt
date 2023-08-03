@@ -16,7 +16,7 @@ import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
-val OverlayBackgroundColorVar by StyleVariable<CSSColorValue>()
+val OverlayBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 val OverlayStyle by ComponentStyle.base(prefix = "silk") {
     Modifier.backgroundColor(OverlayBackgroundColorVar.value())

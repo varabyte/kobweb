@@ -29,7 +29,7 @@ import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
 // 9999px forces a pill shape. 0px causes a rectangular shape.
-val SwitchBorderRadiusVar by StyleVariable<CSSLengthValue>(9999.px, prefix = "silk")
+val SwitchBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 9999.px)
 
 val SwitchTrackWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val SwitchTrackHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
@@ -39,8 +39,7 @@ val SwitchTrackBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk
 val SwitchThumbOffsetVar by StyleVariable<CSSLengthOrPercentageValue>(prefix = "silk") // Should be less than switch height
 val SwitchThumbColorVar by StyleVariable<CSSColorValue>(prefix = "silk") // Should be less than switch height
 
-val SwitchStyle by ComponentStyle(prefix = "silk") {
-}
+val SwitchStyle by ComponentStyle(prefix = "silk") {}
 
 val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifier.tabIndex(0)) {
     base {
