@@ -2145,33 +2145,6 @@ If you're still having issues, you may want to [connect with us ▼](#connecting
 for support (but understand that getting Kobweb added to complex existing projects may not be something we can currently
 prioritize).
 
-## Kobweb server logs
-
-When you run `kobweb run`, the spun up web server will, by default, log to the `.kobweb/server/logs` directory.
-
-You can configure logging behavior by editing the `.kobweb/conf.yaml` file. Below we show setting all parameters to
-their default values:
-
-```yaml
-server:
-  logging:
-    level: DEBUG # ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
-    logRoot: ".kobweb/server/logs"
-    clearLogsOnStart: true # Warning - if true, wipes ALL files in logRoot, so don't put other files in there!
-    logFileBaseName: "kobweb-server" # e.g. "kobweb-server.log", "kobweb-server.2023-04-13.log"
-    maxFileCount: null # null = unbound. One log file is created per day, so 30 = 1 month of logs
-    totalSizeCap: 10MiB # null = unbound. Accepted units: B, K, M, G, KB, MB, GB, KiB, MiB, GiB
-    compressHistory: true # If true, old log files are compressed with gzip
-```
-
-The above defaults were chosen to be reasonable for most users running their projects on their local machines in
-developer mode. However, for production servers, you may want to set `clearLogsOnStart` to false, bump up the
-`totalSizeCap` after reviewing disk limitations of your web server host, and maybe set `maxFileCount` to a reasonable
-limit.
-
-Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
-10 * 1000 * 1000 bytes. You probably want to use "KiB", "MiB", or "GiB" when you configure this value.
-
 ## Exporting your site in a GitHub workflow
 
 While you can always export your site manually on your machine, you may want to automate this process. A common
@@ -2423,6 +2396,35 @@ Ultimately, I believe there is room for both approaches. If you want to make an 
 Android, iOS, Desktop, and Web, then "Multiplatform Compose" could be great for you. However, if you just want to make a
 traditional website but want to use Kotlin instead of TypeScript, Kobweb can provide an excellent development experience
 for that case.
+
+# Miscellaneous topics
+
+## Kobweb server logs
+
+When you run `kobweb run`, the spun up web server will, by default, log to the `.kobweb/server/logs` directory.
+
+You can configure logging behavior by editing the `.kobweb/conf.yaml` file. Below we show setting all parameters to
+their default values:
+
+```yaml
+server:
+  logging:
+    level: DEBUG # ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
+    logRoot: ".kobweb/server/logs"
+    clearLogsOnStart: true # Warning - if true, wipes ALL files in logRoot, so don't put other files in there!
+    logFileBaseName: "kobweb-server" # e.g. "kobweb-server.log", "kobweb-server.2023-04-13.log"
+    maxFileCount: null # null = unbound. One log file is created per day, so 30 = 1 month of logs
+    totalSizeCap: 10MiB # null = unbound. Accepted units: B, K, M, G, KB, MB, GB, KiB, MiB, GiB
+    compressHistory: true # If true, old log files are compressed with gzip
+```
+
+The above defaults were chosen to be reasonable for most users running their projects on their local machines in
+developer mode. However, for production servers, you may want to set `clearLogsOnStart` to false, bump up the
+`totalSizeCap` after reviewing disk limitations of your web server host, and maybe set `maxFileCount` to a reasonable
+limit.
+
+Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
+10 * 1000 * 1000 bytes. You probably want to use "KiB", "MiB", or "GiB" when you configure this value.
 
 # Can We Kobweb Yet
 
