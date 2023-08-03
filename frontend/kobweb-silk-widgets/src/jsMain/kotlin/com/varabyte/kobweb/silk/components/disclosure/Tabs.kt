@@ -74,6 +74,10 @@ val TabsPanelStyle by ComponentStyle.base {
     Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflowY(Overflow.Auto)
 }
 
+@DslMarker
+@Target(AnnotationTarget.CLASS, AnnotationTarget.TYPEALIAS, AnnotationTarget.TYPE)
+annotation class TabsScopeMarker
+
 internal data class TabData(
     val modifier: Modifier = Modifier,
     val content: @Composable BoxScope.() -> Unit,
@@ -91,6 +95,7 @@ internal data class TabPanelData(
     val panel: PanelData
 )
 
+@TabsScopeMarker
 class TabPanelScope {
     internal var tab: TabData? = null
     internal var panel: PanelData? = null
@@ -127,6 +132,7 @@ fun TabPanelScope.Tab(text: String, modifier: Modifier = Modifier) {
     }
 }
 
+@TabsScopeMarker
 class TabsScope {
     private val _tabPanels = mutableListOf<TabPanelData>()
     internal val tabPanels: List<TabPanelData> = _tabPanels
@@ -159,7 +165,7 @@ fun TabsScope.TabPanel(
     panelModifier: Modifier = Modifier,
     enabled: Boolean = true,
     isDefault: Boolean = false,
-    content: @Composable BoxScope.() -> Unit
+    content: @TabsScopeMarker @Composable BoxScope.() -> Unit
 ) {
     TabPanel(enabled, isDefault) {
         Tab(tabText, tabModifier)
