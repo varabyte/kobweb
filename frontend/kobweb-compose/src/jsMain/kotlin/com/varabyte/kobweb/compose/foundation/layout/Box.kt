@@ -11,11 +11,13 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 
-class BoxScope {
+interface BoxScope {
     fun Modifier.align(alignment: Alignment) = attrsModifier {
         classes("${alignment.toClassName()}-self")
     }
 }
+
+internal object BoxScopeInstance : BoxScope
 
 @Composable
 fun Box(
@@ -28,6 +30,6 @@ fun Box(
         classes("kobweb-box", contentAlignment.toClassName())
     }) {
         registerRefScope(ref)
-        BoxScope().content()
+        BoxScopeInstance.content()
     }
 }
