@@ -1700,7 +1700,7 @@ val echo = object : ApiStream {
     // Optional: ctx.stream.broadcast a message to all other clients that ctx.clientId disconnected
     // Optional: Update ctx.data here, removing data associated with ctx.clientId
   }
-} 
+}
 ```
 
 To communicate with an API stream from your site, you need to create a stream connection there:
@@ -1715,7 +1715,7 @@ fun ApiStreamDemoPage() {
       override fun onConnected(ctx: ConnectedContext) {  }
       override fun onTextReceived(ctx: TextReceivedContext) { console.log("Echoed: ${ctx.text}") }
       override fun onDisconnected(ctx: DisconnectedContext) {  }
-    })    
+    })
   }
 
   Button(onClick = {
