@@ -11,6 +11,7 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 
+@LayoutScopeMarker
 interface BoxScope {
     fun Modifier.align(alignment: Alignment) = attrsModifier {
         classes("${alignment.toClassName()}-self")

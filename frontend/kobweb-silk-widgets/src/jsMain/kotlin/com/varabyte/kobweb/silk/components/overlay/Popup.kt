@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.dom.observers.ResizeObserver
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
+import com.varabyte.kobweb.compose.foundation.layout.LayoutScopeMarker
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -67,6 +68,7 @@ enum class PopupPlacement {
  *
  * Note that this is essentially a [BoxScope] with some extra information added to it relevant to popups.
  */
+@LayoutScopeMarker
 class PopupScope(val placement: PopupPlacement?) : BoxScope
 
 private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position) {
