@@ -22,7 +22,7 @@ and [Chakra UI](https://chakra-ui.com).
 fun HomePage() {
   Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
     Row(Modifier.align(Alignment.End)) {
-      var colorMode by rememberColorMode()
+      var colorMode by ColorMode.currentState
       Button(
         onClick = { colorMode = colorMode.opposite() },
         Modifier.borderRadius(50.percent).padding(0.px)
@@ -861,13 +861,13 @@ val CustomStyle by ComponentStyle {
 }
 ```
 
-Note that Silk provides a `SilkTheme` object you can reference in styles. For example, if you want to set your element's
-color to match the color that we use for links, you can reference the `SilkTheme.palettes[colorMode]` object to do so:
+Silk defines a bunch of light and dark colors for all of its widgets, and if you'd like to re-use any of them in your
+own widget, you can query them using `colorMode.toSilkPalette()`:
 
 ```kotlin
 val CustomStyle by ComponentStyle {
     base {
-        Modifier.color(SilkTheme.palettes[colorMode].link.default)
+        Modifier.color(colorMode.toSilkPalette().link.default)
     }
 }
 ```
@@ -1058,7 +1058,7 @@ The `ref { ... }` method can actually take one or more optional keys of any valu
 subsequent recomposition, the callback will be rerun:
 
 ```kotlin
-val colorMode by rememberColorMode()
+val colorMode by ColorMode.currentState
 Box(
     // Callback will get triggered each time the color mode changes
     ref = ref(colorMode) { element -> /* ... */ }
@@ -1490,7 +1490,7 @@ Here's an example application composable override that I use in one of my own pr
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
     SilkApp {
-        val colorMode = getColorMode()
+      val colorMode = ColorMode.current
         LaunchedEffect(colorMode) { // Relaunched every time the color mode changes
             localStorage.setItem(COLOR_MODE_KEY, colorMode.name)
         }

@@ -6,9 +6,32 @@ import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.silk.init.SilkConfig
 import kotlin.math.absoluteValue
 
+private val rootColorModeState by lazy { mutableStateOf(SilkConfig.Instance.initialColorMode) }
+// Used by `Surface`
+internal val LocalColorMode = compositionLocalOf { rootColorModeState }
+
 enum class ColorMode {
     LIGHT,
     DARK;
+
+    companion object {
+        /**
+         * The current color mode, exposed as a [MutableState] so that you can change it and have the UI update.
+         *
+         * See also [current] if you only need read-only access to the current color mode.
+         */
+        val currentState: MutableState<ColorMode> @Composable get() = LocalColorMode.current
+
+        /**
+         * The current color mode.
+         *
+         * By default, this will be a global color mode that affects the whole site. However, if you check this value
+         * within a `ColorMode(colorModeOverride) { ... }` block, it will fetch the local color mode instead.
+         *
+         * See also [currentState] if you need to modify the current color.
+         */
+        val current: ColorMode @Composable @ReadOnlyComposable get() = LocalColorMode.current.value
+    }
 
     fun isLight() = (this == LIGHT)
     fun isDark() = (this == DARK)
@@ -50,13 +73,13 @@ fun Color.shifted(colorMode: ColorMode, byPercent: Float = Color.DEFAULT_SHIFTIN
  */
 @Composable
 @ReadOnlyComposable
-fun Color.shifted(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = shifted(getColorMode(), byPercent)
+fun Color.shifted(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = shifted(ColorMode.current, byPercent)
 
-private val colorModeState by lazy { mutableStateOf(SilkConfig.Instance.initialColorMode) }
-
+@Deprecated("Use `ColorMode.currentState` instead", ReplaceWith("ColorMode.currentState"))
 @Composable
-fun rememberColorMode() = remember { colorModeState }
+fun rememberColorMode() = ColorMode.currentState
 
+@Deprecated("Use `ColorMode.current` instead", ReplaceWith("ColorMode.current"))
 @Composable
 @ReadOnlyComposable
-fun getColorMode(): ColorMode = colorModeState.value
+fun getColorMode(): ColorMode = ColorMode.current
