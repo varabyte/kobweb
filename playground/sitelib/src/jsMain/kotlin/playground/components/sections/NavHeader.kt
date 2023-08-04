@@ -71,7 +71,7 @@ fun NavHeader() {
             Spacer()
 
             Button(
-                onClick = { colorMode = colorMode.opposite() },
+                onClick = { colorMode = colorMode.opposite },
                 NavItemStyle.toModifier(NavButtonVariant)
             ) {
                 Box(Modifier.margin(8.px)) {
