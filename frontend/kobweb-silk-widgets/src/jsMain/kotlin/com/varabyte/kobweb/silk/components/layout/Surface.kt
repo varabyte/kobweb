@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -13,6 +14,9 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.init.setSilkVariables
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.LocalColorMode
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
@@ -49,22 +53,43 @@ val AnimatedColorSurfaceVariant by SurfaceStyle.addVariant {
 /**
  * A panel which encapsulates a SilkTheme-aware area.
  *
- * This should probably be somewhere near the root of your app as it defines colors that cascade down through its
- * children with Silk colors.
+ * This widget is similar to a Box except it also responsible for setting the site's color look and feel.
+ *
+ * You can also explicitly pass in a color mode, which, if set, will override the value for all of its children. In this
+ * way, you can nest child surfaces if you want some areas to have overridden color modes, which can be useful
+ * for things like areas that are always light or always dark regardless of the site's overall theme. See also
+ * [ColorMode.current] (for reading the color mode) and [ColorMode.currentState] if you need to change it.
+ *
+ * All Silk apps expect to have a root Surface at or near the top of their layout.
  */
 @Composable
 fun Surface(
     modifier: Modifier = Modifier,
-    contentAlignment: Alignment = Alignment.TopStart,
     variant: ComponentVariant? = null,
+    colorModeOverride: ColorMode? = null,
+    contentAlignment: Alignment = Alignment.TopStart,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
+    var surfaceElement by remember { mutableStateOf<HTMLElement?>(null)}
     Box(
         SurfaceStyle.toModifier(variant).then(modifier),
         contentAlignment = contentAlignment,
-        ref = ref,
+        ref = refScope {
+            add(ref)
+            ref { surfaceElement = it }
+        },
     ) {
-        content()
+        if (colorModeOverride != null) {
+            surfaceElement?.let { surfaceElement ->
+                CompositionLocalProvider(LocalColorMode provides mutableStateOf(colorModeOverride)) {
+                    val currColorMode = ColorMode.current // Can recompose if child changes ColorMode.currentState
+                    surfaceElement.setSilkVariables(currColorMode)
+                    content()
+                }
+            }
+        } else {
+            content()
+        }
     }
 }

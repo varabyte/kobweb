@@ -16,7 +16,6 @@ import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDele
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
@@ -201,7 +200,7 @@ class ImmutableComponentStyle internal constructor(
 ) {
     @Composable
     fun toModifier(): Modifier {
-        val classNames = listOf(name, name.suffixedWith(getColorMode()))
+        val classNames = listOf(name, name.suffixedWith(ColorMode.current))
             .filter { name -> ComponentStyle.registeredClasses.contains(name) }
 
         return (if (classNames.isNotEmpty()) Modifier.classNames(*classNames.toTypedArray()) else Modifier)

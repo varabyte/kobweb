@@ -10,7 +10,6 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
@@ -123,7 +122,7 @@ private inline fun <C : RenderingContext> Canvas(
     ) {
         registerRefScope(ref)
 
-        val colorMode = getColorMode()
+        val colorMode = ColorMode.current
         DisposableEffect(colorMode) {
             var requestId = 0
             val ctx = createContext(scopeElement)
