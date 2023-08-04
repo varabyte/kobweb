@@ -39,15 +39,14 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import java.util.*
 
-private fun String.yamlStringToKotlinString(): String {
-    val result = if (this.isSurrounded("\"")) {
-        this.removeSurrounding("\"")
+fun String.yamlStringToKotlinString(): String {
+    return if (this.isSurrounded("\"")) {
+        this.removeSurrounding("\"").unescapeQuotes()
     } else if (this.isSurrounded("'")) {
-        this.removeSurrounding("'")
+        this.removeSurrounding("'").unescapeTicks()
     } else {
         this
     }
-    return result.unescapeQuotes()
 }
 
 class KotlinRenderer(
