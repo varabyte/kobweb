@@ -143,7 +143,7 @@ fun Switch(
             modifier = SwitchTrackStyle.toModifier()
                 .setVariable(
                     SwitchTrackBackgroundColorVar,
-                    if (checked) colorScheme?.let { if (colorMode.isDark()) it._200 else it._700 }
+                    if (checked) colorScheme?.let { if (colorMode.isDark) it._200 else it._700 }
                         ?: switchPalette.backgroundOn else switchPalette.backgroundOff)
                 .thenIf(!enabled) { DisabledStyle.toModifier() }
                 .then(modifier)

@@ -33,8 +33,24 @@ enum class ColorMode {
         val current: ColorMode @Composable @ReadOnlyComposable get() = LocalColorMode.current.value
     }
 
+    val isLight get() = (this == LIGHT)
+    val isDark get() = (this == DARK)
+    val opposite
+        get() = when (this) {
+            LIGHT -> DARK
+            DARK -> LIGHT
+        }
+
+    @Deprecated("Use `isLight` property instead.", ReplaceWith("isLight"))
+    @JsName("isLight_Deprecated")
     fun isLight() = (this == LIGHT)
+
+    @Deprecated("Use `isDark` property instead.", ReplaceWith("isDark"))
+    @JsName("isDark_Deprecated")
     fun isDark() = (this == DARK)
+
+    @Deprecated("Use `opposite` property instead.", ReplaceWith("opposite"))
+    @JsName("opposite_Deprecated")
     fun opposite() = when (this) {
         LIGHT -> DARK
         DARK -> LIGHT

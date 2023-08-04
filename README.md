@@ -24,12 +24,12 @@ fun HomePage() {
     Row(Modifier.align(Alignment.End)) {
       var colorMode by ColorMode.currentState
       Button(
-        onClick = { colorMode = colorMode.opposite() },
+        onClick = { colorMode = colorMode.opposite },
         Modifier.borderRadius(50.percent).padding(0.px)
       ) {
         Box(Modifier.margin(7.px)) {
           // Includes support for Font Awesome icons
-          if (colorMode.isLight()) FaSun() else FaMoon()
+          if (colorMode.isLight) FaSun() else FaMoon()
         }
       }
     }
@@ -856,7 +856,7 @@ When you define a `ComponentStyle`, an optional field is available for you to us
 ```kotlin
 val CustomStyle by ComponentStyle {
     base {
-        Modifier.color(if (colorMode.isLight()) Colors.Red else Colors.Pink)
+        Modifier.color(if (colorMode.isLight) Colors.Red else Colors.Pink)
     }
 }
 ```
