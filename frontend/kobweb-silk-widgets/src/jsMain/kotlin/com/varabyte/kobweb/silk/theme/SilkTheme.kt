@@ -341,7 +341,7 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     val palette: SilkPalette
         @Composable
         @ReadOnlyComposable
-        get() = palettes[getColorMode()]
+        get() = palettes[ColorMode.current]
 
     val breakpoints = mutableSilkTheme.breakpoints
 

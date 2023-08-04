@@ -211,7 +211,7 @@ fun Keyframes.toAnimation(
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null
 ): CSSAnimation {
-    val colorMode = if (this.usesColorMode) rememberColorMode().value else null
+    val colorMode = if (this.usesColorMode) ColorMode.current else null
     return toAnimation(colorMode, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 }
 

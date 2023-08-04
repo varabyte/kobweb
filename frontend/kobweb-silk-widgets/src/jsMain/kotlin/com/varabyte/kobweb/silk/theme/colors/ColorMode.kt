@@ -1,14 +1,58 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.dom.ref
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.lightened
+import com.varabyte.kobweb.silk.components.layout.Surface
 import com.varabyte.kobweb.silk.init.SilkConfig
+import com.varabyte.kobweb.silk.init.setSilkVariables
+import org.w3c.dom.HTMLElement
 import kotlin.math.absoluteValue
+
+private val rootColorModeState by lazy { mutableStateOf(SilkConfig.Instance.initialColorMode) }
+private val LocalColorMode = compositionLocalOf { rootColorModeState }
 
 enum class ColorMode {
     LIGHT,
     DARK;
+
+    companion object {
+        /**
+         * The current color mode, exposed as a [MutableState] so that you can change it and have the UI update.
+         *
+         * By default, this will be a global color mode that affects the whole site. However, if you check this value
+         * within a `ColorMode(colorModeOverride) { ... }` block, it will fetch the local color mode instead.
+         */
+        val currentState: MutableState<ColorMode> @Composable get() = LocalColorMode.current
+
+        /**
+         * The current color mode.
+         *
+         * By default, this will be a global color mode that affects the whole site. However, if you check this value
+         * within a `ColorMode(colorModeOverride) { ... }` block, it will fetch the local color mode instead.
+         */
+        val current: ColorMode @Composable @ReadOnlyComposable get() = LocalColorMode.current.value
+
+        /**
+         * Override the current color mode within the scope of the [content] block.
+         *
+         * This can be a useful way to declare an area of the site to always be dark or light mode, for example.
+         */
+        @Composable
+        operator fun invoke(colorMode: ColorMode, content: @Composable () -> Unit) {
+            var surfaceElement by remember { mutableStateOf<HTMLElement?>(null) }
+            Surface(ref = ref { surfaceElement = it }) {
+                if (surfaceElement != null) {
+                    CompositionLocalProvider(LocalColorMode provides mutableStateOf(colorMode)) {
+                        val currColorMode = current // Can recompose if child changes ColorMode.currentState
+                        surfaceElement!!.setSilkVariables(currColorMode)
+                        content()
+                    }
+                }
+            }
+        }
+    }
 
     fun isLight() = (this == LIGHT)
     fun isDark() = (this == DARK)
@@ -50,13 +94,13 @@ fun Color.shifted(colorMode: ColorMode, byPercent: Float = Color.DEFAULT_SHIFTIN
  */
 @Composable
 @ReadOnlyComposable
-fun Color.shifted(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = shifted(getColorMode(), byPercent)
+fun Color.shifted(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = shifted(ColorMode.current, byPercent)
 
-private val colorModeState by lazy { mutableStateOf(SilkConfig.Instance.initialColorMode) }
-
+@Deprecated("Use `ColorMode.currentState` instead", ReplaceWith("ColorMode.currentState"))
 @Composable
-fun rememberColorMode() = remember { colorModeState }
+fun rememberColorMode() = ColorMode.currentState
 
+@Deprecated("Use `ColorMode.current` instead", ReplaceWith("ColorMode.current"))
 @Composable
 @ReadOnlyComposable
-fun getColorMode(): ColorMode = colorModeState.value
+fun getColorMode(): ColorMode = ColorMode.current

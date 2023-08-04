@@ -81,8 +81,8 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme._SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
-import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.w3c.dom.HTMLElement
 
@@ -169,7 +169,10 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
 
 @Composable
 fun HTMLElement.setSilkVariables() {
-    val colorMode by rememberColorMode()
+    setSilkVariables(ColorMode.current)
+}
+
+fun HTMLElement.setSilkVariables(colorMode: ColorMode) {
     val palette = colorMode.toSilkPalette()
 
     // region General color vars

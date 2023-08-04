@@ -24,7 +24,6 @@ import com.varabyte.kobweb.silk.components.style.link
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.visited
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 
@@ -59,7 +58,7 @@ private fun NavLink(path: String, text: String) {
 
 @Composable
 fun NavHeader() {
-    var colorMode by rememberColorMode()
+    var colorMode by ColorMode.currentState
     Box(NavHeaderStyle.toModifier()) {
         Row(
             Modifier.fillMaxSize(),

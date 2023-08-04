@@ -21,9 +21,9 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.SilkPalette
-import com.varabyte.kobweb.silk.theme.colors.getColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
@@ -136,7 +136,7 @@ fun Switch(
     shape: SwitchShape = SwitchShape.PILL,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
-    val colorMode = getColorMode()
+    val colorMode = ColorMode.current
     val switchPalette = colorMode.toSilkPalette().switch
     Box(SwitchStyle.toModifier(variant).then(size.toModifier().then(shape.toModifier())), contentAlignment, ref = ref) {
         Box(
