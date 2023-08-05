@@ -10,6 +10,27 @@ fun StyleScope.borderWidth(width: CSSLengthValue) {
     property("border-width", width)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/border-collapse
+class BorderCollapse private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword
+        val Separate get() = BorderCollapse("separate")
+        val Collapse get() = BorderCollapse("collapse")
+
+        // Global
+        val Inherit get() = BorderCollapse("inherit")
+        val Initial get() = BorderCollapse("initial")
+        val Revert get() = BorderCollapse("revert")
+        val Unset get() = BorderCollapse("unset")
+    }
+}
+
+fun StyleScope.borderCollapse(borderCollapse: BorderCollapse) {
+    property("border-collapse", borderCollapse)
+}
+
 fun StyleScope.borderColor(color: CSSColorValue) {
     property("border-color", color)
 }

@@ -25,6 +25,10 @@ fun Modifier.border(
     border(width, style, color)
 }
 
+fun Modifier.borderCollapse(borderCollapse: BorderCollapse) = styleModifier {
+    borderCollapse(borderCollapse)
+}
+
 fun Modifier.borderColor(color: CSSColorValue) = styleModifier {
     borderColor(color)
 }
