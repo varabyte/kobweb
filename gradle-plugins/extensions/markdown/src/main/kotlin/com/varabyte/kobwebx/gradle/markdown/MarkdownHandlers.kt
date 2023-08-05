@@ -335,6 +335,9 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
                             }
                         } else if (child is Element) {
                             renderNode(child, indentCount + 1, sb)
+                            if (!sb.endsWith("\n")) {
+                                sb.appendLine()
+                            }
                         }
                     }
                     sb.appendLine(indent(indentCount) + "}")
