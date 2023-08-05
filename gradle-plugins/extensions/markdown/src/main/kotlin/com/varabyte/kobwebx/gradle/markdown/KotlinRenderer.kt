@@ -10,6 +10,11 @@ import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
+import org.commonmark.ext.gfm.tables.TableBlock
+import org.commonmark.ext.gfm.tables.TableBody
+import org.commonmark.ext.gfm.tables.TableCell
+import org.commonmark.ext.gfm.tables.TableHead
+import org.commonmark.ext.gfm.tables.TableRow
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
@@ -211,16 +216,9 @@ class KotlinRenderer(
         }
 
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
-            val scope = NodeScope(data)
+            val scope = NodeScope(data, indentCount)
             composableCall.get().invoke(scope, node).takeIf { it.isNotBlank() }?.let { code ->
-                // If the code we get is multi-line, we need to apply the current indent to each line. Note that the
-                // first line of code is automatically started after an indent is applied.
-                val indentedCode = code
-                    .split('\n')
-                    .mapIndexed { i, line -> if (i == 0) line else "$indent$line" }
-                    .joinToString("\n")
-
-                doVisit(node, indentedCode, scope)
+                doVisit(node, code.trim(), scope)
             }
         }
 
@@ -355,11 +353,44 @@ class KotlinRenderer(
         }
 
         override fun visit(customNode: CustomNode) {
-            if (customNode is KobwebCall) {
-                output.appendLine("$indent${customNode.toFqn(project)}")
+            when (customNode) {
+                is KobwebCall -> {
+                    output.appendLine("$indent${customNode.toFqn(project)}")
+                }
+
+                is TableHead -> visit(customNode)
+                is TableBody -> visit(customNode)
+                is TableRow -> visit(customNode)
+                is TableCell -> visit(customNode)
+
+                else -> {
+                    val unhandledNodeName = customNode::class.simpleName!!
+                    reporter.warn("Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
+                }
+            }
+        }
+
+        private fun visit(table: TableBlock) {
+            doVisit(table, handlers.table)
+        }
+
+        private fun visit(tableHead: TableHead) {
+            doVisit(tableHead, handlers.thead)
+        }
+
+        private fun visit(tableBody: TableBody) {
+            doVisit(tableBody, handlers.tbody)
+        }
+
+        private fun visit(tableRow: TableRow) {
+            doVisit(tableRow, handlers.tr)
+        }
+
+        private fun visit(tableCell: TableCell) {
+            if (tableCell.isHeader) {
+                doVisit(tableCell, handlers.th)
             } else {
-                val unhandledNodeName = customNode::class.simpleName!!
-                reporter.warn("Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
+                doVisit(tableCell, handlers.td)
             }
         }
 
@@ -402,6 +433,8 @@ class KotlinRenderer(
                 is YamlFrontMatterBlock -> {
                     // No-op. We don't need to do anything here because we already handled parsing front matter earlier.
                 }
+
+                is TableBlock -> visit(customBlock)
 
                 else -> {
                     val unhandledBlockName = customBlock::class.simpleName!!

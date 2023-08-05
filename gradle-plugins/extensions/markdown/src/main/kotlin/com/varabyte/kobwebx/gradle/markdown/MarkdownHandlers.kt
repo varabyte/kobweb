@@ -44,7 +44,7 @@ private const val SILK = "com.varabyte.kobweb.silk.components"
  *
  * @param data A simple map that is created once per file and can be used by components however they want to.
  */
-class NodeScope(val data: TypedMap) {
+class NodeScope(val data: TypedMap, private val indentCountBase: Int = 0) {
     /** If set, will cause the Markdown visit to visit these nodes instead of the node's original children. */
     var childrenOverride: List<Node>? = null
 
@@ -53,7 +53,7 @@ class NodeScope(val data: TypedMap) {
      *
      * The indent applied here will be consistent with the indent used by the Markdown -> Kotlin renderer.
      */
-    fun indent(indentCount: Int) = "    ".repeat(indentCount)
+    fun indent(indentCount: Int) = "    ".repeat(indentCountBase + indentCount)
 }
 
 /**
