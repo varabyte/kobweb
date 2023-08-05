@@ -17,6 +17,12 @@ Multi-line
 code blocks
 ```
 
+and tables:
+
+| Tables | Are    | Cool   |
+|--------|--------|--------|
+| cell 1 | cell 2 | cell 3 |
+
 and `inline` code as well.
 
 * And

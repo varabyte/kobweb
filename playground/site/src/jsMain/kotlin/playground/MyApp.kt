@@ -45,6 +45,14 @@ fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
             .textAlign(TextAlign.Left)
     }
 
+    registerBaseStyle("table, th, td") {
+        Modifier.border(1.px, LineStyle.Solid, Colors.LightGray)
+    }
+
+    registerBaseStyle("table") {
+        Modifier.borderCollapse(BorderCollapse.Collapse)
+    }
+
     registerBaseStyle("#md-inline-demo") {
         Modifier.color(Colors.OrangeRed)
     }
