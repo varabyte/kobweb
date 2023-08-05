@@ -54,7 +54,7 @@ val AnimatedColorSurfaceVariant by SurfaceStyle.addVariant {
  */
 @Composable
 fun Surface(
-    modifier: Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     variant: ComponentVariant? = null,
     ref: ElementRefScope<HTMLElement>? = null,
