@@ -59,7 +59,7 @@ class KotlinRenderer(
 ) : Renderer {
     private val defaultRoot: String? = handlers.defaultRoot.get().takeIf { it.isNotBlank() }
     private var indentCount = 0
-    private val indent get() = "    ".repeat(indentCount)
+    private val indent get() = NodeScope(TypedMap()).indent(indentCount)
 
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact = project.hasJsDependencyNamed("kobwebx-markdown")
@@ -211,7 +211,14 @@ class KotlinRenderer(
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
             val scope = NodeScope(data)
             composableCall.get().invoke(scope, node).takeIf { it.isNotBlank() }?.let { code ->
-                doVisit(node, code, scope)
+                // If the code we get is multi-line, we need to apply the current indent to each line. Note that the
+                // first line of code is automatically started after an indent is applied.
+                val indentedCode = code
+                    .split('\n')
+                    .mapIndexed { i, line -> if (i == 0) line else "$indent$line" }
+                    .joinToString("\n")
+
+                doVisit(node, indentedCode, scope)
             }
         }
 
