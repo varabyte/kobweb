@@ -5,6 +5,7 @@ import com.varabyte.kobweb.common.lang.toPackageName
 import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.core.util.getResourceRoots
@@ -119,7 +120,8 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     mdPathRel,
                     markdownHandlers,
                     mdPackage,
-                    funName
+                    funName,
+                    LoggingReporter(project.logger),
                 )
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }

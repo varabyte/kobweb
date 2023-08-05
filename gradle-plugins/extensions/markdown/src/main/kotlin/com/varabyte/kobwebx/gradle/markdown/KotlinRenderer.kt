@@ -2,6 +2,7 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.text.isSurrounded
+import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
@@ -56,6 +57,7 @@ class KotlinRenderer(
     private val handlers: MarkdownHandlers,
     private val pkg: String,
     private val funName: String,
+    private val reporter: Reporter,
 ) : Renderer {
     private val defaultRoot: String? = handlers.defaultRoot.get().takeIf { it.isNotBlank() }
     private var indentCount = 0
@@ -355,6 +357,9 @@ class KotlinRenderer(
         override fun visit(customNode: CustomNode) {
             if (customNode is KobwebCall) {
                 output.appendLine("$indent${customNode.toFqn(project)}")
+            } else {
+                val unhandledNodeName = customNode::class.simpleName!!
+                reporter.warn("Unhandled Markdown custom node: $unhandledNodeName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20node%20%22$unhandledNodeName%22")
             }
         }
 
@@ -379,18 +384,28 @@ class KotlinRenderer(
         }
 
         override fun visit(customBlock: CustomBlock) {
-            if (customBlock is KobwebCallBlock) {
-                val visitor = KobwebCallVisitor()
-                customBlock.accept(visitor)
-                visitor.call?.let { call ->
-                    visit(call)
-                    visitor.childrenNodes?.let { children ->
-                        ++indentCount
-                        children.forEach { node -> node.accept(this) }
-                        --indentCount
-                        output.appendLine("$indent}")
+            when (customBlock) {
+                is KobwebCallBlock -> {
+                    val visitor = KobwebCallVisitor()
+                    customBlock.accept(visitor)
+                    visitor.call?.let { call ->
+                        visit(call)
+                        visitor.childrenNodes?.let { children ->
+                            ++indentCount
+                            children.forEach { node -> node.accept(this) }
+                            --indentCount
+                            output.appendLine("$indent}")
+                        }
                     }
+                }
 
+                is YamlFrontMatterBlock -> {
+                    // No-op. We don't need to do anything here because we already handled parsing front matter earlier.
+                }
+
+                else -> {
+                    val unhandledBlockName = customBlock::class.simpleName!!
+                    reporter.warn("Unhandled Markdown custom block: $unhandledBlockName. Consider reporting this at: https://github.com/varabyte/kobweb/issues/new?labels=bug&template=bug_report.md&title=Unhandled%20Markdown%20block%20%22$unhandledBlockName%22")
                 }
             }
         }
