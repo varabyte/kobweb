@@ -11,7 +11,6 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.rememberColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
 
@@ -199,7 +198,7 @@ fun keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = Keyfr
  *
  * This version of the method is [Composable] because it's aware of the site's current color mode.
  *
- * See also: [rememberColorMode]
+ * See also: [ColorMode.currentState]
  */
 @Composable
 fun Keyframes.toAnimation(

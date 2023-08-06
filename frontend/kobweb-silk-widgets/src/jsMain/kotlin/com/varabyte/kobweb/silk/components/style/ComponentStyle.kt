@@ -344,7 +344,7 @@ class ComponentStyle(
          * ```
          * ComponentStyle("custom") { colorMode ->
          *   base {
-         *     Modifier.color(if (colorMode.isLight()) Colors.Red else Colors.Pink)
+         *     Modifier.color(if (colorMode.isLight) Colors.Red else Colors.Pink)
          *   }
          * }
          * ```
