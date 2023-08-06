@@ -84,7 +84,7 @@ fun Surface(
             surfaceElement?.let { surfaceElement ->
                 CompositionLocalProvider(LocalColorMode provides mutableStateOf(colorModeOverride)) {
                     val currColorMode = ColorMode.current // Can recompose if child changes ColorMode.currentState
-                    surfaceElement.setSilkVariables(currColorMode)
+                    LaunchedEffect(currColorMode) { surfaceElement.setSilkVariables(currColorMode) }
                     content()
                 }
             }
