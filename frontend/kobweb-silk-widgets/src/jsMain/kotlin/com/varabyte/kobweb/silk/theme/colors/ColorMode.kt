@@ -91,11 +91,11 @@ fun Color.shifted(colorMode: ColorMode, byPercent: Float = Color.DEFAULT_SHIFTIN
 @ReadOnlyComposable
 fun Color.shifted(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = shifted(ColorMode.current, byPercent)
 
-@Deprecated("Use `ColorMode.currentState` instead", ReplaceWith("ColorMode.currentState"))
+@Deprecated("Use `ColorMode.currentState` instead.", ReplaceWith("ColorMode.currentState"))
 @Composable
 fun rememberColorMode() = ColorMode.currentState
 
-@Deprecated("Use `ColorMode.current` instead", ReplaceWith("ColorMode.current"))
+@Deprecated("Use `ColorMode.current` instead.", ReplaceWith("ColorMode.current"))
 @Composable
 @ReadOnlyComposable
 fun getColorMode(): ColorMode = ColorMode.current
