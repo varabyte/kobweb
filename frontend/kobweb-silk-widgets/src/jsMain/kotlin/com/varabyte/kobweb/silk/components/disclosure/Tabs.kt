@@ -11,7 +11,6 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
@@ -51,9 +50,7 @@ val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.
             .color(TabColorVar.value())
             .userSelect(UserSelect.None)
             .padding(0.5.cssRem)
-            .styleModifier {
-                property("margin-bottom", "calc(-1 * ${TabBorderThicknessVar.value()})")
-            }
+            .margin(bottom = calc { -TabBorderThicknessVar.value() })
             .borderBottom(TabBorderThicknessVar.value(), LineStyle.Solid, TabBorderColorVar.value())
     }
 
