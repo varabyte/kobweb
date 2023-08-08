@@ -15,17 +15,6 @@ fun <T : CSSNumericValue<*>> calc(action: CalcScope.() -> T): T = with(CalcScope
 fun <V : Number, T : CalcScope.CalcNum<V>> calc(action: CalcScope.() -> T): V =
     with(CalcScopeInstance, action).unsafeCast<V>()
 
-/**
- * Expresses a CSS calculation for a [Number], particularly useful when it involves a [StyleVariable].
- *
- * @see [CalcScope.CalcNum.toInt]
- * @see [CalcScope.CalcNum.toLong]
- * @see [CalcScope.CalcNum.toFloat]
- * @see [CalcScope.CalcNum.toDouble]
- */
-fun <T : CalcScope.CalcNum<*>> calc(action: CalcScope.() -> T): CalcScope.CalcNum<*> =
-    with(CalcScopeInstance, action).unsafeCast<CalcScope.CalcNum<*>>()
-
 private object CalcScopeInstance : CalcScope
 
 sealed interface CalcScope {
@@ -52,36 +41,31 @@ sealed interface CalcScope {
         "calc(1 * $this)".unsafeCast<CSSSizeValue<T>>()
 
     // generic is used to preserve type during operations when possible
-    // even though the generic in practice is bounded by Number, we don't explicitly bound it so that its type cannot
-    // be assumed to be Number, preventing users from calling things like Number.toInt() that won't work
-    /** A wrapper around a [Number] which allows for custom implementation of operations. */
-    sealed interface CalcNum<@Suppress("unused") T>
+    /** An extension of [Number] which uses CSS's calc() function to represent operations. */
+    class CalcNum<@Suppress("unused") T : Number> internal constructor(private val value: String) : Number() {
+        override fun toString(): String = value
 
-    fun <T : Number> num(num: T): CalcNum<T> = num.unsafeCast<CalcNum<T>>()
+        override fun toInt(): Int = value.unsafeCast<Int>()
+        override fun toLong(): Long = value.unsafeCast<Long>()
+        override fun toFloat(): Float = value.unsafeCast<Float>()
+        override fun toDouble(): Double = value.unsafeCast<Double>()
+        override fun toByte(): Byte = throw UnsupportedOperationException()
+        override fun toChar(): Char = throw UnsupportedOperationException()
+        override fun toShort(): Short = throw UnsupportedOperationException()
 
-    operator fun <T : Number> CalcNum<T>.plus(b: CalcNum<T>): CalcNum<T> = "calc($this + $b)".unsafeCast<CalcNum<T>>()
-    operator fun <T : Number> CalcNum<T>.minus(b: CalcNum<T>): CalcNum<T> = "calc($this - $b)".unsafeCast<CalcNum<T>>()
-    operator fun <T : Number> CalcNum<T>.times(b: CalcNum<T>): CalcNum<T> = "calc($this * $b)".unsafeCast<CalcNum<T>>()
-    operator fun <T : Number> CalcNum<T>.div(b: CalcNum<T>): CalcNum<T> = "calc($this / $b)".unsafeCast<CalcNum<T>>()
-    operator fun <T : Number> CalcNum<T>.unaryMinus(): CalcNum<T> = "calc(-1 * $this)".unsafeCast<CalcNum<T>>()
-    operator fun <T : Number> CalcNum<T>.unaryPlus(): CalcNum<T> = "calc(1 * $this)".unsafeCast<CalcNum<T>>()
+        // keep the type when the operation involves the same type
+        operator fun plus(b: CalcNum<T>): CalcNum<T> = CalcNum("calc($this + $b)")
+        operator fun minus(b: CalcNum<T>): CalcNum<T> = CalcNum("calc($this - $b)")
+        operator fun times(b: CalcNum<T>): CalcNum<T> = CalcNum("calc($this * $b)")
+        operator fun div(b: CalcNum<T>): CalcNum<T> = CalcNum("calc($this / $b)")
+        operator fun unaryMinus(): CalcNum<T> = CalcNum("calc(-1 * $this)")
+        operator fun unaryPlus(): CalcNum<T> = CalcNum("calc(1 * $this)")
 
-    operator fun CalcNum<*>.plus(b: CalcNum<*>): CalcNum<*> = "calc($this + $b)".unsafeCast<CalcNum<*>>()
-    operator fun CalcNum<*>.minus(b: CalcNum<*>): CalcNum<*> = "calc($this - $b)".unsafeCast<CalcNum<*>>()
-    operator fun CalcNum<*>.times(b: CalcNum<*>): CalcNum<*> = "calc($this * $b)".unsafeCast<CalcNum<*>>()
-    operator fun CalcNum<*>.div(b: CalcNum<*>): CalcNum<*> = "calc($this / $b)".unsafeCast<CalcNum<*>>()
+        operator fun plus(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this + $b)")
+        operator fun minus(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this - $b)")
+        operator fun times(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this * $b)")
+        operator fun div(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this / $b)")
+    }
 
-    operator fun <T : CSSUnit> CalcNum<*>.times(b: CSSSizeValue<T>): CSSSizeValue<T> =
-        "calc($this * $b)".unsafeCast<CSSSizeValue<T>>()
-
-    operator fun <T : CSSUnit> CSSNumericValue<T>.times(b: CalcNum<*>): CSSSizeValue<T> =
-        "calc($this * $b)".unsafeCast<CSSSizeValue<T>>()
-
-    operator fun <T : CSSUnit> CSSNumericValue<T>.div(b: CalcNum<*>): CSSSizeValue<T> =
-        "calc($this / $b)".unsafeCast<CSSSizeValue<T>>()
+    fun <T : Number> num(num: T): CalcNum<T> = CalcNum(num.toString())
 }
-
-fun CalcScope.CalcNum<*>.toInt() = this.unsafeCast<Int>()
-fun CalcScope.CalcNum<*>.toLong() = this.unsafeCast<Long>()
-fun CalcScope.CalcNum<*>.toFloat() = this.unsafeCast<Float>()
-fun CalcScope.CalcNum<*>.toDouble() = this.unsafeCast<Double>()
