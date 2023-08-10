@@ -23,10 +23,24 @@ import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundPressedColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
+import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
+import com.varabyte.kobweb.silk.components.forms.FlushedInputVariant
+import com.varabyte.kobweb.silk.components.forms.InputBorderColorVar
+import com.varabyte.kobweb.silk.components.forms.InputBorderFocusColorVar
+import com.varabyte.kobweb.silk.components.forms.InputBorderHoverColorVar
+import com.varabyte.kobweb.silk.components.forms.InputBorderInvalidColorVar
+import com.varabyte.kobweb.silk.components.forms.InputFilledColorVar
+import com.varabyte.kobweb.silk.components.forms.InputFilledFocusColorVar
+import com.varabyte.kobweb.silk.components.forms.InputFilledHoverColorVar
+import com.varabyte.kobweb.silk.components.forms.InputGroupStyle
+import com.varabyte.kobweb.silk.components.forms.InputPlaceholderColorVar
+import com.varabyte.kobweb.silk.components.forms.InputStyle
+import com.varabyte.kobweb.silk.components.forms.OutlinedInputVariant
 import com.varabyte.kobweb.silk.components.forms.SwitchStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbColorVar
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchTrackStyle
+import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
@@ -86,6 +100,7 @@ import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
+import com.varabyte.kobweb.silk.theme.colors.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import kotlinx.dom.addClass
@@ -135,6 +150,15 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(TabsTabStyle)
     mutableTheme.registerComponentStyle(TabsPanelStyle)
 
+    mutableTheme.registerComponentStyle(InputStyle)
+    mutableTheme.registerComponentVariants(
+        OutlinedInputVariant,
+        FilledInputVariant,
+        FlushedInputVariant,
+        UnstyledInputVariant
+    )
+    mutableTheme.registerComponentStyle(InputGroupStyle)
+
     mutableTheme.registerComponentStyle(TocStyle)
     mutableTheme.registerComponentVariants(TocBorderedVariant)
     mutableTheme.registerComponentStyle(TooltipArrowStyle)
@@ -182,6 +206,7 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(BackgroundColorVar, palette.background)
         .setVariable(ColorVar, palette.color)
         .setVariable(BorderColorVar, palette.border)
+        .setVariable(PlaceholderColorVar, palette.placeholder)
     // endregion
 
     // region Widget color vars
@@ -192,6 +217,15 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(ButtonColorVar, palette.color)
 
         .setVariable(DividerColorVar, palette.border)
+
+        .setVariable(InputBorderColorVar, palette.border)
+        .setVariable(InputBorderFocusColorVar, palette.input.focusedBorder)
+        .setVariable(InputBorderHoverColorVar, palette.input.hoveredBorder)
+        .setVariable(InputBorderInvalidColorVar, palette.input.invalidBorder)
+        .setVariable(InputFilledColorVar, palette.input.filled)
+        .setVariable(InputFilledHoverColorVar, palette.input.filledHover)
+        .setVariable(InputFilledFocusColorVar, palette.input.filledFocus)
+        .setVariable(InputPlaceholderColorVar, palette.placeholder)
 
         .setVariable(LinkDefaultColorVar, palette.link.default)
         .setVariable(LinkVisitedColorVar, palette.link.visited)
@@ -205,7 +239,7 @@ private val SilkColorsStyle by ComponentStyle.base {
 
         .setVariable(TabColorVar, palette.tab.color)
         .setVariable(TabBackgroundColorVar, palette.tab.background)
-        .setVariable(TabBorderColorVar, palette.tab.border)
+        .setVariable(TabBorderColorVar, palette.border)
         .setVariable(TabDisabledBackgroundColorVar, palette.tab.disabled)
         .setVariable(TabHoverBackgroundColorVar, palette.tab.hover)
         .setVariable(TabPressedBackgroundColorVar, palette.tab.pressed)

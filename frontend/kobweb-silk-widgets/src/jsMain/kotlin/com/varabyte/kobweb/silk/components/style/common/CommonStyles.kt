@@ -32,6 +32,24 @@ val DisabledStyle by ComponentStyle.base(
 val StyleModifiers.ariaDisabled get() = CssRule.OfAttributeSelector(this, """aria-disabled="true"""")
 
 /**
+ * A way to select elements that have been tagged with an `aria-invalid` attribute.
+ *
+ * This is different from the `:invalid` pseudo-class selector! The `invalid` pseudo-class is useful when the standard
+ * widget supports a general invalidation algorithm (like an email type input with an invalid email address), but the
+ * `ariaInvalid` version can be used to support custom invalidation strategies.
+ */
+val StyleModifiers.ariaInvalid get() = CssRule.OfAttributeSelector(this, """aria-invalid="true"""")
+
+/**
+ * A way to select elements that have been tagged with an `aria-required` attribute.
+ *
+ * This is different from the `:required` pseudo-class selector! It can be useful to use the `ariaRequired` tag when
+ * using elements that don't support the `required` attribute, like elements created from divs, as a way to communicate
+ * their required state to accessibility readers.
+ */
+val StyleModifiers.ariaRequired get() = CssRule.OfAttributeSelector(this, """aria-required="true"""")
+
+/**
  * A style which opts an element into background color transitions, which looks better than color snapping when the
  * color mode changes.
  *

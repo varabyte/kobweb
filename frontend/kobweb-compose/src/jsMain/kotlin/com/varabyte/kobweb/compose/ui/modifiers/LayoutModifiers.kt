@@ -221,6 +221,14 @@ fun Modifier.paddingInline(
     paddingInline(start, end)
 }
 
+fun Modifier.paddingInlineStart(value: CSSNumeric) = styleModifier {
+    paddingInlineStart(value)
+}
+
+fun Modifier.paddingInlineEnd(value: CSSNumeric) = styleModifier {
+    paddingInlineEnd(value)
+}
+
 fun Modifier.paddingBlock(
     start: CSSNumeric = 0.px,
     end: CSSNumeric = 0.px,
@@ -228,6 +236,13 @@ fun Modifier.paddingBlock(
     paddingBlock(start, end)
 }
 
+fun Modifier.paddingBlockStart(value: CSSNumeric) = styleModifier {
+    paddingBlockStart(value)
+}
+
+fun Modifier.paddingBlockEnd(value: CSSNumeric) = styleModifier {
+    paddingBlockEnd(value)
+}
 
 fun Modifier.overflow(overflow: Overflow) = styleModifier {
     overflow(overflow)

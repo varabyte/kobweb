@@ -12,6 +12,8 @@ import org.jetbrains.compose.web.css.*
 val BackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val ColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val BorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val PlaceholderOpacityVar by StyleVariable<Number>(1.0)
+val PlaceholderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 /**
  * Colors used by all widgets in the Silk library.
@@ -31,7 +33,11 @@ interface SilkPalette {
     val border: Color
     val overlay: Color
 
+    /** Color used for placeholder text in widgets that have them. */
+    val placeholder: Color
+
     val button: Button
+    val input: Input
     val link: Link
     val switch: Switch
     val tab: Tab
@@ -59,6 +65,24 @@ interface SilkPalette {
         val visited: Color
     }
 
+    interface Input {
+        /** Color used for the outline of inputs when selected */
+        val focusedBorder: Color
+
+        /** Color used for the outline of inputs when hovered over */
+        val hoveredBorder: Color
+
+        /** Color used for the outline of inputs when `valid` is set to false */
+        val invalidBorder: Color
+
+        /** Color used for the background of inputs using the filled background variant */
+        val filled: Color
+        /** The filled variant's background when hovered over. */
+        val filledHover: Color
+        /** The filled variant's background when focused. */
+        val filledFocus: Color
+    }
+
     interface Switch {
         val backgroundOn: Color
         val backgroundOff: Color
@@ -68,7 +92,6 @@ interface SilkPalette {
     interface Tab {
         val color: Color
         val background: Color
-        val border: Color
         val selectedColor: Color
         val selectedBackground: Color
         val selectedBorder: Color
@@ -87,29 +110,50 @@ class MutableSilkPalette(
     override var background: Color,
     override var color: Color,
     override var button: Button,
+    override var input: Input,
     override var link: Link,
     override var switch: Switch,
     override var tab: Tab,
-    override var border: Color = color,
+    override var border: Color = color.toRgb().copyf(alpha = 0.2f),
     // Intentionally invert backdrop from normal background
     override var overlay: Color = color.toRgb().copyf(alpha = 0.5f),
+    override var placeholder: Color = ColorSchemes.Gray._500,
     override var tooltip: Tooltip = Tooltip(
         // Intentionally inverted from main colors, for contrast.
         background = color,
         color = background,
     ),
 ) : SilkPalette {
-    class Link(
-        override var default: Color,
-        override var visited: Color,
-    ) : SilkPalette.Link
-
     class Button(
         override var default: Color,
         override var hover: Color,
         override var focus: Color,
         override var pressed: Color,
     ) : SilkPalette.Button
+
+    class Input(
+        override var focusedBorder: Color = ColorSchemes.Blue._500,
+        override val hoveredBorder: Color,
+        override var invalidBorder: Color,
+        override var filled: Color,
+        override var filledHover: Color,
+        override var filledFocus: Color = Colors.Transparent,
+    ) : SilkPalette.Input {
+        constructor(
+            colorMode: ColorMode,
+            filled: Color,
+        ) : this(
+            filled = filled,
+            hoveredBorder = if (colorMode.isDark) ColorSchemes.Gray._600 else ColorSchemes.Gray._500,
+            invalidBorder = if (colorMode.isDark) ColorSchemes.Red._300 else ColorSchemes.Red._900,
+            filledHover = filled.shifted(colorMode, 0.1f)
+        )
+    }
+
+    class Link(
+        override var default: Color,
+        override var visited: Color,
+    ) : SilkPalette.Link
 
     class Switch(
         override var backgroundOn: Color,
@@ -124,7 +168,6 @@ class MutableSilkPalette(
         override var hover: Color,
         override var pressed: Color,
         override var disabled: Color,
-        override var border: Color = color.toRgb().copyf(alpha = 0.2f),
         override var selectedBackground: Color = background,
         override var selectedBorder: Color = selectedColor,
     ) : SilkPalette.Tab
@@ -157,6 +200,10 @@ class MutableSilkPalettes(
                 focus = Colors.CornflowerBlue,
                 pressed = buttonBase.darkened(byPercent = 0.4f)
             ),
+            input = MutableSilkPalette.Input(
+                ColorMode.LIGHT,
+                filled = ColorSchemes.Gray._200
+            ),
             link = MutableSilkPalette.Link(
                 default = Colors.Blue,
                 visited = Colors.Purple,
@@ -186,6 +233,7 @@ class MutableSilkPalettes(
                 focus = Colors.LightSkyBlue,
                 pressed = buttonBase.lightened(byPercent = 0.4f)
             ),
+            input = MutableSilkPalette.Input(ColorMode.DARK, filled = ColorSchemes.Gray._900),
             link = MutableSilkPalette.Link(
                 default = Colors.Cyan,
                 visited = Colors.Violet,

@@ -87,7 +87,7 @@ interface SwitchSize {
     }
 }
 
-internal fun SwitchSize.toModifier() = Modifier
+private fun SwitchSize.toModifier() = Modifier
     .setVariable(SwitchTrackWidthVar, width)
     .setVariable(SwitchTrackHeightVar, height)
     .setVariable(SwitchTrackPaddingVar, padding)

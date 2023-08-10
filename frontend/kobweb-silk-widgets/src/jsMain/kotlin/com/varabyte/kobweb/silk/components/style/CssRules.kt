@@ -115,7 +115,7 @@ val StyleModifiers.readOnly get() = CssRule.OfPseudoClass(this, "read-only")
 val StyleModifiers.readWrite get() = CssRule.OfPseudoClass(this, "read-write")
 
 /**
- * Matches an input element that is displaying placeholder text, for example from the HTML5 placeholder attribute.
+ * Matches an input element that is displaying placeholder text.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown
  */
@@ -292,6 +292,15 @@ val StyleModifiers.firstLetter get() = CssRule.OfPseudoElement(this, "first-lett
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line
  */
 val StyleModifiers.firstLine get() = CssRule.OfPseudoElement(this, "first-line")
+
+/**
+ * Matches the placeholder text within an input element that is displaying placeholder text.
+ *
+ * Note that if you override the color of the placeholder, you should consider setting its `opacity` to `1`.
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder
+ */
+val StyleModifiers.placeholder get() = CssRule.OfPseudoElement(this, "placeholder")
 
 //endregion
 
