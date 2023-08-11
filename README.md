@@ -751,6 +751,19 @@ Box(Modifier.backgroundColor(Colors.Red)) { /* ... */ }
 Box(CustomStyle.toModifier()) { /* ... */ }
 ```
 
+#### `ComponentStyle.base`
+
+You can simplify the syntax of basic component styles a bit further with the `ComponentStyle.base` declaration:
+
+```kotlin
+val CustomStyle by ComponentStyle.base {
+    Modifier.background(Colors.Red)
+}
+```
+
+Just be aware you may have to break this out again if you find yourself needing to
+support [additional states ▼](#additional-states).
+
 #### ComponentStyle name
 
 Note above we used the `by` keyword above to create a component style. This automatically generates a name for your
@@ -934,6 +947,17 @@ outline styling.
 
 ***Note:** Using a variant that was created from a different style will have no effect. In other words,
 `LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.*
+
+##### `ComponentVariant.addVariantBase`
+
+Like `ComponentStyle.base`, variants that don't need to support additional states can use `addVariantBase` instead to
+slightly simplify their declaration:
+
+```kotlin
+val HighlightedCustomVariant by CustomStyle.addVariantBase {
+    Modifier.backgroundColor(Colors.Green)
+}
+```
 
 ##### ComponentVariantName
 
