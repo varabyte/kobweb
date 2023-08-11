@@ -604,20 +604,24 @@ There's no hard and fast rule, but in general, when writing HTML / CSS by hand, 
 inline styles as it better maintains a separation of concerns. That is, the HTML should represent the content of your
 site, while the CSS controls the look and feel.
 
-However! We're not writing HTML / CSS by hand. We're using Compose HTML! So the distinctions discussed up until now
-are less important here.
+However! We're not writing HTML / CSS by hand. We're using Compose HTML! Should we even care about this in Kotlin?
 
-That said, there are times when you have to use stylesheets, because without them you can't define styles for advanced
-behaviors (particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes),
-[pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements), and
-[media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries), the discussion of
-which are outside the scope of this README). For example, you can't override the color of visited links without using a
-stylesheet approach. So it's worth realizing there are occasional differences.
+As it turns out, there are times when you have to use stylesheets, because without them, you can't define styles for
+advanced behaviors
+(particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes), [pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements),
+and [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries)). For example,
+you can't override the color of visited links without using a stylesheet approach. So it's worth realizing there are
+fundamental differences.
+
+Finally, it can also be much easier debugging your page with browser tools when you lean on stylesheets over inline styles, as it
+makes your DOM tree easier to read when your elements are simple (e.g. `<div class="title">`
+vs. `<div style="color:yellow; background-color:black; font-size: 24px; ...">`).
 
 ---
 
-In general, when you pass styles defined on the fly into a composable widget in Silk, those will result in inline
-styles, whereas if you use a `ComponentStyle` to define the styles, those will get embedded into the site's stylesheet:
+We'll be introducing and discussing modifiers and component styles in more detail shortly. But in general, when you pass
+modifiers directly into a composable widget in Silk, those will result in inline styles, whereas if you use a component
+style to define your styles, those will get embedded into the site's stylesheet:
 
 ```kotlin
 // Uses inline styles
@@ -630,11 +634,13 @@ val BoxStyle by ComponentStyle {
 Box(BoxStyle.toModifier()) { /* ... */ }
 ```
 
-We'll talk more about these approaches in the following sections.
+As a beginner, or even as an advanced user when prototyping, feel free to use inline modifiers as much as you can,
+pivoting to component styles if you find yourself needing to use pseudo classes, pseudo elements, or media queries. It
+is fairly easy to migrate inline styles over to stylesheets in Kobweb.
 
-One last note: debugging your page with browser tools may be easier if you lean on stylesheets over inline styles,
-because it makes your DOM tree easier to look through without all that extra noise. As a result, I tend to use
-`ComponentStyle` quite often.
+In my own projects, I tend to use inline styles for really simple layout elements (e.g. `Row(Modifier.fillMaxWidth())`)
+and component styles for complex and/or re-usable widgets. It actually becomes a nice organizational convention to have
+all your styles grouped together in one place above the widget itself.
 
 ### Modifier
 
