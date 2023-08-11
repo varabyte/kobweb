@@ -279,8 +279,27 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         thead.convention { "$JB_DOM.Thead" }
         tbody.convention { "$JB_DOM.Tbody" }
         tr.convention { "$JB_DOM.Tr" }
-        td.convention { "$JB_DOM.Td" }
-        th.convention { "$JB_DOM.Th" }
+
+        // Convert a map of CSS style properties to an `style { ... }` block
+        fun Map<String, String>.toStylesBlock(): String {
+            val styleMap = this.takeIf { it.isNotEmpty() } ?: return ""
+            return buildString {
+                append("style {")
+                append(styleMap.map { (key, value) -> "property(\"$key\", \"$value\")" }.joinToString(";"))
+                append("}")
+            }
+        }
+        // Create relevant `(attrs = { ... })` call parameters for a table cell
+        fun TableCell.toCallParams(): String {
+            val alignment = alignment ?: return ""
+
+            val properties = mutableMapOf<String, String>()
+            properties["text-align"] = alignment.name.lowercase()
+            return "(attrs = { ${properties.toStylesBlock()} })"
+        }
+
+        td.convention { cell -> "$JB_DOM.Td${cell.toCallParams()}" }
+        th.convention { cell -> "$JB_DOM.Th${cell.toCallParams()}" }
 
         fun String.stripTagBrackets() =
             this.removePrefix("</").removePrefix("<").removeSuffix("/>").removeSuffix(">")
