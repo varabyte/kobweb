@@ -594,10 +594,9 @@ And you could use that stylesheet to style the following document:
 
 ```html
 <body>
-  <!-- Div gets background-color from "body" and foreground color from "#title" -->
-  <div id="title">
-      Yellow on green
-  </div>
+  <!-- Title gets background-color from "body" and foreground color from "#title" -->
+  <div id="title">Yellow on black</div>
+  Magenta on black
 </body>
 ```
 
