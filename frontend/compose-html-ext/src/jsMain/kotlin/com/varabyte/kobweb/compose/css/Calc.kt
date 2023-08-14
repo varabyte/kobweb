@@ -40,9 +40,8 @@ sealed interface CalcScope {
     operator fun <T : CSSUnit> CSSSizeValue<T>.unaryPlus(): CSSSizeValue<T> =
         "calc(1 * $this)".unsafeCast<CSSSizeValue<T>>()
 
-    // generic is used to preserve type during operations when possible
     /** An extension of [Number] which uses CSS's calc() function to represent operations. */
-    class CalcNum<@Suppress("unused") T : Number> internal constructor(private val value: String) : Number() {
+    class CalcNum<T : Number> internal constructor(private val value: String) : Number() {
         override fun toString(): String = value
 
         override fun toInt(): Int = value.unsafeCast<Int>()
@@ -61,10 +60,10 @@ sealed interface CalcScope {
         operator fun unaryMinus(): CalcNum<T> = CalcNum("calc(-1 * $this)")
         operator fun unaryPlus(): CalcNum<T> = CalcNum("calc(1 * $this)")
 
-        operator fun plus(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this + $b)")
-        operator fun minus(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this - $b)")
-        operator fun times(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this * $b)")
-        operator fun div(b: CalcNum<*>): CalcNum<CalcNum<*>> = CalcNum("calc($this / $b)")
+        operator fun plus(b: CalcNum<*>): CalcNum<*> = CalcNum<T>("calc($this + $b)")
+        operator fun minus(b: CalcNum<*>): CalcNum<*> = CalcNum<T>("calc($this - $b)")
+        operator fun times(b: CalcNum<*>): CalcNum<*> = CalcNum<T>("calc($this * $b)")
+        operator fun div(b: CalcNum<*>): CalcNum<*> = CalcNum<T>("calc($this / $b)")
     }
 
     fun <T : Number> num(num: T): CalcNum<T> = CalcNum(num.toString())
