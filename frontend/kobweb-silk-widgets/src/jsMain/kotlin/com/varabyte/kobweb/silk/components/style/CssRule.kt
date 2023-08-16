@@ -159,3 +159,12 @@ operator fun Breakpoint.plus(other: CssRule.OfPseudoClass) =
 
 operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) =
     CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
+
+/**
+ * A way you can define multiple rules which all result in the same style.
+ */
+// TODO: Simplify this using selector lists instead?
+//  See also: https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#selector_lists
+fun cssRules(vararg rules: CssRule, createModifier: () -> Modifier) {
+    rules.forEach { rule -> rule.invoke(createModifier) }
+}
