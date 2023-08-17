@@ -75,11 +75,9 @@ fun NavHeader() {
                 onClick = { colorMode = colorMode.opposite },
                 NavItemStyle.toModifier(NavButtonVariant),
             ) {
-                Box(Modifier.margin(8.px)) {
-                    when (colorMode) {
-                        ColorMode.LIGHT -> FaMoon()
-                        ColorMode.DARK -> FaSun()
-                    }
+                when (colorMode) {
+                    ColorMode.LIGHT -> FaMoon()
+                    ColorMode.DARK -> FaSun()
                 }
             }
             Tooltip(ElementTarget.PreviousSibling, "Toggle color mode", placement = PopupPlacement.BottomRight)

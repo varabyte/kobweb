@@ -27,10 +27,8 @@ fun HomePage() {
         onClick = { colorMode = colorMode.opposite },
         Modifier.borderRadius(50.percent).padding(0.px)
       ) {
-        Box(Modifier.margin(7.px)) {
-          // Includes support for Font Awesome icons
-          if (colorMode.isLight) FaSun() else FaMoon()
-        }
+        // Includes support for Font Awesome icons
+        if (colorMode.isLight) FaSun() else FaMoon()
       }
     }
     H1 {
