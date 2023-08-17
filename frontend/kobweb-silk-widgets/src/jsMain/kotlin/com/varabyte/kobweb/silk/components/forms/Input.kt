@@ -476,8 +476,9 @@ private fun <T : Any> _Input(
 
                 onInput { evt -> onValueChanged(type.inputValue(evt.nativeEvent)) }
                 onKeyUp { evt ->
-                    if (evt.code == "Enter") {
+                    if (valid && evt.code == "Enter") {
                         evt.preventDefault()
+                        evt.stopPropagation()
                         onCommit()
                     }
                 }
@@ -571,6 +572,7 @@ fun TextInput(
  * @param autoComplete An optional strategy to help the browser autocomplete the value automatically. See [AutoComplete]
  *   for a full list.
  * @param onCommit An optional callback that gets triggered when the user presses ENTER while focused on the input.
+ *   Note that this method will not be triggered if [valid] is set to false.
  */
 @Composable
 fun <T : Any> Input(
