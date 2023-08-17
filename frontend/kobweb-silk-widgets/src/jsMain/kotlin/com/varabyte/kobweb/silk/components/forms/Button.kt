@@ -10,6 +10,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.isBright
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
@@ -56,9 +57,6 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
             .verticalAlign(VerticalAlign.Middle)
             .borderRadius(0.375.cssRem)
             .borderWidth(0.px)
-            // For focus, we'll use a box shadow instead of an outline. Box shadow combines the general style of a
-            // border (which appears outside the button, not inside it) while also not affecting the layout.
-            .outline(0.px)
             .userSelect(UserSelect.None) // No selecting text within buttons
             .transition(CSSTransition("background-color", duration = 200.ms))
     }
@@ -70,7 +68,13 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
     }
 
     (focusVisible + not(ariaDisabled)) {
-        Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = ButtonBackgroundFocusColorVar.value())
+        // For focus, we use a box shadow instead of an outline. Box shadow combines the general style of a
+        // border (which appears outside the button, not inside it) while also not affecting the layout.
+        // However, box shadow is removed in Windows High Contrast mode, so we add an outline with a
+        // transparent color, which is normally invisible, but becomes visible in High Contrast mode.
+        Modifier
+            .outline(2.px, LineStyle.Solid, Colors.Transparent)
+            .boxShadow(spreadRadius = 0.1875.cssRem, color = ButtonBackgroundFocusColorVar.value())
     }
 
     (active + not(ariaDisabled)) {
