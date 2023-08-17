@@ -718,7 +718,7 @@ fun InputGroup(
                 Modifier
                     .position(Position.Absolute).top(0.px).bottom(0.px).left(0.px)
                     .width(scope.leftInsetWidth ?: InputInsetLeftWidth.value())
-                    .then(modifier),
+                    .then(scope.leftModifier),
                 contentAlignment = Alignment.Center
             ) {
                 leftInset()
@@ -730,7 +730,7 @@ fun InputGroup(
                 Modifier
                     .position(Position.Absolute).top(0.px).bottom(0.px).right(0.px)
                     .width(scope.rightInsetWidth ?: InputInsetRightWidth.value())
-                    .then(modifier),
+                    .then(scope.rightModifier),
                 contentAlignment = Alignment.Center
             ) {
                 rightInset()
