@@ -63,8 +63,8 @@ val InputHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val InputPaddingVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val InputPlaceholderOpacityVar by StyleVariable(prefix = "silk", defaultFallback = PlaceholderOpacityVar.value())
 val InputPlaceholderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val InputInsetLeftWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
-val InputInsetRightWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
+val InputInsetLeftWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
+val InputInsetRightWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
 
 val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
@@ -672,7 +672,7 @@ fun InputGroup(
                 }
             }
             .thenIf(scope.leftInset != null) {
-                Modifier.paddingInlineStart(scope.leftInsetWidth ?: InputInsetLeftWidth.value())
+                Modifier.paddingInlineStart(scope.leftInsetWidth ?: InputInsetLeftWidthVar.value())
             }
             .thenIf(scope.rightAddon != null) {
                 Modifier.styleModifier {
@@ -681,7 +681,7 @@ fun InputGroup(
                 }
             }
             .thenIf(scope.rightInset != null) {
-                Modifier.paddingInlineEnd(scope.rightInsetWidth ?: InputInsetRightWidth.value())
+                Modifier.paddingInlineEnd(scope.rightInsetWidth ?: InputInsetRightWidthVar.value())
             }
 
         // Render addons (if set) and the main input
@@ -727,7 +727,7 @@ fun InputGroup(
             Box(
                 Modifier
                     .position(Position.Absolute).top(0.px).bottom(0.px).left(0.px)
-                    .width(scope.leftInsetWidth ?: InputInsetLeftWidth.value())
+                    .width(scope.leftInsetWidth ?: InputInsetLeftWidthVar.value())
                     .then(scope.leftModifier),
                 contentAlignment = Alignment.Center
             ) {
@@ -739,7 +739,7 @@ fun InputGroup(
             Box(
                 Modifier
                     .position(Position.Absolute).top(0.px).bottom(0.px).right(0.px)
-                    .width(scope.rightInsetWidth ?: InputInsetRightWidth.value())
+                    .width(scope.rightInsetWidth ?: InputInsetRightWidthVar.value())
                     .then(scope.rightModifier),
                 contentAlignment = Alignment.Center
             ) {

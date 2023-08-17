@@ -38,9 +38,9 @@ val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk
 val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val ButtonColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonFontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
-val ButtonHeight by StyleVariable<CSSLengthValue>(prefix = "silk")
-val ButtonPaddingHorizontal by StyleVariable<CSSLengthValue>(prefix = "silk")
+val ButtonFontSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
+val ButtonHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
+val ButtonPaddingHorizontalVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 
 val ButtonStyle by ComponentStyle(prefix = "silk") {
     base {
@@ -48,12 +48,12 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
             .color(ButtonColorVar.value())
             .backgroundColor(ButtonBackgroundDefaultColorVar.value())
             .lineHeight(1.2)
-            .height(ButtonHeight.value())
-            .minWidth(ButtonHeight.value()) // A button should get no more squashed than square / rectangular
-            .fontSize(ButtonFontSize.value())
+            .height(ButtonHeightVar.value())
+            .minWidth(ButtonHeightVar.value()) // A button should get no more squashed than square / rectangular
+            .fontSize(ButtonFontSizeVar.value())
             .fontWeight(FontWeight.SemiBold)
             .whiteSpace(WhiteSpace.NoWrap)
-            .padding(leftRight = ButtonPaddingHorizontal.value())
+            .padding(leftRight = ButtonPaddingHorizontalVar.value())
             .verticalAlign(VerticalAlign.Middle)
             .borderRadius(0.375.cssRem)
             .borderWidth(0.px)
@@ -114,9 +114,9 @@ interface ButtonSize {
 
 fun ButtonSize.toModifier(): Modifier {
     return Modifier
-        .setVariable(ButtonFontSize, fontSize)
-        .setVariable(ButtonHeight, height)
-        .setVariable(ButtonPaddingHorizontal, horizontalPadding)
+        .setVariable(ButtonFontSizeVar, fontSize)
+        .setVariable(ButtonHeightVar, height)
+        .setVariable(ButtonPaddingHorizontalVar, horizontalPadding)
 }
 
 /**
