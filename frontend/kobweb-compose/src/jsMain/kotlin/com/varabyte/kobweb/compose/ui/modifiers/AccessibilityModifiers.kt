@@ -11,6 +11,10 @@ fun Modifier.ariaInvalid(value: Boolean = true) = attrsModifier {
     attr("aria-invalid", value.toString())
 }
 
+fun Modifier.ariaLabel(value: String) = attrsModifier {
+    attr("aria-label", value)
+}
+
 fun Modifier.ariaRequired(value: Boolean = true) = attrsModifier {
     attr("aria-required", value.toString())
 }
