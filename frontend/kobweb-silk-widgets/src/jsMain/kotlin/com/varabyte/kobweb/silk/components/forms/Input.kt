@@ -259,9 +259,10 @@ class InputGroupScope {
      *
      * This is usually a bit of decorative text.
      *
-     * NOTE: You can only declare an addon OR an inset element, but not both.
+     * NOTE: You can only declare a left addon OR inset element, not both.
      *
-     * See also: [RightAddon], [LeftInset].
+     * @see RightAddon
+     * @see LeftInset
      */
     fun LeftAddon(modifier: Modifier = Modifier, block: @InputGroupScopeMarker @Composable BoxScope.() -> Unit) {
         require(leftAddon == null && leftInset == null) { "Can only set one left addon or inset element" }
@@ -272,9 +273,10 @@ class InputGroupScope {
     /**
      * Declare an addon element which will be placed on the right side of the input.
      *
-     * NOTE: You can only declare an addon OR an inset element, but not both.
+     * NOTE: You can only declare a right addon OR inset element, not both.
      *
-     * See also: [LeftAddon], [RightInset]
+     * @see LeftAddon
+     * @see RightInset
      */
     fun RightAddon(modifier: Modifier = Modifier, block: @InputGroupScopeMarker @Composable BoxScope.() -> Unit) {
         require(rightAddon == null && rightInset == null) { "Can only set one right addon or inset element" }
@@ -287,12 +289,13 @@ class InputGroupScope {
      *
      * This is usually a text icon.
      *
-     * Due to technical limitations, insets cannot detect or grow based on their content. Instead, if you want to change
-     * its width, you'll have to set it manually via the [width] parameter.
+     * Due to technical limitations, insets cannot detect their size or grow based on their content. Instead, if you
+     * want to change its width, you'll have to set it manually via the [width] parameter.
      *
-     * NOTE: You can only declare an addon OR an inset element, but not both.
+     * NOTE: You can only declare a left addon OR inset element, not both.
      *
-     * See also: [RightInset], [LeftAddon].
+     * @see RightInset
+     * @see LeftAddon
      */
     fun LeftInset(
         modifier: Modifier = Modifier,
@@ -308,12 +311,13 @@ class InputGroupScope {
     /**
      * Declare an inset element which will be placed within the right side of the input.
      *
-     * Due to technical limitations, insets cannot detect or grow based on their content. Instead, if you want to change
-     * its width, you'll have to set it manually via the [width] parameter.
+     * Due to technical limitations, insets cannot detect their size or grow based on their content. Instead, if you
+     * want to change its width, you'll have to set it manually via the [width] parameter.
      *
-     * NOTE: You can only declare an addon OR an inset element, but not both.
+     * NOTE: You can only declare a right addon OR inset element, not both.
      *
-     * See also: [LeftInset], [RightAddon].
+     * @see LeftInset
+     * @see RightAddon
      */
     fun RightInset(
         modifier: Modifier = Modifier,
@@ -487,10 +491,10 @@ private fun <T : Any> _Input(
 }
 
 /**
- * Like [com.varabyte.kobweb.silk.components.forms.Input] but for the common case of dealing with text.
+ * Like [Input][com.varabyte.kobweb.silk.components.forms.Input] but for the common case of dealing with text.
  *
  * By default, acts like `Input(InputType.Text)` unless `password` is set to true, in which case it acts like
- * `InputType.Password`.
+ * `Input(InputType.Password)`.
  *
  * A simple example looks like this:
  *
@@ -560,9 +564,9 @@ fun TextInput(
  * @param onValueChanged An event triggered when input value wants to change (e.g. in response to user input)
  * @param placeholder Placeholder text to show when the input is empty.
  * @param size The size of the input, with standard T-shirt sizes (XS, SM, MD, LG) available. See also: [InputSize].
- * @param placeholderColor If set, an override for the default placeholder color.
- * @param focusBorderColor If set, an override for the default border color when the input is focused.
- * @param invalidBorderColor If set, an override for the default border color when the [valid] is passed in as false.
+ * @param placeholderColor An optional override for the placeholder color.
+ * @param focusBorderColor An optional override for the border color when the input is focused.
+ * @param invalidBorderColor An optional override for the border color when the [valid] is false.
  * @param enabled If set to false, this input will be disabled.
  * @param valid If set to false, this input will be decorated with a special border color when unfocused, and the
  *   element itself will be tagged with an `aria-invalid` attribute.
@@ -617,9 +621,10 @@ fun <T : Any> Input(
 }
 
 /**
- * Create an input group, which is a collection of related elements that decorate an [com.varabyte.kobweb.silk.components.forms.Input].
+ * Create an input group, which is a collection of related elements that decorate an
+ * [Input][com.varabyte.kobweb.silk.components.forms.Input].
  *
- * You can declare addons, which appear to either the right or the left of the input element outside of its borders,
+ * You can declare addons, which appear to either the right or left of the input element outside its borders,
  * and you can declare insets, which appear within the right or left of the input element's borders.
  *
  * Addons look like tags that appear on the side of the input, and are useful places to add a bit of clarifying text,
@@ -631,7 +636,7 @@ fun <T : Any> Input(
  * var password by remember { mutableStateOf("") }
  * InputGroup {
  *   LeftAddon { Text("Password:") }
- *   TextInput(name, password = true, onTextChanged = { name = it })
+ *   TextInput(password, password = true, onTextChanged = { password = it })
  *   RightInset {
  *     if (isValid(password)) {
  *       FaCheck(Modifier.color(Colors.Green))
@@ -640,7 +645,7 @@ fun <T : Any> Input(
  * }
  * ```
  *
- * Note that the `InputGroup` scope is NOT composable! So you must declare any `remember` block above it.
+ * Note that the `InputGroup` scope is NOT composable! So you must declare any `remember` blocks above it.
  */
 @Composable
 fun InputGroup(
