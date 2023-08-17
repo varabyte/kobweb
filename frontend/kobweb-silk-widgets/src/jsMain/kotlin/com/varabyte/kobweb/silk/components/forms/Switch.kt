@@ -69,21 +69,21 @@ val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
 interface SwitchSize {
     val width: CSSLengthValue
     val height: CSSLengthValue
-    val padding: CSSLengthValue get() = 3.px
+    val padding: CSSLengthValue get() = 0.188.cssRem
 
     object SM : SwitchSize {
-        override val width = 22.px
-        override val height = 12.px
+        override val width = 1.375.cssRem
+        override val height = 0.75.cssRem
     }
 
     object MD : SwitchSize {
-        override val width = 30.px
-        override val height = 16.px
+        override val width = 1.875.cssRem
+        override val height = 1.cssRem
     }
 
     object LG : SwitchSize {
-        override val width = 46.px
-        override val height = 24.px
+        override val width = 2.875.cssRem
+        override val height = 1.5.cssRem
     }
 }
 
