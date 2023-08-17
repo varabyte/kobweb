@@ -124,6 +124,7 @@ fun Button(
     variant: ComponentVariant? = null,
     size: ButtonSize = ButtonSize.MD,
     colorScheme: ColorScheme? = null,
+    focusBorderColor: CSSColorValue? = null,
     enabled: Boolean = true,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
@@ -145,6 +146,9 @@ fun Button(
                     .setVariable(ButtonBackgroundHoverColorVar, if (isDark) colorScheme._300 else colorScheme._600)
                     .setVariable(ButtonBackgroundPressedColorVar, if (isDark) colorScheme._400 else colorScheme._700)
 
+            }
+            .thenIf(focusBorderColor != null) {
+                Modifier.setVariable(ButtonBackgroundFocusColorVar, focusBorderColor!!)
             }
             .then(modifier)
             .thenIf(enabled) {
