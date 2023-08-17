@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.forms.Button
+import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
 import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -72,7 +73,8 @@ fun NavHeader() {
 
             Button(
                 onClick = { colorMode = colorMode.opposite },
-                NavItemStyle.toModifier(NavButtonVariant)
+                NavItemStyle.toModifier(NavButtonVariant),
+                size = ButtonSize.SM,
             ) {
                 Box(Modifier.margin(8.px)) {
                     when (colorMode) {

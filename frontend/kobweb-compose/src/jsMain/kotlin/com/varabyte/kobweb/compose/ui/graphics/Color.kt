@@ -293,6 +293,21 @@ sealed interface Color : CSSColorValue {
  */
 fun Color.lightened(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = inverted().darkened(byPercent).inverted()
 
+/**
+ * Calculate a color's luminance, which is a calculation for how bright it is perceived to be by the human eye.
+ */
+val Color.luminance: Float
+    // See also: https://www.w3.org/TR/AERT/#color-contrast
+    get() = this.toRgb()
+        .let { rgb -> (rgb.redf * 0.299f) + (rgb.greenf * 0.587f) + (rgb.bluef * 0.114f) }
+
+/**
+ * Check if a color is perceived bright or not.
+ *
+ * This can be useful if deciding to overlay dark or light text on top of it, for example.
+ */
+val Color.isBright: Boolean get() = this.luminance > 0.5f
+
 object Colors {
     val Transparent get() = Color.rgba(0, 0, 0, 0)
 

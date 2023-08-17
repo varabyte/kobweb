@@ -187,6 +187,71 @@ fun Tooltip(
 )
 ```
 
+#### Size, color scheme, and other style parameters
+
+When applicable, you SHOULD declare size and color scheme parameters right after the `variant` parameter.
+
+This is because size and color schemes are additional style modifications, and as such, they should logically be
+grouped with the `modifier` and related `variant` parameters.
+
+Additionally, size names MUST be named after abbreviated T-shirt sizes, with at least SM, MD, and LG sizes defined.
+You CAN additionally define XS, XL, and XXL sizes if they seem relevant, but they are not required.
+
+Sizes SHOULD be `cssRem` values, so a site will dynamically resize around a larger font if designed with one.
+
+Sizes MUST be an interface so users can implement their own custom sizes if they prefer.
+
+The default size SHOULD be set to MD.
+
+*Do*
+
+```kotlin
+interface MyWidgetSize {
+  val fontSize: CSSLengthValue
+  object SM : MyWidgetSize { /* ... */ }
+  object MD : MyWidgetSize {
+      override val fontSize = 1.cssRem
+  }
+  object LG : MyWidgetSize { /* ... */ }
+}
+
+private fun MyWidgetSize.toModifier(): Modifier {
+    return Modifier
+      .setVariable(MyWidgetFontSizeVar, fontSize)
+}
+
+@Composable
+fun MyWidget(
+  modifier: Modifier = Modifier,
+  variant: ComponentVariant? = null,
+  size: MyWidgetSize = MyWidgetSize.MD,
+  colorScheme: ColorScheme? = null,
+  enabled: Boolean = true, ...) {
+    Box(
+      MyWidgetStyle.toModifier(variant)
+        .then(size.toModifier())
+        .thenIf(colorScheme != null) {
+            Modifier.setVariable(MyWidgetColorVar, if (ColorMode.current.isDark) colorScheme._200 else colorScheme._700)
+        }
+    )
+}
+```
+
+*Don't*
+
+```kotlin
+@Composable
+fun MyWidget(
+  ...,
+  variant: ComponentVariant? = null,
+  enabled: Boolean,
+  colorScheme: ColorScheme? = null,
+  size: MyWidgetSize,
+  ...) {
+    /* ... */
+}
+```
+
 #### Proper modifier chain order
 
 You MUST build your modifier chain in a way that the user's passed-in modifier will overwrite anything from the base

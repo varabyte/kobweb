@@ -13,6 +13,7 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.forms.Button
+import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
 import com.varabyte.kobweb.silk.components.forms.FlushedInputVariant
 import com.varabyte.kobweb.silk.components.forms.Input
@@ -86,7 +87,15 @@ fun WidgetsPage() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             WidgetSection("Button") {
-                Button(onClick = {}) { Text("Click me!") }
+                Column(Modifier.gap(0.5.cssRem)) {
+                    listOf(null, ColorSchemes.Red, ColorSchemes.Blue, ColorSchemes.Green).forEach { colorScheme ->
+                        Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
+                            listOf(ButtonSize.XS, ButtonSize.SM, ButtonSize.MD, ButtonSize.LG).forEach { size ->
+                                Button(onClick = {}, size = size, colorScheme = colorScheme) { Text("Button") }
+                            }
+                        }
+                    }
+                }
             }
 
             WidgetSection("Input") {
@@ -205,8 +214,8 @@ fun WidgetsPage() {
                                 RightInset(width = 4.5.cssRem) {
                                     Button(
                                         onClick = { showPassword = !showPassword },
-                                        // TODO: Replace with with ButtonSize.SM once we support it
-                                        Modifier.height(1.5.cssRem).width(3.5.cssRem).padding(0.px).fontSize(0.8.cssRem)
+                                        Modifier.width(3.5.cssRem).height(1.75.cssRem),
+                                        size = ButtonSize.SM,
                                     ) {
                                         Text(if (showPassword) "Hide" else "Show")
                                     }
