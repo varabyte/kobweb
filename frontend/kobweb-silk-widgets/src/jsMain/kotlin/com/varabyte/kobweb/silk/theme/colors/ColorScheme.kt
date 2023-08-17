@@ -27,32 +27,6 @@ interface ColorScheme {
  */
 @Suppress("unused")
 object ColorSchemes {
-    val White = object : ColorScheme {
-        override val _50 = Color.rgba(255, 255, 255, 0.04f)
-        override val _100 = Color.rgba(255, 255, 255, 0.06f)
-        override val _200 = Color.rgba(255, 255, 255, 0.08f)
-        override val _300 = Color.rgba(255, 255, 255, 0.16f)
-        override val _400 = Color.rgba(255, 255, 255, 0.24f)
-        override val _500 = Color.rgba(255, 255, 255, 0.36f)
-        override val _600 = Color.rgba(255, 255, 255, 0.48f)
-        override val _700 = Color.rgba(255, 255, 255, 0.64f)
-        override val _800 = Color.rgba(255, 255, 255, 0.80f)
-        override val _900 = Color.rgba(255, 255, 255, 0.92f)
-    }
-
-    val Black = object : ColorScheme {
-        override val _50 = Color.rgba(0, 0, 0, 0.04f)
-        override val _100 = Color.rgba(0, 0, 0, 0.06f)
-        override val _200 = Color.rgba(0, 0, 0, 0.08f)
-        override val _300 = Color.rgba(0, 0, 0, 0.16f)
-        override val _400 = Color.rgba(0, 0, 0, 0.24f)
-        override val _500 = Color.rgba(0, 0, 0, 0.36f)
-        override val _600 = Color.rgba(0, 0, 0, 0.48f)
-        override val _700 = Color.rgba(0, 0, 0, 0.64f)
-        override val _800 = Color.rgba(0, 0, 0, 0.80f)
-        override val _900 = Color.rgba(0, 0, 0, 0.92f)
-    }
-
     val Red = object : ColorScheme {
         override val _50 = Color.rgb(0xFFEBEE)
         override val _100 = Color.rgb(0xFFCDD2)
