@@ -70,6 +70,9 @@ val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .outline(0.px, LineStyle.Solid, Colors.Transparent) // Disable, we'll use box shadow instead
         .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
+        // Although the group container itself has no border, we still want to round the corners in case the user sets
+        // this element's background color, so it will match the shape of the elements on top of it.
+        .borderRadius(InputBorderRadiusVar.value())
         .fontSize(InputFontSizeVar.value())
 }
 
