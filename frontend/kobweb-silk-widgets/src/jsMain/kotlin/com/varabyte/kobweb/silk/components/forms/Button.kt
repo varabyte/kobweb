@@ -26,9 +26,10 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.toSilkPalette
+import org.jetbrains.compose.web.attributes.ButtonType
+import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLElement
 import org.jetbrains.compose.web.dom.Button as JbButton
 
 val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -126,7 +127,7 @@ fun Button(
     colorScheme: ColorScheme? = null,
     focusBorderColor: CSSColorValue? = null,
     enabled: Boolean = true,
-    ref: ElementRefScope<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLButtonElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     var backingElement: HTMLButtonElement? by remember { mutableStateOf(null) }
@@ -160,7 +161,9 @@ fun Button(
                         evt.stopPropagation()
                     }
             }
-            .toAttrs()
+            .toAttrs {
+                type(ButtonType.Button)
+            }
     ) {
         registerRefScope(
             refScope {
