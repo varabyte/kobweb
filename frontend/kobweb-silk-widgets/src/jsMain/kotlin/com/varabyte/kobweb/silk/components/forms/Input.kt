@@ -407,7 +407,7 @@ interface InputSize {
     }
 }
 
-private fun InputSize.toModifier() = Modifier
+fun InputSize.toModifier() = Modifier
     .setVariable(InputBorderRadiusVar, borderRadius)
     .setVariable(InputFontSizeVar, fontSize)
     .setVariable(InputHeightVar, height)

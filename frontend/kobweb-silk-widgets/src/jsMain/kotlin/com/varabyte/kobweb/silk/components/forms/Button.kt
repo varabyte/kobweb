@@ -107,7 +107,7 @@ interface ButtonSize {
     }
 }
 
-private fun ButtonSize.toModifier(): Modifier {
+fun ButtonSize.toModifier(): Modifier {
     return Modifier
         .setVariable(ButtonFontSize, fontSize)
         .setVariable(ButtonHeight, height)

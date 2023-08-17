@@ -5,7 +5,6 @@ package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -87,7 +86,7 @@ interface SwitchSize {
     }
 }
 
-private fun SwitchSize.toModifier() = Modifier
+fun SwitchSize.toModifier() = Modifier
     .setVariable(SwitchTrackWidthVar, width)
     .setVariable(SwitchTrackHeightVar, height)
     .setVariable(SwitchTrackPaddingVar, padding)
