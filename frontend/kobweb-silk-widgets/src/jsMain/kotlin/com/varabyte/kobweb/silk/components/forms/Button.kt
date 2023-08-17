@@ -47,6 +47,7 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
             .backgroundColor(ButtonBackgroundDefaultColorVar.value())
             .lineHeight(1.2)
             .height(ButtonHeight.value())
+            .minWidth(ButtonHeight.value()) // A button should get no more squashed than square / rectangular
             .fontSize(ButtonFontSize.value())
             .fontWeight(FontWeight.SemiBold)
             .whiteSpace(WhiteSpace.NoWrap)

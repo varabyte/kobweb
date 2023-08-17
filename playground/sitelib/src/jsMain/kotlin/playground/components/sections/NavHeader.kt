@@ -74,7 +74,6 @@ fun NavHeader() {
             Button(
                 onClick = { colorMode = colorMode.opposite },
                 NavItemStyle.toModifier(NavButtonVariant),
-                size = ButtonSize.SM,
             ) {
                 Box(Modifier.margin(8.px)) {
                     when (colorMode) {
