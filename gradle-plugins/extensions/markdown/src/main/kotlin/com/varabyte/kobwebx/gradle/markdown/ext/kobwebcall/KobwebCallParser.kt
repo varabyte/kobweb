@@ -14,7 +14,7 @@ import org.commonmark.parser.block.ParserState
 /**
  * A parser for the {{{ MethodCall }}} block pattern.
  *
- * @see [KobwebCall]
+ * @see KobwebCall
  */
 class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockParser() {
     private val block = KobwebCallBlock()

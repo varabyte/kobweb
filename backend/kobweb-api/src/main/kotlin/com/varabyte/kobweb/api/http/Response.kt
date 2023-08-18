@@ -16,7 +16,7 @@ val EMPTY_BODY = ByteArray(0)
  * }
  * ```
  *
- * @see [Request]
+ * @see Request
  */
 class Response {
     private var _status: Int? = null

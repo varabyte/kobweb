@@ -126,7 +126,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
      * If you override this callback, you may want to check with https://www.rfc-editor.org/rfc/rfc3986 to ensure the ID
      * generated is valid.
      *
-     * @see [generateHeaderIds]
+     * @see generateHeaderIds
      */
     abstract val idGenerator: Property<(String) -> String>
 

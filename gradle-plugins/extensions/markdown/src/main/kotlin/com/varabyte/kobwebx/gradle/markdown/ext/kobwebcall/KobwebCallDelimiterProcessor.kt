@@ -12,7 +12,7 @@ import org.commonmark.parser.delimiter.DelimiterRun
  * Note that no spaces are allowed inside the curly braces here, or otherwise, the markdown parser skips over it,
  * unfortunately.
  *
- * @see [KobwebCall]
+ * @see KobwebCall
  */
 class KobwebCallDelimiterProcessor(private val delimiters: Pair<Char, Char>) : DelimiterProcessor {
     override fun getOpeningCharacter() = delimiters.first

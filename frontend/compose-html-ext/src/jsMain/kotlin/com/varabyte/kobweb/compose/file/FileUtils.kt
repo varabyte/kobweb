@@ -108,7 +108,7 @@ private fun <I, O> Document.loadFromDisk(
  * @param onLoaded A callback which will contain the contents of your file, if successfully loaded. The callback is
  *   scoped by a [LoadContext] which contains additional information about the file, such as its name and mime type.
  *
- * @see [FileReader.readAsArrayBuffer]
+ * @see FileReader.readAsArrayBuffer
  */
 fun Document.loadFromDisk(
     accept: String = "",
@@ -130,9 +130,10 @@ fun Document.loadFromDisk(
  *
  * This is useful (necessary?) for loading images in a format that image elements can consume.
  *
- * See [loadFromDisk] for details about the parameters.
+ * See `loadFromDisk` for details about the parameters.
  *
- * @see [FileReader.readAsDataURL]
+ * @see loadFromDisk
+ * @see FileReader.readAsDataURL
  */
 fun Document.loadDataUrlFromDisk(
     accept: String = "",
@@ -149,11 +150,11 @@ fun Document.loadDataUrlFromDisk(
 /**
  * Like [loadFromDisk] but convenient for dealing with text files.
  *
- * See [loadFromDisk] for details about the parameters.
+ * See `loadFromDisk` for details about the parameters.
  *
- * @see [FileReader.readAsText]
- *
- * @see [saveTextToDisk]
+ * @see loadFromDisk
+ * @see FileReader.readAsText
+ * @see saveTextToDisk
  */
 fun Document.loadTextFromDisk(
     accept: String = "",
