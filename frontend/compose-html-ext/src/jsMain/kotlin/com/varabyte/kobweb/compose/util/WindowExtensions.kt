@@ -2,6 +2,8 @@ package com.varabyte.kobweb.compose.util
 
 import kotlinx.browser.window
 import org.w3c.dom.Window
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class CancellableActionHandle(id: Int, isInterval: Boolean = false) {
     var id = id
@@ -38,7 +40,7 @@ class CancellableActionHandle(id: Int, isInterval: Boolean = false) {
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
 fun Window.invokeLater(block: () -> Unit): CancellableActionHandle {
-    return setTimeout(0, block)
+    return setTimeout(0.milliseconds, block)
 }
 
 /**
@@ -46,8 +48,23 @@ fun Window.invokeLater(block: () -> Unit): CancellableActionHandle {
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setTimeout(timeout: Int, block: () -> Unit): CancellableActionHandle {
-    val id = window.setTimeout(block, timeout)
+@Deprecated(
+    "Use the Duration version instead.",
+    ReplaceWith(
+        "setTimeout(timeout.milliseconds, block)",
+        "kotlin.time.Duration.Companion.milliseconds",
+    )
+)
+fun Window.setTimeout(timeout: Int, block: () -> Unit): CancellableActionHandle =
+    setTimeout(timeout.milliseconds, block)
+
+/**
+ * A more Kotlin-friendly version of `window.setTimeout` (with a [Duration] & the lambda parameter last).
+ *
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ */
+fun Window.setTimeout(timeout: Duration, block: () -> Unit): CancellableActionHandle {
+    val id = window.setTimeout(block, timeout.inWholeMilliseconds.toInt())
     return CancellableActionHandle(id)
 }
 
@@ -56,8 +73,22 @@ fun Window.setTimeout(timeout: Int, block: () -> Unit): CancellableActionHandle 
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(delay: Int, block: () -> Unit): CancellableActionHandle {
-    val id = window.setInterval(block, delay)
+@Deprecated(
+    "Use the Duration version instead.",
+    ReplaceWith(
+        "setInterval(delay.milliseconds, block)",
+        "kotlin.time.Duration.Companion.milliseconds",
+    )
+)
+fun Window.setInterval(delay: Int, block: () -> Unit): CancellableActionHandle = setInterval(delay.milliseconds, block)
+
+/**
+ * A more Kotlin-friendly version of `window.setInterval` (with a [Duration] & the lambda parameter last).
+ *
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ */
+fun Window.setInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
+    val id = window.setInterval(block, delay.inWholeMilliseconds.toInt())
     return CancellableActionHandle(id, isInterval = true)
 }
 
@@ -69,11 +100,29 @@ fun Window.setInterval(delay: Int, block: () -> Unit): CancellableActionHandle {
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(initialDelay: Int, delay: Int, block: () -> Unit): CancellableActionHandle {
+@Deprecated(
+    "Use the Duration version instead.",
+    ReplaceWith(
+        "setInterval(initialDelay.milliseconds, delay.milliseconds, block)",
+        "kotlin.time.Duration.Companion.milliseconds",
+    )
+)
+fun Window.setInterval(initialDelay: Int, delay: Int, block: () -> Unit): CancellableActionHandle =
+    setInterval(initialDelay.milliseconds, delay.milliseconds, block)
+
+/**
+ * A version of [setInterval] where the initial delay is different from the followup delay.
+ *
+ * This can be useful if you need to fire something immediately but then have a different delay for subsequent
+ * invocations.
+ *
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ */
+fun Window.setInterval(initialDelay: Duration, delay: Duration, block: () -> Unit): CancellableActionHandle {
     lateinit var handle: CancellableActionHandle
-    handle = window.setTimeout(initialDelay) {
+    handle = setTimeout(initialDelay) {
         block()
-        handle.setTo(window.setInterval(delay, block))
+        handle.setTo(setInterval(delay, block))
     }
     return handle
 }
@@ -87,7 +136,26 @@ fun Window.setInterval(initialDelay: Int, delay: Int, block: () -> Unit): Cancel
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.invokeThenInterval(delay: Int, block: () -> Unit): CancellableActionHandle {
+@Deprecated(
+    "Use the Duration version instead.",
+    ReplaceWith(
+        "invokeThenInterval(delay.milliseconds, block)",
+        "kotlin.time.Duration.Companion.milliseconds",
+    )
+)
+fun Window.invokeThenInterval(delay: Int, block: () -> Unit): CancellableActionHandle =
+    invokeThenInterval(delay.milliseconds, block)
+
+/**
+ * A version of [setInterval] where the action is fired immediately then put on a timer.
+ *
+ * In practice, this behavior should be identical to `setInterval(initialDelay = 0.milliseconds, delay, block)`, but
+ * this version expresses a more explicit intent. Also, this version invokes the callback *immediately* unlike the
+ * `setInterval(0.milliseconds)` method which invokes the callback on the next event loop at the earliest.
+ *
+ * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ */
+fun Window.invokeThenInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
     block()
     return setInterval(delay, block)
 }
