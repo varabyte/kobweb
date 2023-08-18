@@ -15,7 +15,7 @@ sealed class CSSImage private constructor(private val value: String) : StyleProp
         fun of(url: CSSUrl): CSSImage = Url(url)
 
         /**
-         * See also: [com.varabyte.kobweb.compose.css.functions.Gradient.toImage]
+         * @see [com.varabyte.kobweb.compose.css.functions.Gradient.toImage]
          */
         fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): CSSImage = Gradient(gradient)
 

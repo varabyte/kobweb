@@ -20,7 +20,7 @@ package com.varabyte.kobweb.api.http
  * }
  * ```
  *
- * See also: [Response]
+ * @see [Response]
  *
  * @property method The type of http method this call was sent with.
  * @property params A list of key/value pairs extracted from the user's [query string](https://en.wikipedia.org/wiki/Query_string)

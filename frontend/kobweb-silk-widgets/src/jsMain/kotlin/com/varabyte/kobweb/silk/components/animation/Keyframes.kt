@@ -198,7 +198,7 @@ fun keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = Keyfr
  *
  * This version of the method is [Composable] because it's aware of the site's current color mode.
  *
- * See also: [ColorMode.currentState]
+ * @see [ColorMode.currentState]
  */
 @Composable
 fun Keyframes.toAnimation(
