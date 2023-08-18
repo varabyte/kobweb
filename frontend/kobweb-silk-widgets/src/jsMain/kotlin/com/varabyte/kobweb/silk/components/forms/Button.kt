@@ -130,7 +130,7 @@ fun Button(
     size: ButtonSize = ButtonSize.MD,
     colorScheme: ColorScheme? = null,
     focusBorderColor: CSSColorValue? = null,
-    buttonType: ButtonType = ButtonType.Button,
+    type: ButtonType = ButtonType.Button,
     enabled: Boolean = true,
     ref: ElementRefScope<HTMLButtonElement>? = null,
     content: @Composable BoxScope.() -> Unit
@@ -166,9 +166,7 @@ fun Button(
                         evt.stopPropagation()
                     }
             }
-            .toAttrs {
-                type(buttonType)
-            }
+            .toAttrs { type(type) }
     ) {
         registerRefScope(
             refScope {
