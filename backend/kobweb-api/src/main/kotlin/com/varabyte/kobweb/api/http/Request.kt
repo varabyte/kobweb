@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.api.http
 
+import com.varabyte.kobweb.api.ApiContext
+
 /**
  * Information passed into an API endpoint from the client.
  *

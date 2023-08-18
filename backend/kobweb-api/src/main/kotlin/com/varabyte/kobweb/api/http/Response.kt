@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.api.http
 
+import com.varabyte.kobweb.api.ApiContext
+
 /** A convenience value you can use if you want to express intention that your body should be empty */
 val EMPTY_BODY = ByteArray(0)
 
