@@ -56,7 +56,7 @@ class MutableSilkTheme {
      * SomeWidget(SomeStyle.toModifier()) // <-- Pass Style to the target widget
      * ```
      *
-     * See also: [replaceComponentStyle]
+     * @see [replaceComponentStyle]
      */
     fun registerComponentStyle(style: ComponentStyle) {
         check(componentStyles[style.name].let { it == null || it === style }) {

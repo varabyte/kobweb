@@ -50,7 +50,7 @@ abstract class KeepPopupOpenStrategy(private val defaultValue: Boolean = false) 
      *
      * Listeners can either collect the flow as normal, or check its value directly via `keepOpenFlow.value`.
      *
-     * See also: [shouldKeepOpen]
+     * @see [shouldKeepOpen]
      */
     val keepOpenFlow: StateFlow<Boolean> = _keepOpenFlow.asStateFlow()
 
