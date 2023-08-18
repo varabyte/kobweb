@@ -2269,6 +2269,63 @@ Some notes...
 
 For a simple site, the above workflow should take about 2 minutes to run.
 
+## Arithmetic for `StyleVariable`s using `calc`
+
+`StyleVariable`s work in a subtle way that is usually fine until it isn't -- which is often when you try to interact
+with their values instead of just passing them around.
+
+For context, you can use a style variable interchangeably with the value it represents. For example, code like this
+works because `MyOpacityVar.value()` returns something with type `Number`:
+
+```kotlin
+val MyOpacityVar by StyleVariable<Number>()
+
+// later...
+Modifier.opacity(MyOpacityVar.value())
+```
+
+This generates the following CSS:
+```css
+opacity: var(--my-opacity);
+```
+
+How does something of type `Number` generate output like `var(--my-opacity)`?
+
+This is accomplished through the use of Kotlin/JS's `unsafeCast`, where you can tell the compiler to treat a value as a
+different type than it actually is. In this case, `MyOpacityVar.value()` returns some object which the Kotlin compiler
+*treats* like a `Number` for compilation purposes, but it is really some class instance whose `toString()` evaluates to
+`var(--my-opacity)`.
+
+Therefore, `Modifier.opacity(MyOpacityVar.value())` works seemingly like magic! However, if you try to do some
+arithmetic, like `MyOpacityVar.value().toDouble() * 0.5`, the compiler might be happy, but things will break silently at
+runtime, when the JS engine is asked to do math with something that's not really a number.
+
+In CSS, doing math with variables is accomplished by using `calc` blocks , so Kobweb offers its own `calc` method to
+mirror this. When dealing with raw numerical values, you must wrap them in `num` so we can escape the raw type system
+which was causing runtime confusion above:
+
+```kotlin
+calc { num(MyOpacityVar.value()) * num(0.5) }
+// Output: "calc(var(--my-opacity, 1) * 0.5)"
+```
+
+At this point, you can write code like this:
+
+```kotlin
+Modifier.opacity(calc { num(MyOpacityVar.value()) * num(0.5) })
+```
+
+It's a little hard to remember to wrap raw values in `num`, but you will get compile errors if you do it wrong.
+
+Working with variables representing size values inside a calc block doesn't require wrapping methods and feels much more
+natural:
+
+```kotlin
+val MyFontSizeVar by StyleVariable<CSSLengthValue>()
+calc { MyFontSizeVar.value() + 1.cssRem }
+// Output: "calc(var(--my-font-size) + 1rem)"
+```
+
 ## Kobweb Server Plugins
 
 Many users who create a full stack application generally expect to completely own both the client- and server-side code.
