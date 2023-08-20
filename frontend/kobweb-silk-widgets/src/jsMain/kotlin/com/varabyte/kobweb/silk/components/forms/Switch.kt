@@ -6,7 +6,6 @@ import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -41,7 +40,7 @@ val SwitchTrackBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk
 val SwitchFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 val SwitchThumbOffsetVar by StyleVariable<CSSLengthOrPercentageValue>(prefix = "silk") // Should be less than switch height
-val SwitchThumbColorVar by StyleVariable<CSSColorValue>(prefix = "silk") // Should be less than switch height
+val SwitchThumbColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 val SwitchStyle by ComponentStyle(prefix = "silk") {}
 
@@ -87,7 +86,7 @@ val SwitchCheckboxVariant by InputStyle.addVariant {
 val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
     Modifier.size(SwitchTrackHeightVar.value())
         .borderRadius(SwitchBorderRadiusVar.value())
-        .backgroundColor(Colors.White)
+        .backgroundColor(SwitchThumbColorVar.value())
         .translateX(SwitchThumbOffsetVar.value())
         .transition(CSSTransition("translate", duration = 150.ms))
 }
@@ -145,6 +144,7 @@ internal fun SwitchShape.toModifier() = Modifier
  *   custom sizing.
  * @param colorScheme An optional color scheme to use for the switch. If not provided, the switch will use the
  *   appropriate colors from the [SilkPalette].
+ * @param thumbColor An optional override for the color of the thumb.
  * @param focusBorderColor An optional override for the border color when the input is focused.
  * @param ref Provides a reference to the *container* of the switch. Its direct children will be the underlying checkbox
  *   element and the switch track, whose direct child will be the thumb element.
@@ -161,6 +161,7 @@ fun Switch(
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
     colorScheme: ColorScheme? = null,
+    thumbColor: CSSColorValue? = null,
     focusBorderColor: CSSColorValue? = null,
     shape: SwitchShape = SwitchShape.PILL,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -195,6 +196,7 @@ fun Switch(
                     if (checked) colorScheme?.let { if (colorMode.isDark) it._200 else it._700 }
                         ?: switchPalette.backgroundOn else switchPalette.backgroundOff
                 )
+                .thenIf(thumbColor != null) { Modifier.setVariable(SwitchThumbColorVar, thumbColor!!) }
                 .thenIf(focusBorderColor != null) { Modifier.setVariable(SwitchFocusColorVar, focusBorderColor!!) }
                 .thenIf(!enabled) { DisabledStyle.toModifier() }
         ) {
