@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.components.forms
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
+import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -27,6 +28,7 @@ import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Label
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 
 // 9999px forces a pill shape. 0px causes a rectangular shape.
@@ -133,8 +135,10 @@ internal fun SwitchShape.toModifier() = Modifier
  *
  * @param checked Whether the switch is currently checked or not.
  * @param onCheckedChange A callback which is invoked when the switch is toggled.
- * @param modifier The modifier to apply to the *underlying checkbox input* behind this switch element. Use other
- * properties to configure the appearance of the switch itself.
+ * @param modifier The modifier to apply to the *container* of this switch element. This will not be applied to the
+ *   switch itself (since its configuration comes from the other parameters).
+ * @param checkboxModifier The modifier to apply to the underlying checkbox element. It is not recommended to use this
+ *   for styling, but rather to set attributes that must specifically be applied to the input element.
  * @param enabled Whether the switch is enabled or not. If not, the switch will be rendered in a disabled state and will
  *   not be interactable.
  * @param size The size of the switch. Defaults to [SwitchSize.MD]. You can implement your own [SwitchSize] if you want
@@ -142,21 +146,25 @@ internal fun SwitchShape.toModifier() = Modifier
  * @param colorScheme An optional color scheme to use for the switch. If not provided, the switch will use the
  *   appropriate colors from the [SilkPalette].
  * @param focusBorderColor An optional override for the border color when the input is focused.
- * @param ref Provides a reference to the *underlying checkbox input* of the switch. Its next sibling will be the
- * switch track, whose direct child will be the thumb element.
+ * @param ref Provides a reference to the *container* of the switch. Its direct children will be the underlying checkbox
+ *   element and the switch track, whose direct child will be the thumb element.
+ * @param checkboxRef Provides a reference to the underlying checkbox element, which is visually hidden but still
+ *   receives events and represents the state of the switch.
  */
 @Composable
 fun Switch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    checkboxModifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
     colorScheme: ColorScheme? = null,
     focusBorderColor: CSSColorValue? = null,
     shape: SwitchShape = SwitchShape.PILL,
-    ref: ElementRefScope<HTMLInputElement>? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
+    checkboxRef: ElementRefScope<HTMLInputElement>? = null,
 ) {
     val colorMode = ColorMode.current
     val switchPalette = colorMode.toSilkPalette().switch
@@ -164,8 +172,10 @@ fun Switch(
         attrs = SwitchStyle.toModifier(variant)
             .then(size.toModifier())
             .then(shape.toModifier())
+            .then(modifier)
             .toAttrs()
     ) {
+        registerRefScope(ref)
         // We base Switch on a checkbox input for a11y + built-in input/keyboard support, but hide the checkbox itself
         // and render the switch separately. We do however allow it to be focused, which combined with the outer label
         // means that both clicks and keyboard events will toggle the checkbox.
@@ -173,10 +183,10 @@ fun Switch(
             type = InputType.Checkbox,
             value = checked,
             onValueChanged = { onCheckedChange(!checked) },
-            modifier = modifier,
+            modifier = checkboxModifier,
             variant = SwitchCheckboxVariant,
             enabled = enabled,
-            ref = ref,
+            ref = checkboxRef,
         )
         Box(
             SwitchTrackStyle.toModifier()
