@@ -7,6 +7,10 @@ fun Modifier.ariaDisabled(value: Boolean = true) = attrsModifier {
     attr("aria-disabled", value.toString())
 }
 
+fun Modifier.ariaHidden(value: Boolean = true) = attrsModifier {
+    attr("aria-hidden", value.toString())
+}
+
 fun Modifier.ariaInvalid(value: Boolean = true) = attrsModifier {
     attr("aria-invalid", value.toString())
 }

@@ -87,6 +87,7 @@ interface SilkPalette {
         val backgroundOn: Color
         val backgroundOff: Color
         val thumb: Color
+        val focusedBorder: Color
     }
 
     interface Tab {
@@ -159,6 +160,7 @@ class MutableSilkPalette(
         override var backgroundOn: Color,
         override var backgroundOff: Color,
         override var thumb: Color = Colors.White,
+        override var focusedBorder: Color = ColorSchemes.Blue._500,
     ) : SilkPalette.Switch
 
     class Tab(
