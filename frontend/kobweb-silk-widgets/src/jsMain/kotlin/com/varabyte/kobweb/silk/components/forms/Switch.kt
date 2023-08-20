@@ -78,7 +78,7 @@ val SwitchCheckboxVariant by InputStyle.addVariant {
             .whiteSpace(WhiteSpace.NoWrap)
             .position(Position.Absolute)
     }
-    // Since the checkbox is hidden, we highlight its sibling (the track) when the checkbox is focused(-visible).
+    // Since the checkbox is hidden, we highlight its sibling (the switch track) when the checkbox is focused(-visible).
     cssRule(":focus-visible + *") {
         Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = SwitchFocusColorVar.value())
     }
