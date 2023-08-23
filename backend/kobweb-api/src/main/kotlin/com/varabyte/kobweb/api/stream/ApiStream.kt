@@ -60,7 +60,10 @@ abstract class ApiStream() {
     "`routeOverride` is now specified as an annotation on the property itself (`@Api(routeOverride) val stream = ApiStream { ... }`)",
     ReplaceWith("ApiStream(block)")
 )
-fun ApiStream(routeOverride: String = "", block: suspend (ApiStream.TextReceivedContext) -> Unit) = ApiStream(block)
+fun ApiStream(
+    @Suppress("UNUSED_PARAMETER") routeOverride: String = "",
+    block: suspend (ApiStream.TextReceivedContext) -> Unit
+) = ApiStream(block)
 
 fun ApiStream(block: suspend (ApiStream.TextReceivedContext) -> Unit) =
     object : ApiStream() {
