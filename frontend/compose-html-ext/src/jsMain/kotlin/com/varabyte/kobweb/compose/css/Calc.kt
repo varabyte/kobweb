@@ -66,7 +66,6 @@ sealed interface CalcScope {
         override fun toFloat(): Float = value.unsafeCast<Float>()
         override fun toDouble(): Double = value.unsafeCast<Double>()
         override fun toByte(): Byte = throw UnsupportedOperationException()
-        override fun toChar(): Char = throw UnsupportedOperationException()
         override fun toShort(): Short = throw UnsupportedOperationException()
 
         // keep the type when the operation involves the same type
