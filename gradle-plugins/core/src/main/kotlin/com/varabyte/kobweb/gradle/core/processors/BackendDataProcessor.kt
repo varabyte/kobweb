@@ -57,6 +57,15 @@ private fun processApiStreamProperty(
     apiStreams: MutableList<ApiTarget>,
     reporter: Reporter
 ): Boolean {
+    // prioritize the routeOverride from the annotation over the one from the call
+    @Suppress("NAME_SHADOWING")
+    val routeOverride = property.annotationEntries.firstNotNullOfOrNull { entry ->
+        entry
+            .takeIf { API_SIMPLE_NAME == it.shortName?.asString() }
+            ?.getStringValue(0)
+            ?.takeIf { it.isNotBlank() }
+    } ?: routeOverride
+
     val propertyName = property.name ?: return false // Null name not expected in practice; fail silently
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
@@ -233,11 +242,7 @@ class BackendDataProcessor(
                                 if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedApiPackage)) {
                                     apiTargets.add(
                                         ApiTarget(
-                                            type = when (annotationName) {
-                                                apiSimpleName -> ApiTarget.Type.API
-                                                apiStreamSimpleName -> ApiTarget.Type.STREAM
-                                                else -> error("Unexpected annotationName $annotationName")
-                                            },
+                                            type = ApiTarget.Type.API,
                                             name = element.name!!.toString(),
                                             pkg = currPackage,
                                             slugFromFile = file.nameWithoutExtension.lowercase(),
@@ -245,7 +250,7 @@ class BackendDataProcessor(
                                         )
                                     )
                                 } else {
-                                    reporter.error("${file.absolutePath}: Skipped over `@$annotationName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`")
+                                    reporter.error("${file.absolutePath}: Skipped over `@$annotationName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`.")
                                 }
                             }
                         }

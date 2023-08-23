@@ -27,38 +27,14 @@ import com.varabyte.kobweb.api.log.Logger
  * 2. Kobweb supports a live reloading experience, and we cannot easily dynamically create and destroy websocket
  *    handlers in ktor. However, we can create a single streaming endpoint and multiplex the incoming messages to the
  *    appropriate stream handlers.
- *
- * ## routeOverride
- *
- * Note that the route generated for this page is quite customizable by setting the [routeOverride] parameter. In
- * general, you should NOT set it, as this will make it harder for people to navigate your project and find where a
- * api stream is being defined.
- *
- * However, if you do set it, in most cases, it is expected to just be a single, lowercase word, which changes the slug
- * used for this route (instead of the file name).
- *
- * But wait, there's more!
- *
- * If the value starts with a slash, it will be treated as a full path. If the value ends with a slash, it means the
- * override represents a change in the path but the slug will still be derived from the filename.
- *
- * Some examples should clear up the various cases. Let's say this `ApiStream` is defined in `package api.user` in file
- * `Fetch.kt`:
- *
- * ```
- * ApiStream -> "user/fetch
- * ApiStream("retrieve") -> /user/retrieve
- * ApiStream("current/") -> /user/current/fetch
- * ApiStream("current/retrieve") -> /user/current/retrieve
- * ApiStream("/users/") -> /users/fetch
- * ApiStream("/users/retrieve") -> /users/retrieve
- * ApiStream("/") -> /fetch
- * ```
- *
- * @param routeOverride If specified, override the logic for generating a name for this API stream as documented in this
- *   header doc.
  */
-abstract class ApiStream(val routeOverride: String = "") {
+abstract class ApiStream() {
+    @Deprecated(
+        "`routeOverride` is now specified as an annotation on the property itself (`@Api(routeOverride) val stream = object : ApiStream { ... }`)",
+        ReplaceWith("ApiStream()"),
+    )
+    constructor(@Suppress("UNUSED_PARAMETER") routeOverride: String = "") : this()
+
     class ClientConnectedContext(val stream: Stream, val clientId: StreamClientId, val data: Data, val logger: Logger)
     class TextReceivedContext(
         val stream: Stream,
@@ -80,7 +56,13 @@ abstract class ApiStream(val routeOverride: String = "") {
     open suspend fun onClientDisconnected(ctx: ClientDisconnectedContext) = Unit
 }
 
-fun ApiStream(routeOverride: String = "", block: suspend (ApiStream.TextReceivedContext) -> Unit) =
-    object : ApiStream(routeOverride) {
+@Deprecated(
+    "`routeOverride` is now specified as an annotation on the property itself (`@Api(routeOverride) val stream = ApiStream { ... }`)",
+    ReplaceWith("ApiStream(block)")
+)
+fun ApiStream(routeOverride: String = "", block: suspend (ApiStream.TextReceivedContext) -> Unit) = ApiStream(block)
+
+fun ApiStream(block: suspend (ApiStream.TextReceivedContext) -> Unit) =
+    object : ApiStream() {
         override suspend fun onTextReceived(ctx: TextReceivedContext) = block(ctx)
     }

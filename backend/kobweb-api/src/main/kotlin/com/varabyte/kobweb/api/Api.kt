@@ -40,5 +40,5 @@ package com.varabyte.kobweb.api
  * @param routeOverride If specified, override the logic for generating a route for this API as documented in this
  *   header doc.
  */
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 annotation class Api(val routeOverride: String = "")
