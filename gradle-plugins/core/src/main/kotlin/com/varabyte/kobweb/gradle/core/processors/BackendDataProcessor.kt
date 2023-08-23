@@ -17,6 +17,7 @@ import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.visitAllChildren
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
+import org.jetbrains.kotlin.psi.KtCallElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
@@ -57,15 +58,6 @@ private fun processApiStreamProperty(
     apiStreams: MutableList<ApiTarget>,
     reporter: Reporter
 ): Boolean {
-    // prioritize the routeOverride from the annotation over the one from the call
-    @Suppress("NAME_SHADOWING")
-    val routeOverride = property.annotationEntries.firstNotNullOfOrNull { entry ->
-        entry
-            .takeIf { API_SIMPLE_NAME == it.shortName?.asString() }
-            ?.getStringValue(0)
-            ?.takeIf { it.isNotBlank() }
-    } ?: routeOverride
-
     val propertyName = property.name ?: return false // Null name not expected in practice; fail silently
 
     // Only top-level properties are allowed for now, so getting the fully qualified path is easy
@@ -105,33 +97,6 @@ private fun processApiStreamProperty(
         }
         false
     }
-}
-
-// Handle `val api = ApiStream { ... }`
-// callExpr should point at the start of the `ApiStream` call
-private fun processApiStreamFactoryMethod(
-    file: File,
-    filePackage: String,
-    callExpr: KtCallExpression,
-    apiStreams: MutableList<ApiTarget>,
-    reporter: Reporter
-): Boolean {
-    val property = callExpr.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
-    val routeOverride = callExpr.getStringValue(0)?.takeIf { it.isNotBlank() }
-    return processApiStreamProperty(file, filePackage, property, routeOverride, apiStreams, reporter)
-}
-
-// Handle `val api = object : ApiStream { ... }`
-private fun processApiStreamObject(
-    file: File,
-    filePackage: String,
-    callEntry: KtSuperTypeCallEntry,
-    apiStreams: MutableList<ApiTarget>,
-    reporter: Reporter
-): Boolean {
-    val property = callEntry.parents.filterIsInstance<KtProperty>().firstOrNull() ?: return false
-    val routeOverride = callEntry.getStringValue(0)?.takeIf { it.isNotBlank() }
-    return processApiStreamProperty(file, filePackage, property, routeOverride, apiStreams, reporter)
 }
 
 /**
@@ -214,20 +179,21 @@ class BackendDataProcessor(
                     }
                 }
 
-                is KtCallExpression -> {
-                    when (element.calleeExpression?.text) {
-                        apiStreamSimpleName -> {
-                            processApiStreamFactoryMethod(file, currPackage, element, apiTargets, reporter)
-                        }
-                    }
-                }
+                is KtSuperTypeCallEntry, is KtCallExpression -> {
+                    element as KtCallElement
+                    if (element.calleeExpression?.text != apiStreamSimpleName) return@visitAllChildren
 
-                is KtSuperTypeCallEntry -> {
-                    when (element.calleeExpression.text) {
-                        apiStreamSimpleName -> {
-                            processApiStreamObject(file, currPackage, element, apiTargets, reporter)
-                        }
-                    }
+                    val property = element.parents.filterIsInstance<KtProperty>().firstOrNull()
+                        ?: return@visitAllChildren
+                    // prioritize the routeOverride from the @Api annotation over the one from the call
+                    val routeOverride = property.annotationEntries.firstNotNullOfOrNull { entry ->
+                        entry
+                            .takeIf { apiSimpleName == it.shortName?.asString() }
+                            ?.getStringValue(0)
+                            ?.takeIf { it.isNotBlank() }
+                    } ?: element.getStringValue(0)?.takeIf { it.isNotBlank() }
+
+                    processApiStreamProperty(file, currPackage, property, routeOverride, apiTargets, reporter)
                 }
 
                 is KtNamedFunction -> {
