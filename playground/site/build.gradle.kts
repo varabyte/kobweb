@@ -14,6 +14,14 @@ kobweb {
     markdown {
         imports.add(".components.widgets.*")
     }
+    includeKspDependency.set(false)
+}
+
+val kspDependency = "com.varabyte.kobweb:ksp-processor"
+configurations.matching { it.name == "kspJs" || it.name == "kspJvm" }.configureEach {
+    dependencies {
+        add(this@configureEach.name, kspDependency)
+    }
 }
 
 kotlin {
