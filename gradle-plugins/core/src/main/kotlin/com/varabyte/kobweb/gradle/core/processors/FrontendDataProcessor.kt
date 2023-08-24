@@ -18,7 +18,6 @@ import com.varabyte.kobweb.gradle.core.project.frontend.PACKAGE_MAPPING_SIMPLE_N
 import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_FQN
 import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_SIMPLE_NAME
 import com.varabyte.kobweb.gradle.core.project.frontend.PageEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.assertValid
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.visitAllChildren
 import org.jetbrains.kotlin.psi.KtAnnotated
@@ -320,15 +319,8 @@ class FrontendDataProcessor(
                                         qualifiedPagesPackage
                                     )
                                 ) {
-                                    // For simplicity for now, we reject route overrides which use the dynamic
-                                    // route syntax in any part except for the last, e.g. in
-                                    // "/dynamic/{}/route/{}/example/{}" the last "{}" is OK but the previous
-                                    // ones are not currently supported.
-                                    if (routeOverride == null || !routeOverride.substringBeforeLast(
-                                            "/",
-                                            missingDelimiterValue = ""
-                                        ).contains("{}")
-                                    ) {
+                                    // "{}" represents the name of the file and thus can be used as a unique key only once
+                                    if (routeOverride == null || routeOverride.split("{}").size <= 2) {
                                         pagesToProcess.add(
                                             PageToProcess(
                                                 funName = element.name!!.toString(),
@@ -341,7 +333,7 @@ class FrontendDataProcessor(
                                         reporter.error("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. Route override is invalid.")
                                     }
                                 } else {
-                                    reporter.error("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
+                                    reporter.error("${file.absolutePath}: Skipped over `@$pageSimpleName fun ${element.name}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.")
                                 }
                             }
 
@@ -398,7 +390,7 @@ class FrontendDataProcessor(
                     if (value != "{}") value else "{${currPackage.substringAfterLast('.')}}"
                 }
             } else {
-                reporter.error("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`")
+                reporter.error("${packageMappingAnnotation.containingFile.virtualFile.path}: Skipped over `@file:$packageMappingSimpleName`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.")
             }
         }
     }

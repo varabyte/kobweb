@@ -1,0 +1,219 @@
+package com.varabyte.kobweb.ksp.frontend
+
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.getAnnotationsByType
+import com.google.devtools.ksp.isPublic
+import com.google.devtools.ksp.processing.CodeGenerator
+import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
+import com.google.devtools.ksp.processing.Resolver
+import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSFile
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.varabyte.kobweb.gradle.core.ksp.KSP_PAGES_PACKAGE_KEY
+import com.varabyte.kobweb.gradle.core.project.frontend.ComponentStyleEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.ComponentVariantEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
+import com.varabyte.kobweb.gradle.core.project.frontend.INIT_KOBWEB_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.INIT_SILK_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.InitKobwebEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.InitSilkEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.KeyframesEntry
+import com.varabyte.kobweb.gradle.core.project.frontend.PACKAGE_MAPPING_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.PageEntry
+import com.varabyte.kobweb.ksp.common.getPackageMappings
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+@Suppress("MemberVisibilityCanBePrivate") // everything can be private but no point
+class FrontendProcessor(
+    val codeGenerator: CodeGenerator,
+    val logger: KSPLogger,
+    options: Map<String, String>,
+) : SymbolProcessor {
+    val qualifiedPagesPackage = options[KSP_PAGES_PACKAGE_KEY] ?: error("Missing pages package")
+
+    lateinit var pages: List<PageEntry>
+    lateinit var kobwebInits: List<InitKobwebEntry>
+    lateinit var silkInits: List<InitSilkEntry>
+
+    val silkStyles = mutableListOf<ComponentStyleEntry>()
+    val silkVariants = mutableListOf<ComponentVariantEntry>()
+    val keyframesList = mutableListOf<KeyframesEntry>()
+
+    // fqPkg to subdir, e.g. "blog._2022._01" to "01"
+    val packageMappings = mutableMapOf<String, String>()
+
+    val propertyVisitor = FindPropertyVisitor()
+
+    override fun process(resolver: Resolver): List<KSAnnotated> {
+        kobwebInits = resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
+            val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
+            InitKobwebEntry(name, acceptsContext = annotatedFun.parameters.size == 1)
+        }.toList()
+
+        silkInits = resolver.getSymbolsWithAnnotation(INIT_SILK_FQN).map { annotatedFun ->
+            val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
+            InitSilkEntry(name)
+        }.toList()
+
+        resolver.getAllFiles().forEach { file ->
+            // ComponentStyle, ComponentVariant, Keyframes
+            file.accept(propertyVisitor, Unit)
+
+            // TODO: consider including this as part of the first visitor? does that matter for performance?
+            packageMappings += getPackageMappings(file, qualifiedPagesPackage, PACKAGE_MAPPING_FQN, logger).toMap()
+        }
+
+        // must be done after packageMappings is populated
+        pages = resolver.getSymbolsWithAnnotation(PAGE_FQN).mapNotNull {
+            processPagesFun(
+                annotatedFun = it as KSFunctionDeclaration,
+                qualifiedPagesPackage = qualifiedPagesPackage,
+                packageMappings = packageMappings,
+                logger = logger,
+            )
+        }.toList()
+
+        return emptyList()
+    }
+
+    // TODO: we are currently recursively visiting every single property. Is this what we want to do? Is there a better way to go about this?
+    inner class FindPropertyVisitor : KSVisitorVoid() {
+        private val styleDeclaration = DeclarationType(
+            name = "ComponentStyle",
+            qualifiedName = "com.varabyte.kobweb.silk.components.style.ComponentStyle",
+            displayString = "component style",
+            function = "ctx.theme.registerComponentStyle",
+        )
+        private val variantDeclaration = DeclarationType(
+            name = "ComponentVariant",
+            qualifiedName = "com.varabyte.kobweb.silk.components.style.ComponentVariant",
+            displayString = "component variant",
+            function = "ctx.theme.registerComponentVariants",
+        )
+
+        // TODO: currently ignoring "keyframes" (deprecated)
+        private val keyframesDeclaration = DeclarationType(
+            name = "Keyframes",
+            qualifiedName = "com.varabyte.kobweb.silk.components.animation.Keyframes",
+            displayString = "keyframes",
+            function = "ctx.stylesheet.registerKeyframes",
+        )
+        private val declarations = listOf(styleDeclaration, variantDeclaration, keyframesDeclaration)
+        override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
+            val type = property.type.toString()
+
+            val matchingByProvider = declarations.firstOrNull { type == it.providerName }
+            if (matchingByProvider != null) {
+                logger.warn(
+                    "Expected `by`, not assignment. Change \"val ${property.simpleName.asString()} = ...\" to \"val ${property.simpleName.asString()} by ...\"?",
+                    property
+                )
+                return
+            }
+
+            val matchingByType = declarations.firstOrNull { type == it.name }
+            if (matchingByType != null && !validateOrWarnAboutDeclaration(property, matchingByType)) {
+                return
+            }
+
+            // TODO: do we want expensive full type? Current: Yes
+            val expensiveFullType = property.type.resolve().declaration.qualifiedName?.asString()
+            when (expensiveFullType) {
+                styleDeclaration.qualifiedName -> {
+                    silkStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
+                }
+
+                variantDeclaration.qualifiedName -> {
+                    silkVariants.add(ComponentVariantEntry(property.qualifiedName!!.asString()))
+                }
+
+                keyframesDeclaration.qualifiedName -> {
+                    keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
+                }
+            }
+        }
+
+        @OptIn(KspExperimental::class)
+        private fun validateOrWarnAboutDeclaration(
+            property: KSPropertyDeclaration,
+            declarationInfo: DeclarationType
+        ): Boolean {
+            val propertyName = property.simpleName.asString()
+            val topLevelSuppression = "TOP_LEVEL_${declarationInfo.suppressionName}"
+            val privateSuppression = "PRIVATE_${declarationInfo.suppressionName}"
+            if (property.parent !is KSFile) {
+                if (property.getAnnotationsByType(Suppress::class).none { topLevelSuppression in it.names }) {
+                    logger.warn(
+                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$topLevelSuppression\")` annotation.",
+                        property
+                    )
+                }
+                return false
+            }
+            if (!property.isPublic()) {
+                if (property.getAnnotationsByType(Suppress::class).none { privateSuppression in it.names }) {
+                    logger.warn(
+                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
+                        property
+                    )
+                }
+                return false
+            }
+            return true
+        }
+
+        private inner class DeclarationType(
+            val name: String,
+            val qualifiedName: String,
+            val displayString: String,
+            val function: String,
+            val providerName: String = "${name}Provider",
+            val suppressionName: String = displayString.split(" ").joinToString("_") { it.uppercase() }
+        )
+
+        override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
+            classDeclaration.declarations.forEach { it.accept(this, Unit) }
+        }
+
+        override fun visitFile(file: KSFile, data: Unit) {
+            file.declarations.forEach { it.accept(this, Unit) }
+        }
+    }
+
+    override fun finish() {
+        // TODO: maybe this should be in the gradle plugin(s) itself to also account for library+site definitions?
+        val finalRouteNames = pages.map { page -> page.route }.toSet()
+        pages.forEach { page ->
+            if (page.route.endsWith('/')) {
+                val withoutSlashSuffix = page.route.removeSuffix("/")
+                if (finalRouteNames.contains(withoutSlashSuffix)) {
+                    logger.warn("Your site defines both \"$withoutSlashSuffix\" and \"${page.route}\", which may be confusing to users. Unless this was intentional, removing one or the other is suggested.")
+                }
+            }
+        }
+
+        val frontendData = FrontendData(
+            pages,
+            kobwebInits,
+            silkInits,
+            silkStyles,
+            silkVariants,
+            keyframesList
+        ).also { it.assertValid() }
+
+        codeGenerator.createNewFileByPath(
+            Dependencies(true), // TODO
+            path = "frontend",
+            extensionName = "json",
+        ).writer().use { writer ->
+            writer.write(Json.encodeToString(frontendData))
+        }
+    }
+}

@@ -14,6 +14,7 @@ ktor = "2.3.0"
 logback = "1.2.3"
 truthish = "0.6.5"
 shadow = "7.0.0"
+ksp = "1.9.10-1.0.13"
 
 [libraries]
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
@@ -43,6 +44,7 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
 truthish = { module = "com.varabyte.truthish:truthish", version.ref = "truthish" }
+ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
 [bundles]
 commonmark = ["commonmark-core", "commonmark-autolink", "commonmark-frontmatter","commonmark-tables","commonmark-tasklist"]
@@ -67,3 +69,4 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
