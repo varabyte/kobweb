@@ -12,7 +12,6 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 const val KSP_PAGES_PACKAGE_KEY = "kobweb.pagesPackage" // TODO: location
 const val KSP_API_PACKAGE_KEY = "kobweb.apiPackage" // TODO: location
@@ -37,13 +36,8 @@ fun setupKsp(project: Project, kobwebBlock: KobwebBlock) {
         dependsOn(kspCommonMainKotlinMetadata)
     }
 
-    // for playground
-    val kspProcessorVersion = ""
-    val kspDependency = "com.varabyte.kobweb:ksp-processor:$kspProcessorVersion"
-
-    // for outside use
-//    val kspProcessorVersion = "0.13.12-SNAPSHOT-ksp49" // matching lib version
-//    val kspDependency = "com.varabyte.kobweb:kobweb-ksp-processor:$kspProcessorVersion"
+    val kspProcessorVersion = "0.13.12-SNAPSHOT-ksp49" // matching lib version
+    val kspDependency = "com.varabyte.kobweb:kobweb-ksp-processor:$kspProcessorVersion"
 
 //        println(project.plugins.withId("com.varabyte.kobweb.library"))
 
@@ -52,20 +46,13 @@ fun setupKsp(project: Project, kobwebBlock: KobwebBlock) {
 ////            add("kspJs", kspDependency)
 //        }
 
-    val kotlinMppExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
-    project.afterEvaluate {
-        dependencies {
-            add("kspJs", kspDependency)
-            if (configurations.findByName("kspJvm") != null) {
-                add("kspJvm", kspDependency)
+    project.configurations.matching { it.name == "kspJs" || it.name == "kspJvm" }.configureEach {
+        if (kobwebBlock.includeKspDependency.get()) {
+            project.dependencies {
+                add(this@configureEach.name, kspDependency)
             }
         }
-//            kotlinMppExtension.sourceSets.getByName("commonMain").kotlin
-//                .srcDir("build/generated/ksp/metadata/commonMain/kotlin")
-//            kotlinMppExtension.sourceSets.getByName("jsMain").kotlin
-//                .srcDir("build/generated/ksp/js/jsMain/kotlin")
     }
-
 
     taskCollection.kspKotlinJs.configureEach {
         // TODO: we currently set this kep using task.project.group since the group can be different from different modules

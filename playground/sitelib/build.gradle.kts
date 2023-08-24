@@ -9,6 +9,17 @@ plugins {
 group = "playground"
 version = "1.0-SNAPSHOT"
 
+kobweb {
+    includeKspDependency.set(false)
+}
+
+val kspDependency = "com.varabyte.kobweb:ksp-processor"
+configurations.matching { it.name == "kspJs" || it.name == "kspJvm" }.configureEach {
+    dependencies {
+        add(this@configureEach.name, kspDependency)
+    }
+}
+
 kotlin {
     configAsKobwebLibrary(includeServer = true)
 

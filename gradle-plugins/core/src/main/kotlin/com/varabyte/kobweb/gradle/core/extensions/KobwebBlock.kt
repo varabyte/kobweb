@@ -45,11 +45,20 @@ abstract class KobwebBlock {
      */
     abstract val publicPath: Property<String>
 
+    /**
+     * Whether the Kobweb gradle plugin should automatically include its corresponding KSP processor dependency.
+     *
+     * A KSP processor dependency is required for Kobweb to work, but setting this to false allows manually depending on
+     * a different version of the processor.
+     */
+    abstract val includeKspDependency: Property<Boolean>
+
     init {
         genDir.convention(GENERATED_ROOT)
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
+        includeKspDependency.convention(true)
     }
 
     fun getGenJsSrcRoot(project: Project): File {
