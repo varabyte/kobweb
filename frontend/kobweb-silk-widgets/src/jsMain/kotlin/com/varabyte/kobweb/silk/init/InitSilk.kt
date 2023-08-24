@@ -36,8 +36,8 @@ import com.varabyte.kobweb.silk.components.forms.InputGroupStyle
 import com.varabyte.kobweb.silk.components.forms.InputPlaceholderColorVar
 import com.varabyte.kobweb.silk.components.forms.InputStyle
 import com.varabyte.kobweb.silk.components.forms.OutlinedInputVariant
-import com.varabyte.kobweb.silk.components.forms.SwitchCheckboxVariant
 import com.varabyte.kobweb.silk.components.forms.SwitchFocusColorVar
+import com.varabyte.kobweb.silk.components.forms.SwitchInputVariant
 import com.varabyte.kobweb.silk.components.forms.SwitchStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbColorVar
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbStyle
@@ -146,7 +146,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(SwitchStyle)
     mutableTheme.registerComponentStyle(SwitchTrackStyle)
     mutableTheme.registerComponentStyle(SwitchThumbStyle)
-    mutableTheme.registerComponentVariants(SwitchCheckboxVariant)
+    mutableTheme.registerComponentVariants(SwitchInputVariant)
 
     mutableTheme.registerComponentStyle(TabsStyle)
     mutableTheme.registerComponentStyle(TabsTabRowStyle)

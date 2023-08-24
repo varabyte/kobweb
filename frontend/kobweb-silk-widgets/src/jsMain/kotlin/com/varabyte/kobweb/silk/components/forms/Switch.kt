@@ -62,7 +62,7 @@ val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifie
     (hover + not(ariaDisabled)) { Modifier.cursor(Cursor.Pointer) }
 }
 
-val SwitchCheckboxVariant by InputStyle.addVariant {
+val SwitchInputVariant by InputStyle.addVariant {
     // We hide the checkbox itself since the Switch is rendered separately, but keep it a11y-friendly by only limiting
     // its size/appearance (instead of explicitly hiding), matching the approach of many other libraries.
     // See Switch for more context.
@@ -185,7 +185,7 @@ fun Switch(
             value = checked,
             onValueChanged = { onCheckedChange(!checked) },
             modifier = checkboxModifier,
-            variant = SwitchCheckboxVariant,
+            variant = SwitchInputVariant,
             enabled = enabled,
             ref = checkboxRef,
         )
