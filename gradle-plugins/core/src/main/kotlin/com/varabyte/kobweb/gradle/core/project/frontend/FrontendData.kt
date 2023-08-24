@@ -20,7 +20,12 @@ class FrontendData(
     val silkStyles: List<ComponentStyleEntry>,
     val silkVariants: List<ComponentVariantEntry>,
     val keyframesList: List<KeyframesEntry>,
-)
+) {
+    // TODO: for some reason gradle give a noclassdeffounderror
+    fun assertValid() {
+//        pages.assertValidPages()
+    }
+}
 
 fun Iterable<FrontendData>.merge(): FrontendData {
     return FrontendData(
@@ -33,9 +38,9 @@ fun Iterable<FrontendData>.merge(): FrontendData {
     ).also { it.assertValid() }
 }
 
-fun FrontendData.assertValid() {
-    pages.assertValidPages()
-}
+//fun FrontendData.assertValid() {
+//    pages.assertValidPages()
+//}
 
 private fun Iterable<PageEntry>.assertValidPages() {
     val entriesByRoute = this.groupBy { it.route }

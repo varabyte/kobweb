@@ -21,6 +21,7 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
+import com.varabyte.kobweb.gradle.core.ksp.setupKsp
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
@@ -90,6 +91,8 @@ class KobwebApplicationPlugin @Inject constructor(
             createAppBlock(kobwebConf)
             createExportBlock()
         }
+
+        setupKsp(project, kobwebBlock)
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV

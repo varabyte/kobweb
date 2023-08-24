@@ -14,6 +14,7 @@ dependencies {
     implementation(kotlin("gradle-plugin"))
 
     implementation(libs.kotlinx.serialization.json)
+    api("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${libs.versions.ksp.get()}")
 
     // For parsing code.
     api(kotlin("compiler-embeddable"))

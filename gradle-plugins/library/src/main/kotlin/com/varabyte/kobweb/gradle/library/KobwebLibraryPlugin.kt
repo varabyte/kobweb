@@ -5,6 +5,7 @@ import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
+import com.varabyte.kobweb.gradle.core.ksp.setupKsp
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateMetadataBackendTask
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateMetadataFrontendTask
@@ -20,6 +21,8 @@ class KobwebLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         val kobwebBlock = project.kobwebBlock
+
+        setupKsp(project, kobwebBlock)
 
         val kobwebGenFrontendMetadata =
             project.tasks.register(
