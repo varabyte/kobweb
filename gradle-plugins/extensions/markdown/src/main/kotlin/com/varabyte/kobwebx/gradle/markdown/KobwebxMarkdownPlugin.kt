@@ -3,7 +3,6 @@ package com.varabyte.kobwebx.gradle.markdown
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
-import com.varabyte.kobweb.gradle.core.tasks.KobwebProcessSourcesTask
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobwebx.gradle.markdown.tasks.ConvertMarkdownTask
 import org.gradle.api.GradleException
@@ -33,11 +32,12 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             markdownConfig
         )
 
-        project.tasks.withType<KobwebProcessSourcesTask>().configureEach {
-            dependsOn(convertTask)
-        }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
+            // kspKotlinJs doesn't exist yet so we use matching?
+            project.tasks.matching { it.name == "kspKotlinJs" }.configureEach {
+                dependsOn(convertTask)
+            }
             project.tasks.namedOrNull(jsTarget.compileKotlin)?.configure { dependsOn(convertTask) }
         }
     }

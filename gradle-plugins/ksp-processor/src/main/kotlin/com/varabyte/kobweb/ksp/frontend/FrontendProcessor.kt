@@ -14,7 +14,11 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.varabyte.kobweb.gradle.core.ksp.KSP_APP_DATA_KEY
 import com.varabyte.kobweb.gradle.core.ksp.KSP_PAGES_PACKAGE_KEY
+import com.varabyte.kobweb.gradle.core.project.frontend.APP_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.AppData
+import com.varabyte.kobweb.gradle.core.project.frontend.AppEntry
 import com.varabyte.kobweb.gradle.core.project.frontend.ComponentStyleEntry
 import com.varabyte.kobweb.gradle.core.project.frontend.ComponentVariantEntry
 import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
@@ -37,6 +41,9 @@ class FrontendProcessor(
     options: Map<String, String>,
 ) : SymbolProcessor {
     val qualifiedPagesPackage = options[KSP_PAGES_PACKAGE_KEY] ?: error("Missing pages package")
+    val includeAppData = options[KSP_APP_DATA_KEY].toBoolean()
+
+    var appFqn: String? = null
 
     lateinit var pages: List<PageEntry>
     lateinit var kobwebInits: List<InitKobwebEntry>
@@ -79,6 +86,16 @@ class FrontendProcessor(
                 logger = logger,
             )
         }.toList()
+
+        if (includeAppData) {
+            val appFun = resolver.getSymbolsWithAnnotation(APP_FQN).toList()
+
+            if (appFun.size > 1) {
+                logger.error("Only one @App function is allowed per project.") // TODO: "at most"?
+            } else {
+                appFqn = (appFun.singleOrNull() as KSFunctionDeclaration?)?.qualifiedName?.asString()
+            }
+        }
 
         return emptyList()
     }
@@ -208,12 +225,18 @@ class FrontendProcessor(
             keyframesList
         ).also { it.assertValid() }
 
+        val encodedData = if (includeAppData) {
+            Json.encodeToString(AppData(appFqn?.let { AppEntry(it) }, frontendData))
+        } else {
+            Json.encodeToString(frontendData)
+        }
+
         codeGenerator.createNewFileByPath(
-            Dependencies(true), // TODO
+            Dependencies.ALL_FILES, // TODO - not recommended
             path = "frontend",
             extensionName = "json",
         ).writer().use { writer ->
-            writer.write(Json.encodeToString(frontendData))
+            writer.write(encodedData)
         }
     }
 }

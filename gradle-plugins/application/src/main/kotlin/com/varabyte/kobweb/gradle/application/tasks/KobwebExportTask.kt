@@ -9,11 +9,11 @@ import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.application.extensions.export
-import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.project.frontend.AppData
 import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
 import com.varabyte.kobweb.gradle.core.project.frontend.merge
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask

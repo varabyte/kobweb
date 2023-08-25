@@ -165,7 +165,7 @@ class BackendProcessor(
         val backendData = BackendData(initMethods, apiMethods, apiStreams)//.also { it.assertValid() } / TODO
 
         codeGenerator.createNewFileByPath(
-            Dependencies(true), // TODO
+            Dependencies.ALL_FILES, // TODO - not recommended
             path = "backend",
             extensionName = "json",
         ).writer().use { writer ->

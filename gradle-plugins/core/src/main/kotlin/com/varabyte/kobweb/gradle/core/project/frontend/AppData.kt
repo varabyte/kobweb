@@ -1,7 +1,6 @@
-package com.varabyte.kobweb.gradle.application.project.app
+package com.varabyte.kobweb.gradle.core.project.frontend
 
 import com.varabyte.kobweb.gradle.core.project.common.KOBWEB_CORE_FQN_PREFIX
-import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
 import kotlinx.serialization.Serializable
 
 const val APP_SIMPLE_NAME = "App"

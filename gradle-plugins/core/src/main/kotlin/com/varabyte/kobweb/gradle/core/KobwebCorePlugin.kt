@@ -119,6 +119,7 @@ class KobwebCorePlugin : Plugin<Project> {
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 kotlin.srcDir(project.layout.buildDirectory.dir("$genDir${jsTarget.srcSuffix}"))
+                resources.srcDir(project.layout.buildDirectory.dir("generated/ksp/js/jsMain/resources")) // TODO
                 resources.srcDir(project.layout.buildDirectory.dir("$genDir${jsTarget.resourceSuffix}"))
             }
         }
@@ -127,6 +128,7 @@ class KobwebCorePlugin : Plugin<Project> {
 
             project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
                 kotlin.srcDir(project.layout.buildDirectory.dir("$genDir${jvmTarget.srcSuffix}"))
+                resources.srcDir(project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources")) // TODO
                 resources.srcDir(project.layout.buildDirectory.dir("$genDir${jvmTarget.resourceSuffix}"))
             }
         }
