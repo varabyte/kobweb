@@ -9,7 +9,7 @@ group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.libs.get()
 
 dependencies {
-    implementation(libs.ksp)
+    implementation(libs.ksp.processing)
     implementation(libs.kotlinx.serialization.json)
     implementation(project(":gradle-plugins:core"))
 }
