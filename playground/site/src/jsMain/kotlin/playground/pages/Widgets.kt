@@ -14,6 +14,9 @@ import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
+import com.varabyte.kobweb.silk.components.forms.Checkbox
+import com.varabyte.kobweb.silk.components.forms.CheckboxSize
+import com.varabyte.kobweb.silk.components.forms.CheckedState
 import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
 import com.varabyte.kobweb.silk.components.forms.FlushedInputVariant
 import com.varabyte.kobweb.silk.components.forms.Input
@@ -24,6 +27,7 @@ import com.varabyte.kobweb.silk.components.forms.Switch
 import com.varabyte.kobweb.silk.components.forms.SwitchShape
 import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.forms.TextInput
+import com.varabyte.kobweb.silk.components.forms.TriCheckbox
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
 import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
@@ -221,6 +225,58 @@ fun WidgetsPage() {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+
+            WidgetSection("Checkbox") {
+                Column(Modifier.gap(1.cssRem)) {
+                    Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
+                        listOf(CheckboxSize.SM, CheckboxSize.MD, CheckboxSize.LG).forEach { size ->
+                            var checked by remember { mutableStateOf(true) }
+                            Checkbox(
+                                "Checkbox",
+                                checked,
+                                onCheckedChange = { checked = it },
+                                size = size,
+                            )
+                        }
+                    }
+
+                    Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
+                        listOf(ColorSchemes.Red, ColorSchemes.Green, ColorSchemes.Orange).forEach { colorScheme ->
+                            var checked by remember { mutableStateOf(true) }
+                            Checkbox(
+                                "Checkbox",
+                                checked,
+                                onCheckedChange = { checked = it },
+                                colorScheme = colorScheme
+                            )
+                        }
+                    }
+
+                    run {
+                        var checked by remember { mutableStateOf(true) }
+                        Checkbox("Disabled", checked, onCheckedChange = { checked = it }, enabled = false)
+                    }
+
+                    Column(Modifier.gap(0.2.cssRem)) {
+                        var child1Checked by remember { mutableStateOf(false) }
+                        var child2Checked by remember { mutableStateOf(false) }
+
+                        TriCheckbox(
+                            "Parent",
+                            CheckedState.from(child1Checked, child2Checked),
+                            onCheckedChange = {
+                                val checked = it.toBoolean()
+                                child1Checked = checked
+                                child2Checked = checked
+                            },
+                        )
+                        Column(Modifier.margin(left = 1.cssRem).gap(0.2.cssRem)) {
+                            Checkbox("Child 1", child1Checked, onCheckedChange = { child1Checked = it })
+                            Checkbox("Child 2", child2Checked, onCheckedChange = { child2Checked = it })
                         }
                     }
                 }

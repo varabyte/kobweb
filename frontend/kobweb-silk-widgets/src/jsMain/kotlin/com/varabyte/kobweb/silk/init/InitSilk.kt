@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.SilkStyleSheet
+import com.varabyte.kobweb.silk.components.animation.registerKeyframes
 import com.varabyte.kobweb.silk.components.disclosure.TabBackgroundColorVar
 import com.varabyte.kobweb.silk.components.disclosure.TabBorderColorVar
 import com.varabyte.kobweb.silk.components.disclosure.TabColorVar
@@ -22,6 +23,13 @@ import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundPressedColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
+import com.varabyte.kobweb.silk.components.forms.CheckboxEnabledAnim
+import com.varabyte.kobweb.silk.components.forms.CheckboxIconBackgroundColorVar
+import com.varabyte.kobweb.silk.components.forms.CheckboxIconColorVar
+import com.varabyte.kobweb.silk.components.forms.CheckboxIconContainerStyle
+import com.varabyte.kobweb.silk.components.forms.CheckboxIconStyle
+import com.varabyte.kobweb.silk.components.forms.CheckboxInputVariant
+import com.varabyte.kobweb.silk.components.forms.CheckboxStyle
 import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
 import com.varabyte.kobweb.silk.components.forms.FlushedInputVariant
 import com.varabyte.kobweb.silk.components.forms.InputBorderColorVar
@@ -39,6 +47,7 @@ import com.varabyte.kobweb.silk.components.forms.SwitchStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbColorVar
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchTrackStyle
+import com.varabyte.kobweb.silk.components.forms.UncheckedCheckboxIconContainerVariant
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
@@ -126,6 +135,11 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     // TODO: Automate the creation of this list (with a Gradle task?)
     mutableTheme.registerComponentStyle(ButtonStyle)
     mutableTheme.registerComponentStyle(CanvasStyle)
+    mutableTheme.registerComponentStyle(CheckboxStyle)
+    mutableTheme.registerComponentVariants(CheckboxInputVariant)
+    mutableTheme.registerComponentStyle(CheckboxIconContainerStyle)
+    mutableTheme.registerComponentStyle(CheckboxIconStyle)
+    mutableTheme.registerComponentVariants(UncheckedCheckboxIconContainerVariant)
     mutableTheme.registerComponentStyle(DisabledStyle)
     mutableTheme.registerComponentStyle(DividerStyle)
     mutableTheme.registerComponentStyle(DivTextStyle)
@@ -191,6 +205,8 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(DisplayUntilLgStyle)
     mutableTheme.registerComponentStyle(DisplayUntilXlStyle)
 
+    SilkStylesheetInstance.registerKeyframes(CheckboxEnabledAnim)
+
     val config = MutableSilkConfig()
     additionalInit(InitSilkContext(config, SilkStylesheetInstance, mutableTheme))
     MutableSilkConfigInstance = config
@@ -216,6 +232,9 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(ButtonBackgroundHoverColorVar, palette.button.hover)
         .setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
         .setVariable(ButtonColorVar, palette.color)
+
+        .setVariable(CheckboxIconBackgroundColorVar, palette.checkbox.background)
+        .setVariable(CheckboxIconColorVar, palette.checkbox.color)
 
         .setVariable(DividerColorVar, palette.border)
 

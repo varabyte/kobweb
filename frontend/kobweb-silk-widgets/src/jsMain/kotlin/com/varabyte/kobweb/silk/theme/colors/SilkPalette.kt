@@ -42,6 +42,7 @@ interface SilkPalette {
     val placeholder: Color
 
     val button: Button
+    val checkbox: Checkbox
     val input: Input
     val link: Link
     val switch: Switch
@@ -60,6 +61,14 @@ interface SilkPalette {
 
         /** Color used for buttons when they are being depressed by the user. */
         val pressed: Color
+    }
+
+    interface Checkbox {
+        /** The background color of the checkbox icon. */
+        val background: Color
+
+        /** The foreground color of the checkbox icon. */
+        val color: Color
     }
 
     interface Link {
@@ -112,6 +121,7 @@ class MutableSilkPalette(
     override var background: Color,
     override var color: Color,
     override var button: Button,
+    override var checkbox: Checkbox,
     override var input: Input,
     override var link: Link,
     override var switch: Switch,
@@ -133,6 +143,11 @@ class MutableSilkPalette(
         override var focus: Color,
         override var pressed: Color,
     ) : SilkPalette.Button
+
+    class Checkbox(
+        override var background: Color,
+        override var color: Color,
+    ) : SilkPalette.Checkbox
 
     class Input(
         override val hoveredBorder: Color,
@@ -202,6 +217,10 @@ class MutableSilkPalettes(
                 focus = Colors.CornflowerBlue,
                 pressed = buttonBase.darkened(byPercent = 0.4f)
             ),
+            checkbox = MutableSilkPalette.Checkbox(
+                background = ColorSchemes.Blue._500,
+                color = Colors.White,
+            ),
             input = MutableSilkPalette.Input(
                 ColorMode.LIGHT,
                 filled = ColorSchemes.Gray._200
@@ -234,6 +253,10 @@ class MutableSilkPalettes(
                 hover = buttonBase.lightened(byPercent = 0.2f),
                 focus = Colors.LightSkyBlue,
                 pressed = buttonBase.lightened(byPercent = 0.4f)
+            ),
+            checkbox = MutableSilkPalette.Checkbox(
+                background = ColorSchemes.Blue._200,
+                color = Colors.Black,
             ),
             input = MutableSilkPalette.Input(ColorMode.DARK, filled = ColorSchemes.Gray._900),
             link = MutableSilkPalette.Link(
