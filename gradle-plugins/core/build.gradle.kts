@@ -1,6 +1,5 @@
 plugins {
     `kotlin-dsl`
-    alias(libs.plugins.kotlin.jvm)
     id("com.varabyte.kobweb.internal.publish")
     alias(libs.plugins.kotlinx.serialization)
 }
@@ -9,16 +8,11 @@ group = "com.varabyte.kobweb.gradle"
 version = libs.versions.kobweb.libs.get()
 
 dependencies {
-    implementation(kotlin("stdlib"))
     // Get access to Kotlin multiplatform source sets
     implementation(kotlin("gradle-plugin"))
 
     implementation(libs.kotlinx.serialization.json)
-    api("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${libs.versions.ksp.get()}")
-
-    // For parsing code.
-    api(kotlin("compiler-embeddable"))
-
+    implementation(libs.ksp.plugin)
 
     implementation(project(":common:kobweb-common"))
 }

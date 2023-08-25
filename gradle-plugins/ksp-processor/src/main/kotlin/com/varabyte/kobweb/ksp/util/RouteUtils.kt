@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.gradle.core.project.common
+package com.varabyte.kobweb.ksp.util
 
 object RouteUtils {
     /**

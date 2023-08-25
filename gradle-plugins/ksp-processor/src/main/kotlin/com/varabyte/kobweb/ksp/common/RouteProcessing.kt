@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.ksp.common
 
-import com.varabyte.kobweb.gradle.core.project.common.RouteUtils
+import com.varabyte.kobweb.ksp.util.RouteUtils
 
 /**
  * Process all incoming information to produce a final route.

@@ -1,6 +1,5 @@
 plugins {
     `kotlin-dsl`
-    alias(libs.plugins.kotlin.jvm)
     id("com.varabyte.kobweb.internal.publish")
 }
 
@@ -8,7 +7,6 @@ group = "com.varabyte.kobwebx.gradle"
 version = libs.versions.kobweb.libs.get()
 
 dependencies {
-    implementation(kotlin("stdlib"))
     // Get access to Kotlin multiplatform source sets
     implementation(kotlin("gradle-plugin"))
 

@@ -11,15 +11,4 @@ object PackageUtils {
             else -> pkg
         }
     }
-
-    /**
-     * Given a package (potentially empty) and a name, return the fully qualified path,
-     * e.g. "" + "SomeClass" -> "SomeClass"; "example.pkg" + "SomeClass" -> "example.pkg.SomeClass"
-     */
-    fun prefixQualifiedPath(pkg: String, name: String): String {
-        return when {
-            pkg.isNotEmpty() -> "$pkg.$name"
-            else -> name
-        }
-    }
 }
