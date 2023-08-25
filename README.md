@@ -2624,7 +2624,7 @@ Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it
 
 Current state: **Foundations are in place! You may encounter API gaps.**
 
-You may wish to refer to our [Kobweb 1.0 roadmap document](https://docs.google.com/document/d/1n2Jd02yzuxaatpT7gOhEuijzfaSu9UIaQTV2t4EPcPk).
+You may wish to refer to our [Kobweb 1.0 roadmap document](https://docs.google.com/document/d/1n2Jd02yzuxaatpT7gOhEuijzfaSu9UIaQTV2t4EPcPk/preview).
 
 Kobweb is becoming quite functional. We are already using it to build https://kobweb.varabyte.com and
 https://bitspittle.dev. Several users have created working portfolio sites already, and I'm aware of at least two cases
