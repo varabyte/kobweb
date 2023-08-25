@@ -8,8 +8,6 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyDependencyResource
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateMetadataBackendTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateMetadataFrontendTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteEntryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
@@ -22,6 +20,8 @@ import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.ksp.setupKsp
+import com.varabyte.kobweb.gradle.core.kspBackendFile
+import com.varabyte.kobweb.gradle.core.kspFrontendFile
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
@@ -36,15 +36,18 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.withType
 import org.gradle.tooling.events.FailureResult
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -92,7 +95,7 @@ class KobwebApplicationPlugin @Inject constructor(
             createExportBlock()
         }
 
-        setupKsp(project, kobwebBlock)
+        setupKsp(project, kobwebBlock, includeAppData = true)
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
@@ -105,32 +108,6 @@ class KobwebApplicationPlugin @Inject constructor(
             project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }
                 ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
         val buildTarget = project.kobwebBuildTarget
-
-        val kobwebGenFrontendMetadata =
-            project.tasks.register(
-                "kobwebGenFrontendMetadata",
-                KobwebGenerateMetadataFrontendTask::class.java,
-                kobwebBlock
-            )
-
-        val kobwebGenBackendMetadata =
-            project.tasks.register(
-                "kobwebGenBackendMetadata",
-                KobwebGenerateMetadataBackendTask::class.java,
-                kobwebBlock
-            )
-
-        val kobwebGenSiteEntryTask =
-            project.tasks.register(
-                "kobwebGenSiteEntry",
-                KobwebGenerateSiteEntryTask::class.java,
-                kobwebConf,
-                kobwebBlock,
-                buildTarget
-            )
-        kobwebGenSiteEntryTask.configure {
-            dependsOn(kobwebGenFrontendMetadata)
-        }
 
         val kobwebCopyDependencyResourcesTask =
             project.tasks.register("kobwebCopyDepResources", KobwebCopyDependencyResourcesTask::class.java, kobwebBlock)
@@ -148,30 +125,17 @@ class KobwebApplicationPlugin @Inject constructor(
             dependsOn(kobwebCopyDependencyResourcesTask)
         }
 
-        val kobwebGenApisFactoryTask =
-            project.tasks.register("kobwebGenApisFactory", KobwebGenerateApisFactoryTask::class.java, kobwebBlock)
-        kobwebGenApisFactoryTask.configure {
-            dependsOn(kobwebGenBackendMetadata)
-        }
-
         // Umbrella tasks for all other gen tasks
         val kobwebGenFrontendTask = project.tasks.register(
             "kobwebGenFrontend",
             KobwebTask::class.java,
             "The umbrella task that combines all Kobweb frontend generation tasks"
         )
-        kobwebGenFrontendTask.configure {
-            dependsOn(kobwebGenSiteIndexTask)
-            dependsOn(kobwebGenSiteEntryTask)
-        }
         val kobwebGenBackendTask = project.tasks.register(
             "kobwebGenBackend",
             KobwebTask::class.java,
             "The umbrella task that combines all Kobweb backend generation tasks"
         )
-        kobwebGenBackendTask.configure {
-            dependsOn(kobwebGenApisFactoryTask)
-        }
         val kobwebGenTask = project.tasks.register(
             "kobwebGen",
             KobwebTask::class.java,
@@ -232,8 +196,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
-        val taskListenerService =
-            project.gradle.sharedServices.registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
+        val taskListenerService = project.gradle.sharedServices
+            .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
         run {
             var isBuilding = false
             var isServerRunning = run {
@@ -286,6 +250,28 @@ class KobwebApplicationPlugin @Inject constructor(
                 jsTarget.browserRun, jsTarget.run,
             )
 
+            val kobwebGenSiteEntryTask = project.tasks.register(
+                "kobwebGenSiteEntry",
+                KobwebGenerateSiteEntryTask::class.java,
+                kobwebConf,
+                kobwebBlock,
+                buildTarget,
+                project.kspFrontendFile
+            )
+
+            val kotlinMppExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
+            kotlinMppExtension.sourceSets.getByName("jsMain").kotlin
+////                .srcDir(kobwebGenSiteEntryTask)
+
+            kobwebGenSiteEntryTask.configure {
+                dependsOn(project.tasks.named("kspKotlinJs"))
+            }
+
+            kobwebGenFrontendTask.configure {
+                dependsOn(kobwebGenSiteIndexTask)
+                dependsOn(kobwebGenSiteEntryTask)
+            }
+
             // Users should be using Kobweb tasks instead of the standard multiplatform tasks, but they
             // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
             // the Kobweb commands instead.
@@ -299,6 +285,8 @@ class KobwebApplicationPlugin @Inject constructor(
                     }
                 }
 
+            // TODO: ideally kobwebGenSiteEntryTask would be declared as a srcDir for jsMain, but then ksp tried to
+            // parse it, so for now we don't do that
             val jsSourceTasks = listOf(jsTarget.compileKotlin, jsTarget.sourcesJar)
             jsSourceTasks
                 .mapNotNull { taskName -> project.tasks.namedOrNull(taskName) }
@@ -311,6 +299,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             project.tasks.named(jsTarget.processResources) {
+                dependsOn(project.tasks.named("kspKotlinJs"))
                 dependsOn(kobwebGenSiteIndexTask)
                 dependsOn(kobwebCopyDependencyResourcesTask)
             }
@@ -351,9 +340,20 @@ class KobwebApplicationPlugin @Inject constructor(
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
             val jvmTarget = JvmTarget(this)
 
+//            val kotlinMppExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
+//            kotlinMppExtension.sourceSets.getByName("jvmMain").kotlin
+//                .srcDir(kobwebBlock.getGenJvmSrcRoot(project))
+
             // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
+            // TODO
             project.tasks.namedOrNull(jvmTarget.compileKotlin)?.configure { dependsOn(kobwebGenBackendTask) }
             project.tasks.namedOrNull(jvmTarget.jar)?.configure { dependsOn(kobwebGenBackendTask) }
+
+            project.tasks.namedOrNull(jvmTarget.processResources)?.configure {
+                // TODO: are we doing something wrong or is this fine - (also in application)
+                (this as Copy).duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//                dependsOn(project.tasks.named("kspKotlinJvm"))
+            }
 
             // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
             // much.
@@ -367,12 +367,28 @@ class KobwebApplicationPlugin @Inject constructor(
             kobwebGenTask.configure {
                 dependsOn(kobwebGenBackendTask)
             }
+
+            val kobwebGenApisFactoryTask = project.tasks.register(
+                "kobwebGenApisFactory",
+                KobwebGenerateApisFactoryTask::class.java,
+                kobwebBlock,
+                project.kspBackendFile
+            )
+            val kspKotlinJvm = project.tasks.matching { it.name == "kspKotlinJvm" }
+            kobwebGenApisFactoryTask.configure {
+                dependsOn(kspKotlinJvm)
+            }
+
+            kobwebGenBackendTask.configure {
+                dependsOn(kobwebGenApisFactoryTask)
+            }
         }
     }
 }
 
-private fun Project.kobwebGenFrontendMetadata(action: Action<Task>) = tasks.named("kobwebGenFrontendMetadata", action)
-private fun Project.kobwebGenBackendMetadata(action: Action<Task>) = tasks.named("kobwebGenBackendMetadata", action)
+// TODO: configure ksp depend on the Task
+private fun Project.kobwebGenFrontendMetadata(action: Action<Task>) {}//tasks.named("kobwebGenFrontendMetadata", action)
+private fun Project.kobwebGenBackendMetadata(action: Action<Task>) {}//tasks.named("kobwebGenBackendMetadata", action)
 
 /**
  * Method provided for users to call if they generate their own Gradle task that generates some JS (frontend) code.

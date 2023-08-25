@@ -1,11 +1,11 @@
 package com.varabyte.kobweb.gradle.application.processors
 
-import com.varabyte.kobweb.gradle.application.project.app.APP_FQN
-import com.varabyte.kobweb.gradle.application.project.app.APP_SIMPLE_NAME
-import com.varabyte.kobweb.gradle.application.project.app.AppData
-import com.varabyte.kobweb.gradle.application.project.app.AppEntry
 import com.varabyte.kobweb.gradle.core.processors.FrontendDataProcessor
 import com.varabyte.kobweb.gradle.core.processors.TokenProcessor
+import com.varabyte.kobweb.gradle.core.project.frontend.APP_FQN
+import com.varabyte.kobweb.gradle.core.project.frontend.APP_SIMPLE_NAME
+import com.varabyte.kobweb.gradle.core.project.frontend.AppData
+import com.varabyte.kobweb.gradle.core.project.frontend.AppEntry
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.visitAllChildren
 import org.jetbrains.kotlin.psi.KtFile

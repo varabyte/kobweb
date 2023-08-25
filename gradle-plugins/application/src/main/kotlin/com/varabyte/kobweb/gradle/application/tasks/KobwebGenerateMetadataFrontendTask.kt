@@ -4,9 +4,9 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.application.processors.AppDataProcessor
-import com.varabyte.kobweb.gradle.application.project.app.AppData
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.project.common.PackageUtils.resolvePackageShortcut
+import com.varabyte.kobweb.gradle.core.project.frontend.AppData
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateMetadataTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import kotlinx.serialization.encodeToString
