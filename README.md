@@ -69,13 +69,23 @@ Our goal is to provide:
 * an open source foundation that the community can extend
 * and much, much more!
 
-| 📚🧑‍🎓 One of Kobweb's users, Stevdza-San, [is offering a course on Compose HTML using Kobweb](https://stevdza-san.com/p/build-a-complete-website-with-kotlin-and-jetpack-compose). Consider checking it out! |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
 Here's a demo where we create a Compose HTML project from scratch with Markdown support and live reloading, in under
 10 seconds:
 
 https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-aac0-88f8992145ef.mp4
+
+One of Kobweb's users, Stevdza-San, has created YouTube videos that demonstrate how to build projects using Kobweb.
+
+* [Building a static site](https://www.youtube.com/watch?v=F5B-CxJTKlg)
+  * This is a great starting place, and it's perfect for simple portfolio sites or SEO-friendly landing pages for your
+    software. It's easy to migrate from a static site to a full stack site later. (You can read more about
+    [Static vs. Fullstack sites ▼](#static-layout-vs-full-stack-sites) below.)
+  * This is a free video that accompanies his paid course, which [you can check out](https://stevdza-san.com/p/build-a-complete-website-with-kotlin-and-jetpack-compose)
+    if interested.
+* [Building a full stack multiplatform site](https://www.youtube.com/watch?v=zcrY0qayWF4)
+  * This demonstrates how to write both frontend and backend logic. It also demonstrates how you can write a separate
+    Android frontend that can also work with your server. (This video is still useful to watch even if you never intend
+    to have any other frontend besides web).
 
 # Trying it out yourself
 
