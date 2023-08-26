@@ -15,10 +15,10 @@ dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.kaml)
 
-    implementation(project(":backend:kobweb-api"))
-    implementation(project(":backend:server-plugin"))
-    implementation(project(":common:kobweb-common"))
-    implementation(project(":common:client-server-models"))
+    implementation(projects.backend.kobwebApi)
+    implementation(projects.backend.serverPlugin)
+    implementation(projects.common.kobwebCommon)
+    implementation(projects.common.clientServerModels)
 
     testImplementation(libs.truthish)
     testImplementation(libs.ktor.server.tests)

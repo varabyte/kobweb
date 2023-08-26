@@ -22,9 +22,9 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                api(project(":frontend:kobweb-compose"))
-                api(project(":frontend:silk-foundation"))
-                implementation(project(":frontend:compose-html-ext"))
+                api(projects.frontend.kobwebCompose)
+                api(projects.frontend.silkFoundation)
+                implementation(projects.frontend.composeHtmlExt)
             }
         }
     }

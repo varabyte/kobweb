@@ -11,7 +11,7 @@ version = libs.versions.kobweb.libs.get()
 dependencies {
     implementation(libs.ksp.processing)
     implementation(libs.kotlinx.serialization.json)
-    implementation(project(":tools:gradle-plugins:core"))
+    implementation(projects.tools.gradlePlugins.core)
 }
 
 // TODO: strings + filter?

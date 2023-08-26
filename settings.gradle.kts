@@ -7,6 +7,8 @@ pluginManagement {
 
 rootProject.name = "kobweb"
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 include(":common:kobweb-common")
 include(":common:client-server-models")
 include(":frontend:kobweb-core")

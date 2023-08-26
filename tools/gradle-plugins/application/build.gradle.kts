@@ -14,7 +14,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // Common Gradle plugin used by Library and Application plugins
-    api(project(":tools:gradle-plugins:core"))
+    api(projects.tools.gradlePlugins.core)
 
     // For generating code / html
     implementation(libs.kotlinpoet)
@@ -24,7 +24,7 @@ dependencies {
     implementation(libs.playwright)
     implementation(libs.jsoup)
 
-    implementation(project(":common:kobweb-common"))
+    implementation(projects.common.kobwebCommon)
 }
 
 val DESCRIPTION = "A Gradle plugin that completes a user's Kobweb app"
@@ -53,12 +53,12 @@ tasks.register<Copy>("copyServerJar") {
     dependsOn(":backend:server:shadowJar")
 
     val serverJarName = "server-${libs.versions.kobweb.libs.get()}-all.jar"
-    val serverJarFile = project(":backend:server").layout.buildDirectory.file("libs/$serverJarName")
+    val serverJarFile = projects.backend.server.dependencyProject.layout.buildDirectory.file("libs/$serverJarName")
 
     from(serverJarFile)
     into(file("$projectDir/build/resources/main"))
     rename(serverJarName, "server.jar")
 }
-project.tasks.named("processResources") {
+tasks.named("processResources") {
     dependsOn("copyServerJar")
 }
