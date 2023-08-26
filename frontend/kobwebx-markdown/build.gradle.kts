@@ -22,7 +22,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                implementation(project(":frontend:kobweb-core"))
+                implementation(projects.frontend.kobwebCore)
             }
         }
     }

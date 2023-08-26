@@ -12,7 +12,7 @@ dependencies {
     implementation(kotlin("gradle-plugin"))
 
     // Common Gradle plugin used by Library and Application plugins
-    api(project(":tools:gradle-plugins:core"))
+    api(projects.tools.gradlePlugins.core)
 
     // For generating code
     implementation(libs.kotlinpoet)
@@ -20,7 +20,7 @@ dependencies {
     // For creating a metadata file
     implementation(libs.kotlinx.serialization.json)
 
-    implementation(project(":common:kobweb-common"))
+    implementation(projects.common.kobwebCommon)
 }
 
 val DESCRIPTION = "A Gradle plugin that generates useful code for a user's Kobweb library"

@@ -14,7 +14,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ksp.plugin)
 
-    implementation(project(":common:kobweb-common"))
+    implementation(projects.common.kobwebCommon)
 }
 
 val DESCRIPTION = "A Gradle plugin that provides common support for the Library and Application plugins."

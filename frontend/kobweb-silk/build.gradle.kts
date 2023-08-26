@@ -22,10 +22,10 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                api(project(":frontend:kobweb-core"))
-                api(project(":frontend:silk-foundation"))
-                api(project(":frontend:silk-widgets"))
-                api(project(":frontend:silk-widgets-kobweb"))
+                api(projects.frontend.kobwebCore)
+                api(projects.frontend.silkFoundation)
+                api(projects.frontend.silkWidgets)
+                api(projects.frontend.silkWidgetsKobweb)
             }
         }
     }
