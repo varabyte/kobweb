@@ -221,13 +221,20 @@ fun Modifier.paddingInline(
     paddingInline(start, end)
 }
 
-fun Modifier.paddingInlineStart(value: CSSNumeric) = styleModifier {
-    paddingInlineStart(value)
+class PaddingInlineScope internal constructor(private val styleScope: StyleScope) {
+    fun start(value: CSSNumeric) = styleScope.paddingInlineStart(value)
+    fun end(value: CSSNumeric) = styleScope.paddingInlineEnd(value)
+}
+fun Modifier.paddingInline(scope: PaddingInlineScope.() -> Unit) = styleModifier {
+    PaddingInlineScope(this).scope()
 }
 
-fun Modifier.paddingInlineEnd(value: CSSNumeric) = styleModifier {
-    paddingInlineEnd(value)
-}
+// TODO(#168): Remove these before v1.0
+@Deprecated("Use paddingInline { start(value) } instead.", ReplaceWith("paddingInline { start(value) }"))
+fun Modifier.paddingInlineStart(value: CSSNumeric) = paddingInline { start(value) }
+
+@Deprecated("Use paddingInline { end(value) } instead.", ReplaceWith("paddingInline { end(value) }"))
+fun Modifier.paddingInlineEnd(value: CSSNumeric) = paddingInline { end(value) }
 
 fun Modifier.paddingBlock(
     start: CSSNumeric = 0.px,
@@ -236,13 +243,21 @@ fun Modifier.paddingBlock(
     paddingBlock(start, end)
 }
 
-fun Modifier.paddingBlockStart(value: CSSNumeric) = styleModifier {
-    paddingBlockStart(value)
+class PaddingBlockScope internal constructor(private val styleScope: StyleScope) {
+    fun start(value: CSSNumeric) = styleScope.paddingBlockStart(value)
+    fun end(value: CSSNumeric) = styleScope.paddingBlockEnd(value)
 }
 
-fun Modifier.paddingBlockEnd(value: CSSNumeric) = styleModifier {
-    paddingBlockEnd(value)
+fun Modifier.paddingBlock(scope: PaddingBlockScope.() -> Unit) = styleModifier {
+    PaddingBlockScope(this).scope()
 }
+
+// TODO(#168): Remove these before v1.0
+@Deprecated("Use paddingBlock { start(value) } instead.", ReplaceWith("paddingBlock { start(value) }"))
+fun Modifier.paddingBlockStart(value: CSSNumeric) = paddingBlock { start(value) }
+
+@Deprecated("Use paddingBlock { end(value) } instead.", ReplaceWith("paddingBlock { end(value) }"))
+fun Modifier.paddingBlockEnd(value: CSSNumeric) = paddingBlock { end(value) }
 
 fun Modifier.overflow(overflow: Overflow) = styleModifier {
     overflow(overflow)
@@ -252,17 +267,25 @@ fun Modifier.overflow(overflowX: Overflow, overflowY: Overflow) = styleModifier 
     overflow(overflowX, overflowY)
 }
 
-fun Modifier.overflowX(overflowX: Overflow) = styleModifier {
-    overflowX(overflowX)
+class OverflowScope internal constructor(private val styleScope: StyleScope) {
+    fun x(overflowX: Overflow) = styleScope.overflowX(overflowX)
+    fun y(overflowY: Overflow) = styleScope.overflowY(overflowY)
+    fun wrap(overflowWrap: OverflowWrap) = styleScope.overflowWrap(overflowWrap)
 }
 
-fun Modifier.overflowY(overflowY: Overflow) = styleModifier {
-    overflowY(overflowY)
+fun Modifier.overflow(scope: OverflowScope.() -> Unit) = styleModifier {
+    OverflowScope(this).scope()
 }
 
-fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = styleModifier {
-    overflowWrap(overflowWrap)
-}
+// TODO(#168): Remove these before v1.0
+@Deprecated("Use overflow { x(overflowX) } instead.", ReplaceWith("overflow { x(overflowX) }"))
+fun Modifier.overflowX(overflowX: Overflow) = overflow { x(overflowX) }
+
+@Deprecated("Use overflow { y(overflowY) } instead.", ReplaceWith("overflow { y(overflowY) }"))
+fun Modifier.overflowY(overflowY: Overflow) = overflow { y(overflowY) }
+
+@Deprecated("Use overflow { wrap(overflowWrap) } instead.", ReplaceWith("overflow { wrap(overflowWrap) }"))
+fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = overflow { wrap(overflowWrap) }
 
 fun Modifier.verticalAlign(verticalAlign: VerticalAlign) = styleModifier {
     verticalAlign(verticalAlign)

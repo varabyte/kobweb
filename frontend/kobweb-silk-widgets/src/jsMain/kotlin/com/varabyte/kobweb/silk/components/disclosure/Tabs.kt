@@ -2,7 +2,6 @@ package com.varabyte.kobweb.silk.components.disclosure
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -68,7 +67,7 @@ val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.
 }
 
 val TabsPanelStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflowY(Overflow.Auto)
+    Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflow { y(Overflow.Auto) }
 }
 
 @DslMarker
