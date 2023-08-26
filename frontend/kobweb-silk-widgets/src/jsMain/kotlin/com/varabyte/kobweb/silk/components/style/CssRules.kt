@@ -69,7 +69,7 @@ val StyleModifiers.active get() = CssRule.OfPseudoClass(this, "active")
 val StyleModifiers.focus get() = CssRule.OfPseudoClass(this, "focus")
 
 /**
- * Styles to apply to components when they have keybaord / a11y-assisted focus.
+ * Styles to apply to components when they have keyboard / a11y-assisted focus.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible
  */

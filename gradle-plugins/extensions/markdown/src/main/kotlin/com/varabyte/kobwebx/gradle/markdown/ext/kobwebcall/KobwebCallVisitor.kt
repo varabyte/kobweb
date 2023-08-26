@@ -5,7 +5,7 @@ import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
 import org.commonmark.node.Node
 
-/** A visitor that should only be used with a [KobwebCallBlack], extracting relevant information from it. */
+/** A visitor that should only be used with a [KobwebCallBlock], extracting relevant information from it. */
 class KobwebCallVisitor : AbstractVisitor() {
     var call: KobwebCall? = null
         private set

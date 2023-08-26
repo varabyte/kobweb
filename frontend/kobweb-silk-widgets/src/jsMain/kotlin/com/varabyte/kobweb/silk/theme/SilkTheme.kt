@@ -21,9 +21,9 @@ import org.jetbrains.compose.web.css.*
  */
 class MutableSilkTheme {
     internal val componentStyles = mutableMapOf<String, ComponentStyle>()
-    internal val overiddenStyles = mutableSetOf<String>()
+    internal val overriddenStyles = mutableSetOf<String>()
     internal val componentVariants = mutableMapOf<String, ComponentVariant>()
-    internal val overiddenVariants = mutableSetOf<String>()
+    internal val overriddenVariants = mutableSetOf<String>()
 
     var palettes = MutableSilkPalettes()
 
@@ -99,7 +99,7 @@ class MutableSilkTheme {
         init: ComponentModifiers.() -> Unit
     ) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
-        check(overiddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
+        check(overriddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
         componentStyles[style.name] = ComponentStyle(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
     }
 
@@ -156,7 +156,7 @@ class MutableSilkTheme {
             ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
         check(componentVariants.contains(variant.style.name)) { "Attempting to replace a variant that was never registered: \"${variant.style.name}\"" }
-        check(overiddenVariants.add(variant.style.name)) { "Attempting to override variant \"${variant.style.name}\" twice" }
+        check(overriddenVariants.add(variant.style.name)) { "Attempting to override variant \"${variant.style.name}\" twice" }
         componentVariants[variant.style.name] = variant.baseStyle.addVariant(variant.name, extraModifiers, init)
     }
 }
