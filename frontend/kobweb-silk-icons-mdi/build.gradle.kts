@@ -1,4 +1,3 @@
-import Build_gradle.IconStyle.*
 import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
 import com.varabyte.kobweb.gradle.publish.set
 
@@ -55,16 +54,16 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
         .readLines()
         .asSequence()
         .filter { line -> !line.startsWith("#") }
-        .map { line ->
+        .associate { line ->
             // Convert icon name to function name, e.g.
             // align-left -> MdiAlignLeft
             line.split("=", limit = 2).let { parts ->
                 val style = when (parts[0]) {
-                    "mdi" -> FILLED
-                    "mdio" -> OUTLINED
-                    "mdir" -> ROUNDED
-                    "mdis" -> SHARP
-                    "mdit" -> TWO_TONED
+                    "mdi" -> IconStyle.FILLED
+                    "mdio" -> IconStyle.OUTLINED
+                    "mdir" -> IconStyle.ROUNDED
+                    "mdis" -> IconStyle.SHARP
+                    "mdit" -> IconStyle.TWO_TONED
                     else -> throw GradleException("Unexpected style grouping: ${parts[0]}")
                 }
                 val names = parts[1]
@@ -72,7 +71,6 @@ val regenerateIconsTask = tasks.register("regenerateIcons") {
                 style to names.split(",")
             }
         }
-        .toMap()
 
     // For each icon name, figure out what categories they are in. This will affect the function signature we generate.
     val iconStyleGroups = mutableMapOf<String, MutableSet<IconStyle>>()
