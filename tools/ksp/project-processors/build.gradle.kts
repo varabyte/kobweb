@@ -11,12 +11,11 @@ version = libs.versions.kobweb.libs.get()
 dependencies {
     implementation(libs.ksp.processing)
     implementation(libs.kotlinx.serialization.json)
-    implementation(project(":gradle-plugins:core"))
+    implementation(project(":tools:gradle-plugins:core"))
 }
 
-val DESCRIPTION = "KSP processor for Kobweb" // TODO
-
+// TODO: strings + filter?
 kobwebPublication {
-    artifactId.set("kobweb-ksp-processor") // TODO
-    description.set(DESCRIPTION)
+    artifactId.set("kobweb-project-processors")
+    description.set("KSP processors for Kobweb library and site modules")
 }

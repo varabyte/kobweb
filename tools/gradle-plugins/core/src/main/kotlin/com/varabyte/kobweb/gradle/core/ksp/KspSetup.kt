@@ -35,7 +35,7 @@ fun setupKsp(project: Project, kobwebBlock: KobwebBlock, includeAppData: Boolean
     }
 
     val kspProcessorVersion = "0.13.12-SNAPSHOT-ksp49" // matching lib version
-    val kspDependency = "com.varabyte.kobweb:kobweb-ksp-processor:$kspProcessorVersion"
+    val kspDependency = "com.varabyte.kobweb:kobweb-project-processors:$kspProcessorVersion"
 
 //        println(project.plugins.withId("com.varabyte.kobweb.library"))
 
