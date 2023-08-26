@@ -13,10 +13,9 @@ kobweb {
     includeKspDependency.set(false)
 }
 
-val kspDependency = "com.varabyte.kobweb:ksp-processor"
 configurations.matching { it.name == "kspJs" || it.name == "kspJvm" }.configureEach {
     dependencies {
-        add(this@configureEach.name, kspDependency)
+        add(this@configureEach.name, "com.varabyte.kobweb:project-processors")
     }
 }
 
