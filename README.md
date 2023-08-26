@@ -2680,6 +2680,15 @@ So, should you use Kobweb at this point? If you are...
 
 On the fence but not sure? Connect with us, and I'd be happy to help you assess your situation.
 
+## Testimonials
+
+I'm pleased to mention that Kobweb has received feedback from some satisfied users. Here are a few:
+
+* "This is a pretty bloody amazing technology you've created here. I have been dreading upgrading [my] website for ages because I didn't want to go back to html and css 🫤 now i can stay with Kotlin 😀"
+* "Kobweb looks fantastic and I've been [trying] to use kotlin in all parts of [my] hobby stuff and work, so I got real excited when I saw Kobweb, [even though] I hadn't been satisfied with a web framework in a long time. Incredible work."
+* "I started using Kobweb from last week and I have to say this [...] reinvented web development for me. [...] I used to hate html css. After getting hands on kobweb I’m in love with it."
+* "Finally got paid -- all thanks to kobweb 🎉💥"
+
 # Connecting with us
 
 * [Join my Discord!](https://discord.gg/5NZ2GKV5Cs)
