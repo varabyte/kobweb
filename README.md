@@ -2646,10 +2646,10 @@ At this point:
 * The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it.
 * It supports generating pages from Markdown that can reference your Composable code.
 * While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
-* You can use the `Modifier` builder for a growing number of css properties.
+* A huge range of CSS properties are supported, along with support for style variables and animations.
+* * You can use the `Modifier` builder for a significant number of css properties.
 * Silk components are color mode aware and support responsive behavior.
 * There are quite a few widgets available, and it's easy to create your own.
-* A huge range of CSS properties are supported, along with support for style variables and animations.
 
 However, there's always more to do.
 
@@ -2669,14 +2669,14 @@ So, should you use Kobweb at this point? If you are...
       below, we'd definitely love to hear from you. It's still a good time if you'd want to have a voice in the
       direction of this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
-    * **Worth a shot!** I think if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
+    * **Probably!** I hope if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
       with us at our Discord if you try it and have questions or run into missing features.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
     * **Maybe not?** Depending on how much work you've done, it may not be a trivial refactor. You can review
       [this earlier section ▲](#adding-kobweb-to-an-existing-project) if you want to try anyway.
 * a company:
-    * **Probably not?** I'm assuming a company is more risk-averse even to Compose HTML, which Kobweb is
-      building on top of. If you *were* considering Compose HTML, however, Kobweb may be worth a look.
+  * **Probably not?** I'm assuming most companies are so risk-averse they would not even use Compose HTML, which Kobweb
+    is built on top of. If you *were* considering Compose HTML, however, Kobweb is worth a look.
 
 On the fence but not sure? Connect with us, and I'd be happy to help you assess your situation.
 
