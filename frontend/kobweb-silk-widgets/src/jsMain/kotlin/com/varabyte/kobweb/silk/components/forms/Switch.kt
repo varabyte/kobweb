@@ -28,7 +28,6 @@ import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Label
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
 
 // 9999px forces a pill shape. 0px causes a rectangular shape.
 val SwitchBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 9999.px)
@@ -132,12 +131,16 @@ internal fun SwitchShape.toModifier() = Modifier
  * the width or height of the track or the thumb parts. Instead, configure your switch by passing in the relevant
  * parameters.
  *
+ * Note that this widget is backed by a checkbox input. Use the `ref` callback if you need access to it:
+ *
+ * ```
+ * ref = ref { element -> element.getElementsByTagName("input")[0] as HTMLInputElement }
+ * ```
+ *
  * @param checked Whether the switch is currently checked or not.
  * @param onCheckedChange A callback which is invoked when the switch is toggled.
  * @param modifier The modifier to apply to the *container* of this switch element. This will not be applied to the
  *   switch itself (since its configuration comes from the other parameters).
- * @param checkboxModifier The modifier to apply to the underlying checkbox element. It is not recommended to use this
- *   for styling, but rather to set attributes that must specifically be applied to the input element.
  * @param enabled Whether the switch is enabled or not. If not, the switch will be rendered in a disabled state and will
  *   not be interactable.
  * @param size The size of the switch. Defaults to [SwitchSize.MD]. You can implement your own [SwitchSize] if you want
@@ -148,15 +151,12 @@ internal fun SwitchShape.toModifier() = Modifier
  * @param focusBorderColor An optional override for the border color when the input is focused.
  * @param ref Provides a reference to the *container* of the switch. Its direct children will be the underlying checkbox
  *   element and the switch track, whose direct child will be the thumb element.
- * @param checkboxRef Provides a reference to the underlying checkbox element, which is visually hidden but still
- *   receives events and represents the state of the switch.
  */
 @Composable
 fun Switch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    checkboxModifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
@@ -165,7 +165,6 @@ fun Switch(
     focusBorderColor: CSSColorValue? = null,
     shape: SwitchShape = SwitchShape.PILL,
     ref: ElementRefScope<HTMLElement>? = null,
-    checkboxRef: ElementRefScope<HTMLInputElement>? = null,
 ) {
     val colorMode = ColorMode.current
     val switchPalette = colorMode.toSilkPalette().switch
@@ -184,10 +183,8 @@ fun Switch(
             type = InputType.Checkbox,
             value = checked,
             onValueChanged = { onCheckedChange(!checked) },
-            modifier = checkboxModifier,
             variant = SwitchInputVariant,
             enabled = enabled,
-            ref = checkboxRef,
         )
         Box(
             SwitchTrackStyle.toModifier()
