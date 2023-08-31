@@ -18,7 +18,6 @@ import com.varabyte.kobweb.silk.components.document.TocBorderColorVar
 import com.varabyte.kobweb.silk.components.document.TocBorderedVariant
 import com.varabyte.kobweb.silk.components.document.TocStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundDefaultColorVar
-import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundFocusColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundPressedColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonColorVar
@@ -26,7 +25,6 @@ import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
 import com.varabyte.kobweb.silk.components.forms.FlushedInputVariant
 import com.varabyte.kobweb.silk.components.forms.InputBorderColorVar
-import com.varabyte.kobweb.silk.components.forms.InputBorderFocusColorVar
 import com.varabyte.kobweb.silk.components.forms.InputBorderHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.InputBorderInvalidColorVar
 import com.varabyte.kobweb.silk.components.forms.InputFilledColorVar
@@ -36,7 +34,6 @@ import com.varabyte.kobweb.silk.components.forms.InputGroupStyle
 import com.varabyte.kobweb.silk.components.forms.InputPlaceholderColorVar
 import com.varabyte.kobweb.silk.components.forms.InputStyle
 import com.varabyte.kobweb.silk.components.forms.OutlinedInputVariant
-import com.varabyte.kobweb.silk.components.forms.SwitchFocusColorVar
 import com.varabyte.kobweb.silk.components.forms.SwitchInputVariant
 import com.varabyte.kobweb.silk.components.forms.SwitchStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbColorVar
@@ -102,6 +99,7 @@ import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
+import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import com.varabyte.kobweb.silk.theme.toSilkPalette
@@ -209,12 +207,12 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(BackgroundColorVar, palette.background)
         .setVariable(ColorVar, palette.color)
         .setVariable(BorderColorVar, palette.border)
+        .setVariable(FocusOutlineColorVar, palette.focusOutline)
         .setVariable(PlaceholderColorVar, palette.placeholder)
     // endregion
 
     // region Widget color vars
         .setVariable(ButtonBackgroundDefaultColorVar, palette.button.default)
-        .setVariable(ButtonBackgroundFocusColorVar, palette.button.focus)
         .setVariable(ButtonBackgroundHoverColorVar, palette.button.hover)
         .setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
         .setVariable(ButtonColorVar, palette.color)
@@ -222,7 +220,6 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(DividerColorVar, palette.border)
 
         .setVariable(InputBorderColorVar, palette.border)
-        .setVariable(InputBorderFocusColorVar, palette.input.focusedBorder)
         .setVariable(InputBorderHoverColorVar, palette.input.hoveredBorder)
         .setVariable(InputBorderInvalidColorVar, palette.input.invalidBorder)
         .setVariable(InputFilledColorVar, palette.input.filled)
@@ -239,7 +236,6 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(SurfaceColorVar, palette.color)
 
         .setVariable(SwitchThumbColorVar, palette.switch.thumb)
-        .setVariable(SwitchFocusColorVar, palette.switch.focusedBorder)
 
         .setVariable(TabColorVar, palette.tab.color)
         .setVariable(TabBackgroundColorVar, palette.tab.background)

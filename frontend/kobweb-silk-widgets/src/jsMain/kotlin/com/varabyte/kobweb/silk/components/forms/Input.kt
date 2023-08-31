@@ -28,6 +28,7 @@ import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.placeholder
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
+import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.PlaceholderOpacityVar
 import org.jetbrains.compose.web.attributes.AutoComplete
 import org.jetbrains.compose.web.attributes.InputType
@@ -52,7 +53,7 @@ object InputDefaults {
 
 val InputBorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val InputBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val InputBorderFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val InputBorderFocusColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
 val InputBorderHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val InputBorderInvalidColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val InputFilledColorVar by StyleVariable<CSSColorValue>(prefix = "silk")

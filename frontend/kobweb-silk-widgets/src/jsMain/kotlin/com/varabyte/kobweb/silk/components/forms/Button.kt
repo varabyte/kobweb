@@ -25,6 +25,7 @@ import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
+import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.attributes.ButtonType
 import org.jetbrains.compose.web.attributes.type
@@ -33,7 +34,7 @@ import org.w3c.dom.HTMLButtonElement
 import org.jetbrains.compose.web.dom.Button as JbButton
 
 val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundFocusColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
 val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val ButtonColorVar by StyleVariable<CSSColorValue>(prefix = "silk")

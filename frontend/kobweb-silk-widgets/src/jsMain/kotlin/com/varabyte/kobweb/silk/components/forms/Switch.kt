@@ -20,6 +20,7 @@ import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
+import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import com.varabyte.kobweb.silk.theme.shapes.RectF
 import com.varabyte.kobweb.silk.theme.shapes.clip
@@ -36,7 +37,7 @@ val SwitchTrackWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val SwitchTrackHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val SwitchTrackPaddingVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val SwitchTrackBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val SwitchFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val SwitchFocusColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
 
 val SwitchThumbOffsetVar by StyleVariable<CSSLengthOrPercentageValue>(prefix = "silk") // Should be less than switch height
 val SwitchThumbColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
