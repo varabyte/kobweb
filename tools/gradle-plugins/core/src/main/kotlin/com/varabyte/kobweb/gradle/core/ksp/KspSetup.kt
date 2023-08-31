@@ -2,7 +2,10 @@ package com.varabyte.kobweb.gradle.core.ksp
 
 import com.google.devtools.ksp.gradle.KspExtension
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.project.common.PackageUtils
+import com.varabyte.kobweb.ksp.KSP_API_PACKAGE_KEY
+import com.varabyte.kobweb.ksp.KSP_APP_DATA_KEY
+import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
+import com.varabyte.kobweb.project.common.PackageUtils
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskCollection
@@ -12,10 +15,6 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-
-const val KSP_PAGES_PACKAGE_KEY = "kobweb.pagesPackage" // TODO: location
-const val KSP_API_PACKAGE_KEY = "kobweb.apiPackage" // TODO: location
-const val KSP_APP_DATA_KEY = "kobweb.appData" // TODO: location
 
 fun setupKsp(project: Project, kobwebBlock: KobwebBlock, includeAppData: Boolean) {
     project.pluginManager.apply("com.google.devtools.ksp")

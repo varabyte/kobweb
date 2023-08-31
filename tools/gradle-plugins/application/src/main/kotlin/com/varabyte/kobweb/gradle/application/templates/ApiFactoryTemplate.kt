@@ -7,7 +7,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeSpec
-import com.varabyte.kobweb.gradle.core.project.backend.BackendData
+import com.varabyte.kobweb.project.backend.BackendData
 
 fun createApisFactoryImpl(backendData: BackendData): String {
     // Final code should look something like:

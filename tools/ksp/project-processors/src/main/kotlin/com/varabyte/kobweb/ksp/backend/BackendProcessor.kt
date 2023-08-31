@@ -14,19 +14,19 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.varabyte.kobweb.gradle.core.ksp.KSP_API_PACKAGE_KEY
-import com.varabyte.kobweb.gradle.core.project.backend.API_FQN
-import com.varabyte.kobweb.gradle.core.project.backend.API_STREAM_FQN
-import com.varabyte.kobweb.gradle.core.project.backend.API_STREAM_SIMPLE_NAME
-import com.varabyte.kobweb.gradle.core.project.backend.ApiEntry
-import com.varabyte.kobweb.gradle.core.project.backend.ApiStreamEntry
-import com.varabyte.kobweb.gradle.core.project.backend.BackendData
-import com.varabyte.kobweb.gradle.core.project.backend.INIT_SIMPLE_NAME
-import com.varabyte.kobweb.gradle.core.project.backend.InitApiEntry
-import com.varabyte.kobweb.gradle.core.project.backend.PACKAGE_MAPPING_FQN
+import com.varabyte.kobweb.ksp.KSP_API_PACKAGE_KEY
+import com.varabyte.kobweb.ksp.common.API_FQN
+import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
+import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.INIT_API_FQN
+import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.util.nameWithoutExtension
+import com.varabyte.kobweb.project.backend.ApiEntry
+import com.varabyte.kobweb.project.backend.ApiStreamEntry
+import com.varabyte.kobweb.project.backend.BackendData
+import com.varabyte.kobweb.project.backend.InitApiEntry
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -46,8 +46,7 @@ class BackendProcessor(
     lateinit var packageMappings: Map<String, String>
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        // TODO: consider renaming INIT_SIMPLE_NAME to INIT_API_SIMPLE_NAME?
-        initMethods = resolver.getSymbolsWithAnnotation(INIT_SIMPLE_NAME).map { annotatedFun ->
+        initMethods = resolver.getSymbolsWithAnnotation(INIT_API_FQN).map { annotatedFun ->
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
             InitApiEntry(name)
         }.toList()
@@ -55,7 +54,7 @@ class BackendProcessor(
         val allFiles = resolver.getAllFiles()
 
         packageMappings = allFiles.flatMap { file ->
-            getPackageMappings(file, qualifiedApiPackage, PACKAGE_MAPPING_FQN, logger)
+            getPackageMappings(file, qualifiedApiPackage, PACKAGE_MAPPING_API_FQN, logger)
         }.toMap()
 
         // must be after package mapping

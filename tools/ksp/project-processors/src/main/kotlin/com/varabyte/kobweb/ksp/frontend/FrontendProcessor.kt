@@ -14,23 +14,29 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.varabyte.kobweb.gradle.core.ksp.KSP_APP_DATA_KEY
-import com.varabyte.kobweb.gradle.core.ksp.KSP_PAGES_PACKAGE_KEY
-import com.varabyte.kobweb.gradle.core.project.frontend.APP_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.AppData
-import com.varabyte.kobweb.gradle.core.project.frontend.AppEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.ComponentStyleEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.ComponentVariantEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
-import com.varabyte.kobweb.gradle.core.project.frontend.INIT_KOBWEB_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.INIT_SILK_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.InitKobwebEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.InitSilkEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.KeyframesEntry
-import com.varabyte.kobweb.gradle.core.project.frontend.PACKAGE_MAPPING_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.PAGE_FQN
-import com.varabyte.kobweb.gradle.core.project.frontend.PageEntry
+import com.varabyte.kobweb.ksp.KSP_APP_DATA_KEY
+import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
+import com.varabyte.kobweb.ksp.common.APP_FQN
+import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
+import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
+import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
+import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
+import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
+import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
+import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
+import com.varabyte.kobweb.project.frontend.AppData
+import com.varabyte.kobweb.project.frontend.AppEntry
+import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
+import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
+import com.varabyte.kobweb.project.frontend.FrontendData
+import com.varabyte.kobweb.project.frontend.InitKobwebEntry
+import com.varabyte.kobweb.project.frontend.InitSilkEntry
+import com.varabyte.kobweb.project.frontend.KeyframesEntry
+import com.varabyte.kobweb.project.frontend.PageEntry
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -74,7 +80,7 @@ class FrontendProcessor(
             file.accept(propertyVisitor, Unit)
 
             // TODO: consider including this as part of the first visitor? does that matter for performance?
-            packageMappings += getPackageMappings(file, qualifiedPagesPackage, PACKAGE_MAPPING_FQN, logger).toMap()
+            packageMappings += getPackageMappings(file, qualifiedPagesPackage, PACKAGE_MAPPING_PAGE_FQN, logger).toMap()
         }
 
         // must be done after packageMappings is populated
@@ -103,22 +109,22 @@ class FrontendProcessor(
     // TODO: we are currently recursively visiting every single property. Is this what we want to do? Is there a better way to go about this?
     inner class FindPropertyVisitor : KSVisitorVoid() {
         private val styleDeclaration = DeclarationType(
-            name = "ComponentStyle",
-            qualifiedName = "com.varabyte.kobweb.silk.components.style.ComponentStyle",
+            name = COMPONENT_STYLE_SIMPLE_NAME,
+            qualifiedName = COMPONENT_STYLE_FQN,
             displayString = "component style",
             function = "ctx.theme.registerComponentStyle",
         )
         private val variantDeclaration = DeclarationType(
-            name = "ComponentVariant",
-            qualifiedName = "com.varabyte.kobweb.silk.components.style.ComponentVariant",
+            name = COMPONENT_VARIANT_SIMPLE_NAME,
+            qualifiedName = COMPONENT_VARIANT_FQN,
             displayString = "component variant",
             function = "ctx.theme.registerComponentVariants",
         )
 
         // TODO: currently ignoring "keyframes" (deprecated)
         private val keyframesDeclaration = DeclarationType(
-            name = "Keyframes",
-            qualifiedName = "com.varabyte.kobweb.silk.components.animation.Keyframes",
+            name = KEYFRAMES_SIMPLE_NAME,
+            qualifiedName = KEYFRAMES_FQN,
             displayString = "keyframes",
             function = "ctx.stylesheet.registerKeyframes",
         )
