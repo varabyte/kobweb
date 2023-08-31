@@ -13,12 +13,12 @@ import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
-import com.varabyte.kobweb.gradle.core.project.frontend.AppData
-import com.varabyte.kobweb.gradle.core.project.frontend.FrontendData
-import com.varabyte.kobweb.gradle.core.project.frontend.merge
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.project.frontend.AppData
+import com.varabyte.kobweb.project.frontend.FrontendData
+import com.varabyte.kobweb.project.frontend.merge
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json

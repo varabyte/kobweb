@@ -1,7 +1,6 @@
-package com.varabyte.kobweb.gradle.core.project.backend
+package com.varabyte.kobweb.project.backend
 
 import kotlinx.serialization.Serializable
-import org.gradle.api.GradleException
 
 /**
  * Useful Kobweb-related information discovered while parsing a backend module.
@@ -32,8 +31,18 @@ fun BackendData.assertValid() {
 private fun Iterable<ApiEntry>.assertValidApis() {
     val entriesByRoute = this.groupBy { it.route }
     entriesByRoute.forEach { (route, apis) ->
-        if (apis.size > 1) {
-            throw GradleException("The API route \"$route\" was defined more than once. Used by:\n${apis.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
-        }
+        // TODO
+//        if (apis.size > 1) {
+//            throw GradleException("The API route \"$route\" was defined more than once. Used by:\n${apis.joinToString("\n") { entry -> " - ${entry.fqn}" }}")
+//        }
     }
 }
+
+@Serializable
+class InitApiEntry(val fqn: String)
+
+@Serializable
+class ApiStreamEntry(val fqn: String, val route: String)
+
+@Serializable
+class ApiEntry(val fqn: String, val route: String)

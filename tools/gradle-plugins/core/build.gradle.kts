@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.ksp.plugin)
 
     implementation(projects.common.kobwebCommon)
+    api(projects.tools.processorCommon)
 }
 
 val DESCRIPTION = "A Gradle plugin that provides common support for the Library and Application plugins."
