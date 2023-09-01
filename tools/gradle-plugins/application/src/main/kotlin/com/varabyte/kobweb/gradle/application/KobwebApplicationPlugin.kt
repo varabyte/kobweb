@@ -42,12 +42,12 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.withType
 import org.gradle.tooling.events.FailureResult
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -256,15 +256,10 @@ class KobwebApplicationPlugin @Inject constructor(
                 kobwebConf,
                 kobwebBlock,
                 buildTarget,
-                project.kspFrontendFile
             )
 
-            val kotlinMppExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
-            kotlinMppExtension.sourceSets.getByName("jsMain").kotlin
-////                .srcDir(kobwebGenSiteEntryTask)
-
             kobwebGenSiteEntryTask.configure {
-                dependsOn(project.tasks.named("kspKotlinJs"))
+                kspGenFile = project.kspFrontendFile
             }
 
             kobwebGenFrontendTask.configure {
@@ -288,18 +283,17 @@ class KobwebApplicationPlugin @Inject constructor(
             // TODO: ideally kobwebGenSiteEntryTask would be declared as a srcDir for jsMain, but then ksp tried to
             // parse it, so for now we don't do that
             val jsSourceTasks = listOf(jsTarget.compileKotlin, jsTarget.sourcesJar)
-            jsSourceTasks
-                .mapNotNull { taskName -> project.tasks.namedOrNull(taskName) }
-                .forEach { task ->
-                    task.configure { dependsOn(kobwebGenSiteEntryTask) }
-                }
+            jsSourceTasks.forEach { taskName ->
+                project.tasks.namedOrNull(taskName)?.configure { dependsOn(kobwebGenSiteEntryTask) }
+            }
 
             kobwebGenTask.configure {
                 dependsOn(kobwebGenFrontendTask)
             }
 
             project.tasks.named(jsTarget.processResources) {
-                dependsOn(project.tasks.named("kspKotlinJs"))
+                inputs.file(project.kspFrontendFile)
+
                 dependsOn(kobwebGenSiteIndexTask)
                 dependsOn(kobwebCopyDependencyResourcesTask)
             }
@@ -350,7 +344,7 @@ class KobwebApplicationPlugin @Inject constructor(
             project.tasks.namedOrNull(jvmTarget.jar)?.configure { dependsOn(kobwebGenBackendTask) }
 
             project.tasks.namedOrNull(jvmTarget.processResources)?.configure {
-                // TODO: are we doing something wrong or is this fine - (also in application)
+                // TODO: are we doing something wrong or is this fine - (also in library)
                 (this as Copy).duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 //                dependsOn(project.tasks.named("kspKotlinJvm"))
             }
@@ -372,11 +366,9 @@ class KobwebApplicationPlugin @Inject constructor(
                 "kobwebGenApisFactory",
                 KobwebGenerateApisFactoryTask::class.java,
                 kobwebBlock,
-                project.kspBackendFile
             )
-            val kspKotlinJvm = project.tasks.matching { it.name == "kspKotlinJvm" }
             kobwebGenApisFactoryTask.configure {
-                dependsOn(kspKotlinJvm)
+                project.kspBackendFile?.let { kspGenFile = it }
             }
 
             kobwebGenBackendTask.configure {

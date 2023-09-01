@@ -12,7 +12,7 @@ import com.varabyte.kobweb.project.backend.merge
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.provider.DefaultProvider
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFiles
@@ -21,10 +21,11 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
-abstract class KobwebGenerateApisFactoryTask @Inject constructor(
-    kobwebBlock: KobwebBlock,
-    @get:Optional @get:InputFiles val kspGenFile: Provider<RegularFile>?
-) : KobwebModuleTask(kobwebBlock, "Generate Kobweb code for the server") {
+abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: KobwebBlock) :
+    KobwebModuleTask(kobwebBlock, "Generate Kobweb code for the server") {
+    @get:InputFiles // files since it may not exist: TODO: figure out using pure optional file (not fileS)?
+    @get:Optional
+    abstract val kspGenFile: RegularFileProperty
 
     @InputFiles
     fun getCompileClasspath(): Provider<FileCollection> = project.jvmTarget?.let { jvmTarget ->

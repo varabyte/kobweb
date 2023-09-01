@@ -74,6 +74,7 @@ fun setupKsp(project: Project, kobwebBlock: KobwebBlock, includeAppData: Boolean
     }
 
     taskCollection.kspKotlinJvm.configureEach {
+        outputs.file("build/generated/ksp/jvm/jvmMain/resources/backend.json")
         // TODO: we currently set this kep using task.project.group since the group can be different from different modules
         // however, task.project is not recommended to be used, what are our alternatives?
         kspExtension.arg(
