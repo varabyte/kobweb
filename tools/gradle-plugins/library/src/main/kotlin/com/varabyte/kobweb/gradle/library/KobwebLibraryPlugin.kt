@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.ksp.setupKsp
-import com.varabyte.kobweb.gradle.core.kspBackendFile
 import com.varabyte.kobweb.gradle.core.kspFrontendFile
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import org.gradle.api.Plugin
@@ -28,37 +27,25 @@ class KobwebLibraryPlugin : Plugin<Project> {
         setupKsp(project, kobwebBlock, includeAppData = false)
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
-            // TODO: why doesn't declaring the inputs work
-            val kspFrontendFile = project.kspFrontendFile.map { it.asFile.absolutePath }
             val jsTarget = JsTarget(this)
-
-            project.tasks.namedOrNull(jsTarget.processResources)?.configure {
-                dependsOn(project.tasks.named("kspKotlinJs"))
-//                inputs.file(kspFrontendFile)
-            }
-            project.tasks.namedOrNull(jsTarget.jar)?.configure {
-                dependsOn(project.tasks.named("kspKotlinJs"))
-//                inputs.file(kspFrontendFile)
+            listOf(jsTarget.processResources, jsTarget.jar).forEach { taskName ->
+                project.tasks.namedOrNull(taskName)?.configure {
+                    inputs.file(project.kspFrontendFile)
+                }
             }
         }
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
-            val kspBackendFile = project.kspBackendFile
             val jvmTarget = JvmTarget(this)
-
             // NOTE: JVM-related tasks are not always available. If they are, it means this project exports an API jar.
-            project.tasks.namedOrNull(jvmTarget.processResources)?.configure {
-                // TODO: are we doing something wrong or is this fine - (also in application)
-                (this as Copy).duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//                dependsOn(project.tasks.named("kspKotlinJvm"))
-                if (kspBackendFile != null) {
-                    inputs.file(kspBackendFile)
+            listOf(jvmTarget.processResources, jvmTarget.jar).forEach { taskName ->
+                project.tasks.namedOrNull(taskName)?.configure {
+                    inputs.file(project.kspFrontendFile)
                 }
             }
-            project.tasks.namedOrNull(jvmTarget.jar)?.configure {
-//                dependsOn(project.tasks.named("kspKotlinJvm"))
-                if (kspBackendFile != null) {
-                    inputs.file(kspBackendFile)
-                }
+
+            // TODO: are we doing something wrong or is this fine - (also in application)
+            project.tasks.namedOrNull(jvmTarget.processResources)?.configure {
+                (this as Copy).duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             }
         }
     }

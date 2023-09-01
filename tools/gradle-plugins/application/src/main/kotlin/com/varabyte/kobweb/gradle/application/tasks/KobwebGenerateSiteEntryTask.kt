@@ -16,8 +16,7 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
-import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.Provider
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -29,8 +28,9 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     private val kobwebConf: KobwebConf,
     kobwebBlock: KobwebBlock,
     @get:Input val buildTarget: BuildTarget,
-    @get:InputFile val kspGenFile: Provider<RegularFile>,
 ) : KobwebModuleTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
+    @get:InputFile
+    abstract val kspGenFile: RegularFileProperty
 
     @InputFiles
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
