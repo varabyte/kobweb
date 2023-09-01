@@ -7,7 +7,7 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 
 /**
  * A sub-block for defining properties related to configuring the `kobweb export` step.
@@ -40,7 +40,7 @@ abstract class ExportBlock {
 }
 
 val KobwebBlock.export: ExportBlock
-    get() = ((this as ExtensionAware).extensions["export"] as ExportBlock)
+    get() = (this as ExtensionAware).extensions.getByType<ExportBlock>()
 
 internal fun KobwebBlock.createExportBlock() {
     (this as ExtensionAware).extensions.create<ExportBlock>("export")

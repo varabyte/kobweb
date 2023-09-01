@@ -13,7 +13,8 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
 import javax.inject.Inject
 
 /**
@@ -95,17 +96,16 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf) {
         globals.set(mapOf("title" to conf.site.title))
         cleanUrls.convention(true)
 
-        (this as ExtensionAware).extensions.create("index", IndexBlock::class.java, RoutePrefix(conf.site.routePrefix))
+        (this as ExtensionAware).extensions.create<IndexBlock>("index", RoutePrefix(conf.site.routePrefix))
     }
-
 }
 
 val AppBlock.index: AppBlock.IndexBlock
-    get() = ((this as ExtensionAware).extensions["index"] as AppBlock.IndexBlock)
+    get() = (this as ExtensionAware).extensions.getByType<AppBlock.IndexBlock>()
 
 val KobwebBlock.app: AppBlock
-    get() = ((this as ExtensionAware).extensions["app"] as AppBlock)
+    get() = (this as ExtensionAware).extensions.getByType<AppBlock>()
 
 internal fun KobwebBlock.createAppBlock(conf: KobwebConf) {
-    (this as ExtensionAware).extensions.create("app", AppBlock::class.java, conf)
+    (this as ExtensionAware).extensions.create<AppBlock>("app", conf)
 }

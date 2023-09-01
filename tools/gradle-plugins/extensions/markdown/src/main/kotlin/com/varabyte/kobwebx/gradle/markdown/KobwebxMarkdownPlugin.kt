@@ -10,6 +10,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
@@ -25,12 +26,8 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             create<MarkdownFeatures>("features")
         }
 
-        val convertTask = project.tasks.register(
-            "kobwebxMarkdownConvert",
-            ConvertMarkdownTask::class.java,
-            kobwebBlock,
-            markdownConfig
-        )
+        val convertTask = project.tasks
+            .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownConfig)
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
