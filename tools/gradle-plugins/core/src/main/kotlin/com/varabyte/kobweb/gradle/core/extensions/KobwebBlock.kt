@@ -7,7 +7,7 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
-import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 import java.io.File
 
 /**
@@ -82,4 +82,4 @@ abstract class KobwebBlock {
     }
 }
 
-val Project.kobwebBlock get() = project.extensions["kobweb"] as KobwebBlock
+val Project.kobwebBlock get() = project.extensions.getByType<KobwebBlock>()

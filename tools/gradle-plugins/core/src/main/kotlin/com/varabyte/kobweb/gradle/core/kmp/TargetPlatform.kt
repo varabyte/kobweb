@@ -6,8 +6,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
-abstract class TargetPlatform<T : KotlinTarget> {
-    abstract val name: String
+interface TargetPlatform<T : KotlinTarget> {
+    val name: String
 
     val mainSourceSet: String get() = "${name}Main"
     val srcSuffix: String get() = "/src/${mainSourceSet}/kotlin"
@@ -25,7 +25,7 @@ abstract class TargetPlatform<T : KotlinTarget> {
 
 // The suggested replacement for "capitalize" is awful
 @Suppress("DEPRECATION")
-class JsTarget(val kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTarget>() {
+class JsTarget(val kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTarget> {
     override val name: String = kotlinTarget.name
 
     val browserDevelopmentRun get() = "${kotlinTarget.name}BrowserDevelopmentRun"
@@ -49,7 +49,7 @@ val Project.jsTarget: JsTarget
     get() = JsTarget(buildTargets.withType<KotlinJsIrTarget>().single())
 
 
-class JvmTarget(target: KotlinJvmTarget) : TargetPlatform<KotlinJvmTarget>() {
+class JvmTarget(target: KotlinJvmTarget) : TargetPlatform<KotlinJvmTarget> {
     override val name: String = target.name
 }
 
