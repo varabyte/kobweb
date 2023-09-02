@@ -52,6 +52,7 @@ object CheckboxDefaults {
 val CheckboxBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
 val CheckboxBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
 val CheckboxSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
+val CheckboxSpacingVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
 val CheckboxFontSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val CheckboxIconSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val CheckboxFocusOutlineColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
@@ -61,7 +62,7 @@ val CheckboxIconBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "sil
 val CheckboxStyle by ComponentStyle(prefix = "silk") {
     base {
         Modifier
-            .gap(0.5.cssRem)
+            .gap(CheckboxSpacingVar.value())
             .userSelect(UserSelect.None)
             .fontSize(CheckboxFontSizeVar.value())
             .cursor(Cursor.Pointer)
@@ -76,7 +77,6 @@ val CheckboxEnabledAnim by Keyframes(prefix = "silk") {
 val CheckboxIconContainerStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .fontSize(CheckboxIconSizeVar.value())
-        .color(CheckboxIconColorVar.value())
         .size(CheckboxSizeVar.value())
         .backgroundColor(CheckboxIconBackgroundColorVar.value())
         .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxIconBackgroundColorVar.value())
@@ -85,10 +85,8 @@ val CheckboxIconContainerStyle by ComponentStyle.base(prefix = "silk") {
 
 val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
-        .color(CheckboxIconColorVar.value())
         .size(CheckboxSizeVar.value())
-        .backgroundColor(CheckboxIconBackgroundColorVar.value())
-        .borderRadius(CheckboxBorderRadiusVar.value())
+        .color(CheckboxIconColorVar.value())
 }
 
 val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariantBase {
@@ -174,8 +172,10 @@ fun TriCheckbox(
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     size: CheckboxSize = CheckboxDefaults.Size,
+    spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
@@ -202,14 +202,8 @@ fun TriCheckbox(
     Row(
         CheckboxStyle.toModifier(variant)
             .thenIf(!enabled, DisabledStyle.toModifier())
-            .thenIf(borderColor != null) { Modifier.setVariable(CheckboxBorderColorVar, borderColor!!) }
-            .thenIf(focusOutlineColor != null) {
-                Modifier.setVariable(
-                    CheckboxFocusOutlineColorVar,
-                    focusOutlineColor!!
-                )
-            }
             .then(size.toModifier())
+            .thenIf(spacing != null) { Modifier.setVariable(CheckboxSpacingVar, spacing!!) }
             .thenIf(colorScheme != null) {
                 @Suppress("NAME_SHADOWING") val colorScheme = colorScheme!!
                 val isDark = colorMode.isDark
@@ -217,6 +211,14 @@ fun TriCheckbox(
                 Modifier
                     .setVariable(CheckboxIconBackgroundColorVar, if (isDark) colorScheme._200 else colorScheme._500)
                     .setVariable(CheckboxIconColorVar, (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color)
+            }
+            .thenIf(borderColor != null) { Modifier.setVariable(CheckboxBorderColorVar, borderColor!!) }
+            .thenIf(iconColor != null) { Modifier.setVariable(CheckboxIconColorVar, iconColor!!) }
+            .thenIf(focusOutlineColor != null) {
+                Modifier.setVariable(
+                    CheckboxFocusOutlineColorVar,
+                    focusOutlineColor!!
+                )
             }
             .then(modifier)
             .thenIf(enabled) { Modifier.onClick { fireOnCheckChanged() } },
@@ -277,9 +279,11 @@ fun TriCheckbox(
  *   not be interactable.
  * @param size The size of the switch. Defaults to [CheckboxSize.MD]. You can implement your own [CheckboxSize] if you
  *   want custom sizing.
+ * @param spacing An optional spacing parameter to use between the checkbox and any content drawn to the right of it.
  * @param colorScheme An optional color scheme to use for the switch. If not provided, the switch will use the
  *   appropriate colors from the [SilkPalette].
  * @param borderColor An optional override for the border color of the checkbox when unchecked.
+ * @param iconColor An optional override for the color of the icon drawn in the checkbox.
  * @param focusOutlineColor An optional override for the border color when the input is focused.
  */
 @Composable
@@ -290,8 +294,10 @@ fun Checkbox(
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     size: CheckboxSize = CheckboxDefaults.Size,
+    spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
@@ -304,8 +310,10 @@ fun Checkbox(
         variant,
         enabled,
         size,
+        spacing,
         colorScheme,
         borderColor,
+        iconColor,
         focusOutlineColor,
         ref,
         icon,
@@ -322,8 +330,10 @@ fun Checkbox(
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     size: CheckboxSize = CheckboxDefaults.Size,
+    spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
@@ -335,8 +345,10 @@ fun Checkbox(
         variant,
         enabled,
         size,
+        spacing,
         colorScheme,
         borderColor,
+        iconColor,
         focusOutlineColor,
         ref,
         icon
@@ -352,8 +364,10 @@ fun TriCheckbox(
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     size: CheckboxSize = CheckboxDefaults.Size,
+    spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
@@ -365,8 +379,10 @@ fun TriCheckbox(
         variant,
         enabled,
         size,
+        spacing,
         colorScheme,
         borderColor,
+        iconColor,
         focusOutlineColor,
         ref,
         icon
