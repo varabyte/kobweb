@@ -15,6 +15,7 @@ import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.Checkbox
+import com.varabyte.kobweb.silk.components.forms.CheckboxIconScope
 import com.varabyte.kobweb.silk.components.forms.CheckboxSize
 import com.varabyte.kobweb.silk.components.forms.CheckedState
 import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
@@ -29,6 +30,10 @@ import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.forms.TextInput
 import com.varabyte.kobweb.silk.components.forms.TriCheckbox
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
+import com.varabyte.kobweb.silk.components.icons.CircleIcon
+import com.varabyte.kobweb.silk.components.icons.PlusIcon
+import com.varabyte.kobweb.silk.components.icons.SquareIcon
+import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
 import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
@@ -259,6 +264,22 @@ fun WidgetsPage() {
                     run {
                         var checked by remember { mutableStateOf(true) }
                         Checkbox("Disabled", checked, onCheckedChange = { checked = it }, enabled = false)
+                    }
+
+                    Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
+                        // Note: We could have also used `CheckedIcon { PlusIcon() }` etc. below, but we don't ever care
+                        // about the indeterminate state so it doesn't matter.
+                        val iconOverrides = mapOf<String, @Composable CheckboxIconScope.() -> Unit>(
+                            "Plus" to { PlusIcon() },
+                            "Square" to { SquareIcon() },
+                            "Circle" to { CircleIcon() },
+                            "Font Awesome" to { FaBolt() }
+                        )
+
+                        for ((iconLabel, iconProvider) in iconOverrides) {
+                            var checked by remember { mutableStateOf(true) }
+                            Checkbox(iconLabel, checked, onCheckedChange = { checked = it }, icon = iconProvider)
+                        }
                     }
 
                     Column(Modifier.gap(0.2.cssRem)) {

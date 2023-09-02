@@ -37,16 +37,28 @@ import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 
+/**
+ * A convenient icon builder where you only care about the non-indeterminate case.
+ *
+ * This can be useful for cases where you want to create a custom non-check icon for your checkbox but are happy with
+ * default indeterminate icon.
+ *
+ * @param provideIcon Provide an icon that should appear inside a checked checkbox. You should ignore the
+ *  [indeterminate][CheckboxIconScope.indeterminate] property as it will always be false in this context.
+ */
+@Composable
+fun CheckboxIconScope.CheckedIcon(provideIcon: @Composable CheckboxIconScope.() -> Unit) {
+    if (indeterminate) {
+        IndeterminateIcon()
+    } else {
+        provideIcon()
+    }
+}
+
 object CheckboxDefaults {
     const val Enabled = true
     val Size = CheckboxSize.MD
-    val IconProvider: @Composable CheckboxIconScope.() -> Unit = {
-        if (indeterminate) {
-            IndeterminateIcon()
-        } else {
-            CheckIcon()
-        }
-    }
+    val IconProvider: @Composable CheckboxIconScope.() -> Unit = { CheckedIcon { CheckIcon() } }
 }
 
 val CheckboxBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
