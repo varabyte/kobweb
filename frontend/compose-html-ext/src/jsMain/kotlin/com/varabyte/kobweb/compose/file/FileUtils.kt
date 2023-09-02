@@ -1,5 +1,9 @@
 package com.varabyte.kobweb.compose.file
 
+import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
@@ -10,7 +14,50 @@ import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.File
 import org.w3c.files.FileReader
-import org.w3c.dom.url.URL as DomURL // to avoid ambiguity with Document.URL
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+import org.w3c.dom.url.URL as DomURL
+
+abstract class FileException(val file: File, message: String) : Throwable("File (${file.name}): $message")
+class FileErrorException(file: File) : FileException(file, "read failed")
+class FileAbortException(file: File) : FileException(file, "read aborted")
+
+/**
+ * Read the contents of a file as a ByteArray, suspending until the read is complete.
+ *
+ * @throws FileErrorException if the file could not be read.
+ * @throws FileAbortException if the file read was aborted.
+ */
+suspend fun File.readBytes(): ByteArray {
+    return suspendCoroutine { cont ->
+        val reader = FileReader()
+        reader.onload = { loadEvt ->
+            val result = loadEvt.target.asDynamic().result as ArrayBuffer
+            val intArray = Int8Array(result)
+            cont.resume(ByteArray(intArray.byteLength) { i -> intArray[i] })
+        }
+        reader.onabort = { cont.resumeWithException(FileAbortException(this)) }
+        reader.onerror = { cont.resumeWithException(FileErrorException(this)) }
+
+        reader.readAsArrayBuffer(this)
+    }
+}
+
+/**
+ * Read the contents of a file as a ByteArray, asynchronously.
+ */
+fun File.readBytes(onAbort: () -> Unit = {}, onError: () -> Unit = {}, onLoaded: (ByteArray) -> Unit) {
+    CoroutineScope(window.asCoroutineDispatcher()).launch {
+        try {
+            onLoaded(readBytes())
+        } catch (e: FileErrorException) {
+            onError()
+        } catch (e: FileAbortException) {
+            onAbort()
+        }
+    }
+}
 
 /**
  * Save some content to disk, presenting the user with a dialog to choose the file location.
