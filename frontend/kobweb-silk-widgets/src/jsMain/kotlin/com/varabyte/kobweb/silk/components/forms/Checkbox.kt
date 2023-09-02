@@ -195,10 +195,8 @@ fun TriCheckbox(
     }
 
     val colorMode = ColorMode.current
-//    val switchPalette = colorMode.toSilkPalette().switch
 
     var checkboxInput by remember { mutableStateOf<HTMLInputElement?>(null) }
-
     Row(
         CheckboxStyle.toModifier(variant)
             .thenIf(!enabled, DisabledStyle.toModifier())
