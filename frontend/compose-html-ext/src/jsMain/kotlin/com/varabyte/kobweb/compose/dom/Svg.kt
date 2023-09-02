@@ -53,16 +53,19 @@ fun Svg(
 
 // region SVG children
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle
 @Composable
 fun ElementScope<SVGElement>.Circle(attrs: AttrBuilderContext<SVGCircleElement>) {
     GenericTag("circle", "http://www.w3.org/2000/svg", attrs)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse
 @Composable
 fun ElementScope<SVGElement>.Ellipse(attrs: AttrBuilderContext<SVGEllipseElement>) {
     GenericTag("ellipse", "http://www.w3.org/2000/svg", attrs)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g
 @Composable
 fun ElementScope<SVGElement>.Group(
     attrs: AttrBuilderContext<SVGGElement>? = null,
@@ -71,32 +74,37 @@ fun ElementScope<SVGElement>.Group(
     GenericTag("group", "http://www.w3.org/2000/svg", attrs, content)
 }
 
-
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line
 @Composable
 fun ElementScope<SVGElement>.Line(attrs: AttrBuilderContext<SVGLineElement>) {
     GenericTag("line", "http://www.w3.org/2000/svg", attrs)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path
 @Composable
 fun ElementScope<SVGElement>.Path(attrs: AttrBuilderContext<SVGPathElement>) {
     GenericTag("path", "http://www.w3.org/2000/svg", attrs)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon
 @Composable
 fun ElementScope<SVGElement>.Polygon(attrs: AttrBuilderContext<SVGPolygonElement>) {
     GenericTag("polygon", "http://www.w3.org/2000/svg", attrs)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polyline
 @Composable
 fun ElementScope<SVGElement>.Polyline(attrs: AttrBuilderContext<SVGPolylineElement>) {
     GenericTag("polyline", "http://www.w3.org/2000/svg", attrs)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect
 @Composable
 fun ElementScope<SVGElement>.Rect(attrs: AttrBuilderContext<SVGRectElement>) {
     GenericTag("rect", "http://www.w3.org/2000/svg", attrs)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text
 @Composable
 fun ElementScope<SVGElement>.Text(text: String, attrs: AttrBuilderContext<SVGTextElement>) {
     GenericTag("text", "http://www.w3.org/2000/svg", attrs) {
