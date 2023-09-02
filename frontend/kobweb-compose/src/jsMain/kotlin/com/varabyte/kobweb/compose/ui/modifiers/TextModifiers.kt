@@ -76,6 +76,10 @@ fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
     textShadow(textShadow)
 }
 
+fun Modifier.textTransform(textTransform: TextTransform): Modifier = styleModifier {
+    textTransform(textTransform)
+}
+
 fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
     whiteSpace(whiteSpace)
 }

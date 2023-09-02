@@ -114,6 +114,29 @@ fun StyleScope.textShadow(textShadow: TextShadow) {
     property("text-shadow", textShadow)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform
+class TextTransform private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val None get() = TextTransform("none")
+        val Capitalize get() = TextTransform("capitalize")
+        val Uppercase get() = TextTransform("uppercase")
+        val Lowercase get() = TextTransform("lowercase")
+
+        // Globals
+        val Inherit get() = TextTransform("inherit")
+        val Initial get() = TextTransform("initial")
+        val Revert get() = TextTransform("revert")
+        val Unset get() = TextTransform("unset")
+    }
+}
+
+fun StyleScope.textTransform(textTransform: TextTransform) {
+    property("text-transform", textTransform)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
 class UserSelect private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
