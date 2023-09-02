@@ -5,8 +5,9 @@ import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
-import com.varabyte.kobweb.compose.foundation.layout.Box
-import com.varabyte.kobweb.compose.foundation.layout.BoxScope
+import com.varabyte.kobweb.compose.foundation.layout.Arrangement
+import com.varabyte.kobweb.compose.foundation.layout.Row
+import com.varabyte.kobweb.compose.foundation.layout.RowScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -133,7 +134,7 @@ fun Button(
     type: ButtonType = ButtonType.Button,
     enabled: Boolean = true,
     ref: ElementRefScope<HTMLButtonElement>? = null,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable RowScope.() -> Unit
 ) {
     JbButton(
         attrs = ButtonStyle.toModifier(variant)
@@ -167,6 +168,10 @@ fun Button(
     ) {
         registerRefScope(ref)
 
-        Box(contentAlignment = Alignment.Center, content = content)
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            content = content
+        )
     }
 }
