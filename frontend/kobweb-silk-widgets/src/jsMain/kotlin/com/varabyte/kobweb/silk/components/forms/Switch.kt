@@ -161,10 +161,10 @@ fun Switch(
     variant: ComponentVariant? = null,
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
+    shape: SwitchShape = SwitchShape.PILL,
     colorScheme: ColorScheme? = null,
     thumbColor: CSSColorValue? = null,
     focusBorderColor: CSSColorValue? = null,
-    shape: SwitchShape = SwitchShape.PILL,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
     val colorMode = ColorMode.current

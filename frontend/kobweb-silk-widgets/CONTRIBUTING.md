@@ -187,14 +187,50 @@ fun Tooltip(
 )
 ```
 
-#### Size, color scheme, and other style parameters
+#### State and style parameters
 
-When applicable, you SHOULD declare size and color scheme parameters right after the `variant` parameter.
+You SHOULD declare state parameters right after the `variant` parameter, followed by style parameters.
 
-This is because size and color schemes are additional style modifications, and as such, they should logically be
-grouped with the `modifier` and related `variant` parameters.
+This order is chosen to mimic the order used by Jetpack Compose widgets, which appear to do the same thing. It also
+makes some sense as an element's state often effects is visual appearance, and should therefore be prioritized earlier.
 
-Additionally, size names MUST be named after abbreviated T-shirt sizes, with at least SM, MD, and LG sizes defined.
+```kotlin
+@Composable
+fun MyWidget(
+  text: String,
+  modifier: Modifier = Modifier,
+  variant: ComponentVariant? = null,
+  enabled: Boolean,
+  invalid: Boolean,
+  size: MyWidgetSize = MyWidgetSize.MD,
+  colorScheme: ColorScheme? = null,
+  focusOutlineColor: Color? = null,
+  ref: ...) {
+```
+
+*Don't*
+
+```kotlin
+@Composable
+fun MyWidget(
+  ...,
+  variant: ComponentVariant? = null,
+  enabled: Boolean,
+  colorScheme: ColorScheme? = null,
+  size: MyWidgetSize,
+  enabled: Boolean,
+  invalid: Boolean,
+  ...) {
+    /* ... */
+}
+```
+
+#### Widget sizes
+
+Sizes are useful for widgets that have a visual appearance that often benefit from being scaled up or down, but in a
+consistent way across the whole application.
+
+Size names MUST be named after abbreviated T-shirt sizes, with at least SM, MD, and LG sizes defined.
 You CAN additionally define XS, XL, and XXL sizes if they seem relevant, but they are not required.
 
 Sizes SHOULD be `cssRem` values, so a site will dynamically resize around a larger font if designed with one.
@@ -226,7 +262,7 @@ fun MyWidget(
   variant: ComponentVariant? = null,
   size: MyWidgetSize = MyWidgetSize.MD,
   colorScheme: ColorScheme? = null,
-  enabled: Boolean = true, ...) {
+  ...) {
     Box(
       MyWidgetStyle.toModifier(variant)
         .then(size.toModifier())
@@ -234,21 +270,6 @@ fun MyWidget(
             Modifier.setVariable(MyWidgetColorVar, if (ColorMode.current.isDark) colorScheme._200 else colorScheme._700)
         }
     )
-}
-```
-
-*Don't*
-
-```kotlin
-@Composable
-fun MyWidget(
-  ...,
-  variant: ComponentVariant? = null,
-  enabled: Boolean,
-  colorScheme: ColorScheme? = null,
-  size: MyWidgetSize,
-  ...) {
-    /* ... */
 }
 ```
 

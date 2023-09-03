@@ -185,9 +185,6 @@ internal class InputParams<T : Any>(
             this.modifier.then(modifier),
             variant,
             placeholder,
-            placeholderColor,
-            focusBorderColor,
-            invalidBorderColor,
             enabled,
             valid,
             required,
@@ -195,6 +192,9 @@ internal class InputParams<T : Any>(
             spellCheck,
             autoComplete,
             onCommit,
+            placeholderColor,
+            focusBorderColor,
+            invalidBorderColor,
             ref,
         )
     }
@@ -220,9 +220,6 @@ class InputGroupScope {
         modifier: Modifier = Modifier,
         variant: ComponentVariant? = InputDefaults.Variant,
         placeholder: String? = null,
-        placeholderColor: PlaceholderColor? = null,
-        focusBorderColor: CSSColorValue? = null,
-        invalidBorderColor: CSSColorValue? = null,
         enabled: Boolean = InputDefaults.Enabled,
         valid: Boolean = InputDefaults.Valid,
         required: Boolean = InputDefaults.Required,
@@ -230,6 +227,9 @@ class InputGroupScope {
         spellCheck: Boolean = InputDefaults.SpellCheck,
         autoComplete: AutoComplete? = null,
         onCommit: () -> Unit = {},
+        placeholderColor: PlaceholderColor? = null,
+        focusBorderColor: CSSColorValue? = null,
+        invalidBorderColor: CSSColorValue? = null,
         ref: ElementRefScope<HTMLInputElement>? = null,
     ) {
         require(inputParams == null) { "Can only call `Input` once" }
@@ -358,9 +358,6 @@ fun InputGroupScope.TextInput(
         modifier,
         variant,
         placeholder,
-        placeholderColor,
-        focusBorderColor,
-        invalidBorderColor,
         enabled,
         valid,
         required,
@@ -368,6 +365,9 @@ fun InputGroupScope.TextInput(
         spellCheck,
         autoComplete,
         onCommit,
+        placeholderColor,
+        focusBorderColor,
+        invalidBorderColor,
         ref,
     )
 }
@@ -428,9 +428,6 @@ private fun <T : Any> _Input(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     placeholder: String? = null,
-    placeholderColor: PlaceholderColor? = null,
-    focusBorderColor: CSSColorValue? = null,
-    invalidBorderColor: CSSColorValue? = null,
     enabled: Boolean = InputDefaults.Enabled,
     valid: Boolean = InputDefaults.Valid,
     required: Boolean = InputDefaults.Required,
@@ -438,6 +435,9 @@ private fun <T : Any> _Input(
     spellCheck: Boolean = InputDefaults.SpellCheck,
     autoComplete: AutoComplete? = null,
     onCommit: () -> Unit = {},
+    placeholderColor: PlaceholderColor? = null,
+    focusBorderColor: CSSColorValue? = null,
+    invalidBorderColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLInputElement>? = null,
 ) {
     if (ref != null) {
@@ -535,9 +535,6 @@ fun TextInput(
         variant,
         placeholder,
         size,
-        placeholderColor,
-        focusBorderColor,
-        invalidBorderColor,
         enabled,
         valid,
         required,
@@ -545,6 +542,9 @@ fun TextInput(
         spellCheck,
         autoComplete,
         onCommit,
+        placeholderColor,
+        focusBorderColor,
+        invalidBorderColor,
         ref,
     )
 }
@@ -588,9 +588,6 @@ fun <T : Any> Input(
     variant: ComponentVariant? = InputDefaults.Variant,
     placeholder: String? = null,
     size: InputSize = InputDefaults.Size,
-    placeholderColor: PlaceholderColor? = null,
-    focusBorderColor: CSSColorValue? = null,
-    invalidBorderColor: CSSColorValue? = null,
     enabled: Boolean = InputDefaults.Enabled,
     valid: Boolean = InputDefaults.Valid,
     required: Boolean = InputDefaults.Required,
@@ -598,6 +595,9 @@ fun <T : Any> Input(
     spellCheck: Boolean = InputDefaults.SpellCheck,
     autoComplete: AutoComplete? = null,
     onCommit: () -> Unit = {},
+    placeholderColor: PlaceholderColor? = null,
+    focusBorderColor: CSSColorValue? = null,
+    invalidBorderColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLInputElement>? = null,
 ) {
     _Input(
@@ -607,9 +607,6 @@ fun <T : Any> Input(
         size.toModifier().then(modifier),
         variant,
         placeholder,
-        placeholderColor,
-        focusBorderColor,
-        invalidBorderColor,
         enabled,
         valid,
         required,
@@ -617,6 +614,9 @@ fun <T : Any> Input(
         spellCheck,
         autoComplete,
         onCommit,
+        placeholderColor,
+        focusBorderColor,
+        invalidBorderColor,
         ref,
     )
 }

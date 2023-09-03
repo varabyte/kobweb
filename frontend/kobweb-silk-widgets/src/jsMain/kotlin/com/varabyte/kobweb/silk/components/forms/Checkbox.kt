@@ -183,6 +183,7 @@ fun TriCheckbox(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
+    icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
@@ -190,7 +191,6 @@ fun TriCheckbox(
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     content: (@Composable () -> Unit)? = null,
 ) {
     // Don't animate if a checkbox is being added to the DOM while already checked
@@ -303,6 +303,7 @@ fun Checkbox(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
+    icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
@@ -310,7 +311,6 @@ fun Checkbox(
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     content: (@Composable () -> Unit)? = null,
 ) {
     TriCheckbox(
@@ -319,6 +319,7 @@ fun Checkbox(
         modifier,
         variant,
         enabled,
+        icon,
         size,
         spacing,
         colorScheme,
@@ -326,7 +327,6 @@ fun Checkbox(
         iconColor,
         focusOutlineColor,
         ref,
-        icon,
         content
     )
 }
@@ -339,6 +339,7 @@ fun Checkbox(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
+    icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
@@ -346,7 +347,6 @@ fun Checkbox(
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
 ) {
     Checkbox(
         checked,
@@ -354,6 +354,7 @@ fun Checkbox(
         modifier,
         variant,
         enabled,
+        icon,
         size,
         spacing,
         colorScheme,
@@ -361,7 +362,6 @@ fun Checkbox(
         iconColor,
         focusOutlineColor,
         ref,
-        icon
     ) { Text(label) }
 }
 
@@ -373,6 +373,7 @@ fun TriCheckbox(
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
+    icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
@@ -380,7 +381,6 @@ fun TriCheckbox(
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
-    icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
 ) {
     TriCheckbox(
         checked,
@@ -388,6 +388,7 @@ fun TriCheckbox(
         modifier,
         variant,
         enabled,
+        icon,
         size,
         spacing,
         colorScheme,
@@ -395,6 +396,5 @@ fun TriCheckbox(
         iconColor,
         focusOutlineColor,
         ref,
-        icon
     ) { Text(label) }
 }

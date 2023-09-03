@@ -128,11 +128,11 @@ fun Button(
     onClick: (evt: SyntheticMouseEvent) -> Unit,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
+    type: ButtonType = ButtonType.Button,
+    enabled: Boolean = true,
     size: ButtonSize = ButtonSize.MD,
     colorScheme: ColorScheme? = null,
     focusBorderColor: CSSColorValue? = null,
-    type: ButtonType = ButtonType.Button,
-    enabled: Boolean = true,
     ref: ElementRefScope<HTMLButtonElement>? = null,
     content: @Composable RowScope.() -> Unit
 ) {
