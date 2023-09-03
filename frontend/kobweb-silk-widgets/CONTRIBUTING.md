@@ -442,7 +442,6 @@ val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "si
 val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 val ButtonStyle by ComponentStyle(prefix = "silk") {
     base {
@@ -504,7 +503,6 @@ setVariable(ButtonBackgroundDefaultColorVar, palette.button.default)
 setVariable(ButtonBackgroundFocusColorVar, palette.button.focus)
 setVariable(ButtonBackgroundHoverColorVar, palette.button.hover)
 setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
-setVariable(ButtonColorVar, palette.color)
 ```
 
 *Don't*
@@ -521,6 +519,15 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
 
     ...
 }
+```
+
+*Exception*
+
+Variables which are based on global Silk values (like border color) should be connected directly at the variable
+declaration point, and not in `InitSilk.kt`:
+
+```kotlin
+val ButtonColorVar by StyleVariable<CSSColorValue>(prefix = "silk", defaultFallback = ButtonColorVar.value())
 ```
 
 #### evt.stopPropagation
