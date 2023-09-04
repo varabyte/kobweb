@@ -2,7 +2,6 @@ package com.varabyte.kobweb.compose.dom
 
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.NodeFilter
 
 /** An interface for finding some target element, relative to some given initial element. */
 interface ElementTarget {
@@ -53,19 +52,14 @@ interface ElementTarget {
          */
         fun findAncestor(matching: (HTMLElement) -> Boolean) = object : ElementTarget {
             override fun invoke(startingFrom: HTMLElement): HTMLElement? {
-                var currElement: HTMLElement? = startingFrom
-                do {
-                    currElement = currElement?.parentElement as? HTMLElement
-                } while (currElement != null && !matching(currElement))
-
-                return currElement
+                return startingFrom.ancestors.drop(1).firstOrNull { matching(it) }
             }
         }
 
         /**
          * Search all descendants of some root element for the first element matching the passed in condition.
          *
-         * In this case, the starting element that triggers this search is ignored.
+         * The starting element that triggers this search is not included in the search.
          *
          * This search runs in a breadth-first search manner. If not specified, the search starts from the document's `body`
          * element.
@@ -84,10 +78,7 @@ interface ElementTarget {
         fun findDescendant(root: HTMLElement? = document.body, matching: (HTMLElement) -> Boolean) =
             object : ElementTarget {
                 override fun invoke(startingFrom: HTMLElement): HTMLElement? {
-                    if (root == null) return null
-                    return document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT) { element ->
-                        if (element is HTMLElement && matching(element)) NodeFilter.FILTER_ACCEPT else NodeFilter.FILTER_SKIP
-                    }.nextNode() as? HTMLElement
+                    return root?.descendantsBfs?.drop(1)?.firstOrNull { matching(it) }
                 }
             }
 

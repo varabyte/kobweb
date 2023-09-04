@@ -3,6 +3,8 @@ package com.varabyte.kobweb.silk.components.forms
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
+import com.varabyte.kobweb.compose.dom.descendantsBfs
+import com.varabyte.kobweb.compose.dom.generateUniqueId
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toAttrs
@@ -16,18 +18,7 @@ import org.w3c.dom.HTMLMeterElement
 import org.w3c.dom.HTMLProgressElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLTextAreaElement
-import org.w3c.dom.get
 import org.jetbrains.compose.web.dom.Label as JbLabel
-
-private val ALPHANUMERICS = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-
-private fun createUniqueRandomLabelId(): String {
-    var label: String
-    do {
-        label = "for-label-" + StringBuilder().apply { repeat(6) { append(ALPHANUMERICS.random()) } }.toString()
-    } while (document.getElementById(label) != null)
-    return label
-}
 
 // See: https://html.spec.whatwg.org/multipage/forms.html#category-label
 private fun HTMLElement.isLabelable(): Boolean {
@@ -43,20 +34,9 @@ private fun HTMLElement.isLabelable(): Boolean {
     }
 }
 
-// Do a BFS on this element to find the first one that is labelable
 private fun HTMLElement.findFirstLabelable(): HTMLElement? {
-    val toCheck = mutableListOf(this)
-    while (toCheck.isNotEmpty()) {
-        val element = toCheck.removeAt(0)
-        if (element.isLabelable()) return element
-        for (i in 0 until element.children.length) {
-            val child = element.children[i] as? HTMLElement ?: continue
-            toCheck.add(child)
-        }
-    }
-    return null
+    return this.descendantsBfs.firstOrNull { it.isLabelable() }
 }
-
 
 /**
  * Create a label that should be associated with some target form element.
@@ -97,7 +77,8 @@ fun Label(
         ref { labelElement ->
             target.invoke(labelElement)?.findFirstLabelable()
                 ?.let { labelTargetElement ->
-                    if (labelTargetElement.id.isEmpty()) labelTargetElement.id = createUniqueRandomLabelId()
+                    if (labelTargetElement.id.isEmpty()) labelTargetElement.id =
+                        document.generateUniqueId(prefix = "for-label-")
                     labelElement.htmlFor = labelTargetElement.id
                 }
             onDispose { }
