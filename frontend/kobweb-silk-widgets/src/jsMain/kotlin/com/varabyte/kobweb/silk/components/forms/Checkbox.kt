@@ -108,9 +108,9 @@ val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVaria
 }
 
 val CheckboxInputVariant by InputStyle.addVariant {
-    // We hide the checkbox itself since the Switch is rendered separately, but keep it a11y-friendly by only limiting
-    // its size/appearance (instead of explicitly hiding), matching the approach of many other libraries.
-    // See Switch for more context.
+    // We hide the checkbox input itself since rendered is handled by a separate element, but keep it a11y-friendly by
+    // only limiting its size/appearance (instead of explicitly hiding), matching the approach of many other libraries.
+    // See Checkbox for more context.
     base {
         Modifier
             .border(0.px)
@@ -122,7 +122,8 @@ val CheckboxInputVariant by InputStyle.addVariant {
             .whiteSpace(WhiteSpace.NoWrap)
             .position(Position.Absolute)
     }
-    // Since the checkbox is hidden, we highlight its sibling (the switch track) when the checkbox is focused(-visible).
+    // Since the checkbox is hidden, we highlight its sibling (a div which renders a checkbox icon) when the checkbox is
+    // focused(-visible).
     cssRule(":focus-visible + *") {
         Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = CheckboxFocusOutlineColorVar.value())
     }
@@ -230,9 +231,9 @@ fun TriCheckbox(
             verticalAlignment = Alignment.CenterVertically,
             ref = ref,
         ) {
-            // We base Switch on a checkbox input for a11y + built-in input/keyboard support, but hide the checkbox itself
-            // and render the switch separately. We do however allow it to be focused, which combined with the outer label
-            // means that both clicks and keyboard events will toggle the checkbox.
+            // We base Checkbox on a checkbox input for a11y + built-in input/keyboard support, but hide the checkbox itself
+            // and render the box + icon separately. We do however allow it to be focused, which combined with the outer
+            // label means that both clicks and keyboard events will toggle the checkbox.
             Input(
                 type = InputType.Checkbox,
                 value = checked.toBoolean(),
@@ -280,18 +281,16 @@ fun TriCheckbox(
 /**
  * Creates a checkbox.
  *
- * Note that visual control of the switch is fairly limited compared to many other widgets -- you can't directly modify
- * the width or height of the track or the thumb parts. Instead, configure your switch by passing in the relevant
- * parameters.
- *
- * @param checked Whether the switch is currently checked or not.
- * @param onCheckedChange A callback which is invoked when the switch is toggled.
- * @param enabled Whether the switch is enabled or not. If not, the switch will be rendered in a disabled state and will
+ * @param checked Whether the checkbox is currently checked or not.
+ * @param onCheckedChange A callback which is invoked when the checkbox is toggled.
+ * @param enabled Whether the checkbox is enabled or not. If not, the checkbox will be rendered in a disabled state and will
  *   not be interactable.
- * @param size The size of the switch. Defaults to [CheckboxSize.MD]. You can implement your own [CheckboxSize] if you
+ * @param icon The composable that renders the icon inside the checkbox. This will be passed a [CheckboxIconScope] which
+ *   you can use to customize the icon based on potentially relevant context.
+ * @param size The size of the checkbox. Defaults to [CheckboxSize.MD]. You can implement your own [CheckboxSize] if you
  *   want custom sizing.
  * @param spacing An optional spacing parameter to use between the checkbox and any content drawn to the right of it.
- * @param colorScheme An optional color scheme to use for the switch. If not provided, the switch will use the
+ * @param colorScheme An optional color scheme to use for the checkbox. If not provided, the checkbox will use the
  *   appropriate colors from the [SilkPalette].
  * @param borderColor An optional override for the border color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
