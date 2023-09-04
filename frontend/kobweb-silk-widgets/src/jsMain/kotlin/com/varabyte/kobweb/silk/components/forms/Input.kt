@@ -117,13 +117,13 @@ val OutlinedInputVariant by InputStyle.addVariant {
     }
 
     ariaInvalid { Modifier.bordered(InputBorderInvalidColorVar.value()) }
-    (hover + not(disabled)) { Modifier.borderColor(InputBorderHoverColorVar.value()) }
+    (hover + not(disabled)) { Modifier.border { color(InputBorderHoverColorVar.value()) } }
     (focusVisible + not(disabled)) { Modifier.bordered(InputBorderFocusColorVar.value()) }
 }
 
 val FilledInputVariant by InputStyle.addVariant {
     fun Modifier.bordered(color: CSSColorValue): Modifier {
-        return this.borderColor(color).boxShadow(spreadRadius = 1.px, color = color)
+        return this.border { color(color) }.boxShadow(spreadRadius = 1.px, color = color)
     }
 
     base {
@@ -144,12 +144,12 @@ val FilledInputVariant by InputStyle.addVariant {
 
 val FlushedInputVariant by InputStyle.addVariant {
     fun Modifier.bordered(color: CSSColorValue): Modifier {
-        return this.borderColor(color).boxShadow(offsetY = 1.px, color = color)
+        return this.border { color(color) }.boxShadow(offsetY = 1.px, color = color)
     }
 
     base { Modifier.borderBottom(1.px, LineStyle.Solid, InputBorderColorVar.value()) }
     ariaInvalid { Modifier.bordered(InputBorderInvalidColorVar.value()) }
-    (hover + not(disabled)) { Modifier.borderColor(InputBorderHoverColorVar.value()) }
+    (hover + not(disabled)) { Modifier.border { color(InputBorderHoverColorVar.value()) } }
     (focusVisible + not(disabled)) { Modifier.bordered(InputBorderFocusColorVar.value()) }
 }
 

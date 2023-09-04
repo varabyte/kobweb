@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -67,8 +67,10 @@ val TooltipStyle by ComponentStyle.base(prefix = "silk") {
 val TooltipArrowStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .position(Position.Absolute)
-        .borderWidth(TRIANGLE_WIDTH)
-        .borderStyle(LineStyle.Solid)
+        .border {
+            width(TRIANGLE_WIDTH)
+            style(LineStyle.Solid)
+        }
 }
 
 val TopLeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {

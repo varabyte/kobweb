@@ -58,7 +58,7 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
             .padding(leftRight = ButtonPaddingHorizontalVar.value())
             .verticalAlign(VerticalAlign.Middle)
             .borderRadius(0.375.cssRem)
-            .borderWidth(0.px)
+            .border { width(0.px) }
             .userSelect(UserSelect.None) // No selecting text within buttons
             .transition(CSSTransition("background-color", duration = 200.ms))
     }

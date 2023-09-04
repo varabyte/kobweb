@@ -103,7 +103,7 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
     (hover + not(ariaDisabled)) {
         Modifier
             .backgroundColor(CheckboxIconBackgroundHoverColorVar.value())
-            .borderColor(CheckboxIconBackgroundHoverColorVar.value())
+            .border { color(CheckboxIconBackgroundHoverColorVar.value()) }
     }
 }
 
@@ -116,7 +116,7 @@ val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
 val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant {
     val uncheckedStyle = Modifier
         .backgroundColor(BackgroundColor.Inherit)
-        .borderColor(CheckboxBorderColorVar.value())
+        .border { color(CheckboxBorderColorVar.value()) }
 
     base { uncheckedStyle }
     (hover + not(ariaDisabled)) { uncheckedStyle }
