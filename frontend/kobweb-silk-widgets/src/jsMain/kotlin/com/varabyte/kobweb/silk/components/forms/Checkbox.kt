@@ -207,7 +207,7 @@ fun TriCheckbox(
             CheckboxStyle.toModifier(variant)
                 .thenIf(!enabled, DisabledStyle.toModifier())
                 .then(size.toModifier())
-                .thenIf(spacing != null) { Modifier.setVariable(CheckboxSpacingVar, spacing!!) }
+                .setVariable(CheckboxSpacingVar, spacing)
                 .thenIf(colorScheme != null) {
                     @Suppress("NAME_SHADOWING") val colorScheme = colorScheme!!
                     val isDark = colorMode.isDark
@@ -219,14 +219,9 @@ fun TriCheckbox(
                             (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
                         )
                 }
-                .thenIf(borderColor != null) { Modifier.setVariable(CheckboxBorderColorVar, borderColor!!) }
-                .thenIf(iconColor != null) { Modifier.setVariable(CheckboxIconColorVar, iconColor!!) }
-                .thenIf(focusOutlineColor != null) {
-                    Modifier.setVariable(
-                        CheckboxFocusOutlineColorVar,
-                        focusOutlineColor!!
-                    )
-                }
+                .setVariable(CheckboxBorderColorVar, borderColor)
+                .setVariable(CheckboxIconColorVar, iconColor)
+                .setVariable(CheckboxFocusOutlineColorVar, focusOutlineColor)
                 .then(modifier),
             verticalAlignment = Alignment.CenterVertically,
             ref = ref,

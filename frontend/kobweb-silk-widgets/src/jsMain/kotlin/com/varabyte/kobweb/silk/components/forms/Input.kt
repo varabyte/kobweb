@@ -451,14 +451,9 @@ private fun <T : Any> _Input(
         type,
         attrs = InputStyle
             .toModifier(variant)
-            .thenIf(placeholderColor != null) { placeholderColor!!.toModifier() }
-            .thenIf(focusBorderColor != null) { Modifier.setVariable(InputBorderFocusColorVar, focusBorderColor!!) }
-            .thenIf(invalidBorderColor != null) {
-                Modifier.setVariable(
-                    InputBorderInvalidColorVar,
-                    invalidBorderColor!!
-                )
-            }
+            .then(placeholderColor?.toModifier() ?: Modifier)
+            .setVariable(InputBorderFocusColorVar, focusBorderColor)
+            .setVariable(InputBorderInvalidColorVar, invalidBorderColor)
             .thenIf(!valid) {
                 Modifier.ariaInvalid().setVariable(InputBorderColorVar, InputBorderInvalidColorVar.value())
             }

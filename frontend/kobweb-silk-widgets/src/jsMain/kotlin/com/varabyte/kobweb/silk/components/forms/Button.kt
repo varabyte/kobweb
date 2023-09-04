@@ -154,9 +154,7 @@ fun Button(
                     .setVariable(ButtonBackgroundPressedColorVar, if (isDark) colorScheme._400 else colorScheme._700)
 
             }
-            .thenIf(focusBorderColor != null) {
-                Modifier.setVariable(ButtonBackgroundFocusColorVar, focusBorderColor!!)
-            }
+            .setVariable(ButtonBackgroundFocusColorVar, focusBorderColor)
             .then(modifier)
             .thenIf(enabled) {
                 Modifier

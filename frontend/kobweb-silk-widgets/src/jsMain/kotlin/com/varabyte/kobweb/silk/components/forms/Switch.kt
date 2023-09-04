@@ -195,8 +195,8 @@ fun Switch(
                     if (checked) colorScheme?.let { if (colorMode.isDark) it._200 else it._700 }
                         ?: switchPalette.backgroundOn else switchPalette.backgroundOff
                 )
-                .thenIf(thumbColor != null) { Modifier.setVariable(SwitchThumbColorVar, thumbColor!!) }
-                .thenIf(focusBorderColor != null) { Modifier.setVariable(SwitchFocusColorVar, focusBorderColor!!) }
+                .setVariable(SwitchThumbColorVar, thumbColor)
+                .setVariable(SwitchFocusColorVar, focusBorderColor)
                 .thenIf(!enabled) { DisabledStyle.toModifier() }
         ) {
             Box(
