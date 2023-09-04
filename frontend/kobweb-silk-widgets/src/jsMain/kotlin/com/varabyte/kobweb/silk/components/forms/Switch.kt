@@ -169,6 +169,7 @@ fun Switch(
 ) {
     val colorMode = ColorMode.current
     val switchPalette = colorMode.toSilkPalette().switch
+    // Use a label so it intercepts clicks and passes them to the inner Input
     Label(
         attrs = SwitchStyle.toModifier(variant)
             .then(size.toModifier())
