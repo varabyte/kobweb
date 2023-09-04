@@ -26,6 +26,14 @@ interface ElementTarget {
             }
 
         /**
+         * A target which returns the element's next sibling.
+         */
+        val NextSibling
+            get() = object : ElementTarget {
+                override fun invoke(startingFrom: HTMLElement) = startingFrom.nextElementSibling as? HTMLElement
+            }
+
+        /**
          * A direct element target for when you happen to already have access to the target [HTMLElement].
          *
          * In this case, the starting element that triggers this search is ignored.
