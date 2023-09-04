@@ -32,7 +32,7 @@ import com.varabyte.kobweb.silk.theme.shapes.clip
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.Label
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
@@ -195,83 +195,84 @@ fun TriCheckbox(
 ) {
     // Don't animate if a checkbox is being added to the DOM while already checked
     var shouldAnimate by remember { mutableStateOf(checked.toBoolean()) }
-    fun fireOnCheckChanged() {
-        onCheckedChange(
-            when (checked) {
-                CheckedState.Checked -> CheckedState.Unchecked
-                CheckedState.Unchecked -> CheckedState.Checked
-                CheckedState.Indeterminate -> CheckedState.Checked
-            }
-        )
-        shouldAnimate = true
-    }
 
     val colorMode = ColorMode.current
 
     var checkboxInput by remember { mutableStateOf<HTMLInputElement?>(null) }
-    Row(
-        CheckboxStyle.toModifier(variant)
-            .thenIf(!enabled, DisabledStyle.toModifier())
-            .then(size.toModifier())
-            .thenIf(spacing != null) { Modifier.setVariable(CheckboxSpacingVar, spacing!!) }
-            .thenIf(colorScheme != null) {
-                @Suppress("NAME_SHADOWING") val colorScheme = colorScheme!!
-                val isDark = colorMode.isDark
-                val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
-                Modifier
-                    .setVariable(CheckboxIconBackgroundColorVar, if (isDark) colorScheme._200 else colorScheme._500)
-                    .setVariable(CheckboxIconColorVar, (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color)
-            }
-            .thenIf(borderColor != null) { Modifier.setVariable(CheckboxBorderColorVar, borderColor!!) }
-            .thenIf(iconColor != null) { Modifier.setVariable(CheckboxIconColorVar, iconColor!!) }
-            .thenIf(focusOutlineColor != null) {
-                Modifier.setVariable(
-                    CheckboxFocusOutlineColorVar,
-                    focusOutlineColor!!
-                )
-            }
-            .then(modifier)
-            .thenIf(enabled) { Modifier.onClick { fireOnCheckChanged() } },
-        verticalAlignment = Alignment.CenterVertically,
-        ref = ref,
-    ) {
-        // We base Switch on a checkbox input for a11y + built-in input/keyboard support, but hide the checkbox itself
-        // and render the switch separately. We do however allow it to be focused, which combined with the outer label
-        // means that both clicks and keyboard events will toggle the checkbox.
-        Input(
-            type = InputType.Checkbox,
-            value = checked.toBoolean(),
-            onValueChanged = { fireOnCheckChanged() },
-            variant = CheckboxInputVariant,
-            enabled = enabled,
-            ref = ref { checkboxInput = it },
-        )
 
-        Box(
-            CheckboxIconContainerStyle.toModifier(UncheckedCheckboxIconContainerVariant.takeUnless { checked.toBoolean() }),
-            contentAlignment = Alignment.Center
+    // Use a label so it intercepts clicks and passes them to the inner Input
+    Label {
+        Row(
+            CheckboxStyle.toModifier(variant)
+                .thenIf(!enabled, DisabledStyle.toModifier())
+                .then(size.toModifier())
+                .thenIf(spacing != null) { Modifier.setVariable(CheckboxSpacingVar, spacing!!) }
+                .thenIf(colorScheme != null) {
+                    @Suppress("NAME_SHADOWING") val colorScheme = colorScheme!!
+                    val isDark = colorMode.isDark
+                    val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
+                    Modifier
+                        .setVariable(CheckboxIconBackgroundColorVar, if (isDark) colorScheme._200 else colorScheme._500)
+                        .setVariable(
+                            CheckboxIconColorVar,
+                            (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
+                        )
+                }
+                .thenIf(borderColor != null) { Modifier.setVariable(CheckboxBorderColorVar, borderColor!!) }
+                .thenIf(iconColor != null) { Modifier.setVariable(CheckboxIconColorVar, iconColor!!) }
+                .thenIf(focusOutlineColor != null) {
+                    Modifier.setVariable(
+                        CheckboxFocusOutlineColorVar,
+                        focusOutlineColor!!
+                    )
+                }
+                .then(modifier),
+            verticalAlignment = Alignment.CenterVertically,
+            ref = ref,
         ) {
-            if (checked.toBoolean()) {
-                Box(
-                    CheckboxIconStyle
-                        .toModifier()
-                        .thenIf(shouldAnimate) {
-                            Modifier.animation(CheckboxEnabledAnim.toAnimation(colorMode, 200.ms))
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    CheckboxIconScope(
-                        indeterminate = checked == CheckedState.Indeterminate,
-                        colorMode
-                    ).apply { icon() }
+            // We base Switch on a checkbox input for a11y + built-in input/keyboard support, but hide the checkbox itself
+            // and render the switch separately. We do however allow it to be focused, which combined with the outer label
+            // means that both clicks and keyboard events will toggle the checkbox.
+            Input(
+                type = InputType.Checkbox,
+                value = checked.toBoolean(),
+                onValueChanged = {
+                    onCheckedChange(
+                        when (checked) {
+                            CheckedState.Checked -> CheckedState.Unchecked
+                            CheckedState.Unchecked -> CheckedState.Checked
+                            CheckedState.Indeterminate -> CheckedState.Checked
+                        }
+                    )
+                    shouldAnimate = true
+                },
+                variant = CheckboxInputVariant,
+                enabled = enabled,
+                ref = ref { checkboxInput = it },
+            )
+
+            Box(
+                CheckboxIconContainerStyle.toModifier(UncheckedCheckboxIconContainerVariant.takeUnless { checked.toBoolean() }),
+                contentAlignment = Alignment.Center
+            ) {
+                if (checked.toBoolean()) {
+                    Box(
+                        CheckboxIconStyle
+                            .toModifier()
+                            .thenIf(shouldAnimate) {
+                                Modifier.animation(CheckboxEnabledAnim.toAnimation(colorMode, 200.ms))
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CheckboxIconScope(
+                            indeterminate = checked == CheckedState.Indeterminate,
+                            colorMode
+                        ).apply { icon() }
+                    }
                 }
             }
-        }
 
-        if (content != null) {
-            Span {
-                content()
-            }
+            if (content != null) content()
         }
     }
 }
