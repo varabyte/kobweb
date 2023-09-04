@@ -27,8 +27,10 @@ import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.placeholder
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
+import com.varabyte.kobweb.silk.theme.colors.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.PlaceholderOpacityVar
 import org.jetbrains.compose.web.attributes.AutoComplete
 import org.jetbrains.compose.web.attributes.InputType
@@ -51,7 +53,7 @@ object InputDefaults {
     val Variant = OutlinedInputVariant
 }
 
-val InputBorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val InputBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
 val InputBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val InputBorderFocusColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
 val InputBorderHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -63,7 +65,7 @@ val InputFontSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val InputHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val InputPaddingVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val InputPlaceholderOpacityVar by StyleVariable(prefix = "silk", defaultFallback = PlaceholderOpacityVar.value())
-val InputPlaceholderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val InputPlaceholderColorVar by StyleVariable(prefix = "silk", defaultFallback = PlaceholderColorVar.value())
 val InputInsetLeftWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
 val InputInsetRightWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
 

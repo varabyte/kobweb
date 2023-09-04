@@ -548,7 +548,7 @@ Variables which are based on global Silk values (like border color) should be co
 declaration point, and not in `InitSilk.kt`:
 
 ```kotlin
-val ButtonColorVar by StyleVariable<CSSColorValue>(prefix = "silk", defaultFallback = ButtonColorVar.value())
+val ButtonColorVar by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
 ```
 
 #### evt.stopPropagation

@@ -20,6 +20,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.css.*
@@ -27,7 +28,7 @@ import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 
 val TabColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val TabBorderColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val TabBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
 val TabBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val TabDisabledBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val TabHoverBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")

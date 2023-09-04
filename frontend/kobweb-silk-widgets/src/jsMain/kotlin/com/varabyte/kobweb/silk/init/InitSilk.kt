@@ -6,7 +6,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.animation.registerKeyframes
 import com.varabyte.kobweb.silk.components.disclosure.TabBackgroundColorVar
-import com.varabyte.kobweb.silk.components.disclosure.TabBorderColorVar
 import com.varabyte.kobweb.silk.components.disclosure.TabColorVar
 import com.varabyte.kobweb.silk.components.disclosure.TabDisabledBackgroundColorVar
 import com.varabyte.kobweb.silk.components.disclosure.TabHoverBackgroundColorVar
@@ -15,13 +14,11 @@ import com.varabyte.kobweb.silk.components.disclosure.TabsPanelStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsTabRowStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsTabStyle
-import com.varabyte.kobweb.silk.components.document.TocBorderColorVar
 import com.varabyte.kobweb.silk.components.document.TocBorderedVariant
 import com.varabyte.kobweb.silk.components.document.TocStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundDefaultColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundPressedColorVar
-import com.varabyte.kobweb.silk.components.forms.ButtonColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.CheckboxEnabledAnim
 import com.varabyte.kobweb.silk.components.forms.CheckboxIconBackgroundColorVar
@@ -32,14 +29,12 @@ import com.varabyte.kobweb.silk.components.forms.CheckboxInputVariant
 import com.varabyte.kobweb.silk.components.forms.CheckboxStyle
 import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
 import com.varabyte.kobweb.silk.components.forms.FlushedInputVariant
-import com.varabyte.kobweb.silk.components.forms.InputBorderColorVar
 import com.varabyte.kobweb.silk.components.forms.InputBorderHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.InputBorderInvalidColorVar
 import com.varabyte.kobweb.silk.components.forms.InputFilledColorVar
 import com.varabyte.kobweb.silk.components.forms.InputFilledFocusColorVar
 import com.varabyte.kobweb.silk.components.forms.InputFilledHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.InputGroupStyle
-import com.varabyte.kobweb.silk.components.forms.InputPlaceholderColorVar
 import com.varabyte.kobweb.silk.components.forms.InputStyle
 import com.varabyte.kobweb.silk.components.forms.OutlinedInputVariant
 import com.varabyte.kobweb.silk.components.forms.SwitchInputVariant
@@ -53,11 +48,8 @@ import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
 import com.varabyte.kobweb.silk.components.layout.AnimatedColorSurfaceVariant
-import com.varabyte.kobweb.silk.components.layout.DividerColorVar
 import com.varabyte.kobweb.silk.components.layout.DividerStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
-import com.varabyte.kobweb.silk.components.layout.SurfaceBackgroundColorVar
-import com.varabyte.kobweb.silk.components.layout.SurfaceColorVar
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastLgStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastMdStyle
@@ -231,39 +223,28 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(ButtonBackgroundDefaultColorVar, palette.button.default)
         .setVariable(ButtonBackgroundHoverColorVar, palette.button.hover)
         .setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
-        .setVariable(ButtonColorVar, palette.color)
 
         .setVariable(CheckboxIconBackgroundColorVar, palette.checkbox.background)
         .setVariable(CheckboxIconColorVar, palette.checkbox.color)
 
-        .setVariable(DividerColorVar, palette.border)
-
-        .setVariable(InputBorderColorVar, palette.border)
         .setVariable(InputBorderHoverColorVar, palette.input.hoveredBorder)
         .setVariable(InputBorderInvalidColorVar, palette.input.invalidBorder)
         .setVariable(InputFilledColorVar, palette.input.filled)
         .setVariable(InputFilledHoverColorVar, palette.input.filledHover)
         .setVariable(InputFilledFocusColorVar, palette.input.filledFocus)
-        .setVariable(InputPlaceholderColorVar, palette.placeholder)
 
         .setVariable(LinkDefaultColorVar, palette.link.default)
         .setVariable(LinkVisitedColorVar, palette.link.visited)
 
         .setVariable(OverlayBackgroundColorVar, palette.overlay)
 
-        .setVariable(SurfaceBackgroundColorVar, palette.background)
-        .setVariable(SurfaceColorVar, palette.color)
-
         .setVariable(SwitchThumbColorVar, palette.switch.thumb)
 
         .setVariable(TabColorVar, palette.tab.color)
         .setVariable(TabBackgroundColorVar, palette.tab.background)
-        .setVariable(TabBorderColorVar, palette.border)
         .setVariable(TabDisabledBackgroundColorVar, palette.tab.disabled)
         .setVariable(TabHoverBackgroundColorVar, palette.tab.hover)
         .setVariable(TabPressedBackgroundColorVar, palette.tab.pressed)
-
-        .setVariable(TocBorderColorVar, palette.border)
 
         .setVariable(TooltipBackgroundColorVar, palette.tooltip.background)
         .setVariable(TooltipColorVar, palette.tooltip.color)

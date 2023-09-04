@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.addVariantBase
 import com.varabyte.kobweb.silk.components.style.base
+import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import org.jetbrains.compose.web.css.*
 
 // Note: The Silk `Toc` widget itself is defined in the kobweb-silk module since it has dependencies on kobweb-core
@@ -13,7 +14,7 @@ import org.jetbrains.compose.web.css.*
 // However, the styles are defined here, since this module is responsible for registering them, and it can still be
 // useful to use them even without Kobweb.
 
-val TocBorderColorVar by com.varabyte.kobweb.compose.css.StyleVariable<CSSColorValue>(prefix = "silk")
+val TocBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
 
 val TocStyle by ComponentStyle.base(prefix = "silk") {
     Modifier

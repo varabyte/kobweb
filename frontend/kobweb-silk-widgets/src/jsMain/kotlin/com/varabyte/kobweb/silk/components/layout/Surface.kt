@@ -2,7 +2,6 @@ package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -15,13 +14,15 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.init.setSilkVariables
+import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.LocalColorMode
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
-val SurfaceBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val SurfaceColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val SurfaceBackgroundColorVar by StyleVariable(prefix = "silk", defaultFallback = BackgroundColorVar.value())
+val SurfaceColorVar by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
 
 val SurfaceStyle by ComponentStyle(prefix = "silk") {
     base {
