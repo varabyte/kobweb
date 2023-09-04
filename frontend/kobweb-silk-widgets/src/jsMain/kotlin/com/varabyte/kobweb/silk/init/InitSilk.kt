@@ -22,6 +22,7 @@ import com.varabyte.kobweb.silk.components.forms.ButtonBackgroundPressedColorVar
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.CheckboxEnabledAnim
 import com.varabyte.kobweb.silk.components.forms.CheckboxIconBackgroundColorVar
+import com.varabyte.kobweb.silk.components.forms.CheckboxIconBackgroundHoverColorVar
 import com.varabyte.kobweb.silk.components.forms.CheckboxIconColorVar
 import com.varabyte.kobweb.silk.components.forms.CheckboxIconContainerStyle
 import com.varabyte.kobweb.silk.components.forms.CheckboxIconStyle
@@ -225,6 +226,7 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
 
         .setVariable(CheckboxIconBackgroundColorVar, palette.checkbox.background)
+        .setVariable(CheckboxIconBackgroundHoverColorVar, palette.checkbox.hover)
         .setVariable(CheckboxIconColorVar, palette.checkbox.color)
 
         .setVariable(InputBorderHoverColorVar, palette.input.hoveredBorder)

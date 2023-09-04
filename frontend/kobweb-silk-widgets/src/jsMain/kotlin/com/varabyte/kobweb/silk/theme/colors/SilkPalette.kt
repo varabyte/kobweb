@@ -67,6 +67,9 @@ interface SilkPalette {
         /** The background color of the checkbox icon. */
         val background: Color
 
+        /** The background color of the checkbox icon, when hovered over. */
+        val hover: Color
+
         /** The foreground color of the checkbox icon. */
         val color: Color
     }
@@ -146,6 +149,7 @@ class MutableSilkPalette(
 
     class Checkbox(
         override var background: Color,
+        override var hover: Color,
         override var color: Color,
     ) : SilkPalette.Checkbox
 
@@ -219,6 +223,7 @@ class MutableSilkPalettes(
             ),
             checkbox = MutableSilkPalette.Checkbox(
                 background = ColorSchemes.Blue._500,
+                hover = ColorSchemes.Blue._600,
                 color = Colors.White,
             ),
             input = MutableSilkPalette.Input(
@@ -256,6 +261,7 @@ class MutableSilkPalettes(
             ),
             checkbox = MutableSilkPalette.Checkbox(
                 background = ColorSchemes.Blue._200,
+                hover = ColorSchemes.Blue._300,
                 color = Colors.Black,
             ),
             input = MutableSilkPalette.Input(ColorMode.DARK, filled = ColorSchemes.Gray._900),

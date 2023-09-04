@@ -18,9 +18,11 @@ import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
-import com.varabyte.kobweb.silk.components.style.addVariantBase
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
+import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
+import com.varabyte.kobweb.silk.components.style.hover
+import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
@@ -70,6 +72,7 @@ val CheckboxIconSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
 val CheckboxFocusOutlineColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
 val CheckboxIconColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 val CheckboxIconBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val CheckboxIconBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
 
 val CheckboxStyle by ComponentStyle(prefix = "silk") {
     base {
@@ -86,13 +89,22 @@ val CheckboxEnabledAnim by Keyframes(prefix = "silk") {
     to { Modifier.opacity(1) }
 }
 
-val CheckboxIconContainerStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier
-        .fontSize(CheckboxIconSizeVar.value())
-        .size(CheckboxSizeVar.value())
-        .backgroundColor(CheckboxIconBackgroundColorVar.value())
-        .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxIconBackgroundColorVar.value())
-        .borderRadius(CheckboxBorderRadiusVar.value())
+val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
+    base {
+        Modifier
+            .fontSize(CheckboxIconSizeVar.value())
+            .size(CheckboxSizeVar.value())
+            .backgroundColor(CheckboxIconBackgroundColorVar.value())
+            .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxIconBackgroundColorVar.value())
+            .borderRadius(CheckboxBorderRadiusVar.value())
+            .transition(CSSTransition.group(listOf("background-color", "border-color"), 200.ms))
+    }
+
+    (hover + not(ariaDisabled)) {
+        Modifier
+            .backgroundColor(CheckboxIconBackgroundHoverColorVar.value())
+            .borderColor(CheckboxIconBackgroundHoverColorVar.value())
+    }
 }
 
 val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
@@ -101,10 +113,13 @@ val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
         .color(CheckboxIconColorVar.value())
 }
 
-val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariantBase {
-    Modifier
+val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant {
+    val uncheckedStyle = Modifier
         .backgroundColor(BackgroundColor.Inherit)
         .borderColor(CheckboxBorderColorVar.value())
+
+    base { uncheckedStyle }
+    (hover + not(ariaDisabled)) { uncheckedStyle }
 }
 
 val CheckboxInputVariant by InputStyle.addVariant {
@@ -214,6 +229,10 @@ fun TriCheckbox(
                     val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
                     Modifier
                         .setVariable(CheckboxIconBackgroundColorVar, if (isDark) colorScheme._200 else colorScheme._500)
+                        .setVariable(
+                            CheckboxIconBackgroundHoverColorVar,
+                            if (isDark) colorScheme._300 else colorScheme._600
+                        )
                         .setVariable(
                             CheckboxIconColorVar,
                             (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
