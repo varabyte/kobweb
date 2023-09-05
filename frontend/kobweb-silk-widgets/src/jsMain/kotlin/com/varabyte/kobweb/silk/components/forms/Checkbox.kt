@@ -227,6 +227,9 @@ enum class CheckedState {
  * @param uncheckedColor An optional override for the background color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
  * @param focusOutlineColor An optional override for the border color when the input is focused.
+ * @param content Inline content attached to the checkbox. This will be treated as an [HTML label](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label),
+ *   which means when clicked it will toggle the checkbox, and screen readers will read out any text in it when the
+ *   checkbox is focused.
  *
  * @see Checkbox
  * @see CheckedState
@@ -341,6 +344,9 @@ fun TriCheckbox(
  * @param uncheckedColor An optional override for the background color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
  * @param focusOutlineColor An optional override for the border color when the input is focused.
+ * @param content Inline content attached to the checkbox. This will be treated as an [HTML label](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label),
+ *   which means when clicked it will toggle the checkbox, and screen readers will read out any text in it when the
+ *   checkbox is focused.
  *
  * @see TriCheckbox
  */
