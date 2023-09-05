@@ -19,6 +19,7 @@ import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
+import com.varabyte.kobweb.silk.components.style.addVariantBase
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
@@ -72,6 +73,7 @@ object CheckboxVars {
     val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
     val IconSize by StyleVariable<CSSLengthValue>(prefix = "silk")
     val FocusOutlineColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
+    val UncheckedBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconBackgroundHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -107,6 +109,10 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
                 CSSTransition.group(listOf("background-color", "border-color"), CheckboxVars.TransitionDuration.value())
             )
     }
+}
+
+val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariantBase {
+    Modifier.backgroundColor(CheckboxVars.UncheckedBackgroundColor.value())
 }
 
 val CheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant {
@@ -214,6 +220,7 @@ enum class CheckedState {
  * @param colorScheme An optional color scheme to use for the checkbox. If not provided, the checkbox will use the
  *   appropriate colors from the [SilkPalette].
  * @param borderColor An optional override for the border color of the checkbox when unchecked.
+ * @param uncheckedColor An optional override for the background color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
  * @param focusOutlineColor An optional override for the border color when the input is focused.
  *
@@ -232,6 +239,7 @@ fun TriCheckbox(
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    uncheckedColor: CSSColorValue? = null,
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -260,7 +268,9 @@ fun TriCheckbox(
                         (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
                     )
             }
-            .setVariable(CheckboxVars.BorderColor, borderColor).setVariable(CheckboxVars.IconColor, iconColor)
+            .setVariable(CheckboxVars.BorderColor, borderColor)
+            .setVariable(CheckboxVars.UncheckedBackgroundColor, uncheckedColor)
+            .setVariable(CheckboxVars.IconColor, iconColor)
             .setVariable(CheckboxVars.FocusOutlineColor, focusOutlineColor).then(modifier).toAttrs()
     ) {
         registerRefScope(ref)
@@ -285,7 +295,9 @@ fun TriCheckbox(
         )
 
         Box(
-            CheckboxIconContainerStyle.toModifier(CheckedCheckboxIconContainerVariant.takeIf { checked.toBoolean() }),
+            CheckboxIconContainerStyle.toModifier(
+                if (checked.toBoolean()) CheckedCheckboxIconContainerVariant else UncheckedCheckboxIconContainerVariant
+            ),
             contentAlignment = Alignment.Center
         ) {
             if (checked.toBoolean()) {
@@ -322,6 +334,7 @@ fun TriCheckbox(
  * @param colorScheme An optional color scheme to use for the checkbox. If not provided, the checkbox will use the
  *   appropriate colors from the [SilkPalette].
  * @param borderColor An optional override for the border color of the checkbox when unchecked.
+ * @param uncheckedColor An optional override for the background color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
  * @param focusOutlineColor An optional override for the border color when the input is focused.
  *
@@ -339,6 +352,7 @@ fun Checkbox(
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    uncheckedColor: CSSColorValue? = null,
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -355,6 +369,7 @@ fun Checkbox(
         spacing,
         colorScheme,
         borderColor,
+        uncheckedColor,
         iconColor,
         focusOutlineColor,
         ref,
@@ -378,6 +393,7 @@ fun Checkbox(
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    uncheckedColor: CSSColorValue? = null,
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -393,6 +409,7 @@ fun Checkbox(
         spacing,
         colorScheme,
         borderColor,
+        uncheckedColor,
         iconColor,
         focusOutlineColor,
         ref,
@@ -415,6 +432,7 @@ fun TriCheckbox(
     spacing: CSSLengthValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
+    uncheckedColor: CSSColorValue? = null,
     iconColor: CSSColorValue? = null,
     focusOutlineColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -430,6 +448,7 @@ fun TriCheckbox(
         spacing,
         colorScheme,
         borderColor,
+        uncheckedColor,
         iconColor,
         focusOutlineColor,
         ref,

@@ -32,6 +32,7 @@ import com.varabyte.kobweb.silk.components.forms.SwitchStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchTrackStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchVars
+import com.varabyte.kobweb.silk.components.forms.UncheckedCheckboxIconContainerVariant
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
@@ -118,7 +119,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentVariants(CheckboxInputVariant)
     mutableTheme.registerComponentStyle(CheckboxIconContainerStyle)
     mutableTheme.registerComponentStyle(CheckboxIconStyle)
-    mutableTheme.registerComponentVariants(CheckedCheckboxIconContainerVariant)
+    mutableTheme.registerComponentVariants(CheckedCheckboxIconContainerVariant, UncheckedCheckboxIconContainerVariant)
     mutableTheme.registerComponentStyle(DisabledStyle)
     mutableTheme.registerComponentStyle(DividerStyle)
     mutableTheme.registerComponentStyle(DivTextStyle)
