@@ -113,11 +113,10 @@ fun WidgetsPage() {
                         listOf(CheckboxSize.SM, CheckboxSize.MD, CheckboxSize.LG).forEach { size ->
                             var checked by remember { mutableStateOf(true) }
                             Checkbox(
-                                "Checkbox",
                                 checked,
                                 onCheckedChange = { checked = it },
                                 size = size,
-                            )
+                            ) { Text("Checkbox") }
                         }
                     }
 
@@ -125,17 +124,16 @@ fun WidgetsPage() {
                         listOf(ColorSchemes.Red, ColorSchemes.Green, ColorSchemes.Orange).forEach { colorScheme ->
                             var checked by remember { mutableStateOf(true) }
                             Checkbox(
-                                "Checkbox",
                                 checked,
                                 onCheckedChange = { checked = it },
                                 colorScheme = colorScheme
-                            )
+                            ) { Text("Checkbox") }
                         }
                     }
 
                     run {
                         var checked by remember { mutableStateOf(true) }
-                        Checkbox("Disabled", checked, onCheckedChange = { checked = it }, enabled = false)
+                        Checkbox(checked, onCheckedChange = { checked = it }, enabled = false) { Text("Disabled") }
                     }
 
                     Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
@@ -150,7 +148,11 @@ fun WidgetsPage() {
 
                         for ((iconLabel, iconProvider) in iconOverrides) {
                             var checked by remember { mutableStateOf(true) }
-                            Checkbox(iconLabel, checked, onCheckedChange = { checked = it }, icon = iconProvider)
+                            Checkbox(
+                                checked,
+                                onCheckedChange = { checked = it },
+                                icon = iconProvider
+                            ) { Text(iconLabel) }
                         }
                     }
 
@@ -159,17 +161,16 @@ fun WidgetsPage() {
                         var child2Checked by remember { mutableStateOf(false) }
 
                         TriCheckbox(
-                            "Parent",
                             CheckedState.from(child1Checked, child2Checked),
                             onCheckedChange = {
                                 val checked = it.toBoolean()
                                 child1Checked = checked
                                 child2Checked = checked
                             },
-                        )
+                        ) { Text("Parent") }
                         Column(Modifier.margin(left = 1.cssRem).gap(0.2.cssRem)) {
-                            Checkbox("Child 1", child1Checked, onCheckedChange = { child1Checked = it })
-                            Checkbox("Child 2", child2Checked, onCheckedChange = { child2Checked = it })
+                            Checkbox(child1Checked, onCheckedChange = { child1Checked = it }) { Text("Child 1") }
+                            Checkbox(child2Checked, onCheckedChange = { child2Checked = it }) { Text("Child 2") }
                         }
                     }
                 }

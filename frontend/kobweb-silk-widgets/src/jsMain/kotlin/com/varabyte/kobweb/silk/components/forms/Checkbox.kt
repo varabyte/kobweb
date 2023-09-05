@@ -35,7 +35,6 @@ import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Label
-import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 
 /**
@@ -380,82 +379,4 @@ fun Checkbox(
         ref,
         content
     )
-}
-
-/**
- * A convenience overload for [Checkbox] with a simple label.
- */
-@Composable
-fun Checkbox(
-    label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
-    enabled: Boolean = CheckboxDefaults.Enabled,
-    icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
-    size: CheckboxSize = CheckboxDefaults.Size,
-    spacing: CSSLengthValue? = null,
-    colorScheme: ColorScheme? = null,
-    borderColor: CSSColorValue? = null,
-    uncheckedColor: CSSColorValue? = null,
-    iconColor: CSSColorValue? = null,
-    focusOutlineColor: CSSColorValue? = null,
-    ref: ElementRefScope<HTMLElement>? = null,
-) {
-    Checkbox(
-        checked,
-        onCheckedChange,
-        modifier,
-        variant,
-        enabled,
-        icon,
-        size,
-        spacing,
-        colorScheme,
-        borderColor,
-        uncheckedColor,
-        iconColor,
-        focusOutlineColor,
-        ref,
-    ) { Text(label) }
-}
-
-/**
- * A convenience overload for [TriCheckbox] with a simple label.
- */
-@Composable
-fun TriCheckbox(
-    label: String,
-    checked: CheckedState,
-    onCheckedChange: (CheckedState) -> Unit,
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
-    enabled: Boolean = CheckboxDefaults.Enabled,
-    icon: (@Composable CheckboxIconScope.() -> Unit) = CheckboxDefaults.IconProvider,
-    size: CheckboxSize = CheckboxDefaults.Size,
-    spacing: CSSLengthValue? = null,
-    colorScheme: ColorScheme? = null,
-    borderColor: CSSColorValue? = null,
-    uncheckedColor: CSSColorValue? = null,
-    iconColor: CSSColorValue? = null,
-    focusOutlineColor: CSSColorValue? = null,
-    ref: ElementRefScope<HTMLElement>? = null,
-) {
-    TriCheckbox(
-        checked,
-        onCheckedChange,
-        modifier,
-        variant,
-        enabled,
-        icon,
-        size,
-        spacing,
-        colorScheme,
-        borderColor,
-        uncheckedColor,
-        iconColor,
-        focusOutlineColor,
-        ref,
-    ) { Text(label) }
 }
