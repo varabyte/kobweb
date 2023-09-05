@@ -197,6 +197,27 @@ enum class CheckedState {
     fun toBoolean() = this != Unchecked
 }
 
+/**
+ * Creates a checkbox that supports three states: on, off, and indeterminate.
+ *
+ * @param checked The current [CheckedState] of this checkbox.
+ * @param onCheckedChange A callback which is invoked when the checkbox state changes.
+ * @param enabled Whether the checkbox is enabled or not. If not, the checkbox will be rendered in a disabled state and will
+ *   not be interactable.
+ * @param icon The composable that renders the icon inside the checkbox. This will be passed a [CheckboxIconScope] which
+ *   you can use to customize the icon based on potentially relevant context.
+ * @param size The size of the checkbox. Defaults to [CheckboxSize.MD]. You can implement your own [CheckboxSize] if you
+ *   want custom sizing.
+ * @param spacing An optional spacing parameter to use between the checkbox and any content drawn to the right of it.
+ * @param colorScheme An optional color scheme to use for the checkbox. If not provided, the checkbox will use the
+ *   appropriate colors from the [SilkPalette].
+ * @param borderColor An optional override for the border color of the checkbox when unchecked.
+ * @param iconColor An optional override for the color of the icon drawn in the checkbox.
+ * @param focusOutlineColor An optional override for the border color when the input is focused.
+ *
+ * @see Checkbox
+ * @see CheckedState
+ */
 @Composable
 fun TriCheckbox(
     checked: CheckedState,
@@ -302,6 +323,8 @@ fun TriCheckbox(
  * @param borderColor An optional override for the border color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
  * @param focusOutlineColor An optional override for the border color when the input is focused.
+ *
+ * @see TriCheckbox
  */
 @Composable
 fun Checkbox(
@@ -338,6 +361,9 @@ fun Checkbox(
     )
 }
 
+/**
+ * A convenience overload for [Checkbox] with a simple label.
+ */
 @Composable
 fun Checkbox(
     label: String,
@@ -372,6 +398,9 @@ fun Checkbox(
     ) { Text(label) }
 }
 
+/**
+ * A convenience overload for [TriCheckbox] with a simple label.
+ */
 @Composable
 fun TriCheckbox(
     label: String,
