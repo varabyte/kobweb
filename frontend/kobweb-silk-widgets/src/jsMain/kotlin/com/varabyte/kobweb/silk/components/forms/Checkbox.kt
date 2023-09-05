@@ -68,11 +68,13 @@ object CheckboxDefaults {
 object CheckboxVars {
     val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
     val BorderRadius by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
+    val BorderWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
     val Size by StyleVariable<CSSLengthValue>(prefix = "silk")
     val Spacing by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
     val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
     val IconSize by StyleVariable<CSSLengthValue>(prefix = "silk")
     val FocusOutlineColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
+    val FocusOutlineSpread by StyleVariable(prefix = "silk", defaultFallback = 0.1875.cssRem)
     val UncheckedBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -103,7 +105,11 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
         Modifier
             .fontSize(CheckboxVars.IconSize.value())
             .size(CheckboxVars.Size.value())
-            .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxVars.BorderColor.value())
+            .border(
+                width = CheckboxVars.BorderWidth.value(),
+                style = LineStyle.Solid,
+                color = CheckboxVars.BorderColor.value()
+            )
             .borderRadius(CheckboxVars.BorderRadius.value())
             .transition(
                 CSSTransition.group(listOf("background-color", "border-color"), CheckboxVars.TransitionDuration.value())
@@ -153,7 +159,10 @@ val CheckboxInputVariant by InputStyle.addVariant {
     // Since the checkbox is hidden, we highlight its sibling (a div which renders a checkbox icon) when the checkbox is
     // focused(-visible).
     cssRule(":focus-visible + *") {
-        Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = CheckboxVars.FocusOutlineColor.value())
+        Modifier.boxShadow(
+            spreadRadius = CheckboxVars.FocusOutlineSpread.value(),
+            color = CheckboxVars.FocusOutlineColor.value()
+        )
     }
 }
 
