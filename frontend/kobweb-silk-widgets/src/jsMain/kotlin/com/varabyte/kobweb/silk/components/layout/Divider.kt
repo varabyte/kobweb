@@ -13,11 +13,13 @@ import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Hr
 
-val DividerColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+object DividerVars {
+    val Color by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+}
 
 val DividerStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
-        .borderTop(1.px, LineStyle.Solid, DividerColorVar.value())
+        .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
         .fillMaxWidth(90.percent)
 }
 

@@ -61,8 +61,8 @@ import com.varabyte.kobweb.silk.components.overlay.BottomTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.LeftBottomTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.LeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.LeftTopTooltipArrowVariant
-import com.varabyte.kobweb.silk.components.overlay.OverlayBackgroundColorVar
 import com.varabyte.kobweb.silk.components.overlay.OverlayStyle
+import com.varabyte.kobweb.silk.components.overlay.OverlayVars
 import com.varabyte.kobweb.silk.components.overlay.PopupStyle
 import com.varabyte.kobweb.silk.components.overlay.RightBottomTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.RightTooltipArrowVariant
@@ -225,7 +225,7 @@ private val SilkColorsStyle by ComponentStyle.base {
         .setVariable(LinkVars.DefaultColor, palette.link.default)
         .setVariable(LinkVars.VisitedColor, palette.link.visited)
 
-        .setVariable(OverlayBackgroundColorVar, palette.overlay)
+        .setVariable(OverlayVars.BackgroundColor, palette.overlay)
 
         .setVariable(SwitchVars.ThumbColor, palette.switch.thumb)
 

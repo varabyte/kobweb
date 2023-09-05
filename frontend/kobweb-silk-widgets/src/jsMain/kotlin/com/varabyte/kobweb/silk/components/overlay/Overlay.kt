@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
@@ -16,10 +16,12 @@ import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
-val OverlayBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+object OverlayVars {
+    val BackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
+}
 
 val OverlayStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier.backgroundColor(OverlayBackgroundColorVar.value())
+    Modifier.backgroundColor(OverlayVars.BackgroundColor.value())
 }
 
 /**

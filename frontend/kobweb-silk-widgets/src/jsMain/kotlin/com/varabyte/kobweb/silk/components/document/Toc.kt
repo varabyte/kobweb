@@ -14,7 +14,9 @@ import org.jetbrains.compose.web.css.*
 // However, the styles are defined here, since this module is responsible for registering them, and it can still be
 // useful to use them even without Kobweb.
 
-val TocBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+object TocVars {
+    val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+}
 
 val TocStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
@@ -26,6 +28,6 @@ val TocStyle by ComponentStyle.base(prefix = "silk") {
 val TocBorderedVariant by TocStyle.addVariantBase {
     Modifier
         .borderRadius(5.px)
-        .border(1.px, LineStyle.Solid, TocBorderColorVar.value())
+        .border(1.px, LineStyle.Solid, TocVars.BorderColor.value())
         .padding(1.cssRem)
 }
