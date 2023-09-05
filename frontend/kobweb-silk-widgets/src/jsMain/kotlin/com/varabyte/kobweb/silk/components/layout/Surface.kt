@@ -21,14 +21,16 @@ import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.LocalColorMode
 import org.w3c.dom.HTMLElement
 
-val SurfaceBackgroundColorVar by StyleVariable(prefix = "silk", defaultFallback = BackgroundColorVar.value())
-val SurfaceColorVar by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
+object SurfaceVars {
+    val BackgroundColor by StyleVariable(prefix = "silk", defaultFallback = BackgroundColorVar.value())
+    val Color by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
+}
 
 val SurfaceStyle by ComponentStyle(prefix = "silk") {
     base {
         Modifier
-            .backgroundColor(SurfaceBackgroundColorVar.value())
-            .color(SurfaceColorVar.value())
+            .backgroundColor(SurfaceVars.BackgroundColor.value())
+            .color(SurfaceVars.Color.value())
     }
 }
 
