@@ -43,6 +43,8 @@ object SwitchVars {
 
     val ThumbOffset by StyleVariable<CSSLengthOrPercentageValue>(prefix = "silk") // Should be less than switch height
     val ThumbColor by StyleVariable<CSSColorValue>(prefix = "silk")
+
+    val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
 }
 
 val SwitchStyle by ComponentStyle(prefix = "silk") {}
@@ -58,7 +60,7 @@ val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifie
             .padding(SwitchVars.TrackPadding.value())
             .borderRadius(SwitchVars.BorderRadius.value())
             .backgroundColor(SwitchVars.TrackBackgroundColor.value())
-            .transition(CSSTransition("background-color", duration = TransitionDurationVars.Fast.value()))
+            .transition(CSSTransition("background-color", duration = SwitchVars.TransitionDuration.value()))
             .boxSizing(BoxSizing.ContentBox)
     }
 
@@ -91,7 +93,7 @@ val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
         .borderRadius(SwitchVars.BorderRadius.value())
         .backgroundColor(SwitchVars.ThumbColor.value())
         .translateX(SwitchVars.ThumbOffset.value())
-        .transition(CSSTransition("translate", duration = TransitionDurationVars.Fast.value()))
+        .transition(CSSTransition("translate", duration = SwitchVars.TransitionDuration.value()))
 }
 
 interface SwitchSize {

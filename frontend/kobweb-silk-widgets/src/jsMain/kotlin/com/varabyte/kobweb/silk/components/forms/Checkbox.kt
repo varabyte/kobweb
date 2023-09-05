@@ -75,6 +75,7 @@ object CheckboxVars {
     val IconColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconBackgroundHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.VeryFast.value())
 }
 
 val CheckboxStyle by ComponentStyle(
@@ -103,9 +104,7 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
             .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxVars.BorderColor.value())
             .borderRadius(CheckboxVars.BorderRadius.value())
             .transition(
-                CSSTransition.group(
-                    listOf("background-color", "border-color"), TransitionDurationVars.VeryFast.value()
-                )
+                CSSTransition.group(listOf("background-color", "border-color"), CheckboxVars.TransitionDuration.value())
             )
     }
 }
@@ -293,9 +292,7 @@ fun TriCheckbox(
                 Box(
                     CheckboxIconStyle.toModifier().thenIf(shouldAnimate) {
                         Modifier.animation(
-                            CheckboxEnabledAnim.toAnimation(
-                                colorMode, TransitionDurationVars.VeryFast.value()
-                            )
+                            CheckboxEnabledAnim.toAnimation(colorMode, CheckboxVars.TransitionDuration.value())
                         )
                     }, contentAlignment = Alignment.Center
                 ) {
