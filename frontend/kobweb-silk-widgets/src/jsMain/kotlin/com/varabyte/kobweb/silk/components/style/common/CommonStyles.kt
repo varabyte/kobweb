@@ -49,6 +49,11 @@ val StyleModifiers.ariaInvalid get() = CssRule.OfAttributeSelector(this, """aria
  */
 val StyleModifiers.ariaRequired get() = CssRule.OfAttributeSelector(this, """aria-required="true"""")
 
+val SmoothColorTransitionDurationVar by StyleVariable(
+    prefix = "silk",
+    defaultFallback = TransitionDurationVars.Normal.value()
+)
+
 /**
  * A style which opts an element into background color transitions, which looks better than color snapping when the
  * color mode changes.
@@ -75,5 +80,5 @@ val StyleModifiers.ariaRequired get() = CssRule.OfAttributeSelector(this, """ari
  * overriding the style if they'd like.
  */
 val SmoothColorStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier.transition(CSSTransition("background-color", TransitionDurationVars.Normal.value()))
+    Modifier.transition(CSSTransition("background-color", SmoothColorTransitionDurationVar.value()))
 }
