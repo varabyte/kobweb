@@ -28,11 +28,13 @@ object BoxDefaults {
 /**
  * Add classes that tell the browser to display this element as a column.
  *
+ * This method is public as there may occasionally be cases where users could benefit from using this, but in general
+ * you shouldn't reach for this unless you know what you're doing.
+ *
  * NOTE: This modifier sets attribute properties and can therefore not be used within ComponentStyles.
  */
-fun Modifier.asBox(contentAlignment: Alignment = BoxDefaults.ContentAlignment) =
+fun Modifier.boxClasses(contentAlignment: Alignment = BoxDefaults.ContentAlignment) =
     this.classNames("kobweb-box", contentAlignment.toClassName())
-
 
 @Composable
 fun Box(
@@ -41,7 +43,7 @@ fun Box(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}
 ) {
-    Div(attrs = modifier.asBox(contentAlignment).toAttrs()) {
+    Div(attrs = modifier.boxClasses(contentAlignment).toAttrs()) {
         registerRefScope(ref)
         BoxScopeInstance.content()
     }

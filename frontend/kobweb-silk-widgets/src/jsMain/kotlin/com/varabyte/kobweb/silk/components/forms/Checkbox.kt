@@ -6,7 +6,7 @@ import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.ref
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
-import com.varabyte.kobweb.compose.foundation.layout.asRow
+import com.varabyte.kobweb.compose.foundation.layout.rowClasses
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.isBright
@@ -78,7 +78,7 @@ val CheckboxIconBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix =
 
 val CheckboxStyle by ComponentStyle(
     prefix = "silk",
-    extraModifiers = Modifier.asRow(verticalAlignment = Alignment.CenterVertically)
+    extraModifiers = Modifier.rowClasses(verticalAlignment = Alignment.CenterVertically)
 ) {
     base {
         Modifier

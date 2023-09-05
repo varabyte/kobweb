@@ -29,9 +29,12 @@ object ColumnDefaults {
 /**
  * Add classes that tell the browser to display this element as a column.
  *
+ * This method is public as there may occasionally be cases where users could benefit from using this, but in general
+ * you shouldn't reach for this unless you know what you're doing.
+ *
  * NOTE: This modifier sets attribute properties and can therefore not be used within ComponentStyles.
  */
-fun Modifier.asColumn(
+fun Modifier.columnClasses(
     verticalArrangement: Arrangement.Vertical = ColumnDefaults.VerticalArrangement,
     horizontalAlignment: Alignment.Horizontal = ColumnDefaults.HorizontalAlignment,
 ) = this.classNames("kobweb-col", verticalArrangement.toClassName(), horizontalAlignment.toClassName())
@@ -44,7 +47,7 @@ fun Column(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Div(modifier.asColumn(verticalArrangement, horizontalAlignment).toAttrs()) {
+    Div(modifier.columnClasses(verticalArrangement, horizontalAlignment).toAttrs()) {
         registerRefScope(ref)
         ColumnScopeInstance.content()
     }

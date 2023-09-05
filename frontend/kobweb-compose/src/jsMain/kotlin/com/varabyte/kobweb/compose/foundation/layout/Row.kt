@@ -29,9 +29,12 @@ object RowDefaults {
 /**
  * Add classes that tell the browser to display this element as a row.
  *
+ * This method is public as there may occasionally be cases where users could benefit from using this, but in general
+ * you shouldn't reach for this unless you know what you're doing.
+ *
  * NOTE: This modifier sets attribute properties and can therefore not be used within ComponentStyles.
  */
-fun Modifier.asRow(
+fun Modifier.rowClasses(
     horizontalArrangement: Arrangement.Horizontal = RowDefaults.HorizontalArrangement,
     verticalAlignment: Alignment.Vertical = RowDefaults.VerticalAlignment,
 ) = this
@@ -45,7 +48,7 @@ fun Row(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable RowScope.() -> Unit
 ) {
-    Div(modifier.asRow(horizontalArrangement, verticalAlignment).toAttrs()) {
+    Div(modifier.rowClasses(horizontalArrangement, verticalAlignment).toAttrs()) {
         registerRefScope(ref)
         RowScopeInstance.content()
     }
