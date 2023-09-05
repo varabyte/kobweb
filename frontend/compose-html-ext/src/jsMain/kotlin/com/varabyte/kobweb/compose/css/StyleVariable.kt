@@ -94,7 +94,7 @@ sealed class StyleVariable<T : StylePropertyValue, V>(
 
 /** Helper method for transforming a Kotlin property into a CSS variable name. */
 private fun provideVariableName(groupObject: Any?, property: KProperty<*>) =
-    StringBuilder().apply {
+    buildString {
         if (groupObject != null) {
             append(
                 groupObject::class.simpleName!!.titleCamelCaseToKebabCase().removeSuffix("-vars")
@@ -103,7 +103,7 @@ private fun provideVariableName(groupObject: Any?, property: KProperty<*>) =
             append('-')
         }
         append(property.name.titleCamelCaseToKebabCase().removeSuffix("-var").removeSuffix("-variable"))
-    }.toString()
+    }
 
 
 /**

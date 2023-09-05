@@ -11,24 +11,24 @@ package com.varabyte.kobweb.compose.util
 fun String.titleCamelCaseToKebabCase(): String {
     require(this.isNotBlank())
 
-    val result = StringBuilder()
     var lastIsUpper = false // Used to distinguish "E" as the place to break new words in "ABCExample"
 
-    this.forEachIndexed { i, c ->
-        val isUpper = c.isUpperCase()
-        if (isUpper) {
-            // Break new words when either:
-            // - right before the last capital followed by a lowercase (e.g. "E" in "ABCExample")
-            // - right before the first capital following a lowercase (e.g. "A" in "ExampleABC")
-            if (result.isNotEmpty() && (!lastIsUpper || (i < this.lastIndex && this[i + 1].isLowerCase()))) {
-                result.append("-")
+    val str = this
+    return buildString {
+        str.forEachIndexed { i, c ->
+            val isUpper = c.isUpperCase()
+            if (isUpper) {
+                // Break new words when either:
+                // - right before the last capital followed by a lowercase (e.g. "E" in "ABCExample")
+                // - right before the first capital following a lowercase (e.g. "A" in "ExampleABC")
+                if (this.isNotEmpty() && (!lastIsUpper || (i < this.lastIndex && this[i + 1].isLowerCase()))) {
+                    append("-")
+                }
             }
+            append(c.lowercase())
+            lastIsUpper = isUpper
         }
-        result.append(c.lowercase())
-        lastIsUpper = isUpper
     }
-
-    return result.toString()
 }
 
 /**
