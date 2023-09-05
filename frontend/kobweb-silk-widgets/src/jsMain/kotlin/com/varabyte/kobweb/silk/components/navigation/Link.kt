@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.silk.components.navigation
 
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.StyleVariable
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -17,8 +16,10 @@ import org.jetbrains.compose.web.dom.A
 // However, the styles are defined here, since this module is responsible for registering them, and it can still be
 // useful to use them even without Kobweb.
 
-val LinkDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val LinkVisitedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+object LinkVars {
+    val DefaultColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val VisitedColor by StyleVariable<CSSColorValue>(prefix = "silk")
+}
 
 /**
  * Style to use with [A] tags to give them Silk-themed colors.
@@ -29,10 +30,10 @@ val LinkStyle by ComponentStyle(prefix = "silk") {
     }
 
     link {
-        Modifier.color(LinkDefaultColorVar.value())
+        Modifier.color(LinkVars.DefaultColor.value())
     }
     visited {
-        Modifier.color(LinkVisitedColorVar.value())
+        Modifier.color(LinkVars.VisitedColor.value())
     }
     hover {
         Modifier.textDecorationLine(TextDecorationLine.Underline)

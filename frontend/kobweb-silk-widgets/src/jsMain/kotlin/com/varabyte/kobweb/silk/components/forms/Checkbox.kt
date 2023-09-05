@@ -25,7 +25,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVeryFastVar
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
@@ -64,16 +64,18 @@ object CheckboxDefaults {
     val IconProvider: @Composable CheckboxIconScope.() -> Unit = { CheckedIcon { CheckIcon() } }
 }
 
-val CheckboxBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
-val CheckboxBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
-val CheckboxSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val CheckboxSpacingVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
-val CheckboxFontSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val CheckboxIconSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val CheckboxFocusOutlineColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
-val CheckboxIconColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val CheckboxIconBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val CheckboxIconBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+object CheckboxVars {
+    val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+    val BorderRadius by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
+    val Size by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val Spacing by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
+    val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val IconSize by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val FocusOutlineColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
+    val IconColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val IconBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val IconBackgroundHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
+}
 
 val CheckboxStyle by ComponentStyle(
     prefix = "silk",
@@ -81,9 +83,9 @@ val CheckboxStyle by ComponentStyle(
 ) {
     base {
         Modifier
-            .gap(CheckboxSpacingVar.value())
+            .gap(CheckboxVars.Spacing.value())
             .userSelect(UserSelect.None)
-            .fontSize(CheckboxFontSizeVar.value())
+            .fontSize(CheckboxVars.FontSize.value())
             .cursor(Cursor.Pointer)
     }
 }
@@ -96,13 +98,13 @@ val CheckboxEnabledAnim by Keyframes(prefix = "silk") {
 val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
     base {
         Modifier
-            .fontSize(CheckboxIconSizeVar.value())
-            .size(CheckboxSizeVar.value())
-            .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxBorderColorVar.value())
-            .borderRadius(CheckboxBorderRadiusVar.value())
+            .fontSize(CheckboxVars.IconSize.value())
+            .size(CheckboxVars.Size.value())
+            .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxVars.BorderColor.value())
+            .borderRadius(CheckboxVars.BorderRadius.value())
             .transition(
                 CSSTransition.group(
-                    listOf("background-color", "border-color"), TransitionDurationVeryFastVar.value()
+                    listOf("background-color", "border-color"), TransitionDurationVars.VeryFast.value()
                 )
             )
     }
@@ -111,21 +113,21 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
 val CheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant {
     base {
         Modifier
-            .backgroundColor(CheckboxIconBackgroundColorVar.value())
-            .border { color(CheckboxIconBackgroundColorVar.value()) }
+            .backgroundColor(CheckboxVars.IconBackgroundColor.value())
+            .border { color(CheckboxVars.IconBackgroundColor.value()) }
     }
 
     (hover + not(ariaDisabled)) {
         Modifier
-            .backgroundColor(CheckboxIconBackgroundHoverColorVar.value())
-            .border { color(CheckboxIconBackgroundHoverColorVar.value()) }
+            .backgroundColor(CheckboxVars.IconBackgroundHoverColor.value())
+            .border { color(CheckboxVars.IconBackgroundHoverColor.value()) }
     }
 }
 
 val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
-        .size(CheckboxSizeVar.value())
-        .color(CheckboxIconColorVar.value())
+        .size(CheckboxVars.Size.value())
+        .color(CheckboxVars.IconColor.value())
 }
 
 val CheckboxInputVariant by InputStyle.addVariant {
@@ -146,7 +148,7 @@ val CheckboxInputVariant by InputStyle.addVariant {
     // Since the checkbox is hidden, we highlight its sibling (a div which renders a checkbox icon) when the checkbox is
     // focused(-visible).
     cssRule(":focus-visible + *") {
-        Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = CheckboxFocusOutlineColorVar.value())
+        Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = CheckboxVars.FocusOutlineColor.value())
     }
 }
 
@@ -175,9 +177,9 @@ interface CheckboxSize {
 }
 
 fun CheckboxSize.toModifier() = Modifier
-    .setVariable(CheckboxSizeVar, boxSize)
-    .setVariable(CheckboxIconSizeVar, iconSize)
-    .setVariable(CheckboxFontSizeVar, fontSize)
+    .setVariable(CheckboxVars.Size, boxSize)
+    .setVariable(CheckboxVars.IconSize, iconSize)
+    .setVariable(CheckboxVars.FontSize, fontSize)
 
 class CheckboxIconScope internal constructor(val indeterminate: Boolean, val colorMode: ColorMode)
 
@@ -245,22 +247,22 @@ fun TriCheckbox(
     Label(
         attrs = CheckboxStyle
             .toModifier(variant).thenIf(!enabled, DisabledStyle.toModifier()).then(size.toModifier())
-            .setVariable(CheckboxSpacingVar, spacing)
+            .setVariable(CheckboxVars.Spacing, spacing)
             .thenIf(colorScheme != null) {
                 @Suppress("NAME_SHADOWING") val colorScheme = colorScheme!!
                 val isDark = colorMode.isDark
                 val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
                 Modifier
-                    .setVariable(CheckboxIconBackgroundColorVar, if (isDark) colorScheme._200 else colorScheme._500)
+                    .setVariable(CheckboxVars.IconBackgroundColor, if (isDark) colorScheme._200 else colorScheme._500)
                     .setVariable(
-                        CheckboxIconBackgroundHoverColorVar, if (isDark) colorScheme._300 else colorScheme._600
+                        CheckboxVars.IconBackgroundHoverColor, if (isDark) colorScheme._300 else colorScheme._600
                     ).setVariable(
-                        CheckboxIconColorVar,
+                        CheckboxVars.IconColor,
                         (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
                     )
             }
-            .setVariable(CheckboxBorderColorVar, borderColor).setVariable(CheckboxIconColorVar, iconColor)
-            .setVariable(CheckboxFocusOutlineColorVar, focusOutlineColor).then(modifier).toAttrs()
+            .setVariable(CheckboxVars.BorderColor, borderColor).setVariable(CheckboxVars.IconColor, iconColor)
+            .setVariable(CheckboxVars.FocusOutlineColor, focusOutlineColor).then(modifier).toAttrs()
     ) {
         registerRefScope(ref)
         // We base Checkbox on a checkbox input for a11y + built-in input/keyboard support, but hide the checkbox itself
@@ -292,7 +294,7 @@ fun TriCheckbox(
                     CheckboxIconStyle.toModifier().thenIf(shouldAnimate) {
                         Modifier.animation(
                             CheckboxEnabledAnim.toAnimation(
-                                colorMode, TransitionDurationVeryFastVar.value()
+                                colorMode, TransitionDurationVars.VeryFast.value()
                             )
                         )
                     }, contentAlignment = Alignment.Center

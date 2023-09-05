@@ -24,7 +24,7 @@ import com.varabyte.kobweb.silk.components.style.focusVisible
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
@@ -36,37 +36,39 @@ import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLButtonElement
 import org.jetbrains.compose.web.dom.Button as JbButton
 
-val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonBackgroundFocusColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
-val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonColorVar by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
-val ButtonFontSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val ButtonHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val ButtonPaddingHorizontalVar by StyleVariable<CSSLengthValue>(prefix = "silk")
+object ButtonVars {
+    val BackgroundDefaultColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val BackgroundFocusColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
+    val BackgroundHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val BackgroundPressedColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val Color by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
+    val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val Height by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val PaddingHorizontal by StyleVariable<CSSLengthValue>(prefix = "silk")
+}
 
 val ButtonStyle by ComponentStyle(prefix = "silk") {
     base {
         Modifier
-            .color(ButtonColorVar.value())
-            .backgroundColor(ButtonBackgroundDefaultColorVar.value())
+            .color(ButtonVars.Color.value())
+            .backgroundColor(ButtonVars.BackgroundDefaultColor.value())
             .lineHeight(1.2)
-            .height(ButtonHeightVar.value())
-            .minWidth(ButtonHeightVar.value()) // A button should get no more squashed than square / rectangular
-            .fontSize(ButtonFontSizeVar.value())
+            .height(ButtonVars.Height.value())
+            .minWidth(ButtonVars.Height.value()) // A button should get no more squashed than square / rectangular
+            .fontSize(ButtonVars.FontSize.value())
             .fontWeight(FontWeight.SemiBold)
             .whiteSpace(WhiteSpace.NoWrap)
-            .padding(leftRight = ButtonPaddingHorizontalVar.value())
+            .padding(leftRight = ButtonVars.PaddingHorizontal.value())
             .verticalAlign(VerticalAlign.Middle)
             .borderRadius(0.375.cssRem)
             .border { width(0.px) }
             .userSelect(UserSelect.None) // No selecting text within buttons
-            .transition(CSSTransition("background-color", duration = TransitionDurationNormalVar.value()))
+            .transition(CSSTransition("background-color", duration = TransitionDurationVars.Normal.value()))
     }
 
     (hover + not(ariaDisabled)) {
         Modifier
-            .backgroundColor(ButtonBackgroundHoverColorVar.value())
+            .backgroundColor(ButtonVars.BackgroundHoverColor.value())
             .cursor(Cursor.Pointer)
     }
 
@@ -77,11 +79,11 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
         // transparent color, which is normally invisible, but becomes visible in High Contrast mode.
         Modifier
             .outline(2.px, LineStyle.Solid, Colors.Transparent)
-            .boxShadow(spreadRadius = 0.1875.cssRem, color = ButtonBackgroundFocusColorVar.value())
+            .boxShadow(spreadRadius = 0.1875.cssRem, color = ButtonVars.BackgroundFocusColor.value())
     }
 
     (active + not(ariaDisabled)) {
-        Modifier.backgroundColor(ButtonBackgroundPressedColorVar.value())
+        Modifier.backgroundColor(ButtonVars.BackgroundPressedColor.value())
     }
 }
 
@@ -117,9 +119,9 @@ interface ButtonSize {
 
 fun ButtonSize.toModifier(): Modifier {
     return Modifier
-        .setVariable(ButtonFontSizeVar, fontSize)
-        .setVariable(ButtonHeightVar, height)
-        .setVariable(ButtonPaddingHorizontalVar, horizontalPadding)
+        .setVariable(ButtonVars.FontSize, fontSize)
+        .setVariable(ButtonVars.Height, height)
+        .setVariable(ButtonVars.PaddingHorizontal, horizontalPadding)
 }
 
 /**
@@ -148,14 +150,14 @@ fun Button(
                 val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
                 Modifier
                     .setVariable(
-                        ButtonColorVar, (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
+                        ButtonVars.Color, (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
                     )
-                    .setVariable(ButtonBackgroundDefaultColorVar, if (isDark) colorScheme._200 else colorScheme._500)
-                    .setVariable(ButtonBackgroundHoverColorVar, if (isDark) colorScheme._300 else colorScheme._600)
-                    .setVariable(ButtonBackgroundPressedColorVar, if (isDark) colorScheme._400 else colorScheme._700)
+                    .setVariable(ButtonVars.BackgroundDefaultColor, if (isDark) colorScheme._200 else colorScheme._500)
+                    .setVariable(ButtonVars.BackgroundHoverColor, if (isDark) colorScheme._300 else colorScheme._600)
+                    .setVariable(ButtonVars.BackgroundPressedColor, if (isDark) colorScheme._400 else colorScheme._700)
 
             }
-            .setVariable(ButtonBackgroundFocusColorVar, focusBorderColor)
+            .setVariable(ButtonVars.BackgroundFocusColor, focusBorderColor)
             .then(modifier)
             .thenIf(enabled) {
                 Modifier

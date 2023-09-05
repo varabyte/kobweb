@@ -93,40 +93,59 @@ sealed class StyleVariable<T : StylePropertyValue, V>(
 }
 
 /** Helper method for transforming a Kotlin property into a CSS variable name. */
-private fun provideVariableName(property: KProperty<*>) =
-    property.name.titleCamelCaseToKebabCase().removeSuffix("-var").removeSuffix("-variable")
+private fun provideVariableName(groupObject: Any?, property: KProperty<*>) =
+    StringBuilder().apply {
+        if (groupObject != null) {
+            append(
+                groupObject::class.simpleName!!.titleCamelCaseToKebabCase().removeSuffix("-vars")
+                    .removeSuffix("-variables")
+            )
+            append('-')
+        }
+        append(property.name.titleCamelCaseToKebabCase().removeSuffix("-var").removeSuffix("-variable"))
+    }.toString()
+
 
 /**
  * A delegate provider class which allows you to create a [StyleVariable.PropertyValue] instance via the `by` keyword.
+ *
+ * If wrapped inside a parent object, this will treat that as a source of a group name prefix that will get prepended
+ * in front of your variable name.
  */
 class StyleVariablePropertyProvider<T : StylePropertyValue> internal constructor(
     private val defaultFallback: T?,
     private val prefix: String?
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
-        StyleVariable.PropertyValue(provideVariableName(property), defaultFallback, prefix)
+        StyleVariable.PropertyValue(provideVariableName(thisRef, property), defaultFallback, prefix)
 }
 
 /**
  * A delegate provider class which allows you to create a [StyleVariable.NumberValue] instance via the `by` keyword.
+ *
+ * If wrapped inside a parent object, this will treat that as a source of a group name prefix that will get prepended
+ * in front of your variable name.
  */
 class StyleVariableNumberProvider<T : Number> internal constructor(
     private val defaultFallback: T?,
     private val prefix: String?
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
-        StyleVariable.NumberValue(provideVariableName(property), defaultFallback, prefix)
+        StyleVariable.NumberValue(provideVariableName(thisRef, property), defaultFallback, prefix)
 }
 
 /**
  * A delegate provider class which allows you to create a [StyleVariable.StringValue] instance via the `by` keyword.
+ *
+ * If wrapped inside a parent object, this will treat that as a source of a group name prefix that will get prepended
+ * in front of your variable name.
  */
 class StyleVariableStringProvider internal constructor(
     private val defaultFallback: String?,
     private val prefix: String?
 ) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>) =
-        StyleVariable.StringValue(provideVariableName(property), defaultFallback, prefix)
+        StyleVariable.StringValue(provideVariableName(thisRef, property), defaultFallback, prefix)
 }
 
 /** Helper method for declaring a [StyleVariable.PropertyValue] instance via the `by` keyword. */

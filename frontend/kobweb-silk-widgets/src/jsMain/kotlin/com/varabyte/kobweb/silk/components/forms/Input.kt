@@ -27,7 +27,7 @@ import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.placeholder
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
@@ -54,21 +54,23 @@ object InputDefaults {
     val Variant = OutlinedInputVariant
 }
 
-val InputBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
-val InputBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val InputBorderFocusColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
-val InputBorderHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val InputBorderInvalidColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val InputFilledColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val InputFilledHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val InputFilledFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val InputFontSizeVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val InputHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val InputPaddingVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val InputPlaceholderOpacityVar by StyleVariable(prefix = "silk", defaultFallback = PlaceholderOpacityVar.value())
-val InputPlaceholderColorVar by StyleVariable(prefix = "silk", defaultFallback = PlaceholderColorVar.value())
-val InputInsetLeftWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
-val InputInsetRightWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
+object InputVars {
+    val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+    val BorderRadius by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val BorderFocusColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
+    val BorderHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val BorderInvalidColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val FilledColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val FilledHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val FilledFocusColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val Height by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val Padding by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val PlaceholderOpacity by StyleVariable(prefix = "silk", defaultFallback = PlaceholderOpacityVar.value())
+    val PlaceholderColor by StyleVariable(prefix = "silk", defaultFallback = PlaceholderColorVar.value())
+    val InsetLeftWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
+    val InsetRightWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
+}
 
 val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
@@ -76,8 +78,8 @@ val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
         .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
         // Although the group container itself has no border, we still want to round the corners in case the user sets
         // this element's background color, so it will match the shape of the elements on top of it.
-        .borderRadius(InputBorderRadiusVar.value())
-        .fontSize(InputFontSizeVar.value())
+        .borderRadius(InputVars.BorderRadius.value())
+        .fontSize(InputVars.FontSize.value())
 }
 
 val InputStyle by ComponentStyle(prefix = "silk") {
@@ -85,27 +87,27 @@ val InputStyle by ComponentStyle(prefix = "silk") {
         Modifier
             .styleModifier { property("appearance", "none") } // Disable browser styles
             .color(ColorVar.value())
-            .height(InputHeightVar.value())
-            .fontSize(InputFontSizeVar.value())
+            .height(InputVars.Height.value())
+            .fontSize(InputVars.FontSize.value())
             .backgroundColor(Colors.Transparent)
             .outline(0.px, LineStyle.Solid, Colors.Transparent) // Disable, we'll use box shadow instead
             .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
             .transition(
                 CSSTransition.group(
-                    listOf("border-color", "box-shadow", "background-color"), TransitionDurationNormalVar.value()
+                    listOf("border-color", "box-shadow", "background-color"), TransitionDurationVars.Normal.value()
                 )
             )
     }
 
     placeholder {
         Modifier
-            .opacity(InputPlaceholderOpacityVar.value())
-            .color(InputPlaceholderColorVar.value())
+            .opacity(InputVars.PlaceholderOpacity.value())
+            .color(InputVars.PlaceholderColor.value())
     }
 }
 
 private fun Modifier.inputPadding(): Modifier {
-    val padding = InputPaddingVar.value()
+    val padding = InputVars.Padding.value()
     return this.paddingInline(start = padding, end = padding)
 }
 
@@ -117,13 +119,13 @@ val OutlinedInputVariant by InputStyle.addVariant {
     base {
         Modifier
             .inputPadding()
-            .borderRadius(InputBorderRadiusVar.value())
-            .border(1.px, LineStyle.Solid, InputBorderColorVar.value())
+            .borderRadius(InputVars.BorderRadius.value())
+            .border(1.px, LineStyle.Solid, InputVars.BorderColor.value())
     }
 
-    ariaInvalid { Modifier.bordered(InputBorderInvalidColorVar.value()) }
-    (hover + not(disabled)) { Modifier.border { color(InputBorderHoverColorVar.value()) } }
-    (focusVisible + not(disabled)) { Modifier.bordered(InputBorderFocusColorVar.value()) }
+    ariaInvalid { Modifier.bordered(InputVars.BorderInvalidColor.value()) }
+    (hover + not(disabled)) { Modifier.border { color(InputVars.BorderHoverColor.value()) } }
+    (focusVisible + not(disabled)) { Modifier.bordered(InputVars.BorderFocusColor.value()) }
 }
 
 val FilledInputVariant by InputStyle.addVariant {
@@ -134,16 +136,16 @@ val FilledInputVariant by InputStyle.addVariant {
     base {
         Modifier
             .inputPadding()
-            .backgroundColor(InputFilledColorVar.value())
-            .borderRadius(InputBorderRadiusVar.value())
+            .backgroundColor(InputVars.FilledColor.value())
+            .borderRadius(InputVars.BorderRadius.value())
             .border(1.px, LineStyle.Solid, Colors.Transparent)
     }
-    (hover + not(disabled)) { Modifier.backgroundColor(InputFilledHoverColorVar.value()) }
-    ariaInvalid { Modifier.bordered(InputBorderInvalidColorVar.value()) }
+    (hover + not(disabled)) { Modifier.backgroundColor(InputVars.FilledHoverColor.value()) }
+    ariaInvalid { Modifier.bordered(InputVars.BorderInvalidColor.value()) }
     (focusVisible + not(disabled)) {
         Modifier
-            .backgroundColor(InputFilledFocusColorVar.value())
-            .bordered(InputBorderFocusColorVar.value())
+            .backgroundColor(InputVars.FilledFocusColor.value())
+            .bordered(InputVars.BorderFocusColor.value())
     }
 }
 
@@ -152,10 +154,10 @@ val FlushedInputVariant by InputStyle.addVariant {
         return this.border { color(color) }.boxShadow(offsetY = 1.px, color = color)
     }
 
-    base { Modifier.borderBottom(1.px, LineStyle.Solid, InputBorderColorVar.value()) }
-    ariaInvalid { Modifier.bordered(InputBorderInvalidColorVar.value()) }
-    (hover + not(disabled)) { Modifier.border { color(InputBorderHoverColorVar.value()) } }
-    (focusVisible + not(disabled)) { Modifier.bordered(InputBorderFocusColorVar.value()) }
+    base { Modifier.borderBottom(1.px, LineStyle.Solid, InputVars.BorderColor.value()) }
+    ariaInvalid { Modifier.bordered(InputVars.BorderInvalidColor.value()) }
+    (hover + not(disabled)) { Modifier.border { color(InputVars.BorderHoverColor.value()) } }
+    (focusVisible + not(disabled)) { Modifier.bordered(InputVars.BorderFocusColor.value()) }
 }
 
 val UnstyledInputVariant by InputStyle.addVariant {}
@@ -416,15 +418,15 @@ interface InputSize {
 }
 
 fun InputSize.toModifier() = Modifier
-    .setVariable(InputBorderRadiusVar, borderRadius)
-    .setVariable(InputFontSizeVar, fontSize)
-    .setVariable(InputHeightVar, height)
-    .setVariable(InputPaddingVar, padding)
+    .setVariable(InputVars.BorderRadius, borderRadius)
+    .setVariable(InputVars.FontSize, fontSize)
+    .setVariable(InputVars.Height, height)
+    .setVariable(InputVars.Padding, padding)
 
 private fun PlaceholderColor.toModifier(): Modifier {
     return Modifier
-        .setVariable(InputPlaceholderColorVar, color)
-        .setVariable(InputPlaceholderOpacityVar, opacity)
+        .setVariable(InputVars.PlaceholderColor, color)
+        .setVariable(InputVars.PlaceholderOpacity, opacity)
 }
 
 @Composable
@@ -457,10 +459,10 @@ private fun <T : Any> _Input(
         attrs = InputStyle
             .toModifier(variant)
             .then(placeholderColor?.toModifier() ?: Modifier)
-            .setVariable(InputBorderFocusColorVar, focusBorderColor)
-            .setVariable(InputBorderInvalidColorVar, invalidBorderColor)
+            .setVariable(InputVars.BorderFocusColor, focusBorderColor)
+            .setVariable(InputVars.BorderInvalidColor, invalidBorderColor)
             .thenIf(!valid) {
-                Modifier.ariaInvalid().setVariable(InputBorderColorVar, InputBorderInvalidColorVar.value())
+                Modifier.ariaInvalid().setVariable(InputVars.BorderColor, InputVars.BorderInvalidColor.value())
             }
             .thenIf(!enabled) { Modifier.ariaDisabled() }
             .thenIf(required) { Modifier.ariaRequired() }
@@ -675,7 +677,7 @@ fun InputGroup(
                 }
             }
             .thenIf(scope.leftInset != null) {
-                Modifier.paddingInline { start(scope.leftInsetWidth ?: InputInsetLeftWidthVar.value()) }
+                Modifier.paddingInline { start(scope.leftInsetWidth ?: InputVars.InsetLeftWidth.value()) }
             }
             .thenIf(scope.rightAddon != null) {
                 Modifier.styleModifier {
@@ -684,21 +686,21 @@ fun InputGroup(
                 }
             }
             .thenIf(scope.rightInset != null) {
-                Modifier.paddingInline { end(scope.leftInsetWidth ?: InputInsetLeftWidthVar.value()) }
+                Modifier.paddingInline { end(scope.leftInsetWidth ?: InputVars.InsetLeftWidth.value()) }
             }
 
         // Render addons (if set) and the main input
 
         scope.leftAddon?.let { leftAddon ->
-            val padding = InputPaddingVar.value()
+            val padding = InputVars.Padding.value()
             Box(
                 Modifier
-                    .borderRadius(topLeft = InputBorderRadiusVar.value(), bottomLeft = InputBorderRadiusVar.value())
-                    .border(1.px, LineStyle.Solid, InputBorderColorVar.value())
+                    .borderRadius(topLeft = InputVars.BorderRadius.value(), bottomLeft = InputVars.BorderRadius.value())
+                    .border(1.px, LineStyle.Solid, InputVars.BorderColor.value())
                     .flexShrink(0) // Prevent content from collapsing
                     .borderRight(0.px) // prevent double border with input
                     .paddingInline(start = padding, end = padding)
-                    .backgroundColor(InputFilledColorVar.value())
+                    .backgroundColor(InputVars.FilledColor.value())
                     .then(scope.leftModifier), contentAlignment = Alignment.Center
             ) {
                 leftAddon()
@@ -708,15 +710,18 @@ fun InputGroup(
         inputParams.renderInput(inputModifier)
 
         scope.rightAddon?.let { rightAddon ->
-            val padding = InputPaddingVar.value()
+            val padding = InputVars.Padding.value()
             Box(
                 Modifier
-                    .borderRadius(topRight = InputBorderRadiusVar.value(), bottomRight = InputBorderRadiusVar.value())
-                    .border(1.px, LineStyle.Solid, InputBorderColorVar.value())
+                    .borderRadius(
+                        topRight = InputVars.BorderRadius.value(),
+                        bottomRight = InputVars.BorderRadius.value()
+                    )
+                    .border(1.px, LineStyle.Solid, InputVars.BorderColor.value())
                     .flexShrink(0) // Prevent content from collapsing
                     .borderLeft(0.px) // prevent double border with input
                     .paddingInline(start = padding, end = padding)
-                    .backgroundColor(InputFilledColorVar.value())
+                    .backgroundColor(InputVars.FilledColor.value())
                     .then(scope.rightModifier),
                 contentAlignment = Alignment.Center
             ) {
@@ -730,7 +735,7 @@ fun InputGroup(
             Box(
                 Modifier
                     .position(Position.Absolute).top(0.px).bottom(0.px).left(0.px)
-                    .width(scope.leftInsetWidth ?: InputInsetLeftWidthVar.value())
+                    .width(scope.leftInsetWidth ?: InputVars.InsetLeftWidth.value())
                     .then(scope.leftModifier),
                 contentAlignment = Alignment.Center
             ) {
@@ -742,7 +747,7 @@ fun InputGroup(
             Box(
                 Modifier
                     .position(Position.Absolute).top(0.px).bottom(0.px).right(0.px)
-                    .width(scope.rightInsetWidth ?: InputInsetRightWidthVar.value())
+                    .width(scope.rightInsetWidth ?: InputVars.InsetRightWidth.value())
                     .then(scope.rightModifier),
                 contentAlignment = Alignment.Center
             ) {

@@ -7,7 +7,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.CssRule
 import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
 
 // Note: CSS provides a `disabled` selector, but disabling elements using HTML properties prevents mouse events from
 // firing, and this is bad because you might want to show tooltips even for a disabled element. Some solutions online
@@ -75,5 +75,5 @@ val StyleModifiers.ariaRequired get() = CssRule.OfAttributeSelector(this, """ari
  * overriding the style if they'd like.
  */
 val SmoothColorStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier.transition(CSSTransition("background-color", TransitionDurationNormalVar.value()))
+    Modifier.transition(CSSTransition("background-color", TransitionDurationVars.Normal.value()))
 }

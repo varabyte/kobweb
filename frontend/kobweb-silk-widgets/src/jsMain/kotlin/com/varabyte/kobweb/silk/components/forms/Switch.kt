@@ -18,7 +18,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationFastVar
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
@@ -31,17 +31,19 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Label
 import org.w3c.dom.HTMLElement
 
-// 9999px forces a pill shape. 0px causes a rectangular shape.
-val SwitchBorderRadiusVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 9999.px)
+object SwitchVars {
+    // 9999px forces a pill shape. 0px causes a rectangular shape.
+    val BorderRadius by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 9999.px)
 
-val SwitchTrackWidthVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val SwitchTrackHeightVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val SwitchTrackPaddingVar by StyleVariable<CSSLengthValue>(prefix = "silk")
-val SwitchTrackBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val SwitchFocusColorVar by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
+    val TrackWidth by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val TrackHeight by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val TrackPadding by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val TrackBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val FocusColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
 
-val SwitchThumbOffsetVar by StyleVariable<CSSLengthOrPercentageValue>(prefix = "silk") // Should be less than switch height
-val SwitchThumbColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+    val ThumbOffset by StyleVariable<CSSLengthOrPercentageValue>(prefix = "silk") // Should be less than switch height
+    val ThumbColor by StyleVariable<CSSColorValue>(prefix = "silk")
+}
 
 val SwitchStyle by ComponentStyle(prefix = "silk") {}
 
@@ -49,14 +51,14 @@ val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifie
     base {
         Modifier
             .position(Position.Relative) // So input can be positioned absolutely without affecting the layout
-            .width(SwitchTrackWidthVar.value())
-            .minWidth(SwitchTrackWidthVar.value())
-            .height(SwitchTrackHeightVar.value())
-            .minHeight(SwitchTrackHeightVar.value())
-            .padding(SwitchTrackPaddingVar.value())
-            .borderRadius(SwitchBorderRadiusVar.value())
-            .backgroundColor(SwitchTrackBackgroundColorVar.value())
-            .transition(CSSTransition("background-color", duration = TransitionDurationFastVar.value()))
+            .width(SwitchVars.TrackWidth.value())
+            .minWidth(SwitchVars.TrackWidth.value())
+            .height(SwitchVars.TrackHeight.value())
+            .minHeight(SwitchVars.TrackHeight.value())
+            .padding(SwitchVars.TrackPadding.value())
+            .borderRadius(SwitchVars.BorderRadius.value())
+            .backgroundColor(SwitchVars.TrackBackgroundColor.value())
+            .transition(CSSTransition("background-color", duration = TransitionDurationVars.Fast.value()))
             .boxSizing(BoxSizing.ContentBox)
     }
 
@@ -80,16 +82,16 @@ val SwitchInputVariant by InputStyle.addVariant {
     }
     // Since the checkbox is hidden, we highlight its sibling (the switch track) when the checkbox is focused(-visible).
     cssRule(":focus-visible + *") {
-        Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = SwitchFocusColorVar.value())
+        Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = SwitchVars.FocusColor.value())
     }
 }
 
 val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
-    Modifier.size(SwitchTrackHeightVar.value())
-        .borderRadius(SwitchBorderRadiusVar.value())
-        .backgroundColor(SwitchThumbColorVar.value())
-        .translateX(SwitchThumbOffsetVar.value())
-        .transition(CSSTransition("translate", duration = TransitionDurationFastVar.value()))
+    Modifier.size(SwitchVars.TrackHeight.value())
+        .borderRadius(SwitchVars.BorderRadius.value())
+        .backgroundColor(SwitchVars.ThumbColor.value())
+        .translateX(SwitchVars.ThumbOffset.value())
+        .transition(CSSTransition("translate", duration = TransitionDurationVars.Fast.value()))
 }
 
 interface SwitchSize {
@@ -114,9 +116,9 @@ interface SwitchSize {
 }
 
 fun SwitchSize.toModifier() = Modifier
-    .setVariable(SwitchTrackWidthVar, width)
-    .setVariable(SwitchTrackHeightVar, height)
-    .setVariable(SwitchTrackPaddingVar, padding)
+    .setVariable(SwitchVars.TrackWidth, width)
+    .setVariable(SwitchVars.TrackHeight, height)
+    .setVariable(SwitchVars.TrackPadding, padding)
 
 enum class SwitchShape {
     PILL,
@@ -124,7 +126,7 @@ enum class SwitchShape {
 }
 
 internal fun SwitchShape.toModifier() = Modifier
-    .thenIf(this == SwitchShape.RECTANGLE) { Modifier.setVariable(SwitchBorderRadiusVar, 0.px) }
+    .thenIf(this == SwitchShape.RECTANGLE) { Modifier.setVariable(SwitchVars.BorderRadius, 0.px) }
 
 /**
  * Creates a toggleable switch.
@@ -192,18 +194,18 @@ fun Switch(
         Box(
             SwitchTrackStyle.toModifier()
                 .setVariable(
-                    SwitchTrackBackgroundColorVar,
+                    SwitchVars.TrackBackgroundColor,
                     if (checked) colorScheme?.let { if (colorMode.isDark) it._200 else it._700 }
                         ?: switchPalette.backgroundOn else switchPalette.backgroundOff
                 )
-                .setVariable(SwitchThumbColorVar, thumbColor)
-                .setVariable(SwitchFocusColorVar, focusBorderColor)
+                .setVariable(SwitchVars.ThumbColor, thumbColor)
+                .setVariable(SwitchVars.FocusColor, focusBorderColor)
                 .thenIf(!enabled) { DisabledStyle.toModifier() }
         ) {
             Box(
                 SwitchThumbStyle.toModifier()
                     .setVariable(
-                        SwitchThumbOffsetVar,
+                        SwitchVars.ThumbOffset,
                         if (checked) (size.width - size.height).unsafeCast<CSSLengthOrPercentageValue>() else 0.percent
                     )
             )

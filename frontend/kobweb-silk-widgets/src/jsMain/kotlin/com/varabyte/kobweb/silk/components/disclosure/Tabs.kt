@@ -20,7 +20,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
@@ -28,19 +28,21 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 
-val TabColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val TabBorderColorVar by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
-val TabBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val TabDisabledBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val TabHoverBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val TabPressedBackgroundColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val TabBorderThicknessVar by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.px)
+object TabVars {
+    val Color by StyleVariable<CSSColorValue>(prefix = "silk")
+    val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+    val BackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val DisabledBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val HoverBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val PressedBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val BorderThickness by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.px)
+}
 
 val TabsStyle by ComponentStyle(prefix = "silk") {}
 val TabsTabRowStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .fillMaxWidth()
-        .borderBottom(TabBorderThicknessVar.value(), LineStyle.Solid, TabBorderColorVar.value())
+        .borderBottom(TabVars.BorderThickness.value(), LineStyle.Solid, TabVars.BorderColor.value())
 }
 val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.tabIndex(0) }) {
     base {
@@ -48,27 +50,27 @@ val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.
             .cursor(Cursor.Pointer)
             .transition(
                 *CSSTransition.group(
-                    listOf("background-color", "color", "border-color"), TransitionDurationNormalVar.value()
+                    listOf("background-color", "color", "border-color"), TransitionDurationVars.Normal.value()
                 )
             )
-            .backgroundColor(TabBackgroundColorVar.value())
-            .color(TabColorVar.value())
+            .backgroundColor(TabVars.BackgroundColor.value())
+            .color(TabVars.Color.value())
             .userSelect(UserSelect.None)
             .padding(0.5.cssRem)
-            .margin(bottom = calc { -TabBorderThicknessVar.value() })
-            .borderBottom(TabBorderThicknessVar.value(), LineStyle.Solid, TabBorderColorVar.value())
+            .margin(bottom = calc { -TabVars.BorderThickness.value() })
+            .borderBottom(TabVars.BorderThickness.value(), LineStyle.Solid, TabVars.BorderColor.value())
     }
 
     ariaDisabled {
-        Modifier.backgroundColor(TabDisabledBackgroundColorVar.value()).cursor(Cursor.NotAllowed)
+        Modifier.backgroundColor(TabVars.DisabledBackgroundColor.value()).cursor(Cursor.NotAllowed)
     }
 
     (hover + not(ariaDisabled)) {
-        Modifier.backgroundColor(TabHoverBackgroundColorVar.value())
+        Modifier.backgroundColor(TabVars.HoverBackgroundColor.value())
     }
 
     (active + not(ariaDisabled)) {
-        Modifier.backgroundColor(TabPressedBackgroundColorVar.value())
+        Modifier.backgroundColor(TabVars.PressedBackgroundColor.value())
     }
 }
 
@@ -287,9 +289,9 @@ fun Tabs(
                     Modifier
                         .thenIf(isActive) {
                             Modifier
-                                .setVariable(TabColorVar, tabPalette.selectedColor)
-                                .setVariable(TabBackgroundColorVar, tabPalette.selectedBackground)
-                                .setVariable(TabBorderColorVar, tabPalette.selectedBorder)
+                                .setVariable(TabVars.Color, tabPalette.selectedColor)
+                                .setVariable(TabVars.BackgroundColor, tabPalette.selectedBackground)
+                                .setVariable(TabVars.BorderColor, tabPalette.selectedBorder)
                         }
                         .then(TabsTabStyle.toModifier(tabVariant))
                         .then(commonTabModifier)
