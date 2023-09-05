@@ -3,7 +3,6 @@ package com.varabyte.kobweb.silk.components.forms
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
-import com.varabyte.kobweb.compose.dom.ref
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.rowClasses
@@ -40,7 +39,6 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Label
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
 
 /**
  * A convenient icon builder where you only care about the non-indeterminate case.
@@ -245,8 +243,6 @@ fun TriCheckbox(
 
     val colorMode = ColorMode.current
 
-    var checkboxInput by remember { mutableStateOf<HTMLInputElement?>(null) }
-
     // Use a label so it intercepts clicks and passes them to the inner Input
     Label(
         attrs = CheckboxStyle
@@ -287,7 +283,6 @@ fun TriCheckbox(
             },
             variant = CheckboxInputVariant,
             enabled = enabled,
-            ref = ref { checkboxInput = it },
         )
 
         Box(
