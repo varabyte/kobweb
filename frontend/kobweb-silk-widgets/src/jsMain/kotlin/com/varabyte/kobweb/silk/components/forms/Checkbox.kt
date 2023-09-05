@@ -236,7 +236,7 @@ fun TriCheckbox(
     content: (@Composable () -> Unit)? = null,
 ) {
     // Don't animate if a checkbox is being added to the DOM while already checked
-    var shouldAnimate by remember { mutableStateOf(checked.toBoolean()) }
+    var shouldAnimate by remember { mutableStateOf(!checked.toBoolean()) }
 
     val colorMode = ColorMode.current
 
