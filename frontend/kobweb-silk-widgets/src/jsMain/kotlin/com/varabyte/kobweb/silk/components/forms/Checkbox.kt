@@ -98,14 +98,21 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
         Modifier
             .fontSize(CheckboxIconSizeVar.value())
             .size(CheckboxSizeVar.value())
-            .backgroundColor(CheckboxIconBackgroundColorVar.value())
-            .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxIconBackgroundColorVar.value())
+            .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxBorderColorVar.value())
             .borderRadius(CheckboxBorderRadiusVar.value())
             .transition(
                 CSSTransition.group(
                     listOf("background-color", "border-color"), TransitionDurationVeryFastVar.value()
                 )
             )
+    }
+}
+
+val CheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant {
+    base {
+        Modifier
+            .backgroundColor(CheckboxIconBackgroundColorVar.value())
+            .border { color(CheckboxIconBackgroundColorVar.value()) }
     }
 
     (hover + not(ariaDisabled)) {
@@ -119,15 +126,6 @@ val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .size(CheckboxSizeVar.value())
         .color(CheckboxIconColorVar.value())
-}
-
-val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant {
-    val uncheckedStyle = Modifier
-        .backgroundColor(BackgroundColor.Inherit)
-        .border { color(CheckboxBorderColorVar.value()) }
-
-    base { uncheckedStyle }
-    (hover + not(ariaDisabled)) { uncheckedStyle }
 }
 
 val CheckboxInputVariant by InputStyle.addVariant {
@@ -286,7 +284,7 @@ fun TriCheckbox(
         )
 
         Box(
-            CheckboxIconContainerStyle.toModifier(UncheckedCheckboxIconContainerVariant.takeUnless { checked.toBoolean() }),
+            CheckboxIconContainerStyle.toModifier(CheckedCheckboxIconContainerVariant.takeIf { checked.toBoolean() }),
             contentAlignment = Alignment.Center
         ) {
             if (checked.toBoolean()) {
