@@ -270,7 +270,6 @@ fun Modifier.overflow(overflowX: Overflow, overflowY: Overflow) = styleModifier 
 class OverflowScope internal constructor(private val styleScope: StyleScope) {
     fun x(overflowX: Overflow) = styleScope.overflowX(overflowX)
     fun y(overflowY: Overflow) = styleScope.overflowY(overflowY)
-    fun wrap(overflowWrap: OverflowWrap) = styleScope.overflowWrap(overflowWrap)
 }
 
 fun Modifier.overflow(scope: OverflowScope.() -> Unit) = styleModifier {
@@ -284,8 +283,9 @@ fun Modifier.overflowX(overflowX: Overflow) = overflow { x(overflowX) }
 @Deprecated("Use overflow { y(overflowY) } instead.", ReplaceWith("overflow { y(overflowY) }"))
 fun Modifier.overflowY(overflowY: Overflow) = overflow { y(overflowY) }
 
-@Deprecated("Use overflow { wrap(overflowWrap) } instead.", ReplaceWith("overflow { wrap(overflowWrap) }"))
-fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = overflow { wrap(overflowWrap) }
+fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = styleModifier {
+    overflowWrap(overflowWrap)
+}
 
 fun Modifier.verticalAlign(verticalAlign: VerticalAlign) = styleModifier {
     verticalAlign(verticalAlign)
