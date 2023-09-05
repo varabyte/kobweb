@@ -36,6 +36,10 @@ object TabVars {
     val HoverBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val PressedBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val BorderThickness by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.px)
+    val ColorTransitionDuration by StyleVariable(
+        prefix = "silk",
+        defaultFallback = TransitionDurationVars.Normal.value()
+    )
 }
 
 val TabsStyle by ComponentStyle(prefix = "silk") {}
@@ -50,7 +54,7 @@ val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.
             .cursor(Cursor.Pointer)
             .transition(
                 *CSSTransition.group(
-                    listOf("background-color", "color", "border-color"), TransitionDurationVars.Normal.value()
+                    listOf("background-color", "color", "border-color"), TabVars.ColorTransitionDuration.value()
                 )
             )
             .backgroundColor(TabVars.BackgroundColor.value())

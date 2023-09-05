@@ -22,11 +22,15 @@ import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.events.EventListener
 
+object PopupVars {
+    val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
+}
+
 val PopupStyle by ComponentStyle.base(prefix = "silk") {
     // NOTE: If any user replaces this style in their own project, they should make sure they still keep this "opacity"
     // transition in their version, even if they change the duration. Otherwise, the popup will break, as it currently
     // uses the "opacity" transition event to detect when it should close.
-    Modifier.transition(CSSTransition("opacity", TransitionDurationVars.Fast.value()))
+    Modifier.transition(CSSTransition("opacity", PopupVars.TransitionDuration.value()))
 }
 
 /** A small but comfortable amount of space between a popup and its target. */

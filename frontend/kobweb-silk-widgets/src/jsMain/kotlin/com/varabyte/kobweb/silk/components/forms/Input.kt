@@ -60,6 +60,10 @@ object InputVars {
     val BorderFocusColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
     val BorderHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val BorderInvalidColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val ColorTransitionDuration by StyleVariable(
+        prefix = "silk",
+        defaultFallback = TransitionDurationVars.Normal.value()
+    )
     val FilledColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val FilledHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val FilledFocusColor by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -94,7 +98,8 @@ val InputStyle by ComponentStyle(prefix = "silk") {
             .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
             .transition(
                 CSSTransition.group(
-                    listOf("border-color", "box-shadow", "background-color"), TransitionDurationVars.Normal.value()
+                    listOf("border-color", "box-shadow", "background-color"),
+                    duration = InputVars.ColorTransitionDuration.value()
                 )
             )
     }

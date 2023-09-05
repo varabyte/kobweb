@@ -42,6 +42,10 @@ object ButtonVars {
     val BackgroundHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val BackgroundPressedColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val Color by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
+    val ColorTransitionDuration by StyleVariable(
+        prefix = "silk",
+        defaultFallback = TransitionDurationVars.Normal.value()
+    )
     val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
     val Height by StyleVariable<CSSLengthValue>(prefix = "silk")
     val PaddingHorizontal by StyleVariable<CSSLengthValue>(prefix = "silk")
@@ -63,7 +67,7 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
             .borderRadius(0.375.cssRem)
             .border { width(0.px) }
             .userSelect(UserSelect.None) // No selecting text within buttons
-            .transition(CSSTransition("background-color", duration = TransitionDurationVars.Normal.value()))
+            .transition(CSSTransition("background-color", duration = ButtonVars.ColorTransitionDuration.value()))
     }
 
     (hover + not(ariaDisabled)) {
