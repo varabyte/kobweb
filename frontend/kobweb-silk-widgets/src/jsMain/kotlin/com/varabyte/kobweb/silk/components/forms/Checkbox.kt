@@ -26,6 +26,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVeryFastVar
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
@@ -102,7 +103,11 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
             .backgroundColor(CheckboxIconBackgroundColorVar.value())
             .border(width = 0.125.cssRem, style = LineStyle.Solid, color = CheckboxIconBackgroundColorVar.value())
             .borderRadius(CheckboxBorderRadiusVar.value())
-            .transition(CSSTransition.group(listOf("background-color", "border-color"), 200.ms))
+            .transition(
+                CSSTransition.group(
+                    listOf("background-color", "border-color"), TransitionDurationVeryFastVar.value()
+                )
+            )
     }
 
     (hover + not(ariaDisabled)) {
@@ -292,7 +297,11 @@ fun TriCheckbox(
             if (checked.toBoolean()) {
                 Box(
                     CheckboxIconStyle.toModifier().thenIf(shouldAnimate) {
-                        Modifier.animation(CheckboxEnabledAnim.toAnimation(colorMode, 200.ms))
+                        Modifier.animation(
+                            CheckboxEnabledAnim.toAnimation(
+                                colorMode, TransitionDurationVeryFastVar.value()
+                            )
+                        )
                     }, contentAlignment = Alignment.Center
                 ) {
                     CheckboxIconScope(
