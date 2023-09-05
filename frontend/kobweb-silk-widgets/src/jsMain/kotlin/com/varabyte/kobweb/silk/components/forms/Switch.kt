@@ -18,6 +18,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationFastVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
@@ -55,7 +56,7 @@ val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifie
             .padding(SwitchTrackPaddingVar.value())
             .borderRadius(SwitchBorderRadiusVar.value())
             .backgroundColor(SwitchTrackBackgroundColorVar.value())
-            .transition(CSSTransition("background-color", duration = 150.ms))
+            .transition(CSSTransition("background-color", duration = TransitionDurationFastVar.value()))
             .boxSizing(BoxSizing.ContentBox)
     }
 
@@ -88,7 +89,7 @@ val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
         .borderRadius(SwitchBorderRadiusVar.value())
         .backgroundColor(SwitchThumbColorVar.value())
         .translateX(SwitchThumbOffsetVar.value())
-        .transition(CSSTransition("translate", duration = 150.ms))
+        .transition(CSSTransition("translate", duration = TransitionDurationFastVar.value()))
 }
 
 interface SwitchSize {

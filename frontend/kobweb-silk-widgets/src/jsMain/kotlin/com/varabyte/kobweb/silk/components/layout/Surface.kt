@@ -14,11 +14,11 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.init.setSilkVariables
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
 import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.LocalColorMode
-import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
 val SurfaceBackgroundColorVar by StyleVariable(prefix = "silk", defaultFallback = BackgroundColorVar.value())
@@ -43,7 +43,8 @@ val SurfaceStyle by ComponentStyle(prefix = "silk") {
     "Use `SmoothColorStyle` instead, e.g. `Surface(SmoothColorStyle.toModifer())`. The approach used by `AnimatedColorSurfaceVariant` is problematic and conflicts with people trying to set transitions on their own elements."
 )
 val AnimatedColorSurfaceVariant by SurfaceStyle.addVariant {
-    val backgroundColorTransition = Modifier.transition(CSSTransition("background-color", 200.ms))
+    val backgroundColorTransition =
+        Modifier.transition(CSSTransition("background-color", TransitionDurationNormalVar.value()))
 
     base { backgroundColorTransition }
     // It looks weird if parts of the screen snap colors while others transition smoothly. Do our best to make sure all

@@ -24,6 +24,7 @@ import com.varabyte.kobweb.silk.components.style.focusVisible
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
@@ -60,7 +61,7 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
             .borderRadius(0.375.cssRem)
             .border { width(0.px) }
             .userSelect(UserSelect.None) // No selecting text within buttons
-            .transition(CSSTransition("background-color", duration = 200.ms))
+            .transition(CSSTransition("background-color", duration = TransitionDurationNormalVar.value()))
     }
 
     (hover + not(ariaDisabled)) {

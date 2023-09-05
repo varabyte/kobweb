@@ -13,6 +13,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationFastVar
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
@@ -25,7 +26,7 @@ val PopupStyle by ComponentStyle.base(prefix = "silk") {
     // NOTE: If any user replaces this style in their own project, they should make sure they still keep this "opacity"
     // transition in their version, even if they change the duration. Otherwise, the popup will break, as it currently
     // uses the "opacity" transition event to detect when it should close.
-    Modifier.transition(CSSTransition("opacity", 150.ms))
+    Modifier.transition(CSSTransition("opacity", TransitionDurationFastVar.value()))
 }
 
 /** A small but comfortable amount of space between a popup and its target. */

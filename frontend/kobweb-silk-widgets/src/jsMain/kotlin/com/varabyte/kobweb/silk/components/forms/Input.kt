@@ -27,6 +27,7 @@ import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.placeholder
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
@@ -89,7 +90,11 @@ val InputStyle by ComponentStyle(prefix = "silk") {
             .backgroundColor(Colors.Transparent)
             .outline(0.px, LineStyle.Solid, Colors.Transparent) // Disable, we'll use box shadow instead
             .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
-            .transition(CSSTransition.group(listOf("border-color", "box-shadow", "background-color"), 200.ms))
+            .transition(
+                CSSTransition.group(
+                    listOf("border-color", "box-shadow", "background-color"), TransitionDurationNormalVar.value()
+                )
+            )
     }
 
     placeholder {

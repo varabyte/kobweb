@@ -20,6 +20,7 @@ import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.theme.animation.TransitionDurationNormalVar
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.toSilkPalette
@@ -45,7 +46,11 @@ val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.
     base {
         Modifier
             .cursor(Cursor.Pointer)
-            .transition(*CSSTransition.group(listOf("background-color", "color", "border-color"), 200.ms))
+            .transition(
+                *CSSTransition.group(
+                    listOf("background-color", "color", "border-color"), TransitionDurationNormalVar.value()
+                )
+            )
             .backgroundColor(TabBackgroundColorVar.value())
             .color(TabColorVar.value())
             .userSelect(UserSelect.None)
