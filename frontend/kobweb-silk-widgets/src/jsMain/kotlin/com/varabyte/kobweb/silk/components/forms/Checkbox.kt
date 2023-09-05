@@ -22,9 +22,6 @@ import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.addVariantBase
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
@@ -127,12 +124,6 @@ val CheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant
             .backgroundColor(CheckboxVars.IconBackgroundColor.value())
             .border { color(CheckboxVars.IconBackgroundColor.value()) }
     }
-
-    (hover + not(ariaDisabled)) {
-        Modifier
-            .backgroundColor(CheckboxVars.IconBackgroundHoverColor.value())
-            .border { color(CheckboxVars.IconBackgroundHoverColor.value()) }
-    }
 }
 
 val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
@@ -163,6 +154,11 @@ val CheckboxInputVariant by InputStyle.addVariant {
             spreadRadius = CheckboxVars.FocusOutlineSpread.value(),
             color = CheckboxVars.FocusOutlineColor.value()
         )
+    }
+    // If an input's label gets hovered, the input does too.
+    cssRule(":not([aria-disabled]):hover + *") {
+        Modifier
+            .setVariable(CheckboxVars.IconBackgroundColor, CheckboxVars.IconBackgroundHoverColor.value())
     }
 }
 
