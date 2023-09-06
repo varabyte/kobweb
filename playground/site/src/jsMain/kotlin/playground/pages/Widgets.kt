@@ -1,6 +1,8 @@
 package playground.pages
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -30,7 +32,10 @@ import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.forms.TextInput
 import com.varabyte.kobweb.silk.components.forms.TriCheckbox
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
+import com.varabyte.kobweb.silk.components.icons.CheckIcon
 import com.varabyte.kobweb.silk.components.icons.CircleIcon
+import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
+import com.varabyte.kobweb.silk.components.icons.MinusIcon
 import com.varabyte.kobweb.silk.components.icons.PlusIcon
 import com.varabyte.kobweb.silk.components.icons.SquareIcon
 import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
@@ -38,6 +43,7 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
 import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
 import com.varabyte.kobweb.silk.components.icons.fa.IconStyle
+import com.varabyte.kobweb.silk.components.overlay.Tooltip
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -73,6 +79,14 @@ val WidgetLabelStyle by ComponentStyle.base {
         .top((-.7).cssRem)
         .padding(0.2.cssRem)
         .backgroundColor(colorMode.toSilkPalette().background)
+}
+
+val IconContainerStyle by ComponentStyle.base {
+    Modifier
+        .padding(0.2.cssRem)
+        .border(1.px, LineStyle.Solid, colorMode.toSilkPalette().border)
+        .borderRadius(3.px)
+        .cursor(Cursor.Help)
 }
 
 @Composable
@@ -172,6 +186,27 @@ fun WidgetsPage() {
                             Checkbox(child1Checked, onCheckedChange = { child1Checked = it }) { Text("Child 1") }
                             Checkbox(child2Checked, onCheckedChange = { child2Checked = it }) { Text("Child 2") }
                         }
+                    }
+                }
+            }
+
+            WidgetSection("Icons") {
+                val icons = mapOf<String, @Composable () -> Unit>(
+                    "Check" to { CheckIcon() },
+                    "Circle" to { CircleIcon() },
+                    "Indeterminate" to { IndeterminateIcon() },
+                    "Minus" to { MinusIcon() },
+                    "Plus" to { PlusIcon() },
+                    "Square" to { SquareIcon() },
+                )
+
+                Row(
+                    Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap).fontSize(0.8.cssRem),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    icons.forEach { (iconName, iconMethod) ->
+                        Box(IconContainerStyle.toModifier()) { iconMethod() }
+                        Tooltip(ElementTarget.PreviousSibling, iconName)
                     }
                 }
             }
