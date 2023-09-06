@@ -13,17 +13,6 @@ repositories {
     mavenCentral()
 }
 
-// kotlin-dsl uses 1.4 by default, but this spawns warnings at build time.
-// See also: https://handstandsam.com/2022/04/13/using-the-kotlin-dsl-gradle-plugin-forces-kotlin-1-4-compatibility/
-afterEvaluate {
-    tasks.withType<KotlinCompile>().configureEach {
-        compilerOptions {
-            apiVersion.set(KotlinVersion.KOTLIN_1_5)
-            languageVersion.set(KotlinVersion.KOTLIN_1_5)
-        }
-    }
-}
-
 gradlePlugin {
     plugins {
         create("publishKobwebArtifact") {

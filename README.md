@@ -1,8 +1,8 @@
-![version: 0.13.12](https://img.shields.io/badge/kobweb-0.13.12-blue)
+![version: 0.14.0](https://img.shields.io/badge/kobweb-0.14.0-blue)
 ![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)
 <br>
-![kotlin: 1.8.20](https://img.shields.io/badge/kotlin-1.8.20-blue?logo=kotlin)
-![compose: 1.4.1](https://img.shields.io/badge/compose-1.4.1-blue?logo=jetpackcompose)
+![kotlin: 1.9.10](https://img.shields.io/badge/kotlin-1.9.10-blue?logo=kotlin)
+![compose: 1.5.1](https://img.shields.io/badge/compose-1.5.1-blue?logo=jetpackcompose)
 ![ktor: 2.3.0](https://img.shields.io/badge/ktor-2.3.0-blue)
 <br>
 <a href="https://discord.gg/5NZ2GKV5Cs">
