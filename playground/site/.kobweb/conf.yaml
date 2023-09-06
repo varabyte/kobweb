@@ -5,10 +5,10 @@ server:
   files:
     dev:
       contentRoot: "build/processedResources/js/main/public"
-      script: "build/developmentExecutable/playground.js"
+      script: "build/dist/js/developmentExecutable/playground.js"
       api: "build/libs/playground.jar"
     prod:
-      script: "build/distributions/playground.js"
+      script: "build/dist/js/productionExecutable/playground.js"
       siteRoot: ".kobweb/site"
 
   port: 8080
