@@ -55,7 +55,7 @@ tasks.register<Copy>("copyServerJar") {
     dependsOn(":backend:server:shadowJar")
 
     val serverJarName = "server-${libs.versions.kobweb.libs.get()}-all.jar"
-    val serverJarFile = project(":backend:server").layout.buildDirectory.file("/libs/$serverJarName")
+    val serverJarFile = project(":backend:server").layout.buildDirectory.file("libs/$serverJarName")
 
     from(serverJarFile)
     into(file("$projectDir/build/resources/main"))
