@@ -1612,7 +1612,10 @@ information and some clear, concrete examples:
 * [Static site generation and deployment with Kobweb](https://bitspittle.dev/blog/2022/staticdeploy)
 * [Deploying Kobweb into the cloud](https://bitspittle.dev/blog/2023/clouddeploy)
 
-### Talking to the server
+### Communicating with the server
+
+Let's say you've decided on creating a full stack website using Kobweb. This section walks you through setting it up as
+well as introducing the various APIs for communicating to the backend from the frontend.
 
 #### Declare a full stack project
 
