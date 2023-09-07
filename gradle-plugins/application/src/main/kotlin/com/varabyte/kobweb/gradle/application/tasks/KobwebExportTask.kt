@@ -212,6 +212,16 @@ abstract class KobwebExportTask @Inject constructor(
 
         val scriptFileStr = kobwebConf.server.files.prod.script
         val scriptFile = project.layout.projectDirectory.file(scriptFileStr).asFile
+        if (!scriptFile.exists()) {
+            throw GradleException(
+                "e: Your .kobweb/conf.yaml prod script (\"$scriptFileStr\") could not be found. This must be fixed before exporting. Perhaps search your build/ directory for \"${
+                    scriptFileStr.substringAfterLast(
+                        '/'
+                    )
+                }\" to find the right path."
+            )
+        }
+
         run {
             val destFile = systemRoot.resolve(scriptFile.name)
             scriptFile.copyTo(destFile, overwrite = true)

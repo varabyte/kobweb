@@ -186,6 +186,18 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         kobwebStartTask.configure {
             dependsOn(kobwebUnpackServerJarTask)
+            doLast {
+                val devScript = kobwebConf.server.files.dev.script
+                if (!project.file(devScript).exists()) {
+                    throw GradleException(
+                        "e: Your .kobweb/conf.yaml dev script (\"$devScript\") could not be found. This will cause the page to fail to load with a 500 error. Perhaps search your build/ directory for \"${
+                            devScript.substringAfterLast(
+                                '/'
+                            )
+                        }\" to find the right path."
+                    )
+                }
+            }
         }
         project.tasks.register("kobwebStop", KobwebStopTask::class.java)
 
