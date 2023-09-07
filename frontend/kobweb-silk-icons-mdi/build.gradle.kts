@@ -21,8 +21,8 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.html.core)
                 implementation(compose.runtime)
+                implementation(compose.html.core)
 
                 api(project(":frontend:kobweb-compose"))
             }

@@ -20,8 +20,8 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.html.core)
                 implementation(compose.runtime)
+                implementation(compose.html.core)
 
                 implementation(project(":frontend:kobweb-core"))
                 api(project(":frontend:kobweb-silk-widgets"))
