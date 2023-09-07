@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.ksp.frontend
 
 import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.containingFile
 import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -64,13 +65,20 @@ class FrontendProcessor(
 
     val propertyVisitor = FindPropertyVisitor()
 
+    // We track all files we depend on so that ksp can perform smart recompilation
+    // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
+    // will be skipped if the only change is deleted file(s) that we do not depend on.
+    val fileDependencies = mutableListOf<KSFile>()
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         kobwebInits = resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
+            fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
             InitKobwebEntry(name, acceptsContext = annotatedFun.parameters.size == 1)
         }.toList()
 
         silkInits = resolver.getSymbolsWithAnnotation(INIT_SILK_FQN).map { annotatedFun ->
+            fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
             InitSilkEntry(name)
         }.toList()
@@ -81,32 +89,35 @@ class FrontendProcessor(
 
             // TODO: consider including this as part of the first visitor? does that matter for performance?
             packageMappings += getPackageMappings(file, qualifiedPagesPackage, PACKAGE_MAPPING_PAGE_FQN, logger).toMap()
+                .also { if (it.isNotEmpty()) fileDependencies.add(file) }
         }
 
         // must be done after packageMappings is populated
-        pages = resolver.getSymbolsWithAnnotation(PAGE_FQN).mapNotNull {
+        pages = resolver.getSymbolsWithAnnotation(PAGE_FQN).mapNotNull { annotatedFun ->
             processPagesFun(
-                annotatedFun = it as KSFunctionDeclaration,
+                annotatedFun = annotatedFun as KSFunctionDeclaration,
                 qualifiedPagesPackage = qualifiedPagesPackage,
                 packageMappings = packageMappings,
                 logger = logger,
-            )
+            )?.also { fileDependencies.add(annotatedFun.containingFile!!) }
         }.toList()
 
         if (includeAppData) {
             val appFun = resolver.getSymbolsWithAnnotation(APP_FQN).toList()
 
             if (appFun.size > 1) {
-                logger.error("Only one @App function is allowed per project.") // TODO: "at most"?
+                logger.error("At most one @App function is allowed per project.")
             } else {
-                appFqn = (appFun.singleOrNull() as KSFunctionDeclaration?)?.qualifiedName?.asString()
+                appFun.singleOrNull()?.let {
+                    fileDependencies.add(it.containingFile!!)
+                    appFqn = (it as KSFunctionDeclaration).qualifiedName?.asString()
+                }
             }
         }
 
         return emptyList()
     }
 
-    // TODO: we are currently recursively visiting every single property. Is this what we want to do? Is there a better way to go about this?
     inner class FindPropertyVisitor : KSVisitorVoid() {
         private val styleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
@@ -120,8 +131,6 @@ class FrontendProcessor(
             displayString = "component variant",
             function = "ctx.theme.registerComponentVariants",
         )
-
-        // TODO: currently ignoring "keyframes" (deprecated)
         private val keyframesDeclaration = DeclarationType(
             name = KEYFRAMES_SIMPLE_NAME,
             qualifiedName = KEYFRAMES_FQN,
@@ -146,9 +155,8 @@ class FrontendProcessor(
                 return
             }
 
-            // TODO: do we want expensive full type? Current: Yes
-            val expensiveFullType = property.type.resolve().declaration.qualifiedName?.asString()
-            when (expensiveFullType) {
+            val propertyFqn = property.type.resolve().declaration.qualifiedName?.asString()
+            when (propertyFqn) {
                 styleDeclaration.qualifiedName -> {
                     silkStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
                 }
@@ -160,7 +168,9 @@ class FrontendProcessor(
                 keyframesDeclaration.qualifiedName -> {
                     keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
                 }
-            }
+
+                else -> null
+            }?.also { fileDependencies.add(property.containingFile!!) }
         }
 
         @OptIn(KspExperimental::class)
@@ -238,7 +248,7 @@ class FrontendProcessor(
         }
 
         codeGenerator.createNewFileByPath(
-            Dependencies.ALL_FILES, // TODO - not recommended
+            Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
             path = "frontend",
             extensionName = "json",
         ).writer().use { writer ->

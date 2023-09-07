@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.ksp.backend
 
 import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.containingFile
 import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -41,66 +42,42 @@ class BackendProcessor(
     lateinit var initMethods: List<InitApiEntry>
     lateinit var apiMethods: List<ApiEntry>
     private val apiStreams = mutableListOf<ApiStreamEntry>()
-
     // fqPkg to subdir, e.g. "api.id._as._int" to "int"
     lateinit var packageMappings: Map<String, String>
 
+    // We track all files we depend on so that ksp can perform smart recompilation
+    // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
+    // will be skipped if the only change is deleted file(s) that we do not depend on.
+    val fileDependencies = mutableListOf<KSFile>()
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         initMethods = resolver.getSymbolsWithAnnotation(INIT_API_FQN).map { annotatedFun ->
+            fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
             InitApiEntry(name)
         }.toList()
 
         val allFiles = resolver.getAllFiles()
 
+        // package mapping must be processed before api methods & streams
         packageMappings = allFiles.flatMap { file ->
-            getPackageMappings(file, qualifiedApiPackage, PACKAGE_MAPPING_API_FQN, logger)
+            getPackageMappings(file, qualifiedApiPackage, PACKAGE_MAPPING_API_FQN, logger).toList()
+                .also { if (it.isNotEmpty()) fileDependencies.add(file) }
         }.toMap()
 
-        // must be after package mapping
         apiMethods = resolver.getSymbolsWithAnnotation(API_FQN)
             .filterIsInstance<KSFunctionDeclaration>() // @Api for stream properties is handled separately
-            .mapNotNull { processApiFun(it) }
-            .toList()
+            .mapNotNull { annotatedFun ->
+                processApiFun(annotatedFun, qualifiedApiPackage, packageMappings, logger)
+                    ?.also { fileDependencies.add(annotatedFun.containingFile!!) }
+            }.toList()
 
-        // must be after package mapping - TODO: but is this less efficient?
         val visitor = FindPropertyVisitor()
         allFiles.forEach { file ->
             file.accept(visitor, Unit)
         }
 
         return emptyList()
-    }
-
-    private fun processApiFun(annotatedFun: KSFunctionDeclaration): ApiEntry? {
-        // TODO: we resolve here so that we can find the Page annotation even if it's import aliased.
-        // But is there a better way? And should we support this at all?
-        val apiAnnotation = annotatedFun.annotations
-            .first { it.annotationType.resolve().declaration.qualifiedName?.asString() == API_FQN }
-
-        val currPackage = annotatedFun.packageName.asString()
-        val file = annotatedFun.containingFile ?: error("Symbol does not come from a source file")
-        val routeOverride = apiAnnotation.arguments.first().value?.toString()?.takeIf { it.isNotBlank() }
-
-        return if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedApiPackage)) {
-            val resolvedRoute = processRoute(
-                pkg = annotatedFun.packageName.asString(),
-                slugFromFile = file.nameWithoutExtension.lowercase(),
-                routeOverride = routeOverride,
-                qualifiedPackage = qualifiedApiPackage,
-                packageMappings = packageMappings,
-                supportDynamicRoute = false,
-            )
-            ApiEntry(annotatedFun.qualifiedName!!.asString(), resolvedRoute)
-        } else {
-            val funName = annotatedFun.simpleName.asString()
-            val annotationName = apiAnnotation.shortName.asString()
-            logger.warn(
-                "Skipped over `@$annotationName fun ${funName}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`.",
-                annotatedFun
-            )
-            null
-        }
     }
 
     inner class FindPropertyVisitor : KSVisitorVoid() {
@@ -133,6 +110,7 @@ class BackendProcessor(
                 }
                 return
             }
+            fileDependencies.add(property.containingFile!!)
 
             // TODO: we're currently resolving due to import alias -- same as in other places
             val routeOverride = property.annotations
@@ -164,11 +142,47 @@ class BackendProcessor(
         val backendData = BackendData(initMethods, apiMethods, apiStreams)//.also { it.assertValid() } / TODO
 
         codeGenerator.createNewFileByPath(
-            Dependencies.ALL_FILES, // TODO - not recommended
+            Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
             path = "backend",
             extensionName = "json",
         ).writer().use { writer ->
             writer.write(Json.encodeToString(backendData))
         }
+    }
+}
+
+private fun processApiFun(
+    annotatedFun: KSFunctionDeclaration,
+    qualifiedApiPackage: String,
+    packageMappings: Map<String, String>,
+    logger: KSPLogger,
+): ApiEntry? {
+    // TODO: we resolve here so that we can find the Page annotation even if it's import aliased.
+    // But is there a better way? And should we support this at all?
+    val apiAnnotation = annotatedFun.annotations
+        .first { it.annotationType.resolve().declaration.qualifiedName?.asString() == API_FQN }
+
+    val currPackage = annotatedFun.packageName.asString()
+    val file = annotatedFun.containingFile ?: error("Symbol does not come from a source file")
+    val routeOverride = apiAnnotation.arguments.first().value?.toString()?.takeIf { it.isNotBlank() }
+
+    return if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedApiPackage)) {
+        val resolvedRoute = processRoute(
+            pkg = annotatedFun.packageName.asString(),
+            slugFromFile = file.nameWithoutExtension.lowercase(),
+            routeOverride = routeOverride,
+            qualifiedPackage = qualifiedApiPackage,
+            packageMappings = packageMappings,
+            supportDynamicRoute = false,
+        )
+        ApiEntry(annotatedFun.qualifiedName!!.asString(), resolvedRoute)
+    } else {
+        val funName = annotatedFun.simpleName.asString()
+        val annotationName = apiAnnotation.shortName.asString()
+        logger.warn(
+            "Skipped over `@$annotationName fun ${funName}`. It is defined under package `$currPackage` but must exist under `$qualifiedApiPackage`.",
+            annotatedFun
+        )
+        null
     }
 }
