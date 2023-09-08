@@ -19,14 +19,14 @@ class FrontendData(
     val silkStyles: List<ComponentStyleEntry>,
     val silkVariants: List<ComponentVariantEntry>,
     val keyframesList: List<KeyframesEntry>,
-) {
-    // TODO: for some reason gradle give a noclassdeffounderror
-    fun assertValid() {
-//        pages.assertValidPages()
-    }
-}
+)
 
-fun Iterable<FrontendData>.merge(): FrontendData {
+/**
+ * Merge multiple [FrontendData] objects together.
+ *
+ * An error will be thrown if the merged result generates any invalid conditions, e.g. duplicate routes.
+ */
+fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
     return FrontendData(
         this.flatMap { it.pages },
         this.flatMap { it.kobwebInits },
@@ -34,24 +34,23 @@ fun Iterable<FrontendData>.merge(): FrontendData {
         this.flatMap { it.silkStyles },
         this.flatMap { it.silkVariants },
         this.flatMap { it.keyframesList },
-    ).also { it.assertValid() }
+    ).also { it.assertValid(throwError) }
 }
 
-//fun FrontendData.assertValid() {
-//    pages.assertValidPages()
-//}
+fun FrontendData.assertValid(throwError: (String) -> Unit) {
+    pages.assertValidPages(throwError)
+}
 
-private fun Iterable<PageEntry>.assertValidPages() {
+private fun Iterable<PageEntry>.assertValidPages(throwError: (String) -> Unit) {
     val entriesByRoute = this.groupBy { it.route }
     entriesByRoute.forEach { (route, pages) ->
-        // TODO
-//        if (pages.size > 1) {
-//            throw GradleException("The route \"$route\" was defined more than once. Used by:\n${pages.joinToString("\n") { page -> " - ${page.fqn}" }}")
-//        }
-//
-//        if (route.removePrefix("/").split('/', limit = 2).first() == "api") {
-//            throw GradleException("The route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
-//        }
+        if (pages.size > 1) {
+            throwError("The route \"$route\" was defined more than once. Used by:\n${pages.joinToString("\n") { page -> " - ${page.fqn}" }}")
+        }
+
+        if (route.removePrefix("/").split('/', limit = 2).first() == "api") {
+            throwError("The route \"$route\" starts with \"api\", which is currently a reserved route path, so please choose another name. Used by ${pages.first().fqn}.")
+        }
     }
 }
 

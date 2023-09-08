@@ -124,7 +124,7 @@ abstract class KobwebExportTask @Inject constructor(
                 }
             }
         }
-            .merge()
+            .merge(throwError = { throw GradleException(it) })
             .also { data ->
                 data.pages.toList().let { entries ->
                     if (entries.isEmpty()) {

@@ -28,6 +28,7 @@ import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.InitApiEntry
+import com.varabyte.kobweb.project.backend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -72,7 +73,7 @@ class BackendProcessor(
                     ?.also { fileDependencies.add(annotatedFun.containingFile!!) }
             }.toList()
 
-        val visitor = FindPropertyVisitor()
+        val visitor = ApiVisitor()
         allFiles.forEach { file ->
             file.accept(visitor, Unit)
         }
@@ -80,7 +81,7 @@ class BackendProcessor(
         return emptyList()
     }
 
-    inner class FindPropertyVisitor : KSVisitorVoid() {
+    inner class ApiVisitor : KSVisitorVoid() {
         @OptIn(KspExperimental::class)
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val type = property.type.toString()
@@ -139,7 +140,9 @@ class BackendProcessor(
     }
 
     override fun finish() {
-        val backendData = BackendData(initMethods, apiMethods, apiStreams)//.also { it.assertValid() } / TODO
+        val backendData = BackendData(initMethods, apiMethods, apiStreams).also {
+            it.assertValid(throwError = { msg -> logger.error(msg) })
+        }
 
         codeGenerator.createNewFileByPath(
             Dependencies(aggregating = true, *fileDependencies.toTypedArray()),

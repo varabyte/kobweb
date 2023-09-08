@@ -11,6 +11,7 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.merge
+import org.gradle.api.GradleException
 
 private const val KOBWEB_GROUP = "com.varabyte.kobweb"
 
@@ -34,7 +35,7 @@ fun createMainFunction(
     val appFqn = appData.appEntry?.fqn
         ?: (KOBWEB_GROUP + if (usingSilkWidgets) ".silk.SilkApp" else ".core.KobwebApp")
 
-    val frontendData = (listOf(appData.frontendData) + libData).merge()
+    val frontendData = (listOf(appData.frontendData) + libData).merge(throwError = { throw GradleException(it) })
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
     buildList {
