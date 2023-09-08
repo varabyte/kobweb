@@ -11,6 +11,7 @@ import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.merge
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.provider.DefaultProvider
@@ -39,7 +40,7 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
     @TaskAction
     fun execute() {
         val backendData = buildList {
-            kspGenFile?.get()?.asFile?.takeIf { it.exists() }?.let {
+            kspGenFile.get().asFile.takeIf { it.exists() }?.let {
                 add(Json.decodeFromString<BackendData>(it.readText()))
             }
             getCompileClasspath().get().files.forEach { file ->
@@ -47,7 +48,7 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
                     add(Json.decodeFromString<BackendData>(bytes.decodeToString()))
                 }
             }
-        }.merge()
+        }.merge(throwError = { throw GradleException(it) })
 
         val apisFactoryFile = getGenApisFactoryFile()
         apisFactoryFile.parentFile.mkdirs()

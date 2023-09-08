@@ -38,6 +38,7 @@ import com.varabyte.kobweb.project.frontend.InitKobwebEntry
 import com.varabyte.kobweb.project.frontend.InitSilkEntry
 import com.varabyte.kobweb.project.frontend.KeyframesEntry
 import com.varabyte.kobweb.project.frontend.PageEntry
+import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -63,8 +64,6 @@ class FrontendProcessor(
     // fqPkg to subdir, e.g. "blog._2022._01" to "01"
     val packageMappings = mutableMapOf<String, String>()
 
-    val propertyVisitor = FindPropertyVisitor()
-
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
     // will be skipped if the only change is deleted file(s) that we do not depend on.
@@ -83,9 +82,9 @@ class FrontendProcessor(
             InitSilkEntry(name)
         }.toList()
 
+        val frontendVisitor = FrontendVisitor() // ComponentStyle, ComponentVariant, Keyframes
         resolver.getAllFiles().forEach { file ->
-            // ComponentStyle, ComponentVariant, Keyframes
-            file.accept(propertyVisitor, Unit)
+            file.accept(frontendVisitor, Unit)
 
             // TODO: consider including this as part of the first visitor? does that matter for performance?
             packageMappings += getPackageMappings(file, qualifiedPagesPackage, PACKAGE_MAPPING_PAGE_FQN, logger).toMap()
@@ -118,7 +117,7 @@ class FrontendProcessor(
         return emptyList()
     }
 
-    inner class FindPropertyVisitor : KSVisitorVoid() {
+    inner class FrontendVisitor : KSVisitorVoid() {
         private val styleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
@@ -179,9 +178,8 @@ class FrontendProcessor(
             declarationInfo: DeclarationType
         ): Boolean {
             val propertyName = property.simpleName.asString()
-            val topLevelSuppression = "TOP_LEVEL_${declarationInfo.suppressionName}"
-            val privateSuppression = "PRIVATE_${declarationInfo.suppressionName}"
             if (property.parent !is KSFile) {
+                val topLevelSuppression = "TOP_LEVEL_${declarationInfo.suppressionName}"
                 if (property.getAnnotationsByType(Suppress::class).none { topLevelSuppression in it.names }) {
                     logger.warn(
                         "Not registering ${declarationInfo.displayString} `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$topLevelSuppression\")` annotation.",
@@ -191,6 +189,7 @@ class FrontendProcessor(
                 return false
             }
             if (!property.isPublic()) {
+                val privateSuppression = "PRIVATE_${declarationInfo.suppressionName}"
                 if (property.getAnnotationsByType(Suppress::class).none { privateSuppression in it.names }) {
                     logger.warn(
                         "Not registering ${declarationInfo.displayString} `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
@@ -239,7 +238,9 @@ class FrontendProcessor(
             silkStyles,
             silkVariants,
             keyframesList
-        ).also { it.assertValid() }
+        ).also {
+            it.assertValid(throwError = { msg -> logger.error(msg) })
+        }
 
         val encodedData = if (includeAppData) {
             Json.encodeToString(AppData(appFqn?.let { AppEntry(it) }, frontendData))
