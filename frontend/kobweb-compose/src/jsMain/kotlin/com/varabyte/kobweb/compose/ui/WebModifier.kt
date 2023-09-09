@@ -88,11 +88,6 @@ fun <A : AttrsScope<Element>> Modifier.toAttrs(finalHandler: (A.() -> Unit)? = n
     }
 }
 
-@Deprecated("This method has been shortened to `toAttrs`.", ReplaceWith("toAttrs(finalHandler)"))
-fun <A : AttrsScope<Element>> Modifier.asAttributesBuilder(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
-    return toAttrs(finalHandler)
-}
-
 /**
  * Convert a [Modifier] into a [StyleScope] which can be used to initialize a StyleSheet, for example.
  *
@@ -110,9 +105,4 @@ fun Modifier.toStyles(finalHandler: (StyleScope.() -> Unit)? = null): StyleScope
 
         finalHandler?.invoke(this)
     }
-}
-
-@Deprecated("This method has been shortened to `toStyles`.", ReplaceWith("toStyles(finalHandler)"))
-fun Modifier.asStyleBuilder(finalHandler: (StyleScope.() -> Unit)? = null): StyleScope.() -> Unit {
-    return toStyles(finalHandler)
 }

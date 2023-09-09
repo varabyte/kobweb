@@ -13,19 +13,6 @@ fun Modifier.color(color: CSSColor) = styleModifier {
     color(color)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { color(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "com.varabyte.kobweb.compose.css.color"
-    ),
-)
-fun Modifier.color(value: String) = styleModifier {
-    color(value)
-}
-
 fun Modifier.opacity(value: Number) = styleModifier {
     opacity(value)
 }

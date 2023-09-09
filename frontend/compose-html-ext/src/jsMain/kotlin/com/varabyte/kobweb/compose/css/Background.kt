@@ -122,61 +122,14 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-// Suppress: We only have deprecated methods calling deprecated methods, so no need to warn about them. They'll all get
-// removed at the same time.
-@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
 sealed class BackgroundPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class Keyword(value: String) : BackgroundPosition(value)
     private class Position(position: CSSPosition) : BackgroundPosition("$position")
 
-    // TODO(#168): Remove before v1.0, these were replaced by CSSPosition
-    sealed class LegacyEdge(value: String) : BackgroundPosition(value)
-    class LegacyEdgeX internal constructor(value: String) : LegacyEdge(value)
-    class LegacyEdgeY internal constructor(value: String) : LegacyEdge(value)
-    private class LegacyEdgeOffset(edge: LegacyEdge, offset: CSSLengthOrPercentageValue) :
-        BackgroundPosition("$edge $offset")
-
-    private class LegacyPosition(x: LegacyEdgeOffset, y: LegacyEdgeOffset) : BackgroundPosition("$x $y")
-
     companion object {
-        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Left, 50.px)))")
-        fun of(xAnchor: LegacyEdgeX, x: CSSLengthOrPercentageValue): BackgroundPosition = LegacyEdgeOffset(xAnchor, x)
-
-        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Top, 20.percent)))")
-        fun of(yAnchor: LegacyEdgeY, y: CSSLengthOrPercentageValue): BackgroundPosition = LegacyEdgeOffset(yAnchor, y)
-
-        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(Left, 50.px, Top, 20.percent)))")
-        fun of(
-            xAnchor: LegacyEdgeX,
-            x: CSSLengthOrPercentageValue,
-            yAnchor: LegacyEdgeY,
-            y: CSSLengthOrPercentageValue
-        ): BackgroundPosition =
-            LegacyPosition(LegacyEdgeOffset(xAnchor, x), LegacyEdgeOffset(yAnchor, y))
-
-        @Deprecated("Use CSSPosition instead (e.g. BackgroundPosition.of(CSSPosition(50.px, 20.percent)))")
-        fun of(x: CSSLengthOrPercentageValue, y: CSSLengthOrPercentageValue) = this.of(Left, x, Top, y)
-
         fun of(position: CSSPosition): BackgroundPosition = Position(position)
-
-        // Edges
-        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Top)")
-        val Top get() = LegacyEdgeY("top")
-
-        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Bottom)")
-        val Bottom get() = LegacyEdgeY("bottom")
-
-        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Left)")
-        val Left get() = LegacyEdgeX("left")
-
-        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Right)")
-        val Right get() = LegacyEdgeX("right")
-
-        // Keyword
-        @Deprecated("Use CSSPosition instead (e.g. CSSPosition.Center)")
-        val Center get(): BackgroundPosition = Keyword("center")
 
         // Global values
         val Inherit get(): BackgroundPosition = Keyword("inherit")

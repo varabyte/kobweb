@@ -1,10 +1,7 @@
-@file:Suppress("DeprecatedCallableAddReplaceWith")
-
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
@@ -46,20 +43,6 @@ fun Modifier.fillMaxSize(percent: CSSPercentageValue = 100.percent): Modifier = 
     height(percent)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated("This method will be removed before v1.0. If targeting styles, just use `size` without the type argument. Otherwise, call `attrsModifier { width(...); height(...) }`.")
-fun Modifier.size(size: CSSNumeric, type: WebModifierType): Modifier = when (type) {
-    WebModifierType.ATTRS -> attrsModifier {
-        width(size)
-        height(size)
-    }
-
-    WebModifierType.STYLE -> styleModifier {
-        width(size)
-        height(size)
-    }
-}
-
 fun Modifier.size(size: CSSNumeric): Modifier = styleModifier {
     width(size)
     height(size)
@@ -73,21 +56,6 @@ fun Modifier.minSize(size: CSSNumeric): Modifier = styleModifier {
 fun Modifier.maxSize(size: CSSNumeric): Modifier = styleModifier {
     maxWidth(size)
     maxHeight(size)
-}
-
-
-// TODO(#168): Remove before v1.0
-@Deprecated("This method will be removed before v1.0. If targeting styles, just use `width` without the type argument. Otherwise, call `attrsModifier { width(...) }`.")
-fun Modifier.width(size: CSSNumeric, type: WebModifierType): Modifier = when (type) {
-    WebModifierType.ATTRS -> attrsModifier { width(size) }
-    WebModifierType.STYLE -> styleModifier { width(size) }
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated("This method will be removed before v1.0. If targeting styles, just use `height` without the type argument. Otherwise, call `attrsModifier { height(...) }`.")
-fun Modifier.height(size: CSSNumeric, type: WebModifierType): Modifier = when (type) {
-    WebModifierType.ATTRS -> attrsModifier { height(size) }
-    WebModifierType.STYLE -> styleModifier { height(size) }
 }
 
 fun Modifier.width(size: CSSNumeric): Modifier = styleModifier {
@@ -225,6 +193,7 @@ class PaddingInlineScope internal constructor(private val styleScope: StyleScope
     fun start(value: CSSNumeric) = styleScope.paddingInlineStart(value)
     fun end(value: CSSNumeric) = styleScope.paddingInlineEnd(value)
 }
+
 fun Modifier.paddingInline(scope: PaddingInlineScope.() -> Unit) = styleModifier {
     PaddingInlineScope(this).scope()
 }
