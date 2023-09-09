@@ -15,6 +15,7 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
 import com.varabyte.kobweb.ksp.KSP_API_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.common.API_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
@@ -43,6 +44,7 @@ class BackendProcessor(
     lateinit var initMethods: List<InitApiEntry>
     lateinit var apiMethods: List<ApiEntry>
     private val apiStreams = mutableListOf<ApiStreamEntry>()
+
     // fqPkg to subdir, e.g. "api.id._as._int" to "int"
     lateinit var packageMappings: Map<String, String>
 
@@ -144,10 +146,11 @@ class BackendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
+        val (path, extension) = KOBWEB_METADATA_BACKEND.split('.')
         codeGenerator.createNewFileByPath(
             Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
-            path = "backend",
-            extensionName = "json",
+            path = path,
+            extensionName = extension,
         ).writer().use { writer ->
             writer.write(Json.encodeToString(backendData))
         }

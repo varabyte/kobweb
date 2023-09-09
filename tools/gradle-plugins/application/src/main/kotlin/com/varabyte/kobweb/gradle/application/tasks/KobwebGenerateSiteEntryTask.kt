@@ -12,9 +12,11 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.FrontendData
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
@@ -40,15 +42,15 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        val appData = Json.decodeFromString(AppData.serializer(), kspGenFile.get().asFile.readText())
+        val appData = Json.decodeFromString<AppData>(kspGenFile.get().asFile.readText())
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
         val mainFile = getGenMainFile()
         mainFile.parentFile.mkdirs()
 
         val libData = buildList {
             getCompileClasspath().get().files.forEach { file ->
-                file.searchZipFor("frontend.json") { bytes ->
-                    add(Json.decodeFromString(FrontendData.serializer(), bytes.decodeToString()))
+                file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
+                    add(Json.decodeFromString<FrontendData>(bytes.decodeToString()))
                 }
             }
         }

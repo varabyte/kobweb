@@ -7,6 +7,7 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.merge
 import kotlinx.serialization.decodeFromString
@@ -44,7 +45,7 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
                 add(Json.decodeFromString<BackendData>(it.readText()))
             }
             getCompileClasspath().get().files.forEach { file ->
-                file.searchZipFor("backend.json") { bytes ->
+                file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
                     add(Json.decodeFromString<BackendData>(bytes.decodeToString()))
                 }
             }
