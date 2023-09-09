@@ -7,22 +7,23 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.path.toUnixSeparators
-import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
-import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.merge
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -42,8 +43,8 @@ abstract class KobwebExportTask @Inject constructor(
     @InputFiles
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
-    @InputFile
-    fun getAppFrontendMetadata() = project.layout.buildDirectory.file(KOBWEB_APP_METADATA_FRONTEND)
+    @get:InputFile
+    abstract val appFrontendMetadataFile: RegularFileProperty
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -115,12 +116,12 @@ abstract class KobwebExportTask @Inject constructor(
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 
-        val appData = Json.decodeFromString(AppData.serializer(), getAppFrontendMetadata().get().asFile.readText())
+        val appData = Json.decodeFromString<AppData>(appFrontendMetadataFile.get().asFile.readText())
         val frontendData = buildList {
             add(appData.frontendData)
             getCompileClasspath().get().files.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
-                    add(Json.decodeFromString(FrontendData.serializer(), bytes.decodeToString()))
+                    add(Json.decodeFromString<FrontendData>(bytes.decodeToString()))
                 }
             }
         }

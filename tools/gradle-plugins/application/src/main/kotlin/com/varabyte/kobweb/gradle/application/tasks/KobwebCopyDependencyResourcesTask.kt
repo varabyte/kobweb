@@ -61,7 +61,7 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
                         // It's possible to get a classpath file that's not a jar -- npm dependencies are like this --
                         // at which point the file isn't a zip nor a directory. Such dependencies will never contain
                         // Kobweb resources, so we don't care about them. Just skip 'em!
-                        listOf()
+                        emptyList()
                     }
                 }
             }.forEach { (jar, rootAndFile) ->

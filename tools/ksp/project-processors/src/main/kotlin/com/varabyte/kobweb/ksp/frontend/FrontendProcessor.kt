@@ -15,6 +15,7 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.ksp.KSP_APP_DATA_KEY
 import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.common.APP_FQN
@@ -248,10 +249,11 @@ class FrontendProcessor(
             Json.encodeToString(frontendData)
         }
 
+        val (path, extension) = KOBWEB_METADATA_FRONTEND.split('.')
         codeGenerator.createNewFileByPath(
             Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
-            path = "frontend",
-            extensionName = "json",
+            path = path,
+            extensionName = extension,
         ).writer().use { writer ->
             writer.write(encodedData)
         }
