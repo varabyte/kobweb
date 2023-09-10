@@ -118,21 +118,6 @@ class KobwebApplicationPlugin @Inject constructor(
             dependsOn(kobwebCopyDependencyResourcesTask)
         }
 
-        // Umbrella tasks for all other gen tasks
-        val kobwebGenFrontendTask = project.tasks.register<KobwebTask>(
-            "kobwebGenFrontend",
-            "The umbrella task that combines all Kobweb frontend generation tasks"
-        )
-        val kobwebGenBackendTask = project.tasks.register<KobwebTask>(
-            "kobwebGenBackend",
-            "The umbrella task that combines all Kobweb backend generation tasks"
-        )
-        val kobwebGenTask = project.tasks.register<KobwebTask>(
-            "kobwebGen",
-            "The umbrella task that combines all frontend and backend Kobweb generation tasks"
-        )
-        // Note: Configured below
-
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
             .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts")
@@ -240,11 +225,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 kspGenFile = project.kspFrontendFile
             }
 
-            kobwebGenFrontendTask.configure {
-                dependsOn(kobwebGenSiteIndexTask)
-                dependsOn(kobwebGenSiteEntryTask)
-            }
-
             val jsRunTasks = listOf(
                 jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun,
                 jsTarget.browserRun, jsTarget.run,
@@ -262,10 +242,6 @@ class KobwebApplicationPlugin @Inject constructor(
 
             project.kotlin.sourceSets.matching { it.name == "generatedByKspKotlinJs" }.configureEach {
                 kotlin.srcDir(kobwebGenSiteEntryTask)
-            }
-
-            kobwebGenTask.configure {
-                dependsOn(kobwebGenFrontendTask)
             }
 
             project.tasks.named(jsTarget.processResources) {
@@ -286,7 +262,6 @@ class KobwebApplicationPlugin @Inject constructor(
                 // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
                 // much.
                 if (env == ServerEnvironment.DEV) {
-                    dependsOn(kobwebGenTask)
                     val webpackTask = project.tasks.named(jsTarget.browserDevelopmentWebpack)
                     dependsOn(webpackTask)
                 }
@@ -321,19 +296,11 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
-            kobwebGenTask.configure {
-                dependsOn(kobwebGenBackendTask)
-            }
-
             val kobwebGenApisFactoryTask = project.tasks
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock)
 
             kobwebGenApisFactoryTask.configure {
                 kspGenFile = project.kspBackendFile!! // exists when jvm target exists
-            }
-
-            kobwebGenBackendTask.configure {
-                dependsOn(kobwebGenApisFactoryTask)
             }
 
             project.kotlin.sourceSets.matching { it.name == "generatedByKspKotlinJvm" }.configureEach {
