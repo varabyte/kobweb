@@ -44,8 +44,8 @@ class KobwebLibraryPlugin : Plugin<Project> {
             }
 
             // TODO: are we doing something wrong or is this fine - (also in application)
-            project.tasks.namedOrNull(jvmTarget.processResources)?.configure {
-                (this as Copy).duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            project.tasks.namedOrNull<Copy>(jvmTarget.processResources)?.configure {
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             }
         }
     }

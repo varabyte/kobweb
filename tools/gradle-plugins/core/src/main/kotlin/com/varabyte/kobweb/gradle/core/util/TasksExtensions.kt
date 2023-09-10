@@ -1,10 +1,12 @@
 package com.varabyte.kobweb.gradle.core.util
 
-import org.gradle.api.NamedDomainObjectCollection
-import org.gradle.api.NamedDomainObjectProvider
+import org.gradle.api.Task
+import org.gradle.api.tasks.TaskCollection
+import org.gradle.api.tasks.TaskProvider
+import org.jetbrains.kotlin.gradle.utils.named
 
 /**
  * Replacement for `findByName` that supports task configuration avoidance.
  */
-fun <T> NamedDomainObjectCollection<T>.namedOrNull(name: String): NamedDomainObjectProvider<T>? =
-    if (name in names) named(name) else null
+inline fun <reified V : Task> TaskCollection<in V>.namedOrNull(name: String): TaskProvider<V>? =
+    if (name in names) named<V>(name) else null
