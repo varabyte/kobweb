@@ -360,21 +360,25 @@ class KobwebApplicationPlugin @Inject constructor(
     }
 }
 
-// TODO: configure ksp depend on the Task
-private fun Project.kobwebGenFrontendMetadata(action: Action<Task>) {}//tasks.named("kobwebGenFrontendMetadata", action)
-private fun Project.kobwebGenBackendMetadata(action: Action<Task>) {}//tasks.named("kobwebGenBackendMetadata", action)
-
 /**
  * Method provided for users to call if they generate their own Gradle task that generates some JS (frontend) code.
  *
  * Calling this ensures that their task will be triggered before the relevant Kobweb compilation task.
  */
+@Deprecated(
+    "Add the task outputs to the source set directly instead. Note that you may have to adjust the task to output a directory instead of a file.",
+    ReplaceWith("kotlin.sourceSets.getByName(\"jsMain\").kotlin.srcDir(task)"),
+)
 fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
-    kobwebGenFrontendMetadata { dependsOn(task) }
+    tasks.matching { it.name == "kspKotlinJs" }.configureEach { dependsOn(task) }
 }
 
+@Deprecated(
+    "Add the task outputs to the source set directly instead. Note that you may have to adjust the task to output a directory instead of a file.",
+    ReplaceWith("kotlin.sourceSets.getByName(\"jsMain\").kotlin.srcDir(task)"),
+)
 fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: TaskProvider<*>) {
-    kobwebGenFrontendMetadata { dependsOn(task) }
+    tasks.matching { it.name == "kspKotlinJs" }.configureEach { dependsOn(task) }
 }
 
 /**
@@ -382,12 +386,20 @@ fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: TaskProvider<*>) {
  *
  * Calling this ensures that their task will be triggered before the relevant Kobweb compilation task.
  */
+@Deprecated(
+    "Add the task outputs to the source set directly instead. Note that you may have to adjust the task to output a directory instead of a file.",
+    ReplaceWith("kotlin.sourceSets.getByName(\"jvmMain\").kotlin.srcDir(task)"),
+)
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
-    kobwebGenBackendMetadata { dependsOn(task) }
+    tasks.matching { it.name == "kspKotlinJvm" }.configureEach { dependsOn(task) }
 }
 
+@Deprecated(
+    "Add the task outputs to the source set directly instead. Note that you may have to adjust the task to output a directory instead of a file.",
+    ReplaceWith("kotlin.sourceSets.getByName(\"jvmMain\").kotlin.srcDir(task)"),
+)
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: TaskProvider<*>) {
-    kobwebGenBackendMetadata { dependsOn(task) }
+    tasks.matching { it.name == "kspKotlinJvm" }.configureEach { dependsOn(task) }
 }
 
 /**
