@@ -17,7 +17,7 @@ import java.io.File
  */
 abstract class KobwebBlock {
     /**
-     * The string path to the root where generated code will be written to, relative to the project root.
+     * The string path to the root where generated code will be written to, relative to the project build directory.
      */
     abstract val genDir: Property<String>
 
