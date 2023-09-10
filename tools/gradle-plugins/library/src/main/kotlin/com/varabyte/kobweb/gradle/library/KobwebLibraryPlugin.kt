@@ -51,12 +51,18 @@ class KobwebLibraryPlugin : Plugin<Project> {
     }
 }
 
+@Deprecated(
+    "Add the task outputs to the source set directly instead. Note that you may have to adjust the task to output a directory instead of a file.",
+    ReplaceWith("kotlin.sourceSets.getByName(\"jsMain\").kotlin.srcDir(task)"),
+)
 fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
-    // TODO: make ksp depend on the Task
-//    tasks.named("kobwebGenFrontendMetadata") { dependsOn(task) }
+    tasks.matching { it.name == "kspKotlinJs" }.configureEach { dependsOn(task) }
 }
 
+@Deprecated(
+    "Add the task outputs to the source set directly instead. Note that you may have to adjust the task to output a directory instead of a file.",
+    ReplaceWith("kotlin.sourceSets.getByName(\"jvmMain\").kotlin.srcDir(task)"),
+)
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
-    // TODO: make ksp depend on the Task
-//    tasks.named("kobwebGenBackendMetadata") { dependsOn(task) }
+    tasks.matching { it.name == "kspKotlinJvm" }.configureEach { dependsOn(task) }
 }
