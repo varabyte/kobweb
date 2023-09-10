@@ -31,7 +31,6 @@ import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
-import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -48,7 +47,6 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.tooling.events.FailureResult
-import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -147,11 +145,9 @@ class KobwebApplicationPlugin @Inject constructor(
                 val devScript = kobwebConf.server.files.dev.script
                 if (!project.file(devScript).exists()) {
                     throw GradleException(
-                        "e: Your .kobweb/conf.yaml dev script (\"$devScript\") could not be found. This will cause the page to fail to load with a 500 error. Perhaps search your build/ directory for \"${
-                            devScript.substringAfterLast(
-                                '/'
-                            )
-                        }\" to find the right path."
+                        "e: Your .kobweb/conf.yaml dev script (\"$devScript\") could not be found. This will cause " +
+                            "the page to fail to load with a 500 error. Perhaps search your build/ directory for " +
+                            "\"${devScript.substringAfterLast('/')}\" to find the right path."
                     )
                 }
             }
@@ -233,11 +229,6 @@ class KobwebApplicationPlugin @Inject constructor(
             val jsTarget = JsTarget(this)
             project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
 
-            val jsRunTasks = listOf(
-                jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun,
-                jsTarget.browserRun, jsTarget.run,
-            )
-
             val kobwebGenSiteEntryTask = project.tasks
                 .register<KobwebGenerateSiteEntryTask>("kobwebGenSiteEntry", kobwebConf, kobwebBlock, buildTarget)
 
@@ -250,18 +241,20 @@ class KobwebApplicationPlugin @Inject constructor(
                 dependsOn(kobwebGenSiteEntryTask)
             }
 
+            val jsRunTasks = listOf(
+                jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun,
+                jsTarget.browserRun, jsTarget.run,
+            )
             // Users should be using Kobweb tasks instead of the standard multiplatform tasks, but they
             // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
             // the Kobweb commands instead.
-            jsRunTasks
-                .mapNotNull { taskName -> project.tasks.namedOrNull(taskName) }
-                .forEach { task ->
-                    task.configure {
-                        doFirst {
-                            logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
-                        }
+            jsRunTasks.forEach { taskName ->
+                project.tasks.namedOrNull(taskName)?.configure {
+                    doFirst {
+                        logger.error("With Kobweb, you should run `gradlew kobwebStart` instead. Some site behavior may not work.")
                     }
                 }
+            }
 
             // TODO: ideally kobwebGenSiteEntryTask would be declared as a srcDir for jsMain, but then ksp tried to
             // parse it, so for now we don't do that
@@ -275,10 +268,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             project.tasks.named(jsTarget.processResources) {
-                inputs.file(project.kspFrontendFile)
-
-                dependsOn(kobwebGenSiteIndexTask)
-                dependsOn(kobwebCopyDependencyResourcesTask)
+                inputs.files(project.kspFrontendFile, kobwebGenSiteIndexTask, kobwebCopyDependencyResourcesTask)
             }
 
             // When exporting, both dev + production webpack actions are triggered - dev for the temporary server
@@ -287,11 +277,9 @@ class KobwebApplicationPlugin @Inject constructor(
             // declaration is needed for gradle to be happy. Note also that we don't configure the task directly by its
             // name, as it may not yet exist (for some reason). Pending https://github.com/gradle/gradle/issues/16543,
             // we simply match it by its name amongst all tasks of its type.
-            project.tasks.withType<KotlinJsIrLink>().configureEach {
-                if (name == jsTarget.compileProductionExecutableKotlin) {
-                    mustRunAfter(kobwebStartTask)
-                }
-            }
+            project.tasks
+                .matching { it.name == jsTarget.compileProductionExecutableKotlin }
+                .configureEach { mustRunAfter(kobwebStartTask) }
 
             kobwebStartTask.configure {
                 // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
@@ -318,19 +306,13 @@ class KobwebApplicationPlugin @Inject constructor(
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
             val jvmTarget = JvmTarget(this)
 
-//            val kotlinMppExtension = project.extensions.getByType<KotlinMultiplatformExtension>()
-//            kotlinMppExtension.sourceSets.getByName("jvmMain").kotlin
-//                .srcDir(kobwebBlock.getGenJvmSrcRoot(project))
-
             // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
-            // TODO
             project.tasks.namedOrNull(jvmTarget.compileKotlin)?.configure { dependsOn(kobwebGenBackendTask) }
             project.tasks.namedOrNull(jvmTarget.jar)?.configure { dependsOn(kobwebGenBackendTask) }
 
-            project.tasks.namedOrNull(jvmTarget.processResources)?.configure {
+            project.tasks.namedOrNull<Copy>(jvmTarget.processResources)?.configure {
                 // TODO: are we doing something wrong or is this fine - (also in library)
-                (this as Copy).duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//                dependsOn(project.tasks.named("kspKotlinJvm"))
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             }
 
             // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
