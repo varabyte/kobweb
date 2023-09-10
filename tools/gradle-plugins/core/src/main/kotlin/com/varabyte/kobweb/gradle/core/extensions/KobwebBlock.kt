@@ -61,9 +61,10 @@ abstract class KobwebBlock {
         includeKspDependency.convention(true)
     }
 
-    fun getGenJsSrcRoot(project: Project): File {
+    // TODO: ext param currently used for sources that should be parsed for KSP, standardize this
+    fun getGenJsSrcRoot(project: Project, ext: Boolean = false): File {
         val jsSrcSuffix = project.jsTarget.srcSuffix
-        return project.layout.buildDirectory.dir("${genDir.get()}$jsSrcSuffix").get().asFile
+        return project.layout.buildDirectory.dir("${genDir.get()}${if (ext) "x" else ""}$jsSrcSuffix").get().asFile
     }
 
     fun getGenJsResRoot(project: Project): File {

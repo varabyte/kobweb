@@ -22,7 +22,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
@@ -37,15 +37,14 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @InputFiles
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
-    @OutputFile
-    fun getGenMainFile() = kobwebBlock.getGenJsSrcRoot(project).resolve("main.kt")
+    @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
+    fun getGenMainFile() = kobwebBlock.getGenJsSrcRoot(project)
 
     @TaskAction
     fun execute() {
         val appData = Json.decodeFromString<AppData>(kspGenFile.get().asFile.readText())
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
-        val mainFile = getGenMainFile()
-        mainFile.parentFile.mkdirs()
+        val mainFile = getGenMainFile().resolve("main.kt")
 
         val libData = buildList {
             getCompileClasspath().get().files.forEach { file ->

@@ -18,15 +18,13 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.provider.DefaultProvider
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: KobwebBlock) :
     KobwebModuleTask(kobwebBlock, "Generate Kobweb code for the server") {
     @get:InputFiles // files since it may not exist: TODO: figure out using pure optional file (not fileS)?
-    @get:Optional
     abstract val kspGenFile: RegularFileProperty
 
     @InputFiles
@@ -35,8 +33,8 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
         project.configurations.named(jvmTarget.compileClasspath) as Provider<FileCollection>
     } ?: DefaultProvider { project.objects.fileCollection() }
 
-    @OutputFile
-    fun getGenApisFactoryFile() = kobwebBlock.getGenJvmSrcRoot(project).resolve("ApisFactoryImpl.kt")
+    @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
+    fun getGenApisFactoryFile() = kobwebBlock.getGenJvmSrcRoot(project)
 
     @TaskAction
     fun execute() {
@@ -51,8 +49,7 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
             }
         }.merge(throwError = { throw GradleException(it) })
 
-        val apisFactoryFile = getGenApisFactoryFile()
-        apisFactoryFile.parentFile.mkdirs()
+        val apisFactoryFile = getGenApisFactoryFile().resolve("ApisFactoryImpl.kt")
         apisFactoryFile.writeText(createApisFactoryImpl(backendData))
     }
 }

@@ -19,6 +19,7 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
+import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.ksp.setupKsp
 import com.varabyte.kobweb.gradle.core.kspBackendFile
 import com.varabyte.kobweb.gradle.core.kspFrontendFile
@@ -225,6 +226,9 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
+        // TODO: below we add generated kobweb sources to the generatedByKsp... source sets. This is done to prevent KSP
+        //  from processing them, but ideally we should probably create our own source set for this instead?
+        // Note: we use `matching` instead of `named` for the ksp source sets because they don't exist yet at this point
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
@@ -256,11 +260,8 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
-            // TODO: ideally kobwebGenSiteEntryTask would be declared as a srcDir for jsMain, but then ksp tried to
-            // parse it, so for now we don't do that
-            val jsSourceTasks = listOf(jsTarget.compileKotlin, jsTarget.sourcesJar)
-            jsSourceTasks.forEach { taskName ->
-                project.tasks.namedOrNull(taskName)?.configure { dependsOn(kobwebGenSiteEntryTask) }
+            project.kotlin.sourceSets.matching { it.name == "generatedByKspKotlinJs" }.configureEach {
+                kotlin.srcDir(kobwebGenSiteEntryTask)
             }
 
             kobwebGenTask.configure {
@@ -306,10 +307,6 @@ class KobwebApplicationPlugin @Inject constructor(
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
             val jvmTarget = JvmTarget(this)
 
-            // NOTE: JVM-related tasks are not always available. If so, it means this project exports an API jar.
-            project.tasks.namedOrNull(jvmTarget.compileKotlin)?.configure { dependsOn(kobwebGenBackendTask) }
-            project.tasks.namedOrNull(jvmTarget.jar)?.configure { dependsOn(kobwebGenBackendTask) }
-
             project.tasks.namedOrNull<Copy>(jvmTarget.processResources)?.configure {
                 // TODO: are we doing something wrong or is this fine - (also in library)
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -332,11 +329,15 @@ class KobwebApplicationPlugin @Inject constructor(
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock)
 
             kobwebGenApisFactoryTask.configure {
-                project.kspBackendFile?.let { kspGenFile = it }
+                kspGenFile = project.kspBackendFile!! // exists when jvm target exists
             }
 
             kobwebGenBackendTask.configure {
                 dependsOn(kobwebGenApisFactoryTask)
+            }
+
+            project.kotlin.sourceSets.matching { it.name == "generatedByKspKotlinJvm" }.configureEach {
+                kotlin.srcDir(kobwebGenApisFactoryTask)
             }
         }
     }

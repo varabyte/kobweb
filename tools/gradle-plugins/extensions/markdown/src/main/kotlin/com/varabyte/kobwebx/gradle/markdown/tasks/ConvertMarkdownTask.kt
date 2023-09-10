@@ -56,7 +56,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @OutputDirectory
     fun getGenDir(): File =
-        kobwebBlock.getGenJsSrcRoot(project).resolve(
+        kobwebBlock.getGenJsSrcRoot(project, ext = true).resolve(
             project.prefixQualifiedPackage(kobwebBlock.pagesPackage.get()).replace(".", "/")
         )
 
