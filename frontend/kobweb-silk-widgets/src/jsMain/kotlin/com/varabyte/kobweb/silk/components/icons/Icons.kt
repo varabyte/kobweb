@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.components.icons
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.Circle
 import com.varabyte.kobweb.compose.dom.Line
+import com.varabyte.kobweb.compose.dom.Path
 import com.varabyte.kobweb.compose.dom.Polyline
 import com.varabyte.kobweb.compose.dom.Rect
 import com.varabyte.kobweb.compose.dom.Svg
@@ -42,6 +43,42 @@ fun CheckIcon() {
     createIcon(viewBox = "0 0 12 10") {
         Polyline(attrs = {
             attr("points", "1.5 6 4.5 9 10.5 1")
+        })
+    }
+}
+
+@Composable
+fun ChevronDownIcon() {
+    createIcon(viewBox = "0 0 24 24") {
+        Path(attrs = {
+            attr("d", "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z")
+        })
+    }
+}
+
+@Composable
+fun ChevronLeftIcon() {
+    createIcon(viewBox = "0 0 24 24") {
+        Path(attrs = {
+            attr("d", "M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z")
+        })
+    }
+}
+
+@Composable
+fun ChevronRightIcon() {
+    createIcon(viewBox = "0 0 24 24") {
+        Path(attrs = {
+            attr("d", "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z")
+        })
+    }
+}
+
+@Composable
+fun ChevronUpIcon() {
+    createIcon(viewBox = "0 0 24 24") {
+        Path(attrs = {
+            attr("d", "M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z")
         })
     }
 }
