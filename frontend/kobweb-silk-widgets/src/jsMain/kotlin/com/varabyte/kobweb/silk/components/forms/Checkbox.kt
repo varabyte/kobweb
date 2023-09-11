@@ -132,20 +132,8 @@ val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
 }
 
 val CheckboxInputVariant by InputStyle.addVariant {
-    // We hide the checkbox input itself since rendered is handled by a separate element, but keep it a11y-friendly by
-    // only limiting its size/appearance (instead of explicitly hiding), matching the approach of many other libraries.
-    // See Checkbox for more context.
-    base {
-        Modifier
-            .border(0.px)
-            .size(1.px)
-            .margin((-1).px)
-            .padding(0.px)
-            .clip(RectF(50f))
-            .overflow(Overflow.Hidden)
-            .whiteSpace(WhiteSpace.NoWrap)
-            .position(Position.Absolute)
-    }
+    base { HiddenInputModifier }
+
     // Since the checkbox is hidden, we highlight its sibling (a div which renders a checkbox icon) when the checkbox is
     // focused(-visible).
     cssRule(":focus-visible + *") {

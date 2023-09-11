@@ -68,20 +68,8 @@ val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifie
 }
 
 val SwitchInputVariant by InputStyle.addVariant {
-    // We hide the checkbox itself since the Switch is rendered separately, but keep it a11y-friendly by only limiting
-    // its size/appearance (instead of explicitly hiding), matching the approach of many other libraries.
-    // See Switch for more context.
-    base {
-        Modifier
-            .border(0.px)
-            .size(1.px)
-            .margin((-1).px)
-            .padding(0.px)
-            .clip(RectF(50f))
-            .overflow(Overflow.Hidden)
-            .whiteSpace(WhiteSpace.NoWrap)
-            .position(Position.Absolute)
-    }
+    base { HiddenInputModifier }
+
     // Since the checkbox is hidden, we highlight its sibling (the switch track) when the checkbox is focused(-visible).
     cssRule(":focus-visible + *") {
         Modifier.boxShadow(spreadRadius = 0.1875.cssRem, color = SwitchVars.FocusColor.value())

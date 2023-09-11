@@ -33,6 +33,10 @@ import com.varabyte.kobweb.silk.components.forms.TextInput
 import com.varabyte.kobweb.silk.components.forms.TriCheckbox
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
 import com.varabyte.kobweb.silk.components.icons.CheckIcon
+import com.varabyte.kobweb.silk.components.icons.ChevronDownIcon
+import com.varabyte.kobweb.silk.components.icons.ChevronLeftIcon
+import com.varabyte.kobweb.silk.components.icons.ChevronRightIcon
+import com.varabyte.kobweb.silk.components.icons.ChevronUpIcon
 import com.varabyte.kobweb.silk.components.icons.CircleIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.icons.MinusIcon
@@ -193,6 +197,10 @@ fun WidgetsPage() {
             WidgetSection("Icons") {
                 val icons = mapOf<String, @Composable () -> Unit>(
                     "Check" to { CheckIcon() },
+                    "Chevron Down" to { ChevronDownIcon() },
+                    "Chevron Left" to { ChevronLeftIcon() },
+                    "Chevron Right" to { ChevronRightIcon() },
+                    "Chevron Up" to { ChevronUpIcon() },
                     "Circle" to { CircleIcon() },
                     "Indeterminate" to { IndeterminateIcon() },
                     "Minus" to { MinusIcon() },
