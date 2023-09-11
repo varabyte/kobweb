@@ -84,13 +84,6 @@ abstract class KobwebBlock {
         val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
         return project.layout.buildDirectory.dir("$genDir$jvmSrcSuffix").get().asFile
     }
-
-    // not needed?
-//    inline fun <reified T : FileGeneratingBlock> getGenJvmResRoot(project: Project): File {
-//        val jvmResSuffix = (project.jvmTarget ?: error("No JVM target defined")).resourceSuffix
-//        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
-//        return project.layout.buildDirectory.dir("$genDir$jvmResSuffix").get().asFile
-//    }
 }
 
 val Project.kobwebBlock get() = project.extensions.getByType<KobwebBlock>()
