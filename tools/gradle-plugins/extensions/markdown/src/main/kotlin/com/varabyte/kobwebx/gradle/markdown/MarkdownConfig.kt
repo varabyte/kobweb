@@ -4,11 +4,10 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.text.splitCamelCase
 import com.varabyte.kobweb.gradle.core.extensions.FileGeneratingBlock
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 
 abstract class MarkdownConfig(baseGenDir: Provider<String>) : FileGeneratingBlock {
     object RouteOverride {
@@ -91,7 +90,7 @@ abstract class MarkdownConfig(baseGenDir: Provider<String>) : FileGeneratingBloc
         "Use `handlers { ... }` instead. This property was renamed to avoid a naming conflict with Gradle project components.",
     )
     fun components(configure: MarkdownHandlers.() -> Unit) {
-        val handlers = ((this as ExtensionAware).extensions["handlers"] as MarkdownHandlers)
+        val handlers = this.extensions.getByType<MarkdownHandlers>()
         handlers.configure()
     }
 }

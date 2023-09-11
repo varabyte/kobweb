@@ -15,10 +15,10 @@ import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
 import org.gradle.api.DefaultTask
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
 
@@ -30,10 +30,8 @@ abstract class ConvertMarkdownTask @Inject constructor(
         description = "Convert markdown files found in the project's resources path to source code in the final project"
     }
 
-    private val markdownHandlers =
-        (markdownConfig as ExtensionAware).extensions.getByName("handlers") as MarkdownHandlers
-    private val markdownFeatures =
-        (markdownConfig as ExtensionAware).extensions.getByName("features") as MarkdownFeatures
+    private val markdownHandlers = markdownConfig.extensions.getByType<MarkdownHandlers>()
+    private val markdownFeatures = markdownConfig.extensions.getByType<MarkdownFeatures>()
 
     private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(project.jsTarget)
         .map { root -> root.resolve(markdownConfig.markdownPath.get()) }

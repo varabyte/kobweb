@@ -2,10 +2,9 @@
 
 package com.varabyte.kobweb.gradle.core.extensions
 
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 
 /**
  * An enumeration of strategies to take when Kotlin informs us that a project's yarn.lock file has changed.
@@ -83,8 +82,8 @@ abstract class YarnBlock {
 }
 
 val KobwebBlock.yarn: YarnBlock
-    get() = ((this as ExtensionAware).extensions["yarn"] as YarnBlock)
+    get() = extensions.getByType<YarnBlock>()
 
 internal fun KobwebBlock.createYarnBlock() {
-    (this as ExtensionAware).extensions.create<YarnBlock>("yarn")
+    extensions.create<YarnBlock>("yarn")
 }
