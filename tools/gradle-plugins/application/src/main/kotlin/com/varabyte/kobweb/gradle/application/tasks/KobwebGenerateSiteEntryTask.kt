@@ -4,6 +4,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
@@ -38,7 +39,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
-    fun getGenMainFile() = kobwebBlock.getGenJsSrcRoot(project)
+    fun getGenMainFile() = kobwebBlock.getGenJsSrcRoot<AppBlock>(project)
 
     @TaskAction
     fun execute() {

@@ -111,29 +111,17 @@ class KobwebCorePlugin : Plugin<Project> {
             }
         }
 
-        // Kobweb applications and libraries both put stuff in generated folders, which the Kotlin project should be
-        // aware of. Note that KSP processes all code sources in the main source set, so we don't include generated
-        // code here that shouldn't be processed (e.g. main.kt).
-        val genDir = kobwebBlock.genDir.get()
-        val baseBuildDir = project.layout.buildDirectory
+        // use matching instead of named as tasks may not exist yet
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                resources.srcDirs(
-                    baseBuildDir.dir("generated/ksp/js/jsMain/resources"),
-                    baseBuildDir.dir("$genDir${jsTarget.resourceSuffix}"),
-                )
-                // TODO: "x" currently used for sources that should be parsed for KSP, standardize this
-                kotlin.srcDir(baseBuildDir.dir("${genDir}x${jsTarget.srcSuffix}"))
+                resources.srcDirs(project.tasks.matching { it.name == "kspKotlinJs" })
             }
         }
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
             val jvmTarget = JvmTarget(this)
             project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
-                resources.srcDirs(
-                    baseBuildDir.dir("generated/ksp/jvm/jvmMain/resources"),
-                    baseBuildDir.dir("$genDir${jvmTarget.resourceSuffix}"),
-                )
+                resources.srcDirs(project.tasks.matching { it.name == "kspKotlinJvm" })
             }
         }
     }

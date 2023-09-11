@@ -1,24 +1,21 @@
 package com.varabyte.kobweb.gradle.core
 
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import org.gradle.api.Project
+import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 
-const val GENERATED_ROOT = "generated/kobweb"
-
-
-// TODO: ksp/js or ksp/{name}
 val Project.kspFrontendFile: Provider<RegularFile>
-    get() {
-        return tasks.named("kspKotlinJs").map { kspTask ->
-            RegularFile { kspTask.outputs.files.single { it.name == "frontend.json" } }
+    get() = tasks.named("kspKotlinJs").map { kspTask ->
+        RegularFile {
+            kspTask.outputs.files.asFileTree.matching { include(KOBWEB_METADATA_FRONTEND) }.singleFile
         }
     }
 
-val Project.kspBackendFile: Provider<RegularFile>?
-    get() {
-        return tasks.namedOrNull("kspKotlinJvm")?.map { kspTask ->
-            RegularFile { kspTask.outputs.files.single { it.name == "backend.json" } }
-        }
+val Project.kspBackendFile: Provider<FileTree>?
+    get() = tasks.namedOrNull("kspKotlinJvm")?.map { kspTask ->
+        kspTask.outputs.files.asFileTree.matching { include(KOBWEB_METADATA_BACKEND) }
     }
