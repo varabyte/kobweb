@@ -40,11 +40,14 @@ private fun createIcon(
 
 @Composable
 fun CheckIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
-        Polyline(attrs = {
-            attr("points", "3 12 9 19 21 2")
-        })
-    }
+    createIcon(viewBox = "0 0 12 10", strokeWidth = 4) {
+        Polyline {
+            points(
+                Pair(3, 12),
+                Pair(9, 19),
+                Pair(21, 2)
+            )
+        }
 }
 
 @Composable
@@ -87,9 +90,9 @@ fun ChevronUpIcon() {
 fun CircleIcon() {
     createIcon(viewBox = "0 0 24 24", fill = "currentColor") {
         Circle {
-            attr("cx", "12")
-            attr("cy", "12")
-            attr("r", "8")
+            cx(12)
+            cy(12)
+            r(8)
         }
     }
 }
@@ -102,30 +105,30 @@ fun IndeterminateIcon() {
 @Composable
 fun MinusIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
-        Line(attrs = {
-            attr("x1", "3")
-            attr("x2", "21")
-            attr("y1", "12")
-            attr("y2", "12")
-        })
+        Line {
+            x1(3)
+            x2(21)
+            y1(12)
+            y2(12)
+        }
     }
 }
 
 @Composable
 fun PlusIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
-        Line(attrs = {
-            attr("x1", "3")
-            attr("x2", "21")
-            attr("y1", "12")
-            attr("y2", "12")
-        })
-        Line(attrs = {
-            attr("x1", "12")
-            attr("x2", "12")
-            attr("y1", "3")
-            attr("y2", "21")
-        })
+        Line {
+            x1(3)
+            x2(21)
+            y1(12)
+            y2(12)
+        }
+        Line {
+            x1(12)
+            x2(12)
+            y1(3)
+            y2(21)
+        }
     }
 }
 
@@ -133,11 +136,11 @@ fun PlusIcon() {
 fun SquareIcon() {
     createIcon(viewBox = "0 0 24 24", fill = "currentColor") {
         Rect {
-            attr("x", "4")
-            attr("y", "4")
-            attr("width", "16")
-            attr("height", "16")
-            attr("rx", "2")
+            x(4)
+            y(4)
+            width(16)
+            height(16)
+            rx(2)
         }
     }
 }
