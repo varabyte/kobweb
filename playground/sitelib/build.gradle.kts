@@ -10,13 +10,7 @@ group = "playground"
 version = "1.0-SNAPSHOT"
 
 kobweb {
-    includeKspDependency.set(false)
-}
-
-configurations.matching { it.name == "kspJs" || it.name == "kspJvm" }.configureEach {
-    dependencies {
-        add(this@configureEach.name, "com.varabyte.kobweb:project-processors")
-    }
+    kspProcessorDependency.set("com.varabyte.kobweb:project-processors")
 }
 
 kotlin {
