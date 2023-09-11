@@ -5,6 +5,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.BuildTarget
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
@@ -16,10 +17,9 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.link
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
-import java.io.File
 import javax.inject.Inject
 
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
@@ -28,7 +28,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Input val buildTarget: BuildTarget
 ) : KobwebModuleTask(config, "Generate an index.html file for this Kobweb project") {
 
-    private fun getGenResDir(): File = kobwebBlock.getGenJsResRoot(project)
+    private fun getGenIndexFile() = getGenDir().resolve(getPublicPath()).resolve("index.html")
 
     @InputFiles
     fun getResourceFiles() = run {
@@ -38,8 +38,8 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             .filter { it.absolutePath != genIndexFile.absolutePath }
     }
 
-    @OutputFile
-    fun getGenIndexFile() = getGenResDir().resolve(getPublicPath()).resolve("index.html")
+    @OutputDirectory
+    fun getGenDir() = kobwebBlock.getGenJsResRoot<AppBlock>(project)
 
     @TaskAction
     fun execute() {

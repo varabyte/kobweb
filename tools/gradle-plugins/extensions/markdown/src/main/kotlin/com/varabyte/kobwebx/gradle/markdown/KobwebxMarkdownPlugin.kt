@@ -3,7 +3,7 @@ package com.varabyte.kobwebx.gradle.markdown
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
-import com.varabyte.kobweb.gradle.core.util.namedOrNull
+import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobwebx.gradle.markdown.tasks.ConvertMarkdownTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -20,7 +20,8 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         val kobwebBlock = project.extensions.findByName("kobweb") as? KobwebBlock
             ?: throw GradleException("The Gradle markdown plugin should only be applied AFTER com.varabyte.kobweb.application OR com.varabyte.kobweb.library plugins.")
 
-        val markdownConfig = (kobwebBlock as ExtensionAware).extensions.create<MarkdownConfig>("markdown")
+        val markdownConfig = (kobwebBlock as ExtensionAware).extensions
+            .create<MarkdownConfig>("markdown", kobwebBlock.baseGenDir)
         (markdownConfig as ExtensionAware).extensions.apply {
             create<MarkdownHandlers>("handlers", project)
             create<MarkdownFeatures>("features")
@@ -31,11 +32,9 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
-            // kspKotlinJs doesn't exist yet so we use matching?
-            project.tasks.matching { it.name == "kspKotlinJs" }.configureEach {
-                dependsOn(convertTask)
+            project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
+                kotlin.srcDir(convertTask)
             }
-            project.tasks.namedOrNull(jsTarget.compileKotlin)?.configure { dependsOn(convertTask) }
         }
     }
 }

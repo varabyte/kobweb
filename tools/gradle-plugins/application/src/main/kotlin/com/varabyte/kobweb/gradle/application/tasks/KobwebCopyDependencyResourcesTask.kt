@@ -3,6 +3,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.path.toUnixSeparators
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
@@ -25,7 +26,7 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
     @OutputDirectory
-    fun getGenPublicRoot() = kobwebBlock.getGenJsResRoot(project).resolve(kobwebBlock.publicPath.get())
+    fun getGenPublicRoot() = kobwebBlock.getGenJsResRoot<AppBlock>(project).resolve(kobwebBlock.publicPath.get())
 
     @TaskAction
     fun execute() {

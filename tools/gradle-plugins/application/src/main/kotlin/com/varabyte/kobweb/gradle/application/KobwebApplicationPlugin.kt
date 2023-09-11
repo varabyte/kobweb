@@ -244,8 +244,10 @@ class KobwebApplicationPlugin @Inject constructor(
                 kotlin.srcDir(kobwebGenSiteEntryTask)
             }
 
-            project.tasks.named(jsTarget.processResources) {
-                inputs.files(project.kspFrontendFile, kobwebGenSiteIndexTask, kobwebCopyDependencyResourcesTask)
+            project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
+                // TODO: kobwebCopyDependencyResourcesTask is not included as it already has the same output dir
+                //  but ideally they would have different output dirs and then we'd include it here too
+                resources.srcDirs(kobwebGenSiteIndexTask)
             }
 
             // When exporting, both dev + production webpack actions are triggered - dev for the temporary server

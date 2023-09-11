@@ -2,10 +2,10 @@
 
 package com.varabyte.kobweb.gradle.core.extensions
 
-import com.varabyte.kobweb.gradle.core.GENERATED_ROOT
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
@@ -16,10 +16,18 @@ import java.io.File
  * This class also exposes a handful of methods useful for querying the project.
  */
 abstract class KobwebBlock {
+    // TODO: how should this deprecation work
     /**
      * The string path to the root where generated code will be written to, relative to the project build directory.
      */
-    abstract val genDir: Property<String>
+    @Deprecated("", ReplaceWith("baseGenDir"))
+    val genDir: Property<String>
+        get() = baseGenDir
+
+    /**
+     * The string path to the root where generated code will be written to, relative to the project build directory.
+     */
+    abstract val baseGenDir: Property<String>
 
     /**
      * The root package of all pages.
@@ -49,7 +57,8 @@ abstract class KobwebBlock {
     abstract val kspProcessorDependency: Property<String>
 
     init {
-        genDir.convention(GENERATED_ROOT)
+        genDir.convention("generated/kobweb")
+        baseGenDir.convention("generated/kobweb")
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
@@ -58,26 +67,30 @@ abstract class KobwebBlock {
         kspProcessorDependency.convention(kspDependency)
     }
 
-    // TODO: ext param currently used for sources that should be parsed for KSP, standardize this
-    fun getGenJsSrcRoot(project: Project, ext: Boolean = false): File {
+    inline fun <reified T : FileGeneratingBlock> getGenJsSrcRoot(project: Project): File {
         val jsSrcSuffix = project.jsTarget.srcSuffix
-        return project.layout.buildDirectory.dir("${genDir.get()}${if (ext) "x" else ""}$jsSrcSuffix").get().asFile
+        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
+        return project.layout.buildDirectory.dir("$genDir$jsSrcSuffix").get().asFile
     }
 
-    fun getGenJsResRoot(project: Project): File {
+    inline fun <reified T : FileGeneratingBlock> getGenJsResRoot(project: Project): File {
         val jsResourceSuffix = project.jsTarget.resourceSuffix
-        return project.layout.buildDirectory.dir("${genDir.get()}$jsResourceSuffix").get().asFile
+        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
+        return project.layout.buildDirectory.dir("$genDir$jsResourceSuffix").get().asFile
     }
 
-    fun getGenJvmSrcRoot(project: Project): File {
+    inline fun <reified T : FileGeneratingBlock> getGenJvmSrcRoot(project: Project): File {
         val jvmSrcSuffix = (project.jvmTarget ?: error("No JVM target defined")).srcSuffix
-        return project.layout.buildDirectory.dir("${genDir.get()}$jvmSrcSuffix").get().asFile
+        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
+        return project.layout.buildDirectory.dir("$genDir$jvmSrcSuffix").get().asFile
     }
 
-    fun getGenJvmResRoot(project: Project): File {
-        val jvmResSuffix = (project.jvmTarget ?: error("No JVM target defined")).resourceSuffix
-        return project.layout.buildDirectory.dir("${genDir.get()}$jvmResSuffix").get().asFile
-    }
+    // not needed?
+//    inline fun <reified T : FileGeneratingBlock> getGenJvmResRoot(project: Project): File {
+//        val jvmResSuffix = (project.jvmTarget ?: error("No JVM target defined")).resourceSuffix
+//        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
+//        return project.layout.buildDirectory.dir("$genDir$jvmResSuffix").get().asFile
+//    }
 }
 
 val Project.kobwebBlock get() = project.extensions.getByType<KobwebBlock>()
