@@ -20,14 +20,9 @@ fun setupKsp(project: Project, kobwebBlock: KobwebBlock, includeAppData: Boolean
     val kspCommonMainKotlinMetadata =
         project.tasks.matching { it.name == "kspCommonMainKotlinMetadata" } // doesn't exist if js only
 
-    val kspProcessorVersion = "0.14.1-SNAPSHOT-ksp01" // matching lib version
-    val kspDependency = "com.varabyte.kobweb:kobweb-project-processors:$kspProcessorVersion"
-
     project.configurations.matching { it.name == "kspJs" || it.name == "kspJvm" }.configureEach {
-        if (kobwebBlock.includeKspDependency.get()) {
-            project.dependencies {
-                add(this@configureEach.name, kspDependency)
-            }
+        project.dependencies {
+            add(this@configureEach.name, kobwebBlock.kspProcessorDependency.get())
         }
     }
 

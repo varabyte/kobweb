@@ -45,20 +45,17 @@ abstract class KobwebBlock {
      */
     abstract val publicPath: Property<String>
 
-    /**
-     * Whether the Kobweb gradle plugin should automatically include its corresponding KSP processor dependency.
-     *
-     * A KSP processor dependency is required for Kobweb to work, but setting this to false allows manually depending on
-     * a different version of the processor.
-     */
-    abstract val includeKspDependency: Property<Boolean>
+    /** The KSP processor dependency that should be applied to the project, in string dependency notation. */
+    abstract val kspProcessorDependency: Property<String>
 
     init {
         genDir.convention(GENERATED_ROOT)
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
-        includeKspDependency.convention(true)
+        val kspProcessorVersion = "0.14.1-SNAPSHOT" // matching lib version
+        val kspDependency = "com.varabyte.kobweb:kobweb-ksp-project-processors:$kspProcessorVersion"
+        kspProcessorDependency.convention(kspDependency)
     }
 
     // TODO: ext param currently used for sources that should be parsed for KSP, standardize this
