@@ -15,7 +15,7 @@ import java.io.File
  *
  * This class also exposes a handful of methods useful for querying the project.
  */
-abstract class KobwebBlock {
+abstract class KobwebBlock : ExtensionAware {
     // TODO: how should this deprecation work
     /**
      * The string path to the root where generated code will be written to, relative to the project build directory.
@@ -69,19 +69,19 @@ abstract class KobwebBlock {
 
     inline fun <reified T : FileGeneratingBlock> getGenJsSrcRoot(project: Project): File {
         val jsSrcSuffix = project.jsTarget.srcSuffix
-        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
+        val genDir = extensions.getByType<T>().genDir.get()
         return project.layout.buildDirectory.dir("$genDir$jsSrcSuffix").get().asFile
     }
 
     inline fun <reified T : FileGeneratingBlock> getGenJsResRoot(project: Project): File {
         val jsResourceSuffix = project.jsTarget.resourceSuffix
-        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
+        val genDir = extensions.getByType<T>().genDir.get()
         return project.layout.buildDirectory.dir("$genDir$jsResourceSuffix").get().asFile
     }
 
     inline fun <reified T : FileGeneratingBlock> getGenJvmSrcRoot(project: Project): File {
         val jvmSrcSuffix = (project.jvmTarget ?: error("No JVM target defined")).srcSuffix
-        val genDir = (this as ExtensionAware).extensions.getByType<T>().genDir.get()
+        val genDir = extensions.getByType<T>().genDir.get()
         return project.layout.buildDirectory.dir("$genDir$jvmSrcSuffix").get().asFile
     }
 }

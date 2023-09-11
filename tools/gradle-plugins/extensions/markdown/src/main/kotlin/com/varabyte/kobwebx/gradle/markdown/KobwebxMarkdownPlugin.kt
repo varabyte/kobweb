@@ -8,7 +8,6 @@ import com.varabyte.kobwebx.gradle.markdown.tasks.ConvertMarkdownTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -20,9 +19,8 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         val kobwebBlock = project.extensions.findByName("kobweb") as? KobwebBlock
             ?: throw GradleException("The Gradle markdown plugin should only be applied AFTER com.varabyte.kobweb.application OR com.varabyte.kobweb.library plugins.")
 
-        val markdownConfig = (kobwebBlock as ExtensionAware).extensions
-            .create<MarkdownConfig>("markdown", kobwebBlock.baseGenDir)
-        (markdownConfig as ExtensionAware).extensions.apply {
+        val markdownConfig = kobwebBlock.extensions.create<MarkdownConfig>("markdown", kobwebBlock.baseGenDir)
+        markdownConfig.extensions.apply {
             create<MarkdownHandlers>("handlers", project)
             create<MarkdownFeatures>("features")
         }

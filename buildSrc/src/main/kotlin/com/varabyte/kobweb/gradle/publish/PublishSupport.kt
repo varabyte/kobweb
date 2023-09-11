@@ -3,7 +3,6 @@ package com.varabyte.kobweb.gradle.publish
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -104,16 +103,16 @@ internal fun PublishingExtension.addVarabyteArtifact(
 }
 
 private val Project.java: JavaPluginExtension?
-    get() = (this as ExtensionAware).extensions.getByName("java") as? JavaPluginExtension
+    get() = extensions.getByName("java") as? JavaPluginExtension
 
 private val Project.publishing: PublishingExtension
-    get() = (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
+    get() = extensions.getByName("publishing") as PublishingExtension
 
 private fun Project.publishing(configure: Action<PublishingExtension>): Unit =
-    (this as ExtensionAware).extensions.configure("publishing", configure)
+    extensions.configure("publishing", configure)
 
 private fun Project.signing(configure: Action<SigningExtension>): Unit =
-    (this as ExtensionAware).extensions.configure("signing", configure)
+    extensions.configure("signing", configure)
 
 internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
     val project = this
