@@ -23,7 +23,7 @@ import org.w3c.dom.svg.SVGElement
 private fun createIcon(
     viewBox: String,
     width: CSSLengthValue = 1.2.em,
-    strokeWidth: Int = 2,
+    strokeWidth: Int = 1,
     fill: String? = "none",
     content: @Composable ElementScope<SVGElement>.() -> Unit
 ) {
@@ -40,16 +40,16 @@ private fun createIcon(
 
 @Composable
 fun CheckIcon() {
-    createIcon(viewBox = "0 0 12 10") {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
         Polyline(attrs = {
-            attr("points", "1.5 6 4.5 9 10.5 1")
+            attr("points", "3 12 9 19 21 2")
         })
     }
 }
 
 @Composable
 fun ChevronDownIcon() {
-    createIcon(viewBox = "0 0 24 24") {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
         Path(attrs = {
             attr("d", "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z")
         })
@@ -58,7 +58,7 @@ fun ChevronDownIcon() {
 
 @Composable
 fun ChevronLeftIcon() {
-    createIcon(viewBox = "0 0 24 24") {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
         Path(attrs = {
             attr("d", "M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z")
         })
@@ -67,7 +67,7 @@ fun ChevronLeftIcon() {
 
 @Composable
 fun ChevronRightIcon() {
-    createIcon(viewBox = "0 0 24 24") {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
         Path(attrs = {
             attr("d", "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z")
         })
@@ -76,7 +76,7 @@ fun ChevronRightIcon() {
 
 @Composable
 fun ChevronUpIcon() {
-    createIcon(viewBox = "0 0 24 24") {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
         Path(attrs = {
             attr("d", "M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z")
         })
@@ -85,7 +85,7 @@ fun ChevronUpIcon() {
 
 @Composable
 fun CircleIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 1, fill = "currentColor") {
+    createIcon(viewBox = "0 0 24 24", fill = "currentColor") {
         Circle {
             attr("cx", "12")
             attr("cy", "12")
@@ -96,6 +96,11 @@ fun CircleIcon() {
 
 @Composable
 fun IndeterminateIcon() {
+    MinusIcon()
+}
+
+@Composable
+fun MinusIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
         Line(attrs = {
             attr("x1", "3")
@@ -104,11 +109,6 @@ fun IndeterminateIcon() {
             attr("y2", "12")
         })
     }
-}
-
-@Composable
-fun MinusIcon() {
-    IndeterminateIcon()
 }
 
 @Composable
@@ -131,7 +131,7 @@ fun PlusIcon() {
 
 @Composable
 fun SquareIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 1, fill = "currentColor") {
+    createIcon(viewBox = "0 0 24 24", fill = "currentColor") {
         Rect {
             attr("x", "4")
             attr("y", "4")
