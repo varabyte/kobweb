@@ -17,10 +17,6 @@ private fun Project.getRoots(
         .flatMap { sourceSet -> sourceSetToDirSet(sourceSet).srcDirs }
 }
 
-fun Project.getSourceRoots(platform: TargetPlatform<*>): Sequence<File> {
-    return project.getRoots(platform) { sourceSet -> sourceSet.kotlin }
-}
-
 fun Project.getResourceRoots(platform: TargetPlatform<*>): Sequence<File> =
     project.getRoots(platform) { sourceSet -> sourceSet.resources }
 
@@ -40,21 +36,8 @@ private fun Project.getFilesWithRoots(
         }
 }
 
-fun Project.getSourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootAndFile> {
-    return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.kotlin }
-        .filter { it.file.extension == "kt" }
-}
-
 fun Project.getResourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootAndFile> {
     return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.resources }
-}
-
-fun Project.getSourceFiles(platform: TargetPlatform<*>): Sequence<File> {
-    return project.getSourceFilesWithRoots(platform).map { it.file }
-}
-
-fun Project.getResourceFiles(platform: TargetPlatform<*>): Sequence<File> {
-    return project.getResourceFilesWithRoots(platform).map { it.file }
 }
 
 fun Project.getBuildScripts(): Sequence<File> {
