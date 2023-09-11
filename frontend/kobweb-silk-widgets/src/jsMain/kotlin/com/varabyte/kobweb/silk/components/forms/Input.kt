@@ -33,6 +33,8 @@ import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.PlaceholderOpacityVar
+import com.varabyte.kobweb.silk.theme.shapes.RectF
+import com.varabyte.kobweb.silk.theme.shapes.clip
 import org.jetbrains.compose.web.attributes.AutoComplete
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.autoComplete
@@ -43,6 +45,23 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Input
 import org.w3c.dom.HTMLInputElement
+
+/**
+ * Useful internal modifier for hiding an input element that is used as a data source.
+ *
+ * We have several widgets which wrap an input but provide their own custom rendering. In this case, we still want to do
+ * some tricks which keep the final widget a11y-friendly by only limiting its size/appearance (instead of explicitly
+ * hiding it). This matches the approach of many other JS libraries out there.
+ */
+internal val HiddenInputModifier = Modifier
+    .border(0.px)
+    .size(1.px)
+    .margin((-1).px)
+    .padding(0.px)
+    .clip(RectF(50f))
+    .overflow(Overflow.Hidden)
+    .whiteSpace(WhiteSpace.NoWrap)
+    .position(Position.Absolute)
 
 object InputDefaults {
     const val Valid = true
