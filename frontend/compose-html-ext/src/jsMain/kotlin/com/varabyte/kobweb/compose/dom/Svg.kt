@@ -127,7 +127,7 @@ class SVGCEllipseScope internal constructor(private val attrs: AttrsScope<SVGEll
 /**
  * Type-safe API for creating an [SVGEllipseElement].
  *
- * For example, to create a circle with a radius of 8 centered at 12x12:
+ * For example, to create an Ellipse with a radius x-axis of 100 and y-axis of 50 centered at 12x12:
  *
  * ```
  * Svg {
