@@ -17,7 +17,7 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.link
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import javax.inject.Inject
@@ -28,8 +28,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Input val buildTarget: BuildTarget
 ) : KobwebModuleTask(config, "Generate an index.html file for this Kobweb project") {
 
-    private fun getGenIndexFile() = getGenDir().resolve(getPublicPath()).resolve("index.html")
-
     @InputFiles
     fun getResourceFiles() = run {
         // Don't let stuff we output force ourselves to run again
@@ -38,8 +36,8 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             .filter { it.absolutePath != genIndexFile.absolutePath }
     }
 
-    @OutputDirectory
-    fun getGenDir() = kobwebBlock.getGenJsResRoot<AppBlock>(project)
+    @OutputFile
+    fun getGenIndexFile() = kobwebBlock.getGenJsResRoot<AppBlock>(project).resolve("index.html")
 
     @TaskAction
     fun execute() {
@@ -70,19 +68,16 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
 
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
-        getGenIndexFile().let { indexFile ->
-            indexFile.parentFile.mkdirs()
-            indexFile.writeText(
-                createIndexFile(
-                    kobwebConf.site.title,
-                    kobwebBlock.app.index.head.get(),
-                    // Our script will always exist at the root folder, so be sure to ground it,
-                    // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
-                    // a subdirectory.
-                    routePrefix.prependTo(kobwebConf.server.files.dev.script.substringAfterLast("/").prefixIfNot("/")),
-                    buildTarget
-                )
+        getGenIndexFile().writeText(
+            createIndexFile(
+                kobwebConf.site.title,
+                kobwebBlock.app.index.head.get(),
+                // Our script will always exist at the root folder, so be sure to ground it,
+                // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
+                // a subdirectory.
+                routePrefix.prependTo(kobwebConf.server.files.dev.script.substringAfterLast("/").prefixIfNot("/")),
+                buildTarget
             )
-        }
+        )
     }
 }

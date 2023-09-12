@@ -8,6 +8,9 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -15,23 +18,24 @@ import org.gradle.api.tasks.util.PatternSet
 import java.io.File
 import javax.inject.Inject
 
-abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
+abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
     kobwebBlock: KobwebBlock,
+    @get:InputFile val indexFile: Provider<RegularFile>,
 ) : KobwebModuleTask(
     kobwebBlock,
-    "Copy and make available all public/ resources from the application and any libraries to the final site"
+    "Copy and make available index.html & all public/ resources from any libraries to the final site"
 ) {
 
     @InputFiles
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
     @OutputDirectory
-    fun getGenPublicRoot() = kobwebBlock.getGenJsResRoot<AppBlock>(project).resolve(kobwebBlock.publicPath.get())
+    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(project).resolve("app")
+
+    private fun getGenPublicRoot() = getGenResDir().resolve(kobwebBlock.publicPath.get())
 
     @TaskAction
     fun execute() {
-        getGenPublicRoot().mkdirs()
-
         val classpath = getRuntimeClasspath().get()
         val patterns = PatternSet().apply {
             include("public/**")
@@ -73,5 +77,7 @@ abstract class KobwebCopyDependencyResourcesTask @Inject constructor(
                 }
                 rootAndFile.file.copyTo(targetFile, overwrite = true)
             }
+
+        indexFile.get().asFile.copyTo(getGenPublicRoot().resolve("index.html"), overwrite = true)
     }
 }

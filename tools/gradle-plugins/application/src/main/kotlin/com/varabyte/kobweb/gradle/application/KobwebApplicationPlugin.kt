@@ -4,7 +4,7 @@ import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
-import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyDependencyResourcesTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTask
@@ -41,6 +41,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.RegularFile
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
@@ -109,15 +110,13 @@ class KobwebApplicationPlugin @Inject constructor(
                 ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
         val buildTarget = project.kobwebBuildTarget
 
-        val kobwebCopyDependencyResourcesTask = project.tasks
-            .register<KobwebCopyDependencyResourcesTask>("kobwebCopyDepResources", kobwebBlock)
         val kobwebGenSiteIndexTask = project.tasks
             .register<KobwebGenerateSiteIndexTask>("kobwebGenSiteIndex", kobwebConf, kobwebBlock, buildTarget)
-
-        kobwebGenSiteIndexTask.configure {
-            // Make sure copy resources occurs first, so that our index.html file doesn't get overwritten
-            dependsOn(kobwebCopyDependencyResourcesTask)
-        }
+        val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(
+            "kobwebCopySupplementalResources",
+            kobwebBlock,
+            kobwebGenSiteIndexTask.map { RegularFile { it.outputs.files.singleFile } }
+        )
 
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
@@ -248,9 +247,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                // TODO: kobwebCopyDependencyResourcesTask is not included as it already has the same output dir
-                //  but ideally they would have different output dirs and then we'd include it here too
-                resources.srcDirs(kobwebGenSiteIndexTask)
+                resources.srcDir(kobwebCopySupplementalResourcesTask)
             }
 
             // When exporting, both dev + production webpack actions are triggered - dev for the temporary server
