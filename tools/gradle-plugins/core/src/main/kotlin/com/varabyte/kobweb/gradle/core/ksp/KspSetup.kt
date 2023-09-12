@@ -1,7 +1,11 @@
 package com.varabyte.kobweb.gradle.core.ksp
 
 import com.google.devtools.ksp.gradle.KspExtension
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
+import com.google.devtools.ksp.gradle.KspGradleSubplugin
+import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
+import com.varabyte.kobweb.gradle.core.kmp.JsTarget
+import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
+import com.varabyte.kobweb.gradle.core.kmp.TargetPlatform
 import com.varabyte.kobweb.ksp.KSP_API_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.KSP_APP_DATA_KEY
 import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
@@ -10,23 +14,14 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
-fun setupKsp(project: Project, kobwebBlock: KobwebBlock, includeAppData: Boolean) {
-    project.pluginManager.apply("com.google.devtools.ksp")
+fun Project.applyKspPlugin() = pluginManager.apply(KspGradleSubplugin::class.java)
 
-    val kspExtension = project.extensions.getByType<KspExtension>()
+fun Project.setupKspJs(target: JsTarget, includeAppData: Boolean) {
+    addKspDependency(target)
 
-    val kspCommonMainKotlinMetadata =
-        project.tasks.matching { it.name == "kspCommonMainKotlinMetadata" } // doesn't exist if js only
-
-    project.configurations.matching { it.name == "kspJs" || it.name == "kspJvm" }.configureEach {
-        project.dependencies {
-            add(this@configureEach.name, kobwebBlock.kspProcessorDependency.get())
-        }
-    }
-
-    project.tasks.matching { it.name == "kspKotlinJs" }.configureEach {
+    project.tasks.matching { it.name == target.kspKotlin }.configureEach {
         // TODO: we currently set this kep using task.project.group since the group can be different from different modules
-        // however, task.project is not recommended to be used, what are our alternatives?
+        //  however, task.project is not recommended to be used, what are our alternatives?
         kspExtension.arg(
             KSP_PAGES_PACKAGE_KEY,
             PackageUtils.resolvePackageShortcut(this.project.group.toString(), kobwebBlock.pagesPackage.get()),
@@ -36,14 +31,34 @@ fun setupKsp(project: Project, kobwebBlock: KobwebBlock, includeAppData: Boolean
         }
         dependsOn(kspCommonMainKotlinMetadata)
     }
+}
 
-    project.tasks.matching { it.name == "kspKotlinJvm" }.configureEach {
+fun Project.setupKspJvm(target: JvmTarget) {
+    addKspDependency(target)
+
+    project.tasks.matching { it.name == target.kspKotlin }.configureEach {
         // TODO: we currently set this kep using task.project.group since the group can be different from different modules
-        // however, task.project is not recommended to be used, what are our alternatives?
+        //  however, task.project is not recommended to be used, what are our alternatives?
         kspExtension.arg(
             KSP_API_PACKAGE_KEY,
             PackageUtils.resolvePackageShortcut(this.project.group.toString(), kobwebBlock.apiPackage.get()),
         )
         dependsOn(kspCommonMainKotlinMetadata)
+    }
+}
+
+private val Project.kspExtension: KspExtension
+    get() = extensions.getByType<KspExtension>()
+
+private val Project.kspCommonMainKotlinMetadata
+    get() = tasks.matching { it.name == "kspCommonMainKotlinMetadata" } // doesn't exist if js only
+
+private fun Project.addKspDependency(target: TargetPlatform<*>) {
+    val configurationName = "ksp${target.capitalizedName}"
+
+    configurations.matching { it.name == configurationName }.configureEach {
+        dependencies {
+            add(this@configureEach.name, kobwebBlock.kspProcessorDependency.get())
+        }
     }
 }

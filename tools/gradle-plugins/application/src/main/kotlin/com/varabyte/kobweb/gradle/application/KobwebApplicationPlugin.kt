@@ -19,8 +19,12 @@ import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
+import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
-import com.varabyte.kobweb.gradle.core.ksp.setupKsp
+import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
+import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
+import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.kspBackendFile
 import com.varabyte.kobweb.gradle.core.kspFrontendFile
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
@@ -64,6 +68,7 @@ class KobwebApplicationPlugin @Inject constructor(
 ) : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
+        project.applyKspPlugin()
 
         val kobwebFolder = project.kobwebFolder
         val kobwebConf = with(KobwebConfFile(kobwebFolder)) {
@@ -91,8 +96,6 @@ class KobwebApplicationPlugin @Inject constructor(
             createAppBlock(kobwebConf)
             createExportBlock()
         }
-
-        setupKsp(project, kobwebBlock, includeAppData = true)
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
@@ -216,11 +219,13 @@ class KobwebApplicationPlugin @Inject constructor(
             val jsTarget = JsTarget(this)
             project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
 
+            project.setupKspJs(jsTarget, includeAppData = true)
+
             val kobwebGenSiteEntryTask = project.tasks
                 .register<KobwebGenerateSiteEntryTask>("kobwebGenSiteEntry", kobwebConf, kobwebBlock, buildTarget)
 
             kobwebGenSiteEntryTask.configure {
-                kspGenFile = project.kspFrontendFile
+                kspGenFile = project.kspFrontendFile(jsTarget)
             }
 
             val jsRunTasks = listOf(
@@ -238,7 +243,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
-            project.kotlin.sourceSets.matching { it.name == "generatedByKspKotlinJs" }.configureEach {
+            project.kotlin.sourceSets.matching { it.name == jsTarget.kspSourceSet }.configureEach {
                 kotlin.srcDir(kobwebGenSiteEntryTask)
             }
 
@@ -268,7 +273,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebExportTask.configure {
-                appFrontendMetadataFile = project.kspFrontendFile
+                appFrontendMetadataFile = project.kspFrontendFile(jsTarget)
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
                 // before outputting them into a final prod folder.
                 check(env == ServerEnvironment.DEV)
@@ -281,6 +286,8 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
             val jvmTarget = JvmTarget(this)
+
+            project.setupKspJvm(jvmTarget)
 
             project.tasks.namedOrNull<Copy>(jvmTarget.processResources)?.configure {
                 // TODO: are we doing something wrong or is this fine - (also in library)
@@ -300,10 +307,10 @@ class KobwebApplicationPlugin @Inject constructor(
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock)
 
             kobwebGenApisFactoryTask.configure {
-                kspGenFile = project.kspBackendFile!! // exists when jvm target exists
+                kspGenFile = project.kspBackendFile(jvmTarget)!! // exists when jvm target exists
             }
 
-            project.kotlin.sourceSets.matching { it.name == "generatedByKspKotlinJvm" }.configureEach {
+            project.kotlin.sourceSets.matching { it.name == jvmTarget.kspSourceSet }.configureEach {
                 kotlin.srcDir(kobwebGenApisFactoryTask)
             }
         }
@@ -320,7 +327,7 @@ class KobwebApplicationPlugin @Inject constructor(
     ReplaceWith("kotlin.sourceSets.getByName(\"jsMain\").kotlin.srcDir(task)"),
 )
 fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
-    tasks.matching { it.name == "kspKotlinJs" }.configureEach { dependsOn(task) }
+    tasks.matching { it.name == jsTarget.kspKotlin }.configureEach { dependsOn(task) }
 }
 
 @Deprecated(
@@ -328,7 +335,7 @@ fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: Task) {
     ReplaceWith("kotlin.sourceSets.getByName(\"jsMain\").kotlin.srcDir(task)"),
 )
 fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: TaskProvider<*>) {
-    tasks.matching { it.name == "kspKotlinJs" }.configureEach { dependsOn(task) }
+    tasks.matching { it.name == jsTarget.kspKotlin }.configureEach { dependsOn(task) }
 }
 
 /**
@@ -341,7 +348,7 @@ fun Project.notifyKobwebAboutFrontendCodeGeneratingTask(task: TaskProvider<*>) {
     ReplaceWith("kotlin.sourceSets.getByName(\"jvmMain\").kotlin.srcDir(task)"),
 )
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
-    tasks.matching { it.name == "kspKotlinJvm" }.configureEach { dependsOn(task) }
+    tasks.matching { it.name == jvmTarget?.kspKotlin }.configureEach { dependsOn(task) }
 }
 
 @Deprecated(
@@ -349,7 +356,7 @@ fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: Task) {
     ReplaceWith("kotlin.sourceSets.getByName(\"jvmMain\").kotlin.srcDir(task)"),
 )
 fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: TaskProvider<*>) {
-    tasks.matching { it.name == "kspKotlinJvm" }.configureEach { dependsOn(task) }
+    tasks.matching { it.name == jvmTarget?.kspKotlin }.configureEach { dependsOn(task) }
 }
 
 /**
