@@ -115,13 +115,13 @@ class KobwebCorePlugin : Plugin<Project> {
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                resources.srcDirs(project.tasks.matching { it.name == "kspKotlinJs" })
+                resources.srcDirs(project.tasks.matching { it.name == jsTarget.kspKotlin })
             }
         }
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
             val jvmTarget = JvmTarget(this)
             project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
-                resources.srcDirs(project.tasks.matching { it.name == "kspKotlinJvm" })
+                resources.srcDirs(project.tasks.matching { it.name == jvmTarget.kspKotlin })
             }
         }
     }
