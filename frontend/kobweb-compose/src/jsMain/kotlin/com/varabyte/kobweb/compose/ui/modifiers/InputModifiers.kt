@@ -34,6 +34,8 @@ fun Modifier.draggable(draggable: Draggable) = attrsModifier {
     draggable(draggable)
 }
 
+fun Modifier.draggable(draggable: Boolean) = draggable(if (draggable) Draggable.True else Draggable.False)
+
 fun Modifier.pointerEvents(pointerEvents: PointerEvents) = styleModifier {
     pointerEvents(pointerEvents)
 }
