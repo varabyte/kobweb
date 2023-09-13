@@ -10,32 +10,7 @@ plugins {
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.libs.get()
 
-private val GENERATED_SRC_ROOT = "build/generated/kobweb-silk-icons-fa/src/jsMain/kotlin"
-
-kotlin {
-    js {
-        browser()
-        binaries.executable()
-    }
-
-    sourceSets {
-        val jsMain by getting {
-            kotlin.srcDir(GENERATED_SRC_ROOT)
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.html.core)
-
-                api(project(":frontend:kobweb-compose"))
-            }
-        }
-    }
-}
-
-kobwebPublication {
-    artifactId.set("kobweb-silk-icons-fa")
-    description.set("A collection of Kobweb Silk components that directly wrap Font Awesome icons")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
-}
+private val GENERATED_SRC_ROOT = "build/generated/icons/src/jsMain/kotlin"
 
 enum class IconCategory {
     SOLID,
@@ -49,7 +24,7 @@ val generateIconsTask = tasks.register("generateIcons") {
         layout.projectDirectory.file("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/fa/FaIcons.kt")
 
     inputs.files(srcFile)
-    outputs.file(dstFile)
+    outputs.dir(GENERATED_SRC_ROOT)
 
     doLast {
         // {SOLID=[ad, address-book, address-card, ...], REGULAR=[address-book, address-card, angry, ...], ... }
@@ -198,14 +173,34 @@ val generateIconsTask = tasks.register("generateIcons") {
     ${iconMethodEntries.joinToString("\n")}
         """.trimIndent()
 
-        dstFile.asFile.writeText(iconsCode)
+        dstFile.asFile.apply {
+            parentFile.mkdirs()
+            writeText(iconsCode)
+        }
     }
 }
 
-tasks.named("compileKotlinJs") {
-    dependsOn(generateIconsTask)
+kotlin {
+    js {
+        browser()
+        binaries.executable()
+    }
+
+    sourceSets {
+        val jsMain by getting {
+            kotlin.srcDir(generateIconsTask)
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.html.core)
+
+                api(project(":frontend:kobweb-compose"))
+            }
+        }
+    }
 }
 
-tasks.named("jsSourcesJar") {
-    dependsOn(generateIconsTask)
+kobwebPublication {
+    artifactId.set("kobweb-silk-icons-fa")
+    description.set("A collection of Kobweb Silk components that directly wrap Font Awesome icons")
+    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

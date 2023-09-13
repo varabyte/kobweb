@@ -10,32 +10,7 @@ plugins {
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.libs.get()
 
-private val GENERATED_SRC_ROOT = "build/generated/kobweb-silk-icons-mdi/src/jsMain/kotlin"
-
-kotlin {
-    js {
-        browser()
-        binaries.executable()
-    }
-
-    sourceSets {
-        val jsMain by getting {
-            kotlin.srcDir(GENERATED_SRC_ROOT)
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.html.core)
-
-                api(project(":frontend:kobweb-compose"))
-            }
-        }
-    }
-}
-
-kobwebPublication {
-    artifactId.set("kobweb-silk-icons-mdi")
-    description.set("A collection of Kobweb Silk components that directly wrap Material Design icons")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
-}
+private val GENERATED_SRC_ROOT = "build/generated/icons/src/jsMain/kotlin"
 
 enum class IconStyle {
     FILLED,
@@ -51,7 +26,7 @@ val generateIconsTask = tasks.register("generateIcons") {
         layout.projectDirectory.file("$GENERATED_SRC_ROOT/com/varabyte/kobweb/silk/components/icons/mdi/MdIcons.kt")
 
     inputs.files(srcFile)
-    outputs.file(dstFile)
+    outputs.dir(GENERATED_SRC_ROOT)
 
     doLast {
         val iconRawNames = srcFile.asFile
@@ -183,14 +158,34 @@ val generateIconsTask = tasks.register("generateIcons") {
     ${iconMethodEntries.joinToString("\n")}
         """.trimIndent()
 
-        dstFile.asFile.writeText(iconsCode)
+        dstFile.asFile.apply {
+            parentFile.mkdirs()
+            writeText(iconsCode)
+        }
     }
 }
 
-tasks.named("compileKotlinJs") {
-    dependsOn(generateIconsTask)
+kotlin {
+    js {
+        browser()
+        binaries.executable()
+    }
+
+    sourceSets {
+        val jsMain by getting {
+            kotlin.srcDir(generateIconsTask)
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.html.core)
+
+                api(project(":frontend:kobweb-compose"))
+            }
+        }
+    }
 }
 
-tasks.named("jsSourcesJar") {
-    dependsOn(generateIconsTask)
+kobwebPublication {
+    artifactId.set("kobweb-silk-icons-mdi")
+    description.set("A collection of Kobweb Silk components that directly wrap Material Design icons")
+    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }
