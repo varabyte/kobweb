@@ -190,3 +190,7 @@ val generateIconsTask = tasks.register("generateIcons") {
 tasks.named("compileKotlinJs") {
     dependsOn(generateIconsTask)
 }
+
+tasks.named("jsSourcesJar") {
+    dependsOn(generateIconsTask)
+}
