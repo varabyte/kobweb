@@ -16,14 +16,15 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.active
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
+import com.varabyte.kobweb.silk.components.style.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
-import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
+import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.toSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.palette.tab
+import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
@@ -278,7 +279,7 @@ fun Tabs(
 
     Column(TabsStyle.toModifier(variant).then(modifier), ref = ref) {
         Row(TabsTabRowStyle.toModifier()) {
-            val tabPalette = ColorMode.current.toSilkPalette().tab
+            val tabPalette = ColorMode.current.toPalette().tab
             tabPanels.forEachIndexed { i, tabPanel ->
                 val isActive = (i == selectedTabIndex)
 

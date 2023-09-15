@@ -888,12 +888,12 @@ val CustomStyle by ComponentStyle {
 ```
 
 Silk defines a bunch of light and dark colors for all of its widgets, and if you'd like to re-use any of them in your
-own widget, you can query them using `colorMode.toSilkPalette()`:
+own widget, you can query them using `colorMode.toPalette()`:
 
 ```kotlin
 val CustomStyle by ComponentStyle {
     base {
-        Modifier.color(colorMode.toSilkPalette().link.default)
+        Modifier.color(colorMode.toPalette().link.default)
     }
 }
 ```

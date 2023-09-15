@@ -12,20 +12,19 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
+import com.varabyte.kobweb.silk.components.style.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
-import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
-import com.varabyte.kobweb.silk.theme.colors.SilkPalette
-import com.varabyte.kobweb.silk.theme.shapes.RectF
-import com.varabyte.kobweb.silk.theme.shapes.clip
-import com.varabyte.kobweb.silk.theme.toSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.palette.Palette
+import com.varabyte.kobweb.silk.theme.colors.palette.switch
+import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Label
@@ -140,7 +139,7 @@ internal fun SwitchShape.toModifier() = Modifier
  * @param size The size of the switch. Defaults to [SwitchSize.MD]. You can implement your own [SwitchSize] if you want
  *   custom sizing.
  * @param colorScheme An optional color scheme to use for the switch. If not provided, the switch will use the
- *   appropriate colors from the [SilkPalette].
+ *   appropriate colors from the [Palette].
  * @param thumbColor An optional override for the color of the thumb.
  * @param focusBorderColor An optional override for the border color when the input is focused.
  * @param ref Provides a reference to the *container* of the switch. Its direct children will be the underlying checkbox
@@ -161,7 +160,7 @@ fun Switch(
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
     val colorMode = ColorMode.current
-    val switchPalette = colorMode.toSilkPalette().switch
+    val switchPalette = colorMode.toPalette().switch
     // Use a label so it intercepts clicks and passes them to the inner Input
     Label(
         attrs = SwitchStyle.toModifier(variant)

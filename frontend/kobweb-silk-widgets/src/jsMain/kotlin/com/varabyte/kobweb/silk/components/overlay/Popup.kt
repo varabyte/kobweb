@@ -13,7 +13,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect

@@ -18,19 +18,20 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.active
+import com.varabyte.kobweb.silk.components.style.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.common.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.focusVisible
 import com.varabyte.kobweb.silk.components.style.hover
 import com.varabyte.kobweb.silk.components.style.not
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
+import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
+import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
-import com.varabyte.kobweb.silk.theme.colors.ColorVar
-import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
-import com.varabyte.kobweb.silk.theme.size.FontSizeVars
-import com.varabyte.kobweb.silk.theme.toSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.palette.color
+import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.attributes.ButtonType
 import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.css.*
@@ -155,7 +156,7 @@ fun Button(
                 val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
                 Modifier
                     .setVariable(
-                        ButtonVars.Color, (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toSilkPalette().color
+                        ButtonVars.Color, (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toPalette().color
                     )
                     .setVariable(ButtonVars.BackgroundDefaultColor, if (isDark) colorScheme._200 else colorScheme._500)
                     .setVariable(ButtonVars.BackgroundHoverColor, if (isDark) colorScheme._300 else colorScheme._600)

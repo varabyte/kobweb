@@ -9,7 +9,6 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.forms.Button
-import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
 import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -25,7 +24,9 @@ import com.varabyte.kobweb.silk.components.style.link
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.visited
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.toSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.palette.background
+import com.varabyte.kobweb.silk.theme.colors.palette.color
+import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.css.*
 
 val NavHeaderStyle by ComponentStyle.base(extraModifiers = { SmoothColorStyle.toModifier() }) {
@@ -33,7 +34,7 @@ val NavHeaderStyle by ComponentStyle.base(extraModifiers = { SmoothColorStyle.to
         .fillMaxWidth()
         .height(50.px)
         // Intentionally invert the header colors from the rest of the page
-        .backgroundColor(colorMode.toSilkPalette().color)
+        .backgroundColor(colorMode.toPalette().color)
 }
 
 val NavItemStyle by ComponentStyle {
@@ -42,7 +43,7 @@ val NavItemStyle by ComponentStyle {
 
 val NavLinkVariant by LinkStyle.addVariant {
     // Intentionally invert the header colors from the rest of the page
-    val linkColor = colorMode.toSilkPalette().background
+    val linkColor = colorMode.toPalette().background
 
     link { Modifier.color(linkColor) }
     visited { Modifier.color(linkColor) }

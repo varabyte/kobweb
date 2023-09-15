@@ -14,16 +14,25 @@ import com.varabyte.kobweb.gradle.core.project.frontend.merge
 
 private const val KOBWEB_GROUP = "com.varabyte.kobweb"
 
+enum class SilkSupport {
+    NONE,
+    FOUNDATION,
+    FULL,
+}
+
 fun createMainFunction(
     appData: AppData,
     libData: List<FrontendData>,
-    usingSilk: Boolean,
+    silkSupport: SilkSupport,
     appBlock: AppBlock,
     routePrefix: RoutePrefix,
     target: BuildTarget
 ): String {
+    val usingSilkFoundation = silkSupport != SilkSupport.NONE
+    val usingSilkWidgets = silkSupport == SilkSupport.FULL
+
     val appFqn = appData.appEntry?.fqn
-        ?: (KOBWEB_GROUP + if (usingSilk) ".silk.SilkApp" else ".core.KobwebApp")
+        ?: (KOBWEB_GROUP + if (usingSilkWidgets) ".silk.SilkApp" else ".core.KobwebApp")
 
     val frontendData = (listOf(appData.frontendData) + libData).merge()
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
@@ -57,9 +66,6 @@ fun createMainFunction(
         }
         if (frontendData.keyframesList.isNotEmpty()) {
             add("$KOBWEB_GROUP.silk.components.animation.registerKeyframes")
-        }
-        if (usingSilk) {
-            add("$KOBWEB_GROUP.silk.defer.renderWithDeferred")
         }
     }.sorted().forEach { import ->
         fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.'))
@@ -179,10 +185,14 @@ fun createMainFunction(
 
             val needsSilkInit = frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty()
                 || frontendData.silkVariants.isNotEmpty() || frontendData.keyframesList.isNotEmpty()
-            if (usingSilk && needsSilkInit) {
+            if (usingSilkFoundation && needsSilkInit) {
                 addCode(CodeBlock.builder().apply {
-                    addStatement("$KOBWEB_GROUP.silk.init.initSilkHook = { ctx ->")
+                    addStatement("$KOBWEB_GROUP.silk.init.additionalSilkInitialization = { ctx ->")
                     withIndent {
+                        if (usingSilkWidgets) {
+                            addStatement("com.varabyte.kobweb.silk.init.initSilkWidgets(ctx)")
+                            addStatement("com.varabyte.kobweb.silk.init.initSilkWidgetsKobweb(ctx)")
+                        }
                         frontendData.silkStyles.forEach { entry ->
                             addStatement("ctx.theme.registerComponentStyle(${entry.fqcn})")
                         }
@@ -205,29 +215,33 @@ fun createMainFunction(
 
             // Note: Below, we use %S when specifying key/value pairs. This prevents KotlinPoet from breaking
             // our text in the middle of a String.
-            addCode(
-                """
-                router.navigateTo(window.location.href.removePrefix(window.location.origin), UpdateHistoryMode.REPLACE)
-
-                // For SEO, we may bake the contents of a page in at build time. However, we will overwrite them
-                // the first time we render this page with their composable, dynamic versions. Think of this as
-                // poor man's hydration :)
-                // See also: https://en.wikipedia.org/wiki/Hydration_(web_development)
-                val root = document.getElementById("root")!!
-                while (root.firstChild != null) {
-                    root.removeChild(root.firstChild!!)
+            addCode(CodeBlock.Builder().apply {
+                addStatement("router.navigateTo(window.location.href.removePrefix(window.location.origin), UpdateHistoryMode.REPLACE)")
+                addStatement("")
+                addComment("For SEO, we may bake the contents of a page in at build time. However, we will")
+                addComment("overwrite them the first time we render this page with their composable, dynamic")
+                addComment("versions. Think of this as poor man's hydration :)")
+                addComment("See also: https://en.wikipedia.org/wiki/Hydration_(web_development)")
+                addStatement("val root = document.getElementById(\"root\")!!")
+                addStatement("while (root.firstChild != null) { root.removeChild(root.firstChild!!) }")
+                addStatement("")
+                addStatement("renderComposable(rootElementId = \"root\") {")
+                withIndent {
+                    addStatement(
+                        "CompositionLocalProvider(AppGlobalsLocal provides mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()})) {",
+                        *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
+                    )
+                    withIndent {
+                        addStatement("$appFqn {")
+                        withIndent {
+                            addStatement("router.renderActivePage()")
+                        }
+                        addStatement("}")
+                    }
+                    addStatement("}")
                 }
-
-                renderComposable(rootElementId = "root") {
-                    CompositionLocalProvider(
-                        AppGlobalsLocal provides mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()})
-                    ) { $appFqn {
-                          ${if (usingSilk) "router.renderActivePage { renderWithDeferred { it() } }" else "router.renderActivePage()"}
-                    } }
-                }
-                """.trimIndent(),
-                *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
-            )
+                addStatement("}")
+            }.build())
         }.build()
     )
 

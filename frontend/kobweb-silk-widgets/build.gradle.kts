@@ -23,6 +23,7 @@ kotlin {
                 implementation(compose.html.core)
 
                 api(project(":frontend:kobweb-compose"))
+                api(project(":frontend:kobweb-silk-foundation"))
                 implementation(project(":frontend:compose-html-ext"))
             }
         }

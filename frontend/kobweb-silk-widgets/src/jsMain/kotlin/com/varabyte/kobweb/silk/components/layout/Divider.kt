@@ -9,7 +9,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.theme.colors.BorderColorVar
+import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Hr
 

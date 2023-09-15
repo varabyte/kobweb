@@ -53,7 +53,9 @@ import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
-import com.varabyte.kobweb.silk.theme.toSilkPalette
+import com.varabyte.kobweb.silk.theme.colors.palette.background
+import com.varabyte.kobweb.silk.theme.colors.palette.border
+import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.attributes.AutoComplete
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
@@ -65,7 +67,7 @@ import playground.components.widgets.GoHomeLink
 val WidgetSectionStyle by ComponentStyle.base {
     Modifier
         .fillMaxWidth()
-        .border(1.px, LineStyle.Solid, colorMode.toSilkPalette().border)
+        .border(1.px, LineStyle.Solid, colorMode.toPalette().border)
         .position(Position.Relative)
 }
 
@@ -82,13 +84,13 @@ val WidgetLabelStyle by ComponentStyle.base {
         .left(0.3.cssRem)
         .top((-.7).cssRem)
         .padding(0.2.cssRem)
-        .backgroundColor(colorMode.toSilkPalette().background)
+        .backgroundColor(colorMode.toPalette().background)
 }
 
 val IconContainerStyle by ComponentStyle.base {
     Modifier
         .padding(0.2.cssRem)
-        .border(1.px, LineStyle.Solid, colorMode.toSilkPalette().border)
+        .border(1.px, LineStyle.Solid, colorMode.toPalette().border)
         .borderRadius(3.px)
         .cursor(Cursor.Help)
 }

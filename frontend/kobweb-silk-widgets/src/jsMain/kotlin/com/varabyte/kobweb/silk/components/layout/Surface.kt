@@ -13,12 +13,11 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.init.setSilkVariables
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
-import com.varabyte.kobweb.silk.theme.colors.BackgroundColorVar
+import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
+import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.color.BackgroundColorVar
+import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorVar
-import com.varabyte.kobweb.silk.theme.colors.LocalColorMode
 import org.w3c.dom.HTMLElement
 
 object SurfaceVars {
@@ -86,9 +85,9 @@ fun Surface(
     ) {
         if (colorModeOverride != null) {
             surfaceElement?.let { surfaceElement ->
-                CompositionLocalProvider(LocalColorMode provides mutableStateOf(colorModeOverride)) {
+                CompositionLocalProvider(colorModeOverride.provide()) {
                     val currColorMode = ColorMode.current // Can recompose if child changes ColorMode.currentState
-                    LaunchedEffect(currColorMode) { surfaceElement.setSilkVariables(currColorMode) }
+                    LaunchedEffect(currColorMode) { surfaceElement.setSilkWidgetVariables(currColorMode) }
                     content()
                 }
             }

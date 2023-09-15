@@ -4,10 +4,8 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.CssRule
-import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.theme.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 
 // Note: CSS provides a `disabled` selector, but disabling elements using HTML properties prevents mouse events from
 // firing, and this is bad because you might want to show tooltips even for a disabled element. Some solutions online
@@ -21,33 +19,6 @@ val DisabledStyle by ComponentStyle.base(
 ) {
     Modifier.opacity(0.5).cursor(Cursor.NotAllowed)
 }
-
-/**
- * A way to select elements that have been tagged with an `aria-disabled` attribute.
- *
- * This is different from the `:disabled` pseudo-class selector! There are various reasons to use the ARIA version over
- * the HTML version; for example, some elements don't support `disabled` and also `disabled` elements don't fire
- * mouse events, which can be useful e.g. when implementing tooltips.
- */
-val StyleModifiers.ariaDisabled get() = CssRule.OfAttributeSelector(this, """aria-disabled="true"""")
-
-/**
- * A way to select elements that have been tagged with an `aria-invalid` attribute.
- *
- * This is different from the `:invalid` pseudo-class selector! The `invalid` pseudo-class is useful when the standard
- * widget supports a general invalidation algorithm (like an email type input with an invalid email address), but the
- * `ariaInvalid` version can be used to support custom invalidation strategies.
- */
-val StyleModifiers.ariaInvalid get() = CssRule.OfAttributeSelector(this, """aria-invalid="true"""")
-
-/**
- * A way to select elements that have been tagged with an `aria-required` attribute.
- *
- * This is different from the `:required` pseudo-class selector! It can be useful to use the `ariaRequired` tag when
- * using elements that don't support the `required` attribute, like elements created from divs, as a way to communicate
- * their required state to accessibility readers.
- */
-val StyleModifiers.ariaRequired get() = CssRule.OfAttributeSelector(this, """aria-required="true"""")
 
 val SmoothColorTransitionDurationVar by StyleVariable(
     prefix = "silk",
