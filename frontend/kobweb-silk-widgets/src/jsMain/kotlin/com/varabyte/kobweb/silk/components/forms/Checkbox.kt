@@ -31,6 +31,7 @@ import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.SilkPalette
 import com.varabyte.kobweb.silk.theme.shapes.RectF
 import com.varabyte.kobweb.silk.theme.shapes.clip
+import com.varabyte.kobweb.silk.theme.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
@@ -157,19 +158,19 @@ interface CheckboxSize {
     object SM : CheckboxSize {
         override val boxSize = 0.875.cssRem
         override val iconSize = 0.45.cssRem
-        override val fontSize = 0.875.cssRem
+        override val fontSize = FontSizeVars.SM.value()
     }
 
     object MD : CheckboxSize {
         override val boxSize = 1.cssRem
         override val iconSize = 0.625.cssRem
-        override val fontSize = 1.cssRem
+        override val fontSize = FontSizeVars.MD.value()
     }
 
     object LG : CheckboxSize {
         override val boxSize = 1.25.cssRem
         override val iconSize = 0.8.cssRem
-        override val fontSize = 1.125.cssRem
+        override val fontSize = FontSizeVars.LG.value()
     }
 }
 

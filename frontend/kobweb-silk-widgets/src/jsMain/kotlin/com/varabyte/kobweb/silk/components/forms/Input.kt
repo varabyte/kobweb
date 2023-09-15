@@ -35,6 +35,8 @@ import com.varabyte.kobweb.silk.theme.colors.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.PlaceholderOpacityVar
 import com.varabyte.kobweb.silk.theme.shapes.RectF
 import com.varabyte.kobweb.silk.theme.shapes.clip
+import com.varabyte.kobweb.silk.theme.size.BorderRadiusVars
+import com.varabyte.kobweb.silk.theme.size.FontSizeVars
 import org.jetbrains.compose.web.attributes.AutoComplete
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.autoComplete
@@ -413,31 +415,31 @@ interface InputSize {
     val borderRadius: CSSLengthValue
 
     object XS : InputSize {
-        override val fontSize = 0.75.cssRem
+        override val fontSize = FontSizeVars.XS.value()
         override val height = 1.25.cssRem
         override val padding = 0.375.cssRem
-        override val borderRadius = 0.125.cssRem
+        override val borderRadius = BorderRadiusVars.XS.value()
     }
 
     object SM : InputSize {
-        override val fontSize = 0.875.cssRem
+        override val fontSize = FontSizeVars.SM.value()
         override val height = 1.75.cssRem
         override val padding = 0.5.cssRem
-        override val borderRadius = 0.25.cssRem
+        override val borderRadius = BorderRadiusVars.SM.value()
     }
 
     object MD : InputSize {
-        override val fontSize = 1.cssRem
+        override val fontSize = FontSizeVars.MD.value()
         override val height = 2.25.cssRem
         override val padding = 0.625.cssRem
-        override val borderRadius = 0.375.cssRem
+        override val borderRadius = BorderRadiusVars.MD.value()
     }
 
     object LG : InputSize {
-        override val fontSize = 1.125.cssRem
+        override val fontSize = FontSizeVars.LG.value()
         override val height = 2.5.cssRem
-        override val padding = 0.875.cssRem
-        override val borderRadius = 0.375.cssRem
+        override val padding = 0.375.cssRem
+        override val borderRadius = BorderRadiusVars.LG.value()
     }
 }
 

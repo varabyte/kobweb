@@ -29,6 +29,7 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.ColorVar
 import com.varabyte.kobweb.silk.theme.colors.FocusOutlineColorVar
+import com.varabyte.kobweb.silk.theme.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.toSilkPalette
 import org.jetbrains.compose.web.attributes.ButtonType
 import org.jetbrains.compose.web.attributes.type
@@ -97,25 +98,25 @@ interface ButtonSize {
     val horizontalPadding: CSSLengthValue
 
     object XS : ButtonSize {
-        override val fontSize = 0.75.cssRem
+        override val fontSize = FontSizeVars.XS.value()
         override val height = 1.5.cssRem
         override val horizontalPadding = 0.5.cssRem
     }
 
     object SM : ButtonSize {
-        override val fontSize = 0.875.cssRem
+        override val fontSize = FontSizeVars.SM.value()
         override val height = 2.cssRem
         override val horizontalPadding = 0.75.cssRem
     }
 
     object MD : ButtonSize {
-        override val fontSize = 1.cssRem
+        override val fontSize = FontSizeVars.MD.value()
         override val height = 2.5.cssRem
         override val horizontalPadding = 1.cssRem
     }
 
     object LG : ButtonSize {
-        override val fontSize = 1.125.cssRem
+        override val fontSize = FontSizeVars.LG.value()
         override val height = 3.cssRem
         override val horizontalPadding = 1.5.cssRem
     }
