@@ -5,21 +5,22 @@ import com.varabyte.kobweb.gradle.core.extensions.YarnLockChangedStrategy
 import com.varabyte.kobweb.gradle.core.extensions.createYarnBlock
 import com.varabyte.kobweb.gradle.core.extensions.yarn
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
-import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
-import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebCorePlugin : Plugin<Project> {
@@ -111,17 +112,14 @@ class KobwebCorePlugin : Plugin<Project> {
             }
         }
 
-        // use matching instead of named as tasks may not exist yet
+        // jvm resources are automatically hooked up to processResources, but js resources are not
+        // see: https://github.com/google/ksp/issues/1539
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
-            project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                resources.srcDirs(project.tasks.matching { it.name == jsTarget.kspKotlin })
-            }
-        }
-        project.buildTargets.withType<KotlinJvmTarget>().configureEach {
-            val jvmTarget = JvmTarget(this)
-            project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
-                resources.srcDirs(project.tasks.matching { it.name == jvmTarget.kspKotlin })
+            project.tasks.named<ProcessResources>(jsTarget.processResources) {
+                val kspFrontendOutput = project.tasks.named(jsTarget.kspKotlin).get()
+                    .outputs.files.asFileTree.matching { include(KOBWEB_METADATA_FRONTEND) }
+                from(kspFrontendOutput)
             }
         }
     }

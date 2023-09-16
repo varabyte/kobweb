@@ -40,7 +40,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.RegularFile
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
@@ -285,11 +284,6 @@ class KobwebApplicationPlugin @Inject constructor(
             val jvmTarget = JvmTarget(this)
 
             project.setupKspJvm(jvmTarget)
-
-            project.tasks.namedOrNull<Copy>(jvmTarget.processResources)?.configure {
-                // TODO: are we doing something wrong or is this fine - (also in library)
-                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            }
 
             // PROD env uses files copied over into a site folder by the export task, so it doesn't need to trigger
             // much.
