@@ -8,6 +8,7 @@ import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
+import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -23,6 +24,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebCorePlugin : Plugin<Project> {
     override fun apply(project: Project) {
+
         // A `kobweb` block is not used directly here in the core plugin but is provided as a foundational building
         // block for both library and application plugins.
         val kobwebBlock = project.extensions.create<KobwebBlock>("kobweb")
@@ -64,6 +66,22 @@ class KobwebCorePlugin : Plugin<Project> {
             project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
                 kotlin.srcDir(project.layout.buildDirectory.dir("$genDir${jvmTarget.srcSuffix}"))
                 resources.srcDir(project.layout.buildDirectory.dir("$genDir${jvmTarget.resourceSuffix}"))
+            }
+        }
+
+        project.afterEvaluate {
+            val groupId = "com.varabyte.kobweb"
+            val relocatedArtifacts = run {
+                listOf(
+                    "kobweb-silk-widgets",
+                    "kobweb-silk-icons-fa",
+                    "kobweb-silk-icons-mdi"
+                ).associateWith { legacyArtifactId -> legacyArtifactId.removePrefix("kobweb-") }
+            }
+            relocatedArtifacts.forEach { legacyArtifactId, newArtifactId ->
+                if (project.hasJsDependencyNamed(legacyArtifactId)) {
+                    logger.warn("w: The dependency `$groupId:$legacyArtifactId` has been renamed to `$groupId:$newArtifactId`. Please migrate your dependency declaration to the new name. The correct dependency is being used for now, but this will become an error in a future version of Kobweb.")
+                }
             }
         }
     }
