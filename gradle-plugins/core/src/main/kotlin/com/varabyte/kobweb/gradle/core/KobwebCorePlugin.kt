@@ -25,6 +25,67 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 class KobwebCorePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val rootProject = project.rootProject
+        val versionCatalogPath = "gradle/libs.versions.toml"
+
+        run {
+            val groupId = "com.varabyte.kobweb"
+            val relocatedArtifacts = run {
+                listOf(
+                    "kobweb-silk-widgets",
+                    "kobweb-silk-icons-fa",
+                    "kobweb-silk-icons-mdi"
+                ).associateWith { legacyArtifactId -> legacyArtifactId.removePrefix("kobweb-") }
+            }
+
+            val migrateDepsName = "kobwebMigrateDeps"
+            if (rootProject.tasks.findByName(migrateDepsName) != null) return@run
+
+            val migrateDepsTask = rootProject.tasks.register(migrateDepsName) {
+                inputs.file(versionCatalogPath)
+                outputs.file(versionCatalogPath)
+                group = "kobweb"
+                description =
+                    "Migrate any Kobweb dependencies found in `$versionCatalogPath` that should be relocated to new coordinates."
+
+                doLast {
+                    rootProject.layout.projectDirectory.file(versionCatalogPath).asFile.takeIf { it.exists() }
+                        ?.let { tomlFile ->
+                            val originalText = tomlFile.readText()
+                            var updatedText = originalText
+                            relocatedArtifacts.forEach { (legacyArtifactId, newArtifactId) ->
+                                updatedText =
+                                    updatedText.replace("$groupId:$legacyArtifactId", "$groupId:$newArtifactId")
+                            }
+                            if (originalText != updatedText) {
+                                println(
+                                    "Your `$versionCatalogPath` has been updated to use the latest Kobweb dependency names."
+                                )
+                                tomlFile.writeText(updatedText)
+                            } else {
+                                println(
+                                    "We did not find any Kobweb dependencies in `$versionCatalogPath` that need to be migrated."
+                                )
+                            }
+                        }
+                        ?: println(
+                            "We could not find `$versionCatalogPath` so we cannot try to migrate dependencies."
+                        )
+                }
+            }
+
+            project.gradle.taskGraph.whenReady {
+                // Warn the user about any relocated deps, if used, unless we're already running the task which will
+                // migrate them. If we show the warning then, it feels like the task failed even as it succeeded.
+                if (!this.hasTask(migrateDepsTask.get())) {
+                    relocatedArtifacts.forEach { (legacyArtifactId, newArtifactId) ->
+                        if (project.hasJsDependencyNamed(legacyArtifactId)) {
+                            project.logger.warn("w: The dependency `$groupId:$legacyArtifactId` has been renamed to `$groupId:$newArtifactId`. Please migrate to the new name. You can run `./gradlew $migrateDepsName` to attempt to do this automatically. Failing to migrate will become an error in a future version of Kobweb.")
+                        }
+                    }
+                }
+            }
+
+        }
 
         // A `kobweb` block is not used directly here in the core plugin but is provided as a foundational building
         // block for both library and application plugins.
@@ -67,22 +128,6 @@ class KobwebCorePlugin : Plugin<Project> {
             project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
                 kotlin.srcDir(project.layout.buildDirectory.dir("$genDir${jvmTarget.srcSuffix}"))
                 resources.srcDir(project.layout.buildDirectory.dir("$genDir${jvmTarget.resourceSuffix}"))
-            }
-        }
-
-        project.afterEvaluate {
-            val groupId = "com.varabyte.kobweb"
-            val relocatedArtifacts = run {
-                listOf(
-                    "kobweb-silk-widgets",
-                    "kobweb-silk-icons-fa",
-                    "kobweb-silk-icons-mdi"
-                ).associateWith { legacyArtifactId -> legacyArtifactId.removePrefix("kobweb-") }
-            }
-            relocatedArtifacts.forEach { legacyArtifactId, newArtifactId ->
-                if (project.hasJsDependencyNamed(legacyArtifactId)) {
-                    logger.warn("w: The dependency `$groupId:$legacyArtifactId` has been renamed to `$groupId:$newArtifactId`. Please migrate your dependency declaration to the new name. The correct dependency is being used for now, but this will become an error in a future version of Kobweb.")
-                }
             }
         }
     }
