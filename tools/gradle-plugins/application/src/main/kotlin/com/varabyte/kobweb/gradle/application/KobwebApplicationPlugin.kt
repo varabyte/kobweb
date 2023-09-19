@@ -23,10 +23,10 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
+import com.varabyte.kobweb.gradle.core.ksp.kspBackendFile
+import com.varabyte.kobweb.gradle.core.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
-import com.varabyte.kobweb.gradle.core.kspBackendFile
-import com.varabyte.kobweb.gradle.core.kspFrontendFile
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
