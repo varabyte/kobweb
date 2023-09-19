@@ -42,6 +42,9 @@ import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.icons.MinusIcon
 import com.varabyte.kobweb.silk.components.icons.PlusIcon
 import com.varabyte.kobweb.silk.components.icons.SquareIcon
+import com.varabyte.kobweb.silk.components.icons.Staircase
+import com.varabyte.kobweb.silk.components.icons.Moon
+import com.varabyte.kobweb.silk.components.icons.Fire
 import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
 import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
@@ -206,6 +209,9 @@ fun WidgetsPage() {
                     "Minus" to { MinusIcon() },
                     "Plus" to { PlusIcon() },
                     "Square" to { SquareIcon() },
+                    "Staircase" to { Staircase() },
+                    "Moon" to { Moon() },
+                    "Fire" to { Fire() },
                 )
 
                 Row(

@@ -205,11 +205,106 @@ fun ElementScope<SVGElement>.Line(scope: SVGLineScope.() -> Unit) {
 }
 
 
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path
-@Composable
-fun ElementScope<SVGElement>.Path(attrs: AttrBuilderContext<SVGPathElement>) {
-    GenericTag("path", "http://www.w3.org/2000/svg", attrs)
+
+class PathDataScope internal constructor() {
+    internal val pathCommands = mutableListOf<String>()
+
+    fun moveTo(x: Number, y: Number) {
+        pathCommands.add("M $x $y")
+    }
+
+    fun lineTo(x: Number, y: Number, isRelative: Boolean = false) {
+        val isRelativeCommandOrNot: String = if (isRelative) "l" else "L"
+        pathCommands.add("$isRelativeCommandOrNot $x $y")
+    }
+
+    fun verticalLineTo(x: Number, isRelative: Boolean = false) {
+        val isRelativeCommandOrNot: String = if (isRelative) "v" else "V"
+        pathCommands.add("$isRelativeCommandOrNot $x")
+    }
+
+    fun horizontalLineTo(x: Number, isRelative: Boolean = false) {
+        val isRelativeCommandOrNot: String = if (isRelative) "h" else "H"
+        pathCommands.add("$isRelativeCommandOrNot $x")
+    }
+
+    fun curveTo(a1: Number, a2: Number, b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
+        val isRelativeCommandOrNot: String = if (isRelative) "c" else "C"
+        pathCommands.add("$isRelativeCommandOrNot $a1 $a2 $b1 $b2 $x $y")
+    }
+
+    fun smoothCurveTo(b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
+        val isRelativeCommandOrNot: String = if (isRelative) "s" else "S"
+        pathCommands.add("$isRelativeCommandOrNot $b1 $b2 $x $y")
+    }
+
+    fun quadraticBezierCurve(a1: Number, a2: Number, x: Number, y: Number, isRelative: Boolean) {
+        val isRelativeCommandOrNot: String = if (isRelative) "q" else "Q"
+        pathCommands.add("$isRelativeCommandOrNot $a1 $a2 $x $y")
+    }
+
+    fun smoothQuadraticBezierCurve(x: Number, y: Number, isRelative: Boolean) {
+        val isRelativeCommandOrNot: String = if (isRelative) "t" else "T"
+        pathCommands.add("$isRelativeCommandOrNot $x $y")
+    }
+
+    fun ellipticalArc(
+        rx: Number,
+        ry: Number,
+        rotate: Number,
+        largeArcFlag: Number,
+        sweepFlag: Number,
+        x: Number,
+        y: Number,
+        isRelative: Boolean = false
+    ) {
+        val isRelativeCommandOrNot: String = if (isRelative) "a" else "A"
+        pathCommands.add("$isRelativeCommandOrNot $rx $ry $rotate $largeArcFlag $sweepFlag $x $y")
+    }
+
+    fun closePath() {
+        pathCommands.add("Z")
+    }
 }
+
+
+class SVGPathScope internal constructor(private val attrs: AttrsScope<SVGPathElement>) : SVGShapeElementScope(attrs) {
+
+    fun d(scope: PathDataScope.() -> Unit) {
+        attrs.attr("d", PathDataScope().apply(scope).pathCommands.joinToString(" "))
+    }
+}
+
+/**
+ * Type-safe API for creating an [SVGPathElement].
+ *
+ * For example, to create a ChevronDownIcon using Path
+ *
+ * ```
+ * Svg {
+ *  Path {
+ *     d {
+ *         moveTo(16.59, 8.59)
+ *         lineTo(12, 13.17)
+ *         lineTo(7.41, 8.59)
+ *         lineTo(6, 10)
+ *         lineTo(6, 6, true)
+ *         lineTo(6, -6, true)
+ *         closePath()
+ *     }
+ *  }
+ * }
+ * ```
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path">SVG Element Path (Mozilla Docs)</a>
+ */
+@Composable
+fun ElementScope<SVGElement>.Path(scope: SVGPathScope.() -> Unit) {
+    GenericTag("path", "http://www.w3.org/2000/svg", attrs = {
+        SVGPathScope(this).scope()
+    })
+}
+
 
 
 class SVGPolygonScope internal constructor(private val attrs: AttrsScope<SVGPolygonElement>) : SVGShapeElementScope(attrs) {
