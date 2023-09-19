@@ -67,4 +67,4 @@ fun main() {
 }
 ```
 
-See the README for `kobweb-silk-foundation` for more information.
+See the README for `silk-foundation` for more information.

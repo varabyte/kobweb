@@ -22,15 +22,16 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                implementation(project(":frontend:compose-html-ext"))
                 api(project(":frontend:kobweb-compose"))
+                api(project(":frontend:silk-foundation"))
+                implementation(project(":frontend:compose-html-ext"))
             }
         }
     }
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-silk-foundation")
-    description.set("The foundational layer of Silk that provides general purpose styling functionality like component styles, keyframes, and .")
+    artifactId.set("silk-widgets")
+    description.set("The subset of Silk that doesn't depend on Kobweb at all, extracted into its own library in case projects want to use it without Kobweb")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

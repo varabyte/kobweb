@@ -61,7 +61,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                 libData,
                 when {
                     project.hasTransitiveJsDependencyNamed("kobweb-silk") -> SilkSupport.FULL
-                    project.hasTransitiveJsDependencyNamed("kobweb-silk-foundation") -> SilkSupport.FOUNDATION
+                    project.hasTransitiveJsDependencyNamed("silk-foundation") -> SilkSupport.FOUNDATION
                     else -> SilkSupport.NONE
                 },
                 kobwebBlock.app,

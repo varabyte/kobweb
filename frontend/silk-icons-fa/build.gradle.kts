@@ -200,7 +200,7 @@ kotlin {
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-silk-icons-fa")
+    artifactId.set("silk-icons-fa")
     description.set("A collection of Kobweb Silk components that directly wrap Font Awesome icons")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

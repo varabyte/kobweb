@@ -13,4 +13,4 @@ library directly without Silk widgets, they can still:
 You can think of this library as the core utilities and bits that make it easy to style your Kobweb site above and
 beyond the limited tools offered by Compose HTML.
 
-See the README for `kobweb-silk-widgets` for more information.
+See the README for `silk-widgets` for more information.

@@ -43,7 +43,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        if (project.hasTransitiveJsDependencyNamed("kobweb-silk-icons-fa")) {
+        if (project.hasTransitiveJsDependencyNamed("silk-icons-fa")) {
             kobwebBlock.app.index.head.add {
                 link {
                     rel = "stylesheet"
@@ -52,7 +52,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        if (project.hasTransitiveJsDependencyNamed("kobweb-silk-icons-mdi")) {
+        if (project.hasTransitiveJsDependencyNamed("silk-icons-mdi")) {
             kobwebBlock.app.index.head.add {
                 link {
                     rel = "stylesheet"

@@ -23,9 +23,9 @@ kotlin {
                 implementation(compose.html.core)
 
                 api(project(":frontend:kobweb-core"))
-                api(project(":frontend:kobweb-silk-foundation"))
-                api(project(":frontend:kobweb-silk-widgets"))
-                api(project(":frontend:kobweb-silk-widgets-kobweb"))
+                api(project(":frontend:silk-foundation"))
+                api(project(":frontend:silk-widgets"))
+                api(project(":frontend:silk-widgets-kobweb"))
             }
         }
     }

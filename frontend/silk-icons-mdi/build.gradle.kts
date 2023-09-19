@@ -185,7 +185,7 @@ kotlin {
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-silk-icons-mdi")
+    artifactId.set("silk-icons-mdi")
     description.set("A collection of Kobweb Silk components that directly wrap Material Design icons")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

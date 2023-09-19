@@ -22,16 +22,15 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                api(project(":frontend:kobweb-compose"))
-                api(project(":frontend:kobweb-silk-foundation"))
-                implementation(project(":frontend:compose-html-ext"))
+                implementation(project(":frontend:kobweb-core"))
+                api(project(":frontend:silk-widgets"))
             }
         }
     }
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-silk-widgets")
-    description.set("The subset of Silk that doesn't depend on Kobweb at all, extracted into its own library in case projects want to use it without Kobweb")
+    artifactId.set("silk-kobweb-widgets")
+    description.set("Silk UI components tightly integrated with Kobweb functionality -- they cannot be used without Kobweb")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }
