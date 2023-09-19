@@ -30,10 +30,13 @@ internal fun MavenArtifactRepository.gcloudAuth(project: Project) {
     }
 }
 
-// Some publications should add a suffix to the end of their artifact name to avoid ambiguity with the multiplatform
-// artifact. For example, you might generate "artifact", "artifact-js", and "artifact-jvm", three separate maven
-// entries, which a multiplatform project can then handle importing.
-private val MULTIPLATFORM_SUFFIX_NAMES = mutableSetOf("jvm", "js")
+internal fun PublishingExtension.prepareRepositories(project: Project) {
+    if (project.shouldSign() && project.shouldPublishToGCloud()) {
+        repositories {
+            maven { gcloudAuth(project) }
+        }
+    }
+}
 
 /**
  * @param artifactId Can be null if we want to let the system use the default value for this project.
@@ -43,34 +46,42 @@ private val MULTIPLATFORM_SUFFIX_NAMES = mutableSetOf("jvm", "js")
 internal fun PublishingExtension.addVarabyteArtifact(
     project: Project,
     artifactId: ((String) -> String)?,
+    relocationDetails: KobwebPublicationConfig.RelocationDetails,
     description: String?,
     site: String?,
 ) {
-    if (project.shouldSign() && project.shouldPublishToGCloud()) {
-        repositories {
-            maven { gcloudAuth(project) }
-        }
-    }
-
-    val javaComponent = project.components.findByName("java")
-    if (javaComponent != null) {
-        project.java?.let {
-            it.withJavadocJar()
-            it.withSourcesJar()
-        }
-    }
-
-    // kotlin("jvm") projects don't automatically declare a maven publication
-    if (publications.none { it is MavenPublication }) {
-        check(javaComponent != null) // This seems to always be true so far
-        publications.register("maven", MavenPublication::class.java) {
-            groupId = project.group.toString()
-            if (artifactId != null) {
-                this.artifactId = artifactId.invoke(this.name)
+    if (!relocationDetails.artifactId.isPresent) {
+        val javaComponent = project.components.findByName("java")
+        if (javaComponent != null) {
+            project.java?.let {
+                it.withJavadocJar()
+                it.withSourcesJar()
             }
-            version = project.version.toString()
+        }
 
-            from(javaComponent)
+        // kotlin("jvm") projects don't automatically declare a maven publication
+        if (publications.none { it is MavenPublication }) {
+            check(javaComponent != null) // This seems to always be true so far
+            publications.register("maven", MavenPublication::class.java) {
+                groupId = project.group.toString()
+                if (artifactId != null) {
+                    this.artifactId = artifactId.invoke(this.name)
+                }
+                version = project.version.toString()
+
+                from(javaComponent)
+            }
+        }
+    } else {
+        publications.register("relocation", MavenPublication::class.java) {
+            pom {
+                distributionManagement {
+                    relocation {
+                        this.artifactId.set(relocationDetails.artifactId)
+                        this.message.set(relocationDetails.message)
+                    }
+                }
+            }
         }
     }
 
@@ -107,9 +118,11 @@ internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
     val project = this
 
     publishing {
+        prepareRepositories(project)
         addVarabyteArtifact(
             project,
             config.artifactId.orNull,
+            config.relocationDetails,
             config.description.orNull,
             config.site.orNull,
         )
