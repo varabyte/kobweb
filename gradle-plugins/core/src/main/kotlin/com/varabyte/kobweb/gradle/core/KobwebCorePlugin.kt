@@ -24,15 +24,16 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebCorePlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        val rootProject = project.rootProject
 
         // A `kobweb` block is not used directly here in the core plugin but is provided as a foundational building
         // block for both library and application plugins.
         val kobwebBlock = project.extensions.create<KobwebBlock>("kobweb")
         kobwebBlock.createYarnBlock()
 
-        project.rootProject.plugins.withType<YarnPlugin>().configureEach {
+        rootProject.plugins.withType<YarnPlugin>().configureEach {
             try {
-                project.rootProject.extensions.configure<YarnRootExtension> {
+                rootProject.extensions.configure<YarnRootExtension> {
                     val yarnBlock = kobwebBlock.yarn
                     yarnLockMismatchReport = when (yarnBlock.lockChangedStrategy.get()) {
                         is YarnLockChangedStrategy.Fail -> YarnLockMismatchReport.FAIL
