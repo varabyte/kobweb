@@ -4,8 +4,8 @@ kotlin = "1.9.10"
 
 [libraries]
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core" }
-kobweb-silk-core = { module = "com.varabyte.kobweb:kobweb-silk" }
-kobweb-silk-icons-fa = { module = "com.varabyte.kobweb:kobweb-silk-icons-fa" }
+kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk" }
+silk-icons-fa = { module = "com.varabyte.kobweb:silk-icons-fa" }
 
 [plugins]
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }

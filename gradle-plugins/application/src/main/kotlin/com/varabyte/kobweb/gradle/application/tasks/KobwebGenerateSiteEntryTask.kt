@@ -7,6 +7,7 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.KOBWEB_APP_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.project.app.AppData
+import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
@@ -58,7 +59,11 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
             createMainFunction(
                 appData,
                 libData,
-                project.hasTransitiveJsDependencyNamed("kobweb-silk"),
+                when {
+                    project.hasTransitiveJsDependencyNamed("kobweb-silk") -> SilkSupport.FULL
+                    project.hasTransitiveJsDependencyNamed("silk-foundation") -> SilkSupport.FOUNDATION
+                    else -> SilkSupport.NONE
+                },
                 kobwebBlock.app,
                 routePrefix,
                 buildTarget

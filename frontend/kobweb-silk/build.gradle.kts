@@ -22,8 +22,10 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                implementation(project(":frontend:kobweb-core"))
-                api(project(":frontend:kobweb-silk-widgets"))
+                api(project(":frontend:kobweb-core"))
+                api(project(":frontend:silk-foundation"))
+                api(project(":frontend:silk-widgets"))
+                api(project(":frontend:silk-widgets-kobweb"))
             }
         }
     }
@@ -31,6 +33,6 @@ kotlin {
 
 kobwebPublication {
     artifactId.set("kobweb-silk")
-    description.set("A set of rich UI components built on top of Kobweb and inspired by the best parts of Compose and Chakra UI")
+    description.set("An artifact that includes all relevant Silk dependencies and glues them together.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

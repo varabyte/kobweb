@@ -888,12 +888,12 @@ val CustomStyle by ComponentStyle {
 ```
 
 Silk defines a bunch of light and dark colors for all of its widgets, and if you'd like to re-use any of them in your
-own widget, you can query them using `colorMode.toSilkPalette()`:
+own widget, you can query them using `colorMode.toPalette()`:
 
 ```kotlin
 val CustomStyle by ComponentStyle {
     base {
-        Modifier.color(colorMode.toSilkPalette().link.default)
+        Modifier.color(colorMode.toPalette().link.default)
     }
 }
 ```
@@ -1402,7 +1402,7 @@ styles.
 
 ### Font Awesome
 
-Kobweb provides the `kobweb-silk-icons-fa` artifact which you can use in your project if you want access to all the free
+Kobweb provides the `silk-icons-fa` artifact which you can use in your project if you want access to all the free
 Font Awesome (v6) icons.
 
 Using it is easy! Search the [Font Awesome gallery](https://fontawesome.com/search?o=r&m=free), choose an
@@ -2162,9 +2162,9 @@ which the following steps help you work around:
    [libraries]
    kobweb-api = { module = "com.varabyte.kobweb:kobweb-api", version.ref = "kobweb" }
    kobweb-core = { module = "com.varabyte.kobweb:kobweb-core ", version.ref = "kobweb" }
-   kobweb-silk-core = { module = "com.varabyte.kobweb:kobweb-silk", version.ref = "kobweb" }
-   kobweb-silk-icons-fa = { module = "com.varabyte.kobweb:kobweb-silk-icons-fa", version.ref = "kobweb" }
+   kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk", version.ref = "kobweb" }
    kobwebx-markdown = { module = "com.varabyte.kobwebx:kobwebx-markdown", version.ref = "kobweb" }
+   silk-icons-fa = { module = "com.varabyte.kobweb:silk-icons-fa", version.ref = "kobweb" }
 
    [plugins]
    jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }

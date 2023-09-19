@@ -3,10 +3,12 @@ package com.varabyte.kobweb.gradle.publish
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
+import javax.inject.Inject
 
 // In some cases, we aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
 // libraries, but they need to be defined in a multiplatform module because it does extra Compose-related
@@ -15,7 +17,12 @@ import org.gradle.kotlin.dsl.withType
 val FILTER_OUT_MULTIPLATFORM_PUBLICATIONS: (Task) -> Boolean =
     { task -> !task.name.startsWith("publishKotlinMultiplatformPublication") }
 
-abstract class KobwebPublicationConfig {
+abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactory) {
+    abstract class RelocationDetails {
+        abstract val artifactId: Property<String>
+        abstract val message: Property<String>
+    }
+
     /**
      * Provide an artifact ID given the name of the publication.
      *
@@ -31,6 +38,8 @@ abstract class KobwebPublicationConfig {
 
     /**
      * A human-readable description for this artifact.
+     *
+     * If this publication represents a relocation, this will be used for the relocation's message.
      */
     abstract val description: Property<String>
 
@@ -45,6 +54,21 @@ abstract class KobwebPublicationConfig {
      * The callback should return true to get published or false to get filtered out.
      */
     abstract val filter: Property<(Task) -> Boolean>
+
+    /**
+     * Set to non-null if this publication represents a relocation to another artifact.
+     *
+     * Relocations are useful if an artifact coordinate has changed, but you don't want projects using the old
+     * coordinate to fail to build. Relocations give the user a grace period during which they can migrate at their
+     * convenience.
+     *
+     * @see <a href="https://maven.apache.org/pom.html#relocation">Maven Relocation</a>
+     */
+    val relocationDetails: RelocationDetails = objects.newInstance(RelocationDetails::class.java)
+
+    fun relocationDetails(configure: RelocationDetails.() -> Unit) {
+        relocationDetails.configure()
+    }
 
     init {
         site.convention("https://github.com/varabyte/kobweb")
@@ -88,7 +112,7 @@ class KobwebPublishPlugin : Plugin<Project> {
             apply("org.gradle.signing")
         }
 
-        val config = project.extensions.create<KobwebPublicationConfig>("kobwebPublication")
+        val config = project.extensions.create<KobwebPublicationConfig>("kobwebPublication", project.objects)
         project.afterEvaluate {
             // Configure after evaluating to allow the user to set extension values first
             configurePublishing(config)
