@@ -299,26 +299,31 @@ If you don't want to keep a separate terminal window open beside your IDE window
 
 #### Terminal tool window
 
-Use the [IntelliJ terminal tool window](https://www.jetbrains.com/help/idea/terminal-emulator.html).
-
-You can run `kobweb` within it, and if you run into a compile error, the stack trace lines will get decorated with
+You can use the [IntelliJ terminal tool window](https://www.jetbrains.com/help/idea/terminal-emulator.html) to run
+`kobweb` within it. If you run into a compile error, the stack trace lines will get decorated with
 links, making it easy to navigate to the relevant source.
 
 #### Gradle commands
 
-Run gradle commands directly. `kobweb` itself delegates to Gradle, but nothing is stopping you from calling the commands
-yourself.
+`kobweb` itself delegates to Gradle, but nothing is stopping you from calling the commands yourself. You can create
+Gradle run configurations for each of the Kobweb commands.
 
-To start a Kobweb server, execute the `kobwebStart -t` command, and to stop it later, use the `kobwebStop` command. The
-`-t` argument (or, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
+> [!NOTE]
+> When you run a Kobweb CLI command that delegates to Gradle, it will log the Gradle command to the console. This is
+> how you can discover the Gradle commands discussed in this section.
 
-You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html), but in
-general, you should create two run configurations: one for `kobwebStart -t` and one for `kobwebStop`. To do this, start
-from [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
+* To start a Kobweb server, use the `kobwebStart -t` command.
+  * The `-t` argument (or, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
+* To stop a running Kobweb server, use the `kobwebStop` command.
+* To export a site, use<br>
+  `kobwebExport -PkobwebReuseServer=false -PkobwebEnv=DEV -PkobwebRunLayout=KOBWEB -PkobwebBuildTarget=RELEASE -PkobwebExportLayout=KOBWEB`
+  * If you want to export a static layout instead, change the last argument to<br>`-PkobwebExportLayout=STATIC`.
+* To run an exported site, use<br>
+  `kobwebStart -PkobwebEnv=PROD -PkobwebRunLayout=KOBWEB`
+  * If your site was exported using a static layout, change the last argument to<br>`-PkobwebRunLayout=STATIC`.
 
-*ASIDE: If you ever want to export your site via Gradle, it's a bit more complicated but the command is<br>
-`kobwebExport -PkobwebReuseServer=false -PkobwebEnv=DEV -PkobwebRunLayout=KOBWEB -PkobwebBuildTarget=RELEASE`. If you
-want to export a static layout, also add `-PkobwebExportLayout=STATIC`.*
+You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html). Or to just jump straight into how to create run
+configurations for any of the commands discussed above, read [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
 
 ## Running examples
 
