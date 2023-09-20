@@ -447,7 +447,7 @@ better than `site.com/blog/_2022/mypost`.
 Every page method provides access to its `PageContext` via the `rememberPageContext()` method.
 
 A page's context provides it access to a router, allowing you to navigate to other pages, as well as other dynamic
-information about the current page's URL (discussed in the following sections).
+information about the current page's URL (discussed in the next section).
 
 ```kotlin
 @Page
@@ -467,6 +467,17 @@ You can use the page context to check the values of any query parameters passed 
 So if you visit `site.com/posts?id=12345&mode=edit`, you can query those values like so:
 
 ```kotlin
+enum class Mode {
+    EDIT, VIEW;
+
+    companion object {
+        fun from(value: String) {
+           entries.find { it.name.equals(value, ignoreCase = true) }
+               ?: error("Unknown mode: $value")
+        }
+    }
+}
+
 @Page
 @Composable
 fun Posts() {
@@ -474,7 +485,7 @@ fun Posts() {
     // Here, I'm assuming these params are always present, but you can
     // use `get` instead of `getValue` to handle the nullable case.
     val postId = ctx.route.params.getValue("id").toInt()
-    val mode = EditMode.from(ctx.route.params.getValue("mode"))
+    val mode = Mode.from(ctx.route.params.getValue("mode"))
     /* ... */
 }
 ```
