@@ -208,10 +208,10 @@ fun WidgetsPage() {
                     "Circle" to { CircleIcon() },
                     "Indeterminate" to { IndeterminateIcon() },
                     "Minus" to { MinusIcon() },
+                    "Moon" to { MoonIcon() },
                     "Plus" to { PlusIcon() },
                     "Square" to { SquareIcon() },
-                    "MoonIcon" to { MoonIcon() },
-                    "SunIcon" to { SunIcon() },
+                    "Sun" to { SunIcon() },
                 )
 
                 Row(
