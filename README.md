@@ -74,18 +74,18 @@ Here's a demo where we create a Compose HTML project from scratch with Markdown 
 
 https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-aac0-88f8992145ef.mp4
 
-One of Kobweb's users, Stevdza-San, has created YouTube videos that demonstrate how to build projects using Kobweb.
-
-* [Building a static site](https://www.youtube.com/watch?v=F5B-CxJTKlg)
-  * This is a great starting place, and it's perfect for simple portfolio sites or SEO-friendly landing pages for your
-    software. It's easy to migrate from a static site to a full stack site later. (You can read more about
-    [Static vs. Fullstack sites ▼](#static-layout-vs-full-stack-sites) below.)
-  * This is a free video that accompanies his paid course, which [you can check out](https://stevdza-san.com/p/build-a-complete-website-with-kotlin-and-jetpack-compose)
-    if interested.
-* [Building a full stack multiplatform site](https://www.youtube.com/watch?v=zcrY0qayWF4)
-  * This demonstrates how to write both frontend and backend logic. It also demonstrates how you can write a separate
-    Android frontend that can also work with your server. (This video is still useful to watch even if you never intend
-    to have any other frontend besides web).
+> [!NOTE]
+> One of Kobweb's users, Stevdza-San, has created YouTube videos that demonstrate how to build projects using Kobweb.
+>
+> * [Building a static layout site](https://www.youtube.com/watch?v=F5B-CxJTKlg)
+>   * This is a great starting place, and it's perfect for simple portfolio sites or SEO-friendly landing pages for your
+>     software.
+> * [Building a full stack multiplatform site](https://www.youtube.com/watch?v=zcrY0qayWF4)
+>   * This demonstrates how to write both frontend and backend logic. It also demonstrates how you can write a separate
+>     Android frontend that can also work with your server. (This video is still useful to watch even if you never intend
+>     to have any other frontend besides web).
+> * It's easy to start with a static layout site and migrate to a full stack site later. (You can read more about
+>   [Static vs. Fullstack sites ▼](#static-layout-vs-full-stack-sites) below.)
 
 # Trying it out yourself
 
@@ -369,7 +369,8 @@ fun SettingsPage() {
 
 this will create a page that I can then visit by going to `mysite.com/admin/settings`.
 
-**Note:** The last part of a URL, here `settings`, is called a *slug*.
+> [!IMPORTANT]
+> The last part of a URL, here `settings`, is called a *slug*.
 
 By default, the slug comes from the file name, but this behavior can be overridden (more on that shortly).
 
@@ -416,11 +417,11 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 | `@Page("/")`            | `example.com/slug`              |
 | `@Page("/other")`       | `example.com/other`             |
 
-⚠️ We close this section with a warning - despite the flexibility allowed here, you should not be using this feature
-frequently, if at all. A Kobweb project benefits from the fact that a user can easily associate a URL on your site with
-a file in your codebase, but this feature allows you to break those assumptions. It is mainly provided to enable
-dynamic routing (see the section below) or enabling a URL name that uses characters which aren't allowed in Kotlin
-filenames.
+> [!WARNING]
+> Despite the flexibility allowed here, you should not be using this feature frequently, if at all. A Kobweb project
+> benefits from the fact that a user can easily associate a URL on your site with a file in your codebase, but this
+> feature allows you to break those assumptions. It is mainly provided to enable dynamic routing (see the *Dynamic
+> Routes* section below) or enabling a URL name that uses characters which aren't allowed in Kotlin filenames.
 
 ### PackageMapping
 
@@ -553,10 +554,11 @@ fun PostPage() {
 }
 ```
 
-**Note:** You should avoid creating URL paths where the dynamic path and the query parameters have the same name, as in
-`mysite.com/posts/{post}?post=...`, as this could be really tricky to debug in a complex project. If there is a
-conflict, then the dynamic route parameters will take precedence. (You can still access the query parameter value via
-`ctx.route.queryParams` in this case if necessary.)
+> [!IMPORTANT]
+> You should avoid creating URL paths where the dynamic path and the query parameters have the same name, as in
+> `mysite.com/posts/{post}?post=...`, as this could be really tricky to debug in a complex project. If there is a
+> conflict, then the dynamic route parameters will take precedence. (You can still access the query parameter value via
+> `ctx.route.queryParams` in this case if necessary.)
 
 ## Silk
 
@@ -929,8 +931,9 @@ val HighlightedCustomVariant by CustomStyle.addVariant {
 }
 ```
 
-*Note: A common naming convention for variants is to take their associated style and use its name as a suffix plus the
-word "Variant", e.g. "ButtonStyle" -> "GhostButtonVariant" and "TextStyle" -> "OutlinedTextVariant".*
+> [!NOTE]
+> A common naming convention for variants is to take their associated style and use its name as a suffix plus the word
+> "Variant", e.g. "ButtonStyle" -> "GhostButtonVariant" and "TextStyle" -> "OutlinedTextVariant".
 
 Variants can be particularly useful if you're defining a custom widget that has default styles, but you want to give
 callers an easy way to deviate from it in special cases.
@@ -953,8 +956,9 @@ both styles will be applied -- the base style followed by the variant style.
 For example, `MyButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first followed by additional
 outline styling.
 
-***Note:** Using a variant that was created from a different style will have no effect. In other words,
-`LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.*
+> [!IMPORTANT]
+> Using a variant that was created from a different style will have no effect. In other words,
+> `LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.
 
 ##### `ComponentVariant.addVariantBase`
 
@@ -1184,7 +1188,8 @@ Div {
 Kobweb supports CSS variables (also called CSS custom properties), which is a feature where you can store and retrieve
 property values from variables declared within your CSS styles. It does this through a class called `StyleVariable`.
 
-***Note:** You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).*
+> [!NOTE]
+> You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).
 
 Using variables is fairly simple. You first declare one without a value (but lock it down to a type) and later you can
 initialize it within a style using `Modifier.setVariable(...)`:
@@ -1234,9 +1239,11 @@ val DialogStyle300 by ComponentStyle {
   base { Modifier.setVariable(dialogWidth, 300.px).width(dialogWidth.value(400.px)) }
 }
 ```
-***NOTE:** In the above example, we have one line where we set a variable and query it in the same style, which we did
-purely for demonstration purposes. In practice, you would probably never do this -- the variable should have been set
-separately earlier.*
+
+> [!IMPORTANT]
+> In the above example, we have one line where we set a variable and query it in the same style, which we did purely for
+> demonstration purposes. In practice, you would probably never do this -- the variable should have been set separately
+> earlier.
 
 To demonstrate these concepts all together, below we declare a background color variable, create a root container scope
 which sets it, a child style that uses it, and, finally, a child style variant that overrides it:
@@ -1557,9 +1564,10 @@ as the logic that runs on the backend (i.e. on a server somewhere). This custom 
 like a static web hosting service does) plus it should also define endpoints providing unique functionality tailored to
 your site's needs.
 
-***Note:** Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume.
-It was designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
-layout, to emphasize how tightly coupled it is to a Kobweb server.*
+> [!IMPORTANT]
+> Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
+> designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
+> layout, to emphasize how tightly coupled it is to a Kobweb server.
 
 When Kobweb was first written, it only provided the full stack solution, as being able to write your own server logic
 enabled a maximum amount of power and flexibility. The mental model for using Kobweb during this early time was simple
@@ -1643,9 +1651,10 @@ kotlin {
 }
 ```
 
-***NOTE:** `configAsKobwebApplication(includeServer = true)` declares and sets up both `js()` and `jvm()`
-[Kotlin Multiplatform targets](https://kotlinlang.org/docs/multiplatform-set-up-targets.html) for you. If you don't set
-`includeServer = true` explicitly, only the JS target will be declared.*
+> [!IMPORTANT]
+> `configAsKobwebApplication(includeServer = true)` declares and sets up both `js()` and `jvm()`
+> [Kotlin Multiplatform targets](https://kotlinlang.org/docs/multiplatform-set-up-targets.html) for you. If you don't
+> set `includeServer = true` explicitly, only the JS target will be declared.*
 
 The easy way to check if everything is set up correctly is to open your project inside IntelliJ IDEA, wait for it to
 finish indexing, and check that the `jvmMain` folder is detected as a module (if so, it will be given a special icon
@@ -1767,8 +1776,9 @@ fun ApiStreamDemoPage() {
 After running your project, you can click on the button and check the console logs. If everything is working properly,
 you should see "Echoed: hello!" for each time you pressed the button.
 
-***NOTE:** The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
-reference that project for a more realistic example.*
+> [!NOTE]
+> The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
+> reference that project for a more realistic example.
 
 ##### API stream conveniences
 
@@ -1857,8 +1867,9 @@ routes are generally safe to use, so use them often. However, if you have a situ
 events in real-time, especially situations where you want your client to be continuously directed what to do by the
 server via events, API streams are a great choice.
 
-***NOTE:** You can also search online about REST vs WebSockets, as these are the technologies that API routes and API
-streams are implemented with. Any discussions about them should apply here as well.*
+> [!NOTE]
+> You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
+> implemented with. Any discussions about them should apply here as well.
 
 ### Markdown
 
@@ -1905,8 +1916,9 @@ fun AuthorWidget() {
 }
 ```
 
-***Note:** If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
-`com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`*.
+> [!IMPORTANT]
+> If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
+> `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`.
 
 ##### Root
 
@@ -1978,8 +1990,9 @@ Occasionally, you may want to insert a smaller widget into the flow of a single 
 Press ${.components.widgets.ColorButton} to toggle the site's current color.
 ```
 
-**Warning:** Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole
-thing and leaves it as text.
+> [!IMPORTANT]
+> Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
+> it as text.
 
 #### Imports
 
@@ -2354,10 +2367,11 @@ main way users could affect the server's behavior.
 That said, there will always be some use-cases that Kobweb won't anticipate. So as an escape hatch, Kobweb allows users
 who know what they're doing to write their own plugins to extend the server.
 
-***NOTE:** The Kobweb Server plugin feature is still fairly new. If you use it, please consider
-[filing issues](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
-for any missing features and [connecting with us▼](#connecting-with-us) to share any feedback you have about your
-experience.*
+> [!NOTE]
+> The Kobweb Server plugin feature is still fairly new. If you use it, please consider
+> [filing issues](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
+> for any missing features and [connecting with us▼](#connecting-with-us) to share any feedback you have about your
+> experience.
 
 Creating a Kobweb server plugin is relatively straightforward. You'll need to:
 
@@ -2541,10 +2555,11 @@ for that case.
 The easiest way to use a custom font is if it is already hosted for you. For example, Google Fonts provides a CDN that
 you can use to load fonts from directly.
 
-***NOTE:** While this is the easiest approach, be sure you won't run into compliance issues! If you use Google Fonts on
-your site, you may technically be in violation of the GDPR in Europe, because an EU citizen's IP address is communicated
-to Google and logged. You may wish to find a Europe-safe host instead, or self-host, which you can read about
-in [the next section ▼](#self-hosted-fonts)*.
+> [!NOTE]
+> While this is the easiest approach, be sure you won't run into compliance issues! If you use Google Fonts on your
+> site, you may technically be in violation of the GDPR in Europe, because an EU citizen's IP address is communicated to
+> Google and logged. You may wish to find a Europe-safe host instead, or self-host, which you can read about
+> in [the next section ▼](#self-hosted-fonts).
 
 The font service should give you HTML to add to your site's `<head>` tag. For example, Google Fonts suggests the
 following when I select Roboto Regular 400:
@@ -2618,9 +2633,10 @@ where `faces.css` contains all your `@font-face` rule definitions (we just have 
 }
 ```
 
-***NOTE:** The above layout may be slightly overkill if you are sure you'll only ever have a single font, but it's
-flexible enough to support additional fonts if you decide to add more in the future, which is why we recommend it as
-general advice here.*
+> [!NOTE]
+> The above layout may be slightly overkill if you are sure you'll only ever have a single font, but it's flexible
+> enough to support additional fonts if you decide to add more in the future, which is why we recommend it as general
+> advice here.
 
 Now, you need to reference this CSS file from your `build.gradle.kts` script:
 
