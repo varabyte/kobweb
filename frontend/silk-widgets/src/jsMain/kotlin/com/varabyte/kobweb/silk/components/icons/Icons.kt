@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.icons
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.Circle
+import com.varabyte.kobweb.compose.dom.Group
 import com.varabyte.kobweb.compose.dom.Line
 import com.varabyte.kobweb.compose.dom.Path
 import com.varabyte.kobweb.compose.dom.Polyline
@@ -50,36 +51,68 @@ fun CheckIcon() {
 @Composable
 fun ChevronDownIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
-        Path(attrs = {
-            attr("d", "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z")
-        })
+        Path {
+            d {
+                moveTo(16.59, 8.59)
+                lineTo(12, 13.17)
+                lineTo(7.41, 8.59)
+                lineTo(6, 10)
+                lineTo(6, 6, true)
+                lineTo(6, -6, true)
+                closePath()
+            }
+        }
     }
 }
 
 @Composable
 fun ChevronLeftIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
-        Path(attrs = {
-            attr("d", "M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z")
-        })
+        Path {
+            d {
+                moveTo(15.41, 7.41)
+                lineTo(14, 6)
+                lineTo(-6, 6, true)
+                lineTo(6, 6, true)
+                lineTo(1.41, -1.41, true)
+                lineTo(10.83, 12)
+                closePath()
+            }
+        }
     }
 }
 
 @Composable
 fun ChevronRightIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
-        Path(attrs = {
-            attr("d", "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z")
-        })
+        Path {
+            d {
+                moveTo(10, 6)
+                lineTo(8.59, 7.41)
+                lineTo(13.17, 12)
+                lineTo(-4.58, 4.59, true)
+                lineTo(10, 18)
+                lineTo(6, -6, true)
+                closePath()
+            }
+        }
     }
 }
 
 @Composable
 fun ChevronUpIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
-        Path(attrs = {
-            attr("d", "M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z")
-        })
+        Path {
+            d {
+                moveTo(12, 8)
+                lineTo(-6, 6, true)
+                lineTo(1.41, 1.41, true)
+                lineTo(12, 10.83)
+                lineTo(4.59, 4.58, true)
+                lineTo(18, 14)
+                closePath()
+            }
+        }
     }
 }
 
@@ -138,6 +171,85 @@ fun SquareIcon() {
             width(16)
             height(16)
             rx(2)
+        }
+    }
+}
+
+@Composable
+fun MoonIcon() {
+    createIcon(viewBox = "0 0 200 200", strokeWidth = 20) {
+        Path {
+            d {
+                moveTo(175, 106.583)
+                ellipticalArc(75, 75, 0, 1, 1, 93.417, 25)
+                ellipticalArc(58.333, 58.333, 0, 0, 0, 175, 106.583)
+                closePath()
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SunIcon() {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
+        Group(attrs = {
+            attr("stroke-linejoin", "round")
+            attr("stroke-linecap", "round")
+        }) {
+            Circle {
+                cx(12)
+                cy(12)
+                r(5)
+            }
+            Path {
+                d {
+                    moveTo(12, 1)
+                    verticalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(12, 21)
+                    verticalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(4.22, 4.22)
+                    lineTo(1.42, 1.42, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(18.36, 18.36)
+                    lineTo(1.42, 1.42, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(1, 12)
+                    horizontalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(21, 12)
+                    horizontalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(4.22, 19.78)
+                    lineTo(1.42, -1.42, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(18.36, 5.64)
+                    lineTo(1.42, -1.42, true)
+                }
+            }
         }
     }
 }
