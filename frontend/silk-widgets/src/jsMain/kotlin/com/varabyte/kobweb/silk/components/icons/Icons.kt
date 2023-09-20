@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.icons
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.Circle
+import com.varabyte.kobweb.compose.dom.Group
 import com.varabyte.kobweb.compose.dom.Line
 import com.varabyte.kobweb.compose.dom.Path
 import com.varabyte.kobweb.compose.dom.Polyline
@@ -175,22 +176,7 @@ fun SquareIcon() {
 }
 
 @Composable
-fun Staircase() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
-        Path {
-            d {
-                moveTo(2, 2)
-                horizontalLineTo(10, true)
-                verticalLineTo(10, true)
-                horizontalLineTo(10, true)
-                verticalLineTo(10, true)
-            }
-        }
-    }
-}
-
-@Composable
-fun Moon() {
+fun MoonIcon() {
     createIcon(viewBox = "0 0 200 200", strokeWidth = 20) {
         Path {
             d {
@@ -205,18 +191,64 @@ fun Moon() {
 
 
 @Composable
-fun Fire() {
+fun SunIcon() {
     createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
-        Path {
-            d {
-                moveTo(11, 3)
-                ellipticalArc(12.27, 12.27, 0, 0, 1, 7, 11, true)
-                curveTo(0, 5, -3, 7, 0-6, 7, true)
-                smoothCurveTo(-8, -1, -8, -7, true)
-                curveTo(0, -3, 3, -6, 3, -6, true)
-                smoothCurveTo(0.45, 2.92, 2, 4, true)
-                curveTo(11, 10.67, 12, 8, 11, 3)
-                closePath()
+        Group(attrs = {
+            attr("stroke-linejoin", "round")
+            attr("stroke-linecap", "round")
+        }) {
+            Circle {
+                cx(12)
+                cy(12)
+                r(5)
+            }
+            Path {
+                d {
+                    moveTo(12, 1)
+                    verticalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(12, 21)
+                    verticalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(4.22, 4.22)
+                    lineTo(1.42, 1.42, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(18.36, 18.36)
+                    lineTo(1.42, 1.42, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(1, 12)
+                    horizontalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(21, 12)
+                    horizontalLineTo(2, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(4.22, 19.78)
+                    lineTo(1.42, -1.42, true)
+                }
+            }
+            Path {
+                d {
+                    moveTo(18.36, 5.64)
+                    lineTo(1.42, -1.42, true)
+                }
             }
         }
     }

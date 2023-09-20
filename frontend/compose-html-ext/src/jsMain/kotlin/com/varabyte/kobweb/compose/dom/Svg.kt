@@ -156,7 +156,7 @@ fun ElementScope<SVGElement>.Group(
     attrs: AttrBuilderContext<SVGGElement>? = null,
     content: ContentBuilder<SVGGElement>
 ) {
-    GenericTag("group", "http://www.w3.org/2000/svg", attrs, content)
+    GenericTag("g", "http://www.w3.org/2000/svg", attrs, content)
 }
 
 
@@ -214,38 +214,38 @@ class PathDataScope internal constructor() {
     }
 
     fun lineTo(x: Number, y: Number, isRelative: Boolean = false) {
-        val isRelativeCommandOrNot: String = if (isRelative) "l" else "L"
-        pathCommands.add("$isRelativeCommandOrNot $x $y")
+        val command = if (isRelative) "l" else "L"
+        pathCommands.add("$command $x $y")
     }
 
     fun verticalLineTo(x: Number, isRelative: Boolean = false) {
-        val isRelativeCommandOrNot: String = if (isRelative) "v" else "V"
-        pathCommands.add("$isRelativeCommandOrNot $x")
+        val command = if (isRelative) "v" else "V"
+        pathCommands.add("$command $x")
     }
 
     fun horizontalLineTo(x: Number, isRelative: Boolean = false) {
-        val isRelativeCommandOrNot: String = if (isRelative) "h" else "H"
-        pathCommands.add("$isRelativeCommandOrNot $x")
+        val command = if (isRelative) "h" else "H"
+        pathCommands.add("$command $x")
     }
 
     fun curveTo(a1: Number, a2: Number, b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
-        val isRelativeCommandOrNot: String = if (isRelative) "c" else "C"
-        pathCommands.add("$isRelativeCommandOrNot $a1 $a2 $b1 $b2 $x $y")
+        val command = if (isRelative) "c" else "C"
+        pathCommands.add("$command $a1 $a2 $b1 $b2 $x $y")
     }
 
     fun smoothCurveTo(b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
-        val isRelativeCommandOrNot: String = if (isRelative) "s" else "S"
-        pathCommands.add("$isRelativeCommandOrNot $b1 $b2 $x $y")
+        val command = if (isRelative) "s" else "S"
+        pathCommands.add("$command $b1 $b2 $x $y")
     }
 
     fun quadraticBezierCurve(a1: Number, a2: Number, x: Number, y: Number, isRelative: Boolean) {
-        val isRelativeCommandOrNot: String = if (isRelative) "q" else "Q"
-        pathCommands.add("$isRelativeCommandOrNot $a1 $a2 $x $y")
+        val command = if (isRelative) "q" else "Q"
+        pathCommands.add("$command $a1 $a2 $x $y")
     }
 
     fun smoothQuadraticBezierCurve(x: Number, y: Number, isRelative: Boolean) {
-        val isRelativeCommandOrNot: String = if (isRelative) "t" else "T"
-        pathCommands.add("$isRelativeCommandOrNot $x $y")
+        val command = if (isRelative) "t" else "T"
+        pathCommands.add("$command $x $y")
     }
 
     fun ellipticalArc(
@@ -258,8 +258,8 @@ class PathDataScope internal constructor() {
         y: Number,
         isRelative: Boolean = false
     ) {
-        val isRelativeCommandOrNot: String = if (isRelative) "a" else "A"
-        pathCommands.add("$isRelativeCommandOrNot $rx $ry $rotate $largeArcFlag $sweepFlag $x $y")
+        val command = if (isRelative) "a" else "A"
+        pathCommands.add("$command $rx $ry $rotate $largeArcFlag $sweepFlag $x $y")
     }
 
     fun closePath() {
@@ -288,8 +288,8 @@ class SVGPathScope internal constructor(private val attrs: AttrsScope<SVGPathEle
  *         lineTo(12, 13.17)
  *         lineTo(7.41, 8.59)
  *         lineTo(6, 10)
- *         lineTo(6, 6, true)
- *         lineTo(6, -6, true)
+ *         lineTo(6, 6, isRelative = true)
+ *         lineTo(6, -6, isRelative = true)
  *         closePath()
  *     }
  *  }
