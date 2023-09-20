@@ -29,7 +29,6 @@ fun Project.setupKspJs(target: JsTarget, includeAppData: Boolean) {
         if (includeAppData) {
             kspExtension.arg(KSP_APP_DATA_KEY, "true")
         }
-        dependsOn(kspCommonMainKotlinMetadata)
     }
 }
 
@@ -43,15 +42,11 @@ fun Project.setupKspJvm(target: JvmTarget) {
             KSP_API_PACKAGE_KEY,
             PackageUtils.resolvePackageShortcut(this.project.group.toString(), kobwebBlock.apiPackage.get()),
         )
-        dependsOn(kspCommonMainKotlinMetadata)
     }
 }
 
 private val Project.kspExtension: KspExtension
     get() = extensions.getByType<KspExtension>()
-
-private val Project.kspCommonMainKotlinMetadata
-    get() = tasks.matching { it.name == "kspCommonMainKotlinMetadata" } // doesn't exist if js only
 
 private fun Project.addKspDependency(target: TargetPlatform<*>) {
     val configurationName = "ksp${target.capitalizedName}"
