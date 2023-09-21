@@ -16,7 +16,5 @@ fun prepareSilkFoundation(initSilk: (InitSilkContext) -> Unit = {}, content: @Co
 
     Style(KobwebComposeStyleSheet)
     Style(SilkStyleSheet)
-    renderWithDeferred {
-        content()
-    }
+    content()
 }

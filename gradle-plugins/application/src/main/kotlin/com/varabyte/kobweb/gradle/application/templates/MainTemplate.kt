@@ -67,6 +67,9 @@ fun createMainFunction(
         if (frontendData.keyframesList.isNotEmpty()) {
             add("$KOBWEB_GROUP.silk.components.animation.registerKeyframes")
         }
+        if (usingSilkFoundation) {
+            add("$KOBWEB_GROUP.silk.defer.renderWithDeferred")
+        }
     }.sorted().forEach { import ->
         fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.'))
     }
@@ -234,7 +237,11 @@ fun createMainFunction(
                     withIndent {
                         addStatement("$appFqn {")
                         withIndent {
-                            addStatement("router.renderActivePage()")
+                            if (usingSilkFoundation) {
+                                addStatement("router.renderActivePage { renderWithDeferred { it() } }")
+                            } else {
+                                addStatement("router.renderActivePage()")
+                            }
                         }
                         addStatement("}")
                     }
