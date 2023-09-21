@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.application.util
 
+import com.varabyte.kobweb.common.text.suffixIfNot
 import com.varabyte.kobweb.gradle.core.util.suggestKobwebProjectName
 import org.gradle.api.Action
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
@@ -20,7 +21,7 @@ fun KotlinJsTargetDsl.kobwebApplicationBrowser(kobwebName: String? = null) {
     this.moduleName = kobwebName
     browser {
         commonWebpackConfig(Action {
-            outputFileName = kobwebName.addSuffix(".js")
+            outputFileName = kobwebName.suffixIfNot(".js")
         })
     }
     binaries.executable()

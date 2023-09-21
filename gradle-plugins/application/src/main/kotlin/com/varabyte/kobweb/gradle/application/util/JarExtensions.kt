@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.application.util
 
+import com.varabyte.kobweb.common.text.suffixIfNot
 import com.varabyte.kobweb.gradle.core.KOBWEB_METADATA_SUBFOLDER
 import com.varabyte.kobweb.gradle.core.util.suggestKobwebProjectName
 import org.gradle.api.file.DuplicatesStrategy
@@ -19,7 +20,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
  * relevant entries.
  */
 fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
-    val archiveFileName = (kobwebName ?: project.suggestKobwebProjectName()).addSuffix(".jar")
+    val archiveFileName = (kobwebName ?: project.suggestKobwebProjectName()).suffixIfNot(".jar")
     val jvmTargetName = name
     project.tasks.named("${jvmTargetName}Jar", Jar::class.java).configure {
         this.archiveFileName.set(archiveFileName)
