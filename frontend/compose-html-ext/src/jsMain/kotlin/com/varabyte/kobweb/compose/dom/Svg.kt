@@ -236,19 +236,19 @@ class PathDataScope internal constructor() {
         pathCommands.add("$command $x")
     }
 
-    fun curveTo(a1: Number, a2: Number, b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
+    fun curveTo(x1: Number, y1: Number, x2: Number, y2: Number, x: Number, y: Number, isRelative: Boolean = false) {
         val command = if (isRelative) "c" else "C"
-        pathCommands.add("$command $a1 $a2 $b1 $b2 $x $y")
+        pathCommands.add("$command $x1 $y1 $x2 $y2 $x $y")
     }
 
-    fun smoothCurveTo(b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
+    fun smoothCurveTo(x2: Number, y2: Number, x: Number, y: Number, isRelative: Boolean = false) {
         val command = if (isRelative) "s" else "S"
-        pathCommands.add("$command $b1 $b2 $x $y")
+        pathCommands.add("$command $x2 $y2 $x $y")
     }
 
-    fun quadraticBezierCurve(a1: Number, a2: Number, x: Number, y: Number, isRelative: Boolean) {
+    fun quadraticBezierCurve(x1: Number, y1: Number, x: Number, y: Number, isRelative: Boolean) {
         val command = if (isRelative) "q" else "Q"
-        pathCommands.add("$command $a1 $a2 $x $y")
+        pathCommands.add("$command $x1 $y1 $x $y")
     }
 
     fun smoothQuadraticBezierCurve(x: Number, y: Number, isRelative: Boolean) {
