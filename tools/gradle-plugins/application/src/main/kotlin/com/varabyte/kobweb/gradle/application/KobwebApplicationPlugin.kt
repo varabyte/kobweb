@@ -3,6 +3,8 @@ package com.varabyte.kobweb.gradle.application
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
+import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
+import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
@@ -23,8 +25,6 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
-import com.varabyte.kobweb.gradle.core.ksp.kspBackendFile
-import com.varabyte.kobweb.gradle.core.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
@@ -45,7 +45,6 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -223,7 +222,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 .register<KobwebGenerateSiteEntryTask>("kobwebGenSiteEntry", kobwebConf, kobwebBlock, buildTarget)
 
             kobwebGenSiteEntryTask.configure {
-                kspGenFile = project.kspFrontendFile(jsTarget)
+                kspGenFile.set(project.kspFrontendFile(jsTarget))
             }
 
             val jsRunTasks = listOf(
@@ -269,7 +268,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebExportTask.configure {
-                appFrontendMetadataFile = project.kspFrontendFile(jsTarget)
+                appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
                 // before outputting them into a final prod folder.
                 check(env == ServerEnvironment.DEV)
@@ -298,7 +297,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock)
 
             kobwebGenApisFactoryTask.configure {
-                kspGenFile = project.kspBackendFile(jvmTarget)!! // exists when jvm target exists
+                kspGenFile.set(project.kspBackendFile(jvmTarget))
             }
 
             project.kotlin.sourceSets.matching { it.name == jvmTarget.kspSourceSet }.configureEach {
