@@ -10,6 +10,7 @@ import com.varabyte.kobweb.api.stream.Stream
 import com.varabyte.kobweb.api.stream.StreamClientId
 import com.varabyte.kobweb.api.stream.StreamEvent
 import com.varabyte.kobweb.common.error.KobwebException
+import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
@@ -20,6 +21,7 @@ import com.varabyte.kobweb.streams.StreamMessage
 import com.varabyte.kobweb.streams.StreamMessage.Payload
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -516,7 +518,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
 
         resourcesRoot.toFile().let { resourcesRootFile ->
             resourcesRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
-                get("$routePrefix/${file.relativeTo(resourcesRootFile)}") {
+                get("$routePrefix/${file.relativeTo(resourcesRootFile).toUnixSeparators()}") {
                     call.respondFile(file)
                 }
             }
@@ -525,14 +527,10 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
             pagesRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
                 val relativeFile = file.relativeTo(pagesRootFile)
                 val name = relativeFile.nameWithoutExtension
-                if (name != "index") {
-                    get("$routePrefix/${relativeFile.parent}/$name") {
-                        call.respondFile(file)
-                    }
-                } else {
-                    get("$routePrefix/${relativeFile.parent}") {
-                        call.respondFile(file)
-                    }
+                val parent = relativeFile.parent?.let { "${it.toUnixSeparators()}/" } ?: ""
+
+                get(if (name != "index") "$routePrefix/$parent$name" else "$routePrefix/$parent") {
+                    call.respondFile(file)
                 }
             }
         }
@@ -551,37 +549,9 @@ private fun Application.configureStaticRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
 
     routing {
-        siteRoot.toFile().let { siteRootFile ->
-            val routePrefix = conf.site.routePrefixNormalized
-
-            siteRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
-                val relativeFile = file.relativeTo(siteRootFile)
-                val name = relativeFile.name.removeSuffix(".html")
-                val parent = relativeFile.parent?.let { "$it/" } ?: ""
-                if (name != "index") {
-                    get("$routePrefix/$parent$name") {
-                        call.respondFile(file)
-                    }
-                } else {
-                    get("$routePrefix/$parent") {
-                        call.respondFile(file)
-                    }
-                }
-            }
-
-            // Anything not found is an error
-            val errorFile = siteRootFile.resolve("404.html")
-            if (errorFile.exists()) {
-                // Catch URLs of the form a/b/c/
-                get("{...}/") {
-                    call.respondFile(errorFile)
-                }
-
-                // Catch URLs of the form a/b/c/slug
-                get("{...}") {
-                    call.respondFile(errorFile)
-                }
-            }
+        staticFiles(conf.site.routePrefixNormalized, siteRoot.toFile()) {
+            extensions("html")
+            default("404.html")
         }
     }
 }
