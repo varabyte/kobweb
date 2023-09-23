@@ -36,8 +36,6 @@ abstract class SVGShapeElementScope(attrs: AttrsScope<SVGElement>) : SVGElementS
 
     fun fill(value: Color) {this.attr("fill", value.toString()) }
 
-    fun fill(value: String) {this.attr("fill", value) }
-
     fun fill(value: Gradient) {this.attr("fill", value.toString()) }
 }
 
@@ -82,11 +80,11 @@ class SVGCircleScope internal constructor(private val attrs: AttrsScope<SVGCircl
 
     fun r(value: Number) { attrs.attr("r", value.toString()) }
 
-    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.value.toString()) }
+    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.toString()) }
 
-    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.value.toString()) }
+    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.toString()) }
 
-    fun r(value: CSSLengthOrPercentageValue) { attrs.attr("r", value.value.toString()) }
+    fun r(value: CSSLengthOrPercentageValue) { attrs.attr("r", value.toString()) }
 }
 
 /**
@@ -124,13 +122,13 @@ class SVGCEllipseScope internal constructor(private val attrs: AttrsScope<SVGEll
 
     fun ry(value: Number) { attrs.attr("ry", value.toString()) }
 
-    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.value.toString()) }
+    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.toString()) }
 
-    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.value.toString()) }
+    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.toString()) }
 
-    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.value.toString()) }
+    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.toString()) }
 
-    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.value.toString()) }
+    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.toString()) }
 }
 
 
@@ -179,13 +177,13 @@ class SVGLineScope internal constructor(private val attrs: AttrsScope<SVGLineEle
 
     fun y2(value: Number) { attrs.attr("y2", value.toString()) }
 
-    fun x1(value: CSSLengthOrPercentageValue) { attrs.attr("x1", value.value.toString()) }
+    fun x1(value: CSSLengthOrPercentageValue) { attrs.attr("x1", value.toString()) }
 
-    fun x2(value: CSSLengthOrPercentageValue) { attrs.attr("x2", value.value.toString()) }
+    fun x2(value: CSSLengthOrPercentageValue) { attrs.attr("x2", value.toString()) }
 
-    fun y1(value: CSSLengthOrPercentageValue) { attrs.attr("y1", value.value.toString()) }
+    fun y1(value: CSSLengthOrPercentageValue) { attrs.attr("y1", value.toString()) }
 
-    fun y2(value: CSSLengthOrPercentageValue) { attrs.attr("y2", value.value.toString()) }
+    fun y2(value: CSSLengthOrPercentageValue) { attrs.attr("y2", value.toString()) }
 }
 
 /**
@@ -391,17 +389,17 @@ class SVGCRectScope internal constructor(private val attrs: AttrsScope<SVGRectEl
 
     fun ry(value: Number) { attrs.attr("ry", value.toString()) }
 
-    fun x(value: CSSLengthOrPercentageValue) { attrs.attr("x", value.value.toString()) }
+    fun x(value: CSSLengthOrPercentageValue) { attrs.attr("x", value.toString()) }
 
-    fun y(value: CSSLengthOrPercentageValue) { attrs.attr("y", value.value.toString()) }
+    fun y(value: CSSLengthOrPercentageValue) { attrs.attr("y", value.toString()) }
 
-    fun width(value: CSSLengthOrPercentageValue) { attrs.attr("width", value.value.toString()) }
+    fun width(value: CSSLengthOrPercentageValue) { attrs.attr("width", value.toString()) }
 
-    fun height(value: CSSLengthOrPercentageValue) { attrs.attr("height", value.value.toString()) }
+    fun height(value: CSSLengthOrPercentageValue) { attrs.attr("height", value.toString()) }
 
-    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.value.toString()) }
+    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.toString()) }
 
-    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.value.toString()) }
+    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.toString()) }
 }
 
 /**
@@ -470,8 +468,8 @@ class SVGTextScope internal constructor(private val attrs: AttrsScope<SVGTextEle
 
     fun dy(value: CSSLengthOrPercentageValue) { attrs.attr("dy", value.toString()) }
 
-    fun rotate(vararg angleDegree: Number) {
-        val value = angleDegree.joinToString(",") { it.toString() }
+    fun rotate(vararg angles: Number) {
+        val value = angles.joinToString(",") { it.toString() }
         attrs.attr("rotate", value)
     }
 
