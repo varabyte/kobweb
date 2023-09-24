@@ -1965,6 +1965,28 @@ fun KobwebPage() {
 }
 ```
 
+##### Route Override
+
+Kobweb Markdown front matter also supports a `routeOverride` key. If present, its value will be passed into the
+generated `@Page` annotation (see the [Route Override section ▲](#route-override) for valid values here).
+
+This allows you to give your URL a name that normal Kotlin filename rules don't allow for, such as a hyphen:
+
+`# AStarDemo.md`
+```markdown
+---
+routeOverride: a-star-demo
+---
+```
+
+The above will generate code like the following:
+
+```kotlin
+@Composable
+@Page("a-star-demo")
+fun AStarDemoPage() { /* ... */ }
+```
+
 #### Kobweb Call
 
 The power of Kotlin + Compose HTML is interactive components, not static text! Therefore, Kobweb Markdown support

@@ -97,7 +97,7 @@ class KotlinRenderer(
                 }
 
                 appendLine()
-                appendLine("@Page")
+                append("@Page"); frontMatterData?.routeOverride?.let { append("(\"$it\")") }; appendLine()
                 appendLine("@Composable")
                 appendLine("fun $funName() {")
             }
@@ -148,9 +148,15 @@ class KotlinRenderer(
     private class FrontMatterData(val raw: Map<String, List<String>>) {
         val root: String? get() = raw["root"]?.singleOrNull()
         val imports: List<String>? get() = raw["imports"]
+        val routeOverride: String? get() = raw["routeOverride"]?.singleOrNull()
 
         // Hide frontmatter data from the user that is meant to be consumed by the renderer
-        val user: Map<String, List<String>> get() = raw.filterKeys { it != "root" && it != "imports" }
+        val user: Map<String, List<String>>
+            get() = raw.filterKeys {
+                it != "root" &&
+                    it != "imports" &&
+                    it != "routeOverride"
+            }
     }
 
     /** Read data out of the front matter block (if present) */
