@@ -1967,7 +1967,7 @@ fun KobwebPage() {
 
 ##### Route Override
 
-Kobweb Markdown front matter also supports a `routeOverride` key. If present, its value will be passed into the
+Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the
 generated `@Page` annotation (see the [Route Override section ▲](#route-override) for valid values here).
 
 This allows you to give your URL a name that normal Kotlin filename rules don't allow for, such as a hyphen:
@@ -1986,6 +1986,35 @@ The above will generate code like the following:
 @Page("a-star-demo")
 fun AStarDemoPage() { /* ... */ }
 ```
+
+You can additionally override the algorithm used for converting ALL markdown files to their final name, by setting the
+markdown block's `routeOverride` callback:
+
+```kotlin
+kobweb {
+  markdown { //
+    // Given "Example.md", name will be "Example" and output will be "post_example"
+    routeOverride.set { name -> "post_${name.lowercase()}" }
+  }
+}
+```
+
+This callback will be triggered on all Markdown pages *except* `Index.md` files.
+
+Some common algorithms are provided which you can use instead of writing your own:
+
+```kotlin
+import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig.RouteOverride
+
+kobweb {
+  markdown {
+    routeOverride.set(RouteOverride.KebabCase) // e.g. "ExamplePage" to "example-page"
+  }
+}
+```
+
+If you specify both a global route override and a local route override in the front matter, the front matter setting
+will take precedence.
 
 #### Kobweb Call
 

@@ -120,6 +120,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     mdPathRel,
                     markdownHandlers,
                     mdPackage,
+                    markdownConfig.routeOverride.orNull,
                     funName,
                     LoggingReporter(project.logger),
                 )

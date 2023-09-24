@@ -61,6 +61,7 @@ class KotlinRenderer(
     private val filePath: String,
     private val handlers: MarkdownHandlers,
     private val pkg: String,
+    private val routeOverrideProvider: ((String) -> String)?,
     private val funName: String,
     private val reporter: Reporter,
 ) : Renderer {
@@ -97,7 +98,22 @@ class KotlinRenderer(
                 }
 
                 appendLine()
-                append("@Page"); frontMatterData?.routeOverride?.let { append("(\"$it\")") }; appendLine()
+
+                run {
+                    var routeOverride = frontMatterData?.routeOverride
+                    if (routeOverride == null) {
+                        val inputFileName = filePath.substringAfterLast('/').substringBeforeLast('.')
+                        val defaultRoute = inputFileName.lowercase()
+                        if (routeOverrideProvider != null && defaultRoute != "index") {
+                            routeOverride = routeOverrideProvider.invoke(inputFileName).takeIf { it != defaultRoute }
+                        }
+                    }
+
+                    append("@Page")
+                    if (routeOverride != null) append("(\"$routeOverride\")")
+                    appendLine()
+                }
+
                 appendLine("@Composable")
                 appendLine("fun $funName() {")
             }
