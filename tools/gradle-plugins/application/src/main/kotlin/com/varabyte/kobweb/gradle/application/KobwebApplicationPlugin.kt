@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.application
 
+import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
@@ -216,7 +217,7 @@ class KobwebApplicationPlugin @Inject constructor(
             val jsTarget = JsTarget(this)
             project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
 
-            project.setupKspJs(jsTarget, includeAppData = true)
+            project.setupKspJs(jsTarget, ProcessorMode.APP)
 
             val kobwebGenSiteEntryTask = project.tasks
                 .register<KobwebGenerateSiteEntryTask>("kobwebGenSiteEntry", kobwebConf, kobwebBlock, buildTarget)

@@ -15,8 +15,6 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
-import com.varabyte.kobweb.ksp.KSP_API_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.common.API_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
@@ -33,25 +31,23 @@ import com.varabyte.kobweb.project.backend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Suppress("MemberVisibilityCanBePrivate") // everything can be private but no point
 class BackendProcessor(
-    val codeGenerator: CodeGenerator,
-    val logger: KSPLogger,
-    options: Map<String, String>,
+    private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
+    private val genFile: String,
+    private val qualifiedApiPackage: String,
 ) : SymbolProcessor {
-    private val qualifiedApiPackage = options[KSP_API_PACKAGE_KEY] ?: error("Missing option $KSP_API_PACKAGE_KEY")
-
-    lateinit var initMethods: List<InitApiEntry>
-    lateinit var apiMethods: List<ApiEntry>
+    private lateinit var initMethods: List<InitApiEntry>
+    private lateinit var apiMethods: List<ApiEntry>
     private val apiStreams = mutableListOf<ApiStreamEntry>()
 
     // fqPkg to subdir, e.g. "api.id._as._int" to "int"
-    lateinit var packageMappings: Map<String, String>
+    private lateinit var packageMappings: Map<String, String>
 
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
     // will be skipped if the only change is deleted file(s) that we do not depend on.
-    val fileDependencies = mutableListOf<KSFile>()
+    private val fileDependencies = mutableListOf<KSFile>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         initMethods = resolver.getSymbolsWithAnnotation(INIT_API_FQN).map { annotatedFun ->
@@ -83,7 +79,7 @@ class BackendProcessor(
         return emptyList()
     }
 
-    inner class ApiVisitor : KSVisitorVoid() {
+    private inner class ApiVisitor : KSVisitorVoid() {
         @OptIn(KspExperimental::class)
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val type = property.type.toString()
@@ -146,7 +142,7 @@ class BackendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
-        val (path, extension) = KOBWEB_METADATA_BACKEND.split('.')
+        val (path, extension) = genFile.split('.')
         codeGenerator.createNewFileByPath(
             Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
             path = path,
