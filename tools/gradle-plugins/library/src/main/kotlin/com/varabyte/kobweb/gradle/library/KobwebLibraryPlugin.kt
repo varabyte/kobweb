@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.library
 
+import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.core.KobwebCorePlugin
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
@@ -24,7 +25,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
-            project.setupKspJs(jsTarget, includeAppData = false)
+            project.setupKspJs(jsTarget, ProcessorMode.LIBRARY)
         }
 
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {

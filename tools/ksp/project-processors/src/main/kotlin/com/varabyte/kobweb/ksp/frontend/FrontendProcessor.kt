@@ -15,10 +15,6 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
-import com.varabyte.kobweb.ksp.KSP_APP_DATA_KEY
-import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
-import com.varabyte.kobweb.ksp.common.APP_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
@@ -30,8 +26,6 @@ import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
-import com.varabyte.kobweb.project.frontend.AppData
-import com.varabyte.kobweb.project.frontend.AppEntry
 import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
 import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
@@ -43,27 +37,22 @@ import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Suppress("MemberVisibilityCanBePrivate") // everything can be private but no point
 class FrontendProcessor(
-    val codeGenerator: CodeGenerator,
-    val logger: KSPLogger,
-    options: Map<String, String>,
+    private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
+    private val genFile: String,
+    private val qualifiedPagesPackage: String,
 ) : SymbolProcessor {
-    val qualifiedPagesPackage = options[KSP_PAGES_PACKAGE_KEY] ?: error("Missing pages package")
-    val includeAppData = options[KSP_APP_DATA_KEY].toBoolean()
+    private lateinit var pages: List<PageEntry>
+    private lateinit var kobwebInits: List<InitKobwebEntry>
+    private lateinit var silkInits: List<InitSilkEntry>
 
-    var appFqn: String? = null
-
-    lateinit var pages: List<PageEntry>
-    lateinit var kobwebInits: List<InitKobwebEntry>
-    lateinit var silkInits: List<InitSilkEntry>
-
-    val silkStyles = mutableListOf<ComponentStyleEntry>()
-    val silkVariants = mutableListOf<ComponentVariantEntry>()
-    val keyframesList = mutableListOf<KeyframesEntry>()
+    private val silkStyles = mutableListOf<ComponentStyleEntry>()
+    private val silkVariants = mutableListOf<ComponentVariantEntry>()
+    private val keyframesList = mutableListOf<KeyframesEntry>()
 
     // fqPkg to subdir, e.g. "blog._2022._01" to "01"
-    val packageMappings = mutableMapOf<String, String>()
+    private val packageMappings = mutableMapOf<String, String>()
 
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
@@ -102,23 +91,10 @@ class FrontendProcessor(
             )?.also { fileDependencies.add(annotatedFun.containingFile!!) }
         }.toList()
 
-        if (includeAppData) {
-            val appFun = resolver.getSymbolsWithAnnotation(APP_FQN).toList()
-
-            if (appFun.size > 1) {
-                logger.error("At most one @App function is allowed per project.")
-            } else {
-                appFun.singleOrNull()?.let {
-                    fileDependencies.add(it.containingFile!!)
-                    appFqn = (it as KSFunctionDeclaration).qualifiedName?.asString()
-                }
-            }
-        }
-
         return emptyList()
     }
 
-    inner class FrontendVisitor : KSVisitorVoid() {
+    private inner class FrontendVisitor : KSVisitorVoid() {
         private val styleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
@@ -221,6 +197,17 @@ class FrontendProcessor(
     }
 
     override fun finish() {
+        val (path, extension) = genFile.split('.')
+        codeGenerator.createNewFileByPath(
+            Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
+            path = path,
+            extensionName = extension,
+        ).writer().use { writer ->
+            writer.write(Json.encodeToString(getData()))
+        }
+    }
+
+    fun getData(): FrontendData {
         // TODO: maybe this should be in the gradle plugin(s) itself to also account for library+site definitions?
         val finalRouteNames = pages.map { page -> page.route }.toSet()
         pages.forEach { page ->
@@ -243,19 +230,6 @@ class FrontendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
-        val encodedData = if (includeAppData) {
-            Json.encodeToString(AppData(appFqn?.let { AppEntry(it) }, frontendData))
-        } else {
-            Json.encodeToString(frontendData)
-        }
-
-        val (path, extension) = KOBWEB_METADATA_FRONTEND.split('.')
-        codeGenerator.createNewFileByPath(
-            Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
-            path = path,
-            extensionName = extension,
-        ).writer().use { writer ->
-            writer.write(encodedData)
-        }
+        return frontendData
     }
 }
