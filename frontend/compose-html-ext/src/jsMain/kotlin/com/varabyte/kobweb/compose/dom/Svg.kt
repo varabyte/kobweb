@@ -4,6 +4,8 @@
 package com.varabyte.kobweb.compose.dom
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.functions.Gradient
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
@@ -29,6 +31,12 @@ abstract class SVGElementScope(private val attrs: AttrsScope<SVGElement>) {
 
 abstract class SVGShapeElementScope(attrs: AttrsScope<SVGElement>) : SVGElementScope(attrs) {
     fun stroke(value: CSSColorValue) { this.attr("stroke", value.toString()) }
+
+    fun fill(value: CSSColorValue) {this.attr("fill", value.toString()) }
+
+    fun fill(value: Color) {this.attr("fill", value.toString()) }
+
+    fun fill(value: Gradient) {this.attr("fill", value.toString()) }
 }
 
 /**
@@ -72,11 +80,11 @@ class SVGCircleScope internal constructor(private val attrs: AttrsScope<SVGCircl
 
     fun r(value: Number) { attrs.attr("r", value.toString()) }
 
-    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.value.toString()) }
+    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.toString()) }
 
-    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.value.toString()) }
+    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.toString()) }
 
-    fun r(value: CSSLengthOrPercentageValue) { attrs.attr("r", value.value.toString()) }
+    fun r(value: CSSLengthOrPercentageValue) { attrs.attr("r", value.toString()) }
 }
 
 /**
@@ -114,13 +122,13 @@ class SVGCEllipseScope internal constructor(private val attrs: AttrsScope<SVGEll
 
     fun ry(value: Number) { attrs.attr("ry", value.toString()) }
 
-    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.value.toString()) }
+    fun cx(value: CSSLengthOrPercentageValue) { attrs.attr("cx", value.toString()) }
 
-    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.value.toString()) }
+    fun cy(value: CSSLengthOrPercentageValue) { attrs.attr("cy", value.toString()) }
 
-    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.value.toString()) }
+    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.toString()) }
 
-    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.value.toString()) }
+    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.toString()) }
 }
 
 
@@ -169,13 +177,13 @@ class SVGLineScope internal constructor(private val attrs: AttrsScope<SVGLineEle
 
     fun y2(value: Number) { attrs.attr("y2", value.toString()) }
 
-    fun x1(value: CSSLengthOrPercentageValue) { attrs.attr("x1", value.value.toString()) }
+    fun x1(value: CSSLengthOrPercentageValue) { attrs.attr("x1", value.toString()) }
 
-    fun x2(value: CSSLengthOrPercentageValue) { attrs.attr("x2", value.value.toString()) }
+    fun x2(value: CSSLengthOrPercentageValue) { attrs.attr("x2", value.toString()) }
 
-    fun y1(value: CSSLengthOrPercentageValue) { attrs.attr("y1", value.value.toString()) }
+    fun y1(value: CSSLengthOrPercentageValue) { attrs.attr("y1", value.toString()) }
 
-    fun y2(value: CSSLengthOrPercentageValue) { attrs.attr("y2", value.value.toString()) }
+    fun y2(value: CSSLengthOrPercentageValue) { attrs.attr("y2", value.toString()) }
 }
 
 /**
@@ -228,19 +236,19 @@ class PathDataScope internal constructor() {
         pathCommands.add("$command $x")
     }
 
-    fun curveTo(a1: Number, a2: Number, b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
+    fun curveTo(x1: Number, y1: Number, x2: Number, y2: Number, x: Number, y: Number, isRelative: Boolean = false) {
         val command = if (isRelative) "c" else "C"
-        pathCommands.add("$command $a1 $a2 $b1 $b2 $x $y")
+        pathCommands.add("$command $x1 $y1 $x2 $y2 $x $y")
     }
 
-    fun smoothCurveTo(b1: Number, b2: Number, x: Number, y: Number, isRelative: Boolean = false) {
+    fun smoothCurveTo(x2: Number, y2: Number, x: Number, y: Number, isRelative: Boolean = false) {
         val command = if (isRelative) "s" else "S"
-        pathCommands.add("$command $b1 $b2 $x $y")
+        pathCommands.add("$command $x2 $y2 $x $y")
     }
 
-    fun quadraticBezierCurve(a1: Number, a2: Number, x: Number, y: Number, isRelative: Boolean) {
+    fun quadraticBezierCurve(x1: Number, y1: Number, x: Number, y: Number, isRelative: Boolean) {
         val command = if (isRelative) "q" else "Q"
-        pathCommands.add("$command $a1 $a2 $x $y")
+        pathCommands.add("$command $x1 $y1 $x $y")
     }
 
     fun smoothQuadraticBezierCurve(x: Number, y: Number, isRelative: Boolean) {
@@ -381,17 +389,17 @@ class SVGCRectScope internal constructor(private val attrs: AttrsScope<SVGRectEl
 
     fun ry(value: Number) { attrs.attr("ry", value.toString()) }
 
-    fun x(value: CSSLengthOrPercentageValue) { attrs.attr("x", value.value.toString()) }
+    fun x(value: CSSLengthOrPercentageValue) { attrs.attr("x", value.toString()) }
 
-    fun y(value: CSSLengthOrPercentageValue) { attrs.attr("y", value.value.toString()) }
+    fun y(value: CSSLengthOrPercentageValue) { attrs.attr("y", value.toString()) }
 
-    fun width(value: CSSLengthOrPercentageValue) { attrs.attr("width", value.value.toString()) }
+    fun width(value: CSSLengthOrPercentageValue) { attrs.attr("width", value.toString()) }
 
-    fun height(value: CSSLengthOrPercentageValue) { attrs.attr("height", value.value.toString()) }
+    fun height(value: CSSLengthOrPercentageValue) { attrs.attr("height", value.toString()) }
 
-    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.value.toString()) }
+    fun rx(value: CSSLengthOrPercentageValue) { attrs.attr("rx", value.toString()) }
 
-    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.value.toString()) }
+    fun ry(value: CSSLengthOrPercentageValue) { attrs.attr("ry", value.toString()) }
 }
 
 /**
@@ -431,10 +439,96 @@ fun ElementScope<SVGElement>.Rect(scope: SVGCRectScope.() -> Unit) {
     })
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text
+
+enum class SvgTextLengthAdjust {
+    Spacing,
+    SpacingAndGlyphs;
+
+    override fun toString(): String {
+        // Reformat to value expected by SVG tag
+        return name.replaceFirstChar { it.lowercase() }
+    }
+}
+
+class SVGTextScope internal constructor(private val attrs: AttrsScope<SVGTextElement>) : SVGShapeElementScope(attrs) {
+
+    fun x(value: Number) { attrs.attr("x", value.toString()) }
+
+    fun x(value: CSSLengthOrPercentageValue) { attrs.attr("x", value.toString()) }
+
+    fun y(value: Number) { attrs.attr("y", value.toString()) }
+
+    fun y(value: CSSLengthOrPercentageValue) { attrs.attr("y", value.toString()) }
+
+    fun dx(value: Number) { attrs.attr("dx", value.toString()) }
+
+    fun dx(value: CSSLengthOrPercentageValue) { attrs.attr("dx", value.toString()) }
+
+    fun dy(value: Number) { attrs.attr("dy", value.toString()) }
+
+    fun dy(value: CSSLengthOrPercentageValue) { attrs.attr("dy", value.toString()) }
+
+    fun rotate(vararg angles: Number) {
+        val value = angles.joinToString(",") { it.toString() }
+        attrs.attr("rotate", value)
+    }
+
+    fun lengthAdjust(lengthAdjust: SvgTextLengthAdjust) { attrs.attr("lengthAdjust", lengthAdjust.toString()) }
+
+    fun letterSpacing(value: Number) { attrs.attr("letter-spacing", value.toString()) }
+
+    fun letterSpacing(value: CSSLengthOrPercentageValue) { attrs.attr("letter-spacing", value.toString()) }
+
+    fun wordSpacing(value: Number) { attrs.attr("word-spacing", value.toString()) }
+
+    fun wordSpacing(value: CSSLengthOrPercentageValue) { attrs.attr("word-spacing", value.toString()) }
+
+    fun textDecoration(value: TextDecorationLine) { attrs.attr("text-decoration", value.toString()) }
+
+    fun textLength(value: Number) { attrs.attr("textLength", value.toString()) }
+
+    fun textLength(value: CSSLengthOrPercentageValue) { attrs.attr("textLength", value.toString()) }
+
+    fun fontStyle(value: FontStyle) { attrs.attr("font-style", value.toString()) }
+
+    fun fontSize(value: Number) { attrs.attr("font-size", value.toString()) }
+
+    fun fontSize(value: FontSize) { attrs.attr("font-size", value.toString()) }
+
+    fun fontSize(value: CSSLengthOrPercentageValue) { attrs.attr("font-size", value.toString()) }
+
+    fun fontWeight(value: Number) { attrs.attr("font-weight", value.toString()) }
+
+    fun fontWeight(value: FontWeight) { attrs.attr("font-weight", value.toString()) }
+}
+
+/**
+ * Type-safe API for creating an [SVGTextElement].
+ *
+ * For example, to create a Text of value "Hello World":
+ *
+ * ```
+ * Svg {
+ *  Text("Hello World") {
+ *      x(20)
+ *      y(40)
+ *      fill(Color.blue)
+ *      rotate(0, 30)
+ *      fontSize(15)
+ *      fontWeight(FontWeight.SemiBold)
+ *      textDecoration(TextDecorationLine.Underline)
+ *  }
+ * }
+ * ```
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text">SVG Element Text (Mozilla Docs)</a>
+ */
 @Composable
-fun ElementScope<SVGElement>.Text(text: String, attrs: AttrBuilderContext<SVGTextElement>) {
-    GenericTag("text", "http://www.w3.org/2000/svg", attrs) {
+fun ElementScope<SVGElement>.Text(text: String, scope: SVGTextScope.() -> Unit) {
+    @Suppress("RemoveExplicitTypeArguments") // IDE wants to remove generic type but that causes a compile error
+    GenericTag<SVGTextElement>("text", "http://www.w3.org/2000/svg", attrs = {
+        SVGTextScope(this).scope()
+    }) {
         Text(text)
     }
 }
