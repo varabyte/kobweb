@@ -5,24 +5,22 @@ import org.commonmark.parser.Parser
 import org.commonmark.parser.Parser.ParserExtension
 
 /**
- * An extension point for adding {inlinecall} and {{{ blockcall }}} support for typing in raw code snippets into
+ * An extension point for adding ${inlinecall} and {{{ blockcall }}} support for typing in raw code snippets into
  * Markdown.
  *
  * When these items are encountered, they will instruct Markdown to insert the code directly into the final Kotlin file.
  *
- * For example, `Hello {Fancy("World")}, welcome to Kobweb!`
+ * For example, `Hello ${Fancy("World")}, welcome to Kobweb!`
  *
  * will render
  *
  * ```
- * Row {
+ * P {
  *   Text("Hello ")
  *   Fancy("World")
  *   Text(", welcome to Kobweb!")
  * }
  * ```
- *
- * **NOTE** The following feature is not complete yet. TODO(Bug #42): Support multi-line kobweb calls
  *
  * The block syntax can be used to wrap markdown with code, as in
  *
