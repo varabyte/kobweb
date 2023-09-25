@@ -9,15 +9,14 @@ class and its extension methods are _not_ trying to be 100% compatible with Andr
 README's [What about Multiplatform Widgets](https://github.com/varabyte/kobweb#what-about-multiplatform-widgets) section
 for more details on why.
 
-**NOTE**: If you use this library, you must be sure to initialize its stylesheet, like so:
-
-```kotlin
-fun main() {
-    renderComposable(rootElementId = "root") {
-        StyleSheet(KobwebComposeStyleSheet) // REQUIRED
-        ...
-    }
-}
-```
-
-If you are using Silk, however, this has been done for you.
+> [!IMPORTANT]
+> If you use this library directly without Silk, you must be sure to initialize its stylesheet, like so:
+>
+> ```kotlin
+> fun main() {
+>     renderComposable(rootElementId = "root") {
+>         StyleSheet(KobwebComposeStyleSheet) // REQUIRED
+>         ...
+>     }
+> }
+> ```

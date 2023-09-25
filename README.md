@@ -1455,7 +1455,8 @@ All Font Awesome composables accept a modifier parameter, so you can tweak it fu
 FaSpider(Modifier.color(Colors.Red))
 ```
 
-***Note**: When you create a project using our `app` template, Font Awesome icons are included.*
+> [!NOTE]
+> When you create a project using our `app` template, Font Awesome icons are included.
 
 ### Material Design Icons
 
