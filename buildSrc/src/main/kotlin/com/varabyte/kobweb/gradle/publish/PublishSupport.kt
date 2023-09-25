@@ -77,6 +77,7 @@ internal fun PublishingExtension.addVarabyteArtifact(
             pom {
                 distributionManagement {
                     relocation {
+                        relocationDetails.groupId.orNull?.let { this.groupId.set(it) }
                         this.artifactId.set(relocationDetails.artifactId)
                         this.message.set(relocationDetails.message)
                     }

@@ -2244,7 +2244,7 @@ which the following steps help you work around:
    kobweb-core = { module = "com.varabyte.kobweb:kobweb-core ", version.ref = "kobweb" }
    kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk", version.ref = "kobweb" }
    kobwebx-markdown = { module = "com.varabyte.kobwebx:kobwebx-markdown", version.ref = "kobweb" }
-   silk-icons-fa = { module = "com.varabyte.kobweb:silk-icons-fa", version.ref = "kobweb" }
+   silk-icons-fa = { module = "com.varabyte.kobwebx:silk-icons-fa", version.ref = "kobweb" }
 
    [plugins]
    jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }

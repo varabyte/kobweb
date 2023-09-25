@@ -30,7 +30,7 @@ kotlin {
                 implementation(compose.html.core)
                 implementation("com.varabyte.kobweb:kobweb-core")
                 implementation("com.varabyte.kobweb:kobweb-silk")
-                implementation("com.varabyte.kobweb:silk-icons-fa")
+                implementation("com.varabyte.kobwebx:silk-icons-fa")
                 implementation("com.varabyte.kobwebx:kobwebx-markdown")
                 implementation(project(":sitelib"))
             }

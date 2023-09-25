@@ -28,14 +28,14 @@ class KobwebCorePlugin : Plugin<Project> {
         val versionCatalogPath = "gradle/libs.versions.toml"
 
         run {
-            val groupId = "com.varabyte.kobweb"
-            val relocatedArtifacts = run {
-                listOf(
-                    "kobweb-silk-widgets",
-                    "kobweb-silk-icons-fa",
-                    "kobweb-silk-icons-mdi"
-                ).associateWith { legacyArtifactId -> legacyArtifactId.removePrefix("kobweb-") }
-            }
+            val groupIdKobweb = "com.varabyte.kobweb"
+            val groupIdKobwebx = "com.varabyte.kobwebx"
+            // Original artifact ID (grouped under com.varabyte.kobweb) to coordinate
+            val relocatedArtifacts = mapOf(
+                "kobweb-silk-widgets" to "$groupIdKobweb:silk-widgets",
+                "kobweb-silk-icons-fa" to "$groupIdKobwebx:silk-icons-fa",
+                "kobweb-silk-icons-mdi" to "$groupIdKobwebx:silk-icons-mdi",
+            )
 
             val migrateDepsName = "kobwebMigrateDeps"
             if (rootProject.tasks.findByName(migrateDepsName) != null) return@run
@@ -52,9 +52,9 @@ class KobwebCorePlugin : Plugin<Project> {
                         ?.let { tomlFile ->
                             val originalText = tomlFile.readText()
                             var updatedText = originalText
-                            relocatedArtifacts.forEach { (legacyArtifactId, newArtifactId) ->
+                            relocatedArtifacts.forEach { (legacyArtifactId, newCoordinate) ->
                                 updatedText =
-                                    updatedText.replace("$groupId:$legacyArtifactId", "$groupId:$newArtifactId")
+                                    updatedText.replace("$groupIdKobweb:$legacyArtifactId", newCoordinate)
                             }
                             if (originalText != updatedText) {
                                 println(
@@ -77,9 +77,9 @@ class KobwebCorePlugin : Plugin<Project> {
                 // Warn the user about any relocated deps, if used, unless we're already running the task which will
                 // migrate them. If we show the warning then, it feels like the task failed even as it succeeded.
                 if (!this.hasTask(migrateDepsTask.get())) {
-                    relocatedArtifacts.forEach { (legacyArtifactId, newArtifactId) ->
+                    relocatedArtifacts.forEach { (legacyArtifactId, newCoordinate) ->
                         if (project.hasJsDependencyNamed(legacyArtifactId)) {
-                            project.logger.warn("w: The dependency `$groupId:$legacyArtifactId` has been renamed to `$groupId:$newArtifactId`. Please migrate to the new name. You can run `./gradlew $migrateDepsName` to attempt to do this automatically. Failing to migrate will become an error in a future version of Kobweb.")
+                            project.logger.warn("w: The dependency `$groupIdKobweb:$legacyArtifactId` has been renamed to `$newCoordinate`. Please migrate to the new name. You can run `./gradlew $migrateDepsName` to attempt to do this automatically. Failing to migrate will become an error in a future version of Kobweb.")
                         }
                     }
                 }

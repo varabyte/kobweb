@@ -7,7 +7,7 @@ plugins {
     id("com.varabyte.kobweb.internal.publish")
 }
 
-group = "com.varabyte.kobweb"
+group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.libs.get()
 
 private val GENERATED_SRC_ROOT = "build/generated/icons/src/jsMain/kotlin"

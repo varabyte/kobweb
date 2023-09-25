@@ -19,6 +19,7 @@ val FILTER_OUT_MULTIPLATFORM_PUBLICATIONS: (Task) -> Boolean =
 
 abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactory) {
     abstract class RelocationDetails {
+        abstract val groupId: Property<String>
         abstract val artifactId: Property<String>
         abstract val message: Property<String>
     }
