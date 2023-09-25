@@ -15,6 +15,10 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLSpanElement
 
+// NOTE: This component lives in `silk-foundation` and not `silk-widgets` because it's not really a widget, but rather
+// a fairly general, useful, opinionated convenience pattern that people might want to use even if they don't want to
+// bring in Silk UI / are working with a different UI framework.
+
 // Normally, the color of the text is inherited from its parent (see SurfaceStyle), but users may still want to
 // override text styles globally in their own app, so we still register a style here even if it's empty
 val SpanTextStyle by ComponentStyle(prefix = "silk") {}

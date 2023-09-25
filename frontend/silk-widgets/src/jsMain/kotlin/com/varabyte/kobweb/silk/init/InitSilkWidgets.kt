@@ -67,7 +67,6 @@ import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderColorVar
 import com.varabyte.kobweb.silk.components.text.DivTextStyle
-import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.theme.colors.palette.SilkWidgetColorGroups
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
@@ -226,7 +225,6 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
     @Suppress("DEPRECATION") mutableTheme.registerComponentVariants(AnimatedColorSurfaceVariant)
-    mutableTheme.registerComponentStyle(SpanTextStyle)
 
     mutableTheme.registerComponentStyle(SwitchStyle)
     mutableTheme.registerComponentStyle(SwitchTrackStyle)

@@ -11,6 +11,7 @@ import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilMdStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilSmStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilXlStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilZeroStyle
+import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -54,6 +55,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(DisplayUntilMdStyle)
     mutableTheme.registerComponentStyle(DisplayUntilLgStyle)
     mutableTheme.registerComponentStyle(DisplayUntilXlStyle)
+    mutableTheme.registerComponentStyle(SpanTextStyle)
 
     val ctx = InitSilkContext(config, SilkStylesheetInstance, mutableTheme)
     additionalInit(ctx)
