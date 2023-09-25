@@ -74,7 +74,9 @@ suspend fun main() {
         System.setProperty(
             "LOG_MAX_HISTORY",
             maxFileCount?.takeIf { it > 0 }?.toString()
-                ?: if (totalSizeCap?.takeIf { it.inWholeBytes > 0 } == null) "0" else Int.MAX_VALUE.toString())
+                // Note: The "9999" hack value below used to be Int.MAX_VALUE, but this caused logback to break,
+                // consuming 100% of the thread. ~30 years (9999 days) of logs should be enough for anyone.
+                ?: if (totalSizeCap?.takeIf { it.inWholeBytes > 0 } == null) "0" else "9999")
         System.setProperty("LOG_SIZE_CAP", totalSizeCap?.inWholeBytes?.toString() ?: "0")
     }
 
