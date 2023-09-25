@@ -16,16 +16,22 @@ import java.io.File
  * This class also exposes a handful of methods useful for querying the project.
  */
 abstract class KobwebBlock : ExtensionAware {
-    // TODO: how should this deprecation work
     /**
      * The string path to the root where generated code will be written to, relative to the project build directory.
      */
-    @Deprecated("", ReplaceWith("baseGenDir"))
-    val genDir: Property<String>
-        get() = baseGenDir
+    @Deprecated(
+        "Use `baseGenDir` to specify the base path for all generated content, or use the `genDir` property of sub-blocks to configure the location of specific outputs.",
+        ReplaceWith("baseGenDir")
+    )
+    abstract val genDir: Property<String>
 
     /**
-     * The string path to the root where generated code will be written to, relative to the project build directory.
+     * The path to the root where all generated content will be written to by default,
+     * relative to the project build directory.
+     *
+     * Setting this property is a convenient way to configure the root location of all generated content.
+     * For finer control, some sub-blocks provide a `genDir` property for specifying the location of their output,
+     * potentially bypassing this root path.
      */
     abstract val baseGenDir: Property<String>
 
@@ -57,8 +63,11 @@ abstract class KobwebBlock : ExtensionAware {
     abstract val kspProcessorDependency: Property<String>
 
     init {
-        genDir.convention("generated/kobweb")
-        baseGenDir.convention("generated/kobweb")
+        @Suppress("DEPRECATION")
+        genDir.apply {
+            convention("generated/kobweb")
+            baseGenDir.convention(this)
+        }
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
