@@ -1,3 +1,5 @@
+import java.util.*
+
 plugins {
     `kotlin-dsl`
     id("com.varabyte.kobweb.internal.publish")
@@ -34,4 +36,21 @@ kobwebPublication {
     // Leave artifactId blank. It will be set to the name of this module, and then the gradlePlugin step does some
     // additional tweaking that we don't want to interfere with.
     description.set(DESCRIPTION)
+}
+
+// Make the version available to the plugin code, so that it can be used to determine the version of the ksp processor
+// dependency to add to the project
+val generateVersionProperties by tasks.registering {
+    val generatedVersionDir = layout.buildDirectory.dir("generated-version")
+    outputs.dir(generatedVersionDir)
+    doLast {
+        val properties = Properties()
+        properties["version"] = version
+        val propertiesFile = generatedVersionDir.get().file("version.properties").asFile
+        propertiesFile.writer().use { properties.store(it, null) }
+    }
+}
+
+sourceSets.main {
+    resources.srcDir(generateVersionProperties)
 }
