@@ -22,15 +22,6 @@ import org.w3c.dom.svg.SVGPolylineElement
 import org.w3c.dom.svg.SVGRectElement
 import org.w3c.dom.svg.SVGTextElement
 
-@DslMarker
-annotation class SVGScopeMarker
-
-// SVGTopLevelScope is just an ElementScope<SVGElement> essentially, but we want to tag it with @SVGScopeMarker to
-// prevent SVG children from nesting, e.g. this invalid code: `Svg { Circle { Circle { } } }`.
-@SVGScopeMarker
-class SVGTopLevelScope(private val wrapped: ElementScope<SVGElement>) : ElementScope<SVGElement> by wrapped
-
-@SVGScopeMarker
 abstract class SVGElementScope(private val attrs: AttrsScope<SVGElement>) {
     fun attr(name: String, value: String) {
         attrs.attr(name, value)
@@ -140,11 +131,9 @@ abstract class SVGShapeElementScope(attrs: AttrsScope<SVGElement>) : SVGElementS
 @Composable
 fun Svg(
     attrs: AttrBuilderContext<SVGElement>? = null,
-    content: @Composable SVGTopLevelScope.() -> Unit
+    content: ContentBuilder<SVGElement>
 ) {
-    GenericTag("svg", "http://www.w3.org/2000/svg", attrs) {
-        SVGTopLevelScope(this).content()
-    }
+    GenericTag("svg", "http://www.w3.org/2000/svg", attrs, content)
 }
 
 // region SVG children
@@ -195,7 +184,7 @@ class SVGCircleScope internal constructor(private val attrs: AttrsScope<SVGCircl
  */
 
 @Composable
-fun SVGTopLevelScope.Circle(scope: SVGCircleScope.() -> Unit) {
+fun ElementScope<SVGElement>.Circle(scope: SVGCircleScope.() -> Unit) {
     GenericTag("circle", "http://www.w3.org/2000/svg", attrs = {
         SVGCircleScope(this).scope()
     })
@@ -257,7 +246,7 @@ class SVGCEllipseScope internal constructor(private val attrs: AttrsScope<SVGEll
  * @see <a href=https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse">SVG Ellipse Line (Mozilla Docs)</a>
  */
 @Composable
-fun SVGTopLevelScope.Ellipse(scope: SVGCEllipseScope.() -> Unit) {
+fun ElementScope<SVGElement>.Ellipse(scope: SVGCEllipseScope.() -> Unit) {
     GenericTag("ellipse", "http://www.w3.org/2000/svg", attrs = {
         SVGCEllipseScope(this).scope()
     })
@@ -266,7 +255,7 @@ fun SVGTopLevelScope.Ellipse(scope: SVGCEllipseScope.() -> Unit) {
 
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g
 @Composable
-fun SVGTopLevelScope.Group(
+fun ElementScope<SVGElement>.Group(
     attrs: AttrBuilderContext<SVGGElement>? = null,
     content: ContentBuilder<SVGGElement>
 ) {
@@ -328,13 +317,16 @@ class SVGLineScope internal constructor(private val attrs: AttrsScope<SVGLineEle
  */
 
 @Composable
-fun SVGTopLevelScope.Line(scope: SVGLineScope.() -> Unit) {
+fun ElementScope<SVGElement>.Line(scope: SVGLineScope.() -> Unit) {
     GenericTag("line", "http://www.w3.org/2000/svg", attrs = {
         SVGLineScope(this).scope()
     })
 }
 
-@SVGScopeMarker
+@DslMarker
+annotation class PathDataScopeMarker
+
+@PathDataScopeMarker
 class PathDataScope internal constructor() {
     internal val pathCommands = mutableListOf<String>()
 
@@ -428,7 +420,7 @@ class SVGPathScope internal constructor(private val attrs: AttrsScope<SVGPathEle
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path">SVG Element Path (Mozilla Docs)</a>
  */
 @Composable
-fun SVGTopLevelScope.Path(scope: SVGPathScope.() -> Unit) {
+fun ElementScope<SVGElement>.Path(scope: SVGPathScope.() -> Unit) {
     GenericTag("path", "http://www.w3.org/2000/svg", attrs = {
         SVGPathScope(this).scope()
     })
@@ -459,7 +451,7 @@ class SVGPolygonScope internal constructor(private val attrs: AttrsScope<SVGPoly
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon">SVG Element Polygon (Mozilla Docs)</a>
  */
 @Composable
-fun SVGTopLevelScope.Polygon(scope: SVGPolygonScope.() -> Unit) {
+fun ElementScope<SVGElement>.Polygon(scope: SVGPolygonScope.() -> Unit) {
     GenericTag("polygon", "http://www.w3.org/2000/svg", attrs = {
         SVGPolygonScope(this).scope()
     })
@@ -491,7 +483,7 @@ class SVGPolylineScope internal constructor(private val attrs: AttrsScope<SVGPol
  */
 
 @Composable
-fun SVGTopLevelScope.Polyline(scope: SVGPolylineScope.() -> Unit) {
+fun ElementScope<SVGElement>.Polyline(scope: SVGPolylineScope.() -> Unit) {
     GenericTag("polyline", "http://www.w3.org/2000/svg", attrs = {
         SVGPolylineScope(this).scope()
     })
@@ -579,7 +571,7 @@ class SVGCRectScope internal constructor(private val attrs: AttrsScope<SVGRectEl
  */
 
 @Composable
-fun SVGTopLevelScope.Rect(scope: SVGCRectScope.() -> Unit) {
+fun ElementScope<SVGElement>.Rect(scope: SVGCRectScope.() -> Unit) {
     GenericTag("rect", "http://www.w3.org/2000/svg", attrs = {
         SVGCRectScope(this).scope()
     })
@@ -711,7 +703,7 @@ class SVGTextScope internal constructor(private val attrs: AttrsScope<SVGTextEle
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text">SVG Element Text (Mozilla Docs)</a>
  */
 @Composable
-fun SVGTopLevelScope.Text(text: String, scope: SVGTextScope.() -> Unit) {
+fun ElementScope<SVGElement>.Text(text: String, scope: SVGTextScope.() -> Unit) {
     @Suppress("RemoveExplicitTypeArguments") // IDE wants to remove generic type but that causes a compile error
     GenericTag<SVGTextElement>("text", "http://www.w3.org/2000/svg", attrs = {
         SVGTextScope(this).scope()
