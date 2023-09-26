@@ -2,6 +2,7 @@ package com.varabyte.kobweb.ksp.common
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFile
+import com.varabyte.kobweb.ksp.util.getAnnotationsByName
 
 // pair corresponds to (current package, override)
 // in theory should only be one, but we'll return a sequence just in case
@@ -13,25 +14,21 @@ fun getPackageMappings(
     packageMappingFqn: String,
     logger: KSPLogger,
 ): Sequence<Pair<String, String>> {
-    // TODO: we resolve here so that we can find the annotation even if annotatedFile's import aliased.
-    //  But is there a better way? And should we support this at all? See also: @Api logic
-    return file.annotations
-        .filter { it.annotationType.resolve().declaration.qualifiedName?.asString() == packageMappingFqn }
-        .mapNotNull { packageMappingAnnotation ->
-            val currPackage = file.packageName.asString()
-            if (currPackage.startsWith(qualifiedPackage)) {
-                val override = packageMappingAnnotation.arguments.first().value!!.let { value ->
-                    // {} is a special value which means infer from the current package,
-                    // e.g. "{}" under a.b.pkg resolves to "{pkg}"
-                    if (value != "{}") value.toString() else "{${currPackage.substringAfterLast('.')}}"
-                }
-                currPackage to override
-            } else {
-                logger.warn(
-                    "Skipped over `@file:${packageMappingAnnotation.shortName.asString()}` annotation. It is defined under package `$currPackage` but must exist under `$qualifiedPackage`.",
-                    packageMappingAnnotation
-                )
-                null
+    return file.getAnnotationsByName(packageMappingFqn).mapNotNull { packageMappingAnnotation ->
+        val currPackage = file.packageName.asString()
+        if (currPackage.startsWith(qualifiedPackage)) {
+            val override = packageMappingAnnotation.arguments.first().value!!.let { value ->
+                // {} is a special value which means infer from the current package,
+                // e.g. "{}" under a.b.pkg resolves to "{pkg}"
+                if (value != "{}") value.toString() else "{${currPackage.substringAfterLast('.')}}"
             }
+            currPackage to override
+        } else {
+            logger.warn(
+                "Skipped over `@file:${packageMappingAnnotation.shortName.asString()}` annotation. It is defined under package `$currPackage` but must exist under `$qualifiedPackage`.",
+                packageMappingAnnotation
+            )
+            null
         }
+    }
 }

@@ -22,6 +22,7 @@ import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.common.processRoute
+import com.varabyte.kobweb.ksp.util.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.nameWithoutExtension
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
@@ -111,9 +112,7 @@ class BackendProcessor(
             }
             fileDependencies.add(property.containingFile!!)
 
-            // TODO: we're currently resolving due to import alias -- same as in other places
-            val routeOverride = property.annotations
-                .filter { it.annotationType.resolve().declaration.qualifiedName?.asString() == API_FQN }
+            val routeOverride = property.getAnnotationsByName(API_FQN)
                 .firstNotNullOfOrNull { it.arguments.firstOrNull()?.value?.toString() }
 
             val resolvedRoute = processRoute(
@@ -159,11 +158,7 @@ private fun processApiFun(
     packageMappings: Map<String, String>,
     logger: KSPLogger,
 ): ApiEntry? {
-    // TODO: we resolve here so that we can find the Page annotation even if it's import aliased.
-    // But is there a better way? And should we support this at all?
-    val apiAnnotation = annotatedFun.annotations
-        .first { it.annotationType.resolve().declaration.qualifiedName?.asString() == API_FQN }
-
+    val apiAnnotation = annotatedFun.getAnnotationsByName(API_FQN).first()
     val currPackage = annotatedFun.packageName.asString()
     val file = annotatedFun.containingFile ?: error("Symbol does not come from a source file")
     val routeOverride = apiAnnotation.arguments.first().value?.toString()?.takeIf { it.isNotBlank() }
