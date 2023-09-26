@@ -7,6 +7,7 @@ import com.varabyte.kobweb.compose.dom.Line
 import com.varabyte.kobweb.compose.dom.Path
 import com.varabyte.kobweb.compose.dom.Polyline
 import com.varabyte.kobweb.compose.dom.Rect
+import com.varabyte.kobweb.compose.dom.SVGTopLevelScope
 import com.varabyte.kobweb.compose.dom.Svg
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ElementScope
@@ -26,7 +27,7 @@ private fun createIcon(
     width: CSSLengthValue = 1.2.em,
     strokeWidth: Int = 1,
     fill: String? = "none",
-    content: @Composable ElementScope<SVGElement>.() -> Unit
+    content: @Composable SVGTopLevelScope.() -> Unit
 ) {
     Svg(attrs = {
         attr("width", width.toString())
