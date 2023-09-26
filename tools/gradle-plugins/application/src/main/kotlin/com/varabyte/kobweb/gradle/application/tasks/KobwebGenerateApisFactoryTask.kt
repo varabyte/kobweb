@@ -15,19 +15,21 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.internal.provider.DefaultProvider
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import javax.inject.Inject
 
 abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: KobwebBlock) :
     KobwebModuleTask(kobwebBlock, "Generate Kobweb code for the server") {
-    @get:InputFiles // "files" since it may not exist
-    abstract val kspGenFile: ListProperty<File>
+    @get:Optional
+    @get:InputFile
+    abstract val kspGenFile: RegularFileProperty
 
     @InputFiles
     fun getCompileClasspath(): Provider<FileCollection> = project.jvmTarget?.let { jvmTarget ->
@@ -41,8 +43,8 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
     @TaskAction
     fun execute() {
         val backendData = buildList {
-            kspGenFile.get().singleOrNull()?.takeIf { it.exists() }?.let {
-                add(Json.decodeFromString<BackendData>(it.readText()))
+            kspGenFile.orNull?.let {
+                add(Json.decodeFromString<BackendData>(it.asFile.readText()))
             }
             getCompileClasspath().get().files.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
