@@ -4,6 +4,7 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.processRoute
+import com.varabyte.kobweb.ksp.util.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.nameWithoutExtension
 import com.varabyte.kobweb.project.frontend.PageEntry
 
@@ -13,11 +14,7 @@ fun processPagesFun(
     packageMappings: Map<String, String>,
     logger: KSPLogger,
 ): PageEntry? {
-    // TODO: we resolve here so that we can find the Page annotation even if it's import aliased.
-    // But is there a better way? And should we support this at all?
-    val pageAnnotation = annotatedFun.annotations
-        .first { it.annotationType.resolve().declaration.qualifiedName?.asString() == PAGE_FQN }
-
+    val pageAnnotation = annotatedFun.getAnnotationsByName(PAGE_FQN).first()
     val funName = annotatedFun.simpleName.asString()
     val pageSimpleName = pageAnnotation.shortName.asString()
     val file = annotatedFun.containingFile ?: error("Symbol does not come from a source file")
