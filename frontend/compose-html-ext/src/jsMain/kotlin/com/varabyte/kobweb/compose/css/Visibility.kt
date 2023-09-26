@@ -11,6 +11,7 @@ class Visibility private constructor(private val value: String) : StylePropertyV
         val Visible get() = Visibility("visible")
         val Hidden get() = Visibility("hidden")
         val Collapse get() = Visibility("collapse")
+        val None get() = Visibility("none")
 
         // Global
         val Inherit get() = Visibility("inherit")
