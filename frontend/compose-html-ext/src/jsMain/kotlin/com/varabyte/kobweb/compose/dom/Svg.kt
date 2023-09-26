@@ -37,14 +37,80 @@ abstract class SVGElementScope(private val attrs: AttrsScope<SVGElement>) {
     }
 }
 
+// Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
+// Enums have to be capitalized title case for this method to work.
+private fun <E: Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
+
+// region SVG paint attributes (https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint)
+
+enum class SVGPaintType {
+    None,
+    CurrentColor;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGStrokeLineCap {
+    Butt,
+    Round,
+    Square;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGStrokeLineJoin {
+    Miter,
+    Round,
+    Bevel;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGFillRule {
+    NonZero,
+    EvenOdd;
+
+    override fun toString() = this.toSvgValue()
+}
+
+// endregion
+
 abstract class SVGShapeElementScope(attrs: AttrsScope<SVGElement>) : SVGElementScope(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
+    fun stroke(value: SVGPaintType) = this.attr("stroke", value.toString())
+
+    fun strokeDashArray(vararg values: Number) {
+        this.attr("stroke-dasharray", values.joinToString(",") { it.toString() })
+    }
+
+    fun strokeDashArray(vararg values: CSSLengthOrPercentageValue) {
+        this.attr("stroke-dasharray", values.joinToString(",") { it.toString() })
+    }
+
+    fun strokeDashOffset(value: Number) = this.attr("stroke-dashoffset", value.toString())
+    fun strokeDashOffset(value: CSSLengthOrPercentageValue) = this.attr("stroke-dashoffset", value.toString())
+
+    fun strokeLineCap(value: SVGStrokeLineCap) = this.attr("stroke-linecap", value.toString())
+
+    fun strokeLineJoin(value: SVGStrokeLineJoin) = this.attr("stroke-linejoin", value.toString())
+
+    fun strokeMiterLimit(value: Number) = this.attr("stroke-miterlimit", value.toString())
+
+    fun strokeOpacity(value: Number) = this.attr("stroke-opacity", value.toString())
+
+    fun strokeWidth(value: Number) = this.attr("stroke-width", value.toString())
+    fun strokeWidth(value: CSSLengthOrPercentageValue) = this.attr("stroke-width", value.toString())
 
     fun fill(value: CSSColorValue) = this.attr("fill", value.toString())
+    fun fill(value: SVGPaintType) = this.attr("fill", value.toString())
 
     // TODO: Support Gradients. Unfortunately, com.varabyte.kobweb.compose.css.functions.Gradient doesn't work here as
     //  SVG gradients are different from CSS gradients.
 //    fun fill(value: Gradient) = this.attr("fill", value.toString())
+
+    fun fillRule(value: SVGFillRule) = this.attr("fill-rule", value.toString())
+
+    fun fillOpacity(value: Number) = this.attr("fill-opacity", value.toString())
 }
 
 /**
@@ -524,10 +590,7 @@ enum class SvgTextLengthAdjust {
     Spacing,
     SpacingAndGlyphs;
 
-    override fun toString(): String {
-        // Reformat to value expected by SVG tag
-        return name.replaceFirstChar { it.lowercase() }
-    }
+    override fun toString() = this.toSvgValue()
 }
 
 class SVGTextScope internal constructor(private val attrs: AttrsScope<SVGTextElement>) : SVGShapeElementScope(attrs) {
