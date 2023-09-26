@@ -3,13 +3,13 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.text.splitCamelCase
-import com.varabyte.kobweb.gradle.core.extensions.FileGeneratingBlock
+import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 
-abstract class MarkdownConfig(baseGenDir: Provider<String>) : FileGeneratingBlock {
+abstract class MarkdownConfig(baseGenDir: Provider<String>) : KobwebBlock.FileGeneratingBlock {
     object RouteOverride {
         /**
          * An algorithm for converting a markdown filename into a URL name that preserves the original filename.

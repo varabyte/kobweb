@@ -17,6 +17,16 @@ import java.io.File
  */
 abstract class KobwebBlock : ExtensionAware {
     /**
+     * An interface used for tagging Gradle extensions which generate files for Kobweb.
+     *
+     * This enables a consisted approach for tasks to determine where their output should go.
+     */
+    interface FileGeneratingBlock : ExtensionAware {
+        /** The path to the root where generated files will be placed, relative to the project build directory. */
+        val genDir: Property<String>
+    }
+
+    /**
      * The string path to the root where generated code will be written to, relative to the project build directory.
      */
     @Deprecated(
