@@ -5,7 +5,6 @@ package com.varabyte.kobweb.compose.dom
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.functions.Gradient
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
@@ -43,9 +42,9 @@ abstract class SVGShapeElementScope(attrs: AttrsScope<SVGElement>) : SVGElementS
 
     fun fill(value: CSSColorValue) = this.attr("fill", value.toString())
 
-    fun fill(value: Color) = this.attr("fill", value.toString())
-
-    fun fill(value: Gradient) = this.attr("fill", value.toString())
+    // TODO: Support Gradients. Unfortunately, com.varabyte.kobweb.compose.css.functions.Gradient doesn't work here as
+    //  SVG gradients are different from CSS gradients.
+//    fun fill(value: Gradient) = this.attr("fill", value.toString())
 }
 
 /**
