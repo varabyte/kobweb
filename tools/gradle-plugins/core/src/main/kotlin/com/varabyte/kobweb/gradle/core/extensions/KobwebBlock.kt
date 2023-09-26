@@ -4,6 +4,7 @@ package com.varabyte.kobweb.gradle.core.extensions
 
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
+import com.varabyte.kobweb.gradle.core.util.VersionUtil
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
@@ -81,9 +82,7 @@ abstract class KobwebBlock : ExtensionAware {
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
-        val kspProcessorVersion = "0.14.1-SNAPSHOT" // matching lib version
-        val kspDependency = "com.varabyte.kobweb:kobweb-ksp-project-processors:$kspProcessorVersion"
-        kspProcessorDependency.convention(kspDependency)
+        kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-project-processors:${VersionUtil.version}")
     }
 
     inline fun <reified T : FileGeneratingBlock> getGenJsSrcRoot(project: Project): File {
