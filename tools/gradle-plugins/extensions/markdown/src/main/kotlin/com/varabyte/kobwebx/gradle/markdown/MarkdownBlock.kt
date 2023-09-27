@@ -9,7 +9,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 
-abstract class MarkdownConfig(baseGenDir: Provider<String>) : KobwebBlock.FileGeneratingBlock {
+abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGeneratingBlock {
     object RouteOverride {
         /**
          * An algorithm for converting a markdown filename into a URL name that preserves the original filename.

@@ -11,7 +11,7 @@ import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.core.util.getResourceRoots
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
-import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig
+import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
 import org.gradle.api.DefaultTask
@@ -24,17 +24,17 @@ import javax.inject.Inject
 
 abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
-    private val markdownConfig: MarkdownConfig,
+    private val markdownBlock: MarkdownBlock,
 ) : DefaultTask() {
     init {
         description = "Convert markdown files found in the project's resources path to source code in the final project"
     }
 
-    private val markdownHandlers = markdownConfig.extensions.getByType<MarkdownHandlers>()
-    private val markdownFeatures = markdownConfig.extensions.getByType<MarkdownFeatures>()
+    private val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
+    private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
     private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(project.jsTarget)
-        .map { root -> root.resolve(markdownConfig.markdownPath.get()) }
+        .map { root -> root.resolve(markdownBlock.markdownPath.get()) }
 
     private fun getMarkdownFilesWithRoots(): List<RootAndFile> {
         val mdRoots = getMarkdownRoots()
@@ -53,7 +53,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
     }
 
     @OutputDirectory
-    fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownConfig>(project).resolve(
+    fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(project).resolve(
         project.prefixQualifiedPackage(kobwebBlock.pagesPackage.get()).replace(".", "/")
     )
 
@@ -113,11 +113,11 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 val funName = "${ktFileName.capitalize()}Page"
                 val ktRenderer = KotlinRenderer(
                     project,
-                    markdownConfig.imports.get(),
+                    markdownBlock.imports.get(),
                     mdPathRel,
                     markdownHandlers,
                     mdPackage,
-                    markdownConfig.routeOverride.orNull,
+                    markdownBlock.routeOverride.orNull,
                     funName,
                     LoggingReporter(project.logger),
                 )

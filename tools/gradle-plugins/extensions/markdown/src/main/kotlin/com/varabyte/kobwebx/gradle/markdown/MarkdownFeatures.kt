@@ -14,7 +14,7 @@ import org.gradle.api.provider.Property
 /**
  * List feature extensions to markdown that this plugin supports.
  *
- * This block will be nested under [MarkdownConfig], e.g.
+ * This block will be nested under [MarkdownBlock], e.g.
  *
  * ```
  * kobwebx {

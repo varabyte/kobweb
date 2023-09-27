@@ -19,14 +19,14 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         val kobwebBlock = project.extensions.findByName("kobweb") as? KobwebBlock
             ?: throw GradleException("The Gradle markdown plugin should only be applied AFTER com.varabyte.kobweb.application OR com.varabyte.kobweb.library plugins.")
 
-        val markdownConfig = kobwebBlock.extensions.create<MarkdownConfig>("markdown", kobwebBlock.baseGenDir)
-        markdownConfig.extensions.apply {
+        val markdownBlock = kobwebBlock.extensions.create<MarkdownBlock>("markdown", kobwebBlock.baseGenDir)
+        markdownBlock.extensions.apply {
             create<MarkdownHandlers>("handlers", project)
             create<MarkdownFeatures>("features")
         }
 
         val convertTask = project.tasks
-            .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownConfig)
+            .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownBlock)
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)

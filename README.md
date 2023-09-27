@@ -2005,7 +2005,7 @@ This callback will be triggered on all Markdown pages *except* `Index.md` files.
 Some common algorithms are provided which you can use instead of writing your own:
 
 ```kotlin
-import com.varabyte.kobwebx.gradle.markdown.MarkdownConfig.RouteOverride
+import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.RouteOverride
 
 kobweb {
   markdown {
