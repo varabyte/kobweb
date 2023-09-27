@@ -5,6 +5,7 @@ import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.util.getServerJar
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
+import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
@@ -23,6 +24,7 @@ import javax.inject.Inject
  * @param reuseServer If a server is already running, re-use it if possible.
  */
 abstract class KobwebStartTask @Inject constructor(
+    private val conf: KobwebConf,
     private val env: ServerEnvironment,
     private val siteLayout: SiteLayout,
     private val reuseServer: Boolean
@@ -52,15 +54,18 @@ abstract class KobwebStartTask @Inject constructor(
         }
 
         val javaHome = System.getenv("KOBWEB_JAVA_HOME") ?: System.getProperty("java.home")!!
-        val processParams = arrayOf(
-            "${javaHome.toUnixSeparators()}/bin/java",
-            env.toSystemPropertyParam(),
-            siteLayout.toSystemPropertyParam(),
-            // See: https://ktor.io/docs/development-mode.html#system-property
-            "-Dio.ktor.development=${env == ServerEnvironment.DEV}",
-            "-jar",
-            getServerJar().absolutePath
-        )
+        val processParams = buildList<String> {
+            add("${javaHome.toUnixSeparators()}/bin/java")
+            add(env.toSystemPropertyParam())
+            add(siteLayout.toSystemPropertyParam())
+            // See: https://ktor.io/docs/development-mode.html#system-property)
+            add("-Dio.ktor.development=${env == ServerEnvironment.DEV}")
+            if (env == ServerEnvironment.DEV && conf.server.remoteDebugging.enabled) {
+                add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${conf.server.remoteDebugging.port}")
+            }
+            add("-jar")
+            add(getServerJar().absolutePath)
+        }.toTypedArray()
 
         println(
             """

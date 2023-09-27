@@ -34,6 +34,7 @@ class Server(
     val files: Files,
     val port: Int = 8080,
     val logging: Logging = Logging(),
+    val remoteDebugging: RemoteDebugging = RemoteDebugging(),
     val cors: Cors = Cors(),
     val streaming: Streaming = Streaming(),
     val nativeLibraries: List<NativeLibrary> = emptyList(),
@@ -118,6 +119,12 @@ class Server(
             ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
         }
     }
+
+    @Serializable
+    class RemoteDebugging(
+        val enabled: Boolean = false,
+        val port: Int = 5005,
+    )
 
     /**
      * Configuration for CORS.
