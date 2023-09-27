@@ -73,7 +73,7 @@ class KobwebCorePlugin : Plugin<Project> {
                 if (!this.hasTask(migrateDepsTask.get())) {
                     relocatedArtifacts.forEach { (legacyArtifactId, newCoordinate) ->
                         if (project.hasJsDependencyNamed(legacyArtifactId)) {
-                            project.logger.warn("w: The dependency `$groupIdKobweb:$legacyArtifactId` has been renamed to `$newCoordinate`. Please migrate to the new name. You can run `./gradlew $migrateDepsName` to attempt to do this automatically. Failing to migrate will become an error in a future version of Kobweb.")
+                            project.logger.warn("w: The dependency `$groupIdKobweb:$legacyArtifactId` has been renamed to `$newCoordinate`. Please migrate to the new name. You can run `./gradlew :$migrateDepsName` to attempt to do this automatically. Failing to migrate will become an error in a future version of Kobweb.")
                         }
                     }
                 }
