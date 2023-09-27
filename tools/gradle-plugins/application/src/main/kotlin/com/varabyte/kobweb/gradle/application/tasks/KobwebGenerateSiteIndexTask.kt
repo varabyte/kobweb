@@ -62,7 +62,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             .mapNotNull { rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.layout.buildDirectory.asFile.get()) && rootAndFile.relativeFile.toUnixSeparators() == "public/index.html" } }
             .singleOrNull()
             ?.let { indexFile ->
-                project.logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
+                logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
             }
 
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)

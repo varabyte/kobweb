@@ -119,7 +119,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     mdPackage,
                     markdownBlock.routeOverride.orNull,
                     funName,
-                    LoggingReporter(project.logger),
+                    LoggingReporter(logger),
                 )
                 outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
             }

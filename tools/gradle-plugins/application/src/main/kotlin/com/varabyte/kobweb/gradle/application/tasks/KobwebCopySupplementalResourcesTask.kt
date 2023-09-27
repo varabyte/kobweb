@@ -71,7 +71,7 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
                 val targetFile =
                     getGenPublicRoot().resolve(rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
                 if (targetFile.exists() && !rootAndFile.file.readBytes().contentEquals(targetFile.readBytes())) {
-                    project.logger.warn("Overwriting ${rootAndFile.relativeFile} with the public resource found in ${jar.name}")
+                    logger.warn("Overwriting ${rootAndFile.relativeFile} with the public resource found in ${jar.name}")
                 }
                 rootAndFile.file.copyTo(targetFile, overwrite = true)
             }
