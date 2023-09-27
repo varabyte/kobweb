@@ -1,5 +1,3 @@
-@file:Suppress("LeakingThis") // Following official Gradle guidance
-
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.KOBWEB_SERVER_JAR
