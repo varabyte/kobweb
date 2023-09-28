@@ -71,10 +71,10 @@ fun Project.hasJsDependencyNamed(name: String): Boolean {
 /**
  * Like [hasJsDependencyNamed] but includes transitive dependencies as well.
  *
- * This method should only be called after a project is finished beng configured, e.g. inside a task action.
+ * This method should only be called after a project is finished being configured, e.g. inside a task action.
  */
 fun Project.hasTransitiveJsDependencyNamed(name: String): Boolean {
-    return configurations.findByName(jsTarget.compileClasspath)
+    return configurations.findByName(jsTarget.runtimeClasspath)
         ?.resolvedConfiguration
         ?.resolvedArtifacts
         ?.any { artifact -> artifact.moduleVersion.id.name == name }
