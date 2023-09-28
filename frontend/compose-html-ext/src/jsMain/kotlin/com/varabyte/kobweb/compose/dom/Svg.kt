@@ -41,6 +41,9 @@ enum class SVGPaintType {
     override fun toString() = this.toSvgValue()
 }
 
+typealias SVGFillType = SVGPaintType
+typealias SVGStrokeType = SVGPaintType
+
 enum class SVGStrokeLineCap {
     Butt,
     Round,
