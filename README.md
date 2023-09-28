@@ -2666,9 +2666,11 @@ then [follow the official documentation](https://www.jetbrains.com/help/idea/att
 to add a *remote JVM debug* configuration to your IDE.
 
 > [!IMPORTANT]
-> For remote debugging to work, you need to correctly specify the "Use module classpath" value. In general, use the
-> `jvmMain` module for your Kobweb project, e.g. `app.site.jvmMain`. If you've refactored your backend code out to
-> another module, you should be able to use that instead.
+> For remote debugging to work:
+> * The *Debugger Mode* should be set to *Attach to remote JVM*.
+> * You need to correctly specify the *Use module classpath* value. In general, use the `jvmMain` classpath associated
+>   with your Kobweb application, e.g. `app.site.jvmMain`. If you've refactored your backend code out to another module,
+>   you should be able to use that instead.
 
 At this point, start up your Kobweb server using `kobweb run`.
 
