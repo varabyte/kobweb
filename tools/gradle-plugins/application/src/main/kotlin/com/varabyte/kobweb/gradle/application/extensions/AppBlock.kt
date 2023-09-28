@@ -78,6 +78,41 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf, baseGenDir: Proper
     }
 
     /**
+     * Configuration values for the backend of this Kobweb application.
+     */
+    abstract class ServerBlock : ExtensionAware {
+        /**
+         * Configuration for remote debugging.
+         */
+        abstract class RemoteDebuggingBlock : ExtensionAware {
+            /**
+             * When `true`, enables remote debugging on the Kobweb server.
+             *
+             * Remote debugging will only work if the server is running in development mode.
+             */
+            abstract val enabled: Property<Boolean>
+
+            /**
+             * The port to use for remote debugging.
+             *
+             * Defaults to `5005`, a common default for remote debugging.
+             *
+             * @see <a href="https://www.jetbrains.com/help/idea/attaching-to-local-process.html#attach-to-remote">Remote debugging documentation</a>
+             */
+            abstract val port: Property<Int>
+
+            init {
+                enabled.convention(false)
+                port.convention(5005)
+            }
+        }
+
+        init {
+            extensions.create<RemoteDebuggingBlock>("remoteDebugging")
+        }
+    }
+
+    /**
      * A collection of key / value pairs which will be made available within your Kobweb app via `AppGlobals`.
      *
      * This is a useful place to save constant values that describe your app, like a version value or build timestamp.
@@ -99,11 +134,18 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf, baseGenDir: Proper
         genDir.convention(baseGenDir.map { "$it/app" })
 
         extensions.create<IndexBlock>("index", RoutePrefix(conf.site.routePrefix))
+        extensions.create<ServerBlock>("server")
     }
 }
 
 val AppBlock.index: AppBlock.IndexBlock
     get() = extensions.getByType<AppBlock.IndexBlock>()
+
+val AppBlock.server: AppBlock.ServerBlock
+    get() = extensions.getByType<AppBlock.ServerBlock>()
+
+val AppBlock.ServerBlock.remoteDebugging: AppBlock.ServerBlock.RemoteDebuggingBlock
+    get() = extensions.getByType<AppBlock.ServerBlock.RemoteDebuggingBlock>()
 
 val KobwebBlock.app: AppBlock
     get() = extensions.getByType<AppBlock>()

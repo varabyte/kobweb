@@ -2642,21 +2642,27 @@ issues.
 ### Debugging the backend
 
 Debugging the backend first requires configuring the Kobweb server to support remote debugging. This is easy to do by
-modifying your `.kobweb/conf.yaml` file:
+modifying the `kobweb` block in your build script to enable remote debugging:
 
-```yaml
-server:
-  remoteDebugging:
-    enabled: true
-    port: 5005
+```kotiln
+kobweb {
+  app {
+    server {
+      remoteDebugging {
+        enabled.set(true)
+        port.set(5005)
+      }
+    }
+  }
+}
 ```
 
 > [!NOTE]
-> Specifying the port is optional. It will default to 5005, which is a common value for this purpose. If you ever need
-> to debug multiple Kobweb servers at the same time, however, it can be useful to change it.
+> Specifying the port is optional. Otherwise, it is 5005, a common remote debugging default. If you ever need to debug
+> multiple Kobweb servers at the same time, however, it can be useful to change it.
 
-Once you've changed the configuration, you can
-then [follow the official instructions](https://www.jetbrains.com/help/idea/attaching-to-local-process.html#attach-to-remote)
+Once you've enabled remote debugging support, you can
+then [follow the official documentation](https://www.jetbrains.com/help/idea/attaching-to-local-process.html#attach-to-remote)
 to add a *remote JVM debug* configuration to your IDE.
 
 > [!IMPORTANT]
@@ -2667,8 +2673,8 @@ to add a *remote JVM debug* configuration to your IDE.
 At this point, start up your Kobweb server using `kobweb run`.
 
 > [!IMPORTANT]
-> Remote debugging is only supported in dev mode. The following steps will not work for a server started
-> with `kobweb run --env prod`.
+> Remote debugging is only supported in dev mode. It will not be enabled for a server started with
+> `kobweb run --env prod`.
 
 With your Kobweb server running and your "remote debug" run configuration selected, press the debug button. If
 everything is set up correctly, you should see a message in the IDE debugger console
