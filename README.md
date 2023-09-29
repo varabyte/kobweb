@@ -1671,7 +1671,7 @@ kotlin {
 > [!IMPORTANT]
 > `configAsKobwebApplication(includeServer = true)` declares and sets up both `js()` and `jvm()`
 > [Kotlin Multiplatform targets](https://kotlinlang.org/docs/multiplatform-set-up-targets.html) for you. If you don't
-> set `includeServer = true` explicitly, only the JS target will be declared.*
+> set `includeServer = true` explicitly, only the JS target will be declared.
 
 The easy way to check if everything is set up correctly is to open your project inside IntelliJ IDEA, wait for it to
 finish indexing, and check that the `jvmMain` folder is detected as a module (if so, it will be given a special icon
