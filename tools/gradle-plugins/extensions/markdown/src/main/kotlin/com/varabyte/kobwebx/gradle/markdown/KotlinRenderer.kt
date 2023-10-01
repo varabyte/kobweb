@@ -44,6 +44,8 @@ import org.commonmark.renderer.Renderer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.relativeToOrSelf
 
 fun String.yamlStringToKotlinString(): String {
     return if (this.isSurrounded("\"")) {
@@ -57,6 +59,7 @@ fun String.yamlStringToKotlinString(): String {
 
 class KotlinRenderer(
     private val project: Project,
+    private val markdownNodeGetter: (path: String) -> Node?,
     private val imports: List<String>,
     private val filePath: String,
     private val handlers: MarkdownHandlers,
@@ -99,20 +102,9 @@ class KotlinRenderer(
 
                 appendLine()
 
-                run {
-                    var routeOverride = frontMatterData?.routeOverride
-                    if (routeOverride == null) {
-                        val inputFileName = filePath.substringAfterLast('/').substringBeforeLast('.')
-                        val defaultRoute = inputFileName.lowercase()
-                        if (routeOverrideProvider != null && defaultRoute != "index") {
-                            routeOverride = routeOverrideProvider.invoke(inputFileName).takeIf { it != defaultRoute }
-                        }
-                    }
-
-                    append("@Page")
-                    if (routeOverride != null) append("(\"$routeOverride\")")
-                    appendLine()
-                }
+                append("@Page")
+                getRouteOverride(filePath, frontMatterData)?.let{ append("(\"$it\")") }
+                appendLine()
 
                 appendLine("@Composable")
                 appendLine("fun $funName() {")
@@ -131,6 +123,18 @@ class KotlinRenderer(
         return buildString {
             render(node, this)
         }
+    }
+
+    private fun getRouteOverride(filePath: String, frontMatterData: FrontMatterData?): String? {
+        var routeOverride = frontMatterData?.routeOverride
+        if (routeOverride == null) {
+            val inputFileName = filePath.substringAfterLast('/').substringBeforeLast('.')
+            val defaultRoute = inputFileName.lowercase()
+            if (routeOverrideProvider != null && defaultRoute != "index") {
+                routeOverride = routeOverrideProvider.invoke(inputFileName).takeIf { it != defaultRoute }
+            }
+        }
+        return routeOverride
     }
 
     private fun RenderVisitor.visitAndFinish(node: Node) {
@@ -340,6 +344,49 @@ class KotlinRenderer(
         }
 
         override fun visit(link: Link) {
+            // Links to other Markdown files, if the files are present, get converted to their corresponding generated routes
+            if (link.destination.endsWith(".md")) {
+                val destinationPath = Path(filePath.substringBeforeLast('/', "")).resolve(link.destination).normalize().toString()
+                val destinationFile = markdownNodeGetter(destinationPath.removePrefix("/"))
+                if (destinationFile != null) {
+                    // Retrieve the destination's route override, if present
+                    val frontMatterData = with(FrontMatterVisitor()) {
+                        destinationFile.accept(this)
+                        this.data
+                    }
+                    val routeOverride = getRouteOverride(destinationPath, frontMatterData)
+
+                    if (routeOverride != null) {
+                        if ('{' in routeOverride)
+                            reporter.warn("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
+
+                        val prefix = if (routeOverride.startsWith('/')) {
+                            routeOverride.substringBeforeLast('/')
+                        } else {
+                            destinationPath.substringBeforeLast('/', "")
+                        }
+
+                        val extra = if (!routeOverride.startsWith('/') && '/' in routeOverride) {
+                            "/" + routeOverride.substringBeforeLast('/')
+                        } else {
+                            ""
+                        }
+
+                        val slug = when {
+                            routeOverride.substringAfterLast('/').lowercase() == "index" -> ""
+                            routeOverride.last() != '/' -> routeOverride.substringAfterLast('/')
+                            else -> destinationPath.substringAfterLast('/').substringBeforeLast('.').lowercase()
+                        }
+
+                        link.destination = "$prefix$extra/$slug"
+                    } else {
+                        link.destination = destinationPath.replaceAfterLast('/', destinationPath.substringAfterLast('/').lowercase().removeSuffix(".md").let { if (it == "index") "" else it })
+                    }
+
+                    link.destination = Path(link.destination).relativeToOrSelf(Path(filePath.substringBeforeLast('/', ""))).toString()
+                }
+            }
+
             doVisit(link, handlers.a)
         }
 

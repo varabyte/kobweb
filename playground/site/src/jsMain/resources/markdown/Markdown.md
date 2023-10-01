@@ -6,7 +6,7 @@ root: .components.layouts.PageLayout("MARKDOWN")
 
 This is [an example][id] reference-style link.
 
-This site is generated from markdown.
+This site is generated from Markdown.
 
 Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose HTML](https://github.com/JetBrains/compose-multiplatform#compose-html).
 
@@ -36,6 +36,12 @@ You can use blockquotes:
 > The trouble with quotes on the internet is you never know if they are genuine.
 >
 > -- Abraham Lincoln
+
+You can link to other Markdown documents with their route overrides resolved correctly (except for dynamic overrides):
+
+[documents/INDEX.md](documents/INDEX.md)<br>
+[KotlinLanguage.md](KotlinLanguage.md) (`routeOverride: languages/kotlin`)<br>
+[documents/Bananas.md](documents/Bananas.md) (`routeOverride: /fruits/`)
 
 You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is
 wrapped in a span.
