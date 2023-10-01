@@ -22,6 +22,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 abstract class ConvertMarkdownTask @Inject constructor(
@@ -132,14 +133,18 @@ abstract class ConvertMarkdownTask @Inject constructor(
     private class NodeCache(private val parser: Parser, private val roots: List<File>) {
         private val existingNodes = mutableMapOf<String, Node>()
 
-        fun get(file: File): Node = existingNodes.computeIfAbsent(file.toUnixSeparators()) {
+        fun get(file: File): Node = existingNodes.computeIfAbsent(file.canonicalFile.toUnixSeparators()) {
             parser.parse(file.readText())
         }
 
-        fun getRelative(relPath: String): Node? =
+        fun getRelative(relPath: String): Node? = try {
             roots.asSequence()
-                .map { it.resolve(relPath) }
-                .firstOrNull(File::exists)
-                ?.let(::get)
+                .map { it to it.resolve(relPath).canonicalFile }
+                // Make sure we don't access anything outside our markdown roots
+                .firstOrNull { (root, canonicalFile) -> canonicalFile.exists() && canonicalFile.isFile && canonicalFile.startsWith(root) }
+                ?.second?.let(::get)
+        } catch (ignored: IOException) {
+            null
+        }
     }
 }

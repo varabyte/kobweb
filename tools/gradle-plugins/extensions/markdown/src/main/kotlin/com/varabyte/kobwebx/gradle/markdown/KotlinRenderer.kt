@@ -346,7 +346,7 @@ class KotlinRenderer(
         override fun visit(link: Link) {
             // Links to other Markdown files, if the files are present, get converted to their corresponding generated routes
             if (link.destination.endsWith(".md")) {
-                val destinationPath = Path(filePath.substringBeforeLast('/', "")).resolve(link.destination).normalize().toString()
+                val destinationPath = Path(filePath).resolveSibling(link.destination).normalize().toString()
                 val destinationFile = markdownNodeGetter(destinationPath.removePrefix("/"))
                 if (destinationFile != null) {
                     // Retrieve the destination's route override, if present
