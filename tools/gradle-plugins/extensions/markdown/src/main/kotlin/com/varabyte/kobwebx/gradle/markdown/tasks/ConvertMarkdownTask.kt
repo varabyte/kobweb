@@ -125,7 +125,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     funName,
                     LoggingReporter(logger),
                 )
-                outputFile.writeText(ktRenderer.render(cache.get(mdFile)))
+                outputFile.writeText(ktRenderer.render(cache[mdFile]))
             }
         }
     }
@@ -153,7 +153,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
          * Once queried, the node will be cached so that subsequent calls to this method will not re-read the file. If
          * the file fails to parse, this method will throw an exception.
          */
-        fun get(file: File): Node = file.canonicalFile.let { canonicalFile ->
+        operator fun get(file: File): Node = file.canonicalFile.let { canonicalFile ->
             require(roots.any { canonicalFile.startsWith(it) }) {
                 "File $canonicalFile is not under any of the specified Markdown roots: $roots"
             }
