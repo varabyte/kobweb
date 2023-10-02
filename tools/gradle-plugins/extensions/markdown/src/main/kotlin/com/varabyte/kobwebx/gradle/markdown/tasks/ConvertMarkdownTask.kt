@@ -14,12 +14,15 @@ import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
+import org.commonmark.node.Node
+import org.commonmark.parser.Parser
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 abstract class ConvertMarkdownTask @Inject constructor(
@@ -59,7 +62,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        val parser = markdownFeatures.createParser()
+        val cache = NodeCache(markdownFeatures.createParser(), getMarkdownRoots().toList())
         getMarkdownFilesWithRoots().forEach { rootAndFile ->
             val mdFile = rootAndFile.file
             val mdPathRel = rootAndFile.relativeFile.toUnixSeparators()
@@ -113,6 +116,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 val funName = "${ktFileName.capitalize()}Page"
                 val ktRenderer = KotlinRenderer(
                     project,
+                    cache::getRelative,
                     markdownBlock.imports.get(),
                     mdPathRel,
                     markdownHandlers,
@@ -121,8 +125,26 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     funName,
                     LoggingReporter(logger),
                 )
-                outputFile.writeText(ktRenderer.render(parser.parse(mdFile.readText())))
+                outputFile.writeText(ktRenderer.render(cache.get(mdFile)))
             }
+        }
+    }
+
+    private class NodeCache(private val parser: Parser, private val roots: List<File>) {
+        private val existingNodes = mutableMapOf<String, Node>()
+
+        fun get(file: File): Node = existingNodes.computeIfAbsent(file.canonicalFile.toUnixSeparators()) {
+            parser.parse(file.readText())
+        }
+
+        fun getRelative(relPath: String): Node? = try {
+            roots.asSequence()
+                .map { it to it.resolve(relPath).canonicalFile }
+                // Make sure we don't access anything outside our markdown roots
+                .firstOrNull { (root, canonicalFile) -> canonicalFile.exists() && canonicalFile.isFile && canonicalFile.startsWith(root) }
+                ?.second?.let(::get)
+        } catch (ignored: IOException) {
+            null
         }
     }
 }
