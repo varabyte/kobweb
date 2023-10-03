@@ -1,6 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
+import com.varabyte.kobweb.common.navigation.Route
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
@@ -347,43 +348,26 @@ class KotlinRenderer(
             // Links to other Markdown files, if the files are present, get converted to their corresponding generated routes
             if (link.destination.endsWith(".md")) {
                 val destinationPath = Path(filePath).resolveSibling(link.destination).normalize().toString()
-                val destinationFile = markdownNodeGetter(destinationPath.removePrefix("/"))
-                if (destinationFile != null) {
+                val destinationNode = markdownNodeGetter(destinationPath.removePrefix("/"))
+                if (destinationNode != null) {
                     // Retrieve the destination's route override, if present
                     val frontMatterData = with(FrontMatterVisitor()) {
-                        destinationFile.accept(this)
+                        destinationNode.accept(this)
                         this.data
                     }
-                    val routeOverride = getRouteOverride(destinationPath, frontMatterData)
-
-                    if (routeOverride != null) {
-                        if ('{' in routeOverride)
-                            reporter.warn("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
-
-                        val prefix = if (routeOverride.startsWith('/')) {
-                            routeOverride.substringBeforeLast('/')
-                        } else {
-                            destinationPath.substringBeforeLast('/', "")
-                        }
-
-                        val extra = if (!routeOverride.startsWith('/') && '/' in routeOverride) {
-                            "/" + routeOverride.substringBeforeLast('/')
-                        } else {
-                            ""
-                        }
-
-                        val slug = when {
-                            routeOverride.substringAfterLast('/').lowercase() == "index" -> ""
-                            routeOverride.last() != '/' -> routeOverride.substringAfterLast('/')
-                            else -> destinationPath.substringAfterLast('/').substringBeforeLast('.').lowercase()
-                        }
-
-                        link.destination = "$prefix$extra/$slug"
-                    } else {
-                        link.destination = destinationPath.replaceAfterLast('/', destinationPath.substringAfterLast('/').lowercase().removeSuffix(".md").let { if (it == "index") "" else it })
+                    val route = Route(getRouteOverride(destinationPath, frontMatterData) ?: "")
+                    if (route.isDynamic) {
+                        error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
                     }
 
-                    link.destination = Path(link.destination).relativeToOrSelf(Path(filePath.substringBeforeLast('/', ""))).toString()
+                    // The final link destination should be the resolved route path relative to the current directory.
+                    // For example, if we're in the folder "a/b/" and we're linking to sibling file "sibling.md", then
+                    // `route.resolve` will return "/a/b/sibling", at which point we should remove the redundant "a/b"
+                    // prefix and end up just with "sibling". If a different route for page "elsewhere.md" gets resolved
+                    // to "/x/y/elsewhere", then we should end up with "../../x/y/elsewhere".
+                    link.destination = Path(route.resolve(destinationPath))
+                        .relativeToOrSelf(Path(filePath.substringBeforeLast('/', "")))
+                        .toString()
                 }
             }
 
