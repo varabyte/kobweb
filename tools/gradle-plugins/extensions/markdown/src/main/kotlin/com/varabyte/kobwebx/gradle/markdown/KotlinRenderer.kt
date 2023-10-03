@@ -46,7 +46,6 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import java.util.*
 import kotlin.io.path.Path
-import kotlin.io.path.relativeToOrSelf
 
 fun String.yamlStringToKotlinString(): String {
     return if (this.isSurrounded("\"")) {
@@ -360,14 +359,7 @@ class KotlinRenderer(
                         error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
                     }
 
-                    // The final link destination should be the resolved route path relative to the current directory.
-                    // For example, if we're in the folder "a/b/" and we're linking to sibling file "sibling.md", then
-                    // `route.resolve` will return "/a/b/sibling", at which point we should remove the redundant "a/b"
-                    // prefix and end up just with "sibling". If a different route for page "elsewhere.md" gets resolved
-                    // to "/x/y/elsewhere", then we should end up with "../../x/y/elsewhere".
-                    link.destination = Path(route.resolve(destinationPath))
-                        .relativeToOrSelf(Path(filePath.substringBeforeLast('/', "")))
-                        .toString()
+                    link.destination = route.resolve(destinationPath)
                 }
             }
 
