@@ -22,7 +22,7 @@ import org.w3c.dom.svg.SVGPolylineElement
 import org.w3c.dom.svg.SVGRectElement
 import org.w3c.dom.svg.SVGTextElement
 
-abstract class SVGElementScope(private val attrs: AttrsScope<SVGElement>) {
+abstract class SVGElementAttrsScope(private val attrs: AttrsScope<SVGElement>) {
     fun attr(name: String, value: String) {
         attrs.attr(name, value)
     }
@@ -69,7 +69,7 @@ enum class SVGFillRule {
 
 // endregion
 
-abstract class SVGShapeElementScope(attrs: AttrsScope<SVGElement>) : SVGElementScope(attrs) {
+abstract class SVGShapeElementAttrsScope(attrs: AttrsScope<SVGElement>) : SVGElementAttrsScope(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGPaintType) = this.attr("stroke", value.toString())
 
@@ -141,8 +141,8 @@ fun Svg(
 
 // region SVG children
 
-class SVGCircleScope internal constructor(private val attrs: AttrsScope<SVGCircleElement>) :
-    SVGShapeElementScope(attrs) {
+class SVGCircleAttrsScope internal constructor(private val attrs: AttrsScope<SVGCircleElement>) :
+    SVGShapeElementAttrsScope(attrs) {
     fun cx(value: Number) {
         attrs.attr("cx", value.toString())
     }
@@ -187,15 +187,15 @@ class SVGCircleScope internal constructor(private val attrs: AttrsScope<SVGCircl
  */
 
 @Composable
-fun ElementScope<SVGElement>.Circle(scope: SVGCircleScope.() -> Unit) {
+fun ElementScope<SVGElement>.Circle(attrs: SVGCircleAttrsScope.() -> Unit) {
     GenericTag("circle", "http://www.w3.org/2000/svg", attrs = {
-        SVGCircleScope(this).scope()
+        SVGCircleAttrsScope(this).attrs()
     })
 }
 
 
-class SVGCEllipseScope internal constructor(private val attrs: AttrsScope<SVGEllipseElement>) :
-    SVGShapeElementScope(attrs) {
+class SVGCEllipseAttrsScope internal constructor(private val attrs: AttrsScope<SVGEllipseElement>) :
+    SVGShapeElementAttrsScope(attrs) {
     fun cx(value: Number) {
         attrs.attr("cx", value.toString())
     }
@@ -249,9 +249,9 @@ class SVGCEllipseScope internal constructor(private val attrs: AttrsScope<SVGEll
  * @see <a href=https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse">SVG Ellipse Line (Mozilla Docs)</a>
  */
 @Composable
-fun ElementScope<SVGElement>.Ellipse(scope: SVGCEllipseScope.() -> Unit) {
+fun ElementScope<SVGElement>.Ellipse(attrs: SVGCEllipseAttrsScope.() -> Unit) {
     GenericTag("ellipse", "http://www.w3.org/2000/svg", attrs = {
-        SVGCEllipseScope(this).scope()
+        SVGCEllipseAttrsScope(this).attrs()
     })
 }
 
@@ -266,7 +266,8 @@ fun ElementScope<SVGElement>.Group(
 }
 
 
-class SVGLineScope internal constructor(private val attrs: AttrsScope<SVGLineElement>) : SVGShapeElementScope(attrs) {
+class SVGLineAttrsScope internal constructor(private val attrs: AttrsScope<SVGLineElement>) :
+    SVGShapeElementAttrsScope(attrs) {
     fun x1(value: Number) {
         attrs.attr("x1", value.toString())
     }
@@ -320,9 +321,9 @@ class SVGLineScope internal constructor(private val attrs: AttrsScope<SVGLineEle
  */
 
 @Composable
-fun ElementScope<SVGElement>.Line(scope: SVGLineScope.() -> Unit) {
+fun ElementScope<SVGElement>.Line(attrs: SVGLineAttrsScope.() -> Unit) {
     GenericTag("line", "http://www.w3.org/2000/svg", attrs = {
-        SVGLineScope(this).scope()
+        SVGLineAttrsScope(this).attrs()
     })
 }
 
@@ -392,10 +393,10 @@ class PathDataScope internal constructor() {
 }
 
 
-class SVGPathScope internal constructor(private val attrs: AttrsScope<SVGPathElement>) : SVGShapeElementScope(attrs) {
-
-    fun d(scope: PathDataScope.() -> Unit) {
-        attrs.attr("d", PathDataScope().apply(scope).pathCommands.joinToString(" "))
+class SVGPathAttrsScope internal constructor(private val attrs: AttrsScope<SVGPathElement>) :
+    SVGShapeElementAttrsScope(attrs) {
+    fun d(pathDataScope: PathDataScope.() -> Unit) {
+        attrs.attr("d", PathDataScope().apply(pathDataScope).pathCommands.joinToString(" "))
     }
 }
 
@@ -423,15 +424,15 @@ class SVGPathScope internal constructor(private val attrs: AttrsScope<SVGPathEle
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path">SVG Element Path (Mozilla Docs)</a>
  */
 @Composable
-fun ElementScope<SVGElement>.Path(scope: SVGPathScope.() -> Unit) {
+fun ElementScope<SVGElement>.Path(attrs: SVGPathAttrsScope.() -> Unit) {
     GenericTag("path", "http://www.w3.org/2000/svg", attrs = {
-        SVGPathScope(this).scope()
+        SVGPathAttrsScope(this).attrs()
     })
 }
 
 
-class SVGPolygonScope internal constructor(private val attrs: AttrsScope<SVGPolygonElement>) :
-    SVGShapeElementScope(attrs) {
+class SVGPolygonAttrsScope internal constructor(private val attrs: AttrsScope<SVGPolygonElement>) :
+    SVGShapeElementAttrsScope(attrs) {
     fun points(vararg pairs: Pair<Number, Number>) {
         val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
         attrs.attr("points", pointString)
@@ -454,15 +455,15 @@ class SVGPolygonScope internal constructor(private val attrs: AttrsScope<SVGPoly
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon">SVG Element Polygon (Mozilla Docs)</a>
  */
 @Composable
-fun ElementScope<SVGElement>.Polygon(scope: SVGPolygonScope.() -> Unit) {
+fun ElementScope<SVGElement>.Polygon(attrs: SVGPolygonAttrsScope.() -> Unit) {
     GenericTag("polygon", "http://www.w3.org/2000/svg", attrs = {
-        SVGPolygonScope(this).scope()
+        SVGPolygonAttrsScope(this).attrs()
     })
 }
 
 
-class SVGPolylineScope internal constructor(private val attrs: AttrsScope<SVGPolylineElement>) :
-    SVGShapeElementScope(attrs) {
+class SVGPolylineAttrsScope internal constructor(private val attrs: AttrsScope<SVGPolylineElement>) :
+    SVGShapeElementAttrsScope(attrs) {
     fun points(vararg pairs: Pair<Number, Number>) {
         val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
         attrs.attr("points", pointString)
@@ -486,14 +487,15 @@ class SVGPolylineScope internal constructor(private val attrs: AttrsScope<SVGPol
  */
 
 @Composable
-fun ElementScope<SVGElement>.Polyline(scope: SVGPolylineScope.() -> Unit) {
+fun ElementScope<SVGElement>.Polyline(attrs: SVGPolylineAttrsScope.() -> Unit) {
     GenericTag("polyline", "http://www.w3.org/2000/svg", attrs = {
-        SVGPolylineScope(this).scope()
+        SVGPolylineAttrsScope(this).attrs()
     })
 }
 
 
-class SVGCRectScope internal constructor(private val attrs: AttrsScope<SVGRectElement>) : SVGShapeElementScope(attrs) {
+class SVGCRectAttrsScope internal constructor(private val attrs: AttrsScope<SVGRectElement>) :
+    SVGShapeElementAttrsScope(attrs) {
     fun x(value: Number) {
         attrs.attr("x", value.toString())
     }
@@ -574,9 +576,9 @@ class SVGCRectScope internal constructor(private val attrs: AttrsScope<SVGRectEl
  */
 
 @Composable
-fun ElementScope<SVGElement>.Rect(scope: SVGCRectScope.() -> Unit) {
+fun ElementScope<SVGElement>.Rect(attrs: SVGCRectAttrsScope.() -> Unit) {
     GenericTag("rect", "http://www.w3.org/2000/svg", attrs = {
-        SVGCRectScope(this).scope()
+        SVGCRectAttrsScope(this).attrs()
     })
 }
 
@@ -588,7 +590,8 @@ enum class SvgTextLengthAdjust {
     override fun toString() = this.toSvgValue()
 }
 
-class SVGTextScope internal constructor(private val attrs: AttrsScope<SVGTextElement>) : SVGShapeElementScope(attrs) {
+class SVGTextAttrsScope internal constructor(private val attrs: AttrsScope<SVGTextElement>) :
+    SVGShapeElementAttrsScope(attrs) {
 
     fun x(value: Number) {
         attrs.attr("x", value.toString())
@@ -706,10 +709,10 @@ class SVGTextScope internal constructor(private val attrs: AttrsScope<SVGTextEle
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text">SVG Element Text (Mozilla Docs)</a>
  */
 @Composable
-fun ElementScope<SVGElement>.Text(text: String, scope: SVGTextScope.() -> Unit) {
+fun ElementScope<SVGElement>.Text(text: String, attrs: SVGTextAttrsScope.() -> Unit) {
     @Suppress("RemoveExplicitTypeArguments") // IDE wants to remove generic type but that causes a compile error
     GenericTag<SVGTextElement>("text", "http://www.w3.org/2000/svg", attrs = {
-        SVGTextScope(this).scope()
+        SVGTextAttrsScope(this).attrs()
     }) {
         Text(text)
     }
