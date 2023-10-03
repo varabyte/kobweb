@@ -104,7 +104,7 @@ class KotlinRenderer(
                 appendLine()
 
                 append("@Page")
-                getRouteOverride(filePath, frontMatterData)?.let{ append("(\"$it\")") }
+                getRouteOverride(filePath, frontMatterData)?.let { append("(\"$it\")") }
                 appendLine()
 
                 appendLine("@Composable")
