@@ -41,7 +41,8 @@ You can link to other Markdown documents with their route overrides resolved cor
 
 [documents/INDEX.md](documents/INDEX.md)<br>
 [KotlinLanguage.md](KotlinLanguage.md) (`routeOverride: languages/kotlin`)<br>
-[documents/Bananas.md](documents/Bananas.md) (`routeOverride: /fruits/`)
+[documents/Bananas.md](documents/Bananas.md) (`routeOverride: /fruits/`)<br>
+[files/external.md](/files/external.md) (Linking to a Markdown file outside of the processed markdown files)<br>
 
 You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is
 wrapped in a span.

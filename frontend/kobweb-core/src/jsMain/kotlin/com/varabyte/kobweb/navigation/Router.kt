@@ -275,6 +275,12 @@ class Router {
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE
     ): Boolean {
+        val extension = pathQueryAndFragment.substringAfterLast('.', "")
+        if (extension.isNotEmpty() && extension != "html") {
+            // If the user is trying to navigate to a file with an extension that isn't .html or .htm, then we assume
+            // they are trying to open a file hosted on this server. In that case, we aren't routing.
+            return false
+        }
 
         @Suppress("NAME_SHADOWING") // Intentionally transformed
         var pathQueryAndFragment = pathQueryAndFragment
