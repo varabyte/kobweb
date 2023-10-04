@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.io.consumeAsync
-import com.varabyte.kobweb.common.path.toUnixSeparators
+import com.varabyte.kobweb.common.path.invariantSeparatorsPath
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.remoteDebugging
 import com.varabyte.kobweb.gradle.application.extensions.server
@@ -59,7 +59,7 @@ abstract class KobwebStartTask @Inject constructor(
         val javaHome = System.getenv("KOBWEB_JAVA_HOME") ?: System.getProperty("java.home")!!
         val remoteDebuggingEnabled = (env == ServerEnvironment.DEV && block.app.server.remoteDebugging.enabled.get())
         val processParams = buildList<String> {
-            add("${javaHome.toUnixSeparators()}/bin/java")
+            add("${javaHome.invariantSeparatorsPath}/bin/java")
             add(env.toSystemPropertyParam())
             add(siteLayout.toSystemPropertyParam())
             // See: https://ktor.io/docs/development-mode.html#system-property)

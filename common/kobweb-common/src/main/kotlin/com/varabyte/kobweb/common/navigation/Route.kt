@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.common.navigation
 
-import com.varabyte.kobweb.common.path.toUnixSeparators
+import com.varabyte.kobweb.common.path.invariantSeparatorsPath
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.common.text.prefixIfNot
 
@@ -35,7 +35,7 @@ value class Route(private val routeStr: String) {
      *   Kotlin source file (which would be the reference path in that case).
      */
     fun resolve(referencePath: String): String {
-        @Suppress("NAME_SHADOWING") val referencePath = referencePath.toUnixSeparators().prefixIfNot("/")
+        @Suppress("NAME_SHADOWING") val referencePath = referencePath.invariantSeparatorsPath.prefixIfNot("/")
         require(!referencePath.endsWith('/')) {
             "Reference path should specify a file, but got a directory: $referencePath"
         }

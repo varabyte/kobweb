@@ -4,7 +4,6 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.varabyte.kobweb.common.navigation.RoutePrefix
-import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
@@ -199,7 +198,7 @@ abstract class KobwebExportTask @Inject constructor(
         // defined by the site.
         getResourceFilesJsWithRoots().forEach { rootAndFile ->
             // Drop the leading slash so we don't confuse File resolve logic
-            val relativePath = rootAndFile.relativeFile.toUnixSeparators().substringAfter(getPublicPath()).drop(1)
+            val relativePath = rootAndFile.relativeFile.invariantSeparatorsPath.substringAfter(getPublicPath()).drop(1)
             if (relativePath == "index.html" && siteLayout != SiteLayout.KOBWEB) return@forEach
 
             (if (relativePath != "index.html") resourcesRoot else systemRoot)

@@ -10,7 +10,6 @@ import com.varabyte.kobweb.api.stream.Stream
 import com.varabyte.kobweb.api.stream.StreamClientId
 import com.varabyte.kobweb.api.stream.StreamEvent
 import com.varabyte.kobweb.common.error.KobwebException
-import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
@@ -518,7 +517,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
 
         resourcesRoot.toFile().let { resourcesRootFile ->
             resourcesRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
-                get("$routePrefix/${file.relativeTo(resourcesRootFile).toUnixSeparators()}") {
+                get("$routePrefix/${file.relativeTo(resourcesRootFile).invariantSeparatorsPath}") {
                     call.respondFile(file)
                 }
             }
@@ -527,7 +526,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
             pagesRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
                 val relativeFile = file.relativeTo(pagesRootFile)
                 val name = relativeFile.nameWithoutExtension
-                val parent = relativeFile.parent?.let { "${it.toUnixSeparators()}/" } ?: ""
+                val parent = relativeFile.parentFile?.let { "${it.invariantSeparatorsPath}/" } ?: ""
 
                 get(if (name != "index") "$routePrefix/$parent$name" else "$routePrefix/$parent") {
                     call.respondFile(file)

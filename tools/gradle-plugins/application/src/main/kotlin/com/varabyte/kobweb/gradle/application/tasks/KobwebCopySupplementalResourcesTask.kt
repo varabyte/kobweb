@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.path.toUnixSeparators
+import com.varabyte.kobweb.common.path.invariantSeparatorsPath
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
@@ -51,7 +51,8 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
                                 if (!this.isDirectory) {
                                     // relativePath always uses forward slash. Convert the absolute path to forward slashes,
                                     // therefore, before removing the suffix, or else Windows breaks.
-                                    val root = File(file.absolutePath.toUnixSeparators().removeSuffix(relativePath))
+                                    val root =
+                                        File(file.absolutePath.invariantSeparatorsPath.removeSuffix(relativePath))
                                     add(jar to RootAndFile(root, file))
                                 }
                             }
@@ -69,7 +70,7 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
                 }
             }.forEach { (jar, rootAndFile) ->
                 val targetFile =
-                    getGenPublicRoot().resolve(rootAndFile.relativeFile.toUnixSeparators().removePrefix("public/"))
+                    getGenPublicRoot().resolve(rootAndFile.relativeFile.invariantSeparatorsPath.removePrefix("public/"))
                 if (targetFile.exists() && !rootAndFile.file.readBytes().contentEquals(targetFile.readBytes())) {
                     logger.warn("Overwriting ${rootAndFile.relativeFile} with the public resource found in ${jar.name}")
                 }

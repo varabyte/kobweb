@@ -2,7 +2,6 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.toPackageName
-import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
@@ -65,7 +64,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
         val cache = NodeCache(markdownFeatures.createParser(), getMarkdownRoots().toList())
         getMarkdownFilesWithRoots().forEach { rootAndFile ->
             val mdFile = rootAndFile.file
-            val mdPathRel = rootAndFile.relativeFile.toUnixSeparators()
+            val mdPathRel = rootAndFile.relativeFile.invariantSeparatorsPath
 
             val parts = mdPathRel.split('/')
             val dirParts = parts.subList(0, parts.lastIndex)
@@ -157,7 +156,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
             require(roots.any { canonicalFile.startsWith(it) }) {
                 "File $canonicalFile is not under any of the specified Markdown roots: $roots"
             }
-            existingNodes.computeIfAbsent(canonicalFile.toUnixSeparators()) {
+            existingNodes.computeIfAbsent(canonicalFile.invariantSeparatorsPath) {
                 parser.parse(canonicalFile.readText())
             }
         }

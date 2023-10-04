@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.gradle.core.tasks
 
-import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
@@ -23,7 +22,7 @@ abstract class KobwebModuleTask(@get:Internal val kobwebBlock: KobwebBlock, desc
 
     @Internal
     fun getResourceFilesJsWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(project.jsTarget)
-        .filter { rootAndFile -> rootAndFile.relativeFile.toUnixSeparators().startsWith("${getPublicPath()}/") }
+        .filter { rootAndFile -> rootAndFile.relativeFile.invariantSeparatorsPath.startsWith("${getPublicPath()}/") }
 
     @Internal
     protected fun getResourceFilesJs(): List<File> = getResourceFilesJsWithRoots().map { it.file }.toList()

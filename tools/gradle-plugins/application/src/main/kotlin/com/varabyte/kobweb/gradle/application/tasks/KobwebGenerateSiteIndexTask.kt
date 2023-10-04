@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
-import com.varabyte.kobweb.common.path.toUnixSeparators
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
@@ -59,7 +58,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         }
 
         getResourceFilesJsWithRoots()
-            .mapNotNull { rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.layout.buildDirectory.asFile.get()) && rootAndFile.relativeFile.toUnixSeparators() == "public/index.html" } }
+            .mapNotNull { rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.layout.buildDirectory.asFile.get()) && rootAndFile.relativeFile.invariantSeparatorsPath == "public/index.html" } }
             .singleOrNull()
             ?.let { indexFile ->
                 logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
