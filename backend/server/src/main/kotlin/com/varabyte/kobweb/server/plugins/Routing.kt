@@ -80,6 +80,9 @@ fun Application.configureRouting(
     conf: KobwebConf,
     globals: ServerGlobals
 ) {
+    // "example/" should resolve to "example/index.html" if present, but default ktor behavior rejects trailing slashes.
+    this.install(IgnoreTrailingSlash)
+
     val logger = object : Logger {
         override fun trace(message: String) = log.trace(message)
         override fun debug(message: String) = log.debug(message)
@@ -383,13 +386,6 @@ private fun Routing.configureCatchAllRouting(
 ) {
     val scriptMap = Path("$script.map")
 
-    // Catch URLs which end in a trailing slash (e.g. a/b/c/)
-    get("$routePrefix/{$KOBWEB_PARAMS...}/") {
-        val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
-        handleCatchAllRouting(script, scriptMap, index, pathParts, extraHandler)
-    }
-
-    // Catch URLs which end with a slug (e.g. a/b/c/slug)
     get("$routePrefix/{$KOBWEB_PARAMS...}") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
         handleCatchAllRouting(script, scriptMap, index, pathParts, extraHandler)
@@ -546,12 +542,6 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
  */
 private fun Application.configureStaticRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
-
-    // "example/" should resolve to "example/index.html" if present, but static files by default treat a trailing slash
-    // as an error.
-    // Dev note: It's possible we want to install this plugin more generally, but that will require a deeper audit of
-    // the rest of the routing code in here, since currently slash handlers are explicitly added.
-    this.install(IgnoreTrailingSlash)
 
     routing {
         staticFiles(conf.site.routePrefixNormalized, siteRoot.toFile()) {
