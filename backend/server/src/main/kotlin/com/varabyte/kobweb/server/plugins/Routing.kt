@@ -547,6 +547,12 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
 private fun Application.configureStaticRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
 
+    // "example/" should resolve to "example/index.html" if present, but static files by default treat a trailing slash
+    // as an error.
+    // Dev note: It's possible we want to install this plugin more generally, but that will require a deeper audit of
+    // the rest of the routing code in here, since currently slash handlers are explicitly added.
+    this.install(IgnoreTrailingSlash)
+
     routing {
         staticFiles(conf.site.routePrefixNormalized, siteRoot.toFile()) {
             extensions("html")
