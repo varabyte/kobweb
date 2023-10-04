@@ -2,7 +2,7 @@
 playwright="1.33.0"
 commonmark = "0.18.0"
 compose = "1.5.1"
-jsoup = "1.14.3"
+jsoup = "1.16.1"
 kaml = "0.35.3"
 kobweb-libs = "0.14.2-SNAPSHOT"
 kotlin = "1.9.10"
