@@ -20,7 +20,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
             // setting the current element to grid but then jam all of its children into its top-left (and only) cell.
             grid {
                 // Why minmax? See: https://github.com/w3c/csswg-drafts/issues/1777
-                cols { minmax(0.px, 1.fr) }
+                columns { minmax(0.px, 1.fr) }
                 rows { minmax(0.px, 1.fr) }
             }
         }

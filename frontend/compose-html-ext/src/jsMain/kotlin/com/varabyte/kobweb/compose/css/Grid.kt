@@ -292,16 +292,32 @@ fun StyleScope.gridTemplateRows(block: GridTrackBuilder.() -> Unit) {
 
 @GridDslMarker
 abstract class GridBuilderInAuto {
-    protected var cols: List<GridEntry>? = null
+    protected var columns: List<GridEntry>? = null
     protected var rows: List<GridEntry>? = null
     protected var autoBuilder: GridBuilder? = null
 
+    @Deprecated(
+        "`col` has been renamed to `column` to be more consistent with CSS API naming.",
+        ReplaceWith("column(value)")
+    )
     fun col(value: CSSLengthOrPercentageValue) {
-        cols = GridTrackBuilder().apply { size(value) }.tracks
+        column(value)
     }
 
+    @Deprecated(
+        "`col` has been renamed to `column` to be more consistent with CSS API naming.",
+        ReplaceWith("column(value)")
+    )
     fun col(value: CSSFlexValue) {
-        cols = GridTrackBuilder().apply { size(value) }.tracks
+        column(value)
+    }
+
+    fun column(value: CSSLengthOrPercentageValue) {
+        columns = GridTrackBuilder().apply { size(value) }.tracks
+    }
+
+    fun column(value: CSSFlexValue) {
+        columns = GridTrackBuilder().apply { size(value) }.tracks
     }
 
     fun row(value: CSSLengthOrPercentageValue) {
@@ -312,8 +328,16 @@ abstract class GridBuilderInAuto {
         rows = GridTrackBuilder().apply { size(value) }.tracks
     }
 
+    @Deprecated(
+        "`cols` has been renamed to `columns` to be more consistent with CSS API naming.",
+        ReplaceWith("columns(block)")
+    )
     fun cols(block: GridTrackBuilder.() -> Unit) {
-        cols = GridTrackBuilder().apply(block).tracks
+        columns(block)
+    }
+
+    fun columns(block: GridTrackBuilder.() -> Unit) {
+        columns = GridTrackBuilder().apply(block).tracks
     }
 
     fun rows(block: GridTrackBuilder.() -> Unit) {
@@ -322,10 +346,10 @@ abstract class GridBuilderInAuto {
 
     internal fun buildInto(scope: StyleScope) {
         scope.display(DisplayStyle.Grid)
-        cols?.let { scope.gridTemplateColumns(it.toTrackListString()) }
+        columns?.let { scope.gridTemplateColumns(it.toTrackListString()) }
         rows?.let { scope.gridTemplateRows(it.toTrackListString()) }
         autoBuilder?.let { autoBuilder ->
-            autoBuilder.cols?.let { scope.gridAutoColumns(it.toTrackListString()) }
+            autoBuilder.columns?.let { scope.gridAutoColumns(it.toTrackListString()) }
             autoBuilder.rows?.let { scope.gridAutoRows(it.toTrackListString()) }
         }
     }
@@ -354,7 +378,7 @@ abstract class GridBuilderInAuto {
  * Modifier.grid {
  *   cols { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
  *   rows { size(1.fr); size(1.fr) }
- *   auto { col(50.px) }
+ *   auto { column(50.px) }
  * }
  * ```
  */
