@@ -27,6 +27,20 @@ interface ColorScheme {
  */
 @Suppress("unused")
 object ColorSchemes {
+    /** A color scheme which ranges from near white (_50) to near black (_900). */
+    val Monochrome = object : ColorScheme {
+        override val _50 = Color.rgb(0XF2F2F2)
+        override val _100 = Color.rgb(0XE6E6E6)
+        override val _200 = Color.rgb(0XCCCCCC)
+        override val _300 = Color.rgb(0XB3B3B3)
+        override val _400 = Color.rgb(0X999999)
+        override val _500 = Color.rgb(0X808080)
+        override val _600 = Color.rgb(0X666666)
+        override val _700 = Color.rgb(0X4D4D4D)
+        override val _800 = Color.rgb(0X333333)
+        override val _900 = Color.rgb(0X1A1A1A)
+    }
+
     val Red = object : ColorScheme {
         override val _50 = Color.rgb(0xFFEBEE)
         override val _100 = Color.rgb(0xFFCDD2)
