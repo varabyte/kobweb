@@ -1,14 +1,21 @@
-![version: 0.14.1](https://img.shields.io/badge/kobweb-0.14.1-blue)
-![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)
+<p align="center">
+<img src="https://github.com/varabyte/media/raw/main/kobweb/screencasts/kobweb-welcome.gif" />
+</p>
+<p align="center">
+<img alt="Version" src="https://img.shields.io/badge/kobweb-0.14.1-blue">
+<img alt="CLI Version" src="https://img.shields.io/badge/kobweb_cli-0.9.13-blue">
+<img alt="Kotlin Version" src="https://img.shields.io/badge/kotlin-1.9.10-blue?logo=kotlin">
 <br>
-![kotlin: 1.9.10](https://img.shields.io/badge/kotlin-1.9.10-blue?logo=kotlin)
-![compose: 1.5.1](https://img.shields.io/badge/compose-1.5.1-blue?logo=jetpackcompose)
-![ktor: 2.3.0](https://img.shields.io/badge/ktor-2.3.0-blue)
+<img alt="Compose Version" src="https://img.shields.io/badge/compose-1.5.1-blue?logo=jetpackcompose">
+<img alt="Ktor Version" src="https://img.shields.io/badge/ktor-2.3.0-blue">
 <br>
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
 </a>
-[![Mastodon Follow](https://img.shields.io/mastodon/follow/109382855401210782?domain=https%3A%2F%2Ffosstodon.org&style=social)](https://fosstodon.org/@bitspittle)
+<a href="https://fosstodon.org/@bitspittle">
+<img alt="Mastodon Follow Discord" src="https://img.shields.io/mastodon/follow/109382855401210782?domain=https%3A%2F%2Ffosstodon.org&style=social" />
+</a>
+</p>
 
 # K🕸️bweb
 
@@ -44,10 +51,6 @@ fun HomePage() {
 }
 ```
 
-<p align="center">
-<img src="https://github.com/varabyte/media/raw/main/kobweb/screencasts/kobweb-welcome.gif" />
-</p>
-
 ---
 
 **Kobweb is still only publishing pre-release versions, but it's been usable for a while now, and it is getting close to
@@ -74,7 +77,7 @@ Here's a demo where we create a Compose HTML project from scratch with Markdown 
 
 https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-aac0-88f8992145ef.mp4
 
-> [!NOTE]
+> **_NOTE:_** 
 > One of Kobweb's users, Stevdza-San, has created YouTube videos that demonstrate how to build projects using Kobweb.
 >
 > * [Building a static layout site](https://www.youtube.com/watch?v=F5B-CxJTKlg)
@@ -86,6 +89,8 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 >     to have any other frontend besides web).
 > * It's easy to start with a static layout site and migrate to a full stack site later. (You can read more about
 >   [Static vs. Fullstack sites ▼](#static-layout-vs-full-stack-sites) below.)
+>
+
 
 # Trying it out yourself
 
@@ -308,7 +313,7 @@ links, making it easy to navigate to the relevant source.
 `kobweb` itself delegates to Gradle, but nothing is stopping you from calling the commands yourself. You can create
 Gradle run configurations for each of the Kobweb commands.
 
-> [!NOTE]
+> **_NOTE:_** 
 > When you run a Kobweb CLI command that delegates to Gradle, it will log the Gradle command to the console. This is
 > how you can discover the Gradle commands discussed in this section.
 
@@ -374,7 +379,7 @@ fun SettingsPage() {
 
 this will create a page that I can then visit by going to `mysite.com/admin/settings`.
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > The last part of a URL, here `settings`, is called a *slug*.
 
 By default, the slug comes from the file name, but this behavior can be overridden (more on that shortly).
@@ -422,8 +427,8 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 | `@Page("/")`            | `example.com/slug`              |
 | `@Page("/other")`       | `example.com/other`             |
 
-> [!WARNING]
-> Despite the flexibility allowed here, you should not be using this feature frequently, if at all. A Kobweb project
+> **__WARNING:__**
+> Despite the flexibility allowed here, you should **not** be using this feature frequently, if at all. A Kobweb project
 > benefits from the fact that a user can easily associate a URL on your site with a file in your codebase, but this
 > feature allows you to break those assumptions. It is mainly provided to enable dynamic routing (see the *Dynamic
 > Routes* section below) or enabling a URL name that uses characters which aren't allowed in Kotlin filenames.
@@ -570,7 +575,7 @@ fun PostPage() {
 }
 ```
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > You should avoid creating URL paths where the dynamic path and the query parameters have the same name, as in
 > `mysite.com/posts/{post}?post=...`, as this could be really tricky to debug in a complex project. If there is a
 > conflict, then the dynamic route parameters will take precedence. (You can still access the query parameter value via
@@ -947,7 +952,7 @@ val HighlightedCustomVariant by CustomStyle.addVariant {
 }
 ```
 
-> [!NOTE]
+> **__NOTE:__**
 > A common naming convention for variants is to take their associated style and use its name as a suffix plus the word
 > "Variant", e.g. "ButtonStyle" -> "GhostButtonVariant" and "TextStyle" -> "OutlinedTextVariant".
 
@@ -972,7 +977,7 @@ both styles will be applied -- the base style followed by the variant style.
 For example, `MyButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first followed by additional
 outline styling.
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > Using a variant that was created from a different style will have no effect. In other words,
 > `LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.
 
@@ -1204,7 +1209,7 @@ Div {
 Kobweb supports CSS variables (also called CSS custom properties), which is a feature where you can store and retrieve
 property values from variables declared within your CSS styles. It does this through a class called `StyleVariable`.
 
-> [!NOTE]
+> **__NOTE:__**
 > You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).
 
 Using variables is fairly simple. You first declare one without a value (but lock it down to a type) and later you can
@@ -1256,7 +1261,7 @@ val DialogStyle300 by ComponentStyle {
 }
 ```
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > In the above example, we have one line where we set a variable and query it in the same style, which we did purely for
 > demonstration purposes. In practice, you would probably never do this -- the variable should have been set separately
 > earlier.
@@ -1455,7 +1460,7 @@ All Font Awesome composables accept a modifier parameter, so you can tweak it fu
 FaSpider(Modifier.color(Colors.Red))
 ```
 
-> [!NOTE]
+> **__NOTE:__**
 > When you create a project using our `app` template, Font Awesome icons are included.
 
 ### Material Design Icons
@@ -1581,7 +1586,7 @@ as the logic that runs on the backend (i.e. on a server somewhere). This custom 
 like a static web hosting service does) plus it should also define endpoints providing unique functionality tailored to
 your site's needs.
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
 > designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
 > layout, to emphasize how tightly coupled it is to a Kobweb server.
@@ -1668,7 +1673,7 @@ kotlin {
 }
 ```
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > `configAsKobwebApplication(includeServer = true)` declares and sets up both `js()` and `jvm()`
 > [Kotlin Multiplatform targets](https://kotlinlang.org/docs/multiplatform-set-up-targets.html) for you. If you don't
 > set `includeServer = true` explicitly, only the JS target will be declared.
@@ -1793,7 +1798,7 @@ fun ApiStreamDemoPage() {
 After running your project, you can click on the button and check the console logs. If everything is working properly,
 you should see "Echoed: hello!" for each time you pressed the button.
 
-> [!NOTE]
+> **__NOTE:__**
 > The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
 > reference that project for a more realistic example.
 
@@ -1884,7 +1889,7 @@ routes are generally safe to use, so use them often. However, if you have a situ
 events in real-time, especially situations where you want your client to be continuously directed what to do by the
 server via events, API streams are a great choice.
 
-> [!NOTE]
+> **__NOTE:__**
 > You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
 > implemented with. Any discussions about them should apply here as well.
 
@@ -1933,7 +1938,7 @@ fun AuthorWidget() {
 }
 ```
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
 > `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`.
 
@@ -2058,7 +2063,7 @@ Occasionally, you may want to insert a smaller widget into the flow of a single 
 Press ${.components.widgets.ColorButton} to toggle the site's current color.
 ```
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
 > it as text.
 
@@ -2186,7 +2191,7 @@ by hand.
 The recommended best practice is to create a Gradle task that is associated with its own unique output directory, use
 the task to write some code to disk under that directory, and then add that task as a source directory for your project.
 
-> [!NOTE]
+> **__NOTE:__**
 > The reason to encourage tasks with their own unique output directory is because this approach is very friendly with
 > Gradle caching. You may [read more here](https://docs.gradle.org/current/userguide/build_cache_concepts.html#concepts_overlapping_outputs)
 > to learn about this in more detail.
@@ -2494,7 +2499,7 @@ main way users could affect the server's behavior.
 That said, there will always be some use-cases that Kobweb won't anticipate. So as an escape hatch, Kobweb allows users
 who know what they're doing to write their own plugins to extend the server.
 
-> [!NOTE]
+> **__NOTE:__**
 > The Kobweb Server plugin feature is still fairly new. If you use it, please consider
 > [filing issues](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
 > for any missing features and [connecting with us▼](#connecting-with-us) to share any feedback you have about your
@@ -2685,7 +2690,7 @@ different steps to debug them.
 At the moment, attaching a debugger to Kotlin/JS code requires IntelliJ Ultimate. If you have it, you
 can [follow these steps](https://kotlinlang.org/docs/js-debugging.html#debug-in-the-ide) in the official docs.
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > Be sure the port in your URL matches the port you specified in your `.kobweb/conf.yaml` file. By default, this
 > is 8080.
 
@@ -2693,7 +2698,7 @@ If you do not have access to IntelliJ Ultimate, then you'll have to rely on `pri
 great, live reloading plus Kotlin's type system generally help you incrementally build your site up without too many
 issues.
 
-> [!NOTE]
+> **__NOTE:__**
 > If you're a student, you can apply for a free IntelliJ Ultimate
 > license [here](https://www.jetbrains.com/community/education/#students). If you maintain an open source project, you
 > can apply [here](https://www.jetbrains.com/community/opensource/#support).
@@ -2716,7 +2721,7 @@ kobweb {
 }
 ```
 
-> [!NOTE]
+> **__NOTE:__**
 > Specifying the port is optional. Otherwise, it is 5005, a common remote debugging default. If you ever need to debug
 > multiple Kobweb servers at the same time, however, it can be useful to change it.
 
@@ -2724,7 +2729,7 @@ Once you've enabled remote debugging support, you can
 then [follow the official documentation](https://www.jetbrains.com/help/idea/attaching-to-local-process.html#attach-to-remote)
 to add a *remote JVM debug* configuration to your IDE.
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > For remote debugging to work:
 > * The *Debugger Mode* should be set to *Attach to remote JVM*.
 > * You need to correctly specify the *Use module classpath* value. In general, use the `jvmMain` classpath associated
@@ -2733,7 +2738,7 @@ to add a *remote JVM debug* configuration to your IDE.
 
 At this point, start up your Kobweb server using `kobweb run`.
 
-> [!IMPORTANT]
+> **__IMPORTANT:__**
 > Remote debugging is only supported in dev mode. It will not be enabled for a server started with
 > `kobweb run --env prod`.
 
@@ -2752,7 +2757,7 @@ double-check the values in your `conf.yaml` file, restart the server, and try ag
 The easiest way to use a custom font is if it is already hosted for you. For example, Google Fonts provides a CDN that
 you can use to load fonts from directly.
 
-> [!NOTE]
+> **__NOTE:__**
 > While this is the easiest approach, be sure you won't run into compliance issues! If you use Google Fonts on your
 > site, you may technically be in violation of the GDPR in Europe, because an EU citizen's IP address is communicated to
 > Google and logged. You may wish to find a Europe-safe host instead, or self-host, which you can read about
@@ -2830,7 +2835,7 @@ where `faces.css` contains all your `@font-face` rule definitions (we just have 
 }
 ```
 
-> [!NOTE]
+> **__NOTE:__**
 > The above layout may be slightly overkill if you are sure you'll only ever have a single font, but it's flexible
 > enough to support additional fonts if you decide to add more in the future, which is why we recommend it as general
 > advice here.
