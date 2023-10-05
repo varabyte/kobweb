@@ -107,7 +107,7 @@ fun Modifier.gridColumn(start: Int, end: String) = styleModifier {
     gridColumn(start, end)
 }
 
-fun Modifier.gridColumn(start: Int, end: Int) = styleModifier {
+fun Modifier.gridColumn(start: Int, end: Int = start + 1) = styleModifier {
     gridColumn(start, end)
 }
 
@@ -143,7 +143,7 @@ fun Modifier.gridRow(start: Int, end: String) = styleModifier {
     gridRow(start, end)
 }
 
-fun Modifier.gridRow(start: Int, end: Int) = styleModifier {
+fun Modifier.gridRow(start: Int, end: Int = start + 1) = styleModifier {
     gridRow(start, end)
 }
 
@@ -185,16 +185,16 @@ fun Modifier.gridArea(rowStart: String, columnStart: String, rowEnd: String, col
  * Note that the indices are 1-based, not 0-based.
  */
 fun Modifier.gridItem(row: Int, column: Int, width: Int? = null, height: Int? = null) = styleModifier {
-    if (width != null) {
-        check(width > 0) { "Grid item width must be > 0, got $width" }
-        gridRow(row, row + width)
+    if (height != null) {
+        check(height > 0) { "Grid item height must be > 0, got $height" }
+        gridRow(row, row + height)
     } else {
         gridRowStart(row)
     }
 
-    if (height != null) {
-        check(height > 0) { "Grid item height must be > 0, got $height" }
-        gridColumn(column, column + height)
+    if (width != null) {
+        check(width > 0) { "Grid item width must be > 0, got $width" }
+        gridColumn(column, column + width)
     } else {
         gridColumnStart(column)
     }
