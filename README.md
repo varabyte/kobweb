@@ -777,6 +777,27 @@ Box(Modifier.backgroundColor(Colors.Red)) { /* ... */ }
 Box(CustomStyle.toModifier()) { /* ... */ }
 ```
 
+> [!IMPORTANT]
+> When you declare a `ComponentStyle`, it must be public. This is because code gets generated inside a `main.kt` file by
+> the Kobweb Gradle plugin, and that code needs to be able to access your style in order to register it.
+>
+> In general, it's a good idea to think of styles as global anyway, since technically they all live in a globally
+> applied stylesheet, and you have to make sure that the style name is unique across your whole application.
+>
+> You can technically make a style private if you add a bit of boilerplate to handle the registration yourself:
+>
+> ```kotlin
+> @Suppress("PRIVATE_COMPONENT_STYLE")
+> private val SomeCustomStyle by ComponentStyle { /* ... */ }
+>
+> @InitSilk
+> fun registerPrivateStyle(ctx: InitSilkContext) {
+>   ctx.theme.registerComponentStyle(SomeCustomStyle)
+> }
+> ```
+>
+> However, you are encouraged to keep your styles public and let the Kobweb Gradle plugin handle everything for you.
+
 #### `ComponentStyle.base`
 
 You can simplify the syntax of basic component styles a bit further with the `ComponentStyle.base` declaration:
@@ -951,6 +972,27 @@ val HighlightedCustomVariant by CustomStyle.addVariant {
 > A common naming convention for variants is to take their associated style and use its name as a suffix plus the word
 > "Variant", e.g. "ButtonStyle" -> "GhostButtonVariant" and "TextStyle" -> "OutlinedTextVariant".
 
+> [!IMPORTANT]
+> Like a `ComponentStyle`, your `ComponentVariant` must be public. This is for the same reason: because code gets
+> generated inside a `main.kt` file by the Kobweb Gradle plugin, and that code needs to be able to access your variant
+> in order to register it.
+>
+> You can technically make a variant private if you add a bit of boilerplate to handle the registration yourself:
+>
+> ```kotlin
+> @Suppress("PRIVATE_COMPONENT_VARIANT")
+> private val SomeCustomVariant by SomeCustomStyle.addVariant {
+>   /* ... */ 
+> }
+>
+> @InitSilk
+> fun registerPrivateVariant(ctx: InitSilkContext) {
+>   ctx.theme.registerComponentVariant(SomeCustomStyle)
+> }
+> ```
+>
+> However, you are encouraged to keep your variants public and let the Kobweb Gradle plugin handle everything for you.
+
 Variants can be particularly useful if you're defining a custom widget that has default styles, but you want to give
 callers an easy way to deviate from it in special cases.
 
@@ -1077,6 +1119,27 @@ Div(
 The name of the keyframes block is automatically derived from the property name (here, `ShiftRight` is converted into
 `"shift-right"`). You can then use the `toAnimation` method to convert your collection of keyframes into an animation that
 uses them, which you can pass into the `Modifier.animation` modifier.
+
+> [!IMPORTANT]
+> When you declare a `Keyframes` animation, it must be public. This is because code gets generated inside a `main.kt`
+> file by the Kobweb Gradle plugin, and that code needs to be able to access your variant in order to register it.
+>
+> In general, it's a good idea to think of animations as global anyway, since technically they all live in a globally
+> applied stylesheet, and you have to make sure that the animation name is unique across your whole application.
+>
+> You can technically make an animation private if you add a bit of boilerplate to handle the registration yourself:
+>
+> ```kotlin
+> @Suppress("PRIVATE_KEYFRAMES")
+> private val SomeAnim by Keyframes { /* ... */ }
+>
+> @InitSilk
+> fun registerPrivateAnim(ctx: InitSilkContext) {
+>   ctx.stylesheet.registerKeyframes(SomeAnim)
+> }
+> ```
+>
+> However, you are encouraged to keep your animations public and let the Kobweb Gradle plugin handle everything for you.
 
 ### ElementRefScope and raw HTML elements
 
