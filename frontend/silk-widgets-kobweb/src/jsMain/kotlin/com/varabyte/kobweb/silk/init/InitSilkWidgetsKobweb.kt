@@ -7,6 +7,7 @@ import com.varabyte.kobweb.silk.components.document.TocBorderedVariant
 import com.varabyte.kobweb.silk.components.document.TocStyle
 import com.varabyte.kobweb.silk.components.graphics.FitWidthImageVariant
 import com.varabyte.kobweb.silk.components.graphics.ImageStyle
+import com.varabyte.kobweb.silk.components.navigation.AlwaysUnderlinedLinkVariant
 import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.navigation.LinkVars
 import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
@@ -49,7 +50,11 @@ fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
     mutableTheme.registerComponentVariants(FitWidthImageVariant)
 
     mutableTheme.registerComponentStyle(LinkStyle)
-    mutableTheme.registerComponentVariants(UncoloredLinkVariant, UndecoratedLinkVariant)
+    mutableTheme.registerComponentVariants(
+        UncoloredLinkVariant,
+        UndecoratedLinkVariant,
+        AlwaysUnderlinedLinkVariant,
+    )
 
     mutableTheme.registerComponentStyle(TocStyle)
     mutableTheme.registerComponentVariants(TocBorderedVariant)

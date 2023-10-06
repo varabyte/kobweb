@@ -58,6 +58,12 @@ val UncoloredLinkVariant by LinkStyle.addVariant {
     visited { colorModifier }
 }
 
+val AlwaysUnderlinedLinkVariant by LinkStyle.addVariant {
+    base {
+        Modifier.textDecorationLine(TextDecorationLine.Underline)
+    }
+}
+
 
 /**
  * Linkable text which, when clicked, navigates to the target [path].
