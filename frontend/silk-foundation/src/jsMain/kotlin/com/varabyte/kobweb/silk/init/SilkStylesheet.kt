@@ -112,7 +112,7 @@ interface SilkStylesheet {
  * So this:
  *
  * ```
- * ctx.stylesheet.registerBaseStyle("*") {
+ * ctx.stylesheet.registerStyleBase("*") {
  *   Modifier.fontSize(48.px)
  * }
  * ```
@@ -127,12 +127,11 @@ interface SilkStylesheet {
  * }
  * ```
  */
-fun SilkStylesheet.registerBaseStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
-    registerBaseStyle(cssSelector, { extraModifiers }, init)
-
+fun SilkStylesheet.registerStyleBase(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
+    registerStyleBase(cssSelector, { extraModifiers }, init)
 }
 
-fun SilkStylesheet.registerBaseStyle(
+fun SilkStylesheet.registerStyleBase(
     cssSelector: String,
     extraModifiers: @Composable () -> Modifier,
     init: () -> Modifier
@@ -142,6 +141,26 @@ fun SilkStylesheet.registerBaseStyle(
             init()
         }
     }
+}
+
+@Deprecated(
+    "Method has been renamed to `registerStyleBase` for consistency (e.g. with `addVariantBase`, `replaceComponentStyleBase`, etc.)",
+    ReplaceWith("registerStyleBase(cssSelector, extraModifiers, init)")
+)
+fun SilkStylesheet.registerBaseStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
+    registerStyleBase(cssSelector, extraModifiers, init)
+}
+
+@Deprecated(
+    "Method has been renamed to `registerStyleBase` for consistency (e.g. with `addVariantBase`, `replaceComponentStyleBase`, etc.)",
+    ReplaceWith("registerStyleBase(cssSelector, extraModifiers, init)")
+)
+fun SilkStylesheet.registerBaseStyle(
+    cssSelector: String,
+    extraModifiers: @Composable () -> Modifier,
+    init: () -> Modifier
+) {
+    registerStyleBase(cssSelector, extraModifiers, init)
 }
 
 internal object SilkStylesheetInstance : SilkStylesheet {

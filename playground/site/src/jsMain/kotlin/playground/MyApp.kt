@@ -13,7 +13,7 @@ import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.init.InitSilk
 import com.varabyte.kobweb.silk.init.InitSilkContext
-import com.varabyte.kobweb.silk.init.registerBaseStyle
+import com.varabyte.kobweb.silk.init.registerStyleBase
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import kotlinx.browser.localStorage
 import org.jetbrains.compose.web.css.*
@@ -27,7 +27,7 @@ fun updateTheme(ctx: InitSilkContext) = ctx.config.apply {
 
 @InitSilk
 fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
-    registerBaseStyle("body") {
+    registerStyleBase("body") {
         Modifier
             .fontFamily(
                 "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
@@ -36,7 +36,7 @@ fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
             .lineHeight(1.4)
     }
 
-    registerBaseStyle("blockquote") {
+    registerStyleBase("blockquote") {
         Modifier
             .borderLeft(width = 5.px, style = LineStyle.Solid, color = Color.rgb(0x0c0c0c))
             .margin(topBottom = 1.5.em, leftRight = 10.px)
@@ -44,15 +44,15 @@ fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
             .textAlign(TextAlign.Left)
     }
 
-    registerBaseStyle("table, th, td") {
+    registerStyleBase("table, th, td") {
         Modifier.border(1.px, LineStyle.Solid, Colors.LightGray)
     }
 
-    registerBaseStyle("table") {
+    registerStyleBase("table") {
         Modifier.borderCollapse(BorderCollapse.Collapse)
     }
 
-    registerBaseStyle("#md-inline-demo") {
+    registerStyleBase("#md-inline-demo") {
         Modifier.color(Colors.OrangeRed)
     }
 }
