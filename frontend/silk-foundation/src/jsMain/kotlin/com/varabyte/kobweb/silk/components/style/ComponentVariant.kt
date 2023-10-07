@@ -2,6 +2,8 @@ package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
+import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import org.jetbrains.compose.web.css.*
 
 sealed class ComponentVariant {
@@ -90,4 +92,63 @@ fun Iterable<ComponentVariant?>.combine(): ComponentVariant {
         finalVariant = finalVariant.then(variant ?: ComponentVariant.Empty)
     }
     return finalVariant
+}
+
+/**
+ * A delegate provider class which allows you to create a [ComponentVariant] via the `by` keyword.
+ */
+class ComponentVariantProvider internal constructor(
+    private val style: ComponentStyle,
+    private val extraModifiers: @Composable () -> Modifier,
+    private val init: ComponentModifiers.() -> Unit,
+) : CacheByPropertyNameDelegate<ComponentVariant>() {
+    override fun create(propertyName: String): ComponentVariant {
+        // Given a style called "ExampleStyle", we want to support the following variant name simplifications:
+        // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
+        // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
+        // - "OutlinedVariant"        -> "outlined" // But really the user should have kept "Example" in the name
+        // - "ExampleVariant"         -> "example" // In other words, protect against empty strings!
+        // - "ExampleExampleVariant"  -> "example"
+
+        // Step 1, remove variant suffix and turn the code style into CSS sytle,
+        // e.g. "OutlinedExampleVariant" -> "outlined-example"
+        val withoutSuffix = propertyName.removeSuffix("Variant").titleCamelCaseToKebabCase()
+
+        val name =
+            withoutSuffix.removePrefix("${style.nameWithoutPrefix}-").removeSuffix("-${style.nameWithoutPrefix}")
+                .takeIf { it.isNotEmpty() } ?: withoutSuffix
+        return style.addVariant(name, extraModifiers, init)
+    }
+}
+
+fun ComponentStyle.addVariant(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit) =
+    addVariant({ extraModifiers }, init)
+
+fun ComponentStyle.addVariant(extraModifiers: @Composable () -> Modifier, init: ComponentModifiers.() -> Unit) =
+    ComponentVariantProvider(this, extraModifiers, init)
+
+fun ComponentStyle.addVariantBase(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier) =
+    addVariantBase({ extraModifiers }, init)
+
+fun ComponentStyle.addVariantBase(
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+) = ComponentVariantProvider(this, extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+
+/**
+ * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
+ *
+ * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
+ * you'll want to add additional, non-base styles.
+ */
+fun ComponentStyle.addVariantBase(
+    name: String,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+): ComponentVariant {
+    return addVariant(name, extraModifiers) {
+        base {
+            ComponentBaseModifier(colorMode).let(init)
+        }
+    }
 }
