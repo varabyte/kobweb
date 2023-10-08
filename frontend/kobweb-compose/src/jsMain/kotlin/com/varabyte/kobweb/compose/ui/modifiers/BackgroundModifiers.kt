@@ -28,34 +28,8 @@ fun Modifier.background(color: CSSColorValue?, vararg backgrounds: CSSBackground
     background(color, *backgrounds)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { background(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.background"
-    ),
-)
-fun Modifier.background(value: String) = styleModifier {
-    background(value)
-}
-
 fun Modifier.backgroundAttachment(backgroundAttachment: BackgroundAttachment) = styleModifier {
     backgroundAttachment(backgroundAttachment)
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { backgroundAttachment(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.backgroundAttachment"
-    ),
-)
-fun Modifier.backgroundAttachment(value: String) = styleModifier {
-    backgroundAttachment(value)
 }
 
 fun Modifier.backgroundBlendMode(blendMode: BackgroundBlendMode) = styleModifier {
@@ -64,31 +38,6 @@ fun Modifier.backgroundBlendMode(blendMode: BackgroundBlendMode) = styleModifier
 
 fun Modifier.backgroundClip(backgroundClip: BackgroundClip) = styleModifier {
     backgroundClip(backgroundClip)
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { backgroundClip(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.backgroundClip"
-    ),
-)
-fun Modifier.backgroundClip(value: String) = styleModifier {
-    backgroundClip(value)
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { property(\"background-color\", value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier"
-    ),
-)
-fun Modifier.backgroundColor(value: String) = styleModifier {
-    property("background-color", value)
 }
 
 fun Modifier.backgroundColor(color: CSSColorValue) = styleModifier {
@@ -111,51 +60,12 @@ fun Modifier.backgroundImage(gradient: Gradient) = styleModifier {
     backgroundImage(gradient)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { backgroundImage(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.backgroundImage"
-    ),
-)
-fun Modifier.backgroundImage(value: String) = styleModifier {
-    backgroundImage(value)
-}
-
 fun Modifier.backgroundOrigin(backgroundOrigin: BackgroundOrigin) = styleModifier {
     backgroundOrigin(backgroundOrigin)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { backgroundOrigin(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.backgroundOrigin"
-    ),
-)
-fun Modifier.backgroundOrigin(value: String) = styleModifier {
-    backgroundOrigin(value)
-}
-
 fun Modifier.backgroundPosition(backgroundPosition: BackgroundPosition) = styleModifier {
     backgroundPosition(backgroundPosition)
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { backgroundPosition(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.backgroundPosition"
-    ),
-)
-fun Modifier.backgroundPosition(value: String) = styleModifier {
-    backgroundPosition(value)
 }
 
 fun Modifier.backgroundRepeat(backgroundRepeat: BackgroundRepeat) = styleModifier {
@@ -169,32 +79,6 @@ fun Modifier.backgroundRepeat(
     backgroundRepeat(horizontalRepeat, verticalRepeat)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { backgroundRepeat(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.backgroundRepeat"
-    ),
-)
-fun Modifier.backgroundRepeat(value: String) = styleModifier {
-    backgroundRepeat(value)
-}
-
 fun Modifier.backgroundSize(backgroundSize: BackgroundSize) = styleModifier {
     backgroundSize(backgroundSize)
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { backgroundSize(value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier",
-        "org.jetbrains.compose.web.css.backgroundSize"
-    ),
-)
-fun Modifier.backgroundSize(value: String) = styleModifier {
-    backgroundSize(value)
 }

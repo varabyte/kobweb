@@ -5,18 +5,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { property(\"border\", value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier"
-    )
-)
-fun Modifier.border(value: String) = styleModifier {
-    property("border", value)
-}
-
 fun Modifier.border(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
@@ -54,19 +42,6 @@ class BorderSideScope internal constructor(private val styleScope: StyleScope, p
     fun width(width: CSSNumeric) = styleScope.property("border$side-width", width)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { property(\"border-top\", value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier"
-    )
-)
-
-fun Modifier.borderTop(value: String) = styleModifier {
-    property("border-top", value)
-}
-
 fun Modifier.borderTop(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
@@ -77,18 +52,6 @@ fun Modifier.borderTop(
 
 fun Modifier.borderTop(scope: BorderSideScope.() -> Unit) = styleModifier {
     BorderSideScope(this, "-top").apply(scope)
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { property(\"border-bottom\", value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier"
-    )
-)
-fun Modifier.borderBottom(value: String) = styleModifier {
-    property("border-bottom", value)
 }
 
 fun Modifier.borderBottom(
@@ -103,18 +66,6 @@ fun Modifier.borderBottom(scope: BorderSideScope.() -> Unit) = styleModifier {
     BorderSideScope(this, "-bottom").apply(scope)
 }
 
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { property(\"border-left\", value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier"
-    )
-)
-fun Modifier.borderLeft(value: String) = styleModifier {
-    property("border-left", value)
-}
-
 fun Modifier.borderLeft(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
@@ -125,18 +76,6 @@ fun Modifier.borderLeft(
 
 fun Modifier.borderLeft(scope: BorderSideScope.() -> Unit) = styleModifier {
     BorderSideScope(this, "-left").apply(scope)
-}
-
-// TODO(#168): Remove before v1.0
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use a richly-typed version or use styleModifier as a fallback.",
-    ReplaceWith(
-        "styleModifier { property(\"border-right\", value) }",
-        "com.varabyte.kobweb.compose.ui.styleModifier"
-    )
-)
-fun Modifier.borderRight(value: String) = styleModifier {
-    property("border-right", value)
 }
 
 fun Modifier.borderRight(
