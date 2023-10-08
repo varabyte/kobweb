@@ -128,6 +128,38 @@ fun CircleIcon() {
 }
 
 @Composable
+fun CloseIcon() {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 3) {
+        Line {
+            x1(1)
+            x2(23)
+            y1(1)
+            y2(23)
+        }
+        Line {
+            x1(23)
+            x2(1)
+            y1(1)
+            y2(23)
+        }
+    }
+}
+
+@Composable
+fun HamburgerIcon() {
+    createIcon(viewBox = "0 0 24 24", strokeWidth = 3) {
+        for (y in listOf(3, 12, 21)) {
+            Line {
+                x1(0)
+                x2(23)
+                y1(y)
+                y2(y)
+            }
+        }
+    }
+}
+
+@Composable
 fun IndeterminateIcon() {
     MinusIcon()
 }

@@ -38,11 +38,13 @@ import com.varabyte.kobweb.silk.components.icons.ChevronLeftIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronRightIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronUpIcon
 import com.varabyte.kobweb.silk.components.icons.CircleIcon
+import com.varabyte.kobweb.silk.components.icons.CloseIcon
+import com.varabyte.kobweb.silk.components.icons.HamburgerIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.icons.MinusIcon
+import com.varabyte.kobweb.silk.components.icons.MoonIcon
 import com.varabyte.kobweb.silk.components.icons.PlusIcon
 import com.varabyte.kobweb.silk.components.icons.SquareIcon
-import com.varabyte.kobweb.silk.components.icons.MoonIcon
 import com.varabyte.kobweb.silk.components.icons.SunIcon
 import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
@@ -206,6 +208,8 @@ fun WidgetsPage() {
                     "Chevron Right" to { ChevronRightIcon() },
                     "Chevron Up" to { ChevronUpIcon() },
                     "Circle" to { CircleIcon() },
+                    "Close" to { CloseIcon() },
+                    "Hamburger" to { HamburgerIcon() },
                     "Indeterminate" to { IndeterminateIcon() },
                     "Minus" to { MinusIcon() },
                     "Moon" to { MoonIcon() },
