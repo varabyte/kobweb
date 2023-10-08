@@ -34,26 +34,6 @@ val SurfaceStyle by ComponentStyle(prefix = "silk") {
 }
 
 /**
- * A variant which provides a smoother color animation effect.
- *
- * Without applying this variant, colors will snap instantly between dark and light colors. With applying it, the
- * colors will transition smoothly. This variant is not applied by default, however, because sometimes children sections
- * don't themselves animate, causing a strange
- */
-@Deprecated(
-    "Use `SmoothColorStyle` instead, e.g. `Surface(SmoothColorStyle.toModifer())`. The approach used by `AnimatedColorSurfaceVariant` is problematic and conflicts with people trying to set transitions on their own elements."
-)
-val AnimatedColorSurfaceVariant by SurfaceStyle.addVariant {
-    val backgroundColorTransition =
-        Modifier.transition(CSSTransition("background-color", TransitionDurationVars.Normal.value()))
-
-    base { backgroundColorTransition }
-    // It looks weird if parts of the screen snap colors while others transition smoothly. Do our best to make sure all
-    // container elements transition as well.
-    cssRule(" div") { backgroundColorTransition }
-}
-
-/**
  * A panel which encapsulates a SilkTheme-aware area.
  *
  * This widget is similar to a Box except it also responsible for setting the site's color look and feel.

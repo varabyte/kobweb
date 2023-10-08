@@ -34,7 +34,6 @@ import com.varabyte.kobweb.silk.components.forms.SwitchVars
 import com.varabyte.kobweb.silk.components.forms.UncheckedCheckboxIconContainerVariant
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
-import com.varabyte.kobweb.silk.components.layout.AnimatedColorSurfaceVariant
 import com.varabyte.kobweb.silk.components.layout.DividerStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
@@ -67,15 +66,14 @@ import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderColorVar
 import com.varabyte.kobweb.silk.components.text.DivTextStyle
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.palette.SilkWidgetColorGroups
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
-import com.varabyte.kobweb.silk.theme.colors.palette.color
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.palette.button
 import com.varabyte.kobweb.silk.theme.colors.palette.checkbox
-import com.varabyte.kobweb.silk.theme.colors.suffixedWith
+import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.focusOutline
 import com.varabyte.kobweb.silk.theme.colors.palette.input
 import com.varabyte.kobweb.silk.theme.colors.palette.overlay
@@ -84,6 +82,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.switch
 import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.tooltip
+import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import kotlinx.dom.addClass
 import kotlinx.dom.removeClass
 import org.w3c.dom.Document
@@ -224,7 +223,6 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerComponentStyle(PopupStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
-    @Suppress("DEPRECATION") mutableTheme.registerComponentVariants(AnimatedColorSurfaceVariant)
 
     mutableTheme.registerComponentStyle(SwitchStyle)
     mutableTheme.registerComponentStyle(SwitchTrackStyle)
@@ -269,15 +267,15 @@ fun initSilkWidgets(ctx: InitSilkContext) {
 val SilkColorsStyle by ComponentStyle.base {
     val palette = colorMode.toPalette()
     Modifier
-    // region General color vars
+        // region General color vars
         .setVariable(BackgroundColorVar, palette.background)
         .setVariable(ColorVar, palette.color)
         .setVariable(BorderColorVar, palette.border)
         .setVariable(FocusOutlineColorVar, palette.focusOutline)
         .setVariable(PlaceholderColorVar, palette.placeholder)
-    // endregion
+        // endregion
 
-    // region Widget color vars
+        // region Widget color vars
         .setVariable(ButtonVars.BackgroundDefaultColor, palette.button.default)
         .setVariable(ButtonVars.BackgroundHoverColor, palette.button.hover)
         .setVariable(ButtonVars.BackgroundPressedColor, palette.button.pressed)
