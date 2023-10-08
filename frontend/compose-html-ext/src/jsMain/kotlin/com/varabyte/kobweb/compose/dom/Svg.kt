@@ -22,11 +22,30 @@ import org.w3c.dom.svg.SVGPolylineElement
 import org.w3c.dom.svg.SVGRectElement
 import org.w3c.dom.svg.SVGTextElement
 
-abstract class SVGElementAttrsScope(private val attrs: AttrsScope<SVGElement>) {
-    fun attr(name: String, value: String) {
-        attrs.attr(name, value)
-    }
-}
+/**
+ * Our own SVG-specific extensions on top of `AttrsScope<SVGElement>`.
+ *
+ * At the time of writing this, the SVG APIs for Compose HTML are still underbaked. They are missing a lot of type-safe
+ * APIs for various SVG attributes.
+ *
+ * We originally thought we would fix this by a liberal use of extension methods
+ * (e.g. `fun AttrsScope<SVGCircleElement>.cx(value: Number)`), but this approach was fairly inconvenient as doing even
+ * the most basic things with SVG elements required a bunch of imports and code completions were slow.
+ *
+ * As a compromise, we create our own subclasses of `AttrsScope<SVGElement>` and layer our own methods on top of them
+ * directly. This approach is basically invisible to users of our APIs while providing a much better developer
+ * experience. For example, this approaches uses our Circle extensions seamlessly:
+ *
+ * ```
+ * Svg {
+ *   Circle {
+ *     cx(25)
+ *     cy(25)
+ *   }
+ * }
+ * ```
+ */
+abstract class SVGElementAttrsScope<E: SVGElement>(attrs: AttrsScope<E>) : AttrsScope<E> by attrs
 
 // Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
 // Enums have to be capitalized title case for this method to work.
@@ -69,7 +88,7 @@ enum class SVGFillRule {
 
 // endregion
 
-abstract class SVGShapeElementAttrsScope(attrs: AttrsScope<SVGElement>) : SVGElementAttrsScope(attrs) {
+abstract class SVGShapeElementAttrsScope<E: SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGPaintType) = this.attr("stroke", value.toString())
 
@@ -141,30 +160,30 @@ fun Svg(
 
 // region SVG children
 
-class SVGCircleAttrsScope internal constructor(private val attrs: AttrsScope<SVGCircleElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGCircleAttrsScope internal constructor(attrs: AttrsScope<SVGCircleElement>) :
+    SVGShapeElementAttrsScope<SVGCircleElement>(attrs) {
     fun cx(value: Number) {
-        attrs.attr("cx", value.toString())
+        attr("cx", value.toString())
     }
 
     fun cy(value: Number) {
-        attrs.attr("cy", value.toString())
+        attr("cy", value.toString())
     }
 
     fun r(value: Number) {
-        attrs.attr("r", value.toString())
+        attr("r", value.toString())
     }
 
     fun cx(value: CSSLengthOrPercentageValue) {
-        attrs.attr("cx", value.toString())
+        attr("cx", value.toString())
     }
 
     fun cy(value: CSSLengthOrPercentageValue) {
-        attrs.attr("cy", value.toString())
+        attr("cy", value.toString())
     }
 
     fun r(value: CSSLengthOrPercentageValue) {
-        attrs.attr("r", value.toString())
+        attr("r", value.toString())
     }
 }
 
@@ -194,38 +213,38 @@ fun ElementScope<SVGElement>.Circle(attrs: SVGCircleAttrsScope.() -> Unit) {
 }
 
 
-class SVGCEllipseAttrsScope internal constructor(private val attrs: AttrsScope<SVGEllipseElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGCEllipseAttrsScope internal constructor(attrs: AttrsScope<SVGEllipseElement>) :
+    SVGShapeElementAttrsScope<SVGEllipseElement>(attrs) {
     fun cx(value: Number) {
-        attrs.attr("cx", value.toString())
+        attr("cx", value.toString())
     }
 
     fun cy(value: Number) {
-        attrs.attr("cy", value.toString())
+        attr("cy", value.toString())
     }
 
     fun rx(value: Number) {
-        attrs.attr("rx", value.toString())
+        attr("rx", value.toString())
     }
 
     fun ry(value: Number) {
-        attrs.attr("ry", value.toString())
+        attr("ry", value.toString())
     }
 
     fun cx(value: CSSLengthOrPercentageValue) {
-        attrs.attr("cx", value.toString())
+        attr("cx", value.toString())
     }
 
     fun cy(value: CSSLengthOrPercentageValue) {
-        attrs.attr("cy", value.toString())
+        attr("cy", value.toString())
     }
 
     fun rx(value: CSSLengthOrPercentageValue) {
-        attrs.attr("rx", value.toString())
+        attr("rx", value.toString())
     }
 
     fun ry(value: CSSLengthOrPercentageValue) {
-        attrs.attr("ry", value.toString())
+        attr("ry", value.toString())
     }
 }
 
@@ -266,38 +285,38 @@ fun ElementScope<SVGElement>.Group(
 }
 
 
-class SVGLineAttrsScope internal constructor(private val attrs: AttrsScope<SVGLineElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGLineAttrsScope internal constructor(attrs: AttrsScope<SVGLineElement>) :
+    SVGShapeElementAttrsScope<SVGLineElement>(attrs) {
     fun x1(value: Number) {
-        attrs.attr("x1", value.toString())
+        attr("x1", value.toString())
     }
 
     fun x2(value: Number) {
-        attrs.attr("x2", value.toString())
+        attr("x2", value.toString())
     }
 
     fun y1(value: Number) {
-        attrs.attr("y1", value.toString())
+        attr("y1", value.toString())
     }
 
     fun y2(value: Number) {
-        attrs.attr("y2", value.toString())
+        attr("y2", value.toString())
     }
 
     fun x1(value: CSSLengthOrPercentageValue) {
-        attrs.attr("x1", value.toString())
+        attr("x1", value.toString())
     }
 
     fun x2(value: CSSLengthOrPercentageValue) {
-        attrs.attr("x2", value.toString())
+        attr("x2", value.toString())
     }
 
     fun y1(value: CSSLengthOrPercentageValue) {
-        attrs.attr("y1", value.toString())
+        attr("y1", value.toString())
     }
 
     fun y2(value: CSSLengthOrPercentageValue) {
-        attrs.attr("y2", value.toString())
+        attr("y2", value.toString())
     }
 }
 
@@ -393,10 +412,10 @@ class PathDataScope internal constructor() {
 }
 
 
-class SVGPathAttrsScope internal constructor(private val attrs: AttrsScope<SVGPathElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGPathAttrsScope internal constructor(attrs: AttrsScope<SVGPathElement>) :
+    SVGShapeElementAttrsScope<SVGPathElement>(attrs) {
     fun d(pathDataScope: PathDataScope.() -> Unit) {
-        attrs.attr("d", PathDataScope().apply(pathDataScope).pathCommands.joinToString(" "))
+        attr("d", PathDataScope().apply(pathDataScope).pathCommands.joinToString(" "))
     }
 }
 
@@ -431,11 +450,11 @@ fun ElementScope<SVGElement>.Path(attrs: SVGPathAttrsScope.() -> Unit) {
 }
 
 
-class SVGPolygonAttrsScope internal constructor(private val attrs: AttrsScope<SVGPolygonElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGPolygonAttrsScope internal constructor(attrs: AttrsScope<SVGPolygonElement>) :
+    SVGShapeElementAttrsScope<SVGPolygonElement>(attrs) {
     fun points(vararg pairs: Pair<Number, Number>) {
         val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
-        attrs.attr("points", pointString)
+        attr("points", pointString)
     }
 }
 
@@ -462,11 +481,11 @@ fun ElementScope<SVGElement>.Polygon(attrs: SVGPolygonAttrsScope.() -> Unit) {
 }
 
 
-class SVGPolylineAttrsScope internal constructor(private val attrs: AttrsScope<SVGPolylineElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGPolylineAttrsScope internal constructor(attrs: AttrsScope<SVGPolylineElement>) :
+    SVGShapeElementAttrsScope<SVGPolylineElement>(attrs) {
     fun points(vararg pairs: Pair<Number, Number>) {
         val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
-        attrs.attr("points", pointString)
+        attr("points", pointString)
     }
 }
 
@@ -494,54 +513,54 @@ fun ElementScope<SVGElement>.Polyline(attrs: SVGPolylineAttrsScope.() -> Unit) {
 }
 
 
-class SVGCRectAttrsScope internal constructor(private val attrs: AttrsScope<SVGRectElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGCRectAttrsScope internal constructor(attrs: AttrsScope<SVGRectElement>) :
+    SVGShapeElementAttrsScope<SVGRectElement>(attrs) {
     fun x(value: Number) {
-        attrs.attr("x", value.toString())
+        attr("x", value.toString())
     }
 
     fun y(value: Number) {
-        attrs.attr("y", value.toString())
+        attr("y", value.toString())
     }
 
     fun width(value: Number) {
-        attrs.attr("width", value.toString())
+        attr("width", value.toString())
     }
 
     fun height(value: Number) {
-        attrs.attr("height", value.toString())
+        attr("height", value.toString())
     }
 
     fun rx(value: Number) {
-        attrs.attr("rx", value.toString())
+        attr("rx", value.toString())
     }
 
     fun ry(value: Number) {
-        attrs.attr("ry", value.toString())
+        attr("ry", value.toString())
     }
 
     fun x(value: CSSLengthOrPercentageValue) {
-        attrs.attr("x", value.toString())
+        attr("x", value.toString())
     }
 
     fun y(value: CSSLengthOrPercentageValue) {
-        attrs.attr("y", value.toString())
+        attr("y", value.toString())
     }
 
     fun width(value: CSSLengthOrPercentageValue) {
-        attrs.attr("width", value.toString())
+        attr("width", value.toString())
     }
 
     fun height(value: CSSLengthOrPercentageValue) {
-        attrs.attr("height", value.toString())
+        attr("height", value.toString())
     }
 
     fun rx(value: CSSLengthOrPercentageValue) {
-        attrs.attr("rx", value.toString())
+        attr("rx", value.toString())
     }
 
     fun ry(value: CSSLengthOrPercentageValue) {
-        attrs.attr("ry", value.toString())
+        attr("ry", value.toString())
     }
 }
 
@@ -590,100 +609,100 @@ enum class SvgTextLengthAdjust {
     override fun toString() = this.toSvgValue()
 }
 
-class SVGTextAttrsScope internal constructor(private val attrs: AttrsScope<SVGTextElement>) :
-    SVGShapeElementAttrsScope(attrs) {
+class SVGTextAttrsScope internal constructor(attrs: AttrsScope<SVGTextElement>) :
+    SVGShapeElementAttrsScope<SVGTextElement>(attrs) {
 
     fun x(value: Number) {
-        attrs.attr("x", value.toString())
+        attr("x", value.toString())
     }
 
     fun x(value: CSSLengthOrPercentageValue) {
-        attrs.attr("x", value.toString())
+        attr("x", value.toString())
     }
 
     fun y(value: Number) {
-        attrs.attr("y", value.toString())
+        attr("y", value.toString())
     }
 
     fun y(value: CSSLengthOrPercentageValue) {
-        attrs.attr("y", value.toString())
+        attr("y", value.toString())
     }
 
     fun dx(value: Number) {
-        attrs.attr("dx", value.toString())
+        attr("dx", value.toString())
     }
 
     fun dx(value: CSSLengthOrPercentageValue) {
-        attrs.attr("dx", value.toString())
+        attr("dx", value.toString())
     }
 
     fun dy(value: Number) {
-        attrs.attr("dy", value.toString())
+        attr("dy", value.toString())
     }
 
     fun dy(value: CSSLengthOrPercentageValue) {
-        attrs.attr("dy", value.toString())
+        attr("dy", value.toString())
     }
 
     fun rotate(vararg angles: Number) {
         val value = angles.joinToString(",") { it.toString() }
-        attrs.attr("rotate", value)
+        attr("rotate", value)
     }
 
     fun lengthAdjust(lengthAdjust: SvgTextLengthAdjust) {
-        attrs.attr("lengthAdjust", lengthAdjust.toString())
+        attr("lengthAdjust", lengthAdjust.toString())
     }
 
     fun letterSpacing(value: Number) {
-        attrs.attr("letter-spacing", value.toString())
+        attr("letter-spacing", value.toString())
     }
 
     fun letterSpacing(value: CSSLengthOrPercentageValue) {
-        attrs.attr("letter-spacing", value.toString())
+        attr("letter-spacing", value.toString())
     }
 
     fun wordSpacing(value: Number) {
-        attrs.attr("word-spacing", value.toString())
+        attr("word-spacing", value.toString())
     }
 
     fun wordSpacing(value: CSSLengthOrPercentageValue) {
-        attrs.attr("word-spacing", value.toString())
+        attr("word-spacing", value.toString())
     }
 
     fun textDecoration(value: TextDecorationLine) {
-        attrs.attr("text-decoration", value.toString())
+        attr("text-decoration", value.toString())
     }
 
     fun textLength(value: Number) {
-        attrs.attr("textLength", value.toString())
+        attr("textLength", value.toString())
     }
 
     fun textLength(value: CSSLengthOrPercentageValue) {
-        attrs.attr("textLength", value.toString())
+        attr("textLength", value.toString())
     }
 
     fun fontStyle(value: FontStyle) {
-        attrs.attr("font-style", value.toString())
+        attr("font-style", value.toString())
     }
 
     fun fontSize(value: Number) {
-        attrs.attr("font-size", value.toString())
+        attr("font-size", value.toString())
     }
 
     fun fontSize(value: FontSize) {
-        attrs.attr("font-size", value.toString())
+        attr("font-size", value.toString())
     }
 
     fun fontSize(value: CSSLengthOrPercentageValue) {
-        attrs.attr("font-size", value.toString())
+        attr("font-size", value.toString())
     }
 
     fun fontWeight(value: Number) {
-        attrs.attr("font-weight", value.toString())
+        attr("font-weight", value.toString())
     }
 
     fun fontWeight(value: FontWeight) {
-        attrs.attr("font-weight", value.toString())
+        attr("font-weight", value.toString())
     }
 }
 
