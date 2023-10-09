@@ -127,6 +127,7 @@ enum class SVGFillRule {
 abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGPaintType) = this.attr("stroke", value.toString())
+    fun stroke(id: SVGId) = this.attr("stroke", id.urlReference)
 
     fun strokeDashArray(vararg values: Number) {
         this.attr("stroke-dasharray", values.joinToString(",") { it.toString() })
