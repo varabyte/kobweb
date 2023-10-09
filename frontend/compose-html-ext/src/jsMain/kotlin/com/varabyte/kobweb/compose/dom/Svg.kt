@@ -49,7 +49,7 @@ abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs:
 
 // Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
 // Enums have to be capitalized title case for this method to work.
-private fun <E: Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
+private fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
 
 // region SVG paint attributes (https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint)
 
