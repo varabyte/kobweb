@@ -6,20 +6,24 @@ package com.varabyte.kobweb.compose.dom
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.attributes.HtmlAttrMarker
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.svg.SVGCircleElement
+import org.w3c.dom.svg.SVGDefsElement
 import org.w3c.dom.svg.SVGElement
 import org.w3c.dom.svg.SVGEllipseElement
 import org.w3c.dom.svg.SVGGElement
 import org.w3c.dom.svg.SVGLineElement
+import org.w3c.dom.svg.SVGLinearGradientElement
 import org.w3c.dom.svg.SVGPathElement
 import org.w3c.dom.svg.SVGPolygonElement
 import org.w3c.dom.svg.SVGPolylineElement
 import org.w3c.dom.svg.SVGRectElement
+import org.w3c.dom.svg.SVGStopElement
 import org.w3c.dom.svg.SVGTextElement
 
 /**
@@ -50,6 +54,33 @@ abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs:
 // Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
 // Enums have to be capitalized title case for this method to work.
 private fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
+
+/**
+ * An ID tied to some reusable SVG element.
+ *
+ * Useful as a way to get a reference to IDs for gradients and patterns.
+ *
+ * For example:
+ * ```
+ * Svg(...) {
+ *     Defs {
+ *         LinearGradient("myGradient") {
+ *             Stop(10.percent, Colors.Gold)
+ *             Stop(90.percent, Colors.DarkOrange)
+ *         }
+ *     }
+ *
+ *     Circle {
+ *         cx(100); cy(100); r(50)
+ *         fill(SVGId("myGradient"))
+ *     }
+ * }
+ * ```
+ */
+value class SVGId(val value: String) {
+    override fun toString() = value
+    val urlReference get() = "url(#$value)"
+}
 
 // region SVG paint attributes (https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint)
 
@@ -116,22 +147,36 @@ abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
 
     fun fill(value: CSSColorValue) = this.attr("fill", value.toString())
     fun fill(value: SVGPaintType) = this.attr("fill", value.toString())
-
-    // TODO: Support Gradients. Unfortunately, com.varabyte.kobweb.compose.css.functions.Gradient doesn't work here as
-    //  SVG gradients are different from CSS gradients.
-//    fun fill(value: Gradient) = this.attr("fill", value.toString())
+    fun fill(id: SVGId) = this.attr("fill", id.urlReference)
 
     fun fillRule(value: SVGFillRule) = this.attr("fill-rule", value.toString())
 
     fun fillOpacity(value: Number) = this.attr("fill-opacity", value.toString())
 }
 
+// Useful for attributes shared between top-level svg elements and group elements
+abstract class SVGContainerElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) :
+    SVGGraphicalElementAttrsScope<E>(attrs) {
+}
+
 class SVGAttrsScope internal constructor(attrs: AttrsScope<SVGElement>) :
-    SVGGraphicalElementAttrsScope<SVGElement>(attrs) {
+    SVGContainerElementAttrsScope<SVGElement>(attrs) {
     companion object {
         operator fun invoke(attrs: SVGAttrsScope.() -> Unit): AttrBuilderContext<SVGElement> {
             return { SVGAttrsScope(this).attrs() }
         }
+    }
+
+    fun width(value: Number) {
+        attr("width", value.toString())
+    }
+
+    fun width(value: CSSLengthOrPercentageValue) {
+        attr("width", value.toString())
+    }
+
+    fun height(value: Number) {
+        attr("height", value.toString())
     }
 }
 
@@ -167,7 +212,107 @@ fun Svg(
     GenericTag("svg", "http://www.w3.org/2000/svg", attrs?.let { SVGAttrsScope.invoke(it) }, content)
 }
 
-// region SVG children
+// region SVG misc elements
+
+class SVGDefsAttrsScope internal constructor(attrs: AttrsScope<SVGDefsElement>) :
+    SVGElementAttrsScope<SVGDefsElement>(attrs) {
+    companion object {
+        operator fun invoke(attrs: SVGDefsAttrsScope.() -> Unit): AttrBuilderContext<SVGDefsElement> {
+            return { SVGDefsAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGElement>.Defs(
+    attrs: (SVGDefsAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGDefsElement>
+) {
+    GenericTag(
+        "defs",
+        "http://www.w3.org/2000/svg", attrs?.let { SVGDefsAttrsScope(it) }, content
+    )
+}
+
+class SVGLinearGradientAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGLinearGradientElement>) :
+    SVGElementAttrsScope<SVGLinearGradientElement>(attrs) {
+    init {
+        attrs.id(id)
+    }
+
+    companion object {
+        operator fun invoke(
+            id: String,
+            attrs: SVGLinearGradientAttrsScope.() -> Unit
+        ): AttrBuilderContext<SVGLinearGradientElement> {
+            return { SVGLinearGradientAttrsScope(id, this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGDefsElement>.LinearGradient(
+    id: String,
+    attrs: (SVGLinearGradientAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGLinearGradientElement>
+) {
+    GenericTag("linearGradient", "http://www.w3.org/2000/svg", attrs = {
+        if (attrs != null) {
+            attrs(SVGLinearGradientAttrsScope(id, this))
+        } else {
+            id(id)
+        }
+    }, content)
+}
+
+class SVGStopAttrsScope internal constructor(attrs: AttrsScope<SVGStopElement>) :
+    SVGElementAttrsScope<SVGStopElement>(attrs) {
+    companion object {
+        operator fun invoke(attrs: SVGStopAttrsScope.() -> Unit): AttrBuilderContext<SVGStopElement> {
+            return { SVGStopAttrsScope(this).attrs() }
+        }
+    }
+
+    fun offset(value: CSSPercentageValue) {
+        attr("offset", value.toString())
+    }
+
+    fun stopColor(value: CSSColorValue) {
+        attr("stop-color", value.toString())
+    }
+
+    fun stopColor(value: SVGPaintType) {
+        attr("stop-color", value.toString())
+    }
+
+    fun stopOpacity(value: Number) {
+        attr("stop-opacity", value.toString())
+    }
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/stop
+@Composable
+fun ElementScope<SVGLinearGradientElement>.Stop(attrs: SVGStopAttrsScope.() -> Unit) {
+    GenericTag("stop", "http://www.w3.org/2000/svg", SVGStopAttrsScope(attrs))
+}
+
+// A convenience version for one-liner stop entries
+@Composable
+fun ElementScope<SVGLinearGradientElement>.Stop(
+    offset: CSSPercentageValue? = null,
+    stopColor: CSSColorValue? = null,
+    stopOpacity: Number? = null
+) {
+    Stop {
+        offset?.let { offset(it) }
+        stopColor?.let { stopColor(it) }
+        stopOpacity?.let { stopOpacity(it) }
+    }
+}
+
+// endregion
+
+// region SVG graphical elements
 
 class SVGCircleAttrsScope internal constructor(attrs: AttrsScope<SVGCircleElement>) :
     SVGGraphicalElementAttrsScope<SVGCircleElement>(attrs) {
@@ -293,7 +438,7 @@ fun ElementScope<SVGElement>.Ellipse(attrs: SVGEllipseAttrsScope.() -> Unit) {
 }
 
 class SVGGroupAttrsScope internal constructor(attrs: AttrsScope<SVGGElement>) :
-    SVGGraphicalElementAttrsScope<SVGGElement>(attrs) {
+    SVGContainerElementAttrsScope<SVGGElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGGroupAttrsScope.() -> Unit): AttrBuilderContext<SVGGElement> {
