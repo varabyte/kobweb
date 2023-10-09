@@ -45,7 +45,7 @@ import org.w3c.dom.svg.SVGTextElement
  * }
  * ```
  */
-abstract class SVGElementAttrsScope<E: SVGElement>(attrs: AttrsScope<E>) : AttrsScope<E> by attrs
+abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs: AttrsScope<E>) : AttrsScope<E> by attrs
 
 // Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
 // Enums have to be capitalized title case for this method to work.
@@ -88,7 +88,7 @@ enum class SVGFillRule {
 
 // endregion
 
-abstract class SVGShapeElementAttrsScope<E: SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
+abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGPaintType) = this.attr("stroke", value.toString())
 
@@ -126,6 +126,15 @@ abstract class SVGShapeElementAttrsScope<E: SVGElement>(attrs: AttrsScope<E>) : 
     fun fillOpacity(value: Number) = this.attr("fill-opacity", value.toString())
 }
 
+class SVGAttrsScope internal constructor(attrs: AttrsScope<SVGElement>) :
+    SVGGraphicalElementAttrsScope<SVGElement>(attrs) {
+    companion object {
+        operator fun invoke(attrs: SVGAttrsScope.() -> Unit): AttrBuilderContext<SVGElement> {
+            return { SVGAttrsScope(this).attrs() }
+        }
+    }
+}
+
 /**
  * A composable for creating an SVG element.
  *
@@ -152,16 +161,16 @@ abstract class SVGShapeElementAttrsScope<E: SVGElement>(attrs: AttrsScope<E>) : 
  */
 @Composable
 fun Svg(
-    attrs: AttrBuilderContext<SVGElement>? = null,
+    attrs: (SVGAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGElement>
 ) {
-    GenericTag("svg", "http://www.w3.org/2000/svg", attrs, content)
+    GenericTag("svg", "http://www.w3.org/2000/svg", attrs?.let { SVGAttrsScope.invoke(it) }, content)
 }
 
 // region SVG children
 
 class SVGCircleAttrsScope internal constructor(attrs: AttrsScope<SVGCircleElement>) :
-    SVGShapeElementAttrsScope<SVGCircleElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGCircleElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGCircleAttrsScope.() -> Unit): AttrBuilderContext<SVGCircleElement> {
@@ -218,7 +227,7 @@ fun ElementScope<SVGElement>.Circle(attrs: SVGCircleAttrsScope.() -> Unit) {
 }
 
 class SVGEllipseAttrsScope internal constructor(attrs: AttrsScope<SVGEllipseElement>) :
-    SVGShapeElementAttrsScope<SVGEllipseElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGEllipseElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGEllipseAttrsScope.() -> Unit): AttrBuilderContext<SVGEllipseElement> {
@@ -283,19 +292,29 @@ fun ElementScope<SVGElement>.Ellipse(attrs: SVGEllipseAttrsScope.() -> Unit) {
     GenericTag("ellipse", "http://www.w3.org/2000/svg", SVGEllipseAttrsScope(attrs))
 }
 
+class SVGGroupAttrsScope internal constructor(attrs: AttrsScope<SVGGElement>) :
+    SVGGraphicalElementAttrsScope<SVGGElement>(attrs) {
+
+    companion object {
+        operator fun invoke(attrs: SVGGroupAttrsScope.() -> Unit): AttrBuilderContext<SVGGElement> {
+            return { SVGGroupAttrsScope(this).attrs() }
+        }
+    }
+}
+
 
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g
 @Composable
 fun ElementScope<SVGElement>.Group(
-    attrs: AttrBuilderContext<SVGGElement>? = null,
+    attrs: (SVGGroupAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGGElement>
 ) {
-    GenericTag("g", "http://www.w3.org/2000/svg", attrs, content)
+    GenericTag("g", "http://www.w3.org/2000/svg", attrs?.let { SVGGroupAttrsScope(it) }, content)
 }
 
 
 class SVGLineAttrsScope internal constructor(attrs: AttrsScope<SVGLineElement>) :
-    SVGShapeElementAttrsScope<SVGLineElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGLineElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGLineAttrsScope.() -> Unit): AttrBuilderContext<SVGLineElement> {
@@ -427,7 +446,7 @@ class PathDataScope internal constructor() {
 
 
 class SVGPathAttrsScope internal constructor(attrs: AttrsScope<SVGPathElement>) :
-    SVGShapeElementAttrsScope<SVGPathElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGPathElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGPathAttrsScope.() -> Unit): AttrBuilderContext<SVGPathElement> {
@@ -470,7 +489,7 @@ fun ElementScope<SVGElement>.Path(attrs: SVGPathAttrsScope.() -> Unit) {
 
 
 class SVGPolygonAttrsScope internal constructor(attrs: AttrsScope<SVGPolygonElement>) :
-    SVGShapeElementAttrsScope<SVGPolygonElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGPolygonElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGPolygonAttrsScope.() -> Unit): AttrBuilderContext<SVGPolygonElement> {
@@ -506,7 +525,7 @@ fun ElementScope<SVGElement>.Polygon(attrs: SVGPolygonAttrsScope.() -> Unit) {
 
 
 class SVGPolylineAttrsScope internal constructor(attrs: AttrsScope<SVGPolylineElement>) :
-    SVGShapeElementAttrsScope<SVGPolylineElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGPolylineElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGPolylineAttrsScope.() -> Unit): AttrBuilderContext<SVGPolylineElement> {
@@ -543,7 +562,7 @@ fun ElementScope<SVGElement>.Polyline(attrs: SVGPolylineAttrsScope.() -> Unit) {
 
 
 class SVGRectAttrsScope internal constructor(attrs: AttrsScope<SVGRectElement>) :
-    SVGShapeElementAttrsScope<SVGRectElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGRectElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGRectAttrsScope.() -> Unit): AttrBuilderContext<SVGRectElement> {
@@ -644,7 +663,7 @@ enum class SvgTextLengthAdjust {
 }
 
 class SVGTextAttrsScope internal constructor(attrs: AttrsScope<SVGTextElement>) :
-    SVGShapeElementAttrsScope<SVGTextElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGTextElement>(attrs) {
 
     companion object {
         operator fun invoke(attrs: SVGTextAttrsScope.() -> Unit): AttrBuilderContext<SVGTextElement> {
