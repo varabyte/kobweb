@@ -27,7 +27,9 @@ import org.w3c.dom.svg.SVGPolylineElement
 import org.w3c.dom.svg.SVGRadialGradientElement
 import org.w3c.dom.svg.SVGRectElement
 import org.w3c.dom.svg.SVGStopElement
+import org.w3c.dom.svg.SVGSymbolElement
 import org.w3c.dom.svg.SVGTextElement
+import org.w3c.dom.svg.SVGUseElement
 
 /**
  * An ID tied to some reusable SVG element.
@@ -443,6 +445,140 @@ fun ElementScope<SVGDefsElement>.Pattern(
     content: ContentBuilder<SVGPatternElement>
 ) {
     GenericTag("pattern", "http://www.w3.org/2000/svg", SVGPatternAttrsScope(id, attrs), content)
+}
+
+class SVGSymbolAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGSymbolElement>) :
+    SVGContainerElementAttrsScope<SVGSymbolElement>(attrs) {
+    init {
+        attrs.id(id)
+    }
+
+    companion object {
+        operator fun invoke(
+            id: String,
+            attrs: (SVGSymbolAttrsScope.() -> Unit)?
+        ): AttrBuilderContext<SVGSymbolElement> {
+            return {
+                if (attrs != null) {
+                    SVGSymbolAttrsScope(id, this).attrs()
+                } else {
+                    id(id)
+                }
+            }
+        }
+    }
+
+    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
+        attr("viewBox", "$x $y $width $height")
+    }
+
+    fun x(value: Number) {
+        attr("x", value.toString())
+    }
+
+    fun x(value: CSSLengthOrPercentageValue) {
+        attr("x", value.toString())
+    }
+
+    fun y(value: Number) {
+        attr("y", value.toString())
+    }
+
+    fun y(value: CSSLengthOrPercentageValue) {
+        attr("y", value.toString())
+    }
+
+    fun width(value: Number) {
+        attr("width", value.toString())
+    }
+
+    fun width(value: CSSLengthOrPercentageValue) {
+        attr("width", value.toString())
+    }
+
+    fun height(value: Number) {
+        attr("height", value.toString())
+    }
+
+    fun height(value: CSSLengthOrPercentageValue) {
+        attr("height", value.toString())
+    }
+}
+
+
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
+@Composable
+fun ElementScope<SVGElement>.Symbol(
+    id: String,
+    attrs: (SVGSymbolAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGSymbolElement>
+) {
+    GenericTag("symbol", "http://www.w3.org/2000/svg", SVGSymbolAttrsScope(id, attrs), content)
+}
+
+class SVGUseAttrsScope internal constructor(href: String, attrs: AttrsScope<SVGUseElement>) :
+    SVGGraphicalElementAttrsScope<SVGUseElement>(attrs) {
+
+    init {
+        attrs.attr("href", href.prefixWithHash())
+    }
+
+    companion object {
+        private fun String.prefixWithHash() = if (startsWith("#")) this else "#$this"
+
+        operator fun invoke(
+            href: String,
+            attrs: (SVGUseAttrsScope.() -> Unit)
+        ): AttrBuilderContext<SVGUseElement> {
+            return { SVGUseAttrsScope(href, this).attrs() }
+        }
+    }
+
+    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
+        attr("viewBox", "$x $y $width $height")
+    }
+
+    fun x(value: Number) {
+        attr("x", value.toString())
+    }
+
+    fun x(value: CSSLengthOrPercentageValue) {
+        attr("x", value.toString())
+    }
+
+    fun y(value: Number) {
+        attr("y", value.toString())
+    }
+
+    fun y(value: CSSLengthOrPercentageValue) {
+        attr("y", value.toString())
+    }
+
+    fun width(value: Number) {
+        attr("width", value.toString())
+    }
+
+    fun width(value: CSSLengthOrPercentageValue) {
+        attr("width", value.toString())
+    }
+
+    fun height(value: Number) {
+        attr("height", value.toString())
+    }
+
+    fun height(value: CSSLengthOrPercentageValue) {
+        attr("height", value.toString())
+    }
+}
+
+
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
+@Composable
+fun ElementScope<SVGElement>.Use(
+    href: String,
+    attrs: (SVGUseAttrsScope.() -> Unit),
+) {
+    GenericTag("use", "http://www.w3.org/2000/svg", SVGUseAttrsScope(href, attrs))
 }
 
 
