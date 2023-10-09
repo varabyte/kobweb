@@ -524,11 +524,8 @@ fun ElementScope<SVGElement>.Line(attrs: SVGLineAttrsScope.() -> Unit) {
     GenericTag("line", "http://www.w3.org/2000/svg", SVGLineAttrsScope(attrs))
 }
 
-@DslMarker
-annotation class PathDataScopeMarker
-
-@PathDataScopeMarker
-class PathDataScope internal constructor() {
+@HtmlAttrMarker // scope for defining SVG path "d" attribute
+class SVGPathDataScope internal constructor() {
     internal val pathCommands = mutableListOf<String>()
 
     fun moveTo(x: Number, y: Number) {
@@ -599,8 +596,8 @@ class SVGPathAttrsScope internal constructor(attrs: AttrsScope<SVGPathElement>) 
         }
     }
 
-    fun d(pathDataScope: PathDataScope.() -> Unit) {
-        attr("d", PathDataScope().apply(pathDataScope).pathCommands.joinToString(" "))
+    fun d(pathDataScope: SVGPathDataScope.() -> Unit) {
+        attr("d", SVGPathDataScope().apply(pathDataScope).pathCommands.joinToString(" "))
     }
 }
 
