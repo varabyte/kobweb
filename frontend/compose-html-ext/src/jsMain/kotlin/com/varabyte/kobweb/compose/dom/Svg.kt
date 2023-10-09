@@ -21,6 +21,7 @@ import org.w3c.dom.svg.SVGGradientElement
 import org.w3c.dom.svg.SVGLineElement
 import org.w3c.dom.svg.SVGLinearGradientElement
 import org.w3c.dom.svg.SVGPathElement
+import org.w3c.dom.svg.SVGPatternElement
 import org.w3c.dom.svg.SVGPolygonElement
 import org.w3c.dom.svg.SVGPolylineElement
 import org.w3c.dom.svg.SVGRadialGradientElement
@@ -374,6 +375,76 @@ fun ElementScope<SVGGradientElement>.Stop(
         stopOpacity?.let { stopOpacity(it) }
     }
 }
+
+class SVGPatternAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGPatternElement>) :
+    SVGContainerElementAttrsScope<SVGPatternElement>(attrs) {
+    init {
+        attrs.id(id)
+    }
+
+    companion object {
+        operator fun invoke(
+            id: String,
+            attrs: (SVGPatternAttrsScope.() -> Unit)?
+        ): AttrBuilderContext<SVGPatternElement> {
+            return {
+                if (attrs != null) {
+                    SVGPatternAttrsScope(id, this).attrs()
+                } else {
+                    id(id)
+                }
+            }
+        }
+    }
+
+    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
+        attr("viewBox", "$x $y $width $height")
+    }
+
+    fun x(value: Number) {
+        attr("x", value.toString())
+    }
+
+    fun x(value: CSSLengthOrPercentageValue) {
+        attr("x", value.toString())
+    }
+
+    fun y(value: Number) {
+        attr("y", value.toString())
+    }
+
+    fun y(value: CSSLengthOrPercentageValue) {
+        attr("y", value.toString())
+    }
+
+    fun width(value: Number) {
+        attr("width", value.toString())
+    }
+
+    fun width(value: CSSLengthOrPercentageValue) {
+        attr("width", value.toString())
+    }
+
+    fun height(value: Number) {
+        attr("height", value.toString())
+    }
+
+    fun height(value: CSSLengthOrPercentageValue) {
+        attr("height", value.toString())
+    }
+}
+
+
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
+@Composable
+fun ElementScope<SVGDefsElement>.Pattern(
+    id: String,
+    attrs: (SVGPatternAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGPatternElement>
+) {
+    GenericTag("pattern", "http://www.w3.org/2000/svg", SVGPatternAttrsScope(id, attrs), content)
+}
+
 
 // endregion
 
