@@ -17,11 +17,13 @@ import org.w3c.dom.svg.SVGDefsElement
 import org.w3c.dom.svg.SVGElement
 import org.w3c.dom.svg.SVGEllipseElement
 import org.w3c.dom.svg.SVGGElement
+import org.w3c.dom.svg.SVGGradientElement
 import org.w3c.dom.svg.SVGLineElement
 import org.w3c.dom.svg.SVGLinearGradientElement
 import org.w3c.dom.svg.SVGPathElement
 import org.w3c.dom.svg.SVGPolygonElement
 import org.w3c.dom.svg.SVGPolylineElement
+import org.w3c.dom.svg.SVGRadialGradientElement
 import org.w3c.dom.svg.SVGRectElement
 import org.w3c.dom.svg.SVGStopElement
 import org.w3c.dom.svg.SVGTextElement
@@ -268,6 +270,61 @@ fun ElementScope<SVGDefsElement>.LinearGradient(
     }, content)
 }
 
+class SVGRadialGradientAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGRadialGradientElement>) :
+    SVGElementAttrsScope<SVGRadialGradientElement>(attrs) {
+    init {
+        attrs.id(id)
+    }
+
+    companion object {
+        operator fun invoke(
+            id: String,
+            attrs: SVGRadialGradientAttrsScope.() -> Unit
+        ): AttrBuilderContext<SVGRadialGradientElement> {
+            return { SVGRadialGradientAttrsScope(id, this).attrs() }
+        }
+    }
+
+    fun cx(value: Number) {
+        attr("cx", value.toString())
+    }
+
+    fun cy(value: Number) {
+        attr("cy", value.toString())
+    }
+
+    fun r(value: Number) {
+        attr("r", value.toString())
+    }
+
+    fun cx(value: CSSLengthOrPercentageValue) {
+        attr("cx", value.toString())
+    }
+
+    fun cy(value: CSSLengthOrPercentageValue) {
+        attr("cy", value.toString())
+    }
+
+    fun r(value: CSSLengthOrPercentageValue) {
+        attr("r", value.toString())
+    }
+}
+
+@Composable
+fun ElementScope<SVGDefsElement>.RadialGradient(
+    id: String,
+    attrs: (SVGRadialGradientAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGRadialGradientElement>
+) {
+    GenericTag("radialGradient", "http://www.w3.org/2000/svg", attrs = {
+        if (attrs != null) {
+            attrs(SVGRadialGradientAttrsScope(id, this))
+        } else {
+            id(id)
+        }
+    }, content)
+}
+
 class SVGStopAttrsScope internal constructor(attrs: AttrsScope<SVGStopElement>) :
     SVGElementAttrsScope<SVGStopElement>(attrs) {
     companion object {
@@ -295,13 +352,13 @@ class SVGStopAttrsScope internal constructor(attrs: AttrsScope<SVGStopElement>) 
 
 // See: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/stop
 @Composable
-fun ElementScope<SVGLinearGradientElement>.Stop(attrs: SVGStopAttrsScope.() -> Unit) {
+fun ElementScope<SVGGradientElement>.Stop(attrs: SVGStopAttrsScope.() -> Unit) {
     GenericTag("stop", "http://www.w3.org/2000/svg", SVGStopAttrsScope(attrs))
 }
 
 // A convenience version for one-liner stop entries
 @Composable
-fun ElementScope<SVGLinearGradientElement>.Stop(
+fun ElementScope<SVGGradientElement>.Stop(
     offset: CSSPercentageValue? = null,
     stopColor: CSSColorValue? = null,
     stopOpacity: Number? = null
