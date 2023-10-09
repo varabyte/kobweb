@@ -253,9 +253,15 @@ class SVGLinearGradientAttrsScope internal constructor(id: String, attrs: AttrsS
     companion object {
         operator fun invoke(
             id: String,
-            attrs: SVGLinearGradientAttrsScope.() -> Unit
+            attrs: (SVGLinearGradientAttrsScope.() -> Unit)?
         ): AttrBuilderContext<SVGLinearGradientElement> {
-            return { SVGLinearGradientAttrsScope(id, this).attrs() }
+            return {
+                if (attrs != null) {
+                    SVGLinearGradientAttrsScope(id, this).attrs()
+                } else {
+                    id(id)
+                }
+            }
         }
     }
 }
@@ -266,13 +272,7 @@ fun ElementScope<SVGDefsElement>.LinearGradient(
     attrs: (SVGLinearGradientAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGLinearGradientElement>
 ) {
-    GenericTag("linearGradient", "http://www.w3.org/2000/svg", attrs = {
-        if (attrs != null) {
-            attrs(SVGLinearGradientAttrsScope(id, this))
-        } else {
-            id(id)
-        }
-    }, content)
+    GenericTag("linearGradient", "http://www.w3.org/2000/svg", SVGLinearGradientAttrsScope(id, attrs), content)
 }
 
 class SVGRadialGradientAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGRadialGradientElement>) :
@@ -284,9 +284,15 @@ class SVGRadialGradientAttrsScope internal constructor(id: String, attrs: AttrsS
     companion object {
         operator fun invoke(
             id: String,
-            attrs: SVGRadialGradientAttrsScope.() -> Unit
+            attrs: (SVGRadialGradientAttrsScope.() -> Unit)?
         ): AttrBuilderContext<SVGRadialGradientElement> {
-            return { SVGRadialGradientAttrsScope(id, this).attrs() }
+            return {
+                if (attrs != null) {
+                    SVGRadialGradientAttrsScope(id, this).attrs()
+                } else {
+                    id(id)
+                }
+            }
         }
     }
 
@@ -321,13 +327,7 @@ fun ElementScope<SVGDefsElement>.RadialGradient(
     attrs: (SVGRadialGradientAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGRadialGradientElement>
 ) {
-    GenericTag("radialGradient", "http://www.w3.org/2000/svg", attrs = {
-        if (attrs != null) {
-            attrs(SVGRadialGradientAttrsScope(id, this))
-        } else {
-            id(id)
-        }
-    }, content)
+    GenericTag("radialGradient", "http://www.w3.org/2000/svg", SVGRadialGradientAttrsScope(id, attrs), content)
 }
 
 class SVGStopAttrsScope internal constructor(attrs: AttrsScope<SVGStopElement>) :
