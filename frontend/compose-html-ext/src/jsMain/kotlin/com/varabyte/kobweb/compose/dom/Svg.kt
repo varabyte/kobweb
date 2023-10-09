@@ -173,6 +173,10 @@ class SVGAttrsScope internal constructor(attrs: AttrsScope<SVGElement>) :
         }
     }
 
+    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
+        attr("viewBox", "$x $y $width $height")
+    }
+
     fun width(value: Number) {
         attr("width", value.toString())
     }
