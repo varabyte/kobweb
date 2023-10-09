@@ -27,35 +27,6 @@ import org.w3c.dom.svg.SVGStopElement
 import org.w3c.dom.svg.SVGTextElement
 
 /**
- * Our own SVG-specific extensions on top of `AttrsScope<SVGElement>`.
- *
- * At the time of writing this, the SVG APIs for Compose HTML are still underbaked. They are missing a lot of type-safe
- * APIs for various SVG attributes.
- *
- * We originally thought we would fix this by a liberal use of extension methods
- * (e.g. `fun AttrsScope<SVGCircleElement>.cx(value: Number)`), but this approach was fairly inconvenient as doing even
- * the most basic things with SVG elements required a bunch of imports and code completions were slow.
- *
- * As a compromise, we create our own subclasses of `AttrsScope<SVGElement>` and layer our own methods on top of them
- * directly. This approach is basically invisible to users of our APIs while providing a much better developer
- * experience. For example, this approaches uses our Circle extensions seamlessly:
- *
- * ```
- * Svg {
- *   Circle {
- *     cx(25)
- *     cy(25)
- *   }
- * }
- * ```
- */
-abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs: AttrsScope<E>) : AttrsScope<E> by attrs
-
-// Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
-// Enums have to be capitalized title case for this method to work.
-private fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
-
-/**
  * An ID tied to some reusable SVG element.
  *
  * Useful as a way to get a reference to IDs for gradients and patterns.
@@ -81,6 +52,38 @@ value class SVGId(val value: String) {
     override fun toString() = value
     val urlReference get() = "url(#$value)"
 }
+
+/**
+ * Our own SVG-specific extensions on top of `AttrsScope<SVGElement>`.
+ *
+ * At the time of writing this, the SVG APIs for Compose HTML are still underbaked. They are missing a lot of type-safe
+ * APIs for various SVG attributes.
+ *
+ * We originally thought we would fix this by a liberal use of extension methods
+ * (e.g. `fun AttrsScope<SVGCircleElement>.cx(value: Number)`), but this approach was fairly inconvenient as doing even
+ * the most basic things with SVG elements required a bunch of imports and code completions were slow.
+ *
+ * As a compromise, we create our own subclasses of `AttrsScope<SVGElement>` and layer our own methods on top of them
+ * directly. This approach is basically invisible to users of our APIs while providing a much better developer
+ * experience. For example, this approaches uses our Circle extensions seamlessly:
+ *
+ * ```
+ * Svg {
+ *   Circle {
+ *     cx(25)
+ *     cy(25)
+ *   }
+ * }
+ * ```
+ */
+abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs: AttrsScope<E>) :
+    AttrsScope<E> by attrs {
+    fun String.toId() = SVGId(this)
+}
+
+// Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
+// Enums have to be capitalized title case for this method to work.
+private fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
 
 // region SVG paint attributes (https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint)
 
