@@ -169,7 +169,7 @@ abstract class SVGContainerElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
     SVGGraphicalElementAttrsScope<E>(attrs) {
 }
 
-class SVGSvgAttrsScope internal constructor(attrs: AttrsScope<SVGSVGElement>) :
+class SVGSvgAttrsScope private constructor(attrs: AttrsScope<SVGSVGElement>) :
     SVGContainerElementAttrsScope<SVGSVGElement>(attrs) {
     companion object {
         operator fun invoke(attrs: (SVGSvgAttrsScope.() -> Unit)?): AttrBuilderContext<SVGSVGElement> {
@@ -228,7 +228,7 @@ fun Svg(
 
 // region SVG misc elements
 
-class SVGDefsAttrsScope internal constructor(attrs: AttrsScope<SVGDefsElement>) :
+class SVGDefsAttrsScope private constructor(attrs: AttrsScope<SVGDefsElement>) :
     SVGElementAttrsScope<SVGDefsElement>(attrs) {
     companion object {
         operator fun invoke(attrs: SVGDefsAttrsScope.() -> Unit): AttrBuilderContext<SVGDefsElement> {
@@ -248,11 +248,8 @@ fun ElementScope<SVGElement>.Defs(
     )
 }
 
-class SVGLinearGradientAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGLinearGradientElement>) :
-    SVGElementAttrsScope<SVGLinearGradientElement>(attrs) {
-    init {
-        attrs.id(id)
-    }
+class SVGLinearGradientAttrsScope private constructor(id: String, attrs: AttrsScope<SVGLinearGradientElement>) :
+    SVGElementAttrsScope<SVGLinearGradientElement>(attrs.id(id)) {
 
     companion object {
         operator fun invoke(
@@ -279,11 +276,8 @@ fun ElementScope<SVGDefsElement>.LinearGradient(
     GenericTag("linearGradient", "http://www.w3.org/2000/svg", SVGLinearGradientAttrsScope(id, attrs), content)
 }
 
-class SVGRadialGradientAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGRadialGradientElement>) :
-    SVGElementAttrsScope<SVGRadialGradientElement>(attrs) {
-    init {
-        attrs.id(id)
-    }
+class SVGRadialGradientAttrsScope private constructor(id: String, attrs: AttrsScope<SVGRadialGradientElement>) :
+    SVGElementAttrsScope<SVGRadialGradientElement>(attrs.id(id)) {
 
     companion object {
         operator fun invoke(
@@ -334,7 +328,7 @@ fun ElementScope<SVGDefsElement>.RadialGradient(
     GenericTag("radialGradient", "http://www.w3.org/2000/svg", SVGRadialGradientAttrsScope(id, attrs), content)
 }
 
-class SVGStopAttrsScope internal constructor(attrs: AttrsScope<SVGStopElement>) :
+class SVGStopAttrsScope private constructor(attrs: AttrsScope<SVGStopElement>) :
     SVGElementAttrsScope<SVGStopElement>(attrs) {
     companion object {
         operator fun invoke(attrs: SVGStopAttrsScope.() -> Unit): AttrBuilderContext<SVGStopElement> {
@@ -379,11 +373,8 @@ fun ElementScope<SVGGradientElement>.Stop(
     }
 }
 
-class SVGPatternAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGPatternElement>) :
-    SVGContainerElementAttrsScope<SVGPatternElement>(attrs) {
-    init {
-        attrs.id(id)
-    }
+class SVGPatternAttrsScope private constructor(id: String, attrs: AttrsScope<SVGPatternElement>) :
+    SVGContainerElementAttrsScope<SVGPatternElement>(attrs.id(id)) {
 
     companion object {
         operator fun invoke(
@@ -448,11 +439,8 @@ fun ElementScope<SVGDefsElement>.Pattern(
     GenericTag("pattern", "http://www.w3.org/2000/svg", SVGPatternAttrsScope(id, attrs), content)
 }
 
-class SVGSymbolAttrsScope internal constructor(id: String, attrs: AttrsScope<SVGSymbolElement>) :
-    SVGContainerElementAttrsScope<SVGSymbolElement>(attrs) {
-    init {
-        attrs.id(id)
-    }
+class SVGSymbolAttrsScope private constructor(id: String, attrs: AttrsScope<SVGSymbolElement>) :
+    SVGContainerElementAttrsScope<SVGSymbolElement>(attrs.id(id)) {
 
     companion object {
         operator fun invoke(
@@ -517,12 +505,8 @@ fun ElementScope<SVGElement>.Symbol(
     GenericTag("symbol", "http://www.w3.org/2000/svg", SVGSymbolAttrsScope(id, attrs), content)
 }
 
-class SVGUseAttrsScope internal constructor(href: String, attrs: AttrsScope<SVGUseElement>) :
-    SVGGraphicalElementAttrsScope<SVGUseElement>(attrs) {
-
-    init {
-        attrs.attr("href", href.prefixWithHash())
-    }
+class SVGUseAttrsScope private constructor(href: String, attrs: AttrsScope<SVGUseElement>) :
+    SVGGraphicalElementAttrsScope<SVGUseElement>(attrs.attr("href", href.prefixWithHash())) {
 
     companion object {
         private fun String.prefixWithHash() = if (startsWith("#")) this else "#$this"
@@ -587,7 +571,7 @@ fun ElementScope<SVGElement>.Use(
 
 // region SVG graphical elements
 
-class SVGCircleAttrsScope internal constructor(attrs: AttrsScope<SVGCircleElement>) :
+class SVGCircleAttrsScope private constructor(attrs: AttrsScope<SVGCircleElement>) :
     SVGGraphicalElementAttrsScope<SVGCircleElement>(attrs) {
 
     companion object {
@@ -644,7 +628,7 @@ fun ElementScope<SVGElement>.Circle(attrs: SVGCircleAttrsScope.() -> Unit) {
     GenericTag("circle", "http://www.w3.org/2000/svg", SVGCircleAttrsScope(attrs))
 }
 
-class SVGEllipseAttrsScope internal constructor(attrs: AttrsScope<SVGEllipseElement>) :
+class SVGEllipseAttrsScope private constructor(attrs: AttrsScope<SVGEllipseElement>) :
     SVGGraphicalElementAttrsScope<SVGEllipseElement>(attrs) {
 
     companion object {
@@ -710,7 +694,7 @@ fun ElementScope<SVGElement>.Ellipse(attrs: SVGEllipseAttrsScope.() -> Unit) {
     GenericTag("ellipse", "http://www.w3.org/2000/svg", SVGEllipseAttrsScope(attrs))
 }
 
-class SVGGroupAttrsScope internal constructor(attrs: AttrsScope<SVGGElement>) :
+class SVGGroupAttrsScope private constructor(attrs: AttrsScope<SVGGElement>) :
     SVGContainerElementAttrsScope<SVGGElement>(attrs) {
 
     companion object {
@@ -731,7 +715,7 @@ fun ElementScope<SVGElement>.Group(
 }
 
 
-class SVGLineAttrsScope internal constructor(attrs: AttrsScope<SVGLineElement>) :
+class SVGLineAttrsScope private constructor(attrs: AttrsScope<SVGLineElement>) :
     SVGGraphicalElementAttrsScope<SVGLineElement>(attrs) {
 
     companion object {
@@ -860,7 +844,7 @@ class SVGPathDataScope internal constructor() {
 }
 
 
-class SVGPathAttrsScope internal constructor(attrs: AttrsScope<SVGPathElement>) :
+class SVGPathAttrsScope private constructor(attrs: AttrsScope<SVGPathElement>) :
     SVGGraphicalElementAttrsScope<SVGPathElement>(attrs) {
 
     companion object {
@@ -903,7 +887,7 @@ fun ElementScope<SVGElement>.Path(attrs: SVGPathAttrsScope.() -> Unit) {
 }
 
 
-class SVGPolygonAttrsScope internal constructor(attrs: AttrsScope<SVGPolygonElement>) :
+class SVGPolygonAttrsScope private constructor(attrs: AttrsScope<SVGPolygonElement>) :
     SVGGraphicalElementAttrsScope<SVGPolygonElement>(attrs) {
 
     companion object {
@@ -939,7 +923,7 @@ fun ElementScope<SVGElement>.Polygon(attrs: SVGPolygonAttrsScope.() -> Unit) {
 }
 
 
-class SVGPolylineAttrsScope internal constructor(attrs: AttrsScope<SVGPolylineElement>) :
+class SVGPolylineAttrsScope private constructor(attrs: AttrsScope<SVGPolylineElement>) :
     SVGGraphicalElementAttrsScope<SVGPolylineElement>(attrs) {
 
     companion object {
@@ -976,7 +960,7 @@ fun ElementScope<SVGElement>.Polyline(attrs: SVGPolylineAttrsScope.() -> Unit) {
 }
 
 
-class SVGRectAttrsScope internal constructor(attrs: AttrsScope<SVGRectElement>) :
+class SVGRectAttrsScope private constructor(attrs: AttrsScope<SVGRectElement>) :
     SVGGraphicalElementAttrsScope<SVGRectElement>(attrs) {
 
     companion object {
@@ -1077,7 +1061,7 @@ enum class SvgTextLengthAdjust {
     override fun toString() = this.toSvgValue()
 }
 
-class SVGTextAttrsScope internal constructor(attrs: AttrsScope<SVGTextElement>) :
+class SVGTextAttrsScope private constructor(attrs: AttrsScope<SVGTextElement>) :
     SVGGraphicalElementAttrsScope<SVGTextElement>(attrs) {
 
     companion object {
