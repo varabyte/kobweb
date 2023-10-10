@@ -248,8 +248,36 @@ fun ElementScope<SVGElement>.Defs(
     )
 }
 
+enum class SVGGradientUnits {
+    UserSpaceOnUse,
+    UserSpace,
+    ObjectBoundingBox;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGGradientSpreadMethod {
+    Pad,
+    Reflect,
+    Repeat;
+
+    override fun toString() = this.toSvgValue()
+}
+
+abstract class SVGGradientAttrsScope<E : SVGGradientElement> protected constructor(id: String, attrs: AttrsScope<E>) :
+    SVGElementAttrsScope<E>(attrs.id(id)) {
+
+    fun gradientUnits(value: SVGGradientUnits) {
+        attr("gradientUnits", value.toString())
+    }
+
+    fun spreadMethod(value: SVGGradientSpreadMethod) {
+        attr("spreadMethod", value.toString())
+    }
+}
+
 class SVGLinearGradientAttrsScope private constructor(id: String, attrs: AttrsScope<SVGLinearGradientElement>) :
-    SVGElementAttrsScope<SVGLinearGradientElement>(attrs.id(id)) {
+    SVGGradientAttrsScope<SVGLinearGradientElement>(id, attrs) {
 
     companion object {
         operator fun invoke(
@@ -265,6 +293,38 @@ class SVGLinearGradientAttrsScope private constructor(id: String, attrs: AttrsSc
             }
         }
     }
+
+    fun x1(value: Number) {
+        attr("x1", value.toString())
+    }
+
+    fun x1(value: CSSLengthOrPercentageValue) {
+        attr("x1", value.toString())
+    }
+
+    fun y1(value: Number) {
+        attr("y1", value.toString())
+    }
+
+    fun y1(value: CSSLengthOrPercentageValue) {
+        attr("y1", value.toString())
+    }
+
+    fun x2(value: Number) {
+        attr("x2", value.toString())
+    }
+
+    fun x2(value: CSSLengthOrPercentageValue) {
+        attr("x2", value.toString())
+    }
+
+    fun y2(value: Number) {
+        attr("y2", value.toString())
+    }
+
+    fun y2(value: CSSLengthOrPercentageValue) {
+        attr("y2", value.toString())
+    }
 }
 
 @Composable
@@ -277,7 +337,7 @@ fun ElementScope<SVGDefsElement>.LinearGradient(
 }
 
 class SVGRadialGradientAttrsScope private constructor(id: String, attrs: AttrsScope<SVGRadialGradientElement>) :
-    SVGElementAttrsScope<SVGRadialGradientElement>(attrs.id(id)) {
+    SVGGradientAttrsScope<SVGRadialGradientElement>(id, attrs) {
 
     companion object {
         operator fun invoke(
