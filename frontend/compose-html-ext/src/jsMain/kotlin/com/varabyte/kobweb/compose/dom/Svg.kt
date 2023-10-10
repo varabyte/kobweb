@@ -26,6 +26,7 @@ import org.w3c.dom.svg.SVGPolygonElement
 import org.w3c.dom.svg.SVGPolylineElement
 import org.w3c.dom.svg.SVGRadialGradientElement
 import org.w3c.dom.svg.SVGRectElement
+import org.w3c.dom.svg.SVGSVGElement
 import org.w3c.dom.svg.SVGStopElement
 import org.w3c.dom.svg.SVGSymbolElement
 import org.w3c.dom.svg.SVGTextElement
@@ -168,11 +169,11 @@ abstract class SVGContainerElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
     SVGGraphicalElementAttrsScope<E>(attrs) {
 }
 
-class SVGAttrsScope internal constructor(attrs: AttrsScope<SVGElement>) :
-    SVGContainerElementAttrsScope<SVGElement>(attrs) {
+class SVGSvgAttrsScope internal constructor(attrs: AttrsScope<SVGSVGElement>) :
+    SVGContainerElementAttrsScope<SVGSVGElement>(attrs) {
     companion object {
-        operator fun invoke(attrs: SVGAttrsScope.() -> Unit): AttrBuilderContext<SVGElement> {
-            return { SVGAttrsScope(this).attrs() }
+        operator fun invoke(attrs: (SVGSvgAttrsScope.() -> Unit)?): AttrBuilderContext<SVGSVGElement> {
+            return { if (attrs != null) SVGSvgAttrsScope(this).attrs() }
         }
     }
 
@@ -219,10 +220,10 @@ class SVGAttrsScope internal constructor(attrs: AttrsScope<SVGElement>) :
  */
 @Composable
 fun Svg(
-    attrs: (SVGAttrsScope.() -> Unit)? = null,
-    content: ContentBuilder<SVGElement>
+    attrs: (SVGSvgAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGSVGElement>
 ) {
-    GenericTag("svg", "http://www.w3.org/2000/svg", attrs?.let { SVGAttrsScope.invoke(it) }, content)
+    GenericTag("svg", "http://www.w3.org/2000/svg", SVGSvgAttrsScope.invoke(attrs), content)
 }
 
 // region SVG misc elements
