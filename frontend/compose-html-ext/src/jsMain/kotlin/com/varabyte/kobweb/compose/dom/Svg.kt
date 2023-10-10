@@ -49,7 +49,7 @@ import org.w3c.dom.svg.SVGUseElement
  *
  *     Circle {
  *         cx(100); cy(100); r(50)
- *         fill(SVGId("myGradient"))
+ *         fill(SVGId("myGradient")) // or, fill("myGradient".toId())
  *     }
  * }
  * ```
