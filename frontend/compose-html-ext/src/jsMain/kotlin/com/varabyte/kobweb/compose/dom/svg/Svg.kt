@@ -41,8 +41,9 @@ import org.w3c.dom.svg.SVGUseElement
  * For example:
  * ```
  * Svg(...) {
+ *     val goldToOrangeGradientId = SvgId("goldToOrangeGradient")
  *     Defs {
- *         LinearGradient("myGradient") {
+ *         LinearGradient(goldToOrangeGradientId) {
  *             Stop(10.percent, Colors.Gold)
  *             Stop(90.percent, Colors.DarkOrange)
  *         }
@@ -50,14 +51,15 @@ import org.w3c.dom.svg.SVGUseElement
  *
  *     Circle {
  *         cx(100); cy(100); r(50)
- *         fill(SVGId("myGradient")) // or, fill("myGradient".toId())
+ *         fill(goldToOrangeGradientId)
  *     }
  * }
  * ```
  */
-value class SVGId(val value: String) {
+value class SvgId(val value: String) {
     override fun toString() = value
     val urlReference get() = "url(#$value)"
+    val hashReference get() = "#$value"
 }
 
 @HtmlAttrMarker
@@ -139,7 +141,6 @@ class SVGTransformScope internal constructor() {
  */
 abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs: AttrsScope<E>) :
     AttrsScope<E> by attrs {
-    fun String.toId() = SVGId(this)
 
     fun transform(transformScope: SVGTransformScope.() -> Unit) {
         val scope = SVGTransformScope()
@@ -192,7 +193,7 @@ enum class SVGFillRule {
 abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGPaintType) = this.attr("stroke", value.toString())
-    fun stroke(id: SVGId) = this.attr("stroke", id.urlReference)
+    fun stroke(id: SvgId) = this.attr("stroke", id.urlReference)
 
     fun strokeDashArray(vararg values: Number) {
         this.attr("stroke-dasharray", values.joinToString(",") { it.toString() })
@@ -218,7 +219,7 @@ abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
 
     fun fill(value: CSSColorValue) = this.attr("fill", value.toString())
     fun fill(value: SVGPaintType) = this.attr("fill", value.toString())
-    fun fill(id: SVGId) = this.attr("fill", id.urlReference)
+    fun fill(id: SvgId) = this.attr("fill", id.urlReference)
 
     fun fillRule(value: SVGFillRule) = this.attr("fill-rule", value.toString())
 
@@ -325,8 +326,8 @@ enum class SVGGradientSpreadMethod {
     override fun toString() = this.toSvgValue()
 }
 
-abstract class SVGGradientAttrsScope<E : SVGGradientElement> protected constructor(id: String, attrs: AttrsScope<E>) :
-    SVGElementAttrsScope<E>(attrs.id(id)) {
+abstract class SVGGradientAttrsScope<E : SVGGradientElement> protected constructor(id: SvgId, attrs: AttrsScope<E>) :
+    SVGElementAttrsScope<E>(attrs.id(id.toString())) {
 
     fun gradientUnits(value: SVGGradientUnits) {
         attr("gradientUnits", value.toString())
@@ -337,19 +338,19 @@ abstract class SVGGradientAttrsScope<E : SVGGradientElement> protected construct
     }
 }
 
-class SVGLinearGradientAttrsScope private constructor(id: String, attrs: AttrsScope<SVGLinearGradientElement>) :
+class SVGLinearGradientAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGLinearGradientElement>) :
     SVGGradientAttrsScope<SVGLinearGradientElement>(id, attrs) {
 
     companion object {
         operator fun invoke(
-            id: String,
+            id: SvgId,
             attrs: (SVGLinearGradientAttrsScope.() -> Unit)?
         ): AttrBuilderContext<SVGLinearGradientElement> {
             return {
                 if (attrs != null) {
                     SVGLinearGradientAttrsScope(id, this).attrs()
                 } else {
-                    id(id)
+                    id(id.toString())
                 }
             }
         }
@@ -390,26 +391,26 @@ class SVGLinearGradientAttrsScope private constructor(id: String, attrs: AttrsSc
 
 @Composable
 fun ElementScope<SVGDefsElement>.LinearGradient(
-    id: String,
+    id: SvgId,
     attrs: (SVGLinearGradientAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGLinearGradientElement>
 ) {
     GenericTag("linearGradient", "http://www.w3.org/2000/svg", SVGLinearGradientAttrsScope(id, attrs), content)
 }
 
-class SVGRadialGradientAttrsScope private constructor(id: String, attrs: AttrsScope<SVGRadialGradientElement>) :
+class SVGRadialGradientAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGRadialGradientElement>) :
     SVGGradientAttrsScope<SVGRadialGradientElement>(id, attrs) {
 
     companion object {
         operator fun invoke(
-            id: String,
+            id: SvgId,
             attrs: (SVGRadialGradientAttrsScope.() -> Unit)?
         ): AttrBuilderContext<SVGRadialGradientElement> {
             return {
                 if (attrs != null) {
                     SVGRadialGradientAttrsScope(id, this).attrs()
                 } else {
-                    id(id)
+                    id(id.toString())
                 }
             }
         }
@@ -442,7 +443,7 @@ class SVGRadialGradientAttrsScope private constructor(id: String, attrs: AttrsSc
 
 @Composable
 fun ElementScope<SVGDefsElement>.RadialGradient(
-    id: String,
+    id: SvgId,
     attrs: (SVGRadialGradientAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGRadialGradientElement>
 ) {
@@ -494,19 +495,19 @@ fun ElementScope<SVGGradientElement>.Stop(
     }
 }
 
-class SVGPatternAttrsScope private constructor(id: String, attrs: AttrsScope<SVGPatternElement>) :
-    SVGContainerElementAttrsScope<SVGPatternElement>(attrs.id(id)) {
+class SVGPatternAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGPatternElement>) :
+    SVGContainerElementAttrsScope<SVGPatternElement>(attrs.id(id.toString())) {
 
     companion object {
         operator fun invoke(
-            id: String,
+            id: SvgId,
             attrs: (SVGPatternAttrsScope.() -> Unit)?
         ): AttrBuilderContext<SVGPatternElement> {
             return {
                 if (attrs != null) {
                     SVGPatternAttrsScope(id, this).attrs()
                 } else {
-                    id(id)
+                    id(id.toString())
                 }
             }
         }
@@ -553,26 +554,26 @@ class SVGPatternAttrsScope private constructor(id: String, attrs: AttrsScope<SVG
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
 @Composable
 fun ElementScope<SVGDefsElement>.Pattern(
-    id: String,
+    id: SvgId,
     attrs: (SVGPatternAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGPatternElement>
 ) {
     GenericTag("pattern", "http://www.w3.org/2000/svg", SVGPatternAttrsScope(id, attrs), content)
 }
 
-class SVGSymbolAttrsScope private constructor(id: String, attrs: AttrsScope<SVGSymbolElement>) :
-    SVGContainerElementAttrsScope<SVGSymbolElement>(attrs.id(id)) {
+class SVGSymbolAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGSymbolElement>) :
+    SVGContainerElementAttrsScope<SVGSymbolElement>(attrs.id(id.toString())) {
 
     companion object {
         operator fun invoke(
-            id: String,
+            id: SvgId,
             attrs: (SVGSymbolAttrsScope.() -> Unit)?
         ): AttrBuilderContext<SVGSymbolElement> {
             return {
                 if (attrs != null) {
                     SVGSymbolAttrsScope(id, this).attrs()
                 } else {
-                    id(id)
+                    id(id.toString())
                 }
             }
         }
@@ -619,7 +620,7 @@ class SVGSymbolAttrsScope private constructor(id: String, attrs: AttrsScope<SVGS
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
 @Composable
 fun ElementScope<SVGElement>.Symbol(
-    id: String,
+    id: SvgId,
     attrs: (SVGSymbolAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGSymbolElement>
 ) {
