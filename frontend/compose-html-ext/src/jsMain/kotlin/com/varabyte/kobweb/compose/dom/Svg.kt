@@ -59,6 +59,60 @@ value class SVGId(val value: String) {
     val urlReference get() = "url(#$value)"
 }
 
+@HtmlAttrMarker
+class SVGTransformScope internal constructor() {
+    internal val transformCommands = mutableListOf<String>()
+
+    fun matrix(a: Number, b: Number, c: Number, d: Number, e: Number, f: Number) {
+        transformCommands.add("matrix($a $b $c $d $e $f)")
+    }
+
+    fun translate(x: Number, y: Number? = null) {
+        transformCommands.add(buildString {
+            append("translate($x")
+            y?.let { append(" $it") }
+            append(")")
+        })
+    }
+
+    fun scale(x: Number, y: Number? = null) {
+        transformCommands.add(buildString {
+            append("scale($x")
+            y?.let { append(" $it") }
+            append(")")
+        })
+    }
+
+    fun rotate(angle: Number, x: Number? = null, y: Number? = null) {
+        transformCommands.add(buildString {
+            append("rotate($angle")
+            x?.let { append(" $it") }
+            y?.let { append(" $it") }
+            append(")")
+        })
+    }
+
+    fun rotate(angle: CSSAngleValue, x: Number? = null, y: Number? = null) {
+        rotate(angle.toDegrees(), x, y)
+    }
+
+    fun skewX(angle: Number) {
+        transformCommands.add("skewX($angle)")
+    }
+
+    fun skewX(angle: CSSAngleValue) {
+        skewX(angle.toDegrees())
+    }
+
+    fun skewY(angle: Number) {
+        transformCommands.add("skewY($angle)")
+    }
+
+    fun skewY(angle: CSSAngleValue) {
+        skewY(angle.toDegrees())
+    }
+}
+
 /**
  * Our own SVG-specific extensions on top of `AttrsScope<SVGElement>`.
  *
@@ -85,6 +139,12 @@ value class SVGId(val value: String) {
 abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs: AttrsScope<E>) :
     AttrsScope<E> by attrs {
     fun String.toId() = SVGId(this)
+
+    fun transform(transformScope: SVGTransformScope.() -> Unit) {
+        val scope = SVGTransformScope()
+        scope.transformScope()
+        attr("transform", scope.transformCommands.joinToString(" "))
+    }
 }
 
 // Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"

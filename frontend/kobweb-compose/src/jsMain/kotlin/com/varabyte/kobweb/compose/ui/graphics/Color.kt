@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.ui.graphics
 
+import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.css.*
 import kotlin.math.PI
 import kotlin.math.abs
@@ -7,14 +8,6 @@ import kotlin.math.roundToInt
 
 private fun Float.toColorInt() = (this.coerceIn(0f, 1f) * 255.0f).toInt()
 private fun Int.toColorFloat() = this.and(0xFF) / 255.0f
-
-private fun CSSAngleValue.toDegrees() = when (this.unit.toString()) {
-    "deg" -> value
-    "grad" -> (value * 0.9f)
-    "rad" -> (value * 180f / PI.toFloat())
-    "turn" -> (value * 360f)
-    else -> error("Unexpected unit type ${this.unit}")
-} % 360f
 
 /**
  * A base class for colors which provides additional functionality on top of the color class included in Compose HTML.
