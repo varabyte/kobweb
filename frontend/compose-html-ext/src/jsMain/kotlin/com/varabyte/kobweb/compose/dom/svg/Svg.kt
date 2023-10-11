@@ -1,10 +1,11 @@
 // SVGElement scope is useful to ensure SVG children are only used within an SVG
 @file:Suppress("UnusedReceiverParameter")
 
-package com.varabyte.kobweb.compose.dom
+package com.varabyte.kobweb.compose.dom.svg
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.dom.GenericTag
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.HtmlAttrMarker
 import org.jetbrains.compose.web.css.*

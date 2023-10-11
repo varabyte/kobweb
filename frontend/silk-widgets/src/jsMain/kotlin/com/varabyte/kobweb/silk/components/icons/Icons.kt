@@ -1,13 +1,13 @@
 package com.varabyte.kobweb.silk.components.icons
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.dom.Circle
-import com.varabyte.kobweb.compose.dom.Group
-import com.varabyte.kobweb.compose.dom.Line
-import com.varabyte.kobweb.compose.dom.Path
-import com.varabyte.kobweb.compose.dom.Polyline
-import com.varabyte.kobweb.compose.dom.Rect
-import com.varabyte.kobweb.compose.dom.Svg
+import com.varabyte.kobweb.compose.dom.svg.Circle
+import com.varabyte.kobweb.compose.dom.svg.Group
+import com.varabyte.kobweb.compose.dom.svg.Line
+import com.varabyte.kobweb.compose.dom.svg.Path
+import com.varabyte.kobweb.compose.dom.svg.Polyline
+import com.varabyte.kobweb.compose.dom.svg.Rect
+import com.varabyte.kobweb.compose.dom.svg.Svg
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.w3c.dom.svg.SVGElement
