@@ -7,6 +7,11 @@ import com.varabyte.kobweb.compose.dom.svg.Line
 import com.varabyte.kobweb.compose.dom.svg.Path
 import com.varabyte.kobweb.compose.dom.svg.Polyline
 import com.varabyte.kobweb.compose.dom.svg.Rect
+import com.varabyte.kobweb.compose.dom.svg.SVGFillType
+import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineCap
+import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineJoin
+import com.varabyte.kobweb.compose.dom.svg.SVGStrokeType
+import com.varabyte.kobweb.compose.dom.svg.SVGSvgAttrsScope
 import com.varabyte.kobweb.compose.dom.svg.Svg
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ContentBuilder
@@ -18,30 +23,33 @@ import org.w3c.dom.svg.SVGElement
 // dependency.
 // --------------------------------------------------------------------------------------------------------------------
 
+private class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
+    companion object {
+        fun sized(width: Int, height: Int = width) = ViewBox(0, 0, width, height)
+    }
+}
+
 // NOTE: This API is sloppy with params. Revisit if we ever want to make it public. Possibly come up with better SVG API
 // support first, instead of setting attrs everywhere.
 @Composable
 private fun createIcon(
-    viewBox: String,
+    viewBox: ViewBox = ViewBox.sized(24),
     width: CSSLengthValue = 1.2.em,
-    strokeWidth: Int = 1,
-    fill: String? = "none",
+    attrs: (SVGSvgAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGElement>
 ) {
     Svg(attrs = {
-        attr("width", width.toString())
-        attr("viewBox", viewBox)
-        style {
-            fill?.let { property("fill", it) }
-            property("stroke", "currentColor")
-            property("stroke-width", strokeWidth)
-        }
+        width(width)
+        viewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height)
+        fill(SVGFillType.None)
+        stroke(SVGStrokeType.CurrentColor)
+        attrs?.invoke(this)
     }, content)
 }
 
 @Composable
 fun CheckIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
+    createIcon(attrs = { strokeWidth(4) }) {
         Polyline {
             points(3 to 12, 9 to 19, 21 to 2)
         }
@@ -50,7 +58,7 @@ fun CheckIcon() {
 
 @Composable
 fun ChevronDownIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
+    createIcon(attrs = { strokeWidth(2) }) {
         Path {
             d {
                 moveTo(16.59, 8.59)
@@ -67,7 +75,7 @@ fun ChevronDownIcon() {
 
 @Composable
 fun ChevronLeftIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
+    createIcon(attrs = { strokeWidth(2) }) {
         Path {
             d {
                 moveTo(15.41, 7.41)
@@ -84,7 +92,7 @@ fun ChevronLeftIcon() {
 
 @Composable
 fun ChevronRightIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
+    createIcon(attrs = { strokeWidth(2) }) {
         Path {
             d {
                 moveTo(10, 6)
@@ -101,7 +109,7 @@ fun ChevronRightIcon() {
 
 @Composable
 fun ChevronUpIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
+    createIcon(attrs = { strokeWidth(2) }) {
         Path {
             d {
                 moveTo(12, 8)
@@ -118,7 +126,7 @@ fun ChevronUpIcon() {
 
 @Composable
 fun CircleIcon() {
-    createIcon(viewBox = "0 0 24 24", fill = "currentColor") {
+    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
         Circle {
             cx(12)
             cy(12)
@@ -129,7 +137,7 @@ fun CircleIcon() {
 
 @Composable
 fun CloseIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 3) {
+    createIcon(attrs = { strokeWidth(3) }) {
         Line {
             x1(1)
             x2(23)
@@ -147,7 +155,7 @@ fun CloseIcon() {
 
 @Composable
 fun HamburgerIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 3) {
+    createIcon(attrs = { strokeWidth(3) }) {
         for (y in listOf(3, 12, 21)) {
             Line {
                 x1(0)
@@ -166,7 +174,7 @@ fun IndeterminateIcon() {
 
 @Composable
 fun MinusIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
+    createIcon(attrs = { strokeWidth(4) }) {
         Line {
             x1(3)
             x2(21)
@@ -178,7 +186,7 @@ fun MinusIcon() {
 
 @Composable
 fun PlusIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 4) {
+    createIcon(attrs = { strokeWidth(4) }) {
         Line {
             x1(3)
             x2(21)
@@ -196,7 +204,7 @@ fun PlusIcon() {
 
 @Composable
 fun SquareIcon() {
-    createIcon(viewBox = "0 0 24 24", fill = "currentColor") {
+    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
         Rect {
             x(4)
             y(4)
@@ -209,7 +217,7 @@ fun SquareIcon() {
 
 @Composable
 fun MoonIcon() {
-    createIcon(viewBox = "0 0 200 200", strokeWidth = 20) {
+    createIcon(ViewBox.sized(200), attrs = { strokeWidth(20) }) {
         Path {
             d {
                 moveTo(175, 106.583)
@@ -224,10 +232,10 @@ fun MoonIcon() {
 
 @Composable
 fun SunIcon() {
-    createIcon(viewBox = "0 0 24 24", strokeWidth = 2) {
+    createIcon(attrs = { strokeWidth(2) }) {
         Group(attrs = {
-            attr("stroke-linejoin", "round")
-            attr("stroke-linecap", "round")
+            strokeLineJoin(SVGStrokeLineJoin.Round)
+            strokeLineCap(SVGStrokeLineCap.Round)
         }) {
             Circle {
                 cx(12)
