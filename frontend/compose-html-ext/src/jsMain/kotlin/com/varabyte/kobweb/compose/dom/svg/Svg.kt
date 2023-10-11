@@ -1176,7 +1176,7 @@ fun ElementScope<SVGElement>.Rect(attrs: SVGRectAttrsScope.() -> Unit) {
 }
 
 
-enum class SvgTextLengthAdjust {
+enum class SVGTextLengthAdjust {
     Spacing,
     SpacingAndGlyphs;
 
@@ -1229,7 +1229,7 @@ class SVGTextAttrsScope private constructor(attrs: AttrsScope<SVGTextElement>) :
         attr("rotate", value)
     }
 
-    fun lengthAdjust(lengthAdjust: SvgTextLengthAdjust) {
+    fun lengthAdjust(lengthAdjust: SVGTextLengthAdjust) {
         attr("lengthAdjust", lengthAdjust.toString())
     }
 
