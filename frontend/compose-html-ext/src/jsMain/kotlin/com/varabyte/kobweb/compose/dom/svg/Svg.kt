@@ -985,8 +985,22 @@ class SVGPathAttrsScope private constructor(attrs: AttrsScope<SVGPathElement>) :
         }
     }
 
+    /**
+     * Set path data using a rich, type-safe DSL.
+     */
     fun d(pathDataScope: SVGPathDataScope.() -> Unit) {
         attr("d", SVGPathDataScope().apply(pathDataScope).pathCommands.joinToString(" "))
+    }
+
+    /**
+     * A way to set the path data directly.
+     *
+     * You are highly encouraged to use the other `d { ... }` DSL builder method instead, as it is far more readable.
+     * However, in practice, users might get a crazy long path string from a designer or from a tool like Figma, so we
+     * begrudgingly allow setting this directly.
+     */
+    fun d(value: String) {
+        attr("d", value)
     }
 }
 
