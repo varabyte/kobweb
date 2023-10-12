@@ -208,11 +208,11 @@ fun WidgetsPage() {
 
             WidgetSection("Icons") {
                 val icons = mapOf<String, @Composable () -> Unit>(
-                    "ArrowBackIcon" to { ArrowBackIcon() },
-                    "ArrowDownIcon" to { ArrowDownIcon() },
-                    "ArrowForwardIcon" to { ArrowForwardIcon() },
-                    "ArrowUpIcon" to { ArrowUpIcon() },
-                    "AttachmentIcon" to { AttachmentIcon() },
+                    "Arrow Back" to { ArrowBackIcon() },
+                    "Arrow Down" to { ArrowDownIcon() },
+                    "Arrow Forward" to { ArrowForwardIcon() },
+                    "Arrow Up" to { ArrowUpIcon() },
+                    "Attachment" to { AttachmentIcon() },
                     "Check" to { CheckIcon() },
                     "Chevron Down" to { ChevronDownIcon() },
                     "Chevron Left" to { ChevronLeftIcon() },
@@ -220,7 +220,7 @@ fun WidgetsPage() {
                     "Chevron Up" to { ChevronUpIcon() },
                     "Circle" to { CircleIcon() },
                     "Close" to { CloseIcon() },
-                    "DownloadIcon" to { DownloadIcon() },
+                    "Download" to { DownloadIcon() },
                     "Hamburger" to { HamburgerIcon() },
                     "Indeterminate" to { IndeterminateIcon() },
                     "Minus" to { MinusIcon() },

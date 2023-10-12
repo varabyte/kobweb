@@ -51,7 +51,7 @@ private fun createIcon(
 
 @Composable
 fun ArrowBackIcon() {
-    createIcon(attrs = { strokeWidth(2) }) {
+    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
         Path {
             d {
                 moveTo(20, 11)
@@ -72,7 +72,7 @@ fun ArrowBackIcon() {
 
 @Composable
 fun ArrowDownIcon() {
-    createIcon(attrs = { strokeWidth(2) }) {
+    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
         Path {
             d {
                 moveTo(20, 12)
@@ -93,7 +93,7 @@ fun ArrowDownIcon() {
 
 @Composable
 fun ArrowForwardIcon() {
-    createIcon(attrs = { strokeWidth(4) }) {
+    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
         Path {
             d {
                 moveTo(12, 4)
@@ -113,7 +113,7 @@ fun ArrowForwardIcon() {
 
 @Composable
 fun ArrowUpIcon() {
-    createIcon(attrs = { strokeWidth(4) }) {
+    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
         Path {
             d {
                 moveTo(4, 12)
@@ -272,6 +272,7 @@ fun CloseIcon() {
 fun DownloadIcon() {
     createIcon(viewBox = ViewBox(0, 0, 14, 14), attrs = {
         fill(SVGPaintType.CurrentColor)
+        strokeWidth(0)
     }) {
         Path {
             d {
