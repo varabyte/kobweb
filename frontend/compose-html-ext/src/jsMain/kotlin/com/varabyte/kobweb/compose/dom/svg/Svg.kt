@@ -454,6 +454,12 @@ fun ElementScope<SVGDefsElement>.RadialGradient(
     GenericTag("radialGradient", "http://www.w3.org/2000/svg", SVGRadialGradientAttrsScope(id, attrs), content)
 }
 
+enum class SVGStopColorType {
+    CurrentColor;
+
+    override fun toString() = this.toSvgValue()
+}
+
 class SVGStopAttrsScope private constructor(attrs: AttrsScope<SVGStopElement>) :
     SVGElementAttrsScope<SVGStopElement>(attrs) {
     companion object {
@@ -470,7 +476,7 @@ class SVGStopAttrsScope private constructor(attrs: AttrsScope<SVGStopElement>) :
         attr("stop-color", value.toString())
     }
 
-    fun stopColor(value: SVGPaintType) {
+    fun stopColor(value: SVGStopColorType) {
         attr("stop-color", value.toString())
     }
 
