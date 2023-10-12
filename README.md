@@ -2964,7 +2964,7 @@ At this point:
 * It supports generating pages from Markdown that can reference your Composable code.
 * While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
 * A huge range of CSS properties are supported, along with support for style variables and animations.
-* * You can use the `Modifier` builder for a significant number of css properties.
+* You can use the `Modifier` builder for a significant number of css properties.
 * Silk components are color mode aware and support responsive behavior.
 * There are quite a few widgets available, and it's easy to create your own.
 
