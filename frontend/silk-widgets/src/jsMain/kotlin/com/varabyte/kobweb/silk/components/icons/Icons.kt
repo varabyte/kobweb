@@ -159,7 +159,6 @@ fun AttachmentIcon() {
             }
         }
     }
-
 }
 
 @Composable
