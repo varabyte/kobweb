@@ -53,7 +53,7 @@ fun HomePage() {
 **Kobweb is still only publishing pre-release versions, but it's been usable for a while now, and it is getting close to
 stabilization**. Please consider starring the project to indicate interest, so we know we're creating something the
 community wants.
-[How ready is it? ▼](#can-we-kobweb-yet)
+[How ready is it?▼](#can-we-kobweb-yet)
 
 Our goal is to provide:
 
@@ -85,7 +85,7 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 >     Android frontend that can also work with your server. (This video is still useful to watch even if you never intend
 >     to have any other frontend besides web).
 > * It's easy to start with a static layout site and migrate to a full stack site later. (You can read more about
->   [Static vs. Fullstack sites ▼](#static-layout-vs-full-stack-sites) below.)
+>   [Static vs. Fullstack sites▼](#static-layout-vs-full-stack-sites) below.)
 
 # Trying it out yourself
 
@@ -809,7 +809,7 @@ val CustomStyle by ComponentStyle.base {
 ```
 
 Just be aware you may have to break this out again if you find yourself needing to
-support [additional states ▼](#additional-states).
+support [additional states▼](#additional-states).
 
 #### ComponentStyle name
 
@@ -2032,7 +2032,7 @@ fun KobwebPage() {
 ##### Route Override
 
 Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the
-generated `@Page` annotation (see the [Route Override section ▲](#route-override) for valid values here).
+generated `@Page` annotation (see the [Route Override section▲](#route-override) for valid values here).
 
 This allows you to give your URL a name that normal Kotlin filename rules don't allow for, such as a hyphen:
 
@@ -2384,7 +2384,7 @@ cd site
 kobweb run
 ```
 
-If you're still having issues, you may want to [connect with us ▼](#connecting-with-us)
+If you're still having issues, you may want to [connect with us▼](#connecting-with-us)
 for support (but understand that getting Kobweb added to complex existing projects may not be something we can currently
 prioritize).
 
@@ -2662,7 +2662,7 @@ You may already have an existing and complex backend, perhaps written with Ktor 
 wondering if you can integrate Kobweb with it.
 
 The recommended solution for now is to export your site using a static layout
-([read more about static layout sites here ▲](#static-layout-vs-full-stack-sites)) and then add code to your backend to
+([read more about static layout sites here▲](#static-layout-vs-full-stack-sites)) and then add code to your backend to
 serve the files yourself, as it is fairly trivial.
 
 When you export a site statically, it will generate all files into your `.kobweb/site` folder. Then, if using Ktor, for
@@ -2819,7 +2819,7 @@ you can use to load fonts from directly.
 > While this is the easiest approach, be sure you won't run into compliance issues! If you use Google Fonts on your
 > site, you may technically be in violation of the GDPR in Europe, because an EU citizen's IP address is communicated to
 > Google and logged. You may wish to find a Europe-safe host instead, or self-host, which you can read about
-> in [the next section ▼](#self-hosted-fonts).
+> in [the next section▼](#self-hosted-fonts).
 
 The font service should give you HTML to add to your site's `<head>` tag. For example, Google Fonts suggests the
 following when I select Roboto Regular 400:
@@ -2982,7 +2982,7 @@ DIY. It would be great to get real world experience to hear what issues users ar
 So, should you use Kobweb at this point? If you are...
 
 * playing around with Compose HTML for the first time and want to get up and running quickly on a toy project:
-    * **YES!!!** Please see the [connecting with us ▼](#connecting-with-us) section
+    * **YES!!!** Please see the [connecting with us▼](#connecting-with-us) section
       below, we'd definitely love to hear from you. It's still a good time if you'd want to have a voice in the
       direction of this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
@@ -2990,7 +2990,7 @@ So, should you use Kobweb at this point? If you are...
       with us at our Discord if you try it and have questions or run into missing features.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
     * **Maybe not?** Depending on how much work you've done, it may not be a trivial refactor. You can review
-      [this earlier section ▲](#adding-kobweb-to-an-existing-project) if you want to try anyway.
+      [this earlier section▲](#adding-kobweb-to-an-existing-project) if you want to try anyway.
 * a company:
   * **Probably not?** I'm assuming most companies are so risk-averse they would not even use Compose HTML, which Kobweb
     is built on top of. If you *were* considering Compose HTML, however, Kobweb is worth a look.
