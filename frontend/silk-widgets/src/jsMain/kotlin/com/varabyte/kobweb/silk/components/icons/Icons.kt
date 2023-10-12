@@ -8,7 +8,6 @@ import com.varabyte.kobweb.compose.dom.svg.Path
 import com.varabyte.kobweb.compose.dom.svg.Polyline
 import com.varabyte.kobweb.compose.dom.svg.Rect
 import com.varabyte.kobweb.compose.dom.svg.SVGFillType
-import com.varabyte.kobweb.compose.dom.svg.SVGPaintType
 import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineCap
 import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineJoin
 import com.varabyte.kobweb.compose.dom.svg.SVGStrokeType
@@ -51,7 +50,7 @@ private fun createIcon(
 
 @Composable
 fun ArrowBackIcon() {
-    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
+    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
         Path {
             d {
                 moveTo(20, 11)
@@ -72,7 +71,7 @@ fun ArrowBackIcon() {
 
 @Composable
 fun ArrowDownIcon() {
-    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
+    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
         Path {
             d {
                 moveTo(20, 12)
@@ -93,7 +92,7 @@ fun ArrowDownIcon() {
 
 @Composable
 fun ArrowForwardIcon() {
-    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
+    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
         Path {
             d {
                 moveTo(12, 4)
@@ -113,7 +112,7 @@ fun ArrowForwardIcon() {
 
 @Composable
 fun ArrowUpIcon() {
-    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
+    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
         Path {
             d {
                 moveTo(4, 12)
@@ -134,7 +133,7 @@ fun ArrowUpIcon() {
 
 @Composable
 fun AttachmentIcon() {
-    createIcon(attrs = { fill(SVGPaintType.CurrentColor) }) {
+    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
         Path {
             d {
                 moveTo(21.843, 3.455)
@@ -270,7 +269,7 @@ fun CloseIcon() {
 @Composable
 fun DownloadIcon() {
     createIcon(viewBox = ViewBox(0, 0, 14, 14), attrs = {
-        fill(SVGPaintType.CurrentColor)
+        fill(SVGFillType.CurrentColor)
         strokeWidth(0)
     }) {
         Path {
