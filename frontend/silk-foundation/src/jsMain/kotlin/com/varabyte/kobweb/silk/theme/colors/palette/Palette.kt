@@ -78,3 +78,12 @@ class MutablePalettes : Palettes {
  * in a `@Composable` scope (which is common when defining ComponentStyles).
  */
 fun ColorMode.toPalette() = SilkTheme.palettes[this]
+
+/**
+ * Convenience property for discovering the color mode that this palette is associated with.
+ */
+val Palette.colorMode: ColorMode get() = when (this) {
+    SilkTheme.palettes.light -> ColorMode.LIGHT
+    SilkTheme.palettes.dark -> ColorMode.DARK
+    else -> error("Got unexpected palette that's not part of `SilkTheme.palettes`")
+}
