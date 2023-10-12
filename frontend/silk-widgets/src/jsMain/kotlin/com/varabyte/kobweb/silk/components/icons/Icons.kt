@@ -48,10 +48,6 @@ private fun createIcon(
     }, content)
 }
 
-//Attachment,Close,Copy,
-//Delete,Download,Drag,Edit,Email,External,Hamburger,Info,Link,,
-//Phone,Question,Search,Settings,SmallClose,Spinner,Star,UpDown,Warning
-
 
 @Composable
 fun ArrowBackIcon() {
