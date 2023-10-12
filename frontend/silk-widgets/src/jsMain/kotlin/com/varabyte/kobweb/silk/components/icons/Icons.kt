@@ -180,9 +180,9 @@ fun AttachmentIcon() {
 
 @Composable
 fun CheckIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(4)) {
+    createIcon(ViewBox.sized(24, 20), renderStyle = IconRenderStyle.Stroke(4)) {
         Polyline {
-            points(3 to 12, 9 to 19, 21 to 2)
+            points(3 to 12, 9 to 18, 21 to 2)
         }
     }
 }
