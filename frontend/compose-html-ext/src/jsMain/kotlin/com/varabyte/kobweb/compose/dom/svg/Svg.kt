@@ -155,15 +155,19 @@ private fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowe
 
 // region SVG paint attributes (https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint)
 
-enum class SVGPaintType {
+enum class SVGFillType {
     None,
     CurrentColor;
 
     override fun toString() = this.toSvgValue()
 }
 
-typealias SVGFillType = SVGPaintType
-typealias SVGStrokeType = SVGPaintType
+enum class SVGStrokeType {
+    None,
+    CurrentColor;
+
+    override fun toString() = this.toSvgValue()
+}
 
 enum class SVGStrokeLineCap {
     Butt,
@@ -192,7 +196,7 @@ enum class SVGFillRule {
 
 abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
-    fun stroke(value: SVGPaintType) = this.attr("stroke", value.toString())
+    fun stroke(value: SVGStrokeType) = this.attr("stroke", value.toString())
     fun stroke(id: SvgId) = this.attr("stroke", id.urlReference)
 
     fun strokeDashArray(vararg values: Number) {
@@ -218,7 +222,7 @@ abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
     fun strokeWidth(value: CSSLengthOrPercentageValue) = this.attr("stroke-width", value.toString())
 
     fun fill(value: CSSColorValue) = this.attr("fill", value.toString())
-    fun fill(value: SVGPaintType) = this.attr("fill", value.toString())
+    fun fill(value: SVGFillType) = this.attr("fill", value.toString())
     fun fill(id: SvgId) = this.attr("fill", id.urlReference)
 
     fun fillRule(value: SVGFillRule) = this.attr("fill-rule", value.toString())
