@@ -29,20 +29,38 @@ private class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
     }
 }
 
+sealed interface IconRenderStyle {
+    class Fill : IconRenderStyle
+    class Stroke(val strokeWidth: Number? = null) : IconRenderStyle
+}
+
 // NOTE: This API is sloppy with params. Revisit if we ever want to make it public. Possibly come up with better SVG API
 // support first, instead of setting attrs everywhere.
 @Composable
 private fun createIcon(
     viewBox: ViewBox = ViewBox.sized(24),
     width: CSSLengthValue = 1.2.em,
+    renderStyle: IconRenderStyle? = IconRenderStyle.Stroke(),
     attrs: (SVGSvgAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGElement>
 ) {
     Svg(attrs = {
         width(width)
         viewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height)
-        fill(SVGFillType.None)
-        stroke(SVGStrokeType.CurrentColor)
+        renderStyle?.let { renderStyle ->
+            when (renderStyle) {
+                is IconRenderStyle.Fill -> {
+                    fill(SVGFillType.CurrentColor)
+                    stroke(SVGStrokeType.None)
+                }
+
+                is IconRenderStyle.Stroke -> {
+                    stroke(SVGStrokeType.CurrentColor)
+                    fill(SVGFillType.None)
+                    renderStyle.strokeWidth?.let { strokeWidth(it) }
+                }
+            }
+        }
         attrs?.invoke(this)
     }, content)
 }
@@ -50,7 +68,7 @@ private fun createIcon(
 
 @Composable
 fun ArrowBackIcon() {
-    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
+    createIcon(renderStyle = IconRenderStyle.Fill()) {
         Path {
             d {
                 moveTo(20, 11)
@@ -71,7 +89,7 @@ fun ArrowBackIcon() {
 
 @Composable
 fun ArrowDownIcon() {
-    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
+    createIcon(renderStyle = IconRenderStyle.Fill()) {
         Path {
             d {
                 moveTo(20, 12)
@@ -92,7 +110,7 @@ fun ArrowDownIcon() {
 
 @Composable
 fun ArrowForwardIcon() {
-    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
+    createIcon(renderStyle = IconRenderStyle.Fill()) {
         Path {
             d {
                 moveTo(12, 4)
@@ -112,7 +130,7 @@ fun ArrowForwardIcon() {
 
 @Composable
 fun ArrowUpIcon() {
-    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
+    createIcon(renderStyle = IconRenderStyle.Fill()) {
         Path {
             d {
                 moveTo(4, 12)
@@ -133,7 +151,7 @@ fun ArrowUpIcon() {
 
 @Composable
 fun AttachmentIcon() {
-    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
+    createIcon(renderStyle = IconRenderStyle.Fill()) {
         Path {
             d {
                 moveTo(21.843, 3.455)
@@ -162,7 +180,7 @@ fun AttachmentIcon() {
 
 @Composable
 fun CheckIcon() {
-    createIcon(attrs = { strokeWidth(4) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(4)) {
         Polyline {
             points(3 to 12, 9 to 19, 21 to 2)
         }
@@ -171,7 +189,7 @@ fun CheckIcon() {
 
 @Composable
 fun ChevronDownIcon() {
-    createIcon(attrs = { strokeWidth(2) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
         Path {
             d {
                 moveTo(16.59, 8.59)
@@ -188,7 +206,7 @@ fun ChevronDownIcon() {
 
 @Composable
 fun ChevronLeftIcon() {
-    createIcon(attrs = { strokeWidth(2) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
         Path {
             d {
                 moveTo(15.41, 7.41)
@@ -205,7 +223,7 @@ fun ChevronLeftIcon() {
 
 @Composable
 fun ChevronRightIcon() {
-    createIcon(attrs = { strokeWidth(2) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
         Path {
             d {
                 moveTo(10, 6)
@@ -222,7 +240,7 @@ fun ChevronRightIcon() {
 
 @Composable
 fun ChevronUpIcon() {
-    createIcon(attrs = { strokeWidth(2) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
         Path {
             d {
                 moveTo(12, 8)
@@ -239,7 +257,7 @@ fun ChevronUpIcon() {
 
 @Composable
 fun CircleIcon() {
-    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
+    createIcon(renderStyle = IconRenderStyle.Fill()) {
         Circle {
             cx(12)
             cy(12)
@@ -250,7 +268,7 @@ fun CircleIcon() {
 
 @Composable
 fun CloseIcon() {
-    createIcon(attrs = { strokeWidth(3) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(3)) {
         Line {
             x1(1)
             x2(23)
@@ -298,7 +316,7 @@ fun DownloadIcon() {
 
 @Composable
 fun HamburgerIcon() {
-    createIcon(attrs = { strokeWidth(3) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(3)) {
         for (y in listOf(3, 12, 21)) {
             Line {
                 x1(0)
@@ -317,7 +335,7 @@ fun IndeterminateIcon() {
 
 @Composable
 fun MinusIcon() {
-    createIcon(attrs = { strokeWidth(4) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(4)) {
         Line {
             x1(3)
             x2(21)
@@ -329,7 +347,7 @@ fun MinusIcon() {
 
 @Composable
 fun PlusIcon() {
-    createIcon(attrs = { strokeWidth(4) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(4)) {
         Line {
             x1(3)
             x2(21)
@@ -347,7 +365,7 @@ fun PlusIcon() {
 
 @Composable
 fun SquareIcon() {
-    createIcon(attrs = { fill(SVGFillType.CurrentColor) }) {
+    createIcon(renderStyle = IconRenderStyle.Fill()) {
         Rect {
             x(4)
             y(4)
@@ -360,7 +378,7 @@ fun SquareIcon() {
 
 @Composable
 fun MoonIcon() {
-    createIcon(ViewBox.sized(200), attrs = { strokeWidth(20) }) {
+    createIcon(ViewBox.sized(200), renderStyle = IconRenderStyle.Stroke(20)) {
         Path {
             d {
                 moveTo(175, 106.583)
@@ -375,7 +393,7 @@ fun MoonIcon() {
 
 @Composable
 fun SunIcon() {
-    createIcon(attrs = { strokeWidth(2) }) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
         Group(attrs = {
             strokeLineJoin(SVGStrokeLineJoin.Round)
             strokeLineCap(SVGStrokeLineCap.Round)
