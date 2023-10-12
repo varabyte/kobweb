@@ -32,6 +32,11 @@ import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.forms.TextInput
 import com.varabyte.kobweb.silk.components.forms.TriCheckbox
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
+import com.varabyte.kobweb.silk.components.icons.ArrowBackIcon
+import com.varabyte.kobweb.silk.components.icons.ArrowDownIcon
+import com.varabyte.kobweb.silk.components.icons.ArrowForwardIcon
+import com.varabyte.kobweb.silk.components.icons.ArrowUpIcon
+import com.varabyte.kobweb.silk.components.icons.AttachmentIcon
 import com.varabyte.kobweb.silk.components.icons.CheckIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronDownIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronLeftIcon
@@ -39,6 +44,7 @@ import com.varabyte.kobweb.silk.components.icons.ChevronRightIcon
 import com.varabyte.kobweb.silk.components.icons.ChevronUpIcon
 import com.varabyte.kobweb.silk.components.icons.CircleIcon
 import com.varabyte.kobweb.silk.components.icons.CloseIcon
+import com.varabyte.kobweb.silk.components.icons.DownloadIcon
 import com.varabyte.kobweb.silk.components.icons.HamburgerIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.icons.MinusIcon
@@ -202,6 +208,11 @@ fun WidgetsPage() {
 
             WidgetSection("Icons") {
                 val icons = mapOf<String, @Composable () -> Unit>(
+                    "ArrowBackIcon" to { ArrowBackIcon() },
+                    "ArrowDownIcon" to { ArrowDownIcon() },
+                    "ArrowForwardIcon" to { ArrowForwardIcon() },
+                    "ArrowUpIcon" to { ArrowUpIcon() },
+                    "AttachmentIcon" to { AttachmentIcon() },
                     "Check" to { CheckIcon() },
                     "Chevron Down" to { ChevronDownIcon() },
                     "Chevron Left" to { ChevronLeftIcon() },
@@ -209,6 +220,7 @@ fun WidgetsPage() {
                     "Chevron Up" to { ChevronUpIcon() },
                     "Circle" to { CircleIcon() },
                     "Close" to { CloseIcon() },
+                    "DownloadIcon" to { DownloadIcon() },
                     "Hamburger" to { HamburgerIcon() },
                     "Indeterminate" to { IndeterminateIcon() },
                     "Minus" to { MinusIcon() },
