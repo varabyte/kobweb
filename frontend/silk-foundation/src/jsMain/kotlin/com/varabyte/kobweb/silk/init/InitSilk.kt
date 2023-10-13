@@ -45,6 +45,13 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
     val config = MutableSilkConfig()
 
+    mutableTheme.registerComponentStyle(SpanTextStyle)
+
+    val ctx = InitSilkContext(config, SilkStylesheetInstance, mutableTheme)
+    additionalInit(ctx)
+    additionalSilkInitialization(ctx)
+
+    // Declare "DisplayIf" styles last, which gives it extra specificity
     mutableTheme.registerComponentStyle(DisplayIfAtLeastZeroStyle)
     mutableTheme.registerComponentStyle(DisplayIfAtLeastSmStyle)
     mutableTheme.registerComponentStyle(DisplayIfAtLeastMdStyle)
@@ -55,11 +62,6 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     mutableTheme.registerComponentStyle(DisplayUntilMdStyle)
     mutableTheme.registerComponentStyle(DisplayUntilLgStyle)
     mutableTheme.registerComponentStyle(DisplayUntilXlStyle)
-    mutableTheme.registerComponentStyle(SpanTextStyle)
-
-    val ctx = InitSilkContext(config, SilkStylesheetInstance, mutableTheme)
-    additionalInit(ctx)
-    additionalSilkInitialization(ctx)
 
     MutableSilkConfigInstance = config
 
