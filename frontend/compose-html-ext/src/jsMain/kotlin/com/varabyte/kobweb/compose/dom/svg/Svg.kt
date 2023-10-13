@@ -258,6 +258,10 @@ class SVGSvgAttrsScope private constructor(attrs: AttrsScope<SVGSVGElement>) :
     fun height(value: Number) {
         attr("height", value.toString())
     }
+
+    fun height(value: CSSLengthOrPercentageValue) {
+        attr("height", value.toString())
+    }
 }
 
 /**
