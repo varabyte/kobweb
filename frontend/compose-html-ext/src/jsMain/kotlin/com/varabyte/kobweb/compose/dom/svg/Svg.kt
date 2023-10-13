@@ -194,6 +194,77 @@ enum class SVGFillRule {
 
 // endregion
 
+// region Shared SVG traits
+
+private interface CenterCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
+    fun cx(value: Number) {
+        attr("cx", value.toString())
+    }
+
+    fun cx(value: CSSLengthOrPercentageValue) {
+        attr("cx", value.toString())
+    }
+
+    fun cy(value: Number) {
+        attr("cy", value.toString())
+    }
+
+    fun cy(value: CSSLengthOrPercentageValue) {
+        attr("cy", value.toString())
+    }
+}
+
+private interface CoordinateAttrs<T : SVGElement> : AttrsScope<T> {
+    fun x(value: Number) {
+        attr("x", value.toString())
+    }
+
+    fun x(value: CSSLengthOrPercentageValue) {
+        attr("x", value.toString())
+    }
+
+    fun y(value: Number) {
+        attr("y", value.toString())
+    }
+
+    fun y(value: CSSLengthOrPercentageValue) {
+        attr("y", value.toString())
+    }
+}
+
+private interface LengthAttrs<T : SVGElement> : AttrsScope<T> {
+    fun height(value: Number) {
+        attr("height", value.toString())
+    }
+
+    fun height(value: CSSLengthOrPercentageValue) {
+        attr("height", value.toString())
+    }
+
+    fun width(value: Number) {
+        attr("width", value.toString())
+    }
+
+    fun width(value: CSSLengthOrPercentageValue) {
+        attr("width", value.toString())
+    }
+}
+
+private interface PointsAttrs<T : SVGElement> : AttrsScope<T> {
+    fun points(vararg pairs: Pair<Number, Number>) {
+        val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
+        attr("points", pointString)
+    }
+}
+
+private interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
+    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
+        attr("viewBox", "$x $y $width $height")
+    }
+}
+
+// endregion
+
 abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGStrokeType) = this.attr("stroke", value.toString())
@@ -236,31 +307,12 @@ abstract class SVGContainerElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
 }
 
 class SVGSvgAttrsScope private constructor(attrs: AttrsScope<SVGSVGElement>) :
-    SVGContainerElementAttrsScope<SVGSVGElement>(attrs) {
+    SVGContainerElementAttrsScope<SVGSVGElement>(attrs),
+    CoordinateAttrs<SVGSVGElement>, LengthAttrs<SVGSVGElement>, ViewBoxAttrs<SVGSVGElement> {
     companion object {
         operator fun invoke(attrs: (SVGSvgAttrsScope.() -> Unit)?): AttrBuilderContext<SVGSVGElement> {
             return { if (attrs != null) SVGSvgAttrsScope(this).attrs() }
         }
-    }
-
-    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
-        attr("viewBox", "$x $y $width $height")
-    }
-
-    fun width(value: Number) {
-        attr("width", value.toString())
-    }
-
-    fun width(value: CSSLengthOrPercentageValue) {
-        attr("width", value.toString())
-    }
-
-    fun height(value: Number) {
-        attr("height", value.toString())
-    }
-
-    fun height(value: CSSLengthOrPercentageValue) {
-        attr("height", value.toString())
     }
 }
 
@@ -510,7 +562,8 @@ fun ElementScope<SVGGradientElement>.Stop(
 }
 
 class SVGPatternAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGPatternElement>) :
-    SVGContainerElementAttrsScope<SVGPatternElement>(attrs.id(id.toString())) {
+    SVGContainerElementAttrsScope<SVGPatternElement>(attrs.id(id.toString())),
+    CoordinateAttrs<SVGPatternElement>, LengthAttrs<SVGPatternElement>, ViewBoxAttrs<SVGPatternElement> {
 
     companion object {
         operator fun invoke(
@@ -526,42 +579,6 @@ class SVGPatternAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGP
             }
         }
     }
-
-    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
-        attr("viewBox", "$x $y $width $height")
-    }
-
-    fun x(value: Number) {
-        attr("x", value.toString())
-    }
-
-    fun x(value: CSSLengthOrPercentageValue) {
-        attr("x", value.toString())
-    }
-
-    fun y(value: Number) {
-        attr("y", value.toString())
-    }
-
-    fun y(value: CSSLengthOrPercentageValue) {
-        attr("y", value.toString())
-    }
-
-    fun width(value: Number) {
-        attr("width", value.toString())
-    }
-
-    fun width(value: CSSLengthOrPercentageValue) {
-        attr("width", value.toString())
-    }
-
-    fun height(value: Number) {
-        attr("height", value.toString())
-    }
-
-    fun height(value: CSSLengthOrPercentageValue) {
-        attr("height", value.toString())
-    }
 }
 
 
@@ -576,7 +593,8 @@ fun ElementScope<SVGDefsElement>.Pattern(
 }
 
 class SVGSymbolAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGSymbolElement>) :
-    SVGContainerElementAttrsScope<SVGSymbolElement>(attrs.id(id.toString())) {
+    SVGContainerElementAttrsScope<SVGSymbolElement>(attrs.id(id.toString())),
+    CoordinateAttrs<SVGSymbolElement>, LengthAttrs<SVGSymbolElement>, ViewBoxAttrs<SVGSymbolElement> {
 
     companion object {
         operator fun invoke(
@@ -592,42 +610,6 @@ class SVGSymbolAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGSy
             }
         }
     }
-
-    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
-        attr("viewBox", "$x $y $width $height")
-    }
-
-    fun x(value: Number) {
-        attr("x", value.toString())
-    }
-
-    fun x(value: CSSLengthOrPercentageValue) {
-        attr("x", value.toString())
-    }
-
-    fun y(value: Number) {
-        attr("y", value.toString())
-    }
-
-    fun y(value: CSSLengthOrPercentageValue) {
-        attr("y", value.toString())
-    }
-
-    fun width(value: Number) {
-        attr("width", value.toString())
-    }
-
-    fun width(value: CSSLengthOrPercentageValue) {
-        attr("width", value.toString())
-    }
-
-    fun height(value: Number) {
-        attr("height", value.toString())
-    }
-
-    fun height(value: CSSLengthOrPercentageValue) {
-        attr("height", value.toString())
-    }
 }
 
 
@@ -642,7 +624,8 @@ fun ElementScope<SVGElement>.Symbol(
 }
 
 class SVGUseAttrsScope private constructor(href: String, attrs: AttrsScope<SVGUseElement>) :
-    SVGGraphicalElementAttrsScope<SVGUseElement>(attrs.attr("href", href.prefixWithHash())) {
+    SVGGraphicalElementAttrsScope<SVGUseElement>(attrs.attr("href", href.prefixWithHash())),
+    CoordinateAttrs<SVGUseElement>, LengthAttrs<SVGUseElement> {
 
     companion object {
         private fun String.prefixWithHash() = if (startsWith("#")) this else "#$this"
@@ -653,42 +636,6 @@ class SVGUseAttrsScope private constructor(href: String, attrs: AttrsScope<SVGUs
         ): AttrBuilderContext<SVGUseElement> {
             return { SVGUseAttrsScope(href, this).attrs() }
         }
-    }
-
-    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
-        attr("viewBox", "$x $y $width $height")
-    }
-
-    fun x(value: Number) {
-        attr("x", value.toString())
-    }
-
-    fun x(value: CSSLengthOrPercentageValue) {
-        attr("x", value.toString())
-    }
-
-    fun y(value: Number) {
-        attr("y", value.toString())
-    }
-
-    fun y(value: CSSLengthOrPercentageValue) {
-        attr("y", value.toString())
-    }
-
-    fun width(value: Number) {
-        attr("width", value.toString())
-    }
-
-    fun width(value: CSSLengthOrPercentageValue) {
-        attr("width", value.toString())
-    }
-
-    fun height(value: Number) {
-        attr("height", value.toString())
-    }
-
-    fun height(value: CSSLengthOrPercentageValue) {
-        attr("height", value.toString())
     }
 }
 
@@ -708,7 +655,7 @@ fun ElementScope<SVGElement>.Use(
 // region SVG graphical elements
 
 class SVGCircleAttrsScope private constructor(attrs: AttrsScope<SVGCircleElement>) :
-    SVGGraphicalElementAttrsScope<SVGCircleElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGCircleElement>(attrs), CenterCoordinateAttrs<SVGCircleElement> {
 
     companion object {
         operator fun invoke(attrs: SVGCircleAttrsScope.() -> Unit): AttrBuilderContext<SVGCircleElement> {
@@ -716,24 +663,8 @@ class SVGCircleAttrsScope private constructor(attrs: AttrsScope<SVGCircleElement
         }
     }
 
-    fun cx(value: Number) {
-        attr("cx", value.toString())
-    }
-
-    fun cy(value: Number) {
-        attr("cy", value.toString())
-    }
-
     fun r(value: Number) {
         attr("r", value.toString())
-    }
-
-    fun cx(value: CSSLengthOrPercentageValue) {
-        attr("cx", value.toString())
-    }
-
-    fun cy(value: CSSLengthOrPercentageValue) {
-        attr("cy", value.toString())
     }
 
     fun r(value: CSSLengthOrPercentageValue) {
@@ -765,20 +696,12 @@ fun ElementScope<SVGElement>.Circle(attrs: SVGCircleAttrsScope.() -> Unit) {
 }
 
 class SVGEllipseAttrsScope private constructor(attrs: AttrsScope<SVGEllipseElement>) :
-    SVGGraphicalElementAttrsScope<SVGEllipseElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGEllipseElement>(attrs), CenterCoordinateAttrs<SVGEllipseElement> {
 
     companion object {
         operator fun invoke(attrs: SVGEllipseAttrsScope.() -> Unit): AttrBuilderContext<SVGEllipseElement> {
             return { SVGEllipseAttrsScope(this).attrs() }
         }
-    }
-
-    fun cx(value: Number) {
-        attr("cx", value.toString())
-    }
-
-    fun cy(value: Number) {
-        attr("cy", value.toString())
     }
 
     fun rx(value: Number) {
@@ -787,14 +710,6 @@ class SVGEllipseAttrsScope private constructor(attrs: AttrsScope<SVGEllipseEleme
 
     fun ry(value: Number) {
         attr("ry", value.toString())
-    }
-
-    fun cx(value: CSSLengthOrPercentageValue) {
-        attr("cx", value.toString())
-    }
-
-    fun cy(value: CSSLengthOrPercentageValue) {
-        attr("cy", value.toString())
     }
 
     fun rx(value: CSSLengthOrPercentageValue) {
@@ -1038,17 +953,12 @@ fun ElementScope<SVGElement>.Path(attrs: SVGPathAttrsScope.() -> Unit) {
 
 
 class SVGPolygonAttrsScope private constructor(attrs: AttrsScope<SVGPolygonElement>) :
-    SVGGraphicalElementAttrsScope<SVGPolygonElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGPolygonElement>(attrs), PointsAttrs<SVGPolygonElement> {
 
     companion object {
         operator fun invoke(attrs: SVGPolygonAttrsScope.() -> Unit): AttrBuilderContext<SVGPolygonElement> {
             return { SVGPolygonAttrsScope(this).attrs() }
         }
-    }
-
-    fun points(vararg pairs: Pair<Number, Number>) {
-        val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
-        attr("points", pointString)
     }
 }
 
@@ -1074,17 +984,12 @@ fun ElementScope<SVGElement>.Polygon(attrs: SVGPolygonAttrsScope.() -> Unit) {
 
 
 class SVGPolylineAttrsScope private constructor(attrs: AttrsScope<SVGPolylineElement>) :
-    SVGGraphicalElementAttrsScope<SVGPolylineElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGPolylineElement>(attrs), PointsAttrs<SVGPolylineElement> {
 
     companion object {
         operator fun invoke(attrs: SVGPolylineAttrsScope.() -> Unit): AttrBuilderContext<SVGPolylineElement> {
             return { SVGPolylineAttrsScope(this).attrs() }
         }
-    }
-
-    fun points(vararg pairs: Pair<Number, Number>) {
-        val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
-        attr("points", pointString)
     }
 }
 
@@ -1111,28 +1016,12 @@ fun ElementScope<SVGElement>.Polyline(attrs: SVGPolylineAttrsScope.() -> Unit) {
 
 
 class SVGRectAttrsScope private constructor(attrs: AttrsScope<SVGRectElement>) :
-    SVGGraphicalElementAttrsScope<SVGRectElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGRectElement>(attrs), CoordinateAttrs<SVGRectElement>, LengthAttrs<SVGRectElement> {
 
     companion object {
         operator fun invoke(attrs: SVGRectAttrsScope.() -> Unit): AttrBuilderContext<SVGRectElement> {
             return { SVGRectAttrsScope(this).attrs() }
         }
-    }
-
-    fun x(value: Number) {
-        attr("x", value.toString())
-    }
-
-    fun y(value: Number) {
-        attr("y", value.toString())
-    }
-
-    fun width(value: Number) {
-        attr("width", value.toString())
-    }
-
-    fun height(value: Number) {
-        attr("height", value.toString())
     }
 
     fun rx(value: Number) {
@@ -1141,22 +1030,6 @@ class SVGRectAttrsScope private constructor(attrs: AttrsScope<SVGRectElement>) :
 
     fun ry(value: Number) {
         attr("ry", value.toString())
-    }
-
-    fun x(value: CSSLengthOrPercentageValue) {
-        attr("x", value.toString())
-    }
-
-    fun y(value: CSSLengthOrPercentageValue) {
-        attr("y", value.toString())
-    }
-
-    fun width(value: CSSLengthOrPercentageValue) {
-        attr("width", value.toString())
-    }
-
-    fun height(value: CSSLengthOrPercentageValue) {
-        attr("height", value.toString())
     }
 
     fun rx(value: CSSLengthOrPercentageValue) {
@@ -1212,28 +1085,12 @@ enum class SVGTextLengthAdjust {
 }
 
 class SVGTextAttrsScope private constructor(attrs: AttrsScope<SVGTextElement>) :
-    SVGGraphicalElementAttrsScope<SVGTextElement>(attrs) {
+    SVGGraphicalElementAttrsScope<SVGTextElement>(attrs), CoordinateAttrs<SVGTextElement> {
 
     companion object {
         operator fun invoke(attrs: SVGTextAttrsScope.() -> Unit): AttrBuilderContext<SVGTextElement> {
             return { SVGTextAttrsScope(this).attrs() }
         }
-    }
-
-    fun x(value: Number) {
-        attr("x", value.toString())
-    }
-
-    fun x(value: CSSLengthOrPercentageValue) {
-        attr("x", value.toString())
-    }
-
-    fun y(value: Number) {
-        attr("y", value.toString())
-    }
-
-    fun y(value: CSSLengthOrPercentageValue) {
-        attr("y", value.toString())
     }
 
     fun dx(value: Number) {
