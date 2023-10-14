@@ -18,8 +18,6 @@ fun InputStream.consumeAsync(onLineRead: (String) -> Unit) {
         val br = BufferedReader(isr)
         try {
             while (true) {
-                // No need to warn, we're in an IO block
-                @Suppress("BlockingMethodInNonBlockingContext")
                 val line = br.readLine()
                 if (line != null) onLineRead(line) else break
             }

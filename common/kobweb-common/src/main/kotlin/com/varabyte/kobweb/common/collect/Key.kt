@@ -3,7 +3,6 @@ package com.varabyte.kobweb.common.collect
 /**
  * A simple key that associates a type with a name that must be globally unique to your project.
  */
-@Suppress("unused") // Type parameter is needed by data structures that use these keys
 class Key<T> private constructor(val name: String) {
     companion object {
         private val registeredKeys = mutableMapOf<String, Key<*>>()
