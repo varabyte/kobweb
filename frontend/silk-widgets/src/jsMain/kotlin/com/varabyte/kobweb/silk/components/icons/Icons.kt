@@ -42,7 +42,7 @@ sealed interface IconRenderStyle {
 @Composable
 private fun createIcon(
     viewBox: ViewBox = ViewBox.sized(24),
-    width: CSSLengthValue = 1.2.em,
+    width: CSSLengthValue = 1.em,
     renderStyle: IconRenderStyle? = IconRenderStyle.Stroke(),
     attrs: (SVGSvgAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGElement>

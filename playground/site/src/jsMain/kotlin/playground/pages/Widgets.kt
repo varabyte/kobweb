@@ -231,7 +231,7 @@ fun WidgetsPage() {
                 )
 
                 Row(
-                    Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap).fontSize(0.8.cssRem),
+                    Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     icons.forEach { (iconName, iconMethod) ->
