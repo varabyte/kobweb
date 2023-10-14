@@ -13,6 +13,8 @@ import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineJoin
 import com.varabyte.kobweb.compose.dom.svg.SVGStrokeType
 import com.varabyte.kobweb.compose.dom.svg.SVGSvgAttrsScope
 import com.varabyte.kobweb.compose.dom.svg.Svg
+import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.w3c.dom.svg.SVGElement
@@ -68,8 +70,8 @@ private fun createIcon(
 
 
 @Composable
-fun ArrowBackIcon() {
-    createIcon(renderStyle = IconRenderStyle.Fill()) {
+fun ArrowBackIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(20, 11)
@@ -89,8 +91,8 @@ fun ArrowBackIcon() {
 }
 
 @Composable
-fun ArrowDownIcon() {
-    createIcon(renderStyle = IconRenderStyle.Fill()) {
+fun ArrowDownIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(20, 12)
@@ -110,8 +112,8 @@ fun ArrowDownIcon() {
 }
 
 @Composable
-fun ArrowForwardIcon() {
-    createIcon(renderStyle = IconRenderStyle.Fill()) {
+fun ArrowForwardIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(12, 4)
@@ -130,8 +132,8 @@ fun ArrowForwardIcon() {
 }
 
 @Composable
-fun ArrowUpIcon() {
-    createIcon(renderStyle = IconRenderStyle.Fill()) {
+fun ArrowUpIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(4, 12)
@@ -151,8 +153,8 @@ fun ArrowUpIcon() {
 }
 
 @Composable
-fun AttachmentIcon() {
-    createIcon(renderStyle = IconRenderStyle.Fill()) {
+fun AttachmentIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(21.843, 3.455)
@@ -180,8 +182,8 @@ fun AttachmentIcon() {
 }
 
 @Composable
-fun CheckIcon() {
-    createIcon(ViewBox.sized(24, 20), renderStyle = IconRenderStyle.Stroke(4)) {
+fun CheckIcon(modifier: Modifier = Modifier) {
+    createIcon(ViewBox.sized(24, 20), renderStyle = IconRenderStyle.Stroke(4), attrs = modifier.toAttrs()) {
         Polyline {
             points(3 to 12, 9 to 18, 21 to 2)
         }
@@ -189,8 +191,8 @@ fun CheckIcon() {
 }
 
 @Composable
-fun ChevronDownIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
+fun ChevronDownIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(16.59, 8.59)
@@ -206,8 +208,8 @@ fun ChevronDownIcon() {
 }
 
 @Composable
-fun ChevronLeftIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
+fun ChevronLeftIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(15.41, 7.41)
@@ -223,8 +225,8 @@ fun ChevronLeftIcon() {
 }
 
 @Composable
-fun ChevronRightIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
+fun ChevronRightIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(10, 6)
@@ -240,8 +242,8 @@ fun ChevronRightIcon() {
 }
 
 @Composable
-fun ChevronUpIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
+fun ChevronUpIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(12, 8)
@@ -257,8 +259,8 @@ fun ChevronUpIcon() {
 }
 
 @Composable
-fun CircleIcon() {
-    createIcon(renderStyle = IconRenderStyle.Fill()) {
+fun CircleIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Circle {
             cx(12)
             cy(12)
@@ -268,8 +270,8 @@ fun CircleIcon() {
 }
 
 @Composable
-fun CloseIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(3)) {
+fun CloseIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(3), attrs = modifier.toAttrs()) {
         Line {
             x1(1)
             x2(23)
@@ -286,8 +288,8 @@ fun CloseIcon() {
 }
 
 @Composable
-fun DownloadIcon() {
-    createIcon(viewBox = ViewBox(0, 0, 14, 14), attrs = {
+fun DownloadIcon(modifier: Modifier = Modifier) {
+    createIcon(viewBox = ViewBox(0, 0, 14, 14), attrs = modifier.toAttrs {
         fill(SVGFillType.CurrentColor)
         strokeWidth(0)
     }) {
@@ -316,8 +318,8 @@ fun DownloadIcon() {
 }
 
 @Composable
-fun HamburgerIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(3)) {
+fun HamburgerIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(3), attrs = modifier.toAttrs()) {
         for (y in listOf(3, 12, 21)) {
             Line {
                 x1(0)
@@ -330,13 +332,13 @@ fun HamburgerIcon() {
 }
 
 @Composable
-fun IndeterminateIcon() {
-    MinusIcon()
+fun IndeterminateIcon(modifier: Modifier = Modifier) {
+    MinusIcon(modifier)
 }
 
 @Composable
-fun MinusIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(4)) {
+fun MinusIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(4), attrs = modifier.toAttrs()) {
         Line {
             x1(3)
             x2(21)
@@ -347,8 +349,8 @@ fun MinusIcon() {
 }
 
 @Composable
-fun PlusIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(4)) {
+fun PlusIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(4), attrs = modifier.toAttrs()) {
         Line {
             x1(3)
             x2(21)
@@ -365,8 +367,8 @@ fun PlusIcon() {
 }
 
 @Composable
-fun SquareIcon() {
-    createIcon(renderStyle = IconRenderStyle.Fill()) {
+fun SquareIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Rect {
             x(4)
             y(4)
@@ -378,8 +380,8 @@ fun SquareIcon() {
 }
 
 @Composable
-fun MoonIcon() {
-    createIcon(ViewBox.sized(200), renderStyle = IconRenderStyle.Stroke(20)) {
+fun MoonIcon(modifier: Modifier = Modifier) {
+    createIcon(ViewBox.sized(200), renderStyle = IconRenderStyle.Stroke(20), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(175, 106.583)
@@ -393,8 +395,8 @@ fun MoonIcon() {
 
 
 @Composable
-fun SunIcon() {
-    createIcon(renderStyle = IconRenderStyle.Stroke(2)) {
+fun SunIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2), attrs = modifier.toAttrs()) {
         Group(attrs = {
             strokeLineJoin(SVGStrokeLineJoin.Round)
             strokeLineCap(SVGStrokeLineCap.Round)
