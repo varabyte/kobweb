@@ -157,12 +157,13 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
     }
 
     private class Cache(val content: ByteArray, logger: Logger, nativeLibraryMappings: Map<String, String>) {
+        lateinit var factory: ApisFactory
         val apis: Apis = run {
             val classLoader = DynamicClassLoader(content, logger, nativeLibraryMappings)
             val startMs = getTimeMillis()
 
             try {
-                val factory =
+                factory =
                     classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
                 factory.create(logger)
             } finally {
@@ -181,6 +182,9 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
 
             var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
             if (cache == null || cache.content !== delegateFile.content) {
+                if (cache != null) {
+                    cache.factory.dispose()
+                }
                 cache = Cache(currContent, logger, nativeLibraryMappings)
                 this.cache = cache
             }

@@ -24,6 +24,10 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     //        example.init(initCtx)
     //        return apis
     //    }
+    //
+    //    override fun dispose() {
+    //        example.dispose()
+    //    }
     //  }
 
     val fileBuilder = FileSpec.builder("", "ApisFactoryImpl").indent(" ".repeat(4))
@@ -60,6 +64,18 @@ fun createApisFactoryImpl(backendData: BackendData): String {
                         }
                         addStatement("")
                         addStatement("return apis")
+                    }.build())
+                    .build()
+            )
+            .addFunction(
+                FunSpec.builder("dispose")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addCode(CodeBlock.builder().apply {
+                        if (backendData.disposeMethods.isNotEmpty()) {
+                            backendData.disposeMethods.sortedBy { entry -> entry.fqn }.forEach { entry ->
+                                addStatement("${entry.fqn}()")
+                            }
+                        }
                     }.build())
                     .build()
             )

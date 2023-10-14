@@ -18,6 +18,7 @@ import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.ksp.common.API_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.DISPOSE_API_FQN
 import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
@@ -27,6 +28,7 @@ import com.varabyte.kobweb.ksp.util.nameWithoutExtension
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
+import com.varabyte.kobweb.project.backend.DisposeApiEntry
 import com.varabyte.kobweb.project.backend.InitApiEntry
 import com.varabyte.kobweb.project.backend.assertValid
 import kotlinx.serialization.encodeToString
@@ -40,6 +42,7 @@ class BackendProcessor(
 ) : SymbolProcessor {
     private lateinit var initMethods: List<InitApiEntry>
     private lateinit var apiMethods: List<ApiEntry>
+    private lateinit var disposeMethods: List<DisposeApiEntry>
     private val apiStreams = mutableListOf<ApiStreamEntry>()
 
     // fqPkg to subdir, e.g. "api.id._as._int" to "int"
@@ -55,6 +58,12 @@ class BackendProcessor(
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
             InitApiEntry(name)
+        }.toList()
+
+        disposeMethods = resolver.getSymbolsWithAnnotation(DISPOSE_API_FQN).map { annotatedFun ->
+            fileDependencies.add(annotatedFun.containingFile!!)
+            val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
+            DisposeApiEntry(name)
         }.toList()
 
         val allFiles = resolver.getAllFiles()
@@ -137,7 +146,7 @@ class BackendProcessor(
     }
 
     override fun finish() {
-        val backendData = BackendData(initMethods, apiMethods, apiStreams).also {
+        val backendData = BackendData(initMethods, apiMethods, apiStreams, disposeMethods).also {
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 

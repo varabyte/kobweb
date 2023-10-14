@@ -6,6 +6,7 @@ private const val KOBWEB_SILK_FQN_PREFIX = "${KOBWEB_FQN_PREFIX}silk."
 private const val KOBWEB_API_FQN_PREFIX = "${KOBWEB_FQN_PREFIX}api."
 
 const val INIT_API_FQN = "${KOBWEB_API_FQN_PREFIX}init.InitApi"
+const val DISPOSE_API_FQN = "${KOBWEB_API_FQN_PREFIX}dispose.DisposeApi"
 const val PACKAGE_MAPPING_API_FQN = "${KOBWEB_API_FQN_PREFIX}PackageMapping"
 const val API_FQN = "${KOBWEB_API_FQN_PREFIX}Api"
 const val API_STREAM_SIMPLE_NAME = "ApiStream"

@@ -10,4 +10,5 @@ import com.varabyte.kobweb.api.log.Logger
  */
 interface ApisFactory {
     fun create(logger: Logger): Apis
+    fun dispose()
 }
