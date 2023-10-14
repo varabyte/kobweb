@@ -30,6 +30,7 @@ private class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
 }
 
 sealed interface IconRenderStyle {
+    @Suppress("CanSealedSubClassBeObject") // May add Fill parameters someday
     class Fill : IconRenderStyle
     class Stroke(val strokeWidth: Number? = null) : IconRenderStyle
 }
