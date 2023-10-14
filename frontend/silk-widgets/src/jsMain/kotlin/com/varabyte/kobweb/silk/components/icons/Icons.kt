@@ -289,10 +289,7 @@ fun CloseIcon(modifier: Modifier = Modifier) {
 
 @Composable
 fun DownloadIcon(modifier: Modifier = Modifier) {
-    createIcon(viewBox = ViewBox(0, 0, 14, 14), attrs = modifier.toAttrs {
-        fill(SVGFillType.CurrentColor)
-        strokeWidth(0)
-    }) {
+    createIcon(viewBox = ViewBox(0, 0, 14, 14), renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
         Path {
             d {
                 moveTo(11.2857, 6.05714)
