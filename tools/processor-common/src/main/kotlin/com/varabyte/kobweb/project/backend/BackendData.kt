@@ -8,12 +8,14 @@ import kotlinx.serialization.Serializable
  * @param initMethods A collection of methods annotated with `@InitApi` and relevant metadata.
  * @param apiMethods A collection of methods annotated with `@Api` and relevant metadata.
  * @param apiStreamMethods A collection of ApiStream properties and relevant metadata.
+ * @param disposeMethods A collection of methods annotated with `@DisposeApi` and relevant metadata.
  */
 @Serializable
 class BackendData(
     val initMethods: List<InitApiEntry>,
     val apiMethods: List<ApiEntry>,
-    val apiStreamMethods: List<ApiStreamEntry>
+    val apiStreamMethods: List<ApiStreamEntry>,
+    val disposeMethods: List<DisposeApiEntry>
 )
 
 /**
@@ -26,6 +28,7 @@ fun Iterable<BackendData>.merge(throwError: (String) -> Unit): BackendData {
         this.flatMap { it.initMethods },
         this.flatMap { it.apiMethods },
         this.flatMap { it.apiStreamMethods },
+        this.flatMap { it.disposeMethods },
     ).also { it.assertValid(throwError) }
 }
 
@@ -50,3 +53,6 @@ class ApiStreamEntry(val fqn: String, val route: String)
 
 @Serializable
 class ApiEntry(val fqn: String, val route: String)
+
+@Serializable
+class DisposeApiEntry(val fqn: String)

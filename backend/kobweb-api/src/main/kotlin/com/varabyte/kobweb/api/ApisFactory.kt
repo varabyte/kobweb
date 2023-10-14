@@ -11,4 +11,5 @@ import com.varabyte.kobweb.api.log.Logger
 @Suppress("unused") // Called by reflection
 interface ApisFactory {
     fun create(logger: Logger): Apis
+    fun dispose()
 }
