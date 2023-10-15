@@ -33,7 +33,7 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     val classApis = ClassName(apiPackage, "Apis")
     val classApisFactory = ClassName(apiPackage, "ApisFactory")
     val classMutableData = ClassName("$apiPackage.data", "MutableData")
-    val classEventsImpl = ClassName("$apiPackage.event", "EventsImpl")
+    val classEvents = ClassName("$apiPackage.event", "Events")
     val classInitApiContext = ClassName("$apiPackage.init", "InitApiContext")
     val classLogger = ClassName("$apiPackage.log", "Logger")
 
@@ -43,12 +43,12 @@ fun createApisFactoryImpl(backendData: BackendData): String {
             .addFunction(
                 FunSpec.builder("create")
                     .addModifiers(KModifier.OVERRIDE)
+                    .addParameter(ParameterSpec("events", classEvents))
                     .addParameter(ParameterSpec("logger", classLogger))
                     .returns(classApis)
                     .addCode(CodeBlock.builder().apply {
                         addStatement("val data = %T()", classMutableData)
-                        addStatement("val events = %T()", classEventsImpl)
-                        addStatement("val apis = %T(data, events, logger)", classApis)
+                        addStatement("val apis = %T(data, logger)", classApis)
                         backendData.apiMethods.sortedBy { entry -> entry.route }.forEach { entry ->
                             addStatement("apis.register(%S) { ctx -> ${entry.fqn}(ctx) }", entry.route)
                         }

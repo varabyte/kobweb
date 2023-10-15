@@ -2,6 +2,9 @@ package com.varabyte.kobweb.server.io
 
 import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.ApisFactory
+import com.varabyte.kobweb.api.dispose.DisposeEvent
+import com.varabyte.kobweb.api.dispose.DisposeReason
+import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
 import io.ktor.util.date.*
@@ -22,7 +25,7 @@ import java.util.zip.ZipFile
  *
  * @param path The path to the api.jar itself
  */
-class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibraryMappings: Map<String, String>) {
+class ApiJarFile(path: Path, private val events: EventDispatcher, private val logger: Logger, private val nativeLibraryMappings: Map<String, String>) {
     private class DynamicClassLoader(
         private val content: ByteArray,
         private val logger: Logger,
@@ -156,7 +159,7 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
         }
     }
 
-    private class Cache(val content: ByteArray, logger: Logger, nativeLibraryMappings: Map<String, String>) {
+    private class Cache(val content: ByteArray, events: EventDispatcher, logger: Logger, nativeLibraryMappings: Map<String, String>) {
         val apis: Apis = run {
             val classLoader = DynamicClassLoader(content, logger, nativeLibraryMappings)
             val startMs = getTimeMillis()
@@ -164,7 +167,8 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
             try {
                 val factory =
                     classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
-                factory.create(logger)
+                events.reset()
+                factory.create(events, logger)
             } finally {
                 val elapsedMs = getTimeMillis() - startMs
                 logger.info("Loaded and initialized server API jar in ${elapsedMs}ms.")
@@ -181,8 +185,8 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
 
             var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
             if (cache == null || cache.content !== delegateFile.content) {
-                cache?.apis?.dispose()
-                cache = Cache(currContent, logger, nativeLibraryMappings)
+                events.dispose(DisposeEvent(DisposeReason.DEV_API_RELOAD))
+                cache = Cache(currContent, events, logger, nativeLibraryMappings)
                 this.cache = cache
             }
 

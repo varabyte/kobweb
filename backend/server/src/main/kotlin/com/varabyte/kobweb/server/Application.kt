@@ -1,5 +1,8 @@
 package com.varabyte.kobweb.server
 
+import com.varabyte.kobweb.api.dispose.DisposeEvent
+import com.varabyte.kobweb.api.dispose.DisposeReason
+import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
@@ -17,7 +20,6 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.URLClassLoader
@@ -29,7 +31,6 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
-import kotlin.system.exitProcess
 
 private fun isPortInUse(port: Int): Boolean {
     try {
@@ -114,13 +115,18 @@ suspend fun main() {
 
     val globals = ServerGlobals()
     val siteLayout = SiteLayout.get()
+    val events = EventDispatcher()
     val engine = embeddedServer(Netty, port) {
-        configureRouting(env, siteLayout, conf, globals)
+        configureRouting(env, siteLayout, conf, globals, events)
         configureSerialization()
         configureHTTP(conf)
 
         val loader = ServiceLoader.load(KobwebServerPlugin::class.java, pluginClassloader)
         loader.forEach { kobwebServerPlugin -> kobwebServerPlugin.configure(this) }
+    }
+
+    engine.addShutdownHook {
+        events.dispose(DisposeEvent(DisposeReason.SHUTDOWN_HOOK))
     }
 
     engine.start()
@@ -164,6 +170,7 @@ suspend fun main() {
 
     val log = engine.application.log // Extract out a reference to the logger before we kill the engine
     log.info("Kobweb server shutting down...")
+    events.dispose(DisposeEvent(DisposeReason.SERVER_SHUTDOWN))
     engine.stop(1, 5, TimeUnit.SECONDS)
     requestsFile.path.deleteIfExists()
     stateFile.content = null
