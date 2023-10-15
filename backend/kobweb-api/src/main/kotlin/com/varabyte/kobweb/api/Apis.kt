@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.api
 
 import com.varabyte.kobweb.api.data.Data
+import com.varabyte.kobweb.api.dispose.DisposeApiContext
+import com.varabyte.kobweb.api.event.EventsImpl
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.http.Response
 import com.varabyte.kobweb.api.log.Logger
@@ -11,7 +13,7 @@ import com.varabyte.kobweb.api.stream.StreamEvent
  * The class which manages all API paths and handlers within a Kobweb project.
  */
 @Suppress("unused") // Called by generated code
-class Apis(private val data: Data, private val logger: Logger) {
+class Apis(private val data: Data, private val events: EventsImpl, private val logger: Logger) {
     private val apiHandlers = mutableMapOf<String, suspend (ApiContext) -> Unit>()
     private val apiStreamHandlers = mutableMapOf<String, ApiStream>()
 
@@ -71,5 +73,10 @@ class Apis(private val data: Data, private val logger: Logger) {
                 }
             }
         }
+    }
+
+    fun dispose() {
+        val disposeCtx = DisposeApiContext(data, logger)
+        events.dispose(disposeCtx)
     }
 }

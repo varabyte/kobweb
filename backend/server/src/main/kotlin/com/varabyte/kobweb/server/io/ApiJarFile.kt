@@ -181,6 +181,7 @@ class ApiJarFile(path: Path, private val logger: Logger, private val nativeLibra
 
             var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
             if (cache == null || cache.content !== delegateFile.content) {
+                cache?.apis?.dispose()
                 cache = Cache(currContent, logger, nativeLibraryMappings)
                 this.cache = cache
             }
