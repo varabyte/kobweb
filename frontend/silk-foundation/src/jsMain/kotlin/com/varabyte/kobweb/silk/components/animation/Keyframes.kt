@@ -105,7 +105,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  * )
  * ```
  *
- * Note: You should prefer to create keyframes using the [keyframes] delegate method to avoid needing to duplicate the
+ * Note: You should prefer to create keyframes using the [Keyframes] delegate method to avoid needing to duplicate the
  * property name, e.g.
  *
  * ```
@@ -185,13 +185,6 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
  */
 @Suppress("FunctionName") // name chosen to look like a constructor intentionally
 fun Keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = KeyframesProvider(prefix, init)
-
-// TODO(#168): Delete this before 1.0
-@Deprecated(
-    "`keyframes` has been replaced with `Keyframes` (capitalized) for consistency with `ComponentStyle` behavior.",
-    ReplaceWith("Keyframes(init)")
-)
-fun keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = Keyframes(prefix, init)
 
 /**
  * A convenience method to convert this [Keyframes] instance into an object that can be passed into [Modifier.animation].

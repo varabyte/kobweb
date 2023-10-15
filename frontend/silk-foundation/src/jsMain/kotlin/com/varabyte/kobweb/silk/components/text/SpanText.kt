@@ -60,18 +60,3 @@ fun SpanText(
         Text(text)
     }
 }
-
-// TODO(#168): Remove in v1.0
-@Deprecated("'TextStyle' was renamed to 'SpanTextStyle'.", ReplaceWith("SpanTextStyle"))
-val TextStyle = SpanTextStyle
-
-// TODO(#168): Remove in v1.0
-@Deprecated("'Text' was renamed to 'SpanText'.", ReplaceWith("SpanText(text, modifier, variant)"))
-@Composable
-fun Text(
-    text: String,
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null
-) {
-    SpanText(text, modifier, variant)
-}
