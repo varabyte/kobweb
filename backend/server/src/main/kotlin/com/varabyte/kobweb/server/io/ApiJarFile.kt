@@ -2,8 +2,8 @@ package com.varabyte.kobweb.server.io
 
 import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.ApisFactory
-import com.varabyte.kobweb.api.dispose.DisposeEvent
-import com.varabyte.kobweb.api.dispose.DisposeReason
+import com.varabyte.kobweb.api.event.dispose.DisposeEvent
+import com.varabyte.kobweb.api.event.dispose.DisposeReason
 import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile

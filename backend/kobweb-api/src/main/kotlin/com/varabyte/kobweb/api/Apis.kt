@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.api
 
 import com.varabyte.kobweb.api.data.Data
-import com.varabyte.kobweb.api.dispose.DisposeEvent
-import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.http.Response
 import com.varabyte.kobweb.api.log.Logger

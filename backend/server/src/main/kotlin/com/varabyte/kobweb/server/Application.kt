@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.server
 
-import com.varabyte.kobweb.api.dispose.DisposeEvent
-import com.varabyte.kobweb.api.dispose.DisposeReason
+import com.varabyte.kobweb.api.event.dispose.DisposeEvent
+import com.varabyte.kobweb.api.event.dispose.DisposeReason
 import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebFolder
