@@ -15,12 +15,13 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     // class ApisFactoryImpl : ApisFactory {
     //    override fun create(logger: Logger): Apis {
     //        val data = MutableData()
-    //        val apis = Apis(data, logger)
+    //        val events = EventImpl()
+    //        val apis = Apis(data, events, logger)
     //        apis.register("/add") { ctx -> example.api.add(ctx) }
     //        apis.register("/remove") { ctx -> example.api.remove(ctx) }
     //        apis.registerStream("/echo") { ctx -> example.api.echo }
     //        apis.registerStream("/chat") { ctx -> example.api.chat }
-    //        val initCtx = InitApiContext(apis, data, logger)
+    //        val initCtx = InitApiContext(apis, data, events, logger)
     //        example.init(initCtx)
     //        return apis
     //    }
@@ -32,6 +33,7 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     val classApis = ClassName(apiPackage, "Apis")
     val classApisFactory = ClassName(apiPackage, "ApisFactory")
     val classMutableData = ClassName("$apiPackage.data", "MutableData")
+    val classEvents = ClassName("$apiPackage.event", "Events")
     val classInitApiContext = ClassName("$apiPackage.init", "InitApiContext")
     val classLogger = ClassName("$apiPackage.log", "Logger")
 
@@ -41,6 +43,7 @@ fun createApisFactoryImpl(backendData: BackendData): String {
             .addFunction(
                 FunSpec.builder("create")
                     .addModifiers(KModifier.OVERRIDE)
+                    .addParameter(ParameterSpec("events", classEvents))
                     .addParameter(ParameterSpec("logger", classLogger))
                     .returns(classApis)
                     .addCode(CodeBlock.builder().apply {
@@ -53,7 +56,7 @@ fun createApisFactoryImpl(backendData: BackendData): String {
                             addStatement("apis.registerStream(%S, ${entry.fqn})", entry.route)
                         }
                         if (backendData.initMethods.isNotEmpty()) {
-                            addStatement("val initCtx = %T(apis, data, logger)", classInitApiContext)
+                            addStatement("val initCtx = %T(apis, data, events, logger)", classInitApiContext)
                             backendData.initMethods.sortedBy { entry -> entry.fqn }.forEach { entry ->
                                 addStatement("${entry.fqn}(initCtx)")
                             }

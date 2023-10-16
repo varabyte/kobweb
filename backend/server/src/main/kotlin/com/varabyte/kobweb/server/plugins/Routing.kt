@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.server.plugins
 
 import com.varabyte.kobweb.api.Apis
+import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.http.EMPTY_BODY
 import com.varabyte.kobweb.api.http.HttpMethod
 import com.varabyte.kobweb.api.http.Request
@@ -78,7 +79,8 @@ fun Application.configureRouting(
     env: ServerEnvironment,
     siteLayout: SiteLayout,
     conf: KobwebConf,
-    globals: ServerGlobals
+    globals: ServerGlobals,
+    events: EventDispatcher
 ) {
     // "example/" should resolve to "example/index.html" if present, but default ktor behavior rejects trailing slashes.
     this.install(IgnoreTrailingSlash)
@@ -106,8 +108,8 @@ fun Application.configureRouting(
     when (siteLayout) {
         SiteLayout.KOBWEB -> {
             when (env) {
-                ServerEnvironment.DEV -> configureDevRouting(conf, globals, logger)
-                ServerEnvironment.PROD -> configureProdRouting(conf, logger)
+                ServerEnvironment.DEV -> configureDevRouting(conf, globals, events, logger)
+                ServerEnvironment.PROD -> configureProdRouting(conf, events, logger)
             }
         }
 
@@ -392,24 +394,24 @@ private fun Routing.configureCatchAllRouting(
     }
 }
 
-private fun Path?.createApiJar(logger: Logger, nativeLibraryMappings: Map<String, String>): ApiJarFile? {
+private fun Path?.createApiJar(logger: Logger, events: EventDispatcher, nativeLibraryMappings: Map<String, String>): ApiJarFile? {
     when {
         this == null -> logger.info("No API jar file specified in conf.yaml. Server API routes will not be available.")
         !this.exists() -> logger.warn("API jar specified but does not exist! Please fix conf.yaml. Invalid path: \"$this\"")
         else -> {
             logger.info("API jar found and will be loaded: \"$this\"")
-            return ApiJarFile(this, logger, nativeLibraryMappings)
+            return ApiJarFile(this, events, logger, nativeLibraryMappings)
         }
     }
     return null
 }
 
-private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, logger: Logger) {
+private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, events: EventDispatcher, logger: Logger) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
     val apiJar = conf.server.files.dev.api
         ?.let { Path(it) }
-        .createApiJar(logger, conf.server.nativeLibraries.associate { it.name to it.path })
+        .createApiJar(logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
@@ -476,7 +478,7 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     }
 }
 
-private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
+private fun Application.configureProdRouting(conf: KobwebConf, events: EventDispatcher, logger: Logger) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
     if (!siteRoot.exists()) {
         throw KobwebException("No site folder found. Did you run `kobweb export`?")
@@ -497,7 +499,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, logger: Logger) {
     val apiJar = conf.server.files.dev.api
         ?.substringAfterLast("/")
         ?.let { systemRoot.resolve(it) }
-        .createApiJar(logger, conf.server.nativeLibraries.associate { it.name to it.path })
+        .createApiJar(logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         val routePrefix = conf.site.routePrefixNormalized
