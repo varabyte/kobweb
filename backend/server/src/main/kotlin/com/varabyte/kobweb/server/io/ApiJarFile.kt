@@ -2,9 +2,9 @@ package com.varabyte.kobweb.server.io
 
 import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.ApisFactory
+import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.event.dispose.DisposeEvent
 import com.varabyte.kobweb.api.event.dispose.DisposeReason
-import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
 import io.ktor.util.date.*
@@ -192,4 +192,11 @@ class ApiJarFile(path: Path, private val events: EventDispatcher, private val lo
 
             return cache.apis
         }
+
+    init {
+        // Force initialization. This will trigger @InitApi calls when the server starts up, instead of waiting lazily
+        // for the first time an API route is triggered (which could add a lot of unexpected and unwanted latency to the
+        // first time a server request is made).
+        apis
+    }
 }
