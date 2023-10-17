@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.silk.components.style
 
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.ui.StyleModifier
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import org.jetbrains.compose.web.css.*
@@ -76,44 +75,9 @@ internal class CssModifier(
     val mediaQuery: CSSMediaQuery? = null,
     val suffix: String? = null,
 ) {
-    init {
-        modifier.fold(Unit) { _, currModifier ->
-            if (currModifier !is StyleModifier) {
-                throw IllegalArgumentException(
-                    """
-                        You are attempting to construct a ComponentStyle or ComponentVariant with a non-style Modifier
-                        (e.g. `id`, `tabIndex`, etc.). Due to technical limitations in html / css, only `StyleModifier`s
-                        are allowed in this context.
-
-                        Unfortunately, at the point this exception is getting thrown, information about the offending
-                        attribute is not known. Please audit your project's ComponentStyle and ComponentVariant
-                        Modifiers, perhaps commenting out recently added ones, until this exception goes away.
-
-                        Once the offending modifier is identified, to fix this, you can either call attribute modifiers
-                        directly on the Modifier you pass into some widget, or you can extend this Style or Variant with
-                        extra modifiers by passing them in the `extraModifier` parameter:
-
-                        ```
-                        // Approach #1: Call Attribute Modifiers later
-
-                        val ExampleStyle = ComponentStyle("ex") {
-                           ...
-                        }
-
-                        ExampleWidget(ExampleStyle.toModifier().tabIndex(0))
-
-                        // Approach #2: Use `extraModifiers`:
-
-                        val ExampleStyle = ComponentStyle("ex", extraModifiers = Modifier.tabIndex(0)) {
-                           ...
-                        }
-
-                        ExampleWidget(ExampleStyle.toModifier())
-                        ```
-                    """.trimIndent()
-                )
-            }
-        }
+    internal fun mergeWith(other: CssModifier): CssModifier {
+        check(this !== other && mediaQuery == other.mediaQuery && suffix == other.suffix)
+        return CssModifier(modifier.then(other.modifier), mediaQuery, suffix)
     }
 
     companion object {

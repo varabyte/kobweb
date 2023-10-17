@@ -185,15 +185,7 @@ class ComponentStyle(
                 .mapValues { (_, group) ->
                     val first = group.first()
                     if (group.size == 1) return@mapValues first
-
-                    // Weird "Modifier as Modifier" casting trick required to get around type ambiguity
-                    var mergedModifier = Modifier as Modifier
-                    group.forEach { curr ->
-                        check(curr.mediaQuery == first.mediaQuery && curr.suffix == first.suffix)
-                        mergedModifier = mergedModifier.then(curr.modifier)
-                    }
-
-                    CssModifier(mergedModifier, first.mediaQuery, first.suffix)
+                    group.reduce { acc, curr -> acc.mergeWith(curr) }
                 }
         }
 
