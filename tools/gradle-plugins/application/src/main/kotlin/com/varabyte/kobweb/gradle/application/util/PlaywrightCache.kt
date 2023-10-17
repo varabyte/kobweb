@@ -39,10 +39,16 @@ internal class PlaywrightCache {
         if (version != null) {
             pb.environment()["PW_CLI_DISPLAY_VERSION"] = version
         }
-        pb.inheritIO()
         println("Updating browser cache if necessary. This can take a while if out of date...")
         try {
             val process = pb.start()
+            // We manually capture the output as `ProcessBuilder.inheritIO()` doesn't seem to work and/or hangs
+            // See also: https://github.com/gradle/gradle/issues/16716
+            process.inputStream.bufferedReader().useLines { lines ->
+                lines.forEach {
+                    println(it.replace(9632.toChar(), '-')) // replace unsupported UTF-8 char
+                }
+            }
             println("Browser cache updated. Process returned status code ${process.waitFor()}")
         } catch (e: Exception) {
             e.printStackTrace()
