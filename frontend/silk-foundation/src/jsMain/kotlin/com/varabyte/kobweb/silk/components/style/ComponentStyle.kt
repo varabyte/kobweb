@@ -3,11 +3,13 @@
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.compose.util.kebabCaseToTitleCamelCase
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
@@ -189,8 +191,71 @@ class ComponentStyle(
                 }
         }
 
-        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).mergeCssModifiers(init)
-        val darkModifiers = ComponentModifiers(ColorMode.DARK).mergeCssModifiers(init)
+        fun Map<CssModifier.Key, CssModifier>.assertNoAttributeModifiers(): Map<CssModifier.Key, CssModifier> {
+            this.forEach { (_, cssModifier) ->
+                ComparableAttrsScope<Element>().apply {
+                    cssModifier.modifier.toAttrs<AttrsScope<Element>>().invoke(this)
+
+                    if (attributes.isNotEmpty()) {
+                        error(buildString {
+                            appendLine("ComponentStyle declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the ComponentStyle's `extraModifiers` parameter.")
+                            appendLine()
+                            appendLine("Details:")
+
+                            append("\tCSS rule: ")
+                            append("\"$selectorName")
+                            if (cssModifier.mediaQuery != null) append(cssModifier.mediaQuery)
+                            if (cssModifier.suffix != null) append(cssModifier.suffix)
+                            append("\"")
+
+                            append(" (do you declare a property called ")
+                            // ".example" likely comes from `ExampleStyle` while ".example.example-outlined" likely
+                            // comes from ExampleOutlinedVariant or OutlinedExampleVariant
+                            val isStyle = selectorName.count { it == '.' } == 1// "Variant" else "Style"
+                            val styleName = selectorName.substringAfter(".").substringBefore(".")
+
+                            if (isStyle) {
+                                append("`${styleName.kebabCaseToTitleCamelCase()}Style`")
+                            } else {
+                                // Convert ".example.example-outlined" to "outlined". This could come from a variant
+                                // property called OutlinedExampleVariant or ExampleOutlinedVariant
+                                val variantPart = selectorName.substringAfterLast(".").removePrefix("$styleName-")
+                                append("`${"$styleName-$variantPart".kebabCaseToTitleCamelCase()}Variant`")
+                                append(" or ")
+                                append("`${"$variantPart-$styleName".kebabCaseToTitleCamelCase()}Variant`")
+                            }
+                            appendLine("?)")
+                            appendLine("\tAttribute(s): ${attributes.keys.joinToString(", ") { "\"$it\"" }}")
+                            appendLine()
+                            appendLine("An example of how to fix this:")
+                            appendLine(
+                                """
+                                    // Before
+                                    val ExampleStyle by ComponentStyle {
+                                        base {
+                                           Modifier
+                                               .backgroundColor(Colors.Magenta))
+                                               .tabIndex(0) // <-- The offending attribute modifier
+                                        }
+                                    }
+                                    
+                                    // After
+                                    val ExampleStyle by ComponentStyle(extraModifiers = Modifier.tabIndex(0)) {
+                                        base {
+                                            Modifier.backgroundColor(Colors.Magenta)
+                                        }
+                                    }
+                                """.trimIndent().split("\n").joinToString(separator = "\n") { "\t$it" }
+                            )
+                        })
+                    }
+                }
+            }
+            return this
+        }
+
+        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).mergeCssModifiers(init).assertNoAttributeModifiers()
+        val darkModifiers = ComponentModifiers(ColorMode.DARK).mergeCssModifiers(init).assertNoAttributeModifiers()
 
         StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
             withFinalSelectorName(selectorName, group) { name, styles ->
