@@ -84,6 +84,10 @@ fun Modifier.whiteSpace(whiteSpace: WhiteSpace): Modifier = styleModifier {
     whiteSpace(whiteSpace)
 }
 
+fun Modifier.wordBreak(wordBreak: WordBreak): Modifier = styleModifier {
+    wordBreak(wordBreak)
+}
+
 fun Modifier.writingMode(writingMode: WritingMode) = styleModifier {
     writingMode(writingMode)
 }

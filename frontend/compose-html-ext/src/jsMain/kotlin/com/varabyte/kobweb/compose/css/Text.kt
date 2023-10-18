@@ -184,6 +184,31 @@ fun StyleScope.whiteSpace(whiteSpace: WhiteSpace) {
     property("white-space", whiteSpace)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/word-break
+class WordBreak private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        val Normal get() = WordBreak("normal");
+        val BreakAll get() = WordBreak("break-all");
+        val KeepAll get() = WordBreak("keep-all");
+        // BreakWord is intentionally not supported as it has been deprecated:
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/word-break#values
+        // Instead, use `overflow-wrap: break-word` or `overflow-wrap: break-anywhere`,
+        // or possibly `word-break: break-all`
+        // val BreakWord get() = WordBreak("break-word");
+
+        val Inherit get() = WordBreak("inherit")
+        val Initial get() = WordBreak("initial")
+        val Revert get() = WordBreak("revert")
+        val Unset get() = WordBreak("unset")
+    }
+}
+
+fun StyleScope.wordBreak(wordBreak: WordBreak) {
+    property("word-break", wordBreak)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode
 class WritingMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
