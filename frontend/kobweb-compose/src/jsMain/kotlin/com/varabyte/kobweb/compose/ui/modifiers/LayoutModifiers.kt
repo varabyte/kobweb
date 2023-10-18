@@ -114,8 +114,19 @@ fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
     maxHeight(maxHeight)
 }
 
+class MarginScope internal constructor(private val styleScope: StyleScope) {
+    fun left(value: CSSNumeric) = styleScope.marginLeft(value)
+    fun right(value: CSSNumeric) = styleScope.marginRight(value)
+    fun top(value: CSSNumeric) = styleScope.marginTop(value)
+    fun bottom(value: CSSNumeric) = styleScope.marginBottom(value)
+}
+
 fun Modifier.margin(all: CSSNumeric): Modifier = styleModifier {
     margin(all)
+}
+
+fun Modifier.margin(scope: MarginScope.() -> Unit): Modifier = styleModifier {
+    MarginScope(this).scope()
 }
 
 fun Modifier.margin(topBottom: CSSNumeric = 0.px, leftRight: CSSNumeric = 0.px): Modifier = styleModifier {
@@ -157,8 +168,19 @@ fun Modifier.resize(resize: Resize) = styleModifier {
     resize(resize)
 }
 
+class PaddingScope internal constructor(private val styleScope: StyleScope) {
+    fun left(value: CSSNumeric) = styleScope.paddingLeft(value)
+    fun right(value: CSSNumeric) = styleScope.paddingRight(value)
+    fun top(value: CSSNumeric) = styleScope.paddingTop(value)
+    fun bottom(value: CSSNumeric) = styleScope.paddingBottom(value)
+}
+
 fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
     padding(all)
+}
+
+fun Modifier.padding(scope: PaddingScope.() -> Unit) = styleModifier {
+    PaddingScope(this).scope()
 }
 
 fun Modifier.padding(topBottom: CSSNumeric = 0.px, leftRight: CSSNumeric = 0.px): Modifier = styleModifier {
