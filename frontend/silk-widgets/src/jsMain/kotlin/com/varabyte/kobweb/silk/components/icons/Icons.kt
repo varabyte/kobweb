@@ -25,7 +25,10 @@ import org.w3c.dom.svg.SVGElement
 // dependency.
 // --------------------------------------------------------------------------------------------------------------------
 
-private class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
+/**
+ * Parameters that will be used to set the viewBox attribute of an SVG.
+ */
+class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
     companion object {
         fun sized(width: Int, height: Int = width) = ViewBox(0, 0, width, height)
     }
@@ -37,19 +40,30 @@ sealed interface IconRenderStyle {
     class Stroke(val strokeWidth: Number? = null) : IconRenderStyle
 }
 
-// NOTE: This API is sloppy with params. Revisit if we ever want to make it public. Possibly come up with better SVG API
-// support first, instead of setting attrs everywhere.
+/**
+ * A convenience helper function for creating your own SVG icon.
+ *
+ * This method takes a few common parameters (with defaults). Any of them can be set to null in case you want to
+ * handle them yourself, setting values on [attrs] directly.
+ *
+ * @param viewBox The viewBox to use for the SVG. Defaults to 24x24.
+ * @param width The width of the SVG. Defaults to 1em (so that it will resize according to its container's font size).
+ *   Can be set explicitly to null if you want to handle passing in sizes yourself.
+ * @param renderStyle The drawing style to use when rendering the SVG (i.e. stroke or fill).
+ * @param attrs A scope for setting attributes on the SVG.
+ * @param content A scope which handles declaring the SVG's content.
+ */
 @Composable
-private fun createIcon(
-    viewBox: ViewBox = ViewBox.sized(24),
-    width: CSSLengthValue = 1.em,
+fun createIcon(
+    viewBox: ViewBox? = ViewBox.sized(24),
+    width: CSSLengthValue? = 1.em,
     renderStyle: IconRenderStyle? = IconRenderStyle.Stroke(),
     attrs: (SVGSvgAttrsScope.() -> Unit)? = null,
     content: ContentBuilder<SVGElement>
 ) {
     Svg(attrs = {
-        width(width)
-        viewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height)
+        width?.let { width(it) }
+        viewBox?.let { viewBox(it.x, it.y, it.width, it.height) }
         renderStyle?.let { renderStyle ->
             when (renderStyle) {
                 is IconRenderStyle.Fill -> {
