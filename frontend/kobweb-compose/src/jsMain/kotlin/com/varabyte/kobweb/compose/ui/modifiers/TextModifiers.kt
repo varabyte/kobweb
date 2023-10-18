@@ -11,30 +11,6 @@ fun Modifier.dir(dirType: DirType) = attrsModifier {
     dir(dirType)
 }
 
-fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
-    fontFamily(*values)
-}
-
-fun Modifier.fontSize(value: CSSNumeric): Modifier = styleModifier {
-    fontSize(value)
-}
-
-fun Modifier.fontSize(fontSize: FontSize): Modifier = styleModifier {
-    fontSize(fontSize)
-}
-
-fun Modifier.fontStyle(value: FontStyle): Modifier = styleModifier {
-    fontStyle(value)
-}
-
-fun Modifier.fontWeight(value: FontWeight): Modifier = styleModifier {
-    fontWeight(value)
-}
-
-fun Modifier.fontWeight(value: Int): Modifier = styleModifier {
-    fontWeight(value)
-}
-
 fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }
