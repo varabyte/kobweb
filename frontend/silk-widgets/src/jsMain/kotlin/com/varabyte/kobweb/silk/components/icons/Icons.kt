@@ -23,6 +23,8 @@ import org.w3c.dom.svg.SVGElement
 // This file provides some basic SVG icons. Users will more likely reach to Font Awesome or Google Material icons, but
 // SVG icons can be a simple way to get some quick icons working in your project without having to pull in a large
 // dependency.
+//
+// Some of these icons in here are based on those found in Chakra UI: https://chakra-ui.com/docs/components/icon
 // --------------------------------------------------------------------------------------------------------------------
 
 /**
