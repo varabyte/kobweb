@@ -16,12 +16,13 @@ import org.jetbrains.compose.web.dom.Hr
 
 object DividerVars {
     val Color by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
+    val Length: StyleVariable.PropertyValue<CSSLengthOrPercentageValue> by StyleVariable(prefix = "silk", defaultFallback = 90.percent)
 }
 
 val DividerStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
-        .fillMaxWidth(90.percent)
+        .width(DividerVars.Length.value())
 }
 
 val VerticalDividerVariant by DividerStyle.addVariantBase {
@@ -29,7 +30,7 @@ val VerticalDividerVariant by DividerStyle.addVariantBase {
         .borderTop { width(0.px) }
         .maxWidth(0.percent)
         .borderLeft(1.px, LineStyle.Solid, DividerVars.Color.value())
-        .fillMaxHeight(90.percent)
+        .height(DividerVars.Length.value())
 }
 
 /**
