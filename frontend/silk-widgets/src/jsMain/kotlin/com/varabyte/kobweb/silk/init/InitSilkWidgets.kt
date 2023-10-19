@@ -37,6 +37,7 @@ import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
 import com.varabyte.kobweb.silk.components.layout.DividerStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
+import com.varabyte.kobweb.silk.components.layout.VerticalDividerVariant
 import com.varabyte.kobweb.silk.components.overlay.BottomLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.BottomRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.BottomTooltipArrowVariant
@@ -218,6 +219,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerComponentStyle(CheckboxIconStyle)
     mutableTheme.registerComponentVariants(CheckedCheckboxIconContainerVariant, UncheckedCheckboxIconContainerVariant)
     mutableTheme.registerComponentStyle(DividerStyle)
+    mutableTheme.registerComponentVariants(VerticalDividerVariant)
     mutableTheme.registerComponentStyle(DivTextStyle)
     mutableTheme.registerComponentStyle(OverlayStyle)
     mutableTheme.registerComponentStyle(PopupStyle)

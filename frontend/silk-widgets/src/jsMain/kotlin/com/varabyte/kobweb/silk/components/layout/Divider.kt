@@ -7,6 +7,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.addVariantBase
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
@@ -21,6 +22,14 @@ val DividerStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
         .fillMaxWidth(90.percent)
+}
+
+val VerticalDividerVariant by DividerStyle.addVariantBase {
+    Modifier
+        .borderTop { width(0.px) }
+        .maxWidth(0.percent)
+        .borderLeft(1.px, LineStyle.Solid, DividerVars.Color.value())
+        .fillMaxHeight(90.percent)
 }
 
 /**
