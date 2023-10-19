@@ -8,22 +8,6 @@ import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.w3c.dom.HTMLAnchorElement
 
-@Deprecated(
-    "Kobweb core's Link class has been renamed to Anchor",
-    ReplaceWith("Anchor(href, attrs, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, content)")
-)
-@Composable
-fun Link(
-    href: String,
-    attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
-    openInternalLinksStrategy: OpenLinkStrategy? = null,
-    openExternalLinksStrategy: OpenLinkStrategy? = null,
-    autoPrefix: Boolean = true,
-    content: ContentBuilder<HTMLAnchorElement>? = null
-) {
-    Anchor(href, attrs, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, content)
-}
-
 /**
  * A special version of the A tag which, when clicked on, will not reload the current page if it's within the
  * same site.

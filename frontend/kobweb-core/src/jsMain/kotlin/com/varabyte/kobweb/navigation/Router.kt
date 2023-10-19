@@ -235,18 +235,6 @@ class Router {
         interceptors.add(interceptor)
     }
 
-    @Deprecated(
-        "\"routeTo\" has been renamed to \"tryRoutingTo\".",
-        ReplaceWith("tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)")
-    )
-    fun routeTo(
-        pathQueryAndFragment: String,
-        updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
-        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE
-    ): Boolean {
-        return tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openLinkStrategy)
-    }
-
     /**
      * Attempt to navigate **internally** within this site, or return false if that's not possible (i.e. because the
      * path is external).
