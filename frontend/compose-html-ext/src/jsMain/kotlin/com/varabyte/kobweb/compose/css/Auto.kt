@@ -14,6 +14,4 @@ import org.jetbrains.compose.web.css.*
  * Note that this can fail silently if you try to use it in a context that doesn't support it.
  */
 inline val numericAuto: CSSNumeric
-    get() = object : CSSNumericValue<CSSUnit> {
-        override fun toString(): String = "auto"
-    }
+    get() = "auto".unsafeCast<CSSNumeric>()
