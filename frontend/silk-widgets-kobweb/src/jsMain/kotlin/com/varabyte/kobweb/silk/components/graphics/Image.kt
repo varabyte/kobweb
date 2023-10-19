@@ -63,22 +63,3 @@ fun Image(
         if (height != null) attr("height", height.toString())
     })
 }
-
-/**
- * Convenience version of [Image] with a non-optional [alt] parameter.
- *
- * Setting alt text is a common and encouraged use-case.
- */
-@Composable
-fun Image(
-    src: String,
-    alt: String,
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
-    width: Int? = null,
-    height: Int? = null,
-    autoPrefix: Boolean = true,
-    ref: ElementRefScope<HTMLImageElement>? = null,
-) {
-    Image(src, modifier, variant, width, height, alt, autoPrefix, ref)
-}
