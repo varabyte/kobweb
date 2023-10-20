@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
@@ -50,14 +51,14 @@ val OverlayStyle by ComponentStyle.base(prefix = "silk") {
 @Composable
 fun Overlay(
     modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
     contentAlignment: Alignment = Alignment.TopCenter,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}
 ) {
     deferRender {
         Box(
-            OverlayStyle
-                .toModifier()
+            OverlayStyle.toModifier(variant)
                 .position(Position.Fixed)
                 .top(0.px).bottom(0.px).left(0.px).right(0.px)
                 .then(modifier),
