@@ -7,17 +7,9 @@ import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDele
 import org.jetbrains.compose.web.css.*
 
 sealed class ComponentVariant {
-    object Empty : ComponentVariant() {
-        override fun addStylesInto(styleSheet: StyleSheet) = Unit
-
-        @Composable
-        override fun toModifier() = Modifier
-    }
 
     infix fun then(next: ComponentVariant): ComponentVariant {
-        return if (next === Empty) this
-        else if (this === Empty) next
-        else CompositeComponentVariant(this, next)
+        return CompositeComponentVariant(this, next)
     }
 
     internal abstract fun addStylesInto(styleSheet: StyleSheet)
@@ -66,8 +58,7 @@ private class CompositeComponentVariant(private val head: ComponentVariant, priv
 }
 
 fun ComponentVariant.thenIf(condition: Boolean, produce: () -> ComponentVariant): ComponentVariant {
-    return this
-        .then(if (condition) produce() else ComponentVariant.Empty)
+    return if (condition) this.then(produce()) else this
 }
 
 fun ComponentVariant.thenUnless(condition: Boolean, produce: () -> ComponentVariant): ComponentVariant {
@@ -84,14 +75,14 @@ fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): Co
 
 /**
  * A convenience method for folding a list of component variants into one single one that represents all of them.
+ *
+ * Returns `null` if the collection is empty or entirely `null`.
  */
 @Composable
-fun Iterable<ComponentVariant?>.combine(): ComponentVariant {
-    var finalVariant: ComponentVariant = ComponentVariant.Empty
-    for (variant in this) {
-        finalVariant = finalVariant.then(variant ?: ComponentVariant.Empty)
+fun Iterable<ComponentVariant?>.combine(): ComponentVariant? {
+    return reduceOrNull { acc, variant ->
+        if (acc != null && variant != null) acc.then(variant) else acc ?: variant
     }
-    return finalVariant
 }
 
 /**

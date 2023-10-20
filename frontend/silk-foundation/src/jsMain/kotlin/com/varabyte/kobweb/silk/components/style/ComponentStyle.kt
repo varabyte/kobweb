@@ -476,7 +476,8 @@ fun ComponentStyle.Companion.base(
  */
 @Composable
 fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
-    return SilkTheme.componentStyles.getValue(name).toModifier().then(variants.toList().combine().toModifier())
+    return SilkTheme.componentStyles.getValue(name).toModifier()
+        .then(variants.toList().combine()?.toModifier() ?: Modifier)
 }
 
 /**
