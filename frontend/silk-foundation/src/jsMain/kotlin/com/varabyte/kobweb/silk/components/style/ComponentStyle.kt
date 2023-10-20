@@ -502,11 +502,7 @@ fun <T : Element, A : AttrsScope<T>> ComponentStyle.toAttrs(
  */
 @Composable
 fun Iterable<ComponentStyle>.toModifier(): Modifier {
-    var finalModifier: Modifier = Modifier
-    for (style in this) {
-        finalModifier = finalModifier.then(style.toModifier())
-    }
-    return finalModifier
+    return fold<_, Modifier>(Modifier) { acc, style -> acc.then(style.toModifier()) }
 }
 
 /**
