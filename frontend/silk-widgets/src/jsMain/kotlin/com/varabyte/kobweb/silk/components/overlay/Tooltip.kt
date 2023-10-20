@@ -291,7 +291,7 @@ fun AdvancedTooltip(
     AdvancedPopover(
         target,
         TooltipStyle.toModifier(variant).then(modifier), hiddenModifier,
-        variant,
+        variant = null,
         showDelayMs, hideDelayMs,
         openCloseStrategy,
         placementTarget,
