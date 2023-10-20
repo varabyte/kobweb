@@ -254,7 +254,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         strong.convention { "$JB_DOM.B" }
         hr.convention {
             if (useSilk.get()) {
-                "$SILK.layout.Divider"
+                "$SILK.layout.HorizontalDivider"
             } else {
                 "$JB_DOM.Hr"
             }

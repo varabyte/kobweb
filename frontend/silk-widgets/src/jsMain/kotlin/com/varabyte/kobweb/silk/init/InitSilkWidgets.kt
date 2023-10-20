@@ -34,10 +34,10 @@ import com.varabyte.kobweb.silk.components.forms.SwitchVars
 import com.varabyte.kobweb.silk.components.forms.UncheckedCheckboxIconContainerVariant
 import com.varabyte.kobweb.silk.components.forms.UnstyledInputVariant
 import com.varabyte.kobweb.silk.components.graphics.CanvasStyle
-import com.varabyte.kobweb.silk.components.layout.DividerStyle
+import com.varabyte.kobweb.silk.components.layout.HorizontalDividerStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGridStyle
 import com.varabyte.kobweb.silk.components.layout.SurfaceStyle
-import com.varabyte.kobweb.silk.components.layout.VerticalDividerVariant
+import com.varabyte.kobweb.silk.components.layout.VerticalDividerStyle
 import com.varabyte.kobweb.silk.components.overlay.BottomLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.BottomRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.BottomTooltipArrowVariant
@@ -218,13 +218,14 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerComponentStyle(CheckboxIconContainerStyle)
     mutableTheme.registerComponentStyle(CheckboxIconStyle)
     mutableTheme.registerComponentVariants(CheckedCheckboxIconContainerVariant, UncheckedCheckboxIconContainerVariant)
-    mutableTheme.registerComponentStyle(DividerStyle)
-    mutableTheme.registerComponentVariants(VerticalDividerVariant)
     mutableTheme.registerComponentStyle(DivTextStyle)
     mutableTheme.registerComponentStyle(OverlayStyle)
     mutableTheme.registerComponentStyle(PopupStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
     mutableTheme.registerComponentStyle(SurfaceStyle)
+
+    mutableTheme.registerComponentStyle(HorizontalDividerStyle)
+    mutableTheme.registerComponentStyle(VerticalDividerStyle)
 
     mutableTheme.registerComponentStyle(SwitchStyle)
     mutableTheme.registerComponentStyle(SwitchTrackStyle)
