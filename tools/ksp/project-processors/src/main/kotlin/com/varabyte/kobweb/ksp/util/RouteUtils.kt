@@ -2,7 +2,7 @@ package com.varabyte.kobweb.ksp.util
 
 object RouteUtils {
     /**
-     * Given a qpackage, e.g. "a._123.int_", and some mappings, e.g. "a._123" to "123" and "a._123.int_" to "int",
+     * Given a package, e.g. "a._123.int_", and some mappings, e.g. "a._123" to "123" and "a._123.int_" to "int",
      * generate a final route, e.g. "a/123/int"
      */
     fun resolve(packageMappings: Map<String, String>, pkg: String): String {
