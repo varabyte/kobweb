@@ -106,8 +106,6 @@ class ComponentStyle(
         }
     }
 
-    internal val variants = mutableListOf<ComponentVariant>()
-
     /**
      * Create a new variant that builds on top of this style.
      *
@@ -136,9 +134,7 @@ class ComponentStyle(
         return SimpleComponentVariant(
             ComponentStyle("${this.name}-$name", extraModifiers, prefix = null, init),
             baseStyle = this
-        ).also {
-            variants.add(it)
-        }
+        )
     }
 
     /**

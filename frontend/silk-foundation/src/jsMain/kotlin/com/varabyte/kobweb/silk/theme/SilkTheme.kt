@@ -74,7 +74,6 @@ class MutableSilkTheme {
             """.trimIndent()
         }
         componentStyles[style.name] = style
-        registerComponentVariants(*style.variants.toTypedArray())
     }
 
     /**
@@ -393,7 +392,8 @@ val SilkTheme: ImmutableSilkTheme
  * in a `@Composable` scope (which is common when defining ComponentStyles).
  */
 @Suppress("DEPRECATION")
-@Deprecated("Please migrate to `toPalette`, a more general, extensible API. Afterwards, you will need to additionally import palette properties (as they are extension properties).",
+@Deprecated(
+    "Please migrate to `toPalette`, a more general, extensible API. Afterwards, you will need to additionally import palette properties (as they are extension properties).",
     ReplaceWith("this.toPalette()", "com.varabyte.kobweb.silk.theme.colors.palette.toPalette")
 )
 fun ColorMode.toSilkPalette() = SilkTheme.legacyPalettes[this]
