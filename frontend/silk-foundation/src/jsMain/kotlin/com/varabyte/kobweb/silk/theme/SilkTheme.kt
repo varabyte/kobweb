@@ -26,10 +26,13 @@ import org.jetbrains.compose.web.css.*
  * Unlike [SilkConfig] values, theme values are expected to be accessible in user projects via the [SilkTheme] object.
  */
 class MutableSilkTheme {
-    internal val componentStyles = mutableMapOf<String, ComponentStyle>()
-    internal val overriddenStyles = mutableSetOf<String>()
-    internal val componentVariants = mutableMapOf<String, ComponentVariant>()
-    internal val overriddenVariants = mutableSetOf<String>()
+    private val _componentStyles = mutableMapOf<String, ComponentStyle>()
+    internal val componentStyles: Map<String, ComponentStyle> = _componentStyles
+    private val overriddenStyles = mutableSetOf<String>()
+
+    private val _componentVariants = mutableMapOf<String, ComponentVariant>()
+    internal val componentVariants: Map<String, ComponentVariant> = _componentVariants
+    private val overriddenVariants = mutableSetOf<String>()
 
     val palettes = MutablePalettes()
     internal val legacyPalettes = LegacyMutableSilkPalettes(palettes)
@@ -73,7 +76,7 @@ class MutableSilkTheme {
                 If this was an intentional override, you should use `replaceComponentStyle` instead.
             """.trimIndent()
         }
-        componentStyles[style.name] = style
+        _componentStyles[style.name] = style
     }
 
     /**
@@ -106,7 +109,7 @@ class MutableSilkTheme {
     ) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
         check(overriddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
-        componentStyles[style.name] = ComponentStyle(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
+        _componentStyles[style.name] = ComponentStyle(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
     }
 
     /**
@@ -124,7 +127,7 @@ class MutableSilkTheme {
                 consider filing an issue at https://github.com/varabyte/kobweb/issues
             """.trimIndent()
             }
-            componentVariants[variant.style.name] = variant
+            _componentVariants[variant.style.name] = variant
         }
     }
 
@@ -163,7 +166,7 @@ class MutableSilkTheme {
 
         check(componentVariants.contains(variant.style.name)) { "Attempting to replace a variant that was never registered: \"${variant.style.name}\"" }
         check(overriddenVariants.add(variant.style.name)) { "Attempting to override variant \"${variant.style.name}\" twice" }
-        componentVariants[variant.style.name] = variant.baseStyle.addVariant(variant.name, extraModifiers, init)
+        _componentVariants[variant.style.name] = variant.baseStyle.addVariant(variant.name, extraModifiers, init)
     }
 }
 
