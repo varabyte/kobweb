@@ -14,29 +14,29 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
 
-private val KeyframesBuilder.comparableKeyframeStyles
-    get() = keyframeStyles.mapValues { (_, create) ->
-        ComparableStyleScope().apply {
-            create().toStyles().invoke(this)
-        }
-    }
-
 class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
-    internal val keyframeStyles = mutableMapOf<CSSKeyframe, () -> Modifier>()
+    private val keyframeStyles = mutableMapOf<CSSKeyframe, Modifier>()
+
+    private val comparableKeyframeStyles
+        get() = keyframeStyles.mapValues { (_, modifier) ->
+            ComparableStyleScope().apply {
+                modifier.toStyles().invoke(this)
+            }
+        }
 
     /** Describe the style of the element when this animation starts. */
     fun from(createStyle: () -> Modifier) {
-        keyframeStyles += CSSKeyframe.From to createStyle
+        keyframeStyles += CSSKeyframe.From to createStyle()
     }
 
     /** Describe the style of the element when this animation ends. */
     fun to(createStyle: () -> Modifier) {
-        keyframeStyles += CSSKeyframe.To to createStyle
+        keyframeStyles += CSSKeyframe.To to createStyle()
     }
 
     /** Describe the style of the element when the animation reaches some percent completion. */
     operator fun CSSSizeValue<CSSUnit.percent>.invoke(createStyle: () -> Modifier) {
-        keyframeStyles += CSSKeyframe.Percentage(this) to createStyle
+        keyframeStyles += CSSKeyframe.Percentage(this) to createStyle()
     }
 
     /**
@@ -54,7 +54,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
      * ```
      */
     fun each(vararg keys: CSSSizeValue<CSSUnit.percent>, createStyle: () -> Modifier) {
-        keyframeStyles += CSSKeyframe.Combine(keys.toList()) to createStyle
+        keyframeStyles += CSSKeyframe.Combine(keys.toList()) to createStyle()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -67,8 +67,8 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
     }
 
     internal fun addKeyframesIntoStylesheet(stylesheet: StyleSheet, keyframesName: String) {
-        val keyframeRules = keyframeStyles.map { (keyframe, create) ->
-            val styles = create().toStyles()
+        val keyframeRules = keyframeStyles.map { (keyframe, modifier) ->
+            val styles = modifier.toStyles()
 
             val cssRuleBuilder = StyleScopeBuilder()
             styles.invoke(cssRuleBuilder)
@@ -100,7 +100,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  *       timingFunction = AnimationTimingFunction.EaseIn,
  *       direction = AnimationDirection.Alternate,
  *       iterationCount = AnimationIterationCount.Infinite
- *     )
+ *     ))
  *     .toAttrs()
  * )
  * ```
