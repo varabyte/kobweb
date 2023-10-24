@@ -187,9 +187,7 @@ fun createMainFunction(
                 addStatement("")
             }.build())
 
-            val needsSilkInit = frontendData.silkInits.isNotEmpty() || frontendData.silkStyles.isNotEmpty()
-                || frontendData.silkVariants.isNotEmpty() || frontendData.keyframesList.isNotEmpty()
-            if (usingSilkFoundation && needsSilkInit) {
+            if (usingSilkFoundation) {
                 addCode(CodeBlock.builder().apply {
                     addStatement("$KOBWEB_GROUP.silk.init.additionalSilkInitialization = { ctx ->")
                     withIndent {
