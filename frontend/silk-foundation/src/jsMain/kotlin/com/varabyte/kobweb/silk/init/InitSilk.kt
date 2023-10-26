@@ -19,11 +19,11 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme._SilkTheme
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.asList
 import org.w3c.dom.css.CSSGroupingRule
 import org.w3c.dom.css.CSSRule
 import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.CSSStyleSheet
-import org.w3c.dom.css.get
 
 /**
  * An annotation which identifies a function as one which will be called when the page opens, before DOM nodes are
@@ -100,27 +100,26 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     // as in `setProperty("x", "y", "important")`)
     window.invokeLater { // invokeLater gives the engine a chance to register Silk styles into the stylesheet objects
         val displayStyleSelectorNames = displayStyles.map { ".${it.name}" }.toSet()
-        for (styleSheetIndex in 0..<document.styleSheets.length) {
-            val styleSheet = (document.styleSheets[styleSheetIndex] as? CSSStyleSheet)
-                // Trying to peek at external stylesheets causes a security exception so step over them
-                ?.takeIf { styleSheet -> styleSheet.href == null }
-                ?: continue
-            for (ruleIndex in 0..<styleSheet.cssRules.length) {
-                val rule = styleSheet.cssRules[ruleIndex] as? CSSGroupingRule ?: continue
-                // Note: We know all display rules are media rules, but if we ever want to support
-                // "important" more generally, we'd have to handle at least STYLE_RULE as well
-                if (rule.type != CSSRule.MEDIA_RULE)
-                    continue
-                for (innerRuleIndex in 0..<rule.cssRules.length) {
-                    val innerRule = rule.cssRules[innerRuleIndex] as? CSSStyleRule ?: continue
-                    val selectorText = innerRule.selectorText
-                    val innerStyle = innerRule.style
-                    if (selectorText in displayStyleSelectorNames) {
-                        val displayValue = innerStyle.getPropertyValue("display")
-                        innerStyle.setProperty("display", displayValue, "important")
+        document.styleSheets.asList()
+            .filterIsInstance<CSSStyleSheet>()
+            // Trying to peek at external stylesheets causes a security exception so step over them
+            .filter { it.href == null }
+            .forEach { styleSheet ->
+                styleSheet.cssRules.asList()
+                    .filterIsInstance<CSSGroupingRule>()
+                    // Note: We know all display styles use media rules, but if we ever want to support
+                    // "important" more generally, we'd have to handle at least STYLE_RULE as well
+                    .filter { rule -> rule.type == CSSRule.MEDIA_RULE }
+                    .forEach { rule ->
+                        rule.cssRules.asList().filterIsInstance<CSSStyleRule>().forEach { innerRule ->
+                            val selectorText = innerRule.selectorText
+                            val innerStyle = innerRule.style
+                            if (selectorText in displayStyleSelectorNames) {
+                                val displayValue = innerStyle.getPropertyValue("display")
+                                innerStyle.setProperty("display", displayValue, "important")
+                            }
+                        }
                     }
-                }
             }
-        }
     }
 }
