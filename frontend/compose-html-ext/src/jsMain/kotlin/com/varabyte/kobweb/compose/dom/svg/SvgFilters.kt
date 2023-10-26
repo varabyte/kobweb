@@ -60,6 +60,12 @@ private interface FilterPrimitiveAttrs<T : SVGElement> : AttrsScope<T>, Coordina
 
 // Interface for filters that only take a single input
 private interface FilterInput1AttrsScope<T : SVGElement> : AttrsScope<T> {
+    /**
+     * A convenience method which maps to `in` and has a naming convention consistent with `in2`.
+     *
+     * While `in1` is not an official attribute, it provides a way to avoid using `in` which is awkward to use in
+     * Kotlin since `in` is an official keyword.
+     */
     fun in1(input: SVGFEInput) {
         `in`(input)
     }
@@ -69,8 +75,12 @@ private interface FilterInput1AttrsScope<T : SVGElement> : AttrsScope<T> {
     }
 
     /**
-     * Input is passed the result of a previous filter.
+     * A convenience method which maps to `in` and has a naming convention consistent with `in2`.
      *
+     * While `in1` is not an official attribute, it provides a way to avoid using `in` which is awkward to use in
+     * Kotlin since `in` is an official keyword.
+     *
+     * @param resultName The name of the result of a previous filter.
      * @see [FilterPrimitiveAttrs.result]
      */
     fun in1(resultName: String) {
@@ -78,8 +88,7 @@ private interface FilterInput1AttrsScope<T : SVGElement> : AttrsScope<T> {
     }
 
     /**
-     * Input is passed the result of a previous filter.
-     *
+     * @param resultName The name of the result of a previous filter.
      * @see [FilterPrimitiveAttrs.result]
      */
     fun `in`(resultName: String) {
