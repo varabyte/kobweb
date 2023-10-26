@@ -51,8 +51,15 @@ enum class SVGFEInput {
     override fun toString() = this.name
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute#filter_primitive_attributes
+private interface FilterPrimitiveAttrs<T : SVGElement> : AttrsScope<T>, CoordinateAttrs<T>, LengthAttrs<T> {
+    fun result(name: String) {
+        attr("result", name)
+    }
+}
+
 // Interface for filters that only take a single input
-private interface FilterInputOutput1Attrs<T : SVGElement> : AttrsScope<T> {
+private interface FilterInput1AttrsScope<T : SVGElement> : AttrsScope<T> {
     fun in1(input: SVGFEInput) {
         `in`(input)
     }
@@ -64,7 +71,7 @@ private interface FilterInputOutput1Attrs<T : SVGElement> : AttrsScope<T> {
     /**
      * Input is passed the result of a previous filter.
      *
-     * @see result
+     * @see [FilterPrimitiveAttrs.result]
      */
     fun in1(resultName: String) {
         `in`(resultName)
@@ -73,19 +80,15 @@ private interface FilterInputOutput1Attrs<T : SVGElement> : AttrsScope<T> {
     /**
      * Input is passed the result of a previous filter.
      *
-     * @see result
+     * @see [FilterPrimitiveAttrs.result]
      */
     fun `in`(resultName: String) {
         attr("in", resultName)
     }
-
-    fun result(name: String) {
-        attr("result", name)
-    }
 }
 
 // Interface for filters that take two inputs
-private interface FilterInputOutput2Attrs<T : SVGElement> : FilterInputOutput1Attrs<T> {
+private interface FilterInput2AttrsScope<T : SVGElement> : FilterInput1AttrsScope<T> {
     fun in2(input: SVGFEInput) {
         in2(input.toString())
     }
@@ -93,7 +96,7 @@ private interface FilterInputOutput2Attrs<T : SVGElement> : FilterInputOutput1At
     /**
      * Input is passed the result of a previous filter.
      *
-     * @see result
+     * @see [FilterPrimitiveAttrs.result]
      */
     fun in2(resultName: String) {
         attr("in2", resultName)
@@ -178,8 +181,8 @@ abstract external class SVGFEColorMatrixElement : SVGElement {
 }
 
 class SVGFEColorMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEColorMatrixElement>) :
-    SVGElementAttrsScope<SVGFEColorMatrixElement>(attrs), CoordinateAttrs<SVGFEColorMatrixElement>,
-    LengthAttrs<SVGFEColorMatrixElement>, FilterInputOutput1Attrs<SVGFEColorMatrixElement> {
+    SVGElementAttrsScope<SVGFEColorMatrixElement>(attrs), FilterPrimitiveAttrs<SVGFEColorMatrixElement>,
+    FilterInput1AttrsScope<SVGFEColorMatrixElement> {
 
     fun type(type: SVGFEColorMatrixType) {
         attr("type", type.toString())
@@ -243,8 +246,8 @@ abstract external class SVGFEGaussianBlurElement : SVGElement {
 }
 
 class SVGFEGaussianBlurAttrsScope private constructor(attrs: AttrsScope<SVGFEGaussianBlurElement>) :
-    SVGElementAttrsScope<SVGFEGaussianBlurElement>(attrs), CoordinateAttrs<SVGFEGaussianBlurElement>,
-    LengthAttrs<SVGFEGaussianBlurElement>, FilterInputOutput1Attrs<SVGFEGaussianBlurElement> {
+    SVGElementAttrsScope<SVGFEGaussianBlurElement>(attrs), FilterPrimitiveAttrs<SVGFEGaussianBlurElement>,
+    FilterInput1AttrsScope<SVGFEGaussianBlurElement> {
 
     fun stdDeviation(value: Number) {
         attr("stdDeviation", value.toString())
