@@ -50,9 +50,9 @@ fun HomePage() {
 
 ---
 
-**Kobweb is still only publishing pre-release versions, but it's been usable for a while now, and it is getting close to
-stabilization**. Please consider starring the project to indicate interest, so we know we're creating something the
-community wants.
+While Kobweb is still pre-1.0, it has been usable for a while now. It provides escape hatches to lower level APIs, so
+you can accomplish anything even if Kobweb doesn't support it yet. Please consider starring the project to indicate
+interest, so we know we're creating something the community wants.
 [How ready is it?▼](#can-we-kobweb-yet)
 
 Our goal is to provide:
