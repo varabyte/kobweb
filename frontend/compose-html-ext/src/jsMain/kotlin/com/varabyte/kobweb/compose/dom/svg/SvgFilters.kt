@@ -6,12 +6,14 @@ package com.varabyte.kobweb.compose.dom.svg
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.GenericTag
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.ElementScope
 import org.w3c.dom.svg.SVGAnimatedEnumeration
 import org.w3c.dom.svg.SVGAnimatedLength
 import org.w3c.dom.svg.SVGAnimatedNumber
+import org.w3c.dom.svg.SVGAnimatedNumberList
 import org.w3c.dom.svg.SVGAnimatedString
 import org.w3c.dom.svg.SVGDefsElement
 import org.w3c.dom.svg.SVGElement
@@ -50,7 +52,7 @@ enum class SVGFEInput {
 }
 
 // Interface for filters that only take a single input
-private interface FilterInput1Attrs<T : SVGElement> : AttrsScope<T> {
+private interface FilterInputOutput1Attrs<T : SVGElement> : AttrsScope<T> {
     fun in1(input: SVGFEInput) {
         `in`(input)
     }
@@ -59,23 +61,42 @@ private interface FilterInput1Attrs<T : SVGElement> : AttrsScope<T> {
         `in`(input.toString())
     }
 
-    fun in1(filterReference: String) {
-        `in`(filterReference)
+    /**
+     * Input is passed the result of a previous filter.
+     *
+     * @see result
+     */
+    fun in1(resultName: String) {
+        `in`(resultName)
     }
 
-    fun `in`(filterReference: String) {
-        attr("in", filterReference)
+    /**
+     * Input is passed the result of a previous filter.
+     *
+     * @see result
+     */
+    fun `in`(resultName: String) {
+        attr("in", resultName)
+    }
+
+    fun result(name: String) {
+        attr("result", name)
     }
 }
 
 // Interface for filters that take two inputs
-private interface FilterInput2Attrs<T : SVGElement> : FilterInput1Attrs<T> {
+private interface FilterInputOutput2Attrs<T : SVGElement> : FilterInputOutput1Attrs<T> {
     fun in2(input: SVGFEInput) {
         in2(input.toString())
     }
 
-    fun in2(filterReference: String) {
-        attr("in2", filterReference)
+    /**
+     * Input is passed the result of a previous filter.
+     *
+     * @see result
+     */
+    fun in2(resultName: String) {
+        attr("in2", resultName)
     }
 }
 
@@ -128,6 +149,79 @@ fun ElementScope<SVGDefsElement>.Filter(
     )
 }
 
+// region filter elements
+
+enum class SVGFEColorMatrixType {
+    Matrix,
+    Saturate,
+    HueRotate,
+    LuminanceToAlpha;
+
+    override fun toString() = this.toSvgValue()
+}
+
+/**
+ * Exposes the JavaScript [SVGFEGaussianBlurElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEGaussianBlurElement) to Kotlin
+ */
+abstract external class SVGFEColorMatrixElement : SVGElement {
+    open val type: SVGAnimatedEnumeration
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val values: SVGAnimatedNumberList
+
+    open val in1: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+class SVGFEColorMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEColorMatrixElement>) :
+    SVGElementAttrsScope<SVGFEColorMatrixElement>(attrs), CoordinateAttrs<SVGFEColorMatrixElement>,
+    LengthAttrs<SVGFEColorMatrixElement>, FilterInputOutput1Attrs<SVGFEColorMatrixElement> {
+
+    fun type(type: SVGFEColorMatrixType) {
+        attr("type", type.toString())
+    }
+
+    /** Values to set when type is Matrix */
+    fun values(
+        r1: Number, r2: Number, r3: Number, r4: Number, r5: Number,
+        g1: Number, g2: Number, g3: Number, g4: Number, g5: Number,
+        b1: Number, b2: Number, b3: Number, b4: Number, b5: Number,
+        a1: Number, a2: Number, a3: Number, a4: Number, a5: Number
+    ) {
+        attr("values", "$r1 $r2 $r3 $r4 $r5 $g1 $g2 $g3 $g4 $g5 $b1 $b2 $b3 $b4 $b5 $a1 $a2 $a3 $a4 $a5")
+    }
+
+    /** Value to set when type is Saturate */
+    fun values(value: Number) {
+        attr("values", value.toString())
+    }
+
+    /** Value to set when type is HueRotate */
+    fun values(value: CSSAngleValue) {
+        attr("values", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEColorMatrixAttrsScope.() -> Unit): AttrBuilderContext<SVGFEColorMatrixElement> {
+            return { SVGFEColorMatrixAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.ColorMatrix(
+    attrs: (SVGFEColorMatrixAttrsScope.() -> Unit)? = null,
+) {
+    GenericTag(
+        "feColorMatrix",
+        "http://www.w3.org/2000/svg", attrs?.let { SVGFEColorMatrixAttrsScope(it) }
+    )
+}
+
 /**
  * Exposes the JavaScript [SVGFEGaussianBlurElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEGaussianBlurElement) to Kotlin
  */
@@ -150,7 +244,7 @@ abstract external class SVGFEGaussianBlurElement : SVGElement {
 
 class SVGFEGaussianBlurAttrsScope private constructor(attrs: AttrsScope<SVGFEGaussianBlurElement>) :
     SVGElementAttrsScope<SVGFEGaussianBlurElement>(attrs), CoordinateAttrs<SVGFEGaussianBlurElement>,
-    LengthAttrs<SVGFEGaussianBlurElement>, FilterInput1Attrs<SVGFEGaussianBlurElement> {
+    LengthAttrs<SVGFEGaussianBlurElement>, FilterInputOutput1Attrs<SVGFEGaussianBlurElement> {
 
     fun stdDeviation(value: Number) {
         attr("stdDeviation", value.toString())
@@ -180,3 +274,5 @@ fun ElementScope<SVGFilterElement>.GaussianBlur(
         "http://www.w3.org/2000/svg", attrs?.let { SVGFEGaussianBlurAttrsScope(it) }
     )
 }
+
+// end region
