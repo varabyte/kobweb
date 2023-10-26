@@ -85,20 +85,12 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
         DisplayUntilXlStyle,
     )
     displayStyles.forEach { mutableTheme.registerComponentStyle(it) }
-
-    MutableSilkConfigInstance = config
-
-    _SilkTheme = ImmutableSilkTheme(mutableTheme)
-    SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
-    SilkTheme.registerStyles(SilkStyleSheet)
-
-    // Hack alert part 2: Here is where we run through all styles in the stylesheet and update the ones associated with
-    // our display styles.
-    // Note that a real solution would be if the Compose HTML APIs allowed us to identify a style as important, but
-    // currently, as you can see with their code here: https://github.com/JetBrains/compose-multiplatform/blob/9e25001e9e3a6be96668e38c7f0bd222c54d1388/html/core/src/jsMain/kotlin/org/jetbrains/compose/web/elements/Style.kt#L116
+    // Next, run through all styles in the stylesheet and update the ones associated with our display styles. Note that
+    // a real solution would be if the Compose HTML APIs allowed us to identify a style as important, but currently, as
+    // you can see with their code here: https://github.com/JetBrains/compose-multiplatform/blob/9e25001e9e3a6be96668e38c7f0bd222c54d1388/html/core/src/jsMain/kotlin/org/jetbrains/compose/web/elements/Style.kt#L116
     // they don't support it. (There would have to be a version of the API that takes an additional priority parameter,
     // as in `setProperty("x", "y", "important")`)
-    window.invokeLater { // invokeLater gives the engine a chance to register Silk styles into the stylesheet objects
+    window.invokeLater { // invokeLater gives the engine time to register Silk styles into the stylesheet objects first
         val displayStyleSelectorNames = displayStyles.map { ".${it.name}" }.toSet()
         document.styleSheets.asList()
             .filterIsInstance<CSSStyleSheet>()
@@ -122,4 +114,10 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                     }
             }
     }
+
+    MutableSilkConfigInstance = config
+
+    _SilkTheme = ImmutableSilkTheme(mutableTheme)
+    SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
+    SilkTheme.registerStyles(SilkStyleSheet)
 }
