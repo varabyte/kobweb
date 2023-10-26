@@ -151,7 +151,7 @@ abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs:
 
 // Reformat to value expected by SVG tag, e.g. "CurrentColor" -> "currentColor"
 // Enums have to be capitalized title case for this method to work.
-private fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
+internal fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
 
 // region SVG paint attributes (https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint)
 
@@ -196,7 +196,7 @@ enum class SVGFillRule {
 
 // region Shared SVG traits
 
-private interface CenterCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
+internal interface CenterCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     fun cx(value: Number) {
         attr("cx", value.toString())
     }
@@ -214,7 +214,7 @@ private interface CenterCoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     }
 }
 
-private interface CoordinateAttrs<T : SVGElement> : AttrsScope<T> {
+internal interface CoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     fun x(value: Number) {
         attr("x", value.toString())
     }
@@ -232,7 +232,7 @@ private interface CoordinateAttrs<T : SVGElement> : AttrsScope<T> {
     }
 }
 
-private interface LengthAttrs<T : SVGElement> : AttrsScope<T> {
+internal interface LengthAttrs<T : SVGElement> : AttrsScope<T> {
     fun height(value: Number) {
         attr("height", value.toString())
     }
@@ -250,14 +250,14 @@ private interface LengthAttrs<T : SVGElement> : AttrsScope<T> {
     }
 }
 
-private interface PointsAttrs<T : SVGElement> : AttrsScope<T> {
+internal interface PointsAttrs<T : SVGElement> : AttrsScope<T> {
     fun points(vararg pairs: Pair<Number, Number>) {
         val pointString = pairs.joinToString(" ") { "${it.first},${it.second}" }
         attr("points", pointString)
     }
 }
 
-private interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
+internal interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
     fun viewBox(x: Number, y: Number, width: Number, height: Number) {
         attr("viewBox", "$x $y $width $height")
     }
@@ -299,6 +299,8 @@ abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
     fun fillRule(value: SVGFillRule) = this.attr("fill-rule", value.toString())
 
     fun fillOpacity(value: Number) = this.attr("fill-opacity", value.toString())
+
+    fun filter(id: SvgId) = this.attr("filter", id.urlReference)
 }
 
 // Useful for attributes shared between top-level svg elements and group elements
