@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.ElementScope
 import org.w3c.dom.svg.SVGAnimatedEnumeration
+import org.w3c.dom.svg.SVGAnimatedInteger
 import org.w3c.dom.svg.SVGAnimatedLength
 import org.w3c.dom.svg.SVGAnimatedNumber
 import org.w3c.dom.svg.SVGAnimatedNumberList
@@ -443,6 +444,74 @@ abstract external class SVGFEConvolveMatrixElement : SVGElement {
 }
 
 /**
+ * Exposes the JavaScript [SVGFETurbulenceElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETurbulenceElement) to Kotlin
+ */
+abstract external class SVGFEDisplacementMapElement : SVGElement {
+    companion object {
+        val SVG_CHANNEL_UNKNOWN: Short
+        val SVG_CHANNEL_R: Short
+        val SVG_CHANNEL_G: Short
+        val SVG_CHANNEL_B: Short
+        val SVG_CHANNEL_A: Short
+    }
+
+    // SVGFEDisplacementMapElement.SVG_CHANNEL_...
+    open val xChannelSelector: SVGAnimatedEnumeration
+    open val yChannelSelector: SVGAnimatedEnumeration
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val scale: SVGAnimatedNumber
+
+    open val in1: SVGAnimatedString
+    open val in2: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+enum class SVGFEColorChannel {
+    R, G, B, A;
+
+    override fun toString() = this.name
+}
+
+class SVGFEDisplacementMapAttrsScope private constructor(attrs: AttrsScope<SVGFEDisplacementMapElement>) :
+    SVGElementAttrsScope<SVGFEDisplacementMapElement>(attrs), CommonSvgAttrs<SVGFEDisplacementMapElement>,
+    FilterInput2Attrs<SVGFEDisplacementMapElement> {
+
+    fun xChannelSelector(value: SVGFEColorChannel) {
+        attr("xChannelSelector", value.toString())
+    }
+
+    fun yChannelSelector(value: SVGFEColorChannel) {
+        attr("yChannelSelector", value.toString())
+    }
+
+    fun scale(value: Number) {
+        attr("scale", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEDisplacementMapAttrsScope.() -> Unit): AttrBuilderContext<SVGFEDisplacementMapElement> {
+            return { SVGFEDisplacementMapAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.DisplacementMap(
+    attrs: SVGFEDisplacementMapAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feDisplacementMap",
+        "http://www.w3.org/2000/svg", SVGFEDisplacementMapAttrsScope(attrs)
+    )
+}
+
+
+/**
  * Exposes the JavaScript [SVGFEDropShadowElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEDropShadowElement) to Kotlin
  */
 abstract external class SVGFEDropShadowElement : SVGElement {
@@ -726,6 +795,100 @@ fun ElementScope<SVGFilterElement>.Offset(
     GenericTag(
         "feOffset",
         "http://www.w3.org/2000/svg", SVGFEOffsetAttrsScope(attrs)
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGFETurbulenceElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETurbulenceElement) to Kotlin
+ */
+abstract external class SVGFETurbulenceElement : SVGElement {
+    companion object {
+        val SVG_TURBULENCE_TYPE_UNKNOWN: Short
+        val SVG_TURBULENCE_TYPE_FRACTALNOISE: Short
+        val SVG_TURBULENCE_TYPE_TURBULENCE: Short
+
+        val SVG_STITCHTYPE_UNKNOWN: Short
+        val SVG_STITCHTYPE_STITCH: Short
+        val SVG_STITCHTYPE_NOSTITCH: Short
+    }
+
+    // SVGFETurbulenceElement.SVG_TURBULENCE_TYPE_...
+    open val type: SVGAnimatedEnumeration
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val radiusX: SVGAnimatedNumber
+    open val radiusY: SVGAnimatedNumber
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    // SVGFETurbulenceElement.SVG_STITCHTYPE_...
+    open val stitchTiles: SVGAnimatedEnumeration
+
+    open val baseFrequencyX: SVGAnimatedNumber
+    open val baseFrequencyY: SVGAnimatedNumber
+    open val numOctaves: SVGAnimatedInteger
+    open val seed: SVGAnimatedNumber
+
+    open val result: SVGAnimatedString
+}
+
+enum class SVGFETurbulenceType {
+    FractalNoise,
+    Turbulence;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGFEStitchType {
+    Stitch,
+    NoStitch;
+
+    override fun toString() = this.toSvgValue()
+}
+
+class SVGFETurbulenceAttrsScope private constructor(attrs: AttrsScope<SVGFETurbulenceElement>) :
+    SVGElementAttrsScope<SVGFETurbulenceElement>(attrs), CommonSvgAttrs<SVGFETurbulenceElement>,
+    FilterInput1Attrs<SVGFETurbulenceElement> {
+
+    fun type(value: SVGFETurbulenceType) {
+        attr("type", value.toString())
+    }
+
+    fun stitchTiles(value: SVGFEStitchType) {
+        attr("stitchTiles", value.toString())
+    }
+
+    fun baseFrequency(value: Number) {
+        attr("baseFrequency", value.toString())
+    }
+
+    fun baseFrequency(x: Number, y: Number) {
+        attr("baseFrequency", "$x $y")
+    }
+
+    fun numOctaves(value: Int) {
+        attr("numOctaves", value.toString())
+    }
+
+    fun seed(value: Number) {
+        attr("seed", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFETurbulenceAttrsScope.() -> Unit): AttrBuilderContext<SVGFETurbulenceElement> {
+            return { SVGFETurbulenceAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Turbulence(
+    attrs: SVGFETurbulenceAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feTurbulence",
+        "http://www.w3.org/2000/svg", SVGFETurbulenceAttrsScope(attrs)
     )
 }
 
