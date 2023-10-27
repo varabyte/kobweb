@@ -51,6 +51,17 @@ enum class SVGFEInput {
     override fun toString() = this.name
 }
 
+enum class SVGFEOperator {
+    Over,
+    In,
+    Out,
+    Atop,
+    Xor,
+    Arithmetic;
+
+    override fun toString() = this.toSvgValue()
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute#filter_primitive_attributes
 private interface FilterPrimitiveAttrs<T : SVGElement> : AttrsScope<T>, CoordinateAttrs<T>, LengthAttrs<T> {
     fun result(name: String) {
@@ -246,6 +257,101 @@ fun ElementScope<SVGFilterElement>.ColorMatrix(
         "http://www.w3.org/2000/svg", attrs?.let { SVGFEColorMatrixAttrsScope(it) }
     )
 }
+
+/**
+ * Exposes the JavaScript [SVGFECompositeElement](https://developer.mozilla.org/en/docs/Web/API/SVGFECompositeElement) to Kotlin
+ */
+abstract external class SVGFECompositeElement : SVGElement {
+    companion object {
+        val SVG_FECOMPOSITE_OPERATOR_UNKNOWN: Short
+        val SVG_FECOMPOSITE_OPERATOR_OVER: Short
+        val SVG_FECOMPOSITE_OPERATOR_IN: Short
+        val SVG_FECOMPOSITE_OPERATOR_OUT: Short
+        val SVG_FECOMPOSITE_OPERATOR_ATOP: Short
+        val SVG_FECOMPOSITE_OPERATOR_XOR: Short
+        val SVG_FECOMPOSITE_OPERATOR_ARITHMETIC: Short
+    }
+
+    // SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_...
+    open val type: SVGAnimatedEnumeration
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val values: SVGAnimatedNumberList
+
+    open val in1: SVGAnimatedString
+    open val in2: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+class SVGFECompositeAttrsScope private constructor(attrs: AttrsScope<SVGFECompositeElement>) :
+    SVGElementAttrsScope<SVGFECompositeElement>(attrs), FilterPrimitiveAttrs<SVGFECompositeElement>,
+    FilterInput2AttrsScope<SVGFECompositeElement> {
+
+    fun operator(value: SVGFEOperator) {
+        attr("operator", value.toString())
+    }
+
+    /** k1 value, useful for arithmetic operator */
+    fun k1(value: Number) {
+        attr("k1", value.toString())
+    }
+
+    /** k2 value, useful for arithmetic operator */
+    fun k2(value: Number) {
+        attr("k2", value.toString())
+    }
+
+    /** k3 value, useful for arithmetic operator */
+    fun k3(value: Number) {
+        attr("k3", value.toString())
+    }
+
+    /** k4 value, useful for arithmetic operator */
+    fun k4(value: Number) {
+        attr("k4", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFECompositeAttrsScope.() -> Unit): AttrBuilderContext<SVGFECompositeElement> {
+            return { SVGFECompositeAttrsScope(this).attrs() }
+        }
+    }
+}
+
+/** A convenience function to set all k values at once */
+fun SVGFECompositeAttrsScope.values(k1: Number, k2: Number, k3: Number, k4: Number) {
+    attr("k1", k1.toString())
+    attr("k2", k2.toString())
+    attr("k3", k3.toString())
+    attr("k4", k4.toString())
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Composite(
+    attrs: (SVGFECompositeAttrsScope.() -> Unit)? = null,
+) {
+    GenericTag(
+        "feComposite",
+        "http://www.w3.org/2000/svg", attrs?.let { SVGFECompositeAttrsScope(it) }
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGFEConvolveMatrixElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEConvolveMatrixElement) to Kotlin
+ */
+abstract external class SVGFEConvolveMatrixElement : SVGElement {
+    companion object {
+        val SVG_EDGEMODE_UNKNOWN: Short
+        val SVG_EDGEMODE_DUPLICATE: Short
+        val SVG_EDGEMODE_WRAP: Short
+        val SVG_EDGEMODE_NONE: Short
+    }
+}
+
 
 /**
  * Exposes the JavaScript [SVGFEGaussianBlurElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEGaussianBlurElement) to Kotlin
