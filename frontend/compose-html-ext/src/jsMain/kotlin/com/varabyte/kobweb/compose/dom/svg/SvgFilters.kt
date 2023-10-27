@@ -443,6 +443,47 @@ abstract external class SVGFEConvolveMatrixElement : SVGElement {
 }
 
 /**
+ * Exposes the JavaScript [SVGFEDropShadowElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEDropShadowElement) to Kotlin
+ */
+abstract external class SVGFEDropShadowElement : SVGElement {
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val dx: SVGAnimatedLength
+    open val dy: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val stdDeviationX: SVGAnimatedNumber
+    open val stdDeviationY: SVGAnimatedNumber
+
+    open val in1: SVGAnimatedString
+    open val result: SVGAnimatedString
+
+    fun setStdDeviation(stdDeviationX: Float, stdDeviationY: Float)
+}
+
+class SVGFEDropShadowAttrsScope private constructor(attrs: AttrsScope<SVGFEDropShadowElement>) :
+    SVGElementAttrsScope<SVGFEDropShadowElement>(attrs), CommonSvgAttrs<SVGFEDropShadowElement>,
+    OffsetAttrs<SVGFEDropShadowElement>, StdDeviationAttrs<SVGFEDropShadowElement> {
+
+    companion object {
+        operator fun invoke(attrs: SVGFEDropShadowAttrsScope.() -> Unit): AttrBuilderContext<SVGFEDropShadowElement> {
+            return { SVGFEDropShadowAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.DropShadow(
+    attrs: SVGFEDropShadowAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feDropShadow",
+        "http://www.w3.org/2000/svg", SVGFEDropShadowAttrsScope(attrs)
+    )
+}
+
+/**
  * Exposes the JavaScript [SVGFEFloodElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEFloodElement) to Kotlin
  */
 abstract external class SVGFEFloodElement : SVGElement {
