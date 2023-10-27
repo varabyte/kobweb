@@ -625,15 +625,21 @@ fun ElementScope<SVGElement>.Symbol(
     GenericTag("symbol", "http://www.w3.org/2000/svg", SVGSymbolAttrsScope(id, attrs), content)
 }
 
-class SVGUseAttrsScope private constructor(href: String, attrs: AttrsScope<SVGUseElement>) :
-    SVGGraphicalElementAttrsScope<SVGUseElement>(attrs.attr("href", href.prefixWithHash())),
-    CoordinateAttrs<SVGUseElement>, LengthAttrs<SVGUseElement> {
+class SVGUseAttrsScope private constructor(href: String?, attrs: AttrsScope<SVGUseElement>) :
+    CoordinateAttrs<SVGUseElement>, LengthAttrs<SVGUseElement>,
+    SVGGraphicalElementAttrsScope<SVGUseElement>(
+        if (href != null) {
+            attrs.attr("href", href.prefixWithHash())
+        } else {
+            attrs
+        }
+    ) {
 
     companion object {
         private fun String.prefixWithHash() = if (startsWith("#")) this else "#$this"
 
         operator fun invoke(
-            href: String,
+            href: String?,
             attrs: (SVGUseAttrsScope.() -> Unit)
         ): AttrBuilderContext<SVGUseElement> {
             return { SVGUseAttrsScope(href, this).attrs() }
@@ -645,12 +651,11 @@ class SVGUseAttrsScope private constructor(href: String, attrs: AttrsScope<SVGUs
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
 @Composable
 fun ElementScope<SVGElement>.Use(
-    href: String,
+    href: String? = null,
     attrs: (SVGUseAttrsScope.() -> Unit),
 ) {
     GenericTag("use", "http://www.w3.org/2000/svg", SVGUseAttrsScope(href, attrs))
 }
-
 
 // endregion
 
