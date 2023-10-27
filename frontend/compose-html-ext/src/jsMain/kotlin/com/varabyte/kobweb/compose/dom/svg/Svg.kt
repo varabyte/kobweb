@@ -78,12 +78,28 @@ class SVGTransformScope internal constructor() {
         })
     }
 
+    fun translateX(value: Number) {
+        translate(value)
+    }
+
+    fun translateY(value: Number) {
+        translate(0, value)
+    }
+
     fun scale(x: Number, y: Number? = null) {
         transformCommands.add(buildString {
             append("scale($x")
             y?.let { append(" $it") }
             append(")")
         })
+    }
+
+    fun scaleX(value: Number) {
+        scale(value)
+    }
+
+    fun scaleY(value: Number) {
+        scale(1, value)
     }
 
     fun rotate(angle: Number, x: Number? = null, y: Number? = null) {
