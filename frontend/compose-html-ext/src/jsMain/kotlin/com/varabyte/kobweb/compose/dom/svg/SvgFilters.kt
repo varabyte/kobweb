@@ -51,17 +51,6 @@ enum class SVGFEInput {
     override fun toString() = this.name
 }
 
-enum class SVGFEOperator {
-    Over,
-    In,
-    Out,
-    Atop,
-    Xor,
-    Arithmetic;
-
-    override fun toString() = this.toSvgValue()
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute#filter_primitive_attributes
 private interface FilterPrimitiveAttrs<T : SVGElement> : AttrsScope<T>, CoordinateAttrs<T>, LengthAttrs<T> {
     fun result(name: String) {
@@ -377,11 +366,22 @@ abstract external class SVGFECompositeElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
+enum class SVGFECompositeOperator {
+    Over,
+    In,
+    Out,
+    Atop,
+    Xor,
+    Arithmetic;
+
+    override fun toString() = this.toSvgValue()
+}
+
 class SVGFECompositeAttrsScope private constructor(attrs: AttrsScope<SVGFECompositeElement>) :
     SVGElementAttrsScope<SVGFECompositeElement>(attrs), CommonSvgAttrs<SVGFECompositeElement>,
     FilterInput2Attrs<SVGFECompositeElement> {
 
-    fun operator(value: SVGFEOperator) {
+    fun operator(value: SVGFECompositeOperator) {
         attr("operator", value.toString())
     }
 
@@ -624,6 +624,71 @@ fun ElementScope<SVGFEMergeElement>.MergeNode(attrs: SVGFEMergeNodeAttrsScope.()
     GenericTag(
         "feMergeNode",
         "http://www.w3.org/2000/svg", SVGFEMergeNodeAttrsScope(attrs)
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGFEMorphologyElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMorphologyElement) to Kotlin
+ */
+abstract external class SVGFEMorphologyElement : SVGElement {
+    companion object {
+        val SVG_MORPHOLOGY_OPERATOR_UNKNOWN: Short
+        val SVG_MORPHOLOGY_OPERATOR_ERODE: Short
+        val SVG_MORPHOLOGY_OPERATOR_DILATE: Short
+    }
+
+    // SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_...
+    open val operator: SVGAnimatedEnumeration
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val radiusX: SVGAnimatedNumber
+    open val radiusY: SVGAnimatedNumber
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val in1: SVGAnimatedString
+    open val in2: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+enum class SVGFEMorphologyOperator {
+    Erode,
+    Dilate;
+
+    override fun toString() = this.toSvgValue()
+}
+
+class SVGFEMorphologyAttrsScope private constructor(attrs: AttrsScope<SVGFEMorphologyElement>) :
+    SVGElementAttrsScope<SVGFEMorphologyElement>(attrs), CommonSvgAttrs<SVGFEMorphologyElement>,
+    FilterInput1Attrs<SVGFEMorphologyElement> {
+
+    fun operator(value: SVGFEMorphologyOperator) {
+        attr("operator", value.toString())
+    }
+
+    fun radius(value: Number) {
+        attr("radius", value.toString())
+    }
+
+    fun radius(x: Number, y: Number) {
+        attr("radius", "$x $y")
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEMorphologyAttrsScope.() -> Unit): AttrBuilderContext<SVGFEMorphologyElement> {
+            return { SVGFEMorphologyAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Morphology(
+    attrs: SVGFEMorphologyAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feMorphology",
+        "http://www.w3.org/2000/svg", SVGFEMorphologyAttrsScope(attrs)
     )
 }
 
