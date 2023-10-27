@@ -415,4 +415,115 @@ fun ElementScope<SVGFilterElement>.GaussianBlur(
     )
 }
 
+/**
+ * Exposes the JavaScript [SVGFEMergeElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMergeElement) to Kotlin
+ */
+abstract external class SVGFEMergeElement : SVGElement {
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val result: SVGAnimatedString
+}
+
+class SVGFEMergeAttrsScope private constructor(attrs: AttrsScope<SVGFEMergeElement>) :
+    SVGElementAttrsScope<SVGFEMergeElement>(attrs), FilterPrimitiveAttrs<SVGFEMergeElement> {
+
+    companion object {
+        operator fun invoke(attrs: SVGFEMergeAttrsScope.() -> Unit): AttrBuilderContext<SVGFEMergeElement> {
+            return { SVGFEMergeAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Merge(
+    attrs: (SVGFEMergeAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGFEMergeElement>
+) {
+    GenericTag(
+        "feMerge",
+        "http://www.w3.org/2000/svg", attrs?.let { SVGFEMergeAttrsScope(it) }, content
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGFEMergeNodeElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMergeNodeElement) to Kotlin
+ */
+abstract external class SVGFEMergeNodeElement : SVGElement {
+    open val in1: SVGAnimatedString
+}
+
+class SVGFEMergeNodeAttrsScope private constructor(attrs: AttrsScope<SVGFEMergeNodeElement>) :
+    SVGElementAttrsScope<SVGFEMergeNodeElement>(attrs), FilterInput1AttrsScope<SVGFEMergeNodeElement> {
+
+    companion object {
+        operator fun invoke(attrs: SVGFEMergeNodeAttrsScope.() -> Unit): AttrBuilderContext<SVGFEMergeNodeElement> {
+            return { SVGFEMergeNodeAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFEMergeElement>.MergeNode(attrs: SVGFEMergeNodeAttrsScope.() -> Unit) {
+    GenericTag(
+        "feMergeNode",
+        "http://www.w3.org/2000/svg", SVGFEMergeNodeAttrsScope(attrs)
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGFEOffsetElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEOffsetElement) to Kotlin
+ */
+abstract external class SVGFEOffsetElement : SVGElement {
+    open val dx: SVGAnimatedLength
+    open val dy: SVGAnimatedLength
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val in1: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+class SVGFEOffsetAttrsScope private constructor(attrs: AttrsScope<SVGFEOffsetElement>) :
+    SVGElementAttrsScope<SVGFEOffsetElement>(attrs), FilterPrimitiveAttrs<SVGFEOffsetElement>,
+    FilterInput1AttrsScope<SVGFEOffsetElement> {
+
+    fun dx(value: Number) {
+        attr("dx", value.toString())
+    }
+
+    fun dx(value: CSSLengthOrPercentageValue) {
+        attr("dx", value.toString())
+    }
+
+    fun dy(value: Number) {
+        attr("dy", value.toString())
+    }
+
+    fun dy(value: CSSLengthOrPercentageValue) {
+        attr("dy", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEOffsetAttrsScope.() -> Unit): AttrBuilderContext<SVGFEOffsetElement> {
+            return { SVGFEOffsetAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Offset(
+    attrs: SVGFEOffsetAttrsScope.() -> Unit
+) {
+    GenericTag(
+        "feOffset",
+        "http://www.w3.org/2000/svg", SVGFEOffsetAttrsScope(attrs)
+    )
+}
+
 // end region
