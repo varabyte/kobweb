@@ -257,15 +257,7 @@ internal interface PointsAttrs<T : SVGElement> : AttrsScope<T> {
     }
 }
 
-internal interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
-    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
-        attr("viewBox", "$x $y $width $height")
-    }
-}
-
-// endregion
-
-abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs) {
+internal interface PresentationAttrs<T : SVGElement> : AttrsScope<T> {
     fun stroke(value: CSSColorValue) = this.attr("stroke", value.toString())
     fun stroke(value: SVGStrokeType) = this.attr("stroke", value.toString())
     fun stroke(id: SvgId) = this.attr("stroke", id.urlReference)
@@ -301,7 +293,21 @@ abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E
     fun fillOpacity(value: Number) = this.attr("fill-opacity", value.toString())
 
     fun filter(id: SvgId) = this.attr("filter", id.urlReference)
+
+    fun floodColor(color: CSSColorValue) = attr("flood-color", color.toString())
+    fun floodOpacity(value: Number) = attr("flood-opacity", value.toString())
 }
+
+internal interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
+    fun viewBox(x: Number, y: Number, width: Number, height: Number) {
+        attr("viewBox", "$x $y $width $height")
+    }
+}
+
+// endregion
+
+abstract class SVGGraphicalElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) : SVGElementAttrsScope<E>(attrs),
+    PresentationAttrs<E>
 
 // Useful for attributes shared between top-level svg elements and group elements
 abstract class SVGContainerElementAttrsScope<E : SVGElement>(attrs: AttrsScope<E>) :
