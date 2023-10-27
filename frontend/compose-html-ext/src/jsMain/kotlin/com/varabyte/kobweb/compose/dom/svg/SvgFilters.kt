@@ -178,6 +178,67 @@ fun ElementScope<SVGDefsElement>.Filter(
 
 // region filter elements
 
+/**
+ * Exposes the JavaScript [SVGFEBlendElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEBlendElement) to Kotlin
+ */
+abstract external class SVGFEBlendElement : SVGElement {
+    companion object {
+        val SVG_FEBLEND_MODE_NORMAL: Short
+        val SVG_FEBLEND_MODE_MULTIPLY: Short
+        val SVG_FEBLEND_MODE_SCREEN: Short
+        val SVG_FEBLEND_MODE_DARKEN: Short
+        val SVG_FEBLEND_MODE_LIGHTEN: Short
+    }
+
+    // SVGFEBlendElement.SVG_FEBLEND_MODE_...
+    open val mode: SVGAnimatedEnumeration
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val in1: SVGAnimatedString
+    open val in2: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+enum class SVGFEBlendMode {
+    Normal,
+    Multiply,
+    Screen,
+    Darken,
+    Lighten;
+
+    override fun toString() = this.toSvgValue()
+}
+
+class SVGFEBlendAttrsScope private constructor(attrs: AttrsScope<SVGFEBlendElement>) :
+    SVGElementAttrsScope<SVGFEBlendElement>(attrs), FilterPrimitiveAttrs<SVGFEBlendElement>,
+    FilterInput2AttrsScope<SVGFEBlendElement> {
+
+    fun mode(mode: SVGFEBlendMode) {
+        attr("mode", mode.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEBlendAttrsScope.() -> Unit): AttrBuilderContext<SVGFEBlendElement> {
+            return { SVGFEBlendAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Blend(
+    attrs: SVGFEBlendAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feBlend",
+        "http://www.w3.org/2000/svg", SVGFEBlendAttrsScope(attrs)
+    )
+}
+
+
 enum class SVGFEColorMatrixType {
     Matrix,
     Saturate,
@@ -350,6 +411,46 @@ abstract external class SVGFEConvolveMatrixElement : SVGElement {
         val SVG_EDGEMODE_WRAP: Short
         val SVG_EDGEMODE_NONE: Short
     }
+}
+
+/**
+ * Exposes the JavaScript [SVGFEFloodElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEFloodElement) to Kotlin
+ */
+abstract external class SVGFEFloodElement : SVGElement {
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val result: SVGAnimatedString
+}
+
+class SVGFEFloodAttrsScope private constructor(attrs: AttrsScope<SVGFEFloodElement>) :
+    SVGElementAttrsScope<SVGFEFloodElement>(attrs), FilterPrimitiveAttrs<SVGFEFloodElement> {
+
+    fun floodColor(color: CSSColorValue) {
+        attr("flood-color", color.toString())
+    }
+
+    fun floodOpacity(value: Number) {
+        attr("flood-opacity", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEFloodAttrsScope.() -> Unit): AttrBuilderContext<SVGFEFloodElement> {
+            return { SVGFEFloodAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Flood(
+    attrs: SVGFEFloodAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feFlood",
+        "http://www.w3.org/2000/svg", SVGFEFloodAttrsScope(attrs)
+    )
 }
 
 
