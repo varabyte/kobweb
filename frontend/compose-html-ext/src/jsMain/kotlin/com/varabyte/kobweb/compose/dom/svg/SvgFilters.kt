@@ -72,7 +72,7 @@ private interface FilterPrimitiveAttrs<T : SVGElement> : AttrsScope<T>, Coordina
 private interface CommonSvgAttrs<T : SVGElement> : PresentationAttrs<T>, FilterPrimitiveAttrs<T>
 
 // Interface for filters that only take a single input
-private interface FilterInput1AttrsScope<T : SVGElement> : AttrsScope<T> {
+private interface FilterInput1Attrs<T : SVGElement> : AttrsScope<T> {
     /**
      * A convenience method which maps to `in` and has a naming convention consistent with `in2`.
      *
@@ -110,7 +110,7 @@ private interface FilterInput1AttrsScope<T : SVGElement> : AttrsScope<T> {
 }
 
 // Interface for filters that take two inputs
-private interface FilterInput2AttrsScope<T : SVGElement> : FilterInput1AttrsScope<T> {
+private interface FilterInput2Attrs<T : SVGElement> : FilterInput1Attrs<T> {
     fun in2(input: SVGFEInput) {
         in2(input.toString())
     }
@@ -122,6 +122,34 @@ private interface FilterInput2AttrsScope<T : SVGElement> : FilterInput1AttrsScop
      */
     fun in2(resultName: String) {
         attr("in2", resultName)
+    }
+}
+
+private interface OffsetAttrs<T : SVGElement> : AttrsScope<T> {
+    fun dx(value: Number) {
+        attr("dx", value.toString())
+    }
+
+    fun dx(value: CSSLengthOrPercentageValue) {
+        attr("dx", value.toString())
+    }
+
+    fun dy(value: Number) {
+        attr("dy", value.toString())
+    }
+
+    fun dy(value: CSSLengthOrPercentageValue) {
+        attr("dy", value.toString())
+    }
+}
+
+private interface StdDeviationAttrs<T : SVGElement> : AttrsScope<T> {
+    fun stdDeviation(value: Number) {
+        attr("stdDeviation", value.toString())
+    }
+
+    fun stdDeviation(x: Number, y: Number) {
+        attr("stdDeviation", "$x $y")
     }
 }
 
@@ -217,7 +245,7 @@ enum class SVGFEBlendMode {
 
 class SVGFEBlendAttrsScope private constructor(attrs: AttrsScope<SVGFEBlendElement>) :
     SVGElementAttrsScope<SVGFEBlendElement>(attrs), CommonSvgAttrs<SVGFEBlendElement>,
-    FilterInput2AttrsScope<SVGFEBlendElement> {
+    FilterInput2Attrs<SVGFEBlendElement> {
 
     fun mode(mode: SVGFEBlendMode) {
         attr("mode", mode.toString())
@@ -277,7 +305,7 @@ enum class SVGFEColorMatrixType {
 
 class SVGFEColorMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEColorMatrixElement>) :
     SVGElementAttrsScope<SVGFEColorMatrixElement>(attrs), CommonSvgAttrs<SVGFEColorMatrixElement>,
-    FilterInput1AttrsScope<SVGFEColorMatrixElement> {
+    FilterInput1Attrs<SVGFEColorMatrixElement> {
 
     fun type(type: SVGFEColorMatrixType) {
         attr("type", type.toString())
@@ -351,7 +379,7 @@ abstract external class SVGFECompositeElement : SVGElement {
 
 class SVGFECompositeAttrsScope private constructor(attrs: AttrsScope<SVGFECompositeElement>) :
     SVGElementAttrsScope<SVGFECompositeElement>(attrs), CommonSvgAttrs<SVGFECompositeElement>,
-    FilterInput2AttrsScope<SVGFECompositeElement> {
+    FilterInput2Attrs<SVGFECompositeElement> {
 
     fun operator(value: SVGFEOperator) {
         attr("operator", value.toString())
@@ -477,15 +505,7 @@ val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_NONE get() = SVGFEConvolveMa
 
 class SVGFEGaussianBlurAttrsScope private constructor(attrs: AttrsScope<SVGFEGaussianBlurElement>) :
     SVGElementAttrsScope<SVGFEGaussianBlurElement>(attrs), CommonSvgAttrs<SVGFEGaussianBlurElement>,
-    FilterInput1AttrsScope<SVGFEGaussianBlurElement> {
-
-    fun stdDeviation(value: Number) {
-        attr("stdDeviation", value.toString())
-    }
-
-    fun stdDeviation(x: Number, y: Number) {
-        attr("stdDeviation", "$x $y")
-    }
+    FilterInput1Attrs<SVGFEGaussianBlurElement>, StdDeviationAttrs<SVGFEGaussianBlurElement> {
 
     fun edgeMode(edgeMode: SVGFEEdgeMode) {
         attr("edgeMode", edgeMode.toString())
@@ -549,7 +569,7 @@ abstract external class SVGFEMergeNodeElement : SVGElement {
 }
 
 class SVGFEMergeNodeAttrsScope private constructor(attrs: AttrsScope<SVGFEMergeNodeElement>) :
-    SVGElementAttrsScope<SVGFEMergeNodeElement>(attrs), FilterInput1AttrsScope<SVGFEMergeNodeElement> {
+    SVGElementAttrsScope<SVGFEMergeNodeElement>(attrs), FilterInput1Attrs<SVGFEMergeNodeElement> {
 
     companion object {
         operator fun invoke(attrs: SVGFEMergeNodeAttrsScope.() -> Unit): AttrBuilderContext<SVGFEMergeNodeElement> {
@@ -584,23 +604,7 @@ abstract external class SVGFEOffsetElement : SVGElement {
 
 class SVGFEOffsetAttrsScope private constructor(attrs: AttrsScope<SVGFEOffsetElement>) :
     SVGElementAttrsScope<SVGFEOffsetElement>(attrs), CommonSvgAttrs<SVGFEOffsetElement>,
-    FilterInput1AttrsScope<SVGFEOffsetElement> {
-
-    fun dx(value: Number) {
-        attr("dx", value.toString())
-    }
-
-    fun dx(value: CSSLengthOrPercentageValue) {
-        attr("dx", value.toString())
-    }
-
-    fun dy(value: Number) {
-        attr("dy", value.toString())
-    }
-
-    fun dy(value: CSSLengthOrPercentageValue) {
-        attr("dy", value.toString())
-    }
+    FilterInput1Attrs<SVGFEOffsetElement>, OffsetAttrs<SVGFEOffsetElement> {
 
     companion object {
         operator fun invoke(attrs: SVGFEOffsetAttrsScope.() -> Unit): AttrBuilderContext<SVGFEOffsetElement> {
