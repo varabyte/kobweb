@@ -696,6 +696,176 @@ fun ElementScope<SVGFEMergeElement>.MergeNode(attrs: SVGFEMergeNodeAttrsScope.()
 }
 
 /**
+ * Exposes the JavaScript [SVGFEComponentTransferElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEComponentTransferElement) to Kotlin
+ */
+abstract external class SVGFEComponentTransferElement : SVGElement {
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val result: SVGAnimatedString
+}
+
+class SVGFEComponentTransferAttrsScope private constructor(attrs: AttrsScope<SVGFEComponentTransferElement>) :
+    SVGFilterElementAttrsScope<SVGFEComponentTransferElement>(attrs), FilterInput1Attrs<SVGFEComponentTransferElement> {
+
+    companion object {
+        operator fun invoke(attrs: SVGFEComponentTransferAttrsScope.() -> Unit): AttrBuilderContext<SVGFEComponentTransferElement> {
+            return { SVGFEComponentTransferAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.ComponentTransfer(
+    attrs: (SVGFEComponentTransferAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGFEComponentTransferElement>
+) {
+    GenericTag(
+        "feComponentTransfer",
+        "http://www.w3.org/2000/svg", attrs?.let { SVGFEComponentTransferAttrsScope(it) }, content
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGComponentTransferFunctionElement](https://developer.mozilla.org/en/docs/Web/API/SVGComponentTransferFunctionElement) to Kotlin
+ */
+abstract external class SVGComponentTransferFunctionElement : SVGElement {
+    companion object {
+        val SVG_FECOMPONENTTRANSFER_TYPE_UNKNOWN: Short
+        val SVG_FECOMPONENTTRANSFER_TYPE_IDENTITY: Short
+        val SVG_FECOMPONENTTRANSFER_TYPE_TABLE: Short
+        val SVG_FECOMPONENTTRANSFER_TYPE_DISCRETE: Short
+        val SVG_FECOMPONENTTRANSFER_TYPE_LINEAR: Short
+        val SVG_FECOMPONENTTRANSFER_TYPE_GAMMA: Short
+    }
+
+    // SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_...
+    open val type: SVGAnimatedEnumeration
+
+    open val tableValues: SVGAnimatedNumberList
+    open val slope: SVGAnimatedNumber
+    open val intercept: SVGAnimatedNumber
+    open val amplitude: SVGAnimatedNumber
+    open val exponent: SVGAnimatedNumber
+    open val offset: SVGAnimatedNumber
+}
+
+/**
+ * Exposes the JavaScript [SVGFEFuncAElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEFuncAElement) to Kotlin
+ */
+abstract external class SVGFEFuncAElement : SVGComponentTransferFunctionElement
+
+/**
+ * Exposes the JavaScript [SVGFEFuncRElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEFuncRElement) to Kotlin
+ */
+abstract external class SVGFEFuncRElement : SVGComponentTransferFunctionElement
+
+/**
+ * Exposes the JavaScript [SVGFEFuncGElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEFuncGElement) to Kotlin
+ */
+abstract external class SVGFEFuncGElement : SVGComponentTransferFunctionElement
+
+/**
+ * Exposes the JavaScript [SVGFEFuncBElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEFuncBElement) to Kotlin
+ */
+abstract external class SVGFEFuncBElement : SVGComponentTransferFunctionElement
+
+
+enum class SVGComponentTransferFunctionType {
+    Identity,
+    Table,
+    Discrete,
+    Linear,
+    Gamma;
+
+    override fun toString() = this.toSvgValue()
+}
+
+class SVGComponentTransferFunctionAttrsScope<E : SVGComponentTransferFunctionElement> private constructor(attrs: AttrsScope<E>) :
+    SVGFilterElementAttrsScope<E>(attrs) {
+    fun type(type: SVGComponentTransferFunctionType) {
+        attr("type", type.toString())
+    }
+
+    fun tableValues(vararg values: Number) {
+        attr("tableValues", values.joinToString(" "))
+    }
+
+    /**
+     * Used in the equation "slope * C + intercept".
+     *
+     * Relevant when [type] is set to [SVGComponentTransferFunctionType.Linear].
+     */
+    fun slope(value: Number) {
+        attr("slope", value.toString())
+    }
+
+    /**
+     * Used in the equation "slope * C + intercept".
+     *
+     * Relevant when [type] is set to [SVGComponentTransferFunctionType.Linear].
+     */
+    fun intercept(value: Number) {
+        attr("intercept", value.toString())
+    }
+
+    /**
+     * Used in the equation "amplitude * pow(C, exponent) + offset".
+     *
+     * Relevant when [type] is set to [SVGComponentTransferFunctionType.Gamma].
+     */
+    fun amplitude(value: Number) {
+        attr("amplitude", value.toString())
+    }
+
+    /**
+     * Used in the equation "amplitude * pow(C, exponent) + offset".
+     *
+     * Relevant when [type] is set to [SVGComponentTransferFunctionType.Gamma].
+     */
+    fun exponent(value: Number) {
+        attr("exponent", value.toString())
+    }
+
+    /**
+     * Used in the equation "amplitude * pow(C, exponent) + offset".
+     *
+     * Relevant when [type] is set to [SVGComponentTransferFunctionType.Gamma].
+     */
+    fun offset(value: Number) {
+        attr("offset", value.toString())
+    }
+
+    companion object {
+        operator fun <E : SVGComponentTransferFunctionElement> invoke(attrs: SVGComponentTransferFunctionAttrsScope<E>.() -> Unit): AttrBuilderContext<E> {
+            return { SVGComponentTransferFunctionAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFEComponentTransferElement>.FuncA(attrs: SVGComponentTransferFunctionAttrsScope<SVGFEFuncAElement>.() -> Unit) {
+    GenericTag("feFuncA", "http://www.w3.org/2000/svg", SVGComponentTransferFunctionAttrsScope(attrs))
+}
+
+@Composable
+fun ElementScope<SVGFEComponentTransferElement>.FuncR(attrs: SVGComponentTransferFunctionAttrsScope<SVGFEFuncRElement>.() -> Unit) {
+    GenericTag("feFuncR", "http://www.w3.org/2000/svg", SVGComponentTransferFunctionAttrsScope(attrs))
+}
+
+@Composable
+fun ElementScope<SVGFEComponentTransferElement>.FuncG(attrs: SVGComponentTransferFunctionAttrsScope<SVGFEFuncGElement>.() -> Unit) {
+    GenericTag("feFuncG", "http://www.w3.org/2000/svg", SVGComponentTransferFunctionAttrsScope(attrs))
+}
+
+@Composable
+fun ElementScope<SVGFEComponentTransferElement>.FuncB(attrs: SVGComponentTransferFunctionAttrsScope<SVGFEFuncBElement>.() -> Unit) {
+    GenericTag("feFuncB", "http://www.w3.org/2000/svg", SVGComponentTransferFunctionAttrsScope(attrs))
+}
+
+/**
  * Exposes the JavaScript [SVGFEMorphologyElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMorphologyElement) to Kotlin
  */
 abstract external class SVGFEMorphologyElement : SVGElement {
