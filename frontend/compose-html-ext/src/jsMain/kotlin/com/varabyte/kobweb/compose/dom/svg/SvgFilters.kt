@@ -250,11 +250,11 @@ class SVGFEColorMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEColo
 
 @Composable
 fun ElementScope<SVGFilterElement>.ColorMatrix(
-    attrs: (SVGFEColorMatrixAttrsScope.() -> Unit)? = null,
+    attrs: SVGFEColorMatrixAttrsScope.() -> Unit,
 ) {
     GenericTag(
         "feColorMatrix",
-        "http://www.w3.org/2000/svg", attrs?.let { SVGFEColorMatrixAttrsScope(it) }
+        "http://www.w3.org/2000/svg", SVGFEColorMatrixAttrsScope(attrs)
     )
 }
 
@@ -332,11 +332,11 @@ fun SVGFECompositeAttrsScope.values(k1: Number, k2: Number, k3: Number, k4: Numb
 
 @Composable
 fun ElementScope<SVGFilterElement>.Composite(
-    attrs: (SVGFECompositeAttrsScope.() -> Unit)? = null,
+    attrs: SVGFECompositeAttrsScope.() -> Unit,
 ) {
     GenericTag(
         "feComposite",
-        "http://www.w3.org/2000/svg", attrs?.let { SVGFECompositeAttrsScope(it) }
+        "http://www.w3.org/2000/svg", SVGFECompositeAttrsScope(attrs)
     )
 }
 
@@ -407,11 +407,11 @@ class SVGFEGaussianBlurAttrsScope private constructor(attrs: AttrsScope<SVGFEGau
 
 @Composable
 fun ElementScope<SVGFilterElement>.GaussianBlur(
-    attrs: (SVGFEGaussianBlurAttrsScope.() -> Unit)? = null,
+    attrs: SVGFEGaussianBlurAttrsScope.() -> Unit
 ) {
     GenericTag(
         "feGaussianBlur",
-        "http://www.w3.org/2000/svg", attrs?.let { SVGFEGaussianBlurAttrsScope(it) }
+        "http://www.w3.org/2000/svg", SVGFEGaussianBlurAttrsScope(attrs)
     )
 }
 
