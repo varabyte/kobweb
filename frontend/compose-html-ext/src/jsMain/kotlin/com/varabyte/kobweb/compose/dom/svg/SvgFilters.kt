@@ -120,7 +120,11 @@ abstract external class SVGFilterElement : SVGElement {
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
     open val height: SVGAnimatedLength
+
+    // SVGUnitTypes.SVG_UNIT_TYPE_...
     open val filterUnits: SVGAnimatedEnumeration
+
+    // SVGUnitTypes.SVG_UNIT_TYPE_...
     open val primitiveUnits: SVGAnimatedEnumeration
 }
 
@@ -173,9 +177,18 @@ enum class SVGFEColorMatrixType {
 }
 
 /**
- * Exposes the JavaScript [SVGFEGaussianBlurElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEGaussianBlurElement) to Kotlin
+ * Exposes the JavaScript [SVGFEColorMatrixElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEColorMatrixElement) to Kotlin
  */
 abstract external class SVGFEColorMatrixElement : SVGElement {
+    companion object {
+        val SVG_FECOLORMATRIX_TYPE_UNKNOWN: Short
+        val SVG_FECOLORMATRIX_TYPE_MATRIX: Short
+        val SVG_FECOLORMATRIX_TYPE_SATURATE: Short
+        val SVG_FECOLORMATRIX_TYPE_HUEROTATE: Short
+        val SVG_FECOLORMATRIX_TYPE_LUMINANCETOALPHA: Short
+    }
+
+    // SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_...
     open val type: SVGAnimatedEnumeration
 
     open val x: SVGAnimatedLength
@@ -238,6 +251,8 @@ fun ElementScope<SVGFilterElement>.ColorMatrix(
  * Exposes the JavaScript [SVGFEGaussianBlurElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEGaussianBlurElement) to Kotlin
  */
 abstract external class SVGFEGaussianBlurElement : SVGElement {
+    companion object {} // Empty companion object declaration necessary so we can extend it
+
     open val x: SVGAnimatedLength
     open val y: SVGAnimatedLength
     open val width: SVGAnimatedLength
@@ -246,6 +261,7 @@ abstract external class SVGFEGaussianBlurElement : SVGElement {
     open val stdDeviationX: SVGAnimatedNumber
     open val stdDeviationY: SVGAnimatedNumber
 
+    // SVGFEGaussianBlurElement.SVG_EDGEMODE_...
     open val edgeMode: SVGAnimatedEnumeration
 
     open val in1: SVGAnimatedString
@@ -253,6 +269,12 @@ abstract external class SVGFEGaussianBlurElement : SVGElement {
 
     fun setStdDeviation(stdDeviationX: Float, stdDeviationY: Float)
 }
+
+// EDGEMODE constants are declared on SVGFEConvolveMatrixElement but also relevant to SVGFEGaussianBlurElement
+val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_UNKNOWN get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_UNKNOWN
+val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_DUPLICATE get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_DUPLICATE
+val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_WRAP get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_WRAP
+val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_NONE get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_NONE
 
 class SVGFEGaussianBlurAttrsScope private constructor(attrs: AttrsScope<SVGFEGaussianBlurElement>) :
     SVGElementAttrsScope<SVGFEGaussianBlurElement>(attrs), FilterPrimitiveAttrs<SVGFEGaussianBlurElement>,
