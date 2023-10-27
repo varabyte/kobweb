@@ -238,16 +238,6 @@ fun ElementScope<SVGFilterElement>.Blend(
     )
 }
 
-
-enum class SVGFEColorMatrixType {
-    Matrix,
-    Saturate,
-    HueRotate,
-    LuminanceToAlpha;
-
-    override fun toString() = this.toSvgValue()
-}
-
 /**
  * Exposes the JavaScript [SVGFEColorMatrixElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEColorMatrixElement) to Kotlin
  */
@@ -272,6 +262,15 @@ abstract external class SVGFEColorMatrixElement : SVGElement {
 
     open val in1: SVGAnimatedString
     open val result: SVGAnimatedString
+}
+
+enum class SVGFEColorMatrixType {
+    Matrix,
+    Saturate,
+    HueRotate,
+    LuminanceToAlpha;
+
+    override fun toString() = this.toSvgValue()
 }
 
 class SVGFEColorMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEColorMatrixElement>) :
