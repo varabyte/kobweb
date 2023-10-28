@@ -113,6 +113,16 @@ private interface FilterInput2Attrs<T : SVGElement> : FilterInput1Attrs<T> {
     }
 }
 
+private interface KernelUnitLengthAttrs<T : SVGElement> : AttrsScope<T> {
+    fun kernelUnitLength(value: Number) {
+        attr("kernelUnitLength", value.toString())
+    }
+
+    fun kernelUnitLength(x: Number, y: Number) {
+        attr("kernelUnitLength", "$x $y")
+    }
+}
+
 private interface OffsetAttrs<T : SVGElement> : AttrsScope<T> {
     fun dx(value: Number) {
         attr("dx", value.toString())
@@ -413,7 +423,7 @@ class SVGFECompositeAttrsScope private constructor(attrs: AttrsScope<SVGFECompos
 }
 
 /** A convenience function to set all k values at once */
-fun SVGFECompositeAttrsScope.values(k1: Number, k2: Number, k3: Number, k4: Number) {
+fun SVGFECompositeAttrsScope.kValues(k1: Number, k2: Number, k3: Number, k4: Number) {
     attr("k1", k1.toString())
     attr("k2", k2.toString())
     attr("k3", k3.toString())
@@ -440,6 +450,229 @@ abstract external class SVGFEConvolveMatrixElement : SVGElement {
         val SVG_EDGEMODE_WRAP: Short
         val SVG_EDGEMODE_NONE: Short
     }
+}
+
+/**
+ * Exposes the JavaScript [SVGFEDiffuseLightingElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEDiffuseLightingElement) to Kotlin
+ */
+abstract external class SVGFEDiffuseLightingElement : SVGElement {
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val diffuseConstant: SVGAnimatedNumber
+    open val kernelUnitLengthX: SVGAnimatedNumber
+    open val kernelUnitLengthY: SVGAnimatedNumber
+    open val surfaceScale: SVGAnimatedNumber
+
+    open val in1: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+class SVGFEDiffuseLightingAttrsScope private constructor(attrs: AttrsScope<SVGFEDiffuseLightingElement>) :
+    SVGFilterElementAttrsScope<SVGFEDiffuseLightingElement>(attrs),
+    FilterInput1Attrs<SVGFEDiffuseLightingElement>, KernelUnitLengthAttrs<SVGFEDiffuseLightingElement> {
+
+    fun diffuseConstant(value: Number) {
+        attr("diffuseConstant", value.toString())
+    }
+
+    fun surfaceScale(value: Number) {
+        attr("surfaceScale", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEDiffuseLightingAttrsScope.() -> Unit): AttrBuilderContext<SVGFEDiffuseLightingElement> {
+            return { SVGFEDiffuseLightingAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.DiffuseLighting(
+    attrs: SVGFEDiffuseLightingAttrsScope.() -> Unit,
+    content: ContentBuilder<SVGFEDiffuseLightingElement>
+) {
+    GenericTag(
+        "feDiffuseLighting",
+        "http://www.w3.org/2000/svg", SVGFEDiffuseLightingAttrsScope(attrs), content
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGFEDistantLightElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEDistantLightElement) to Kotlin
+ */
+abstract external class SVGFEDistantLightElement : SVGElement {
+    open val azimuth: SVGAnimatedNumber
+    open val elevation: SVGAnimatedNumber
+}
+
+class SVGFEDistantLightAttrsScope private constructor(attrs: AttrsScope<SVGFEDistantLightElement>) :
+    SVGElementAttrsScope<SVGFEDistantLightElement>(attrs) {
+
+    fun azimuth(value: Number) {
+        attr("azimuth", value.toString())
+    }
+
+    fun elevation(value: Number) {
+        attr("elevation", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEDistantLightAttrsScope.() -> Unit): AttrBuilderContext<SVGFEDistantLightElement> {
+            return { SVGFEDistantLightAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+private fun UnscopedDistantLight(
+    attrs: SVGFEDistantLightAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feDistantLight",
+        "http://www.w3.org/2000/svg", SVGFEDistantLightAttrsScope(attrs)
+    )
+}
+
+@Composable
+fun ElementScope<SVGFEDiffuseLightingElement>.DistantLight(attrs: SVGFEDistantLightAttrsScope.() -> Unit) {
+    UnscopedDistantLight(attrs)
+}
+
+@Composable
+fun ElementScope<SVGFESpecularLightingElement>.DistantLight(attrs: SVGFEDistantLightAttrsScope.() -> Unit) {
+    UnscopedDistantLight(attrs)
+}
+
+/**
+ * Exposes the JavaScript [SVGFEPointLightElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEPointLightElement) to Kotlin
+ */
+abstract external class SVGFEPointLightElement : SVGElement {
+    open val x: SVGAnimatedNumber
+    open val y: SVGAnimatedNumber
+    open val z: SVGAnimatedNumber
+}
+
+class SVGFEPointLightAttrsScope private constructor(attrs: AttrsScope<SVGFEPointLightElement>) :
+    SVGElementAttrsScope<SVGFEPointLightElement>(attrs) {
+
+    fun x(value: Number) {
+        attr("x", value.toString())
+    }
+
+    fun y(value: Number) {
+        attr("y", value.toString())
+    }
+
+    fun z(value: Number) {
+        attr("z", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEPointLightAttrsScope.() -> Unit): AttrBuilderContext<SVGFEPointLightElement> {
+            return { SVGFEPointLightAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+private fun UnscopedPointLight(
+    attrs: SVGFEPointLightAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "fePointLight",
+        "http://www.w3.org/2000/svg", SVGFEPointLightAttrsScope(attrs)
+    )
+}
+
+@Composable
+fun ElementScope<SVGFEDiffuseLightingElement>.PointLight(attrs: SVGFEPointLightAttrsScope.() -> Unit) {
+    UnscopedPointLight(attrs)
+}
+
+@Composable
+fun ElementScope<SVGFESpecularLightingElement>.PointLight(attrs: SVGFEPointLightAttrsScope.() -> Unit) {
+    UnscopedPointLight(attrs)
+}
+
+/**
+ * Exposes the JavaScript [SVGFESpotLightElement](https://developer.mozilla.org/en/docs/Web/API/SVGFESpotLightElement) to Kotlin
+ */
+abstract external class SVGFESpotLightElement : SVGElement {
+    open val x: SVGAnimatedNumber
+    open val y: SVGAnimatedNumber
+    open val z: SVGAnimatedNumber
+
+    open val pointsAtX: SVGAnimatedNumber
+    open val pointsAtY: SVGAnimatedNumber
+    open val pointsAtZ: SVGAnimatedNumber
+
+    open val specularExponent: SVGAnimatedNumber
+    open val limitingConeAngle: SVGAnimatedNumber
+}
+
+class SVGFESpotLightAttrsScope private constructor(attrs: AttrsScope<SVGFESpotLightElement>) :
+    SVGElementAttrsScope<SVGFESpotLightElement>(attrs) {
+
+    fun x(value: Number) {
+        attr("x", value.toString())
+    }
+
+    fun y(value: Number) {
+        attr("y", value.toString())
+    }
+
+    fun z(value: Number) {
+        attr("z", value.toString())
+    }
+
+    fun pointsAtX(value: Number) {
+        attr("pointsAtX", value.toString())
+    }
+
+    fun pointsAtY(value: Number) {
+        attr("pointsAtY", value.toString())
+    }
+
+    fun pointsAtZ(value: Number) {
+        attr("pointsAtZ", value.toString())
+    }
+
+    fun specularExponent(value: Number) {
+        attr("specularExponent", value.toString())
+    }
+
+    fun limitingConeAngle(value: Number) {
+        attr("limitingConeAngle", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFESpotLightAttrsScope.() -> Unit): AttrBuilderContext<SVGFESpotLightElement> {
+            return { SVGFESpotLightAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+private fun UnscopedSpotLight(
+    attrs: SVGFESpotLightAttrsScope.() -> Unit,
+) {
+    GenericTag(
+        "feSpotLight",
+        "http://www.w3.org/2000/svg", SVGFESpotLightAttrsScope(attrs)
+    )
+}
+
+@Composable
+fun ElementScope<SVGFEDiffuseLightingElement>.SpotLight(attrs: SVGFESpotLightAttrsScope.() -> Unit) {
+    UnscopedSpotLight(attrs)
+}
+
+@Composable
+fun ElementScope<SVGFESpecularLightingElement>.SpotLight(attrs: SVGFESpotLightAttrsScope.() -> Unit) {
+    UnscopedSpotLight(attrs)
 }
 
 /**
@@ -966,6 +1199,61 @@ fun ElementScope<SVGFilterElement>.Offset(
         "http://www.w3.org/2000/svg", SVGFEOffsetAttrsScope(attrs)
     )
 }
+
+/**
+ * Exposes the JavaScript [SVGFESpecularLightingElement](https://developer.mozilla.org/en/docs/Web/API/SVGFESpecularLightingElement) to Kotlin
+ */
+abstract external class SVGFESpecularLightingElement : SVGElement {
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val specularConstant: SVGAnimatedNumber
+    open val specularExponent: SVGAnimatedNumber
+
+    open val kernelUnitLengthX: SVGAnimatedNumber
+    open val kernelUnitLengthY: SVGAnimatedNumber
+    open val surfaceScale: SVGAnimatedNumber
+
+    open val in1: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+class SVGFESpecularLightingAttrsScope private constructor(attrs: AttrsScope<SVGFESpecularLightingElement>) :
+    SVGFilterElementAttrsScope<SVGFESpecularLightingElement>(attrs),
+    FilterInput1Attrs<SVGFESpecularLightingElement>, KernelUnitLengthAttrs<SVGFESpecularLightingElement> {
+
+    fun specularConstant(value: Number) {
+        attr("specularConstant", value.toString())
+    }
+
+    fun specularExponent(value: Number) {
+        attr("specularExponent", value.toString())
+    }
+
+    fun surfaceScale(value: Number) {
+        attr("surfaceScale", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFESpecularLightingAttrsScope.() -> Unit): AttrBuilderContext<SVGFESpecularLightingElement> {
+            return { SVGFESpecularLightingAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.SpecularLighting(
+    attrs: SVGFESpecularLightingAttrsScope.() -> Unit,
+    content: ContentBuilder<SVGFESpecularLightingElement>
+) {
+    GenericTag(
+        "feSpecularLighting",
+        "http://www.w3.org/2000/svg", SVGFESpecularLightingAttrsScope(attrs), content
+    )
+}
+
 
 /**
  * Exposes the JavaScript [SVGFETurbulenceElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETurbulenceElement) to Kotlin

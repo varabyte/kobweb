@@ -312,6 +312,8 @@ internal interface PresentationAttrs<T : SVGElement> : AttrsScope<T> {
 
     fun floodColor(color: CSSColorValue) = attr("flood-color", color.toString())
     fun floodOpacity(value: Number) = attr("flood-opacity", value.toString())
+
+    fun lightingColor(color: CSSColorValue) = attr("lighting-color", color.toString())
 }
 
 internal interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
