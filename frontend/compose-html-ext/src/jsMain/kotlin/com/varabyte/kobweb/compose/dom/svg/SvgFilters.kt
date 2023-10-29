@@ -21,7 +21,7 @@ import org.w3c.dom.svg.SVGAnimatedString
 import org.w3c.dom.svg.SVGDefsElement
 import org.w3c.dom.svg.SVGElement
 
-enum class SVGFEInput {
+enum class SVGFilterInput {
     SourceGraphic,
     SourceAlpha,
     BackgroundImage,
@@ -47,11 +47,11 @@ private interface FilterInput1Attrs<T : SVGElement> : AttrsScope<T> {
      * While `in1` is not an official attribute, it provides a way to avoid using `in` which is awkward to use in
      * Kotlin since `in` is an official keyword.
      */
-    fun in1(input: SVGFEInput) {
+    fun in1(input: SVGFilterInput) {
         `in`(input)
     }
 
-    fun `in`(input: SVGFEInput) {
+    fun `in`(input: SVGFilterInput) {
         `in`(input.toString())
     }
 
@@ -79,7 +79,7 @@ private interface FilterInput1Attrs<T : SVGElement> : AttrsScope<T> {
 
 // Interface for filters that take two inputs
 private interface FilterInput2Attrs<T : SVGElement> : FilterInput1Attrs<T> {
-    fun in2(input: SVGFEInput) {
+    fun in2(input: SVGFilterInput) {
         in2(input.toString())
     }
 
@@ -218,7 +218,7 @@ abstract external class SVGFEBlendElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
-enum class SVGFEBlendMode {
+enum class SVGBlendMode {
     Normal,
     Multiply,
     Screen,
@@ -231,7 +231,7 @@ enum class SVGFEBlendMode {
 class SVGFEBlendAttrsScope private constructor(attrs: AttrsScope<SVGFEBlendElement>) :
     SVGFilterElementAttrsScope<SVGFEBlendElement>(attrs), FilterInput2Attrs<SVGFEBlendElement> {
 
-    fun mode(mode: SVGFEBlendMode) {
+    fun mode(mode: SVGBlendMode) {
         attr("mode", mode.toString())
     }
 
@@ -278,7 +278,7 @@ abstract external class SVGFEColorMatrixElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
-enum class SVGFEColorMatrixType {
+enum class SVGColorMatrixType {
     Matrix,
     Saturate,
     HueRotate,
@@ -290,7 +290,7 @@ enum class SVGFEColorMatrixType {
 class SVGFEColorMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEColorMatrixElement>) :
     SVGFilterElementAttrsScope<SVGFEColorMatrixElement>(attrs), FilterInput1Attrs<SVGFEColorMatrixElement> {
 
-    fun type(type: SVGFEColorMatrixType) {
+    fun type(type: SVGColorMatrixType) {
         attr("type", type.toString())
     }
 
@@ -360,7 +360,7 @@ abstract external class SVGFECompositeElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
-enum class SVGFECompositeOperator {
+enum class SVGCompositeOperator {
     Over,
     In,
     Out,
@@ -375,7 +375,7 @@ class SVGFECompositeAttrsScope private constructor(attrs: AttrsScope<SVGFECompos
     SVGFilterElementAttrsScope<SVGFECompositeElement>(attrs),
     FilterInput2Attrs<SVGFECompositeElement> {
 
-    fun operator(value: SVGFECompositeOperator) {
+    fun operator(value: SVGCompositeOperator) {
         attr("operator", value.toString())
     }
 
@@ -494,7 +494,7 @@ class SVGFEConvolveMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEC
         attr("targetY", value.toString())
     }
 
-    fun edgeMode(value: SVGFEEdgeMode) {
+    fun edgeMode(value: SVGEdgeMode) {
         attr("edgeMode", value.toString())
     }
 
@@ -768,7 +768,7 @@ abstract external class SVGFEDisplacementMapElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
-enum class SVGFEColorChannel {
+enum class SVGColorChannel {
     R, G, B, A;
 
     override fun toString() = this.name
@@ -778,11 +778,11 @@ class SVGFEDisplacementMapAttrsScope private constructor(attrs: AttrsScope<SVGFE
     SVGFilterElementAttrsScope<SVGFEDisplacementMapElement>(attrs),
     FilterInput2Attrs<SVGFEDisplacementMapElement> {
 
-    fun xChannelSelector(value: SVGFEColorChannel) {
+    fun xChannelSelector(value: SVGColorChannel) {
         attr("xChannelSelector", value.toString())
     }
 
-    fun yChannelSelector(value: SVGFEColorChannel) {
+    fun yChannelSelector(value: SVGColorChannel) {
         attr("yChannelSelector", value.toString())
     }
 
@@ -910,7 +910,7 @@ val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_DUPLICATE get() = SVGFEConvo
 val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_WRAP get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_WRAP
 val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_NONE get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_NONE
 
-enum class SVGFEEdgeMode {
+enum class SVGEdgeMode {
     Duplicate,
     Wrap,
     None;
@@ -922,7 +922,7 @@ class SVGFEGaussianBlurAttrsScope private constructor(attrs: AttrsScope<SVGFEGau
     SVGFilterElementAttrsScope<SVGFEGaussianBlurElement>(attrs),
     FilterInput1Attrs<SVGFEGaussianBlurElement>, StdDeviationAttrs<SVGFEGaussianBlurElement> {
 
-    fun edgeMode(edgeMode: SVGFEEdgeMode) {
+    fun edgeMode(edgeMode: SVGEdgeMode) {
         attr("edgeMode", edgeMode.toString())
     }
 
@@ -1237,7 +1237,7 @@ abstract external class SVGFEMorphologyElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
-enum class SVGFEMorphologyOperator {
+enum class SVGMorphologyOperator {
     Erode,
     Dilate;
 
@@ -1248,7 +1248,7 @@ class SVGFEMorphologyAttrsScope private constructor(attrs: AttrsScope<SVGFEMorph
     SVGFilterElementAttrsScope<SVGFEMorphologyElement>(attrs),
     FilterInput1Attrs<SVGFEMorphologyElement> {
 
-    fun operator(value: SVGFEMorphologyOperator) {
+    fun operator(value: SVGMorphologyOperator) {
         attr("operator", value.toString())
     }
 
@@ -1434,14 +1434,14 @@ abstract external class SVGFETurbulenceElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
-enum class SVGFETurbulenceType {
+enum class SVGTurbulenceType {
     FractalNoise,
     Turbulence;
 
     override fun toString() = this.toSvgValue()
 }
 
-enum class SVGFEStitchType {
+enum class SVGStitchType {
     Stitch,
     NoStitch;
 
@@ -1452,11 +1452,11 @@ class SVGFETurbulenceAttrsScope private constructor(attrs: AttrsScope<SVGFETurbu
     SVGFilterElementAttrsScope<SVGFETurbulenceElement>(attrs),
     FilterInput1Attrs<SVGFETurbulenceElement> {
 
-    fun type(value: SVGFETurbulenceType) {
+    fun type(value: SVGTurbulenceType) {
         attr("type", value.toString())
     }
 
-    fun stitchTiles(value: SVGFEStitchType) {
+    fun stitchTiles(value: SVGStitchType) {
         attr("stitchTiles", value.toString())
     }
 
