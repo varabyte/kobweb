@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.ElementScope
+import org.w3c.dom.svg.SVGAnimatedBoolean
 import org.w3c.dom.svg.SVGAnimatedEnumeration
 import org.w3c.dom.svg.SVGAnimatedInteger
 import org.w3c.dom.svg.SVGAnimatedLength
@@ -434,6 +435,89 @@ abstract external class SVGFEConvolveMatrixElement : SVGElement {
         val SVG_EDGEMODE_WRAP: Short
         val SVG_EDGEMODE_NONE: Short
     }
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val bias: SVGAnimatedNumber
+    open val divisor: SVGAnimatedNumber
+
+    // SVGConvolveMatrixElement.SVG_EDGEMODE_...
+    open val edgeMode: SVGAnimatedEnumeration
+
+    open val kernelMatrix: SVGAnimatedNumberList
+    open val orderX: SVGAnimatedInteger
+    open val orderY: SVGAnimatedInteger
+    open val preserveAlpha: SVGAnimatedBoolean
+    open val targetX: SVGAnimatedInteger
+    open val targetY: SVGAnimatedInteger
+
+    open val in1: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+class SVGFEConvolveMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEConvolveMatrixElement>) :
+    SVGFilterElementAttrsScope<SVGFEConvolveMatrixElement>(attrs), FilterInput1Attrs<SVGFEConvolveMatrixElement> {
+
+    fun order(value: Number) {
+        attr("order", value.toString())
+    }
+
+    fun order(numColumns: Number, numRows: Number) {
+        attr("order", "$numColumns $numRows")
+    }
+
+    /**
+     * The numbers that make up the kernel matrix.
+     *
+     * The number of entries in the list must match the number of columns * the number of rows, or else this filter is
+     * disabled.
+     */
+    fun kernelMatrix(vararg values: Number) {
+        attr("kernelMatrix", values.joinToString(" "))
+    }
+
+    fun divisor(value: Number) {
+        attr("divisor", value.toString())
+    }
+
+    fun bias(value: Number) {
+        attr("bias", value.toString())
+    }
+
+    fun targetX(value: Int) {
+        attr("targetX", value.toString())
+    }
+
+    fun targetY(value: Int) {
+        attr("targetY", value.toString())
+    }
+
+    fun edgeMode(value: SVGFEEdgeMode) {
+        attr("edgeMode", value.toString())
+    }
+
+    fun preserveAlpha(value: Boolean) {
+        attr("preserveAlpha", value.toString())
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEConvolveMatrixAttrsScope.() -> Unit): AttrBuilderContext<SVGFEConvolveMatrixElement> {
+            return { SVGFEConvolveMatrixAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.ConvolveMatrix(
+    attrs: SVGFEConvolveMatrixAttrsScope.() -> Unit
+) {
+    GenericTag(
+        "feConvolveMatrix",
+        "http://www.w3.org/2000/svg", SVGFEConvolveMatrixAttrsScope(attrs)
+    )
 }
 
 /**
