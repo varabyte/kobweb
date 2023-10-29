@@ -6,6 +6,7 @@ package com.varabyte.kobweb.compose.dom.svg
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.GenericTag
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.HtmlAttrMarker
 import org.jetbrains.compose.web.css.*
@@ -19,6 +20,7 @@ import org.w3c.dom.svg.SVGElement
 import org.w3c.dom.svg.SVGEllipseElement
 import org.w3c.dom.svg.SVGGElement
 import org.w3c.dom.svg.SVGGradientElement
+import org.w3c.dom.svg.SVGImageElement
 import org.w3c.dom.svg.SVGLineElement
 import org.w3c.dom.svg.SVGLinearGradientElement
 import org.w3c.dom.svg.SVGPathElement
@@ -169,7 +171,14 @@ abstract class SVGElementAttrsScope<E : SVGElement> protected constructor(attrs:
 // Enums have to be capitalized title case for this method to work.
 internal fun <E : Enum<E>> Enum<E>.toSvgValue() = name.replaceFirstChar { it.lowercase() }
 
-// region SVG paint attributes (https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint)
+// region Common SVG enumerations
+
+enum class SVGCrossOrigin {
+    Anonymous,
+    UseCredentials;
+
+    override fun toString() = this.name.titleCamelCaseToKebabCase()
+}
 
 enum class SVGFillType {
     None,
@@ -208,6 +217,29 @@ enum class SVGFillRule {
     override fun toString() = this.toSvgValue()
 }
 
+enum class SVGAspectRatioAlignment {
+    None,
+    XMinYMin,
+    XMidYMin,
+    XMaxYMin,
+    XMinYMid,
+    XMidYMid,
+    XMaxYMid,
+    XMinYMax,
+    XMidYMax,
+    XMaxYMax;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGAspectRatioScale {
+    Meet,
+    Slice;
+
+    override fun toString() = this.toSvgValue()
+}
+
+
 // endregion
 
 // region Shared SVG traits
@@ -245,6 +277,12 @@ internal interface CoordinateAttrs<T : SVGElement> : AttrsScope<T> {
 
     fun y(value: CSSLengthOrPercentageValue) {
         attr("y", value.toString())
+    }
+}
+
+internal interface CrossOriginAttrs<T : SVGElement> : AttrsScope<T> {
+    fun crossOrigin(value: SVGCrossOrigin) {
+        attr("crossOrigin", value.toString())
     }
 }
 
@@ -314,6 +352,15 @@ internal interface PresentationAttrs<T : SVGElement> : AttrsScope<T> {
     fun floodOpacity(value: Number) = attr("flood-opacity", value.toString())
 
     fun lightingColor(color: CSSColorValue) = attr("lighting-color", color.toString())
+}
+
+internal interface PreserveAspectRatioAttrs<T : SVGElement> : AttrsScope<T> {
+    fun preserveAspectRatio(alignment: SVGAspectRatioAlignment, scale: SVGAspectRatioScale? = null) {
+        attr("preserveAspectRatio", buildString {
+            append(alignment)
+            scale?.let { append(' '); append(it) }
+        })
+    }
 }
 
 /**
@@ -601,9 +648,28 @@ fun ElementScope<SVGGradientElement>.Stop(
     }
 }
 
+enum class SVGPatternUnits {
+    UserSpaceOnUse,
+    ObjectBoundingBox;
+
+    override fun toString() = this.toSvgValue()
+}
+
 class SVGPatternAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGPatternElement>) :
     SVGContainerElementAttrsScope<SVGPatternElement>(attrs.id(id.toString())),
     CoordinateAttrs<SVGPatternElement>, LengthAttrs<SVGPatternElement>, ViewBoxAttrs<SVGPatternElement> {
+
+    fun patternContentUnits(value: SVGPatternUnits) {
+        attr("patternContentUnits", value.toString())
+    }
+
+    fun patternUnits(value: SVGPatternUnits) {
+        attr("patternUnits", value.toString())
+    }
+
+    fun preserveAspectRatio(value: SVGAspectRatioAlignment) {
+        attr("preserveAspectRatio", value.toString())
+    }
 
     companion object {
         operator fun invoke(
@@ -810,6 +876,45 @@ fun ElementScope<SVGElement>.Group(
     GenericTag("g", "http://www.w3.org/2000/svg", attrs?.let { SVGGroupAttrsScope(it) }, content)
 }
 
+class SVGImageAttrsScope private constructor(attrs: AttrsScope<SVGImageElement>) :
+    SVGGraphicalElementAttrsScope<SVGImageElement>(attrs), CoordinateAttrs<SVGImageElement>,
+    LengthAttrs<SVGImageElement>, PreserveAspectRatioAttrs<SVGImageElement>, CrossOriginAttrs<SVGImageElement> {
+
+    companion object {
+        operator fun invoke(attrs: SVGImageAttrsScope.() -> Unit): AttrBuilderContext<SVGImageElement> {
+            return { SVGImageAttrsScope(this).attrs() }
+        }
+    }
+
+    fun href(value: String) {
+        attr("href", value)
+    }
+}
+
+/**
+ * Type-safe API for creating an [SVGImageElement].
+ *
+ * For example, to create a Image from (3, 12) to (21, 12):
+ *
+ * ```
+ * Svg {
+ *  Image {
+ *      href("image.png")
+ *      x(10.percent)
+ *      y(10.percent)
+ *      width(80.percent)
+ *      height(80.percent)
+ *  }
+ * }
+ * ```
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/image">SVG Element Image (Mozilla Docs)</a>
+ */
+@Composable
+fun ElementScope<SVGElement>.Image(attrs: SVGImageAttrsScope.() -> Unit) {
+    GenericTag("image", "http://www.w3.org/2000/svg", SVGImageAttrsScope(attrs))
+}
+
 
 class SVGLineAttrsScope private constructor(attrs: AttrsScope<SVGLineElement>) :
     SVGGraphicalElementAttrsScope<SVGLineElement>(attrs) {
@@ -871,7 +976,6 @@ class SVGLineAttrsScope private constructor(attrs: AttrsScope<SVGLineElement>) :
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line">SVG Element Line (Mozilla Docs)</a>
  */
-
 @Composable
 fun ElementScope<SVGElement>.Line(attrs: SVGLineAttrsScope.() -> Unit) {
     GenericTag("line", "http://www.w3.org/2000/svg", SVGLineAttrsScope(attrs))

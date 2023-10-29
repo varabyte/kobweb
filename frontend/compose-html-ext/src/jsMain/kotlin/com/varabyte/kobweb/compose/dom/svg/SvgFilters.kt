@@ -961,51 +961,11 @@ abstract external class SVGFEImageElement : SVGElement {
     open val result: SVGAnimatedString
 }
 
-enum class SVGFECrossOrigin {
-    Anonymous,
-    UseCredentials;
-
-    override fun toString() = this.name.titleCamelCaseToKebabCase()
-}
-
-enum class SVGFEAspectRatioAlignment {
-    None,
-    XMinYMin,
-    XMidYMin,
-    XMaxYMin,
-    XMinYMid,
-    XMidYMid,
-    XMaxYMid,
-    XMinYMax,
-    XMidYMax,
-    XMaxYMax;
-
-    override fun toString() = this.toSvgValue()
-}
-
-enum class SVGFEAspectRatioScale {
-    Meet,
-    Slice;
-
-    override fun toString() = this.toSvgValue()
-}
-
 class SVGFEImageAttrsScope private constructor(attrs: AttrsScope<SVGFEImageElement>) :
-    SVGFilterElementAttrsScope<SVGFEImageElement>(attrs) {
+    SVGFilterElementAttrsScope<SVGFEImageElement>(attrs), PreserveAspectRatioAttrs<SVGFEImageElement> {
 
     fun href(value: String) {
         attr("href", value)
-    }
-
-    fun crossOrigin(value: SVGFECrossOrigin) {
-        attr("crossOrigin", value.toString())
-    }
-
-    fun preserveAspectRatio(alignment: SVGFEAspectRatioAlignment, scale: SVGFEAspectRatioScale? = null) {
-        attr("preserveAspectRatio", buildString {
-            append(alignment)
-            scale?.let { append(' '); append(it) }
-        })
     }
 
     companion object {
@@ -1017,12 +977,11 @@ class SVGFEImageAttrsScope private constructor(attrs: AttrsScope<SVGFEImageEleme
 
 @Composable
 fun ElementScope<SVGFilterElement>.Image(
-    attrs: (SVGFEImageAttrsScope.() -> Unit)? = null,
-    content: ContentBuilder<SVGFEImageElement>
+    attrs: SVGFEImageAttrsScope.() -> Unit
 ) {
     GenericTag(
         "feImage",
-        "http://www.w3.org/2000/svg", attrs?.let { SVGFEImageAttrsScope(it) }, content
+        "http://www.w3.org/2000/svg", SVGFEImageAttrsScope(attrs)
     )
 }
 
