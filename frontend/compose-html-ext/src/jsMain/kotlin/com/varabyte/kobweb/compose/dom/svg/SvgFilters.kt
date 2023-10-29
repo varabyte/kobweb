@@ -93,16 +93,6 @@ private interface FilterInput2Attrs<T : SVGElement> : FilterInput1Attrs<T> {
     }
 }
 
-private interface KernelUnitLengthAttrs<T : SVGElement> : AttrsScope<T> {
-    fun kernelUnitLength(value: Number) {
-        attr("kernelUnitLength", value.toString())
-    }
-
-    fun kernelUnitLength(x: Number, y: Number) {
-        attr("kernelUnitLength", "$x $y")
-    }
-}
-
 private interface OffsetAttrs<T : SVGElement> : AttrsScope<T> {
     fun dx(value: Number) {
         attr("dx", value.toString())
@@ -456,8 +446,6 @@ abstract external class SVGFEDiffuseLightingElement : SVGElement {
     open val height: SVGAnimatedLength
 
     open val diffuseConstant: SVGAnimatedNumber
-    open val kernelUnitLengthX: SVGAnimatedNumber
-    open val kernelUnitLengthY: SVGAnimatedNumber
     open val surfaceScale: SVGAnimatedNumber
 
     open val in1: SVGAnimatedString
@@ -466,7 +454,7 @@ abstract external class SVGFEDiffuseLightingElement : SVGElement {
 
 class SVGFEDiffuseLightingAttrsScope private constructor(attrs: AttrsScope<SVGFEDiffuseLightingElement>) :
     SVGFilterElementAttrsScope<SVGFEDiffuseLightingElement>(attrs),
-    FilterInput1Attrs<SVGFEDiffuseLightingElement>, KernelUnitLengthAttrs<SVGFEDiffuseLightingElement> {
+    FilterInput1Attrs<SVGFEDiffuseLightingElement> {
 
     fun diffuseConstant(value: Number) {
         attr("diffuseConstant", value.toString())
@@ -1296,8 +1284,6 @@ abstract external class SVGFESpecularLightingElement : SVGElement {
     open val specularConstant: SVGAnimatedNumber
     open val specularExponent: SVGAnimatedNumber
 
-    open val kernelUnitLengthX: SVGAnimatedNumber
-    open val kernelUnitLengthY: SVGAnimatedNumber
     open val surfaceScale: SVGAnimatedNumber
 
     open val in1: SVGAnimatedString
@@ -1306,7 +1292,7 @@ abstract external class SVGFESpecularLightingElement : SVGElement {
 
 class SVGFESpecularLightingAttrsScope private constructor(attrs: AttrsScope<SVGFESpecularLightingElement>) :
     SVGFilterElementAttrsScope<SVGFESpecularLightingElement>(attrs),
-    FilterInput1Attrs<SVGFESpecularLightingElement>, KernelUnitLengthAttrs<SVGFESpecularLightingElement> {
+    FilterInput1Attrs<SVGFESpecularLightingElement> {
 
     fun specularConstant(value: Number) {
         attr("specularConstant", value.toString())
