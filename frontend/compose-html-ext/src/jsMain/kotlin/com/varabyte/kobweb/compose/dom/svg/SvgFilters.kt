@@ -19,28 +19,6 @@ import org.w3c.dom.svg.SVGAnimatedString
 import org.w3c.dom.svg.SVGDefsElement
 import org.w3c.dom.svg.SVGElement
 
-enum class SVGFilterUnits {
-    UserSpaceOnUse,
-    ObjectBoundingBox;
-
-    override fun toString() = this.toSvgValue()
-}
-
-enum class SVGPrimitiveUnits {
-    UserSpaceOnUse,
-    ObjectBoundingBox;
-
-    override fun toString() = this.toSvgValue()
-}
-
-enum class SVGFEEdgeMode {
-    Duplicate,
-    Wrap,
-    None;
-
-    override fun toString() = this.toSvgValue()
-}
-
 enum class SVGFEInput {
     SourceGraphic,
     SourceAlpha,
@@ -168,6 +146,20 @@ abstract external class SVGFilterElement : SVGElement {
 
     // SVGUnitTypes.SVG_UNIT_TYPE_...
     open val primitiveUnits: SVGAnimatedEnumeration
+}
+
+enum class SVGFilterUnits {
+    UserSpaceOnUse,
+    ObjectBoundingBox;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGPrimitiveUnits {
+    UserSpaceOnUse,
+    ObjectBoundingBox;
+
+    override fun toString() = this.toSvgValue()
 }
 
 class SVGFilterAttrsScope private constructor(id: SvgId, attrs: AttrsScope<SVGFilterElement>) :
@@ -844,6 +836,14 @@ val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_UNKNOWN get() = SVGFEConvolv
 val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_DUPLICATE get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_DUPLICATE
 val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_WRAP get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_WRAP
 val SVGFEGaussianBlurElement.Companion.SVG_EDGEMODE_NONE get() = SVGFEConvolveMatrixElement.SVG_EDGEMODE_NONE
+
+enum class SVGFEEdgeMode {
+    Duplicate,
+    Wrap,
+    None;
+
+    override fun toString() = this.toSvgValue()
+}
 
 class SVGFEGaussianBlurAttrsScope private constructor(attrs: AttrsScope<SVGFEGaussianBlurElement>) :
     SVGFilterElementAttrsScope<SVGFEGaussianBlurElement>(attrs),
