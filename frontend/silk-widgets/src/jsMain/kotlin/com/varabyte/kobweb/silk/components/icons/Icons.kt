@@ -13,6 +13,7 @@ import com.varabyte.kobweb.compose.dom.svg.SVGStrokeLineJoin
 import com.varabyte.kobweb.compose.dom.svg.SVGStrokeType
 import com.varabyte.kobweb.compose.dom.svg.SVGSvgAttrsScope
 import com.varabyte.kobweb.compose.dom.svg.Svg
+import com.varabyte.kobweb.compose.dom.svg.ViewBox
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.css.*
@@ -26,15 +27,6 @@ import org.w3c.dom.svg.SVGElement
 //
 // Some of these icons in here are based on those found in Chakra UI: https://chakra-ui.com/docs/components/icon
 // --------------------------------------------------------------------------------------------------------------------
-
-/**
- * Parameters that will be used to set the viewBox attribute of an SVG.
- */
-class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
-    companion object {
-        fun sized(width: Int, height: Int = width) = ViewBox(0, 0, width, height)
-    }
-}
 
 sealed interface IconRenderStyle {
     @Suppress("CanSealedSubClassBeObject") // May add Fill parameters someday

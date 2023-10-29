@@ -316,9 +316,23 @@ internal interface PresentationAttrs<T : SVGElement> : AttrsScope<T> {
     fun lightingColor(color: CSSColorValue) = attr("lighting-color", color.toString())
 }
 
+/**
+ * Parameters that can be used to set the viewBox attribute of an SVG.
+ */
+class ViewBox(val x: Int, val y: Int, val width: Int, val height: Int) {
+    companion object {
+        fun sized(width: Int, height: Int = width) = ViewBox(0, 0, width, height)
+    }
+}
+
+
 internal interface ViewBoxAttrs<T : SVGElement> : AttrsScope<T> {
     fun viewBox(x: Number, y: Number, width: Number, height: Number) {
         attr("viewBox", "$x $y $width $height")
+    }
+
+    fun viewBox(viewBox: ViewBox) {
+        viewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height)
     }
 }
 
