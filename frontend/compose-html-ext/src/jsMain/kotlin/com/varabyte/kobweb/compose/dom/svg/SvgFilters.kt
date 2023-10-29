@@ -5,6 +5,7 @@ package com.varabyte.kobweb.compose.dom.svg
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.GenericTag
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
@@ -15,6 +16,7 @@ import org.w3c.dom.svg.SVGAnimatedInteger
 import org.w3c.dom.svg.SVGAnimatedLength
 import org.w3c.dom.svg.SVGAnimatedNumber
 import org.w3c.dom.svg.SVGAnimatedNumberList
+import org.w3c.dom.svg.SVGAnimatedPreserveAspectRatio
 import org.w3c.dom.svg.SVGAnimatedString
 import org.w3c.dom.svg.SVGDefsElement
 import org.w3c.dom.svg.SVGElement
@@ -867,6 +869,88 @@ fun ElementScope<SVGFilterElement>.GaussianBlur(
     GenericTag(
         "feGaussianBlur",
         "http://www.w3.org/2000/svg", SVGFEGaussianBlurAttrsScope(attrs)
+    )
+}
+
+/**
+ * Exposes the JavaScript [SVGFEImageElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEImageElement) to Kotlin
+ */
+abstract external class SVGFEImageElement : SVGElement {
+    open val href: SVGAnimatedString
+
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val crossOrigin: SVGAnimatedString
+    open val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
+
+    open val result: SVGAnimatedString
+}
+
+enum class SVGFECrossOrigin {
+    Anonymous,
+    UseCredentials;
+
+    override fun toString() = this.name.titleCamelCaseToKebabCase()
+}
+
+enum class SVGFEAspectRatioAlignment {
+    None,
+    XMinYMin,
+    XMidYMin,
+    XMaxYMin,
+    XMinYMid,
+    XMidYMid,
+    XMaxYMid,
+    XMinYMax,
+    XMidYMax,
+    XMaxYMax;
+
+    override fun toString() = this.toSvgValue()
+}
+
+enum class SVGFEAspectRatioScale {
+    Meet,
+    Slice;
+
+    override fun toString() = this.toSvgValue()
+}
+
+class SVGFEImageAttrsScope private constructor(attrs: AttrsScope<SVGFEImageElement>) :
+    SVGFilterElementAttrsScope<SVGFEImageElement>(attrs) {
+
+    fun href(value: String) {
+        attr("href", value)
+    }
+
+    fun crossOrigin(value: SVGFECrossOrigin) {
+        attr("crossOrigin", value.toString())
+    }
+
+    fun preserveAspectRatio(alignment: SVGFEAspectRatioAlignment, scale: SVGFEAspectRatioScale? = null) {
+        attr("preserveAspectRatio", buildString {
+            append(alignment)
+            scale?.let { append(' '); append(it) }
+        })
+    }
+
+    companion object {
+        operator fun invoke(attrs: SVGFEImageAttrsScope.() -> Unit): AttrBuilderContext<SVGFEImageElement> {
+            return { SVGFEImageAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Image(
+    attrs: (SVGFEImageAttrsScope.() -> Unit)? = null,
+    content: ContentBuilder<SVGFEImageElement>
+) {
+    GenericTag(
+        "feImage",
+        "http://www.w3.org/2000/svg", attrs?.let { SVGFEImageAttrsScope(it) }, content
     )
 }
 
