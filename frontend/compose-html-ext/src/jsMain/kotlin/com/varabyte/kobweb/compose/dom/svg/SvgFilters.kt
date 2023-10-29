@@ -5,7 +5,6 @@ package com.varabyte.kobweb.compose.dom.svg
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.GenericTag
-import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.AttrBuilderContext
@@ -1367,6 +1366,38 @@ fun ElementScope<SVGFilterElement>.SpecularLighting(
     )
 }
 
+/**
+ * Exposes the JavaScript [SVGFETileElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETileElement) to Kotlin
+ */
+abstract external class SVGFETileElement : SVGElement {
+    open val x: SVGAnimatedLength
+    open val y: SVGAnimatedLength
+    open val width: SVGAnimatedLength
+    open val height: SVGAnimatedLength
+
+    open val in1: SVGAnimatedString
+    open val result: SVGAnimatedString
+}
+
+class SVGFETileAttrsScope private constructor(attrs: AttrsScope<SVGFETileElement>) :
+    SVGFilterElementAttrsScope<SVGFETileElement>(attrs), FilterInput1Attrs<SVGFETileElement> {
+
+    companion object {
+        operator fun invoke(attrs: SVGFETileAttrsScope.() -> Unit): AttrBuilderContext<SVGFETileElement> {
+            return { SVGFETileAttrsScope(this).attrs() }
+        }
+    }
+}
+
+@Composable
+fun ElementScope<SVGFilterElement>.Tile(
+    attrs: (SVGFETileAttrsScope.() -> Unit)? = null
+) {
+    GenericTag(
+        "feTile",
+        "http://www.w3.org/2000/svg", attrs?.let { SVGFETileAttrsScope(it) }
+    )
+}
 
 /**
  * Exposes the JavaScript [SVGFETurbulenceElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETurbulenceElement) to Kotlin
