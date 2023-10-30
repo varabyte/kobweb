@@ -1132,7 +1132,7 @@ fun ElementScope<SVGFEComponentTransferElement>.FuncB(attrs: SVGComponentTransfe
 /**
  * Exposes the JavaScript [SVGFEMorphologyElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMorphologyElement) to Kotlin
  */
-abstract external class SVGFEMorphologyElement : SVGElement, SVGFECommon, SVGFEInput2 {
+abstract external class SVGFEMorphologyElement : SVGElement, SVGFECommon, SVGFEInput1 {
     companion object {
         val SVG_MORPHOLOGY_OPERATOR_UNKNOWN: Short
         val SVG_MORPHOLOGY_OPERATOR_ERODE: Short
