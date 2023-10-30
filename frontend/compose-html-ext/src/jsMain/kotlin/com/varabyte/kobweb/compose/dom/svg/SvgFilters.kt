@@ -128,16 +128,16 @@ abstract class SVGFilterElementAttrsScope<E : SVGElement> protected constructor(
  * Exposes the JavaScript [SVGFilterElement](https://developer.mozilla.org/en/docs/Web/API/SVGFilterElement) to Kotlin
  */
 abstract external class SVGFilterElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
+    val x: SVGAnimatedLength
+    val y: SVGAnimatedLength
+    val width: SVGAnimatedLength
+    val height: SVGAnimatedLength
 
     // SVGUnitTypes.SVG_UNIT_TYPE_...
-    open val filterUnits: SVGAnimatedEnumeration
+    val filterUnits: SVGAnimatedEnumeration
 
     // SVGUnitTypes.SVG_UNIT_TYPE_...
-    open val primitiveUnits: SVGAnimatedEnumeration
+    val primitiveUnits: SVGAnimatedEnumeration
 }
 
 enum class SVGFilterUnits {
@@ -193,10 +193,35 @@ fun ElementScope<SVGDefsElement>.Filter(
 
 // region filter elements
 
+private external interface SVGFECommon {
+    val x: SVGAnimatedLength
+    val y: SVGAnimatedLength
+    val height: SVGAnimatedLength
+    val width: SVGAnimatedLength
+
+    val result: SVGAnimatedString
+}
+
+private external interface SVGFEInput1 {
+    val in1: SVGAnimatedString
+}
+
+private external interface SVGFEInput2 : SVGFEInput1 {
+    val in2: SVGAnimatedString
+}
+
+private external interface SVGFEStdDeviation {
+    val stdDeviationX: SVGAnimatedNumber
+    val stdDeviationY: SVGAnimatedNumber
+
+    fun setStdDeviation(stdDeviationX: Float, stdDeviationY: Float)
+}
+
+
 /**
  * Exposes the JavaScript [SVGFEBlendElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEBlendElement) to Kotlin
  */
-abstract external class SVGFEBlendElement : SVGElement {
+abstract external class SVGFEBlendElement : SVGElement, SVGFECommon, SVGFEInput2 {
     companion object {
         val SVG_FEBLEND_MODE_NORMAL: Short
         val SVG_FEBLEND_MODE_MULTIPLY: Short
@@ -206,16 +231,7 @@ abstract external class SVGFEBlendElement : SVGElement {
     }
 
     // SVGFEBlendElement.SVG_FEBLEND_MODE_...
-    open val mode: SVGAnimatedEnumeration
-
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val in1: SVGAnimatedString
-    open val in2: SVGAnimatedString
-    open val result: SVGAnimatedString
+    val mode: SVGAnimatedEnumeration
 }
 
 enum class SVGBlendMode {
@@ -255,7 +271,7 @@ fun ElementScope<SVGFilterElement>.Blend(
 /**
  * Exposes the JavaScript [SVGFEColorMatrixElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEColorMatrixElement) to Kotlin
  */
-abstract external class SVGFEColorMatrixElement : SVGElement {
+abstract external class SVGFEColorMatrixElement : SVGElement, SVGFECommon, SVGFEInput1 {
     companion object {
         val SVG_FECOLORMATRIX_TYPE_UNKNOWN: Short
         val SVG_FECOLORMATRIX_TYPE_MATRIX: Short
@@ -265,17 +281,8 @@ abstract external class SVGFEColorMatrixElement : SVGElement {
     }
 
     // SVGFEColorMatrixElement.SVG_FECOLORMATRIX_TYPE_...
-    open val type: SVGAnimatedEnumeration
-
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val values: SVGAnimatedNumberList
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
+    val type: SVGAnimatedEnumeration
+    val values: SVGAnimatedNumberList
 }
 
 enum class SVGColorMatrixType {
@@ -334,7 +341,7 @@ fun ElementScope<SVGFilterElement>.ColorMatrix(
 /**
  * Exposes the JavaScript [SVGFECompositeElement](https://developer.mozilla.org/en/docs/Web/API/SVGFECompositeElement) to Kotlin
  */
-abstract external class SVGFECompositeElement : SVGElement {
+abstract external class SVGFECompositeElement : SVGElement, SVGFECommon, SVGFEInput2 {
     companion object {
         val SVG_FECOMPOSITE_OPERATOR_UNKNOWN: Short
         val SVG_FECOMPOSITE_OPERATOR_OVER: Short
@@ -346,18 +353,8 @@ abstract external class SVGFECompositeElement : SVGElement {
     }
 
     // SVGFECompositeElement.SVG_FECOMPOSITE_OPERATOR_...
-    open val type: SVGAnimatedEnumeration
-
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val values: SVGAnimatedNumberList
-
-    open val in1: SVGAnimatedString
-    open val in2: SVGAnimatedString
-    open val result: SVGAnimatedString
+    val type: SVGAnimatedEnumeration
+    val values: SVGAnimatedNumberList
 }
 
 enum class SVGCompositeOperator {
@@ -427,7 +424,7 @@ fun ElementScope<SVGFilterElement>.Composite(
 /**
  * Exposes the JavaScript [SVGFEConvolveMatrixElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEConvolveMatrixElement) to Kotlin
  */
-abstract external class SVGFEConvolveMatrixElement : SVGElement {
+abstract external class SVGFEConvolveMatrixElement : SVGElement, SVGFECommon, SVGFEInput1 {
     companion object {
         val SVG_EDGEMODE_UNKNOWN: Short
         val SVG_EDGEMODE_DUPLICATE: Short
@@ -435,26 +432,18 @@ abstract external class SVGFEConvolveMatrixElement : SVGElement {
         val SVG_EDGEMODE_NONE: Short
     }
 
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val bias: SVGAnimatedNumber
-    open val divisor: SVGAnimatedNumber
+    val bias: SVGAnimatedNumber
+    val divisor: SVGAnimatedNumber
 
     // SVGConvolveMatrixElement.SVG_EDGEMODE_...
-    open val edgeMode: SVGAnimatedEnumeration
+    val edgeMode: SVGAnimatedEnumeration
 
-    open val kernelMatrix: SVGAnimatedNumberList
-    open val orderX: SVGAnimatedInteger
-    open val orderY: SVGAnimatedInteger
-    open val preserveAlpha: SVGAnimatedBoolean
-    open val targetX: SVGAnimatedInteger
-    open val targetY: SVGAnimatedInteger
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
+    val kernelMatrix: SVGAnimatedNumberList
+    val orderX: SVGAnimatedInteger
+    val orderY: SVGAnimatedInteger
+    val preserveAlpha: SVGAnimatedBoolean
+    val targetX: SVGAnimatedInteger
+    val targetY: SVGAnimatedInteger
 }
 
 class SVGFEConvolveMatrixAttrsScope private constructor(attrs: AttrsScope<SVGFEConvolveMatrixElement>) :
@@ -522,17 +511,9 @@ fun ElementScope<SVGFilterElement>.ConvolveMatrix(
 /**
  * Exposes the JavaScript [SVGFEDiffuseLightingElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEDiffuseLightingElement) to Kotlin
  */
-abstract external class SVGFEDiffuseLightingElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val diffuseConstant: SVGAnimatedNumber
-    open val surfaceScale: SVGAnimatedNumber
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
+abstract external class SVGFEDiffuseLightingElement : SVGElement, SVGFECommon, SVGFEInput1 {
+    val diffuseConstant: SVGAnimatedNumber
+    val surfaceScale: SVGAnimatedNumber
 }
 
 class SVGFEDiffuseLightingAttrsScope private constructor(attrs: AttrsScope<SVGFEDiffuseLightingElement>) :
@@ -569,8 +550,8 @@ fun ElementScope<SVGFilterElement>.DiffuseLighting(
  * Exposes the JavaScript [SVGFEDistantLightElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEDistantLightElement) to Kotlin
  */
 abstract external class SVGFEDistantLightElement : SVGElement {
-    open val azimuth: SVGAnimatedNumber
-    open val elevation: SVGAnimatedNumber
+    val azimuth: SVGAnimatedNumber
+    val elevation: SVGAnimatedNumber
 }
 
 class SVGFEDistantLightAttrsScope private constructor(attrs: AttrsScope<SVGFEDistantLightElement>) :
@@ -615,9 +596,9 @@ fun ElementScope<SVGFESpecularLightingElement>.DistantLight(attrs: SVGFEDistantL
  * Exposes the JavaScript [SVGFEPointLightElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEPointLightElement) to Kotlin
  */
 abstract external class SVGFEPointLightElement : SVGElement {
-    open val x: SVGAnimatedNumber
-    open val y: SVGAnimatedNumber
-    open val z: SVGAnimatedNumber
+    val x: SVGAnimatedNumber
+    val y: SVGAnimatedNumber
+    val z: SVGAnimatedNumber
 }
 
 class SVGFEPointLightAttrsScope private constructor(attrs: AttrsScope<SVGFEPointLightElement>) :
@@ -666,16 +647,16 @@ fun ElementScope<SVGFESpecularLightingElement>.PointLight(attrs: SVGFEPointLight
  * Exposes the JavaScript [SVGFESpotLightElement](https://developer.mozilla.org/en/docs/Web/API/SVGFESpotLightElement) to Kotlin
  */
 abstract external class SVGFESpotLightElement : SVGElement {
-    open val x: SVGAnimatedNumber
-    open val y: SVGAnimatedNumber
-    open val z: SVGAnimatedNumber
+    val x: SVGAnimatedNumber
+    val y: SVGAnimatedNumber
+    val z: SVGAnimatedNumber
 
-    open val pointsAtX: SVGAnimatedNumber
-    open val pointsAtY: SVGAnimatedNumber
-    open val pointsAtZ: SVGAnimatedNumber
+    val pointsAtX: SVGAnimatedNumber
+    val pointsAtY: SVGAnimatedNumber
+    val pointsAtZ: SVGAnimatedNumber
 
-    open val specularExponent: SVGAnimatedNumber
-    open val limitingConeAngle: SVGAnimatedNumber
+    val specularExponent: SVGAnimatedNumber
+    val limitingConeAngle: SVGAnimatedNumber
 }
 
 class SVGFESpotLightAttrsScope private constructor(attrs: AttrsScope<SVGFESpotLightElement>) :
@@ -743,7 +724,7 @@ fun ElementScope<SVGFESpecularLightingElement>.SpotLight(attrs: SVGFESpotLightAt
 /**
  * Exposes the JavaScript [SVGFETurbulenceElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETurbulenceElement) to Kotlin
  */
-abstract external class SVGFEDisplacementMapElement : SVGElement {
+abstract external class SVGFEDisplacementMapElement : SVGElement, SVGFECommon, SVGFEInput2 {
     companion object {
         val SVG_CHANNEL_UNKNOWN: Short
         val SVG_CHANNEL_R: Short
@@ -753,19 +734,10 @@ abstract external class SVGFEDisplacementMapElement : SVGElement {
     }
 
     // SVGFEDisplacementMapElement.SVG_CHANNEL_...
-    open val xChannelSelector: SVGAnimatedEnumeration
-    open val yChannelSelector: SVGAnimatedEnumeration
+    val xChannelSelector: SVGAnimatedEnumeration
+    val yChannelSelector: SVGAnimatedEnumeration
 
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val scale: SVGAnimatedNumber
-
-    open val in1: SVGAnimatedString
-    open val in2: SVGAnimatedString
-    open val result: SVGAnimatedString
+    val scale: SVGAnimatedNumber
 }
 
 enum class SVGColorChannel {
@@ -811,21 +783,9 @@ fun ElementScope<SVGFilterElement>.DisplacementMap(
 /**
  * Exposes the JavaScript [SVGFEDropShadowElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEDropShadowElement) to Kotlin
  */
-abstract external class SVGFEDropShadowElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val dx: SVGAnimatedLength
-    open val dy: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val stdDeviationX: SVGAnimatedNumber
-    open val stdDeviationY: SVGAnimatedNumber
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
-
-    fun setStdDeviation(stdDeviationX: Float, stdDeviationY: Float)
+abstract external class SVGFEDropShadowElement : SVGElement, SVGFECommon, SVGFEInput1, SVGFEStdDeviation {
+    val dx: SVGAnimatedLength
+    val dy: SVGAnimatedLength
 }
 
 class SVGFEDropShadowAttrsScope private constructor(attrs: AttrsScope<SVGFEDropShadowElement>) :
@@ -852,14 +812,7 @@ fun ElementScope<SVGFilterElement>.DropShadow(
 /**
  * Exposes the JavaScript [SVGFEFloodElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEFloodElement) to Kotlin
  */
-abstract external class SVGFEFloodElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val result: SVGAnimatedString
-}
+abstract external class SVGFEFloodElement : SVGElement, SVGFECommon
 
 class SVGFEFloodAttrsScope private constructor(attrs: AttrsScope<SVGFEFloodElement>) :
     SVGFilterElementAttrsScope<SVGFEFloodElement>(attrs) {
@@ -884,24 +837,11 @@ fun ElementScope<SVGFilterElement>.Flood(
 /**
  * Exposes the JavaScript [SVGFEGaussianBlurElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEGaussianBlurElement) to Kotlin
  */
-abstract external class SVGFEGaussianBlurElement : SVGElement {
+abstract external class SVGFEGaussianBlurElement : SVGElement, SVGFECommon, SVGFEInput1, SVGFEStdDeviation {
     companion object {} // Empty companion object declaration necessary so we can extend it
 
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val stdDeviationX: SVGAnimatedNumber
-    open val stdDeviationY: SVGAnimatedNumber
-
     // SVGFEGaussianBlurElement.SVG_EDGEMODE_...
-    open val edgeMode: SVGAnimatedEnumeration
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
-
-    fun setStdDeviation(stdDeviationX: Float, stdDeviationY: Float)
+    val edgeMode: SVGAnimatedEnumeration
 }
 
 // EDGEMODE constants are declared on SVGFEConvolveMatrixElement but also relevant to SVGFEGaussianBlurElement
@@ -946,18 +886,11 @@ fun ElementScope<SVGFilterElement>.GaussianBlur(
 /**
  * Exposes the JavaScript [SVGFEImageElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEImageElement) to Kotlin
  */
-abstract external class SVGFEImageElement : SVGElement {
-    open val href: SVGAnimatedString
+abstract external class SVGFEImageElement : SVGElement, SVGFECommon {
+    val href: SVGAnimatedString
 
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val crossOrigin: SVGAnimatedString
-    open val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
-
-    open val result: SVGAnimatedString
+    val crossOrigin: SVGAnimatedString
+    val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
 }
 
 class SVGFEImageAttrsScope private constructor(attrs: AttrsScope<SVGFEImageElement>) :
@@ -987,14 +920,7 @@ fun ElementScope<SVGFilterElement>.Image(
 /**
  * Exposes the JavaScript [SVGFEMergeElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMergeElement) to Kotlin
  */
-abstract external class SVGFEMergeElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val result: SVGAnimatedString
-}
+abstract external class SVGFEMergeElement : SVGElement, SVGFECommon
 
 class SVGFEMergeAttrsScope private constructor(attrs: AttrsScope<SVGFEMergeElement>) :
     SVGFilterElementAttrsScope<SVGFEMergeElement>(attrs) {
@@ -1020,9 +946,7 @@ fun ElementScope<SVGFilterElement>.Merge(
 /**
  * Exposes the JavaScript [SVGFEMergeNodeElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMergeNodeElement) to Kotlin
  */
-abstract external class SVGFEMergeNodeElement : SVGElement {
-    open val in1: SVGAnimatedString
-}
+abstract external class SVGFEMergeNodeElement : SVGElement, SVGFEInput1
 
 class SVGFEMergeNodeAttrsScope private constructor(attrs: AttrsScope<SVGFEMergeNodeElement>) :
     SVGFilterElementAttrsScope<SVGFEMergeNodeElement>(attrs), FilterInput1Attrs<SVGFEMergeNodeElement> {
@@ -1045,14 +969,7 @@ fun ElementScope<SVGFEMergeElement>.MergeNode(attrs: SVGFEMergeNodeAttrsScope.()
 /**
  * Exposes the JavaScript [SVGFEComponentTransferElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEComponentTransferElement) to Kotlin
  */
-abstract external class SVGFEComponentTransferElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val result: SVGAnimatedString
-}
+abstract external class SVGFEComponentTransferElement : SVGElement, SVGFECommon
 
 class SVGFEComponentTransferAttrsScope private constructor(attrs: AttrsScope<SVGFEComponentTransferElement>) :
     SVGFilterElementAttrsScope<SVGFEComponentTransferElement>(attrs), FilterInput1Attrs<SVGFEComponentTransferElement> {
@@ -1089,14 +1006,14 @@ abstract external class SVGComponentTransferFunctionElement : SVGElement {
     }
 
     // SVGComponentTransferFunctionElement.SVG_FECOMPONENTTRANSFER_TYPE_...
-    open val type: SVGAnimatedEnumeration
+    val type: SVGAnimatedEnumeration
 
-    open val tableValues: SVGAnimatedNumberList
-    open val slope: SVGAnimatedNumber
-    open val intercept: SVGAnimatedNumber
-    open val amplitude: SVGAnimatedNumber
-    open val exponent: SVGAnimatedNumber
-    open val offset: SVGAnimatedNumber
+    val tableValues: SVGAnimatedNumberList
+    val slope: SVGAnimatedNumber
+    val intercept: SVGAnimatedNumber
+    val amplitude: SVGAnimatedNumber
+    val exponent: SVGAnimatedNumber
+    val offset: SVGAnimatedNumber
 }
 
 /**
@@ -1215,7 +1132,7 @@ fun ElementScope<SVGFEComponentTransferElement>.FuncB(attrs: SVGComponentTransfe
 /**
  * Exposes the JavaScript [SVGFEMorphologyElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEMorphologyElement) to Kotlin
  */
-abstract external class SVGFEMorphologyElement : SVGElement {
+abstract external class SVGFEMorphologyElement : SVGElement, SVGFECommon, SVGFEInput2 {
     companion object {
         val SVG_MORPHOLOGY_OPERATOR_UNKNOWN: Short
         val SVG_MORPHOLOGY_OPERATOR_ERODE: Short
@@ -1223,18 +1140,10 @@ abstract external class SVGFEMorphologyElement : SVGElement {
     }
 
     // SVGFEMorphologyElement.SVG_MORPHOLOGY_OPERATOR_...
-    open val operator: SVGAnimatedEnumeration
+    val operator: SVGAnimatedEnumeration
 
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val radiusX: SVGAnimatedNumber
-    open val radiusY: SVGAnimatedNumber
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val in1: SVGAnimatedString
-    open val in2: SVGAnimatedString
-    open val result: SVGAnimatedString
+    val radiusX: SVGAnimatedNumber
+    val radiusY: SVGAnimatedNumber
 }
 
 enum class SVGMorphologyOperator {
@@ -1280,17 +1189,9 @@ fun ElementScope<SVGFilterElement>.Morphology(
 /**
  * Exposes the JavaScript [SVGFEOffsetElement](https://developer.mozilla.org/en/docs/Web/API/SVGFEOffsetElement) to Kotlin
  */
-abstract external class SVGFEOffsetElement : SVGElement {
-    open val dx: SVGAnimatedLength
-    open val dy: SVGAnimatedLength
-
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
+abstract external class SVGFEOffsetElement : SVGElement, SVGFECommon, SVGFEInput1 {
+    val dx: SVGAnimatedLength
+    val dy: SVGAnimatedLength
 }
 
 class SVGFEOffsetAttrsScope private constructor(attrs: AttrsScope<SVGFEOffsetElement>) :
@@ -1317,19 +1218,11 @@ fun ElementScope<SVGFilterElement>.Offset(
 /**
  * Exposes the JavaScript [SVGFESpecularLightingElement](https://developer.mozilla.org/en/docs/Web/API/SVGFESpecularLightingElement) to Kotlin
  */
-abstract external class SVGFESpecularLightingElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
+abstract external class SVGFESpecularLightingElement : SVGElement, SVGFECommon, SVGFEInput1 {
+    val specularConstant: SVGAnimatedNumber
+    val specularExponent: SVGAnimatedNumber
 
-    open val specularConstant: SVGAnimatedNumber
-    open val specularExponent: SVGAnimatedNumber
-
-    open val surfaceScale: SVGAnimatedNumber
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
+    val surfaceScale: SVGAnimatedNumber
 }
 
 class SVGFESpecularLightingAttrsScope private constructor(attrs: AttrsScope<SVGFESpecularLightingElement>) :
@@ -1369,15 +1262,7 @@ fun ElementScope<SVGFilterElement>.SpecularLighting(
 /**
  * Exposes the JavaScript [SVGFETileElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETileElement) to Kotlin
  */
-abstract external class SVGFETileElement : SVGElement {
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
-
-    open val in1: SVGAnimatedString
-    open val result: SVGAnimatedString
-}
+abstract external class SVGFETileElement : SVGElement, SVGFECommon, SVGFEInput1
 
 class SVGFETileAttrsScope private constructor(attrs: AttrsScope<SVGFETileElement>) :
     SVGFilterElementAttrsScope<SVGFETileElement>(attrs), FilterInput1Attrs<SVGFETileElement> {
@@ -1402,7 +1287,7 @@ fun ElementScope<SVGFilterElement>.Tile(
 /**
  * Exposes the JavaScript [SVGFETurbulenceElement](https://developer.mozilla.org/en/docs/Web/API/SVGFETurbulenceElement) to Kotlin
  */
-abstract external class SVGFETurbulenceElement : SVGElement {
+abstract external class SVGFETurbulenceElement : SVGElement, SVGFECommon {
     companion object {
         val SVG_TURBULENCE_TYPE_UNKNOWN: Short
         val SVG_TURBULENCE_TYPE_FRACTALNOISE: Short
@@ -1414,24 +1299,18 @@ abstract external class SVGFETurbulenceElement : SVGElement {
     }
 
     // SVGFETurbulenceElement.SVG_TURBULENCE_TYPE_...
-    open val type: SVGAnimatedEnumeration
+    val type: SVGAnimatedEnumeration
 
-    open val x: SVGAnimatedLength
-    open val y: SVGAnimatedLength
-    open val radiusX: SVGAnimatedNumber
-    open val radiusY: SVGAnimatedNumber
-    open val width: SVGAnimatedLength
-    open val height: SVGAnimatedLength
+    val radiusX: SVGAnimatedNumber
+    val radiusY: SVGAnimatedNumber
 
     // SVGFETurbulenceElement.SVG_STITCHTYPE_...
-    open val stitchTiles: SVGAnimatedEnumeration
+    val stitchTiles: SVGAnimatedEnumeration
 
-    open val baseFrequencyX: SVGAnimatedNumber
-    open val baseFrequencyY: SVGAnimatedNumber
-    open val numOctaves: SVGAnimatedInteger
-    open val seed: SVGAnimatedNumber
-
-    open val result: SVGAnimatedString
+    val baseFrequencyX: SVGAnimatedNumber
+    val baseFrequencyY: SVGAnimatedNumber
+    val numOctaves: SVGAnimatedInteger
+    val seed: SVGAnimatedNumber
 }
 
 enum class SVGTurbulenceType {
