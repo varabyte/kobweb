@@ -47,12 +47,15 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.tooling.events.FailureResult
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
+import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import javax.inject.Inject
 import kotlin.io.path.exists
 import kotlin.io.path.readText
@@ -210,9 +213,6 @@ class KobwebApplicationPlugin @Inject constructor(
         }
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
-        // TODO: below we add generated kobweb sources to the generatedByKsp... source sets. This is done to prevent KSP
-        //  from processing them, but ideally we should probably create our own source set for this instead?
-        // Note: we use `matching` instead of `named` for the ksp source sets because they don't exist yet at this point
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.hackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
@@ -241,8 +241,9 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
-            project.kotlin.sourceSets.matching { it.name == jsTarget.kspSourceSet }.configureEach {
-                kotlin.srcDir(kobwebGenSiteEntryTask)
+            // Register generated sources directly to compileKotlin task so that KSP doesn't process them
+            project.tasks.named<Kotlin2JsCompile>(jsTarget.compileKotlin) {
+                source(kobwebGenSiteEntryTask)
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
@@ -301,8 +302,9 @@ class KobwebApplicationPlugin @Inject constructor(
                 kspGenFile.set(project.kspBackendFile(jvmTarget))
             }
 
-            project.kotlin.sourceSets.matching { it.name == jvmTarget.kspSourceSet }.configureEach {
-                kotlin.srcDir(kobwebGenApisFactoryTask)
+            // Register generated sources directly to compileKotlin task so that KSP doesn't process them
+            project.tasks.named<KotlinJvmCompile>(jvmTarget.compileKotlin) {
+                source(kobwebGenApisFactoryTask)
             }
         }
     }

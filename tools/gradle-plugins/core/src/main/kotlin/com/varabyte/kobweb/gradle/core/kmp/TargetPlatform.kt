@@ -23,7 +23,6 @@ interface TargetPlatform<T : KotlinTarget> {
     val processResources get() = "${name}ProcessResources"
 
     val kspKotlin get() = "kspKotlin$capitalizedName"
-    val kspSourceSet get() = "generatedBy${kspKotlin.replaceFirstChar { it.uppercase() }}"
 }
 
 class JsTarget(kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTarget> {
