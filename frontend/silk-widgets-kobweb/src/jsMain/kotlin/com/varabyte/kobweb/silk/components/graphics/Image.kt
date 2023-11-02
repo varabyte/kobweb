@@ -63,3 +63,24 @@ fun Image(
         if (height != null) attr("height", height.toString())
     })
 }
+
+/**
+ * Convenience version of `Image` where the alt description is not optional.
+ */
+@Deprecated(
+    "After review, we've decided to take this convenience method out for simplicity / consistency with other methods in the Silk library. Please replace `Image(\"src\", \"description\")` with `Image(\"src\", alt = \"description\")`.",
+    ReplaceWith("Image(src, modifier, variant, width, height, desc, autoPrefix, ref)"),
+)
+@Composable
+fun Image(
+    src: String,
+    desc: String,
+    modifier: Modifier = Modifier,
+    variant: ComponentVariant? = null,
+    width: Int? = null,
+    height: Int? = null,
+    autoPrefix: Boolean = true,
+    ref: ElementRefScope<HTMLImageElement>? = null,
+) {
+    Image(src, modifier, variant, width, height, desc, autoPrefix, ref)
+}
