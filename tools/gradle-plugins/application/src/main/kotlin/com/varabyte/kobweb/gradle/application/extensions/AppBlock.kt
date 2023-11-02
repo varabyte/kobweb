@@ -56,6 +56,30 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf, baseGenDir: Proper
          */
         abstract val faviconPath: Property<String>
 
+        /**
+         * A list of attribute key / value pairs to add to the script tag that imports your site.
+         *
+         * By default, Kobweb will just generate a very minimal script tag:
+         *
+         * ```
+         * <script src="/yourapp.js"></script>
+         * ```
+         *
+         * However, if you need to add attributes to it, you can do so here. For example, if you need to add a `type`
+         * attribute, you can do so like this:
+         *
+         * ```
+         * scriptAttributes.put("type", "module")
+         * ```
+         *
+         * which would generate:
+         *
+         * ```
+         * <script src="/yourapp.js" type="module"></script>
+         * ```
+         */
+        abstract val scriptAttributes: MapProperty<String, String>
+
         init {
             description.convention("Powered by Kobweb")
             faviconPath.convention("/favicon.ico")

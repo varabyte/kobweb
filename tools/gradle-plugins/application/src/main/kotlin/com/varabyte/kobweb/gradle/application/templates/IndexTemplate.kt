@@ -73,6 +73,7 @@ fun createIndexFile(
     title: String,
     headElements: Iterable<HEAD.() -> Unit>,
     src: String,
+    scriptAttributes: Map<String, String>,
     buildTarget: BuildTarget
 ): String {
     return document {
@@ -98,6 +99,7 @@ fun createIndexFile(
 
                     script {
                         this.src = src
+                        attributes.putAll(scriptAttributes)
                     }
                 }
             }

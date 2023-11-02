@@ -73,6 +73,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
                 routePrefix.prependTo(kobwebConf.server.files.dev.script.substringAfterLast("/").prefixIfNot("/")),
+                kobwebBlock.app.index.scriptAttributes.get(),
                 buildTarget
             )
         )
