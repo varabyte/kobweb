@@ -1,4 +1,4 @@
-![version: 0.14.2](https://img.shields.io/badge/kobweb-0.14.2-blue)
+![version: 0.14.3](https://img.shields.io/badge/kobweb-0.14.3-blue)
 ![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)
 <br>
 ![kotlin: 1.9.10](https://img.shields.io/badge/kotlin-1.9.10-blue?logo=kotlin)
