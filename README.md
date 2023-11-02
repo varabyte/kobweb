@@ -341,6 +341,33 @@ You can create the following Kobweb projects by typing `kobweb create ...`
 
 For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 
+### Gradle version catalogs
+
+The project templates created by Kobweb all embrace Gradle version catalogs.
+
+If you're not aware of it, it's a file that exists at `gradle/libs.versions.toml`. If you find yourself wanting to tweak
+or add new versions to projects you originally created via `kobweb create`, that's where you'll find them.
+
+For example, here's the
+[libs.versions.toml](https://github.com/varabyte/kobweb-site/blob/main/gradle/libs.versions.toml) we use for our own
+landing site.
+
+To read more about the feature, please check out the
+[official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
+
+#### Upgrading Kobweb in your project
+
+The latest available version of Kobweb is declared at the top of this README. If a new version has come out, you can
+update your own project by visiting `libs.version.toml` and updating the `kobweb` version there.
+
+> [!IMPORTANT]
+> You should also double-check [COMPATIBILITY.md](COMPATIBILITY.md) to see if you also need to update your `kotlin` and
+> `jetbrains-compose` versions at the same time.
+
+> [!NOTE]
+> It can be confusing, but Kobweb has two versions -- the version for the library itself (the one that is applicable in
+> this situation), and the one for the command line tool.
+
 # Beginner topics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
@@ -2180,30 +2207,6 @@ imports:
 
 {{{ VisitorCounter }}}
 ```
-
-### Version Catalogs
-
-The project templates created by Kobweb all embrace Gradle version catalogs, which are (at the time of writing this
-README) a relatively new feature, so users may not be aware of it.
-
-There is a file called `libs.versions.toml` that exists inside your project's root `gradle` folder. If you find yourself
-wanting to tweak or add new versions to projects you originally created via `kobweb create`, that's where you'll find
-them.
-
-For example, here's the
-[libs.versions.toml](https://github.com/varabyte/kobweb-site/blob/main/gradle/libs.versions.toml) we use for our own
-landing site.
-
-To read more about the feature, please check out the
-[official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
-
-#### Upgrading Kobweb
-
-The latest available version of Kobweb is declared at the top of this README. If a new version has come out, you can
-update your own project by visiting `libs.version.toml` and updating the `kobweb` version there.
-
-You should also double-check [COMPATIBILITY.md](COMPATIBILITY.md) to see if you also need to update your `kotlin` and
-`jetbrains-compose` versions at the same time.
 
 # Advanced topics
 
