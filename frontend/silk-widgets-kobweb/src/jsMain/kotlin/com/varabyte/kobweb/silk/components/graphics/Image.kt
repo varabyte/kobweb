@@ -66,15 +66,24 @@ fun Image(
 
 /**
  * Convenience version of `Image` where the alt description is not optional.
+ *
+ * We provide this convenience method since it is strongly encouraged to include a description with your
+ * images for accessibility reasons.
+ *
+ * Note that the parameter here is called `description` instead of `alt` to avoid ambiguity issues with the other
+ * `Image` method. In other words, because of this decision, you can write this code:
+ * ```
+ * Image(
+ * "/my-image.png",
+ * alt = "My image description",
+ * modifier = Modifier.stuff()
+ * ```
+ * and the compiler won't complain about getting confused between which method you're trying to call.
  */
-@Deprecated(
-    "After review, we've decided to take this convenience method out for simplicity / consistency with other methods in the Silk library. Please replace `Image(\"src\", \"description\")` with `Image(\"src\", alt = \"description\")`.",
-    ReplaceWith("Image(src, modifier, variant, width, height, desc, autoPrefix, ref)"),
-)
 @Composable
 fun Image(
     src: String,
-    desc: String,
+    description: String,
     modifier: Modifier = Modifier,
     variant: ComponentVariant? = null,
     width: Int? = null,
@@ -82,5 +91,5 @@ fun Image(
     autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLImageElement>? = null,
 ) {
-    Image(src, modifier, variant, width, height, desc, autoPrefix, ref)
+    Image(src, modifier, variant, width, height, description, autoPrefix, ref)
 }
