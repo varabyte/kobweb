@@ -23,7 +23,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     private val kobwebConf: KobwebConf,
     config: KobwebBlock,
     @get:Input val buildTarget: BuildTarget
-) : KobwebModuleTask(config, "Generate an index.html file for this Kobweb project") {
+) : KobwebGenerateTask(config, "Generate an index.html file for this Kobweb project") {
 
     @InputFiles
     fun getResourceFiles() = run {

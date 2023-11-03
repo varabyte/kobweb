@@ -24,7 +24,7 @@ import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: KobwebBlock) :
-    KobwebModuleTask(kobwebBlock, "Generate Kobweb code for the server") {
+    KobwebGenerateTask(kobwebBlock, "Generate Kobweb code for the server") {
     @get:Optional
     @get:InputFile
     abstract val kspGenFile: RegularFileProperty

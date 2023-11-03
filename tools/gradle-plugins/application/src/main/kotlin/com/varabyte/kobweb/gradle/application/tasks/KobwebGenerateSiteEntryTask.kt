@@ -29,7 +29,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     private val kobwebConf: KobwebConf,
     kobwebBlock: KobwebBlock,
     @get:Input val buildTarget: BuildTarget,
-) : KobwebModuleTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
+) : KobwebGenerateTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:InputFile
     abstract val kspGenFile: RegularFileProperty
 

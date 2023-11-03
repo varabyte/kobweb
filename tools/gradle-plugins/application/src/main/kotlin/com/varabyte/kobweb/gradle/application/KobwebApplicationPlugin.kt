@@ -13,6 +13,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteEntryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
@@ -306,6 +307,14 @@ class KobwebApplicationPlugin @Inject constructor(
             project.tasks.named<KotlinJvmCompile>(jvmTarget.compileKotlin) {
                 source(kobwebGenApisFactoryTask)
             }
+        }
+
+        // Convenience task in case you quickly want to run all "kobwebGen..." tasks
+        project.tasks.register("kobwebGenAll") {
+            group = "kobweb"
+            description = "Run all Kobweb code generation tasks"
+
+            dependsOn(project.tasks.withType<KobwebGenerateTask>())
         }
     }
 }
