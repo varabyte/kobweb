@@ -358,11 +358,11 @@ To read more about the feature, please check out the
 #### Upgrading Kobweb in your project
 
 The latest available version of Kobweb is declared at the top of this README. If a new version has come out, you can
-update your own project by visiting `libs.version.toml` and updating the `kobweb` version there.
+update your own project by editing `gradle/libs.version.toml` and updating the `kobweb` version there.
 
 > [!IMPORTANT]
-> You should also double-check [COMPATIBILITY.md](COMPATIBILITY.md) to see if you also need to update your `kotlin` and
-> `jetbrains-compose` versions at the same time.
+> You should double-check [COMPATIBILITY.md](COMPATIBILITY.md) to see if you also need to update your `kotlin` and
+> `jetbrains-compose` versions as well.
 
 > [!NOTE]
 > It can be confusing, but Kobweb has two versions -- the version for the library itself (the one that is applicable in
