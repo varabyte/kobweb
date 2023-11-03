@@ -8,7 +8,4 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
  *
  * This allows us to search for all Kobweb generate tasks by type.
  */
-abstract class KobwebGenerateTask(
-    kobwebBlock: KobwebBlock,
-    desc: String,
-) : KobwebModuleTask(kobwebBlock, "Generate an index.html file for this Kobweb project")
+abstract class KobwebGenerateTask(kobwebBlock: KobwebBlock, desc: String) : KobwebModuleTask(kobwebBlock, desc)
