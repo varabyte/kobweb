@@ -11,7 +11,6 @@ group = "com.varabyte.kobweb.server"
 version = libs.versions.kobweb.libs.get()
 
 dependencies {
-    implementation(kotlin("stdlib"))
     implementation(libs.bundles.ktor)
     implementation(libs.kaml)
 
