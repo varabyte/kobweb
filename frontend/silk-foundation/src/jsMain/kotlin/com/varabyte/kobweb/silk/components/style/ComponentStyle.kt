@@ -302,7 +302,7 @@ class ComponentStyle(
  * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
  */
-class ImmutableComponentStyle internal constructor(
+internal class ImmutableComponentStyle(
     private val name: String,
     private val extraModifiers: @Composable () -> Modifier
 ) {
