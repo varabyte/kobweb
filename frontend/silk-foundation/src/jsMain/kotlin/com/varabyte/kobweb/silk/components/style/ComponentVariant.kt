@@ -12,7 +12,13 @@ sealed class ComponentVariant {
         return CompositeComponentVariant(this, next)
     }
 
-    internal abstract fun addStylesInto(styleSheet: StyleSheet)
+    /**
+     * Add this [ComponentVariant]'s styles to the target [StyleSheet].
+     *
+     * @return The list of CSS class selectors associated specifically with this variant. For example, if the selector
+     *  for this variant is `.some-style.some-variant`, then this method will only contain `some-variant`.
+     */
+    internal abstract fun addStylesInto(styleSheet: StyleSheet): List<String>
 
     @Composable
     internal abstract fun toModifier(): Modifier
@@ -33,24 +39,23 @@ class SimpleComponentVariant(
     val name: String
         get() = style.name.removePrefix("${baseStyle.name}-")
 
-    override fun addStylesInto(styleSheet: StyleSheet) {
+    override fun addStylesInto(styleSheet: StyleSheet): List<String> {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
         // a link (so this would be registered as ".silk-link.silk-link-undecorated").
         // To put it another way, if you use a link variant with a surface widget, it won't be applied.
-        style.addStylesInto(styleSheet, ".${baseStyle.name}.${style.name}")
+        return style.addStylesInto(styleSheet, ".${baseStyle.name}.${style.name}")
     }
 
     @Composable
     override fun toModifier() = style.toModifier()
-    internal fun intoImmutableStyle() = style.intoImmutableStyle()
+    internal fun intoImmutableStyle(classNames: List<String>) = style.intoImmutableStyle(classNames)
 }
 
 private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant) :
     ComponentVariant() {
-    override fun addStylesInto(styleSheet: StyleSheet) {
-        head.addStylesInto(styleSheet)
-        tail.addStylesInto(styleSheet)
+    override fun addStylesInto(styleSheet: StyleSheet): List<String> {
+        return head.addStylesInto(styleSheet) + tail.addStylesInto(styleSheet)
     }
 
     @Composable
