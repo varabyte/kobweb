@@ -373,13 +373,13 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         // initialization blocks can reference `SilkTheme`.
         check(_SilkTheme != null)
         mutableSilkTheme.componentStyles.values.forEach { componentStyle ->
-            componentStyle.addStylesInto(componentStyleSheet)
-            _componentStyles[componentStyle.name] = componentStyle.intoImmutableStyle()
+            val classNames = componentStyle.addStylesInto(componentStyleSheet)
+            _componentStyles[componentStyle.name] = componentStyle.intoImmutableStyle(classNames)
         }
         // Variants should be defined after base styles to make sure they take priority if used
         mutableSilkTheme.componentVariants.values.filterIsInstance<SimpleComponentVariant>().forEach { variant ->
-            variant.addStylesInto(componentStyleSheet)
-            _componentStyles[variant.style.name] = variant.intoImmutableStyle()
+            val classNames = variant.addStylesInto(componentStyleSheet)
+            _componentStyles[variant.style.name] = variant.intoImmutableStyle(classNames)
         }
     }
 }

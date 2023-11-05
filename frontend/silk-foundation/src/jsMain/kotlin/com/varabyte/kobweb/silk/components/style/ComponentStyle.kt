@@ -70,41 +70,7 @@ class ComponentStyle(
     )
         : this(name, { extraModifiers }, prefix, init)
 
-    companion object {
-        /**
-         * A set of all classnames we have styles registered against.
-         *
-         * This lets us avoid applying unnecessary classnames, which really helps cut down on the number of class tags
-         * we use, making it easier to debug CSS issues in the browser.
-         *
-         * An example can help clarify here. Let's say you define a color-aware style:
-         *
-         * ```
-         * ComponentStyle("custom") { colorMode ->
-         *   base {
-         *     Modifier.color(if (colorMode.isLight) Colors.Red else Colors.Pink)
-         *   }
-         * }
-         * ```
-         *
-         * For this, you only need the class name "custom-dark" (in dark mode) and "custom-light"; if instead it was
-         * color-agnostic, we would only need "custom". Before, we were applying all color modes because we weren't sure
-         * what was defined and what wasn't.
-         *
-         * In some cases, we have empty styles too, as hooks that user's can optionally replace if they want to.
-         * Now, as long as the style remains empty, we won't add any tagging at all to the user's elements.
-         */
-        internal val registeredClasses = mutableSetOf<String>()
-
-        /**
-         * Handle being notified of a selector name, e.g. ".someStyle" or ".someStyle.someVariant"
-         */
-        // Note: This is kind of a hack, but since we can't currently query the StyleSheet for selector names, what we
-        // do instead is update our internal list as we run through all ComponentStyles.
-        private fun notifySelectorName(selectorName: String) {
-            selectorName.split('.').filter { it.isNotEmpty() }.forEach { registeredClasses.add(it) }
-        }
-    }
+    companion object // for extensions
 
     /**
      * Create a new variant that builds on top of this style.
@@ -167,11 +133,11 @@ class ComponentStyle(
         }
     }
 
-    internal fun addStylesInto(styleSheet: StyleSheet, selectorName: String) {
+    internal fun addStylesInto(styleSheet: StyleSheet, selectorName: String): List<String> {
         // Always add the base selector name, even if the ComponentStyle is empty. Callers may use empty
         // component styles as classnames, which can still be useful for targeting one element from another, or
         // searching for all elements tagged with a certain class.
-        notifySelectorName(selectorName)
+        val classNames = mutableListOf(selectorName)
 
         // Collect all CSS selectors (e.g. all base, hover, breakpoints, etc. modifiers) and, if we ever find multiple
         // definitions for the same selector, just combine them together. One way this is useful is you can use
@@ -256,7 +222,7 @@ class ComponentStyle(
         StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
             withFinalSelectorName(selectorName, group) { name, styles ->
                 if (styles.isNotEmpty()) {
-                    notifySelectorName(name)
+                    classNames.add(name)
                     styleSheet.addStyles(name, styles)
                 }
             }
@@ -267,7 +233,7 @@ class ComponentStyle(
             StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)?.let { group ->
                 withFinalSelectorName(selectorName, group) { name, styles ->
                     if (styles.isNotEmpty()) {
-                        notifySelectorName(name)
+                        classNames.add(name)
 
                         val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
                         if (cssRuleKey.mediaQuery != null) {
@@ -283,35 +249,40 @@ class ComponentStyle(
                 }
             }
         }
+        // Selectors may be ".someStyle" or ".someStyle.someVariant" - only the last part is relevant to this style
+        return classNames.map { it.substringAfterLast('.') }
     }
 
     /**
-     * Add this [ComponentStyle]'s styles to the target [StyleSheet]
+     * Add this [ComponentStyle]'s styles to the target [StyleSheet].
+     *
+     * @return The list of CSS class selectors associated with this style.
      */
-    internal fun addStylesInto(styleSheet: StyleSheet) {
+    internal fun addStylesInto(styleSheet: StyleSheet): List<String> {
         // Register styles associated with this style's classname
-        addStylesInto(styleSheet, ".$name")
+        return addStylesInto(styleSheet, ".$name")
     }
 
-    internal fun intoImmutableStyle() = ImmutableComponentStyle(name, extraModifiers)
+    internal fun intoImmutableStyle(classNames: List<String>) = ImmutableComponentStyle(classNames, extraModifiers)
 }
 
 /**
  * A [ComponentStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
  *
+ * @param classNames The list of CSS class selectors associated with this style.
  * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
  */
 internal class ImmutableComponentStyle(
-    private val name: String,
+    classNames: List<String>,
     private val extraModifiers: @Composable () -> Modifier
 ) {
+    private val classNames = classNames.toSet()
+
     @Composable
     fun toModifier(): Modifier {
-        val classNames = listOf(name, name.suffixedWith(ColorMode.current))
-            .filter { name -> ComponentStyle.registeredClasses.contains(name) }
-
-        return (if (classNames.isNotEmpty()) Modifier.classNames(*classNames.toTypedArray()) else Modifier)
+        val currentClassNames = classNames.filterNot { it.endsWith(ColorMode.current.opposite.name.lowercase()) }
+        return (if (currentClassNames.isNotEmpty()) Modifier.classNames(*currentClassNames.toTypedArray()) else Modifier)
             .then(extraModifiers())
     }
 }
