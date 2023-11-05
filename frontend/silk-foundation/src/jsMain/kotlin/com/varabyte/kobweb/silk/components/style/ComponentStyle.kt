@@ -133,91 +133,88 @@ class ComponentStyle(
         }
     }
 
+    // Collect all CSS selectors (e.g. all base, hover, breakpoints, etc. modifiers) and, if we ever find multiple
+    // definitions for the same selector, just combine them together. One way this is useful is you can use
+    // `MutableSilkTheme.modifyComponentStyle` to layer additional styles on top of a base style. In almost all
+    // practical cases, however, there will only ever be a single selector of each type per component style.
+    private fun ComponentModifiers.mergeCssModifiers(init: ComponentModifiers.() -> Unit): Map<CssModifier.Key, CssModifier> {
+        return apply(init).cssModifiers
+            .groupBy { it.key }
+            .mapValues { (_, group) ->
+                group.reduce { acc, curr -> acc.mergeWith(curr) }
+            }
+    }
+
+    private fun Map<CssModifier.Key, CssModifier>.assertNoAttributeModifiers(selectorName: String): Map<CssModifier.Key, CssModifier> {
+        return this.onEach { (_, cssModifier) ->
+            val attrsScope = ComparableAttrsScope<Element>()
+            cssModifier.modifier.toAttrs<AttrsScope<Element>>().invoke(attrsScope)
+            if (attrsScope.attributes.isEmpty()) return@onEach
+
+            error(buildString {
+                appendLine("ComponentStyle declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the ComponentStyle's `extraModifiers` parameter.")
+                appendLine()
+                appendLine("Details:")
+
+                append("\tCSS rule: ")
+                append("\"$selectorName")
+                if (cssModifier.mediaQuery != null) append(cssModifier.mediaQuery)
+                if (cssModifier.suffix != null) append(cssModifier.suffix)
+                append("\"")
+
+                append(" (do you declare a property called ")
+                // ".example" likely comes from `ExampleStyle` while ".example.example-outlined" likely
+                // comes from ExampleOutlinedVariant or OutlinedExampleVariant
+                val isStyle = selectorName.count { it == '.' } == 1// "Variant" else "Style"
+                val styleName = selectorName.substringAfter(".").substringBefore(".")
+
+                if (isStyle) {
+                    append("`${styleName.kebabCaseToTitleCamelCase()}Style`")
+                } else {
+                    // Convert ".example.example-outlined" to "outlined". This could come from a variant
+                    // property called OutlinedExampleVariant or ExampleOutlinedVariant
+                    val variantPart = selectorName.substringAfterLast(".").removePrefix("$styleName-")
+                    append("`${"$styleName-$variantPart".kebabCaseToTitleCamelCase()}Variant`")
+                    append(" or ")
+                    append("`${"$variantPart-$styleName".kebabCaseToTitleCamelCase()}Variant`")
+                }
+                appendLine("?)")
+                appendLine("\tAttribute(s): ${attrsScope.attributes.keys.joinToString(", ") { "\"$it\"" }}")
+                appendLine()
+                appendLine("An example of how to fix this:")
+                appendLine(
+                    """
+                    |   // Before
+                    |   val ExampleStyle by ComponentStyle {
+                    |       base {
+                    |          Modifier
+                    |              .backgroundColor(Colors.Magenta))
+                    |              .tabIndex(0) // <-- The offending attribute modifier
+                    |       }
+                    |   }
+                    |   
+                    |   // After
+                    |   val ExampleStyle by ComponentStyle(extraModifiers = Modifier.tabIndex(0)) {
+                    |       base {
+                    |           Modifier.backgroundColor(Colors.Magenta)
+                    |       }
+                    |   }
+                    """.trimMargin()
+                )
+            })
+        }
+    }
+
     internal fun addStylesInto(styleSheet: StyleSheet, selectorName: String): List<String> {
         // Always add the base selector name, even if the ComponentStyle is empty. Callers may use empty
         // component styles as classnames, which can still be useful for targeting one element from another, or
         // searching for all elements tagged with a certain class.
         val classNames = mutableListOf(selectorName)
 
-        // Collect all CSS selectors (e.g. all base, hover, breakpoints, etc. modifiers) and, if we ever find multiple
-        // definitions for the same selector, just combine them together. One way this is useful is you can use
-        // `MutableSilkTheme.modifyComponentStyle` to layer additional styles on top of a base style. In almost all
-        // practical cases, however, there will only ever be a single selector of each type per component style.
-        fun ComponentModifiers.mergeCssModifiers(init: ComponentModifiers.() -> Unit): Map<CssModifier.Key, CssModifier> {
-            return apply(init).cssModifiers
-                .groupBy { it.key }
-                .mapValues { (_, group) ->
-                    val first = group.first()
-                    if (group.size == 1) return@mapValues first
-                    group.reduce { acc, curr -> acc.mergeWith(curr) }
-                }
-        }
-
-        fun Map<CssModifier.Key, CssModifier>.assertNoAttributeModifiers(): Map<CssModifier.Key, CssModifier> {
-            this.forEach { (_, cssModifier) ->
-                ComparableAttrsScope<Element>().apply {
-                    cssModifier.modifier.toAttrs<AttrsScope<Element>>().invoke(this)
-
-                    if (attributes.isNotEmpty()) {
-                        error(buildString {
-                            appendLine("ComponentStyle declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the ComponentStyle's `extraModifiers` parameter.")
-                            appendLine()
-                            appendLine("Details:")
-
-                            append("\tCSS rule: ")
-                            append("\"$selectorName")
-                            if (cssModifier.mediaQuery != null) append(cssModifier.mediaQuery)
-                            if (cssModifier.suffix != null) append(cssModifier.suffix)
-                            append("\"")
-
-                            append(" (do you declare a property called ")
-                            // ".example" likely comes from `ExampleStyle` while ".example.example-outlined" likely
-                            // comes from ExampleOutlinedVariant or OutlinedExampleVariant
-                            val isStyle = selectorName.count { it == '.' } == 1// "Variant" else "Style"
-                            val styleName = selectorName.substringAfter(".").substringBefore(".")
-
-                            if (isStyle) {
-                                append("`${styleName.kebabCaseToTitleCamelCase()}Style`")
-                            } else {
-                                // Convert ".example.example-outlined" to "outlined". This could come from a variant
-                                // property called OutlinedExampleVariant or ExampleOutlinedVariant
-                                val variantPart = selectorName.substringAfterLast(".").removePrefix("$styleName-")
-                                append("`${"$styleName-$variantPart".kebabCaseToTitleCamelCase()}Variant`")
-                                append(" or ")
-                                append("`${"$variantPart-$styleName".kebabCaseToTitleCamelCase()}Variant`")
-                            }
-                            appendLine("?)")
-                            appendLine("\tAttribute(s): ${attributes.keys.joinToString(", ") { "\"$it\"" }}")
-                            appendLine()
-                            appendLine("An example of how to fix this:")
-                            appendLine(
-                                """
-                                    // Before
-                                    val ExampleStyle by ComponentStyle {
-                                        base {
-                                           Modifier
-                                               .backgroundColor(Colors.Magenta))
-                                               .tabIndex(0) // <-- The offending attribute modifier
-                                        }
-                                    }
-                                    
-                                    // After
-                                    val ExampleStyle by ComponentStyle(extraModifiers = Modifier.tabIndex(0)) {
-                                        base {
-                                            Modifier.backgroundColor(Colors.Magenta)
-                                        }
-                                    }
-                                """.trimIndent().split("\n").joinToString(separator = "\n") { "\t$it" }
-                            )
-                        })
-                    }
-                }
-            }
-            return this
-        }
-
-        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).mergeCssModifiers(init).assertNoAttributeModifiers()
-        val darkModifiers = ComponentModifiers(ColorMode.DARK).mergeCssModifiers(init).assertNoAttributeModifiers()
+        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).mergeCssModifiers(init)
+            .assertNoAttributeModifiers(selectorName)
+        val darkModifiers = ComponentModifiers(ColorMode.DARK).mergeCssModifiers(init)
+            .assertNoAttributeModifiers(selectorName)
 
         StyleGroup.from(lightModifiers[BaseKey]?.modifier, darkModifiers[BaseKey]?.modifier)?.let { group ->
             withFinalSelectorName(selectorName, group) { name, styles ->
@@ -230,21 +227,21 @@ class ComponentStyle(
 
         val allCssRuleKeys = (lightModifiers.keys + darkModifiers.keys).filter { it != BaseKey }
         for (cssRuleKey in allCssRuleKeys) {
-            StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)?.let { group ->
-                withFinalSelectorName(selectorName, group) { name, styles ->
-                    if (styles.isNotEmpty()) {
-                        classNames.add(name)
+            val group = StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)
+                ?: continue
+            withFinalSelectorName(selectorName, group) { name, styles ->
+                if (styles.isNotEmpty()) {
+                    classNames.add(name)
 
-                        val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
-                        if (cssRuleKey.mediaQuery != null) {
-                            styleSheet.apply {
-                                media(cssRuleKey.mediaQuery) {
-                                    addStyles(cssRule, styles)
-                                }
+                    val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
+                    if (cssRuleKey.mediaQuery != null) {
+                        styleSheet.apply {
+                            media(cssRuleKey.mediaQuery) {
+                                addStyles(cssRule, styles)
                             }
-                        } else {
-                            styleSheet.addStyles(cssRule, styles)
                         }
+                    } else {
+                        styleSheet.addStyles(cssRule, styles)
                     }
                 }
             }
