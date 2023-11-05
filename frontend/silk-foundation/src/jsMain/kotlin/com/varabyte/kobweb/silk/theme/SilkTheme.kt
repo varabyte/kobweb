@@ -357,7 +357,7 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     val breakpoints = mutableSilkTheme.breakpoints
 
     private val _componentStyles = mutableMapOf<String, ImmutableComponentStyle>()
-    val componentStyles: Map<String, ImmutableComponentStyle> = _componentStyles
+    internal val componentStyles: Map<String, ImmutableComponentStyle> = _componentStyles
 
     // Note: We separate this function out from the SilkTheme constructor so we can construct it first and then call
     // this later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
