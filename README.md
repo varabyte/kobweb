@@ -3,7 +3,7 @@
 <br>
 ![kotlin: 1.9.20](https://img.shields.io/badge/kotlin-1.9.20-blue?logo=kotlin)
 ![compose: 1.5.10](https://img.shields.io/badge/compose-1.5.10-blue?logo=jetpackcompose)
-![ktor: 2.3.0](https://img.shields.io/badge/ktor-2.3.0-blue)
+![ktor: 2.3.5](https://img.shields.io/badge/ktor-2.3.5-blue)
 <br>
 <a href="https://discord.gg/5NZ2GKV5Cs">
 <img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
