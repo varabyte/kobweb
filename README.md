@@ -1,13 +1,11 @@
-![version: 0.15.0](https://img.shields.io/badge/kobweb-0.15.0-blue)
-![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)
+[![version: 0.15.0](https://img.shields.io/badge/kobweb-0.15.0-blue)](COMPATIBILITY.md)
+[![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
-![kotlin: 1.9.20](https://img.shields.io/badge/kotlin-1.9.20-blue?logo=kotlin)
-![compose: 1.5.10](https://img.shields.io/badge/compose-1.5.10-blue?logo=jetpackcompose)
-![ktor: 2.3.0](https://img.shields.io/badge/ktor-2.3.0-blue)
+[![kotlin: 1.9.20](https://img.shields.io/badge/kotlin-1.9.20-blue?logo=kotlin)](COMPATIBILITY.md)
+[![compose: 1.5.10](https://img.shields.io/badge/compose-1.5.10-blue?logo=jetpackcompose)](COMPATIBILITY.md)
+[![ktor: 2.3.0](https://img.shields.io/badge/ktor-2.3.0-blue)](https://ktor.io/)
 <br>
-<a href="https://discord.gg/5NZ2GKV5Cs">
-<img alt="Varabyte Discord" src="https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
-</a>
+[![Varabyte Discord](https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/5NZ2GKV5Cs)
 [![Mastodon Follow](https://img.shields.io/mastodon/follow/109382855401210782?domain=https%3A%2F%2Ffosstodon.org&style=social)](https://fosstodon.org/@bitspittle)
 
 # K🕸️bweb
