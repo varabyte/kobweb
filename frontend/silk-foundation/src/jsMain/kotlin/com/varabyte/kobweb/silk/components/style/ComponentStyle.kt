@@ -205,7 +205,14 @@ class ComponentStyle(
         }
     }
 
-    internal fun addStylesInto(styleSheet: StyleSheet, selectorName: String): List<String> {
+    /**
+     * Adds styles into the given stylesheet for the specified selector.
+     *
+     * @return The CSS class selectors that were added to the stylesheet, always including the base class, and
+     *  potentially additional classes if the style is color mode aware. This lets us avoid applying unnecessary
+     *  classnames, making it easier to debug CSS issues in the browser.
+     */
+    internal fun addStylesInto(styleSheet: StyleSheet, selectorName: String): ClassSelectors {
         // Always add the base selector name, even if the ComponentStyle is empty. Callers may use empty
         // component styles as classnames, which can still be useful for targeting one element from another, or
         // searching for all elements tagged with a certain class.
@@ -246,35 +253,36 @@ class ComponentStyle(
                 }
             }
         }
-        // Selectors may be ".someStyle" or ".someStyle.someVariant" - only the last part is relevant to this style
-        return classNames.map { it.substringAfterLast('.') }
+        return ClassSelectors(classNames)
     }
 
     /**
      * Add this [ComponentStyle]'s styles to the target [StyleSheet].
      *
-     * @return The list of CSS class selectors associated with this style.
+     * @return The CSS class selectors that were added to the stylesheet.
      */
-    internal fun addStylesInto(styleSheet: StyleSheet): List<String> {
+    internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         // Register styles associated with this style's classname
         return addStylesInto(styleSheet, ".$name")
     }
 
-    internal fun intoImmutableStyle(classNames: List<String>) = ImmutableComponentStyle(classNames, extraModifiers)
+    internal fun intoImmutableStyle(classSelectors: ClassSelectors) =
+        ImmutableComponentStyle(classSelectors, extraModifiers)
 }
 
 /**
  * A [ComponentStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
  *
- * @param classNames The list of CSS class selectors associated with this style.
+ * @param classSelectors The CSS class selectors associated with this style, including the base class and any
+ *  color mode specific classes, used to determine the exact classnames to apply when this style is used.
  * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
  */
 internal class ImmutableComponentStyle(
-    classNames: List<String>,
+    classSelectors: ClassSelectors,
     private val extraModifiers: @Composable () -> Modifier
 ) {
-    private val classNames = classNames.toSet()
+    private val classNames = classSelectors.classNames.toSet()
 
     @Composable
     fun toModifier(): Modifier {
@@ -282,6 +290,13 @@ internal class ImmutableComponentStyle(
         return (if (currentClassNames.isNotEmpty()) Modifier.classNames(*currentClassNames.toTypedArray()) else Modifier)
             .then(extraModifiers())
     }
+}
+
+/** Represents the class selectors associated with a [ComponentStyle]. */
+internal value class ClassSelectors(private val value: List<String>) {
+    // Selectors may be ".someStyle" or ".someStyle.someVariant" - only the last part is relevant to the specific style
+    val classNames get() = value.map { it.substringAfterLast('.') }
+    operator fun plus(other: ClassSelectors) = ClassSelectors(value + other.value)
 }
 
 private sealed interface StyleGroup {

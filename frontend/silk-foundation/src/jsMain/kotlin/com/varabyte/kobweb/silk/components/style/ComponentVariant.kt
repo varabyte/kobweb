@@ -15,10 +15,12 @@ sealed class ComponentVariant {
     /**
      * Add this [ComponentVariant]'s styles to the target [StyleSheet].
      *
-     * @return The list of CSS class selectors associated specifically with this variant. For example, if the selector
+     * @return The CSS class selectors associated specifically with this variant. For example, if the selector
      *  for this variant is `.some-style.some-variant`, then this method will only contain `some-variant`.
+     *
+     *  @see ComponentStyle.addStylesInto
      */
-    internal abstract fun addStylesInto(styleSheet: StyleSheet): List<String>
+    internal abstract fun addStylesInto(styleSheet: StyleSheet): ClassSelectors
 
     @Composable
     internal abstract fun toModifier(): Modifier
@@ -39,7 +41,7 @@ class SimpleComponentVariant(
     val name: String
         get() = style.name.removePrefix("${baseStyle.name}-")
 
-    override fun addStylesInto(styleSheet: StyleSheet): List<String> {
+    override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
         // a link (so this would be registered as ".silk-link.silk-link-undecorated").
@@ -49,12 +51,12 @@ class SimpleComponentVariant(
 
     @Composable
     override fun toModifier() = style.toModifier()
-    internal fun intoImmutableStyle(classNames: List<String>) = style.intoImmutableStyle(classNames)
+    internal fun intoImmutableStyle(classSelectors: ClassSelectors) = style.intoImmutableStyle(classSelectors)
 }
 
 private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant) :
     ComponentVariant() {
-    override fun addStylesInto(styleSheet: StyleSheet): List<String> {
+    override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         return head.addStylesInto(styleSheet) + tail.addStylesInto(styleSheet)
     }
 
