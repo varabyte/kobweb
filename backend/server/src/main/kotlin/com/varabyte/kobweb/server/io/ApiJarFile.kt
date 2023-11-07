@@ -23,21 +23,50 @@ import java.util.zip.ZipFile
 /**
  * Wrapper around a Kobweb API jar, which is expected (in dev mode at least) to occasionally be reloaded on the fly.
  *
+ * A Kobweb API jar is a bundle of user code meant to be loaded by the server and used to handle API requests.
+ *
  * @param path The path to the api.jar itself
  */
 class ApiJarFile(path: Path, private val events: EventDispatcher, private val logger: Logger, private val nativeLibraryMappings: Map<String, String>) {
-    private class DynamicClassLoader(
+    /**
+     * A classloader provided for user code that is mostly isolated from the server classloader.
+     *
+     * This allows users to pull in all sorts of dependencies without worrying about conflicts with the server's
+     * dependencies, i.e. both the server and user code can depend on different versions of the same library, because
+     * their classloader is on a different branch than the server's classloader.
+     *
+     * Note that *some* of the server's dependencies are still exposed to the user code, especially the base
+     * `ApisFactory` interface (and surrounding API classes). Otherwise, the JVM throws an exception when the server
+     * tries to use user code, because it will see that it has two separate instances of the same class name but with
+     * different byte code. Kotlin standard library methods are also provided by the server classloader. See
+     * the [packagesFromServerClassLoader] variable for the full list.
+     */
+    private class IsolatedZipClassLoader(
         private val content: ByteArray,
         private val logger: Logger,
-        private val nativeLibraryMappings: Map<String, String>
-    ) : ClassLoader(ApiJarFile::class.java.classLoader) {
+        private val nativeLibraryMappings: Map<String, String>,
+        private val serverClassLoader: ClassLoader = ApiJarFile::class.java.classLoader,
+    ) : ClassLoader(serverClassLoader.parent) {
+
         private val zipFile: ZipFile = run {
             val file = File.createTempFile("KobwebApiJar", ".jar").also { it.deleteOnExit() }
             ByteArrayInputStream(content).use { stream -> file.writeBytes(stream.readBytes()) }
             ZipFile(file)
         }
 
+        // Packages that, if encountered, are provided by the server classloader instead of the user's classloader.
+        // This allows the server to use user code without running into class conflicts. We want to keep this list as
+        // small as possible, to avoid confusion for users. (For example, a user might try to use a newer method from a
+        // more recent version of Kotlin than the one provided by the server, which would compile for them but then fail
+        // at runtime; while this is done to allow server and user code to talk seamlessly, they'll just see a runtime
+        // error and not be sure why it's happening.)
+        private val packagesFromServerClassLoader = listOf(
+            "com.varabyte.kobweb.api.",
+            "kotlin.",
+        )
         override fun findClass(name: String): Class<*> {
+            if (packagesFromServerClassLoader.any { name.startsWith(it) }) return serverClassLoader.loadClass(name)
+
             return findClassInZip(name)
                 ?.use { stream -> stream.readBytes() }
                 ?.let { bytes -> defineClass(name, bytes, 0, bytes.size) }
@@ -161,7 +190,7 @@ class ApiJarFile(path: Path, private val events: EventDispatcher, private val lo
 
     private class Cache(val content: ByteArray, events: EventDispatcher, logger: Logger, nativeLibraryMappings: Map<String, String>) {
         val apis: Apis = run {
-            val classLoader = DynamicClassLoader(content, logger, nativeLibraryMappings)
+            val classLoader = IsolatedZipClassLoader(content, logger, nativeLibraryMappings)
             val startMs = getTimeMillis()
 
             try {
