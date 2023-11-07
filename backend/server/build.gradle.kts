@@ -52,17 +52,23 @@ tasks.withType<ShadowJar>().configureEach {
     //  code and the server code won't stomp on each other. After a day fighting code, I couldn't figure out how to get
     //  this to work, but it may be worth a shot trying again, as it will allow us to delete all this relocating logic.
 
-    // NOTE: I used to relocate "com" but that caused the server to fail starting up. I removed it for now.
-    relocate("org", "relocated.org") {
-        exclude("org.xml.sax.**") // Need to exclude this or else we get an exception at runtime
+    // NOTE: All patterns have a trailing . below, which is to avoid renaming string values that happen to have the
+    // same prefix. See also https://github.com/johnrengelman/shadow/issues/232
+    relocate("com.", "relocated.com.") {
+        // Leave varabyte code in place. If the user is referencing any varabyte classes in their server APIs, the
+        // versions should be synced up with anything also referenced in the server (since the server is versioned the
+        // same as varabyte artifacts).
+        exclude("com.varabyte.**")
+    }
+    relocate("org.", "relocated.org.") {
         exclude("org.xml.sax.**") // Need to exclude this or else we get an exception at runtime
         exclude("org.slf4j.**") // Don't relocate ktor; might be referenced by Kobweb server plugins
     }
-    relocate("io", "relocated.io") {
+    relocate("io.", "relocated.io.") {
         exclude("io.netty.**") // Relocating io.netty causes exceptions to happen on server startup
         exclude("io.ktor.**") // Don't relocate ktor; might be referenced by Kobweb server plugins
     }
-    relocate("kotlinx", "relocated.kotlinx") {
+    relocate("kotlinx.", "relocated.kotlinx.") {
         // Coroutines are provided by ktor, so let's leave them in place
         exclude("kotlinx.coroutines.**")
     }
