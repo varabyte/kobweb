@@ -344,8 +344,13 @@ class KotlinRenderer(
         }
 
         override fun visit(link: Link) {
-            // Links to other Markdown files, if the files are present, get converted to their corresponding generated routes
-            if (link.destination.endsWith(".md")) {
+            // Relative links to other Markdown files, if they are present, get converted to their corresponding
+            // generated routes, e.g. "[link](a/b.md)" -> "[link](a/b)". This isn't as simple as dropping the ".md"
+            // extension however -- some pages override their route (e.g. "b.md" actually routes to "c/d"), and we
+            // handle that here as well. We intentionally avoid absolute links
+            // (e.g. "[link](http://path/to/example.md")), since in that case, the user is explicitly linking to an
+            // external resource.
+            if (link.destination.endsWith(".md") && !link.destination.contains("://")) {
                 val destinationPath = Path(filePath).resolveSibling(link.destination).normalize().toString()
                 val destinationNode = markdownNodeGetter(destinationPath.removePrefix("/"))
                 if (destinationNode != null) {
