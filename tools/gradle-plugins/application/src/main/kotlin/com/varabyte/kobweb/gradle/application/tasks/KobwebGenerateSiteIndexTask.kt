@@ -23,6 +23,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import org.jsoup.Jsoup
+import java.io.File
 import javax.inject.Inject
 
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
@@ -76,37 +77,66 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
         // allowed to declare some as well. If they do, they will have embedded serialized html in their library
         // artifacts.
-        val headElements = kobwebBlock.app.index.head.get().toMutableList()
+        val headInitializers = kobwebBlock.app.index.head.get().toMutableList()
+        val kobwebLibraries = mutableListOf<File>()
         getCompileClasspath().get().files.forEach { file ->
             file.searchZipFor(KOBWEB_METADATA_INDEX) { bytes ->
+                kobwebLibraries.add(file)
+
                 val indexMetadata = Json.decodeFromString<LibraryIndexMetadata>(bytes.decodeToString())
                 val document = Jsoup.parse(indexMetadata.headElements)
-                headElements.add {
-                    document.head().children().forEach { element ->
-                        // Weird hack alert -- void elements (like <link>, <meta>), which are common in <head> tags, are
-                        // considered by JSoup as self-closing even without a trailing slash. This is valid HTML but
-                        // currently kotlinx html can't seem to handle them when specified as raw text, triggering a
-                        // parse error. (See also: https://github.com/Kotlin/kotlinx.html/issues/247). To work around
-                        // this limitation, we force a trailing slash ourselves.
-                        unsafe {
-                            val rawElement = element.outerHtml()
-                            if (element.tag().isSelfClosing && !rawElement.endsWith("/>")) {
-                                raw(rawElement.removeSuffix(">") + "/>")
-                            } else {
-                                raw(rawElement)
+                val headElements = document.head().children()
+
+                if (headElements.isNotEmpty()) {
+                    val optedOut =
+                        kobwebBlock.app.index.excludeTags.orNull?.invoke(AppBlock.IndexBlock.ExcludeTagsContext(file.name))
+                            ?: false
+
+                    if (!optedOut) {
+                        logger.warn(buildString {
+                            appendLine()
+                            appendLine("Dependency artifact \"${file.name}\" will add the following <head> elements to your site's index.html:")
+                            appendLine(headElements.joinToString("\n") { "   " + it.outerHtml() })
+                            append(
+                                "Add `kobweb { app { index { excludeTagsForDependency(\"${
+                                    file.nameWithoutExtension.substringBeforeLast("-js-")
+                                }\") } } }` to your build.gradle.kts file to opt-out."
+                            )
+                        })
+
+                        headInitializers.add {
+                            document.head().children().forEach { element ->
+                                // Weird hack alert -- void elements (like <link>, <meta>), which are common in <head> tags, are
+                                // considered by JSoup as self-closing even without a trailing slash. This is valid HTML but
+                                // currently kotlinx html can't seem to handle them when specified as raw text, triggering a
+                                // parse error. (See also: https://github.com/Kotlin/kotlinx.html/issues/247). To work around
+                                // this limitation, we force a trailing slash ourselves.
+                                unsafe {
+                                    val rawElement = element.outerHtml()
+                                    if (element.tag().isSelfClosing && !rawElement.endsWith("/>")) {
+                                        raw(rawElement.removeSuffix(">") + "/>")
+                                    } else {
+                                        raw(rawElement)
+                                    }
+                                }
                             }
                         }
+                    } else {
+                        logger.warn(buildString {
+                            appendLine()
+                            appendLine("Dependency artifact \"${file.name}\" was prevented from adding the following <head> elements to your site's index.html:")
+                            append(headElements.joinToString("\n") { "   " + it.outerHtml() })
+                        })
                     }
                 }
             }
         }
 
-
         val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
         getGenIndexFile().writeText(
             createIndexFile(
                 kobwebConf.site.title,
-                headElements,
+                headInitializers,
                 // Our script will always exist at the root folder, so be sure to ground it,
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
