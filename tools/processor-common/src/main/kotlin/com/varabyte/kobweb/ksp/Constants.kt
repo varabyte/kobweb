@@ -4,8 +4,11 @@ const val KSP_PAGES_PACKAGE_KEY = "kobweb.pagesPackage"
 const val KSP_API_PACKAGE_KEY = "kobweb.apiPackage"
 const val KSP_PROCESSOR_MODE_KEY = "kobweb.mode"
 
+// Metadata files that will be bundled as resources in JS / JVM artifacts.
+
 const val KOBWEB_METADATA_SUBFOLDER = "META-INF/kobweb"
 const val KOBWEB_METADATA_MODULE = "$KOBWEB_METADATA_SUBFOLDER/module.json"
+const val KOBWEB_METADATA_INDEX = "$KOBWEB_METADATA_SUBFOLDER/index.json"
 const val KOBWEB_METADATA_FRONTEND = "$KOBWEB_METADATA_SUBFOLDER/frontend.json"
 const val KOBWEB_METADATA_BACKEND = "$KOBWEB_METADATA_SUBFOLDER/backend.json"
 

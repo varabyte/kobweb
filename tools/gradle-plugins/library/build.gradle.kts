@@ -14,8 +14,9 @@ dependencies {
     // Common Gradle plugin used by Library and Application plugins
     api(projects.tools.gradlePlugins.core)
 
-    // For generating code
+    // For generating code / html
     implementation(libs.kotlinpoet)
+    api(libs.kotlinx.html) // Exposed as api dependency because it's exposed by the kobweb.library.index API anyway.
 
     // For creating a metadata file
     implementation(libs.kotlinx.serialization.json)
