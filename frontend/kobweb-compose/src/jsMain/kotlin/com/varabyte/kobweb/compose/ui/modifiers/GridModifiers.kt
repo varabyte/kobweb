@@ -20,7 +20,7 @@ fun Modifier.gridTemplateColumns(block: GridTrackBuilder.() -> Unit) = styleModi
     gridTemplateColumns(block)
 }
 
-fun Modifier.gridTemplateColumns(value: GridTemplate.Keyword) = styleModifier {
+fun Modifier.gridTemplateColumns(value: GridTemplate) = styleModifier {
     gridTemplateColumns(value)
 }
 
@@ -37,7 +37,7 @@ fun Modifier.gridAutoColumns(block: GridTrackBuilder.() -> Unit) = styleModifier
     gridAutoColumns(block)
 }
 
-fun Modifier.gridAutoColumns(value: GridAuto.Keyword) = styleModifier {
+fun Modifier.gridAutoColumns(value: GridAuto) = styleModifier {
     gridAutoColumns(value)
 }
 
@@ -58,7 +58,7 @@ fun Modifier.gridTemplateRows(block: GridTrackBuilder.() -> Unit) = styleModifie
     gridTemplateRows(block)
 }
 
-fun Modifier.gridTemplateRows(value: GridTemplate.Keyword) = styleModifier {
+fun Modifier.gridTemplateRows(value: GridTemplate) = styleModifier {
     gridTemplateRows(value)
 }
 
@@ -75,7 +75,7 @@ fun Modifier.gridAutoRows(block: GridTrackBuilder.() -> Unit) = styleModifier {
     gridAutoRows(block)
 }
 
-fun Modifier.gridAutoRows(value: GridAuto.Keyword) = styleModifier {
+fun Modifier.gridAutoRows(value: GridAuto) = styleModifier {
     gridAutoRows(value)
 }
 

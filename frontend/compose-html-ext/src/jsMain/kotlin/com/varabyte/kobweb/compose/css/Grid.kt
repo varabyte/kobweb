@@ -34,24 +34,24 @@ sealed class GridEntry(private val value: String) {
             TrackSize("minmax($min, $max)")
 
         /** Represents a track size which is a flex value (e.g. `1fr`) */
-        class Flex internal constructor(value: String) : TrackSize(value)
+        class Flex internal constructor(value: CSSFlexValue) : TrackSize(value.toString())
 
         /** Like [TrackSize] but excludes flex values (e.g. `1fr`). */
         sealed class Inflexible(value: String) : TrackSize(value)
 
         /** Represents a track size defined by a keyword (e.g. `auto`). */
-        class Keyword internal constructor(value: String) : Inflexible(value)
+        internal class Keyword(value: String) : Inflexible(value)
 
         /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
-        class Fixed internal constructor(value: String) : Inflexible(value)
+        class Fixed internal constructor(value: CSSLengthOrPercentageValue) : Inflexible(value.toString())
 
         companion object {
-            val Auto get() = Keyword("auto")
-            val MinContent get() = Keyword("min-content")
-            val MaxContent get() = Keyword("max-content")
+            val Auto: Inflexible get() = Keyword("auto")
+            val MinContent: Inflexible get() = Keyword("min-content")
+            val MaxContent: Inflexible get() = Keyword("max-content")
 
-            operator fun invoke(value: CSSLengthOrPercentageValue) = Fixed(value.toString())
-            operator fun invoke(value: CSSFlexValue) = Flex(value.toString())
+            operator fun invoke(value: CSSLengthOrPercentageValue) = Fixed(value)
+            operator fun invoke(value: CSSFlexValue) = Flex(value)
 
             fun minmax(min: Inflexible, max: TrackSize) = MinMax(min, max)
 
@@ -200,24 +200,22 @@ class GridTrackBuilder : GridTrackBuilderInRepeat() {
     }
 }
 
-sealed class GridAuto private constructor(private val value: String) : StylePropertyValue {
+class GridAuto private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
-
-    class Keyword internal constructor(value: String) : GridAuto(value)
 
     companion object {
         // Keywords
-        val None get() = Keyword("none")
+        val None get() = GridAuto("none")
 
         // Global values
-        val Inherit get() = Keyword("inherit")
-        val Initial get() = Keyword("initial")
-        val Revert get() = Keyword("revert")
-        val Unset get() = Keyword("unset")
+        val Inherit get() = GridAuto("inherit")
+        val Initial get() = GridAuto("initial")
+        val Revert get() = GridAuto("revert")
+        val Unset get() = GridAuto("unset")
     }
 }
 
-fun StyleScope.gridAutoColumns(gridAutoColumns: GridAuto.Keyword) {
+fun StyleScope.gridAutoColumns(gridAutoColumns: GridAuto) {
     gridAutoColumns(gridAutoColumns.toString())
 }
 
@@ -229,7 +227,7 @@ fun StyleScope.gridAutoColumns(block: GridTrackBuilder.() -> Unit) {
     gridAutoColumns(GridTrackBuilder().apply(block).tracks.toTrackListString())
 }
 
-fun StyleScope.gridAutoRows(gridAutoRows: GridAuto.Keyword) {
+fun StyleScope.gridAutoRows(gridAutoRows: GridAuto) {
     gridAutoRows(gridAutoRows.toString())
 }
 
@@ -250,23 +248,22 @@ fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template
  */
-sealed class GridTemplate private constructor(private val value: String) : StylePropertyValue {
+class GridTemplate private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class Keyword internal constructor(value: String) : GridTemplate(value)
     companion object {
         // Keywords
-        val None get() = Keyword("none")
+        val None get() = GridTemplate("none")
 
         // Global
-        val Initial get() = Keyword("initial")
-        val Inherit get() = Keyword("inherit")
-        val Revert get() = Keyword("revert")
-        val Unset get() = Keyword("unset")
+        val Initial get() = GridTemplate("initial")
+        val Inherit get() = GridTemplate("inherit")
+        val Revert get() = GridTemplate("revert")
+        val Unset get() = GridTemplate("unset")
     }
 }
 
-fun StyleScope.gridTemplateColumns(gridTemplateColumns: GridTemplate.Keyword) {
+fun StyleScope.gridTemplateColumns(gridTemplateColumns: GridTemplate) {
     gridTemplateColumns(gridTemplateColumns.toString())
 }
 
@@ -278,7 +275,7 @@ fun StyleScope.gridTemplateColumns(block: GridTrackBuilder.() -> Unit) {
     gridTemplateColumns(GridTrackBuilder().apply(block).tracks.toTrackListString())
 }
 
-fun StyleScope.gridTemplateRows(gridTemplateRows: GridTemplate.Keyword) {
+fun StyleScope.gridTemplateRows(gridTemplateRows: GridTemplate) {
     gridTemplateRows(gridTemplateRows.toString())
 }
 
@@ -394,7 +391,7 @@ abstract class GridBuilderInAuto {
  * Modifier.grid {
  *   columns { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
  *   rows { size(1.fr); size(1.fr) }
- *   auto { column(50.px) }
+ *   auto { columns { size(50.px) } }
  * }
  * ```
  */
