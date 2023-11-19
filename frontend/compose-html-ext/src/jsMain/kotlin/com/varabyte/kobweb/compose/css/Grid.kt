@@ -376,7 +376,7 @@ abstract class GridBuilderInAuto {
  *
  * // With the builder
  * Modifier.grid {
- *   cols { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
+ *   columns { size(40.px); size(1.fr); repeat(3) { size(200.px) } }
  *   rows { size(1.fr); size(1.fr) }
  *   auto { column(50.px) }
  * }
