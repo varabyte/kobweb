@@ -242,24 +242,53 @@ fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
 /**
  * Represents all possible values that can be passed into a CSS grid property.
  *
- * Note: "subgrid" and "masonry" purposely excluded as they are not widely supported
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid
+ * Note: "masonry" purposely excluded as it's not widely supported
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Masonry_layout
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template">Grid Template</a>
  */
-class GridTemplate private constructor(private val value: String) : StylePropertyValue {
+sealed class GridTemplate private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
+
+    private class Keyword(value: String) : GridTemplate(value)
+
+    class Subgrid(block: (Builder.() -> Unit)? = null) : GridTemplate("subgrid${buildNames(block)}") {
+        class Builder internal constructor() {
+            internal val names = mutableListOf<GridEntry>()
+
+            fun lineNames(vararg lineNames: String) {
+                names.add(GridEntry.lineNames(*lineNames))
+            }
+
+            // Don't use GridEntry.Repeat as it does not support name-only repeats
+            private fun internalRepeat(count: Any, lineNames: Array<out String>) {
+                val repeatTrack = GridEntry.TrackSize.Keyword("repeat($count, ${GridEntry.lineNames(*lineNames)})")
+                names.add(repeatTrack)
+            }
+
+            fun repeat(count: Int, vararg lineNames: String) = internalRepeat(count, lineNames)
+
+            fun repeatAutoFill(vararg lineNames: String) =
+                internalRepeat(GridEntry.Repeat.Auto.Type.AutoFill, lineNames)
+        }
+
+        internal companion object {
+            fun buildNames(block: (Builder.() -> Unit)? = null): String {
+                return if (block == null) "" else Builder().apply(block).names.joinToString(" ", prefix = " ")
+            }
+        }
+    }
 
     companion object {
         // Keywords
-        val None get() = GridTemplate("none")
+        val None: GridTemplate get() = Keyword("none")
+        val Subgrid: GridTemplate get() = Subgrid()
 
         // Global
-        val Initial get() = GridTemplate("initial")
-        val Inherit get() = GridTemplate("inherit")
-        val Revert get() = GridTemplate("revert")
-        val Unset get() = GridTemplate("unset")
+        val Initial: GridTemplate get() = Keyword("initial")
+        val Inherit: GridTemplate get() = Keyword("inherit")
+        val Revert: GridTemplate get() = Keyword("revert")
+        val Unset: GridTemplate get() = Keyword("unset")
     }
 }
 
