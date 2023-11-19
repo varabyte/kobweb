@@ -7,7 +7,7 @@ object BorderRadiusVars {
     val XS by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
     val SM by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.25.cssRem)
     val MD by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.375.cssRem)
-    val LG by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.375.cssRem)
+    val LG by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
 }
 
 object FontSizeVars {

@@ -439,7 +439,7 @@ interface InputSize {
         override val fontSize = FontSizeVars.LG.value()
         override val height = 2.5.cssRem
         override val padding = 0.375.cssRem
-        override val borderRadius = BorderRadiusVars.LG.value()
+        override val borderRadius = BorderRadiusVars.MD.value() // Intentionally same as MD
     }
 }
 
