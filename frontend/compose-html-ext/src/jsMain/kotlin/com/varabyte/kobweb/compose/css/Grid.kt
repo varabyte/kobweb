@@ -297,35 +297,51 @@ abstract class GridBuilderInAuto {
     protected var autoBuilder: GridBuilder? = null
 
     @Deprecated(
-        "`col` has been renamed to `column` to be more consistent with CSS API naming.",
-        ReplaceWith("column(value)")
+        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
+        ReplaceWith("columns { size(value) }")
     )
     fun col(value: CSSLengthOrPercentageValue) {
-        column(value)
+        columns { size(value) }
     }
 
     @Deprecated(
-        "`col` has been renamed to `column` to be more consistent with CSS API naming.",
-        ReplaceWith("column(value)")
+        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
+        ReplaceWith("columns { size(value) }")
     )
     fun col(value: CSSFlexValue) {
-        column(value)
+        columns { size(value) }
     }
 
+    @Deprecated(
+        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
+        ReplaceWith("columns { size(value) }")
+    )
     fun column(value: CSSLengthOrPercentageValue) {
-        columns = GridTrackBuilder().apply { size(value) }.tracks
+        columns { size(value) }
     }
 
+    @Deprecated(
+        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
+        ReplaceWith("columns { size(value) }")
+    )
     fun column(value: CSSFlexValue) {
-        columns = GridTrackBuilder().apply { size(value) }.tracks
+        columns { size(value) }
     }
 
+    @Deprecated(
+        "All grid row convenience APIs are being removed, and code should migrate to use `rows { ... }` for clarity and consistency with CSS APIs.",
+        ReplaceWith("rows { size(value) }")
+    )
     fun row(value: CSSLengthOrPercentageValue) {
-        rows = GridTrackBuilder().apply { size(value) }.tracks
+        rows { size(value) }
     }
 
+    @Deprecated(
+        "All grid row convenience APIs are being removed, and code should migrate to use `rows { ... }` for clarity and consistency with CSS APIs.",
+        ReplaceWith("rows { size(value) }")
+    )
     fun row(value: CSSFlexValue) {
-        rows = GridTrackBuilder().apply { size(value) }.tracks
+        rows { size(value) }
     }
 
     @Deprecated(
