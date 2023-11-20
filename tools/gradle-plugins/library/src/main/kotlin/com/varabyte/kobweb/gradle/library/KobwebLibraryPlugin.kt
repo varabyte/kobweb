@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
-import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
@@ -51,16 +50,16 @@ class KobwebLibraryPlugin : Plugin<Project> {
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.setupKspJs(jsTarget, ProcessorMode.LIBRARY)
-            project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                resources.srcDir(createModuleMetadataTask)
+            project.tasks.named<ProcessResources>(jsTarget.processResources) {
+                from(createModuleMetadataTask)
             }
         }
 
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
             val jvmTarget = JvmTarget(this)
             project.setupKspJvm(jvmTarget)
-            project.kotlin.sourceSets.named(jvmTarget.mainSourceSet) {
-                resources.srcDir(createModuleMetadataTask)
+            project.tasks.named<ProcessResources>(jvmTarget.processResources) {
+                from(createModuleMetadataTask)
             }
         }
     }
