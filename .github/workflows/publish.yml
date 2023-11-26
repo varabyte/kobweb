@@ -31,4 +31,4 @@ jobs:
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
 
       - name: Publish Kobweb artifacts
-        run: ./gradlew publish
+        run: ./gradlew publish --scan
