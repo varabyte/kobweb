@@ -2,9 +2,9 @@ package com.varabyte.kobweb.gradle.publish
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.publish.Publication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
@@ -14,8 +14,7 @@ import javax.inject.Inject
 // libraries, but they need to be defined in a multiplatform module because it does extra Compose-related
 // processing on the artifacts as a side effect. For simplicity in our maven repo, though, we only send
 // the JS bits.
-val FILTER_OUT_MULTIPLATFORM_PUBLICATIONS: (Task) -> Boolean =
-    { task -> !task.name.startsWith("publishKotlinMultiplatformPublication") }
+val FILTER_OUT_MULTIPLATFORM_PUBLICATIONS: (Publication) -> Boolean = { it.name != "kotlinMultiplatform" }
 
 abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactory) {
     abstract class RelocationDetails {
@@ -54,7 +53,7 @@ abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactor
      *
      * The callback should return true to get published or false to get filtered out.
      */
-    abstract val filter: Property<(Task) -> Boolean>
+    abstract val filter: Property<(Publication) -> Boolean>
 
     /**
      * Set to non-null if this publication represents a relocation to another artifact.
@@ -121,7 +120,7 @@ class KobwebPublishPlugin : Plugin<Project> {
             // AbstractPublishToMaven configured both maven local and remote maven publish tasks
             tasks.withType<AbstractPublishToMaven>().configureEach {
                 onlyIf {
-                    config.filter.get().invoke(this)
+                    config.filter.get().invoke(publication)
                 }
             }
         }

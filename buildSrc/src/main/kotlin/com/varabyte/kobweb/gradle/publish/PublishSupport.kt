@@ -146,7 +146,7 @@ internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
 
             // Signing requires following steps at https://docs.gradle.org/current/userguide/signing_plugin.html#sec:signatory_credentials
             // and adding singatory properties somewhere reachable, e.g. ~/.gradle/gradle.properties
-            sign(publishing.publications)
+            sign(publishing.publications.matching { config.filter.get().invoke(it) })
         }
     }
 }
