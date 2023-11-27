@@ -2993,7 +2993,8 @@ I'm pleased to mention that Kobweb has received feedback from some satisfied use
 # Connecting with us
 
 * [Join my Discord!](https://discord.gg/5NZ2GKV5Cs)
-* Follow me on Mastodon: [@bitspittle@fosstodon.org](https://fosstodon.org/@bitspittle)
+* [GitHub Discussions](https://github.com/varabyte/kobweb/discussions) for this project
+* The [Kobweb channel](https://kotlinlang.slack.com/archives/C04RTD72RQ8) on the Kotlin Slack
 * You can send direct queries to [my email](mailto:bitspittle@gmail.com)
 
 If you're comfortable with it, using Discord is recommended, because there's a growing community of users in there who
