@@ -59,11 +59,11 @@ Our goal is to provide:
 * automatic handling of routing between pages
 * a collection of useful _batteries included_ widgets built on top of Compose HTML
 * an environment built from the ground up around live reloading
-* static site exports for improved SEO and potentially cheaper server setups
+* static site exports for improved SEO
 * support for responsive (i.e. mobile and desktop) design
-* shared, rich types between client and server
 * out-of-the-box Markdown support
 * a way to easily define server API routes and persistent API streams
+* a growing collection of general purpose utilities added on top of Compose HTML ([learn more▼](#improvements-to-the-compose-html-library))
 * an open source foundation that the community can extend
 * and much, much more!
 
@@ -2929,6 +2929,76 @@ limit.
 
 Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
 10 * 1000 * 1000 bytes. You probably want to use "KiB", "MiB", or "GiB" when you configure this value.
+
+## Improvements to the Compose HTML library
+
+In the beginning, Kobweb was only intended to be a thin layer on top of Compose HTML, but the more we worked on it, the
+more we ran into features that were simply not yet implemented in Compose HTML. We also wrote utility methods and
+classes that were so generally useful, it would have been a shame to bury them deep inside our framework.
+
+As a result, we created a module called [`compose-html-ext`](frontend/compose-html-ext/README.md), where we put code
+that we would be more than happy for the Compose HTML team to fork and migrate over to Compose HTML someday.
+
+This now includes (not comprehensive):
+
+* a *ton* of missing type-safe wrappers around many, many CSS properties
+* type-safe wrappers around CSS functions, like gradients, filters,
+  `calc` (especially useful when working with CSS variables), etc.
+* rich SVG support
+* utility methods around saving files to / loading files from disk
+* utility methods and classes built on top
+  of [`window.fetch`](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-window-or-worker-global-scope/fetch.html)
+  (for example, making it easier to use the most common HTTP verbs like GET, POST, etc.,
+  as well as providing `suspend fun` versions of fetch)
+* additions for the missing [transition events](https://developer.mozilla.org/en-US/docs/Web/API/TransitionEvent)
+* implementations of resize and intersection observers
+* utility methods for getting a sequence of descendant / ancestor HTML elements, useful for walking the DOM tree in a
+  Kotlin-idiomatic way
+* a utility composable, `GenericTag`, which is an easy-to-use API wrapping Compose HTML's `TagElement` composable, with
+  additional namespacing support if needed (for example, required when implementing SVG elements)
+* a utility class for working with CSS variables, `StyleVariable`, allows specifying a default value, provides
+  first-class number / string variable support, and
+  fixes [a bug in Compose HTML's `CSSStyleVariable`class](https://github.com/JetBrains/compose-multiplatform/issues/2763)
+  where it can accept invalid values.
+* `setTimeout` and `setInterval` methods that are more Kotlin-idiomatic (e.g. the lambdas are the last parameter)
+
+> [!NOTE]
+> Some users have mentioned we should have opened PRs for the Compose HTML team instead of maintaining a separate
+> codebase. However, after observing that Jetbrains was focusing more and more of their energy on Compose Multiplatform
+> for Web, we decided to implement the features we needed in our own project. This way, we could maintain our velocity
+> while allowing their team to pick and choose what they agreed with at some point in the future at their leisure.
+> There's so much code here, especially around CSS APIs, that getting mired down in PR discussions would have ground our
+> progress to a halt.
+
+If you want to use Compose HTML but *not* Kobweb, you can still use and benefit from `compose-html-ext` in your own
+project. An example build script could look like this:
+
+```kotlin
+// build.gradle.kts
+plugins {
+  kotlin("multiplatform") version "..."
+}
+
+repositories {
+  mavenCentral()
+  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+  google()
+  maven("https://us-central1-maven.pkg.dev/varabyte-repos/public") // IMPORTANT!!!
+}
+
+kotlin {
+  js().browser()
+  sourceSets {
+    val jsMain by getting {
+      dependencies {
+        implementation(compose.html.core)
+        implementation(compose.runtime)
+        implementation("com.varabyte.kobweb:compose-html-ext:...") // IMPORTANT!!!
+      }
+    }
+  }
+}
+```
 
 # Can We Kobweb Yet
 
