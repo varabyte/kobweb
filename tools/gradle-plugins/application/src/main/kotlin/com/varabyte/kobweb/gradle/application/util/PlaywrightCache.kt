@@ -39,7 +39,6 @@ internal class PlaywrightCache {
         if (version != null) {
             pb.environment()["PW_CLI_DISPLAY_VERSION"] = version
         }
-        println("Updating browser cache if necessary. This can take a while if out of date...")
         try {
             val process = pb.start()
             // We manually capture the output as `ProcessBuilder.inheritIO()` doesn't seem to work and/or hangs
@@ -49,7 +48,6 @@ internal class PlaywrightCache {
                     println(it.replace(9632.toChar(), '-')) // replace unsupported UTF-8 char
                 }
             }
-            println("Browser cache updated. Process returned status code ${process.waitFor()}")
         } catch (e: Exception) {
             e.printStackTrace()
         }
