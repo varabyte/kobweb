@@ -4,6 +4,7 @@ package com.varabyte.kobweb.gradle.application.extensions
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.text.prefixIfNot
+import com.varabyte.kobweb.gradle.application.Browser
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.HEAD
@@ -167,6 +168,37 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf, baseGenDir: Proper
     }
 
     /**
+     * A sub-block for defining properties related to configuring the `kobweb export` step.
+     */
+    abstract class ExportBlock {
+        /**
+         * Which browser to use for the export step.
+         *
+         * Besides potentially affecting the snapshotted output and export times, this can also affect the download size.
+         *
+         * Chromium is chosen as a default due to its ubiquity, but Firefox may also be a good choice as its download size
+         * is significantly smaller than Chromium's.
+         */
+        abstract val browser: Property<Browser>
+
+        /**
+         * Whether to include a source map when exporting your site.
+         *
+         * In release mode, source gets minified and obfuscated, but if you include your source map with your site, browsers
+         * can still show you the original source code when you inspect an element.
+         *
+         * By default, this value is set to true, making it easier for developers to debug a problem gone awry.
+         */
+        abstract val includeSourceMap: Property<Boolean>
+
+        init {
+            browser.convention(Browser.Chromium)
+            includeSourceMap.convention(true)
+        }
+    }
+
+
+    /**
      * A collection of key / value pairs which will be made available within your Kobweb app via `AppGlobals`.
      *
      * This is a useful place to save constant values that describe your app, like a version value or build timestamp.
@@ -189,11 +221,15 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf, baseGenDir: Proper
 
         extensions.create<IndexBlock>("index", RoutePrefix(conf.site.routePrefix))
         extensions.create<ServerBlock>("server")
+        extensions.create<ExportBlock>("export")
     }
 }
 
 val AppBlock.index: AppBlock.IndexBlock
     get() = extensions.getByType<AppBlock.IndexBlock>()
+
+val AppBlock.export: AppBlock.ExportBlock
+    get() = extensions.getByType<AppBlock.ExportBlock>()
 
 val AppBlock.server: AppBlock.ServerBlock
     get() = extensions.getByType<AppBlock.ServerBlock>()

@@ -4,6 +4,7 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
@@ -17,7 +18,6 @@ import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.merge
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
@@ -141,7 +141,7 @@ abstract class KobwebExportTask @Inject constructor(
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            val browser = kobwebBlock.export.browser.get()
+            val browser = kobwebBlock.app.export.browser.get()
             PlaywrightCache().install(browser)
             Playwright.create(
                 Playwright.CreateOptions().setEnv(
@@ -225,7 +225,7 @@ abstract class KobwebExportTask @Inject constructor(
             scriptFile.copyTo(destFile, overwrite = true)
         }
 
-        if (kobwebBlock.export.includeSourceMap.get()) {
+        if (kobwebBlock.app.export.includeSourceMap.get()) {
             val scriptMapFile = File("${scriptFile}.map")
             val destFile = systemRoot.resolve(scriptMapFile.name)
             scriptMapFile.copyTo(destFile, overwrite = true)

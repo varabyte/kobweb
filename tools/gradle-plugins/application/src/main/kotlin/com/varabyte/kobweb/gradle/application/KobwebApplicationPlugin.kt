@@ -3,7 +3,6 @@ package com.varabyte.kobweb.gradle.application
 import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
-import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
@@ -98,7 +97,6 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebBlock = project.kobwebBlock.apply {
             createAppBlock(kobwebConf)
-            createExportBlock()
         }
 
         val env =

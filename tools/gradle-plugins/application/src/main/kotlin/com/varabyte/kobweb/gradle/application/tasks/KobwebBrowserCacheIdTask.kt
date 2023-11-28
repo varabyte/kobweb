@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
@@ -18,6 +19,6 @@ abstract class KobwebBrowserCacheIdTask @Inject constructor(kobwebBlock: KobwebB
     KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
     @TaskAction
     fun execute() {
-        println("${kobwebBlock.export.browser.get().playwrightName}-${PlaywrightCache().version}")
+        println("${kobwebBlock.app.export.browser.get().playwrightName}-${PlaywrightCache().version}")
     }
 }
