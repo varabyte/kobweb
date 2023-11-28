@@ -172,6 +172,15 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf, baseGenDir: Proper
      */
     abstract class ExportBlock {
         /**
+         * @property route The route for the current page being exported, including a leading slash
+         *   (e.g. "/admin/login"). Note that if your project specifies a global route prefix, it will not be included
+         *   here.
+         */
+        class ExportFilterContext(
+            val route: String,
+        )
+
+        /**
          * Which browser to use for the export step.
          *
          * Besides potentially affecting the snapshotted output and export times, this can also affect the download size.
@@ -190,6 +199,17 @@ abstract class AppBlock @Inject constructor(conf: KobwebConf, baseGenDir: Proper
          * By default, this value is set to true, making it easier for developers to debug a problem gone awry.
          */
         abstract val includeSourceMap: Property<Boolean>
+
+        /**
+         * A filter which, if set, will be invoked for every page to test if it should be exported.
+         *
+         * The callback should return true to allow the export and false otherwise.
+         *
+         * If this isn't set, then all discovered pages will be exported.
+         *
+         * @see ExportFilterContext
+         */
+        abstract val filter: Property<ExportFilterContext.() -> Boolean>
 
         init {
             browser.convention(Browser.Chromium)

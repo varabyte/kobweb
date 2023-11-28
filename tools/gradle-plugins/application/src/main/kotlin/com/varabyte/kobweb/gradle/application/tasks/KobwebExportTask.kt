@@ -4,6 +4,7 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
@@ -163,8 +164,18 @@ abstract class KobwebExportTask @Inject constructor(
                         // Skip export routes with dynamic parts, as they are dynamically generated based on their URL
                         // anyway
                         .filter { !it.contains('{') }
+                        .filter { route ->
+                            val ctx = AppBlock.ExportBlock.ExportFilterContext(route)
+                            (kobwebBlock.app.export.filter.orNull?.invoke(ctx) ?: true)
+                                .also { shouldExport ->
+                                    if (!shouldExport) {
+                                        logger.lifecycle("\nSkipped export for \"$route\".")
+                                    }
+                                }
+                        }
                         .toSet()
-                        .forEach { route ->
+                        .takeIf { routes -> routes.isNotEmpty() }
+                        ?.forEach { route ->
                             logger.lifecycle("\nSnapshotting html for \"$route\"...")
 
                             val prefixedRoute = routePrefix.prependTo(route)
@@ -187,6 +198,21 @@ abstract class KobwebExportTask @Inject constructor(
                                     parentFile.mkdirs()
                                     writeText(snapshot)
                                 }
+                        }
+                        ?: run {
+                            val noPagesExportedMessage = buildString {
+                                append("No pages were found to export.")
+                                if (kobwebBlock.app.export.filter.isPresent) {
+                                    append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
+                                }
+                            }
+                            // This case is an error in static layout mode, because with no pages, there's nothing for
+                            // the user to visit. For a kobweb layout, however, there is always at least a minimal
+                            // index.html file included.
+                            when (siteLayout) {
+                                SiteLayout.KOBWEB -> logger.warn("w: $noPagesExportedMessage")
+                                SiteLayout.STATIC -> logger.error("e: $noPagesExportedMessage")
+                            }
                         }
                 }
             }
