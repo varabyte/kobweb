@@ -34,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -108,8 +107,8 @@ fun Application.configureRouting(
     when (siteLayout) {
         SiteLayout.KOBWEB -> {
             when (env) {
-                ServerEnvironment.DEV -> configureDevRouting(conf, globals, events, logger)
-                ServerEnvironment.PROD -> configureProdRouting(conf, events, logger)
+                ServerEnvironment.DEV -> configureDevRouting(env, conf, globals, events, logger)
+                ServerEnvironment.PROD -> configureProdRouting(env, conf, events, logger)
             }
         }
 
@@ -394,24 +393,35 @@ private fun Routing.configureCatchAllRouting(
     }
 }
 
-private fun Path?.createApiJar(logger: Logger, events: EventDispatcher, nativeLibraryMappings: Map<String, String>): ApiJarFile? {
+private fun Path?.createApiJar(
+    env: ServerEnvironment,
+    logger: Logger,
+    events: EventDispatcher,
+    nativeLibraryMappings: Map<String, String>
+): ApiJarFile? {
     when {
         this == null -> logger.info("No API jar file specified in conf.yaml. Server API routes will not be available.")
         !this.exists() -> logger.warn("API jar specified but does not exist! Please fix conf.yaml. Invalid path: \"$this\"")
         else -> {
             logger.info("API jar found and will be loaded: \"$this\"")
-            return ApiJarFile(this, events, logger, nativeLibraryMappings)
+            return ApiJarFile(this, env, events, logger, nativeLibraryMappings)
         }
     }
     return null
 }
 
-private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlobals, events: EventDispatcher, logger: Logger) {
+private fun Application.configureDevRouting(
+    env: ServerEnvironment,
+    conf: KobwebConf,
+    globals: ServerGlobals,
+    events: EventDispatcher,
+    logger: Logger
+) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
     val apiJar = conf.server.files.dev.api
         ?.let { Path(it) }
-        .createApiJar(logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
+        .createApiJar(env, logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
@@ -478,7 +488,12 @@ private fun Application.configureDevRouting(conf: KobwebConf, globals: ServerGlo
     }
 }
 
-private fun Application.configureProdRouting(conf: KobwebConf, events: EventDispatcher, logger: Logger) {
+private fun Application.configureProdRouting(
+    env: ServerEnvironment,
+    conf: KobwebConf,
+    events: EventDispatcher,
+    logger: Logger
+) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
     if (!siteRoot.exists()) {
         throw KobwebException("No site folder found. Did you run `kobweb export`?")
@@ -499,7 +514,7 @@ private fun Application.configureProdRouting(conf: KobwebConf, events: EventDisp
     val apiJar = conf.server.files.dev.api
         ?.substringAfterLast("/")
         ?.let { systemRoot.resolve(it) }
-        .createApiJar(logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
+        .createApiJar(env, logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         val routePrefix = conf.site.routePrefixNormalized

@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.api
 
+import com.varabyte.kobweb.api.env.Environment
 import com.varabyte.kobweb.api.event.Events
 import com.varabyte.kobweb.api.log.Logger
 
@@ -10,5 +11,5 @@ import com.varabyte.kobweb.api.log.Logger
  * directly. It is expected that a Kobweb project will generate an implementation for this at compile-time.
  */
 interface ApisFactory {
-    fun create(events: Events, logger: Logger): Apis
+    fun create(env: Environment, events: Events, logger: Logger): Apis
 }
