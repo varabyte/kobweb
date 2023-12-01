@@ -3,6 +3,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.Tracing
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
@@ -29,6 +30,7 @@ import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 import com.varabyte.kobweb.gradle.application.Browser as KobwebBrowser
 
@@ -97,10 +99,48 @@ abstract class KobwebExportTask @Inject constructor(
         return Jsoup.parse(content()).toString()
     }
 
-    private fun Browser.takeSnapshot(url: String): String {
+    private fun Browser.takeSnapshot(route: String, url: String): String {
         newContext().use { context ->
+            val traceConfig = kobwebBlock.app.export.traceConfig.orNull
+                ?.takeIf { it.filter(route) }
+            if (traceConfig != null) {
+                val traceRoot = traceConfig.root
+                traceRoot.toFile().mkdirs()
+                traceRoot.resolve("README.md").writeText(
+                    """
+                        # Export Traces
+
+                        This directory contains traces of your exported pages. These traces can be opened in the
+                        [Playwright Trace Viewer](https://trace.playwright.dev/).
+
+                        To open a trace, open the link above and then drag and drop it onto that page.
+
+                        For understanding trace results, see: https://playwright.dev/docs/trace-viewer
+                    """.trimIndent()
+                )
+
+                context.tracing().start(
+                    Tracing.StartOptions()
+                        .setTitle(route)
+                        .setScreenshots(traceConfig.includeScreenshots)
+                        .setSnapshots(true)
+                        .setSources(true)
+                )
+            }
             context.newPage().use { page ->
-                return page.takeSnapshot(url)
+                try {
+                    return page.takeSnapshot(url)
+                } finally {
+                    traceConfig?.let { traceConfig ->
+                        val traceRelativePath = traceConfig.root.resolve(
+                            (if (route.endsWith('/')) route + "index" else route).removePrefix(
+                                "/"
+                            ) + ".trace.zip"
+                        )
+                        context.tracing().stop(Tracing.StopOptions().setPath(traceRelativePath))
+                        logger.lifecycle("Saved export trace to: $traceRelativePath")
+                    }
+                }
             }
         }
     }
@@ -182,7 +222,7 @@ abstract class KobwebExportTask @Inject constructor(
 
                             val snapshot: String
                             val elapsedMs = measureTimeMillis {
-                                snapshot = browser.takeSnapshot("http://localhost:$port$prefixedRoute")
+                                snapshot = browser.takeSnapshot(route, "http://localhost:$port$prefixedRoute")
                             }
                             logger.lifecycle("Snapshot finished in ${elapsedMs}ms.")
 
