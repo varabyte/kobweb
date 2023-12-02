@@ -48,7 +48,7 @@ fun HomePage() {
 
 ---
 
-While Kobweb is still pre-1.0, it has been usable for a while now. It provides escape hatches to lower level APIs, so
+While Kobweb is still pre-1.0, it has been usable for a while now. It provides escape hatches to lower-level APIs, so
 you can accomplish anything even if Kobweb doesn't support it yet. Please consider starring the project to indicate
 interest, so we know we're creating something the community wants.
 [How ready is it?▼](#can-we-kobweb-yet)
@@ -56,15 +56,15 @@ interest, so we know we're creating something the community wants.
 Our goal is to provide:
 
 * an intuitive structure for organizing your Kotlin website or web app
-* automatic handling of routing between pages
+* Automatic handling of routing between pages
 * a collection of useful _batteries included_ widgets built on top of Compose HTML
 * an environment built from the ground up around live reloading
 * static site exports for improved SEO
-* support for responsive (i.e. mobile and desktop) design
-* out-of-the-box Markdown support
+* Support for responsive (i.e. mobile and desktop) design
+* Out-of-the-box markdown support
 * a way to easily define server API routes and persistent API streams
-* a growing collection of general purpose utilities added on top of Compose HTML ([learn more▼](#improvements-to-the-compose-html-library))
-* an open source foundation that the community can extend
+* a growing collection of general-purpose utilities added on top of Compose HTML ([learn more▼](#improvements-to-the-compose-html-library))
+* an open-source foundation that the community can extend
 * and much, much more!
 
 Here's a demo where we create a Compose HTML project from scratch with Markdown support and live reloading, in under
@@ -81,8 +81,8 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 > * [Building a full stack multiplatform site](https://www.youtube.com/watch?v=zcrY0qayWF4)
 >   * This demonstrates how to write both frontend and backend logic. It also demonstrates how you can write a separate
 >     Android frontend that can also work with your server. (This video is still useful to watch even if you never intend
->     to have any other frontend besides web).
-> * It's easy to start with a static layout site and migrate to a full stack site later. (You can read more about
+>     to have any other frontend besides the web).
+> * It's easy to start with a static layout site and migrate to a full-stack site later. (You can read more about
 >   [Static vs. Fullstack sites▼](#static-layout-vs-full-stack-sites) below.)
 
 # Trying it out yourself
@@ -134,9 +134,9 @@ Please see: https://github.com/varabyte/kobweb/issues/117 and consider leaving a
 
 ## Download the Kobweb binary
 
-Our binary artifact is hosted on GitHub. To download latest, you can either
-[grab the zip or tar file from the GitHub](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.13) or you can fetch
-it from your terminal:
+Our binary artifact is hosted on GitHub. To download the latest, you can either
+[grab the zip or tar file from GitHub](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.13) or you can fetch
+it, from the terminal:
 
 ```bash
 $ cd /path/to/applications
@@ -236,7 +236,7 @@ create.
 
 When finished, you'll have a basic project with three pages - a home page, an about page, and a markdown page - and some
 components (which are collections of reusable, composable pieces). Your own directory structure should look something
-like:
+like this:
 
 ```
 my-project
@@ -258,7 +258,7 @@ my-project
 ```
 
 Note that there's no index.html or routing logic anywhere! We generate that for you automatically when you run Kobweb.
-Which brings us to the next section...
+This brings us to the next section...
 
 ## Run your Kobweb site
 
@@ -267,7 +267,7 @@ $ cd /path/to/projects/your-project/site
 $ kobweb run
 ```
 
-This command spins up a webserver at http://localhost:8080. If you want to configure the port, you can do so by editing
+This command spins up a web server at http://localhost:8080. If you want to configure the port, you can do so by editing
 your project's `.kobweb/conf.yaml` file.
 
 You can open your project in IntelliJ and start editing it. While Kobweb is running, it will detect changes, recompile,
@@ -303,7 +303,7 @@ Gradle run configurations for each of the Kobweb commands.
   * If your site was exported using a static layout, change the last argument to<br>`-PkobwebRunLayout=STATIC`.
 
 You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html). Or to just jump straight into how to create run
-configurations for any of the commands discussed above, read [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
+configurations for any of the commands discussed above read [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
 
 ## Running examples
 
@@ -353,7 +353,7 @@ update your own project by editing `gradle/libs.version.toml` and updating the `
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
 Compose HTML app, such as routing and configuring basic CSS styles.
 
-Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and / or
+Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and/or
 running a Compose HTML app. We want to get that stuff out of the way, so you can enjoy focusing on the more
 interesting work!
 
@@ -668,7 +668,7 @@ Box(BoxStyle.toModifier()) { /* ... */ }
 ```
 
 As a beginner, or even as an advanced user when prototyping, feel free to use inline modifiers as much as you can,
-pivoting to component styles if you find yourself needing to use pseudo classes, pseudo elements, or media queries. It
+pivoting to component styles if you find yourself needing to use pseudo-classes, pseudo-elements, or media queries. It
 is fairly easy to migrate inline styles over to stylesheets in Kobweb.
 
 In my own projects, I tend to use inline styles for really simple layout elements (e.g. `Row(Modifier.fillMaxWidth())`)
@@ -1151,7 +1151,7 @@ uses them, which you can pass into the `Modifier.animation` modifier.
 ### ElementRefScope and raw HTML elements
 
 Occasionally, you may need access to the raw element backing the Silk widget you've just created. All Silk widgets
-provide an optional `ref` parameter which take a listener that provide this information.
+provide an optional `ref` parameter which takes a listener that provides this information.
 
 ```kotlin
 Box(
@@ -1166,7 +1166,7 @@ All `ref` callbacks (discussed more below) will receive an `org.w3c.dom.Element`
 relevant [HTMLElement](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-h-t-m-l-element/) inheritor) to see the
 methods and properties that are available on it.
 
-Raw HTML elements expose a lot of functionality not available through the higher level Compose HTML APIs.
+Raw HTML elements expose a lot of functionality not available through the higher-level Compose HTML APIs.
 
 #### `ref`
 
@@ -1210,7 +1210,7 @@ Box(
 )
 ```
 
-The `disposableRef` method can also take keys which rerun the listener if any of them change. The `onDispose` callback
+The `disposableRef` method can also take keys that rerun the listener if any of them change. The `onDispose` callback
 will also be triggered in that case, as the old effect gets discarded.
 
 #### `refScope`
@@ -1248,7 +1248,7 @@ Div(attrs = {
 
 *The above snippet was adapted from [the official tutorials](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/HTML/Using_Effects#ref-in-attrsbuilder).*
 
-You could put that exact same logic inside the `Modifier.toAttrs` block, if you're terminating some modifier chain:
+You could put that exact same logic inside the `Modifier.toAttrs` block if you're terminating some modifier chain:
 
 ```kotlin
 Div(attrs = Modifier.toAttrs {
@@ -1382,7 +1382,7 @@ The above renders the following output:
 
 ---
 
-You can also set CSS variables directly from code, if you have access to the backing HTML element. Below, we use the
+You can also set CSS variables directly from code if you have access to the backing HTML element. Below, we use the
 `ref` callback to get the backing element for a fullscreen `Box` and then use a `Button` to set it to a random color
 from the colors of the rainbow:
 
@@ -1485,7 +1485,7 @@ environments. But here are some situations that might benefit from CSS variables
   your site is responsible for setting.
 * You are using a component style for a pseudo-class selector already (e.g. hover, focus, active) and you want that
   behavior to be dynamic.
-* You have a widget that you ended up creating a bunch of variants for, but instead you realize you could replace them
+* You have a widget that you ended up creating a bunch of variants for, but instead, you realize you could replace them
   all with one or two CSS variables.
 
 When in doubt, however, lean on Kotlin for handling dynamic behavior. If you want to share common style settings across
@@ -1512,7 +1512,7 @@ That's it!
 
 Some icons have a choice between solid and outline versions, such as "Square"
 ([outline](https://fontawesome.com/icons/square?s=solid&f=classic) and
-[filled](https://fontawesome.com/icons/square?s=regular&f=classic)). In that case, the default choice will be outline
+[filled](https://fontawesome.com/icons/square?s=regular&f=classic)). In that case, the default choice will be an outline
 mode, but you can pass in a style enum to control this:
 
 ```kotlin
@@ -1565,7 +1565,7 @@ MdiError(Modifier.color(Colors.Red))
 ### Components: Layouts, Sections, and Widgets
 
 Outside of pages, it is common to create reusable, composable parts. While Kobweb doesn't enforce any particular rule
-here, we recommend a convention which, if followed, may make it easier to allow new readers of your codebase to get
+here, we recommend a convention that, if followed, may make it easier to allow new readers of your codebase to get
 around.
 
 First, as a sibling to pages, create a folder called **components**. Within it, add:
@@ -1573,9 +1573,9 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
 * **layouts** - High-level composables that provide entire page layouts. Most (all?) of your `@Page` pages will start by
   calling a page layout function first. It's possible that you will only need a single layout for your entire site.
 * **sections** - Medium-level composables that represent compound areas inside your pages, organizing a collection of
-  many children composables. If you have multiple layouts, it's likely sections would be shared across them. For
+  many children's composables. If you have multiple layouts, it's likely sections would be shared across them. For
   example, nav headers and footers are great candidates for this subfolder.
-* **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
+* **widgets** - Low-level composables. Focused UI pieces that you may want to reuse all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder.
 
 ### Specifying your application root
@@ -1646,13 +1646,13 @@ A *static* site (or, more completely, a *static layout* site) is one where you e
 a [static website hosting provider](https://en.wikipedia.org/wiki/Web_hosting_service#Static_page_hosting). In other
 words, the name *static* does not refer to the behavior of your site but rather that of your hosting provider solution.
 
-A *full stack* site is one where you write both the logic that runs on the frontend (i.e. on the user's machine) as well
-as the logic that runs on the backend (i.e. on a server somewhere). This custom server must serve requested files (much
+A *full stack* site is one where you write both the logic that runs on the front end (i.e. on the user's machine) as well
+as the logic that runs on the back end (i.e. on a server somewhere). This custom server must serve requested files (much
 like a static web hosting service does) plus it should also define endpoints providing unique functionality tailored to
 your site's needs.
 
 > [!IMPORTANT]
-> Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
+> Kobweb supports full-stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
 > designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
 > layout, to emphasize how tightly coupled it is to a Kobweb server.
 
@@ -1669,7 +1669,7 @@ analytics solutions all without writing a single line of backend code.
 
 The process for exporting a bunch of files in a way that can be consumed by a static web hosting provider tends to be
 *much* faster *and* cheaper than using a full stack solution. Therefore, you should prefer a static site layout unless
-you have a specific need for a full stack approach.
+you have a specific need for a full-stack approach.
 
 Some possible reasons to use a custom server are:
 * needing to communicate with other, private backend services in your company.
@@ -1709,10 +1709,10 @@ information and some clear, concrete examples:
 
 ### Communicating with the server
 
-Let's say you've decided on creating a full stack website using Kobweb. This section walks you through setting it up as
+Let's say you've decided to create a full-stack website using Kobweb. This section walks you through setting it up as
 well as introducing the various APIs for communicating to the backend from the frontend.
 
-#### Declare a full stack project
+#### Declare a full-stack project
 
 A Kobweb project will always at least have a JavaScript component, but if you declare a JVM target, that will be used to
 define custom server logic that can then be used by your Kobweb site.
@@ -1751,7 +1751,7 @@ and look the same as the `jsMain` folder):
 
 #### Define API routes
 
-You can define and annotate methods which will generate server endpoints you can interact with. To add one:
+You can define and annotate methods that will generate server endpoints you can interact with. To add one:
 
 1. Define your method (optionally `suspend`able) in a file somewhere under the `api` package in your `jvmMain` source
    directory.
@@ -1861,7 +1861,7 @@ fun ApiStreamDemoPage() {
 ```
 
 After running your project, you can click on the button and check the console logs. If everything is working properly,
-you should see "Echoed: hello!" for each time you pressed the button.
+you should see "Echoed: hello!" each time you press the button.
 
 > [!NOTE]
 > The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
@@ -1869,7 +1869,7 @@ you should see "Echoed: hello!" for each time you pressed the button.
 
 ##### API stream conveniences
 
-The above example demonstrated API streams in their most verbose form. However, depending on your use-case, you can
+The above example demonstrated API streams in their most verbose form. However, depending on your use case, you can
 elide a fair bit of boilerplate.
 
 First of all, the connect and disconnect handlers are optional, so you can omit them if you don't need them. Let's
@@ -1921,11 +1921,11 @@ client-server connection!
 
 When faced with a choice, use API routes as often as you can. They are conceptually simpler, and you can query API
 endpoints with a CLI program like curl and sometimes even visit the URL directly in your browser. They are great for
-handling queries of or updates to server resources in response to user-driven actions (like visiting a page or clicking
+handling queries or updates to server resources in response to user-driven actions (like visiting a page or clicking
 on a button). Every operation you perform returns a clear response code in addition to some payload information.
 
 Meanwhile, API streams are very flexible and can be a natural choice to handle high-frequency communication. But they
-are also more complex. Unlike a simple request / response pattern, you are instead opting in to manage a potentially
+are also more complex. Unlike a simple request/response pattern, you are instead opting in to manage a potentially
 long lifetime during which you can receive any number of events. You may have to concern yourself about interactions
 between all the clients on the stream as well. API streams are fundamentally stateful.
 
@@ -1941,22 +1941,22 @@ a situation where a new web server is spun up to handle some intense load.
 If you're using API routes, you're already probably delegating to a database service as your data backend, so this may
 just work seamlessly.
 
-But for API streams, you many naturally find yourself writing a bunch of broadcasting code. However, this only works to
+But for API streams, you may naturally find yourself writing a bunch of broadcasting code. However, this only works to
 communicate between all clients that are connected to the same server. Two clients connected to the same stream on
 different servers are effectively in different, disconnected worlds.
 
-The above situation is often handled by using a pubsub service (like Redis). This feels somewhat equivalent to using a
+The above situation is often handled by using a pub-sub service (like Redis). This feels somewhat equivalent to using a
 database as a service in the API route situation, but this code might not be as straightforward to migrate.
 
 API routes and API streams are not a you-must-use-one-or-the-other situation. Your project can use both! In general, try
 to imagine the case where a new server might get spun up, and design your code to handle that situation gracefully. API
 routes are generally safe to use, so use them often. However, if you have a situation where you need to communicate
-events in real-time, especially situations where you want your client to be continuously directed what to do by the
+events in real-time, especially situations where you want your client to be continuously directed on what to do by the
 server via events, API streams are a great choice.
 
 > [!NOTE]
 > You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
-> implemented with. Any discussions about them should apply here as well.
+> implemented. Any discussions about them should apply here as well.
 
 ### Markdown
 
@@ -1988,7 +1988,7 @@ author: bitspittle
 ...
 ```
 
-In a following section, we'll discuss how to embed code in your markdown, but for now, know that these key / value pairs
+In the following section, we'll discuss how to embed code in your markdown, but for now, know that these key/value pairs
 can be queried in code using the page's context:
 
 ```kotlin
@@ -2009,7 +2009,7 @@ fun AuthorWidget() {
 
 ##### Root
 
-Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
+Within your front matter, there's a special value that, if set, will be used to render a root `@Composable` that wraps
 the code your markdown file would otherwise create. This is useful for specifying a layout for example:
 
 ```markdown
@@ -2458,11 +2458,11 @@ Some notes...
 * ***Setup Gradle***: This action is optional but I recommend it because it configures a bunch of caching for you.
 * ***Caching the browser***: `kobweb export` needs to download a browser the first time it is run. This workflow sets up
   a cache that saves it across runs. The cache is tagged with a unique ID so that future Kobweb releases, which may
-  change the version of browser downloaded, will use a new cache bucket (allowing GitHub to eventually clean up the old
+  change the version of the browser downloaded, will use a new cache bucket (allowing GitHub to eventually clean up the old
   one).
 * ***Upload site***: This action uploads the exported site as an artifact. You can then download the artifact from the
   workflow summary page. Your own workflow will likely delete this action and do something else here, like upload to a
-  web server (or some location accessible by your webserver) or copy files over into a `gh_pages` repository. I've
+  web server (or some location accessible by your web server) or copy files over into a `gh_pages` repository. I've
   included this here (and set the retention days very low) just so you can verify that the workflow is working for your
   project.
 
@@ -2497,9 +2497,9 @@ different type than it actually is. In this case, `MyOpacityVar.value()` returns
 
 Therefore, `Modifier.opacity(MyOpacityVar.value())` works seemingly like magic! However, if you try to do some
 arithmetic, like `MyOpacityVar.value().toDouble() * 0.5`, the compiler might be happy, but things will break silently at
-runtime, when the JS engine is asked to do math with something that's not really a number.
+runtime when the JS engine is asked to do math with something that's not really a number.
 
-In CSS, doing math with variables is accomplished by using `calc` blocks , so Kobweb offers its own `calc` method to
+In CSS, doing math with variables is accomplished by using `calc` blocks, so Kobweb offers its own `calc` method to
 mirror this. When dealing with raw numerical values, you must wrap them in `num` so we can escape the raw type system
 which was causing runtime confusion above:
 
@@ -2530,14 +2530,14 @@ calc { MyFontSizeVar.value() + 1.cssRem }
 Many users who create a full stack application generally expect to completely own both the client- and server-side code.
 
 However, being an opinionated framework, Kobweb provides a custom Ktor server in order to deliver some of its features.
-For example, it implements logic for handling [server API routes▲](#define-api-routes) as well as some live reloading
+For example, it implements the logic for handling [server API routes▲](#define-api-routes) as well as some live reloading
 functionality.
 
 It would not be trivial to refactor this behavior into some library that users could import into their own backend
 server. As a compromise, some server configuration is exposed by the `.kobweb/conf.yaml` file, and this has been the
 main way users could affect the server's behavior.
 
-That said, there will always be some use-cases that Kobweb won't anticipate. So as an escape hatch, Kobweb allows users
+That said, there will always be some use cases that Kobweb won't anticipate. So as an escape hatch, Kobweb allows users
 who know what they're doing to write their own plugins to extend the server.
 
 > [!NOTE]
@@ -2548,7 +2548,7 @@ who know what they're doing to write their own plugins to extend the server.
 
 Creating a Kobweb server plugin is relatively straightforward. You'll need to:
 
-* Create a new module in your project that produces a JAR file which bundles an implementation of
+* Create a new module in your project that produces a JAR file that bundles an implementation of
   the `KobwebServerPlugin` interface.
 * Move a copy of that jar under your project's `.kobweb/server/plugins` directory.
 
@@ -2658,7 +2658,7 @@ routing {
 ```
 
 If you need to access HTTP endpoints exposed by your backend, you can use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
-directly, or you can use the convenience `http` property that Kobweb adds to the `window` object and which exposes
+directly, or you can use the convenience `http` property that Kobweb adds to the `window` object which exposes
 all the HTTP methods (`get`, `post`, `put`, etc.):
 
 ```kotlin
@@ -2787,7 +2787,7 @@ With your Kobweb server running and your "remote debug" run configuration select
 everything is set up correctly, you should see a message in the IDE debugger console
 like: `Connected to the target VM, address: 'localhost:5005', transport: 'socket'`
 
-If instead you see a red popup with a message
+If instead, you see a red popup with a message
 like `Unable to open debugger port (localhost:5005): java.net.ConnectException "Connection refused"`, please
 double-check the values in your `conf.yaml` file, restart the server, and try again.
 
@@ -2796,7 +2796,7 @@ double-check the values in your `conf.yaml` file, restart the server, and try ag
 ### Font hosting service
 
 The easiest way to use a custom font is if it is already hosted for you. For example, Google Fonts provides a CDN that
-you can use to load fonts from directly.
+you can use to load fonts directly.
 
 > [!NOTE]
 > While this is the easiest approach, be sure you won't run into compliance issues! If you use Google Fonts on your
@@ -2845,7 +2845,7 @@ Column(Modifier.fontFamily("Roboto")) {
 Users can flexibly declare a custom font by using
 CSS's [`@font-face` rule](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face).
 
-In Kobweb, you can normally declare CSS properties in Kotlin (within an `@InitSilk` block), but unfortunately Firefox
+In Kobweb, you can normally declare CSS properties in Kotlin (within an `@InitSilk` block), but unfortunately, Firefox
 doesn't allow you to define or modify `@font-face` entries
 in code ([relevant Bugzilla issue](https://bugzilla.mozilla.org/show_bug.cgi?id=443978)). Therefore, for guaranteed
 cross-platform compatibility, you should create a CSS file and reference it from your build script.
@@ -2878,7 +2878,7 @@ where `faces.css` contains all your `@font-face` rule definitions (we just have 
 
 > [!NOTE]
 > The above layout may be slightly overkill if you are sure you'll only ever have a single font, but it's flexible
-> enough to support additional fonts if you decide to add more in the future, which is why we recommend it as general
+> enough to support additional fonts if you decide to add more in the future, which is why we recommend it as a general
 > advice here.
 
 Now, you need to reference this CSS file from your `build.gradle.kts` script:
@@ -2905,7 +2905,7 @@ Column(Modifier.fontFamily("Lobster")) {
 
 ## Kobweb server logs
 
-When you run `kobweb run`, the spun up web server will, by default, log to the `.kobweb/server/logs` directory.
+When you run `kobweb run`, the spun-up web server will, by default, log to the `.kobweb/server/logs` directory.
 
 You can configure logging behavior by editing the `.kobweb/conf.yaml` file. Below we show setting all parameters to
 their default values:
@@ -2924,7 +2924,7 @@ server:
 
 The above defaults were chosen to be reasonable for most users running their projects on their local machines in
 developer mode. However, for production servers, you may want to set `clearLogsOnStart` to false, bump up the
-`totalSizeCap` after reviewing disk limitations of your web server host, and maybe set `maxFileCount` to a reasonable
+`totalSizeCap` after reviewing the disk limitations of your web server host, and maybe set `maxFileCount` to a reasonable
 limit.
 
 Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
@@ -2934,7 +2934,7 @@ Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it
 
 In the beginning, Kobweb was only intended to be a thin layer on top of Compose HTML, but the more we worked on it, the
 more we ran into features that were simply not yet implemented in Compose HTML. We also wrote utility methods and
-classes that were so generally useful, it would have been a shame to bury them deep inside our framework.
+classes that were so generally useful, that it would have been a shame to bury them deep inside our framework.
 
 As a result, we created a module called [`compose-html-ext`](frontend/compose-html-ext/README.md), where we put code
 that we would be more than happy for the Compose HTML team to fork and migrate over to Compose HTML someday.
@@ -2944,27 +2944,27 @@ This now includes (not comprehensive):
 * a *ton* of missing type-safe wrappers around many, many CSS properties
 * type-safe wrappers around CSS functions, like gradients, filters,
   `calc` (especially useful when working with CSS variables), etc.
-* rich SVG support
-* utility methods around saving files to / loading files from disk
+* Rich SVG support
+* utility methods around saving files to / loading files from the disk
 * utility methods and classes built on top
   of [`window.fetch`](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-window-or-worker-global-scope/fetch.html)
   (for example, making it easier to use the most common HTTP verbs like GET, POST, etc.,
   as well as providing `suspend fun` versions of fetch)
 * additions for the missing [transition events](https://developer.mozilla.org/en-US/docs/Web/API/TransitionEvent)
 * implementations of resize and intersection observers
-* utility methods for getting a sequence of descendant / ancestor HTML elements, useful for walking the DOM tree in a
+* utility methods for getting a sequence of descendant/ancestor HTML elements, useful for walking the DOM tree in a
   Kotlin-idiomatic way
 * a utility composable, `GenericTag`, which is an easy-to-use API wrapping Compose HTML's `TagElement` composable, with
   additional namespacing support if needed (for example, required when implementing SVG elements)
 * a utility class for working with CSS variables, `StyleVariable`, allows specifying a default value, provides
-  first-class number / string variable support, and
+  first-class number/string variable support, and
   fixes [a bug in Compose HTML's `CSSStyleVariable`class](https://github.com/JetBrains/compose-multiplatform/issues/2763)
   where it can accept invalid values.
 * `setTimeout` and `setInterval` methods that are more Kotlin-idiomatic (e.g. the lambdas are the last parameter)
 
 > [!NOTE]
 > Some users have mentioned we should have opened PRs for the Compose HTML team instead of maintaining a separate
-> codebase. However, after observing that Jetbrains was focusing more and more of their energy on Compose Multiplatform
+> codebase. However, after observing that JetBrains was focusing more and more of its energy on Compose Multiplatform
 > for Web, we decided to implement the features we needed in our own project. This way, we could maintain our velocity
 > while allowing their team to pick and choose what they agreed with at some point in the future at their leisure.
 > There's so much code here, especially around CSS APIs, that getting mired down in PR discussions would have ground our
@@ -3015,28 +3015,28 @@ At this point:
 * It is easy to set up a new project and get things running quickly.
 * The live reloading flow is pretty nice, and you'll miss it when you switch to projects that don't have it.
 * It supports generating pages from Markdown that can reference your Composable code.
-* While it's not quite server-side rendering, you can export static pages which will get hydrated on load.
+* While it's not quite a server-side rendering, you can export static pages which will get hydrated on load.
 * A huge range of CSS properties are supported, along with support for style variables and animations.
-* You can use the `Modifier` builder for a significant number of css properties.
-* Silk components are color mode aware and support responsive behavior.
+* You can use the `Modifier` builder for a significant number of CSS properties.
+* Silk components are color-mode aware and support responsive behavior.
 * There are quite a few widgets available, and it's easy to create your own.
 
 However, there's always more to do.
 
 * I'm trying to add support for every stabilized CSS property, but some are still missing, especially less
-  common ones. (You can use a fallback for such cases in the meanwhile).
+  common ones. (You can use a fallback for such cases in the meantime).
 * There are still a handful of widgets planned to be added.
 * A lot of detailed documentation is planned to go into the Kobweb site (linked just above) but it isn't done yet.
 
 I think there's enough there now to let you do almost anything you'd want to do, as either Kobweb supports it or you can
 escape hatch to underlying Compose HTML / Kotlin/JS approaches, but there might be some areas where it's still a bit
-DIY. It would be great to get real world experience to hear what issues users are actually running into.
+DIY. It would be great to get real-world experience to hear what issues users are actually running into.
 
 So, should you use Kobweb at this point? If you are...
 
 * playing around with Compose HTML for the first time and want to get up and running quickly on a toy project:
     * **YES!!!** Please see the [connecting with us▼](#connecting-with-us) section
-      below, we'd definitely love to hear from you. It's still a good time if you'd want to have a voice in the
+      below, we'd definitely love to hear from you. It's still a good time if you want to have a voice in the
       direction of this project.
 * a Kotlin developer who wants to write a small web app or create a new blog from scratch:
     * **Probably!** I hope if you evaluate Kobweb at this point, you'll find a lot to like. You can get in touch
@@ -3048,17 +3048,17 @@ So, should you use Kobweb at this point? If you are...
   * **Probably not?** I'm assuming most companies are so risk-averse they would not even use Compose HTML, which Kobweb
     is built on top of. If you *were* considering Compose HTML, however, Kobweb is worth a look.
 
-On the fence but not sure? Connect with us, and I'd be happy to help you assess your situation.
+On the fence but not sure. Connect with us, and I'd be happy to help you assess your situation.
 
 ## Testimonials
 
 I'm pleased to mention that Kobweb has received feedback from some satisfied users. Here are a few:
 
-* "This is a pretty bloody amazing technology you've created here. I have been dreading upgrading [my] website for ages because I didn't want to go back to html and css 🫤 now i can stay with Kotlin 😀"
-* "Kobweb looks fantastic and I've been [trying] to use kotlin in all parts of [my] hobby stuff and work, so I got real excited when I saw Kobweb, [even though] I hadn't been satisfied with a web framework in a long time. Incredible work."
-* "I started using Kobweb from last week and I have to say this [...] reinvented web development for me. [...] I used to hate html css. After getting hands on kobweb I’m in love with it."
+* "This is a pretty bloody amazing technology you've created here. I have been dreading upgrading [my] website for ages because I didn't want to go back to html and css 🫤 now I can stay with Kotlin 😀"
+* "Kobweb looks fantastic and I've been [trying] to use Kotlin in all parts of [my] hobby stuff and work, so I got real excited when I saw Kobweb, [even though] I hadn't been satisfied with a web framework in a long time. Incredible work."
+* "I started using Kobweb last week and I have to say this [...] reinvented web development for me. [...] I used to hate html css. After getting my hands on kobweb I’m in love with it."
 * "Finally got paid -- all thanks to kobweb 🎉💥"
-* "I didn't wanna learn any JS framework so when I first learned about kobweb it felt like a no-brainer; having built 2 Android apps with compose already and a backend with ktor. One could argue Android developers are the best target audience, since the additional knowledge needed to move an app to web with kobweb is minimal. I love it! 🤩"
+* "I didn't wanna learn any JS framework so when I first learned about kobweb it felt like a no-brainer; having built 2 Android apps with compose already and a backend with ktor. One could argue Android developers are the best target audience since the additional knowledge needed to move an app to the web with kobweb is minimal. I love it! 🤩"
 
 # Connecting with us
 
