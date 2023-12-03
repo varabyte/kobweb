@@ -19,6 +19,7 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
 import javax.inject.Inject
+import kotlin.time.Duration
 
 /**
  * A sub-block for defining all properties relevant to a Kobweb application.
@@ -236,6 +237,14 @@ abstract class AppBlock @Inject constructor(
          * @see ExportFilterContext
          */
         abstract val filter: Property<ExportFilterContext.() -> Boolean>
+
+        /**
+         * The max timeout to allow for each export.
+         *
+         * By default, this is chosen by Playwright, which at the time of writing this documentation uses 30 seconds as
+         * a timeout.
+         */
+        abstract val timeout: Property<Duration>
 
         /**
          * @see enableTraces

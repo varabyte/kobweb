@@ -32,6 +32,7 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
+import kotlin.time.DurationUnit
 import com.varabyte.kobweb.gradle.application.Browser as KobwebBrowser
 
 abstract class KobwebExportTask @Inject constructor(
@@ -101,6 +102,7 @@ abstract class KobwebExportTask @Inject constructor(
 
     private fun Browser.takeSnapshot(route: String, url: String): String {
         newContext().use { context ->
+            kobwebBlock.app.export.timeout.orNull?.let { context.setDefaultTimeout(it.toDouble(DurationUnit.MILLISECONDS)) }
             val traceConfig = kobwebBlock.app.export.traceConfig.orNull
                 ?.takeIf { it.filter(route) }
             if (traceConfig != null) {
