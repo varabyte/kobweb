@@ -1560,9 +1560,9 @@ All Material Design Icon composables accept a modifier parameter, so you can twe
 MdiError(Modifier.color(Colors.Red))
 ```
 
-## Intermediate topics
+# Intermediate topics
 
-### Components: Layouts, Sections, and Widgets
+## Components: Layouts, Sections, and Widgets
 
 Outside of pages, it is common to create reusable, composable parts. While Kobweb doesn't enforce any particular rule
 here, we recommend a convention which, if followed, may make it easier to allow new readers of your codebase to get
@@ -1578,7 +1578,7 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder.
 
-### Specifying your application root
+## Specifying your application root
 
 By default, Kobweb will automatically root every page to the [`KobwebApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-core/src/jsMain/kotlin/com/varabyte/kobweb/core/App.kt)
 (or, if using Silk, to a [`SilkApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-silk/src/jsMain/kotlin/com/varabyte/kobweb/silk/SilkApp.kt)).
@@ -1637,7 +1637,7 @@ fun MyApp(content: @Composable () -> Unit) {
 You can define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
 time.
 
-### Static layout vs. Full stack sites
+## Static layout vs. Full stack sites
 
 There are two flavors of Kobweb sites: *static* and *full stack*.
 
@@ -1680,7 +1680,7 @@ Some possible reasons to use a custom server are:
 If you aren't sure which category you fall into, then you should probably be creating a static layout site. It's much
 easier to migrate from a static layout site to a full stack site later than the other way around.
 
-#### Exporting and running
+### Exporting and running
 
 Both site flavors require an export. To export your site with a static layout, use the `kobweb export --layout static`
 command, while for full stack the command is `kobweb export --layout kobweb` (or just `kobweb export` since `kobweb` is
@@ -1690,7 +1690,7 @@ Once exported, you can test your site by running it locally before uploading. Yo
 `kobweb run --env prod --layout static` and a full stack site with `kobweb run --env prod --layout kobweb` (or just
 `kobweb run --env prod`).
 
-#### Deploying
+### Deploying
 
 A static site gets exported into `.kobweb/site` by default (you can configure this location in your `.kobweb/conf.yaml`
 file if you'd like). You can then upload the contents of that folder to the static web hosting provider of your choice.
@@ -1707,12 +1707,12 @@ information and some clear, concrete examples:
 * [Static site generation and deployment with Kobweb](https://bitspittle.dev/blog/2022/staticdeploy)
 * [Deploying Kobweb into the cloud](https://bitspittle.dev/blog/2023/clouddeploy)
 
-### Communicating with the server
+## Communicating with the server
 
 Let's say you've decided on creating a full stack website using Kobweb. This section walks you through setting it up as
 well as introducing the various APIs for communicating to the backend from the frontend.
 
-#### Declare a full stack project
+### Declare a full stack project
 
 A Kobweb project will always at least have a JavaScript component, but if you declare a JVM target, that will be used to
 define custom server logic that can then be used by your Kobweb site.
@@ -1749,7 +1749,7 @@ and look the same as the `jsMain` folder):
 
 ![Kobweb JVM main set up correctly](https://github.com/varabyte/media/raw/main/kobweb/images/kobweb-jvm-main.png)
 
-#### Define API routes
+### Define API routes
 
 You can define and annotate methods which will generate server endpoints you can interact with. To add one:
 
@@ -1800,7 +1800,7 @@ corresponding "try" version that will return null instead (`tryPost`, `tryPut`, 
 If you know what you're doing, you can of course always use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
 directly.
 
-#### Define API streams
+### Define API streams
 
 Kobweb servers also support persistent connections via streams. Streams are essentially named channels that maintain
 continuous contact between the client and the server, allowing either to send messages to the other at any time. This is
@@ -1867,7 +1867,7 @@ you should see "Echoed: hello!" for each time you pressed the button.
 > The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
 > reference that project for a more realistic example.
 
-##### API stream conveniences
+#### API stream conveniences
 
 The above example demonstrated API streams in their most verbose form. However, depending on your use-case, you can
 elide a fair bit of boilerplate.
@@ -1917,7 +1917,7 @@ In practice, your API streams will probably be a bit more involved than the echo
 can handle some cases only needing a one-liner on the server and another on the client to create a persistent
 client-server connection!
 
-#### API routes vs. API streams
+### API routes vs. API streams
 
 When faced with a choice, use API routes as often as you can. They are conceptually simpler, and you can query API
 endpoints with a CLI program like curl and sometimes even visit the URL directly in your browser. They are great for
@@ -1958,7 +1958,7 @@ server via events, API streams are a great choice.
 > You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
 > implemented with. Any discussions about them should apply here as well.
 
-### Markdown
+## Markdown
 
 If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for you
 at build time, using the filename as its path.
@@ -1975,7 +1975,7 @@ For example, if I create the following file:
 
 this will create a page that I can then visit by going to `mysite.com/docs/tutorial/kobweb`
 
-#### Front Matter
+### Front Matter
 
 Front Matter is metadata that you can specify at the beginning of your document, like so:
 
@@ -2007,7 +2007,7 @@ fun AuthorWidget() {
 > If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
 > `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`.
 
-##### Root
+#### Root
 
 Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
 the code your markdown file would otherwise create. This is useful for specifying a layout for example:
@@ -2036,7 +2036,7 @@ fun KobwebPage() {
 }
 ```
 
-##### Route Override
+#### Route Override
 
 Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the
 generated `@Page` annotation (see the [Route Override section▲](#route-override) for valid values here).
@@ -2087,12 +2087,12 @@ kobweb {
 If you specify both a global route override and a local route override in the front matter, the front matter setting
 will take precedence.
 
-#### Kobweb Call
+### Kobweb Call
 
 The power of Kotlin + Compose HTML is interactive components, not static text! Therefore, Kobweb Markdown support
 enables special syntax that can be used to insert Kotlin code.
 
-##### Block syntax
+#### Block syntax
 
 Usually, you will define widgets that belong in their own section. Just use three triple-curly braces to insert a
 function that lives in its own block:
@@ -2119,7 +2119,7 @@ fun KobwebPage() {
 You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
 will automatically be prepended with your site's full package.
 
-##### Inline syntax
+#### Inline syntax
 
 Occasionally, you may want to insert a smaller widget into the flow of a single sentence. For this case, use the
 `${...}` inline syntax:
@@ -2132,13 +2132,13 @@ Press ${.components.widgets.ColorButton} to toggle the site's current color.
 > Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
 > it as text.
 
-#### Imports
+### Imports
 
 You may wish to add imports to the code generated from your markdown. Kobweb Markdown supports registering both
 *global* imports (imports that will be added to every generated file) and *local* imports (those that will only apply
 to a single target file).
 
-##### Global Imports
+#### Global Imports
 
 To register a global import, you configure the `markdown` block in your build script:
 
@@ -2171,7 +2171,7 @@ Press ${.components.widgets.ColorButton} to toggle the site's current color.
 Press ${ColorButton} to toggle the site's current color.
 ```
 
-##### Local Imports
+#### Local Imports
 
 Local imports are specified in your markdown's Front Matter (and can even affect its root declaration!):
 
