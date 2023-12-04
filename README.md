@@ -63,7 +63,7 @@ Our goal is to provide:
 * support for responsive (i.e. mobile and desktop) design
 * out-of-the-box Markdown support
 * a way to easily define server API routes and persistent API streams
-* a growing collection of general purpose utilities added on top of Compose HTML ([learn more▼](#improvements-to-the-compose-html-library))
+* a growing collection of general purpose utilities added on top of Compose HTML ([learn more▼](#extending-the-compose-html-library))
 * an open source foundation that the community can extend
 * and much, much more!
 
@@ -3036,7 +3036,7 @@ It's not expected many users will need to debug their site exports, but it's a g
 with the [server logs feature](#kobweb-server-logs)) to diagnose if one of your pages is taking longer to export than
 expected.
 
-## Improvements to the Compose HTML library
+## Extending the Compose HTML library
 
 In the beginning, Kobweb was only intended to be a thin layer on top of Compose HTML, but the more we worked on it, the
 more we ran into features that were simply not yet implemented in Compose HTML. We also wrote utility methods and
