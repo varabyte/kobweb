@@ -15,6 +15,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
@@ -227,6 +228,30 @@ abstract class AppBlock @Inject constructor(
         )
 
         /**
+         * Configuration for exporting a specific route.
+         *
+         * @property route The route to export (e.g. "/admin/login"). Your route should start with a leading slash, but
+         *   one will be added for you if it's missing.
+         * @property exportPath The path to export the route to (e.g. "admin/login.html"). If not specified, the
+         *   default value will be the route appended with `.html` (or `index.html` if the route ends with a trailing
+         *   slash). Unlike route, which should be absolute, the path should be relative. However, if you do specify a
+         *   leading slash, it will be removed.
+         */
+        internal class RouteConfig(
+            route: String,
+            exportPath: String? = null,
+        ) {
+            val route = route.prefixIfNot("/")
+
+            // Note: We drop any leading slash so we don't confuse File resolve logic
+            val exportPath = (exportPath ?: this.route.let { route ->
+                route.substringBeforeLast('/') + "/" +
+                    (route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
+                    ".html"
+            }).removePrefix("/")
+        }
+
+        /**
          * Which browser to use for the export step.
          *
          * Besides potentially affecting the snapshotted output and export times, this can also affect the download size.
@@ -256,6 +281,20 @@ abstract class AppBlock @Inject constructor(
          * @see ExportFilterContext
          */
         abstract val filter: Property<ExportFilterContext.() -> Boolean>
+
+        internal abstract val extraRoutes: SetProperty<RouteConfig>
+
+        /**
+         * Add a route to export on top of what's normally discovered.
+         *
+         * This can be useful if you want to export a specific dynamic route (which are normally skipped) or re-export
+         * a copy of an existing route to a different location.
+         *
+         * Note that any added [filter] will NOT be applied to these routes.
+         */
+        fun addExtraRoute(route: String, exportPath: String? = null) {
+            extraRoutes.add(RouteConfig(route, exportPath))
+        }
 
         /**
          * The max timeout to allow for each export.

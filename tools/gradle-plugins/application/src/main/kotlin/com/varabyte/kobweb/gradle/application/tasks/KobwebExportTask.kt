@@ -202,6 +202,7 @@ abstract class KobwebExportTask @Inject constructor(
                 browserType.launch().use { browser ->
                     val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
                     pages
+                        .asSequence()
                         .map { it.route }
                         // Skip export routes with dynamic parts, as they are dynamically generated based on their URL
                         // anyway
@@ -215,9 +216,14 @@ abstract class KobwebExportTask @Inject constructor(
                                     }
                                 }
                         }
+                        .map { route -> AppBlock.ExportBlock.RouteConfig(route) }
                         .toSet()
+                        .let { pageRoutes ->
+                            pageRoutes + kobwebBlock.app.export.extraRoutes.orNull.orEmpty()
+                        }
                         .takeIf { routes -> routes.isNotEmpty() }
-                        ?.forEach { route ->
+                        ?.forEach { routeConfig ->
+                            val route = routeConfig.route
                             logger.lifecycle("\nSnapshotting html for \"$route\"...")
 
                             val prefixedRoute = routePrefix.prependTo(route)
@@ -226,20 +232,19 @@ abstract class KobwebExportTask @Inject constructor(
                             val elapsedMs = measureTimeMillis {
                                 snapshot = browser.takeSnapshot(route, "http://localhost:$port$prefixedRoute")
                             }
-                            logger.lifecycle("Snapshot finished in ${elapsedMs}ms.")
 
-                            var filePath = route.substringBeforeLast('/') + "/" +
-                                (route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
-                                ".html"
-
-                            // Drop the leading slash so we don't confuse File resolve logic
-                            filePath = filePath.drop(1)
                             pagesRoot
-                                .resolve(filePath)
+                                .resolve(routeConfig.exportPath)
                                 .run {
+                                    if (this.exists()) {
+                                        logger.warn("w: Export for \"${routeConfig.route}\" overwrote existing file \"$this\".")
+                                    }
+
                                     parentFile.mkdirs()
                                     writeText(snapshot)
                                 }
+
+                            logger.lifecycle("Snapshot finished in ${elapsedMs}ms (saved to: \"${routeConfig.exportPath}\").")
                         }
                         ?: run {
                             val noPagesExportedMessage = buildString {
