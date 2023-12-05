@@ -29,10 +29,7 @@ sealed class ComponentVariant {
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
  */
-class SimpleComponentVariant(
-    internal val style: ComponentStyle,
-    internal val baseStyle: ComponentStyle,
-) : ComponentVariant() {
+internal class SimpleComponentVariant(val style: ComponentStyle, val baseStyle: ComponentStyle) : ComponentVariant() {
     /**
      * The raw variant name, unqualified by its parent base style.
      *
@@ -51,7 +48,7 @@ class SimpleComponentVariant(
 
     @Composable
     override fun toModifier() = style.toModifier()
-    internal fun intoImmutableStyle(classSelectors: ClassSelectors) = style.intoImmutableStyle(classSelectors)
+    fun intoImmutableStyle(classSelectors: ClassSelectors) = style.intoImmutableStyle(classSelectors)
 }
 
 private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant) :
