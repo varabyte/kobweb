@@ -1270,7 +1270,7 @@ Div {
 }
 ```
 
-### CSS Variables
+### Style Variables
 
 Kobweb supports CSS variables (also called CSS custom properties), which is a feature where you can store and retrieve
 property values from variables declared within your CSS styles. It does this through a class called `StyleVariable`.
@@ -1278,8 +1278,8 @@ property values from variables declared within your CSS styles. It does this thr
 > [!NOTE]
 > You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).
 
-Using variables is fairly simple. You first declare one without a value (but lock it down to a type) and later you can
-initialize it within a style using `Modifier.setVariable(...)`:
+Using style variables is fairly simple. You first declare one without a value (but lock it down to a type) and later you
+can initialize it within a style using `Modifier.setVariable(...)`:
 
 ```kotlin
 val dialogWidth by StyleVariable<CSSLengthValue>()
@@ -1290,7 +1290,7 @@ val RootStyle by ComponentStyle {
 }
 ```
 
-You can later use variables that were previously set, using the `value()` method to extract their current value:
+You can later query variables using the `value()` method to extract their current value:
 
 ```kotlin
 val DialogStyle by ComponentStyle {
@@ -1303,6 +1303,7 @@ set previously:
 
 ```kotlin
 val DialogStyle by ComponentStyle {
+  // Will be the value of the dialogWidth variable if it was set, otherwise 500px
   base { Modifier.width(dialogWidth.value(500.px)) }
 }
 ```
@@ -1328,9 +1329,9 @@ val DialogStyle300 by ComponentStyle {
 ```
 
 > [!IMPORTANT]
-> In the above example, we have one line where we set a variable and query it in the same style, which we did purely for
-> demonstration purposes. In practice, you would probably never do this -- the variable should have been set separately
-> earlier.
+> In the above example in the `DialogStyle300` style, we set a variable and query it in the same line, which we did
+> purely for demonstration purposes. In practice, you would probably never do this -- the variable would have been set
+> separately elsewhere.
 
 To demonstrate these concepts all together, below we declare a background color variable, create a root container scope
 which sets it, a child style that uses it, and, finally, a child style variant that overrides it:
@@ -1388,15 +1389,13 @@ You can also set CSS variables directly from code, if you have access to the bac
 from the colors of the rainbow:
 
 ```kotlin
-val bgColor by StyleVariable<CSSColorValue>()
+// We specify the initial color of the rainbow here, since the variable
+// won't otherwise be set until the user clicks a button.
+val bgColor by StyleVariable<CSSColorValue>(Colors.Red)
 
 val ScreenStyle by ComponentStyle {
     base {
-        Modifier.fillMaxSize().backgroundColor(
-            // We specify `Red` as a fallback here, since the variable
-            // won't otherwise be set when the UI first renders.
-            bgColor.value(Colors.Red)
-        )
+        Modifier.fillMaxSize().backgroundColor(bgColor.value())
     }
 }
 
@@ -1408,7 +1407,7 @@ fun RainbowBackground() {
     var screenElement: HTMLElement? by remember { mutableStateOf(null) }
     Box(ScreenStyle.toModifier(), ref = ref { screenElement = it }) {
         Button(onClick = {
-            // We have the backing HTML element, so use setProperty to set the variable value directly
+            // You can call `setVariable` on the backing HTML element to set the variable value directly
             screenElement!!.setVariable(bgColor, roygbiv.random())
         }) {
             Text("Click me")
@@ -1484,15 +1483,14 @@ environments. But here are some situations that might benefit from CSS variables
   example, maybe your site has a dark area and a light area, and the widget should use white outlines in the dark area
   and black outlines in the light. This can be accomplished by exposing an outline color variable, which each area of
   your site is responsible for setting.
-* You are using a component style for a pseudo-class selector already (e.g. hover, focus, active) and you want that
-  behavior to be dynamic.
+* You want to allow the user to tweak values within a pseudo-class selector (e.g. hover, focus, active) for some
+  widget (e.g. color or border size), which is much easier to do using variables than listening to events and setting
+  inline styles.
 * You have a widget that you ended up creating a bunch of variants for, but instead you realize you could replace them
   all with one or two CSS variables.
 
-When in doubt, however, lean on Kotlin for handling dynamic behavior. If you want to share common style settings across
-multiple component styles, just declare a `Modifier` instance somewhere and share *that* in each style. If you
-want behavior to change based on some event, prefer using inline styles instead of hiding the logic inside component
-styles.
+When in doubt, lean on Kotlin for handling dynamic behavior, and occasionally consider using style variables if you feel
+doing so would clean up the code.
 
 ### Font Awesome
 
