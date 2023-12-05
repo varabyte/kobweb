@@ -683,9 +683,10 @@ the concept).
 
 In the world of Compose HTML, you can think of a `Modifier` as a wrapper on top of CSS styles and attributes.
 
-*Please refer to official documentation if you are not familiar with HTML
-[attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes) and/or
-[styles](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style)*.
+> [!IMPORTANT]
+> Please refer to official documentation if you are not familiar with
+> HTML [attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes)
+> and/or [styles](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style).
 
 So this:
 
