@@ -9,7 +9,7 @@ fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
     fontFamily(*values)
 }
 
-fun Modifier.fontSize(value: CSSNumeric): Modifier = styleModifier {
+fun Modifier.fontSize(value: CSSLengthOrPercentageValue): Modifier = styleModifier {
     fontSize(value)
 }
 
@@ -23,7 +23,9 @@ fun Modifier.fontStyle(value: FontStyle): Modifier = styleModifier {
 
 class FontVariantScope internal constructor(private val styleScope: StyleScope) {
     fun alternates(alternates: FontVariantAlternates) = styleScope.fontVariantAlternates(alternates)
-    fun alternates(vararg alternates: FontVariantAlternates.ListableValue) = styleScope.fontVariantAlternates(*alternates)
+    fun alternates(vararg alternates: FontVariantAlternates.ListableValue) =
+        styleScope.fontVariantAlternates(*alternates)
+
     fun caps(caps: FontVariantCaps) = styleScope.fontVariantCaps(caps)
     fun eastAsian(eastAsian: FontVariantEastAsian) = styleScope.fontVariantEastAsian(eastAsian)
     fun emoji(emoji: FontVariantEmoji) = styleScope.fontVariantEmoji(emoji)

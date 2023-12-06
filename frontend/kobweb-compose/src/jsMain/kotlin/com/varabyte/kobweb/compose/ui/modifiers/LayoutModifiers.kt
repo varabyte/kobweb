@@ -18,7 +18,7 @@ fun Modifier.aspectRatio(ratio: AspectRatio): Modifier = styleModifier {
     aspectRatio(ratio)
 }
 
-fun Modifier.lineHeight(value: CSSNumeric): Modifier = styleModifier {
+fun Modifier.lineHeight(value: CSSLengthOrPercentageValue): Modifier = styleModifier {
     lineHeight(value)
 }
 
@@ -30,7 +30,7 @@ fun Modifier.lineHeight(lineHeight: LineHeight): Modifier = styleModifier {
     lineHeight(lineHeight)
 }
 
-fun Modifier.fillMaxWidth(percent: CSSPercentageValue = 100.percent) = styleModifier {
+fun Modifier.fillMaxWidth(percent: CSSLengthOrPercentageValue = 100.percent) = styleModifier {
     width(percent)
 }
 
@@ -43,32 +43,32 @@ fun Modifier.fillMaxSize(percent: CSSPercentageValue = 100.percent): Modifier = 
     height(percent)
 }
 
-fun Modifier.size(size: CSSNumeric): Modifier = size(width = size, height = size)
+fun Modifier.size(size: CSSLengthOrPercentageValue): Modifier = size(width = size, height = size)
 
-fun Modifier.size(width: CSSNumeric, height: CSSNumeric): Modifier = styleModifier {
+fun Modifier.size(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue): Modifier = styleModifier {
     width(width)
     height(height)
 }
 
-fun Modifier.minSize(size: CSSNumeric): Modifier = minSize(width = size, height = size)
+fun Modifier.minSize(size: CSSLengthOrPercentageValue): Modifier = minSize(width = size, height = size)
 
-fun Modifier.minSize(width: CSSNumeric, height: CSSNumeric): Modifier = styleModifier {
+fun Modifier.minSize(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue): Modifier = styleModifier {
     minWidth(width)
     minHeight(height)
 }
 
-fun Modifier.maxSize(size: CSSNumeric): Modifier = maxSize(width = size, height = size)
+fun Modifier.maxSize(size: CSSLengthOrPercentageValue): Modifier = maxSize(width = size, height = size)
 
-fun Modifier.maxSize(width: CSSNumeric, height: CSSNumeric): Modifier = styleModifier {
+fun Modifier.maxSize(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue): Modifier = styleModifier {
     maxWidth(width)
     maxHeight(height)
 }
 
-fun Modifier.width(size: CSSNumeric): Modifier = styleModifier {
+fun Modifier.width(size: CSSLengthOrPercentageValue): Modifier = styleModifier {
     width(size)
 }
 
-fun Modifier.height(size: CSSNumeric): Modifier = styleModifier {
+fun Modifier.height(size: CSSLengthOrPercentageValue): Modifier = styleModifier {
     height(size)
 }
 
@@ -88,7 +88,7 @@ fun Modifier.height(auto: CSSAutoKeyword): Modifier = styleModifier {
     height(auto)
 }
 
-fun Modifier.minWidth(size: CSSNumeric): Modifier = styleModifier {
+fun Modifier.minWidth(size: CSSLengthOrPercentageValue): Modifier = styleModifier {
     minWidth(size)
 }
 
@@ -96,7 +96,7 @@ fun Modifier.minWidth(minWidth: MinWidth): Modifier = styleModifier {
     minWidth(minWidth)
 }
 
-fun Modifier.maxWidth(size: CSSNumeric): Modifier = styleModifier {
+fun Modifier.maxWidth(size: CSSLengthOrPercentageValue): Modifier = styleModifier {
     maxWidth(size)
 }
 
@@ -104,7 +104,7 @@ fun Modifier.maxWidth(maxWidth: MaxWidth): Modifier = styleModifier {
     maxWidth(maxWidth)
 }
 
-fun Modifier.minHeight(size: CSSNumeric): Modifier = styleModifier {
+fun Modifier.minHeight(size: CSSLengthOrPercentageValue): Modifier = styleModifier {
     minHeight(size)
 }
 
@@ -112,7 +112,7 @@ fun Modifier.minHeight(minHeight: MinHeight): Modifier = styleModifier {
     minHeight(minHeight)
 }
 
-fun Modifier.maxHeight(size: CSSNumeric): Modifier = styleModifier {
+fun Modifier.maxHeight(size: CSSLengthOrPercentageValue): Modifier = styleModifier {
     maxHeight(size)
 }
 
@@ -121,13 +121,13 @@ fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
 }
 
 class MarginScope internal constructor(private val styleScope: StyleScope) {
-    fun left(value: CSSNumeric) = styleScope.marginLeft(value)
-    fun right(value: CSSNumeric) = styleScope.marginRight(value)
-    fun top(value: CSSNumeric) = styleScope.marginTop(value)
-    fun bottom(value: CSSNumeric) = styleScope.marginBottom(value)
+    fun left(value: CSSLengthOrPercentageValue) = styleScope.marginLeft(value)
+    fun right(value: CSSLengthOrPercentageValue) = styleScope.marginRight(value)
+    fun top(value: CSSLengthOrPercentageValue) = styleScope.marginTop(value)
+    fun bottom(value: CSSLengthOrPercentageValue) = styleScope.marginBottom(value)
 }
 
-fun Modifier.margin(all: CSSNumeric): Modifier = styleModifier {
+fun Modifier.margin(all: CSSLengthOrPercentageValue): Modifier = styleModifier {
     margin(all)
 }
 
@@ -135,37 +135,40 @@ fun Modifier.margin(scope: MarginScope.() -> Unit): Modifier = styleModifier {
     MarginScope(this).scope()
 }
 
-fun Modifier.margin(topBottom: CSSNumeric = 0.px, leftRight: CSSNumeric = 0.px): Modifier = styleModifier {
+fun Modifier.margin(
+    topBottom: CSSLengthOrPercentageValue = 0.px,
+    leftRight: CSSLengthOrPercentageValue = 0.px
+): Modifier = styleModifier {
     margin(topBottom, leftRight)
 }
 
 fun Modifier.margin(
-    top: CSSNumeric = 0.px,
-    leftRight: CSSNumeric = 0.px,
-    bottom: CSSNumeric = 0.px,
+    top: CSSLengthOrPercentageValue = 0.px,
+    leftRight: CSSLengthOrPercentageValue = 0.px,
+    bottom: CSSLengthOrPercentageValue = 0.px,
 ): Modifier = styleModifier {
     margin(top, leftRight, bottom)
 }
 
 fun Modifier.margin(
-    top: CSSNumeric = 0.px,
-    right: CSSNumeric = 0.px,
-    bottom: CSSNumeric = 0.px,
-    left: CSSNumeric = 0.px
+    top: CSSLengthOrPercentageValue = 0.px,
+    right: CSSLengthOrPercentageValue = 0.px,
+    bottom: CSSLengthOrPercentageValue = 0.px,
+    left: CSSLengthOrPercentageValue = 0.px
 ): Modifier = styleModifier {
     margin(top, right, bottom, left)
 }
 
 fun Modifier.marginInline(
-    start: CSSNumeric = 0.px,
-    end: CSSNumeric = 0.px,
+    start: CSSLengthOrPercentageValue = 0.px,
+    end: CSSLengthOrPercentageValue = 0.px,
 ) = styleModifier {
     marginInline(start, end)
 }
 
 fun Modifier.marginBlock(
-    start: CSSNumeric = 0.px,
-    end: CSSNumeric = 0.px,
+    start: CSSLengthOrPercentageValue = 0.px,
+    end: CSSLengthOrPercentageValue = 0.px,
 ) = styleModifier {
     marginBlock(start, end)
 }
@@ -175,13 +178,13 @@ fun Modifier.resize(resize: Resize) = styleModifier {
 }
 
 class PaddingScope internal constructor(private val styleScope: StyleScope) {
-    fun left(value: CSSNumeric) = styleScope.paddingLeft(value)
-    fun right(value: CSSNumeric) = styleScope.paddingRight(value)
-    fun top(value: CSSNumeric) = styleScope.paddingTop(value)
-    fun bottom(value: CSSNumeric) = styleScope.paddingBottom(value)
+    fun left(value: CSSLengthOrPercentageValue) = styleScope.paddingLeft(value)
+    fun right(value: CSSLengthOrPercentageValue) = styleScope.paddingRight(value)
+    fun top(value: CSSLengthOrPercentageValue) = styleScope.paddingTop(value)
+    fun bottom(value: CSSLengthOrPercentageValue) = styleScope.paddingBottom(value)
 }
 
-fun Modifier.padding(all: CSSNumeric): Modifier = styleModifier {
+fun Modifier.padding(all: CSSLengthOrPercentageValue): Modifier = styleModifier {
     padding(all)
 }
 
@@ -189,37 +192,40 @@ fun Modifier.padding(scope: PaddingScope.() -> Unit) = styleModifier {
     PaddingScope(this).scope()
 }
 
-fun Modifier.padding(topBottom: CSSNumeric = 0.px, leftRight: CSSNumeric = 0.px): Modifier = styleModifier {
+fun Modifier.padding(
+    topBottom: CSSLengthOrPercentageValue = 0.px,
+    leftRight: CSSLengthOrPercentageValue = 0.px
+): Modifier = styleModifier {
     padding(topBottom, leftRight)
 }
 
 fun Modifier.padding(
-    top: CSSNumeric = 0.px,
-    leftRight: CSSNumeric = 0.px,
-    bottom: CSSNumeric = 0.px,
+    top: CSSLengthOrPercentageValue = 0.px,
+    leftRight: CSSLengthOrPercentageValue = 0.px,
+    bottom: CSSLengthOrPercentageValue = 0.px,
 ): Modifier = styleModifier {
     padding(top, leftRight, bottom)
 }
 
 fun Modifier.padding(
-    top: CSSNumeric = 0.px,
-    right: CSSNumeric = 0.px,
-    bottom: CSSNumeric = 0.px,
-    left: CSSNumeric = 0.px
+    top: CSSLengthOrPercentageValue = 0.px,
+    right: CSSLengthOrPercentageValue = 0.px,
+    bottom: CSSLengthOrPercentageValue = 0.px,
+    left: CSSLengthOrPercentageValue = 0.px
 ): Modifier = styleModifier {
     padding(top, right, bottom, left)
 }
 
 fun Modifier.paddingInline(
-    start: CSSNumeric = 0.px,
-    end: CSSNumeric = 0.px,
+    start: CSSLengthOrPercentageValue = 0.px,
+    end: CSSLengthOrPercentageValue = 0.px,
 ) = styleModifier {
     paddingInline(start, end)
 }
 
 class PaddingInlineScope internal constructor(private val styleScope: StyleScope) {
-    fun start(value: CSSNumeric) = styleScope.paddingInlineStart(value)
-    fun end(value: CSSNumeric) = styleScope.paddingInlineEnd(value)
+    fun start(value: CSSLengthOrPercentageValue) = styleScope.paddingInlineStart(value)
+    fun end(value: CSSLengthOrPercentageValue) = styleScope.paddingInlineEnd(value)
 }
 
 fun Modifier.paddingInline(scope: PaddingInlineScope.() -> Unit) = styleModifier {
@@ -228,21 +234,21 @@ fun Modifier.paddingInline(scope: PaddingInlineScope.() -> Unit) = styleModifier
 
 // TODO(#168): Remove these before v1.0
 @Deprecated("Use paddingInline { start(value) } instead.", ReplaceWith("paddingInline { start(value) }"))
-fun Modifier.paddingInlineStart(value: CSSNumeric) = paddingInline { start(value) }
+fun Modifier.paddingInlineStart(value: CSSLengthOrPercentageValue) = paddingInline { start(value) }
 
 @Deprecated("Use paddingInline { end(value) } instead.", ReplaceWith("paddingInline { end(value) }"))
-fun Modifier.paddingInlineEnd(value: CSSNumeric) = paddingInline { end(value) }
+fun Modifier.paddingInlineEnd(value: CSSLengthOrPercentageValue) = paddingInline { end(value) }
 
 fun Modifier.paddingBlock(
-    start: CSSNumeric = 0.px,
-    end: CSSNumeric = 0.px,
+    start: CSSLengthOrPercentageValue = 0.px,
+    end: CSSLengthOrPercentageValue = 0.px,
 ) = styleModifier {
     paddingBlock(start, end)
 }
 
 class PaddingBlockScope internal constructor(private val styleScope: StyleScope) {
-    fun start(value: CSSNumeric) = styleScope.paddingBlockStart(value)
-    fun end(value: CSSNumeric) = styleScope.paddingBlockEnd(value)
+    fun start(value: CSSLengthOrPercentageValue) = styleScope.paddingBlockStart(value)
+    fun end(value: CSSLengthOrPercentageValue) = styleScope.paddingBlockEnd(value)
 }
 
 fun Modifier.paddingBlock(scope: PaddingBlockScope.() -> Unit) = styleModifier {
@@ -251,10 +257,10 @@ fun Modifier.paddingBlock(scope: PaddingBlockScope.() -> Unit) = styleModifier {
 
 // TODO(#168): Remove these before v1.0
 @Deprecated("Use paddingBlock { start(value) } instead.", ReplaceWith("paddingBlock { start(value) }"))
-fun Modifier.paddingBlockStart(value: CSSNumeric) = paddingBlock { start(value) }
+fun Modifier.paddingBlockStart(value: CSSLengthOrPercentageValue) = paddingBlock { start(value) }
 
 @Deprecated("Use paddingBlock { end(value) } instead.", ReplaceWith("paddingBlock { end(value) }"))
-fun Modifier.paddingBlockEnd(value: CSSNumeric) = paddingBlock { end(value) }
+fun Modifier.paddingBlockEnd(value: CSSLengthOrPercentageValue) = paddingBlock { end(value) }
 
 fun Modifier.overflow(overflow: Overflow) = styleModifier {
     overflow(overflow)
@@ -288,7 +294,7 @@ fun Modifier.verticalAlign(verticalAlign: VerticalAlign) = styleModifier {
     verticalAlign(verticalAlign)
 }
 
-fun Modifier.verticalAlign(value: CSSNumeric) = styleModifier {
+fun Modifier.verticalAlign(value: CSSLengthOrPercentageValue) = styleModifier {
     verticalAlign(value)
 }
 

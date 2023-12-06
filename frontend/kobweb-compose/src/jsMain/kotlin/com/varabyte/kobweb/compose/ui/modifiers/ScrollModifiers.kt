@@ -18,23 +18,25 @@ fun Modifier.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = null) 
 }
 
 fun Modifier.scrollPadding(
-    top: CSSNumeric = 0.px,
-    right: CSSNumeric = 0.px,
-    bottom: CSSNumeric = 0.px,
-    left: CSSNumeric = 0.px
+    top: CSSLengthOrPercentageValue = 0.px,
+    right: CSSLengthOrPercentageValue = 0.px,
+    bottom: CSSLengthOrPercentageValue = 0.px,
+    left: CSSLengthOrPercentageValue = 0.px
 ) = styleModifier {
     scrollPadding(top, right, bottom, left)
 }
 
-fun Modifier.scrollPadding(value: CSSNumeric) = styleModifier {
+fun Modifier.scrollPadding(value: CSSLengthOrPercentageValue) = styleModifier {
     scrollPadding(value)
 }
 
-fun Modifier.scrollPaddingInline(start: CSSNumeric = 0.px, end: CSSNumeric = 0.px) = styleModifier {
+fun Modifier.scrollPaddingInline(start: CSSLengthOrPercentageValue = 0.px, end: CSSLengthOrPercentageValue = 0.px) =
+    styleModifier {
     scrollPaddingInline(start, end)
 }
 
-fun Modifier.scrollPaddingBlock(start: CSSNumeric = 0.px, end: CSSNumeric = 0.px) = styleModifier {
+fun Modifier.scrollPaddingBlock(start: CSSLengthOrPercentageValue = 0.px, end: CSSLengthOrPercentageValue = 0.px) =
+    styleModifier {
     scrollPaddingBlock(start, end)
 }
 
@@ -51,22 +53,22 @@ fun Modifier.scrollSnapStop(scrollSnapStop: ScrollSnapStop) = styleModifier {
 }
 
 fun Modifier.scrollMargin(
-    top: CSSNumeric = 0.px,
-    right: CSSNumeric = 0.px,
-    bottom: CSSNumeric = 0.px,
-    left: CSSNumeric = 0.px
+    top: CSSLengthValue = 0.px,
+    right: CSSLengthValue = 0.px,
+    bottom: CSSLengthValue = 0.px,
+    left: CSSLengthValue = 0.px
 ) = styleModifier {
     scrollMargin(top, right, bottom, left)
 }
 
-fun Modifier.scrollMargin(value: CSSNumeric) = styleModifier {
+fun Modifier.scrollMargin(value: CSSLengthValue) = styleModifier {
     scrollMargin(value)
 }
 
-fun Modifier.scrollMarginInline(start: CSSNumeric = 0.px, end: CSSNumeric = 0.px) = styleModifier {
+fun Modifier.scrollMarginInline(start: CSSLengthValue = 0.px, end: CSSLengthValue = 0.px) = styleModifier {
     scrollMarginInline(start, end)
 }
 
-fun Modifier.scrollMarginBlock(start: CSSNumeric = 0.px, end: CSSNumeric = 0.px) = styleModifier {
+fun Modifier.scrollMarginBlock(start: CSSLengthValue = 0.px, end: CSSLengthValue = 0.px) = styleModifier {
     scrollMarginBlock(start, end)
 }

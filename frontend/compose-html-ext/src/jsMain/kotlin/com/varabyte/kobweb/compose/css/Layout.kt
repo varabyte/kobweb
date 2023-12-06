@@ -152,15 +152,15 @@ fun StyleScope.maxHeight(maxHeight: MaxHeight) {
 
 // region padding-inline See: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-inline
 
-fun StyleScope.paddingInline(vararg value: CSSNumeric) {
+fun StyleScope.paddingInline(vararg value: CSSLengthOrPercentageValue) {
     property("padding-inline", value.joinToString(" "))
 }
 
-fun StyleScope.paddingInlineStart(value: CSSNumeric) {
+fun StyleScope.paddingInlineStart(value: CSSLengthOrPercentageValue) {
     property("padding-inline-start", value)
 }
 
-fun StyleScope.paddingInlineEnd(value: CSSNumeric) {
+fun StyleScope.paddingInlineEnd(value: CSSLengthOrPercentageValue) {
     property("padding-inline-end", value)
 }
 
@@ -168,15 +168,15 @@ fun StyleScope.paddingInlineEnd(value: CSSNumeric) {
 
 // region padding-block See: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-block
 
-fun StyleScope.paddingBlock(vararg value: CSSNumeric) {
+fun StyleScope.paddingBlock(vararg value: CSSLengthOrPercentageValue) {
     property("padding-block", value.joinToString(" "))
 }
 
-fun StyleScope.paddingBlockStart(value: CSSNumeric) {
+fun StyleScope.paddingBlockStart(value: CSSLengthOrPercentageValue) {
     property("padding-block-start", value)
 }
 
-fun StyleScope.paddingBlockEnd(value: CSSNumeric) {
+fun StyleScope.paddingBlockEnd(value: CSSLengthOrPercentageValue) {
     property("padding-block-end", value)
 }
 
@@ -184,15 +184,15 @@ fun StyleScope.paddingBlockEnd(value: CSSNumeric) {
 
 // region margin-inline See https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline
 
-fun StyleScope.marginInline(vararg value: CSSNumeric) {
+fun StyleScope.marginInline(vararg value: CSSLengthOrPercentageValue) {
     property("margin-inline", value.joinToString(" "))
 }
 
-fun StyleScope.marginInlineStart(value: CSSNumeric) {
+fun StyleScope.marginInlineStart(value: CSSLengthOrPercentageValue) {
     property("margin-inline-start", value)
 }
 
-fun StyleScope.marginInlineEnd(value: CSSNumeric) {
+fun StyleScope.marginInlineEnd(value: CSSLengthOrPercentageValue) {
     property("margin-inline-end", value)
 }
 
@@ -200,15 +200,15 @@ fun StyleScope.marginInlineEnd(value: CSSNumeric) {
 
 // region margin-block See: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block
 
-fun StyleScope.marginBlock(vararg value: CSSNumeric) {
+fun StyleScope.marginBlock(vararg value: CSSLengthOrPercentageValue) {
     property("margin-block", value.joinToString(" "))
 }
 
-fun StyleScope.marginBlockStart(value: CSSNumeric) {
+fun StyleScope.marginBlockStart(value: CSSLengthOrPercentageValue) {
     property("margin-block-start", value)
 }
 
-fun StyleScope.marginBlockEnd(value: CSSNumeric) {
+fun StyleScope.marginBlockEnd(value: CSSLengthOrPercentageValue) {
     property("margin-block-end", value)
 }
 
@@ -242,7 +242,7 @@ fun StyleScope.verticalAlign(verticalAlign: VerticalAlign) {
     property("vertical-align", verticalAlign)
 }
 
-fun StyleScope.verticalAlign(value: CSSNumeric) {
+fun StyleScope.verticalAlign(value: CSSLengthOrPercentageValue) {
     property("vertical-align", value)
 }
 
