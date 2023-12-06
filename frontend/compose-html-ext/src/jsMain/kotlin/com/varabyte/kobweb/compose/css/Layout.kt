@@ -29,7 +29,7 @@ class Width private constructor(private val value: String) : StylePropertyValue 
 }
 typealias MinWidth = Width
 
-fun AttrsScope<*>.width(width: CSSNumeric) {
+fun AttrsScope<*>.width(width: Int) {
     attr("width", width.toString())
 }
 
@@ -70,7 +70,7 @@ class Height private constructor(private val value: String) : StylePropertyValue
 }
 typealias MinHeight = Height
 
-fun AttrsScope<*>.height(height: CSSNumeric) {
+fun AttrsScope<*>.height(height: Int) {
     attr("height", height.toString())
 }
 
