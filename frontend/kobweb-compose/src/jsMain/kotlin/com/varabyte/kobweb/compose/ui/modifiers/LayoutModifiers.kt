@@ -43,19 +43,25 @@ fun Modifier.fillMaxSize(percent: CSSPercentageValue = 100.percent): Modifier = 
     height(percent)
 }
 
-fun Modifier.size(size: CSSNumeric): Modifier = styleModifier {
-    width(size)
-    height(size)
+fun Modifier.size(size: CSSNumeric): Modifier = size(width = size, height = size)
+
+fun Modifier.size(width: CSSNumeric, height: CSSNumeric): Modifier = styleModifier {
+    width(width)
+    height(height)
 }
 
-fun Modifier.minSize(size: CSSNumeric): Modifier = styleModifier {
-    minWidth(size)
-    minHeight(size)
+fun Modifier.minSize(size: CSSNumeric): Modifier = minSize(width = size, height = size)
+
+fun Modifier.minSize(width: CSSNumeric, height: CSSNumeric): Modifier = styleModifier {
+    minWidth(width)
+    minHeight(height)
 }
 
-fun Modifier.maxSize(size: CSSNumeric): Modifier = styleModifier {
-    maxWidth(size)
-    maxHeight(size)
+fun Modifier.maxSize(size: CSSNumeric): Modifier = maxSize(width = size, height = size)
+
+fun Modifier.maxSize(width: CSSNumeric, height: CSSNumeric): Modifier = styleModifier {
+    maxWidth(width)
+    maxHeight(height)
 }
 
 fun Modifier.width(size: CSSNumeric): Modifier = styleModifier {
