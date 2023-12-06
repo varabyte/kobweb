@@ -155,7 +155,11 @@ class KeyframesProvider internal constructor(
     private val init: KeyframesBuilder.() -> Unit
 ) : CacheByPropertyNameDelegate<Keyframes>() {
     override fun create(propertyName: String): Keyframes {
-        val name = propertyName.titleCamelCaseToKebabCase()
+        val name = propertyName
+            .removeSuffix("Anim")
+            .removeSuffix("Animation")
+            .removeSuffix("Keyframes")
+            .titleCamelCaseToKebabCase()
         return Keyframes(name, prefix, init)
     }
 }
