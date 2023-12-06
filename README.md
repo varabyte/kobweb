@@ -288,7 +288,7 @@ links, making it easy to navigate to the relevant source.
 `kobweb` itself delegates to Gradle, but nothing is stopping you from calling the commands yourself. You can create
 Gradle run configurations for each of the Kobweb commands.
 
-> [!NOTE]
+> [!TIP]
 > When you run a Kobweb CLI command that delegates to Gradle, it will log the Gradle command to the console. This is
 > how you can discover the Gradle commands discussed in this section.
 
@@ -344,7 +344,7 @@ update your own project by editing `gradle/libs.version.toml` and updating the `
 > You should double-check [COMPATIBILITY.md](COMPATIBILITY.md) to see if you also need to update your `kotlin` and
 > `jetbrains-compose` versions as well.
 
-> [!NOTE]
+> [!CAUTION]
 > It can be confusing, but Kobweb has two versions -- the version for the library itself (the one that is applicable in
 > this situation), and the one for the command line tool.
 
@@ -429,7 +429,7 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 | `@Page("/")`            | `example.com/slug`              |
 | `@Page("/other")`       | `example.com/other`             |
 
-> [!WARNING]
+> [!CAUTION]
 > Despite the flexibility allowed here, you should not be using this feature frequently, if at all. A Kobweb project
 > benefits from the fact that a user can easily associate a URL on your site with a file in your codebase, but this
 > feature allows you to break those assumptions. It is mainly provided to enable dynamic routing (see the *Dynamic
@@ -1022,7 +1022,7 @@ both styles will be applied -- the base style followed by the variant style.
 For example, `MyButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first followed by additional
 outline styling.
 
-> [!IMPORTANT]
+> [!CAUTION]
 > Using a variant that was created from a different style will have no effect. In other words,
 > `LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.
 
@@ -1328,7 +1328,7 @@ val DialogStyle300 by ComponentStyle {
 }
 ```
 
-> [!IMPORTANT]
+> [!CAUTION]
 > In the above example in the `DialogStyle300` style, we set a variable and query it in the same line, which we did
 > purely for demonstration purposes. In practice, you would probably never do this -- the variable would have been set
 > separately elsewhere.
@@ -1650,7 +1650,7 @@ as the logic that runs on the backend (i.e. on a server somewhere). This custom 
 like a static web hosting service does) plus it should also define endpoints providing unique functionality tailored to
 your site's needs.
 
-> [!IMPORTANT]
+> [!NOTE]
 > Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
 > designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
 > layout, to emphasize how tightly coupled it is to a Kobweb server.
@@ -1862,7 +1862,7 @@ fun ApiStreamDemoPage() {
 After running your project, you can click on the button and check the console logs. If everything is working properly,
 you should see "Echoed: hello!" for each time you pressed the button.
 
-> [!NOTE]
+> [!TIP]
 > The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
 > reference that project for a more realistic example.
 
@@ -2127,7 +2127,7 @@ Occasionally, you may want to insert a smaller widget into the flow of a single 
 Press ${.components.widgets.ColorButton} to toggle the site's current color.
 ```
 
-> [!IMPORTANT]
+> [!CAUTION]
 > Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
 > it as text.
 
@@ -2802,7 +2802,7 @@ If you do not have access to IntelliJ Ultimate, then you'll have to rely on `pri
 great, live reloading plus Kotlin's type system generally help you incrementally build your site up without too many
 issues.
 
-> [!NOTE]
+> [!TIP]
 > If you're a student, you can apply for a free IntelliJ Ultimate
 > license [here](https://www.jetbrains.com/community/education/#students). If you maintain an open source project, you
 > can apply [here](https://www.jetbrains.com/community/opensource/#support).
@@ -2842,7 +2842,7 @@ to add a *remote JVM debug* configuration to your IDE.
 
 At this point, start up your Kobweb server using `kobweb run`.
 
-> [!IMPORTANT]
+> [!CAUTION]
 > Remote debugging is only supported in dev mode. It will not be enabled for a server started with
 > `kobweb run --env prod`.
 
@@ -2861,7 +2861,7 @@ double-check the values in your `conf.yaml` file, restart the server, and try ag
 The easiest way to use a custom font is if it is already hosted for you. For example, Google Fonts provides a CDN that
 you can use to load fonts from directly.
 
-> [!NOTE]
+> [!CAUTION]
 > While this is the easiest approach, be sure you won't run into compliance issues! If you use Google Fonts on your
 > site, you may technically be in violation of the GDPR in Europe, because an EU citizen's IP address is communicated to
 > Google and logged. You may wish to find a Europe-safe host instead, or self-host, which you can read about
@@ -3027,7 +3027,7 @@ Once enabled, you can run `kobweb export`, then once exported, open any of the g
 navigating to them using your OS's file explorer and drag-and-dropping them into
 the [Playwright Trace Viewer](https://trace.playwright.dev/).
 
-> [!NOTE]
+> [!TIP]
 > You can learn more about how to use the Trace
 > Viewer [using the official documentation](https://playwright.dev/docs/trace-viewer).
 
