@@ -15,7 +15,7 @@ fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }
 
-fun Modifier.letterSpacing(value: CSSNumeric) = styleModifier {
+fun Modifier.letterSpacing(value: CSSLengthValue) = styleModifier {
     letterSpacing(value)
 }
 
