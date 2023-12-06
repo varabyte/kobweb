@@ -13,7 +13,7 @@ fun Modifier.border(
     border(width, style, color)
 }
 
-class BorderScope internal constructor(private val styleScope: StyleScope, private val subproperty: String = "") {
+class BorderScope internal constructor(private val styleScope: StyleScope) {
     fun color(color: CSSColorValue) = styleScope.borderColor(color)
     fun style(lineStyle: LineStyle) = styleScope.borderStyle(lineStyle)
     fun width(width: CSSNumeric) = styleScope.borderWidth(width)
