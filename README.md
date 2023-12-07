@@ -2114,7 +2114,7 @@ Box(
 }
 ```
 
-![Learning CSS in Kobweb, Step 5 (gardient background added)](https://github.com/varabyte/media/raw/main/kobweb/images/css/css-example-step-5.png)
+![Learning CSS in Kobweb, Step 5 (gradient background added)](https://github.com/varabyte/media/raw/main/kobweb/images/css/css-example-step-5.png)
 
 **Add a wobble animation**
 
