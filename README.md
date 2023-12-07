@@ -1840,36 +1840,87 @@ KobwebApp {
 }
 ```
 
-It is likely you'll want to configure this further for your own application. Perhaps you have additional styles you'd
-like to globally define (e.g. the default font used by your site). Perhaps you have some initialization logic that you'd
-like to run before any page gets run (like logic for updating saved settings into local storage).
+It is likely you'll want to configure this further for your own application. Perhaps you have some initialization logic
+that you'd like to run before any page gets run (like logic for updating saved settings into local storage). And for
+many apps it's a great place to specify a full screen Silk `Surface` as that makes all children beneath it transition
+between light and dark colors smoothly.
 
 In this case, you can create your own root composable and annotate it with `@App`. If present, Kobweb will use that
 instead of its own default. You should, of course, delegate to `KobwebApp` (or `SilkApp` if using Silk), as the
 initialization logic from those methods should still be run.
 
-Here's an example application composable override that I use in one of my own projects:
+Here's an example application composable override that I use in many of my own projects:
 
 ```kotlin
 @App
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
-    SilkApp {
-      val colorMode = ColorMode.current
-        LaunchedEffect(colorMode) { // Relaunched every time the color mode changes
-            localStorage.setItem(COLOR_MODE_KEY, colorMode.name)
-        }
-
-        // A full screen Silk surface. Sets the background based on Silk's palette and animates color changes.
-        Surface(Modifier.minHeight(100.vh)) {
-            content()
-        }
+  SilkApp {
+    val colorMode = ColorMode.current
+    LaunchedEffect(colorMode) { // Relaunched every time the color mode changes
+      localStorage.setItem("color-mode", colorMode.name)
     }
+
+    // A full screen Silk surface. Sets the background based on Silk's palette and animates color changes.
+    Surface(SmoothColorStyle.toModifier().minHeight(100.vh)) {
+      content()
+    }
+  }
 }
 ```
 
 You can define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
 time.
+
+## Updating default HTML styles with Silk
+
+The default styles picked by browsers for many HTML elements rarely fit most site designs, and it's likely you'll want
+to tweak at least some of them. A very common example of this is the default web font, which if left as is will make
+your site look a bit archaic.
+
+Most traditional sites overwrite styles by creating a CSS stylesheet and then linking to it in their HTML. However, if
+you are using Silk in your Kobweb application, you can use an approach very similar to `ComponentStyle` discussed above
+but for general HTML elements.
+
+To do this, annotate a method with `@InitSilk`. This method must take a single `InitSilkContext` parameter, which
+includes a `stylesheet` property that represents the CSS stylesheet for your site, providing a Silk-idiomatic API for
+adding CSS rules to it.
+
+Below is a simple example that sets the whole site to more aesthetically pleasing fonts than the default, one for
+regular text and one for code:
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+  ctx.stylesheet.registerStyleBase("body") {
+    Modifier.fontFamily("Ubuntu", "Roboto", "Arial", "Helvetica", "sans-serif")
+      .fontSize(18.px)
+      .lineHeight(1.5)
+  }
+
+  ctx.stylesheet.registerStyleBase("code") {
+    Modifier.fontFamily("Ubuntu Mono", "Roboto Mono", "Lucida Console", "Courier New", "monospace")
+  }
+}
+```
+
+> [!TIP]
+> The `registerStyleBase` method is commonly used for registering styles with minimal code, but you can also use
+> `registerStyle`, especially if you want to add some support for one or more psuedo-classes (
+> e.g. `hover`, `focus`, `active`):
+>
+> ```kotlin
+> ctx.stylesheet.registerStyle("code") {
+>   base {
+>     Modifier
+>       .fontFamily("Ubuntu Mono", "Roboto Mono", "Lucida Console", "Courier New", "monospace")
+>       .userSelect(UserSelect.None) // No copying code allowed!
+>   }
+>   hover {
+>     Modifier.cursor(Cursor.NotAllowed)
+>   }
+> } 
+> ``` 
 
 ## Setting application globals
 
