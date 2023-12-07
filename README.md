@@ -1560,8 +1560,6 @@ All Material Design Icon composables accept a modifier parameter, so you can twe
 MdiError(Modifier.color(Colors.Red))
 ```
 
-# Intermediate topics
-
 ## Components: Layouts, Sections, and Widgets
 
 Outside of pages, it is common to create reusable, composable parts. While Kobweb doesn't enforce any particular rule
@@ -1577,6 +1575,240 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
   example, nav headers and footers are great candidates for this subfolder.
 * **widgets** - Low-level composables. Focused UI pieces that you may want to re-use all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder.
+
+## Markdown
+
+If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for you
+at build time, using the filename as its path.
+
+For example, if I create the following file:
+
+```markdown
+// jsMain/resources/markdown/docs/tutorial/Kobweb.kt
+
+# Kobweb Tutorial
+
+...
+```
+
+this will create a page that I can then visit by going to `mysite.com/docs/tutorial/kobweb`
+
+### Front Matter
+
+Front Matter is metadata that you can specify at the beginning of your document, like so:
+
+```markdown
+---
+title: Tutorial
+author: bitspittle
+---
+
+...
+```
+
+In a following section, we'll discuss how to embed code in your markdown, but for now, know that these key / value pairs
+can be queried in code using the page's context:
+
+```kotlin
+@Composable
+fun AuthorWidget() {
+  val ctx = rememberPageContext()
+  // Note: You can use `markdown!!` only if you're sure that
+  // this composable is called while inside a page generated
+  // from Markdown.
+  val author = ctx.markdown!!.frontMatter.getValue("author").single()
+  Text("Article by $author")
+}
+```
+
+> [!IMPORTANT]
+> If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
+> `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`.
+
+#### Root
+
+Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
+the code your markdown file would otherwise create. This is useful for specifying a layout for example:
+
+```markdown
+---
+root: .components.layout.DocsLayout
+---
+
+# Kobweb Tutorial
+```
+
+The above will generate code like the following:
+
+```kotlin
+import com.mysite.components.layout.DocsLayout
+
+@Composable
+@Page
+fun KobwebPage() {
+  DocsLayout {
+    H1 {
+      Text("Kobweb Tutorial")
+    }
+  }
+}
+```
+
+#### Route Override
+
+Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the
+generated `@Page` annotation (see the [Route Override section▲](#route-override) for valid values here).
+
+This allows you to give your URL a name that normal Kotlin filename rules don't allow for, such as a hyphen:
+
+`# AStarDemo.md`
+
+```markdown
+---
+routeOverride: a-star-demo
+---
+```
+
+The above will generate code like the following:
+
+```kotlin
+@Composable
+@Page("a-star-demo")
+fun AStarDemoPage() { /* ... */
+}
+```
+
+You can additionally override the algorithm used for converting ALL markdown files to their final name, by setting the
+markdown block's `routeOverride` callback:
+
+```kotlin
+kobweb {
+  markdown { //
+    // Given "Example.md", name will be "Example" and output will be "post_example"
+    routeOverride.set { name -> "post_${name.lowercase()}" }
+  }
+}
+```
+
+This callback will be triggered on all Markdown pages *except* `Index.md` files.
+
+Some common algorithms are provided which you can use instead of writing your own:
+
+```kotlin
+import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.RouteOverride
+
+kobweb {
+  markdown {
+    routeOverride.set(RouteOverride.KebabCase) // e.g. "ExamplePage" to "example-page"
+  }
+}
+```
+
+If you specify both a global route override and a local route override in the front matter, the front matter setting
+will take precedence.
+
+### Kobweb Call
+
+The power of Kotlin + Compose HTML is interactive components, not static text! Therefore, Kobweb Markdown support
+enables special syntax that can be used to insert Kotlin code.
+
+#### Block syntax
+
+Usually, you will define widgets that belong in their own section. Just use three triple-curly braces to insert a
+function that lives in its own block:
+
+```markdown
+# Kobweb Tutorial
+
+...
+
+{{{ .components.widgets.VisitorCounter }}}
+```
+
+which will generate code for you like the following:
+
+```kotlin
+@Composable
+@Page
+fun KobwebPage() {
+  /* ... */
+  com.mysite.components.widgets.VisitorCounter()
+}
+```
+
+You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
+will automatically be prepended with your site's full package.
+
+#### Inline syntax
+
+Occasionally, you may want to insert a smaller widget into the flow of a single sentence. For this case, use the
+`${...}` inline syntax:
+
+```markdown
+Press ${.components.widgets.ColorButton} to toggle the site's current color.
+```
+
+> [!CAUTION]
+> Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
+> it as text.
+
+### Imports
+
+You may wish to add imports to the code generated from your markdown. Kobweb Markdown supports registering both
+*global* imports (imports that will be added to every generated file) and *local* imports (those that will only apply
+to a single target file).
+
+#### Global Imports
+
+To register a global import, you configure the `markdown` block in your build script:
+
+```kotlin
+// site/build.gradle.kts
+
+kobweb {
+  markdown {
+    imports.add(".components.widgets.*")
+  }
+}
+```
+
+Notice that you can begin your path with a "." to tell the Kobweb Markdown plugin to prepend your site's package to it.
+The above would ensure that every markdown file generated would have the following import:
+
+```kotlin
+import com.mysite.components.widgets.*
+```
+
+Imports can help you simplify your Kobweb calls. Revisiting an example from just above:
+
+```markdown
+# Without imports
+
+Press ${.components.widgets.ColorButton} to toggle the site's current color.
+
+# With imports
+
+Press ${ColorButton} to toggle the site's current color.
+```
+
+#### Local Imports
+
+Local imports are specified in your markdown's Front Matter (and can even affect its root declaration!):
+
+```markdown
+---
+root: DocsLayout
+imports:
+  - .components.sections.DocsLayout
+  - .components.widgets.VisitorCounter
+---
+
+...
+
+{{{ VisitorCounter }}}
+```
+
+# Intermediate topics
 
 ## Specifying your application root
 
@@ -2212,236 +2444,6 @@ server via events, API streams are a great choice.
 > [!NOTE]
 > You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
 > implemented with. Any discussions about them should apply here as well.
-
-## Markdown
-
-If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for you
-at build time, using the filename as its path.
-
-For example, if I create the following file:
-
-```markdown
-// jsMain/resources/markdown/docs/tutorial/Kobweb.kt
-
-# Kobweb Tutorial
-
-...
-```
-
-this will create a page that I can then visit by going to `mysite.com/docs/tutorial/kobweb`
-
-### Front Matter
-
-Front Matter is metadata that you can specify at the beginning of your document, like so:
-
-```markdown
----
-title: Tutorial
-author: bitspittle
----
-
-...
-```
-
-In a following section, we'll discuss how to embed code in your markdown, but for now, know that these key / value pairs
-can be queried in code using the page's context:
-
-```kotlin
-@Composable
-fun AuthorWidget() {
-    val ctx = rememberPageContext()
-    // Note: You can use `markdown!!` only if you're sure that
-    // this composable is called while inside a page generated
-    // from Markdown.
-    val author = ctx.markdown!!.frontMatter.getValue("author").single()
-    Text("Article by $author")
-}
-```
-
-> [!IMPORTANT]
-> If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
-> `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`.
-
-#### Root
-
-Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
-the code your markdown file would otherwise create. This is useful for specifying a layout for example:
-
-```markdown
----
-root: .components.layout.DocsLayout
----
-
-# Kobweb Tutorial
-```
-
-The above will generate code like the following:
-
-```kotlin
-import com.mysite.components.layout.DocsLayout
-
-@Composable
-@Page
-fun KobwebPage() {
-    DocsLayout {
-        H1 {
-            Text("Kobweb Tutorial")
-        }
-    }
-}
-```
-
-#### Route Override
-
-Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the
-generated `@Page` annotation (see the [Route Override section▲](#route-override) for valid values here).
-
-This allows you to give your URL a name that normal Kotlin filename rules don't allow for, such as a hyphen:
-
-`# AStarDemo.md`
-```markdown
----
-routeOverride: a-star-demo
----
-```
-
-The above will generate code like the following:
-
-```kotlin
-@Composable
-@Page("a-star-demo")
-fun AStarDemoPage() { /* ... */ }
-```
-
-You can additionally override the algorithm used for converting ALL markdown files to their final name, by setting the
-markdown block's `routeOverride` callback:
-
-```kotlin
-kobweb {
-  markdown { //
-    // Given "Example.md", name will be "Example" and output will be "post_example"
-    routeOverride.set { name -> "post_${name.lowercase()}" }
-  }
-}
-```
-
-This callback will be triggered on all Markdown pages *except* `Index.md` files.
-
-Some common algorithms are provided which you can use instead of writing your own:
-
-```kotlin
-import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.RouteOverride
-
-kobweb {
-  markdown {
-    routeOverride.set(RouteOverride.KebabCase) // e.g. "ExamplePage" to "example-page"
-  }
-}
-```
-
-If you specify both a global route override and a local route override in the front matter, the front matter setting
-will take precedence.
-
-### Kobweb Call
-
-The power of Kotlin + Compose HTML is interactive components, not static text! Therefore, Kobweb Markdown support
-enables special syntax that can be used to insert Kotlin code.
-
-#### Block syntax
-
-Usually, you will define widgets that belong in their own section. Just use three triple-curly braces to insert a
-function that lives in its own block:
-
-```markdown
-# Kobweb Tutorial
-
-...
-
-{{{ .components.widgets.VisitorCounter }}}
-```
-
-which will generate code for you like the following:
-
-```kotlin
-@Composable
-@Page
-fun KobwebPage() {
-    /* ... */
-    com.mysite.components.widgets.VisitorCounter()
-}
-```
-
-You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
-will automatically be prepended with your site's full package.
-
-#### Inline syntax
-
-Occasionally, you may want to insert a smaller widget into the flow of a single sentence. For this case, use the
-`${...}` inline syntax:
-
-```markdown
-Press ${.components.widgets.ColorButton} to toggle the site's current color.
-```
-
-> [!CAUTION]
-> Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
-> it as text.
-
-### Imports
-
-You may wish to add imports to the code generated from your markdown. Kobweb Markdown supports registering both
-*global* imports (imports that will be added to every generated file) and *local* imports (those that will only apply
-to a single target file).
-
-#### Global Imports
-
-To register a global import, you configure the `markdown` block in your build script:
-
-```kotlin
-// site/build.gradle.kts
-
-kobweb {
-  markdown {
-    imports.add(".components.widgets.*")
-  }
-}
-```
-
-Notice that you can begin your path with a "." to tell the Kobweb Markdown plugin to prepend your site's package to it.
-The above would ensure that every markdown file generated would have the following import:
-
-```kotlin
-import com.mysite.components.widgets.*
-```
-
-Imports can help you simplify your Kobweb calls. Revisiting an example from just above:
-
-```markdown
-# Without imports
-
-Press ${.components.widgets.ColorButton} to toggle the site's current color.
-
-# With imports
-
-Press ${ColorButton} to toggle the site's current color.
-```
-
-#### Local Imports
-
-Local imports are specified in your markdown's Front Matter (and can even affect its root declaration!):
-
-```markdown
----
-root: DocsLayout
-imports:
-  - .components.sections.DocsLayout
-  - .components.widgets.VisitorCounter
----
-
-...
-
-{{{ VisitorCounter }}}
-```
 
 # Advanced topics
 
