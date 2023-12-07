@@ -1869,6 +1869,66 @@ fun MyApp(content: @Composable () -> Unit) {
 You can define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
 time.
 
+## Setting application globals
+
+Occasionally you might find yourself with a value at build time that you want your site to know at runtime.
+
+For example, maybe you want to specify a version based on the current UTC timestamp. Or maybe you want to read a system
+environment variable's value and pass that into your Kobweb site as a way to configure its behavior.
+
+This is supported via Kobweb's `AppGlobals` singleton, which is essentially a `Map<String, String>` you can set from
+your project's build script using the `kobweb.app.globals` property.
+
+Let's demonstrate this with the UTC version example.
+
+In your application's `build.gradle.kts`, add the following code:
+
+```kotlin
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.TimeZone
+
+plugins {
+  /* ... */
+  alias(libs.plugins.kobweb.application)
+}
+
+kobweb {
+  app {
+    globals.put("version", SimpleDateFormat("yyyyMMdd.kkmm").apply {
+      timeZone = TimeZone.getTimeZone("UTC")
+    }.format(Date()))
+  }
+}
+```
+
+Then, in your Kotlin code somewhere, you are recommended to add a convenience property for accessing this:
+
+```kotlin
+// SiteGlobals.kt
+
+import com.varabyte.kobweb.core.AppGlobals
+
+val AppGlobals.version: String
+  get() = this.getValue("version")
+```
+
+And finally, you can access this value in your site's code, say for a tiny label that would look good in a footer
+perhaps:
+
+```kotlin
+// components/widgets/SiteVersion.kt
+
+val VersionTextStyle by ComponentStyle.base {
+  Modifier.fontSize(0.6.cssRem)
+}
+
+@Composable
+fun SiteVersion(modifier: Modifier = Modifier) {
+  SpanText("v" + AppGlobals.version, VersionTextStyle.toModifier().then(modifier))
+}
+```
+
 ## Learning CSS through Kobweb
 
 Many developers new to web development have heard horror stories about CSS, and they might hope that Kobweb, by
