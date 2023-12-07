@@ -1560,7 +1560,7 @@ All Material Design Icon composables accept a modifier parameter, so you can twe
 MdiError(Modifier.color(Colors.Red))
 ```
 
-## Components: Layouts, Sections, and Widgets
+## Layouts, Sections, and Widgets
 
 Outside of pages, it is common to create reusable, composable parts. While Kobweb doesn't enforce any particular rule
 here, we recommend a convention which, if followed, may make it easier to allow new readers of your codebase to get
