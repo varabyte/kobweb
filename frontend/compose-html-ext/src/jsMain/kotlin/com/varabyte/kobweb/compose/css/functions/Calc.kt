@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css.functions
 
+import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.css.*
 import kotlin.experimental.ExperimentalTypeInference
 
