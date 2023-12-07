@@ -10,7 +10,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 /**
- * A simple task for creating scripts which can be use to run the Kobweb server in production mode.
+ * A simple task for creating scripts which can be used to run the Kobweb server in production mode.
  */
 abstract class KobwebCreateServerScriptsTask :
     KobwebTask("Create scripts which can be used to start the Kobweb server in production mode") {

@@ -9,6 +9,5 @@ Ultimately, this project is a space where a developer can play with and verify A
 plugins they use before checking something in. Any changes made to Kobweb are picked up immediately by this project,
 instead of requiring an expensive "publish to maven local".
 
-You can run it like a normal Kobweb project. Just run `kobweb run` inside this directory. Note that it will may
+You can run it like a normal Kobweb project. Just run `kobweb run` inside this directory. Note that it may
 take significantly longer than your average project because this will configure and rebuild Kobweb as necessary!
-
