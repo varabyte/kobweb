@@ -2237,6 +2237,91 @@ Hopefully this section gave you insight into how you can explore CSS APIs on you
 an effect working, remember you can reach out to one of the options in the [connecting with us▼](#connecting-with-us)
 section, and someone in the community can probably help!
 
+## Globally replacing Silk widget styles
+
+Silk widgets all use [component styles▲](#componentstyle) to power their look and feel.
+
+Normally, if you want to tweak a style in select locations within your site, you just create a variant from that style:
+
+```kotlin
+val TweakedButtonStyle by ButtonStyle.addVariantBase { /* ... */ }
+
+// Later...
+Button(variant = TweakedButtonStyle) { /* ... */ }
+```
+
+But what if you want to globally change the look and feel of a widget across your entire site?
+
+You could of course create your own composable which wraps some underlying composable with its own new style, e.g.
+`MyButton` which defines its own `MyButtonStyle` that internally delegates to `Button`. However, you'd have to be
+careful to make sure all new developers who add code to your site know to use `MyButton` instead of `Button` directly.
+
+Silk provides another way, allowing you to modify any of its declared styles and/or variants in place.
+
+You can do this via an `@InitSilk` method, which takes an `InitSilkContext` parameter. This context provides the `theme`
+property, which provides the following family of methods for rewriting styles and variants:
+
+```kotlin
+@InitSilk
+fun replaceStylesAndOrVariants(ctx: InitSilkContext) {
+  ctx.theme.replaceComponentStyle(SomeStyle) { /* ... */ }
+  ctx.theme.replaceComponentVariant(SomeStyle) { /* ... */ }
+  ctx.theme.modifyComponentStyle(SomeStyle) { /* ... */ }
+  ctx.theme.modifyComponentVariant(SomeStyle) { /* ... */ }
+}
+```
+
+> [!NOTE]
+> Technically, you can use these methods with your own site's declared styles and variants as well, but there should be
+> no reason to do so since you can just go to the source and change those values directly. However, this can still be
+> useful if you're using a third-party Kobweb library that provides its own styles and/or variants.
+
+Use the `replace` versions if you want to define a whole new set of CSS rules from scratch, or use the `modify` versions
+to layer additional changes on top of what's already there.
+
+> [!CAUTION]
+> Using `replace` on some of the more complex Silk styles can be tricky, and you may want to familiarize yourself with
+> the details of how those widgets are implemented before attempting to do so. Additionally, once you replace a style
+> in your site, you will be opting-out of any future improvements to that style that may be made in future versions of
+> Silk.
+
+Here's an example of replacing `ImageStyle` on a site that wants to force all images to have rounded corners and
+automatically scale down to fit their container:
+
+```kotlin
+@InitSilk
+fun replaceSilkImageStyle(ctx: InitSilkContext) {
+  ctx.theme.replaceComponentStyleBase(ImageStyle) {
+    Modifier
+      .clip(Rect(cornerRadius = 8.px))
+      .fillMaxWidth()
+      .objectFit(ObjectFit.ScaleDown)
+  }
+}
+```
+
+and here's an example for a site that always wants its horizontal dividers to fill max width:
+
+```kotlin
+@InitSilk
+fun makeHorizontalDividersFillWidth(ctx: InitSilkContext) {
+  ctx.theme.modifyComponentStyleBase(HorizontalDividerStyle) {
+    Modifier.fillMaxWidth()
+  }
+}
+```
+
+> [!TIP]
+> The names of your `@InitSilk` methods don't matter, as long as they're public, take a single `InitSilkContext`
+> parameter, and don't collide with another method of the same name. You are encouraged to choose a name for readability
+> purposes.
+>
+> You can define as many `@InitSilk` methods as you want, so feel free to break them up into relevant, clearly named
+> pieces, instead of declaring a single, monolithic, generically named `fun initSilk(ctx)` method that does everything.
+>
+> That said, for the above two examples, it would have been totally fine to combine them into a single
+> `fun adjustSilkStyles(ctx)` method.
+
 ## Static layout vs. Full stack sites
 
 There are two flavors of Kobweb sites: *static* and *full stack*.
