@@ -33,7 +33,7 @@ private fun Pair<Int, Int>.toFloatPair() = first.toFloat() to second.toFloat()
 class InsetPath(
     private val topLeft: Pair<Float, Float>,
     botRight: Pair<Float, Float>,
-    private val roundness: CSSNumeric = 0.px,
+    private val roundness: CSSLengthOrPercentageValue = 0.px,
 ) : Path() {
     private val botRight = botRight.from100()
 
@@ -72,18 +72,18 @@ interface Shape {
 class RectF(
     val topLeft: Pair<Float, Float>,
     val botRight: Pair<Float, Float>,
-    val cornerRadius: CSSNumeric = 0.px,
+    val cornerRadius: CSSLengthOrPercentageValue = 0.px,
 ) : Shape {
     constructor() : this(0.px)
-    constructor(cornerRadius: CSSNumeric) : this(0f to 0f, 100f to 100f, cornerRadius)
+    constructor(cornerRadius: CSSLengthOrPercentageValue) : this(0f to 0f, 100f to 100f, cornerRadius)
 
     constructor(
         topBottom: Float,
         leftRight: Float,
-        cornerRadius: CSSNumeric = 0.px,
+        cornerRadius: CSSLengthOrPercentageValue = 0.px,
     ) : this(leftRight to topBottom, (leftRight to topBottom).from100(), cornerRadius)
 
-    constructor(side: Float, cornerRadius: CSSNumeric = 0.px) : this(
+    constructor(side: Float, cornerRadius: CSSLengthOrPercentageValue = 0.px) : this(
         side to side,
         (side to side).from100(),
         cornerRadius
@@ -103,22 +103,22 @@ class RectF(
 class Rect(
     val topLeft: Pair<Int, Int>,
     val botRight: Pair<Int, Int>,
-    val cornerRadius: CSSNumeric = 0.px,
+    val cornerRadius: CSSLengthOrPercentageValue = 0.px,
 ) : Shape by RectF(topLeft.toFloatPair(), botRight.toFloatPair(), cornerRadius) {
     constructor() : this(0.px)
-    constructor(cornerRadius: CSSNumeric) : this(0 to 0, 100 to 100, cornerRadius)
+    constructor(cornerRadius: CSSLengthOrPercentageValue) : this(0 to 0, 100 to 100, cornerRadius)
 
     constructor(
         topBottom: Int,
         leftRight: Int,
-        cornerRadius: CSSNumeric = 0.px
+        cornerRadius: CSSLengthOrPercentageValue = 0.px
     ) : this(
         leftRight to topBottom,
         (leftRight to topBottom).from100(),
         cornerRadius
     )
 
-    constructor(side: Int, cornerRadius: CSSNumeric = 0.px) : this(
+    constructor(side: Int, cornerRadius: CSSLengthOrPercentageValue = 0.px) : this(
         side to side,
         (side to side).from100(),
         cornerRadius
