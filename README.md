@@ -1929,8 +1929,8 @@ Occasionally you might find yourself with a value at build time that you want yo
 For example, maybe you want to specify a version based on the current UTC timestamp. Or maybe you want to read a system
 environment variable's value and pass that into your Kobweb site as a way to configure its behavior.
 
-This is supported via Kobweb's `AppGlobals` singleton, which is a `Map<String, String>` whose values you can set from
-your project's build script using the `kobweb.app.globals` property.
+This is supported via Kobweb's `AppGlobals` singleton, which is like a `Map<String, String>` whose values you can set
+from your project's build script using the `kobweb.app.globals` property.
 
 Let's demonstrate this with the UTC version example.
 
@@ -1955,20 +1955,33 @@ kobweb {
 }
 ```
 
-In your Kotlin project somewhere, you are recommended to create an object that wraps `AppGlobals`, which you can use
-to expose its values with a type-safe API:
+You can then access them via the `AppGlobals.get` or `AppGlobals.getValue` methods:
+
+```kotlin
+val version = AppGlobals.getValue("version")
+```
+
+In your Kotlin project somewhere, it is recommended that you either add some type-safe extension methods, or you can
+create your own wrapper object (based on your preference):
 
 ```kotlin
 // SiteGlobals.kt
 
 import com.varabyte.kobweb.core.AppGlobals
 
+// Extension method approach ---------------------
+
+val AppGlobals.version: String
+  get() = getValue("version")
+
+// Wrapper object approach -----------------------
+
 object SiteGlobals {
   val version: String = AppGlobals.getValue("version")
 }
 ```
 
-And finally, you can access this value in your site's code, say for a tiny label that would look good in a footer
+At this point, you can access this value in your site's code, say for a tiny label that would look good in a footer
 perhaps:
 
 ```kotlin
