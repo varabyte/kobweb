@@ -2236,6 +2236,32 @@ declarations.
 
 ![CSS 2 Kobweb example](https://github.com/varabyte/media/raw/main/kobweb/images/css/css2kobweb.png)
 
+> [!TIP]
+> CSS 2 Kobweb also supports specifying class name selectors and animations. For example, try it out with this CSS
+> code:
+> ```css
+> .site-banner {
+>   display: relative;
+>   padding-left: 10px;
+>   padding-top: 5%;
+>   animation: slide-in 3s linear 1s infinite;
+>   background-position: bottom 10px right;
+>   background-image: linear-gradient(to bottom, #eeeeee, white 25px);
+> }
+> .site-banner:hover {
+>   color: rgb(40, 40, 40);
+> }
+> @keyframes slide-in {
+>   from {
+>     transform: translateX(-2rem) scale(0.5);
+>   }
+>   to {
+>     transform: translateX(0);
+>     opacity: 1;
+>   }
+> }
+> ```
+
 The web is full of examples of interesting CSS effects. Almost any CSS-related search will result in tons of
 StackOverflow answers, interactive playgrounds featuring WYSIWYG editors, and blog posts. Many of these introduce some
 really novel CSS examples. This is a great way to learn more about web development!
