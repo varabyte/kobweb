@@ -7,7 +7,6 @@ import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDele
 import org.jetbrains.compose.web.css.*
 
 sealed class ComponentVariant {
-
     infix fun then(next: ComponentVariant): ComponentVariant {
         return CompositeComponentVariant(this, next)
     }
@@ -29,26 +28,27 @@ sealed class ComponentVariant {
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
  */
-internal class SimpleComponentVariant(val style: ComponentStyle, val baseStyle: ComponentStyle) : ComponentVariant() {
+internal class SimpleComponentVariant(val styleRule: SimpleStyleRule, val baseStyle: ComponentStyle) :
+    ComponentVariant() {
     /**
      * The raw variant name, unqualified by its parent base style.
      *
      * This name is not guaranteed to be unique across all variants. If you need that, check `style.name` instead.
      */
     val name: String
-        get() = style.name.removePrefix("${baseStyle.name}-")
+        get() = styleRule.selector.removePrefix(".${baseStyle.name}.")
 
     override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
         // a link (so this would be registered as ".silk-link.silk-link-undecorated").
         // To put it another way, if you use a link variant with a surface widget, it won't be applied.
-        return style.addStylesInto(styleSheet, ".${baseStyle.name}.${style.name}")
+        return styleRule.addStylesInto(styleSheet)
     }
 
     @Composable
-    override fun toModifier() = style.toModifier()
-    fun intoImmutableStyle(classSelectors: ClassSelectors) = style.intoImmutableStyle(classSelectors)
+    override fun toModifier() = styleRule.toModifier()
+    fun intoImmutableStyle(classSelectors: ClassSelectors) = styleRule.intoImmutableStyle(classSelectors)
 }
 
 private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant) :
