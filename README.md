@@ -2538,6 +2538,46 @@ corresponding "try" version that will return null instead (`tryPost`, `tryPut`, 
 If you know what you're doing, you can of course always use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
 directly.
 
+### `@InitApi` methods and initializing services
+
+In addition to `@Api` methods, you can also define `@InitApi` methods which must take a single `InitApiContext`
+parameter. These methods are run once when your server starts up, and they are particularly useful for initializing
+services that your `@Api` methods can then use.
+
+> [!IMPORTANT]
+> If you are running a development server and change any of your backend code, causing a live reloading event, the
+> init methods will be run again.
+
+The `InitApiContext` class exposes a mutable set property (called `data`) which you can put anything into. Meanwhile,
+`@Api` methods expose an immutable version of `data`. This allows you to initialize a service in an `@InitApi` method
+and then access it in your `@Api` methods.
+
+Let's demonstrate a concrete example, imagining we had an interface called `Database` with a mutable
+subclass `MutableDatabase` that implements it and provides additional APIs for mutating the database.
+
+The skeleton for registering and later querying such a database instance might look like this:
+
+```kotlin
+@InitApi
+fun initDatabase(ctx: InitApiContext) {
+  val db = MutableDatabase()
+  db.createTable("users", listOf("id", "name")).apply {
+    addRow(listOf("1", "Alice"))
+    addRow(listOf("2", "Bob"))
+  }
+  db.loadResource("products.csv")
+
+  ctx.data.add<Database>(db)
+}
+
+@Api
+fun getUsers(ctx: ApiContext) {
+  if (ctx.req.method != HttpMethod.GET) return
+  val db = ctx.data.get<Database>()
+  ctx.res.setBodyText(db.query("SELECT * FROM users").toString())
+}
+```
+
 ### Define API streams
 
 Kobweb servers also support persistent connections via streams. Streams are essentially named channels that maintain
