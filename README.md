@@ -3542,6 +3542,62 @@ limit.
 Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
 10 * 1000 * 1000 bytes. You probably want to use "KiB", "MiB", or "GiB" when you configure this value.
 
+## Configuring CORS
+
+### What is CORS?
+
+CORS, or *Cross-Origin Resource Sharing*, is a security feature built on the idea that a web page should not be able to
+make requests for resources from a server that is not the same as the one that served the page.
+
+The underlying security mechanism that enforces this restriction is called the *Same-Origin Policy* (SOP). SOP prevents
+malicious sites from requesting sensitive data from other sites. For example, if you visit a malicious site, it should
+not be able to make a request to your bank's website and then read the response to see your account balance.
+
+SOP prevents cross-domain server requests by default. CORS offers a way to relax this policy in a controlled manner by
+allowing trusted exceptions.
+
+It's important to note that not all operations are blocked by SOP. As a result, you might create a site that functions
+well without configuring CORS, only to encounter issues when you introduce a new feature later that requires it.
+
+This brief introduction should give you a basic understanding of CORS and its importance. For a deeper dive, consider
+exploring Mozilla's documentation on [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+and [SOP](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy).
+
+### Configuring CORS for a Kobweb backend
+
+Kobweb's `.kobweb/conf.yaml` file allows you to configure trusted domains using a `cors` block:
+
+```yaml
+server:
+  cors:
+    hosts:
+      - name: "example.com"
+        schemes:
+          - "https"
+```
+
+> [!NOTE]
+> Specifying the schemes is optional. If you don't specify them, Kobweb defaults to "http" and "https".
+
+> [!NOTE]
+> You can also specify subdomains, e.g.
+> ```yaml
+> - name: "example.com"
+>   subdomains:
+>     - "en"
+>     - "de"
+>     - "es"
+> ```
+> which would add CORS support for `en.example.com`, `de.example.com`, and `es.example.com`, as well as `example.com`
+> itself.
+
+Once configured, your Kobweb server will be able to respond to data requests from any of the specified hosts.
+
+> [!TIP]
+> If you find that your full-stack site, which was working locally during development, suddenly rejects requests in the
+> production version, check your browser's console logs. If you see errors in there about a violated CORS policy, that
+> means you didn't configure CORS correctly.
+
 ## Generating export traces
 
 The Kobweb export feature is built on top of [Microsoft Playwright](https://playwright.dev/), a solution for making it
