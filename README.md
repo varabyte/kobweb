@@ -675,6 +675,29 @@ In my own projects, I tend to use inline styles for really simple layout element
 and component styles for complex and/or re-usable widgets. It actually becomes a nice organizational convention to have
 all your styles grouped together in one place above the widget itself.
 
+### `@InitSilk` methods
+
+Before going further, we want to quickly mention you can annotate a method with `@InitSilk`, which will be called when
+your site starts up.
+
+This method must take a single `InitSilkContext` parameter. A context contains various properties that allow for
+adjusting Silk defaults and which will be demonstrated in more detail in sections below.
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+  // `ctx` has a handful of properties which allow you to adjust Silk's default behavior.
+}
+```
+
+> [!TIP]
+> The names of your `@InitSilk` methods don't matter, as long as they're public, take a single `InitSilkContext`
+> parameter, and don't collide with another method of the same name. You are encouraged to choose a name for readability
+> purposes.
+>
+> You can define as many `@InitSilk` methods as you want, so feel free to break them up into relevant, clearly named
+> pieces, instead of declaring a single, monolithic, generically named `fun initSilk(ctx)` method that does everything.
+
 ### Modifier
 
 Silk introduces the `Modifier` class, in order to provide an experience similar to what you find in Jetpack Compose.
@@ -894,7 +917,8 @@ gives you five buckets you can work with when designing your site:
 * lg - widescreen (and larger)
 * xl - ultra widescreen (and larger)
 
-You can change the default values of breakpoints for your site by adding an "@InitSilk" block to your code:
+You can change the default values of breakpoints for your site by adding
+an `@InitSilk` method to your code and setting `ctx.theme.breakpoints`:
 
 ```kotlin
 @InitSilk
@@ -945,18 +969,18 @@ val CustomStyle by ComponentStyle {
 }
 ```
 
-`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in an `@InitSilk` method,
-perhaps to something that is more brand aware:
+`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in
+an `@InitSilk` method, perhaps to something that is more brand-aware:
 
 ```kotlin
 // Assume a bunch of color constants (e.g. BRAND_LIGHT_COLOR) are defined somewhere
 
 @InitSilk
 fun overrideSilkTheme(ctx: InitSilkContext) {
-    ctx.theme.palettes.light.background = BRAND_LIGHT_BACKGROUND
-    ctx.theme.palettes.light.color = BRAND_LIGHT_COLOR
-    ctx.theme.palettes.dark.background = BRAND_DARK_BACKGROUND
-    ctx.theme.palettes.dark.color = BRAND_DARK_COLOR
+  ctx.theme.palettes.light.background = BRAND_LIGHT_BACKGROUND
+  ctx.theme.palettes.light.color = BRAND_LIGHT_COLOR
+  ctx.theme.palettes.dark.background = BRAND_DARK_BACKGROUND
+  ctx.theme.palettes.dark.color = BRAND_DARK_COLOR
 }
 ```
 
@@ -2163,12 +2187,11 @@ Most traditional sites overwrite styles by creating a CSS stylesheet and then li
 you are using Silk in your Kobweb application, you can use an approach very similar to `ComponentStyle` discussed above
 but for general HTML elements.
 
-To do this, annotate a method with `@InitSilk`. This method must take a single `InitSilkContext` parameter, which
-includes a `stylesheet` property that represents the CSS stylesheet for your site, providing a Silk-idiomatic API for
-adding CSS rules to it.
+To do this, create an `@InitSilk` method. The context parameter includes a `stylesheet` property that represents the CSS
+stylesheet for your site, providing a Silk-idiomatic API for adding CSS rules to it.
 
-Below is a simple example that sets the whole site to more aesthetically pleasing fonts than the default, one for
-regular text and one for code:
+Below is a simple example that sets the whole site to more aesthetically pleasing fonts than the browser defaults, one
+for regular text and one for code:
 
 ```kotlin
 @InitSilk
@@ -2351,17 +2374,6 @@ fun makeHorizontalDividersFillWidth(ctx: InitSilkContext) {
   }
 }
 ```
-
-> [!TIP]
-> The names of your `@InitSilk` methods don't matter, as long as they're public, take a single `InitSilkContext`
-> parameter, and don't collide with another method of the same name. You are encouraged to choose a name for readability
-> purposes.
->
-> You can define as many `@InitSilk` methods as you want, so feel free to break them up into relevant, clearly named
-> pieces, instead of declaring a single, monolithic, generically named `fun initSilk(ctx)` method that does everything.
->
-> That said, for the above two examples, it would have been totally fine to combine them into a single
-> `fun adjustSilkStyles(ctx)` method.
 
 ## Static layout vs. Full stack sites
 
