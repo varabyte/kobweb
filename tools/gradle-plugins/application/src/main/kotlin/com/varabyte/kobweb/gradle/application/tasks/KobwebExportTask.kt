@@ -3,6 +3,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.TimeoutError
 import com.microsoft.playwright.Tracing
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
@@ -228,23 +229,33 @@ abstract class KobwebExportTask @Inject constructor(
 
                             val prefixedRoute = routePrefix.prependTo(route)
 
-                            val snapshot: String
-                            val elapsedMs = measureTimeMillis {
-                                snapshot = browser.takeSnapshot(route, "http://localhost:$port$prefixedRoute")
-                            }
-
-                            pagesRoot
-                                .resolve(routeConfig.exportPath)
-                                .run {
-                                    if (this.exists()) {
-                                        logger.warn("w: Export for \"${routeConfig.route}\" overwrote existing file \"$this\".")
-                                    }
-
-                                    parentFile.mkdirs()
-                                    writeText(snapshot)
+                            try {
+                                val snapshot: String
+                                val elapsedMs = measureTimeMillis {
+                                    snapshot = browser.takeSnapshot(route, "http://localhost:$port$prefixedRoute")
                                 }
 
-                            logger.lifecycle("Snapshot finished in ${elapsedMs}ms (saved to: \"${routeConfig.exportPath}\").")
+                                pagesRoot
+                                    .resolve(routeConfig.exportPath)
+                                    .run {
+                                        if (this.exists()) {
+                                            logger.warn("w: Export for \"${routeConfig.route}\" overwrote existing file \"$this\".")
+                                        }
+
+                                        parentFile.mkdirs()
+                                        writeText(snapshot)
+                                    }
+
+                                logger.lifecycle("Snapshot finished in ${elapsedMs}ms (saved to: \"${routeConfig.exportPath}\").")
+                            } catch (ex: TimeoutError) {
+                                logger.error(buildString {
+                                    append("e: Export for \"${routeConfig.route}\" skipped due to timeout.")
+                                    if (siteLayout == SiteLayout.KOBWEB) {
+                                        append(" Double-check any API routes this page communicates to, in case they are getting stuck due to misconfiguration at export time.")
+                                    }
+                                    append(" In your build script, consider calling `kobweb.app.export.enableTraces(...)` to generate snapshots which can help understanding. Finally, you can try increasing the timeout by setting `kobweb.app.export.timeout`.")
+                                })
+                            }
                         }
                         ?: run {
                             val noPagesExportedMessage = buildString {
