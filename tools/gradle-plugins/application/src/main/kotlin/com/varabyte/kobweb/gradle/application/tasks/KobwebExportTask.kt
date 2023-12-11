@@ -251,7 +251,7 @@ abstract class KobwebExportTask @Inject constructor(
                                 logger.error(buildString {
                                     append("e: Export for \"${routeConfig.route}\" skipped due to timeout.")
                                     if (siteLayout == SiteLayout.KOBWEB) {
-                                        append(" Double-check any API routes this page communicates to, in case they are getting stuck due to misconfiguration at export time.")
+                                        append(" It might be worth reviewing if any of your API routes have blocking logic in them (e.g. a database failing to connect), as this can eventually cause the Kobweb server to hang if too many blocking calls accumulate.")
                                     }
                                     append(" In your build script, consider calling `kobweb.app.export.enableTraces(...)` to generate snapshots which can help understanding. Finally, you can try increasing the timeout by setting `kobweb.app.export.timeout`.")
                                 })
