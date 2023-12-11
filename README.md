@@ -2241,9 +2241,9 @@ Let's demonstrate this with the UTC version example.
 In your application's `build.gradle.kts`, add the following code:
 
 ```kotlin
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.TimeZone
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 plugins {
   /* ... */
@@ -2252,9 +2252,12 @@ plugins {
 
 kobweb {
   app {
-    globals.put("version", SimpleDateFormat("yyyyMMdd.kkmm").apply {
-      timeZone = TimeZone.getTimeZone("UTC")
-    }.format(Date()))
+    globals.put(
+      "version",
+      LocalDateTime
+          .now(ZoneId.of("UTC"))
+          .format(DateTimeFormatter.ofPattern("yyyyMMdd.kkmm"))
+    )
   }
 }
 ```
