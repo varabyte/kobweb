@@ -3547,28 +3547,12 @@ Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it
 
 ## Configuring CORS
 
-### What is CORS?
+[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS), or *Cross-Origin Resource Sharing*, is a security
+feature built on the idea that a web page should not be able to make requests for resources from a server that is not
+the same as the one that served the page *unless* it was served from a trusted domain.
 
-CORS, or *Cross-Origin Resource Sharing*, is a security feature built on the idea that a web page should not be able to
-make requests for resources from a server that is not the same as the one that served the page.
-
-The underlying security mechanism that enforces this restriction is called the *Same-Origin Policy* (SOP). SOP prevents
-malicious sites from requesting sensitive data from other sites. For example, if you visit a malicious site, it should
-not be able to make a request to your bank's website and then read the response to see your account balance.
-
-SOP prevents cross-domain server requests by default. CORS offers a way to relax this policy in a controlled manner by
-allowing trusted exceptions.
-
-It's important to note that not all operations are blocked by SOP. As a result, you might create a site that functions
-well without configuring CORS, only to encounter issues when you introduce a new feature later that requires it.
-
-This brief introduction should give you a basic understanding of CORS and its importance. For a deeper dive, consider
-exploring Mozilla's documentation on [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
-and [SOP](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy).
-
-### Configuring CORS for a Kobweb backend
-
-Kobweb's `.kobweb/conf.yaml` file allows you to configure trusted domains using a `cors` block:
+To configure CORS for a Kobweb backend, Kobweb's `.kobweb/conf.yaml` file allows you to declare such trusted domains
+using a `cors` block:
 
 ```yaml
 server:
