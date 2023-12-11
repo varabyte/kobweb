@@ -2543,9 +2543,9 @@ directly.
 
 ### `@InitApi` methods and initializing services
 
-In addition to `@Api` methods, you can also define `@InitApi` methods which must take a single `InitApiContext`
-parameter. These methods are run once when your server starts up, and they are particularly useful for initializing
-services that your `@Api` methods can then use.
+Kobweb also supports declaring methods that should be run when your server starts up, which is particularly useful for
+initializing services that your `@Api` methods can then use. These methods must be annotated with `@InitApi` and must
+take a single `InitApiContext` parameter.
 
 > [!IMPORTANT]
 > If you are running a development server and change any of your backend code, causing a live reloading event, the
@@ -3581,7 +3581,7 @@ server:
 Once configured, your Kobweb server will be able to respond to data requests from any of the specified hosts.
 
 > [!TIP]
-> If you find that your full-stack site, which was working locally during development, suddenly rejects requests in the
+> If you find that your full-stack site, which was working locally during development, rejects requests in the
 > production version, check your browser's console logs. If you see errors in there about a violated CORS policy, that
 > means you didn't configure CORS correctly.
 
