@@ -13,7 +13,7 @@ fun Document.generateUniqueId(len: Int = 6, prefix: String = ""): String {
 
     var label: String
     do {
-        label = prefix + buildString { append(ALPHANUMERICS.random()) }
+        label = prefix + buildString { repeat(len) { append(ALPHANUMERICS.random()) } }
     } while (!label[0].isLetter() && getElementById(label) != null)
     return label
 }
