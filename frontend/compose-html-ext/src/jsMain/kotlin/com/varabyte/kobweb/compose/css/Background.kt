@@ -188,13 +188,16 @@ sealed class BackgroundSize private constructor(private val value: String) : Sty
     private class Size(value: String) : BackgroundSize(value)
 
     companion object {
-        fun of(width: CSSLengthOrPercentageValue): BackgroundSize = Size("$width")
+        fun of(width: CSSLengthOrPercentageNumericValue): BackgroundSize = Size("$width")
         fun of(width: CSSAutoKeyword): BackgroundSize = Size("$width")
-        fun of(width: CSSLengthOrPercentageValue, height: CSSLengthOrPercentageValue): BackgroundSize =
+        fun of(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): BackgroundSize =
             Size("$width $height")
 
-        fun of(width: CSSAutoKeyword, height: CSSLengthOrPercentageValue): BackgroundSize = Size("$width $height")
-        fun of(width: CSSLengthOrPercentageValue, height: CSSAutoKeyword): BackgroundSize = Size("$width $height")
+        fun of(width: CSSAutoKeyword, height: CSSLengthOrPercentageNumericValue): BackgroundSize =
+            Size("$width $height")
+
+        fun of(width: CSSLengthOrPercentageNumericValue, height: CSSAutoKeyword): BackgroundSize =
+            Size("$width $height")
 
         // Keywords
         val Cover get(): BackgroundSize = Keyword("cover")

@@ -28,5 +28,5 @@ inline val numericAuto: CSSNumeric
  *
  * Note that this can fail silently if you try to use it in a context that doesn't support it.
  */
-inline val autoLength: CSSLengthValue
-    get() = "auto".unsafeCast<CSSLengthValue>()
+inline val autoLength: CSSLengthNumericValue
+    get() = "auto".unsafeCast<CSSLengthNumericValue>()

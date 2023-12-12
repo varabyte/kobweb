@@ -9,7 +9,7 @@ fun Modifier.flexBasis(flexBasis: FlexBasis): Modifier = styleModifier {
     flexBasis(flexBasis)
 }
 
-fun Modifier.flexBasis(value: CSSLengthOrPercentageValue): Modifier = styleModifier {
+fun Modifier.flexBasis(value: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     flexBasis(value)
 }
 
@@ -45,11 +45,11 @@ fun Modifier.flex(value: Int): Modifier = styleModifier {
     flex(value)
 }
 
-fun Modifier.flex(value: CSSLengthOrPercentageValue): Modifier = styleModifier {
+fun Modifier.flex(value: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     flex(value)
 }
 
-fun Modifier.flex(flexGrow: Int, flexBasis: CSSLengthOrPercentageValue): Modifier = styleModifier {
+fun Modifier.flex(flexGrow: Int, flexBasis: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     flex(flexGrow, flexBasis)
 }
 
@@ -57,22 +57,24 @@ fun Modifier.flex(flexGrow: Int, flexShrink: Int): Modifier = styleModifier {
     flex(flexGrow, flexShrink)
 }
 
-fun Modifier.flex(flexGrow: Int, flexShrink: Int, flexBasis: CSSLengthOrPercentageValue): Modifier = styleModifier {
+fun Modifier.flex(flexGrow: Int, flexShrink: Int, flexBasis: CSSLengthOrPercentageNumericValue): Modifier =
+    styleModifier {
     flex(flexGrow, flexShrink, flexBasis)
 }
 
-fun Modifier.rowGap(value: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.rowGap(value: CSSLengthOrPercentageNumericValue) = styleModifier {
     rowGap(value)
 }
 
-fun Modifier.columnGap(value: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.columnGap(value: CSSLengthOrPercentageNumericValue) = styleModifier {
     columnGap(value)
 }
 
-fun Modifier.gap(value: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.gap(value: CSSLengthOrPercentageNumericValue) = styleModifier {
     gap(value)
 }
 
-fun Modifier.gap(rowGap: CSSLengthOrPercentageValue, columnGap: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.gap(rowGap: CSSLengthOrPercentageNumericValue, columnGap: CSSLengthOrPercentageNumericValue) =
+    styleModifier {
     gap(rowGap, columnGap)
 }

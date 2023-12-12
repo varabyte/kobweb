@@ -77,7 +77,7 @@ object InputDefaults {
 
 object InputVars {
     val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
-    val BorderRadius by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val BorderRadius by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
     val BorderFocusColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
     val BorderHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val BorderInvalidColor by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -88,13 +88,13 @@ object InputVars {
     val FilledColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val FilledHoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val FilledFocusColor by StyleVariable<CSSColorValue>(prefix = "silk")
-    val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val Height by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val Padding by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val FontSize by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val Height by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val Padding by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
     val PlaceholderOpacity by StyleVariable(prefix = "silk", defaultFallback = PlaceholderOpacityVar.value())
     val PlaceholderColor by StyleVariable(prefix = "silk", defaultFallback = PlaceholderColorVar.value())
-    val InsetLeftWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
-    val InsetRightWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
+    val InsetLeftWidth by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
+    val InsetRightWidth by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
 }
 
 val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
@@ -244,9 +244,9 @@ class InputGroupScope {
     internal var leftAddon: (@Composable BoxScope.() -> Unit)? = null
     internal var rightAddon: (@Composable BoxScope.() -> Unit)? = null
     internal var leftInset: (@Composable BoxScope.() -> Unit)? = null
-    internal var leftInsetWidth: CSSLengthOrPercentageValue? = null
+    internal var leftInsetWidth: CSSLengthOrPercentageNumericValue? = null
     internal var rightInset: (@Composable BoxScope.() -> Unit)? = null
-    internal var rightInsetWidth: CSSLengthOrPercentageValue? = null
+    internal var rightInsetWidth: CSSLengthOrPercentageNumericValue? = null
 
     fun <T : Any> Input(
         type: InputType<T>,
@@ -335,7 +335,7 @@ class InputGroupScope {
      */
     fun LeftInset(
         modifier: Modifier = Modifier,
-        width: CSSLengthOrPercentageValue? = null,
+        width: CSSLengthOrPercentageNumericValue? = null,
         block: @InputGroupScopeMarker @Composable BoxScope.() -> Unit
     ) {
         require(leftAddon == null && leftInset == null) { "Can only set one left addon or inset element" }
@@ -357,7 +357,7 @@ class InputGroupScope {
      */
     fun RightInset(
         modifier: Modifier = Modifier,
-        width: CSSLengthOrPercentageValue? = null,
+        width: CSSLengthOrPercentageNumericValue? = null,
         block: @InputGroupScopeMarker @Composable BoxScope.() -> Unit
     ) {
         require(rightAddon == null && rightInset == null) { "Can only set one right addon or inset element" }
@@ -409,10 +409,10 @@ fun InputGroupScope.TextInput(
 
 
 interface InputSize {
-    val fontSize: CSSLengthValue
-    val height: CSSLengthValue
-    val padding: CSSLengthValue
-    val borderRadius: CSSLengthValue
+    val fontSize: CSSLengthNumericValue
+    val height: CSSLengthNumericValue
+    val padding: CSSLengthNumericValue
+    val borderRadius: CSSLengthNumericValue
 
     object XS : InputSize {
         override val fontSize = FontSizeVars.XS.value()

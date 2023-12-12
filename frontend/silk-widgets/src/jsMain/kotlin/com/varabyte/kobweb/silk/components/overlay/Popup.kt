@@ -12,8 +12,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
@@ -87,7 +87,7 @@ private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position
  * See [calculate], which must be implemented by any implementing classes.
  */
 abstract class PopupPlacementStrategy {
-    class Position(val top: CSSLengthValue, val left: CSSLengthValue)
+    class Position(val top: CSSLengthNumericValue, val left: CSSLengthNumericValue)
     class PositionAndPlacement(val position: Position, val placement: PopupPlacement? = null)
 
     /**

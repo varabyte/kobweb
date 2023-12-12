@@ -55,51 +55,56 @@ fun Modifier.scaleZ(s: Number) = styleModifier {
     scaleZ(s)
 }
 
-fun Modifier.scale(s: CSSPercentageValue) = styleModifier {
+fun Modifier.scale(s: CSSPercentageNumericValue) = styleModifier {
     scale(s)
 }
 
-fun Modifier.scale(sx: CSSPercentageValue, sy: CSSPercentageValue) = styleModifier {
+fun Modifier.scale(sx: CSSPercentageNumericValue, sy: CSSPercentageNumericValue) = styleModifier {
     scale(sx, sy)
 }
 
-fun Modifier.scale(sx: CSSPercentageValue, sy: CSSPercentageValue, sz: CSSPercentageValue) = styleModifier {
+fun Modifier.scale(sx: CSSPercentageNumericValue, sy: CSSPercentageNumericValue, sz: CSSPercentageNumericValue) =
+    styleModifier {
     scale(sx, sy, sz)
 }
 
-fun Modifier.scaleX(s: CSSPercentageValue) = styleModifier {
+fun Modifier.scaleX(s: CSSPercentageNumericValue) = styleModifier {
     scaleX(s)
 }
 
-fun Modifier.scaleY(s: CSSPercentageValue) = styleModifier {
+fun Modifier.scaleY(s: CSSPercentageNumericValue) = styleModifier {
     scaleY(s)
 }
 
-fun Modifier.scaleZ(s: CSSPercentageValue) = styleModifier {
+fun Modifier.scaleZ(s: CSSPercentageNumericValue) = styleModifier {
     scaleZ(s)
 }
 
-fun Modifier.translate(tx: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.translate(tx: CSSLengthOrPercentageNumericValue) = styleModifier {
     translate(tx)
 }
 
-fun Modifier.translate(tx: CSSLengthOrPercentageValue, ty: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.translate(tx: CSSLengthOrPercentageNumericValue, ty: CSSLengthOrPercentageNumericValue) = styleModifier {
     translate(tx, ty)
 }
 
-fun Modifier.translate(tx: CSSLengthOrPercentageValue, ty: CSSLengthOrPercentageValue, tz: CSSLengthOrPercentageValue) =
+fun Modifier.translate(
+    tx: CSSLengthOrPercentageNumericValue,
+    ty: CSSLengthOrPercentageNumericValue,
+    tz: CSSLengthOrPercentageNumericValue
+) =
     styleModifier {
         translate(tx, ty, tz)
     }
 
-fun Modifier.translateX(tx: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.translateX(tx: CSSLengthOrPercentageNumericValue) = styleModifier {
     translateX(tx)
 }
 
-fun Modifier.translateY(ty: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.translateY(ty: CSSLengthOrPercentageNumericValue) = styleModifier {
     translateY(ty)
 }
 
-fun Modifier.translateZ(tz: CSSLengthOrPercentageValue) = styleModifier {
+fun Modifier.translateZ(tz: CSSLengthOrPercentageNumericValue) = styleModifier {
     translateZ(tz)
 }

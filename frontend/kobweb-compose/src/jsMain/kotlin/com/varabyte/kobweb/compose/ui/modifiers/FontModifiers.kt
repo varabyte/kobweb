@@ -9,7 +9,7 @@ fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
     fontFamily(*values)
 }
 
-fun Modifier.fontSize(value: CSSLengthOrPercentageValue): Modifier = styleModifier {
+fun Modifier.fontSize(value: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     fontSize(value)
 }
 
