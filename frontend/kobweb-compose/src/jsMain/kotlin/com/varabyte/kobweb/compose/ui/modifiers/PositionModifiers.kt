@@ -10,32 +10,32 @@ fun Modifier.position(position: Position) = styleModifier {
     position(position)
 }
 
-fun Modifier.top(value: CSSLengthOrPercentageValue) = styleModifier {
-    top(value)
+fun Modifier.top(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    top(value.unsafeCast<CSSLengthOrPercentageValue>())
 }
 
 fun Modifier.top(value: CSSAutoKeyword) = styleModifier {
     top(value)
 }
 
-fun Modifier.bottom(value: CSSLengthOrPercentageValue) = styleModifier {
-    bottom(value)
+fun Modifier.bottom(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    bottom(value.unsafeCast<CSSLengthOrPercentageValue>())
 }
 
 fun Modifier.bottom(value: CSSAutoKeyword) = styleModifier {
     bottom(value)
 }
 
-fun Modifier.left(value: CSSLengthOrPercentageValue) = styleModifier {
-    left(value)
+fun Modifier.left(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    left(value.unsafeCast<CSSLengthOrPercentageValue>())
 }
 
 fun Modifier.left(value: CSSAutoKeyword) = styleModifier {
     left(value)
 }
 
-fun Modifier.right(value: CSSLengthOrPercentageValue) = styleModifier {
-    right(value)
+fun Modifier.right(value: CSSLengthOrPercentageNumericValue) = styleModifier {
+    right(value.unsafeCast<CSSLengthOrPercentageValue>())
 }
 
 fun Modifier.right(value: CSSAutoKeyword) = styleModifier {

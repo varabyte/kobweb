@@ -5,7 +5,7 @@ import org.jetbrains.compose.web.css.*
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline
 @Suppress("EqualsOrHashCode")
 class CSSOutline internal constructor() : CSSStyleValue {
-    var width: CSSLengthValue? = null
+    var width: CSSLengthNumericValue? = null
     var style: LineStyle? = null
     var color: CSSColorValue? = null
 
@@ -26,7 +26,7 @@ fun StyleScope.outline(outlineBuilder: CSSOutline.() -> Unit) {
 }
 
 fun StyleScope.outline(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
@@ -62,7 +62,7 @@ fun StyleScope.outlineColor(value: CSSColorValue) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-offset
-fun StyleScope.outlineOffset(value: CSSLengthValue) {
+fun StyleScope.outlineOffset(value: CSSLengthNumericValue) {
     property("outline-offset", value)
 }
 
@@ -93,6 +93,6 @@ fun StyleScope.outlineWidth(outlineWidth: OutlineWidth) {
     property("outline-width", outlineWidth)
 }
 
-fun StyleScope.outlineWidth(value: CSSLengthValue) {
+fun StyleScope.outlineWidth(value: CSSLengthNumericValue) {
     property("outline-width", value)
 }

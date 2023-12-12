@@ -17,7 +17,7 @@ class FontStyle private constructor(private val value: String) : StylePropertyVa
         val Italic get() = FontStyle("italic")
         val Oblique get() = FontStyle("oblique")
 
-        fun Oblique(angle: CSSAngleValue) = FontStyle("oblique $angle")
+        fun Oblique(angle: CSSAngleNumericValue) = FontStyle("oblique $angle")
 
         // Global
         val Inherit get() = FontStyle("inherit")

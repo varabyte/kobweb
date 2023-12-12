@@ -17,9 +17,9 @@ value class AnimationIterationCount private constructor(private val count: Numbe
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
 data class CSSAnimation(
     val name: String,
-    val duration: CSSSizeValue<out CSSUnitTime>? = null,
+    val duration: CSSTimeNumericValue? = null,
     val timingFunction: AnimationTimingFunction? = null,
-    val delay: CSSSizeValue<out CSSUnitTime>? = null,
+    val delay: CSSTimeNumericValue? = null,
     val iterationCount: AnimationIterationCount? = null,
     val direction: AnimationDirection? = null,
     val fillMode: AnimationFillMode? = null,

@@ -50,10 +50,10 @@ fun StyleScope.boxShadow(value: String) {
 }
 
 fun StyleScope.boxShadow(
-    offsetX: CSSLengthValue = 0.px,
-    offsetY: CSSLengthValue = 0.px,
-    blurRadius: CSSLengthValue? = null,
-    spreadRadius: CSSLengthValue? = null,
+    offsetX: CSSLengthNumericValue = 0.px,
+    offsetY: CSSLengthNumericValue = 0.px,
+    blurRadius: CSSLengthNumericValue? = null,
+    spreadRadius: CSSLengthNumericValue? = null,
     color: CSSColorValue? = null,
     inset: Boolean = false,
 ) {

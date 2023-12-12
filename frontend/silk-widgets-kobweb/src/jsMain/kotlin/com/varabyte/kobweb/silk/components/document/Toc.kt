@@ -81,7 +81,7 @@ fun Toc(
     variant: ComponentVariant? = null,
     minHeaderLevel: Int = 2,
     maxHeaderLevel: Int = 3,
-    indent: CSSLengthOrPercentageValue = 1.cssRem,
+    indent: CSSLengthOrPercentageNumericValue = 1.cssRem,
     ref: ElementRefScope<HTMLUListElement>? = null,
 ) {
     require(minHeaderLevel in 1..6) { "Toc minHeaderLevel must be in range 1..6, got $minHeaderLevel" }

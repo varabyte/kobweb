@@ -6,7 +6,8 @@ import org.jetbrains.compose.web.css.*
 @DslMarker
 annotation class GridDslMarker
 
-typealias CSSFlexValue = CSSSizeValue<out CSSUnitFlex>
+@Deprecated("Use `CSSFlexNumericValue` instead", ReplaceWith("CSSFlexNumericValue"))
+typealias CSSFlexValue = CSSFlexNumericValue
 
 // TODO(#168): Remove before v1.0
 @Deprecated("Use GridEntry.TrackSize instead", ReplaceWith("GridEntry.TrackSize"))
@@ -27,14 +28,15 @@ sealed class GridEntry(private val value: String) {
      */
     sealed class TrackSize(value: String) : GridEntry(value) {
         /** A size which tells the track to be as small as possible while still fitting all of its contents. */
-        class FitContent internal constructor(value: CSSLengthOrPercentageValue) : TrackSize("fit-content($value)")
+        class FitContent internal constructor(value: CSSLengthOrPercentageNumericValue) :
+            TrackSize("fit-content($value)")
 
         /** A size which represents a range of values this track can be. */
         class MinMax internal constructor(internal val min: Inflexible, internal val max: TrackSize) :
             TrackSize("minmax($min, $max)")
 
         /** Represents a track size which is a flex value (e.g. `1fr`) */
-        class Flex internal constructor(value: CSSFlexValue) : TrackSize(value.toString())
+        class Flex internal constructor(value: CSSFlexNumericValue) : TrackSize(value.toString())
 
         /** Like [TrackSize] but excludes flex values (e.g. `1fr`). */
         sealed class Inflexible(value: String) : TrackSize(value)
@@ -43,19 +45,19 @@ sealed class GridEntry(private val value: String) {
         internal class Keyword(value: String) : Inflexible(value)
 
         /** Represents a track size which is fixed, either a length or percentage value (e.g. `100px`, `40%`). */
-        class Fixed internal constructor(value: CSSLengthOrPercentageValue) : Inflexible(value.toString())
+        class Fixed internal constructor(value: CSSLengthOrPercentageNumericValue) : Inflexible(value.toString())
 
         companion object {
             val Auto: Inflexible get() = Keyword("auto")
             val MinContent: Inflexible get() = Keyword("min-content")
             val MaxContent: Inflexible get() = Keyword("max-content")
 
-            operator fun invoke(value: CSSLengthOrPercentageValue) = Fixed(value)
-            operator fun invoke(value: CSSFlexValue) = Flex(value)
+            operator fun invoke(value: CSSLengthOrPercentageNumericValue) = Fixed(value)
+            operator fun invoke(value: CSSFlexNumericValue) = Flex(value)
 
             fun minmax(min: Inflexible, max: TrackSize) = MinMax(min, max)
 
-            fun fitContent(value: CSSLengthOrPercentageValue) = FitContent(value)
+            fun fitContent(value: CSSLengthOrPercentageNumericValue) = FitContent(value)
         }
     }
 
@@ -155,11 +157,11 @@ abstract class GridTrackBuilderInRepeat {
         tracks.add(track)
     }
 
-    fun size(value: CSSLengthOrPercentageValue) = size(GridEntry.TrackSize(value))
+    fun size(value: CSSLengthOrPercentageNumericValue) = size(GridEntry.TrackSize(value))
 
-    fun size(value: CSSFlexValue) = size(GridEntry.TrackSize(value))
+    fun size(value: CSSFlexNumericValue) = size(GridEntry.TrackSize(value))
 
-    fun fitContent(value: CSSLengthOrPercentageValue) = size(GridEntry.TrackSize.fitContent(value))
+    fun fitContent(value: CSSLengthOrPercentageNumericValue) = size(GridEntry.TrackSize.fitContent(value))
 
     fun minmax(min: GridEntry.TrackSize.Inflexible, max: GridEntry.TrackSize) =
         size(GridEntry.TrackSize.minmax(min, max))
@@ -167,17 +169,17 @@ abstract class GridTrackBuilderInRepeat {
     fun minmax(min: GridEntry.TrackSize.Fixed, max: GridEntry.TrackSize) =
         size(GridEntry.TrackSize.minmax(min, max))
 
-    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSFlexValue) = minmax(min, GridEntry.TrackSize(max))
+    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSFlexNumericValue) = minmax(min, GridEntry.TrackSize(max))
 
-    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSLengthOrPercentageValue) =
+    fun minmax(min: GridEntry.TrackSize.Inflexible, max: CSSLengthOrPercentageNumericValue) =
         minmax(min, GridEntry.TrackSize(max))
 
-    fun minmax(min: CSSLengthOrPercentageValue, max: GridEntry.TrackSize) = minmax(GridEntry.TrackSize(min), max)
+    fun minmax(min: CSSLengthOrPercentageNumericValue, max: GridEntry.TrackSize) = minmax(GridEntry.TrackSize(min), max)
 
-    fun minmax(min: CSSLengthOrPercentageValue, max: CSSLengthOrPercentageValue) =
+    fun minmax(min: CSSLengthOrPercentageNumericValue, max: CSSLengthOrPercentageNumericValue) =
         minmax(GridEntry.TrackSize(min), GridEntry.TrackSize(max))
 
-    fun minmax(min: CSSLengthOrPercentageValue, max: CSSFlexValue) =
+    fun minmax(min: CSSLengthOrPercentageNumericValue, max: CSSFlexNumericValue) =
         minmax(GridEntry.TrackSize(min), GridEntry.TrackSize(max))
 
     fun lineNames(vararg names: String) {
@@ -326,7 +328,7 @@ abstract class GridBuilderInAuto {
         "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
         ReplaceWith("columns { size(value) }")
     )
-    fun col(value: CSSLengthOrPercentageValue) {
+    fun col(value: CSSLengthOrPercentageNumericValue) {
         columns { size(value) }
     }
 
@@ -334,7 +336,7 @@ abstract class GridBuilderInAuto {
         "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
         ReplaceWith("columns { size(value) }")
     )
-    fun col(value: CSSFlexValue) {
+    fun col(value: CSSFlexNumericValue) {
         columns { size(value) }
     }
 
@@ -342,7 +344,7 @@ abstract class GridBuilderInAuto {
         "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
         ReplaceWith("columns { size(value) }")
     )
-    fun column(value: CSSLengthOrPercentageValue) {
+    fun column(value: CSSLengthOrPercentageNumericValue) {
         columns { size(value) }
     }
 
@@ -350,7 +352,7 @@ abstract class GridBuilderInAuto {
         "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
         ReplaceWith("columns { size(value) }")
     )
-    fun column(value: CSSFlexValue) {
+    fun column(value: CSSFlexNumericValue) {
         columns { size(value) }
     }
 
@@ -358,7 +360,7 @@ abstract class GridBuilderInAuto {
         "All grid row convenience APIs are being removed, and code should migrate to use `rows { ... }` for clarity and consistency with CSS APIs.",
         ReplaceWith("rows { size(value) }")
     )
-    fun row(value: CSSLengthOrPercentageValue) {
+    fun row(value: CSSLengthOrPercentageNumericValue) {
         rows { size(value) }
     }
 
@@ -366,7 +368,7 @@ abstract class GridBuilderInAuto {
         "All grid row convenience APIs are being removed, and code should migrate to use `rows { ... }` for clarity and consistency with CSS APIs.",
         ReplaceWith("rows { size(value) }")
     )
-    fun row(value: CSSFlexValue) {
+    fun row(value: CSSFlexNumericValue) {
         rows { size(value) }
     }
 

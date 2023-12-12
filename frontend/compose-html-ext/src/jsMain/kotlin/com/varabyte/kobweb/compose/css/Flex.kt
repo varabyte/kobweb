@@ -30,6 +30,6 @@ fun StyleScope.flexBasis(flexBasis: FlexBasis) {
     property("flex-basis", flexBasis)
 }
 
-fun StyleScope.flexBasis(value: CSSLengthOrPercentageValue) {
+fun StyleScope.flexBasis(value: CSSLengthOrPercentageNumericValue) {
     property("flex-basis", value)
 }

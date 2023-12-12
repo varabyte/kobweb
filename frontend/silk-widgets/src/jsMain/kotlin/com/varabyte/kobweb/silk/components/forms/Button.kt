@@ -48,9 +48,9 @@ object ButtonVars {
         prefix = "silk",
         defaultFallback = TransitionDurationVars.Normal.value()
     )
-    val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val Height by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val PaddingHorizontal by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val FontSize by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val Height by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val PaddingHorizontal by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
 }
 
 val ButtonStyle by ComponentStyle(prefix = "silk") {
@@ -94,9 +94,9 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
 }
 
 interface ButtonSize {
-    val fontSize: CSSLengthValue
-    val height: CSSLengthValue
-    val horizontalPadding: CSSLengthValue
+    val fontSize: CSSLengthNumericValue
+    val height: CSSLengthNumericValue
+    val horizontalPadding: CSSLengthNumericValue
 
     object XS : ButtonSize {
         override val fontSize = FontSizeVars.XS.value()
