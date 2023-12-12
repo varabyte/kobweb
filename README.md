@@ -136,7 +136,7 @@ Please see: https://github.com/varabyte/kobweb/issues/117 and consider leaving a
 
 Our binary artifact is hosted on GitHub. To download the latest, you can either
 [grab the zip or tar file from GitHub](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.13) or you can fetch
-it, from the terminal:
+it from your terminal:
 
 ```bash
 $ cd /path/to/applications
