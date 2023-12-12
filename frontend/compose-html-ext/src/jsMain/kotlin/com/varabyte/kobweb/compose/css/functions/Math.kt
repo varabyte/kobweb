@@ -17,10 +17,10 @@ data class CSSClamp<T : CSSUnit>(
     override fun toString() = "clamp($min, $value, $max)"
 }
 
-fun clamp(
-    min: CSSNumericValue<out CSSUnit>,
-    value: CSSNumericValue<out CSSUnit>,
-    max: CSSNumericValue<out CSSUnit>,
+fun <T : CSSUnit> clamp(
+    min: CSSNumericValue<out T>,
+    value: CSSNumericValue<out T>,
+    max: CSSNumericValue<out T>,
 ) = CSSClamp(min, value, max)
 
 
@@ -40,7 +40,7 @@ class CSSMin<T : CSSUnit>(vararg val values: CSSNumericValue<out T>) : CSSNumeri
     override fun hashCode() = values.contentHashCode()
 }
 
-fun min(vararg values: CSSNumericValue<out CSSUnit>) = CSSMin(*values)
+fun <T : CSSUnit> min(vararg values: CSSNumericValue<out T>) = CSSMin(*values)
 
 /**
  * See: https://developer.mozilla.org/en-US/docs/Web/CSS/max
@@ -58,4 +58,4 @@ class CSSMax<T : CSSUnit>(vararg val values: CSSNumericValue<out T>) : CSSNumeri
     override fun hashCode() = values.contentHashCode()
 }
 
-fun max(vararg values: CSSNumericValue<out CSSUnit>) = CSSMax(*values)
+fun <T : CSSUnit> max(vararg values: CSSNumericValue<out T>) = CSSMax(*values)
