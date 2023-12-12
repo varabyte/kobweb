@@ -56,7 +56,7 @@ interest, so we know we're creating something the community wants.
 Our goal is to provide:
 
 * an intuitive structure for organizing your Kotlin website or web app
-* Automatic handling of routing between pages
+* automatic handling of routing between pages
 * a collection of useful _batteries included_ widgets built on top of Compose HTML
 * an environment built from the ground up around live reloading
 * static site exports for improved SEO
