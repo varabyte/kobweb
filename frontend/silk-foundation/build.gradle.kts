@@ -22,8 +22,8 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.html.core)
 
-                implementation(project(":frontend:compose-html-ext"))
-                api(project(":frontend:kobweb-compose"))
+                implementation(projects.frontend.composeHtmlExt)
+                api(projects.frontend.kobwebCompose)
             }
         }
     }
