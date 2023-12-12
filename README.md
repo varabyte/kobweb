@@ -302,8 +302,7 @@ Gradle run configurations for each of the Kobweb commands.
   `kobwebStart -PkobwebEnv=PROD -PkobwebRunLayout=KOBWEB`
   * If your site was exported using a static layout, change the last argument to<br>`-PkobwebRunLayout=STATIC`.
 
-You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html). Or to just jump straight into how to create run
-configurations for any of the commands discussed above read [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
+configurations for any of the commands discussed above, read [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).	configurations for any of the commands discussed above read [these instructions](https://www.jetbrains.com/help/idea/run-debug-gradle.html).
 
 ## Running examples
 
