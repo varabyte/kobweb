@@ -70,7 +70,7 @@ object CheckboxVars {
     val FontSize by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
     val IconSize by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
     val FocusOutlineColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
-    val FocusOutlineSpread by StyleVariable(prefix = "silk", defaultFallback = 0.1875.cssRem)
+    val FocusOutlineSpread by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 0.1875.cssRem)
     val UncheckedBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
