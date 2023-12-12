@@ -3322,7 +3322,7 @@ resources to be able to prioritize resolving this for a 1.0 release.
 
 ## `CSSNumericValue` typealiases
 
-Kobweb introduces a handful of typealiases for unit values, basing them off of the `CSSNumericValue` class and
+Kobweb introduces a handful of typealiases for CSS unit values, basing them off of the `CSSNumericValue` class and
 extending the set defined by Compose HTML:
 
 ```kotlin
@@ -3399,11 +3399,11 @@ val angleSum = 45.deg + 1.turn // CSSNumericValue<CSSAngleLength>
 ```
 
 These numeric operations are of course useful to the browser, which can resolve them into absolute screen values, but
-for us in user space, they are essentially opaque calculations to us.
+for us in user space, they are opaque calculations.
 
-In practice, however, that's fine! The limited view of these values does not matter to us because we rarely need to
-query them in our code. In almost all cases, we just take some numeric value, optionally tweak it by doing some more
-math on it, and then pass it onto the browser.
+In practice, however, that's fine! The limited view of these values does not matter because we rarely need to query them
+in our code. In almost all cases, we just take some numeric value, optionally tweak it by doing some more math on it,
+and then pass it onto the browser.
 
 Because it is opaque, `CSSNumericValue` is far more flexible and widely applicable than `CSSSizeValue` is. If you are
 writing a function that takes a parameter, or declaring a `StyleVariable` tied to some length or time, you almost always
@@ -3413,8 +3413,8 @@ want to use `CSSNumericValue` and not `CSSSizeValue`.
 
 As mentioned above, the Compose HTML team created their unit-related typealiases against the `CSSSizeValue` class.
 
-This decision makes it really easy to write a lot of code that works with concrete size values without realizing you're
-making code that is probably more restrictive than you expected.
+This decision makes it really easy to write code that works well when you test it with concrete size values but is
+actually more restrictive than you expected.
 
 Kobweb ensures its APIs all reference its `CSSNumericValue` typealiases:
 
