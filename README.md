@@ -3360,7 +3360,7 @@ fun drawArc(arc: CSSSizeValue<CSSUnit.deg>)
 ```
 
 Note also that the above cases are overly restrictive, only supporting a single length and angle type, respectively. We
-usually want to support all relevant types (e.g. `px`, `em`, `cssRem`, etc. units for lengths; `deg`, `rad`, `grad`, and
+usually want to support all relevant types (e.g. `px`, `em`, `cssRem`, etc. for lengths; `deg`, `rad`, `grad`, and
 `turn` for angles). We can do this with the following `out` syntax:
 
 ```kotlin
@@ -3370,7 +3370,7 @@ fun drawArc(arc: CSSSizeValue<out CSSUnitAngle>)
 
 What a mouthful!
 
-As a result, the Compose HTML team added typealises for all these unit types, such as `CSSLengthValue`
+As a result, the Compose HTML team added typealiases for all these unit types, such as `CSSLengthValue`
 and `CSSAngleValue`. Now, you can write the above code like:
 
 ```kotlin
@@ -3445,7 +3445,7 @@ fun drawArc(arc: CSSAngleNumericValue)
 ```
 
 > [!NOTE]
-> Perhaps in the future, the Compose HTML team might consider updating their typealises to use the `CSSNumericValue`
+> Perhaps in the future, the Compose HTML team might consider updating their typealiases to use the `CSSNumericValue`
 > type and not the `CSSSizeValue` type. If that happens, we can revert our changes and delete this section. But until
 > then, it's worth understanding why Kobweb introduces its own typealiases and why you are encouraged to use them
 > instead of the Compose HTML versions.
