@@ -13,6 +13,7 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
@@ -23,6 +24,10 @@ import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
+import com.varabyte.kobweb.ksp.common.STYLE_RULE_BASE_FQN
+import com.varabyte.kobweb.ksp.common.STYLE_RULE_BASE_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.STYLE_RULE_FQN
+import com.varabyte.kobweb.ksp.common.STYLE_RULE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
@@ -32,6 +37,7 @@ import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.InitKobwebEntry
 import com.varabyte.kobweb.project.frontend.InitSilkEntry
 import com.varabyte.kobweb.project.frontend.KeyframesEntry
+import com.varabyte.kobweb.project.frontend.StyleRuleEntry
 import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -107,7 +113,13 @@ class FrontendProcessor(
             function = "ctx.stylesheet.registerKeyframes",
         )
         private val declarations = listOf(styleDeclaration, variantDeclaration, keyframesDeclaration)
+
+        val styleRules = mutableListOf<KSClassDeclaration>()
+        val propertyDeclarations = mutableListOf<KSPropertyDeclaration>()
+
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
+            propertyDeclarations.add(property)
+
             val type = property.type.toString()
 
             val matchingByProvider = declarations.firstOrNull { type == it.providerName }
@@ -179,6 +191,15 @@ class FrontendProcessor(
         )
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
+            val isCssStyleClass = classDeclaration.superTypes
+                .filter { it.toString() == STYLE_RULE_SIMPLE_NAME || it.toString() == STYLE_RULE_BASE_SIMPLE_NAME }
+                .any {
+                    val fqn = it.resolveQualifiedName()
+                    fqn == STYLE_RULE_FQN || fqn == STYLE_RULE_BASE_FQN
+                }
+            if (isCssStyleClass) {
+                styleRules.add(classDeclaration)
+            }
             classDeclaration.declarations.forEach { it.accept(this, Unit) }
         }
 
@@ -209,6 +230,20 @@ class FrontendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
+        val styleClassDeclarations = frontendVisitor.styleRules.groupBy { it.simpleName.asString() }
+
+        val styleRules = frontendVisitor.propertyDeclarations.mapNotNull { property ->
+            val potentialClasses = styleClassDeclarations[property.type.toString()] ?: return@mapNotNull null
+            val matchingClass = potentialClasses
+                .firstOrNull { it.qualifiedName?.asString() == property.type.resolve().declaration.qualifiedName?.asString() }
+                ?: return@mapNotNull null
+
+            property to matchingClass
+        }.map { (property, matchingClass) ->
+            val fullName = matchingClass.simpleName.asString() + property.simpleName.asString()
+            StyleRuleEntry(property.qualifiedName!!.asString(), fullName.titleCamelCaseToKebabCase())
+        }
+
         // pages are processed here as they rely on packageMappings, which may be populated over several rounds
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
@@ -236,7 +271,8 @@ class FrontendProcessor(
             silkInits,
             silkStyles,
             silkVariants,
-            keyframesList
+            keyframesList,
+            styleRules,
         ).also {
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
@@ -250,3 +286,15 @@ class FrontendProcessor(
      */
     data class Result(val data: FrontendData, val fileDependencies: List<KSFile>)
 }
+
+/**
+ * Convert a String for a name that is using TitleCamelCase into kebab-case.
+ *
+ * For example, "ExampleText" to "example-text"
+ *
+ * Same as [camelCaseToKebabCase], there is special handling for acronyms. See those docs for examples.
+ */
+// Note: There's really no difference between title case and camel case when going to kebab case, but both are
+// provided for symmetry with the reverse methods, and also for expressing intention clearly.
+// Note 2: Copied from frontend/browser-ext/.../util/StringExtensions.kt
+fun String.titleCamelCaseToKebabCase() = camelCaseToKebabCase()
