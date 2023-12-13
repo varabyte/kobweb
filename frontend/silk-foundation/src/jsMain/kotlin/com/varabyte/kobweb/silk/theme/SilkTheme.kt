@@ -47,14 +47,15 @@ class MutableSilkTheme {
     )
 
     fun registerStyleRule(name: String, style: StyleRule) {
-        check(styleRules[name].let { it == null || it === style }) {
+        val selector = ".$name"
+        check(styleRules[selector].let { it == null || it === style }) {
             """
                 Attempting to register a second StyleRule with a name that's already used: "$name"
 
                 If this was an intentional override, you should use `replaceStyleRule` instead.
             """.trimIndent()
         }
-        _styleRules[name] = style
+        _styleRules[selector] = style
     }
 
     /**
