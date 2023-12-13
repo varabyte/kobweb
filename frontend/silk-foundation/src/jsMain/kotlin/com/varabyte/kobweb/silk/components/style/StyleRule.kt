@@ -8,6 +8,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.compose.util.kebabCaseToTitleCamelCase
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
+import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -281,3 +283,39 @@ private sealed interface StyleGroup {
         }
     }
 }
+
+class SimpleStyleRuleProvider internal constructor(
+    private val extraModifiers: @Composable () -> Modifier,
+    private val prefix: String? = null,
+    private val init: ComponentModifiers.() -> Unit,
+) : CacheByPropertyNameDelegate<StyleRule>() {
+    override fun create(propertyName: String): StyleRule {
+        val prefix = prefix?.let { "$it-" } ?: ""
+        // e.g. "TitleTextStyle" to "title-text"
+        val name = prefix + propertyName.removeSuffix("Style").titleCamelCaseToKebabCase()
+        return SimpleStyleRule(".$name", init, extraModifiers)
+    }
+}
+
+fun Style(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit) =
+    Style({ extraModifiers }, prefix, init)
+
+fun Style(
+    extraModifiers: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: ComponentModifiers.() -> Unit
+) = SimpleStyleRuleProvider(extraModifiers, prefix, init)
+
+object Style
+
+fun Style.base(
+    extraModifiers: Modifier = Modifier,
+    prefix: String? = null,
+    init: ComponentBaseModifier.() -> Modifier
+) = base({ extraModifiers }, prefix, init)
+
+fun Style.base(
+    extraModifiers: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: ComponentBaseModifier.() -> Modifier
+) = SimpleStyleRuleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
