@@ -19,6 +19,16 @@ abstract class StyleRule(
     internal val init: ComponentModifiers.() -> Unit,
     internal val extraModifiers: @Composable () -> Modifier,
 ) {
+    // Note: setting a default value for `extraModifiers` in the main constructor causes a compilation error
+    constructor(init: ComponentModifiers.() -> Unit) : this(init, { Modifier })
+
+    abstract class Base(
+        init: ComponentBaseModifier.() -> Modifier,
+        extraModifiers: @Composable () -> Modifier,
+    ) : StyleRule({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers) {
+        constructor(init: ComponentBaseModifier.() -> Modifier) : this(init, { Modifier })
+    }
+
     /**
      * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
      */
