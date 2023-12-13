@@ -54,6 +54,7 @@ class FrontendProcessor(
 
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
+    private val styleRules = mutableListOf<StyleRuleEntry>()
     private val silkStyles = mutableListOf<ComponentStyleEntry>()
     private val silkVariants = mutableListOf<ComponentVariantEntry>()
     private val keyframesList = mutableListOf<KeyframesEntry>()
@@ -94,6 +95,12 @@ class FrontendProcessor(
     }
 
     private inner class FrontendVisitor : KSVisitorVoid() {
+        private val styleRuleDeclaration = DeclarationType(
+            name = STYLE_RULE_SIMPLE_NAME,
+            qualifiedName = STYLE_RULE_FQN,
+            displayString = "style rule",
+            function = "ctx.theme.registerStyleRule",
+        )
         private val styleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
@@ -114,7 +121,7 @@ class FrontendProcessor(
         )
         private val declarations = listOf(styleDeclaration, variantDeclaration, keyframesDeclaration)
 
-        val styleRules = mutableListOf<KSClassDeclaration>()
+        val styleRuleClasses = mutableListOf<KSClassDeclaration>()
         val propertyDeclarations = mutableListOf<KSPropertyDeclaration>()
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
@@ -147,6 +154,10 @@ class FrontendProcessor(
 
                 keyframesDeclaration.qualifiedName -> {
                     keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
+                }
+
+                styleRuleDeclaration.qualifiedName -> {
+                    styleRules.add(StyleRuleEntry(property.qualifiedName!!.asString(), null))
                 }
 
                 else -> null
@@ -198,7 +209,7 @@ class FrontendProcessor(
                     fqn == STYLE_RULE_FQN || fqn == STYLE_RULE_BASE_FQN
                 }
             if (isCssStyleClass) {
-                styleRules.add(classDeclaration)
+                styleRuleClasses.add(classDeclaration)
             }
             classDeclaration.declarations.forEach { it.accept(this, Unit) }
         }
@@ -230,9 +241,9 @@ class FrontendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
-        val styleClassDeclarations = frontendVisitor.styleRules.groupBy { it.simpleName.asString() }
+        val styleClassDeclarations = frontendVisitor.styleRuleClasses.groupBy { it.simpleName.asString() }
 
-        val styleRules = frontendVisitor.propertyDeclarations.mapNotNull { property ->
+        styleRules += frontendVisitor.propertyDeclarations.mapNotNull { property ->
             val potentialClasses = styleClassDeclarations[property.type.toString()] ?: return@mapNotNull null
             val matchingClass = potentialClasses
                 .firstOrNull { it.qualifiedName?.asString() == property.type.resolve().declaration.qualifiedName?.asString() }

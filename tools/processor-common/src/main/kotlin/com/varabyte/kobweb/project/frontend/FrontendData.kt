@@ -105,5 +105,6 @@ class ComponentStyleEntry(val fqcn: String)
 @Serializable
 class ComponentVariantEntry(val fqcn: String)
 
+// null name means SimpleStyleRule aka `Style {}` declaration
 @Serializable
-class StyleRuleEntry(val fqcn: String, val name: String)
+class StyleRuleEntry(val fqcn: String, val name: String?)
