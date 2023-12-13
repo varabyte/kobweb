@@ -206,7 +206,7 @@ fun createMainFunction(
                             addStatement("ctx.theme.registerComponentVariants(${entry.fqcn})")
                         }
                         frontendData.styleRules.forEach { entry ->
-                            addStatement("ctx.theme.registerStyleRule(\"${entry.name}\", ${entry.fqcn})")
+                            addStatement("ctx.theme.registerStyleRule(${entry.name?.let { "\"$it\"" } ?: "null"}, ${entry.fqcn})")
                         }
                         frontendData.keyframesList.forEach { entry ->
                             addStatement("ctx.stylesheet.registerKeyframes(${entry.fqcn})")

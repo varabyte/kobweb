@@ -10,6 +10,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.ImmutableStyleRule
 import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant
+import com.varabyte.kobweb.silk.components.style.SimpleStyleRule
 import com.varabyte.kobweb.silk.components.style.StyleRule
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
@@ -46,8 +47,9 @@ class MutableSilkTheme {
         80.cssRem,
     )
 
-    fun registerStyleRule(name: String, style: StyleRule) {
-        val selector = ".$name"
+    fun registerStyleRule(name: String?, style: StyleRule) {
+        // currently using `null` name to represent simple `Style {}` declarations, which are SimpleStyleRules
+        val selector = name?.let { ".$it" } ?: (style as SimpleStyleRule).selector
         check(styleRules[selector].let { it == null || it === style }) {
             """
                 Attempting to register a second StyleRule with a name that's already used: "$name"
