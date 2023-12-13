@@ -2943,7 +2943,7 @@ This now includes (not comprehensive):
 * a *ton* of missing type-safe wrappers around many, many CSS properties
 * type-safe wrappers around CSS functions, like gradients, filters,
   `calc` (especially useful when working with CSS variables), etc.
-* Rich SVG support
+* rich SVG support
 * utility methods around saving files to / loading files from the disk
 * utility methods and classes built on top
   of [`window.fetch`](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/-window-or-worker-global-scope/fetch.html)
