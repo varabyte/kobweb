@@ -1484,7 +1484,7 @@ environments. But here are some situations that might benefit from CSS variables
   your site is responsible for setting.
 * You are using a component style for a pseudo-class selector already (e.g. hover, focus, active) and you want that
   behavior to be dynamic.
-* You have a widget that you ended up creating a bunch of variants for, but instead, you realize you could replace them
+* You have a widget that you ended up creating a bunch of variants for, but instead you realize you could replace them
   all with one or two CSS variables.
 
 When in doubt, however, lean on Kotlin for handling dynamic behavior. If you want to share common style settings across
