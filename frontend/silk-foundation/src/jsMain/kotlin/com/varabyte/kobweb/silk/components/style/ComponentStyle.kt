@@ -357,13 +357,13 @@ interface ComponentModifier {
     val colorMode: ColorMode
 }
 
-class ComponentModifiers(override val colorMode: ColorMode) : ComponentModifier, StyleModifiers()
+class ComponentModifiers internal constructor(override val colorMode: ColorMode) : ComponentModifier, StyleModifiers()
 
 /**
  * Class provided for cases where you only generate a single style (e.g. base), unlike [ComponentModifiers] where you
  * can define a collection of styles.
  */
-class ComponentBaseModifier(override val colorMode: ColorMode) : ComponentModifier
+class ComponentBaseModifier internal constructor(override val colorMode: ColorMode) : ComponentModifier
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.

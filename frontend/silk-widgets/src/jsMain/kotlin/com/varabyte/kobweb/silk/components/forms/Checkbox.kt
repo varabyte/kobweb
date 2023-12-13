@@ -63,14 +63,14 @@ object CheckboxDefaults {
 
 object CheckboxVars {
     val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
-    val BorderRadius by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
-    val BorderWidth by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
-    val Size by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val Spacing by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
-    val FontSize by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val IconSize by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val BorderRadius by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
+    val BorderWidth by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 0.125.cssRem)
+    val Size by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val Spacing by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
+    val FontSize by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val IconSize by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
     val FocusOutlineColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
-    val FocusOutlineSpread by StyleVariable(prefix = "silk", defaultFallback = 0.1875.cssRem)
+    val FocusOutlineSpread by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 0.1875.cssRem)
     val UncheckedBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val IconBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
@@ -150,9 +150,9 @@ val CheckboxInputVariant by InputStyle.addVariant {
 }
 
 interface CheckboxSize {
-    val boxSize: CSSLengthValue
-    val iconSize: CSSLengthValue
-    val fontSize: CSSLengthValue
+    val boxSize: CSSLengthNumericValue
+    val iconSize: CSSLengthNumericValue
+    val fontSize: CSSLengthNumericValue
 
     object SM : CheckboxSize {
         override val boxSize = 0.875.cssRem
@@ -231,7 +231,7 @@ fun TriCheckbox(
     enabled: Boolean = CheckboxDefaults.Enabled,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
-    spacing: CSSLengthValue? = null,
+    spacing: CSSLengthNumericValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
     uncheckedColor: CSSColorValue? = null,
@@ -347,7 +347,7 @@ fun Checkbox(
     enabled: Boolean = CheckboxDefaults.Enabled,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
-    spacing: CSSLengthValue? = null,
+    spacing: CSSLengthNumericValue? = null,
     colorScheme: ColorScheme? = null,
     borderColor: CSSColorValue? = null,
     uncheckedColor: CSSColorValue? = null,

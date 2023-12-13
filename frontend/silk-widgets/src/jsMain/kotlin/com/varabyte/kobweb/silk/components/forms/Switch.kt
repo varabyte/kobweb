@@ -32,15 +32,15 @@ import org.w3c.dom.HTMLElement
 
 object SwitchVars {
     // 9999px forces a pill shape. 0px causes a rectangular shape.
-    val BorderRadius by StyleVariable<CSSLengthValue>(prefix = "silk", defaultFallback = 9999.px)
+    val BorderRadius by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 9999.px)
 
-    val TrackWidth by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val TrackHeight by StyleVariable<CSSLengthValue>(prefix = "silk")
-    val TrackPadding by StyleVariable<CSSLengthValue>(prefix = "silk")
+    val TrackWidth by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val TrackHeight by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
+    val TrackPadding by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
     val TrackBackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val FocusColor by StyleVariable(prefix = "silk", defaultFallback = FocusOutlineColorVar.value())
 
-    val ThumbOffset by StyleVariable<CSSLengthOrPercentageValue>(prefix = "silk") // Should be less than switch height
+    val ThumbOffset by StyleVariable<CSSLengthOrPercentageNumericValue>(prefix = "silk") // Should be less than switch height
     val ThumbColor by StyleVariable<CSSColorValue>(prefix = "silk")
 
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
@@ -84,9 +84,9 @@ val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
 }
 
 interface SwitchSize {
-    val width: CSSLengthValue
-    val height: CSSLengthValue
-    val padding: CSSLengthValue get() = 0.188.cssRem
+    val width: CSSLengthNumericValue
+    val height: CSSLengthNumericValue
+    val padding: CSSLengthNumericValue get() = 0.188.cssRem
 
     object SM : SwitchSize {
         override val width = 1.375.cssRem
@@ -195,7 +195,7 @@ fun Switch(
                 SwitchThumbStyle.toModifier()
                     .setVariable(
                         SwitchVars.ThumbOffset,
-                        if (checked) (size.width - size.height).unsafeCast<CSSLengthOrPercentageValue>() else 0.percent
+                        if (checked) size.width - size.height else 0.percent
                     )
             )
         }

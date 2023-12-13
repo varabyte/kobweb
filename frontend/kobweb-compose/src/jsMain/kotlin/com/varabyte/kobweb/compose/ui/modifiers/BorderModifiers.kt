@@ -6,22 +6,29 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
 fun Modifier.border(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
-    border(width, style, color)
+    border(width.unsafeCast<CSSLengthValue>(), style, color)
 }
 
-class BorderScope internal constructor(private val styleScope: StyleScope, private val subproperty: String = "") {
+class BorderScope internal constructor(private val styleScope: StyleScope) {
     fun color(color: CSSColorValue) = styleScope.borderColor(color)
     fun style(lineStyle: LineStyle) = styleScope.borderStyle(lineStyle)
-    fun width(width: CSSNumeric) = styleScope.borderWidth(width)
-    fun width(topAndBottom: CSSNumeric, leftAndRight: CSSNumeric) = styleScope.borderWidth(topAndBottom, leftAndRight)
-    fun width(top: CSSNumeric, leftAndRight: CSSNumeric, bottom: CSSNumeric) =
+    fun width(width: CSSLengthNumericValue) = styleScope.borderWidth(width)
+    fun width(topAndBottom: CSSLengthNumericValue, leftAndRight: CSSLengthNumericValue) =
+        styleScope.borderWidth(topAndBottom, leftAndRight)
+
+    fun width(top: CSSLengthNumericValue, leftAndRight: CSSLengthNumericValue, bottom: CSSLengthNumericValue) =
         styleScope.borderWidth(top, leftAndRight, bottom)
 
-    fun width(top: CSSNumeric, right: CSSNumeric, bottom: CSSNumeric, left: CSSNumeric) =
+    fun width(
+        top: CSSLengthNumericValue,
+        right: CSSLengthNumericValue,
+        bottom: CSSLengthNumericValue,
+        left: CSSLengthNumericValue
+    ) =
         styleScope.borderWidth(top, right, bottom, left)
 }
 
@@ -39,11 +46,11 @@ fun Modifier.borderColor(color: CSSColorValue) = border { color(color) }
 class BorderSideScope internal constructor(private val styleScope: StyleScope, private val side: String) {
     fun color(color: CSSColorValue) = styleScope.property("border$side-color", color)
     fun style(lineStyle: LineStyle) = styleScope.property("border$side-style", lineStyle)
-    fun width(width: CSSNumeric) = styleScope.property("border$side-width", width)
+    fun width(width: CSSLengthOrPercentageNumericValue) = styleScope.property("border$side-width", width)
 }
 
 fun Modifier.borderTop(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
@@ -55,7 +62,7 @@ fun Modifier.borderTop(scope: BorderSideScope.() -> Unit) = styleModifier {
 }
 
 fun Modifier.borderBottom(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
@@ -67,7 +74,7 @@ fun Modifier.borderBottom(scope: BorderSideScope.() -> Unit) = styleModifier {
 }
 
 fun Modifier.borderLeft(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
@@ -79,7 +86,7 @@ fun Modifier.borderLeft(scope: BorderSideScope.() -> Unit) = styleModifier {
 }
 
 fun Modifier.borderRight(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
@@ -90,28 +97,30 @@ fun Modifier.borderRight(scope: BorderSideScope.() -> Unit) = styleModifier {
     BorderSideScope(this, "-right").apply(scope)
 }
 
-fun Modifier.borderRadius(r: CSSNumeric) = styleModifier {
+fun Modifier.borderRadius(r: CSSLengthOrPercentageNumericValue) = styleModifier {
     borderRadius(r)
 }
 
-fun Modifier.borderRadius(topLeftAndBottomRight: CSSNumeric = 0.px, topRightAndBottomLeft: CSSNumeric = 0.px) =
-    styleModifier {
-        borderRadius(topLeftAndBottomRight, topRightAndBottomLeft)
-    }
+fun Modifier.borderRadius(
+    topLeftAndBottomRight: CSSLengthOrPercentageNumericValue = 0.px,
+    topRightAndBottomLeft: CSSLengthOrPercentageNumericValue = 0.px
+) = styleModifier {
+    borderRadius(topLeftAndBottomRight, topRightAndBottomLeft)
+}
 
 fun Modifier.borderRadius(
-    topLeft: CSSNumeric = 0.px,
-    topRightAndBottomLeft: CSSNumeric = 0.px,
-    bottomRight: CSSNumeric = 0.px,
+    topLeft: CSSLengthOrPercentageNumericValue = 0.px,
+    topRightAndBottomLeft: CSSLengthOrPercentageNumericValue = 0.px,
+    bottomRight: CSSLengthOrPercentageNumericValue = 0.px,
 ) = styleModifier {
     borderRadius(topLeft, topRightAndBottomLeft, bottomRight)
 }
 
 fun Modifier.borderRadius(
-    topLeft: CSSNumeric = 0.px,
-    topRight: CSSNumeric = 0.px,
-    bottomRight: CSSNumeric = 0.px,
-    bottomLeft: CSSNumeric = 0.px,
+    topLeft: CSSLengthOrPercentageNumericValue = 0.px,
+    topRight: CSSLengthOrPercentageNumericValue = 0.px,
+    bottomRight: CSSLengthOrPercentageNumericValue = 0.px,
+    bottomLeft: CSSLengthOrPercentageNumericValue = 0.px,
 ) = styleModifier {
     borderRadius(topLeft, topRight, bottomRight, bottomLeft)
 }
@@ -120,24 +129,24 @@ fun Modifier.borderRadius(
 fun Modifier.borderStyle(lineStyle: LineStyle) = border { style(lineStyle) }
 
 @Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(width) }"))
-fun Modifier.borderWidth(width: CSSNumeric) = border { width(width) }
+fun Modifier.borderWidth(width: CSSLengthNumericValue) = border { width(width) }
 
 @Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(topAndBottom, leftAndRight) }"))
-fun Modifier.borderWidth(topAndBottom: CSSNumeric, leftAndRight: CSSNumeric) = border {
+fun Modifier.borderWidth(topAndBottom: CSSLengthNumericValue, leftAndRight: CSSLengthNumericValue) = border {
     width(topAndBottom, leftAndRight)
 }
 
 @Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(top, leftAndRight, bottom) }"))
 fun Modifier.borderWidth(
-    top: CSSNumeric,
-    leftAndRight: CSSNumeric,
-    bottom: CSSNumeric
+    top: CSSLengthNumericValue,
+    leftAndRight: CSSLengthNumericValue,
+    bottom: CSSLengthNumericValue
 ) = border { width(top, leftAndRight, bottom) }
 
 @Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(top, right, bottom, left) }"))
 fun Modifier.borderWidth(
-    top: CSSNumeric,
-    right: CSSNumeric,
-    bottom: CSSNumeric,
-    left: CSSNumeric
+    top: CSSLengthNumericValue,
+    right: CSSLengthNumericValue,
+    bottom: CSSLengthNumericValue,
+    left: CSSLengthNumericValue
 ) = border { width(top, right, bottom, left) }

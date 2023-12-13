@@ -15,7 +15,7 @@ import org.jetbrains.compose.web.dom.Hr
 
 object DividerVars {
     val Color by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
-    val Length: StyleVariable.PropertyValue<CSSLengthOrPercentageValue> by StyleVariable(prefix = "silk", defaultFallback = 90.percent)
+    val Length by StyleVariable<CSSLengthOrPercentageNumericValue>(prefix = "silk", defaultFallback = 90.percent)
 }
 
 /**

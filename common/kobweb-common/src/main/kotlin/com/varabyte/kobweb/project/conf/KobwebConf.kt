@@ -185,13 +185,13 @@ class Server(
      *   like "http://badexample.com". That should be mentioned separately. "*" is a special value which would mean
      *   allow any host to send a request to this site, but this should be avoided in production.
      * @param schemes Support HTTP schemes for this cross-site request, e.g. "http"
-     * @param subDomains Subdomains for the site, e.g. "media" if you wanted to allow "media.varabyte.com"
+     * @param subdomains Subdomains for the site, e.g. "media" if you wanted to allow "media.varabyte.com"
      */
     @Serializable
     class Host(
         val name: String,
         val schemes: List<String> = listOf("http", "https"),
-        val subDomains: List<String> = emptyList(),
+        val subdomains: List<String> = emptyList(),
     ) {
         init {
             require(name == "*" || schemes.isNotEmpty()) {

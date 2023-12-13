@@ -243,7 +243,7 @@ The default size SHOULD be set to MD.
 
 ```kotlin
 interface MyWidgetSize {
-  val fontSize: CSSLengthValue
+  val fontSize: CSSLengthNumericValue
   object SM : MyWidgetSize { /* ... */ }
   object MD : MyWidgetSize {
       override val fontSize = 1.cssRem

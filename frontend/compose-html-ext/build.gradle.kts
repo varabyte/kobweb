@@ -23,6 +23,13 @@ kotlin {
                 implementation(compose.html.core)
             }
         }
+
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+                implementation(libs.truthish)
+            }
+        }
     }
 }
 

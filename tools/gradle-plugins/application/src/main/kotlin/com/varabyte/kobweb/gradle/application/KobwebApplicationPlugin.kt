@@ -2,8 +2,9 @@ package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
+import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
-import com.varabyte.kobweb.gradle.application.extensions.createExportBlock
+import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
@@ -97,8 +98,7 @@ class KobwebApplicationPlugin @Inject constructor(
         }
 
         val kobwebBlock = project.kobwebBlock.apply {
-            createAppBlock(kobwebConf)
-            createExportBlock()
+            createAppBlock(kobwebFolder, kobwebConf)
         }
 
         val env =
@@ -149,6 +149,7 @@ class KobwebApplicationPlugin @Inject constructor(
         )
         kobwebCleanSiteTask.configure {
             doLast {
+                kobwebBlock.app.export.traceConfig.orNull?.let { traceConfig -> project.delete(traceConfig.root) }
                 project.delete(kobwebConf.server.files.prod.siteRoot)
             }
         }

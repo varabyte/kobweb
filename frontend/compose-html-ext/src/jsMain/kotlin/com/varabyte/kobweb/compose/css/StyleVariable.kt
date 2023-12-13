@@ -164,6 +164,66 @@ fun <T : Number> StyleVariable(defaultFallback: T? = null, prefix: String? = nul
 fun <T : String> StyleVariable(defaultFallback: T? = null, prefix: T? = null) =
     StyleVariableStringProvider(defaultFallback, prefix)
 
+// Below we define some additional overloads for numeric unit types, so that they are automatically inferred to be
+// slightly broader types when applicable. For example, `StyleVariable(8.px)` will be inferred to be
+// `StyleVariable.PropertyValue<CSSLengthNumericValue>()` as opposed to `StyleVariable.PropertyValue<CSSPxValue>()`.
+// This is in general desirable, as style variables are intended to be used for css properties that do not care about
+// the specific unit type. The user can always explicitly specify the type if they need to.
+// These functions also enforce that `CSSNumericValue` is used as the underlying type, as opposed to `CSSSizeValue`,
+// which is a safer and more accurate choice (see CSSUnits.kt for more detail).
+
+// this overload is necessary to avoid ambiguity when no default fallback is provided
+/** Helper method for declaring a [StyleVariable.PropertyValue] instance via the `by` keyword. */
+@Suppress("FunctionName")
+fun <T : StylePropertyValue> StyleVariable(prefix: String? = null) =
+    StyleVariablePropertyProvider<T>(null, prefix)
+
+/**
+ * Helper method for declaring a [StyleVariable.PropertyValue] instance representing an angle value via the `by`
+ * keyword.
+ */
+@Suppress("FunctionName")
+fun <T : CSSAngleValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariablePropertyProvider<CSSAngleNumericValue>(defaultFallback, prefix)
+
+/**
+ * Helper method for declaring a [StyleVariable.PropertyValue] instance representing a length value via the `by`
+ * keyword.
+ */
+@Suppress("FunctionName")
+fun <T : CSSLengthValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariablePropertyProvider<CSSLengthNumericValue>(defaultFallback, prefix)
+
+/**
+ * Helper method for declaring a [StyleVariable.PropertyValue] instance representing a percentage value via the `by`
+ * keyword.
+ */
+@Suppress("FunctionName")
+fun <T : CSSPercentageValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariablePropertyProvider<CSSPercentageNumericValue>(defaultFallback, prefix)
+
+/**
+ * Helper method for declaring a [StyleVariable.PropertyValue] instance representing a length or percentage value via
+ * the `by` keyword.
+ */
+@Suppress("FunctionName")
+fun <T : CSSLengthOrPercentageValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariablePropertyProvider<CSSLengthOrPercentageNumericValue>(defaultFallback, prefix)
+
+/**
+ * Helper method for declaring a [StyleVariable.PropertyValue] instance representing a time value via the `by` keyword.
+ */
+@Suppress("FunctionName")
+fun <T : CSSTimeNumericValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariablePropertyProvider<CSSTimeNumericValue>(defaultFallback, prefix)
+
+/**
+ * Helper method for declaring a [StyleVariable.PropertyValue] instance representing a flex value via the `by` keyword.
+ */
+@Suppress("FunctionName")
+fun <T : CSSFlexNumericValue> StyleVariable(defaultFallback: T? = null, prefix: String? = null) =
+    StyleVariablePropertyProvider<CSSFlexNumericValue>(defaultFallback, prefix)
+
 /**
  * Helper method for setting a [StyleVariable] onto a raw HTML element.
  *

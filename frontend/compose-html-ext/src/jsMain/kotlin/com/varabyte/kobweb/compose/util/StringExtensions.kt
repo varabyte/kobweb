@@ -17,11 +17,11 @@ fun String.titleCamelCaseToKebabCase(): String {
     return buildString {
         str.forEachIndexed { i, c ->
             val isUpper = c.isUpperCase()
-            if (isUpper) {
+            if (isUpper && this.isNotEmpty()) {
                 // Break new words when either:
                 // - right before the last capital followed by a lowercase (e.g. "E" in "ABCExample")
                 // - right before the first capital following a lowercase (e.g. "A" in "ExampleABC")
-                if (this.isNotEmpty() && (!lastIsUpper || (i < this.lastIndex && this[i + 1].isLowerCase()))) {
+                if (!lastIsUpper || (i < str.lastIndex && str[i + 1].isLowerCase())) {
                     append("-")
                 }
             }

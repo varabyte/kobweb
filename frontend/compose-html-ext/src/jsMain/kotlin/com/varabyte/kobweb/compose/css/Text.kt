@@ -77,9 +77,9 @@ class TextShadow private constructor(private val value: String) : StylePropertyV
 }
 
 class CSSTextShadow(
-    val offsetX: CSSLengthValue,
-    val offsetY: CSSLengthValue,
-    val blurRadius: CSSLengthValue? = null,
+    val offsetX: CSSLengthNumericValue,
+    val offsetY: CSSLengthNumericValue,
+    val blurRadius: CSSLengthNumericValue? = null,
     val color: CSSColorValue? = null
 ) : StylePropertyValue {
     override fun toString() = buildString {
@@ -98,9 +98,9 @@ class CSSTextShadow(
 }
 
 fun StyleScope.textShadow(
-    offsetX: CSSLengthValue,
-    offsetY: CSSLengthValue,
-    blurRadius: CSSLengthValue? = null,
+    offsetX: CSSLengthNumericValue,
+    offsetY: CSSLengthNumericValue,
+    blurRadius: CSSLengthNumericValue? = null,
     color: CSSColorValue? = null
 ) {
     textShadow(CSSTextShadow(offsetX, offsetY, blurRadius, color))

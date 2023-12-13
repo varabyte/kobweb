@@ -3,7 +3,11 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.TimeoutError
+import com.microsoft.playwright.Tracing
 import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
+import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
@@ -17,7 +21,6 @@ import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.merge
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
@@ -28,7 +31,9 @@ import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
 import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
+import kotlin.time.DurationUnit
 import com.varabyte.kobweb.gradle.application.Browser as KobwebBrowser
 
 abstract class KobwebExportTask @Inject constructor(
@@ -96,10 +101,49 @@ abstract class KobwebExportTask @Inject constructor(
         return Jsoup.parse(content()).toString()
     }
 
-    private fun Browser.takeSnapshot(url: String): String {
+    private fun Browser.takeSnapshot(route: String, url: String): String {
         newContext().use { context ->
+            kobwebBlock.app.export.timeout.orNull?.let { context.setDefaultTimeout(it.toDouble(DurationUnit.MILLISECONDS)) }
+            val traceConfig = kobwebBlock.app.export.traceConfig.orNull
+                ?.takeIf { it.filter(route) }
+            if (traceConfig != null) {
+                val traceRoot = traceConfig.root
+                traceRoot.toFile().mkdirs()
+                traceRoot.resolve("README.md").writeText(
+                    """
+                        # Export Traces
+
+                        This directory contains traces of your exported pages. These traces can be opened in the
+                        [Playwright Trace Viewer](https://trace.playwright.dev/).
+
+                        To open a trace, open the link above and then drag and drop it onto that page.
+
+                        For understanding trace results, see: https://playwright.dev/docs/trace-viewer
+                    """.trimIndent()
+                )
+
+                context.tracing().start(
+                    Tracing.StartOptions()
+                        .setTitle(route)
+                        .setScreenshots(traceConfig.includeScreenshots)
+                        .setSnapshots(true)
+                        .setSources(true)
+                )
+            }
             context.newPage().use { page ->
-                return page.takeSnapshot(url)
+                try {
+                    return page.takeSnapshot(url)
+                } finally {
+                    traceConfig?.let { traceConfig ->
+                        val traceRelativePath = traceConfig.root.resolve(
+                            (if (route.endsWith('/')) route + "index" else route).removePrefix(
+                                "/"
+                            ) + ".trace.zip"
+                        )
+                        context.tracing().stop(Tracing.StopOptions().setPath(traceRelativePath))
+                        logger.lifecycle("Saved export trace to: $traceRelativePath")
+                    }
+                }
             }
         }
     }
@@ -141,7 +185,7 @@ abstract class KobwebExportTask @Inject constructor(
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            val browser = kobwebBlock.export.browser.get()
+            val browser = kobwebBlock.app.export.browser.get()
             PlaywrightCache().install(browser)
             Playwright.create(
                 Playwright.CreateOptions().setEnv(
@@ -159,34 +203,74 @@ abstract class KobwebExportTask @Inject constructor(
                 browserType.launch().use { browser ->
                     val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
                     pages
+                        .asSequence()
                         .map { it.route }
                         // Skip export routes with dynamic parts, as they are dynamically generated based on their URL
                         // anyway
                         .filter { !it.contains('{') }
+                        .filter { route ->
+                            val ctx = AppBlock.ExportBlock.ExportFilterContext(route)
+                            (kobwebBlock.app.export.filter.orNull?.invoke(ctx) ?: true)
+                                .also { shouldExport ->
+                                    if (!shouldExport) {
+                                        logger.lifecycle("\nSkipped export for \"$route\".")
+                                    }
+                                }
+                        }
+                        .map { route -> AppBlock.ExportBlock.RouteConfig(route) }
                         .toSet()
-                        .forEach { route ->
+                        .let { pageRoutes ->
+                            pageRoutes + kobwebBlock.app.export.extraRoutes.orNull.orEmpty()
+                        }
+                        .takeIf { routes -> routes.isNotEmpty() }
+                        ?.forEach { routeConfig ->
+                            val route = routeConfig.route
                             logger.lifecycle("\nSnapshotting html for \"$route\"...")
 
                             val prefixedRoute = routePrefix.prependTo(route)
 
-                            val snapshot: String
-                            val elapsedMs = measureTimeMillis {
-                                snapshot = browser.takeSnapshot("http://localhost:$port$prefixedRoute")
-                            }
-                            logger.lifecycle("Snapshot finished in ${elapsedMs}ms.")
-
-                            var filePath = route.substringBeforeLast('/') + "/" +
-                                (route.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "index") +
-                                ".html"
-
-                            // Drop the leading slash so we don't confuse File resolve logic
-                            filePath = filePath.drop(1)
-                            pagesRoot
-                                .resolve(filePath)
-                                .run {
-                                    parentFile.mkdirs()
-                                    writeText(snapshot)
+                            try {
+                                val snapshot: String
+                                val elapsedMs = measureTimeMillis {
+                                    snapshot = browser.takeSnapshot(route, "http://localhost:$port$prefixedRoute")
                                 }
+
+                                pagesRoot
+                                    .resolve(routeConfig.exportPath)
+                                    .run {
+                                        if (this.exists()) {
+                                            logger.warn("w: Export for \"${routeConfig.route}\" overwrote existing file \"$this\".")
+                                        }
+
+                                        parentFile.mkdirs()
+                                        writeText(snapshot)
+                                    }
+
+                                logger.lifecycle("Snapshot finished in ${elapsedMs}ms (saved to: \"${routeConfig.exportPath}\").")
+                            } catch (ex: TimeoutError) {
+                                logger.error(buildString {
+                                    append("e: Export for \"${routeConfig.route}\" skipped due to timeout.")
+                                    if (siteLayout == SiteLayout.KOBWEB) {
+                                        append(" It might be worth reviewing if any of your API routes have blocking logic in them (e.g. a database failing to connect), as this can eventually cause the Kobweb server to hang if too many blocking calls accumulate.")
+                                    }
+                                    append(" In your build script, consider calling `kobweb.app.export.enableTraces(...)` to generate snapshots which can help understanding. Finally, you can try increasing the timeout by setting `kobweb.app.export.timeout`.")
+                                })
+                            }
+                        }
+                        ?: run {
+                            val noPagesExportedMessage = buildString {
+                                append("No pages were found to export.")
+                                if (kobwebBlock.app.export.filter.isPresent) {
+                                    append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
+                                }
+                            }
+                            // This case is an error in static layout mode, because with no pages, there's nothing for
+                            // the user to visit. For a kobweb layout, however, there is always at least a minimal
+                            // index.html file included.
+                            when (siteLayout) {
+                                SiteLayout.KOBWEB -> logger.warn("w: $noPagesExportedMessage")
+                                SiteLayout.STATIC -> logger.error("e: $noPagesExportedMessage")
+                            }
                         }
                 }
             }
@@ -225,7 +309,7 @@ abstract class KobwebExportTask @Inject constructor(
             scriptFile.copyTo(destFile, overwrite = true)
         }
 
-        if (kobwebBlock.export.includeSourceMap.get()) {
+        if (kobwebBlock.app.export.includeSourceMap.get()) {
             val scriptMapFile = File("${scriptFile}.map")
             val destFile = systemRoot.resolve(scriptMapFile.name)
             scriptMapFile.copyTo(destFile, overwrite = true)

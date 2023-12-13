@@ -6,7 +6,7 @@ fun StyleScope.borderStyle(lineStyle: LineStyle) {
     property("border-style", lineStyle.value)
 }
 
-fun StyleScope.borderWidth(width: CSSLengthValue) {
+fun StyleScope.borderWidth(width: CSSLengthNumericValue) {
     property("border-width", width)
 }
 
@@ -40,7 +40,7 @@ fun StyleScope.borderTop(borderBuild: CSSBorder.() -> Unit) {
 }
 
 fun StyleScope.borderTop(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
@@ -56,7 +56,7 @@ fun StyleScope.borderBottom(borderBuild: CSSBorder.() -> Unit) {
 }
 
 fun StyleScope.borderBottom(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
@@ -72,7 +72,7 @@ fun StyleScope.borderLeft(borderBuild: CSSBorder.() -> Unit) {
 }
 
 fun StyleScope.borderLeft(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
@@ -88,7 +88,7 @@ fun StyleScope.borderRight(borderBuild: CSSBorder.() -> Unit) {
 }
 
 fun StyleScope.borderRight(
-    width: CSSLengthValue? = null,
+    width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {

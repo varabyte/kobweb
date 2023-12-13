@@ -2,11 +2,13 @@ package com.varabyte.kobweb.server.io
 
 import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.ApisFactory
+import com.varabyte.kobweb.api.env.Environment
 import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.event.dispose.DisposeEvent
 import com.varabyte.kobweb.api.event.dispose.DisposeReason
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.project.io.LiveFile
+import com.varabyte.kobweb.server.api.ServerEnvironment
 import io.ktor.util.date.*
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -27,7 +29,13 @@ import java.util.zip.ZipFile
  *
  * @param path The path to the api.jar itself
  */
-class ApiJarFile(path: Path, private val events: EventDispatcher, private val logger: Logger, private val nativeLibraryMappings: Map<String, String>) {
+class ApiJarFile(
+    path: Path,
+    private val environment: ServerEnvironment,
+    private val events: EventDispatcher,
+    private val logger: Logger,
+    private val nativeLibraryMappings: Map<String, String>
+) {
     /**
      * A classloader provided for user code that is mostly isolated from the server classloader.
      *
@@ -188,7 +196,20 @@ class ApiJarFile(path: Path, private val events: EventDispatcher, private val lo
         }
     }
 
-    private class Cache(val content: ByteArray, events: EventDispatcher, logger: Logger, nativeLibraryMappings: Map<String, String>) {
+    private class Cache(
+        val content: ByteArray,
+        environment: ServerEnvironment,
+        events: EventDispatcher,
+        logger: Logger,
+        nativeLibraryMappings: Map<String, String>
+    ) {
+        private fun ServerEnvironment.toApiEnvironment(): Environment {
+            return when (this) {
+                ServerEnvironment.DEV -> Environment.DEV
+                ServerEnvironment.PROD -> Environment.PROD
+            }
+        }
+
         val apis: Apis = run {
             val classLoader = IsolatedZipClassLoader(content, logger, nativeLibraryMappings)
             val startMs = getTimeMillis()
@@ -197,7 +218,7 @@ class ApiJarFile(path: Path, private val events: EventDispatcher, private val lo
                 val factory =
                     classLoader.loadClass("ApisFactoryImpl").getDeclaredConstructor().newInstance() as ApisFactory
                 events.reset()
-                factory.create(events, logger)
+                factory.create(environment.toApiEnvironment(), events, logger)
             } finally {
                 val elapsedMs = getTimeMillis() - startMs
                 logger.info("Loaded and initialized server API jar in ${elapsedMs}ms.")
@@ -215,7 +236,7 @@ class ApiJarFile(path: Path, private val events: EventDispatcher, private val lo
             var cache = cache // Reassign temporarily so Kotlin knows it won't change underneath us
             if (cache == null || cache.content !== delegateFile.content) {
                 events.dispose(DisposeEvent(DisposeReason.DEV_API_RELOAD))
-                cache = Cache(currContent, events, logger, nativeLibraryMappings)
+                cache = Cache(currContent, environment, events, logger, nativeLibraryMappings)
                 this.cache = cache
             }
 

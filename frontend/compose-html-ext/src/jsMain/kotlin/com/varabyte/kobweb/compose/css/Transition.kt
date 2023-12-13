@@ -57,7 +57,7 @@ fun StyleScope.transitionDuration(duration: TransitionDuration) {
     property("transition-duration", duration)
 }
 
-fun StyleScope.transitionDuration(vararg duration: CSSSizeValue<out CSSUnitTime>) {
+fun StyleScope.transitionDuration(vararg duration: CSSTimeNumericValue) {
     property("transition-duration", duration.joinToString())
 }
 
@@ -78,7 +78,7 @@ class TransitionDelay private constructor(private val value: String) : StyleProp
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
-fun StyleScope.transitionDelay(vararg delay: CSSSizeValue<out CSSUnitTime>) {
+fun StyleScope.transitionDelay(vararg delay: CSSTimeNumericValue) {
     property("transition-delay", delay.joinToString())
 }
 
@@ -96,9 +96,9 @@ fun StyleScope.transitionTimingFunction(vararg value: TransitionTimingFunction) 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition
 data class CSSTransition(
     val property: TransitionProperty,
-    val duration: CSSSizeValue<out CSSUnitTime>? = null,
+    val duration: CSSTimeNumericValue? = null,
     val timingFunction: TransitionTimingFunction? = null,
-    val delay: CSSSizeValue<out CSSUnitTime>? = null,
+    val delay: CSSTimeNumericValue? = null,
 ) : CSSStyleValue {
     companion object {
 
@@ -113,9 +113,9 @@ data class CSSTransition(
          */
         fun group(
             properties: Iterable<String>,
-            duration: CSSSizeValue<out CSSUnitTime>? = null,
+            duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
-            delay: CSSSizeValue<out CSSUnitTime>? = null
+            delay: CSSTimeNumericValue? = null
         ) = properties.map { property -> CSSTransition(property, duration, timingFunction, delay) }.toTypedArray()
 
         /**
@@ -129,16 +129,16 @@ data class CSSTransition(
          */
         fun group(
             properties: Iterable<TransitionProperty>,
-            duration: CSSSizeValue<out CSSUnitTime>? = null,
+            duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
-            delay: CSSSizeValue<out CSSUnitTime>? = null
+            delay: CSSTimeNumericValue? = null
         ) = properties.map { property -> CSSTransition(property, duration, timingFunction, delay) }.toTypedArray()
     }
 
     constructor(
-        property: String, duration: CSSSizeValue<out CSSUnitTime>? = null,
+        property: String, duration: CSSTimeNumericValue? = null,
         timingFunction: TransitionTimingFunction? = null,
-        delay: CSSSizeValue<out CSSUnitTime>? = null
+        delay: CSSTimeNumericValue? = null
     ) : this(TransitionProperty.of(property), duration, timingFunction, delay)
 
     override fun toString() = buildList {

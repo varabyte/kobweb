@@ -41,7 +41,7 @@ fun Application.configureHTTP(conf: KobwebConf) {
         allowCredentials = true
         allowNonSimpleContentTypes = true // Kobweb uses octet-streams
 
-        conf.server.cors.hosts.forEach { host -> allowHost(host.name, host.schemes, host.subDomains) }
+        conf.server.cors.hosts.forEach { host -> allowHost(host.name, host.schemes, host.subdomains) }
     }
 
     install(Compression) {

@@ -1,4 +1,4 @@
-[![version: 0.15.2](https://img.shields.io/badge/kobweb-0.15.2-blue)](COMPATIBILITY.md)
+[![version: 0.15.3](https://img.shields.io/badge/kobweb-0.15.3-blue)](COMPATIBILITY.md)
 [![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
 [![kotlin: 1.9.21](https://img.shields.io/badge/kotlin-1.9.21-blue?logo=kotlin)](COMPATIBILITY.md)
@@ -63,8 +63,8 @@ Our goal is to provide:
 * Support for responsive (i.e. mobile and desktop) design
 * Out-of-the-box markdown support
 * a way to easily define server API routes and persistent API streams
-* a growing collection of general-purpose utilities added on top of Compose HTML ([learn more▼](#improvements-to-the-compose-html-library))
-* an open-source foundation that the community can extend
+* a growing collection of general purpose utilities added on top of Compose HTML ([learn more▼](#extending-the-compose-html-library))
+* an open source foundation that the community can extend
 * and much, much more!
 
 Here's a demo where we create a Compose HTML project from scratch with Markdown support and live reloading, in under
@@ -288,7 +288,7 @@ links, making it easy to navigate to the relevant source.
 `kobweb` itself delegates to Gradle, but nothing is stopping you from calling the commands yourself. You can create
 Gradle run configurations for each of the Kobweb commands.
 
-> [!NOTE]
+> [!TIP]
 > When you run a Kobweb CLI command that delegates to Gradle, it will log the Gradle command to the console. This is
 > how you can discover the Gradle commands discussed in this section.
 
@@ -343,7 +343,7 @@ update your own project by editing `gradle/libs.version.toml` and updating the `
 > You should double-check [COMPATIBILITY.md](COMPATIBILITY.md) to see if you also need to update your `kotlin` and
 > `jetbrains-compose` versions as well.
 
-> [!NOTE]
+> [!CAUTION]
 > It can be confusing, but Kobweb has two versions -- the version for the library itself (the one that is applicable in
 > this situation), and the one for the command line tool.
 
@@ -428,7 +428,7 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 | `@Page("/")`            | `example.com/slug`              |
 | `@Page("/other")`       | `example.com/other`             |
 
-> [!WARNING]
+> [!CAUTION]
 > Despite the flexibility allowed here, you should not be using this feature frequently, if at all. A Kobweb project
 > benefits from the fact that a user can easily associate a URL on your site with a file in your codebase, but this
 > feature allows you to break those assumptions. It is mainly provided to enable dynamic routing (see the *Dynamic
@@ -674,6 +674,29 @@ In my own projects, I tend to use inline styles for really simple layout element
 and component styles for complex and/or re-usable widgets. It actually becomes a nice organizational convention to have
 all your styles grouped together in one place above the widget itself.
 
+### `@InitSilk` methods
+
+Before going further, we want to quickly mention you can annotate a method with `@InitSilk`, which will be called when
+your site starts up.
+
+This method must take a single `InitSilkContext` parameter. A context contains various properties that allow for
+adjusting Silk defaults and which will be demonstrated in more detail in sections below.
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+  // `ctx` has a handful of properties which allow you to adjust Silk's default behavior.
+}
+```
+
+> [!TIP]
+> The names of your `@InitSilk` methods don't matter, as long as they're public, take a single `InitSilkContext`
+> parameter, and don't collide with another method of the same name. You are encouraged to choose a name for readability
+> purposes.
+>
+> You can define as many `@InitSilk` methods as you want, so feel free to break them up into relevant, clearly named
+> pieces, instead of declaring a single, monolithic, generically named `fun initSilk(ctx)` method that does everything.
+
 ### Modifier
 
 Silk introduces the `Modifier` class, in order to provide an experience similar to what you find in Jetpack Compose.
@@ -682,9 +705,10 @@ the concept).
 
 In the world of Compose HTML, you can think of a `Modifier` as a wrapper on top of CSS styles and attributes.
 
-*Please refer to official documentation if you are not familiar with HTML
-[attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes) and/or
-[styles](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style)*.
+> [!IMPORTANT]
+> Please refer to official documentation if you are not familiar with
+> HTML [attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes)
+> and/or [styles](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style).
 
 So this:
 
@@ -892,7 +916,8 @@ gives you five buckets you can work with when designing your site:
 * lg - widescreen (and larger)
 * xl - ultra widescreen (and larger)
 
-You can change the default values of breakpoints for your site by adding an "@InitSilk" block to your code:
+You can change the default values of breakpoints for your site by adding
+an `@InitSilk` method to your code and setting `ctx.theme.breakpoints`:
 
 ```kotlin
 @InitSilk
@@ -943,18 +968,18 @@ val CustomStyle by ComponentStyle {
 }
 ```
 
-`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in an `@InitSilk` method,
-perhaps to something that is more brand aware:
+`SilkTheme` contains very simple (e.g. black and white) defaults, but you can override them in
+an `@InitSilk` method, perhaps to something that is more brand-aware:
 
 ```kotlin
 // Assume a bunch of color constants (e.g. BRAND_LIGHT_COLOR) are defined somewhere
 
 @InitSilk
 fun overrideSilkTheme(ctx: InitSilkContext) {
-    ctx.theme.palettes.light.background = BRAND_LIGHT_BACKGROUND
-    ctx.theme.palettes.light.color = BRAND_LIGHT_COLOR
-    ctx.theme.palettes.dark.background = BRAND_DARK_BACKGROUND
-    ctx.theme.palettes.dark.color = BRAND_DARK_COLOR
+  ctx.theme.palettes.light.background = BRAND_LIGHT_BACKGROUND
+  ctx.theme.palettes.light.color = BRAND_LIGHT_COLOR
+  ctx.theme.palettes.dark.background = BRAND_DARK_BACKGROUND
+  ctx.theme.palettes.dark.color = BRAND_DARK_COLOR
 }
 ```
 
@@ -1020,7 +1045,7 @@ both styles will be applied -- the base style followed by the variant style.
 For example, `MyButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first followed by additional
 outline styling.
 
-> [!IMPORTANT]
+> [!CAUTION]
 > Using a variant that was created from a different style will have no effect. In other words,
 > `LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.
 
@@ -1119,6 +1144,7 @@ Div(
             duration = 5.s,
             iterationCount = AnimationIterationCount.Infinite
         ))
+      .toAttrs()
 )
 ```
 
@@ -1268,7 +1294,7 @@ Div {
 }
 ```
 
-### CSS Variables
+### Style Variables
 
 Kobweb supports CSS variables (also called CSS custom properties), which is a feature where you can store and retrieve
 property values from variables declared within your CSS styles. It does this through a class called `StyleVariable`.
@@ -1276,11 +1302,11 @@ property values from variables declared within your CSS styles. It does this thr
 > [!NOTE]
 > You can find [official documentation for CSS custom properties here](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).
 
-Using variables is fairly simple. You first declare one without a value (but lock it down to a type) and later you can
-initialize it within a style using `Modifier.setVariable(...)`:
+Using style variables is fairly simple. You first declare one without a value (but lock it down to a type) and later you
+can initialize it within a style using `Modifier.setVariable(...)`:
 
 ```kotlin
-val dialogWidth by StyleVariable<CSSLengthValue>()
+val dialogWidth by StyleVariable<CSSLengthNumericValue>()
 
 // This style will be applied to a div that wraps the whole page
 val RootStyle by ComponentStyle {
@@ -1288,7 +1314,13 @@ val RootStyle by ComponentStyle {
 }
 ```
 
-You can later use variables that were previously set, using the `value()` method to extract their current value:
+> [!TIP]
+> Compose HTML provides a `CSSLengthValue`, which represents concrete values like `10.px` or `5.cssRem`. However, Kobweb
+> provides a `CSSLengthNumericValue` type which represents the concept more generally, e.g. as the result of
+> intermediate calculations. There are `CSS*NumericValue` types provided for all relevant units, and it is recommended
+> to use them when declaring style variables as they more naturally support being used in calculations.
+
+You can later query variables using the `value()` method to extract their current value:
 
 ```kotlin
 val DialogStyle by ComponentStyle {
@@ -1301,6 +1333,7 @@ set previously:
 
 ```kotlin
 val DialogStyle by ComponentStyle {
+  // Will be the value of the dialogWidth variable if it was set, otherwise 500px
   base { Modifier.width(dialogWidth.value(500.px)) }
 }
 ```
@@ -1308,7 +1341,7 @@ val DialogStyle by ComponentStyle {
 Additionally, you can also provide a default fallback value when declaring the variable:
 
 ```kotlin
-val dialogWidth by StyleVariable<CSSLengthValue>(100.px)
+val dialogWidth by StyleVariable<CSSLengthNumericValue>(100.px)
 
 // This style will be applied to a div that wraps the whole page
 val DialogStyle100 by ComponentStyle {
@@ -1325,10 +1358,10 @@ val DialogStyle300 by ComponentStyle {
 }
 ```
 
-> [!IMPORTANT]
-> In the above example, we have one line where we set a variable and query it in the same style, which we did purely for
-> demonstration purposes. In practice, you would probably never do this -- the variable should have been set separately
-> earlier.
+> [!CAUTION]
+> In the above example in the `DialogStyle300` style, we set a variable and query it in the same line, which we did
+> purely for demonstration purposes. In practice, you would probably never do this -- the variable would have been set
+> separately elsewhere.
 
 To demonstrate these concepts all together, below we declare a background color variable, create a root container scope
 which sets it, a child style that uses it, and, finally, a child style variant that overrides it:
@@ -1386,15 +1419,13 @@ You can also set CSS variables directly from code if you have access to the back
 from the colors of the rainbow:
 
 ```kotlin
-val bgColor by StyleVariable<CSSColorValue>()
+// We specify the initial color of the rainbow here, since the variable
+// won't otherwise be set until the user clicks a button.
+val bgColor by StyleVariable<CSSColorValue>(Colors.Red)
 
 val ScreenStyle by ComponentStyle {
     base {
-        Modifier.fillMaxSize().backgroundColor(
-            // We specify `Red` as a fallback here, since the variable
-            // won't otherwise be set when the UI first renders.
-            bgColor.value(Colors.Red)
-        )
+        Modifier.fillMaxSize().backgroundColor(bgColor.value())
     }
 }
 
@@ -1406,7 +1437,7 @@ fun RainbowBackground() {
     var screenElement: HTMLElement? by remember { mutableStateOf(null) }
     Box(ScreenStyle.toModifier(), ref = ref { screenElement = it }) {
         Button(onClick = {
-            // We have the backing HTML element, so use setProperty to set the variable value directly
+            // You can call `setVariable` on the backing HTML element to set the variable value directly
             screenElement!!.setVariable(bgColor, roygbiv.random())
         }) {
             Text("Click me")
@@ -1482,15 +1513,14 @@ environments. But here are some situations that might benefit from CSS variables
   example, maybe your site has a dark area and a light area, and the widget should use white outlines in the dark area
   and black outlines in the light. This can be accomplished by exposing an outline color variable, which each area of
   your site is responsible for setting.
-* You are using a component style for a pseudo-class selector already (e.g. hover, focus, active) and you want that
-  behavior to be dynamic.
+* You want to allow the user to tweak values within a pseudo-class selector (e.g. hover, focus, active) for some
+  widget (e.g. color or border size), which is much easier to do using variables than listening to events and setting
+  inline styles.
 * You have a widget that you ended up creating a bunch of variants for, but instead you realize you could replace them
   all with one or two CSS variables.
 
-When in doubt, however, lean on Kotlin for handling dynamic behavior. If you want to share common style settings across
-multiple component styles, just declare a `Modifier` instance somewhere and share *that* in each style. If you
-want behavior to change based on some event, prefer using inline styles instead of hiding the logic inside component
-styles.
+When in doubt, lean on Kotlin for handling dynamic behavior, and occasionally consider using style variables if you feel
+doing so would clean up the code.
 
 ### Font Awesome
 
@@ -1559,9 +1589,9 @@ All Material Design Icon composables accept a modifier parameter, so you can twe
 MdiError(Modifier.color(Colors.Red))
 ```
 
-## Intermediate topics
+<!-- Some template READMEs link to this section from before I simplified its name, so adding a span here so they can still find it. -->
 
-### Components: Layouts, Sections, and Widgets
+## <span id="components-layouts-sections-and-widgets">Layouts, Sections, and Widgets</span>
 
 Outside of pages, it is common to create reusable, composable parts. While Kobweb doesn't enforce any particular rule
 here, we recommend a convention that, if followed, may make it easier to allow new readers of your codebase to get
@@ -1577,7 +1607,522 @@ First, as a sibling to pages, create a folder called **components**. Within it, 
 * **widgets** - Low-level composables. Focused UI pieces that you may want to reuse all around your site. For example,
   a stylized visitor counter would be a good candidate for this subfolder.
 
-### Specifying your application root
+## Markdown
+
+If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for you
+at build time, using the filename as its path.
+
+For example, if I create the following file:
+
+```markdown
+// jsMain/resources/markdown/docs/tutorial/Kobweb.kt
+
+# Kobweb Tutorial
+
+...
+```
+
+this will create a page that I can then visit by going to `mysite.com/docs/tutorial/kobweb`
+
+### Front Matter
+
+Front Matter is metadata that you can specify at the beginning of your document, like so:
+
+```markdown
+---
+title: Tutorial
+author: bitspittle
+---
+
+...
+```
+
+In a following section, we'll discuss how to embed code in your markdown, but for now, know that these key / value pairs
+can be queried in code using the page's context:
+
+```kotlin
+@Composable
+fun AuthorWidget() {
+  val ctx = rememberPageContext()
+  // Note: You can use `markdown!!` only if you're sure that
+  // this composable is called while inside a page generated
+  // from Markdown.
+  val author = ctx.markdown!!.frontMatter.getValue("author").single()
+  Text("Article by $author")
+}
+```
+
+> [!IMPORTANT]
+> If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
+> `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`.
+
+#### Root
+
+Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
+the code your markdown file would otherwise create. This is useful for specifying a layout for example:
+
+```markdown
+---
+root: .components.layout.DocsLayout
+---
+
+# Kobweb Tutorial
+```
+
+The above will generate code like the following:
+
+```kotlin
+import com.mysite.components.layout.DocsLayout
+
+@Composable
+@Page
+fun KobwebPage() {
+  DocsLayout {
+    H1 {
+      Text("Kobweb Tutorial")
+    }
+  }
+}
+```
+
+#### Route Override
+
+Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the
+generated `@Page` annotation (see the [Route Override section▲](#route-override) for valid values here).
+
+This allows you to give your URL a name that normal Kotlin filename rules don't allow for, such as a hyphen:
+
+`# AStarDemo.md`
+
+```markdown
+---
+routeOverride: a-star-demo
+---
+```
+
+The above will generate code like the following:
+
+```kotlin
+@Composable
+@Page("a-star-demo")
+fun AStarDemoPage() { /* ... */
+}
+```
+
+You can additionally override the algorithm used for converting ALL markdown files to their final name, by setting the
+markdown block's `routeOverride` callback:
+
+```kotlin
+kobweb {
+  markdown { //
+    // Given "Example.md", name will be "Example" and output will be "post_example"
+    routeOverride.set { name -> "post_${name.lowercase()}" }
+  }
+}
+```
+
+This callback will be triggered on all Markdown pages *except* `Index.md` files.
+
+Some common algorithms are provided which you can use instead of writing your own:
+
+```kotlin
+import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.RouteOverride
+
+kobweb {
+  markdown {
+    routeOverride.set(RouteOverride.KebabCase) // e.g. "ExamplePage" to "example-page"
+  }
+}
+```
+
+If you specify both a global route override and a local route override in the front matter, the front matter setting
+will take precedence.
+
+### Kobweb Call
+
+The power of Kotlin + Compose HTML is interactive components, not static text! Therefore, Kobweb Markdown support
+enables special syntax that can be used to insert Kotlin code.
+
+#### Block syntax
+
+Usually, you will define widgets that belong in their own section. Just use three triple-curly braces to insert a
+function that lives in its own block:
+
+```markdown
+# Kobweb Tutorial
+
+...
+
+{{{ .components.widgets.VisitorCounter }}}
+```
+
+which will generate code for you like the following:
+
+```kotlin
+@Composable
+@Page
+fun KobwebPage() {
+  /* ... */
+  com.mysite.components.widgets.VisitorCounter()
+}
+```
+
+You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
+will automatically be prepended with your site's full package.
+
+#### Inline syntax
+
+Occasionally, you may want to insert a smaller widget into the flow of a single sentence. For this case, use the
+`${...}` inline syntax:
+
+```markdown
+Press ${.components.widgets.ColorButton} to toggle the site's current color.
+```
+
+> [!CAUTION]
+> Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
+> it as text.
+
+### Imports
+
+You may wish to add imports to the code generated from your markdown. Kobweb Markdown supports registering both
+*global* imports (imports that will be added to every generated file) and *local* imports (those that will only apply
+to a single target file).
+
+#### Global Imports
+
+To register a global import, you configure the `markdown` block in your build script:
+
+```kotlin
+// site/build.gradle.kts
+
+kobweb {
+  markdown {
+    imports.add(".components.widgets.*")
+  }
+}
+```
+
+Notice that you can begin your path with a "." to tell the Kobweb Markdown plugin to prepend your site's package to it.
+The above would ensure that every markdown file generated would have the following import:
+
+```kotlin
+import com.mysite.components.widgets.*
+```
+
+Imports can help you simplify your Kobweb calls. Revisiting an example from just above:
+
+```markdown
+# Without imports
+
+Press ${.components.widgets.ColorButton} to toggle the site's current color.
+
+# With imports
+
+Press ${ColorButton} to toggle the site's current color.
+```
+
+#### Local Imports
+
+Local imports are specified in your markdown's Front Matter (and can even affect its root declaration!):
+
+```markdown
+---
+root: DocsLayout
+imports:
+  - .components.sections.DocsLayout
+  - .components.widgets.VisitorCounter
+---
+
+...
+
+{{{ VisitorCounter }}}
+```
+
+## Learning CSS through Kobweb
+
+Many developers new to web development have heard horror stories about CSS, and they might hope that Kobweb, by
+leveraging Kotlin and a Jetpack Compose-inspired API, means they won't have to learn it.
+
+It's worth dispelling that illusion! CSS is inevitable.
+
+That said, CSS's reputation is probably worse than it deserves to be. Many of its features are actually fairly
+straightforward and some are quite powerful. For example, you can efficiently declare that your element should be
+wrapped with a thin border, with round corners, casting a drop shadow beneath it to give it a feeling of depth,
+painted with a gradient effect for its background, and animated with an oscillating, tilting effect.
+
+It's hoped that, once you've learned a bit of CSS through Kobweb, you'll find yourself actually enjoying it (sometimes)!
+
+### Ways Kobweb helps with CSS
+
+Kobweb offers enough of a layer of abstraction that you can learn CSS in a more incremental way.
+
+First and most importantly, Kobweb gives you a Kotlin-idiomatic type-safe API to CSS properties. This is a major
+improvement over writing CSS in text files which fail silently at runtime.
+
+Next, layout widgets like `Box`, `Column`, and `Row` can get you up and running quickly with rich, complex layouts
+before ever having to understand what a "flex layout" is.
+
+Meanwhile, using `ComponentStyle` can help you break your CSS up into smaller, more manageable
+pieces that live close to the code that actually uses them, allowing your project to avoid a giant, monolithic CSS file.
+(Such giant CSS files are one of the reasons CSS has an intimidating reputation).
+
+For example, a CSS file that could easily look like this:
+
+```css
+/* Dozens of rules... */
+
+.important {
+  background-color: red;
+  font-weight: bold;
+}
+
+.important:hover {
+  background-color: pink;
+}
+
+/* Dozens of other rules... */
+
+.post-title {
+    font-size: 24px;
+}
+
+/* A dozen more more rules... */
+```
+
+can migrate to this in Kobweb:
+
+```kotlin
+//------------------ CriticalInformation.kt
+
+val ImportantStyle by ComponentStyle {
+  base {
+    Modifier.backgroundColor(Colors.Red).fontWeight(FontWeight.Bold)
+  }
+
+  hover {
+    Modifier.backgroundColor(Colors.Pink)
+  }
+}
+
+//------------------ Post.kt
+
+val PostTitleStyle by ComponentStyle.base { Modifier.fontSize(24.px) }
+```
+
+Next, Silk provides a `deferRender` method which lets you declare code that won't get rendered until the rest of the
+DOM finishes first, meaning it will appear on top of everything else. This is a clean way to avoid setting CSS z-index
+values (another aspect of CSS that has a bad reputation).
+
+And finally, Silk aims to provide widgets with default styles that look good for many sites. This means you should be
+able to rapidly develop common UIs without running into some of the more complex aspects of CSS.
+
+### A concrete example
+
+Let's walk through an example of layering CSS effects on top of a basic element.
+
+> [!TIP]
+> Two of the best learning resources for CSS properties are `https://developer.mozilla.org`
+> and `https://www.w3schools.com`. Keep an eye out for these when you do a search.
+
+We'll create the bordered, floating, oscillating element we discussed earlier. Rereading it now, here are the concepts
+we need to figure out how to do:
+
+* Create a border
+* Round out the corners
+* Add a drop shadow
+* Add a gradient background
+* Add a wobble animation
+
+Let's say we want to create an attention grabbing "welcome" widget
+on our site. You can always start with an empty box, which we'll put some text in:
+
+```kotlin
+Box(Modifier.padding(topBottom = 5.px, leftRight = 30.px)) {
+  Text("WELCOME!!")
+}
+```
+
+![Learning CSS in Kobweb, Step 1 (base)](https://github.com/varabyte/media/raw/main/kobweb/images/css/css-example-step-1.png)
+
+**Create a border**
+
+Next, search the internet for "CSS border". One of the top links should be: https://developer.mozilla.org/en-US/docs/Web/CSS/border
+
+Skim the docs and play around with the interactive examples. With an understanding of the border property now, let's use
+code completion to discover the Kobweb version of the API:
+
+```kotlin
+Box(
+  Modifier
+    .padding(topBottom = 5.px, leftRight = 30.px)
+    .border(1.px, LineStyle.Solid, Colors.Black)
+) {
+  Text("WELCOME!!")
+}
+```
+
+![Learning CSS in Kobweb, Step 2 (border added)](https://github.com/varabyte/media/raw/main/kobweb/images/css/css-example-step-2.png)
+
+**Round out the corners**
+
+Search for "CSS rounded corners". It turns out the CSS property in this case is called a "border
+radius": https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius
+
+```kotlin
+Box(
+  Modifier
+    .padding(topBottom = 5.px, leftRight = 30.px)
+    .border(1.px, LineStyle.Solid, Colors.Black)
+    .borderRadius(5.px)
+) {
+  Text("WELCOME!!")
+}
+```
+
+![Learning CSS in Kobweb, Step 3 (corners rounded)](https://github.com/varabyte/media/raw/main/kobweb/images/css/css-example-step-3.png)
+
+**Add a drop shadow**
+
+Search for "CSS shadow". There are a few types of CSS shadow features, but after some quick reading, we
+realize we want to use box shadows: https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
+
+After playing around with blur and spread values, we get something that looks decent:
+
+```kotlin
+Box(
+  Modifier
+    .padding(topBottom = 5.px, leftRight = 30.px)
+    .border(1.px, LineStyle.Solid, Colors.Black)
+    .borderRadius(5.px)
+    .boxShadow(blurRadius = 5.px, spreadRadius = 3.px, color = Colors.DarkGray)
+) {
+  Text("WELCOME!!")
+}
+```
+
+![Learning CSS in Kobweb, Step 4 (box shadow added)](https://github.com/varabyte/media/raw/main/kobweb/images/css/css-example-step-4.png)
+
+**Add a gradient background**
+
+Search for "CSS gradient background". This isn't a straightforward CSS property like the previous cases, so we instead
+get a more general documentation page explaining the feature: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_images/Using_CSS_gradients
+
+This case turns out to be a little trickier to ultimately find the Kotlin, type-safe equivalent, but if you dig a bit
+more into the CSS docs, you'll learn that a linear gradient is a type of background image.
+
+```kotlin
+Box(
+  Modifier
+    .padding(topBottom = 5.px, leftRight = 30.px)
+    .border(1.px, LineStyle.Solid, Colors.Black)
+    .borderRadius(5.px)
+    .boxShadow(blurRadius = 5.px, spreadRadius = 3.px, color = Colors.DarkGray)
+    .backgroundImage(linearGradient(LinearGradient.Direction.ToRight, Colors.LightBlue, Colors.LightGreen))
+) {
+  Text("WELCOME!!")
+}
+```
+
+![Learning CSS in Kobweb, Step 5 (gradient background added)](https://github.com/varabyte/media/raw/main/kobweb/images/css/css-example-step-5.png)
+
+**Add a wobble animation**
+
+And finally, search for "CSS
+animations": https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations
+
+You can review the [Animations▲](#animations) section above for a refresher on how Kobweb supports this feature, which
+requires declaring a top-level `Keyframes` block which then gets referenced inside an animation modifier:
+
+```kotlin
+// Top level property
+val WobbleKeyframes by Keyframes {
+  from { Modifier.rotate((-5).deg) }
+  to { Modifier.rotate(5.deg) }
+}
+
+// Inside your @Page composable
+Box(
+  Modifier
+    .padding(topBottom = 5.px, leftRight = 30.px)
+    .border(1.px, LineStyle.Solid, Colors.Black)
+    .borderRadius(5.px)
+    .boxShadow(blurRadius = 5.px, spreadRadius = 3.px, color = Colors.DarkGray)
+    .backgroundImage(linearGradient(LinearGradient.Direction.ToRight, Colors.LightBlue, Colors.LightGreen))
+    .animation(
+      WobbleKeyframes.toAnimation(
+        duration = 1.s,
+        iterationCount = AnimationIterationCount.Infinite,
+        timingFunction = AnimationTimingFunction.EaseInOut,
+        direction = AnimationDirection.Alternate,
+      )
+    )
+) {
+  Text("WELCOME!!")
+}
+```
+
+![Learning CSS in Kobweb, Step 6 (wobble animation added)](https://github.com/varabyte/media/raw/main/kobweb/screencasts/css/css-example-step-6.gif)
+
+**And we're done!**
+
+The above element isn't going to win any style awards, but I hope this demonstrates how much power CSS can give you in
+just a few declarative lines of code. And thanks to the nature of CSS, combined with Kobweb's live reloading experience,
+we were able to experiment with our idea incrementally.
+
+### CSS 2 Kobweb
+
+One of our main project contributors created a site called [CSS 2 Kobweb](https://opletter.github.io/css2kobweb/)
+which aims to simplify the process of converting CSS examples to equivalent Kobweb ComponentStyle and/or Modifier
+declarations.
+
+![CSS 2 Kobweb example](https://github.com/varabyte/media/raw/main/kobweb/images/css/css2kobweb.png)
+
+> [!TIP]
+> [CSS 2 Kobweb](https://opletter.github.io/css2kobweb/) also supports specifying class name selectors and keyframes.
+> For example, see what happens when you paste in the following CSS code:
+> ```css
+> .site-banner {
+>   display: relative;
+>   padding-left: 10px;
+>   padding-top: 5%;
+>   animation: slide-in 3s linear 1s infinite;
+>   background-position: bottom 10px right;
+>   background-image: linear-gradient(to bottom, #eeeeee, white 25px);
+> }
+> .site-banner:hover {
+>   color: rgb(40, 40, 40);
+> }
+> @keyframes slide-in {
+>   from {
+>     transform: translateX(-2rem) scale(0.5);
+>   }
+>   to {
+>     transform: translateX(0);
+>     opacity: 1;
+>   }
+> }
+> ```
+
+The web is full of examples of interesting CSS effects. Almost any CSS-related search will result in tons of
+StackOverflow answers, interactive playgrounds featuring WYSIWYG editors, and blog posts. Many of these introduce some
+really novel CSS examples. This is a great way to learn more about web development!
+
+However, as the previous section demonstrated, it can sometimes be a pain to go from a CSS example to the equivalent
+Kobweb code. We hope that *CSS 2 Kobweb* can help with that.
+
+This project is already very useful, but it's still early days. If you find cases of *CSS 2 Kobweb* that are
+incorrect, please consider [filing an issue](https://github.com/opLetter/css2kobweb/issues) in their repository.
+
+### Still stuck?
+
+Hopefully this section gave you insight into how you can explore CSS APIs on your own, but if you're stuck on getting
+an effect working, remember you can reach out to one of the options in the [connecting with us▼](#connecting-with-us)
+section, and someone in the community can probably help!
+
+# Intermediate topics
+
+## Specifying your application root
 
 By default, Kobweb will automatically root every page to the [`KobwebApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-core/src/jsMain/kotlin/com/varabyte/kobweb/core/App.kt)
 (or, if using Silk, to a [`SilkApp` composable](https://github.com/varabyte/kobweb/blob/main/frontend/kobweb-silk/src/jsMain/kotlin/com/varabyte/kobweb/silk/SilkApp.kt)).
@@ -1605,38 +2150,240 @@ KobwebApp {
 }
 ```
 
-It is likely you'll want to configure this further for your own application. Perhaps you have additional styles you'd
-like to globally define (e.g. the default font used by your site). Perhaps you have some initialization logic that you'd
-like to run before any page gets run (like logic for updating saved settings into local storage).
+It is likely you'll want to configure this further for your own application. Perhaps you have some initialization logic
+that you'd like to run before any page gets run (like logic for updating saved settings into local storage). And for
+many apps it's a great place to specify a full screen Silk `Surface` as that makes all children beneath it transition
+between light and dark colors smoothly.
 
 In this case, you can create your own root composable and annotate it with `@App`. If present, Kobweb will use that
 instead of its own default. You should, of course, delegate to `KobwebApp` (or `SilkApp` if using Silk), as the
 initialization logic from those methods should still be run.
 
-Here's an example application composable override that I use in one of my own projects:
+Here's an example application composable override that I use in many of my own projects:
 
 ```kotlin
 @App
 @Composable
 fun MyApp(content: @Composable () -> Unit) {
-    SilkApp {
-      val colorMode = ColorMode.current
-        LaunchedEffect(colorMode) { // Relaunched every time the color mode changes
-            localStorage.setItem(COLOR_MODE_KEY, colorMode.name)
-        }
-
-        // A full screen Silk surface. Sets the background based on Silk's palette and animates color changes.
-        Surface(Modifier.minHeight(100.vh)) {
-            content()
-        }
+  SilkApp {
+    val colorMode = ColorMode.current
+    LaunchedEffect(colorMode) { // Relaunched every time the color mode changes
+      localStorage.setItem("color-mode", colorMode.name)
     }
+
+    // A full screen Silk surface. Sets the background based on Silk's palette and animates color changes.
+    Surface(SmoothColorStyle.toModifier().minHeight(100.vh)) {
+      content()
+    }
+  }
 }
 ```
 
 You can define *at most* a single `@App` on your site, or else the Kobweb Application plugin will complain at build
 time.
 
-### Static layout vs. Full stack sites
+## Updating default HTML styles with Silk
+
+The default styles picked by browsers for many HTML elements rarely fit most site designs, and it's likely you'll want
+to tweak at least some of them. A very common example of this is the default web font, which if left as is will make
+your site look a bit archaic.
+
+Most traditional sites overwrite styles by creating a CSS stylesheet and then linking to it in their HTML. However, if
+you are using Silk in your Kobweb application, you can use an approach very similar to `ComponentStyle` discussed above
+but for general HTML elements.
+
+To do this, create an `@InitSilk` method. The context parameter includes a `stylesheet` property that represents the CSS
+stylesheet for your site, providing a Silk-idiomatic API for adding CSS rules to it.
+
+Below is a simple example that sets the whole site to more aesthetically pleasing fonts than the browser defaults, one
+for regular text and one for code:
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+  ctx.stylesheet.registerStyleBase("body") {
+    Modifier.fontFamily("Ubuntu", "Roboto", "Arial", "Helvetica", "sans-serif")
+      .fontSize(18.px)
+      .lineHeight(1.5)
+  }
+
+  ctx.stylesheet.registerStyleBase("code") {
+    Modifier.fontFamily("Ubuntu Mono", "Roboto Mono", "Lucida Console", "Courier New", "monospace")
+  }
+}
+```
+
+> [!TIP]
+> The `registerStyleBase` method is commonly used for registering styles with minimal code, but you can also use
+> `registerStyle`, especially if you want to add some support for one or more psuedo-classes (
+> e.g. `hover`, `focus`, `active`):
+>
+> ```kotlin
+> ctx.stylesheet.registerStyle("code") {
+>   base {
+>     Modifier
+>       .fontFamily("Ubuntu Mono", "Roboto Mono", "Lucida Console", "Courier New", "monospace")
+>       .userSelect(UserSelect.None) // No copying code allowed!
+>   }
+>   hover {
+>     Modifier.cursor(Cursor.NotAllowed)
+>   }
+> } 
+> ``` 
+
+## Setting application globals
+
+Occasionally you might find yourself with a value at build time that you want your site to know at runtime.
+
+For example, maybe you want to specify a version based on the current UTC timestamp. Or maybe you want to read a system
+environment variable's value and pass that into your Kobweb site as a way to configure its behavior.
+
+This is supported via Kobweb's `AppGlobals` singleton, which is like a `Map<String, String>` whose values you can set
+from your project's build script using the `kobweb.app.globals` property.
+
+Let's demonstrate this with the UTC version example.
+
+In your application's `build.gradle.kts`, add the following code:
+
+```kotlin
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+plugins {
+  /* ... */
+  alias(libs.plugins.kobweb.application)
+}
+
+kobweb {
+  app {
+    globals.put(
+      "version",
+      LocalDateTime
+          .now(ZoneId.of("UTC"))
+          .format(DateTimeFormatter.ofPattern("yyyyMMdd.kkmm"))
+    )
+  }
+}
+```
+
+You can then access them via the `AppGlobals.get` or `AppGlobals.getValue` methods:
+
+```kotlin
+val version = AppGlobals.getValue("version")
+```
+
+In your Kotlin project somewhere, it is recommended that you either add some type-safe extension methods, or you can
+create your own wrapper object (based on your preference):
+
+```kotlin
+// SiteGlobals.kt
+
+import com.varabyte.kobweb.core.AppGlobals
+
+// Extension method approach ---------------------
+
+val AppGlobals.version: String
+  get() = getValue("version")
+
+// Wrapper object approach -----------------------
+
+object SiteGlobals {
+  val version: String = AppGlobals.getValue("version")
+}
+```
+
+At this point, you can access this value in your site's code, say for a tiny label that would look good in a footer
+perhaps:
+
+```kotlin
+// components/widgets/SiteVersion.kt
+
+val VersionTextStyle by ComponentStyle.base {
+  Modifier.fontSize(0.6.cssRem)
+}
+
+@Composable
+fun SiteVersion(modifier: Modifier = Modifier) {
+  SpanText("v" + SiteGlobals.version, VersionTextStyle.toModifier().then(modifier))
+}
+```
+
+## Globally replacing Silk widget styles
+
+Silk widgets all use [component styles▲](#componentstyle) to power their look and feel.
+
+Normally, if you want to tweak a style in select locations within your site, you just create a variant from that style:
+
+```kotlin
+val TweakedButtonStyle by ButtonStyle.addVariantBase { /* ... */ }
+
+// Later...
+Button(variant = TweakedButtonStyle) { /* ... */ }
+```
+
+But what if you want to globally change the look and feel of a widget across your entire site?
+
+You could of course create your own composable which wraps some underlying composable with its own new style, e.g.
+`MyButton` which defines its own `MyButtonStyle` that internally delegates to `Button`. However, you'd have to be
+careful to make sure all new developers who add code to your site know to use `MyButton` instead of `Button` directly.
+
+Silk provides another way, allowing you to modify any of its declared styles and/or variants in place.
+
+You can do this via an `@InitSilk` method, which takes an `InitSilkContext` parameter. This context provides the `theme`
+property, which provides the following family of methods for rewriting styles and variants:
+
+```kotlin
+@InitSilk
+fun replaceStylesAndOrVariants(ctx: InitSilkContext) {
+  ctx.theme.replaceComponentStyle(SomeStyle) { /* ... */ }
+  ctx.theme.replaceComponentVariant(SomeStyle) { /* ... */ }
+  ctx.theme.modifyComponentStyle(SomeStyle) { /* ... */ }
+  ctx.theme.modifyComponentVariant(SomeStyle) { /* ... */ }
+}
+```
+
+> [!NOTE]
+> Technically, you can use these methods with your own site's declared styles and variants as well, but there should be
+> no reason to do so since you can just go to the source and change those values directly. However, this can still be
+> useful if you're using a third-party Kobweb library that provides its own styles and/or variants.
+
+Use the `replace` versions if you want to define a whole new set of CSS rules from scratch, or use the `modify` versions
+to layer additional changes on top of what's already there.
+
+> [!CAUTION]
+> Using `replace` on some of the more complex Silk styles can be tricky, and you may want to familiarize yourself with
+> the details of how those widgets are implemented before attempting to do so. Additionally, once you replace a style
+> in your site, you will be opting-out of any future improvements to that style that may be made in future versions of
+> Silk.
+
+Here's an example of replacing `ImageStyle` on a site that wants to force all images to have rounded corners and
+automatically scale down to fit their container:
+
+```kotlin
+@InitSilk
+fun replaceSilkImageStyle(ctx: InitSilkContext) {
+  ctx.theme.replaceComponentStyleBase(ImageStyle) {
+    Modifier
+      .clip(Rect(cornerRadius = 8.px))
+      .fillMaxWidth()
+      .objectFit(ObjectFit.ScaleDown)
+  }
+}
+```
+
+and here's an example for a site that always wants its horizontal dividers to fill max width:
+
+```kotlin
+@InitSilk
+fun makeHorizontalDividersFillWidth(ctx: InitSilkContext) {
+  ctx.theme.modifyComponentStyleBase(HorizontalDividerStyle) {
+    Modifier.fillMaxWidth()
+  }
+}
+```
+
+## Static layout vs. Full stack sites
 
 There are two flavors of Kobweb sites: *static* and *full stack*.
 
@@ -1645,13 +2392,13 @@ A *static* site (or, more completely, a *static layout* site) is one where you e
 a [static website hosting provider](https://en.wikipedia.org/wiki/Web_hosting_service#Static_page_hosting). In other
 words, the name *static* does not refer to the behavior of your site but rather that of your hosting provider solution.
 
-A *full stack* site is one where you write both the logic that runs on the front end (i.e. on the user's machine) as well
-as the logic that runs on the back end (i.e. on a server somewhere). This custom server must serve requested files (much
+A *full stack* site is one where you write both the logic that runs on the frontend (i.e. on the user's machine) as well
+as the logic that runs on the backend (i.e. on a server somewhere). This custom server must serve requested files (much
 like a static web hosting service does) plus it should also define endpoints providing unique functionality tailored to
 your site's needs.
 
-> [!IMPORTANT]
-> Kobweb supports full-stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
+> [!NOTE]
+> Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
 > designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
 > layout, to emphasize how tightly coupled it is to a Kobweb server.
 
@@ -1668,7 +2415,7 @@ analytics solutions all without writing a single line of backend code.
 
 The process for exporting a bunch of files in a way that can be consumed by a static web hosting provider tends to be
 *much* faster *and* cheaper than using a full stack solution. Therefore, you should prefer a static site layout unless
-you have a specific need for a full-stack approach.
+you have a specific need for a full stack approach.
 
 Some possible reasons to use a custom server are:
 * needing to communicate with other, private backend services in your company.
@@ -1679,7 +2426,7 @@ Some possible reasons to use a custom server are:
 If you aren't sure which category you fall into, then you should probably be creating a static layout site. It's much
 easier to migrate from a static layout site to a full stack site later than the other way around.
 
-#### Exporting and running
+### Exporting and running
 
 Both site flavors require an export. To export your site with a static layout, use the `kobweb export --layout static`
 command, while for full stack the command is `kobweb export --layout kobweb` (or just `kobweb export` since `kobweb` is
@@ -1689,7 +2436,7 @@ Once exported, you can test your site by running it locally before uploading. Yo
 `kobweb run --env prod --layout static` and a full stack site with `kobweb run --env prod --layout kobweb` (or just
 `kobweb run --env prod`).
 
-#### Deploying
+### Deploying
 
 A static site gets exported into `.kobweb/site` by default (you can configure this location in your `.kobweb/conf.yaml`
 file if you'd like). You can then upload the contents of that folder to the static web hosting provider of your choice.
@@ -1706,12 +2453,12 @@ information and some clear, concrete examples:
 * [Static site generation and deployment with Kobweb](https://bitspittle.dev/blog/2022/staticdeploy)
 * [Deploying Kobweb into the cloud](https://bitspittle.dev/blog/2023/clouddeploy)
 
-### Communicating with the server
+## Communicating with the server
 
-Let's say you've decided to create a full-stack website using Kobweb. This section walks you through setting it up as
+Let's say you've decided on creating a full stack website using Kobweb. This section walks you through setting it up as
 well as introducing the various APIs for communicating to the backend from the frontend.
 
-#### Declare a full-stack project
+### Declare a full stack project
 
 A Kobweb project will always at least have a JavaScript component, but if you declare a JVM target, that will be used to
 define custom server logic that can then be used by your Kobweb site.
@@ -1748,9 +2495,9 @@ and look the same as the `jsMain` folder):
 
 ![Kobweb JVM main set up correctly](https://github.com/varabyte/media/raw/main/kobweb/images/kobweb-jvm-main.png)
 
-#### Define API routes
+### Define API routes
 
-You can define and annotate methods that will generate server endpoints you can interact with. To add one:
+You can define and annotate methods which will generate server endpoints you can interact with. To add one:
 
 1. Define your method (optionally `suspend`able) in a file somewhere under the `api` package in your `jvmMain` source
    directory.
@@ -1799,7 +2546,47 @@ corresponding "try" version that will return null instead (`tryPost`, `tryPut`, 
 If you know what you're doing, you can of course always use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
 directly.
 
-#### Define API streams
+### `@InitApi` methods and initializing services
+
+Kobweb also supports declaring methods that should be run when your server starts up, which is particularly useful for
+initializing services that your `@Api` methods can then use. These methods must be annotated with `@InitApi` and must
+take a single `InitApiContext` parameter.
+
+> [!IMPORTANT]
+> If you are running a development server and change any of your backend code, causing a live reloading event, the
+> init methods will be run again.
+
+The `InitApiContext` class exposes a mutable set property (called `data`) which you can put anything into. Meanwhile,
+`@Api` methods expose an immutable version of `data`. This allows you to initialize a service in an `@InitApi` method
+and then access it in your `@Api` methods.
+
+Let's demonstrate a concrete example, imagining we had an interface called `Database` with a mutable
+subclass `MutableDatabase` that implements it and provides additional APIs for mutating the database.
+
+The skeleton for registering and later querying such a database instance might look like this:
+
+```kotlin
+@InitApi
+fun initDatabase(ctx: InitApiContext) {
+  val db = MutableDatabase()
+  db.createTable("users", listOf("id", "name")).apply {
+    addRow(listOf("1", "Alice"))
+    addRow(listOf("2", "Bob"))
+  }
+  db.loadResource("products.csv")
+
+  ctx.data.add<Database>(db)
+}
+
+@Api
+fun getUsers(ctx: ApiContext) {
+  if (ctx.req.method != HttpMethod.GET) return
+  val db = ctx.data.get<Database>()
+  ctx.res.setBodyText(db.query("SELECT * FROM users").toString())
+}
+```
+
+### Define API streams
 
 Kobweb servers also support persistent connections via streams. Streams are essentially named channels that maintain
 continuous contact between the client and the server, allowing either to send messages to the other at any time. This is
@@ -1860,15 +2647,15 @@ fun ApiStreamDemoPage() {
 ```
 
 After running your project, you can click on the button and check the console logs. If everything is working properly,
-you should see "Echoed: hello!" each time you press the button.
+you should see "Echoed: hello!" for each time you pressed the button.
 
-> [!NOTE]
+> [!TIP]
 > The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
 > reference that project for a more realistic example.
 
-##### API stream conveniences
+#### API stream conveniences
 
-The above example demonstrated API streams in their most verbose form. However, depending on your use case, you can
+The above example demonstrated API streams in their most verbose form. However, depending on your use-case, you can
 elide a fair bit of boilerplate.
 
 First of all, the connect and disconnect handlers are optional, so you can omit them if you don't need them. Let's
@@ -1916,15 +2703,15 @@ In practice, your API streams will probably be a bit more involved than the echo
 can handle some cases only needing a one-liner on the server and another on the client to create a persistent
 client-server connection!
 
-#### API routes vs. API streams
+### API routes vs. API streams
 
 When faced with a choice, use API routes as often as you can. They are conceptually simpler, and you can query API
 endpoints with a CLI program like curl and sometimes even visit the URL directly in your browser. They are great for
-handling queries or updates to server resources in response to user-driven actions (like visiting a page or clicking
+handling queries of or updates to server resources in response to user-driven actions (like visiting a page or clicking
 on a button). Every operation you perform returns a clear response code in addition to some payload information.
 
 Meanwhile, API streams are very flexible and can be a natural choice to handle high-frequency communication. But they
-are also more complex. Unlike a simple request/response pattern, you are instead opting in to manage a potentially
+are also more complex. Unlike a simple request / response pattern, you are instead opting in to manage a potentially
 long lifetime during which you can receive any number of events. You may have to concern yourself about interactions
 between all the clients on the stream as well. API streams are fundamentally stateful.
 
@@ -1940,264 +2727,97 @@ a situation where a new web server is spun up to handle some intense load.
 If you're using API routes, you're already probably delegating to a database service as your data backend, so this may
 just work seamlessly.
 
-But for API streams, you may naturally find yourself writing a bunch of broadcasting code. However, this only works to
+But for API streams, you many naturally find yourself writing a bunch of broadcasting code. However, this only works to
 communicate between all clients that are connected to the same server. Two clients connected to the same stream on
 different servers are effectively in different, disconnected worlds.
 
-The above situation is often handled by using a pub-sub service (like Redis). This feels somewhat equivalent to using a
+The above situation is often handled by using a pubsub service (like Redis). This feels somewhat equivalent to using a
 database as a service in the API route situation, but this code might not be as straightforward to migrate.
 
 API routes and API streams are not a you-must-use-one-or-the-other situation. Your project can use both! In general, try
 to imagine the case where a new server might get spun up, and design your code to handle that situation gracefully. API
 routes are generally safe to use, so use them often. However, if you have a situation where you need to communicate
-events in real-time, especially situations where you want your client to be continuously directed on what to do by the
+events in real-time, especially situations where you want your client to be continuously directed what to do by the
 server via events, API streams are a great choice.
 
 > [!NOTE]
 > You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
-> implemented. Any discussions about them should apply here as well.
-
-### Markdown
-
-If you create a markdown file under the `jsMain/resources/markdown` folder, a corresponding page will be created for you
-at build time, using the filename as its path.
-
-For example, if I create the following file:
-
-```markdown
-// jsMain/resources/markdown/docs/tutorial/Kobweb.kt
-
-# Kobweb Tutorial
-
-...
-```
-
-this will create a page that I can then visit by going to `mysite.com/docs/tutorial/kobweb`
-
-#### Front Matter
-
-Front Matter is metadata that you can specify at the beginning of your document, like so:
-
-```markdown
----
-title: Tutorial
-author: bitspittle
----
-
-...
-```
-
-In the following section, we'll discuss how to embed code in your markdown, but for now, know that these key/value pairs
-can be queried in code using the page's context:
-
-```kotlin
-@Composable
-fun AuthorWidget() {
-    val ctx = rememberPageContext()
-    // Note: You can use `markdown!!` only if you're sure that
-    // this composable is called while inside a page generated
-    // from Markdown.
-    val author = ctx.markdown!!.frontMatter.getValue("author").single()
-    Text("Article by $author")
-}
-```
-
-> [!IMPORTANT]
-> If you're not seeing `ctx.markdown` autocomplete, you need to make sure you depend on the
-> `com.varabyte.kobwebx:kobwebx-markdown` artifact in your project's `build.gradle`.
-
-##### Root
-
-Within your front matter, there's a special value that, if set, will be used to render a root `@Composable` that wraps
-the code your markdown file would otherwise create. This is useful for specifying a layout for example:
-
-```markdown
----
-root: .components.layout.DocsLayout
----
-
-# Kobweb Tutorial
-```
-
-The above will generate code like the following:
-
-```kotlin
-import com.mysite.components.layout.DocsLayout
-
-@Composable
-@Page
-fun KobwebPage() {
-    DocsLayout {
-        H1 {
-            Text("Kobweb Tutorial")
-        }
-    }
-}
-```
-
-##### Route Override
-
-Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the
-generated `@Page` annotation (see the [Route Override section▲](#route-override) for valid values here).
-
-This allows you to give your URL a name that normal Kotlin filename rules don't allow for, such as a hyphen:
-
-`# AStarDemo.md`
-```markdown
----
-routeOverride: a-star-demo
----
-```
-
-The above will generate code like the following:
-
-```kotlin
-@Composable
-@Page("a-star-demo")
-fun AStarDemoPage() { /* ... */ }
-```
-
-You can additionally override the algorithm used for converting ALL markdown files to their final name, by setting the
-markdown block's `routeOverride` callback:
-
-```kotlin
-kobweb {
-  markdown { //
-    // Given "Example.md", name will be "Example" and output will be "post_example"
-    routeOverride.set { name -> "post_${name.lowercase()}" }
-  }
-}
-```
-
-This callback will be triggered on all Markdown pages *except* `Index.md` files.
-
-Some common algorithms are provided which you can use instead of writing your own:
-
-```kotlin
-import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.RouteOverride
-
-kobweb {
-  markdown {
-    routeOverride.set(RouteOverride.KebabCase) // e.g. "ExamplePage" to "example-page"
-  }
-}
-```
-
-If you specify both a global route override and a local route override in the front matter, the front matter setting
-will take precedence.
-
-#### Kobweb Call
-
-The power of Kotlin + Compose HTML is interactive components, not static text! Therefore, Kobweb Markdown support
-enables special syntax that can be used to insert Kotlin code.
-
-##### Block syntax
-
-Usually, you will define widgets that belong in their own section. Just use three triple-curly braces to insert a
-function that lives in its own block:
-
-```markdown
-# Kobweb Tutorial
-
-...
-
-{{{ .components.widgets.VisitorCounter }}}
-```
-
-which will generate code for you like the following:
-
-```kotlin
-@Composable
-@Page
-fun KobwebPage() {
-    /* ... */
-    com.mysite.components.widgets.VisitorCounter()
-}
-```
-
-You may have noticed that the code path in the markdown file is prefixed with a `.`. When you do that, the final path
-will automatically be prepended with your site's full package.
-
-##### Inline syntax
-
-Occasionally, you may want to insert a smaller widget into the flow of a single sentence. For this case, use the
-`${...}` inline syntax:
-
-```markdown
-Press ${.components.widgets.ColorButton} to toggle the site's current color.
-```
-
-> [!IMPORTANT]
-> Spaces are not allowed within the curly braces! If you have them there, Markdown skips over the whole thing and leaves
-> it as text.
-
-#### Imports
-
-You may wish to add imports to the code generated from your markdown. Kobweb Markdown supports registering both
-*global* imports (imports that will be added to every generated file) and *local* imports (those that will only apply
-to a single target file).
-
-##### Global Imports
-
-To register a global import, you configure the `markdown` block in your build script:
-
-```kotlin
-// site/build.gradle.kts
-
-kobweb {
-  markdown {
-    imports.add(".components.widgets.*")
-  }
-}
-```
-
-Notice that you can begin your path with a "." to tell the Kobweb Markdown plugin to prepend your site's package to it.
-The above would ensure that every markdown file generated would have the following import:
-
-```kotlin
-import com.mysite.components.widgets.*
-```
-
-Imports can help you simplify your Kobweb calls. Revisiting an example from just above:
-
-```markdown
-# Without imports
-
-Press ${.components.widgets.ColorButton} to toggle the site's current color.
-
-# With imports
-
-Press ${ColorButton} to toggle the site's current color.
-```
-
-##### Local Imports
-
-Local imports are specified in your markdown's Front Matter (and can even affect its root declaration!):
-
-```markdown
----
-root: DocsLayout
-imports:
-  - .components.sections.DocsLayout
-  - .components.widgets.VisitorCounter
----
-
-...
-
-{{{ VisitorCounter }}}
-```
+> implemented with. Any discussions about them should apply here as well.
 
 # Advanced topics
 
-## Multimodule
+## Setting your site's route prefix
 
-For simplicity, new projects can choose to put all their pages and widgets inside a single application module.
+Typically, sites live at the top level. This means if you have a root file `index.html` and your site is hosted at
+the domain `https://mysite.com` then that HTML file can be accessed by visiting `https://mysite.com/index.html`.
 
-However, Kobweb is capable of splitting code up across modules. You can define components and/or pages in separate
-modules and apply the `com.varabyte.kobweb.library` plugin on them (in contrast to your main module which applies the
-`com.varabyte.kobweb.application` plugin.)
+However, in some cases your site may be hosted under a subfolder, such as `https://example.com/products/myproduct/`, in which case your site's root `index.html` file would live at `https://example.com/products/myproduct/index.html`.
 
-In other words, you can lay out your project like this:
+Kobweb needs to know about this subfolder structure so that it takes them into account in its routing logic. This can be
+specified in your project's `.kobweb/conf.yaml` file with the `routePrefix` value under the `site` section:
+
+```yaml
+site:
+  title: "..."
+  routePrefix: "..."
+```
+
+where the value of `routePrefix` is the part between the origin part of the URL and your site's root. For example, if
+your site is rooted at `https://example.com/products/myproduct/`, then the value of `routePrefix` would be `products/myproduct`.
+
+> [!NOTE]
+> If you are planning to host your site on GitHub Pages using the default `github.io` domain, you will need to set an
+> appropriate `routePrefix` value. For a concrete example of setting `routePrefix` for GitHub Pages,
+> [check out this relevant section](https://bitspittle.dev/blog/2022/staticdeploy#github-pages) from my blog post about
+> exporting static layout sites.
+
+Outside of setting your `routePrefix` in the `conf.yaml` file, you can design your site without explicitly mentioning
+it, as Kobweb's composables handle it for you. For example, `Link("docs/manuals/v123.pdf")` (or `Anchor` if you're not
+using Silk) will automatically resolve to `https://example.com/products/myproduct/docs/manuals/v123.pdf`.
+
+If you do need to access the route prefix in your own code, you can do so by referencing the `RoutePrefix.value`
+companion property or by utilizing the `RoutePrefix.prepend(...)` companion method. This should rarely be required in
+practice, however.
+
+> [!NOTE]
+> This note is included for anyone who wants to better understand the reason for this feature's design in Kobweb.
+>
+> Normally, websites are flexible enough to be hosted under any subfolder because they can use relative paths.
+> For example, if you are on page `a/b/c` and you need to get to `e/f/g`, you would set your link to `../../../e/f/g`
+> and not `/e/f/g`. In this setup, if you referenced an icon in your top-level `index.html` file, you would use
+> `favicon.ico` (a relative path to a sibling file) and not `/favicon.ico`.
+>
+> However, Kobweb is built on top of a reactive framework (Compose HTML) normally meant for SPAs (Single Page
+> Applications). In this setup, the same code is used to handle any URL in your site, at which point it intercepts the
+> URL value and renders the associated content using some giant switch case in its routing logic.
+>
+> This means that Kobweb has a single, global `index.html` which is used for all pages on the site. (If you look at it,
+> you'll mainly see a minimal DOM skeleton that acts as a container for your dynamically generated pages, plus a script
+> link to the code of your site.)
+>
+> Now, imagine if this `index.html` linked to `favicon.ico`, as in the relative path case. If you were to
+> visit `https://example.com/products/myproduct/a/b/c`, you would ultimately get served the global `index.html`
+> file that would then look for the icon file at `https://example.com/products/myproduct/a/b/c/favicon.ico`, where
+> it doesn't exist. In other words, Kobweb needs help to know that the icon file it is looking for is always at
+> `https://example.com/products/myproduct/favicon.ico`, so that the `index.html` file link is valid in whatever
+> context it is served.
+>
+> If you were creating your site the traditional way, you might have one hand-crafted HTML file per page, where each one
+> would have its own unique link to `favicon.ico`. Perhaps the rooted `index.html` file would use `favicon.ico` and the
+> one located under `a/b/c` would use `../../../favicon.ico`.
+>
+> But, in Kobweb, since we're using the same `index.html` file for every page, we use the absolute path `/favicon.ico`,
+> or, in the case of a route prefix being set, `/${routePrefix}/favicon.ico`.
+
+## Splitting Kobweb code across multiple modules
+
+For simplicity, new projects can choose to put all their pages and widgets inside a single application module, e.g.
+`site/`.
+
+However, you can define components and/or pages in separate modules and apply the `com.varabyte.kobweb.library` plugin
+on them (in contrast to your main module which applies the `com.varabyte.kobweb.application` plugin.)
+
+In other words, you can split up and organize your project like this:
 
 ```
 my-project
@@ -2209,6 +2829,7 @@ my-project
 │           └── pages
 └── site
     ├── build.gradle.kts # apply "com.varabyte.kobweb.application"
+    ├── .kobweb/conf.yaml
     └── src/jsMain
         └── kotlin.org.example.myproject.site
             ├── components
@@ -2472,8 +3093,18 @@ For a simple site, the above workflow should take about 2 minutes to run.
 `StyleVariable`s work in a subtle way that is usually fine until it isn't -- which is often when you try to interact
 with their values instead of just passing them around.
 
-For context, you can use a style variable interchangeably with the value it represents. For example, code like this
-works because `MyOpacityVar.value()` returns something with type `Number`:
+Specifically, this would compile but be a problem at runtime:
+
+```kotlin
+val MyOpacityVar by StyleVariable<Number>()
+
+// later...
+
+// Border opacity should be more opaque than the rest of the widget
+val borderOpacity = max(1.0, MyOpacityVar.value().toDouble() * 2)
+```
+
+To see what the problem is, let's first take a step back. The following code:
 
 ```kotlin
 val MyOpacityVar by StyleVariable<Number>()
@@ -2482,12 +3113,14 @@ val MyOpacityVar by StyleVariable<Number>()
 Modifier.opacity(MyOpacityVar.value())
 ```
 
-This generates the following CSS:
+generates the following CSS:
+
 ```css
 opacity: var(--my-opacity);
 ```
 
-How does something of type `Number` generate output like `var(--my-opacity)`?
+However, `MyOpacityVar` acts like a `Number` in our code! How does something that effectively has a type of `Number`
+generate text output like `var(--my-opacity)`?
 
 This is accomplished through the use of Kotlin/JS's `unsafeCast`, where you can tell the compiler to treat a value as a
 different type than it actually is. In this case, `MyOpacityVar.value()` returns some object which the Kotlin compiler
@@ -2496,7 +3129,7 @@ different type than it actually is. In this case, `MyOpacityVar.value()` returns
 
 Therefore, `Modifier.opacity(MyOpacityVar.value())` works seemingly like magic! However, if you try to do some
 arithmetic, like `MyOpacityVar.value().toDouble() * 0.5`, the compiler might be happy, but things will break silently at
-runtime when the JS engine is asked to do math with something that's not really a number.
+runtime, when the JS engine is asked to do math on something that's not really a number.
 
 In CSS, doing math with variables is accomplished by using `calc` blocks, so Kobweb offers its own `calc` method to
 mirror this. When dealing with raw numerical values, you must wrap them in `num` so we can escape the raw type system
@@ -2515,13 +3148,23 @@ Modifier.opacity(calc { num(MyOpacityVar.value()) * num(0.5) })
 
 It's a little hard to remember to wrap raw values in `num`, but you will get compile errors if you do it wrong.
 
-Working with variables representing size values inside a calc block doesn't require wrapping methods and feels much more
-natural:
+Working with variables representing length values don't require calc blocks because Compose HTML supports mathematical
+operations on such numeric unit types:
 
 ```kotlin
-val MyFontSizeVar by StyleVariable<CSSLengthValue>()
-calc { MyFontSizeVar.value() + 1.cssRem }
+val MyFontSizeVar by StyleVariable<CSSLengthNumericValue>()
+
+MyFontSizeVar.value() + 1.cssRem
 // Output: "calc(var(--my-font-size) + 1rem)"
+```
+
+However, a calc block could still be useful if you were starting with a raw number that you wanted to convert to a size:
+
+```kotlin
+val MyFontSizeScaleFactorVar by StyleVariable<Number>()
+
+calc { MyFontSizeScaleFactorVar.value() * 16.px }
+// Output: calc(var(--my-font-size-scale-factor) * 16px)
 ```
 
 ## Kobweb Server Plugins
@@ -2676,6 +3319,136 @@ won't have access to Kobweb's API routes, API streams, or live reloading support
 improve someday ([link to tracking issue](https://github.com/varabyte/kobweb/issues/22)), but we don't have enough
 resources to be able to prioritize resolving this for a 1.0 release.
 
+## `CSSNumericValue` typealiases
+
+Kobweb introduces a handful of typealiases for CSS unit values, basing them off of the `CSSNumericValue` class and
+extending the set defined by Compose HTML:
+
+```kotlin
+typealias CSSAngleNumericValue = CSSNumericValue<out CSSUnitAngle>
+typealias CSSLengthOrPercentageNumericValue = CSSNumericValue<out CSSUnitLengthOrPercentage>
+typealias CSSLengthNumericValue = CSSNumericValue<out CSSUnitLength>
+typealias CSSPercentageNumericValue = CSSNumericValue<out CSSUnitPercentage>
+typealias CSSFlexNumericValue = CSSNumericValue<out CSSUnitFlex>
+typealias CSSTimeNumericValue = CSSNumericValue<out CSSUnitTime>
+```
+
+This section explains why they were added and why you should almost always prefer using them.
+
+### Background
+
+#### CSSSizeValue
+
+When you write CSS values like `10.px`, `5.cssRem`, `45.deg`, or even `30.s` into your code, you normally don't have to
+think too much about their types. You just create them and pass them into the appropriate Kobweb / Compose HTML APIs.
+
+Let's discuss what is actually happening when you do this. Compose HTML provides a `CSSSizeValue` class which represents
+a number value and its unit.
+
+```kotlin
+val lengthValue = 10.px // CSSSizeValue<CSSUnit.px> (value = 10 and unit = px)
+val angleValue = 45.deg // CSSSizeValue<CSSUnit.deg> (value = 45 and unit = deg)
+```
+
+This is a pretty elegant approach, but the types are verbose. This can be troublesome when writing code that needs to
+work with them:
+
+```kotlin
+val lengths: List<CSSSizeValue<CSSUnit.px>>
+fun drawArc(arc: CSSSizeValue<CSSUnit.deg>)
+```
+
+Note also that the above cases are overly restrictive, only supporting a single length and angle type, respectively. We
+usually want to support all relevant types (e.g. `px`, `em`, `cssRem`, etc. for lengths; `deg`, `rad`, `grad`, and
+`turn` for angles). We can do this with the following `out` syntax:
+
+```kotlin
+val lengths: List<CSSSizeValue<out CSSUnitLength>>
+fun drawArc(arc: CSSSizeValue<out CSSUnitAngle>)
+```
+
+What a mouthful!
+
+As a result, the Compose HTML team added typealiases for all these unit types, such as `CSSLengthValue`
+and `CSSAngleValue`. Now, you can write the above code like:
+
+```kotlin
+val lengths: List<CSSLengthValue>
+fun drawArc(arc: CSSAngleValue)
+```
+
+Much better! Seems great. No problems, right? *Right?!*
+
+#### CSSNumericValue
+
+You can probably tell by my tone: Yes problems.
+
+To explain, we first need to talk about `CSSNumericValue`.
+
+It is common to transform values in CSS using many of its various mathematical functions. Perhaps you want to take the
+sum of two different units (`10.px + 5.cssRem`) or call some other math function (`clamp(1.cssRem, 3.vw)`). These
+operations return intermediate values that cannot be directly queried like a `CSSSizeValue` can.
+
+This is handled by the `CSSNumericValue` class, also defined by Compose HTML (and which is actually a base class
+of `CSSSizeValue`).
+
+```kotlin
+val lengthSum = 10.px + 2.cssRem // CSSNumericValue<CSSUnitLength>
+val angleSum = 45.deg + 1.turn // CSSNumericValue<CSSAngleLength>
+```
+
+These numeric operations are of course useful to the browser, which can resolve them into absolute screen values, but
+for us in user space, they are opaque calculations.
+
+In practice, however, that's fine! The limited view of these values does not matter because we rarely need to query them
+in our code. In almost all cases, we just take some numeric value, optionally tweak it by doing some more math on it,
+and then pass it onto the browser.
+
+Because it is opaque, `CSSNumericValue` is far more flexible and widely applicable than `CSSSizeValue` is. If you are
+writing a function that takes a parameter, or declaring a `StyleVariable` tied to some length or time, you almost always
+want to use `CSSNumericValue` and not `CSSSizeValue`.
+
+### Prefer using Kobweb's `CSSNumericValue` typealiases
+
+As mentioned above, the Compose HTML team created their unit-related typealiases against the `CSSSizeValue` class.
+
+This decision makes it really easy to write code that works well when you test it with concrete size values but is
+actually more restrictive than you expected.
+
+Kobweb ensures its APIs all reference its `CSSNumericValue` typealiases:
+
+```kotlin
+// Legacy Kobweb
+fun Modifier.lineHeight(value: CSSLengthOrPercentageValue): Modifier = styleModifier {
+    lineHeight(value)
+  }
+
+// Modern Kobweb
+fun Modifier.lineHeight(value: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
+  lineHeight(value)
+}
+```
+
+If you are using style variables in your code, or writing your own functions that take CSS units as arguments, you might
+be referencing the Compose HTML types. Your code will still work fine, but you are strongly encouraged to migrate them
+to Kobweb's newer set, in order to make your code more flexible about what it can accept:
+
+```kotlin
+// Not recommended
+val MyFontSize by StyleVariable<CSSLengthValue>
+fun drawArc(arc: CSSAngleValue)
+
+// Recommended
+val MyFontSize by StyleVariable<CSSLengthNumericValue>
+fun drawArc(arc: CSSAngleNumericValue)
+```
+
+> [!NOTE]
+> Perhaps in the future, the Compose HTML team might consider updating their typealiases to use the `CSSNumericValue`
+> type and not the `CSSSizeValue` type. If that happens, we can revert our changes and delete this section. But until
+> then, it's worth understanding why Kobweb introduces its own typealiases and why you are encouraged to use them
+> instead of the Compose HTML versions.
+
 <!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
 ## <span id="what-about-multiplatform-widgets"><span id="what-about-compose-for-web-canvas">What about Compose Multiplatform for Web?</span></span>
 
@@ -2738,7 +3511,7 @@ If you do not have access to IntelliJ Ultimate, then you'll have to rely on `pri
 great, live reloading plus Kotlin's type system generally help you incrementally build your site up without too many
 issues.
 
-> [!NOTE]
+> [!TIP]
 > If you're a student, you can apply for a free IntelliJ Ultimate
 > license [here](https://www.jetbrains.com/community/education/#students). If you maintain an open source project, you
 > can apply [here](https://www.jetbrains.com/community/opensource/#support).
@@ -2778,7 +3551,7 @@ to add a *remote JVM debug* configuration to your IDE.
 
 At this point, start up your Kobweb server using `kobweb run`.
 
-> [!IMPORTANT]
+> [!CAUTION]
 > Remote debugging is only supported in dev mode. It will not be enabled for a server started with
 > `kobweb run --env prod`.
 
@@ -2797,7 +3570,7 @@ double-check the values in your `conf.yaml` file, restart the server, and try ag
 The easiest way to use a custom font is if it is already hosted for you. For example, Google Fonts provides a CDN that
 you can use to load fonts directly.
 
-> [!NOTE]
+> [!CAUTION]
 > While this is the easiest approach, be sure you won't run into compliance issues! If you use Google Fonts on your
 > site, you may technically be in violation of the GDPR in Europe, because an EU citizen's IP address is communicated to
 > Google and logged. You may wish to find a Europe-safe host instead, or self-host, which you can read about
@@ -2929,7 +3702,89 @@ limit.
 Note that most config files assume "10MB" is 10 * 1024 * 1024 bytes, but here it will actually result in
 10 * 1000 * 1000 bytes. You probably want to use "KiB", "MiB", or "GiB" when you configure this value.
 
-## Improvements to the Compose HTML library
+## Configuring CORS
+
+[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS), or *Cross-Origin Resource Sharing*, is a security
+feature built on the idea that a web page should not be able to make requests for resources from a server that is not
+the same as the one that served the page *unless* it was served from a trusted domain.
+
+To configure CORS for a Kobweb backend, Kobweb's `.kobweb/conf.yaml` file allows you to declare such trusted domains
+using a `cors` block:
+
+```yaml
+server:
+  cors:
+    hosts:
+      - name: "example.com"
+        schemes:
+          - "https"
+```
+
+> [!NOTE]
+> Specifying the schemes is optional. If you don't specify them, Kobweb defaults to "http" and "https".
+
+> [!NOTE]
+> You can also specify subdomains, e.g.
+> ```yaml
+> - name: "example.com"
+>   subdomains:
+>     - "en"
+>     - "de"
+>     - "es"
+> ```
+> which would add CORS support for `en.example.com`, `de.example.com`, and `es.example.com`, as well as `example.com`
+> itself.
+
+Once configured, your Kobweb server will be able to respond to data requests from any of the specified hosts.
+
+> [!TIP]
+> If you find that your full-stack site, which was working locally during development, rejects requests in the
+> production version, check your browser's console logs. If you see errors in there about a violated CORS policy, that
+> means you didn't configure CORS correctly.
+
+## Generating export traces
+
+The Kobweb export feature is built on top of [Microsoft Playwright](https://playwright.dev/), a solution for making it
+easy to download and run browsers programmatically.
+
+One of the features provided by Playwright is the ability to generate traces, which are essentially detailed reports
+you can use to understand what is happening as your site loads. Kobweb exposes this feature through the `export` block
+in your Kobweb application's build script.
+
+Enabling traces is easy:
+
+```kotlin
+// build.gradle.kts
+plugins {
+  // ... other plugins ...
+  alias(libs.plugins.kobweb.application)
+}
+
+kobweb {
+  app {
+    export {
+      enableTraces()
+    }
+  }
+}
+```
+
+You can pass in parameters to configure the `enableTraces` method, but by default, it will generate trace files into
+your `.kobweb/export-traces/` directory.
+
+Once enabled, you can run `kobweb export`, then once exported, open any of the generated `*.trace.zip` files by
+navigating to them using your OS's file explorer and drag-and-dropping them into
+the [Playwright Trace Viewer](https://trace.playwright.dev/).
+
+> [!TIP]
+> You can learn more about how to use the Trace
+> Viewer [using the official documentation](https://playwright.dev/docs/trace-viewer).
+
+It's not expected many users will need to debug their site exports, but it's a great tool to have (especially combined
+with the [server logs feature](#kobweb-server-logs)) to diagnose if one of your pages is taking longer to export than
+expected.
+
+## Extending the Compose HTML library
 
 In the beginning, Kobweb was only intended to be a thin layer on top of Compose HTML, but the more we worked on it, the
 more we ran into features that were simply not yet implemented in Compose HTML. We also wrote utility methods and

@@ -155,7 +155,11 @@ class KeyframesProvider internal constructor(
     private val init: KeyframesBuilder.() -> Unit
 ) : CacheByPropertyNameDelegate<Keyframes>() {
     override fun create(propertyName: String): Keyframes {
-        val name = propertyName.titleCamelCaseToKebabCase()
+        val name = propertyName
+            .removeSuffix("Anim")
+            .removeSuffix("Animation")
+            .removeSuffix("Keyframes")
+            .titleCamelCaseToKebabCase()
         return Keyframes(name, prefix, init)
     }
 }
@@ -195,9 +199,9 @@ fun Keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = Keyfr
  */
 @Composable
 fun Keyframes.toAnimation(
-    duration: CSSSizeValue<out CSSUnitTime>? = null,
+    duration: CSSTimeNumericValue? = null,
     timingFunction: AnimationTimingFunction? = null,
-    delay: CSSSizeValue<out CSSUnitTime>? = null,
+    delay: CSSTimeNumericValue? = null,
     iterationCount: AnimationIterationCount? = null,
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
@@ -229,9 +233,9 @@ fun Keyframes.toAnimation(
  */
 fun Keyframes.toAnimation(
     colorMode: ColorMode?,
-    duration: CSSSizeValue<out CSSUnitTime>? = null,
+    duration: CSSTimeNumericValue? = null,
     timingFunction: AnimationTimingFunction? = null,
-    delay: CSSSizeValue<out CSSUnitTime>? = null,
+    delay: CSSTimeNumericValue? = null,
     iterationCount: AnimationIterationCount? = null,
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,

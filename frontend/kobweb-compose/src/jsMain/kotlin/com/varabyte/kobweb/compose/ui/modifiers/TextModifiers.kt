@@ -15,7 +15,7 @@ fun Modifier.lang(value: String) = attrsModifier {
     lang(value)
 }
 
-fun Modifier.letterSpacing(value: CSSNumeric) = styleModifier {
+fun Modifier.letterSpacing(value: CSSLengthNumericValue) = styleModifier {
     letterSpacing(value)
 }
 
@@ -36,9 +36,9 @@ fun Modifier.textOverflow(textOverflow: TextOverflow): Modifier = styleModifier 
 }
 
 fun Modifier.textShadow(
-    offsetX: CSSLengthValue,
-    offsetY: CSSLengthValue,
-    blurRadius: CSSLengthValue? = null,
+    offsetX: CSSLengthNumericValue,
+    offsetY: CSSLengthNumericValue,
+    blurRadius: CSSLengthNumericValue? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
     textShadow(offsetX, offsetY, blurRadius, color)

@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.api.stream
 
 import com.varabyte.kobweb.api.data.Data
+import com.varabyte.kobweb.api.env.Environment
 import com.varabyte.kobweb.api.log.Logger
 
 /**
@@ -35,11 +36,18 @@ abstract class ApiStream() {
     )
     constructor(@Suppress("UNUSED_PARAMETER") routeOverride: String = "") : this()
 
-    class ClientConnectedContext(val stream: Stream, val clientId: StreamClientId, val data: Data, val logger: Logger)
+    class ClientConnectedContext(
+        val stream: Stream,
+        val clientId: StreamClientId,
+        val env: Environment,
+        val data: Data,
+        val logger: Logger
+    )
     class TextReceivedContext(
         val stream: Stream,
         val clientId: StreamClientId,
         val text: String,
+        val env: Environment,
         val data: Data,
         val logger: Logger
     )
@@ -47,6 +55,7 @@ abstract class ApiStream() {
     class ClientDisconnectedContext(
         val stream: DisconnectedStream,
         val clientId: StreamClientId,
+        val env: Environment,
         val data: Data,
         val logger: Logger
     )

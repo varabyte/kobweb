@@ -13,15 +13,14 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     // Final code should look something like:
     //
     // class ApisFactoryImpl : ApisFactory {
-    //    override fun create(logger: Logger): Apis {
+    //    override fun create(env: Environment, events: Events, logger: Logger): Apis {
     //        val data = MutableData()
-    //        val events = EventImpl()
-    //        val apis = Apis(data, events, logger)
+    //        val apis = Apis(env, data, logger)
     //        apis.register("/add") { ctx -> example.api.add(ctx) }
     //        apis.register("/remove") { ctx -> example.api.remove(ctx) }
     //        apis.registerStream("/echo") { ctx -> example.api.echo }
     //        apis.registerStream("/chat") { ctx -> example.api.chat }
-    //        val initCtx = InitApiContext(apis, data, events, logger)
+    //        val initCtx = InitApiContext(env, apis, data, events, logger)
     //        example.init(initCtx)
     //        return apis
     //    }
@@ -32,6 +31,7 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     val apiPackage = "com.varabyte.kobweb.api"
     val classApis = ClassName(apiPackage, "Apis")
     val classApisFactory = ClassName(apiPackage, "ApisFactory")
+    val classEnvironment = ClassName("$apiPackage.env", "Environment")
     val classMutableData = ClassName("$apiPackage.data", "MutableData")
     val classEvents = ClassName("$apiPackage.event", "Events")
     val classInitApiContext = ClassName("$apiPackage.init", "InitApiContext")
@@ -43,12 +43,13 @@ fun createApisFactoryImpl(backendData: BackendData): String {
             .addFunction(
                 FunSpec.builder("create")
                     .addModifiers(KModifier.OVERRIDE)
+                    .addParameter(ParameterSpec("env", classEnvironment))
                     .addParameter(ParameterSpec("events", classEvents))
                     .addParameter(ParameterSpec("logger", classLogger))
                     .returns(classApis)
                     .addCode(CodeBlock.builder().apply {
                         addStatement("val data = %T()", classMutableData)
-                        addStatement("val apis = %T(data, logger)", classApis)
+                        addStatement("val apis = %T(env, data, logger)", classApis)
                         backendData.apiMethods.sortedBy { entry -> entry.route }.forEach { entry ->
                             addStatement("apis.register(%S) { ctx -> ${entry.fqn}(ctx) }", entry.route)
                         }
@@ -56,7 +57,7 @@ fun createApisFactoryImpl(backendData: BackendData): String {
                             addStatement("apis.registerStream(%S, ${entry.fqn})", entry.route)
                         }
                         if (backendData.initMethods.isNotEmpty()) {
-                            addStatement("val initCtx = %T(apis, data, events, logger)", classInitApiContext)
+                            addStatement("val initCtx = %T(env, apis, data, events, logger)", classInitApiContext)
                             backendData.initMethods.sortedBy { entry -> entry.fqn }.forEach { entry ->
                                 addStatement("${entry.fqn}(initCtx)")
                             }
