@@ -37,10 +37,7 @@ class Request(
     val headers: Map<String, List<String>>,
     val body: ByteArray?,
     val contentType: String?,
-) {
-    @get:Deprecated("`query` has been renamed to `params` for consistency with `PageContext`.", ReplaceWith("params"))
-    val query get() = params
-}
+)
 
 fun Request.readBodyText(): String? {
     return body?.toString(Charsets.UTF_8)
