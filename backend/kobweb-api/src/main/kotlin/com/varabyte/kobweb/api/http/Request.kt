@@ -90,6 +90,11 @@ class Request(
     }
 }
 
+/**
+ * Convenience method to pull body text out from a request.
+ *
+ * Otherwise, you'd have to deal with the raw [ByteArray] and convert it to a [String] yourself.
+ */
 fun Request.readBodyText(): String? {
     return body?.toString(Charsets.UTF_8)
 }
