@@ -24,6 +24,7 @@ import com.varabyte.kobweb.api.ApiContext
  *
  * @property method The type of http method this call was sent with.
  * @property params A list of key/value pairs extracted from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
+ * @property headers All headers sent with the request.
  * @property body An (optional) payload sent with the request. Will only potentially be set with appropriate methods that
  * are allowed to send data, i.e. [HttpMethod.POST], [HttpMethod.PUT], and [HttpMethod.PATCH]
  * @property contentType The content type of the [body], if set and sent.
@@ -33,6 +34,7 @@ import com.varabyte.kobweb.api.ApiContext
 class Request(
     val method: HttpMethod,
     val params: Map<String, String>,
+    val headers: Map<String, List<String>>,
     val body: ByteArray?,
     val contentType: String?,
 ) {

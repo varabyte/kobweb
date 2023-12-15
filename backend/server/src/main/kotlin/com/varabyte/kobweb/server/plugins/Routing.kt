@@ -145,7 +145,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
             .flattenEntries()
             .toMap()
 
-        val request = Request(httpMethod, query, body, bodyContentType)
+        val headers = call.request.headers.entries().associate { it.key to it.value }
+        val request = Request(httpMethod, query, headers, body, bodyContentType)
         try {
             val response = apiJar.apis.handle("/$pathStr", request)
             if (response != null) {
