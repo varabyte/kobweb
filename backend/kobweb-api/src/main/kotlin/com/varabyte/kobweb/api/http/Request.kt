@@ -28,10 +28,6 @@ import com.varabyte.kobweb.api.ApiContext
  * @property headers All headers sent with the request.
  * @property cookies Any cookies sent with the request. Note the value of the cookies will be in a raw format, so you
  *   may need to decode them yourself.
- *   message. The details
- * @property cookies Any cookies sent with the request. Note the value of the cookies will be in a raw format, so you
- *   may need to decode them yourself.
- *
  * @property body An (optional) payload sent with the request. Will only potentially be set with appropriate methods that
  * are allowed to send data, i.e. [HttpMethod.POST], [HttpMethod.PUT], and [HttpMethod.PATCH]
  * @property contentType The content type of the [body], if set and sent.
