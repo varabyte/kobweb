@@ -8,6 +8,7 @@ import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.plugins.forwardedheaders.*
 
 fun Application.configureHTTP(conf: KobwebConf) {
     install(DefaultHeaders) {
@@ -31,6 +32,11 @@ fun Application.configureHTTP(conf: KobwebConf) {
             }
         }
     }
+
+    install(ForwardedHeaders)
+    // We decided not to install(XForwardedHeaders), as those are non-standard and also might be configured differently
+    // by different user needs. If a user needs to install this plugin, they are expected to create a Kobweb Server
+    // Plugin to do so.
 
     install(CORS) {
         allowMethod(HttpMethod.Options)

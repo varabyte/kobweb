@@ -22,6 +22,7 @@ import com.varabyte.kobweb.streams.StreamMessage.Payload
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -125,6 +126,19 @@ val Site.routePrefixNormalized: String
         return routePrefix.removePrefix("/").removeSuffix("/")
     }
 
+private fun RequestConnectionPoint.toRequestConnectionDetails() = Request.Connection.Details(
+    scheme = scheme,
+    version = version,
+    localAddress = localAddress,
+    localHost = localHost,
+    localPort = localPort,
+    remoteAddress = remoteAddress,
+    remoteHost = remoteHost,
+    remotePort = remotePort,
+    serverHost = serverHost,
+    serverPort = serverPort,
+)
+
 private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
     env: ServerEnvironment,
     apiJar: ApiJarFile,
@@ -146,7 +160,18 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
             .toMap()
 
         val headers = call.request.headers.entries().associate { it.key to it.value }
-        val request = Request(httpMethod, query, headers, body, bodyContentType)
+        val request = Request(
+            Request.Connection(
+                origin = call.request.origin.toRequestConnectionDetails(),
+                local = call.request.local.toRequestConnectionDetails(),
+            ),
+            httpMethod,
+            query,
+            headers,
+            call.request.cookies.rawCookies,
+            body,
+            bodyContentType
+        )
         try {
             val response = apiJar.apis.handle("/$pathStr", request)
             if (response != null) {
