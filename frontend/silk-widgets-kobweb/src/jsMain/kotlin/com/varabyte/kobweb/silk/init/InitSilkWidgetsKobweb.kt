@@ -21,16 +21,15 @@ import com.varabyte.kobweb.silk.theme.modifyComponentStyleBase
 fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
     val mutableTheme = ctx.theme
 
-    ctx.theme.palettes.apply {
-        run { // init light palette
-            SilkWidgetKobwebColorGroups.MutableLink(light).set(
+    mutableTheme.palettes.apply {
+        light.apply {
+            link.set(
                 default = Colors.Blue,
                 visited = Colors.Purple,
             )
         }
-
-        run { // init dark palette
-            SilkWidgetKobwebColorGroups.MutableLink(dark).set(
+        dark.apply {
+            link.set(
                 default = Colors.Cyan,
                 visited = Colors.Violet,
             )

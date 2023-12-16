@@ -106,21 +106,21 @@ fun initSilkWidgets(ctx: InitSilkContext) {
             light.placeholder = placeholder
 
             val buttonBase = Colors.White.darkened(byPercent = 0.2f)
-            SilkWidgetColorGroups.MutableButton(light).set(
+            light.button.set(
                 default = buttonBase,
                 hover = buttonBase.darkened(byPercent = 0.2f),
                 focus = Colors.CornflowerBlue,
                 pressed = buttonBase.darkened(byPercent = 0.4f),
             )
 
-            SilkWidgetColorGroups.MutableCheckbox(light).set(
+            light.checkbox.set(
                 background = ColorSchemes.Blue._500,
                 hover = ColorSchemes.Blue._600,
                 color = Colors.White,
             )
 
             val inputFilled = ColorSchemes.Gray._200
-            SilkWidgetColorGroups.MutableInput(light).set(
+            light.input.set(
                 filled = inputFilled,
                 filledFocus = Colors.Transparent,
                 hoveredBorder = ColorSchemes.Gray._500,
@@ -128,13 +128,13 @@ fun initSilkWidgets(ctx: InitSilkContext) {
                 filledHover = inputFilled.darkened(0.1f),
             )
 
-            SilkWidgetColorGroups.MutableSwitch(light).set(
+            light.switch.set(
                 thumb = Colors.White,
                 backgroundOn = Colors.DodgerBlue,
                 backgroundOff = Colors.LightGray,
             )
 
-            SilkWidgetColorGroups.MutableTab(light).set(
+            light.tab.set(
                 color = Colors.Black,
                 background = Colors.White,
                 selectedColor = Colors.CornflowerBlue,
@@ -143,7 +143,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
                 disabled = Colors.White,
             )
 
-            SilkWidgetColorGroups.MutableTooltip(light).set(
+            light.tooltip.set(
                 // Intentionally inverted from main colors, for contrast
                 background = light.color,
                 color = light.background,
@@ -160,21 +160,21 @@ fun initSilkWidgets(ctx: InitSilkContext) {
             dark.placeholder = placeholder
 
             val buttonBase = Colors.Black.lightened(byPercent = 0.2f)
-            SilkWidgetColorGroups.MutableButton(dark).set(
+            dark.button.set(
                 default = buttonBase,
                 hover = buttonBase.lightened(byPercent = 0.2f),
                 focus = Colors.LightSkyBlue,
                 pressed = buttonBase.lightened(byPercent = 0.4f),
             )
 
-            SilkWidgetColorGroups.MutableCheckbox(dark).set(
+            dark.checkbox.set(
                 background = ColorSchemes.Blue._200,
                 hover = ColorSchemes.Blue._300,
                 color = Colors.Black,
             )
 
             val inputFilled = ColorSchemes.Gray._900
-            SilkWidgetColorGroups.MutableInput(dark).set(
+            dark.input.set(
                 filled = inputFilled,
                 filledFocus = Colors.Transparent,
                 hoveredBorder = ColorSchemes.Gray._600,
@@ -182,13 +182,13 @@ fun initSilkWidgets(ctx: InitSilkContext) {
                 filledHover = inputFilled.lightened(0.1f),
             )
 
-            SilkWidgetColorGroups.MutableSwitch(dark).set(
+            dark.switch.set(
                 thumb = Colors.White,
                 backgroundOn = Colors.LightSkyBlue,
                 backgroundOff = Colors.DarkGray,
             )
 
-            SilkWidgetColorGroups.MutableTab(dark).set(
+            dark.tab.set(
                 color = Colors.White,
                 background = Colors.Black,
                 selectedColor = Colors.LightSkyBlue,
@@ -197,7 +197,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
                 disabled = Colors.Black,
             )
 
-            SilkWidgetColorGroups.MutableTooltip(dark).set(
+            dark.tooltip.set(
                 // Intentionally inverted from main colors, for contrast
                 background = dark.color,
                 color = dark.background,
