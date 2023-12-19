@@ -5,6 +5,20 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
+class FontScope internal constructor(private val styleScope: StyleScope) {
+    fun family(vararg values: String) = styleScope.fontFamily(*values)
+    fun size(value: CSSLengthOrPercentageNumericValue) = styleScope.fontSize(value)
+    fun size(fontSize: FontSize) = styleScope.fontSize(fontSize)
+    fun style(value: FontStyle) = styleScope.fontStyle(value)
+    fun variant(scope: FontVariantScope.() -> Unit) = FontVariantScope(styleScope).scope()
+    fun weight(value: FontWeight) = styleScope.fontWeight(value)
+    fun weight(value: Int) = styleScope.fontWeight(value)
+}
+
+fun Modifier.font(scope: FontScope.() -> Unit) = styleModifier {
+    FontScope(this).scope()
+}
+
 fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
     fontFamily(*values)
 }
