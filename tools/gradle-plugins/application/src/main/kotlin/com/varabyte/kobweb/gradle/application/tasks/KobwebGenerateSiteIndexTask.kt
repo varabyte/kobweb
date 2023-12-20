@@ -17,6 +17,7 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.link
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -32,13 +33,16 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Input val buildTarget: BuildTarget
 ) : KobwebGenerateTask(config, "Generate an index.html file for this Kobweb project") {
 
+    // No one should define their own root `public/index.html` files anywhere in their resources.
     @InputFiles
-    fun getResourceFiles() = run {
-        // Don't let stuff we output force ourselves to run again
-        val genIndexFile = getGenIndexFile()
-        getResourceFilesJs()
-            .filter { it.absolutePath != genIndexFile.absolutePath }
-    }
+    fun getUserDefinedRootIndexFiles() =
+        getResourceFilesJsWithRoots()
+            .mapNotNull { rootAndFile ->
+                rootAndFile
+                    .file
+                    .takeIf { it.absolutePath != getGenIndexFile().absolutePath }
+                    ?.takeIf { !it.isDescendantOf(project.layout.buildDirectory.asFile.get()) && rootAndFile.relativeFile.invariantSeparatorsPath == "public/index.html" }
+            }.toList()
 
     @InputFiles
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
@@ -67,11 +71,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        getResourceFilesJsWithRoots()
-            .mapNotNull { rootAndFile -> rootAndFile.file.takeIf { !it.isDescendantOf(project.layout.buildDirectory.asFile.get()) && rootAndFile.relativeFile.invariantSeparatorsPath == "public/index.html" } }
-            .singleOrNull()
-            ?.let { indexFile ->
-                logger.error("$indexFile: You are not supposed to define this file yourself. Kobweb provides its own. Use the kobweb.index { ... } block if you need to modify the generated index file.")
+        getUserDefinedRootIndexFiles()
+            .takeIf { it.isNotEmpty() }
+            ?.let { externalIndexFiles ->
+                throw GradleException("You are not supposed to define the root index file yourself. Kobweb provides its own. Use the `kobweb.app.index { ... }` block if you need to modify the generated index file. Problematic file(s): ${externalIndexFiles.joinToString(", ") { it.absoluteFile.toRelativeString(project.rootDir) }}")
             }
 
         // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
