@@ -22,7 +22,7 @@ class CaptionSide private constructor(private val value: String) : StyleProperty
         val Inherit get() = CaptionSide("inherit")
         val Initial get() = CaptionSide("initial")
         val Revert get() = CaptionSide("revert")
-        val RevertLayer get() = CaptionSide("revert-layer")
+//        val RevertLayer get() = CaptionSide("revert-layer")
         val Unset get() = CaptionSide("unset")
     }
 }
