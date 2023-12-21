@@ -337,3 +337,29 @@ fun StyleScope.zIndex(value: Number) {
 }
 
 // endregion
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/clear
+class Clear private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword values
+        val None get() = Clear("none")
+        val Left get() = Clear("left")
+        val Right get() = Clear("right")
+        val Both get() = Clear("both")
+        val InlineStart get() = Clear("inline-start")
+        val InlineEnd get() = Clear("inline-end")
+
+        // Global values
+        val Lear get() = Clear("inherit")
+        val Initial get() = Clear("initial")
+        val Revert get() = Clear("revert")
+//        val RevertLayer get() = Clear("revert-layer")
+        val Unset get() = Clear("unset")
+    }
+}
+
+fun StyleScope.clear(clear: Clear) {
+    property("clear", clear)
+}

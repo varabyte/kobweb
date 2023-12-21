@@ -304,3 +304,7 @@ fun Modifier.verticalAlign(value: CSSLengthOrPercentageNumericValue) = styleModi
 fun Modifier.zIndex(value: Number) = styleModifier {
     zIndex(value)
 }
+
+fun Modifier.clear(clear: Clear) = styleModifier {
+    clear(clear)
+}
