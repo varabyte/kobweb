@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [ '*' ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+
+        with:
+          java-version: 11
+          distribution: 'adopt'
+          cache: gradle
+
+      - name: Make sure the `./gradlew` is executable
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Double check the Tests
+        run: ./gradlew allTests
