@@ -65,3 +65,33 @@ fun StyleScope.content(value: String) {
 
 fun CSSUrl.toContent() = Content.of(this)
 fun Gradient.toContent() = Content.of(this)
+
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/appearance
+class Appearance private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // CSS Basic User Interface Module Level 4 values
+        val None get() = Appearance("none")
+        val Auto get() = Appearance("auto")
+        val MenuListButton get() = Appearance("menulist-button")
+        val TextField get() = Appearance("textfield")
+
+        // Global values
+        val Inherit get() = Appearance("inherit")
+        val Initial get() = Appearance("initial")
+        val Revert get() = Appearance("revert")
+
+        //        val RevertLayer get() = Appearance("revert-layer")
+        val Unset get() = Appearance("unset")
+
+        // <compat-auto> values have the same effect as 'auto'
+        val Button get() = Appearance("button")
+        val Checkbox get() = Appearance("checkbox")
+    }
+}
+
+fun StyleScope.appearance(appearance: Appearance) {
+    property("appearance", appearance)
+}

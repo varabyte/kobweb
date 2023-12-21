@@ -36,3 +36,7 @@ fun Modifier.id(value: String) = attrsModifier {
 fun Modifier.title(value: String) = attrsModifier {
     title(value)
 }
+
+fun Modifier.appearance(appearance: Appearance) = styleModifier {
+    appearance(appearance)
+}
