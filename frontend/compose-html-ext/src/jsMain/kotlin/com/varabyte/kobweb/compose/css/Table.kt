@@ -2,10 +2,6 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-fun StyleScope.captionSide(value: String) {
-    property("caption-side", value)
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/caption-side
 class CaptionSide private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
