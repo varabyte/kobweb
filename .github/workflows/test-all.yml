@@ -1,4 +1,4 @@
-name: Build
+name: Test all
 
 on:
   pull_request:
@@ -21,9 +21,6 @@ jobs:
 
       - name: Make sure the `./gradlew` is executable
         run: chmod +x ./gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew build
 
       - name: Double check the Tests
         run: ./gradlew allTests
