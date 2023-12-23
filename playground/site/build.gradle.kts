@@ -17,6 +17,20 @@ kobweb {
     kspProcessorDependency.set("com.varabyte.kobweb:project-processors")
 }
 
+val getWorkerScript by configurations.registering {}
+
+dependencies {
+    getWorkerScript(project(path = ":worker", configuration = "exposeWorkerScript"))
+}
+
+val customTask by tasks.registering(Sync::class) {
+    from(getWorkerScript)
+    into(layout.buildDirectory.dir("generated/worker/public"))
+
+    outputs.dir(layout.buildDirectory.dir("generated/worker"))
+}
+
+
 kotlin {
     configAsKobwebApplication(includeServer = true)
 
@@ -27,6 +41,8 @@ kotlin {
             }
         }
         val jsMain by getting {
+            resources.srcDir(customTask)
+
             dependencies {
                 implementation(compose.html.core)
                 implementation("com.varabyte.kobweb:kobweb-core")
@@ -34,6 +50,7 @@ kotlin {
                 implementation("com.varabyte.kobwebx:silk-icons-fa")
                 implementation("com.varabyte.kobwebx:kobwebx-markdown")
                 implementation(project(":sitelib"))
+                implementation(project(":worker"))
             }
         }
         val jvmMain by getting {
