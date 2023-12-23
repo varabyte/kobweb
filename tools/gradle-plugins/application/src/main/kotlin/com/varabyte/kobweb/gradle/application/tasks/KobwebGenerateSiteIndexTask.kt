@@ -38,11 +38,15 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     fun getUserDefinedRootIndexFiles() =
         getResourceFilesJsWithRoots()
             .mapNotNull { rootAndFile ->
-                rootAndFile
-                    .file
-                    .takeIf { it.absolutePath != getGenIndexFile().absolutePath }
-                    ?.takeIf { !it.isDescendantOf(project.layout.buildDirectory.asFile.get()) && rootAndFile.relativeFile.invariantSeparatorsPath == "public/index.html" }
-            }.toList()
+                rootAndFile.takeIf {
+                    // Ignore files that are in our build directory, since we put them there. We are looking for index
+                    // files explicitly added by a user, often because they don't realize that Kobweb generates one yet.
+                    !it.file.isDescendantOf(project.layout.buildDirectory.asFile.get())
+                        && it.relativeFile.invariantSeparatorsPath == "public/index.html"
+                }
+            }
+            .map { it.file }
+            .toList()
 
     @InputFiles
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
