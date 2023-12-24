@@ -10,10 +10,12 @@ import org.khronos.webgl.get
 import org.w3c.dom.Document
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.events.Event
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.File
 import org.w3c.files.FileReader
+import org.w3c.xhr.ProgressEvent
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -21,13 +23,15 @@ import org.w3c.dom.url.URL as DomURL
 
 abstract class FileException(val file: File, message: String) : Throwable("File (${file.name}): $message")
 class FileErrorException(file: File) : FileException(file, "read failed")
-class FileAbortException(file: File) : FileException(file, "read aborted")
+
+private fun handleUnexpectedOnAbort(context: String) {
+    error("Unexpected onabort occurred in $context; aborting file loads should not currently be possible. Please report this issue at https://github.com/varabyte/kobweb/issues")
+}
 
 /**
  * Read the contents of a file as a ByteArray, suspending until the read is complete.
  *
  * @throws FileErrorException if the file could not be read.
- * @throws FileAbortException if the file read was aborted.
  */
 suspend fun File.readBytes(): ByteArray {
     return suspendCoroutine { cont ->
@@ -37,7 +41,7 @@ suspend fun File.readBytes(): ByteArray {
             val intArray = Int8Array(result)
             cont.resume(ByteArray(intArray.byteLength) { i -> intArray[i] })
         }
-        reader.onabort = { cont.resumeWithException(FileAbortException(this)) }
+        reader.onabort = { handleUnexpectedOnAbort("readBytes") }
         reader.onerror = { cont.resumeWithException(FileErrorException(this)) }
 
         reader.readAsArrayBuffer(this)
@@ -47,14 +51,12 @@ suspend fun File.readBytes(): ByteArray {
 /**
  * Read the contents of a file as a ByteArray, asynchronously.
  */
-fun File.readBytes(onAbort: () -> Unit = {}, onError: () -> Unit = {}, onLoaded: (ByteArray) -> Unit) {
+fun File.readBytes(onError: () -> Unit = {}, onLoad: (ByteArray) -> Unit) {
     CoroutineScope(window.asCoroutineDispatcher()).launch {
         try {
-            onLoaded(readBytes())
+            onLoad(readBytes())
         } catch (e: FileErrorException) {
             onError()
-        } catch (e: FileAbortException) {
-            onAbort()
         }
     }
 }
@@ -109,7 +111,26 @@ fun Document.saveTextToDisk(
 class LoadContext(
     val filename: String,
     val mimeType: String?,
+    val event: ProgressEvent,
 )
+
+private fun Document.loadFromDisk(
+    accept: String,
+    multiple: Boolean,
+    onChange: ((Event) -> dynamic)
+) {
+    val tempInput = (createElement("input") as HTMLInputElement).apply {
+        type = "file"
+        style.display = "none"
+        this.accept = accept
+        this.multiple = multiple
+    }
+
+    tempInput.onchange = onChange
+    body!!.append(tempInput)
+    tempInput.click()
+    tempInput.remove()
+}
 
 // I = input type (from the disk)
 // O = output type (produced for users)
@@ -117,29 +138,27 @@ private fun <I, O> Document.loadFromDisk(
     accept: String = "",
     triggerLoad: FileReader.(Blob) -> Unit,
     deserialize: (I) -> O,
-    onLoading: LoadContext.(O) -> Unit,
+    onError: LoadContext.() -> Unit,
+    onLoad: LoadContext.(O) -> Unit,
 ) {
-    val tempInput = (createElement("input") as HTMLInputElement).apply {
-        type = "file"
-        style.display = "none"
-        this.accept = accept
-        multiple = false
-    }
-
-    tempInput.onchange = { changeEvt ->
+    loadFromDisk(accept, multiple = false, onChange = { changeEvt ->
         val file = changeEvt.target.asDynamic().files[0] as File
-
         val reader = FileReader()
+        reader.onabort = { handleUnexpectedOnAbort("loadFromDisk") }
+        reader.onerror = { evt ->
+            onError(LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt as ProgressEvent))
+        }
         reader.onload = { loadEvt ->
-            val result = loadEvt.target.asDynamic().result as I
-            onLoading(LoadContext(file.name, file.type.takeIf { it.isNotBlank() }), deserialize(result))
+            val loadContext = LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, loadEvt as ProgressEvent)
+            try {
+                val result = loadEvt.target.asDynamic().result as I
+                onLoad(loadContext, deserialize(result))
+            } catch (_: Throwable) {
+                onError(loadContext)
+            }
         }
         reader.triggerLoad(file)
-    }
-
-    body!!.append(tempInput)
-    tempInput.click()
-    tempInput.remove()
+    })
 }
 
 /**
@@ -148,18 +167,21 @@ private fun <I, O> Document.loadFromDisk(
  * This method extends the global `document` variable, so you can use it like this:
  *
  * ```
- * document.loadFromDisk("*.png") { bytes -> /* ... */ }
+ * document.loadFromDisk(".png") { bytes -> /* ... */ }
  * ```
  *
- * @param accept A comma-separated list of extensions to filter by (e.g. ".txt,*.sav")
- * @param onLoaded A callback which will contain the contents of your file, if successfully loaded. The callback is
+ * @param accept A comma-separated list of extensions to filter by (e.g. ".txt,.sav").
+ * @param onError A callback which will be invoked if the file could not be loaded.
+ * @param onLoad A callback which will contain the contents of your file, if successfully loaded. The callback is
  *   scoped by a [LoadContext] which contains additional information about the file, such as its name and mime type.
  *
  * @see FileReader.readAsArrayBuffer
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept">Accept values</a>
  */
 fun Document.loadFromDisk(
     accept: String = "",
-    onLoaded: LoadContext.(ByteArray) -> Unit,
+    onError: LoadContext.() -> Unit = {},
+    onLoad: LoadContext.(ByteArray) -> Unit,
 ) {
     loadFromDisk<ArrayBuffer, ByteArray>(
         accept,
@@ -168,7 +190,8 @@ fun Document.loadFromDisk(
             val intArray = Int8Array(result)
             ByteArray(intArray.byteLength) { i -> intArray[i] }
         },
-        onLoaded
+        onError,
+        onLoad
     )
 }
 
@@ -184,13 +207,15 @@ fun Document.loadFromDisk(
  */
 fun Document.loadDataUrlFromDisk(
     accept: String = "",
-    onLoaded: LoadContext.(String) -> Unit,
+    onError: LoadContext.() -> Unit = {},
+    onLoad: LoadContext.(String) -> Unit,
 ) {
     loadFromDisk<String, String>(
         accept,
         FileReader::readAsDataURL,
         { result -> result },
-        onLoaded
+        onError,
+        onLoad
     )
 }
 
@@ -206,12 +231,125 @@ fun Document.loadDataUrlFromDisk(
 fun Document.loadTextFromDisk(
     accept: String = "",
     encoding: String = "UTF-8",
-    onLoaded: LoadContext.(String) -> Unit,
+    onError: LoadContext.() -> Unit = {},
+    onLoad: LoadContext.(String) -> Unit,
 ) {
     loadFromDisk<String, String>(
         accept,
         { file -> this.readAsText(file, encoding) },
         { result -> result },
-        onLoaded
+        onError,
+        onLoad
+    )
+}
+
+class LoadedFile<O>(
+    val context: LoadContext,
+    val contents: O,
+)
+
+private fun <I, O> Document.loadMultipleFromDisk(
+    accept: String = "",
+    triggerLoad: FileReader.(Blob) -> Unit,
+    deserialize: (I) -> O,
+    onError: (List<LoadContext>) -> Unit = {},
+    onLoad: (List<LoadedFile<O>>) -> Unit,
+) {
+    loadFromDisk(accept, multiple = true, onChange = { changeEvt ->
+        val selectedFiles = changeEvt.target.asDynamic().files
+        val length = selectedFiles.length as Int
+        val failedToLoadFiles = mutableListOf<LoadContext>()
+        val loadedFiles = mutableListOf<LoadedFile<O>>()
+
+        for (i in 0 until length) {
+            val reader = FileReader()
+            val file = selectedFiles[i] as File
+            fun createLoadContext(evt: ProgressEvent) =
+                LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt)
+
+            fun triggerCallbacksIfReady() {
+                if (failedToLoadFiles.size + loadedFiles.size == length) {
+                    failedToLoadFiles.takeIf { it.isNotEmpty() }?.let { onError(it) }
+                    loadedFiles.takeIf { it.isNotEmpty() }?.let { onLoad(it) }
+                }
+            }
+
+            reader.onabort = { handleUnexpectedOnAbort("loadMultipleFromDisk") }
+            reader.onerror = {
+                failedToLoadFiles.add(createLoadContext(it as ProgressEvent))
+                triggerCallbacksIfReady()
+            }
+            reader.onload = { loadEvt ->
+                val loadContext = createLoadContext(loadEvt as ProgressEvent)
+                try {
+                    val result = loadEvt.target.asDynamic().result as I
+                    loadedFiles.add(LoadedFile(loadContext, deserialize(result)))
+                } catch (_: Throwable) {
+                    failedToLoadFiles.add(loadContext)
+                }
+                triggerCallbacksIfReady()
+            }
+            reader.triggerLoad(file)
+        }
+    })
+}
+
+/**
+ * Like [loadFromDisk] but allows loading multiple files at once.
+ *
+ * The `onLoad` callback will be invoked with a list of [LoadedFile] objects, each of which contains that file's
+ * contents:
+ *
+ * ```
+ * document.loadMultipleFromDisk(".png") { files ->
+ *   files.forEach { file ->
+ *      println("Loaded ${file.contents.size} bytes from ${file.context.filename}")
+ *   }
+ * }
+ * ```
+ */
+fun Document.loadMultipleFromDisk(
+    accept: String = "",
+    onError: (List<LoadContext>) -> Unit = {},
+    onLoad: (List<LoadedFile<ByteArray>>) -> Unit,
+) {
+    loadMultipleFromDisk<ArrayBuffer, ByteArray>(
+        accept,
+        FileReader::readAsArrayBuffer,
+        { result ->
+            val intArray = Int8Array(result)
+            ByteArray(intArray.byteLength) { i -> intArray[i] }
+        },
+        onError,
+        onLoad
+    )
+}
+
+fun Document.loadMultipleDataUrlFromDisk(
+    accept: String = "",
+    onError: (List<LoadContext>) -> Unit = {},
+    onLoad: (List<LoadedFile<String>>) -> Unit,
+) {
+    loadMultipleFromDisk<String, String>(
+        accept,
+        FileReader::readAsDataURL,
+        { result -> result },
+        onError,
+        onLoad
+    )
+}
+
+fun Document.loadMultipleTextFromDisk(
+    accept: String = "",
+    encoding: String = "UTF-8",
+    onError: (List<LoadContext>) -> Unit = {},
+    onLoad: (List<LoadedFile<String>>) -> Unit,
+) {
+    loadMultipleFromDisk<String, String>(
+        accept,
+        { file -> this.readAsText(file, encoding) },
+        { result -> result },
+        onError,
+        onLoad
     )
 }
