@@ -68,6 +68,21 @@ abstract class StyleModifiers {
 }
 
 /**
+ * Convenience method for tying a general CSS rule to a breakpoint.
+ *
+ * This is equivalent to:
+ *
+ * ```
+ * cssRule(breakpoint.toMinWidthQuery(), suffix, createModifier)
+ * ```
+ *
+ * but when people use a breakpoint, like Breakpoint.MD, they almost always want to use the min-width query.
+ */
+fun StyleModifiers.cssRule(breakpoint: Breakpoint, suffix: String?, createModifier: () -> Modifier) {
+    cssRule(breakpoint.toMinWidthQuery(), suffix, createModifier)
+}
+
+/**
  * Represents a [Modifier] entry that is tied to a css rule, e.g. the modifier for ".myclass:hover" for example.
  */
 internal class CssModifier(
