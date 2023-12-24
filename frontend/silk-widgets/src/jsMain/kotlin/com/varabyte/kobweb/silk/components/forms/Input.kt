@@ -192,7 +192,7 @@ val UnstyledInputVariant by InputStyle.addVariant {}
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
 annotation class InputGroupScopeMarker
 
-internal class InputParams<T : Any>(
+internal class InputParams<T : Any?>(
     private val type: InputType<T>,
     private val value: T,
     private val onValueChanged: (T) -> Unit,
@@ -237,7 +237,7 @@ internal class InputParams<T : Any>(
 
 @InputGroupScopeMarker
 class InputGroupScope {
-    internal var inputParams: InputParams<out Any>? = null
+    internal var inputParams: InputParams<out Any?>? = null
 
     internal var leftModifier: Modifier = Modifier
     internal var rightModifier: Modifier = Modifier
@@ -248,7 +248,7 @@ class InputGroupScope {
     internal var rightInset: (@Composable BoxScope.() -> Unit)? = null
     internal var rightInsetWidth: CSSLengthOrPercentageNumericValue? = null
 
-    fun <T : Any> Input(
+    fun <T : Any?> Input(
         type: InputType<T>,
         value: T,
         onValueChanged: (T) -> Unit,
@@ -456,7 +456,7 @@ private fun PlaceholderColor.toModifier(): Modifier {
 }
 
 @Composable
-private fun <T : Any> _Input(
+private fun <T : Any?> _Input(
     type: InputType<T>,
     value: T,
     onValueChanged: (T) -> Unit,
@@ -494,12 +494,15 @@ private fun <T : Any> _Input(
             .thenIf(required) { Modifier.ariaRequired() }
             .then(modifier)
             .toAttrs {
-                when (value) {
-                    is String -> value(value)
-                    is Number -> value(value)
-                    is Boolean -> checked(value)
-                    is Unit -> {}
-                    else -> error("Unexpected `Input` value type: ${value::class}")
+                if (value != null) {
+                    @Suppress("UNNECESSARY_NOT_NULL_ASSERTION") // value!! or compile error...
+                    when (value) {
+                        is String -> value(value)
+                        is Number -> value(value)
+                        is Boolean -> checked(value)
+                        is Unit -> {}
+                        else -> error("Unexpected `Input` value type: ${value!!::class}")
+                    }
                 }
 
                 placeholder?.let { this.placeholder(it) }
@@ -610,7 +613,7 @@ fun TextInput(
  *   Note that this method will not be triggered if [valid] is set to false.
  */
 @Composable
-fun <T : Any> Input(
+fun <T : Any?> Input(
     type: InputType<T>,
     value: T,
     onValueChanged: (T) -> Unit,
