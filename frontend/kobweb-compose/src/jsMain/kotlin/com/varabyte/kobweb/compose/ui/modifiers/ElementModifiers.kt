@@ -5,6 +5,10 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 
+fun Modifier.appearance(appearance: Appearance) = styleModifier {
+    appearance(appearance)
+}
+
 fun Modifier.classNames(vararg classes: String) = attrsModifier {
     classes(*classes)
 }
@@ -35,8 +39,4 @@ fun Modifier.id(value: String) = attrsModifier {
 
 fun Modifier.title(value: String) = attrsModifier {
     title(value)
-}
-
-fun Modifier.appearance(appearance: Appearance) = styleModifier {
-    appearance(appearance)
 }
