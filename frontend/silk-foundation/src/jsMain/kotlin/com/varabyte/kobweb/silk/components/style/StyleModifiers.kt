@@ -93,7 +93,7 @@ internal class CssModifier(
     // People might use e.g. "h1" as a suffix, but it has to be " h1" (leading space) to avoid running into the previous
     // part of the selector (e.g. ".myclass h1", not ".myclassh1"). Let's detect this ourselves and add the space, since
     // we understand the user's intentions (and forgetting the space is really hard to debug).
-    val suffix: String = suffix?.takeIf { it.isNotBlank() }?.let { if (it.first().isLetter()) " $it" else it } ?: ""
+    val suffix: String? = suffix?.takeIf { it.isNotBlank() }?.let { if (it.first().isLetter()) " $it" else it }
 
     internal fun mergeWith(other: CssModifier): CssModifier {
         check(this !== other && mediaQuery == other.mediaQuery && suffix == other.suffix)
