@@ -432,8 +432,9 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 > [!CAUTION]
 > Despite the flexibility allowed here, you should not be using this feature frequently, if at all. A Kobweb project
 > benefits from the fact that a user can easily associate a URL on your site with a file in your codebase, but this
-> feature allows you to break those assumptions. It is mainly provided to enable dynamic routing (see the *Dynamic
-> Routes* section below) or enabling a URL name that uses characters which aren't allowed in Kotlin filenames.
+> feature allows you to break those assumptions. It is mainly provided to enable dynamic routing (see the
+> [Dynamic Routes▼](https://github.com/varabyte/kobweb?tab=readme-ov-file#dynamic-routes) section) or enabling a URL
+> name that uses characters which aren't allowed in Kotlin filenames.
 
 ### PackageMapping
 
