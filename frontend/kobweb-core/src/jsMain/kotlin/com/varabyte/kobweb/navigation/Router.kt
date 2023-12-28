@@ -263,10 +263,13 @@ class Router {
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE
     ): Boolean {
-        val extension = pathQueryAndFragment.substringAfterLast('.', "")
-        if (extension.isNotEmpty() && extension != "html") {
+        val extension = Route.tryCreate(pathQueryAndFragment)?.slug
+            ?.substringAfterLast('.', missingDelimiterValue = "")
+            ?.takeIf { it.isNotEmpty() }
+        if (extension != null && extension !in setOf("html", "htm")) {
             // If the user is trying to navigate to a file with an extension that isn't .html or .htm, then we assume
-            // they are trying to open a file hosted on this server. In that case, we aren't routing.
+            // they are trying to open a file hosted on the server. In that case, we aren't routing; instead, treat this
+            // request like a navigation (which means reach out to the server to ask it for the file).
             return false
         }
 

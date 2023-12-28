@@ -108,3 +108,5 @@ class Route(pathQueryAndFragment: String) {
 
     override fun toString() = "$path${url.search}${url.hash}"
 }
+
+val Route.slug: String get() = path.substringAfterLast("/")
