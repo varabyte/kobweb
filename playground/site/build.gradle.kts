@@ -17,20 +17,6 @@ kobweb {
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
 }
 
-val getWorkerScript by configurations.registering {}
-
-dependencies {
-    getWorkerScript(project(path = ":worker", configuration = "exposeWorkerScript"))
-}
-
-val customTask by tasks.registering(Sync::class) {
-    from(getWorkerScript)
-    into(layout.buildDirectory.dir("generated/worker/public"))
-
-    outputs.dir(layout.buildDirectory.dir("generated/worker"))
-}
-
-
 kotlin {
     configAsKobwebApplication(includeServer = true)
 
@@ -39,8 +25,6 @@ kotlin {
             implementation(compose.runtime)
         }
         jsMain {
-            resources.srcDir(customTask)
-
             dependencies {
                 implementation(compose.html.core)
                 implementation("com.varabyte.kobweb:kobweb-core")

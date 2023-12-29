@@ -4,8 +4,8 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.processRoute
-import com.varabyte.kobweb.ksp.util.getAnnotationsByName
-import com.varabyte.kobweb.ksp.util.nameWithoutExtension
+import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
+import com.varabyte.kobweb.ksp.symbol.nameWithoutExtension
 import com.varabyte.kobweb.project.frontend.PageEntry
 
 fun processPagesFun(

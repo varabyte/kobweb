@@ -24,7 +24,7 @@ import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
-import com.varabyte.kobweb.ksp.util.suppresses
+import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
 import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData

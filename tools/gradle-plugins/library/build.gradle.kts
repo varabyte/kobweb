@@ -11,7 +11,7 @@ dependencies {
     // Get access to Kotlin multiplatform source sets
     implementation(kotlin("gradle-plugin"))
 
-    // Common Gradle plugin used by Library and Application plugins
+    // Common Gradle plugin used by Library, Application, and Worker plugins
     api(projects.tools.gradlePlugins.core)
 
     // For generating code / html

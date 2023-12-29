@@ -11,6 +11,8 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
+import java.security.MessageDigest
+import kotlin.math.absoluteValue
 
 private fun Project.getRoots(
     platform: TargetPlatform<*>,
@@ -105,4 +107,22 @@ fun Project.generateModuleMetadataFor(target: TargetPlatform<*>) {
     project.tasks.named<ProcessResources>(target.processResources) {
         from(project.tasks.withType<KobwebGenerateModuleMetadataTask>())
     }
+}
+
+/**
+ * Generate a consistent, unique ID for this project.
+ *
+ * The UID is generated based on a combination of the project's group and name. The result will be a hashed, uppercase
+ * string using hex values (e.g. "F169AE3A...").
+ *
+ * The string generated is fairly long, but you can definitely truncate it and still have reasonable randomness from
+ * that. For example, if you truncate this to 4 characters, the chance of a collision is 1 out of 16^4, or 1 out of
+ * 65,536.
+ */
+fun Project.toUidString(): String {
+    val rawText = "${project.group}:${project.name}"
+    val digest = MessageDigest.getInstance("SHA-256")
+    val hash = digest.digest(rawText.toByteArray(Charsets.UTF_8))
+
+    return hash.joinToString("") { "%02x".format(it) }.uppercase()
 }

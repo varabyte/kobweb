@@ -2762,6 +2762,416 @@ server via events, API streams are a great choice.
 > You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
 > implemented with. Any discussions about them should apply here as well.
 
+## Creating a Kobweb Worker
+
+### Background: What are web workers?
+
+[Web workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) are a standard web technology that allow
+you to run JavaScript code in a separate thread from your main application. Although JavaScript is famously
+single-threaded, web workers offer a way for you to run potentially expensive code in parallel to your main site without
+slowing it down.
+
+A web worker script is entirely isolated from your main site and has no access to the DOM. The only way to communicate
+between them is via message passing.
+
+> [!NOTE]
+> Astute readers may recognize the [actor model](https://en.wikipedia.org/wiki/Actor_model) here, which is an effective
+> way to allow concurrency without worrying about common synchronization issues that plague common lock-based
+> approaches.
+
+A somewhat forced but easy-to-understand example of a web worker is one that computes the first N prime numbers.
+
+While the worker is crunching away on intensive calculations, your site still works as normal, fully responsive. When
+the worker is finished, it posts a message to the application, which handles it by updating relevant UI elements.
+
+### Web workers wrapped in Kobweb
+
+Kobweb aims to make using web workers as easy as possible.
+
+Here's everything you have to do (we'll show examples of these steps shortly):
+
+* Create a new module and apply the Kobweb Worker Gradle plugin on it.
+* (Optional but recommended) Create a name that will be used for your worker's output file
+  * e.g. `kobweb { worker { name.set("example-worker") } }` 
+* Tag the `kotlin { ... }` block in your build script with a `configAsKobwebWorker()` call.
+* Declare a dependency on `"com.varabyte.kobweb:kobweb-worker"`.
+* Implement the `WorkerStrategy` class, overriding the handler for input messages.
+* (Optional but recommended) If using a strategy with rich input and output message types, provide logic that
+  handles serializing them into and out of strings.
+  * If your worker passes raw strings back and forth, you can skip this.
+  * If you are willing to use Kotlinx serialization to serialize your messages, you can add a dependency on
+    `"com.varabyte.kobweb:kobwebx-serialization-kotlinx"` to make this step trivial.
+
+### Worker strategy
+
+The `WorkerStrategy` base class encapsulates the following responsibilities:
+
+* What types your worker accepts as input and output messages.
+* How it serializes those input and output messages.
+* Defining the handler for input messages from the application.
+* Providing a `postOutput` method that can be used to send output messages to the application.
+
+Bringing it all together, its high level API looks like this:
+
+```kotlin
+abstract class WorkerStrategy<I, O> {
+  abstract fun onInput(input: I)
+  protected fun postOutput(output: O)
+  abstract val ioSerializer: IOSerializer<I, O>
+}
+```
+
+where `IOSerializer` is defined as:
+
+```kotlin
+interface IOSerializer<I, O> {
+  fun serializeInput(input: I): String
+  fun deserializeInput(input: String): I
+  fun serializeOutput(output: O): String
+  fun deserializeOutput(output: String): O
+}
+```
+
+### Worker
+
+Once the Kobweb Worker Gradle plugin finds your worker strategy implementation, it will generate a `Worker` class that
+wraps it.
+
+```kotlin
+class Worker(val onOutput: (O) -> Unit) {
+    fun postInput(input: I)
+    fun terminate()
+}
+```
+
+Applications will interact with this `Worker` and not your `WorkerStrategy` directly. In fact, you should make your
+worker strategy implementation `internal` to prevent applications from accidentally accessing it.
+
+Whereas the `WorkerStrategy` implementation is written from the point of view of the worker itself, the `Worker` class
+is the API that is written for the application's point of view. In other words, the worker strategy deals with receiving
+inputs and posting outputs, while the worker deals with posting inputs and receiving outputs.
+
+An application module (i.e. one that applies the Kobweb Application Gradle plugin) will automatically discover any
+Kobweb worker dependencies, automatically extracting its worker script and putting it under the `public/` folder of your
+final site.
+
+### Example Worker module build file
+
+```kotlin
+import com.varabyte.kobweb.gradle.worker.util.configAsKobwebWorker
+
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kobweb.worker) // or id("com.varabyte.kobweb.worker")
+}
+
+group = "example.worker"
+version = "1.0-SNAPSHOT"
+
+kobweb {
+    worker {
+        name.set("example-worker")
+    }
+}
+
+kotlin {
+    configAsKobwebWorker()
+    sourceSets {
+        jsMain.dependencies {
+            implementation(libs.kobweb.worker) // or "com.varabyte.kobweb:kobweb-worker"
+        }
+    }
+}
+```
+
+### WorkerStrategy examples
+
+The following sections introduce concrete worker strategies, which should help solidify the abstract concepts introduced
+above.
+
+#### EchoWorkerStrategy
+
+The simplest worker strategy possible is one that blindly repeats back whatever input it receives.
+
+This is never a worker strategy that you'd actually create -- there wouldn't be a point to it -- but it's a good
+starting point for seeing a worker strategy in action.
+
+When you have a worker strategy that works with raw strings, there is actually a convenience base class provided for
+this case, called `SimpleWorkerStrategy`, which implements pass-thru serialization for you.
+
+```kotlin
+internal class EchoWorkerStrategy : SimpleWorkerStrategy() {
+  override fun onInput(input: String) { postOutput(input) }
+}
+```
+
+After defining that, a worker called `EchoWorker` will be auto-generated at compile time. Using it in your application
+looks like this:
+
+```kotlin
+val worker = remember {
+  EchoWorker { message -> println("Echoed: $message") }
+}
+
+// Later
+worker.postInput("hello!") // After a round trip: "Echoed: hello!"
+```
+
+That's it!
+
+#### CountDownWorkerStrategy
+
+This next worker strategy will let the user pass in an `Int` value representing the number of seconds to count down
+from, firing a message for each second that passes.
+
+This is another strategy that you'd never need in practice -- you'd just use the `window.setInterval` method yourself
+in your site script -- but we'll show this anyway to demonstrate two additional concepts on top of the echo worker:
+
+* How to define a custom message serializer.
+* The fact you can use `postOutput` from the worker strategy at any time.
+
+This time, we implement the `WorkerStrategy` base class directly:
+
+```kotlin
+internal class CountDownWorkerStrategy : WorkerStrategy<Int, Int>() {
+  override fun onInput(input: Int) {
+    var nextCount = input
+    var intervalId: Int = 0
+    intervalId = self.setInterval({ // A
+      postOutput(nextCount) // B
+      if (nextCount > 0) { --nextCount } else { self.clearInterval(intervalId) }
+    }, 1000)
+  }
+
+  override val ioSerializer = object : IOSerializer<Int, Int> { // C
+    override fun serializeInput(input: Int) = input.toString()
+    override fun deserializeInput(input: String) = input.toInt()
+    override fun serializeOutput(output: Int) = output.toString()
+    override fun deserializeOutput(output: String) = output.toInt()
+  }
+}
+```
+
+Notice the three comment tags above.
+
+* **A:** We use `self.setInterval` (and `self.clearInterval` later) instead of the `window` object to do this. This is
+  because the `window` object is only available in the main script and using it here will throw an exception.
+  Instead, [`self`](https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope/self) is how you access a web
+  worker's scope, so for your convenience, it is exposed for you inside the worker strategy.
+* **B:** You can use `postOutput` any time following an input message, not just in direct response to one. You could
+  even set a timer inside an `init` block and post an output message after some time had passed.
+* **C:** This is how you define a custom message serializer. You shouldn't worry about receiving improperly formatted
+  strings in your `deserialize` calls, because you control them! In other words, the only way you'd get a bad string is
+  if you generated it yourself in either of the `serialize` methods. If a message serializer ever does throw an
+  exception, then the Kobweb worker will simply ignore it as a bad message.
+
+Using the worker in your application looks like this:
+
+```kotlin
+val worker = remember {
+  CountDownWorker {
+    if (it > 0) {
+      console.log(it + "...")
+    } else {
+      console.log("HAPPY NEW YEAR!!!")
+    }
+  }
+}
+
+DisposableEffect(Unit) {
+  onDispose { worker.terminate() }
+}
+
+// Later
+worker.postInput(10) // 10... 9... 8... etc.
+```
+
+> [!IMPORTANT]
+> Observe the explicit call to `worker.terminate()` in the `DisposableEffect`. This is because Kobweb workers, once
+> started, will keep running even if you navigate away from the current page.
+>
+> You can also stop a worker from within the worker strategy itself by calling `self.close()`.
+
+> [!TIP]
+> If you need really accurate, consistent interval timing, creating a worker like this may actually be beneficial.
+> According to [this article](https://hackwild.com/article/web-worker-timers/), web worker timers are slightly more
+> accurate than timers run in the main thread, as they don't have to compete with the rest of the site's
+> responsibilities. Also, it seems that web workers timers stay consistent even if the site tab loses focus.
+
+#### FindPrimesWorkerStrategy
+
+Finally, we get to the worker strategy idea we introduced in the first section. This kind of worker likely looks like
+one that would actually get used in a real codebase, that being a worker which performs a potentially expensive,
+UI-agnostic calculation.
+
+We'll also use this example to demonstrate how to use Kotlinx Serialization to easily declare rich input and output
+message types.
+
+First, add `kotlinx-serialization` and `kobwebx-serialization-kotlinx` to your dependencies:
+
+```kotlin
+// build.gradle.kts
+kotlin {
+  configAsKobwebWorker()
+  jsMain.dependencies {
+    implementation(libs.kotlinx.serialization.json) // or "org.jetbrains.kotlinx:kotlinx-serialization-json"
+    implementation(libs.kobwebx.worker.kotlinx.serialization) // or "com.varabyte.kobweb:kobwebx-serialization-kotlinx"
+  }
+}
+```
+
+Then, define the worker strategy:
+
+```kotlin
+@Serializable
+data class FindPrimesInput(val max: Int)
+
+@Serializable
+data class FindPrimesOutput(val max: Int, val primes: List<Int>)
+
+internal class FindPrimesWorkerStrategy: WorkerStrategy<FindPrimesInput, FindPrimesOutput>() {
+  private fun findPrimes(max: Int): List<Int> {
+    // Loop through all numbers, taking out multiples of each prime
+    // e.g. 2 will take out 4, 6, 8, 10, etc.
+    // then 3 will take out 9, 15, 21, etc. (6, 12, and 18 were already removed)
+    val primes = (1..max).toMutableList()
+    var primeIndex = 1 // Skip index 0, which is 1.
+    while (primeIndex < primes.lastIndex) {
+      val prime = primes[primeIndex]
+      var maybePrimeIndex = primeIndex + 1
+      while (maybePrimeIndex <= primes.lastIndex) {
+        if (primes[maybePrimeIndex] % prime == 0) {
+          primes.removeAt(maybePrimeIndex)
+        } else {
+          ++maybePrimeIndex
+        }
+      }
+      primeIndex++
+    }
+
+    return primes
+  }
+
+  override fun onInput(input: FindPrimesInput) {
+    postOutput(FindPrimesOutput(input.max, findPrimes(input.max)))
+  }
+
+  override val ioSerializer = Json.createIOSerializer<FindPrimesInput, FindPrimesOutput>()
+}
+```
+
+Most of the complexity above is the `findPrimes` algorithm itself!
+
+The `onInput` handler is about as easy as it gets. Notice that we pass the input `max` value back into the output, so
+that the receiving application can easily correlate the output with the input.
+
+And finally, note the use of the `Json.createIOSerializer` method call. This utility method comes from the
+`kobwebx-serialization-kotlinx` dependency, allowing you to use a one-liner to implement all the serialization methods
+for you using `Json.encodeToString` and `Json.decodeFromString` calls.
+
+> [!TIP]
+> It's fairly trivial to write the message serializer yourself if you don't want to pull in the extra dependency (or if
+> you are using a different serialization library):
+>
+> ```kotlin
+> object : IOSerializer<FindPrimesInput, FindPrimesOutput> {
+>   override fun serializeInput(input: FindPrimesInput): String = Json.encodeToString(input)
+>   override fun deserializeInput(input: String): FindPrimesInput = Json.decodeFromString(input)
+>   override fun serializeOutput(output: FindPrimesOutput): String = Json.encodeToString(output)
+>   override fun deserializeOutput(output: String): FindPrimesOutput = Json.decodeFromString(output)
+> }
+> ```
+
+Using the worker in your application looks like this:
+
+```kotlin
+val worker = remember {
+  FindPrimesWorker {
+    println("Primes for ${it.max}: ${it.primes}")
+  }
+}
+
+// Later
+worker.postInput(FindPrimesInput(1000)) // Primes for 1000: [1, 2, 3, 5, 7, 11, ..., 977, 983, 991, 997]
+```
+
+The richly-typed input and output messages allow for a very explicit API here, and in the future, more parameters could
+be added (with default values) to either input or output classes, extending the functionality of your workers without
+breaking existing code.
+
+We don't show it here, but you could also create sealed classes for your input and output messages, allowing you to
+define multiple types of messages that your worker can receive and respond to.
+
+#### Final notes about worker strategies
+
+##### Single worker strategy
+
+Due to the fundamental design of web workers, you can only define a single worker strategy per module. If you need
+multiple workers, you must create multiple modules, each providing their own separate worker strategy.
+
+The Kobweb Worker Gradle plugin will complain if it finds more than one worker strategy in a module.
+
+##### Worker strategy name constraint
+
+As the Kobweb Worker Gradle plugin needs to derive its name from the worker strategy, the Kobweb Worker Gradle plugin
+by default requires your worker strategy class to be suffixed with `WorkerStrategy` (where for example
+`MyExampleWorkerStrategy` would generate a worker named `MyExampleWorker` using the same package).
+
+If you don't like this constraint, you can override the `kobweb.worker.fqcn` property in your build script to provide
+any name you like:
+
+```kotlin
+// build.gradle.kts
+kobweb {
+  worker {
+    fqcn.set("com.mysite.MyWorker")
+  }
+}
+```
+
+at which point, you are free to name your worker strategy whatever name you like.
+
+If you want to just change the name of your worker, you can omit the package:
+
+```kotlin
+// build.gradle.kts
+kobweb {
+  worker {
+    fqcn.set(".MyWorker") // Uses the same package as the worker strategy
+  }
+}
+```
+
+### When to use Kobweb Workers
+
+In practice, almost every site can get away without ever using a worker, especially in Kotlin/JS where you can
+leverage coroutines as a way to mimic concurrency in your single-threaded site.
+
+That said, if you know your site is going to run some logic that is not concerned with the web DOM at all, and which
+might additionally take a long time to run, separating that out into its own worker can be a sensible approach.
+
+By isolating your logic into a separate worker, you not only keep it from potentially freezing your UI, but you also
+guarantee that it will be strongly decoupled from the rest of your site, preventing future developers from introducing
+potential spaghetti code issues in the future.
+
+Another interesting use-case for a worker is isolating some sort of complex state management, where encapsulating that
+complexity keeps the rest of your site easier to reason about.
+
+For example, maybe you're making a web game, and you decide to create a worker to manage all the game logic. You could
+of course create a Kobweb library for the same effect, but using a worker has a stronger guarantee that the logic will
+never interact directly with your site's UI.
+
+> [!WARNING]
+> You should be aware that, since a web worker is a whole separate standalone script, it needs to include its own copy
+> of the Kotlin/JS runtime, even though your main site already has its own copy.
+>
+> Even after running a dead-code elimination pass, I found that the trivial echo worker's final output was about 200K
+> (which compressed down to 60K before being sent over the wire).
+>
+> For most practical use-cases, a 60K download is not a deal-breaker, especially as most images are many multiples
+> larger than that. But users should be aware of it, and if this is indeed a concern, you may need to avoid using Kobweb
+> workers on your site.
+
 # Advanced topics
 
 ## Setting your site's route prefix

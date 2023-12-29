@@ -2,7 +2,7 @@ package com.varabyte.kobweb.ksp.common
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFile
-import com.varabyte.kobweb.ksp.util.getAnnotationsByName
+import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 
 // pair corresponds to (current package, override)
 // in theory should only be one, but we'll return a sequence just in case

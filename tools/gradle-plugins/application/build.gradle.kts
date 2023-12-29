@@ -13,7 +13,7 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
-    // Common Gradle plugin used by Library and Application plugins
+    // Common Gradle plugin used by Library, Application, and Worker plugins
     api(projects.tools.gradlePlugins.core)
 
     // For generating code / html

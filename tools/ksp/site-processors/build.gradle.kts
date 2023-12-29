@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.ksp.processing)
     implementation(libs.kotlinx.serialization.json)
     implementation(projects.tools.processorCommon)
+    implementation(projects.tools.ksp.kspExt)
 }
 
 kobwebPublication {

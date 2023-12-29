@@ -20,9 +20,9 @@ import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.common.processRoute
-import com.varabyte.kobweb.ksp.util.getAnnotationsByName
-import com.varabyte.kobweb.ksp.util.nameWithoutExtension
-import com.varabyte.kobweb.ksp.util.suppresses
+import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
+import com.varabyte.kobweb.ksp.symbol.nameWithoutExtension
+import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
