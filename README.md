@@ -424,10 +424,13 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 | `@Page("index")`        | `example.com/a/b/c/`            |
 | `@Page("d/e/f/")`       | `example.com/a/b/c/d/e/f/slug`  |
 | `@Page("d/e/f/other")`  | `example.com/a/b/c/d/e/f/other` |
+| `@Page("d/e/f/index")`  | `example.com/a/b/c/d/e/f/`      |
 | `@Page("/d/e/f/")`      | `example.com/d/e/f/slug`        |
 | `@Page("/d/e/f/other")` | `example.com/d/e/f/other`       |
+| `@Page("/d/e/f/index")` | `example.com/d/e/f/`            |
 | `@Page("/")`            | `example.com/slug`              |
 | `@Page("/other")`       | `example.com/other`             |
+| `@Page("/index")`       | `example.com/`                  |
 
 > [!CAUTION]
 > Despite the flexibility allowed here, you should not be using this feature frequently, if at all. A Kobweb project
