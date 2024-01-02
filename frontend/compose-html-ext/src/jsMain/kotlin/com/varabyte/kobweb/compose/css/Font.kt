@@ -302,17 +302,17 @@ fun StyleScope.fontVariantPosition(position: FontVariantPosition) {
     property("font-variant-position", position)
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-alternates
-sealed class FontVariantSettings private constructor(private val value: String) : StylePropertyValue {
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font-variation-settings
+sealed class FontVariationSettings private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    private class Keyword(value: String) : FontVariantSettings(value)
-    class Axis(name: String, value: Number) : FontVariantSettings("${name.wrapQuotesIfNecessary()} $value")
-    class Axes(vararg axes: Axis) : FontVariantSettings(axes.joinToString(","))
+    private class Keyword(value: String) : FontVariationSettings(value)
+    class Axis(name: String, value: Number) : FontVariationSettings("${name.wrapQuotesIfNecessary()} $value")
+    class Axes(vararg axes: Axis) : FontVariationSettings(axes.joinToString(","))
 
     companion object {
         // Keyword
-        val Normal: FontVariantSettings get() = Keyword("normal")
+        val Normal: FontVariationSettings get() = Keyword("normal")
 
         // Registered axes
         fun Wght(value: Number): Axis = Axis("wght", value)
@@ -322,19 +322,19 @@ sealed class FontVariantSettings private constructor(private val value: String) 
         fun Opbd(value: Number): Axis = Axis("opbd", value)
 
         // Global
-        val Inherit: FontVariantSettings get() = Keyword("inherit")
-        val Initial: FontVariantSettings get() = Keyword("initial")
-        val Revert: FontVariantSettings get() = Keyword("revert")
-        val Unset: FontVariantSettings get() = Keyword("unset")
+        val Inherit: FontVariationSettings get() = Keyword("inherit")
+        val Initial: FontVariationSettings get() = Keyword("initial")
+        val Revert: FontVariationSettings get() = Keyword("revert")
+        val Unset: FontVariationSettings get() = Keyword("unset")
     }
 }
 
-fun StyleScope.fontVariantSettings(settings: FontVariantSettings) {
-    property("font-variant-settings", settings)
+fun StyleScope.fontVariationSettings(settings: FontVariationSettings) {
+    property("font-variation-settings", settings)
 }
 
-fun StyleScope.fontVariantSettings(vararg axes: FontVariantSettings.Axis) {
-    fontVariantSettings(FontVariantSettings.Axes(*axes))
+fun StyleScope.fontVariationSettings(vararg axes: FontVariationSettings.Axis) {
+    fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
 
 fun StyleScope.fontVariant(

@@ -46,8 +46,8 @@ class FontVariantScope internal constructor(private val styleScope: StyleScope) 
     fun ligatures(ligatures: FontVariantLigatures) = styleScope.fontVariantLigatures(ligatures)
     fun numeric(numeric: FontVariantNumeric) = styleScope.fontVariantNumeric(numeric)
     fun numeric(vararg numerics: FontVariantNumeric.ListableKeyword) = styleScope.fontVariantNumeric(*numerics)
-    fun settings(settings: FontVariantSettings) = styleScope.fontVariantSettings(settings)
-    fun settings(vararg axes: FontVariantSettings.Axis) = styleScope.fontVariantSettings(*axes)
+    fun settings(settings: FontVariationSettings) = styleScope.fontVariationSettings(settings)
+    fun settings(vararg axes: FontVariationSettings.Axis) = styleScope.fontVariationSettings(*axes)
 }
 
 fun Modifier.fontVariant(scope: FontVariantScope.() -> Unit) = styleModifier {
