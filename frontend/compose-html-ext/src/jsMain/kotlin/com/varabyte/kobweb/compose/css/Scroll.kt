@@ -180,6 +180,7 @@ class ScrollSnapStop private constructor(private val value: String) : StylePrope
         // Global
         val Inherit get() = ScrollSnapStop("inherit")
         val Initial get() = ScrollSnapStop("initial")
+        val Revert get() = ScrollSnapStop("revert")
         val Unset get() = ScrollSnapStop("unset")
     }
 }
