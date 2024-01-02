@@ -10,11 +10,13 @@ import org.khronos.webgl.get
 import org.w3c.dom.Document
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.asList
 import org.w3c.dom.events.Event
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.File
 import org.w3c.files.FileReader
+import org.w3c.files.get
 import org.w3c.xhr.ProgressEvent
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -37,7 +39,7 @@ suspend fun File.readBytes(): ByteArray {
     return suspendCoroutine { cont ->
         val reader = FileReader()
         reader.onload = { loadEvt ->
-            val result = loadEvt.target.asDynamic().result as ArrayBuffer
+            val result = loadEvt.target.unsafeCast<FileReader>().result as ArrayBuffer
             val intArray = Int8Array(result)
             cont.resume(ByteArray(intArray.byteLength) { i -> intArray[i] })
         }
@@ -142,16 +144,17 @@ private fun <I, O> Document.loadFromDisk(
     onLoad: LoadContext.(O) -> Unit,
 ) {
     loadFromDisk(accept, multiple = false, onChange = { changeEvt ->
-        val file = changeEvt.target.asDynamic().files[0] as File
+        val file = changeEvt.target.unsafeCast<HTMLInputElement>().files!![0]!!
         val reader = FileReader()
         reader.onabort = { handleUnexpectedOnAbort("loadFromDisk") }
         reader.onerror = { evt ->
-            onError(LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt as ProgressEvent))
+            onError(LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt.unsafeCast<ProgressEvent>()))
         }
         reader.onload = { loadEvt ->
-            val loadContext = LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, loadEvt as ProgressEvent)
+            val loadContext =
+                LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, loadEvt.unsafeCast<ProgressEvent>())
             try {
-                val result = loadEvt.target.asDynamic().result as I
+                val result = loadEvt.target.unsafeCast<FileReader>().result as I
                 onLoad(loadContext, deserialize(result))
             } catch (_: Throwable) {
                 onError(loadContext)
@@ -256,19 +259,17 @@ private fun <I, O> Document.loadMultipleFromDisk(
     onLoad: (List<LoadedFile<O>>) -> Unit,
 ) {
     loadFromDisk(accept, multiple = true, onChange = { changeEvt ->
-        val selectedFiles = changeEvt.target.asDynamic().files
-        val length = selectedFiles.length as Int
+        val selectedFiles = changeEvt.target.unsafeCast<HTMLInputElement>().files!!
         val failedToLoadFiles = mutableListOf<LoadContext>()
         val loadedFiles = mutableListOf<LoadedFile<O>>()
 
-        for (i in 0 until length) {
+        selectedFiles.asList().forEach { file ->
             val reader = FileReader()
-            val file = selectedFiles[i] as File
             fun createLoadContext(evt: ProgressEvent) =
                 LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt)
 
             fun triggerCallbacksIfReady() {
-                if (failedToLoadFiles.size + loadedFiles.size == length) {
+                if (failedToLoadFiles.size + loadedFiles.size == selectedFiles.length) {
                     failedToLoadFiles.takeIf { it.isNotEmpty() }?.let { onError(it) }
                     loadedFiles.takeIf { it.isNotEmpty() }?.let { onLoad(it) }
                 }
@@ -276,13 +277,13 @@ private fun <I, O> Document.loadMultipleFromDisk(
 
             reader.onabort = { handleUnexpectedOnAbort("loadMultipleFromDisk") }
             reader.onerror = {
-                failedToLoadFiles.add(createLoadContext(it as ProgressEvent))
+                failedToLoadFiles.add(createLoadContext(it.unsafeCast<ProgressEvent>()))
                 triggerCallbacksIfReady()
             }
             reader.onload = { loadEvt ->
-                val loadContext = createLoadContext(loadEvt as ProgressEvent)
+                val loadContext = createLoadContext(loadEvt.unsafeCast<ProgressEvent>())
                 try {
-                    val result = loadEvt.target.asDynamic().result as I
+                    val result = loadEvt.target.unsafeCast<FileReader>().result as I
                     loadedFiles.add(LoadedFile(loadContext, deserialize(result)))
                 } catch (_: Throwable) {
                     failedToLoadFiles.add(loadContext)
