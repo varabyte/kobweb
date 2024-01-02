@@ -2600,16 +2600,20 @@ Additionally, multiple clients can connect to the same stream. In this case, the
 message back to your client, but also to broadcast messages to all users (or a filtered subset of users) on the same
 stream. You could use this, for example, to implement a chat server with rooms.
 
+#### Example API stream
+
 Like API routes, API streams must be defined under the `api` package in your `jvmMain` source directory. By default, the
-name of the stream will be derived from the file name and path that it's declared in.
+name of the stream will be derived from the file name and path that it's declared in (e.g. "api/lobby/Chat.kt" will
+create a channel named "lobby/chat").
 
 Unlike API routes, API streams are defined as properties, not methods. This is because API streams need to be a bit more
 flexible than routes, since streams consist of multiple distinct events: client connection, client messages, and
 client disconnection.
 
-Streams do not have to be annotated. The Kobweb Application plugin can automatically detect them.
+Also unlike API routes, streams do not have to be annotated. The Kobweb Application plugin can automatically detect
+them.
 
-For example, here's a simple stream that echoes back any argument passed into it:
+For example, here's a simple stream, declared on the backend, that echoes back any argument it receives:
 
 ```kotlin
 // jvmMain/kotlin/com/mysite/api/Echo.kt
@@ -2629,29 +2633,28 @@ val echo = object : ApiStream {
 }
 ```
 
-To communicate with an API stream from your site, you need to create a stream connection there:
+To communicate with an API stream from your site, you need to create a stream connection on the client:
 
 ```kotlin
 @Page
 @Composable
 fun ApiStreamDemoPage() {
-  val echoStream = remember { ApiStream("echo") }
-  LaunchedEffect(Unit) {
-    echoStream.connect(object : ApiStreamListener {
-      override fun onConnected(ctx: ConnectedContext) {  }
-      override fun onTextReceived(ctx: TextReceivedContext) { console.log("Echoed: ${ctx.text}") }
-      override fun onDisconnected(ctx: DisconnectedContext) {  }
-    })
-  }
+  val echoStream = rememberApiStream("echo", object : ApiStreamListener {
+    override fun onConnected(ctx: ConnectedContext) {}
+    override fun onTextReceived(ctx: TextReceivedContext) {
+      console.log("Echoed: ${ctx.text}")
+    }
+    override fun onDisconnected(ctx: DisconnectedContext) {}
+  })
 
   Button(onClick = {
-      echoStream.send("hello!")
+    echoStream.send("hello!")
   }) { Text("Click me") }
 }
 ```
 
 After running your project, you can click on the button and check the console logs. If everything is working properly,
-you should see "Echoed: hello!" for each time you pressed the button.
+you should see "Echoed: hello!" for each time you press the button.
 
 > [!TIP]
 > The `examples/chat` template project uses API streams to implement a very simple chat application, so you can
@@ -2659,8 +2662,8 @@ you should see "Echoed: hello!" for each time you pressed the button.
 
 #### API stream conveniences
 
-The above example demonstrated API streams in their most verbose form. However, depending on your use-case, you can
-elide a fair bit of boilerplate.
+The above example was intentionally verbose, to showcase the broader functionality around API streams. However,
+depending on your use-case, you can elide a fair bit of boilerplate.
 
 First of all, the connect and disconnect handlers are optional, so you can omit them if you don't need them. Let's
 simplify the echo example:
@@ -2668,44 +2671,47 @@ simplify the echo example:
 ```kotlin
 // Backend
 val echo = object : ApiStream {
-  override suspend fun onTextReceived(ctx: TextReceivedContext) { ctx.stream.send(ctx.text) }
+  override suspend fun onTextReceived(ctx: TextReceivedContext) {
+    ctx.stream.send(ctx.text)
+  }
 }
 
 // Frontend
-val echoStream = remember { ApiStream("echo") }
-LaunchedEffect(Unit) {
-  echoStream.connect(object : ApiStreamListener {
-    override fun onTextReceived(ctx: TextReceivedContext) { console.log("Echoed: ${ctx.text}") }
-  })
-}
+val echoStream = rememberApiStream("echo", object : ApiStreamListener {
+  override fun onTextReceived(ctx: TextReceivedContext) {
+    console.log("Echoed: ${ctx.text}")
+  }
+})
 ```
 
-Additionally, if you only care about the text event, there are convenience overrides for that:
+Additionally, if you only care about the text event, there are convenience methods for that:
 
 ```kotlin
 // Backend
 val echo = ApiStream { ctx -> ctx.stream.send(ctx.text) }
 
 // Frontend
-val echoStream = remember { ApiStream("echo") }
-LaunchedEffect(Unit) {
-  echoStream.connect { ctx -> console.log("Echoed: ${ctx.text}") }
+val echoStream = rememberApiStream("echo") {
+  ctx -> console.log("Echoed: ${ctx.text}") 
 }
 ```
 
-And *finally*, you can simplify the frontend code even further by using the `rememberApiStream` composable:
-
-```kotlin
-// Frontend
-val echoStream = rememberApiStream("echo") { text -> console.log("Echoed: $text") }
-
-// ApiStreamListener version also available:
-// val echoStream = rememberApiStream("echo", object : ApiStreamListener { ... })
-```
-
-In practice, your API streams will probably be a bit more involved than the echo example, but it's nice to know that you
-can handle some cases only needing a one-liner on the server and another on the client to create a persistent
+In practice, your API streams will probably be a bit more involved than the echo example above, but it's nice to know
+that you can handle some cases only needing a one-liner on the server and another on the client to create a persistent
 client-server connection!
+
+> [!NOTE]
+> If you need to create an API stream with stricter control around when it actually connects to the server, you can
+> create the `ApiStream` object directly instead of using `rememberApiStream`:
+> ```kotlin
+> val echoStream = remember { ApiStream("echo") }
+> val scope = rememberCoroutineScope()
+>
+> // Later, perhaps after a button is clicked...
+> scope.launch {
+>   echoStream.connect(object : ApiStreamListener { /* ... */ })
+> }
+> ```
 
 ### API routes vs. API streams
 
