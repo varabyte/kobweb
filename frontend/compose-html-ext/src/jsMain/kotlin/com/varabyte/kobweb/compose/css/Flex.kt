@@ -33,3 +33,9 @@ fun StyleScope.flexBasis(flexBasis: FlexBasis) {
 fun StyleScope.flexBasis(value: CSSLengthOrPercentageNumericValue) {
     property("flex-basis", value)
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction
+val FlexDirection.Companion.Inherit get() = FlexDirection("inherit")
+val FlexDirection.Companion.Initial get() = FlexDirection("initial")
+val FlexDirection.Companion.Revert get() = FlexDirection("revert")
+val FlexDirection.Companion.Unset get() = FlexDirection("unset")
