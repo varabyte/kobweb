@@ -257,21 +257,21 @@ fun StyleScope.fontVariantLigatures(vararg ligatures: FontVariantLigatures.Lista
     fontVariantLigatures(FontVariantLigatures.of(*ligatures))
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-alternates
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-numeric
 sealed class FontVariantNumeric private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    private class SingleKeyword(value: String) : FontVariantNumeric(value)
-    class ListableKeyword(value: String) : FontVariantNumeric(value)
-    class Keywords(vararg keywords: ListableKeyword) : FontVariantNumeric(keywords.joinToString(" "))
+    private class Keyword(value: String) : FontVariantNumeric(value)
+    class ListableKeyword internal constructor(value: String) : FontVariantNumeric(value)
+    private class KeywordList(vararg keywords: ListableKeyword) : FontVariantNumeric(keywords.joinToString(" "))
 
     companion object {
         // Keyword
-        val Normal: FontVariantNumeric get() = SingleKeyword("normal")
+        val Normal: FontVariantNumeric get() = Keyword("normal")
         val Ordinal: ListableKeyword get() = ListableKeyword("ordinal")
         val SlashedZero: ListableKeyword get() = ListableKeyword("slashed-zero")
 
-        // Numeric figure styles
+        // Numeric figure
         val LiningNums: ListableKeyword get() = ListableKeyword("lining-nums")
         val OldstyleNums: ListableKeyword get() = ListableKeyword("oldstyle-nums")
 
@@ -283,11 +283,13 @@ sealed class FontVariantNumeric private constructor(private val value: String) :
         val DiagonalFractions: ListableKeyword get() = ListableKeyword("diagonal-fractions")
         val StackedFractions: ListableKeyword get() = ListableKeyword("stacked-fractions")
 
+        fun of(vararg keywords: ListableKeyword): FontVariantNumeric = KeywordList(*keywords)
+
         // Global
-        val Inherit: FontVariantNumeric get() = SingleKeyword("inherit")
-        val Initial: FontVariantNumeric get() = SingleKeyword("initial")
-        val Revert: FontVariantNumeric get() = SingleKeyword("revert")
-        val Unset: FontVariantNumeric get() = SingleKeyword("unset")
+        val Inherit: FontVariantNumeric get() = Keyword("inherit")
+        val Initial: FontVariantNumeric get() = Keyword("initial")
+        val Revert: FontVariantNumeric get() = Keyword("revert")
+        val Unset: FontVariantNumeric get() = Keyword("unset")
     }
 }
 
@@ -296,10 +298,10 @@ fun StyleScope.fontVariantNumeric(numeric: FontVariantNumeric) {
 }
 
 fun StyleScope.fontVariantNumeric(vararg numerics: FontVariantNumeric.ListableKeyword) {
-    fontVariantNumeric(FontVariantNumeric.Keywords(*numerics))
+    fontVariantNumeric(FontVariantNumeric.of(*numerics))
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-ligatures
+// https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-position
 class FontVariantPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
