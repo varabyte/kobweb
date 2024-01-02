@@ -110,7 +110,7 @@ val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
 val InputStyle by ComponentStyle(prefix = "silk") {
     base {
         Modifier
-            .styleModifier { property("appearance", "none") } // Disable browser styles
+            .appearance(Appearance.None) // Disable browser styles
             .color(ColorVar.value())
             .height(InputVars.Height.value())
             .fontSize(InputVars.FontSize.value())
