@@ -42,16 +42,41 @@ fun Modifier.fontStyle(value: FontStyle): Modifier = styleModifier {
 class FontVariantScope internal constructor(private val styleScope: StyleScope) {
     fun alternates(alternates: FontVariantAlternates) = styleScope.fontVariantAlternates(alternates)
     fun alternates(vararg alternates: FontVariantAlternates.ListableValue) =
-        styleScope.fontVariantAlternates(*alternates)
+        styleScope.fontVariantAlternates(FontVariantAlternates.of(*alternates))
 
     fun caps(caps: FontVariantCaps) = styleScope.fontVariantCaps(caps)
+
     fun eastAsian(eastAsian: FontVariantEastAsian) = styleScope.fontVariantEastAsian(eastAsian)
+    fun eastAsian(vararg eastAsians: FontVariantEastAsian.ListableKeyword) =
+        styleScope.fontVariantEastAsian(FontVariantEastAsian.of(*eastAsians))
+
     fun emoji(emoji: FontVariantEmoji) = styleScope.fontVariantEmoji(emoji)
+
     fun ligatures(ligatures: FontVariantLigatures) = styleScope.fontVariantLigatures(ligatures)
+    fun ligatures(vararg ligatures: FontVariantLigatures.ListableKeyword) =
+        styleScope.fontVariantLigatures(FontVariantLigatures.of(*ligatures))
+
+    fun ligatures(
+        common: Boolean? = null,
+        discretionary: Boolean? = null,
+        historical: Boolean? = null,
+        contextual: Boolean? = null
+    ) = styleScope.fontVariantLigatures(
+        FontVariantLigatures.of(
+            common = common,
+            discretionary = discretionary,
+            historical = historical,
+            contextual = contextual
+        )
+    )
+
     fun numeric(numeric: FontVariantNumeric) = styleScope.fontVariantNumeric(numeric)
-    fun numeric(vararg numerics: FontVariantNumeric.ListableKeyword) = styleScope.fontVariantNumeric(*numerics)
+    fun numeric(vararg numerics: FontVariantNumeric.ListableKeyword) =
+        styleScope.fontVariantNumeric(FontVariantNumeric.of(*numerics))
+
     fun settings(settings: FontVariationSettings) = styleScope.fontVariationSettings(settings)
-    fun settings(vararg axes: FontVariationSettings.Axis) = styleScope.fontVariationSettings(*axes)
+    fun settings(vararg axes: FontVariationSettings.Axis) =
+        styleScope.fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
 
 fun Modifier.fontVariant(scope: FontVariantScope.() -> Unit) = styleModifier {

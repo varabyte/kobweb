@@ -89,10 +89,6 @@ fun StyleScope.fontVariantAlternates(fontVariantAlternates: FontVariantAlternate
     property("font-variant-alternates", fontVariantAlternates)
 }
 
-fun StyleScope.fontVariantAlternates(vararg fontVariantAlternates: FontVariantAlternates.ListableValue) {
-    fontVariantAlternates(FontVariantAlternates.of(*fontVariantAlternates))
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-caps
 class FontVariantCaps private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
@@ -158,10 +154,6 @@ sealed class FontVariantEastAsian private constructor(private val value: String)
 
 fun StyleScope.fontVariantEastAsian(eastAsian: FontVariantEastAsian) {
     property("font-variant-east-asian", eastAsian)
-}
-
-fun StyleScope.fontVariantEastAsian(vararg eastAsian: FontVariantEastAsian.ListableKeyword) {
-    fontVariantEastAsian(FontVariantEastAsian.of(*eastAsian))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-emoji
@@ -253,10 +245,6 @@ fun StyleScope.fontVariantLigatures(ligatures: FontVariantLigatures) {
     property("font-variant-ligatures", ligatures)
 }
 
-fun StyleScope.fontVariantLigatures(vararg ligatures: FontVariantLigatures.ListableKeyword) {
-    fontVariantLigatures(FontVariantLigatures.of(*ligatures))
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-numeric
 sealed class FontVariantNumeric private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
@@ -295,10 +283,6 @@ sealed class FontVariantNumeric private constructor(private val value: String) :
 
 fun StyleScope.fontVariantNumeric(numeric: FontVariantNumeric) {
     property("font-variant-numeric", numeric)
-}
-
-fun StyleScope.fontVariantNumeric(vararg numerics: FontVariantNumeric.ListableKeyword) {
-    fontVariantNumeric(FontVariantNumeric.of(*numerics))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-position
@@ -373,10 +357,6 @@ sealed class FontVariationSettings private constructor(private val value: String
 
 fun StyleScope.fontVariationSettings(settings: FontVariationSettings) {
     property("font-variation-settings", settings)
-}
-
-fun StyleScope.fontVariationSettings(vararg axes: FontVariationSettings.Axis) {
-    fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
