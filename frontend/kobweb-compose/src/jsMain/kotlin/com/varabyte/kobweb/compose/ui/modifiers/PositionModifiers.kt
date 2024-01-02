@@ -61,7 +61,3 @@ fun Modifier.right(right: Right) = styleModifier {
 fun Modifier.float(float: CSSFloat) = styleModifier {
     float(float)
 }
-
-fun Modifier.float(float: Float) = styleModifier {
-    float(float)
-}
