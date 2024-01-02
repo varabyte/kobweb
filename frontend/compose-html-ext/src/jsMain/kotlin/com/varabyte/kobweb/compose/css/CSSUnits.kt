@@ -3,12 +3,12 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 import kotlin.math.PI
 
-// The typealiases below are a copy of Compose HTML's typealiases org.jetbrains.compose.web.css.CSSUnits.kt
+// The type aliases below are a copy of Compose HTML's type aliases org.jetbrains.compose.web.css.CSSUnits.kt
 // with the key difference that they are based on `CSSNumericValue` instead of `CSSSizeValue`.
 // This means that in addition to including raw values, they also cover the result of calculations, css functions like
 // `min()`, and StyleVariables. These are intended to almost entirely replace the Compose HTML versions, as in general,
 // when a something like a "length" value is needed in CSS, it does not necessarily need to be a raw value.
-// Eventually, we would like the values of Compose HTML's typealiases to be based on `CSSNumericValue` as well, at which
+// Eventually, we would like the values of Compose HTML's type aliases to be based on `CSSNumericValue` as well, at which
 // time these would no longer be necessary.
 
 /**
@@ -43,7 +43,7 @@ typealias CSSLengthNumericValue = CSSNumericValue<out CSSUnitLength>
  */
 typealias CSSPercentageNumericValue = CSSNumericValue<out CSSUnitPercentage>
 
-// these do not have corresponding non-numeric typealiases defined in Compose HTML, but are named for consistency
+// these do not have corresponding non-numeric type aliases defined in Compose HTML, but are named for consistency
 
 /** A CSS numeric value representing a flex value. */
 typealias CSSFlexNumericValue = CSSNumericValue<out CSSUnitFlex>
