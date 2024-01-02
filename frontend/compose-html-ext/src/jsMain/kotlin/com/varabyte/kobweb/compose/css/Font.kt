@@ -356,13 +356,10 @@ sealed class FontVariationSettings private constructor(private val value: String
     companion object {
         // Keyword
         val Normal: FontVariationSettings get() = Keyword("normal")
-
-        // Registered axes
-        fun Wght(value: Number): Axis = Axis("wght", value)
-        fun Wdth(value: Number): Axis = Axis("wdth", value)
-        fun Itas(value: Number): Axis = Axis("itas", value)
-        fun Slnt(value: Number): Axis = Axis("slnt", value)
-        fun Opbd(value: Number): Axis = Axis("opbd", value)
+        // We intentionally do not include convenience functions for registered axes, as it is preferred to use
+        // the corresponding higher-level properties instead. (e.g. font-weight instead of wght)
+        // From https://drafts.csswg.org/css-fonts/#font-variation-settings-def:
+        // "When possible, authors should generally use the other properties related to font variations"
 
         // Global
         val Inherit: FontVariationSettings get() = Keyword("inherit")
