@@ -53,7 +53,7 @@ sealed class FontVariantAlternates private constructor(private val value: String
         fun Styleset(ident: String): ListableValue = FunctionalNotation("styleset", ident)
         fun CharacterVariant(ident: String): ListableValue = FunctionalNotation("character-variant", ident)
         fun Swash(ident: String): ListableValue = FunctionalNotation("swash", ident)
-        fun Ornament(ident: String): ListableValue = FunctionalNotation("ornament", ident)
+        fun Ornaments(ident: String): ListableValue = FunctionalNotation("ornaments", ident)
         fun Annotation(ident: String): ListableValue = FunctionalNotation("annotation", ident)
 
         // Global
