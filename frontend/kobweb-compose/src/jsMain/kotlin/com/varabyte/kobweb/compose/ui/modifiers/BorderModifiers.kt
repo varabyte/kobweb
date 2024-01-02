@@ -141,6 +141,54 @@ class BorderRadiusScope internal constructor(private val styleScope: StyleScope)
     fun bottomLeft(r: CSSLengthOrPercentageNumericValue) = styleScope.borderBottomLeftRadius(r)
     fun bottomLeft(horizontal: CSSLengthOrPercentageNumericValue, vertical: CSSLengthOrPercentageNumericValue) =
         styleScope.borderBottomLeftRadius(horizontal, vertical)
+
+    // store values of each axis since they are set independently but are applied together as a single property
+    private var currentHorizontal = 0.px.toString()
+    private var currentVertical = 0.px.toString()
+
+    private fun updateHorizontal(value: String) {
+        currentHorizontal = value
+        styleScope.property("border-radius", "$currentHorizontal / $currentVertical")
+    }
+
+    private fun updateVertical(value: String) {
+        currentVertical = value
+        styleScope.property("border-radius", "$currentHorizontal / $currentVertical")
+    }
+
+    fun horizontal(all: CSSLengthOrPercentageNumericValue) = updateHorizontal(all.toString())
+    fun horizontal(topAndBottom: CSSLengthOrPercentageNumericValue, leftAndRight: CSSLengthOrPercentageNumericValue) =
+        updateHorizontal("$topAndBottom $leftAndRight")
+
+    fun horizontal(
+        top: CSSLengthOrPercentageNumericValue,
+        leftAndRight: CSSLengthOrPercentageNumericValue,
+        bottom: CSSLengthOrPercentageNumericValue
+    ) = updateHorizontal("$top $leftAndRight $bottom")
+
+    fun horizontal(
+        top: CSSLengthOrPercentageNumericValue,
+        right: CSSLengthOrPercentageNumericValue,
+        bottom: CSSLengthOrPercentageNumericValue,
+        left: CSSLengthOrPercentageNumericValue
+    ) = updateHorizontal("$top $right $bottom $left")
+
+    fun vertical(all: CSSLengthOrPercentageNumericValue) = updateVertical(all.toString())
+    fun vertical(topAndBottom: CSSLengthOrPercentageNumericValue, leftAndRight: CSSLengthOrPercentageNumericValue) =
+        updateVertical("$topAndBottom $leftAndRight")
+
+    fun vertical(
+        top: CSSLengthOrPercentageNumericValue,
+        leftAndRight: CSSLengthOrPercentageNumericValue,
+        bottom: CSSLengthOrPercentageNumericValue
+    ) = updateVertical("$top $leftAndRight $bottom")
+
+    fun vertical(
+        top: CSSLengthOrPercentageNumericValue,
+        right: CSSLengthOrPercentageNumericValue,
+        bottom: CSSLengthOrPercentageNumericValue,
+        left: CSSLengthOrPercentageNumericValue
+    ) = updateVertical("$top $right $bottom $left")
 }
 
 fun Modifier.borderRadius(scope: BorderRadiusScope.() -> Unit) = styleModifier {
