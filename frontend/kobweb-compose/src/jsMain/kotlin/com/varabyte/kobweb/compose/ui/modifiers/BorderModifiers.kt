@@ -125,6 +125,28 @@ fun Modifier.borderRadius(
     borderRadius(topLeft, topRight, bottomRight, bottomLeft)
 }
 
+class BorderRadiusScope internal constructor(private val styleScope: StyleScope) {
+    fun topLeft(r: CSSLengthOrPercentageNumericValue) = styleScope.borderTopLeftRadius(r)
+    fun topLeft(horizontal: CSSLengthOrPercentageNumericValue, vertical: CSSLengthOrPercentageNumericValue) =
+        styleScope.borderTopLeftRadius(horizontal, vertical)
+
+    fun topRight(r: CSSLengthOrPercentageNumericValue) = styleScope.borderTopRightRadius(r)
+    fun topRight(horizontal: CSSLengthOrPercentageNumericValue, vertical: CSSLengthOrPercentageNumericValue) =
+        styleScope.borderTopRightRadius(horizontal, vertical)
+
+    fun bottomRight(r: CSSLengthOrPercentageNumericValue) = styleScope.borderBottomRightRadius(r)
+    fun bottomRight(horizontal: CSSLengthOrPercentageNumericValue, vertical: CSSLengthOrPercentageNumericValue) =
+        styleScope.borderBottomRightRadius(horizontal, vertical)
+
+    fun bottomLeft(r: CSSLengthOrPercentageNumericValue) = styleScope.borderBottomLeftRadius(r)
+    fun bottomLeft(horizontal: CSSLengthOrPercentageNumericValue, vertical: CSSLengthOrPercentageNumericValue) =
+        styleScope.borderBottomLeftRadius(horizontal, vertical)
+}
+
+fun Modifier.borderRadius(scope: BorderRadiusScope.() -> Unit) = styleModifier {
+    BorderRadiusScope(this).apply(scope)
+}
+
 @Deprecated("Use border { style(...) } instead.", ReplaceWith("border { style(lineStyle) }"))
 fun Modifier.borderStyle(lineStyle: LineStyle) = border { style(lineStyle) }
 

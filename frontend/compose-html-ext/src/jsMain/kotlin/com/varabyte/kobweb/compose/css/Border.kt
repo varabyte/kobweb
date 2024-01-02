@@ -98,3 +98,47 @@ fun StyleScope.borderRight(
         color?.let { color(it) }
     }
 }
+
+fun StyleScope.borderTopLeftRadius(radius: CSSLengthOrPercentageNumericValue) {
+    property("border-top-left-radius", radius)
+}
+
+fun StyleScope.borderTopLeftRadius(
+    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
+    vertical: CSSLengthOrPercentageNumericValue = 0.px
+) {
+    property("border-top-left-radius", "$horizontal $vertical")
+}
+
+fun StyleScope.borderTopRightRadius(radius: CSSLengthOrPercentageNumericValue) {
+    property("border-top-right-radius", radius)
+}
+
+fun StyleScope.borderTopRightRadius(
+    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
+    vertical: CSSLengthOrPercentageNumericValue = 0.px
+) {
+    property("border-top-right-radius", "$horizontal $vertical")
+}
+
+fun StyleScope.borderBottomLeftRadius(radius: CSSLengthOrPercentageNumericValue) {
+    property("border-bottom-left-radius", radius)
+}
+
+fun StyleScope.borderBottomLeftRadius(
+    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
+    vertical: CSSLengthOrPercentageNumericValue = 0.px
+) {
+    property("border-bottom-left-radius", "$horizontal $vertical")
+}
+
+fun StyleScope.borderBottomRightRadius(radius: CSSLengthOrPercentageNumericValue) {
+    property("border-bottom-right-radius", radius)
+}
+
+fun StyleScope.borderBottomRightRadius(
+    horizontal: CSSLengthOrPercentageNumericValue = 0.px,
+    vertical: CSSLengthOrPercentageNumericValue = 0.px
+) {
+    property("border-bottom-right-radius", "$horizontal $vertical")
+}
