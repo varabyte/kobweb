@@ -302,6 +302,30 @@ fun StyleScope.fontVariantPosition(position: FontVariantPosition) {
     property("font-variant-position", position)
 }
 
+fun StyleScope.fontVariant(
+    alternates: FontVariantAlternates? = null,
+    caps: FontVariantCaps? = null,
+    eastAsian: FontVariantEastAsian? = null,
+    emoji: FontVariantEmoji? = null,
+    ligatures: FontVariantLigatures? = null,
+    numeric: FontVariantNumeric? = null,
+    position: FontVariantPosition? = null,
+) {
+    property(
+        "font-variant", buildList {
+            alternates?.let { add(it) }
+            caps?.let { add(it) }
+            eastAsian?.let { add(it) }
+            emoji?.let { add(it) }
+            ligatures?.let { add(it) }
+            numeric?.let { add(it) }
+            position?.let { add(it) }
+        }.joinToString(" ")
+    )
+}
+
+// endregion FontVariant
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variation-settings
 sealed class FontVariationSettings private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
@@ -336,30 +360,6 @@ fun StyleScope.fontVariationSettings(settings: FontVariationSettings) {
 fun StyleScope.fontVariationSettings(vararg axes: FontVariationSettings.Axis) {
     fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
-
-fun StyleScope.fontVariant(
-    alternates: FontVariantAlternates? = null,
-    caps: FontVariantCaps? = null,
-    eastAsian: FontVariantEastAsian? = null,
-    emoji: FontVariantEmoji? = null,
-    ligatures: FontVariantLigatures? = null,
-    numeric: FontVariantNumeric? = null,
-    position: FontVariantPosition? = null,
-) {
-    property(
-        "font-variant", buildList {
-            alternates?.let { add(it) }
-            caps?.let { add(it) }
-            eastAsian?.let { add(it) }
-            emoji?.let { add(it) }
-            ligatures?.let { add(it) }
-            numeric?.let { add(it) }
-            position?.let { add(it) }
-        }.joinToString(" ")
-    )
-}
-
-// endregion FontVariant
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
 class FontWeight private constructor(private val value: String) : CSSStyleValue {
