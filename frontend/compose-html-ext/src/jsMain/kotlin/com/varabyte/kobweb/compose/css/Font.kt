@@ -162,21 +162,27 @@ class FontVariantLigatures private constructor(private val value: String) : Styl
         val Normal get() = FontVariantLigatures("normal")
         val None get() = FontVariantLigatures("none")
 
-        // Common ligature values
-        val CommonLigatures get() = FontVariantLigatures("common-ligatures")
-        val NoCommonLigatures get() = FontVariantLigatures("no-common-ligatures")
-
-        // Discretionary ligature values
-        val DiscretionaryLigatures get() = FontVariantLigatures("discretionary-ligatures")
-        val NoDiscretionaryLigatures get() = FontVariantLigatures("no-discretionary-ligatures")
-
-        // Historical ligature values
-        val HistoricalLigatures get() = FontVariantLigatures("historical-ligatures")
-        val NoHistoricalLigatures get() = FontVariantLigatures("no-historical-ligatures")
-
-        // Contextual ligature values
-        val Contextual get() = FontVariantLigatures("contextual")
-        val NoContextual get() = FontVariantLigatures("no-contextual")
+        fun of(
+            common: Boolean? = null,
+            discretionary: Boolean? = null,
+            historical: Boolean? = null,
+            contextual: Boolean? = null
+        ): FontVariantLigatures {
+            return FontVariantLigatures(buildString {
+                if (common != null) {
+                    append("${if (common) "" else "no-"}common-ligatures ")
+                }
+                if (discretionary != null) {
+                    append("${if (discretionary) "" else "no-"}discretionary-ligatures ")
+                }
+                if (historical != null) {
+                    append("${if (historical) "" else "no-"}historical-ligatures ")
+                }
+                if (contextual != null) {
+                    append("${if (contextual) "" else "no-"}contextual ")
+                }
+            })
+        }
 
         // Global
         val Inherit get() = FontVariantLigatures("inherit")
