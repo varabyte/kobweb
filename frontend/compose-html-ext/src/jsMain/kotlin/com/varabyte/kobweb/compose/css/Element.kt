@@ -16,10 +16,6 @@ class Appearance private constructor(private val value: String) : StylePropertyV
         val MenuListButton get() = Appearance("menulist-button")
         val TextField get() = Appearance("textfield")
 
-        // <compat-auto> values have the same effect as 'auto'
-        val Button get() = Appearance("button")
-        val Checkbox get() = Appearance("checkbox")
-
         // Global values
         val Inherit get() = Appearance("inherit")
         val Initial get() = Appearance("initial")
