@@ -3,10 +3,6 @@ package com.varabyte.kobweb.compose.css
 import com.varabyte.kobweb.compose.util.wrapQuotesIfNecessary
 import org.jetbrains.compose.web.css.*
 
-fun StyleScope.fontFamily(value: String) {
-    property("font-family", value)
-}
-
 class FontOpticalSizing private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
