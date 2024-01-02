@@ -700,18 +700,18 @@ fun InputGroup(
         val inputModifier = Modifier
             .width(100.percent)
             .thenIf(scope.leftAddon != null) {
-                Modifier.styleModifier {
-                    property("border-top-left-radius", 0.px)
-                    property("border-bottom-left-radius", 0.px)
+                Modifier.borderRadius {
+                    topLeft(0.px)
+                    bottomLeft(0.px)
                 }
             }
             .thenIf(scope.leftInset != null) {
                 Modifier.paddingInline { start(scope.leftInsetWidth ?: InputVars.InsetLeftWidth.value()) }
             }
             .thenIf(scope.rightAddon != null) {
-                Modifier.styleModifier {
-                    property("border-top-right-radius", 0.px)
-                    property("border-bottom-right-radius", 0.px)
+                Modifier.borderRadius {
+                    topRight(0.px)
+                    bottomRight(0.px)
                 }
             }
             .thenIf(scope.rightInset != null) {
