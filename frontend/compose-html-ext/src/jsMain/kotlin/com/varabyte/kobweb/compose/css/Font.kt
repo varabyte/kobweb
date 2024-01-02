@@ -101,35 +101,48 @@ fun StyleScope.fontVariantCaps(caps: FontVariantCaps) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-east-asian
-class FontVariantEastAsian private constructor(private val value: String) : StylePropertyValue {
+sealed class FontVariantEastAsian private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
+
+    private class Keyword(value: String) : FontVariantEastAsian(value)
+    class ListableKeyword internal constructor(value: String) : FontVariantEastAsian(value)
+    private class KeywordList(vararg values: ListableKeyword) : FontVariantEastAsian(values.joinToString(" "))
 
     companion object {
         // Keyword
-        val Normal get() = FontVariantEastAsian("normal")
+        val Normal: FontVariantEastAsian get() = Keyword("normal")
+
+        // Ruby
+        val Ruby get() = ListableKeyword("ruby")
 
         // East Asian variants
-        val Jis78 get() = FontVariantEastAsian("jis78")
-        val Jis83 get() = FontVariantEastAsian("jis83")
-        val Jis90 get() = FontVariantEastAsian("jis90")
-        val Jis04 get() = FontVariantEastAsian("jis04")
-        val Simplified get() = FontVariantEastAsian("simplified")
-        val Traditional get() = FontVariantEastAsian("traditional")
+        val Jis78 get() = ListableKeyword("jis78")
+        val Jis83 get() = ListableKeyword("jis83")
+        val Jis90 get() = ListableKeyword("jis90")
+        val Jis04 get() = ListableKeyword("jis04")
+        val Simplified get() = ListableKeyword("simplified")
+        val Traditional get() = ListableKeyword("traditional")
 
         // East Asian widths
-        val FullWidth get() = FontVariantEastAsian("full-width")
-        val ProportionalWidth get() = FontVariantEastAsian("proportional-width")
+        val FullWidth get() = ListableKeyword("full-width")
+        val ProportionalWidth get() = ListableKeyword("proportional-width")
+
+        fun of(vararg values: ListableKeyword): FontVariantEastAsian = KeywordList(*values)
 
         // Global
-        val Inherit get() = FontVariantEastAsian("inherit")
-        val Initial get() = FontVariantEastAsian("initial")
-        val Revert get() = FontVariantEastAsian("revert")
-        val Unset get() = FontVariantEastAsian("unset")
+        val Inherit: FontVariantEastAsian get() = Keyword("inherit")
+        val Initial: FontVariantEastAsian get() = Keyword("initial")
+        val Revert: FontVariantEastAsian get() = Keyword("revert")
+        val Unset: FontVariantEastAsian get() = Keyword("unset")
     }
 }
 
 fun StyleScope.fontVariantEastAsian(eastAsian: FontVariantEastAsian) {
     property("font-variant-east-asian", eastAsian)
+}
+
+fun StyleScope.fontVariantEastAsian(vararg eastAsian: FontVariantEastAsian.ListableKeyword) {
+    fontVariantEastAsian(FontVariantEastAsian.of(*eastAsian))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-emoji
@@ -156,40 +169,73 @@ fun StyleScope.fontVariantEmoji(emoji: FontVariantEmoji) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-ligatures
-class FontVariantLigatures private constructor(private val value: String) : StylePropertyValue {
+sealed class FontVariantLigatures private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
+
+    private class Keyword(value: String) : FontVariantLigatures(value)
+    class ListableKeyword internal constructor(value: String) : FontVariantLigatures(value)
+    private class KeywordList(vararg values: ListableKeyword) : FontVariantLigatures(values.joinToString(" "))
 
     companion object {
         // Keyword
-        val Normal get() = FontVariantLigatures("normal")
-        val None get() = FontVariantLigatures("none")
+        val Normal: FontVariantLigatures get() = Keyword("normal")
+        val None: FontVariantLigatures get() = Keyword("none")
 
         // Common ligature values
-        val CommonLigatures get() = FontVariantLigatures("common-ligatures")
-        val NoCommonLigatures get() = FontVariantLigatures("no-common-ligatures")
+        val CommonLigatures get() = ListableKeyword("common-ligatures")
+        val NoCommonLigatures get() = ListableKeyword("no-common-ligatures")
 
         // Discretionary ligature values
-        val DiscretionaryLigatures get() = FontVariantLigatures("discretionary-ligatures")
-        val NoDiscretionaryLigatures get() = FontVariantLigatures("no-discretionary-ligatures")
+        val DiscretionaryLigatures get() = ListableKeyword("discretionary-ligatures")
+        val NoDiscretionaryLigatures get() = ListableKeyword("no-discretionary-ligatures")
 
         // Historical ligature values
-        val HistoricalLigatures get() = FontVariantLigatures("historical-ligatures")
-        val NoHistoricalLigatures get() = FontVariantLigatures("no-historical-ligatures")
+        val HistoricalLigatures get() = ListableKeyword("historical-ligatures")
+        val NoHistoricalLigatures get() = ListableKeyword("no-historical-ligatures")
 
         // Contextual ligature values
-        val Contextual get() = FontVariantLigatures("contextual")
-        val NoContextual get() = FontVariantLigatures("no-contextual")
+        val Contextual get() = ListableKeyword("contextual")
+        val NoContextual get() = ListableKeyword("no-contextual")
+
+        fun of(vararg values: ListableKeyword): FontVariantLigatures = KeywordList(*values)
+
+        fun of(
+            common: Boolean? = null,
+            discretionary: Boolean? = null,
+            historical: Boolean? = null,
+            contextual: Boolean? = null
+        ): FontVariantLigatures {
+            val values = buildList {
+                if (common != null) {
+                    add(if (common) CommonLigatures else NoCommonLigatures)
+                }
+                if (discretionary != null) {
+                    add(if (discretionary) DiscretionaryLigatures else NoDiscretionaryLigatures)
+                }
+                if (historical != null) {
+                    add(if (historical) HistoricalLigatures else NoHistoricalLigatures)
+                }
+                if (contextual != null) {
+                    add(if (contextual) Contextual else NoContextual)
+                }
+            }
+            return of(*values.toTypedArray())
+        }
 
         // Global
-        val Inherit get() = FontVariantLigatures("inherit")
-        val Initial get() = FontVariantLigatures("initial")
-        val Revert get() = FontVariantLigatures("revert")
-        val Unset get() = FontVariantLigatures("unset")
+        val Inherit: FontVariantLigatures get() = Keyword("inherit")
+        val Initial: FontVariantLigatures get() = Keyword("initial")
+        val Revert: FontVariantLigatures get() = Keyword("revert")
+        val Unset: FontVariantLigatures get() = Keyword("unset")
     }
 }
 
 fun StyleScope.fontVariantLigatures(ligatures: FontVariantLigatures) {
     property("font-variant-ligatures", ligatures)
+}
+
+fun StyleScope.fontVariantLigatures(vararg ligatures: FontVariantLigatures.ListableKeyword) {
+    fontVariantLigatures(FontVariantLigatures.of(*ligatures))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-alternates
