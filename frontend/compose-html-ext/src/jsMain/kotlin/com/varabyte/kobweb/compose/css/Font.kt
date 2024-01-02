@@ -41,7 +41,7 @@ sealed class FontVariantAlternates private constructor(private val value: String
     sealed class ListableValue(value: String) : FontVariantAlternates(value)
     private class ListableKeyword(value: String) : ListableValue(value)
     private class FunctionalNotation(name: String, ident: String) : ListableValue("$name($ident)")
-    class ValueList(vararg values: ListableValue) : FontVariantAlternates(values.joinToString(" "))
+    private class ValueList(vararg values: ListableValue) : FontVariantAlternates(values.joinToString(" "))
 
     companion object {
         // Keyword
@@ -56,6 +56,8 @@ sealed class FontVariantAlternates private constructor(private val value: String
         fun Ornaments(ident: String): ListableValue = FunctionalNotation("ornaments", ident)
         fun Annotation(ident: String): ListableValue = FunctionalNotation("annotation", ident)
 
+        fun of(vararg values: ListableValue): FontVariantAlternates = ValueList(*values)
+
         // Global
         val Inherit: FontVariantAlternates get() = SingleKeyword("inherit")
         val Initial: FontVariantAlternates get() = SingleKeyword("initial")
@@ -69,7 +71,7 @@ fun StyleScope.fontVariantAlternates(fontVariantAlternates: FontVariantAlternate
 }
 
 fun StyleScope.fontVariantAlternates(vararg fontVariantAlternates: FontVariantAlternates.ListableValue) {
-    fontVariantAlternates(FontVariantAlternates.ValueList(*fontVariantAlternates))
+    fontVariantAlternates(FontVariantAlternates.of(*fontVariantAlternates))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-variant-caps
