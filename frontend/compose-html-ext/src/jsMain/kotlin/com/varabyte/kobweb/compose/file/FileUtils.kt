@@ -86,6 +86,7 @@ fun Document.saveToDisk(
 ) {
     val snapshotBlob = Blob(arrayOf(content), BlobPropertyBag(mimeType.orEmpty()))
     val url = DomURL.createObjectURL(snapshotBlob)
+
     val tempAnchor = (createElement("a") as HTMLAnchorElement).apply {
         style.display = "none"
         href = url
@@ -115,6 +116,10 @@ class LoadContext(
     val mimeType: String?,
     val event: ProgressEvent,
 )
+
+// take an `Event` instead of a `ProgressEvent` so we don't have to cast everywhere
+private fun createLoadContext(file: File, evt: Event) =
+    LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt.unsafeCast<ProgressEvent>())
 
 private fun Document.loadFromDisk(
     accept: String,
@@ -147,12 +152,9 @@ private fun <I, O> Document.loadFromDisk(
         val file = changeEvt.target.unsafeCast<HTMLInputElement>().files!![0]!!
         val reader = FileReader()
         reader.onabort = { handleUnexpectedOnAbort("loadFromDisk") }
-        reader.onerror = { evt ->
-            onError(LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt.unsafeCast<ProgressEvent>()))
-        }
+        reader.onerror = { onError(createLoadContext(file, it)) }
         reader.onload = { loadEvt ->
-            val loadContext =
-                LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, loadEvt.unsafeCast<ProgressEvent>())
+            val loadContext = createLoadContext(file, loadEvt)
             try {
                 val result = loadEvt.target.unsafeCast<FileReader>().result as I
                 onLoad(loadContext, deserialize(result))
@@ -263,25 +265,23 @@ private fun <I, O> Document.loadMultipleFromDisk(
         val failedToLoadFiles = mutableListOf<LoadContext>()
         val loadedFiles = mutableListOf<LoadedFile<O>>()
 
+        fun triggerCallbacksIfReady() {
+            if (failedToLoadFiles.size + loadedFiles.size == selectedFiles.length) {
+                failedToLoadFiles.takeIf { it.isNotEmpty() }?.let { onError(it) }
+                loadedFiles.takeIf { it.isNotEmpty() }?.let { onLoad(it) }
+            }
+        }
+
         selectedFiles.asList().forEach { file ->
             val reader = FileReader()
-            fun createLoadContext(evt: ProgressEvent) =
-                LoadContext(file.name, file.type.takeIf { it.isNotBlank() }, evt)
-
-            fun triggerCallbacksIfReady() {
-                if (failedToLoadFiles.size + loadedFiles.size == selectedFiles.length) {
-                    failedToLoadFiles.takeIf { it.isNotEmpty() }?.let { onError(it) }
-                    loadedFiles.takeIf { it.isNotEmpty() }?.let { onLoad(it) }
-                }
-            }
 
             reader.onabort = { handleUnexpectedOnAbort("loadMultipleFromDisk") }
             reader.onerror = {
-                failedToLoadFiles.add(createLoadContext(it.unsafeCast<ProgressEvent>()))
+                failedToLoadFiles.add(createLoadContext(file, it))
                 triggerCallbacksIfReady()
             }
             reader.onload = { loadEvt ->
-                val loadContext = createLoadContext(loadEvt.unsafeCast<ProgressEvent>())
+                val loadContext = createLoadContext(file, loadEvt)
                 try {
                     val result = loadEvt.target.unsafeCast<FileReader>().result as I
                     loadedFiles.add(LoadedFile(loadContext, deserialize(result)))
