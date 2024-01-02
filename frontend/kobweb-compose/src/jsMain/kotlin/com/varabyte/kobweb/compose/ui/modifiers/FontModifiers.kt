@@ -23,6 +23,10 @@ fun Modifier.fontFamily(vararg values: String): Modifier = styleModifier {
     fontFamily(*values)
 }
 
+fun Modifier.fontOpticalSizing(value: FontOpticalSizing): Modifier = styleModifier {
+    fontOpticalSizing(value)
+}
+
 fun Modifier.fontSize(value: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     fontSize(value)
 }

@@ -7,6 +7,25 @@ fun StyleScope.fontFamily(value: String) {
     property("font-family", value)
 }
 
+class FontOpticalSizing private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        val Auto get() = FontOpticalSizing("auto")
+        val None get() = FontOpticalSizing("none")
+
+        // Global
+        val Inherit get() = FontOpticalSizing("inherit")
+        val Initial get() = FontOpticalSizing("initial")
+        val Revert get() = FontOpticalSizing("revert")
+        val Unset get() = FontOpticalSizing("unset")
+    }
+}
+
+fun StyleScope.fontOpticalSizing(sizing: FontOpticalSizing) {
+    property("font-optical-sizing", sizing)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
 class FontStyle private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
