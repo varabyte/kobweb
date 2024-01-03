@@ -55,16 +55,16 @@ private fun OverflowStrategy.toValue(position: StylePropertyValue) = "${name.low
 sealed class AlignContent(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class AlignContentKeyword internal constructor(value: String) : AlignContent(value)
+    private class AlignContentKeyword(value: String) : AlignContent(value)
     class AlignContentPosition internal constructor(value: String) : AlignContent(value)
 
-    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : AlignContent(baselineSet.toValue())
-    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: AlignContentPosition) :
+    private class BaselineAlignment(baselineSet: BaselineSet?) : AlignContent(baselineSet.toValue())
+    private class OverflowAlignment(strategy: OverflowStrategy, position: AlignContentPosition) :
         AlignContent(strategy.toValue(position))
 
     companion object {
         // Basic
-        val Normal get() = AlignContentKeyword("normal")
+        val Normal: AlignContent get() = AlignContentKeyword("normal")
 
         // Positional
         val Center get() = AlignContentPosition("center")
@@ -74,25 +74,25 @@ sealed class AlignContent(private val value: String) : StylePropertyValue {
         val FlexEnd get() = AlignContentPosition("flex-end")
 
         // Distributed
-        val SpaceBetween get() = AlignContentKeyword("space-between")
-        val SpaceAround get() = AlignContentKeyword("space-around")
-        val SpaceEvenly get() = AlignContentKeyword("space-evenly")
-        val Stretch get() = AlignContentKeyword("stretch")
+        val SpaceBetween: AlignContent get() = AlignContentKeyword("space-between")
+        val SpaceAround: AlignContent get() = AlignContentKeyword("space-around")
+        val SpaceEvenly: AlignContent get() = AlignContentKeyword("space-evenly")
+        val Stretch: AlignContent get() = AlignContentKeyword("stretch")
 
         // Baseline
-        val Baseline get() = BaselineAlignment(null)
-        val FirstBaseline get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline: AlignContent get() = BaselineAlignment(null)
+        val FirstBaseline: AlignContent get() = BaselineAlignment(BaselineSet.FIRST)
+        val LastBaseline: AlignContent get() = BaselineAlignment(BaselineSet.LAST)
 
         // Overflow
-        fun Safe(position: AlignContentPosition) = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: AlignContentPosition) = OverflowAlignment(OverflowStrategy.UNSAFE, position)
+        fun Safe(position: AlignContentPosition): AlignContent = OverflowAlignment(OverflowStrategy.SAFE, position)
+        fun Unsafe(position: AlignContentPosition): AlignContent = OverflowAlignment(OverflowStrategy.UNSAFE, position)
 
         // Global
-        val Inherit get() = AlignContentKeyword("inherit")
-        val Initial get() = AlignContentKeyword("initial")
-        val Revert get() = AlignContentKeyword("revert")
-        val Unset get() = AlignContentKeyword("unset")
+        val Inherit: AlignContent get() = AlignContentKeyword("inherit")
+        val Initial: AlignContent get() = AlignContentKeyword("initial")
+        val Revert: AlignContent get() = AlignContentKeyword("revert")
+        val Unset: AlignContent get() = AlignContentKeyword("unset")
     }
 }
 
@@ -114,17 +114,17 @@ fun StyleScope.alignContent(alignContent: AlignContent) {
 sealed class AlignItems private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class AlignItemsKeyword internal constructor(value: String) : AlignItems(value)
+    private class AlignItemsKeyword(value: String) : AlignItems(value)
     class AlignItemsPosition internal constructor(value: String) : AlignItems(value)
 
-    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : AlignItems(baselineSet.toValue())
-    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: AlignItemsPosition) :
+    private class BaselineAlignment(baselineSet: BaselineSet?) : AlignItems(baselineSet.toValue())
+    private class OverflowAlignment(strategy: OverflowStrategy, position: AlignItemsPosition) :
         AlignItems(strategy.toValue(position))
 
     companion object {
         // Basic
-        val Normal get() = AlignItemsKeyword("normal")
-        val Stretch get() = AlignItemsKeyword("stretch")
+        val Normal: AlignItems get() = AlignItemsKeyword("normal")
+        val Stretch: AlignItems get() = AlignItemsKeyword("stretch")
 
         // Positional
         val Center get() = AlignItemsPosition("center")
@@ -136,19 +136,19 @@ sealed class AlignItems private constructor(private val value: String) : StylePr
         val FlexEnd get() = AlignItemsPosition("flex-end")
 
         // Baseline
-        val Baseline get() = BaselineAlignment(null)
-        val FirstBaseline get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline: AlignItems get() = BaselineAlignment(null)
+        val FirstBaseline: AlignItems get() = BaselineAlignment(BaselineSet.FIRST)
+        val LastBaseline: AlignItems get() = BaselineAlignment(BaselineSet.LAST)
 
         // Overflow
-        fun Safe(position: AlignItemsPosition) = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: AlignItemsPosition) = OverflowAlignment(OverflowStrategy.UNSAFE, position)
+        fun Safe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.SAFE, position)
+        fun Unsafe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.UNSAFE, position)
 
         // Global
-        val Inherit get() = AlignItemsKeyword("inherit")
-        val Initial get() = AlignItemsKeyword("initial")
-        val Revert get() = AlignItemsKeyword("revert")
-        val Unset get() = AlignItemsKeyword("unset")
+        val Inherit: AlignItems get() = AlignItemsKeyword("inherit")
+        val Initial: AlignItems get() = AlignItemsKeyword("initial")
+        val Revert: AlignItems get() = AlignItemsKeyword("revert")
+        val Unset: AlignItems get() = AlignItemsKeyword("unset")
     }
 }
 
@@ -170,18 +170,18 @@ fun StyleScope.alignItems(alignItems: AlignItems) {
 sealed class AlignSelf private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class AlignSelfKeyword internal constructor(value: String) : AlignSelf(value)
+    private class AlignSelfKeyword(value: String) : AlignSelf(value)
     class AlignSelfPosition internal constructor(value: String) : AlignSelf(value)
 
-    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : AlignSelf(baselineSet.toValue())
-    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: AlignSelfPosition) :
+    private class BaselineAlignment(baselineSet: BaselineSet?) : AlignSelf(baselineSet.toValue())
+    private class OverflowAlignment(strategy: OverflowStrategy, position: AlignSelfPosition) :
         AlignSelf(strategy.toValue(position))
 
     companion object {
         // Basic
-        val Auto get() = AlignSelfKeyword("auto")
-        val Normal get() = AlignSelfKeyword("normal")
-        val Stretch get() = AlignSelfKeyword("stretch")
+        val Auto: AlignSelf get() = AlignSelfKeyword("auto")
+        val Normal: AlignSelf get() = AlignSelfKeyword("normal")
+        val Stretch: AlignSelf get() = AlignSelfKeyword("stretch")
 
         // Positional
         val Center get() = AlignSelfPosition("center")
@@ -193,19 +193,19 @@ sealed class AlignSelf private constructor(private val value: String) : StylePro
         val FlexEnd get() = AlignSelfPosition("flex-end")
 
         // Baseline
-        val Baseline get() = BaselineAlignment(null)
-        val FirstBaseline get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline: AlignSelf get() = BaselineAlignment(null)
+        val FirstBaseline: AlignSelf get() = BaselineAlignment(BaselineSet.FIRST)
+        val LastBaseline: AlignSelf get() = BaselineAlignment(BaselineSet.LAST)
 
         // Overflow
-        fun Safe(position: AlignSelfPosition) = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: AlignSelfPosition) = OverflowAlignment(OverflowStrategy.UNSAFE, position)
+        fun Safe(position: AlignSelfPosition): AlignSelf = OverflowAlignment(OverflowStrategy.SAFE, position)
+        fun Unsafe(position: AlignSelfPosition): AlignSelf = OverflowAlignment(OverflowStrategy.UNSAFE, position)
 
         // Global
-        val Inherit get() = AlignSelfKeyword("inherit")
-        val Initial get() = AlignSelfKeyword("initial")
-        val Revert get() = AlignSelfKeyword("revert")
-        val Unset get() = AlignSelfKeyword("unset")
+        val Inherit: AlignSelf get() = AlignSelfKeyword("inherit")
+        val Initial: AlignSelf get() = AlignSelfKeyword("initial")
+        val Revert: AlignSelf get() = AlignSelfKeyword("revert")
+        val Unset: AlignSelf get() = AlignSelfKeyword("unset")
     }
 }
 
@@ -228,15 +228,15 @@ fun StyleScope.alignSelf(alignSelf: AlignSelf) {
 sealed class JustifyContent private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class JustifyContentKeyword internal constructor(value: String) : JustifyContent(value)
+    private class JustifyContentKeyword(value: String) : JustifyContent(value)
     class JustifyContentPosition internal constructor(value: String) : JustifyContent(value)
 
-    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: JustifyContentPosition) :
+    private class OverflowAlignment(strategy: OverflowStrategy, position: JustifyContentPosition) :
         JustifyContent(strategy.toValue(position))
 
     companion object {
         // Basic
-        val Normal get() = JustifyContentKeyword("normal")
+        val Normal: JustifyContent get() = JustifyContentKeyword("normal")
 
         // Positional
         val Center get() = JustifyContentPosition("center")
@@ -248,20 +248,21 @@ sealed class JustifyContent private constructor(private val value: String) : Sty
         val Right get() = JustifyContentPosition("right")
 
         // Distributed
-        val SpaceBetween get() = JustifyContentKeyword("space-between")
-        val SpaceAround get() = JustifyContentKeyword("space-around")
-        val SpaceEvenly get() = JustifyContentKeyword("space-evenly")
-        val Stretch get() = JustifyContentKeyword("stretch")
+        val SpaceBetween: JustifyContent get() = JustifyContentKeyword("space-between")
+        val SpaceAround: JustifyContent get() = JustifyContentKeyword("space-around")
+        val SpaceEvenly: JustifyContent get() = JustifyContentKeyword("space-evenly")
+        val Stretch: JustifyContent get() = JustifyContentKeyword("stretch")
 
         // Overflow
-        fun Safe(position: JustifyContentPosition) = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: JustifyContentPosition) = OverflowAlignment(OverflowStrategy.UNSAFE, position)
+        fun Safe(position: JustifyContentPosition): JustifyContent = OverflowAlignment(OverflowStrategy.SAFE, position)
+        fun Unsafe(position: JustifyContentPosition): JustifyContent =
+            OverflowAlignment(OverflowStrategy.UNSAFE, position)
 
         // Global
-        val Inherit get() = JustifyContentKeyword("inherit")
-        val Initial get() = JustifyContentKeyword("initial")
-        val Revert get() = JustifyContentKeyword("revert")
-        val Unset get() = JustifyContentKeyword("unset")
+        val Inherit: JustifyContent get() = JustifyContentKeyword("inherit")
+        val Initial: JustifyContent get() = JustifyContentKeyword("initial")
+        val Revert: JustifyContent get() = JustifyContentKeyword("revert")
+        val Unset: JustifyContent get() = JustifyContentKeyword("unset")
     }
 }
 
@@ -283,17 +284,17 @@ fun StyleScope.justifyContent(justifyContent: JustifyContent) {
 sealed class JustifyItems private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class JustifyItemsKeyword internal constructor(value: String) : JustifyItems(value)
+    private class JustifyItemsKeyword(value: String) : JustifyItems(value)
     class JustifyItemsPosition internal constructor(value: String) : JustifyItems(value)
 
-    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : JustifyItems(baselineSet.toValue())
-    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: JustifyItemsPosition) :
+    private class BaselineAlignment(baselineSet: BaselineSet?) : JustifyItems(baselineSet.toValue())
+    private class OverflowAlignment(strategy: OverflowStrategy, position: JustifyItemsPosition) :
         JustifyItems(strategy.toValue(position))
 
     companion object {
         // Basic
-        val Normal get() = JustifyItemsKeyword("normal")
-        val Stretch get() = JustifyItemsKeyword("stretch")
+        val Normal: JustifyItems get() = JustifyItemsKeyword("normal")
+        val Stretch: JustifyItems get() = JustifyItemsKeyword("stretch")
 
         // Positional
         val Center get() = JustifyItemsPosition("center")
@@ -307,19 +308,19 @@ sealed class JustifyItems private constructor(private val value: String) : Style
         val Right get() = JustifyItemsPosition("right")
 
         // Baseline
-        val Baseline get() = BaselineAlignment(null)
-        val FirstBaseline get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline: JustifyItems get() = BaselineAlignment(null)
+        val FirstBaseline: JustifyItems get() = BaselineAlignment(BaselineSet.FIRST)
+        val LastBaseline: JustifyItems get() = BaselineAlignment(BaselineSet.LAST)
 
         // Overflow
-        fun Safe(position: JustifyItemsPosition) = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: JustifyItemsPosition) = OverflowAlignment(OverflowStrategy.UNSAFE, position)
+        fun Safe(position: JustifyItemsPosition): JustifyItems = OverflowAlignment(OverflowStrategy.SAFE, position)
+        fun Unsafe(position: JustifyItemsPosition): JustifyItems = OverflowAlignment(OverflowStrategy.UNSAFE, position)
 
         // Global
-        val Inherit get() = JustifyItemsKeyword("inherit")
-        val Initial get() = JustifyItemsKeyword("initial")
-        val Revert get() = JustifyItemsKeyword("revert")
-        val Unset get() = JustifyItemsKeyword("unset")
+        val Inherit: JustifyItems get() = JustifyItemsKeyword("inherit")
+        val Initial: JustifyItems get() = JustifyItemsKeyword("initial")
+        val Revert: JustifyItems get() = JustifyItemsKeyword("revert")
+        val Unset: JustifyItems get() = JustifyItemsKeyword("unset")
     }
 }
 
@@ -341,18 +342,18 @@ fun StyleScope.justifyItems(justifyItems: JustifyItems) {
 sealed class JustifySelf private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    class JustifySelfKeyword internal constructor(value: String) : JustifySelf(value)
+    private class JustifySelfKeyword(value: String) : JustifySelf(value)
     class JustifySelfPosition internal constructor(value: String) : JustifySelf(value)
 
-    class BaselineAlignment internal constructor(baselineSet: BaselineSet?) : JustifySelf(baselineSet.toValue())
-    class OverflowAlignment internal constructor(strategy: OverflowStrategy, position: JustifySelfPosition) :
+    private class BaselineAlignment(baselineSet: BaselineSet?) : JustifySelf(baselineSet.toValue())
+    private class OverflowAlignment(strategy: OverflowStrategy, position: JustifySelfPosition) :
         JustifySelf(strategy.toValue(position))
 
     companion object {
         // Basic
-        val Auto get() = JustifySelfKeyword("auto")
-        val Normal get() = JustifySelfKeyword("normal")
-        val Stretch get() = JustifySelfKeyword("stretch")
+        val Auto: JustifySelf get() = JustifySelfKeyword("auto")
+        val Normal: JustifySelf get() = JustifySelfKeyword("normal")
+        val Stretch: JustifySelf get() = JustifySelfKeyword("stretch")
 
         // Positional
         val Center get() = JustifySelfPosition("center")
@@ -366,19 +367,19 @@ sealed class JustifySelf private constructor(private val value: String) : StyleP
         val Right get() = JustifySelfPosition("right")
 
         // Baseline
-        val Baseline get() = BaselineAlignment(null)
-        val FirstBaseline get() = BaselineAlignment(BaselineSet.FIRST)
-        val LastBaseline get() = BaselineAlignment(BaselineSet.LAST)
+        val Baseline: JustifySelf get() = BaselineAlignment(null)
+        val FirstBaseline: JustifySelf get() = BaselineAlignment(BaselineSet.FIRST)
+        val LastBaseline: JustifySelf get() = BaselineAlignment(BaselineSet.LAST)
 
         // Overflow
-        fun Safe(position: JustifySelfPosition) = OverflowAlignment(OverflowStrategy.SAFE, position)
-        fun Unsafe(position: JustifySelfPosition) = OverflowAlignment(OverflowStrategy.UNSAFE, position)
+        fun Safe(position: JustifySelfPosition): JustifySelf = OverflowAlignment(OverflowStrategy.SAFE, position)
+        fun Unsafe(position: JustifySelfPosition): JustifySelf = OverflowAlignment(OverflowStrategy.UNSAFE, position)
 
         // Global
-        val Inherit get() = JustifySelfKeyword("inherit")
-        val Initial get() = JustifySelfKeyword("initial")
-        val Revert get() = JustifySelfKeyword("revert")
-        val Unset get() = JustifySelfKeyword("unset")
+        val Inherit: JustifySelf get() = JustifySelfKeyword("inherit")
+        val Initial: JustifySelf get() = JustifySelfKeyword("initial")
+        val Revert: JustifySelf get() = JustifySelfKeyword("revert")
+        val Unset: JustifySelf get() = JustifySelfKeyword("unset")
     }
 }
 
