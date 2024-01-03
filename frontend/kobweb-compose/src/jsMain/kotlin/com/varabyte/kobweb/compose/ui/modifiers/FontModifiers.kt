@@ -73,10 +73,6 @@ class FontVariantScope internal constructor(private val styleScope: StyleScope) 
     fun numeric(numeric: FontVariantNumeric) = styleScope.fontVariantNumeric(numeric)
     fun numeric(vararg numerics: FontVariantNumeric.ListableKeyword) =
         styleScope.fontVariantNumeric(FontVariantNumeric.of(*numerics))
-
-    fun settings(settings: FontVariationSettings) = styleScope.fontVariationSettings(settings)
-    fun settings(vararg axes: FontVariationSettings.Axis) =
-        styleScope.fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
 
 fun Modifier.fontVariant(scope: FontVariantScope.() -> Unit) = styleModifier {
@@ -93,6 +89,14 @@ fun Modifier.fontVariant(
     position: FontVariantPosition? = null,
 ) = styleModifier {
     fontVariant(alternates, caps, eastAsian, emoji, ligatures, numeric, position)
+}
+
+fun Modifier.fontVariationSettings(value: FontVariationSettings): Modifier = styleModifier {
+    fontVariationSettings(value)
+}
+
+fun Modifier.fontVariationSettings(vararg axes: FontVariationSettings.Axis): Modifier = styleModifier {
+    fontVariationSettings(FontVariationSettings.Axes(*axes))
 }
 
 fun Modifier.fontWeight(value: FontWeight): Modifier = styleModifier {
