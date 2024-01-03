@@ -6,6 +6,27 @@ fun StyleScope.borderStyle(lineStyle: LineStyle) {
     property("border-style", lineStyle.value)
 }
 
+fun StyleScope.borderStyle(topBottom: LineStyle = LineStyle.None, leftRight: LineStyle = LineStyle.None) {
+    property("border-style", "$topBottom $leftRight")
+}
+
+fun StyleScope.borderStyle(
+    top: LineStyle = LineStyle.None,
+    leftRight: LineStyle = LineStyle.None,
+    bottom: LineStyle = LineStyle.None
+) {
+    property("border-style", "$top $leftRight $bottom")
+}
+
+fun StyleScope.borderStyle(
+    top: LineStyle = LineStyle.None,
+    right: LineStyle = LineStyle.None,
+    bottom: LineStyle = LineStyle.None,
+    left: LineStyle = LineStyle.None
+) {
+    property("border-style", "$top $right $bottom $left")
+}
+
 fun StyleScope.borderWidth(width: CSSLengthNumericValue) {
     property("border-width", width)
 }
@@ -33,6 +54,30 @@ fun StyleScope.borderCollapse(borderCollapse: BorderCollapse) {
 
 fun StyleScope.borderColor(color: CSSColorValue) {
     property("border-color", color)
+}
+
+fun StyleScope.borderColor(
+    topBottom: CSSColorValue = Color.currentColor,
+    leftRight: CSSColorValue = Color.currentColor
+) {
+    property("border-color", "$topBottom $leftRight")
+}
+
+fun StyleScope.borderColor(
+    top: CSSColorValue = Color.currentColor,
+    leftRight: CSSColorValue = Color.currentColor,
+    bottom: CSSColorValue = Color.currentColor
+) {
+    property("border-color", "$top $leftRight $bottom")
+}
+
+fun StyleScope.borderColor(
+    top: CSSColorValue = Color.currentColor,
+    right: CSSColorValue = Color.currentColor,
+    bottom: CSSColorValue = Color.currentColor,
+    left: CSSColorValue = Color.currentColor
+) {
+    property("border-color", "$top $right $bottom $left")
 }
 
 fun StyleScope.borderTop(borderBuild: CSSBorder.() -> Unit) {
