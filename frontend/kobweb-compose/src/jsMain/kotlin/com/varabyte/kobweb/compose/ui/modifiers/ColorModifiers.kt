@@ -25,6 +25,6 @@ fun Modifier.opacity(value: Number) = styleModifier {
     opacity(value)
 }
 
-fun Modifier.opacity(value: CSSSizeValue<CSSUnit.percent>) = styleModifier {
-    opacity(value)
+fun Modifier.opacity(value: CSSPercentageNumericValue) = styleModifier {
+    opacity(value.unsafeCast<CSSSizeValue<CSSUnit.percent>>())
 }
