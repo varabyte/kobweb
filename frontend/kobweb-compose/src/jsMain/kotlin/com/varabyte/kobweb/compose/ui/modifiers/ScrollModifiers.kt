@@ -13,6 +13,12 @@ fun Modifier.scrollSnapType(scrollSnapType: ScrollSnapType) = styleModifier {
     scrollSnapType(scrollSnapType)
 }
 
+fun Modifier.scrollSnapType(axis: ScrollSnapType.Axis, strictness: ScrollSnapType.Strictness) = styleModifier {
+    scrollSnapType(ScrollSnapType.of(axis, strictness))
+}
+
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+@Deprecated("`ScrollSnapAxis` and `ScrollSnapMode` are deprecated. Use `ScrollSnapType.Axis` and `ScrollSnapType.Strictness` instead.")
 fun Modifier.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = null) = styleModifier {
     scrollSnapType(axis, mode)
 }
@@ -33,16 +39,14 @@ fun Modifier.scrollPadding(value: CSSLengthOrPercentageNumericValue) = styleModi
 fun Modifier.scrollPaddingInline(
     start: CSSLengthOrPercentageNumericValue = 0.px,
     end: CSSLengthOrPercentageNumericValue = 0.px
-) =
-    styleModifier {
+) = styleModifier {
     scrollPaddingInline(start, end)
 }
 
 fun Modifier.scrollPaddingBlock(
     start: CSSLengthOrPercentageNumericValue = 0.px,
     end: CSSLengthOrPercentageNumericValue = 0.px
-) =
-    styleModifier {
+) = styleModifier {
     scrollPaddingBlock(start, end)
 }
 
@@ -73,8 +77,8 @@ fun Modifier.scrollMargin(value: CSSLengthNumericValue) = styleModifier {
 
 fun Modifier.scrollMarginInline(start: CSSLengthNumericValue = 0.px, end: CSSLengthNumericValue = 0.px) =
     styleModifier {
-    scrollMarginInline(start, end)
-}
+        scrollMarginInline(start, end)
+    }
 
 fun Modifier.scrollMarginBlock(start: CSSLengthNumericValue = 0.px, end: CSSLengthNumericValue = 0.px) = styleModifier {
     scrollMarginBlock(start, end)

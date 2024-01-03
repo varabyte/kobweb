@@ -24,18 +24,37 @@ fun StyleScope.scrollBehavior(scrollBehavior: ScrollBehavior) {
 
 // region Scroll snap
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-type
-class ScrollSnapType private constructor(private val value: String) : StylePropertyValue {
+sealed class ScrollSnapType private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
+
+    private class Keyword(value: String) : ScrollSnapType(value)
+    class Axis internal constructor(value: String) : ScrollSnapType(value)
+    private class AxisWithStrictness(axis: Axis, strictness: Strictness) : ScrollSnapType("$axis $strictness")
+
+    enum class Strictness {
+        Mandatory, Proximity;
+
+        override fun toString() = name.lowercase()
+    }
 
     companion object {
         // Keyword
-        val None get() = ScrollSnapType("none")
+        val None: ScrollSnapType get() = Keyword("none")
+
+        // Axes
+        val X get() = Axis("x")
+        val Y get() = Axis("y")
+        val Block get() = Axis("block")
+        val Inline get() = Axis("inline")
+        val Both get() = Axis("both")
+
+        fun of(axis: Axis, strictness: Strictness): ScrollSnapType = AxisWithStrictness(axis, strictness)
 
         // Global
-        val Inherit get() = ScrollSnapType("inherit")
-        val Initial get() = ScrollSnapType("initial")
-        val Revert get() = ScrollSnapType("revert")
-        val Unset get() = ScrollSnapType("unset")
+        val Inherit: ScrollSnapType get() = Keyword("inherit")
+        val Initial: ScrollSnapType get() = Keyword("initial")
+        val Revert: ScrollSnapType get() = Keyword("revert")
+        val Unset: ScrollSnapType get() = Keyword("unset")
     }
 }
 
@@ -44,10 +63,19 @@ class ScrollSnapAxis private constructor(private val value: String) : StylePrope
 
     companion object {
         // Keyword
+        @Deprecated("Use `ScrollSnapType.X` instead.", ReplaceWith("ScrollSnapType.X"))
         val X get() = ScrollSnapAxis("x")
+
+        @Deprecated("Use `ScrollSnapType.Y` instead.", ReplaceWith("ScrollSnapType.Y"))
         val Y get() = ScrollSnapAxis("y")
+
+        @Deprecated("Use `ScrollSnapType.Block` instead.", ReplaceWith("ScrollSnapType.Block"))
         val Block get() = ScrollSnapAxis("block")
+
+        @Deprecated("Use `ScrollSnapType.Inline` instead.", ReplaceWith("ScrollSnapType.Inline"))
         val Inline get() = ScrollSnapAxis("inline")
+
+        @Deprecated("Use `ScrollSnapType.Both` instead.", ReplaceWith("ScrollSnapType.Both"))
         val Both get() = ScrollSnapAxis("both")
     }
 }
@@ -57,15 +85,25 @@ class ScrollSnapMode private constructor(private val value: String) : StylePrope
 
     companion object {
         // Keyword
+        @Deprecated(
+            "Use `ScrollSnapType.Strictness.Mandatory` instead.",
+            ReplaceWith("ScrollSnapType.Strictness.Mandatory")
+        )
         val Mandatory get() = ScrollSnapMode("mandatory")
+
+        @Deprecated(
+            "Use `ScrollSnapType.Strictness.Proximity` instead.",
+            ReplaceWith("ScrollSnapType.Strictness.Proximity")
+        )
         val Proximity get() = ScrollSnapMode("proximity")
     }
 }
 
-fun StyleScope.scrollSnapType(type: ScrollSnapType) {
-    property("scroll-snap-type", type)
+fun StyleScope.scrollSnapType(scrollSnapType: ScrollSnapType) {
+    property("scroll-snap-type", scrollSnapType)
 }
 
+@Deprecated("`ScrollSnapAxis` and `ScrollSnapMode` are deprecated. Use `ScrollSnapType.Axis` and `ScrollSnapType.Strictness` instead.")
 fun StyleScope.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = null) {
     val value = buildString {
         append(axis.toString())
