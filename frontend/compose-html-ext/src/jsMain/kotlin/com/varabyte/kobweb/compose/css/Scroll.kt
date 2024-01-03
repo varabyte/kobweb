@@ -176,30 +176,32 @@ fun StyleScope.scrollPaddingBlockEnd(value: CSSLengthOrPercentageNumericValue) {
 // region Scroll snap align
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-snap-align
-class ScrollSnapAlign private constructor(private val value: String) : StylePropertyValue {
+sealed class ScrollSnapAlign private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
+
+    private class Keyword(value: String) : ScrollSnapAlign(value)
+    class Alignment internal constructor(value: String) : ScrollSnapAlign(value)
+    private class TwoAxis(block: Alignment, inline: Alignment) : ScrollSnapAlign("$block $inline")
 
     companion object {
         // Keyword
-        val None get() = ScrollSnapAlign("none")
-        val Start get() = ScrollSnapAlign("start")
-        val End get() = ScrollSnapAlign("end")
-        val Center get() = ScrollSnapAlign("center")
+        val None get() = Alignment("none")
+        val Start get() = Alignment("start")
+        val End get() = Alignment("end")
+        val Center get() = Alignment("center")
+
+        fun of(blockAxis: Alignment, inlineAxis: Alignment): ScrollSnapAlign = TwoAxis(blockAxis, inlineAxis)
 
         // Global
-        val Inherit get() = ScrollSnapAlign("inherit")
-        val Initial get() = ScrollSnapAlign("initial")
-        val Revert get() = ScrollSnapAlign("revert")
-        val Unset get() = ScrollSnapAlign("unset")
+        val Inherit: ScrollSnapAlign get() = Keyword("inherit")
+        val Initial: ScrollSnapAlign get() = Keyword("initial")
+        val Revert: ScrollSnapAlign get() = Keyword("revert")
+        val Unset: ScrollSnapAlign get() = Keyword("unset")
     }
 }
 
-fun StyleScope.scrollSnapAlign(align: ScrollSnapAlign) {
-    scrollSnapAlign(align, align)
-}
-
-fun StyleScope.scrollSnapAlign(blockAxis: ScrollSnapAlign, inlineAxis: ScrollSnapAlign? = null) {
-    property("scroll-snap-align", "$blockAxis $inlineAxis")
+fun StyleScope.scrollSnapAlign(scrollSnapAlign: ScrollSnapAlign) {
+    property("scroll-snap-align", scrollSnapAlign)
 }
 
 // endregion

@@ -50,13 +50,14 @@ fun Modifier.scrollPaddingBlock(
     scrollPaddingBlock(start, end)
 }
 
-fun Modifier.scrollSnapAlign(align: ScrollSnapAlign) = styleModifier {
-    scrollSnapAlign(align)
+fun Modifier.scrollSnapAlign(scrollSnapAlign: ScrollSnapAlign) = styleModifier {
+    scrollSnapAlign(scrollSnapAlign)
 }
 
-fun Modifier.scrollSnapAlign(blockAxis: ScrollSnapAlign, inlineAxis: ScrollSnapAlign? = null) = styleModifier {
-    scrollSnapAlign(blockAxis, inlineAxis)
-}
+fun Modifier.scrollSnapAlign(blockAxis: ScrollSnapAlign.Alignment, inlineAxis: ScrollSnapAlign.Alignment) =
+    styleModifier {
+        scrollSnapAlign(ScrollSnapAlign.of(blockAxis, inlineAxis))
+    }
 
 fun Modifier.scrollSnapStop(scrollSnapStop: ScrollSnapStop) = styleModifier {
     scrollSnapStop(scrollSnapStop)
