@@ -44,10 +44,9 @@ class Clear private constructor(private val value: String) : StylePropertyValue 
         val InlineEnd get() = Clear("inline-end")
 
         // Global values
-        val Lear get() = Clear("inherit")
+        val Inherit get() = Clear("inherit")
         val Initial get() = Clear("initial")
         val Revert get() = Clear("revert")
-        //        val RevertLayer get() = Clear("revert-layer")
         val Unset get() = Clear("unset")
     }
 }
