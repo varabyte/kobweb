@@ -48,6 +48,8 @@ class MixBlendMode private constructor(private val value: String) : StylePropert
         val Saturation get() = MixBlendMode("saturation")
         val Color get() = MixBlendMode("color")
         val Luminosity get() = MixBlendMode("luminosity")
+        val PlusDarker get() = MixBlendMode("plus-darker")
+        val PlusLighter get() = MixBlendMode("plus-lighter")
 
         // Global values
         val Inherit get() = MixBlendMode("inherit")
