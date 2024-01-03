@@ -15,7 +15,40 @@ fun Modifier.border(
 
 class BorderScope internal constructor(private val styleScope: StyleScope) {
     fun color(color: CSSColorValue) = styleScope.borderColor(color)
+    fun color(topBottom: CSSColorValue = Color.currentColor, leftRight: CSSColorValue = Color.currentColor) =
+        styleScope.borderColor(topBottom, leftRight)
+
+    fun color(
+        top: CSSColorValue = Color.currentColor,
+        leftRight: CSSColorValue = Color.currentColor,
+        bottom: CSSColorValue = Color.currentColor
+    ) = styleScope.borderColor(top, leftRight, bottom)
+
+    fun color(
+        top: CSSColorValue = Color.currentColor,
+        right: CSSColorValue = Color.currentColor,
+        bottom: CSSColorValue = Color.currentColor,
+        left: CSSColorValue = Color.currentColor
+    ) = styleScope.borderColor(top, right, bottom, left)
+
     fun style(lineStyle: LineStyle) = styleScope.borderStyle(lineStyle)
+    fun style(topBottom: LineStyle = LineStyle.None, leftRight: LineStyle = LineStyle.None) =
+        styleScope.borderStyle(topBottom, leftRight)
+
+    fun style(
+        top: LineStyle = LineStyle.None,
+        leftRight: LineStyle = LineStyle.None,
+        bottom: LineStyle = LineStyle.None
+    ) = styleScope.borderStyle(top, leftRight, bottom)
+
+    fun style(
+        top: LineStyle = LineStyle.None,
+        right: LineStyle = LineStyle.None,
+        bottom: LineStyle = LineStyle.None,
+        left: LineStyle = LineStyle.None
+    ) = styleScope.borderStyle(top, right, bottom, left)
+
+
     fun width(width: CSSLengthNumericValue) = styleScope.borderWidth(width)
     fun width(topBottom: CSSLengthNumericValue, leftRight: CSSLengthNumericValue) =
         styleScope.borderWidth(topBottom, leftRight)
@@ -28,8 +61,7 @@ class BorderScope internal constructor(private val styleScope: StyleScope) {
         right: CSSLengthNumericValue,
         bottom: CSSLengthNumericValue,
         left: CSSLengthNumericValue
-    ) =
-        styleScope.borderWidth(top, right, bottom, left)
+    ) = styleScope.borderWidth(top, right, bottom, left)
 }
 
 fun Modifier.border(scope: BorderScope.() -> Unit) = styleModifier {
