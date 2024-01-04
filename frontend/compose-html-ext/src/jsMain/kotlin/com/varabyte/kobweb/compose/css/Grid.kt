@@ -66,7 +66,7 @@ sealed class GridEntry(private val value: String) {
         GridEntry("repeat($value, ${entries.toTrackListString()})") {
 
         /** A fixed count of repeated track sizes and line names. */
-        class Track internal constructor(count: Int, vararg entries: GridEntry) : Repeat(count, entries)
+        internal class Track(count: Int, vararg entries: GridEntry) : Repeat(count, entries)
 
         /**
          * An automatically-determined repetition of track sizes and line names.
