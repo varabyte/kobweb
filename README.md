@@ -101,7 +101,7 @@ need to do this in your own project!*
 *OS: Mac and Linux*
 
 ```bash
-$ brew install varabyte/tap/kobweb
+ brew install varabyte/tap/kobweb
 ```
 
 ### [Scoop](https://scoop.sh/)
@@ -125,7 +125,7 @@ $ brew install varabyte/tap/kobweb
 *OS: Windows, Mac, and \*nix*
 
 ```shell
-$ sdk install kobweb
+ sdk install kobweb
 ```
 
 ### Don't see your favorite package manager?
@@ -139,17 +139,17 @@ Our binary artifact is hosted on GitHub. To download the latest, you can either
 it from your terminal:
 
 ```bash
-$ cd /path/to/applications
+ cd /path/to/applications
 
 # You can either pull down the zip file
 
-$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.13/kobweb-0.9.13.zip
-$ unzip kobweb-0.9.13.zip
+ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.13/kobweb-0.9.13.zip
+ unzip kobweb-0.9.13.zip
 
 # ... or the tar file
 
-$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.13/kobweb-0.9.13.tar
-$ tar -xvf kobweb-0.9.13.tar
+ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.13/kobweb-0.9.13.tar
+ tar -xvf kobweb-0.9.13.tar
 ```
 
 and I recommend adding it to your path, either directly:
@@ -162,8 +162,8 @@ $ kobweb version # to check it's working
 or via symbolic link:
 
 ```bash
-$ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb-0.9.13/bin/kobweb kobweb
+ cd /path/to/bin # some folder you've created that's in your PATH
+ ln -s /path/to/applications/kobweb-0.9.13/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
@@ -197,17 +197,17 @@ The Kobweb CLI is actually maintained in a separate GitHub repo. Once you have t
 clone and build it:
 
 ```bash
-$ cd /path/to/src/root # some folder you've created for storing src code
-$ git clone https://github.com/varabyte/kobweb-cli
-$ cd kobweb-cli
-$ ./gradlew :kobweb:installDist
+ cd /path/to/src/root # some folder you've created for storing src code
+ git clone https://github.com/varabyte/kobweb-cli
+ cd kobweb-cli
+ ./gradlew :kobweb:installDist
 ```
 
 Finally, update your PATH:
 
 ```bash
-$ PATH=$PATH:/path/to/src/root/kobweb-cli/kobweb/build/install/kobweb/bin
-$ kobweb version # to check it's working
+ PATH=$PATH:/path/to/src/root/kobweb-cli/kobweb/build/install/kobweb/bin
+ kobweb version # to check it's working
 ```
 
 ## Update the Kobweb binary
@@ -225,8 +225,8 @@ you installed it.
 ## Create your Kobweb site
 
 ```bash
-$ cd /path/to/projects/
-$ kobweb create app
+ cd /path/to/projects/
+ kobweb create app
 ```
 
 You'll be asked a few questions required for setting up your project.
@@ -263,8 +263,8 @@ This brings us to the next section...
 ## Run your Kobweb site
 
 ```bash
-$ cd /path/to/projects/your-project/site
-$ kobweb run
+ cd /path/to/projects/your-project/site
+ kobweb run
 ```
 
 This command spins up a web server at http://localhost:8080. If you want to configure the port, you can do so by editing
@@ -310,7 +310,7 @@ configurations for any of the commands discussed above, read [these instructions
 Kobweb will provide a growing collection of samples for you to learn from. To see what's available, run:
 
 ```bash
-$ kobweb list
+ kobweb list
 
 You can create the following Kobweb projects by typing `kobweb create ...`
 
