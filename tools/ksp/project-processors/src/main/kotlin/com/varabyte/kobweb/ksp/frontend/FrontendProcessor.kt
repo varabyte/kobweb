@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.ksp.frontend
 
-import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.containingFile
-import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -26,6 +24,7 @@ import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
+import com.varabyte.kobweb.ksp.util.suppresses
 import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
 import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
@@ -149,7 +148,6 @@ class FrontendProcessor(
             }?.also { fileDependencies.add(property.containingFile!!) }
         }
 
-        @OptIn(KspExperimental::class)
         private fun validateOrWarnAboutDeclaration(
             property: KSPropertyDeclaration,
             declarationInfo: DeclarationType
@@ -157,7 +155,7 @@ class FrontendProcessor(
             val propertyName = property.simpleName.asString()
             if (property.parent !is KSFile) {
                 val topLevelSuppression = "TOP_LEVEL_${declarationInfo.suppressionName}"
-                if (property.getAnnotationsByType(Suppress::class).none { topLevelSuppression in it.names }) {
+                if (!property.suppresses(topLevelSuppression)) {
                     logger.warn(
                         "Not registering ${declarationInfo.displayString} `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$topLevelSuppression\")` annotation.",
                         property
@@ -167,7 +165,7 @@ class FrontendProcessor(
             }
             if (!property.isPublic()) {
                 val privateSuppression = "PRIVATE_${declarationInfo.suppressionName}"
-                if (property.getAnnotationsByType(Suppress::class).none { privateSuppression in it.names }) {
+                if (!property.suppresses(privateSuppression)) {
                     logger.warn(
                         "Not registering ${declarationInfo.displayString} `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
                         property

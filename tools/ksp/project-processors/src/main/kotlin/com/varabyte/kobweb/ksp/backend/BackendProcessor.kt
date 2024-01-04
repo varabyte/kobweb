@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.ksp.backend
 
-import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.containingFile
-import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -24,6 +22,7 @@ import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.util.getAnnotationsByName
 import com.varabyte.kobweb.ksp.util.nameWithoutExtension
+import com.varabyte.kobweb.ksp.util.suppresses
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
@@ -81,7 +80,6 @@ class BackendProcessor(
     }
 
     private inner class ApiVisitor : KSVisitorVoid() {
-        @OptIn(KspExperimental::class)
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val type = property.type.toString()
             if (type != API_STREAM_SIMPLE_NAME) return
@@ -93,7 +91,7 @@ class BackendProcessor(
             val topLevelSuppression = "TOP_LEVEL_API_STREAM"
             val privateSuppression = "PRIVATE_API_STREAM"
             if (property.parent !is KSFile) {
-                if (property.getAnnotationsByType(Suppress::class).none { topLevelSuppression in it.names }) {
+                if (!property.suppresses(topLevelSuppression)) {
                     logger.warn(
                         "Not registering ApiStream `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your API Stream inside an @InitSilk block instead (`ctx.apis.register($propertyName)`). Suppress this message by adding a `@Suppress(\"$topLevelSuppression\")` annotation.",
                         property
@@ -102,7 +100,7 @@ class BackendProcessor(
                 return
             }
             if (!property.isPublic()) {
-                if (property.getAnnotationsByType(Suppress::class).none { privateSuppression in it.names }) {
+                if (!property.suppresses(privateSuppression)) {
                     logger.warn(
                         "Not registering ApiStream `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your API Stream inside an @InitSilk block instead (`ctx.apis.register($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
                         property
