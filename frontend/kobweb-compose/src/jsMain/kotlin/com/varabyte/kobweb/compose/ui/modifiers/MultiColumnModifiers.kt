@@ -5,28 +5,28 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
-fun Modifier.multiColumn(multiColumn: MultiColumn) = styleModifier {
-    multiColumn(multiColumn)
+fun Modifier.columnRule(columnRule: ColumnRule) = styleModifier {
+    columnRule(columnRule)
 }
 
-fun Modifier.multiColumn(color: CSSColorValue) = styleModifier {
-    multiColumn(color)
+fun Modifier.columnRule(color: CSSColorValue) = styleModifier {
+    columnRule(color)
 }
 
-fun Modifier.multiColumn(style: LineStyle) = styleModifier {
-    multiColumn(style)
+fun Modifier.columnRule(style: LineStyle) = styleModifier {
+    columnRule(style)
 }
 
-fun Modifier.multiColumn(width: CSSLengthNumericValue) = styleModifier {
-    multiColumn(width)
+fun Modifier.columnRule(width: CSSLengthNumericValue) = styleModifier {
+    columnRule(width)
 }
 
-fun Modifier.multiColumn(
+fun Modifier.columnRule(
     width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) = styleModifier {
-    multiColumn(
+    columnRule(
         width, style, color
     )
 }

@@ -3,49 +3,47 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule
-class MultiColumn private constructor(private val value: String) : StylePropertyValue {
+class ColumnRule private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
 
         // Global values
-        val Inherit get() = MultiColumn("inherit")
-        val Initial get() = MultiColumn("initial")
-        val Revert get() = MultiColumn("revert")
-
-        //        val RevertLayer get() = MultiColumn("revert-layer")
-        val Unset get() = MultiColumn("unset")
+        val Inherit get() = ColumnRule("inherit")
+        val Initial get() = ColumnRule("initial")
+        val Revert get() = ColumnRule("revert")
+        val Unset get() = ColumnRule("unset")
     }
 }
 
-fun StyleScope.multiColumn(multiColumn: MultiColumn) {
-    property("column-rule", multiColumn)
+fun StyleScope.columnRule(columnRule: ColumnRule) {
+    property("column-rule", columnRule)
 }
 
-fun StyleScope.multiColumn(color: CSSColorValue) {
+fun StyleScope.columnRule(color: CSSColorValue) {
     property("column-rule", color)
 }
 
-fun StyleScope.multiColumn(style: LineStyle) {
+fun StyleScope.columnRule(style: LineStyle) {
     property("column-rule", style)
 }
 
-fun StyleScope.multiColumn(width: CSSLengthNumericValue) {
+fun StyleScope.columnRule(width: CSSLengthNumericValue) {
     property("column-rule", width)
 }
 
-fun StyleScope.multiColumn(
+fun StyleScope.columnRule(
     width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
     width?.let {
-        multiColumn(it)
+        columnRule(it)
     }
     style?.let {
-        multiColumn(it)
+        columnRule(it)
     }
     color?.let {
-        multiColumn(it)
+        columnRule(it)
     }
 }
