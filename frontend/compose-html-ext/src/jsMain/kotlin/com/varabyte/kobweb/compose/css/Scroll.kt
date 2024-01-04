@@ -31,7 +31,7 @@ sealed class ScrollSnapType private constructor(private val value: String) : Sty
     class Axis internal constructor(value: String) : ScrollSnapType(value)
     private class AxisWithStrictness(axis: Axis, strictness: Strictness) : ScrollSnapType("$axis $strictness")
 
-    enum class Strictness {
+    enum class Strictness : StylePropertyValue {
         Mandatory, Proximity;
 
         override fun toString() = name.lowercase()
