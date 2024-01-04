@@ -20,16 +20,16 @@ fun StyleScope.columnRule(columnRule: ColumnRule) {
     property("column-rule", columnRule)
 }
 
-fun StyleScope.columnRule(color: CSSColorValue) {
-    property("column-rule", color)
+fun StyleScope.columnRuleColor(color: CSSColorValue) {
+    property("column-rule-color", color)
 }
 
-fun StyleScope.columnRule(style: LineStyle) {
-    property("column-rule", style)
+fun StyleScope.columnRuleStyle(style: LineStyle) {
+    property("column-rule-style", style)
 }
 
-fun StyleScope.columnRule(width: CSSLengthNumericValue) {
-    property("column-rule", width)
+fun StyleScope.columnRuleWidth(width: CSSLengthNumericValue) {
+    property("column-rule-width", width)
 }
 
 fun StyleScope.columnRule(
@@ -38,12 +38,12 @@ fun StyleScope.columnRule(
     color: CSSColorValue? = null
 ) {
     width?.let {
-        columnRule(it)
+        columnRuleWidth(it)
     }
     style?.let {
-        columnRule(it)
+        columnRuleStyle(it)
     }
     color?.let {
-        columnRule(it)
+        columnRuleColor(it)
     }
 }

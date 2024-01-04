@@ -9,16 +9,16 @@ fun Modifier.columnRule(columnRule: ColumnRule) = styleModifier {
     columnRule(columnRule)
 }
 
-fun Modifier.columnRule(color: CSSColorValue) = styleModifier {
-    columnRule(color)
+fun Modifier.columnRuleColor(color: CSSColorValue) = styleModifier {
+    columnRuleColor(color)
 }
 
-fun Modifier.columnRule(style: LineStyle) = styleModifier {
-    columnRule(style)
+fun Modifier.columnRuleStyle(style: LineStyle) = styleModifier {
+    columnRuleStyle(style)
 }
 
-fun Modifier.columnRule(width: CSSLengthNumericValue) = styleModifier {
-    columnRule(width)
+fun Modifier.columnRuleWidth(width: CSSLengthNumericValue) = styleModifier {
+    columnRuleWidth(width)
 }
 
 fun Modifier.columnRule(
