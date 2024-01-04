@@ -17,11 +17,11 @@ class BorderScope internal constructor(private val styleScope: StyleScope) {
     fun color(color: CSSColorValue) = styleScope.borderColor(color)
     fun style(lineStyle: LineStyle) = styleScope.borderStyle(lineStyle)
     fun width(width: CSSLengthNumericValue) = styleScope.borderWidth(width)
-    fun width(topAndBottom: CSSLengthNumericValue, leftAndRight: CSSLengthNumericValue) =
-        styleScope.borderWidth(topAndBottom, leftAndRight)
+    fun width(topBottom: CSSLengthNumericValue, leftRight: CSSLengthNumericValue) =
+        styleScope.borderWidth(topBottom, leftRight)
 
-    fun width(top: CSSLengthNumericValue, leftAndRight: CSSLengthNumericValue, bottom: CSSLengthNumericValue) =
-        styleScope.borderWidth(top, leftAndRight, bottom)
+    fun width(top: CSSLengthNumericValue, leftRight: CSSLengthNumericValue, bottom: CSSLengthNumericValue) =
+        styleScope.borderWidth(top, leftRight, bottom)
 
     fun width(
         top: CSSLengthNumericValue,
@@ -157,14 +157,14 @@ class BorderRadiusScope internal constructor(private val styleScope: StyleScope)
     }
 
     fun horizontal(all: CSSLengthOrPercentageNumericValue) = updateHorizontal(all.toString())
-    fun horizontal(topAndBottom: CSSLengthOrPercentageNumericValue, leftAndRight: CSSLengthOrPercentageNumericValue) =
-        updateHorizontal("$topAndBottom $leftAndRight")
+    fun horizontal(topBottom: CSSLengthOrPercentageNumericValue, leftRight: CSSLengthOrPercentageNumericValue) =
+        updateHorizontal("$topBottom $leftRight")
 
     fun horizontal(
         top: CSSLengthOrPercentageNumericValue,
-        leftAndRight: CSSLengthOrPercentageNumericValue,
+        leftRight: CSSLengthOrPercentageNumericValue,
         bottom: CSSLengthOrPercentageNumericValue
-    ) = updateHorizontal("$top $leftAndRight $bottom")
+    ) = updateHorizontal("$top $leftRight $bottom")
 
     fun horizontal(
         top: CSSLengthOrPercentageNumericValue,
@@ -174,14 +174,14 @@ class BorderRadiusScope internal constructor(private val styleScope: StyleScope)
     ) = updateHorizontal("$top $right $bottom $left")
 
     fun vertical(all: CSSLengthOrPercentageNumericValue) = updateVertical(all.toString())
-    fun vertical(topAndBottom: CSSLengthOrPercentageNumericValue, leftAndRight: CSSLengthOrPercentageNumericValue) =
-        updateVertical("$topAndBottom $leftAndRight")
+    fun vertical(topBottom: CSSLengthOrPercentageNumericValue, leftRight: CSSLengthOrPercentageNumericValue) =
+        updateVertical("$topBottom $leftRight")
 
     fun vertical(
         top: CSSLengthOrPercentageNumericValue,
-        leftAndRight: CSSLengthOrPercentageNumericValue,
+        leftRight: CSSLengthOrPercentageNumericValue,
         bottom: CSSLengthOrPercentageNumericValue
-    ) = updateVertical("$top $leftAndRight $bottom")
+    ) = updateVertical("$top $leftRight $bottom")
 
     fun vertical(
         top: CSSLengthOrPercentageNumericValue,
