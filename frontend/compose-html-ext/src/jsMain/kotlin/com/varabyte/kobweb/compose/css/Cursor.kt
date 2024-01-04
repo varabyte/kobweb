@@ -54,6 +54,12 @@ class Cursor private constructor(private val value: String) : StylePropertyValue
         // Zoom
         val ZoomIn get() = Cursor("zoom-in")
         val ZoomOut get() = Cursor("zoom-out")
+
+        // Global
+        val Inherit get() = Cursor("inherit")
+        val Initial get() = Cursor("initial")
+        val Revert get() = Cursor("revert")
+        val Unset get() = Cursor("unset")
     }
 }
 

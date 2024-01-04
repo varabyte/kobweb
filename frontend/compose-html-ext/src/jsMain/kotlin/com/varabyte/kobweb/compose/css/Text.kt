@@ -14,6 +14,11 @@ class TextAlign private constructor(private val value: String) : StylePropertyVa
         val Start get() = TextAlign("start")
         val End get() = TextAlign("end")
         val MatchParent get() = TextAlign("match-parent")
+
+        val Inherit get() = TextAlign("inherit")
+        val Initial get() = TextAlign("initial")
+        val Revert get() = TextAlign("revert")
+        val Unset get() = TextAlign("unset")
     }
 }
 
