@@ -72,18 +72,25 @@ Here's a demo where we create a Compose HTML project from scratch with Markdown 
 
 https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-aac0-88f8992145ef.mp4
 
-> [!NOTE]
-> One of Kobweb's users, Stevdza-San, has created YouTube videos that demonstrate how to build projects using Kobweb.
+<span id="stevdza-san"><span> <!-- Useful way to link to the following tip -->
+> [!TIP]
+> One of Kobweb's users, Stevdza-San, has created free starting tutorials that demonstrate how to build projects using
+> Kobweb.
 >
-> * [Building a static layout site](https://www.youtube.com/watch?v=F5B-CxJTKlg)
->   * This is a great starting place, and it's perfect for simple portfolio sites or SEO-friendly landing pages for your
->     software.
+> * [Getting started with Kobweb](https://www.youtube.com/watch?v=F5B-CxJTKlg)
+>   * This video introduces basic Kobweb concepts and walks you through the process from creating a simple
+>     (static layout) site to exporting it locally on your machine (with files you can then upload to a static hosting
+>     provider of your choice).
+> * [Deploying a Kobweb site](https://www.youtube.com/watch?v=ciAqQPThXn0)
+>   * This video builds upon the previous, showcasing some additional tips and tricks, and walks you all the way through
+>     to deploying your site live on the internet using free hosting.
 > * [Building a full stack multiplatform site](https://www.youtube.com/watch?v=zcrY0qayWF4)
 >   * This demonstrates how to write both frontend and backend logic. It also demonstrates how you can write a separate
->     Android frontend that can also work with your server. (This video is still useful to watch even if you never intend
->     to have any other frontend besides the web).
-> * It's easy to start with a static layout site and migrate to a full-stack site later. (You can read more about
->   [Static vs. Fullstack sites▼](#static-layout-vs-full-stack-sites) below.)
+>     Android frontend that can also work with your server. (This video is still useful to watch even if you never
+>     intend to use Android).
+>
+> It's easy to start with a static layout site first and migrate to a full stack site later. (You can read more
+> about [Static layout vs. Full stack sites▼](#static-layout-vs-full-stack-sites) below.)
 
 # Trying it out yourself
 
