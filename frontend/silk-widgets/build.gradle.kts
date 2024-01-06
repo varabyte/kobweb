@@ -17,15 +17,13 @@ kotlin {
     }
 
     sourceSets {
-        val jsMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.html.core)
+        jsMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.html.core)
 
-                api(projects.frontend.kobwebCompose)
-                api(projects.frontend.silkFoundation)
-                implementation(projects.frontend.composeHtmlExt)
-            }
+            api(projects.frontend.kobwebCompose)
+            api(projects.frontend.silkFoundation)
+            implementation(projects.frontend.composeHtmlExt)
         }
     }
 }

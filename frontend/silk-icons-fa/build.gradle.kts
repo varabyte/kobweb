@@ -187,7 +187,7 @@ kotlin {
     }
 
     sourceSets {
-        val jsMain by getting {
+        jsMain {
             kotlin.srcDir(generateIconsTask)
             dependencies {
                 implementation(compose.runtime)

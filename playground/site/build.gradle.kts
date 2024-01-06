@@ -35,12 +35,10 @@ kotlin {
     configAsKobwebApplication(includeServer = true)
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-            }
+        commonMain.dependencies {
+            implementation(compose.runtime)
         }
-        val jsMain by getting {
+        jsMain {
             resources.srcDir(customTask)
 
             dependencies {
@@ -53,11 +51,9 @@ kotlin {
                 implementation(project(":worker"))
             }
         }
-        val jvmMain by getting {
-            dependencies {
-                implementation("com.varabyte.kobweb:kobweb-api")
-                implementation(project(":sitelib"))
-            }
+        jvmMain.dependencies {
+            implementation("com.varabyte.kobweb:kobweb-api")
+            implementation(project(":sitelib"))
         }
     }
 }

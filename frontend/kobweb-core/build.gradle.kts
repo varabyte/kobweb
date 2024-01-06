@@ -17,14 +17,12 @@ kotlin {
     }
 
     sourceSets {
-        val jsMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.html.core)
-                implementation(libs.kotlinx.serialization.json)
-                api(projects.frontend.composeHtmlExt)
-                implementation(projects.common.clientServerModels)
-            }
+        jsMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.html.core)
+            implementation(libs.kotlinx.serialization.json)
+            api(projects.frontend.composeHtmlExt)
+            implementation(projects.common.clientServerModels)
         }
     }
 }
