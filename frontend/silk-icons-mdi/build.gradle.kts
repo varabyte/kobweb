@@ -81,10 +81,10 @@ val generateIconsTask = tasks.register("generateIcons") {
                         throw GradleException("Unexpected icon entry with no styles: $entry")
                     }
 
-                styles.size == IconStyle.values().size -> {
-                    // This icon supports all styles. No need to assert input parameters.
-                    "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = FILLED) = MdIcon(\"$rawName\", modifier, style)"
-                }
+                    styles.size == IconStyle.values().size -> {
+                        // This icon supports all styles. No need to assert input parameters.
+                        "@Composable fun $methodName(modifier: Modifier = Modifier, style: IconStyle = FILLED) = MdIcon(\"$rawName\", modifier, style)"
+                    }
 
                     else -> {
                         // Not all styles are valid. For now, we throw an exception to inform the user about this, but we
@@ -172,7 +172,7 @@ kotlin {
     }
 
     sourceSets {
-        val jsMain by getting {
+        jsMain {
             kotlin.srcDir(generateIconsTask)
             dependencies {
                 implementation(compose.runtime)

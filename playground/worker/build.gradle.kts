@@ -21,8 +21,7 @@ kotlin {
     }
 
     sourceSets {
-        val jsMain by getting {
-            dependencies {
+        jsMain.dependencies {
                 api(libs.kotlinx.serialization.json)
             }
         }

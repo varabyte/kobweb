@@ -16,10 +16,8 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.kotlinx.serialization.core)
-            }
+        commonMain.dependencies {
+            implementation(libs.kotlinx.serialization.core)
         }
     }
 }

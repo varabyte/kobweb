@@ -2909,8 +2909,8 @@ val generateCodeTask = tasks.register("generateCode") {
 
 kotlin {
   configAsKobwebApplication()
-  val commonMain by getting { /* ... */ }
-  val jsMain by getting {
+  commonMain.dependencies { /* ... */ }
+  jsMain {
     kotlin.srcDir(generateCodeTask) // <----- Set your task here
     dependencies { /* ... */ }
   }
@@ -3860,13 +3860,11 @@ repositories {
 
 kotlin {
   js().browser()
-  sourceSets {
-    val jsMain by getting {
-      dependencies {
-        implementation(compose.html.core)
-        implementation(compose.runtime)
-        implementation("com.varabyte.kobweb:compose-html-ext:...") // IMPORTANT!!!
-      }
+  sourceSets { 
+    jsMain.dependencies {
+      implementation(compose.html.core)
+      implementation(compose.runtime)
+      implementation("com.varabyte.kobweb:compose-html-ext:...") // IMPORTANT!!!
     }
   }
 }

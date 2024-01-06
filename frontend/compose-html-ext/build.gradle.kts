@@ -17,18 +17,15 @@ kotlin {
     }
 
     sourceSets {
-        val jsMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.html.core)
-            }
+        jsMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.html.core)
+            api(libs.kotlinx.coroutines)
         }
 
-        val jsTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
-                implementation(libs.truthish)
-            }
+        jsTest.dependencies {
+            implementation(kotlin("test-js"))
+            implementation(libs.truthish)
         }
     }
 }

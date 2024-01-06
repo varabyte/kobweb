@@ -17,23 +17,17 @@ kotlin {
     configAsKobwebLibrary(includeServer = true)
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-            }
+        commonMain.dependencies {
+            implementation(compose.runtime)
         }
-        val jsMain by getting {
-            dependencies {
-                implementation(compose.html.core)
-                implementation("com.varabyte.kobweb:kobweb-core")
-                implementation("com.varabyte.kobweb:kobweb-silk")
-                implementation("com.varabyte.kobwebx:silk-icons-fa")
-            }
+        jsMain.dependencies {
+            implementation(compose.html.core)
+            implementation("com.varabyte.kobweb:kobweb-core")
+            implementation("com.varabyte.kobweb:kobweb-silk")
+            implementation("com.varabyte.kobwebx:silk-icons-fa")
         }
-        val jvmMain by getting {
-            dependencies {
-                implementation("com.varabyte.kobweb:kobweb-api")
-            }
+        jvmMain.dependencies {
+            implementation("com.varabyte.kobweb:kobweb-api")
         }
     }
 }
