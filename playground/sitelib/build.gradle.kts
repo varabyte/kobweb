@@ -10,7 +10,7 @@ group = "playground"
 version = "1.0-SNAPSHOT"
 
 kobweb {
-    kspProcessorDependency.set("com.varabyte.kobweb:project-processors")
+    kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
 }
 
 kotlin {

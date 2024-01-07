@@ -82,7 +82,7 @@ abstract class KobwebBlock : ExtensionAware {
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")
-        kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-project-processors:${KobwebVersionUtil.version}")
+        kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-site-processors:${KobwebVersionUtil.version}")
     }
 
     inline fun <reified T : FileGeneratingBlock> getGenJsSrcRoot(project: Project): File {

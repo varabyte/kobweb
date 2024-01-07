@@ -14,7 +14,7 @@ kobweb {
     markdown {
         imports.add(".components.widgets.*")
     }
-    kspProcessorDependency.set("com.varabyte.kobweb:project-processors")
+    kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
 }
 
 val getWorkerScript by configurations.registering {}
