@@ -20,7 +20,7 @@ import org.jetbrains.compose.web.css.*
  *
  * @App
  * @Composable
- * fun MyApp(content: @Composable () -> Unit) {
+ * fun AppEntry(content: @Composable () -> Unit) {
  *   KobwebApp {
  *     Style(SiteStyleSheet)
  *     Box(Modifier.fillMaxSize().backgroundColor(Colors.Magenta)) {

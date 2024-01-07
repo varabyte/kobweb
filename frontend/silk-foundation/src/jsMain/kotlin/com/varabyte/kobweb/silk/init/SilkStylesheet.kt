@@ -54,7 +54,7 @@ interface SilkStylesheet {
      *
      * @App
      * @Composable
-     * fun MyApp(content: @Composable () -> Unit) {
+     * fun AppEntry(content: @Composable () -> Unit) {
      *   SilkApp {
      *     Style(MyStyleSheet)
      *     ...
@@ -95,7 +95,7 @@ interface SilkStylesheet {
      *
      * @App
      * @Composable
-     * fun MyApp(content: @Composable () -> Unit) {
+     * fun AppEntry(content: @Composable () -> Unit) {
      *   SilkApp {
      *     Style(MyStyleSheet)
      *     ...
