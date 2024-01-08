@@ -3,8 +3,12 @@ package com.varabyte.kobweb.gradle.core.util
 import com.varabyte.kobweb.gradle.core.kmp.TargetPlatform
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
+import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
 
@@ -88,3 +92,17 @@ fun Project.hasTransitiveJsDependencyNamed(name: String): Boolean {
  * jar name or the main javascript file.
  */
 fun Project.suggestKobwebProjectName() = project.group.toString().replace('.', '-')
+
+/**
+ * All Kobweb dependencies should include a module.json to identify themselves as such.
+ *
+ * Kobweb application plugins will check for it and use its presence to distinguish which of its dependencies are
+ * Kobweb artifacts.
+ *
+ * This method will fail with an exception if the core plugin is not applied before calling it.
+ */
+fun Project.generateModuleMetadataFor(target: TargetPlatform<*>) {
+    project.tasks.named<ProcessResources>(target.processResources) {
+        from(project.tasks.withType<KobwebGenerateModuleMetadataTask>())
+    }
+}

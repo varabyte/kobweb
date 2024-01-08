@@ -4,6 +4,7 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.extensions.YarnLockChangedStrategy
 import com.varabyte.kobweb.gradle.core.extensions.createYarnBlock
 import com.varabyte.kobweb.gradle.core.extensions.yarn
+import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -104,5 +105,7 @@ class KobwebCorePlugin : Plugin<Project> {
                 throw GradleException("This version of Kobweb requires a newer Kotlin version than what this project is using. Please refer to https://github.com/varabyte/kobweb/blob/main/COMPATIBILITY.md")
             }
         }
+
+        project.tasks.register("kobwebGenerateModuleMetadata", KobwebGenerateModuleMetadataTask::class.java)
     }
 }
