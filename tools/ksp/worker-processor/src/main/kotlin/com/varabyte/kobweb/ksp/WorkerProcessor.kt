@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.ksp
 
-import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getConstructors
 import com.google.devtools.ksp.isInternal
 import com.google.devtools.ksp.isPrivate
@@ -212,9 +211,11 @@ class WorkerProcessor(
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
             val workerStrategyBaseClass = classDeclaration
-                .getAllSuperTypes()
-                .filter { it.declaration.qualifiedName?.asString() == WORKER_STRATEGY_FQN }
-                .firstOrNull()
+                .superTypes
+                .filter {
+                    it.toString() == WORKER_STRATEGY_SIMPLE_NAME &&
+                        it.resolve().declaration.qualifiedName?.asString() == WORKER_STRATEGY_FQN
+                }.firstOrNull()?.resolve()
 
             if (workerStrategyBaseClass != null) {
                 val resolvedTypes = workerStrategyBaseClass.arguments.mapNotNull { it.type?.resolve() }
