@@ -12,8 +12,8 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSFile
-import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.ksp.symbol.suppresses
 
@@ -33,9 +33,10 @@ class WorkerProcessor(
 ) : SymbolProcessor {
     class WorkerStrategyInfo(
         val classDeclaration: KSClassDeclaration,
-        val inputType: KSType,
-        val outputType: KSType,
+        val inputTypeDeclaration: KSDeclaration,
+        val outputTypeDeclaration: KSDeclaration,
     )
+
     private var workerStrategyInfo: WorkerStrategyInfo? = null
 
     // See WorkerBlock.fqcn property documentation for explicit examples for converting the fqcn value to final
@@ -83,12 +84,12 @@ class WorkerProcessor(
             }
         }
 
-        if (!workerStrategy.inputType.declaration.isPublic()) {
-            error("A Kobweb `WorkerStrategy` implementation's input type must be public so the Kobweb application can use it. Please make `${workerStrategy.inputType.declaration.qualifiedName!!.asString()}` public.")
+        if (!workerStrategy.inputTypeDeclaration.isPublic()) {
+            error("A Kobweb `WorkerStrategy` implementation's input type must be public so the Kobweb application can use it. Please make `${workerStrategy.inputTypeDeclaration.qualifiedName!!.asString()}` public.")
         }
 
-        if (!workerStrategy.outputType.declaration.isPublic()) {
-            error("A Kobweb `WorkerStrategy` implementation's output type must be public so the Kobweb application can use it. Please make `${workerStrategy.outputType.declaration.qualifiedName!!.asString()}` public.")
+        if (!workerStrategy.outputTypeDeclaration.isPublic()) {
+            error("A Kobweb `WorkerStrategy` implementation's output type must be public so the Kobweb application can use it. Please make `${workerStrategy.outputTypeDeclaration.qualifiedName!!.asString()}` public.")
         }
 
         if (classNameOverride == null && !workerStrategy.classDeclaration.qualifiedName!!.asString()
@@ -109,8 +110,8 @@ class WorkerProcessor(
             aggregating = true,
             *listOfNotNull(
                 workerStrategyInfo.classDeclaration.containingFile,
-                workerStrategyInfo.inputType.declaration.containingFile,
-                workerStrategyInfo.inputType.declaration.containingFile
+                workerStrategyInfo.inputTypeDeclaration.containingFile,
+                workerStrategyInfo.inputTypeDeclaration.containingFile
             ).toTypedArray()
         )
 
@@ -121,7 +122,8 @@ class WorkerProcessor(
                 it
             }
         } ?: workerStrategyInfo.classDeclaration.packageName.asString()
-        val workerClassName = classNameOverride ?: workerStrategyInfo.classDeclaration.simpleName.asString().removeSuffix("Strategy")
+        val workerClassName = classNameOverride
+            ?: workerStrategyInfo.classDeclaration.simpleName.asString().removeSuffix("Strategy")
 
         codeGenerator.createNewFile(
             deps,
@@ -129,8 +131,8 @@ class WorkerProcessor(
             workerClassName
         ).writer().use { writer ->
             val strategyWorkerType = workerStrategyInfo.classDeclaration.qualifiedName!!.asString()
-            val inputType = workerStrategyInfo.inputType.declaration.qualifiedName!!.asString()
-            val outputType = workerStrategyInfo.outputType.declaration.qualifiedName!!.asString()
+            val inputType = workerStrategyInfo.inputTypeDeclaration.qualifiedName!!.asString()
+            val outputType = workerStrategyInfo.outputTypeDeclaration.qualifiedName!!.asString()
 
             writer.write(
                 """
@@ -228,8 +230,8 @@ class WorkerProcessor(
                 _workerStrategies.add(
                     WorkerStrategyInfo(
                         classDeclaration,
-                        inputType = resolvedTypes[0],
-                        outputType = resolvedTypes[1],
+                        inputTypeDeclaration = resolvedTypes[0].declaration,
+                        outputTypeDeclaration = resolvedTypes[1].declaration,
                     )
                 )
             }
