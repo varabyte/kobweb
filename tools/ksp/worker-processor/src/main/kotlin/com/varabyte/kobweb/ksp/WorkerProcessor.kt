@@ -140,7 +140,7 @@ class WorkerProcessor(
 
                     import org.w3c.dom.Worker
 
-                    class $workerClassName(override var onOutput: ($outputType) -> Unit = {}): com.varabyte.kobweb.worker.Worker<$inputType, $outputType> {
+                    class $workerClassName(override var onOutput: ($outputType) -> Unit = {}): $WORKER_FQN<$inputType, $outputType> {
                         private val ioSerializer = $strategyWorkerType().ioSerializer
 
                         private val worker = Worker("${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
@@ -213,7 +213,7 @@ class WorkerProcessor(
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
             val workerStrategyBaseClass = classDeclaration
                 .getAllSuperTypes()
-                .filter { it.declaration.qualifiedName?.asString() == "com.varabyte.kobweb.worker.WorkerStrategy" }
+                .filter { it.declaration.qualifiedName?.asString() == WORKER_STRATEGY_FQN }
                 .firstOrNull()
 
             if (workerStrategyBaseClass != null) {
