@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.util.CancellableActionHandle
-import com.varabyte.kobweb.compose.util.setInterval
+import com.varabyte.kobweb.browser.util.CancellableActionHandle
+import com.varabyte.kobweb.browser.util.setInterval
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
 import kotlinx.browser.document

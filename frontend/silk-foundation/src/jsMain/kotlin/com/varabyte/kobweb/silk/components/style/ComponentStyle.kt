@@ -3,14 +3,14 @@
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.util.kebabCaseToTitleCamelCase
+import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
-import com.varabyte.kobweb.compose.util.kebabCaseToTitleCamelCase
-import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.style.CssModifier.Companion.BaseKey
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.theme.SilkTheme

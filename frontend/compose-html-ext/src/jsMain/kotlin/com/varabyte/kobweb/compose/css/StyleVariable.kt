@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
+import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 import kotlin.reflect.KProperty

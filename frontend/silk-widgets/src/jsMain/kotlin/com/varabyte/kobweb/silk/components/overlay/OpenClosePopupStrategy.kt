@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.silk.components.overlay
 
-import com.varabyte.kobweb.compose.events.EventListenerManager
+import com.varabyte.kobweb.browser.events.EventListenerManager
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope

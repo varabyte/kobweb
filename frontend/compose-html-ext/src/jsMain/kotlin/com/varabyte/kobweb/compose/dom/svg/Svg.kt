@@ -4,9 +4,9 @@
 package com.varabyte.kobweb.compose.dom.svg
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.GenericTag
-import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.HtmlAttrMarker
 import org.jetbrains.compose.web.css.*

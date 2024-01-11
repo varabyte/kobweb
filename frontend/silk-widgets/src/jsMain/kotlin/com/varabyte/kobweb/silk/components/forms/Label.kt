@@ -1,10 +1,10 @@
 package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.dom.ElementTarget
+import com.varabyte.kobweb.browser.dom.descendantsBfs
+import com.varabyte.kobweb.browser.dom.generateUniqueId
 import com.varabyte.kobweb.compose.dom.ElementRefScope
-import com.varabyte.kobweb.compose.dom.ElementTarget
-import com.varabyte.kobweb.compose.dom.descendantsBfs
-import com.varabyte.kobweb.compose.dom.generateUniqueId
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toAttrs

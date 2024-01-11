@@ -1,6 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 package com.varabyte.kobweb.compose.util
 
-import kotlinx.browser.window
+import com.varabyte.kobweb.browser.util.invokeLater
+import com.varabyte.kobweb.browser.util.invokeThenInterval
+import com.varabyte.kobweb.browser.util.setInterval
+import com.varabyte.kobweb.browser.util.setTimeout
 import org.w3c.dom.Window
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -17,47 +22,8 @@ import kotlin.time.Duration.Companion.milliseconds
  * with the advantage that it can be used for both `setTimeout` and `setInterval` calls, as well as mixed mode calls,
  * like starting with an initial timeout before leading into a repeated interval.
  */
-class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) {
-    companion object {
-        /**
-         * A fake handle which can be used as a stub if you need to initialize a handle before a timer is started.
-         *
-         * For example, in code like:
-         *
-         * ```
-         * var handle = CancellableActionHandle.Stub
-         * handle = window.setInterval(timeToWaitPerAttempt) {
-         *   if (someCondition) {
-         *      handle.cancel()
-         *   }
-         * }
-         * ```
-         *
-         * In the above case, `handle` will be correctly set by the time the first interval callback is triggered.
-         *
-         * Without this stub, the user would have to declare `handle` as nullable, resulting in `handle!!` calls in
-         * common cases like the above example represents.
-         */
-        val Stub = CancellableActionHandle(0)
-    }
-
-    internal var id = id
-        private set
-
-    fun cancel() {
-        if (isInterval) {
-            window.clearInterval(id)
-        } else {
-            window.clearTimeout(id)
-        }
-        id = 0
-    }
-
-    internal fun setTo(other: CancellableActionHandle) {
-        this.id = other.id
-        this.isInterval = other.isInterval
-    }
-}
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.CancellableActionHandle` instead (that is, `compose` → `browser`).")
+typealias CancellableActionHandle = com.varabyte.kobweb.browser.util.CancellableActionHandle
 
 /**
  * A helper function to invoke a block of code on the next event loop.
@@ -71,9 +37,9 @@ class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) 
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.invokeLater(block: () -> Unit): CancellableActionHandle {
-    return setTimeout(0.milliseconds, block)
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.invokeLater` instead (that is, `compose` → `browser`).")
+fun Window.invokeLater(block: () -> Unit) = invokeLater(block)
 
 /**
  * An alternate version of `window.setTimeout` in a more Kotlin-friendly form (with the lambda parameter last).
@@ -95,10 +61,9 @@ fun Window.setTimeout(timeout: Int, block: () -> Unit): CancellableActionHandle 
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setTimeout(timeout: Duration, block: () -> Unit): CancellableActionHandle {
-    val id = window.setTimeout(block, timeout.inWholeMilliseconds.toInt())
-    return CancellableActionHandle(id)
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.setTimeout` instead (that is, `compose` → `browser`).")
+fun Window.setTimeout(timeout: Duration, block: () -> Unit) = setTimeout(timeout, block)
 
 /**
  * An alternate version of `window.setInterval` in a more Kotlin-friendly form (with the lambda parameter last).
@@ -119,10 +84,9 @@ fun Window.setInterval(delay: Int, block: () -> Unit): CancellableActionHandle =
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
-    val id = window.setInterval(block, delay.inWholeMilliseconds.toInt())
-    return CancellableActionHandle(id, isInterval = true)
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.setInterval` instead (that is, `compose` → `browser`).")
+fun Window.setInterval(delay: Duration, block: () -> Unit) = setInterval(delay, block)
 
 /**
  * A version of [setInterval] where the initial delay is different from the followup delay.
@@ -150,14 +114,10 @@ fun Window.setInterval(initialDelay: Int, delay: Int, block: () -> Unit): Cancel
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(initialDelay: Duration, delay: Duration, block: () -> Unit): CancellableActionHandle {
-    lateinit var handle: CancellableActionHandle
-    handle = setTimeout(initialDelay) {
-        block()
-        handle.setTo(setInterval(delay, block))
-    }
-    return handle
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.setInterval` instead (that is, `compose` → `browser`).")
+fun Window.setInterval(initialDelay: Duration, delay: Duration, block: () -> Unit) =
+    setInterval(initialDelay, delay, block)
 
 /**
  * A version of [setInterval] where the action is fired immediately then put on a timer.
@@ -187,7 +147,6 @@ fun Window.invokeThenInterval(delay: Int, block: () -> Unit): CancellableActionH
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.invokeThenInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
-    block()
-    return setInterval(delay, block)
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.invokeThenInterval` instead (that is, `compose` → `browser`).")
+fun Window.invokeThenInterval(delay: Duration, block: () -> Unit) = invokeThenInterval(delay, block)

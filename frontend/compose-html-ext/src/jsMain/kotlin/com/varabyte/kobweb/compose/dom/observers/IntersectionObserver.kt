@@ -1,64 +1,32 @@
 package com.varabyte.kobweb.compose.dom.observers
 
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.dom.observers.externals.IntersectionObserverEntry
-import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element
-import kotlin.js.json
-import com.varabyte.kobweb.compose.dom.observers.externals.IntersectionObserver as ActualIntersectionObserver
+import com.varabyte.kobweb.browser.dom.observers.IntersectionObserver as BrowserIntersectionObserver
+
+// We provide our own wrapper around IntersectionObserver.Options for rich-type CSSMargin support
+class IntersectionObserverOptions(
+    val root: Element? = null,
+    val rootMargin: CSSMargin? = null,
+    val thresholds: List<Double>? = null,
+)
+
+@Suppress("FunctionName") // Factory method that mimics a constructor
+fun IntersectionObserver(options: IntersectionObserverOptions, resized: (List<BrowserIntersectionObserver.Entry>, BrowserIntersectionObserver) -> Unit) {
+    @Suppress("NAME_SHADOWING") val options = options.let {
+        BrowserIntersectionObserver.Options(
+            it.root,
+            it.rootMargin.toString(),
+            it.thresholds
+        )
+    }
+    BrowserIntersectionObserver(options, resized)
+}
 
 /**
  * Provides a way to asynchronously observe changes in the intersection of a target element with an ancestor element.
  *
  * See https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
  */
-class IntersectionObserver(options: Options? = null, resized: (List<Entry>, IntersectionObserver) -> Unit) {
-    constructor(options: Options? = null, resized: (List<Entry>) -> Unit) : this(
-        options,
-        { entries, _ -> resized(entries) })
-
-    private val _actualObserver = ActualIntersectionObserver({ actualEntries, _ ->
-        resized.invoke(actualEntries.map { Entry.from(it) }, this)
-    }, options?.toJson())
-
-    class Options(
-        val root: Element? = null,
-        val rootMargin: CSSMargin? = null,
-        val thresholds: List<Double>? = null,
-    ) {
-        internal fun toJson() = json().apply {
-            root?.let { this["root"] = it }
-            rootMargin?.let { this["rootMargin"] = it.toString() }
-            thresholds?.takeIf { it.isNotEmpty() }?.let { this["threshold"] = it.toTypedArray() }
-        }
-    }
-
-    class Entry(
-        val target: Element,
-        val boundingClientRect: DOMRectReadOnly,
-        val intersectionRatio: Double,
-        val intersectionRect: DOMRectReadOnly,
-        val isIntersecting: Boolean,
-        val rootBounds: DOMRectReadOnly,
-    ) {
-        companion object {
-            internal fun from(actualEntry: IntersectionObserverEntry) = Entry(
-                actualEntry.target,
-                actualEntry.boundingClientRect,
-                actualEntry.intersectionRatio,
-                actualEntry.intersectionRect,
-                actualEntry.isIntersecting,
-                actualEntry.rootBounds
-            )
-        }
-    }
-
-    val root: Element? get() = _actualObserver.root as? Element
-    val rootMargin get() = _actualObserver.rootMargin
-    val thresholds: List<Double> get() = _actualObserver.thresholds.toList()
-
-    fun observe(element: Element): Unit = _actualObserver.observe(element)
-    fun unobserve(element: Element): Unit = _actualObserver.unobserve(element)
-    fun disconnect(): Unit = _actualObserver.disconnect()
-    fun takeRecords(): List<Entry> = _actualObserver.takeRecords().map { Entry.from(it) }
-}
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.dom.observers.IntersectionObserver` instead (that is, `compose` → `browser`).")
+typealias IntersectionObserver = com.varabyte.kobweb.browser.dom.observers.IntersectionObserver

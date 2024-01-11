@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.util.wrapQuotesIfNecessary
+import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
 import org.jetbrains.compose.web.css.*
 
 class FontOpticalSizing private constructor(private val value: String) : StylePropertyValue {

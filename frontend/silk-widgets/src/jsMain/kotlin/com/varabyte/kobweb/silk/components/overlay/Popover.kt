@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.silk.components.overlay
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.dom.ElementTarget
 import com.varabyte.kobweb.compose.dom.ElementRefScope
-import com.varabyte.kobweb.compose.dom.ElementTarget
 import com.varabyte.kobweb.compose.dom.disposableRef
 import com.varabyte.kobweb.compose.dom.refScope
 import com.varabyte.kobweb.compose.foundation.layout.Box

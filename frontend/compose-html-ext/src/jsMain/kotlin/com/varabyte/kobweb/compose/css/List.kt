@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
 import com.varabyte.kobweb.compose.css.functions.CSSImage
-import com.varabyte.kobweb.compose.util.wrapQuotesIfNecessary
 import org.jetbrains.compose.web.css.*
 
 typealias ListStyleImage = CSSImage

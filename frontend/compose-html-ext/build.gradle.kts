@@ -21,6 +21,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.html.core)
             api(libs.kotlinx.coroutines)
+            api(projects.frontend.browserExt) // If you want compose-html-ext, you also want browser-ext
         }
 
         jsTest.dependencies {

@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.silk.init
 
-import com.varabyte.kobweb.compose.util.invokeLater
+import com.varabyte.kobweb.browser.util.invokeLater
 import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastLgStyle
 import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastMdStyle

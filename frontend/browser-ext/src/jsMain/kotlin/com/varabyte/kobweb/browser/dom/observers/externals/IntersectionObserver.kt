@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.compose.dom.observers.externals
+package com.varabyte.kobweb.browser.dom.observers.externals
 
 import org.w3c.dom.DOMRectReadOnly
 import org.w3c.dom.Element

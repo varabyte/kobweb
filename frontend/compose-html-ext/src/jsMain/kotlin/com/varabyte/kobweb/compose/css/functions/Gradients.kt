@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.compose.css.functions
 
+import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import org.jetbrains.compose.web.css.*
 
 interface Gradient : CSSStyleValue {

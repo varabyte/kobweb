@@ -1,5 +1,9 @@
 package com.varabyte.kobweb.compose.util
 
+import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
+import com.varabyte.kobweb.browser.util.kebabCaseToTitleCamelCase
+import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
+
 /**
  * Convert a String for a name that is using TitleCamelCase into kebab-case.
  *
@@ -8,28 +12,9 @@ package com.varabyte.kobweb.compose.util
  * Note that there's special handling for acronyms, so "ExampleABC" will be converted to "example-abc", and "ABCExample"
  * will be converted to "abc-example" (not "example-a-b-c" and "a-b-c-example").
  */
-fun String.titleCamelCaseToKebabCase(): String {
-    require(this.isNotBlank())
-
-    var lastIsUpper = false // Used to distinguish "E" as the place to break new words in "ABCExample"
-
-    val str = this
-    return buildString {
-        str.forEachIndexed { i, c ->
-            val isUpper = c.isUpperCase()
-            if (isUpper && this.isNotEmpty()) {
-                // Break new words when either:
-                // - right before the last capital followed by a lowercase (e.g. "E" in "ABCExample")
-                // - right before the first capital following a lowercase (e.g. "A" in "ExampleABC")
-                if (!lastIsUpper || (i < str.lastIndex && str[i + 1].isLowerCase())) {
-                    append("-")
-                }
-            }
-            append(c.lowercase())
-            lastIsUpper = isUpper
-        }
-    }
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase` instead (that is, `compose` → `browser`).")
+fun String.titleCamelCaseToKebabCase() = titleCamelCaseToKebabCase()
 
 /**
  * Convert a String for a name that is using kebab-case into TitleCamelCase.
@@ -39,11 +24,9 @@ fun String.titleCamelCaseToKebabCase(): String {
  * This is often but NOT ALWAYS the inverse of [titleCamelCaseToKebabCase], if there were acronyms in the original
  * text. For example, "ABCExample" will get converted to "abc-example", which, when inversed, will become "AbcExample".
  */
-fun String.kebabCaseToTitleCamelCase(): String {
-    require(this.isNotBlank())
-    // The suggested replacement for "capitalize" is awful
-    @Suppress("DEPRECATION") return this.split("-").joinToString("") { it.capitalize() }
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.kebabCaseToTitleCamelCase` instead (that is, `compose` → `browser`).")
+fun String.kebabCaseToTitleCamelCase() = kebabCaseToTitleCamelCase()
 
 
 /**
@@ -60,8 +43,6 @@ fun String.kebabCaseToTitleCamelCase(): String {
  * * `"test"` -> `"test"` (unchanged)
  * * `"Is the test today?" he asked` -> `"\"Is the test today?\" he asked"`
  */
-fun String.wrapQuotesIfNecessary() = if (this.length >= 2 && this.first() == '"' && this.last() == '"') {
-    this
-} else {
-    "\"${this.replace("\"", "\\\"")}\""
-}
+@Suppress("DeprecatedCallableAddReplaceWith") // Migrating deprecated extension methods is not a good experience
+@Deprecated("We are migrating non-Compose utilities to a new artifact. Please change your imports to use `com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary` instead (that is, `compose` → `browser`).")
+fun String.wrapQuotesIfNecessary() = wrapQuotesIfNecessary()

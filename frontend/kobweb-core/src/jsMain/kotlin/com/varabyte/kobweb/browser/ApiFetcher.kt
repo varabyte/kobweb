@@ -1,9 +1,9 @@
 package com.varabyte.kobweb.browser
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.http.AbortController
-import com.varabyte.kobweb.compose.http.fetch
-import com.varabyte.kobweb.compose.http.http
+import com.varabyte.kobweb.browser.http.AbortController
+import com.varabyte.kobweb.browser.http.fetch
+import com.varabyte.kobweb.browser.http.http
 import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.prependIf
 import kotlinx.browser.window
