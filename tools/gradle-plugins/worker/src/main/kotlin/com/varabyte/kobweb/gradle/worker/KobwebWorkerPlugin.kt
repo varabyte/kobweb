@@ -19,7 +19,7 @@ import com.varabyte.kobweb.ksp.KSP_WORKER_FQCN_KEY
 import com.varabyte.kobweb.ksp.KSP_WORKER_OUTPUT_PATH_KEY
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Sync
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
@@ -51,11 +51,10 @@ class KobwebWorkerPlugin : Plugin<Project> {
             }
             project.generateModuleMetadataFor(jsTarget)
 
-            val copyWorkerJsOutput = project.tasks.register<Copy>("kobwebCopyWorkerJsOutput") {
+            val copyWorkerJsOutput = project.tasks.register<Sync>("kobwebCopyWorkerJsOutput") {
                 val genResDir = project.layout.buildDirectory.dir("generated/kobweb/worker")
 
-                from(project.tasks.named(jsTarget.browserProductionWebpack))
-                exclude("webpack.config.js")
+                from(project.tasks.named(jsTarget.browserDistribution))
                 // NOTE: I originally also included the .js.map file, but it doesn't seem to get loaded by the browser,
                 // and meanwhile its presence causes the Kotlin/JS compiler to spit out a huuuuuuge warning. So for now
                 // I'm leaving it out, but we may revisit this decision later.

@@ -35,6 +35,7 @@ class JsTarget(kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTarget
 
     val browserDevelopmentWebpack get() = "${name}BrowserDevelopmentWebpack"
     val browserProductionWebpack get() = "${name}BrowserProductionWebpack"
+    val browserDistribution get() = "${name}BrowserDistribution"
 
     val developmentExecutableCompileSync get() = "${name}DevelopmentExecutableCompileSync"
     val productionExecutableCompileSync get() = "${name}ProductionExecutableCompileSync"
