@@ -3,6 +3,7 @@ package com.varabyte.kobweb.ksp
 import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getConstructors
 import com.google.devtools.ksp.isInternal
+import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -14,7 +15,6 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.google.devtools.ksp.symbol.Modifier
 import com.varabyte.kobweb.ksp.symbol.suppresses
 
 /**
@@ -73,11 +73,10 @@ class WorkerProcessor(
             error("A Kobweb `WorkerStrategy` implementation must have a public empty constructor. Please add one to `${workerStrategy.classDeclaration.qualifiedName!!.asString()}`.")
         }
 
-        if (!workerStrategy.classDeclaration.modifiers.contains(Modifier.INTERNAL)) {
-            if (workerStrategy.classDeclaration.modifiers.contains(Modifier.PRIVATE)) {
-                error("A Kobweb `WorkerStrategy` implementation cannot be private, as this prevents us from generating code that wraps it. Please make `${workerStrategy.classDeclaration.qualifiedName!!.asString()}` internal.")
-            }
-
+        if (workerStrategy.classDeclaration.isPrivate()) {
+            error("A Kobweb `WorkerStrategy` implementation cannot be private, as this prevents us from generating code that wraps it. Please make `${workerStrategy.classDeclaration.qualifiedName!!.asString()}` internal.")
+        }
+        if (workerStrategy.classDeclaration.isPublic()) {
             val publicSuppression = "PUBLIC_WORKER_STRATEGY"
             if (!workerStrategy.classDeclaration.suppresses(publicSuppression)) {
                 logger.warn("It is recommended that you make your `WorkerStrategy` implementation internal to prevent Kobweb applications from using it unintentionally. Please add `internal` to `${workerStrategy.classDeclaration.qualifiedName!!.asString()}`. You can annotate your class with `@Suppress(\"$publicSuppression\")` to suppress this warning.")
