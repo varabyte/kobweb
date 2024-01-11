@@ -11,7 +11,6 @@ import com.varabyte.kobweb.gradle.core.util.KobwebVersionUtil
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
 import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.core.util.suggestKobwebProjectName
-import com.varabyte.kobweb.gradle.core.util.toUidString
 import com.varabyte.kobweb.gradle.worker.extensions.createWorkerBlock
 import com.varabyte.kobweb.gradle.worker.extensions.worker
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER_SUBFOLDER
