@@ -38,7 +38,7 @@ private val _self = self
  *
  * Within a `WorkerStrategy`, you can use the `postMessage` method to send messages back to the application domain.
  *
- * The Kobweb Worker Gradle plugin will fine this implementation and generate code that wraps it inside a worker class
+ * The Kobweb Worker Gradle plugin will find this implementation and generate code that wraps it inside a worker class
  * that the application will interact with:
  *
  * ```
@@ -49,7 +49,7 @@ private val _self = self
  * val worker = remember { ExampleWorker() { outParams -> ... } }
  * ```
  *
- * The name of the final class should end with "WorkerStrategy" i(since a correlated "Worker" class will
+ * The name of the final class should end with "WorkerStrategy" (since a correlated "Worker" class will
  * automatically be generated with its name derived from it, e.g. "ExampleWorkerStrategy" to "ExampleWorker". It should
  * also be marked `internal` because there shouldn't be a reason for the application to ever interact with it.
  *

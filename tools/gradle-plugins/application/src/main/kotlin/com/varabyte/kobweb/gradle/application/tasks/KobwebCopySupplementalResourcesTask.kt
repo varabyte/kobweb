@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER_SUBFOLDER
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
