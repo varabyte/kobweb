@@ -5,17 +5,22 @@ import com.varabyte.kobweb.gradle.core.util.KobwebVersionUtil
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import javax.inject.Inject
 
 abstract class KobwebGenerateModuleMetadataTask :
     KobwebTask("Generate a module.json metadata file into this project's jar metadata, which identifies this artifact as one built by Kobweb.") {
     @Input
     fun getKobwebVersion() = KobwebVersionUtil.version
 
+    @get:Inject
+    abstract val projectLayout: ProjectLayout
+
     @OutputDirectory
-    fun getGenResDir() = project.layout.buildDirectory.dir("generated/kobweb/module")
+    fun getGenResDir() = projectLayout.buildDirectory.dir("generated/kobweb/module")
 
     @TaskAction
     fun execute() {

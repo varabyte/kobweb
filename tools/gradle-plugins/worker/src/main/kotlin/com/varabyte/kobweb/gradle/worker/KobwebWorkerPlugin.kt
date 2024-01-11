@@ -25,7 +25,9 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import org.jetbrains.kotlin.gradle.utils.provider
 
+@Suppress("unused") // Used by Gradle
 class KobwebWorkerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
@@ -33,7 +35,7 @@ class KobwebWorkerPlugin : Plugin<Project> {
         project.tasks.withType<KotlinWebpack>().configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
 
         project.kobwebBlock.apply {
-            project.kobwebBlock.kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-worker-processor:${KobwebVersionUtil.version}")
+            kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-worker-processor:${KobwebVersionUtil.version}")
             createWorkerBlock(project)
         }
 
@@ -50,17 +52,19 @@ class KobwebWorkerPlugin : Plugin<Project> {
             }
             project.generateModuleMetadataFor(jsTarget)
 
+            val jsBrowserDistributionTask by provider { project.tasks.named(jsTarget.browserDistribution) }
             val copyWorkerJsOutput = project.tasks.register<Sync>("kobwebCopyWorkerJsOutput") {
                 val genResDir = project.layout.buildDirectory.dir("generated/kobweb/worker")
 
-                from(project.tasks.named(jsTarget.browserDistribution))
+                from(jsBrowserDistributionTask)
                 // NOTE: I originally also included the .js.map file, but it doesn't seem to get loaded by the browser,
                 // and meanwhile its presence causes the Kotlin/JS compiler to spit out a huuuuuuge warning. So for now
                 // I'm leaving it out, but we may revisit this decision later.
                 include("*.js")
 
+                val suggestedProjectName = project.suggestKobwebProjectName()
                 eachFile {
-                    path = "$KOBWEB_METADATA_WORKER_SUBFOLDER/${project.suggestKobwebProjectName()}/$path"
+                    path = "$KOBWEB_METADATA_WORKER_SUBFOLDER/$suggestedProjectName/$path"
                 }
                 into(genResDir)
             }
