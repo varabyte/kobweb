@@ -136,43 +136,43 @@ class WorkerProcessor(
 
             writer.write(
                 """
-                    ${workerPackage.takeIf { it.isNotEmpty() }?.let { "package $it" } ?: ""}
+            ${workerPackage.takeIf { it.isNotEmpty() }?.let { "package $it" } ?: ""}
 
-                    import org.w3c.dom.Worker
+            import org.w3c.dom.Worker
 
-                    class $workerClassName(override var onOutput: ($outputType) -> Unit = {}): $WORKER_FQN<$inputType, $outputType> {
-                        private val ioSerializer = $strategyWorkerType().ioSerializer
+            class $workerClassName(override var onOutput: ($outputType) -> Unit = {}) : $WORKER_FQN<$inputType, $outputType> {
+                private val ioSerializer = $strategyWorkerType().ioSerializer
 
-                        private val worker = Worker("${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
-                            onmessage = { e ->
-                                // If `IOSerializer` throws, that means the message was invalid. Ignore it.
-                                val outputDeserialized = try {
-                                    ioSerializer.deserializeOutput(e.data as String)
-                                } catch(e: Throwable) {
-                                    null
-                                }
-                                if (outputDeserialized != null) {
-                                    onOutput(outputDeserialized)
-                                }
-                            }
+                private val worker = Worker("${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
+                    onmessage = { e ->
+                        // If `IOSerializer` throws, that means the message was invalid. Ignore it.
+                        val outputDeserialized = try {
+                            ioSerializer.deserializeOutput(e.data as String)
+                        } catch (e: Throwable) {
+                            null
                         }
-
-                        override fun postInput(input: $inputType) {
-                            // If `IOSerializer` throws, that means the message was invalid. Ignore it.
-                            val inputSerialized = try {
-                                ioSerializer.serializeInput(input)
-                            } catch(e: Throwable) {
-                                null
-                            }
-                            if (inputSerialized != null) {
-                                worker.postMessage(inputSerialized)
-                            }
-                        }
-
-                        override fun terminate() {
-                            worker.terminate()
+                        if (outputDeserialized != null) {
+                            onOutput(outputDeserialized)
                         }
                     }
+                }
+
+                override fun postInput(input: $inputType) {
+                    // If `IOSerializer` throws, that means the message was invalid. Ignore it.
+                    val inputSerialized = try {
+                        ioSerializer.serializeInput(input)
+                    } catch (e: Throwable) {
+                        null
+                    }
+                    if (inputSerialized != null) {
+                        worker.postMessage(inputSerialized)
+                    }
+                }
+
+                override fun terminate() {
+                    worker.terminate()
+                }
+            }
                 """.trimIndent()
             )
         }
