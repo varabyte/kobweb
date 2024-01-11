@@ -1,11 +1,14 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.util.CancellableActionHandle
+import com.varabyte.kobweb.compose.util.setInterval
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.url.URL
+import kotlin.time.Duration.Companion.milliseconds
 
 /** How to affect the current history when navigating to a new location */
 enum class UpdateHistoryMode {
@@ -322,7 +325,29 @@ class Router {
                 // Even if the URL hasn't changed, still scroll to the target element if you can. Sometimes a user might
                 // scroll the page and then re-enter the same URL to go back.
                 if (url.contains('#')) {
-                    document.getElementById(url.substringAfter('#'))?.scrollIntoView(js("{behavior: \"smooth\"}"))
+                    val fragment = url.substringAfter('#')
+                    // HACK ALERT
+                    // We need to give the page a chance to render first, or else the element with the ID might not
+                    // exist yet. There doesn't seem like a great way to do this consistently that I've found, so for
+                    // now, just try a bunch of times in a row, and give up if we continue to fail (at that point, the
+                    // page may never have a matching element).
+                    var attempts = 10
+                    val timeToWaitPerAttempt = 100.milliseconds
+
+                    var handle = CancellableActionHandle.Stub
+                    handle = window.setInterval(timeToWaitPerAttempt) {
+                        val element = document.getElementById(fragment)
+                        if (element != null) {
+                            element.scrollIntoView(js("{behavior: \"smooth\"}"))
+                            attempts = 0
+                        } else {
+                            attempts--
+                        }
+
+                        if (attempts == 0) {
+                            handle.cancel()
+                        }
+                    }
                 }
             }
 

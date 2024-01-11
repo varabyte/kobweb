@@ -5,11 +5,43 @@ import org.w3c.dom.Window
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class CancellableActionHandle(id: Int, isInterval: Boolean = false) {
-    var id = id
-        private set
+/**
+ * A handle to a `setTimeout` or `setInterval` call which can be used to cancel it.
+ *
+ * This is essentially a convenient replacement for:
+ * ```
+ * val id = window.setTimeout(block, timeout)
+ * window.clearTimeout(id)
+ * ```
+ *
+ * with the advantage that it can be used for both `setTimeout` and `setInterval` calls, as well as mixed mode calls,
+ * like starting with an initial timeout before leading into a repeated interval.
+ */
+class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) {
+    companion object {
+        /**
+         * A fake handle which can be used as a stub if you need to initialize a handle before a timer is started.
+         *
+         * For example, in code like:
+         *
+         * ```
+         * var handle = CancellableActionHandle.Stub
+         * handle = window.setInterval(timeToWaitPerAttempt) {
+         *   if (someCondition) {
+         *      handle.cancel()
+         *   }
+         * }
+         * ```
+         *
+         * In the above case, `handle` will be correctly set by the time the first interval callback is triggered.
+         *
+         * Without this stub, the user would have to declare `handle` as nullable, resulting in `handle!!` calls in
+         * common cases like the above example represents.
+         */
+        val Stub = CancellableActionHandle(0)
+    }
 
-    var isInterval = isInterval
+    internal var id = id
         private set
 
     fun cancel() {
@@ -21,7 +53,7 @@ class CancellableActionHandle(id: Int, isInterval: Boolean = false) {
         id = 0
     }
 
-    fun setTo(other: CancellableActionHandle) {
+    internal fun setTo(other: CancellableActionHandle) {
         this.id = other.id
         this.isInterval = other.isInterval
     }
