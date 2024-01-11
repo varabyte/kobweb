@@ -29,7 +29,7 @@ class WorkerProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val outputPath: String,
-    workerFcqnOverride: String? = null,
+    workerFqcnOverride: String? = null,
 ) : SymbolProcessor {
     class WorkerStrategyInfo(
         val classDeclaration: KSClassDeclaration,
@@ -38,10 +38,10 @@ class WorkerProcessor(
     )
     private var workerStrategyInfo: WorkerStrategyInfo? = null
 
-    // See WorkerBlock.fcqn property documentation for explicit examples for converting the fqcn value to final
+    // See WorkerBlock.fqcn property documentation for explicit examples for converting the fqcn value to final
     // values for class generation.
-    private val classNameOverride = workerFcqnOverride?.substringAfterLast('.')?.takeIf { it.isNotBlank() }
-    private val classPackageOverride = workerFcqnOverride?.substringBeforeLast('.')?.takeIf { it.isNotBlank() }
+    private val classNameOverride = workerFqcnOverride?.substringAfterLast('.')?.takeIf { it.isNotBlank() }
+    private val classPackageOverride = workerFqcnOverride?.substringBeforeLast('.')?.takeIf { it.isNotBlank() }
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val allFiles = resolver.getAllFiles()
