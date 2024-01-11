@@ -3,6 +3,7 @@ package playground.pages
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.forms.Input
+import com.varabyte.kobweb.worker.rememberWorker
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
@@ -15,7 +16,7 @@ import playground.worker.SumWorker
 fun WorkerPage() {
     PageLayout("Worker test") {
         var sum by remember { mutableStateOf(0) }
-        val worker = remember { SumWorker {
+        val worker = rememberWorker { SumWorker {
             sum = it.sum
         } }
 

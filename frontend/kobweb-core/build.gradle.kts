@@ -23,6 +23,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             api(projects.frontend.composeHtmlExt)
             implementation(projects.common.clientServerModels)
+            api(projects.frontend.kobwebWorkerInterface)
         }
     }
 }

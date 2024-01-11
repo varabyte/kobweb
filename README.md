@@ -2909,7 +2909,7 @@ After defining that, a worker called `EchoWorker` will be auto-generated at comp
 looks like this:
 
 ```kotlin
-val worker = remember {
+val worker = rememberWorker {
   EchoWorker { message -> println("Echoed: $message") }
 }
 
@@ -2918,6 +2918,13 @@ worker.postInput("hello!") // After a round trip: "Echoed: hello!"
 ```
 
 That's it!
+
+> [!IMPORTANT]
+> Note the use of the `rememberWorker` method. This internally calls a `remember` but also sets up disposal logic that
+> terminates the worker when the composable is exited. If you just use a normal `remember` block, the worker may keep
+> running longer than you expect, even if you navigate to another part of your site.
+>
+> You can also stop a worker yourself by calling `worker.terminate()` directly.
 
 #### CountDownWorkerStrategy
 
@@ -2968,7 +2975,7 @@ Notice the three comment tags above.
 Using the worker in your application looks like this:
 
 ```kotlin
-val worker = remember {
+val worker = rememberWorker {
   CountDownWorker {
     if (it > 0) {
       console.log(it + "...")
@@ -2978,19 +2985,9 @@ val worker = remember {
   }
 }
 
-DisposableEffect(Unit) {
-  onDispose { worker.terminate() }
-}
-
 // Later
 worker.postInput(10) // 10... 9... 8... etc.
 ```
-
-> [!IMPORTANT]
-> Observe the explicit call to `worker.terminate()` in the `DisposableEffect`. This is because Kobweb workers, once
-> started, will keep running even if you navigate away from the current page.
->
-> You can also stop a worker from within the worker strategy itself by calling `self.close()`.
 
 > [!TIP]
 > If you need really accurate, consistent interval timing, creating a worker like this may actually be beneficial.
@@ -3085,7 +3082,7 @@ for you using `Json.encodeToString` and `Json.decodeFromString` calls.
 Using the worker in your application looks like this:
 
 ```kotlin
-val worker = remember {
+val worker = rememberWorker {
   FindPrimesWorker {
     println("Primes for ${it.max}: ${it.primes}")
   }

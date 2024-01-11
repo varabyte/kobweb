@@ -14,17 +14,10 @@ kotlin {
         browser()
         binaries.executable()
     }
-
-    sourceSets {
-        jsMain.dependencies {
-            api(projects.kobweb.common.kobwebSerialization)
-            api(projects.kobweb.frontend.kobwebWorkerInterface)
-        }
-    }
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-worker")
-    description.set("Utility classes for creating a type-safe web worker in Kobweb")
+    artifactId.set("kobweb-worker-interface")
+    description.set("Common interface for worker implementations")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

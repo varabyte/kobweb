@@ -129,18 +129,18 @@ class WorkerProcessor(
             workerPackage,
             workerClassName
         ).writer().use { writer ->
+            val strategyWorkerType = workerStrategyInfo.classDeclaration.qualifiedName!!.asString()
+            val inputType = workerStrategyInfo.inputType.declaration.qualifiedName!!.asString()
+            val outputType = workerStrategyInfo.outputType.declaration.qualifiedName!!.asString()
+
             writer.write(
                 """
                     ${workerPackage.takeIf { it.isNotEmpty() }?.let { "package $it" } ?: ""}
 
                     import org.w3c.dom.Worker
 
-                    /**
-                     * @param onOutput A callback that will be invoked when the worker posts a message communicating
-                     *   finished work.
-                     */
-                    class $workerClassName(var onOutput: (${workerStrategyInfo.outputType.declaration.qualifiedName!!.asString()}) -> Unit = {}) {
-                        private val ioSerializer = ${workerStrategyInfo.classDeclaration.qualifiedName!!.asString()}().ioSerializer
+                    class $workerClassName(override var onOutput: ($outputType) -> Unit = {}): com.varabyte.kobweb.worker.Worker<$inputType, $outputType> {
+                        private val ioSerializer = $strategyWorkerType().ioSerializer
 
                         private val worker = Worker("${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
                             onmessage = { e ->
@@ -156,10 +156,7 @@ class WorkerProcessor(
                             }
                         }
 
-                        /**
-                         * Send a message to the worker.
-                         */
-                        fun postInput(input: ${workerStrategyInfo.inputType.declaration.qualifiedName!!.asString()}) {
+                        override fun postInput(input: $inputType) {
                             // If `IOSerializer` throws, that means the message was invalid. Ignore it.
                             val inputSerialized = try {
                                 ioSerializer.serializeInput(input)
@@ -171,14 +168,7 @@ class WorkerProcessor(
                             }
                         }
 
-                        /**
-                         * Immediately terminate the worker, interrupting any processing it might still be doing.
-                         *
-                         * It can be a good practice to explicitly terminate your worker when you're sure you're done
-                         * with it, as otherwise it may keep running even if you navigate to a different part of your
-                         * site.
-                         */
-                        fun terminate() {
+                        override fun terminate() {
                             worker.terminate()
                         }
                     }
