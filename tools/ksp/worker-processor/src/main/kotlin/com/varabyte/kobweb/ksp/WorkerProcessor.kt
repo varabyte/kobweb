@@ -139,7 +139,9 @@ class WorkerProcessor(
 
             import org.w3c.dom.Worker
 
-            class $workerClassName(override var onOutput: ($outputType) -> Unit = {}) : $WORKER_FQN<$inputType, $outputType> {
+            class $workerClassName(override var onOutput: ($outputType) -> Unit = {}) :
+                $WORKER_FQN<$inputType, $outputType> {
+
                 private val ioSerializer = $workerFactoryType().createIOSerializer()
 
                 private val worker = Worker("${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
@@ -192,7 +194,7 @@ class WorkerProcessor(
                             // If `IOSerializer` throws, that means the message was invalid. Ignore it.
                             val outputSerialized = try {
                                 ioSerializer.serializeOutput(output)
-                            } catch(e: Throwable) {
+                            } catch (e: Throwable) {
                                 null
                             }
                             if (outputSerialized != null) {
