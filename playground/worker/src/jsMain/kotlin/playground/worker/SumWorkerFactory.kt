@@ -1,5 +1,6 @@
 package playground.worker
 
+import com.varabyte.kobweb.worker.WorkerFactory
 import com.varabyte.kobweb.worker.WorkerStrategy
 import com.varabyte.kobwebx.worker.kotlinx.serialization.util.createIOSerializer
 import kotlinx.serialization.Serializable
@@ -11,10 +12,10 @@ data class SumInputs(val a: Int, val b: Int)
 @Serializable
 data class SumOutput(val sum: Int)
 
-internal class SumWorkerStrategy: WorkerStrategy<SumInputs, SumOutput>() {
-    override fun onInput(input: SumInputs) {
+internal class SumWorkerFactory : WorkerFactory<SumInputs, SumOutput> {
+    override fun createStrategy(postOutput: (SumOutput) -> Unit) = WorkerStrategy<SumInputs> { input ->
         postOutput(SumOutput(input.a + input.b))
     }
 
-    override val ioSerializer = Json.createIOSerializer<SumInputs, SumOutput>()
+    override fun createIOSerializer() = Json.createIOSerializer<SumInputs, SumOutput>()
 }

@@ -25,15 +25,15 @@ abstract class WorkerBlock @Inject constructor(project: Project) {
     /**
      * Set the fully qualified class name of the worker class to generate.
      *
-     * Normally, the class name is inferred from the name of the `WorkerStrategy` implementation class, but users can
+     * Normally, the class name is inferred from the name of the `WorkerFactory` implementation class, but users can
      * choose to override this if they prefer.
      *
-     * Note that if this value begins with a ".", it will be prepended with the package that the `WorkerStrategy`
+     * Note that if this value begins with a ".", it will be prepended with the package that the `WorkerFactory`
      * implementation lives in. Similarly, if this value ends with a ".", its package will be used and then appended
-     * with a class name inferred from the `WorkerStrategy` implementation's name.
+     * with a class name inferred from the `WorkerFactory` implementation's name.
      *
-     * For a concrete example, if this worker's `WorkerStrategy` implementation is
-     * `com.example.PiCalculatorWorkerStrategy`, then...
+     * For a concrete example, if this worker's `WorkerFactory` implementation is
+     * `com.example.PiCalculatorWorkerFactory`, then...
      *
      * * fqcn = _not set_ → "com.example.PiCalculatorWorker"
      * * fqcn = "com.mysite.PiWorker" → "com.mysite.PiWorker"

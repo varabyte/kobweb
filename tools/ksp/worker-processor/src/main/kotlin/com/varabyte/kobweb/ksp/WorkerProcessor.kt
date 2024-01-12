@@ -17,10 +17,10 @@ import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.ksp.symbol.suppresses
 
 /**
- * A KSP processor that generates code that instantiates / wraps a Worker class related to a given `WorkerStrategy`
+ * A KSP processor that generates code that instantiates / wraps a Worker class related to a given `WorkerFactory`
  * implementation.
  *
- * For example, if the user defines a class called `CalculatePiWorkerStrategy`, then this processor will generate a
+ * For example, if the user defines a class called `CalculatePiWorkerFactory`, then this processor will generate a
  * `main.kt` file that instantiates it plus a `CalculatePiWorker` class that wraps it and acts as the main way a
  * Kobweb application would interact with this module.
  */
@@ -30,13 +30,13 @@ class WorkerProcessor(
     private val outputPath: String,
     workerFqcnOverride: String? = null,
 ) : SymbolProcessor {
-    class WorkerStrategyInfo(
+    class WorkerFactoryInfo(
         val classDeclaration: KSClassDeclaration,
         val inputTypeDeclaration: KSDeclaration,
         val outputTypeDeclaration: KSDeclaration,
     )
 
-    private var workerStrategyInfo: WorkerStrategyInfo? = null
+    private var workerFactoryInfo: WorkerFactoryInfo? = null
 
     // See WorkerBlock.fqcn property documentation for explicit examples for converting the fqcn value to final
     // values for class generation.
@@ -46,15 +46,15 @@ class WorkerProcessor(
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val allFiles = resolver.getAllFiles()
 
-        val visitor = WorkerStrategyVisitor()
+        val visitor = WorkerFactoryVisitor()
 
         allFiles.forEach { file ->
             file.accept(visitor, Unit)
         }
 
-        val workerStrategy = visitor.workerStrategies.singleOrNull() ?: run {
+        val workerFactory = visitor.workerStrategies.singleOrNull() ?: run {
             error(buildString {
-                append("A Kobweb worker module must have exactly one class that implements `WorkerStrategy`. ")
+                append("A Kobweb worker module must have exactly one class that implements `$WORKER_FACTORY_SIMPLE_NAME`. ")
                 if (visitor.workerStrategies.isEmpty()) {
                     append("However, none were found.")
                 } else {
@@ -67,71 +67,71 @@ class WorkerProcessor(
             })
         }
 
-        if (workerStrategy.classDeclaration.getConstructors()
+        if (workerFactory.classDeclaration.getConstructors()
                 .none { (it.isPublic() || it.isInternal()) && (it.parameters.isEmpty() || it.parameters.all { param -> param.hasDefault }) }
         ) {
-            error("A Kobweb `WorkerStrategy` implementation must have a public empty constructor. Please add one to `${workerStrategy.classDeclaration.qualifiedName!!.asString()}`.")
+            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation must have a public empty constructor. Please add one to `${workerFactory.classDeclaration.qualifiedName!!.asString()}`.")
         }
 
-        if (workerStrategy.classDeclaration.isPrivate()) {
-            error("A Kobweb `WorkerStrategy` implementation cannot be private, as this prevents us from generating code that wraps it. Please make `${workerStrategy.classDeclaration.qualifiedName!!.asString()}` internal.")
+        if (workerFactory.classDeclaration.isPrivate()) {
+            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation cannot be private, as this prevents us from generating code that wraps it. Please make `${workerFactory.classDeclaration.qualifiedName!!.asString()}` internal.")
         }
-        if (workerStrategy.classDeclaration.isPublic()) {
-            val publicSuppression = "PUBLIC_WORKER_STRATEGY"
-            if (!workerStrategy.classDeclaration.suppresses(publicSuppression)) {
-                logger.warn("It is recommended that you make your `WorkerStrategy` implementation internal to prevent Kobweb applications from using it unintentionally. Please add `internal` to `${workerStrategy.classDeclaration.qualifiedName!!.asString()}`. You can annotate your class with `@Suppress(\"$publicSuppression\")` to suppress this warning.")
+        if (workerFactory.classDeclaration.isPublic()) {
+            val publicSuppression = "PUBLIC_WORKER_FACTORY"
+            if (!workerFactory.classDeclaration.suppresses(publicSuppression)) {
+                logger.warn("It is recommended that you make your `$WORKER_FACTORY_SIMPLE_NAME` implementation internal to prevent Kobweb applications from using it unintentionally. Please add `internal` to `${workerFactory.classDeclaration.qualifiedName!!.asString()}`. You can annotate your class with `@Suppress(\"$publicSuppression\")` to suppress this warning.")
             }
         }
 
-        if (!workerStrategy.inputTypeDeclaration.isPublic()) {
-            error("A Kobweb `WorkerStrategy` implementation's input type must be public so the Kobweb application can use it. Please make `${workerStrategy.inputTypeDeclaration.qualifiedName!!.asString()}` public.")
+        if (!workerFactory.inputTypeDeclaration.isPublic()) {
+            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's input type must be public so the Kobweb application can use it. Please make `${workerFactory.inputTypeDeclaration.qualifiedName!!.asString()}` public.")
         }
 
-        if (!workerStrategy.outputTypeDeclaration.isPublic()) {
-            error("A Kobweb `WorkerStrategy` implementation's output type must be public so the Kobweb application can use it. Please make `${workerStrategy.outputTypeDeclaration.qualifiedName!!.asString()}` public.")
+        if (!workerFactory.outputTypeDeclaration.isPublic()) {
+            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's output type must be public so the Kobweb application can use it. Please make `${workerFactory.outputTypeDeclaration.qualifiedName!!.asString()}` public.")
         }
 
-        if (classNameOverride == null && !workerStrategy.classDeclaration.qualifiedName!!.asString()
-                .let { it.endsWith("WorkerStrategy") && it != "WorkerStrategy" }
+        if (classNameOverride == null && !workerFactory.classDeclaration.qualifiedName!!.asString()
+                .let { it.endsWith(WORKER_FACTORY_SIMPLE_NAME) && it != WORKER_FACTORY_SIMPLE_NAME }
         ) {
-            error("A Kobweb `WorkerStrategy` implementation's name should end with the suffix \"WorkerStrategy\", so we can automatically generate an associated \"Worker\" class from it. Please change the name of `${workerStrategy.classDeclaration.qualifiedName!!.asString()}` to meet this requirement. Alternately, call `kobweb { worker { fqcn.set(...) }` to explicitly set the generated class name.")
+            error("A Kobweb `$WORKER_FACTORY_SIMPLE_NAME` implementation's name should end with the suffix \"$WORKER_FACTORY_SIMPLE_NAME\", so we can automatically generate an associated \"Worker\" class from it. Please change the name of `${workerFactory.classDeclaration.qualifiedName!!.asString()}` to meet this requirement. Alternately, call `kobweb { worker { fqcn.set(...) }` to explicitly set the generated class name.")
         }
 
-        workerStrategyInfo = workerStrategy
+        workerFactoryInfo = workerFactory
 
         return emptyList()
     }
 
     override fun finish() {
-        val workerStrategyInfo = workerStrategyInfo ?: return
+        val workerFactoryInfo = workerFactoryInfo ?: return
 
         val deps = Dependencies(
             aggregating = true,
             *listOfNotNull(
-                workerStrategyInfo.classDeclaration.containingFile,
-                workerStrategyInfo.inputTypeDeclaration.containingFile,
-                workerStrategyInfo.inputTypeDeclaration.containingFile
+                workerFactoryInfo.classDeclaration.containingFile,
+                workerFactoryInfo.inputTypeDeclaration.containingFile,
+                workerFactoryInfo.inputTypeDeclaration.containingFile
             ).toTypedArray()
         )
 
         val workerPackage = classPackageOverride?.let {
             if (it.startsWith('.')) {
-                workerStrategyInfo.classDeclaration.packageName.asString() + it
+                workerFactoryInfo.classDeclaration.packageName.asString() + it
             } else {
                 it
             }
-        } ?: workerStrategyInfo.classDeclaration.packageName.asString()
+        } ?: workerFactoryInfo.classDeclaration.packageName.asString()
         val workerClassName = classNameOverride
-            ?: workerStrategyInfo.classDeclaration.simpleName.asString().removeSuffix("Strategy")
+            ?: workerFactoryInfo.classDeclaration.simpleName.asString().removeSuffix("Factory")
 
         codeGenerator.createNewFile(
             deps,
             workerPackage,
             workerClassName
         ).writer().use { writer ->
-            val strategyWorkerType = workerStrategyInfo.classDeclaration.qualifiedName!!.asString()
-            val inputType = workerStrategyInfo.inputTypeDeclaration.qualifiedName!!.asString()
-            val outputType = workerStrategyInfo.outputTypeDeclaration.qualifiedName!!.asString()
+            val workerFactoryType = workerFactoryInfo.classDeclaration.qualifiedName!!.asString()
+            val inputType = workerFactoryInfo.inputTypeDeclaration.qualifiedName!!.asString()
+            val outputType = workerFactoryInfo.outputTypeDeclaration.qualifiedName!!.asString()
 
             writer.write(
                 """
@@ -140,7 +140,7 @@ class WorkerProcessor(
             import org.w3c.dom.Worker
 
             class $workerClassName(override var onOutput: ($outputType) -> Unit = {}) : $WORKER_FQN<$inputType, $outputType> {
-                private val ioSerializer = $strategyWorkerType().ioSerializer
+                private val ioSerializer = $workerFactoryType().createIOSerializer()
 
                 private val worker = Worker("${KOBWEB_PUBLIC_WORKER_ROOT}/$outputPath").apply {
                     onmessage = { e ->
@@ -183,9 +183,33 @@ class WorkerProcessor(
         ).writer().use { writer ->
             writer.write(
                 """
+                    private external val self: org.w3c.dom.DedicatedWorkerGlobalScope
+
                     fun main() {
-                        // As a side effect, registers self.onmessage handler
-                        ${workerStrategyInfo.classDeclaration.qualifiedName!!.asString()}()
+                        val factory = ${workerFactoryInfo.classDeclaration.qualifiedName!!.asString()}()
+                        val ioSerializer = factory.createIOSerializer()
+                        val strategy = factory.createStrategy { output ->
+                            // If `IOSerializer` throws, that means the message was invalid. Ignore it.
+                            val outputSerialized = try {
+                                ioSerializer.serializeOutput(output)
+                            } catch(e: Throwable) {
+                                null
+                            }
+                            if (outputSerialized != null) {
+                                self.postMessage(outputSerialized)
+                            }
+                        }
+                        self.onmessage = { e ->
+                            // If `IOSerializer` throws, that means the message was invalid. Ignore it.
+                            val inputDeserialized = try {
+                                ioSerializer.deserializeInput(e.data as String)
+                            } catch (e: Throwable) {
+                                null
+                            }
+                            if (inputDeserialized != null) {
+                                strategy.onInput(inputDeserialized)
+                            }
+                        }
                     }
                 """.trimIndent()
             )
@@ -193,7 +217,7 @@ class WorkerProcessor(
     }
 
     /**
-     * Search the codebase for classes that implement `WorkerStrategy`.
+     * Search the codebase for classes that implement `WorkerFactory`.
      *
      * After this processor runs, the [workerStrategies] property will be populated with all the classes that implement
      * this base class, along with their input and output types.
@@ -201,35 +225,37 @@ class WorkerProcessor(
      * Ideally, a Kobweb worker module has exactly one implementation. If there are none or multiple, an error should be
      * reported to the user, but this is handled at a higher level.
      */
-    private inner class WorkerStrategyVisitor : KSVisitorVoid() {
-        private val _workerStrategies = mutableListOf<WorkerStrategyInfo>()
-        val workerStrategies: List<WorkerStrategyInfo> = _workerStrategies
+    private inner class WorkerFactoryVisitor : KSVisitorVoid() {
+        private val _workerStrategies = mutableListOf<WorkerFactoryInfo>()
+        val workerStrategies: List<WorkerFactoryInfo> = _workerStrategies
 
         override fun visitFile(file: KSFile, data: Unit) {
             file.declarations.forEach { it.accept(this, Unit) }
         }
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-            val workerStrategyBaseClass = classDeclaration
+            val workerFactoryBaseClass = classDeclaration
                 .superTypes
-                .filter {
-                    it.toString() == WORKER_STRATEGY_SIMPLE_NAME &&
-                        it.resolve().declaration.qualifiedName?.asString() == WORKER_STRATEGY_FQN
-                }.firstOrNull()?.resolve()
+                .filter { it.toString() == WORKER_FACTORY_SIMPLE_NAME }
+                .mapNotNull {
+                    it.resolve()
+                        .takeIf { resolved -> resolved.declaration.qualifiedName?.asString() == WORKER_FACTORY_FQN }
+                }
+                .firstOrNull()
 
-            if (workerStrategyBaseClass != null) {
-                val resolvedTypes = workerStrategyBaseClass.arguments.mapNotNull { it.type?.resolve() }
+            if (workerFactoryBaseClass != null) {
+                val resolvedTypes = workerFactoryBaseClass.arguments.mapNotNull { it.type?.resolve() }
 
-                // WorkerStrategy<I, O>
+                // WorkerFactory<I, O>
                 check(resolvedTypes.size == 2) {
-                    "Unexpected error parsing WorkerStrategy subclass. Expected 2 type arguments, got ${resolvedTypes.size}: [${
+                    "Unexpected error parsing $WORKER_FACTORY_SIMPLE_NAME subclass. Expected 2 type arguments, got ${resolvedTypes.size}: [${
                         resolvedTypes.joinToString {
                             it.declaration.qualifiedName?.asString() ?: "?"
                         }
                     }]"
                 }
                 _workerStrategies.add(
-                    WorkerStrategyInfo(
+                    WorkerFactoryInfo(
                         classDeclaration,
                         inputTypeDeclaration = resolvedTypes[0].declaration,
                         outputTypeDeclaration = resolvedTypes[1].declaration,

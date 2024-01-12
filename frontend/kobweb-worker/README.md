@@ -1,7 +1,7 @@
 Utility classes which help the user define type-safe web-worker APIs.
 
 These classes work hand in hand with the Kobweb Worker Gradle plugin, which will look for a single implementation of the
-`WorkerStrategy` class somewhere in the user's codebase.
+`WorkerFactory` class somewhere in the user's codebase.
 
 Using vanilla web workers, the implementation for an echoing web worker would look something like this:
 
@@ -31,8 +31,8 @@ Using Kobweb Workers, the implementation is similar but type-safe:
 ```kotlin
 // Worker module
 
-internal class EchoWorkerStrategy : WorkerStrategy<String, String> {
-    override fun onInput(input: String) {
+internal class EchoWorkerFactory : WorkerFactory<String, String> {
+    override fun createStrategy(postOutput: (String) -> Unit) = WorkerStrategy<String> { input ->
         postOutput("Echoed: $input")
     }
 }
@@ -41,9 +41,7 @@ internal class EchoWorkerStrategy : WorkerStrategy<String, String> {
 
 @Composable
 fun SomePage() {
-    val worker = remember {
-        EchoWorker() { message -> println(message) }
-    }
+    val worker = remember { EchoWorker() { message -> println(message) } }
     worker.postMessage("Hello, world!")
 }
 ```
