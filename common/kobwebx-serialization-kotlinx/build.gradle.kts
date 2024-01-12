@@ -17,7 +17,7 @@ kotlin {
 
     sourceSets {
         jsMain.dependencies {
-            compileOnly(project(":frontend:kobweb-worker"))
+            implementation(projects.common.kobwebSerialization)
             implementation(libs.kotlinx.serialization.json)
         }
     }
