@@ -1,9 +1,10 @@
 package com.varabyte.kobweb.browser.util
 
-import kotlinx.browser.window
-import org.w3c.dom.Window
+import org.w3c.dom.WindowOrWorkerGlobalScope
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+
+private external val self: WindowOrWorkerGlobalScope
 
 /**
  * A handle to a `setTimeout` or `setInterval` call which can be used to cancel it.
@@ -46,9 +47,9 @@ class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) 
 
     fun cancel() {
         if (isInterval) {
-            window.clearInterval(id)
+            self.clearInterval(id)
         } else {
-            window.clearTimeout(id)
+            self.clearTimeout(id)
         }
         id = 0
     }
@@ -71,7 +72,7 @@ class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) 
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.invokeLater(block: () -> Unit): CancellableActionHandle {
+fun WindowOrWorkerGlobalScope.invokeLater(block: () -> Unit): CancellableActionHandle {
     return setTimeout(0.milliseconds, block)
 }
 
@@ -80,8 +81,8 @@ fun Window.invokeLater(block: () -> Unit): CancellableActionHandle {
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setTimeout(timeout: Duration, block: () -> Unit): CancellableActionHandle {
-    val id = window.setTimeout(block, timeout.inWholeMilliseconds.toInt())
+fun WindowOrWorkerGlobalScope.setTimeout(timeout: Duration, block: () -> Unit): CancellableActionHandle {
+    val id = setTimeout(block, timeout.inWholeMilliseconds.toInt())
     return CancellableActionHandle(id)
 }
 
@@ -90,8 +91,8 @@ fun Window.setTimeout(timeout: Duration, block: () -> Unit): CancellableActionHa
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
-    val id = window.setInterval(block, delay.inWholeMilliseconds.toInt())
+fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
+    val id = setInterval(block, delay.inWholeMilliseconds.toInt())
     return CancellableActionHandle(id, isInterval = true)
 }
 
@@ -103,7 +104,7 @@ fun Window.setInterval(delay: Duration, block: () -> Unit): CancellableActionHan
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.setInterval(initialDelay: Duration, delay: Duration, block: () -> Unit): CancellableActionHandle {
+fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duration, block: () -> Unit): CancellableActionHandle {
     lateinit var handle: CancellableActionHandle
     handle = setTimeout(initialDelay) {
         block()
@@ -121,7 +122,7 @@ fun Window.setInterval(initialDelay: Duration, delay: Duration, block: () -> Uni
  *
  * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
-fun Window.invokeThenInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
+fun WindowOrWorkerGlobalScope.invokeThenInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
     block()
     return setInterval(delay, block)
 }
