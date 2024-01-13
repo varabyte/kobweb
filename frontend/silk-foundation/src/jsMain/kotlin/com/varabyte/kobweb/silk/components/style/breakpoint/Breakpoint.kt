@@ -36,19 +36,4 @@ enum class Breakpoint {
     MD,
     LG,
     XL;
-
-    // TODO(#168): Remove before v1.0
-    // At the time of writing this comment, we recently realized that there was a difference between two similar APIs,
-    // rememberPageContext and rememberBreakpoint. The former returned a raw `PageContext` element while the latter
-    // returned a `State<Breakpoint>`. We decided that the non-state version was better because there's nothing useful
-    // you can do with a state besides unwrap it. We also searched the Android codebase and noticed that most
-    // `remember` calls returned raw values, not states, so doing that here would be consistent with their code as well.
-    // However, we didn't want to break existing code in the wild, so we added this operator to allow the old syntax to
-    // continue to work for now. With this operator in place, the user can choose to write:
-    // `val bp = rememberBreakpoint()`
-    // OR
-    // `val bp by rememberBreakpoint() // Legacy version, delete before 1.0!`
-    @Suppress("DeprecatedCallableAddReplaceWith") // Can't suggest a replace-with expression for property delegation syntax
-    @Deprecated("You no longer should use the `by` keyword with `rememberBreakpoint`. In other words, change `val bp by rememberBreakpoint()` to `val bp = rememberBreakpoint()`")
-    operator fun getValue(thisRef: Any?, property: Any?) = this
 }

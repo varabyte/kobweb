@@ -58,8 +58,6 @@ internal val DisplayUntilXlStyle by ComponentStyle(prefix = "silk") {
     Breakpoint.XL { Modifier.display(DisplayStyle.None) }
 }
 
-@Deprecated("Method was renamed to `displayIfAtLeast` for clarity.", ReplaceWith("displayIfAtLeast(breakpoint)"))
-fun Modifier.displayIf(breakpoint: Breakpoint) = displayIfAtLeast(breakpoint)
 fun Modifier.displayIfAtLeast(breakpoint: Breakpoint) =
     this.classNames("silk-display-if-at-least-${breakpoint.name.lowercase()}")
 

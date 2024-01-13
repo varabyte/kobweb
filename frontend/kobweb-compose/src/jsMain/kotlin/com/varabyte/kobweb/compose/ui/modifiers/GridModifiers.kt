@@ -7,30 +7,12 @@ import org.jetbrains.compose.web.css.*
 
 // region grid container
 
-// TODO(#168): Remove before v1.0
-@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
-)
-fun Modifier.gridTemplateColumns(value: String) = styleModifier {
-    gridTemplateColumns(value)
-}
-
 fun Modifier.gridTemplateColumns(block: GridTrackBuilder.() -> Unit) = styleModifier {
     gridTemplateColumns(block)
 }
 
 fun Modifier.gridTemplateColumns(value: GridTemplate) = styleModifier {
     gridTemplateColumns(value)
-}
-
-// TODO(#168): Remove before v1.0
-@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
-)
-fun Modifier.gridAutoColumns(value: String) = styleModifier {
-    gridAutoColumns(value)
 }
 
 fun Modifier.gridAutoColumns(block: GridTrackBuilder.() -> Unit) = styleModifier {
@@ -45,30 +27,12 @@ fun Modifier.gridAutoFlow(value: GridAutoFlow) = styleModifier {
     gridAutoFlow(value)
 }
 
-// TODO(#168): Remove before v1.0
-@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
-)
-fun Modifier.gridTemplateRows(value: String) = styleModifier {
-    gridTemplateRows(value)
-}
-
 fun Modifier.gridTemplateRows(block: GridTrackBuilder.() -> Unit) = styleModifier {
     gridTemplateRows(block)
 }
 
 fun Modifier.gridTemplateRows(value: GridTemplate) = styleModifier {
     gridTemplateRows(value)
-}
-
-// TODO(#168): Remove before v1.0
-@Suppress("DeprecatedCallableAddReplaceWith") // Not a trivial replace
-@Deprecated(
-    "All stringly-typed Kobweb Modifiers will be removed before v1.0. Use `grid` instead or use styleModifier as a fallback.",
-)
-fun Modifier.gridAutoRows(value: String) = styleModifier {
-    gridAutoRows(value)
 }
 
 fun Modifier.gridAutoRows(block: GridTrackBuilder.() -> Unit) = styleModifier {

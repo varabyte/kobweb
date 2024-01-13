@@ -84,56 +84,16 @@ class CSSPosition private constructor(private val value: String) : StyleProperty
     constructor(yAnchor: EdgeYOrCenter) : this("${Edge.CenterX.toOffset()} ${yAnchor.toOffset()}")
     constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeYOrCenter) : this(xAnchor.toOffset(), yAnchor.toOffset())
 
-    @Deprecated(
-        "Create an offset directly instead (by invoking `Edge(offset)`).",
-        replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset))")
-    )
-    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageNumericValue) : this(xAnchor(xOffset))
     constructor(xOffset: EdgeXOffset) : this(xOffset, Edge.CenterY.toOffset())
 
-    @Deprecated(
-        "Create an offset directly instead (by invoking `Edge(offset)`).",
-        replaceWith = ReplaceWith("CSSPosition(yAnchor(yOffset))")
-    )
-    constructor(yAnchor: EdgeY, yOffset: CSSLengthOrPercentageNumericValue) : this(yAnchor(yOffset))
     constructor(yOffset: EdgeYOffset) : this(Edge.CenterX.toOffset(), yOffset)
 
     constructor(xCenter: CenterX, y: CSSLengthOrPercentageNumericValue) : this("$xCenter $y")
     constructor(x: CSSLengthOrPercentageNumericValue, yCenter: CenterY) : this("$x $yCenter")
 
-    @Deprecated(
-        "Create an offset directly instead (by invoking `Edge(offset)`).",
-        replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset), yAnchor)")
-    )
-    constructor(xAnchor: EdgeX, xOffset: CSSLengthOrPercentageNumericValue, yAnchor: EdgeYOrCenter) : this(
-        xAnchor(xOffset),
-        yAnchor
-    )
-
     constructor(xOffset: EdgeXOffset, yAnchor: EdgeYOrCenter) : this(xOffset, yAnchor.toOffset())
 
-    @Deprecated(
-        "Create an offset directly instead (by invoking `Edge(offset)`).",
-        replaceWith = ReplaceWith("CSSPosition(xAnchor, yAnchor(yOffset))")
-    )
-    constructor(xAnchor: EdgeXOrCenter, yAnchor: EdgeY, yOffset: CSSLengthOrPercentageNumericValue) : this(
-        xAnchor,
-        yAnchor(yOffset)
-    )
-
     constructor(xAnchor: EdgeXOrCenter, yOffset: EdgeYOffset) : this(xAnchor.toOffset(), yOffset)
-
-    @Deprecated(
-        "Create an offset directly instead (by invoking `Edge(offset)`).",
-        replaceWith = ReplaceWith("CSSPosition(xAnchor(xOffset), yAnchor(yOffset))")
-    )
-    constructor(
-        xAnchor: EdgeX,
-        xOffset: CSSLengthOrPercentageNumericValue,
-        yAnchor: EdgeY,
-        yOffset: CSSLengthOrPercentageNumericValue
-    ) :
-        this(xAnchor(xOffset), yAnchor(yOffset))
 
     constructor(xAnchor: EdgeXOffset, yAnchor: EdgeYOffset) : this("$xAnchor $yAnchor")
 

@@ -1,19 +1,14 @@
 package com.varabyte.kobweb.silk.components.overlay
 
-import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.dom.ElementTarget
 import com.varabyte.kobweb.browser.dom.observers.ResizeObserver
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.foundation.layout.LayoutScopeMarker
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
-import com.varabyte.kobweb.silk.defer.renderWithDeferred
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
@@ -288,56 +283,4 @@ abstract class PopupPlacementStrategy {
          */
         fun of(offsetPixels: Number) = of(PopupPlacement.Bottom, offsetPixels)
     }
-}
-
-/**
- * Render a general, undecorated composable in a location above and outside some target element.
- *
- * See also [Tooltip], which wraps your composable in a sort of chat bubble, making it particularly well-suited for
- * text tooltips.
- *
- * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
- * first, as a parent method that this lives under. See the method for more details.
- *
- * @param target Indicates which element should listen for mouse enter and leave events in order to cause this popup to
- *   show up.
- * @param placementTarget If set, indicates which element the popup should be shown relative to. If not set, the
- *   original [target] will be used.
- * @param showDelayMs If set, there will be a delay before the popup is shown after the mouse enters the target.
- * @param hideDelayMs If set, there will be a delay before the popup is hidden after the mouse leaves the target.
- * @param keepOpenStrategy Once a popup is open, this strategy controls how it should decide to stay open. If no
- *   strategy is passed in, the popup will stay open as long as the mouse is over it or if any child inside of it has
- *   focus. See also: [KeepPopupOpenStrategy].
- */
-@Deprecated(
-    "Popup has been renamed to Popover",
-    ReplaceWith("Popover(target, modifier, placement, offsetPixels, placementTarget, showDelayMs, hideDelayMs, keepOpenStrategy, variant, ref, content)")
-)
-@Composable
-fun Popup(
-    target: ElementTarget,
-    modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
-    placement: PopupPlacement = PopupPlacement.Bottom,
-    offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
-    placementTarget: ElementTarget? = null,
-    showDelayMs: Int = 0,
-    hideDelayMs: Int = 0,
-    keepOpenStrategy: KeepPopupOpenStrategy? = null,
-    ref: ElementRefScope<HTMLElement>? = null,
-    content: @Composable PopupScope.() -> Unit,
-) {
-    Popover(
-        target = target,
-        modifier = modifier,
-        placement = placement,
-        offsetPixels = offsetPixels,
-        placementTarget = placementTarget,
-        showDelayMs = showDelayMs,
-        hideDelayMs = hideDelayMs,
-        keepOpenStrategy = keepOpenStrategy,
-        variant = variant,
-        ref = ref,
-        content = content
-    )
 }

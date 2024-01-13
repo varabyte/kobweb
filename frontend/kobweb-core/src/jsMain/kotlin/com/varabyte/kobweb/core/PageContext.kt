@@ -121,22 +121,6 @@ class PageContext internal constructor(val router: Router) {
             instance = PageContext(router)
         }
     }
-
-    // region deprecated route properties
-
-    // We moved the following properties under the `route` property to limit unnecessary recompositions for users who
-    // just want to access the router property.
-
-    @Deprecated("Use `route.slug` instead", ReplaceWith("route.slug"))
-    val slug: String get() = route.slug
-
-    @Deprecated("Use `route.params` instead", ReplaceWith("route.params"))
-    val params: Map<String, String> get() = route.params
-
-    @Deprecated("Use `route.fragment` instead", ReplaceWith("route.params"))
-    val fragment: String? get() = route.fragment
-
-    // endregion
 }
 
 /**

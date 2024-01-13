@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.kotlin.dsl.getByType
 
 abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGeneratingBlock {
     object RouteOverride {
@@ -84,13 +83,5 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
         markdownPath.convention("markdown")
         imports.set(emptyList())
         genDir.convention(baseGenDir.map { "$it/markdown" })
-    }
-
-    @Deprecated(
-        "Use `handlers { ... }` instead. This property was renamed to avoid a naming conflict with Gradle project components.",
-    )
-    fun components(configure: MarkdownHandlers.() -> Unit) {
-        val handlers = this.extensions.getByType<MarkdownHandlers>()
-        handlers.configure()
     }
 }

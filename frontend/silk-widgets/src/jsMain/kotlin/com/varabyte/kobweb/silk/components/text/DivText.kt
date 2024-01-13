@@ -37,7 +37,6 @@ val DivTextStyle by ComponentStyle(prefix = "silk") {}
  * the same way, so in those cases which you choose may not matter functionally but can be used to express intention.
  */
 @Composable
-// Deprecated in 0.14.1
 @Deprecated("It was a mistake to create this composable, as it is not solving a common pain point. Consider using SpanText instead, or just create a Div wrapping a Text manually.")
 fun DivText(
     text: String,

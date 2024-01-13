@@ -3,7 +3,6 @@ package com.varabyte.kobweb.compose.css
 import com.varabyte.kobweb.compose.css.functions.CSSImage
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.Gradient
-import com.varabyte.kobweb.compose.css.functions.toImage
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
@@ -91,13 +90,6 @@ fun StyleScope.backgroundImage(backgroundImage: BackgroundImage) {
 
 fun StyleScope.backgroundImage(url: CSSUrl) = backgroundImage(BackgroundImage.of(url))
 fun StyleScope.backgroundImage(gradient: Gradient) = backgroundImage(BackgroundImage.of(gradient))
-
-// Provided for backwards compatibility. We've since refactored out a common CSSImage class, so use that instead.
-@Deprecated(
-    "Use Gradient.toImage() instead",
-    ReplaceWith("this.toImage()", "com.varabyte.kobweb.compose.css.functions.toImage")
-)
-fun Gradient.toBackgroundImage() = this.toImage()
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
 class BackgroundOrigin private constructor(private val value: String) : StylePropertyValue {

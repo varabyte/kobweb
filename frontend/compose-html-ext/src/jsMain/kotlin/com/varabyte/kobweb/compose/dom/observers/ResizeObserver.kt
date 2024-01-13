@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.varabyte.kobweb.compose.dom.observers
 
 /**

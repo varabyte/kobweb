@@ -9,10 +9,6 @@ annotation class GridDslMarker
 @Deprecated("Use `CSSFlexNumericValue` instead", ReplaceWith("CSSFlexNumericValue"))
 typealias CSSFlexValue = CSSFlexNumericValue
 
-// TODO(#168): Remove before v1.0
-@Deprecated("Use GridEntry.TrackSize instead", ReplaceWith("GridEntry.TrackSize"))
-typealias GridTrackSize = GridEntry.TrackSize
-
 /**
  * The base class for all values which can be used to configure a CSS grid's rows or columns.
  *

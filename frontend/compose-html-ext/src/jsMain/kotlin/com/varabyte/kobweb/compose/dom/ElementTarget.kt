@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.varabyte.kobweb.compose.dom
 
 /** An interface for finding some target element, relative to some given initial element. */
