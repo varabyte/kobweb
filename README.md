@@ -3175,7 +3175,7 @@ For example, maybe you're making a web game, and you decide to create a worker t
 of course create a Kobweb library for the same effect, but using a worker has a stronger guarantee that the logic will
 never interact directly with your site's UI.
 
-> [!WARNING]
+> [!CAUTION]
 > You should be aware that, since a web worker is a whole separate standalone script, it needs to include its own copy
 > of the Kotlin/JS runtime, even though your main site already has its own copy.
 >
