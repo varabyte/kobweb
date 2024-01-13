@@ -4226,16 +4226,20 @@ It's not expected many users will need to debug their site exports, but it's a g
 with the [server logs feature](#kobweb-server-logs)) to diagnose if one of your pages is taking longer to export than
 expected.
 
-## Extending the Compose HTML library
+## General purpose improvements on top of Compose HTML and Kotlin/JS
 
 In the beginning, Kobweb was only intended to be a thin layer on top of Compose HTML, but the more we worked on it, the
-more we ran into features that were simply not yet implemented in Compose HTML. We also wrote utility methods and
-classes that were so generally useful, that it would have been a shame to bury them deep inside our framework.
+more we ran into features that were simply not yet implemented in Compose HTML. In other cases, we found ourselves
+reaching for utilities that we wished existed in Kotlin/JS browser APIs. As we began adding these features, we realized
+it would have been a shame to bury them deep inside our framework.
 
-As a result, we created a module called [`compose-html-ext`](frontend/compose-html-ext/README.md), where we put code
-that we would be more than happy for the Compose HTML team to fork and migrate over to Compose HTML someday.
+As a result, we created two modules:
+* [`compose-html-ext`](frontend/compose-html-ext/README.md), where we put code that we would be more than happy for the
+  Compose HTML team to fork and migrate over to Compose HTML someday.
+* [`browser-ext`](frontend/browser-ext/README.md), a collection of general purpose utilities that we think could be
+  useful to any Kotlin/JS project targeting the browser.
 
-This now includes (not comprehensive):
+The features across these modules include (not comprehensive):
 
 * a *ton* of missing type-safe wrappers around many, many CSS properties
 * type-safe wrappers around CSS functions, like gradients, filters,
@@ -4266,8 +4270,9 @@ This now includes (not comprehensive):
 > There's so much code here, especially around CSS APIs, that getting mired down in PR discussions would have ground our
 > progress to a halt.
 
-If you want to use Compose HTML but *not* Kobweb, you can still use and benefit from `compose-html-ext` in your own
-project. An example build script could look like this:
+If you want to use Compose HTML but *not* Kobweb, or Kotlin/JS but *not* Compose HTML, you can still use and benefit
+from `compose-html-ext` or `browser-ext` in your own project. An example build script could look like this (here, for a
+non-Kobweb Compose HTML project):
 
 ```kotlin
 // build.gradle.kts
@@ -4293,6 +4298,9 @@ kotlin {
   }
 }
 ```
+
+> [!NOTE]
+> The `compose-html-ext` dependency automatically exposes the `browser-ext` dependency.
 
 # Can We Kobweb Yet
 
