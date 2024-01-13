@@ -1,4 +1,4 @@
-[![version: 0.15.4](https://img.shields.io/badge/kobweb-0.15.4-blue)](COMPATIBILITY.md)
+[![version: 0.15.5](https://img.shields.io/badge/kobweb-0.15.5-blue)](COMPATIBILITY.md)
 [![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
 [![kotlin: 1.9.21](https://img.shields.io/badge/kotlin-1.9.21-blue?logo=kotlin)](COMPATIBILITY.md)
