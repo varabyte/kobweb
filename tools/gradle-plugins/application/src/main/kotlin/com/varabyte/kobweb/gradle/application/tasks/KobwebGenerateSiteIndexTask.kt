@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // Intentionally supporting legacy API around `LibraryIndexMetadata`
+
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
@@ -9,10 +11,12 @@ import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
+import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_INDEX
+import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.link
 import kotlinx.html.unsafe
@@ -24,7 +28,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import org.jsoup.Jsoup
-import java.io.File
 import javax.inject.Inject
 
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
@@ -85,13 +88,26 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // allowed to declare some as well. If they do, they will have embedded serialized html in their library
         // artifacts.
         val headInitializers = kobwebBlock.app.index.head.get().toMutableList()
-        val kobwebLibraries = mutableListOf<File>()
         getCompileClasspath().get().files.forEach { file ->
-            file.searchZipFor(KOBWEB_METADATA_INDEX) { bytes ->
-                kobwebLibraries.add(file)
+            var libraryMetadata: LibraryMetadata? = null
 
-                val indexMetadata = Json.decodeFromString<LibraryIndexMetadata>(bytes.decodeToString())
-                val document = Jsoup.parse(indexMetadata.headElements)
+            file.searchZipFor(KOBWEB_METADATA_LIBRARY) { bytes ->
+                libraryMetadata = Json.decodeFromString(LibraryMetadata.serializer(), bytes.decodeToString())
+            }
+
+            if (libraryMetadata == null) {
+                // It's possible that we're loading a library that was built with an older version of Kobweb that used
+                // the index.json file instead of library.json. If so, we'll try to load it from there.
+                @Suppress("DEPRECATION")
+                file.searchZipFor(KOBWEB_METADATA_INDEX) { bytes ->
+                    libraryMetadata = Json.decodeFromString(LibraryIndexMetadata.serializer(), bytes.decodeToString())
+                        .toLibraryMetadata()
+                }
+            }
+
+            libraryMetadata?.index?.headElements?.let { headElementsStr ->
+                println("\tWE GOT $headElementsStr")
+                val document = Jsoup.parse(headElementsStr)
                 val headElements = document.head().children()
 
                 if (headElements.isNotEmpty()) {

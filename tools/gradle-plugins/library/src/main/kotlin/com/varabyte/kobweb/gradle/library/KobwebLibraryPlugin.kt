@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // Providing legacy support for deprecated `LibraryIndexMetadata`
+
 package com.varabyte.kobweb.gradle.library
 
 import com.varabyte.kobweb.ProcessorMode
@@ -12,15 +14,10 @@ import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
-import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.library.extensions.createLibraryBlock
-import com.varabyte.kobweb.gradle.library.extensions.index
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_INDEX
-import kotlinx.html.head
-import kotlinx.html.stream.createHTML
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateIndexMetadataTask
+import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateLibraryMetadataTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -32,38 +29,20 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 class KobwebLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
-        val libraryBlock = project.kobwebBlock.createLibraryBlock()
+        project.kobwebBlock.createLibraryBlock()
         project.applyKspPlugin()
 
-        val createIndexMetadataTask = project.tasks.register("kobwebCreateIndexMetadata") {
-            val generatedResourcesDir = project.layout.buildDirectory.dir("generated/kobweb/index")
-            val indexMetadataFile = generatedResourcesDir.get().file(KOBWEB_METADATA_INDEX)
-            outputs.dir(generatedResourcesDir)
-
-            doLast {
-                val headElements = libraryBlock.index.head.orNull?.takeIf { it.isNotEmpty() } ?: return@doLast
-
-                indexMetadataFile.asFile.apply {
-                    parentFile.mkdirs()
-                    writeText(
-                        Json.encodeToString(
-                            LibraryIndexMetadata(
-                                createHTML().head {
-                                    headElements.forEach { element -> element() }
-                                }
-                            )
-                        )
-                    )
-                }
-            }
-        }
-
+        val kobwebGenerateIndexMetadataTask =
+            project.tasks.register("kobwebGenerateIndexMetadataTask", KobwebGenerateIndexMetadataTask::class.java)
+        val kobwebGenerateLibraryMetadataTask =
+            project.tasks.register("kobwebGenerateLibraryMetadataTask", KobwebGenerateLibraryMetadataTask::class.java)
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.setupKspJs(jsTarget, ProcessorMode.LIBRARY)
             project.generateModuleMetadataFor(jsTarget)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                resources.srcDir(createIndexMetadataTask)
+                resources.srcDir(kobwebGenerateLibraryMetadataTask)
+                resources.srcDir(kobwebGenerateIndexMetadataTask) // Legacy task, kept around for a little while to give users a chance to upgrade
             }
         }
 

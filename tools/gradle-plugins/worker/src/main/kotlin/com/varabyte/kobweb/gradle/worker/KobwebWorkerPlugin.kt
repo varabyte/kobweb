@@ -13,6 +13,7 @@ import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.core.util.suggestKobwebProjectName
 import com.varabyte.kobweb.gradle.worker.extensions.createWorkerBlock
 import com.varabyte.kobweb.gradle.worker.extensions.worker
+import com.varabyte.kobweb.gradle.worker.tasks.KobwebGenerateWorkerMetadataTask
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER_SUBFOLDER
 import com.varabyte.kobweb.ksp.KSP_WORKER_FQCN_KEY
 import com.varabyte.kobweb.ksp.KSP_WORKER_OUTPUT_PATH_KEY
@@ -23,6 +24,7 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.utils.provider
@@ -39,6 +41,9 @@ class KobwebWorkerPlugin : Plugin<Project> {
             createWorkerBlock(project)
         }
 
+        val kobwebGenerateWorkerMetadataTask =
+            project.tasks.register("kobwebGenerateWorkerMetadata", KobwebGenerateWorkerMetadataTask::class.java)
+
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.addKspDependency(jsTarget)
@@ -51,10 +56,13 @@ class KobwebWorkerPlugin : Plugin<Project> {
                 )
             }
             project.generateModuleMetadataFor(jsTarget)
+            project.tasks.named<ProcessResources>(jsTarget.processResources) {
+                from(kobwebGenerateWorkerMetadataTask)
+            }
 
             val jsBrowserDistributionTask by provider { project.tasks.named(jsTarget.browserDistribution) }
             val copyWorkerJsOutput = project.tasks.register<Sync>("kobwebCopyWorkerJsOutput") {
-                val genResDir = project.layout.buildDirectory.dir("generated/kobweb/worker")
+                val genResDir = project.layout.buildDirectory.dir("generated/kobweb/worker/output")
 
                 from(jsBrowserDistributionTask)
                 // NOTE: I originally also included the .js.map file, but it doesn't seem to get loaded by the browser,

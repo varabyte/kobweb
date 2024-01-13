@@ -13,6 +13,8 @@ dependencies {
 
     // Common Gradle plugin used by Library, Application, and Worker plugins
     api(projects.tools.gradlePlugins.core)
+
+    implementation(libs.kotlinx.serialization.json)
 }
 
 val DESCRIPTION = "A Gradle plugin that helps wrap vanilla web workers with type-safe APIs"
