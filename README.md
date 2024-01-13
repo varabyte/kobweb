@@ -3891,48 +3891,6 @@ fun drawArc(arc: CSSAngleNumericValue)
 > then, it's worth understanding why Kobweb introduces its own typealiases and why you are encouraged to use them
 > instead of the Compose HTML versions.
 
-<!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
-## <span id="what-about-multiplatform-widgets"><span id="what-about-compose-for-web-canvas">What about Compose Multiplatform for Web?</span></span>
-
-Jetbrains is working on a project called "Compose Multiplatform", which will allow developers to use the same Compose
-API across Android, iOS, Desktop, and the Web. And it may seem like the Kobweb + Silk approach will be obsoleted by it.
-
-It's first worth understanding the core difference between the two approaches. With Multiplatform Compose, the framework
-owns its own rendering pipeline, drawing to a buffer, while Compose HTML modifies an HTML / CSS DOM tree and leaves it
-up to the browser to do the final rendering.
-
-This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
-modifiers matters, while in HTML, this action simply sets html style properties under the hood, where order does not
-matter.
-
-Ditching HTML / CSS entirely at first can seem like a total win, but this approach has several limits:
-
-* robots would lose the ability to crawl and index your site, hurting SEO.
-* your initial render may take longer.
-* your site will need to allocate a large canvas buffer, which could be *very* expensive on high res, wide-screen
-  desktops.
-* your UI will be opaque to the powerful suite of devtools that come bundled with browsers.
-* you won't have the ability to style unvisited vs visited links differently (this information is hidden from you by
-  the browser for security reasons and can only be set through HTML / CSS).
-* you won't have the ability to turn elements on / off when printing the page.
-* accessibility tools for browsers might not work.
-
-It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there.
-
-For now, I am making a bet that there will always be value in embracing the web, providing a framework that sticks to
-HTML / CSS but offers a growing suite of UI widgets that hopefully makes it relatively rare for the developer to need to
-worry about it.
-
-For example, [flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) is a very powerful CSS concept, but
-you'll find it's much easier to compose `Row`s and `Column`s together than trying to remember if you should be
-justifying your items or aligning your content, even if `Row`s and `Column`s are just creating the correct HTML / CSS
-for you behind the scenes.
-
-Ultimately, I believe there is room for both approaches. If you want to make an app experience that feels the same on
-Android, iOS, Desktop, and Web, then "Multiplatform Compose" could be great for you. However, if you just want to make a
-traditional website but want to use Kotlin instead of TypeScript, Kobweb can provide an excellent development experience
-for that case.
-
 # Miscellaneous topics
 
 ## Debugging your site
@@ -4301,6 +4259,48 @@ kotlin {
 
 > [!NOTE]
 > The `compose-html-ext` dependency automatically exposes the `browser-ext` dependency.
+
+<!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
+## <span id="what-about-multiplatform-widgets"><span id="what-about-compose-for-web-canvas">What about Compose Multiplatform for Web?</span></span>
+
+Jetbrains is working on a project called "Compose Multiplatform", which will allow developers to use the same Compose
+API across Android, iOS, Desktop, and the Web. And it may seem like the Kobweb + Silk approach will be obsoleted by it.
+
+It's first worth understanding the core difference between the two approaches. With Multiplatform Compose, the framework
+owns its own rendering pipeline, drawing to a buffer, while Compose HTML modifies an HTML / CSS DOM tree and leaves it
+up to the browser to do the final rendering.
+
+This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
+modifiers matters, while in HTML, this action simply sets html style properties under the hood, where order does not
+matter.
+
+Ditching HTML / CSS entirely at first can seem like a total win, but this approach has several limits:
+
+* robots would lose the ability to crawl and index your site, hurting SEO.
+* your initial render may take longer.
+* your site will need to allocate a large canvas buffer, which could be *very* expensive on high res, wide-screen
+  desktops.
+* your UI will be opaque to the powerful suite of devtools that come bundled with browsers.
+* you won't have the ability to style unvisited vs visited links differently (this information is hidden from you by
+  the browser for security reasons and can only be set through HTML / CSS).
+* you won't have the ability to turn elements on / off when printing the page.
+* accessibility tools for browsers might not work.
+
+It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there.
+
+For now, I am making a bet that there will always be value in embracing the web, providing a framework that sticks to
+HTML / CSS but offers a growing suite of UI widgets that hopefully makes it relatively rare for the developer to need to
+worry about it.
+
+For example, [flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) is a very powerful CSS concept, but
+you'll find it's much easier to compose `Row`s and `Column`s together than trying to remember if you should be
+justifying your items or aligning your content, even if `Row`s and `Column`s are just creating the correct HTML / CSS
+for you behind the scenes.
+
+Ultimately, I believe there is room for both approaches. If you want to make an app experience that feels the same on
+Android, iOS, Desktop, and Web, then "Multiplatform Compose" could be great for you. However, if you just want to make a
+traditional website but want to use Kotlin instead of TypeScript, Kobweb can provide an excellent development experience
+for that case.
 
 # Can We Kobweb Yet
 
