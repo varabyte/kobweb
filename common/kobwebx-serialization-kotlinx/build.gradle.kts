@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -10,13 +9,13 @@ group = "com.varabyte.kobwebx"
 version = libs.versions.kobweb.libs.get()
 
 kotlin {
+    jvm()
     js {
         browser()
-        binaries.executable()
     }
 
     sourceSets {
-        jsMain.dependencies {
+        commonMain.dependencies {
             implementation(projects.common.kobwebSerialization)
             implementation(libs.kotlinx.serialization.json)
         }
@@ -24,7 +23,6 @@ kotlin {
 }
 
 kobwebPublication {
-    artifactId.set("kobwebx-serialization-kotlinx")
+    artifactId.setForMultiplatform("kobwebx-serialization-kotlinx")
     description.set("Support code for using Kobweb workers in projects using Kotlinx Serialization")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

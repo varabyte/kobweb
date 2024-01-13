@@ -1,4 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -13,11 +13,10 @@ kotlin {
     jvm()
     js {
         browser()
-        binaries.executable()
     }
 }
 
 kobwebPublication {
-    artifactId.set("kobweb-serialization")
+    artifactId.setForMultiplatform("kobweb-serialization")
     description.set("A collection of utility classes related to serialization.")
 }
