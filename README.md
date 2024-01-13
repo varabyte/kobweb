@@ -3761,9 +3761,9 @@ won't have access to Kobweb's API routes, API streams, or live reloading support
 improve someday ([link to tracking issue](https://github.com/varabyte/kobweb/issues/22)), but we don't have enough
 resources to be able to prioritize resolving this for a 1.0 release.
 
-## `CSSNumericValue` typealiases
+## `CSSNumericValue` type-aliases
 
-Kobweb introduces a handful of typealiases for CSS unit values, basing them off of the `CSSNumericValue` class and
+Kobweb introduces a handful of type-aliases for CSS unit values, basing them off of the `CSSNumericValue` class and
 extending the set defined by Compose HTML:
 
 ```kotlin
@@ -3811,7 +3811,7 @@ fun drawArc(arc: CSSSizeValue<out CSSUnitAngle>)
 
 What a mouthful!
 
-As a result, the Compose HTML team added typealiases for all these unit types, such as `CSSLengthValue`
+As a result, the Compose HTML team added type-aliases for all these unit types, such as `CSSLengthValue`
 and `CSSAngleValue`. Now, you can write the above code like:
 
 ```kotlin
@@ -3850,14 +3850,14 @@ Because it is opaque, `CSSNumericValue` is far more flexible and widely applicab
 writing a function that takes a parameter, or declaring a `StyleVariable` tied to some length or time, you almost always
 want to use `CSSNumericValue` and not `CSSSizeValue`.
 
-### Prefer using Kobweb's `CSSNumericValue` typealiases
+### Prefer using Kobweb's `CSSNumericValue` type-aliases
 
-As mentioned above, the Compose HTML team created their unit-related typealiases against the `CSSSizeValue` class.
+As mentioned above, the Compose HTML team created their unit-related type-aliases against the `CSSSizeValue` class.
 
 This decision makes it really easy to write code that works well when you test it with concrete size values but is
 actually more restrictive than you expected.
 
-Kobweb ensures its APIs all reference its `CSSNumericValue` typealiases:
+Kobweb ensures its APIs all reference its `CSSNumericValue` type-aliases:
 
 ```kotlin
 // Legacy Kobweb
@@ -3886,9 +3886,9 @@ fun drawArc(arc: CSSAngleNumericValue)
 ```
 
 > [!NOTE]
-> Perhaps in the future, the Compose HTML team might consider updating their typealiases to use the `CSSNumericValue`
+> Perhaps in the future, the Compose HTML team might consider updating their type-aliases to use the `CSSNumericValue`
 > type and not the `CSSSizeValue` type. If that happens, we can revert our changes and delete this section. But until
-> then, it's worth understanding why Kobweb introduces its own typealiases and why you are encouraged to use them
+> then, it's worth understanding why Kobweb introduces its own type-aliases and why you are encouraged to use them
 > instead of the Compose HTML versions.
 
 # Miscellaneous topics
