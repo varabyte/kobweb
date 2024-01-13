@@ -25,6 +25,8 @@ class IntersectionObserver(options: Options? = null, resized: (List<Entry>, Inte
         val rootMargin: String? = null,
         val thresholds: List<Double>? = null,
     ) {
+        companion object {} // Created so compose-html-ext can extend it
+
         internal fun toJson() = json().apply {
             root?.let { this["root"] = it }
             rootMargin?.let { this["rootMargin"] = it.toString() }

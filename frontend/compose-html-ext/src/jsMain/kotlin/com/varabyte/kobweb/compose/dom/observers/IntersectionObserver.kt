@@ -1,27 +1,21 @@
 package com.varabyte.kobweb.compose.dom.observers
 
+import com.varabyte.kobweb.browser.dom.observers.IntersectionObserver
 import com.varabyte.kobweb.compose.css.*
 import org.w3c.dom.Element
-import com.varabyte.kobweb.browser.dom.observers.IntersectionObserver as BrowserIntersectionObserver
 
-// We provide our own wrapper around IntersectionObserver.Options for rich-type CSSMargin support
-class IntersectionObserverOptions(
-    val root: Element? = null,
-    val rootMargin: CSSMargin? = null,
-    val thresholds: List<Double>? = null,
+/**
+ * A helper method for generating [IntersectionObserver.Options] being able to use a [CSSMargin] object.
+ */
+operator fun IntersectionObserver.Options.Companion.invoke(
+    root: Element? = null,
+    rootMargin: CSSMargin? = null,
+    thresholds: List<Double>? = null,
+) = IntersectionObserver.Options(
+    root,
+    rootMargin?.toString(),
+    thresholds
 )
-
-@Suppress("FunctionName") // Factory method that mimics a constructor
-fun IntersectionObserver(options: IntersectionObserverOptions, resized: (List<BrowserIntersectionObserver.Entry>, BrowserIntersectionObserver) -> Unit) {
-    @Suppress("NAME_SHADOWING") val options = options.let {
-        BrowserIntersectionObserver.Options(
-            it.root,
-            it.rootMargin.toString(),
-            it.thresholds
-        )
-    }
-    BrowserIntersectionObserver(options, resized)
-}
 
 /**
  * Provides a way to asynchronously observe changes in the intersection of a target element with an ancestor element.
