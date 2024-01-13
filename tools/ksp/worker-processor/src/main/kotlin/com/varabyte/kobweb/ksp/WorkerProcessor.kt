@@ -139,7 +139,7 @@ class WorkerProcessor(
 
             import org.w3c.dom.Worker
 
-            class $workerClassName(override var onOutput: ($outputType) -> Unit = {}) :
+            class $workerClassName(override var onOutput: (output: $outputType) -> Unit = {}) :
                 $WORKER_FQN<$inputType, $outputType> {
 
                 private val ioSerializer = $workerFactoryType().createIOSerializer()

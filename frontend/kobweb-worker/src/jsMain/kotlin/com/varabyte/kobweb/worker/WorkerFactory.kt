@@ -50,7 +50,7 @@ performs some (presumably expensive) logic on it.
  * ever interact with it.
  */
 interface WorkerFactory<I, O> {
-    fun createStrategy(postOutput: (O) -> Unit): WorkerStrategy<I>
+    fun createStrategy(postOutput: (output: O) -> Unit): WorkerStrategy<I>
     fun createIOSerializer(): IOSerializer<I, O>
 }
 
