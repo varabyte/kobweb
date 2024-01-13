@@ -1025,7 +1025,7 @@ val HighlightedCustomVariant by CustomStyle.addVariant {
 > ```kotlin
 > @Suppress("PRIVATE_COMPONENT_VARIANT")
 > private val SomeCustomVariant by SomeCustomStyle.addVariant {
->   /* ... */ 
+>   /* ... */
 > }
 >
 > @InitSilk
@@ -2240,8 +2240,8 @@ fun initSilk(ctx: InitSilkContext) {
 >   hover {
 >     Modifier.cursor(Cursor.NotAllowed)
 >   }
-> } 
-> ``` 
+> }
+> ```
 
 ## Setting application globals
 
@@ -2700,7 +2700,7 @@ val echo = ApiStream { ctx -> ctx.stream.send(ctx.text) }
 
 // Frontend
 val echoStream = rememberApiStream("echo") {
-  ctx -> console.log("Echoed: ${ctx.text}") 
+  ctx -> console.log("Echoed: ${ctx.text}")
 }
 ```
 
@@ -2792,7 +2792,7 @@ Here's everything you have to do (we'll show examples of these steps shortly):
 
 * Create a new module and apply the Kobweb Worker Gradle plugin on it.
 * (Optional but recommended) Create a name that will be used for your worker's output file
-  * e.g. `kobweb { worker { name.set("example-worker") } }` 
+  * e.g. `kobweb { worker { name.set("example-worker") } }`
 * Tag the `kotlin { ... }` block in your build script with a `configAsKobwebWorker()` call.
 * Declare a dependency on `"com.varabyte.kobweb:kobweb-worker"`.
 * Implement the `WorkerFactory` interface, providing a `WorkerStrategy` that represents the core logic of your worker.
@@ -2909,8 +2909,8 @@ implement the `createIOSerializer` method, called `createPassThroughSerializer`.
 // Worker module
 internal class EchoWorkerFactory : WorkerFactory<String, String> {
   override fun createStrategy(postOutput: (String) -> Unit) = WorkerStrategy<String> { input ->
-    postOutput(input)  
-  }  
+    postOutput(input)
+  }
   override fun createIOSerializer() = createPassThroughSerializer()
 }
 ```
@@ -4247,7 +4247,7 @@ repositories {
 
 kotlin {
   js().browser()
-  sourceSets { 
+  sourceSets {
     jsMain.dependencies {
       implementation(compose.html.core)
       implementation(compose.runtime)
