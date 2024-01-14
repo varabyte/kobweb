@@ -2792,9 +2792,9 @@ Kobweb aims to make using web workers as easy as possible.
 Here's everything you have to do (we'll show examples of these steps shortly):
 
 * Create a new module and apply the Kobweb Worker Gradle plugin on it.
-* (Optional but recommended) Create a name that will be used for your worker's output file
-  * e.g. `kobweb { worker { name.set("example-worker") } }`
 * Tag the `kotlin { ... }` block in your build script with a `configAsKobwebWorker()` call.
+  * (Optional but recommended) Specify a name for your worker. Otherwise, the generic name "worker" (with a short random
+    suffix) will be used.
 * Declare a dependency on `"com.varabyte.kobweb:kobweb-worker"`.
 * Implement the `WorkerFactory` interface, providing a `WorkerStrategy` that represents the core logic of your worker.
 
@@ -2811,14 +2811,8 @@ plugins {
 group = "example.worker"
 version = "1.0-SNAPSHOT"
 
-kobweb {
-    worker {
-        name.set("example-worker")
-    }
-}
-
 kotlin {
-    configAsKobwebWorker()
+    configAsKobwebWorker("example-worker")
     sourceSets {
         jsMain.dependencies {
             implementation(libs.kobweb.worker) // or "com.varabyte.kobweb:kobweb-worker"

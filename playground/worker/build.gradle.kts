@@ -10,15 +10,11 @@ group = "playground.worker"
 version = "1.0-SNAPSHOT"
 
 kobweb {
-    worker {
-        name.set("sum-worker")
-    }
-
     kspProcessorDependency.set("com.varabyte.kobweb:worker-processor")
 }
 
 kotlin {
-    configAsKobwebWorker()
+    configAsKobwebWorker("sum-worker")
     sourceSets {
         jsMain.dependencies {
             api(libs.kotlinx.serialization.json)
