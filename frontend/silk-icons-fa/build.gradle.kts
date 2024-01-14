@@ -172,7 +172,7 @@ val generateIconsTask = tasks.register("generateIcons") {
             |}
             |
             |${iconMethodEntries.joinToString("\n")}
-            """.trimMargin().trimIndent()
+            """.trimMargin()
 
         dstFile.asFile.apply {
             parentFile.mkdirs()
