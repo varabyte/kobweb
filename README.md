@@ -64,7 +64,7 @@ Our goal is to provide:
 * out-of-the-box Markdown support
 * a way to easily define server API routes and persistent API streams
 * support for creating and using web workers
-* a growing collection of general purpose utilities added on top of Compose HTML ([learn more▼](#extending-the-compose-html-library))
+* a growing collection of general purpose utilities added on top of Compose HTML and Kotlin/JS ([learn more▼](#general-purpose-improvements-on-top-of-compose-html-and-kotlinjs))
 * an open source foundation that the community can extend
 * and much, much more!
 
