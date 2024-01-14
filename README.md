@@ -63,6 +63,7 @@ Our goal is to provide:
 * support for responsive (i.e. mobile and desktop) design
 * out-of-the-box Markdown support
 * a way to easily define server API routes and persistent API streams
+* support for creating and using web workers
 * a growing collection of general purpose utilities added on top of Compose HTML ([learn more▼](#extending-the-compose-html-library))
 * an open source foundation that the community can extend
 * and much, much more!
