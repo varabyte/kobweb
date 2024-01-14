@@ -3638,22 +3638,28 @@ The following instructions are based on a Kobweb multimodule setup, like the one
 * Create a new module in your project.
   * For example, name it "demo-server-plugin".
   * Be sure to update your `settings.gradle.kts` file to include the new project.
-* Add a new entry for the `kobweb-server-project` library in `.gradle/libs.versions.toml`:
+* Add new entries for the `kobweb-server-project` library and kotlin JVM plugin in `.gradle/libs.versions.toml`:
   ```toml
   [libraries]
   kobweb-server-plugin = { module = "com.varabyte.kobweb:kobweb-server-plugin", version.ref = "kobweb" }
+
+  [plugins]
+  kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
   ```
 * **For all remaining steps, create all files / directories under your new module's directory (e.g. `demo-server-plugin/`).**
 * Create `build.gradle.kts`:
   ```kotlin
     plugins {
-      kotlin("jvm")
+      alias(libs.plugins.kotlin.jvm)
     }
     group = "org.example.app" // update to your own project's group
     version = "1.0-SNAPSHOT"
 
     tasks.jar {
       // Remove the version number
+      // We don't want multiple versioned copies of the same plugin
+      // ending up in the Kobweb server. Instead, each new version
+      // should replace the previous one.
       archiveFileName.set("${project.name}.jar")
     }
 
@@ -3661,8 +3667,6 @@ The following instructions are based on a Kobweb multimodule setup, like the one
       compileOnly(libs.kobweb.server.plugin)
     }
   ```
-  * We omit the version number to prevent the accumulation of multiple versioned copies of the same plugin ended up in
-    the Kobweb server. Instead, each new version should replace the previous one.
 * Create `src/main/kotlin/DemoKobwebServerPlugin.kt`:
   ```kotlin
   import com.varabyte.kobweb.server.plugin.KobwebServerPlugin
@@ -3698,6 +3702,8 @@ Upon the next Kobweb server run (e.g. via `kobweb run`), if you check the logs, 
 [main] INFO  ktor.application - Responding at http://0.0.0.0:8080
 ```
 
+This can be tedious, so we provide an automatic approach in the next section.
+
 ### Copy your plugin jar automatically
 
 For convenience, the Kobweb Gradle Application plugin provides a way to notify it about your JAR task, and it will build
@@ -3707,6 +3713,7 @@ In your Kobweb project's build script, include the following `notify...` line:
 
 ```kotlin
 // site/build.gradle.kts
+import org.gradle.jvm.tasks.Jar
 
 kobweb { /* ... */ }
 
