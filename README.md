@@ -3688,12 +3688,32 @@ The following instructions are based on a Kobweb multimodule setup, like the one
   * This helps the JDK discover service implementations bundled within a JAR. You can
     read [this helpful article](https://www.baeldung.com/java-spi) to learn more about this useful Java feature.
 
-### Copy your plugin jar manually
+### Register your server plugin jar
 
-After building your JAR (`./gradlew :demo-server-plugin:jar`), manually copy it from `build/libs/` to your Kobweb
-project's `.kobweb/server/plugins` directory.
+For convenience, the Kobweb Gradle Application plugin provides a way to notify it about your JAR project. Set it up, and
+Gradle will build and copy your plugin jar over for you automatically.
 
-Upon the next Kobweb server run (e.g. via `kobweb run`), if you check the logs, you should see something like this:
+In your Kobweb project's build script, include the following `kobwebServerPlugin` line in your JVM dependencies block:
+
+```kotlin
+// site/build.gradle.kts
+import com.varabyte.kobweb.gradle.application.artifacts.kobwebServerPlugin
+
+/* ... */
+
+dependencies {
+  kobwebServerPlugin(project(":demo-server-plugin"))
+}
+
+kotlin { /* ... */ }
+```
+
+> [!IMPORTANT]
+> You need to put the `kobwebServerPlugin` declaration inside a top-level `dependencies` block, not in one of the
+> ones nested under the `kotlin` block (such as `kotlin.jvmMain.dependencies`).
+
+Once this is set up, upon the next Kobweb server run (e.g. via `kobweb run`), if you check the logs, you should see
+something like this:
 
 ```text
 [main] INFO  ktor.application - Autoreload is disabled because the development mode is off.
@@ -3701,29 +3721,6 @@ Upon the next Kobweb server run (e.g. via `kobweb run`), if you check the logs, 
 [main] INFO  ktor.application - Application started in 0.112 seconds.
 [main] INFO  ktor.application - Responding at http://0.0.0.0:8080
 ```
-
-This can be tedious, so we provide an automatic approach in the next section.
-
-### Copy your plugin jar automatically
-
-For convenience, the Kobweb Gradle Application plugin provides a way to notify it about your JAR task, and it will build
-and copy it over for you automatically.
-
-In your Kobweb project's build script, include the following `notify...` line:
-
-```kotlin
-// site/build.gradle.kts
-import org.gradle.jvm.tasks.Jar
-
-kobweb { /* ... */ }
-
-notifyKobwebAboutServerPluginTask(project(":demo-server-plugin").tasks.named("jar", Jar::class))
-
-kotlin { /* ... */ }
-```
-
-Once this is set up, you can modify your Kobweb server plugin, quit the server if one is running, and then rerun
-`kobweb run` to have it pick up your changes automatically.
 
 ## Using your own backend with Kobweb
 

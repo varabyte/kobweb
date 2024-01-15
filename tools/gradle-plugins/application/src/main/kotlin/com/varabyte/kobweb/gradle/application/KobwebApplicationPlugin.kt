@@ -47,6 +47,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.RegularFile
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
@@ -54,6 +55,7 @@ import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.tooling.events.FailureResult
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -69,6 +71,8 @@ val Project.kobwebFolder: KobwebFolder
     get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
         ?: throw GradleException("This project is not a Kobweb project but is applying the Kobweb plugin.")
 
+internal const val KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME = "kobwebServerPlugin"
+
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebApplicationPlugin @Inject constructor(
     private val buildEventsListenerRegistry: BuildEventsListenerRegistry
@@ -76,6 +80,12 @@ class KobwebApplicationPlugin @Inject constructor(
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         project.applyKspPlugin()
+
+        // A Kobweb Server Plugin is one which is loaded by the Kobweb server when it starts up. It's a way for users to
+        // configure their ktor server in ways that Kobweb does not currently expose.
+        project.configurations.register(KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME) {
+            isTransitive = false
+        }
 
         val kobwebFolder = project.kobwebFolder
         val kobwebConf = with(KobwebConfFile(kobwebFolder)) {
@@ -322,6 +332,18 @@ class KobwebApplicationPlugin @Inject constructor(
 
             dependsOn(project.tasks.withType<KobwebGenerateTask>())
         }
+
+        val kobwebCopyServerPluginJarsTask = project.tasks.register<Sync>("kobwebCopyServerPluginJars") {
+            group = "kobweb"
+            description = "Copy all Kobweb server plugin jars (if any) into the server's plugins directory"
+
+            from(project.configurations.named(KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME))
+            into(project.projectDir.resolve(".kobweb/server/plugins"))
+        }
+
+        project.tasks.withType<ProcessResources>().configureEach {
+            from(kobwebCopyServerPluginJarsTask)
+        }
     }
 }
 
@@ -376,11 +398,10 @@ fun Project.notifyKobwebAboutBackendCodeGeneratingTask(task: TaskProvider<*>) {
  *
  * This method will create an intermediate task that copies the jar into the plugins directory, and then hooks up task
  * dependencies so that it will be called automatically before the Kobweb server runs.
- *
- * @param name An optional name you can provide for the intermediate "copy jar to plugins dir" task. You normally don't
- *   have to provide a name, but providing your own may be slightly more performant (since the task name I generate
- *   requires realizing the task, which may slightly slow down the configuration phase).
  */
+@Deprecated(
+    "This approach has been simplified. Please replace it with `dependencies { kobwebServerPlugin(...) }` instead (where `dependencies` is the top-level dependencies block and \"...\" is the dependency that represents a kobweb server plugin jar)."
+)
 fun Project.notifyKobwebAboutServerPluginTask(
     jarTask: TaskProvider<Jar>,
     name: String = "copy${project.name.kebabCaseToTitleCamelCase()}JarToKobwebServerPluginsDir"
