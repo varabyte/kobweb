@@ -2466,7 +2466,8 @@ information and some clear, concrete examples:
 * [Static site generation and deployment with Kobweb](https://bitspittle.dev/blog/2022/staticdeploy)
 * [Deploying Kobweb into the cloud](https://bitspittle.dev/blog/2023/clouddeploy)
 
-## Communicating with the server
+<!-- Create a shorter ID for convenience to access a popular section -->
+## <span id="server">Communicating with the server</span>
 
 Let's say you've decided on creating a full stack website using Kobweb. This section walks you through setting it up as
 well as introducing the various APIs for communicating to the backend from the frontend.
@@ -2763,7 +2764,8 @@ server via events, API streams are a great choice.
 > You can also search online about REST vs WebSockets, as these are the technologies that API routes and API streams are
 > implemented with. Any discussions about them should apply here as well.
 
-## Creating a Kobweb Worker
+<!-- Create a shorter ID for convenience to access a popular section -->
+## <span id="worker">Creating a Kobweb Worker</span>
 
 ### Background: What are web workers?
 
