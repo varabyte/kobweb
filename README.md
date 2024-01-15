@@ -3629,11 +3629,12 @@ Creating a Kobweb server plugin is relatively straightforward. You'll need to:
 
 * Create a new module in your project that produces a JAR file that bundles an implementation of
   the `KobwebServerPlugin` interface.
-* Move a copy of that jar under your project's `.kobweb/server/plugins` directory.
+* Add that module as a `kobwebServerPlugin` dependency in your site's build script.
+  * This ensures a copy of that jar is put under your project's `.kobweb/server/plugins` directory.
 
 ### Create a Kobweb Server Plugin
 
-The following instructions are based on a Kobweb multimodule setup, like the one created by `kobweb create app`.
+The following steps will walk you through creating your first Kobweb Server Plugin.
 
 * Create a new module in your project.
   * For example, name it "demo-server-plugin".
@@ -3655,14 +3656,6 @@ The following instructions are based on a Kobweb multimodule setup, like the one
     group = "org.example.app" // update to your own project's group
     version = "1.0-SNAPSHOT"
 
-    tasks.jar {
-      // Remove the version number
-      // We don't want multiple versioned copies of the same plugin
-      // ending up in the Kobweb server. Instead, each new version
-      // should replace the previous one.
-      archiveFileName.set("${project.name}.jar")
-    }
-
     dependencies {
       compileOnly(libs.kobweb.server.plugin)
     }
@@ -3679,21 +3672,25 @@ The following instructions are based on a Kobweb multimodule setup, like the one
     }
   }
   ```
-  * As the Kobweb server is written in Ktor, you should familiarize yourself
-    with [Ktor's documentation](https://ktor.io/docs/plugins.html).
-* Create `src/main/resources/META-INF/services/com.varabyte.kobweb.server.plugin.KobwebServerPlugin`:
+> [!TIP]
+> As the Kobweb server is written in Ktor, you should familiarize yourself with [Ktor's documentation](https://ktor.io/docs/plugins.html).
+* Create `src/main/resources/META-INF/services/com.varabyte.kobweb.server.plugin.KobwebServerPlugin`, setting its
+  content to the fully-qualified class name of your plugin. For example:
   ```text
   org.example.app.DemoKobwebServerPlugin
   ```
-  * This helps the JDK discover service implementations bundled within a JAR. You can
-    read [this helpful article](https://www.baeldung.com/java-spi) to learn more about this useful Java feature.
+> [!NOTE]
+> If you aren't familiar with `META-INF/services`, you can
+> read [this helpful article](https://www.baeldung.com/java-spi) to learn more about service implementations, a very
+> useful Java feature.
 
 ### Register your server plugin jar
 
-For convenience, the Kobweb Gradle Application plugin provides a way to notify it about your JAR project. Set it up, and
-Gradle will build and copy your plugin jar over for you automatically.
+The Kobweb Gradle Application plugin provides a way to notify it about your JAR project. Set it up, and Gradle will
+build and copy your plugin jar over for you automatically.
 
-In your Kobweb project's build script, include the following `kobwebServerPlugin` line in your JVM dependencies block:
+In your Kobweb project's build script, include the following `kobwebServerPlugin` line in a top-level dependencies
+block:
 
 ```kotlin
 // site/build.gradle.kts
