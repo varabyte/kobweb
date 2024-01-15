@@ -3722,6 +3722,44 @@ something like this:
 [main] INFO  ktor.application - Responding at http://0.0.0.0:8080
 ```
 
+### Hooking into Ktor routing events
+
+Despite the simplicity of the `KobwebServerPlugin` interface, the `application` parameter passed
+into `KobwebServerPlugin.configure` is quite powerful.
+
+While I know it may sound kind of meta, you can create and install a Ktor Application Plugin inside a Kobweb Server
+Plugin. Once you've done that, you have access to all stages of a network call, as well as some other hooks like ones
+for receiving Application lifecycle events.
+
+> [!TIP]
+> Please read the [Extending Ktor documentation](https://ktor.io/docs/custom-plugins.html) to learn more.
+
+Doing so looks like this:
+
+```kotlin
+import com.varabyte.kobweb.server.plugin.KobwebServerPlugin
+import io.ktor.server.application.Application
+import io.ktor.server.application.createApplicationPlugin
+import io.ktor.server.application.install
+
+class DemoKobwebServerPlugin : KobwebServerPlugin {
+  override fun configure(application: Application) {
+    val demo = createApplicationPlugin("DemoKobwebServerPlugin") {
+      onCall { call -> /* ... */ } // Request comes in
+      onCallRespond { call -> /* ... */ } // Response goes out
+    }
+    application.install(demo)
+  }
+}
+```
+
+### Changing a Kobweb Server Plugin requires a server restart
+
+It's important to note that, unlike other parts of Kobweb, Kobweb Server Plugins do NOT support live reloading. We only
+start up and configure a Kobweb server once in its lifetime.
+
+If you make a change to a Kobweb Server Plugin, you must quit and restart the server for it to take effect.
+
 ## Using your own backend with Kobweb
 
 You may already have an existing and complex backend, perhaps written with Ktor or Spring Boot, and, if so, are
