@@ -55,7 +55,6 @@ import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
-import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.tooling.events.FailureResult
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -142,8 +141,18 @@ class KobwebApplicationPlugin @Inject constructor(
             val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
             project.tasks.register<KobwebStartTask>("kobwebStart", kobwebBlock, env, runLayout, reuseServer)
         }
+
+        val kobwebSyncServerPluginJarsTask = project.tasks.register<Sync>("kobwebSyncServerPluginJars") {
+            group = "kobweb"
+            description = "Copy all Kobweb server plugin jars (if any) into the server's plugins directory"
+
+            from(project.configurations.named(KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME))
+            into(project.projectDir.resolve(".kobweb/server/plugins"))
+        }
+
         kobwebStartTask.configure {
             dependsOn(kobwebUnpackServerJarTask)
+            dependsOn(kobwebSyncServerPluginJarsTask)
             doLast {
                 val devScript = kobwebConf.server.files.dev.script
                 if (env == ServerEnvironment.DEV && !project.file(devScript).exists()) {
@@ -331,18 +340,6 @@ class KobwebApplicationPlugin @Inject constructor(
             description = "Run all Kobweb code generation tasks"
 
             dependsOn(project.tasks.withType<KobwebGenerateTask>())
-        }
-
-        val kobwebCopyServerPluginJarsTask = project.tasks.register<Sync>("kobwebCopyServerPluginJars") {
-            group = "kobweb"
-            description = "Copy all Kobweb server plugin jars (if any) into the server's plugins directory"
-
-            from(project.configurations.named(KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME))
-            into(project.projectDir.resolve(".kobweb/server/plugins"))
-        }
-
-        project.tasks.withType<ProcessResources>().configureEach {
-            from(kobwebCopyServerPluginJarsTask)
         }
     }
 }
