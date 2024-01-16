@@ -16,11 +16,15 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.library.extensions.createLibraryBlock
+import com.varabyte.kobweb.gradle.library.extensions.index
+import com.varabyte.kobweb.gradle.library.extensions.library
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateIndexMetadataTask
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateLibraryMetadataTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -33,9 +37,11 @@ class KobwebLibraryPlugin : Plugin<Project> {
         project.applyKspPlugin()
 
         val kobwebGenerateIndexMetadataTask =
-            project.tasks.register("kobwebGenerateIndexMetadataTask", KobwebGenerateIndexMetadataTask::class.java)
-        val kobwebGenerateLibraryMetadataTask =
-            project.tasks.register("kobwebGenerateLibraryMetadataTask", KobwebGenerateLibraryMetadataTask::class.java)
+            project.tasks.register<KobwebGenerateIndexMetadataTask>("kobwebGenerateIndexMetadata")
+        val kobwebGenerateLibraryMetadataTask = project.tasks
+            .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
+                indexHead = project.kobwebBlock.library.index.head
+            }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.setupKspJs(jsTarget, ProcessorMode.LIBRARY)
