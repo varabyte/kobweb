@@ -51,6 +51,7 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
@@ -151,8 +152,8 @@ class KobwebApplicationPlugin @Inject constructor(
         }
 
         kobwebStartTask.configure {
-            dependsOn(kobwebUnpackServerJarTask)
-            dependsOn(kobwebSyncServerPluginJarsTask)
+            serverJar = kobwebUnpackServerJarTask.map { it.getServerJar() }
+            serverPluginsDir = kobwebSyncServerPluginJarsTask.map { it.destinationDir }
             doLast {
                 val devScript = kobwebConf.server.files.dev.script
                 if (env == ServerEnvironment.DEV && !project.file(devScript).exists()) {

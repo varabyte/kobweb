@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.KOBWEB_SERVER_JAR
+import com.varabyte.kobweb.gradle.application.util.getServerJar
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
@@ -21,20 +21,17 @@ import java.util.*
  */
 abstract class KobwebUnpackServerJarTask :
     KobwebTask("Extract a server.jar resource from the Gradle plugin and move it into the .kobweb folder") {
-    private val serverJarResource =
-        KobwebUnpackServerJarTask::class.java.getResourceAsStream("/server.jar")!!.readAllBytes()
+    private val serverJarResource = javaClass.getResourceAsStream("/server.jar")!!.readAllBytes()
 
     @Input
     fun getServerJarResourceHash(): String {
-        return String(
-            Base64.getEncoder().encode(
-                MessageDigest.getInstance("SHA-256").digest(serverJarResource)!!
-            )
-        )
+        return Base64.getEncoder().encode(
+            MessageDigest.getInstance("SHA-256").digest(serverJarResource)!!
+        ).decodeToString()
     }
 
     @OutputFile
-    fun getServerJar() = kobwebApplication.kobwebFolder.resolve(KOBWEB_SERVER_JAR).toFile()
+    fun getServerJar() = kobwebApplication.kobwebFolder.getServerJar()
 
     @TaskAction
     fun execute() {
