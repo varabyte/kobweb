@@ -5,7 +5,6 @@ import com.varabyte.kobweb.common.path.invariantSeparatorsPath
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.remoteDebugging
 import com.varabyte.kobweb.gradle.application.extensions.server
-import com.varabyte.kobweb.gradle.application.util.getServerJar
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
@@ -13,7 +12,10 @@ import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
@@ -33,8 +35,14 @@ abstract class KobwebStartTask @Inject constructor(
     private val reuseServer: Boolean
 ) : KobwebTask("Start a Kobweb server") {
 
-    @InputFile
-    fun getServerJar() = kobwebApplication.kobwebFolder.getServerJar()
+    @get:InputFile
+    abstract val serverJar: RegularFileProperty
+
+    // This is not directly used by the task, but is used by the server which this task starts, so we configure the
+    // directory as an input so that gradle handles task dependencies correctly.
+    // Note: we don't use @InputDirectory as it doesn't support optional directories (https://github.com/gradle/gradle/issues/2016)
+    @get:InputFiles
+    abstract val serverPluginsDir: DirectoryProperty
 
     @TaskAction
     fun execute() {
@@ -68,7 +76,7 @@ abstract class KobwebStartTask @Inject constructor(
                 add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${block.app.server.remoteDebugging.port.get()}")
             }
             add("-jar")
-            add(getServerJar().absolutePath)
+            add(serverJar.get().asFile.absolutePath)
         }.toTypedArray()
 
         println(
