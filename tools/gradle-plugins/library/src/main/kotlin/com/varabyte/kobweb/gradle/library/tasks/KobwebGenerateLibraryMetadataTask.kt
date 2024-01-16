@@ -11,16 +11,12 @@ import kotlinx.html.stream.createHTML
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 abstract class KobwebGenerateLibraryMetadataTask @Inject constructor(private val project: Project) :
     KobwebTask("Generate a library.json metadata file into this project's jar metadata, which identifies this artifact as a Kobweb library.") {
-
-    @get:Inject
-    abstract val projectLayout: ProjectLayout
 
     @OutputDirectory
     fun getGenResDir() = projectLayout.buildDirectory.dir("generated/kobweb/library/metadata")

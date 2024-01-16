@@ -13,7 +13,6 @@ import kotlinx.html.stream.createHTML
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
@@ -24,9 +23,6 @@ import javax.inject.Inject
 @Deprecated("Migrated to KobwebGenerateLibraryMetadataTask")
 abstract class KobwebGenerateIndexMetadataTask @Inject constructor(private val project: Project) :
     KobwebTask("Generate an index.json metadata file into this project's jar metadata, which contains details from the kobweb index block.") {
-
-    @get:Inject
-    abstract val projectLayout: ProjectLayout
 
     @OutputDirectory
     fun getGenResDir() = projectLayout.buildDirectory.dir("generated/kobweb/library/index/metadata")

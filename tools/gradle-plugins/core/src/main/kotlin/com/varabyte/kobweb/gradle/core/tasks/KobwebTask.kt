@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.core.tasks
 
 import com.varabyte.kobweb.project.KobwebApplication
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.tasks.Internal
 import javax.inject.Inject
 
@@ -9,6 +10,9 @@ import javax.inject.Inject
  * Minimal base class for ensuring that the current task is grouped consistently with other Kobweb tasks.
  */
 abstract class KobwebTask @Inject constructor(desc: String) : DefaultTask() {
+    @get:Inject
+    abstract val projectLayout: ProjectLayout
+
     /**
      * Request access to a [KobwebApplication] instance.
      *
@@ -18,7 +22,7 @@ abstract class KobwebTask @Inject constructor(desc: String) : DefaultTask() {
      * See also: [KobwebApplication] for more details.
      */
     @get:Internal
-    val kobwebApplication get() = KobwebApplication(project.layout.projectDirectory.asFile.toPath())
+    val kobwebApplication get() = KobwebApplication(projectLayout.projectDirectory.asFile.toPath())
 
     init {
         group = "kobweb"
