@@ -3638,6 +3638,11 @@ Creating a Kobweb server plugin is relatively straightforward. You'll need to:
 
 The following steps will walk you through creating your first Kobweb Server Plugin.
 
+> [!TIP]
+> You can
+> download [this project](https://drive.google.com/file/d/1NBwuyU9rKlmG7bpatyFsMnABPdSZ45lB/) to see the completed
+> result from applying the instructions in this section to the `kobweb create app` site.
+
 * Create a new module in your project.
   * For example, name it "demo-server-plugin".
   * Be sure to update your `settings.gradle.kts` file to include the new project.
