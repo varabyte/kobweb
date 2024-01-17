@@ -86,7 +86,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  * For example,
  *
  * ```
- * val Bounce = Keyframes("bounce") {
+ * val BounceKeyframes = Keyframes("bounce") {
  *   from { Modifier.translateX((-50).percent) }
  *   to { Modifier.translateX((50).percent) }
  * }
@@ -95,7 +95,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  * Div(
  *   Modifier
  *     .size(100.px).backgroundColor(Colors.Red)
- *     .animation(Bounce.toAnimation(
+ *     .animation(BounceKeyframes.toAnimation(
  *       duration = 2.s,
  *       timingFunction = AnimationTimingFunction.EaseIn,
  *       direction = AnimationDirection.Alternate,
@@ -109,7 +109,7 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  * property name, e.g.
  *
  * ```
- * val Bounce by Keyframes {
+ * val BounceKeyframes by Keyframes {
  *   from { Modifier.translateX((-50).percent) }
  *   to { Modifier.translateX((50).percent) }
  * }
@@ -119,10 +119,10 @@ class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
  * `@InitSilk` block to register your keyframes:
  *
  * ```
- * val Bounce = Keyframes("bounce") { ... }
+ * val BounceKeyframes = Keyframes("bounce") { ... }
  * @InitSilk
  * fun initSilk(ctx: InitSilkContext) {
- *   ctx.stylesheet.registerKeyframes(Bounce)
+ *   ctx.stylesheet.registerKeyframes(BounceKeyframes)
  * }
  * ```
  *

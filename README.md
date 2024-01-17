@@ -1135,7 +1135,7 @@ div {
   animation: mymove 5s infinite;
 }
 
-@keyframes mymove {
+@keyframes shift-right {
   from {left: 0px;}
   to {left: 200px;}
 }
@@ -1144,7 +1144,7 @@ div {
 Kobweb lets you define your keyframes in code by using the `by Keyframes` pattern:
 
 ```kotlin
-val ShiftRight by Keyframes {
+val ShiftRightKeyframes by Keyframes {
     from { Modifier.left(0.px) }
     to { Modifier.left(200.px) }
 }
@@ -1153,7 +1153,7 @@ val ShiftRight by Keyframes {
 Div(
     Modifier
         .size(100.px).backgroundColor(Colors.Red).position(Position.Relative)
-        .animation(ShiftRight.toAnimation(
+        .animation(ShiftRightKeyframes.toAnimation(
             duration = 5.s,
             iterationCount = AnimationIterationCount.Infinite
         ))
@@ -1161,9 +1161,9 @@ Div(
 )
 ```
 
-The name of the keyframes block is automatically derived from the property name (here, `ShiftRight` is converted into
-`"shift-right"`). You can then use the `toAnimation` method to convert your collection of keyframes into an animation that
-uses them, which you can pass into the `Modifier.animation` modifier.
+The name of the keyframes block is automatically derived from the property name (here, `ShiftRightKeyframes` is
+converted into `"shift-right"`). You can then use the `toAnimation` method to convert your collection of keyframes into
+an animation that uses them, which you can pass into the `Modifier.animation` modifier.
 
 > [!IMPORTANT]
 > When you declare a `Keyframes` animation, it must be public. This is because code gets generated inside a `main.kt`
@@ -1176,15 +1176,15 @@ uses them, which you can pass into the `Modifier.animation` modifier.
 >
 > ```kotlin
 > @Suppress("PRIVATE_KEYFRAMES")
-> private val SomeAnim by Keyframes { /* ... */ }
+> private val SomeKeyframes by Keyframes { /* ... */ }
 >
 > @InitSilk
 > fun registerPrivateAnim(ctx: InitSilkContext) {
->   ctx.stylesheet.registerKeyframes(SomeAnim)
+>   ctx.stylesheet.registerKeyframes(SomeKeyframes)
 > }
 > ```
 >
-> However, you are encouraged to keep your animations public and let the Kobweb Gradle plugin handle everything for you.
+> However, you are encouraged to keep your keyframes public and let the Kobweb Gradle plugin handle everything for you.
 
 ### ElementRefScope and raw HTML elements
 
