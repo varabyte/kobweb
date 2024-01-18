@@ -44,7 +44,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 rootAndFile.takeIf {
                     // Ignore files that are in our build directory, since we put them there. We are looking for index
                     // files explicitly added by a user, often because they don't realize that Kobweb generates one yet.
-                    !it.file.isDescendantOf(project.layout.buildDirectory.asFile.get())
+                    !it.file.isDescendantOf(projectLayout.buildDirectory.asFile.get())
                         && it.relativeFile.invariantSeparatorsPath == "public/index.html"
                 }
             }

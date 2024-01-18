@@ -50,7 +50,7 @@ abstract class KobwebExportTask @Inject constructor(
 
     @OutputDirectory
     fun getSiteDir(): File {
-        return project.layout.projectDirectory.dir(kobwebConf.server.files.prod.siteRoot).asFile
+        return projectLayout.projectDirectory.dir(kobwebConf.server.files.prod.siteRoot).asFile
     }
 
     private fun Page.takeSnapshot(url: String): String {
@@ -293,7 +293,7 @@ abstract class KobwebExportTask @Inject constructor(
         }
 
         val scriptFileStr = kobwebConf.server.files.prod.script
-        val scriptFile = project.layout.projectDirectory.file(scriptFileStr).asFile
+        val scriptFile = projectLayout.projectDirectory.file(scriptFileStr).asFile
         if (!scriptFile.exists()) {
             throw GradleException(
                 "e: Your .kobweb/conf.yaml prod script (\"$scriptFileStr\") could not be found. This must be fixed before exporting. Perhaps search your build/ directory for \"${
@@ -319,7 +319,7 @@ abstract class KobwebExportTask @Inject constructor(
         if (siteLayout == SiteLayout.KOBWEB) {
             // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
             kobwebConf.server.files.dev.api?.let { apiFile ->
-                val apiJarFile = project.layout.projectDirectory.file(apiFile).asFile
+                val apiJarFile = projectLayout.projectDirectory.file(apiFile).asFile
                 if (apiJarFile.exists()) {
                     val destFile = systemRoot.resolve(apiJarFile.name)
                     apiJarFile.copyTo(destFile, overwrite = true)
