@@ -81,7 +81,13 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         getUserDefinedRootIndexFiles()
             .takeIf { it.isNotEmpty() }
             ?.let { externalIndexFiles ->
-                throw GradleException("You are not supposed to define the root index file yourself. Kobweb provides its own. Use the `kobweb.app.index { ... }` block if you need to modify the generated index file. Problematic file(s): ${externalIndexFiles.joinToString(", ") { it.absoluteFile.toRelativeString(project.rootDir) }}")
+                throw GradleException(
+                    "You are not supposed to define the root index file yourself. Kobweb provides its own. Use the `kobweb.app.index { ... }` block if you need to modify the generated index file. Problematic file(s): ${
+                        externalIndexFiles.joinToString(
+                            ", "
+                        ) { it.absoluteFile.toRelativeString(projectLayout.projectDirectory.asFile) }
+                    }"
+                )
             }
 
         // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
