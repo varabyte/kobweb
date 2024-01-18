@@ -7,8 +7,12 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
+import org.gradle.api.file.ArchiveOperations
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFile
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -25,6 +29,14 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
     kobwebBlock,
     "Copy and make available index.html & all public/ resources from any libraries to the final site"
 ) {
+    @get:Inject
+    abstract val fileSystemOperations: FileSystemOperations
+
+    @get:Inject
+    abstract val objectFactory: ObjectFactory
+
+    @get:Inject
+    abstract val archiveOperations: ArchiveOperations
 
     @InputFiles
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
@@ -59,36 +71,42 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
             }
         }
 
-        classpath
-            .flatMap { jar ->
-                if (jar.isDirectory) {
-                    project.fileTree(jar).toPublicKobwebResources(jar)
-                } else {
-                    try {
-                        project.zipTree(jar).toPublicKobwebResources(jar)
-                    } catch (ex: Exception) {
-                        // NOTE: I used to catch ZipException here, but it became GradleException at some point?? So
-                        // let's just be safe and block all exceptions here. It sucks if this task crashes here because
-                        // not being able to unzip a non-zip file is not really a big deal.
+        val resourceData = classpath.flatMap { jar ->
+            if (jar.isDirectory) {
+                objectFactory.fileTree().from(jar).toPublicKobwebResources(jar)
+            } else {
+                try {
+                    archiveOperations.zipTree(jar).toPublicKobwebResources(jar)
+                } catch (ex: Exception) {
+                    // NOTE: I used to catch ZipException here, but it became GradleException at some point?? So
+                    // let's just be safe and block all exceptions here. It sucks if this task crashes here because
+                    // not being able to unzip a non-zip file is not really a big deal.
 
-                        // It's possible to get a classpath file that's not a jar -- npm dependencies are like this --
-                        // at which point the file isn't a zip nor a directory. Such dependencies will never contain
-                        // Kobweb resources, so we don't care about them. Just skip 'em!
-                        emptyList()
-                    }
+                    // It's possible to get a classpath file that's not a jar -- npm dependencies are like this --
+                    // at which point the file isn't a zip nor a directory. Such dependencies will never contain
+                    // Kobweb resources, so we don't care about them. Just skip 'em!
+                    emptyList()
                 }
-            }.forEach { (jar, rootAndFile) ->
-                // If here, we are sure that "jar" is a Kobweb library (because the kobweb module.json file was present)
-                // and we are processing one of its public resources. Remove the "public" prefix from the file path
-                // because it's going to get copied into a target "public" directory.
-                val targetFile =
-                    getGenPublicRoot().resolve(rootAndFile.relativeFile.invariantSeparatorsPath.removePrefix("public/"))
-                if (targetFile.exists() && !rootAndFile.file.readBytes().contentEquals(targetFile.readBytes())) {
-                    logger.warn("Overwriting ${rootAndFile.relativeFile} with the public resource found in ${jar.name}")
-                }
-                rootAndFile.file.copyTo(targetFile, overwrite = true)
             }
+        }
 
-        indexFile.get().asFile.copyTo(getGenPublicRoot().resolve("index.html"), overwrite = true)
+        fileSystemOperations.sync {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            into(getGenPublicRoot())
+            from(indexFile)
+            resourceData.forEach { (jar, rootAndFile) ->
+                from(rootAndFile.file) {
+                    // If here, we are sure that "jar" is a Kobweb library (because the kobweb module.json file was present)
+                    // and we are processing one of its public resources. Remove the "public" prefix from the file path
+                    // because it's going to get copied into a target "public" directory.
+                    val targetFile = getGenPublicRoot()
+                        .resolve(rootAndFile.relativeFile.invariantSeparatorsPath.removePrefix("public/"))
+                    if (targetFile.exists() && !rootAndFile.file.readBytes().contentEquals(targetFile.readBytes())) {
+                        logger.warn("Overwriting ${rootAndFile.relativeFile} with the public resource found in ${jar.name}")
+                    }
+                    into(targetFile.relativeTo(getGenPublicRoot()).parentFile) // relative to top-level "into" dir
+                }
+            }
+        }
     }
 }
