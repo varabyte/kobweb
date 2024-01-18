@@ -12,7 +12,6 @@ import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
 import java.security.MessageDigest
-import kotlin.math.absoluteValue
 
 private fun Project.getRoots(
     platform: TargetPlatform<*>,
@@ -44,12 +43,6 @@ private fun Project.getFilesWithRoots(
 
 fun Project.getResourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootAndFile> {
     return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.resources }
-}
-
-fun Project.getBuildScripts(): Sequence<File> {
-    return sequenceOf("build.gradle", "build.gradle.kts")
-        .map { script -> project.layout.projectDirectory.file(script).asFile }
-        .filter { it.exists() }
 }
 
 /**
