@@ -22,6 +22,8 @@ import org.gradle.language.jvm.tasks.ProcessResources
 
 fun Project.applyKspPlugin() = pluginManager.apply(KspGradleSubplugin::class.java)
 
+fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE_KEY to mode.name)
+
 // TODO: we currently set KSP_*_PACKAGE_KEY using task.project.group since the project.group of where the plugin is
 //  applied may be different. However, task.project is not recommended to be used, what are our alternatives?
 
@@ -34,8 +36,7 @@ fun Project.setupKspJs(target: JsTarget, mode: ProcessorMode) {
             KSP_PAGES_PACKAGE_KEY to PackageUtils.resolvePackageShortcut(
                 this@configureEach.project.group.toString(),
                 kobwebBlock.pagesPackage.get()
-            ),
-            KSP_PROCESSOR_MODE_KEY to mode.toString()
+            )
         )
     }
 

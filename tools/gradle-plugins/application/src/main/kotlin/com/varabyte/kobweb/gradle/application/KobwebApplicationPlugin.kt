@@ -29,6 +29,7 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
+import com.varabyte.kobweb.gradle.core.ksp.setKspMode
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
@@ -80,6 +81,8 @@ class KobwebApplicationPlugin @Inject constructor(
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         project.applyKspPlugin()
+        val kspProcessorMode = ProcessorMode.APP
+        project.setKspMode(kspProcessorMode)
 
         // A Kobweb Server Plugin is one which is loaded by the Kobweb server when it starts up. It's a way for users to
         // configure their ktor server in ways that Kobweb does not currently expose.
@@ -243,7 +246,7 @@ class KobwebApplicationPlugin @Inject constructor(
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
 
-            project.setupKspJs(jsTarget, ProcessorMode.APP)
+            project.setupKspJs(jsTarget, kspProcessorMode)
 
             val kobwebGenSiteEntryTask = project.tasks
                 .register<KobwebGenerateSiteEntryTask>("kobwebGenSiteEntry", kobwebConf, kobwebBlock, buildTarget)
