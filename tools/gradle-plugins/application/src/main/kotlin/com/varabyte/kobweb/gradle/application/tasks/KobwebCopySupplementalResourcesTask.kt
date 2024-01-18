@@ -1,43 +1,25 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.path.invariantSeparatorsPath
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
-import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
-import com.varabyte.kobweb.gradle.core.util.RootAndFile
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
-import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.file.FileTree
 import org.gradle.api.file.RegularFile
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
-import java.io.File
 import javax.inject.Inject
 
 abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
     kobwebBlock: KobwebBlock,
     @get:InputFile val indexFile: Provider<RegularFile>,
-) : KobwebModuleTask(
+) : KobwebCopyTask(
     kobwebBlock,
     "Copy and make available index.html & all public/ resources from any libraries to the final site"
 ) {
-    @get:Inject
-    abstract val fileSystemOperations: FileSystemOperations
-
-    @get:Inject
-    abstract val objectFactory: ObjectFactory
-
-    @get:Inject
-    abstract val archiveOperations: ArchiveOperations
-
     @InputFiles
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
@@ -49,46 +31,11 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
     @TaskAction
     fun execute() {
         val classpath = getRuntimeClasspath().get()
-        val kobwebModulePattern = PatternSet().apply {
-            include(KOBWEB_METADATA_MODULE)
-        }
         val publicFilesPattern = PatternSet().apply {
             include("public/**")
         }
 
-        fun FileTree.toPublicKobwebResources(jar: File): List<Pair<File, RootAndFile>> {
-            val fileTree = this
-            if (fileTree.matching(kobwebModulePattern).isEmpty) return emptyList()
-
-            return buildList {
-                fileTree.matching(publicFilesPattern)
-                    .visit {
-                        if (this.isDirectory) return@visit
-                        val root =
-                            File(file.absolutePath.invariantSeparatorsPath.removeSuffix(relativePath))
-                        add(jar to RootAndFile(root, file))
-                    }
-            }
-        }
-
-        val resourceData = classpath.flatMap { jar ->
-            if (jar.isDirectory) {
-                objectFactory.fileTree().from(jar).toPublicKobwebResources(jar)
-            } else {
-                try {
-                    archiveOperations.zipTree(jar).toPublicKobwebResources(jar)
-                } catch (ex: Exception) {
-                    // NOTE: I used to catch ZipException here, but it became GradleException at some point?? So
-                    // let's just be safe and block all exceptions here. It sucks if this task crashes here because
-                    // not being able to unzip a non-zip file is not really a big deal.
-
-                    // It's possible to get a classpath file that's not a jar -- npm dependencies are like this --
-                    // at which point the file isn't a zip nor a directory. Such dependencies will never contain
-                    // Kobweb resources, so we don't care about them. Just skip 'em!
-                    emptyList()
-                }
-            }
-        }
+        val resourceData = classpath.toKobwebOutputByPattern(publicFilesPattern)
 
         fileSystemOperations.sync {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
