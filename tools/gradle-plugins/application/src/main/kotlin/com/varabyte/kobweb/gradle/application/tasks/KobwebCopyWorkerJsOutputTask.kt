@@ -54,7 +54,7 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(kobwebBlock: Kob
                         )
 
                     copiedFiles.putIfAbsent(targetFile.absolutePath, jar.name)?.let { sourceJar ->
-                        throw GradleException("You are attempting to use two different worker dependencies that both have the same group and worker name: $sourceJar and ${jar.name}. They are incompatible and you cannot use both. If you own the project for either, consider changing the Gradle group or the worker name (via `kobweb { worker { name.set(...) } }`) on one or the other to avoid this naming collision.")
+                        throw GradleException("You are attempting to use two different worker dependencies that both have the same group and worker name: $sourceJar and ${jar.name}. They are incompatible and you cannot use both. If you own the project for either, consider changing the Gradle group or the worker name (via `configAsKobwebWorker(...)`) on one or the other to avoid this naming collision.")
                     }
 
                     into(targetFile.relativeTo(getGenPublicRoot()).parentFile) // relative to top-level "into" dir
