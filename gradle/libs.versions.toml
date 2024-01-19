@@ -15,6 +15,7 @@ ktor = "2.3.6"
 logback = "1.4.11"
 truthish = "0.6.5"
 shadow = "8.1.1"
+intellij-gradle = "1.16.1"
 
 [libraries]
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
@@ -72,3 +73,4 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+intellij-gradle = { id = "org.jetbrains.intellij", version.ref = "intellij-gradle" }
