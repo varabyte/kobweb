@@ -24,8 +24,11 @@ import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
@@ -36,10 +39,24 @@ import kotlin.system.measureTimeMillis
 import kotlin.time.DurationUnit
 import com.varabyte.kobweb.gradle.application.Browser as KobwebBrowser
 
+class KobwebExportConfInputs(
+    @get:Input val siteRoot: String,
+    @get:Input val routePrefix: String,
+    @get:Input val script: String,
+    @get:Input @get:Optional val api: String?,
+) {
+    constructor(kobwebConf: KobwebConf) : this(
+        siteRoot = kobwebConf.server.files.prod.siteRoot,
+        routePrefix = kobwebConf.site.routePrefix,
+        script = kobwebConf.server.files.prod.script,
+        api = kobwebConf.server.files.dev.api,
+    )
+}
+
 abstract class KobwebExportTask @Inject constructor(
-    private val kobwebConf: KobwebConf,
+    @get:Nested val confInputs: KobwebExportConfInputs,
+    @get:Input val siteLayout: SiteLayout,
     kobwebBlock: KobwebBlock,
-    private val siteLayout: SiteLayout
 ) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
 
     @InputFiles
@@ -50,7 +67,7 @@ abstract class KobwebExportTask @Inject constructor(
 
     @OutputDirectory
     fun getSiteDir(): File {
-        return projectLayout.projectDirectory.dir(kobwebConf.server.files.prod.siteRoot).asFile
+        return projectLayout.projectDirectory.dir(confInputs.siteRoot).asFile
     }
 
     private fun Page.takeSnapshot(url: String): String {
@@ -201,7 +218,7 @@ abstract class KobwebExportTask @Inject constructor(
                     KobwebBrowser.WebKit -> playwright.webkit()
                 }
                 browserType.launch().use { browser ->
-                    val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
+                    val routePrefix = RoutePrefix(confInputs.routePrefix)
                     pages
                         .asSequence()
                         .map { it.route }
@@ -292,7 +309,7 @@ abstract class KobwebExportTask @Inject constructor(
                 }
         }
 
-        val scriptFileStr = kobwebConf.server.files.prod.script
+        val scriptFileStr = confInputs.script
         val scriptFile = projectLayout.projectDirectory.file(scriptFileStr).asFile
         if (!scriptFile.exists()) {
             throw GradleException(
@@ -318,7 +335,7 @@ abstract class KobwebExportTask @Inject constructor(
         // API routes are only supported by the Kobweb layout
         if (siteLayout == SiteLayout.KOBWEB) {
             // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
-            kobwebConf.server.files.dev.api?.let { apiFile ->
+            confInputs.api?.let { apiFile ->
                 val apiJarFile = projectLayout.projectDirectory.file(apiFile).asFile
                 if (apiJarFile.exists()) {
                     val destFile = systemRoot.resolve(apiJarFile.name)
