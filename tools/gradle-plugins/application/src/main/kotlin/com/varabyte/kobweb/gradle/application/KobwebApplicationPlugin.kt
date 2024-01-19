@@ -140,7 +140,7 @@ class KobwebApplicationPlugin @Inject constructor(
             kobwebGenSiteIndexTask.map { RegularFile { it.outputs.files.singleFile } }
         )
         val kobwebCopyWorkerJsOutputTask =
-            project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerOutputJs", kobwebBlock)
+            project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock)
 
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
