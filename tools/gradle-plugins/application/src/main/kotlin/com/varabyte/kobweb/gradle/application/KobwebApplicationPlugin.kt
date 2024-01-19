@@ -11,7 +11,9 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyWorkerJsOutputTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebExportConfInputs
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenIndexConfInputs
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteEntryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
@@ -125,8 +127,10 @@ class KobwebApplicationPlugin @Inject constructor(
                 ?: if (env == ServerEnvironment.DEV) BuildTarget.DEBUG else BuildTarget.RELEASE
         val buildTarget = project.kobwebBuildTarget
 
-        val kobwebGenSiteIndexTask = project.tasks
-            .register<KobwebGenerateSiteIndexTask>("kobwebGenSiteIndex", kobwebConf, kobwebBlock, buildTarget)
+        val kobwebGenSiteIndexTask = project.tasks.register<KobwebGenerateSiteIndexTask>(
+            "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock
+        )
+
         val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(
             "kobwebCopySupplementalResources",
             kobwebBlock,
@@ -188,7 +192,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
         }
         val kobwebExportTask = project.tasks
-            .register<KobwebExportTask>("kobwebExport", kobwebConf, kobwebBlock, exportLayout)
+            .register<KobwebExportTask>("kobwebExport", KobwebExportConfInputs(kobwebConf), exportLayout, kobwebBlock)
 
         project.tasks.register<KobwebBrowserCacheIdTask>("kobwebBrowserCacheId", kobwebBlock)
 
@@ -245,8 +249,9 @@ class KobwebApplicationPlugin @Inject constructor(
 
             project.setupKspJs(jsTarget, ProcessorMode.APP)
 
-            val kobwebGenSiteEntryTask = project.tasks
-                .register<KobwebGenerateSiteEntryTask>("kobwebGenSiteEntry", kobwebConf, kobwebBlock, buildTarget)
+            val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
+                "kobwebGenSiteEntry", kobwebConf.site.routePrefix, buildTarget, kobwebBlock
+            )
 
             kobwebGenSiteEntryTask.configure {
                 kspGenFile.set(project.kspFrontendFile(jsTarget))

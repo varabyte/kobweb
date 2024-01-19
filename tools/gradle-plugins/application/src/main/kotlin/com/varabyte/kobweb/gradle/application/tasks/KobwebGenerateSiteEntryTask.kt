@@ -8,14 +8,11 @@ import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
-import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
-import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.FrontendData
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
@@ -26,9 +23,9 @@ import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(
-    private val kobwebConf: KobwebConf,
-    kobwebBlock: KobwebBlock,
+    @get:Input val routePrefix: String,
     @get:Input val buildTarget: BuildTarget,
+    kobwebBlock: KobwebBlock,
 ) : KobwebGenerateTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:InputFile
     abstract val kspGenFile: RegularFileProperty
@@ -42,7 +39,6 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @TaskAction
     fun execute() {
         val appData = Json.decodeFromString<AppData>(kspGenFile.get().asFile.readText())
-        val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
         val mainFile = getGenMainFile().resolve("main.kt")
 
         val libData = buildList {
@@ -63,7 +59,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                     else -> SilkSupport.NONE
                 },
                 kobwebBlock.app,
-                routePrefix,
+                RoutePrefix(routePrefix),
                 buildTarget
             )
         )

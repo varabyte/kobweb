@@ -24,17 +24,30 @@ import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import org.jsoup.Jsoup
 import javax.inject.Inject
 
+class KobwebGenIndexConfInputs(
+    @get:Input val title: String,
+    @get:Input val routePrefix: String,
+    @get:Input val script: String,
+) {
+    constructor(kobwebConf: KobwebConf) : this(
+        title = kobwebConf.site.title,
+        routePrefix = kobwebConf.site.routePrefix,
+        script = kobwebConf.server.files.dev.script
+    )
+}
+
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
-    private val kobwebConf: KobwebConf,
-    config: KobwebBlock,
-    @get:Input val buildTarget: BuildTarget
-) : KobwebGenerateTask(config, "Generate an index.html file for this Kobweb project") {
+    @get:Nested val confInputs: KobwebGenIndexConfInputs,
+    @get:Input val buildTarget: BuildTarget,
+    block: KobwebBlock,
+) : KobwebGenerateTask(block, "Generate an index.html file for this Kobweb project") {
 
     // No one should define their own root `public/index.html` files anywhere in their resources.
     @InputFiles
@@ -161,15 +174,15 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        val routePrefix = RoutePrefix(kobwebConf.site.routePrefix)
+        val routePrefix = RoutePrefix(confInputs.routePrefix)
         getGenIndexFile().writeText(
             createIndexFile(
-                kobwebConf.site.title,
+                confInputs.title,
                 headInitializers,
                 // Our script will always exist at the root folder, so be sure to ground it,
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
-                routePrefix.prependTo(kobwebConf.server.files.dev.script.substringAfterLast("/").prefixIfNot("/")),
+                routePrefix.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
                 kobwebBlock.app.index.scriptAttributes.get(),
                 buildTarget
             )
