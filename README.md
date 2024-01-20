@@ -3782,6 +3782,17 @@ routing {
 }
 ```
 
+If using Ktor, you should also install
+the [`IgnoreTrailingSlash` plugin](https://api.ktor.io/ktor-server/ktor-server-core/io.ktor.server.routing/-ignore-trailing-slash.html)
+so that your web server will serve `index.html` when a user visits a directory (e.g. `/docs/`) instead of returning a 404:
+
+```kotlin
+embeddedServer(...) { // `this` is `Application` in this scope
+  this.install(IgnoreTrailingSlash)
+  // Remaining configuration
+}
+```
+
 If you need to access HTTP endpoints exposed by your backend, you can use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
 directly, or you can use the convenience `http` property that Kobweb adds to the `window` object which exposes
 all the HTTP methods (`get`, `post`, `put`, etc.):
