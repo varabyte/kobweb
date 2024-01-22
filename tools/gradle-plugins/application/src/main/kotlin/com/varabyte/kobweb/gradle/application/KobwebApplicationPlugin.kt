@@ -197,7 +197,9 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebExportTask = project.tasks
             .register<KobwebExportTask>("kobwebExport", KobwebExportConfInputs(kobwebConf), exportLayout, kobwebBlock)
 
-        project.tasks.register<KobwebBrowserCacheIdTask>("kobwebBrowserCacheId", kobwebBlock)
+        project.tasks.register<KobwebBrowserCacheIdTask>("kobwebBrowserCacheId") {
+            browser = kobwebBlock.app.export.browser
+        }
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
