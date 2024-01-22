@@ -12,7 +12,6 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.APP_FQN
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.AppEntry
-import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -20,16 +19,23 @@ class AppProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    private val qualifiedPagesPackage: String,
+    qualifiedPagesPackage: String,
 ) : SymbolProcessor {
     private val fileDependencies = mutableListOf<KSFile>()
     private var appFqn: String? = null
-    private lateinit var frontendData: FrontendData
+
+    // use single processor so that results are stored between round during multi-round processing
+    private val frontendProcessor = FrontendProcessor(
+        codeGenerator = codeGenerator,
+        logger = logger,
+        genFile = "",
+        qualifiedPagesPackage = qualifiedPagesPackage,
+    )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val appFun = resolver.getSymbolsWithAnnotation(APP_FQN).toList()
 
-        if (appFun.size > 1) {
+        if (appFun.size > 1 || (appFqn != null && appFun.isNotEmpty())) {
             logger.error("At most one @App function is allowed per project.")
         } else {
             appFun.singleOrNull()?.let {
@@ -38,20 +44,14 @@ class AppProcessor(
             }
         }
 
-        val frontendProcessor = FrontendProcessor(
-            codeGenerator = codeGenerator,
-            logger = logger,
-            genFile = "",
-            qualifiedPagesPackage = qualifiedPagesPackage,
-        ).also { it.process(resolver) }
-        fileDependencies.addAll(frontendProcessor.fileDependencies)
-        frontendData = frontendProcessor.getData()
+        frontendProcessor.process(resolver)
 
         return emptyList()
     }
 
     override fun finish() {
-        val encodedData = Json.encodeToString(AppData(appFqn?.let { AppEntry(it) }, frontendData))
+        fileDependencies.addAll(frontendProcessor.fileDependencies)
+        val appData = AppData(appFqn?.let { AppEntry(it) }, frontendProcessor.getData())
 
         val (path, extension) = genFile.split('.')
         codeGenerator.createNewFileByPath(
@@ -59,7 +59,7 @@ class AppProcessor(
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(encodedData)
+            writer.write(Json.encodeToString(appData))
         }
     }
 }
