@@ -1,8 +1,5 @@
-package com.varabyte.kobweb.compose.util
+package com.varabyte.kobweb.browser.util
 
-import com.varabyte.kobweb.browser.util.kebabCaseToTitleCamelCase
-import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
-import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
 import com.varabyte.truthish.assertThat
 import kotlin.test.Test
 
