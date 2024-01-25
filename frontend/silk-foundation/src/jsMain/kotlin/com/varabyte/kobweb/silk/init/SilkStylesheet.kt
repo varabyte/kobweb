@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.init
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
-import com.varabyte.kobweb.silk.components.style.SimpleStyleRule
+import com.varabyte.kobweb.silk.components.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.components.style.StyleModifiers
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -144,7 +144,7 @@ fun SilkStylesheet.registerStyleBase(
 }
 
 internal object SilkStylesheetInstance : SilkStylesheet {
-    private val styles = mutableListOf<SimpleStyleRule>()
+    private val styles = mutableListOf<SimpleCssStyle>()
     private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
 
     override fun registerStyle(
@@ -152,7 +152,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         extraModifiers: @Composable () -> Modifier,
         init: StyleModifiers.() -> Unit
     ) {
-        styles.add(SimpleStyleRule(cssSelector, init, extraModifiers))
+        styles.add(SimpleCssStyle(cssSelector, init, extraModifiers))
     }
 
     override fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit) {

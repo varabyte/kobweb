@@ -19,7 +19,7 @@ class FrontendData(
     val silkStyles: List<ComponentStyleEntry>,
     val silkVariants: List<ComponentVariantEntry>,
     val keyframesList: List<KeyframesEntry>,
-    val styleRules: List<StyleRuleEntry>,
+    val cssStyles: List<CssStyleEntry>,
 )
 
 /**
@@ -35,7 +35,7 @@ fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
         this.flatMap { it.silkStyles },
         this.flatMap { it.silkVariants },
         this.flatMap { it.keyframesList },
-        this.flatMap { it.styleRules },
+        this.flatMap { it.cssStyles },
     ).also { it.assertValid(throwError) }
 }
 
@@ -105,6 +105,6 @@ class ComponentStyleEntry(val fqcn: String)
 @Serializable
 class ComponentVariantEntry(val fqcn: String)
 
-// null name means SimpleStyleRule aka `Style {}` declaration
+// null name means SimpleCssStyle aka `CssStyle {}` declaration
 @Serializable
-class StyleRuleEntry(val fqcn: String, val name: String?)
+class CssStyleEntry(val fqcn: String, val name: String?)

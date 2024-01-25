@@ -17,17 +17,20 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 
-abstract class StyleRule(
+abstract class CssStyle(
     internal val init: ComponentModifiers.() -> Unit,
     internal val extraModifiers: @Composable () -> Modifier,
 ) {
     // Note: setting a default value for `extraModifiers` in the main constructor causes a compilation error
-    constructor(init: ComponentModifiers.() -> Unit) : this(init, { Modifier })
+    // TODO: "dummy" parameter is used to disambiguate from the builder functions, this shouldn't be necessary
+    //  once the default value can be set in the main constructor
+    @Suppress("UNUSED_PARAMETER")
+    constructor(init: ComponentModifiers.() -> Unit, dummy: Unit) : this(init, { Modifier })
 
     abstract class Base(
         init: ComponentBaseModifier.() -> Modifier,
         extraModifiers: @Composable () -> Modifier,
-    ) : StyleRule({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers) {
+    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers) {
         constructor(init: ComponentBaseModifier.() -> Modifier) : this(init, { Modifier })
     }
 
@@ -180,31 +183,33 @@ abstract class StyleRule(
     }
 
     internal fun intoImmutableStyle(classSelectors: ClassSelectors) =
-        ImmutableStyleRule(classSelectors, extraModifiers)
+        ImmutableCssStyle(classSelectors, extraModifiers)
 
     @Composable
-    fun toModifier(): Modifier = SilkTheme.styleRules.getValue(this).toModifier()
+    fun toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
+
+    companion object // for extensions
 }
 
-internal class SimpleStyleRule(
+internal class SimpleCssStyle(
     val selector: String,
     init: ComponentModifiers.() -> Unit,
     extraModifiers: @Composable () -> Modifier,
-) : StyleRule(init, extraModifiers) {
+) : CssStyle(init, extraModifiers) {
     internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         return addStylesInto(selector, styleSheet)
     }
 }
 
 /**
- * A [StyleRule] pared down to read-only data only, which should happen shortly after Silk initializes.
+ * A [CssStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
  *
  * @param classSelectors The CSS class selectors associated with this style, including the base class and any
  *  color mode specific classes, used to determine the exact classnames to apply when this style is used.
  * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
  */
-internal class ImmutableStyleRule(
+internal class ImmutableCssStyle(
     classSelectors: ClassSelectors,
     private val extraModifiers: @Composable () -> Modifier
 ) {
@@ -284,38 +289,36 @@ private sealed interface StyleGroup {
     }
 }
 
-class SimpleStyleRuleProvider internal constructor(
+class SimpleCssStyleProvider internal constructor(
     private val extraModifiers: @Composable () -> Modifier,
     private val prefix: String? = null,
     private val init: ComponentModifiers.() -> Unit,
-) : CacheByPropertyNameDelegate<StyleRule>() {
-    override fun create(propertyName: String): StyleRule {
+) : CacheByPropertyNameDelegate<CssStyle>() {
+    override fun create(propertyName: String): CssStyle {
         val prefix = prefix?.let { "$it-" } ?: ""
         // e.g. "TitleTextStyle" to "title-text"
         val name = prefix + propertyName.removeSuffix("Style").titleCamelCaseToKebabCase()
-        return SimpleStyleRule(".$name", init, extraModifiers)
+        return SimpleCssStyle(".$name", init, extraModifiers)
     }
 }
 
-fun Style(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit) =
-    Style({ extraModifiers }, prefix, init)
+fun CssStyle(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit) =
+    CssStyle({ extraModifiers }, prefix, init)
 
-fun Style(
+fun CssStyle(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
     init: ComponentModifiers.() -> Unit
-) = SimpleStyleRuleProvider(extraModifiers, prefix, init)
+) = SimpleCssStyleProvider(extraModifiers, prefix, init)
 
-object Style
-
-fun Style.base(
+fun CssStyle.Companion.base(
     extraModifiers: Modifier = Modifier,
     prefix: String? = null,
     init: ComponentBaseModifier.() -> Modifier
 ) = base({ extraModifiers }, prefix, init)
 
-fun Style.base(
+fun CssStyle.Companion.base(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
     init: ComponentBaseModifier.() -> Modifier
-) = SimpleStyleRuleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+) = SimpleCssStyleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
