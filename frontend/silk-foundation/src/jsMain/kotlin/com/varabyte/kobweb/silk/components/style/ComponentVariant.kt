@@ -28,7 +28,7 @@ sealed class ComponentVariant {
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
  */
-internal class SimpleComponentVariant(val styleRule: SimpleStyleRule, val baseStyle: ComponentStyle) :
+internal class SimpleComponentVariant(val cssStyle: SimpleCssStyle, val baseStyle: ComponentStyle) :
     ComponentVariant() {
     /**
      * The raw variant name, unqualified by its parent base style.
@@ -36,19 +36,19 @@ internal class SimpleComponentVariant(val styleRule: SimpleStyleRule, val baseSt
      * This name is not guaranteed to be unique across all variants. If you need that, check `style.name` instead.
      */
     val name: String
-        get() = styleRule.selector.removePrefix(".${baseStyle.name}.")
+        get() = cssStyle.selector.removePrefix(".${baseStyle.name}.")
 
     override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
         // a link (so this would be registered as ".silk-link.silk-link-undecorated").
         // To put it another way, if you use a link variant with a surface widget, it won't be applied.
-        return styleRule.addStylesInto(styleSheet)
+        return cssStyle.addStylesInto(styleSheet)
     }
 
     @Composable
-    override fun toModifier() = styleRule.toModifier()
-    fun intoImmutableStyle(classSelectors: ClassSelectors) = styleRule.intoImmutableStyle(classSelectors)
+    override fun toModifier() = cssStyle.toModifier()
+    fun intoImmutableStyle(classSelectors: ClassSelectors) = cssStyle.intoImmutableStyle(classSelectors)
 }
 
 private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant) :

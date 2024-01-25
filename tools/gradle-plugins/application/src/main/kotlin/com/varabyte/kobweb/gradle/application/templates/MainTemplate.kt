@@ -205,8 +205,8 @@ fun createMainFunction(
                         frontendData.silkVariants.forEach { entry ->
                             addStatement("ctx.theme.registerComponentVariants(${entry.fqcn})")
                         }
-                        frontendData.styleRules.forEach { entry ->
-                            addStatement("ctx.theme.registerStyleRule(${entry.name?.let { "\"$it\"" } ?: "null"}, ${entry.fqcn})")
+                        frontendData.cssStyles.forEach { entry ->
+                            addStatement("ctx.theme.registerCssStyle(${entry.name?.let { "\"$it\"" } ?: "null"}, ${entry.fqcn})")
                         }
                         frontendData.keyframesList.forEach { entry ->
                             addStatement("ctx.stylesheet.registerKeyframes(${entry.fqcn})")

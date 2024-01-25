@@ -18,26 +18,26 @@ import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.CSS_STYLE_BASE_FQN
+import com.varabyte.kobweb.ksp.common.CSS_STYLE_BASE_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
+import com.varabyte.kobweb.ksp.common.CSS_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
-import com.varabyte.kobweb.ksp.common.STYLE_RULE_BASE_FQN
-import com.varabyte.kobweb.ksp.common.STYLE_RULE_BASE_SIMPLE_NAME
-import com.varabyte.kobweb.ksp.common.STYLE_RULE_FQN
-import com.varabyte.kobweb.ksp.common.STYLE_RULE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
 import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
+import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.InitKobwebEntry
 import com.varabyte.kobweb.project.frontend.InitSilkEntry
 import com.varabyte.kobweb.project.frontend.KeyframesEntry
-import com.varabyte.kobweb.project.frontend.StyleRuleEntry
 import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -54,7 +54,7 @@ class FrontendProcessor(
 
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
-    private val styleRules = mutableListOf<StyleRuleEntry>()
+    private val cssStyles = mutableListOf<CssStyleEntry>()
     private val silkStyles = mutableListOf<ComponentStyleEntry>()
     private val silkVariants = mutableListOf<ComponentVariantEntry>()
     private val keyframesList = mutableListOf<KeyframesEntry>()
@@ -95,11 +95,11 @@ class FrontendProcessor(
     }
 
     private inner class FrontendVisitor : KSVisitorVoid() {
-        private val styleRuleDeclaration = DeclarationType(
-            name = STYLE_RULE_SIMPLE_NAME,
-            qualifiedName = STYLE_RULE_FQN,
+        private val cssStyleDeclaration = DeclarationType(
+            name = CSS_STYLE_SIMPLE_NAME,
+            qualifiedName = CSS_STYLE_FQN,
             displayString = "style rule",
-            function = "ctx.theme.registerStyleRule",
+            function = "ctx.theme.registerCssStyle",
         )
         private val styleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
@@ -121,7 +121,7 @@ class FrontendProcessor(
         )
         private val declarations = listOf(styleDeclaration, variantDeclaration, keyframesDeclaration)
 
-        val styleRuleClasses = mutableListOf<KSClassDeclaration>()
+        val cssStyleClasses = mutableListOf<KSClassDeclaration>()
         val propertyDeclarations = mutableListOf<KSPropertyDeclaration>()
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
@@ -156,8 +156,8 @@ class FrontendProcessor(
                     keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
                 }
 
-                styleRuleDeclaration.qualifiedName -> {
-                    styleRules.add(StyleRuleEntry(property.qualifiedName!!.asString(), null))
+                cssStyleDeclaration.qualifiedName -> {
+                    cssStyles.add(CssStyleEntry(property.qualifiedName!!.asString(), null))
                 }
 
                 else -> null
@@ -203,13 +203,13 @@ class FrontendProcessor(
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
             val isCssStyleClass = classDeclaration.superTypes
-                .filter { it.toString() == STYLE_RULE_SIMPLE_NAME || it.toString() == STYLE_RULE_BASE_SIMPLE_NAME }
+                .filter { it.toString() == CSS_STYLE_SIMPLE_NAME || it.toString() == CSS_STYLE_BASE_SIMPLE_NAME }
                 .any {
                     val fqn = it.resolveQualifiedName()
-                    fqn == STYLE_RULE_FQN || fqn == STYLE_RULE_BASE_FQN
+                    fqn == CSS_STYLE_FQN || fqn == CSS_STYLE_BASE_FQN
                 }
             if (isCssStyleClass) {
-                styleRuleClasses.add(classDeclaration)
+                cssStyleClasses.add(classDeclaration)
             }
             classDeclaration.declarations.forEach { it.accept(this, Unit) }
         }
@@ -241,9 +241,9 @@ class FrontendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
-        val styleClassDeclarations = frontendVisitor.styleRuleClasses.groupBy { it.simpleName.asString() }
+        val styleClassDeclarations = frontendVisitor.cssStyleClasses.groupBy { it.simpleName.asString() }
 
-        styleRules += frontendVisitor.propertyDeclarations.mapNotNull { property ->
+        cssStyles += frontendVisitor.propertyDeclarations.mapNotNull { property ->
             val potentialClasses = styleClassDeclarations[property.type.toString()] ?: return@mapNotNull null
             val matchingClass = potentialClasses
                 .firstOrNull { it.qualifiedName?.asString() == property.type.resolve().declaration.qualifiedName?.asString() }
@@ -252,7 +252,7 @@ class FrontendProcessor(
             property to matchingClass
         }.map { (property, matchingClass) ->
             val fullName = matchingClass.simpleName.asString() + property.simpleName.asString()
-            StyleRuleEntry(property.qualifiedName!!.asString(), fullName.titleCamelCaseToKebabCase())
+            CssStyleEntry(property.qualifiedName!!.asString(), fullName.titleCamelCaseToKebabCase())
         }
 
         // pages are processed here as they rely on packageMappings, which may be populated over several rounds
@@ -283,7 +283,7 @@ class FrontendProcessor(
             silkStyles,
             silkVariants,
             keyframesList,
-            styleRules,
+            cssStyles,
         ).also {
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
