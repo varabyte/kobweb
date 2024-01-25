@@ -91,12 +91,12 @@ class ComponentStyle(
         init: ComponentModifiers.() -> Unit
     ): ComponentVariant {
         return SimpleComponentVariant(
-            SimpleStyleRule(".${this.name}.$name", init, extraModifiers),
+            SimpleCssStyle(".${this.name}.$name", init, extraModifiers),
             baseStyle = this
         )
     }
 
-    internal val styleRule = SimpleStyleRule(".${this.name}", init, extraModifiers)
+    internal val cssStyle = SimpleCssStyle(".${this.name}", init, extraModifiers)
 }
 
 /** Represents the class selectors associated with a [ComponentStyle]. */
@@ -196,7 +196,7 @@ fun ComponentStyle.Companion.base(
  */
 @Composable
 fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
-    return styleRule.toModifier()
+    return cssStyle.toModifier()
         .then(variants.toList().combine()?.toModifier() ?: Modifier)
 }
 
