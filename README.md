@@ -68,6 +68,7 @@ Our goal is to provide:
 * an open source foundation that the community can extend
 * and much, much more!
 
+<span id="demo"></span>
 Here's a demo where we create a Compose HTML project from scratch with Markdown support and live reloading, in under
 10 seconds:
 
