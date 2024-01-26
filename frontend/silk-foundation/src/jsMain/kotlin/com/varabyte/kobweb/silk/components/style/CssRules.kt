@@ -186,6 +186,13 @@ val StyleModifiers.required get() = CssRule.OfPseudoClass(this, "required")
 val StyleModifiers.optional get() = CssRule.OfPseudoClass(this, "optional")
 
 /**
+ * Represents an element with correct input, but only when the user has interacted with it.
+ *
+ * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:user-valid
+ */
+val StyleModifiers.userValid get() = CssRule.OfPseudoClass(this, "user-valid")
+
+/**
  * Represents an element with incorrect input, but only when the user has interacted with it.
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid
