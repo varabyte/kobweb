@@ -45,20 +45,22 @@ kobwebPublication {
     description.set(DESCRIPTION)
 }
 
+val serverJar by configurations.registering { isTransitive = false }
+dependencies {
+    @Suppress("UnstableApiUsage")
+    serverJar(project(projects.backend.server.dependencyProject.path, configuration = "shadow"))
+}
+
 /**
  * Embed a copy of the latest Kobweb server, naming it server.jar and putting it into the project's resources/ dir, so
  * we can run it from the plugin at runtime.
  */
-tasks.register<Copy>("copyServerJar") {
-    dependsOn(":backend:server:shadowJar")
-
-    val serverJarName = "server-${libs.versions.kobweb.libs.get()}-all.jar"
-    val serverJarFile = projects.backend.server.dependencyProject.layout.buildDirectory.file("libs/$serverJarName")
-
-    from(serverJarFile)
-    into(file("$projectDir/build/resources/main"))
-    rename(serverJarName, "server.jar")
+val copyServerJar by tasks.registering(Sync::class) {
+    from(serverJar)
+    into(layout.buildDirectory.dir("generated/kobweb/server"))
+    rename("server-${libs.versions.kobweb.libs.get()}-all.jar", "server.jar")
 }
-tasks.named("processResources") {
-    dependsOn("copyServerJar")
+
+kotlin.sourceSets.main {
+    resources.srcDir(copyServerJar)
 }
