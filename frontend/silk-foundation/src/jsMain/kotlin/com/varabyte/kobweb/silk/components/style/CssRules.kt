@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.css.*
 /**
  * Styles to apply to components that would be matched by both "link" or "visited".
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:any-link
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:any-link">:any-link</a>
  */
 val StyleModifiers.anyLink get() = CssRule.OfPseudoClass(this, "any-link")
 
@@ -18,14 +18,14 @@ val StyleModifiers.anyLink get() = CssRule.OfPseudoClass(this, "any-link")
  *
  * Be aware that you should use the LVHA order if using link, visited, hover, and/or active pseudo classes.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:link
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:link">:link</a>
  */
 val StyleModifiers.link get() = CssRule.OfPseudoClass(this, "link")
 
 /**
  * Styles to apply to elements that are targets of links in the same document.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:target
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:target">:target</a>
  */
 val StyleModifiers.target get() = CssRule.OfPseudoClass(this, "target")
 
@@ -34,7 +34,7 @@ val StyleModifiers.target get() = CssRule.OfPseudoClass(this, "target")
  *
  * Be aware that you should use the LVHA order if using link, visited, hover, and/or active pseudo classes.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:visited
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:visited">:visited</a>
  */
 val StyleModifiers.visited get() = CssRule.OfPseudoClass(this, "visited")
 
@@ -47,7 +47,7 @@ val StyleModifiers.visited get() = CssRule.OfPseudoClass(this, "visited")
  *
  * Be aware that you should use the LVHA order if using link, visited, hover, and/or active pseudo classes.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:hover
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:hover">:hover</a>
  */
 val StyleModifiers.hover get() = CssRule.OfPseudoClass(this, "hover")
 
@@ -56,7 +56,7 @@ val StyleModifiers.hover get() = CssRule.OfPseudoClass(this, "hover")
  *
  * Be aware that you should use the LVHA order if using link, visited, hover, and/or active pseudo classes.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:active
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:active">:active</a>
  */
 val StyleModifiers.active get() = CssRule.OfPseudoClass(this, "active")
 
@@ -64,14 +64,14 @@ val StyleModifiers.active get() = CssRule.OfPseudoClass(this, "active")
 /**
  * Styles to apply to components when they have focus.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:focus
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus">:focus</a>
  */
 val StyleModifiers.focus get() = CssRule.OfPseudoClass(this, "focus")
 
 /**
  * Styles to apply to components when they have keyboard / a11y-assisted focus.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">:focus-visible</a>
  */
 val StyleModifiers.focusVisible get() = CssRule.OfPseudoClass(this, "focus-visible")
 
@@ -82,84 +82,84 @@ val StyleModifiers.focusVisible get() = CssRule.OfPseudoClass(this, "focus-visib
 /**
  * Matches when an input element has been autofilled by the browser.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill">:autofill</a>
  */
 val StyleModifiers.autofill get() = CssRule.OfPseudoClass(this, "autofill")
 
 /**
  * Represents a user interface element that is in an enabled state.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled">:enabled</a>
  */
 val StyleModifiers.enabled get() = CssRule.OfPseudoClass(this, "enabled")
 
 /**
  * Represents a user interface element that is in a disabled state.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled">:disabled</a>
  */
 val StyleModifiers.disabled get() = CssRule.OfPseudoClass(this, "disabled")
 
 /**
  * Represents any element that cannot be changed by the user.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only">:read-only</a>
  */
 val StyleModifiers.readOnly get() = CssRule.OfPseudoClass(this, "read-only")
 
 /**
  * Represents any element that is user-editable.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write">:read-write</a>
  */
 val StyleModifiers.readWrite get() = CssRule.OfPseudoClass(this, "read-write")
 
 /**
  * Matches an input element that is displaying placeholder text.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown">:placeholder-shown</a>
  */
 val StyleModifiers.placeholderShown get() = CssRule.OfPseudoClass(this, "placeholder-shown")
 
 /**
  * Matches one or more UI elements that are the default among a set of elements.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:default
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:default">:default</a>
  */
 val StyleModifiers.default get() = CssRule.OfPseudoClass(this, "default")
 
 /**
  * Matches an element, such as checkboxes and radio buttons, that are checked or toggled to an `on` state.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:checked
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:checked">:checked</a>
  */
 val StyleModifiers.checked get() = CssRule.OfPseudoClass(this, "checked")
 
 /**
  * Matches when elements, such as checkboxes and radio buttons, are toggled on.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate">:indeterminate</a>
  */
 val StyleModifiers.indeterminate get() = CssRule.OfPseudoClass(this, "indeterminate")
 
 /**
  * Matches an element with valid contents. For example, an input element with type 'email' which contains a validly formed email address.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:valid
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:valid">:valid</a>
  */
 val StyleModifiers.valid get() = CssRule.OfPseudoClass(this, "valid")
 
 /**
  * Matches an element with invalid contents. For example, an input element with type 'email' with a name entered.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid">:invalid</a>
  */
 val StyleModifiers.invalid get() = CssRule.OfPseudoClass(this, "invalid")
 
 /**
  * Applies to elements with range limitations, for example a slider control, when the selected value is in the allowed range.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range">:in-range</a>
  */
 val StyleModifiers.inRange get() = CssRule.OfPseudoClass(this, "in-range")
 
@@ -167,35 +167,35 @@ val StyleModifiers.inRange get() = CssRule.OfPseudoClass(this, "in-range")
  * Applies to elements with range limitations, for example a slider control, when the selected value is outside the
  * allowed range.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range">:out-of-range</a>
  */
 val StyleModifiers.outOfRange get() = CssRule.OfPseudoClass(this, "out-of-range")
 
 /**
  * Matches when a form element is required.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:required
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:required">:required</a>
  */
 val StyleModifiers.required get() = CssRule.OfPseudoClass(this, "required")
 
 /**
  * Matches when a form element is optional.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:optional
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:optional">:optional</a>
  */
 val StyleModifiers.optional get() = CssRule.OfPseudoClass(this, "optional")
 
 /**
  * Represents an element with correct input, but only when the user has interacted with it.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:user-valid
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-valid">:user-valid</a>
  */
 val StyleModifiers.userValid get() = CssRule.OfPseudoClass(this, "user-valid")
 
 /**
  * Represents an element with incorrect input, but only when the user has interacted with it.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid">:user-invalid</a>
  */
 val StyleModifiers.userInvalid get() = CssRule.OfPseudoClass(this, "user-invalid")
 
@@ -206,56 +206,56 @@ val StyleModifiers.userInvalid get() = CssRule.OfPseudoClass(this, "user-invalid
 /**
  * Represents an element that is the root of the document. In HTML this is usually the `<html>` element.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:root
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:root">:root</a>
  */
 val StyleModifiers.root get() = CssRule.OfPseudoClass(this, "root")
 
 /**
  * Represents an element with no children other than white-space characters.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:empty
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:empty">:empty</a>
  */
 val StyleModifiers.empty get() = CssRule.OfPseudoClass(this, "empty")
 
 /**
  * Matches an element that is the first of its siblings.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child">:first-child</a>
  */
 val StyleModifiers.firstChild get() = CssRule.OfPseudoClass(this, "first-child")
 
 /**
  * Matches an element that is the last of its siblings.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child">:last-child</a>
  */
 val StyleModifiers.lastChild get() = CssRule.OfPseudoClass(this, "last-child")
 
 /**
  * Matches an element that has no siblings. For example, a list item with no other list items in that list.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child">:only-child</a>
  */
 val StyleModifiers.onlyChild get() = CssRule.OfPseudoClass(this, "only-child")
 
 /**
  * Matches an element that is the first of its siblings, and also matches a certain type selector.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type">:first-of-type</a>
  */
 val StyleModifiers.firstOfType get() = CssRule.OfPseudoClass(this, "first-of-type")
 
 /**
  * Matches an element that is the last of its siblings, and also matches a certain type selector.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type">:last-of-type</a>
  */
 val StyleModifiers.lastOfType get() = CssRule.OfPseudoClass(this, "last-of-type")
 
 /**
  * Matches an element that has no siblings of the chosen type selector.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type">:only-of-type</a>
  */
 val StyleModifiers.onlyOfType get() = CssRule.OfPseudoClass(this, "only-of-type")
 
@@ -268,35 +268,35 @@ val StyleModifiers.onlyOfType get() = CssRule.OfPseudoClass(this, "only-of-type"
 /**
  * Styles to apply to a virtual element that is created before the first element in some container.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::before
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::before">::before</a>
  */
 val StyleModifiers.before get() = CssRule.OfPseudoElement(this, "before")
 
 /**
  * Styles to apply to a virtual element that is created after the last element in some container.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::after
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::after">::after</a>
  */
 val StyleModifiers.after get() = CssRule.OfPseudoElement(this, "after")
 
 /**
  * Styles to apply to the selected part of a document.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::selection
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::selection">::selection</a>
  */
 val StyleModifiers.selection get() = CssRule.OfPseudoElement(this, "selection")
 
 /**
  * Styles to apply to the first letter in a block of text.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter">::first-letter</a>
  */
 val StyleModifiers.firstLetter get() = CssRule.OfPseudoElement(this, "first-letter")
 
 /**
  * Styles to apply to the first line in a block of text.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line">::first-line</a>
  */
 val StyleModifiers.firstLine get() = CssRule.OfPseudoElement(this, "first-line")
 
@@ -305,7 +305,7 @@ val StyleModifiers.firstLine get() = CssRule.OfPseudoElement(this, "first-line")
  *
  * Note that if you override the color of the placeholder, you should consider setting its `opacity` to `1`.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder">::placeholder</a>
  */
 val StyleModifiers.placeholder get() = CssRule.OfPseudoElement(this, "placeholder")
 
