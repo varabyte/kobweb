@@ -47,6 +47,11 @@ class Response {
      * See also: https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
      */
     var contentType: String? = null
+
+    /**
+     * Any additional headers to send back to the client.
+     */
+    val headers = mutableMapOf<String, String>()
 }
 
 /**
