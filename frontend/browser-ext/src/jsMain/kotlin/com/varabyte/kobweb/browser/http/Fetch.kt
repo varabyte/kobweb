@@ -78,8 +78,7 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
  * A Kotlin-idiomatic version of the standard library's [Window.fetch] function.
  *
  * @param headers An optional map of headers to send with the request. Note: If a body is specified, the
- *   `Content-Length` and `Content-Type` headers will be automatically set. Setting them manually here will result in
- *   those values getting overridden.
+ *   `Content-Length` header will be automatically set. However, any headers set manually will always take precedence.
  */
 suspend fun Window.fetch(
     method: HttpMethod,
@@ -93,7 +92,6 @@ suspend fun Window.fetch(
         json().apply {
             if (body != null) {
                 this["Content-Length"] = body.size
-                this["Content-Type"] = "application/octet-stream"
             }
             headers?.let { headers ->
                 for ((key, value) in headers) {
