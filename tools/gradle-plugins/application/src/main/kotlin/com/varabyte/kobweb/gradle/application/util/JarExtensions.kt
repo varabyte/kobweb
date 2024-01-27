@@ -25,16 +25,13 @@ fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
     project.tasks.named("${jvmTargetName}Jar", Jar::class.java).configure {
         this.archiveFileName.set(archiveFileName)
 
-        val classpathProvider = project.configurations.named("${jvmTargetName}RuntimeClasspath")
-        inputs.files(classpathProvider)
-
-        doFirst {
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            val classpath = classpathProvider.get()
-            val patterns = PatternSet().apply {
-                exclude("$KOBWEB_METADATA_SUBFOLDER/**")
-            }
-            from(classpath.map { if (it.isDirectory) it else project.zipTree(it).matching(patterns) })
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        val patterns = PatternSet().apply {
+            exclude("$KOBWEB_METADATA_SUBFOLDER/**")
         }
+        val classpathFiles = project.configurations.named("${jvmTargetName}RuntimeClasspath").map { configuration ->
+            configuration.map { if (it.isDirectory) it else project.zipTree(it).matching(patterns) }
+        }
+        from(classpathFiles)
     }
 }
