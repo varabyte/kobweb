@@ -959,6 +959,11 @@ val CustomStyle by ComponentStyle {
 }
 ```
 
+> [!TIP]
+> When testing your breakpoint-conditinal styles, you should be aware that browser dev tools let you simulate window
+> dimensions to see how your site looks at different sizes. For example, on Chrome, you can follow these instructions:
+> https://developer.chrome.com/docs/devtools/device-mode
+
 #### Color-mode aware
 
 When you define a `ComponentStyle`, an optional field is available for you to use called `colorMode`:
