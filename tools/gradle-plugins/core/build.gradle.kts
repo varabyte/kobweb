@@ -41,11 +41,12 @@ kobwebPublication {
 // Make the version available to the plugin code, so that it can be used to determine the version of the ksp processor
 // dependency to add to the project
 val generateVersionProperties by tasks.registering {
+    val projectVersion = version.toString() // store outside of task action for configuration cache compatibility
     val generatedVersionDir = layout.buildDirectory.dir("generated-version")
     outputs.dir(generatedVersionDir)
     doLast {
         val properties = Properties()
-        properties["version"] = version
+        properties["version"] = projectVersion
         val propertiesFile = generatedVersionDir.get().file("version.properties").asFile
         propertiesFile.writer().use { properties.store(it, null) }
     }
