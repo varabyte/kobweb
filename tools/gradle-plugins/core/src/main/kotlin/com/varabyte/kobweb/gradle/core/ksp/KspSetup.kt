@@ -15,7 +15,6 @@ import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.KSP_PROCESSOR_MODE_KEY
 import com.varabyte.kobweb.project.common.PackageUtils
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -42,9 +41,9 @@ fun Project.setupKspJs(target: JsTarget, mode: ProcessorMode) {
 
     // js resources are not automatically hooked up to processResources, see: https://github.com/google/ksp/issues/1539
     project.tasks.named<ProcessResources>(jsTarget.processResources) {
-        val kspFrontendOutput = project.tasks.named(jsTarget.kspKotlin).get()
-            .outputs.files.asFileTree.matching { include(mode.frontendFile) }
-        from(kspFrontendOutput)
+        from(project.tasks.named(jsTarget.kspKotlin)) {
+            include(mode.frontendFile)
+        }
     }
 }
 
@@ -84,11 +83,5 @@ fun Project.addKspArguments(vararg keyValues: Pair<String, String>) {
  * a side effect.
  */
 fun Project.addKspDependency(target: TargetPlatform<*>) {
-    val configurationName = "ksp${target.capitalizedName}"
-
-    configurations.matching { it.name == configurationName }.configureEach {
-        dependencies {
-            add(this@configureEach.name, kobwebBlock.kspProcessorDependency.get())
-        }
-    }
+    dependencies.add("ksp${target.capitalizedName}", kobwebBlock.kspProcessorDependency)
 }
