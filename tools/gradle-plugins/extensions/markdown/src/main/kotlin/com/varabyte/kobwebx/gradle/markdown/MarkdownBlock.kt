@@ -7,8 +7,6 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import kotlin.reflect.KClass
-import kotlin.reflect.full.memberProperties
 
 abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGeneratingBlock {
     object RouteOverride {
@@ -81,55 +79,47 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      */
     abstract val routeOverride: Property<(String) -> String>
 
-    abstract val process: Property<(List<MarkdownData>) -> String>
+    /**
+     * Register a handler which will be triggered with a list of all markdown files in this project.
+     *
+     * The markdown files will be partially parsed to include frontmatter information, plus
+     * additional metadata that could be useful for generating some additional content,
+     * such as a top-level listing page that links to all markdown pages.
+     *
+     * If set, this will run before all markdown files are converted (meaning you can
+     * potentially add an additional markdown file as a result of this call, although
+     * normally we expect users will just generate Kotlin files).
+     *
+     * @see MarkdownEntry
+     */
+    abstract val process: Property<ProcessScope.(List<MarkdownEntry>) -> Unit>
 
-    // TODO should probably rename these
-    internal abstract val packageName: Property<String>
-    internal abstract val ktFileName: Property<String>
-    internal abstract val generateMarkdownListingFile: Property<Boolean>
+    class ProcessScope {
 
-    fun generateMarkdownListingFile(
-        packageName: String = "dev.stralman.markdown.listing",
-        ktFileName: String = "MarkdownDataListing.kt",
-    ) {
-        this.packageName.set(packageName)
-        this.ktFileName.set(ktFileName)
-        generateMarkdownListingFile.set(true)
-    }
+        data class ProcessNode(
+            val path: String,
+            val contents: String,
+        )
 
-    fun KClass<*>.toFormattedString(): String {
-        val propertiesString = memberProperties
-            .joinToString("\n|") { property ->
-                val propertyName = property.name
-                val propertyType = property.returnType.toString()
-                "|   val $propertyName: $propertyType,"
+        val markdownOutput: MutableList<ProcessNode> = mutableListOf()
+        val kotlinOutput: MutableList<ProcessNode> = mutableListOf()
+
+        fun generateKotlin(path: String, contents: String) {
+            if (path.endsWith(".kt")) {
+                kotlinOutput.add(ProcessNode(path, contents))
             }
+        }
 
-        return """
-        |class ${this.simpleName}(
-        $propertiesString
-        |)
-        |""".trimMargin()
+        fun generateMarkdown(path: String, contents: String) {
+            if (path.endsWith(".md")) {
+                markdownOutput.add(ProcessNode(path, contents))
+            }
+        }
     }
 
     init {
         markdownPath.convention("markdown")
         imports.set(emptyList())
         genDir.convention(baseGenDir.map { "$it/markdown" })
-        process.convention { markdownData ->
-            buildString {
-                appendLine(
-                    """
-                    |${MarkdownData::class.toFormattedString()}
-                    |
-                    |// Map of path of markdown file to frontmatter data
-                    |val MARKDOWN_DATA_LIST: List<${MarkdownData::class.simpleName}> = listOf( 
-                    """.trimMargin()
-                )
-                appendLine(markdownData.map { it }.joinToString("\n"))
-                appendLine(")")
-            }
-        }
-        generateMarkdownListingFile.set(false)
     }
 }

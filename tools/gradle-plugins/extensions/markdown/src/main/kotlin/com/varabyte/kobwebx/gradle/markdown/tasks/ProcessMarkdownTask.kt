@@ -2,27 +2,25 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
 import com.varabyte.kobweb.gradle.core.util.getResourceRoots
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
-import com.varabyte.kobwebx.gradle.markdown.MarkdownData
+import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.yamlStringToKotlinString
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
-import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
-import kotlin.reflect.KClass
-import kotlin.reflect.full.memberProperties
 
 class MarkdownVisitor : AbstractVisitor() {
     private val _frontMatter = mutableMapOf<String, List<String>>()
@@ -45,10 +43,7 @@ class MarkdownVisitor : AbstractVisitor() {
 abstract class ProcessMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
     private val markdownBlock: MarkdownBlock,
-) : DefaultTask() {
-    init {
-        description = ""
-    }
+) : KobwebTask("Processes markdown files found in the project's resources path to metadata and provides methods for user to add custom generated files to the final project") {
 
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
@@ -73,38 +68,42 @@ abstract class ProcessMarkdownTask @Inject constructor(
 
     @OutputDirectory
     fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(project).resolve(
-        project.prefixQualifiedPackage(kobwebBlock.pagesPackage.get()).replace(".", "/")
+        project.prefixQualifiedPackage(kobwebBlock.baseGenDir.get()).replace(".", "/")
     )
 
+    @OutputDirectory
+    fun getGenResDir(): File = kobwebBlock.getGenJsResRoot<MarkdownBlock>(project).resolve(
+        project.prefixQualifiedPackage(kobwebBlock.publicPath.get()).replace(".", "/")
+    )
 
     @TaskAction
     fun execute() {
         val parser = markdownFeatures.createParser()
-        val markdownDataList = getMarkdownFiles().map {
+        val markdownEntries = getMarkdownFiles().map {
             val visitor = MarkdownVisitor()
             parser
                 .parse(it.readText())
                 .accept(visitor)
-            MarkdownData(
+            MarkdownEntry(
                 filePath = it.path,
                 frontMatter = visitor.frontMatter
             )
         }
-        File(getGenDir(), markdownBlock.ktFileName.get()).let { outputFile ->
-            outputFile.parentFile.mkdirs()
-            outputFile.writeText(
-                buildString {
-                    appendLine(
-                        """
-                        |// This file is generated. Modify the build script if you need to change it.
-                        |
-                        |package ${markdownBlock.packageName.get()}
-                        |
-                        """.trimMargin()
-                    )
-                    append(markdownBlock.process.get()(markdownDataList))
-                }
-            )
+        val process = markdownBlock.process.orNull ?: return
+        val processScope = MarkdownBlock.ProcessScope()
+        processScope.process(markdownEntries)
+
+        processScope.markdownOutput.forEach { processNode ->
+            File(getGenResDir(), processNode.path).let { outputFile ->
+                outputFile.parentFile.mkdirs()
+                outputFile.writeText(processNode.contents)
+            }
+        }
+        processScope.kotlinOutput.forEach { processNode ->
+            File(getGenDir(), processNode.path).let { outputFile ->
+                outputFile.parentFile.mkdirs()
+                outputFile.writeText(processNode.contents)
+            }
         }
     }
 }

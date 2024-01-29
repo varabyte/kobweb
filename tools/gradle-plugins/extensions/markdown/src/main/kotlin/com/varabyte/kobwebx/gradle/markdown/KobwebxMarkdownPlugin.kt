@@ -32,12 +32,6 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         val processTask = project.tasks
             .register<ProcessMarkdownTask>("kobwebxMarkdownDataProcess", kobwebBlock, markdownBlock)
 
-        processTask.configure {
-            onlyIf {
-                markdownBlock.generateMarkdownListingFile.get()
-            }
-        }
-
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
