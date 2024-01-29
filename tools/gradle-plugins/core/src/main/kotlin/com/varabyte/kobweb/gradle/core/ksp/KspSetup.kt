@@ -15,6 +15,8 @@ import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.KSP_PROCESSOR_MODE_KEY
 import com.varabyte.kobweb.project.common.PackageUtils
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -30,10 +32,10 @@ fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE
 fun Project.setupKspJs(target: JsTarget, mode: ProcessorMode) {
     addKspDependency(target)
 
-    project.tasks.matching { it.name == target.kspKotlin }.configureEach {
+    configureKspTask(target) {
         addKspArguments(
             KSP_PAGES_PACKAGE_KEY to PackageUtils.resolvePackageShortcut(
-                this@configureEach.project.group.toString(),
+                this@configureKspTask.project.group.toString(),
                 kobwebBlock.pagesPackage.get()
             )
         )
@@ -51,8 +53,9 @@ fun Project.setupKspJs(target: JsTarget, mode: ProcessorMode) {
 fun Project.setupKspJvm(target: JvmTarget) {
     addKspDependency(target)
 
-    project.tasks.matching { it.name == target.kspKotlin }.configureEach {
-        val apiPackage = PackageUtils.resolvePackageShortcut(this.project.group.toString(), kobwebBlock.apiPackage.get())
+    configureKspTask(target) {
+        val apiPackage =
+            PackageUtils.resolvePackageShortcut(this.project.group.toString(), kobwebBlock.apiPackage.get())
         addKspArguments(KSP_API_PACKAGE_KEY to apiPackage)
     }
 }
@@ -64,6 +67,9 @@ private val Project.kspExtension: KspExtension
  * Convenience method for registering key/value parameters that can be read by KSP.
  *
  * This method assumes that this project has already applied the KSP plugin.
+ *
+ * If any of the [keyValues] come from a [Provider], ensure that this function is called lazily, for example inside a
+ * [configureKspTask] block.
  */
 fun Project.addKspArguments(vararg keyValues: Pair<String, String>) {
     kspExtension.apply {
@@ -84,4 +90,10 @@ fun Project.addKspArguments(vararg keyValues: Pair<String, String>) {
  */
 fun Project.addKspDependency(target: TargetPlatform<*>) {
     dependencies.add("ksp${target.capitalizedName}", kobwebBlock.kspProcessorDependency)
+}
+
+/** Configure the KSP task for the given target. */
+fun Project.configureKspTask(target: TargetPlatform<*>, action: Task.() -> Unit) {
+    // use `matching` instead of `named()` because the task may not exist yet
+    tasks.matching { it.name == target.kspKotlin }.configureEach(action)
 }
