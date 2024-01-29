@@ -7,6 +7,7 @@ import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.ksp.addKspArguments
 import com.varabyte.kobweb.gradle.core.ksp.addKspDependency
 import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
+import com.varabyte.kobweb.gradle.core.ksp.configureKspTask
 import com.varabyte.kobweb.gradle.core.util.KobwebVersionUtil
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
 import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
@@ -47,13 +48,15 @@ class KobwebWorkerPlugin : Plugin<Project> {
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
             project.addKspDependency(jsTarget)
-            project.addKspArguments(
-                KSP_WORKER_OUTPUT_PATH_KEY to "${project.suggestKobwebProjectName()}/${project.kobwebBlock.worker.name.get()}.js",
-            )
-            if (project.kobwebBlock.worker.fqcn.isPresent) {
+            project.configureKspTask(jsTarget) {
                 project.addKspArguments(
-                    KSP_WORKER_FQCN_KEY to project.kobwebBlock.worker.fqcn.get(),
+                    KSP_WORKER_OUTPUT_PATH_KEY to "${project.suggestKobwebProjectName()}/${project.kobwebBlock.worker.name.get()}.js",
                 )
+                if (project.kobwebBlock.worker.fqcn.isPresent) {
+                    project.addKspArguments(
+                        KSP_WORKER_FQCN_KEY to project.kobwebBlock.worker.fqcn.get(),
+                    )
+                }
             }
             project.generateModuleMetadataFor(jsTarget)
             project.tasks.named<ProcessResources>(jsTarget.processResources) {
