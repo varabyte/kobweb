@@ -189,13 +189,13 @@ class FrontendProcessor(
 
     override fun finish() {
         val (path, extension) = genFile.split('.')
-        val (frontendData, fileDependencies) = getFinalizedData()
+        val result = getProcessorResult()
         codeGenerator.createNewFileByPath(
-            Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
+            Dependencies(aggregating = true, *result.fileDependencies.toTypedArray()),
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString<FrontendData>(frontendData))
+            writer.write(Json.encodeToString<FrontendData>(result.data))
         }
     }
 
@@ -205,10 +205,10 @@ class FrontendProcessor(
      * This function should only be called from [SymbolProcessor.finish] as it relies on all rounds of processing being
      * complete.
      *
-     * @return A pair consisting of the finalized FrontendData and a list of file dependencies that should be passed in
-     * when using KSP's [CodeGenerator] to store the data.
+     * @return A [Result] containing the finalized [FrontendData] and the file dependencies that should be
+     * passed in when using KSP's [CodeGenerator] to store the data.
      */
-    fun getFinalizedData(): Pair<FrontendData, List<KSFile>> {
+    fun getProcessorResult(): Result {
         // pages are processed here as they rely on packageMappings, which may be populated over several rounds
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
@@ -241,6 +241,12 @@ class FrontendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
-        return frontendData to fileDependencies
+        return Result(frontendData, fileDependencies)
     }
+
+    /**
+     * Represents the result of [FrontendProcessor]'s processing, consisting of the generated [FrontendData] and the
+     * files that contained relevant declarations.
+     */
+    data class Result(val data: FrontendData, val fileDependencies: List<KSFile>)
 }

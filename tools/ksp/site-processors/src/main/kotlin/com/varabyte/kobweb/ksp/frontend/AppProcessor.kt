@@ -50,9 +50,9 @@ class AppProcessor(
     }
 
     override fun finish() {
-        val (frontendData, files) = frontendProcessor.getFinalizedData()
-        fileDependencies.addAll(files)
-        val appData = AppData(appFqn?.let { AppEntry(it) }, frontendData)
+        val frontendResult = frontendProcessor.getProcessorResult()
+        fileDependencies.addAll(frontendResult.fileDependencies)
+        val appData = AppData(appFqn?.let { AppEntry(it) }, frontendResult.data)
 
         val (path, extension) = genFile.split('.')
         codeGenerator.createNewFileByPath(
