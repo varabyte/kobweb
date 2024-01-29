@@ -4,6 +4,7 @@ import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.toPackageName
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
@@ -27,10 +28,7 @@ import javax.inject.Inject
 abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
     private val markdownBlock: MarkdownBlock,
-) : DefaultTask() {
-    init {
-        description = "Convert markdown files found in the project's resources path to source code in the final project"
-    }
+) : KobwebTask("Convert markdown files found in the project's resources path to source code in the final project") {
 
     private val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
