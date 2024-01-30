@@ -79,6 +79,69 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      */
     abstract val routeOverride: Property<(String) -> String>
 
+    /**
+     * Register a handler which will be triggered with a list of all markdown files in this project.
+     *
+     * The markdown files will be partially parsed to include frontmatter information, plus
+     * additional metadata that could be useful for generating some additional content,
+     * such as a top-level listing page that links to all markdown pages.
+     *
+     * If set, this will run before all markdown files are converted (meaning you can
+     * potentially add an additional markdown file as a result of this call, although
+     * normally we expect users will just generate Kotlin files).
+     *
+     * @see MarkdownEntry
+     */
+    abstract val process: Property<ProcessScope.(List<MarkdownEntry>) -> Unit>
+
+    class ProcessScope {
+
+        /**
+         * Data used to create a file later.
+         *
+         * @property filePath A path to a file that should be created. Note that this file will be scoped
+         *   to some root directory and is not supposed to escape it. In other words, using ".." will result
+         *   in an exception.
+         */
+        data class OutputFile(
+            val filePath: String,
+            val content: String,
+        ) {
+            init {
+                require(!filePath.contains("..")) { "Relative paths are not allowed. Invalid: \"$filePath\"" }
+            }
+        }
+
+        private val _markdownOutput = mutableListOf<OutputFile>()
+        internal val markdownOutput: List<OutputFile> = _markdownOutput
+        private val _kotlinOutput = mutableListOf<OutputFile>()
+        internal val kotlinOutput: List<OutputFile> = _kotlinOutput
+
+        /**
+         * Generate Kotlin source in the final project.
+         *
+         * @property filePath A path to a Kotlin file, which will automatically be put under a generated `src/jsMain/kotlin` directory.
+         *   It is an error if the path does not end in `.kt`
+         */
+        fun generateKotlin(filePath: String, content: String) {
+            require(filePath.endsWith(".kt")) { "Expected a path that ends with .kt, got \"$filePath\"" }
+            _kotlinOutput.add(OutputFile(filePath, content))
+        }
+
+        /**
+         * Generate a Markdown resource.
+         *
+         * This file will automatically be picked up and converted to Kotlin code in the final project.
+         *
+         * @property filePath A path to a Markdown file, which will automatically be put under a generated
+         *   `src/resources/markdown` directory. It is an error if the path does not end in `.md`
+         */
+        fun generateMarkdown(filePath: String, content: String) {
+            require(filePath.endsWith(".md")) { "Expected a path that ends with .md, got \"$filePath\"" }
+            _markdownOutput.add(OutputFile(filePath, content))
+        }
+    }
+
     init {
         markdownPath.convention("markdown")
         imports.set(emptyList())
