@@ -22,16 +22,14 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
          *
          * For example, a markdown filename like "ExamplePost.md" will be converted into "example-post".
          */
-        val KebabCase: (String) -> String =
-            { it.splitCamelCase().joinToString("-") { word -> word.lowercase() } }
+        val KebabCase: (String) -> String = { it.splitCamelCase().joinToString("-") { word -> word.lowercase() } }
 
         /**
          * An algorithm for converting a markdown filename into a snake-case URL name.
          *
          * For example, a markdown filename like "ExamplePost.md" will be converted into "example_post".
          */
-        val SnakeCase: (String) -> String =
-            { it.splitCamelCase().joinToString("_") { word -> word.lowercase() } }
+        val SnakeCase: (String) -> String = { it.splitCamelCase().joinToString("_") { word -> word.lowercase() } }
     }
 
     /**
