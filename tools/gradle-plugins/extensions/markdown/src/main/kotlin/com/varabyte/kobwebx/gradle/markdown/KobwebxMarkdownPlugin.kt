@@ -36,7 +36,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             val jsTarget = JsTarget(this)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 kotlin.srcDir(convertTask)
-                kotlin.srcDir(processTask)
+                kotlin.srcDir(processTask.map { it.getGenSrcDir() })
             }
         }
     }

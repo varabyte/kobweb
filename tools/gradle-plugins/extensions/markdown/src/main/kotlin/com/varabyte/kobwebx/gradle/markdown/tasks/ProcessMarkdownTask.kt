@@ -67,7 +67,7 @@ abstract class ProcessMarkdownTask @Inject constructor(
     }
 
     @OutputDirectory
-    fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(project).resolve(
+    fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(project).resolve(
         project.prefixQualifiedPackage(kobwebBlock.baseGenDir.get()).replace(".", "/")
     )
 
@@ -100,7 +100,7 @@ abstract class ProcessMarkdownTask @Inject constructor(
             }
         }
         processScope.kotlinOutput.forEach { processNode ->
-            File(getGenDir(), processNode.path).let { outputFile ->
+            File(getGenSrcDir(), processNode.path).let { outputFile ->
                 outputFile.parentFile.mkdirs()
                 outputFile.writeText(processNode.contents)
             }
