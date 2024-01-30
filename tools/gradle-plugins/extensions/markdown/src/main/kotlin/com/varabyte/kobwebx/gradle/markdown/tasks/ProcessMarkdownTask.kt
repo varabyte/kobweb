@@ -22,7 +22,7 @@ import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
 
-class MarkdownVisitor : AbstractVisitor() {
+private class MarkdownVisitor : AbstractVisitor() {
     private val _frontMatter = mutableMapOf<String, List<String>>()
     val frontMatter: Map<String, List<String>> = _frontMatter
 
@@ -43,7 +43,7 @@ class MarkdownVisitor : AbstractVisitor() {
 abstract class ProcessMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
     private val markdownBlock: MarkdownBlock,
-) : KobwebTask("Processes markdown files found in the project's resources path to metadata and provides methods for user to add custom generated files to the final project") {
+) : KobwebTask("Runs the `process` callback registered in the markdown block (which gives the user a chance to generate additional files around all of the markdown resources)") {
 
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
@@ -78,6 +78,7 @@ abstract class ProcessMarkdownTask @Inject constructor(
 
     @TaskAction
     fun execute() {
+        val process = markdownBlock.process.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = getMarkdownFiles().map {
             val visitor = MarkdownVisitor()
@@ -89,20 +90,19 @@ abstract class ProcessMarkdownTask @Inject constructor(
                 frontMatter = visitor.frontMatter
             )
         }
-        val process = markdownBlock.process.orNull ?: return
         val processScope = MarkdownBlock.ProcessScope()
         processScope.process(markdownEntries)
 
         processScope.markdownOutput.forEach { processNode ->
-            File(getGenResDir(), processNode.path).let { outputFile ->
+            File(getGenResDir(), processNode.filePath).let { outputFile ->
                 outputFile.parentFile.mkdirs()
-                outputFile.writeText(processNode.contents)
+                outputFile.writeText(processNode.content)
             }
         }
         processScope.kotlinOutput.forEach { processNode ->
-            File(getGenSrcDir(), processNode.path).let { outputFile ->
+            File(getGenSrcDir(), processNode.filePath).let { outputFile ->
                 outputFile.parentFile.mkdirs()
-                outputFile.writeText(processNode.contents)
+                outputFile.writeText(processNode.content)
             }
         }
     }

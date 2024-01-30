@@ -22,14 +22,16 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
          *
          * For example, a markdown filename like "ExamplePost.md" will be converted into "example-post".
          */
-        val KebabCase: (String) -> String = { it.splitCamelCase().joinToString("-") { word -> word.lowercase() } }
+        val KebabCase: (String) -> String =
+            { it.splitCamelCase().joinToString("-") { word -> word.lowercase() } }
 
         /**
          * An algorithm for converting a markdown filename into a snake-case URL name.
          *
          * For example, a markdown filename like "ExamplePost.md" will be converted into "example_post".
          */
-        val SnakeCase: (String) -> String = { it.splitCamelCase().joinToString("_") { word -> word.lowercase() } }
+        val SnakeCase: (String) -> String =
+            { it.splitCamelCase().joinToString("_") { word -> word.lowercase() } }
     }
 
     /**
@@ -96,24 +98,49 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
 
     class ProcessScope {
 
-        data class ProcessNode(
-            val path: String,
-            val contents: String,
-        )
-
-        val markdownOutput: MutableList<ProcessNode> = mutableListOf()
-        val kotlinOutput: MutableList<ProcessNode> = mutableListOf()
-
-        fun generateKotlin(path: String, contents: String) {
-            if (path.endsWith(".kt")) {
-                kotlinOutput.add(ProcessNode(path, contents))
+        /**
+         * Data used to create a file later.
+         *
+         * @property filePath A path to a file that should be created. Note that this file will be scoped
+         *   to some root directory and is not supposed to escape it. In other words, using ".." will result
+         *   in an exception.
+         */
+        data class OutputFile(
+            val filePath: String,
+            val content: String,
+        ) {
+            init {
+                require(!filePath.contains("..")) { "Relative paths are not allowed. Invalid: \"$filePath\"" }
             }
         }
 
-        fun generateMarkdown(path: String, contents: String) {
-            if (path.endsWith(".md")) {
-                markdownOutput.add(ProcessNode(path, contents))
-            }
+        private val _markdownOutput = mutableListOf<OutputFile>()
+        internal val markdownOutput: List<OutputFile> = _markdownOutput
+        private val _kotlinOutput = mutableListOf<OutputFile>()
+        internal val kotlinOutput: List<OutputFile> = _kotlinOutput
+
+        /**
+         * Generate Kotlin source in the final project.
+         *
+         * @property filePath A path to a Kotlin file, which will automatically be put under a generated `src/jsMain/kotlin` directory.
+         *   It is an error if the path does not end in `.kt`
+         */
+        fun generateKotlin(filePath: String, content: String) {
+            require(filePath.endsWith(".kt")) { "Expected a path that ends with .kt, got \"$filePath\"" }
+            _kotlinOutput.add(OutputFile(filePath, content))
+        }
+
+        /**
+         * Generate a Markdown resource.
+         *
+         * This file will automatically be picked up and converted to Kotlin code in the final project.
+         *
+         * @property filePath A path to a Markdown file, which will automatically be put under a generated
+         *   `src/resources/markdown` directory. It is an error if the path does not end in `.md`
+         */
+        fun generateMarkdown(filePath: String, content: String) {
+            require(filePath.endsWith(".md")) { "Expected a path that ends with .md, got \"$filePath\"" }
+            _markdownOutput.add(OutputFile(filePath, content))
         }
     }
 

@@ -26,11 +26,14 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             create<MarkdownFeatures>("features")
         }
 
-        val convertTask = project.tasks
-            .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownBlock)
-
         val processTask = project.tasks
             .register<ProcessMarkdownTask>("kobwebxMarkdownDataProcess", kobwebBlock, markdownBlock)
+
+        val convertTask = project.tasks
+            .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownBlock)
+            .configure {
+                mustRunAfter(processTask)
+            }
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
