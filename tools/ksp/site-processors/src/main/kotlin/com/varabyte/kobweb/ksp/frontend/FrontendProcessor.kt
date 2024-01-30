@@ -57,7 +57,7 @@ class FrontendProcessor(
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
     // will be skipped if the only change is deleted file(s) that we do not depend on.
-    val fileDependencies = mutableListOf<KSFile>()
+    private val fileDependencies = mutableListOf<KSFile>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
@@ -189,16 +189,26 @@ class FrontendProcessor(
 
     override fun finish() {
         val (path, extension) = genFile.split('.')
+        val result = getProcessorResult()
         codeGenerator.createNewFileByPath(
-            Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
+            Dependencies(aggregating = true, *result.fileDependencies.toTypedArray()),
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString(getData()))
+            writer.write(Json.encodeToString<FrontendData>(result.data))
         }
     }
 
-    fun getData(): FrontendData {
+    /**
+     * Get the finalized metadata acquired over all rounds of processing.
+     *
+     * This function should only be called from [SymbolProcessor.finish] as it relies on all rounds of processing being
+     * complete.
+     *
+     * @return A [Result] containing the finalized [FrontendData] and the file dependencies that should be
+     * passed in when using KSP's [CodeGenerator] to store the data.
+     */
+    fun getProcessorResult(): Result {
         // pages are processed here as they rely on packageMappings, which may be populated over several rounds
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
@@ -231,6 +241,12 @@ class FrontendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
-        return frontendData
+        return Result(frontendData, fileDependencies)
     }
+
+    /**
+     * Represents the result of [FrontendProcessor]'s processing, consisting of the generated [FrontendData] and the
+     * files that contained relevant declarations.
+     */
+    data class Result(val data: FrontendData, val fileDependencies: List<KSFile>)
 }
