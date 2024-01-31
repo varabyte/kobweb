@@ -24,7 +24,7 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
     @OutputDirectory
-    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(project).resolve("app")
+    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("app")
 
     private fun getGenPublicRoot() = getGenResDir().resolve(kobwebBlock.publicPath.get())
 

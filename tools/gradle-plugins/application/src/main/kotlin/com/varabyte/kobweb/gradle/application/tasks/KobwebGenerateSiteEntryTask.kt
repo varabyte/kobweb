@@ -34,7 +34,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
-    fun getGenMainFile() = kobwebBlock.getGenJsSrcRoot<AppBlock>(project)
+    fun getGenMainFile() = kobwebBlock.getGenJsSrcRoot<AppBlock>(projectLayout)
 
     @TaskAction
     fun execute() {

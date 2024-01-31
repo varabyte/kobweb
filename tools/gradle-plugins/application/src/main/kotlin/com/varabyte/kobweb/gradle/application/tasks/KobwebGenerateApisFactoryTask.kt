@@ -4,12 +4,10 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
-import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.merge
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
@@ -36,7 +34,7 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
     } ?: DefaultProvider { project.objects.fileCollection() }
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
-    fun getGenApisFactoryFile() = kobwebBlock.getGenJvmSrcRoot<AppBlock>(project)
+    fun getGenApisFactoryFile() = kobwebBlock.getGenJvmSrcRoot<AppBlock>(projectLayout)
 
     @TaskAction
     fun execute() {
