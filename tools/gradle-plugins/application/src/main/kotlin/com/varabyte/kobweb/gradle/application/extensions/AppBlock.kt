@@ -334,6 +334,7 @@ abstract class AppBlock @Inject constructor(
             showScreenshots: Boolean = true,
         ) {
             traceConfig.set(TraceConfig(tracesRoot, filter, showScreenshots))
+            traceConfig.disallowChanges()
         }
 
         init {
@@ -413,8 +414,10 @@ fun AppBlock.IndexBlock.excludeTagsForDependency(dependencyNamePrefix: String) {
         val ctx = this
         name.startsWith(dependencyNamePrefix) || excludeTags.get().invoke(ctx)
     }
+    excludeTags.disallowChanges()
 }
 
 fun AppBlock.IndexBlock.excludeAllTags() {
     excludeTags.set { true }
+    excludeTags.disallowChanges()
 }
