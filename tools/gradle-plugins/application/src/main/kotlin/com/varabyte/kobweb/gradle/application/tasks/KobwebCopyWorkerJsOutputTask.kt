@@ -24,7 +24,7 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(kobwebBlock: Kob
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
     @OutputDirectory
-    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(project).resolve("worker")
+    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("worker")
 
     private fun getGenPublicRoot() = getGenResDir().resolve(kobwebBlock.publicPath.get())
 

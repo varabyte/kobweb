@@ -59,12 +59,12 @@ abstract class ProcessMarkdownTask @Inject constructor(
     }
 
     @OutputDirectory
-    fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(project).resolve(
+    fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(projectLayout).resolve(
         project.prefixQualifiedPackage(kobwebBlock.baseGenDir.get()).replace(".", "/")
     )
 
     @OutputDirectory
-    fun getGenResDir(): File = kobwebBlock.getGenJsResRoot<MarkdownBlock>(project)
+    fun getGenResDir(): File = kobwebBlock.getGenJsResRoot<MarkdownBlock>(projectLayout)
 
     @TaskAction
     fun execute() {

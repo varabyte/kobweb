@@ -68,7 +68,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
     @OutputFile
-    fun getGenIndexFile() = kobwebBlock.getGenJsResRoot<AppBlock>(project).resolve("index.html")
+    fun getGenIndexFile() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("index.html")
 
     @TaskAction
     fun execute() {

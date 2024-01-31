@@ -2,10 +2,9 @@
 
 package com.varabyte.kobweb.gradle.core.extensions
 
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
-import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
 import com.varabyte.kobweb.gradle.core.util.KobwebVersionUtil
 import org.gradle.api.Project
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.getByType
@@ -85,22 +84,19 @@ abstract class KobwebBlock : ExtensionAware {
         kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-site-processors:${KobwebVersionUtil.version}")
     }
 
-    inline fun <reified T : FileGeneratingBlock> getGenJsSrcRoot(project: Project): File {
-        val jsSrcSuffix = project.jsTarget.srcSuffix
+    inline fun <reified T : FileGeneratingBlock> getGenJsSrcRoot(layout: ProjectLayout): File {
         val genDir = extensions.getByType<T>().genDir.get()
-        return project.layout.buildDirectory.dir("$genDir$jsSrcSuffix").get().asFile
+        return layout.buildDirectory.dir("$genDir/src/jsMain/kotlin").get().asFile
     }
 
-    inline fun <reified T : FileGeneratingBlock> getGenJsResRoot(project: Project): File {
-        val jsResourceSuffix = project.jsTarget.resourceSuffix
+    inline fun <reified T : FileGeneratingBlock> getGenJsResRoot(layout: ProjectLayout): File {
         val genDir = extensions.getByType<T>().genDir.get()
-        return project.layout.buildDirectory.dir("$genDir$jsResourceSuffix").get().asFile
+        return layout.buildDirectory.dir("$genDir/src/resources/kotlin").get().asFile
     }
 
-    inline fun <reified T : FileGeneratingBlock> getGenJvmSrcRoot(project: Project): File {
-        val jvmSrcSuffix = (project.jvmTarget ?: error("No JVM target defined")).srcSuffix
+    inline fun <reified T : FileGeneratingBlock> getGenJvmSrcRoot(layout: ProjectLayout): File {
         val genDir = extensions.getByType<T>().genDir.get()
-        return project.layout.buildDirectory.dir("$genDir$jvmSrcSuffix").get().asFile
+        return layout.buildDirectory.dir("$genDir/src/jvmMain/kotlin").get().asFile
     }
 }
 
