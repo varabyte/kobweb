@@ -4,11 +4,13 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
+import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobwebx.gradle.markdown.tasks.ConvertMarkdownTask
 import com.varabyte.kobwebx.gradle.markdown.tasks.ProcessMarkdownTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -31,12 +33,18 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
         val convertTask = project.tasks
             .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownBlock)
-        convertTask.configure {
-            mustRunAfter(processTask)
-        }
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
+
+            processTask.configure {
+                resources = project.getResourceSources(jsTarget)
+            }
+            convertTask.configure {
+                resources = project.getResourceSources(jsTarget)
+                generatedMarkdownDir = processTask.map { it.getGenResDir() }
+            }
+
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 kotlin.srcDir(convertTask)
                 kotlin.srcDir(processTask.map { it.getGenSrcDir() })

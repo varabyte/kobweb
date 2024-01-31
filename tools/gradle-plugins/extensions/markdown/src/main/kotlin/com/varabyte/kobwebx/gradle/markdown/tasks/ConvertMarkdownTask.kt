@@ -3,12 +3,8 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.toPackageName
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
-import com.varabyte.kobweb.gradle.core.util.RootAndFile
-import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
-import com.varabyte.kobweb.gradle.core.util.getResourceRoots
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
@@ -16,7 +12,15 @@ import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
 import org.commonmark.node.Node
 import org.commonmark.parser.Parser
+import org.gradle.api.file.FileTree
+import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
@@ -26,30 +30,32 @@ import javax.inject.Inject
 
 abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
-    private val markdownBlock: MarkdownBlock,
+    @get:Input val markdownBlock: MarkdownBlock,
 ) : KobwebTask("Convert markdown files found in the project's resources path to source code in the final project") {
 
     private val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
-    private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(project.jsTarget)
-        .map { root -> root.resolve(markdownBlock.markdownPath.get()) }
+    @get:Inject
+    abstract val objectFactory: ObjectFactory
 
-    private fun getMarkdownFilesWithRoots(): List<RootAndFile> {
-        val mdRoots = getMarkdownRoots()
-        return project.getResourceFilesWithRoots(project.jsTarget)
-            .filter { rootAndFile -> rootAndFile.file.extension == "md" }
-            .mapNotNull { rootAndFile ->
-                mdRoots.find { mdRoot -> rootAndFile.file.startsWith(mdRoot) }
-                    ?.let { mdRoot -> RootAndFile(mdRoot, rootAndFile.file) }
-            }
-            .toList()
+    @get:Internal
+    abstract val resources: Property<SourceDirectorySet>
+
+    @InputFiles
+    fun getMarkdownRoots(): Provider<List<File>> = resources.map {
+        it.srcDirs.map { root -> root.resolve(markdownBlock.markdownPath.get()) }
     }
 
     @InputFiles
-    fun getMarkdownFiles(): List<File> {
-        return getMarkdownFilesWithRoots().map { it.file }
+    fun getMarkdownResources(): Provider<FileTree> {
+        return resources.zip(markdownBlock.markdownPath) { fileTree, path ->
+            fileTree.matching { include("$path/**/*.md") }
+        }
     }
+
+    @get:InputDirectory
+    abstract val generatedMarkdownDir: Property<File>
 
     @OutputDirectory
     fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(project).resolve(
@@ -58,10 +64,13 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        val cache = NodeCache(markdownFeatures.createParser(), getMarkdownRoots().toList())
-        getMarkdownFilesWithRoots().forEach { rootAndFile ->
-            val mdFile = rootAndFile.file
-            val mdPathRel = rootAndFile.relativeFile.invariantSeparatorsPath
+        val cache = NodeCache(markdownFeatures.createParser(), getMarkdownRoots().get() + generatedMarkdownDir.get())
+        val markdownFiles = getMarkdownResources().get() + objectFactory.fileTree().setDir(generatedMarkdownDir)
+
+        markdownFiles.visit {
+            if (isDirectory) return@visit
+            val mdFile = this.file
+            val mdPathRel = this.relativePath.pathString.removePrefix(markdownBlock.markdownPath.get() + "/")
 
             val parts = mdPathRel.split('/')
             val dirParts = parts.subList(0, parts.lastIndex)
@@ -174,8 +183,9 @@ abstract class ConvertMarkdownTask @Inject constructor(
             roots.asSequence()
                 .map { it to it.resolve(relPath).canonicalFile }
                 // Make sure we don't access anything outside our markdown roots
-                .firstOrNull { (root, canonicalFile) -> canonicalFile.exists() && canonicalFile.isFile && canonicalFile.startsWith(root) }
-                ?.second?.let(::get)
+                .firstOrNull { (root, canonicalFile) ->
+                    canonicalFile.exists() && canonicalFile.isFile && canonicalFile.startsWith(root)
+                }?.second?.let(::get)
         } catch (ignored: IOException) {
             null
         }
