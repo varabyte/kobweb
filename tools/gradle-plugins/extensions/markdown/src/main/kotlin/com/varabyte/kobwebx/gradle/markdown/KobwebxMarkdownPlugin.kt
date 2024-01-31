@@ -29,7 +29,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         }
 
         val processTask = project.tasks
-            .register<ProcessMarkdownTask>("kobwebxMarkdownDataProcess", kobwebBlock, markdownBlock)
+            .register<ProcessMarkdownTask>("kobwebxMarkdownProcess", kobwebBlock, markdownBlock)
 
         val convertTask = project.tasks
             .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownBlock)
