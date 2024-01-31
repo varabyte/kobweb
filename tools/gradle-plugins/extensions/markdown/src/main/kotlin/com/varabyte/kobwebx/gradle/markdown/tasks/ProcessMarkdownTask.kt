@@ -1,11 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
-import com.varabyte.kobweb.gradle.core.util.RootAndFile
-import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
-import com.varabyte.kobweb.gradle.core.util.getResourceRoots
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
@@ -15,7 +11,12 @@ import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
+import org.gradle.api.file.FileTree
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
@@ -42,28 +43,19 @@ private class MarkdownVisitor : AbstractVisitor() {
 
 abstract class ProcessMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
-    private val markdownBlock: MarkdownBlock,
+    @get:Input val markdownBlock: MarkdownBlock,
 ) : KobwebTask("Runs the `process` callback registered in the markdown block (which gives the user a chance to generate additional files around all of the markdown resources)") {
 
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
-    private fun getMarkdownRoots(): Sequence<File> = project.getResourceRoots(project.jsTarget)
-        .map { root -> root.resolve(markdownBlock.markdownPath.get()) }
-
-    private fun getMarkdownFilesWithRoots(): List<RootAndFile> {
-        val mdRoots = getMarkdownRoots()
-        return project.getResourceFilesWithRoots(project.jsTarget)
-            .filter { rootAndFile -> rootAndFile.file.extension == "md" }
-            .mapNotNull { rootAndFile ->
-                mdRoots.find { mdRoot -> rootAndFile.file.startsWith(mdRoot) }
-                    ?.let { mdRoot -> RootAndFile(mdRoot, rootAndFile.file) }
-            }
-            .toList()
-    }
+    @get:Internal
+    abstract val resources: Property<FileTree>
 
     @InputFiles
-    fun getMarkdownFiles(): List<File> {
-        return getMarkdownFilesWithRoots().map { it.file }
+    fun getMarkdownFiles(): Provider<FileTree> {
+        return resources.zip(markdownBlock.markdownPath) { fileTree, path ->
+            fileTree.matching { include("$path/**/*.md") }
+        }
     }
 
     @OutputDirectory
@@ -72,29 +64,32 @@ abstract class ProcessMarkdownTask @Inject constructor(
     )
 
     @OutputDirectory
-    fun getGenResDir(): File = kobwebBlock.getGenJsResRoot<MarkdownBlock>(project).resolve(
-        project.prefixQualifiedPackage(kobwebBlock.publicPath.get()).replace(".", "/")
-    )
+    fun getGenResDir(): File = kobwebBlock.getGenJsResRoot<MarkdownBlock>(project)
 
     @TaskAction
     fun execute() {
         val process = markdownBlock.process.orNull ?: return
         val parser = markdownFeatures.createParser()
-        val markdownEntries = getMarkdownFiles().map {
-            val visitor = MarkdownVisitor()
-            parser
-                .parse(it.readText())
-                .accept(visitor)
-            MarkdownEntry(
-                filePath = it.path,
-                frontMatter = visitor.frontMatter
-            )
+        val markdownEntries = buildList {
+            getMarkdownFiles().get().visit {
+                if (isDirectory) return@visit
+                val visitor = MarkdownVisitor()
+                parser
+                    .parse(file.readText())
+                    .accept(visitor)
+                add(
+                    MarkdownEntry(
+                        filePath = relativePath.pathString,
+                        frontMatter = visitor.frontMatter
+                    )
+                )
+            }
         }
         val processScope = MarkdownBlock.ProcessScope()
         processScope.process(markdownEntries)
 
         processScope.markdownOutput.forEach { processNode ->
-            File(getGenResDir(), processNode.filePath).let { outputFile ->
+            File(getGenResDir().resolve(markdownBlock.markdownPath.get()), processNode.filePath).let { outputFile ->
                 outputFile.parentFile.mkdirs()
                 outputFile.writeText(processNode.content)
             }

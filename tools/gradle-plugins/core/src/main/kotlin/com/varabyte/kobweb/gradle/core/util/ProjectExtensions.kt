@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -22,8 +23,8 @@ private fun Project.getRoots(
         .flatMap { sourceSet -> sourceSetToDirSet(sourceSet).srcDirs }
 }
 
-fun Project.getResourceRoots(platform: TargetPlatform<*>): Sequence<File> =
-    project.getRoots(platform) { sourceSet -> sourceSet.resources }
+fun Project.getResourceSources(target: TargetPlatform<*>): Provider<SourceDirectorySet> =
+    project.kotlin.sourceSets.named(target.mainSourceSet).map { it.resources }
 
 class RootAndFile(val root: File, val file: File) {
     val relativeFile get() = file.relativeTo(root)
