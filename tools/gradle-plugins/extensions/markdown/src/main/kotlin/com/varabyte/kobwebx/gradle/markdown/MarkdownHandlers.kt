@@ -5,6 +5,8 @@ package com.varabyte.kobwebx.gradle.markdown
 import com.varabyte.kobweb.common.collect.Key
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
+import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
+import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell

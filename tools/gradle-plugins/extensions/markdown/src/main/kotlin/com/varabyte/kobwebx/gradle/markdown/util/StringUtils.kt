@@ -1,4 +1,4 @@
-package com.varabyte.kobwebx.gradle.markdown
+package com.varabyte.kobwebx.gradle.markdown.util
 
 /**
  * Escape quote characters in strings, useful if they're going to be converted to code.

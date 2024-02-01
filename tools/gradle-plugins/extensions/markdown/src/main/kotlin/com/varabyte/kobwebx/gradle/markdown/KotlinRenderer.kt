@@ -9,6 +9,9 @@ import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
+import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
+import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
+import com.varabyte.kobwebx.gradle.markdown.util.unescapeTicks
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.ext.gfm.tables.TableBlock
