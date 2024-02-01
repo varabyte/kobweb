@@ -1,8 +1,11 @@
 package com.varabyte.kobweb.gradle.core.tasks
 
+import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.project.KobwebApplication
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.Directory
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import javax.inject.Inject
 
@@ -28,4 +31,7 @@ abstract class KobwebTask @Inject constructor(desc: String) : DefaultTask() {
         group = "kobweb"
         description = desc
     }
+
+    protected fun KobwebBlock.FileGeneratingBlock.getGenJsSrcRoot(): Provider<Directory> =
+        genDir.flatMap { projectLayout.buildDirectory.dir("$it/src/jsMain/kotlin") }
 }

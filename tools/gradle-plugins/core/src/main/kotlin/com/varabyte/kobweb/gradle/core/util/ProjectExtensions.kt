@@ -7,6 +7,7 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.SourceDirectorySet
+import org.gradle.api.internal.provider.DefaultProvider
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
@@ -71,15 +72,13 @@ fun Project.hasJsDependencyNamed(name: String): Boolean {
 
 /**
  * Like [hasJsDependencyNamed] but includes transitive dependencies as well.
- *
- * This method should only be called after a project is finished being configured, e.g. inside a task action.
  */
-fun Project.hasTransitiveJsDependencyNamed(name: String): Boolean {
-    return configurations.findByName(jsTarget.runtimeClasspath)
-        ?.resolvedConfiguration
-        ?.resolvedArtifacts
-        ?.any { artifact -> artifact.moduleVersion.id.name == name }
-        ?: false
+fun Project.hasTransitiveJsDependencyNamed(name: String): Provider<Boolean> {
+    return configurations.namedOrNull(jsTarget.runtimeClasspath)?.map {
+        it.resolvedConfiguration
+            .resolvedArtifacts
+            .any { artifact -> artifact.moduleVersion.id.name == name }
+    } ?: DefaultProvider { false }
 }
 
 /**

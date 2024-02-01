@@ -36,6 +36,7 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
+import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
@@ -54,6 +55,7 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
@@ -256,11 +258,14 @@ class KobwebApplicationPlugin @Inject constructor(
             project.setupKspJs(jsTarget, kspProcessorMode)
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
-                "kobwebGenSiteEntry", kobwebConf.site.routePrefix, buildTarget, kobwebBlock
+                "kobwebGenSiteEntry", kobwebConf.site.routePrefix, buildTarget, kobwebBlock.app, kobwebBlock
             )
 
             kobwebGenSiteEntryTask.configure {
-                kspGenFile.set(project.kspFrontendFile(jsTarget))
+                kspGenFile = project.kspFrontendFile(jsTarget)
+                compileClasspath.from(project.configurations.named(project.jsTarget.compileClasspath))
+                hasKobwebSilkDependency = project.hasTransitiveJsDependencyNamed("kobweb-silk")
+                hasSilkFoundationDependency = project.hasTransitiveJsDependencyNamed("silk-foundation")
             }
 
             val jsRunTasks = listOf(
