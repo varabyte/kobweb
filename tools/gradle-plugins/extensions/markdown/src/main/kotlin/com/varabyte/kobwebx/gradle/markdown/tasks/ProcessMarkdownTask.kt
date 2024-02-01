@@ -2,7 +2,6 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
-import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
@@ -59,9 +58,8 @@ abstract class ProcessMarkdownTask @Inject constructor(
     }
 
     @OutputDirectory
-    fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(projectLayout).resolve(
-        project.prefixQualifiedPackage(kobwebBlock.baseGenDir.get()).replace(".", "/")
-    )
+    fun getGenSrcDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(projectLayout)
+        .resolve("process")
 
     @OutputDirectory
     fun getGenResDir(): File = kobwebBlock.getGenJsResRoot<MarkdownBlock>(projectLayout)

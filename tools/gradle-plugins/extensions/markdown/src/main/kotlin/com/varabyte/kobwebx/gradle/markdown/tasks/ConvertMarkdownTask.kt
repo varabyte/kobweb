@@ -58,9 +58,9 @@ abstract class ConvertMarkdownTask @Inject constructor(
     abstract val generatedMarkdownDir: Property<File>
 
     @OutputDirectory
-    fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(projectLayout).resolve(
-        project.prefixQualifiedPackage(kobwebBlock.pagesPackage.get()).replace(".", "/")
-    )
+    fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(projectLayout)
+        .resolve("convert")
+        .resolve(project.prefixQualifiedPackage(kobwebBlock.pagesPackage.get()).replace(".", "/"))
 
     @TaskAction
     fun execute() {
