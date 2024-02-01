@@ -22,6 +22,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.Path
+import kotlin.io.path.pathString
 
 private class MarkdownVisitor : AbstractVisitor() {
     private val _frontMatter = mutableMapOf<String, List<String>>()
@@ -71,15 +73,18 @@ abstract class ProcessMarkdownTask @Inject constructor(
         val process = markdownBlock.process.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
+            val rootPath = Path(markdownBlock.markdownPath.get())
             getMarkdownFiles().get().visit {
                 if (isDirectory) return@visit
+
+                val fullPath = Path(relativePath.pathString)
                 val visitor = MarkdownVisitor()
                 parser
                     .parse(file.readText())
                     .accept(visitor)
                 add(
                     MarkdownEntry(
-                        filePath = relativePath.pathString,
+                        filePath = rootPath.relativize(fullPath).pathString,
                         frontMatter = visitor.frontMatter
                     )
                 )
