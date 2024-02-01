@@ -27,6 +27,8 @@ import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.io.path.Path
+import kotlin.io.path.pathString
 
 abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
@@ -67,10 +69,12 @@ abstract class ConvertMarkdownTask @Inject constructor(
         val cache = NodeCache(markdownFeatures.createParser(), getMarkdownRoots().get() + generatedMarkdownDir.get())
         val markdownFiles = getMarkdownResources().get() + objectFactory.fileTree().setDir(generatedMarkdownDir)
 
+        val rootPath = Path(markdownBlock.markdownPath.get())
         markdownFiles.visit {
             if (isDirectory) return@visit
             val mdFile = this.file
-            val mdPathRel = this.relativePath.pathString.removePrefix(markdownBlock.markdownPath.get() + "/")
+            val fullPath = Path(relativePath.pathString)
+            val mdPathRel = rootPath.relativize(fullPath).pathString
 
             val parts = mdPathRel.split('/')
             val dirParts = parts.subList(0, parts.lastIndex)
