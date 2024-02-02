@@ -134,7 +134,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val buildTarget = project.kobwebBuildTarget
 
         val kobwebGenSiteIndexTask = project.tasks.register<KobwebGenerateSiteIndexTask>(
-            "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock.app, kobwebBlock
+            "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock.app
         )
 
         val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(
@@ -282,7 +282,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
-                "kobwebGenSiteEntry", kobwebConf.site.routePrefix, buildTarget, kobwebBlock.app, kobwebBlock
+                "kobwebGenSiteEntry", kobwebConf.site.routePrefix, buildTarget, kobwebBlock.app
             )
 
             kobwebGenSiteEntryTask.configure {
@@ -363,7 +363,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             val kobwebGenApisFactoryTask = project.tasks
-                .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app, kobwebBlock)
+                .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
 
             kobwebGenApisFactoryTask.configure {
                 kspGenFile = project.kspBackendFile(jvmTarget)

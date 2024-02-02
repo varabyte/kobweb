@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
@@ -45,9 +44,8 @@ class KobwebGenIndexConfInputs(
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Nested val confInputs: KobwebGenIndexConfInputs,
     @get:Input val buildTarget: BuildTarget,
-    private val appBlock: AppBlock,
-    kobwebBlock: KobwebBlock,
-) : KobwebGenerateTask(kobwebBlock, "Generate an index.html file for this Kobweb project") {
+    appBlock: AppBlock,
+) : KobwebGenerateTask(appBlock, "Generate an index.html file for this Kobweb project") {
     @get:Input
     val indexBlock = appBlock.index
 

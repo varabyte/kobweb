@@ -5,7 +5,6 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.project.frontend.AppData
@@ -25,9 +24,8 @@ import javax.inject.Inject
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @get:Input val routePrefix: String,
     @get:Input val buildTarget: BuildTarget,
-    private val appBlock: AppBlock,
-    kobwebBlock: KobwebBlock,
-) : KobwebGenerateTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
+    appBlock: AppBlock,
+) : KobwebGenerateTask(appBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:Input
     val cleanUrls: Provider<Boolean> = appBlock.cleanUrls
 
