@@ -123,6 +123,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 // The suggested replacement for "capitalize" is awful
                 @Suppress("DEPRECATION")
                 val funName = "${ktFileName.capitalize()}Page"
+                @Suppress("DEPRECATION") // routeOverride supported for legacy codebases
                 val ktRenderer = KotlinRenderer(
                     project,
                     cache::getRelative,
@@ -130,7 +131,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                     mdPathRel,
                     markdownHandlers,
                     mdPackage,
-                    markdownBlock.routeOverride.orNull,
+                    markdownBlock.filenameToSlug.orNull ?: markdownBlock.routeOverride.orNull,
                     funName,
                     LoggingReporter(logger),
                 )

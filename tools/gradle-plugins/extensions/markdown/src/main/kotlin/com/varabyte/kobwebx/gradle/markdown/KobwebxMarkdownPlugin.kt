@@ -50,5 +50,14 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 kotlin.srcDir(processTask.map { it.getGenSrcDir() })
             }
         }
+
+        project.afterEvaluate {
+            @Suppress("DEPRECATION")
+            if (markdownBlock.routeOverride.isPresent) {
+                project.logger.warn(
+                    "The 'routeOverride' property has been deprecated. It has been renamed to 'filenameToSlug' for clarity."
+                )
+            }
+        }
     }
 }

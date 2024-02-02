@@ -70,9 +70,8 @@ fun String.yamlStringToKotlinString(): String {
  * @property filePath The path to the markdown file being processed (relative from its `markdown` folder root).
  * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
  * @property pkg The package that the generated file should be placed in.
- * @property routeOverrideProvider A function that can be used to override the route of a given markdown file. This is
- *   useful for overriding how routes are generated globally. If a `routeOverride` is present in the frontmatter, it
- *   takes precedence over this provider.
+ * @property filenameToSlug A function that can be used to override the name of a given markdown file. If not
+ *   specified, the default format is to simply lowercase the name of the file.
  * @property funName The name of the page function that will be generated.
  * @property reporter A reporter that can be used to log warnings and errors.
  */
@@ -83,7 +82,7 @@ class KotlinRenderer(
     private val filePath: String,
     private val handlers: MarkdownHandlers,
     private val pkg: String,
-    private val routeOverrideProvider: ((String) -> String)?,
+    private val filenameToSlug: ((String) -> String)?,
     private val funName: String,
     private val reporter: Reporter,
 ) : Renderer {
@@ -149,8 +148,8 @@ class KotlinRenderer(
         if (routeOverride == null) {
             val inputFileName = filePath.substringAfterLast('/').substringBeforeLast('.')
             val defaultRoute = inputFileName.lowercase()
-            if (routeOverrideProvider != null && defaultRoute != "index") {
-                routeOverride = routeOverrideProvider.invoke(inputFileName).takeIf { it != defaultRoute }
+            if (filenameToSlug != null && defaultRoute != "index") {
+                routeOverride = filenameToSlug.invoke(inputFileName).takeIf { it != defaultRoute }
             }
         }
         return routeOverride
