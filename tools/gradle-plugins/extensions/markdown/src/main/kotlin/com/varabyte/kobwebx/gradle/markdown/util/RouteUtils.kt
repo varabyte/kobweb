@@ -16,7 +16,7 @@ internal object RouteUtils {
             ?.let { "$it/" }
             ?: ""
 
-        return prefix + file.nameWithoutExtension.lowercase()
+        return "/$prefix${file.nameWithoutExtension.lowercase()}"
     }
 
     /**
