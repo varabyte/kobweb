@@ -29,10 +29,10 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         }
 
         val processTask = project.tasks
-            .register<ProcessMarkdownTask>("kobwebxMarkdownProcess", kobwebBlock, markdownBlock)
+            .register<ProcessMarkdownTask>("kobwebxMarkdownProcess", markdownBlock)
 
         val convertTask = project.tasks
-            .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", kobwebBlock, markdownBlock)
+            .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", markdownBlock)
 
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
@@ -41,8 +41,9 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 resources.set(project.getResourceSources(jsTarget))
             }
             convertTask.configure {
-                resources.set(project.getResourceSources(jsTarget))
-                generatedMarkdownDir.set(processTask.map { it.getGenResDir() })
+                resources = project.getResourceSources(jsTarget)
+                generatedMarkdownDir = processTask.map { it.getGenResDir().get() }
+                pagesPackage = kobwebBlock.pagesPackage
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {

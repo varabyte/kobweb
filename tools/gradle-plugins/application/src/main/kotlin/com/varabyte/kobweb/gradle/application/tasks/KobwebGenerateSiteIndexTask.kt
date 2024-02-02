@@ -58,7 +58,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:InputFiles
     abstract val compileClasspath: ConfigurableFileCollection
 
-    @OutputFile // needs to be dir to be registered as a kotlin srcDir
+    @OutputFile
     fun getGenIndexFile(): Provider<RegularFile> = appBlock.getGenJsResRoot().map { it.file("index.html") }
 
     @TaskAction

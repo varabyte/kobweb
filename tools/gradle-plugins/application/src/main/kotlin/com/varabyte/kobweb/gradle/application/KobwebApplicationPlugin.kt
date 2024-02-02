@@ -9,6 +9,7 @@ import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyWorkerJsOutputTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportConfInputs
@@ -137,13 +138,13 @@ class KobwebApplicationPlugin @Inject constructor(
             "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock.app
         )
 
-        val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(
-            "kobwebCopySupplementalResources",
-            kobwebBlock,
-            kobwebGenSiteIndexTask.map { RegularFile { it.outputs.files.singleFile } }
-        )
+        val kobwebCopySupplementalResourcesTask = project.tasks
+            .register<KobwebCopySupplementalResourcesTask>("kobwebCopySupplementalResources", kobwebBlock.app)
+        kobwebCopySupplementalResourcesTask.configure {
+            indexFile = kobwebGenSiteIndexTask.map { it.getGenIndexFile().get() }
+        }
         val kobwebCopyWorkerJsOutputTask =
-            project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock)
+            project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock.app)
 
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
@@ -310,6 +311,12 @@ class KobwebApplicationPlugin @Inject constructor(
             // Register generated sources directly to compileKotlin task so that KSP doesn't process them
             project.tasks.named<Kotlin2JsCompile>(jsTarget.compileKotlin) {
                 source(kobwebGenSiteEntryTask)
+            }
+
+            // configure both kobwebCopySupplementalResourcesTask & kobwebCopyWorkerJsOutputTask
+            project.tasks.withType<KobwebCopyTask>().configureEach {
+                publicPath = kobwebBlock.publicPath
+                runtimeClasspath.from(project.configurations.named(jsTarget.runtimeClasspath))
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {

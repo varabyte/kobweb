@@ -1,41 +1,33 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.Provider
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
 import javax.inject.Inject
 
-abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
-    kobwebBlock: KobwebBlock,
-    @get:InputFile val indexFile: Provider<RegularFile>,
-) : KobwebCopyTask(
-    kobwebBlock,
-    "Copy and make available index.html & all public/ resources from any libraries to the final site"
-) {
-    @InputFiles
-    fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
+abstract class KobwebCopySupplementalResourcesTask @Inject constructor(@get:Internal val appBlock: AppBlock) :
+    KobwebCopyTask("Copy and make available index.html & all public/ resources from any libraries to the final site") {
+
+    @get:InputFile
+    abstract val indexFile: RegularFileProperty
 
     @OutputDirectory
-    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("app")
+    fun getGenResDir() = appBlock.getGenJsResRoot("supplemental")
 
-    private fun getGenPublicRoot() = getGenResDir().resolve(kobwebBlock.publicPath.get())
+    private fun getGenPublicRoot() = getGenResDir().get().asFile.resolve(publicPath.get())
 
     @TaskAction
     fun execute() {
-        val classpath = getRuntimeClasspath().get()
         val publicFilesPattern = PatternSet().apply {
             include("public/**")
         }
 
-        val resourceData = classpath.toKobwebOutputByPattern(publicFilesPattern)
+        val resourceData = runtimeClasspath.asFileTree.toKobwebOutputByPattern(publicFilesPattern)
 
         fileSystemOperations.sync {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
