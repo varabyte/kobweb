@@ -271,12 +271,13 @@ class KobwebApplicationPlugin @Inject constructor(
                 inputs.property("kobwebGenDir", kobwebBlock.app.genDir)
                 // No one should define their own root `public/index.html` files anywhere in their resources.
                 val generatedRoot = project.layout.buildDirectory.dir(kobwebBlock.app.genDir).get().asFile
+                val projectDir = project.projectDir
                 filesMatching("${kobwebBlock.publicPath.get()}/index.html") {
                     if (!file.isDescendantOf(generatedRoot)) {
                         throw GradleException(
                             "You are not supposed to define the root index file yourself. Kobweb provides its own. " +
                                 "Use the `kobweb.app.index { ... }` block if you need to modify the generated index file. " +
-                                "Problematic file: ${file.relativeToOrSelf(project.projectDir)}"
+                                "Problematic file: ${file.relativeToOrSelf(projectDir)}"
                         )
                     }
                 }
