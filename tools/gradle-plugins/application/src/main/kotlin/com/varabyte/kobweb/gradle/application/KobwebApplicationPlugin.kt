@@ -363,10 +363,11 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             val kobwebGenApisFactoryTask = project.tasks
-                .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock)
+                .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app, kobwebBlock)
 
             kobwebGenApisFactoryTask.configure {
-                kspGenFile.set(project.kspBackendFile(jvmTarget))
+                kspGenFile = project.kspBackendFile(jvmTarget)
+                compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
             }
 
             // Register generated sources directly to compileKotlin task so that KSP doesn't process them
