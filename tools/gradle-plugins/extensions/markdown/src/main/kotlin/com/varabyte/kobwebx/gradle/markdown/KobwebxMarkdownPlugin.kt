@@ -10,7 +10,6 @@ import com.varabyte.kobwebx.gradle.markdown.tasks.ProcessMarkdownTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -38,11 +37,11 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             val jsTarget = JsTarget(this)
 
             processTask.configure {
-                resources = project.getResourceSources(jsTarget)
+                resources.set(project.getResourceSources(jsTarget))
             }
             convertTask.configure {
-                resources = project.getResourceSources(jsTarget)
-                generatedMarkdownDir = processTask.map { it.getGenResDir() }
+                resources.set(project.getResourceSources(jsTarget))
+                generatedMarkdownDir.set(processTask.map { it.getGenResDir() })
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {

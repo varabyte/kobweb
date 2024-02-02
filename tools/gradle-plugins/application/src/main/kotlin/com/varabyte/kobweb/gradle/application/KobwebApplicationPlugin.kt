@@ -54,7 +54,6 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
@@ -159,8 +158,10 @@ class KobwebApplicationPlugin @Inject constructor(
         }
 
         kobwebStartTask.configure {
-            serverJar = kobwebUnpackServerJarTask.map { it.getServerJar() }
-            serverPluginsDir = kobwebSyncServerPluginJarsTask.map { it.destinationDir }
+            serverJar.set(kobwebUnpackServerJarTask.map { RegularFile { it.getServerJar() } })
+            serverPluginsDir.set(kobwebSyncServerPluginJarsTask.map {
+                project.objects.directoryProperty().apply { set(it.destinationDir) }.get()
+            })
             doLast {
                 val devScript = kobwebConf.server.files.dev.script
                 if (env == ServerEnvironment.DEV && !project.file(devScript).exists()) {
@@ -198,7 +199,7 @@ class KobwebApplicationPlugin @Inject constructor(
             .register<KobwebExportTask>("kobwebExport", KobwebExportConfInputs(kobwebConf), exportLayout, kobwebBlock)
 
         project.tasks.register<KobwebBrowserCacheIdTask>("kobwebBrowserCacheId") {
-            browser = kobwebBlock.app.export.browser
+            browser.set(kobwebBlock.app.export.browser)
         }
 
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
