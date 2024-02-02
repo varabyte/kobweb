@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
+import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
 import com.varabyte.kobwebx.gradle.markdown.yamlStringToKotlinString
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
@@ -78,14 +79,20 @@ abstract class ProcessMarkdownTask @Inject constructor(
                 if (isDirectory) return@visit
 
                 val fullPath = Path(relativePath.pathString)
+                val relativePath = rootPath.relativize(fullPath)
                 val visitor = MarkdownVisitor()
                 parser
                     .parse(file.readText())
                     .accept(visitor)
                 add(
                     MarkdownEntry(
-                        filePath = rootPath.relativize(fullPath).pathString,
-                        frontMatter = visitor.frontMatter
+                        filePath = relativePath.pathString,
+                        frontMatter = visitor.frontMatter,
+                        route = RouteUtils.getRoute(
+                            relativePath.toFile(),
+                            visitor.frontMatter,
+                            markdownBlock.filenameToSlug.orNull
+                        )
                     )
                 )
             }

@@ -9,6 +9,7 @@ import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
+import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeTicks
@@ -47,6 +48,7 @@ import org.commonmark.node.ThematicBreak
 import org.commonmark.renderer.Renderer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import java.io.File
 import java.util.*
 import kotlin.io.path.Path
 
@@ -144,15 +146,7 @@ class KotlinRenderer(
     }
 
     private fun getRouteOverride(filePath: String, frontMatterData: FrontMatterData?): String? {
-        var routeOverride = frontMatterData?.routeOverride
-        if (routeOverride == null) {
-            val inputFileName = filePath.substringAfterLast('/').substringBeforeLast('.')
-            val defaultRoute = inputFileName.lowercase()
-            if (filenameToSlug != null && defaultRoute != "index") {
-                routeOverride = filenameToSlug.invoke(inputFileName).takeIf { it != defaultRoute }
-            }
-        }
-        return routeOverride
+        return RouteUtils.getRouteOverride(File(filePath), frontMatterData?.routeOverride, filenameToSlug)
     }
 
     private fun RenderVisitor.visitAndFinish(node: Node) {
