@@ -28,7 +28,7 @@ import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.io.path.Path
-import kotlin.io.path.pathString
+import kotlin.io.path.invariantSeparatorsPathString
 
 abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
@@ -74,7 +74,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
             if (isDirectory) return@visit
             val mdFile = this.file
             val fullPath = Path(relativePath.pathString)
-            val mdPathRel = rootPath.relativize(fullPath).pathString
+            val mdPathRel = rootPath.relativize(fullPath).invariantSeparatorsPathString
 
             val parts = mdPathRel.split('/')
             val dirParts = parts.subList(0, parts.lastIndex)
@@ -123,6 +123,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
                 // The suggested replacement for "capitalize" is awful
                 @Suppress("DEPRECATION")
                 val funName = "${ktFileName.capitalize()}Page"
+
                 @Suppress("DEPRECATION") // routeOverride supported for legacy codebases
                 val ktRenderer = KotlinRenderer(
                     project,

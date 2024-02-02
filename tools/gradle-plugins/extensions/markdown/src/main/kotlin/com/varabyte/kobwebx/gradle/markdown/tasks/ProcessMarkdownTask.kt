@@ -24,7 +24,7 @@ import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
 import kotlin.io.path.Path
-import kotlin.io.path.pathString
+import kotlin.io.path.invariantSeparatorsPathString
 
 private class MarkdownVisitor : AbstractVisitor() {
     private val _frontMatter = mutableMapOf<String, List<String>>()
@@ -86,7 +86,7 @@ abstract class ProcessMarkdownTask @Inject constructor(
                     .accept(visitor)
                 add(
                     MarkdownEntry(
-                        filePath = relativePath.pathString,
+                        filePath = relativePath.invariantSeparatorsPathString,
                         frontMatter = visitor.frontMatter,
                         route = RouteUtils.getRoute(
                             relativePath.toFile(),
