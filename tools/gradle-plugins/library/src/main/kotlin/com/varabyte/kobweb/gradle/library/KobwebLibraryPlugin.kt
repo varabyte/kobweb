@@ -24,7 +24,6 @@ import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateLibraryMetadataTas
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
@@ -43,7 +42,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
             project.tasks.register<KobwebGenerateIndexMetadataTask>("kobwebGenerateIndexMetadata")
         val kobwebGenerateLibraryMetadataTask = project.tasks
             .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
-                indexHead = project.kobwebBlock.library.index.head
+                indexHead.set(project.kobwebBlock.library.index.head)
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
