@@ -60,6 +60,22 @@ fun String.yamlStringToKotlinString(): String {
     }
 }
 
+/**
+ * A markdown renderer that generates a Kobweb source file given an input markdown file.
+ *
+ * @property project The Gradle project that owns these markdown files.
+ * @property markdownNodeGetter A function that can be used to retrieve the AST for a given markdown file. This allows
+ *   avoiding needing to do redundant parsing.
+ * @property imports A list of additional imports to include at the top of the generated file.
+ * @property filePath The path to the markdown file being processed (relative from its `markdown` folder root).
+ * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
+ * @property pkg The package that the generated file should be placed in.
+ * @property routeOverrideProvider A function that can be used to override the route of a given markdown file. This is
+ *   useful for overriding how routes are generated globally. If a `routeOverride` is present in the frontmatter, it
+ *   takes precedence over this provider.
+ * @property funName The name of the page function that will be generated.
+ * @property reporter A reporter that can be used to log warnings and errors.
+ */
 class KotlinRenderer(
     private val project: Project,
     private val markdownNodeGetter: (path: String) -> Node?,
