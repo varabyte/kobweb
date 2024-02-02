@@ -5,15 +5,11 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
-import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
-import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_INDEX
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
@@ -21,7 +17,10 @@ import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.link
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
-import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
@@ -46,34 +45,33 @@ class KobwebGenIndexConfInputs(
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Nested val confInputs: KobwebGenIndexConfInputs,
     @get:Input val buildTarget: BuildTarget,
-    block: KobwebBlock,
-) : KobwebGenerateTask(block, "Generate an index.html file for this Kobweb project") {
+    private val appBlock: AppBlock,
+    kobwebBlock: KobwebBlock,
+) : KobwebGenerateTask(kobwebBlock, "Generate an index.html file for this Kobweb project") {
+    @get:Input
+    val indexBlock = appBlock.index
 
-    // No one should define their own root `public/index.html` files anywhere in their resources.
-    @InputFiles
-    fun getUserDefinedRootIndexFiles() =
-        getResourceFilesJsWithRoots()
-            .mapNotNull { rootAndFile ->
-                rootAndFile.takeIf {
-                    // Ignore files that are in our build directory, since we put them there. We are looking for index
-                    // files explicitly added by a user, often because they don't realize that Kobweb generates one yet.
-                    !it.file.isDescendantOf(projectLayout.buildDirectory.asFile.get())
-                        && it.relativeFile.invariantSeparatorsPath == "public/index.html"
-                }
-            }
-            .map { it.file }
-            .toList()
+    @get:Input
+    abstract val hasFaIconsDependency: Property<Boolean>
 
-    @InputFiles
-    fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
+    @get:Input
+    abstract val hasMdiIconsDependency: Property<Boolean>
 
-    @OutputFile
-    fun getGenIndexFile() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("index.html")
+    @get:InputFiles
+    abstract val compileClasspath: ConfigurableFileCollection
+
+    @OutputFile // needs to be dir to be registered as a kotlin srcDir
+    fun getGenIndexFile(): Provider<RegularFile> = appBlock.getGenJsResRoot().map { it.file("index.html") }
 
     @TaskAction
     fun execute() {
-        if (project.hasTransitiveJsDependencyNamed("silk-icons-fa").get()) {
-            kobwebBlock.app.index.head.add {
+        // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
+        // allowed to declare some as well. If they do, they will have embedded serialized html in their library
+        // artifacts.
+        val headInitializers = indexBlock.head.get().toMutableList()
+
+        if (hasFaIconsDependency.get()) {
+            headInitializers.add {
                 link {
                     rel = "stylesheet"
                     href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
@@ -81,8 +79,8 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        if (project.hasTransitiveJsDependencyNamed("silk-icons-mdi").get()) {
-            kobwebBlock.app.index.head.add {
+        if (hasFaIconsDependency.get()) {
+            headInitializers.add {
                 link {
                     rel = "stylesheet"
                     href =
@@ -91,23 +89,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        getUserDefinedRootIndexFiles()
-            .takeIf { it.isNotEmpty() }
-            ?.let { externalIndexFiles ->
-                throw GradleException(
-                    "You are not supposed to define the root index file yourself. Kobweb provides its own. Use the `kobweb.app.index { ... }` block if you need to modify the generated index file. Problematic file(s): ${
-                        externalIndexFiles.joinToString(
-                            ", "
-                        ) { it.absoluteFile.toRelativeString(projectLayout.projectDirectory.asFile) }
-                    }"
-                )
-            }
-
-        // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
-        // allowed to declare some as well. If they do, they will have embedded serialized html in their library
-        // artifacts.
-        val headInitializers = kobwebBlock.app.index.head.get().toMutableList()
-        getCompileClasspath().get().files.forEach { file ->
+        compileClasspath.forEach { file ->
             var libraryMetadata: LibraryMetadata? = null
 
             file.searchZipFor(KOBWEB_METADATA_LIBRARY) { bytes ->
@@ -130,9 +112,9 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 val headElements = document.head().children()
 
                 if (headElements.isNotEmpty()) {
-                    val optedOut =
-                        kobwebBlock.app.index.excludeTags.orNull?.invoke(AppBlock.IndexBlock.ExcludeTagsContext(file.name))
-                            ?: false
+                    val optedOut = indexBlock.excludeTags.orNull
+                        ?.invoke(AppBlock.IndexBlock.ExcludeTagsContext(file.name))
+                        ?: false
 
                     if (!optedOut) {
                         logger.warn(buildString {
@@ -175,7 +157,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         }
 
         val routePrefix = RoutePrefix(confInputs.routePrefix)
-        getGenIndexFile().writeText(
+        getGenIndexFile().get().asFile.writeText(
             createIndexFile(
                 confInputs.title,
                 headInitializers,
@@ -183,7 +165,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
                 routePrefix.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
-                kobwebBlock.app.index.scriptAttributes.get(),
+                indexBlock.scriptAttributes.get(),
                 buildTarget
             )
         )

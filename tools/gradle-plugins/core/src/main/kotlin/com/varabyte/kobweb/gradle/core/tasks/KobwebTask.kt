@@ -34,4 +34,7 @@ abstract class KobwebTask @Inject constructor(desc: String) : DefaultTask() {
 
     protected fun KobwebBlock.FileGeneratingBlock.getGenJsSrcRoot(): Provider<Directory> =
         genDir.flatMap { projectLayout.buildDirectory.dir("$it/src/jsMain/kotlin") }
+
+    protected fun KobwebBlock.FileGeneratingBlock.getGenJsResRoot(): Provider<Directory> =
+        genDir.flatMap { projectLayout.buildDirectory.dir("$it/src/resources/kotlin") }
 }

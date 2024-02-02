@@ -37,6 +37,7 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
@@ -60,6 +61,7 @@ import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.tooling.events.FailureResult
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -132,7 +134,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val buildTarget = project.kobwebBuildTarget
 
         val kobwebGenSiteIndexTask = project.tasks.register<KobwebGenerateSiteIndexTask>(
-            "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock
+            "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock.app, kobwebBlock
         )
 
         val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(
@@ -256,6 +258,28 @@ class KobwebApplicationPlugin @Inject constructor(
             val jsTarget = JsTarget(this)
 
             project.setupKspJs(jsTarget, kspProcessorMode)
+
+            kobwebGenSiteIndexTask.configure {
+                compileClasspath.from(project.configurations.named(project.jsTarget.compileClasspath))
+                hasFaIconsDependency = project.hasTransitiveJsDependencyNamed("silk-icons-fa")
+                hasMdiIconsDependency = project.hasTransitiveJsDependencyNamed("silk-icons-mdi")
+            }
+
+            project.tasks.named<ProcessResources>(jsTarget.processResources) {
+                inputs.property("kobwebPublicPath", kobwebBlock.publicPath)
+                inputs.property("kobwebGenDir", kobwebBlock.app.genDir)
+                // No one should define their own root `public/index.html` files anywhere in their resources.
+                val generatedRoot = project.layout.buildDirectory.dir(kobwebBlock.app.genDir).get().asFile
+                filesMatching("${kobwebBlock.publicPath.get()}/index.html") {
+                    if (!file.isDescendantOf(generatedRoot)) {
+                        throw GradleException(
+                            "You are not supposed to define the root index file yourself. Kobweb provides its own. " +
+                                "Use the `kobweb.app.index { ... }` block if you need to modify the generated index file. " +
+                                "Problematic file: ${file.relativeToOrSelf(project.projectDir)}"
+                        )
+                    }
+                }
+            }
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
                 "kobwebGenSiteEntry", kobwebConf.site.routePrefix, buildTarget, kobwebBlock.app, kobwebBlock
