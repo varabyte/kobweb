@@ -6,7 +6,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 
 // resolve() so that import aliased annotations can be found as well
 fun KSAnnotated.getAnnotationsByName(fqn: String) = annotations
-    .filter { it.annotationType.resolve().declaration.qualifiedName?.asString() == fqn }
+    .filter { it.annotationType.resolveQualifiedName() == fqn }
 
 /**
  * Returns true if the annotated element has a `@Suppress("...")` annotation matching the given suppression name.
