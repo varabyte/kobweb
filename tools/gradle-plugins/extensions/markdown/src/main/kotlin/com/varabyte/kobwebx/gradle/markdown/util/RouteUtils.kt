@@ -11,8 +11,6 @@ internal object RouteUtils {
     private fun getDefaultRoute(file: File): String {
         val prefix = file.parentFile
             ?.invariantSeparatorsPath
-            ?.split('/')
-            ?.joinToString("/") { it.toPackageName() }
             ?.let { "$it/" }
             ?: ""
 
