@@ -21,6 +21,7 @@ import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
+import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
@@ -81,8 +82,7 @@ class BackendProcessor(
             val type = property.type.toString()
             if (type != API_STREAM_SIMPLE_NAME) return
 
-            val expensiveFullType = property.type.resolve().declaration.qualifiedName?.asString()
-            if (expensiveFullType != API_STREAM_FQN) return
+            if (property.type.resolveQualifiedName() != API_STREAM_FQN) return
 
             val propertyName = property.simpleName.asString()
             val topLevelSuppression = "TOP_LEVEL_API_STREAM"
