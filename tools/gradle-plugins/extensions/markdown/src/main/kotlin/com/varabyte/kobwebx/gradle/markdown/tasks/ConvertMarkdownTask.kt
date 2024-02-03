@@ -5,6 +5,7 @@ import com.varabyte.kobweb.common.lang.toPackageName
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
+import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
@@ -22,6 +23,8 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
@@ -32,8 +35,13 @@ import kotlin.io.path.invariantSeparatorsPathString
 
 abstract class ConvertMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
-    @get:Input val markdownBlock: MarkdownBlock,
+    private val markdownBlock: MarkdownBlock,
 ) : KobwebTask("Convert markdown files found in the project's resources path to source code in the final project") {
+
+    // Use changing the build script as a proxy for changing markdownBlock or kobwebBlock values.
+    @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
+    fun getBuildScripts(): List<File> = projectLayout.getBuildScripts()
 
     private val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()

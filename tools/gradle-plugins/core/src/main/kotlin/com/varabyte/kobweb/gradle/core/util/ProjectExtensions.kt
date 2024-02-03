@@ -5,6 +5,7 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.named
@@ -119,4 +120,36 @@ fun Project.toUidString(): String {
     val hash = digest.digest(rawText.toByteArray(Charsets.UTF_8))
 
     return hash.joinToString("") { "%02x".format(it) }.uppercase()
+}
+
+/**
+ * Return the Gradle build script in the current project.
+ *
+ * If a task depends on a Kobweb block property, then you want to make sure it is invalidated if that changes. However,
+ * passing the block into the task with an `@Input` annotation is not always possible, as the block may not be
+ * serializable, which is a requirement for Gradle inputs and outputs. (For example, this can happen if one of the
+ * properties accepts a lambda which pulls in some property into its closure.)
+ *
+ * As a workaround for those cases, you can do something like this:
+ *
+ * ```
+ * abstract class ExampleTask(private val someBlock: SomeBlock) {
+ *   @InputFiles
+ *   @PathSensitive(PathSensitivity.RELATIVE)
+ *   fun getBuildScripts(): List<File> = project.getBuildScripts().toList()
+ * }
+ * ```
+ *
+ * Note that the above case doesn't play friendly with Gradle's configuration cache, so it should only be used as a last
+ * resort.
+ *
+ * The method technically returns a collection of files, which could happen if the project has both a `build.gradle` and
+ * a `build.gradle.kts` file. However, in practice, we always expect this to return a single entry, as most projects
+ * would only ever have one or the other.
+ */
+// TODO: If possible, kill this approach and find a way to make Kobweb blocks safe to use as inputs even with lambdas.
+fun ProjectLayout.getBuildScripts(): List<File> {
+    return sequenceOf("build.gradle", "build.gradle.kts")
+        .mapNotNull { script -> this.projectDirectory.file(script).asFile.takeIf { it.exists() } }
+        .toList()
 }

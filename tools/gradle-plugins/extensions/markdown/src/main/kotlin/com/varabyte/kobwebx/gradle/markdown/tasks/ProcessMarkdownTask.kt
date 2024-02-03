@@ -2,6 +2,7 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
+import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
@@ -19,6 +20,8 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
@@ -46,8 +49,13 @@ private class MarkdownVisitor : AbstractVisitor() {
 
 abstract class ProcessMarkdownTask @Inject constructor(
     private val kobwebBlock: KobwebBlock,
-    @get:Input val markdownBlock: MarkdownBlock,
+    private val markdownBlock: MarkdownBlock,
 ) : KobwebTask("Runs the `process` callback registered in the markdown block (which gives the user a chance to generate additional files around all of the markdown resources)") {
+
+    // Use changing the build script as a proxy for changing markdownBlock or kobwebBlock values.
+    @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
+    fun getBuildScripts(): List<File> = projectLayout.getBuildScripts()
 
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
