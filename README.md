@@ -1634,7 +1634,7 @@ at build time, using the filename as its path.
 For example, if I create the following file:
 
 ```markdown
-// jsMain/resources/markdown/docs/tutorial/Kobweb.kt
+// jsMain/resources/markdown/docs/tutorial/Kobweb.md
 
 # Kobweb Tutorial
 
@@ -1677,8 +1677,8 @@ fun AuthorWidget() {
 
 #### Root
 
-Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that wraps
-the code your markdown file would otherwise create. This is useful for specifying a layout for example:
+Within your front matter, there's a special value which, if set, will be used to render a root `@Composable` that adds
+the rest of your markdown code as its content. This is useful for specifying a layout for example:
 
 ```markdown
 ---
@@ -1729,13 +1729,13 @@ fun AStarDemoPage() { /* ... */
 ```
 
 You can additionally override the algorithm used for converting ALL markdown files to their final name, by setting the
-markdown block's `routeOverride` callback:
+markdown block's `filenameToSlug` callback:
 
 ```kotlin
 kobweb {
   markdown { //
-    // Given "Example.md", name will be "Example" and output will be "post_example"
-    routeOverride.set { name -> "post_${name.lowercase()}" }
+    // Given "Example.md", `name` will be "Example" and output will be "post_example"
+    filenameToSlug.set { name -> "post_${name.lowercase()}" }
   }
 }
 ```
@@ -1745,17 +1745,18 @@ This callback will be triggered on all Markdown pages *except* `Index.md` files.
 Some common algorithms are provided which you can use instead of writing your own:
 
 ```kotlin
-import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.RouteOverride
+import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.TextTransformers
 
 kobweb {
   markdown {
-    routeOverride.set(RouteOverride.KebabCase) // e.g. "ExamplePage" to "example-page"
+    filenameToSlug.set(TextTransformers.KebabCase) // e.g. "ExamplePage" to "example-page"
   }
 }
 ```
 
-If you specify both a global route override and a local route override in the front matter, the front matter setting
-will take precedence.
+If you specify a front matter `routeOverride` that points to a concrete slug, it will take precedence -- the
+`filenameToSlug` callback will be ignored. However, if your override ends with a "/", then if the `filenameToSlug`
+handler is also set, their outputs will be combined into the final route.
 
 ### Kobweb Call
 
@@ -1843,7 +1844,7 @@ Press ${ColorButton} to toggle the site's current color.
 
 #### Local Imports
 
-Local imports are specified in your markdown's Front Matter (and can even affect its root declaration!):
+Local imports are specified in your markdown's front matter (and can even affect its root declaration!):
 
 ```markdown
 ---
@@ -1857,6 +1858,56 @@ imports:
 
 {{{ VisitorCounter }}}
 ```
+
+### Iterating over all markdown files
+
+It can be really useful to process all markdown files during your site's build. A common example is to collect all
+markdown articles and generate a listing page from them.
+
+You can actually do this using pure Gradle code, but it's common enough that Kobweb provides a convenience API, via the
+`markdown` block's `process` callback.
+
+You can register a callback that will be triggered at build time with a list of all markdown files in your project.
+
+```kotlin
+kobweb {
+  markdown {
+    process.set { markdownEntries ->
+      // `markdownEntries` is type `List<MarkdownEntry>`, where an entry includes the file's path, the route it will
+      // be served at, and any parsed front matter.
+
+      println("Processing markdown files:")
+      markdownEntries.forEach { entry ->
+        println("\t* ${entry.filePath} -> ${entry.route}")
+      }
+    }
+  }
+}
+```
+
+Inside the callback, you can also call `generateKotlin` and `generateMarkdown` utility methods. Here is a very rough
+example of creating a listing page for all blog posts in a site (found under the `resources/markdown/blog` folder):
+
+```kotlin
+kobweb {
+  markdown {
+    process.set { markdownEntries ->
+      generateMarkdown("blog/index.md", buildString {
+        appendLine("# Blog Index")  
+        markdownEntries.forEach { entry ->
+          if (entry.filePath.startsWith("blog/")) {
+            val title = entry.frontMatter["title"] ?: "Untitled"      
+            appendLine("* [$title](${entry.route})")
+          }
+        }  
+      })
+    }
+  }
+}
+```
+
+Refer to the build script of [my open source blog site](https://github.com/bitspittle/bitspittle.dev/blob/main/site/build.gradle.kts)
+and search for "process.set" to see this feature in action in a production environment.
 
 ## Learning CSS through Kobweb
 
