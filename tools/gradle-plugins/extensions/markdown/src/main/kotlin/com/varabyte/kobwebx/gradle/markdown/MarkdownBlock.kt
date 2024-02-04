@@ -129,7 +129,7 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
     /**
      * Register a handler which will be triggered with a list of all markdown files in this project.
      *
-     * The markdown files will be partially parsed to include frontmatter information, plus
+     * The markdown files will be partially parsed to include front matter information, plus
      * additional metadata that could be useful for generating some additional content,
      * such as a top-level listing page that links to all markdown pages.
      *

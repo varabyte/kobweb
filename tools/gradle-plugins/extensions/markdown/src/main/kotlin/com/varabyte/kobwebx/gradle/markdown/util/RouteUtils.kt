@@ -18,7 +18,7 @@ internal object RouteUtils {
     /**
      * Return the final route that will be generated for this markdown file.
      *
-     * This final route may be partially or entirely affected by a route override set in the frontmatter or if a
+     * This final route may be partially or entirely affected by a route override set in the front matter or if a
      * `filenameToSlug` transformation algorithm has been set up in the markdown block.
      */
     fun getRoute(

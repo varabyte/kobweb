@@ -182,7 +182,7 @@ class KotlinRenderer(
         val imports: List<String>? get() = raw["imports"]
         val routeOverride: String? get() = raw["routeOverride"]?.singleOrNull()
 
-        // Hide frontmatter data from the user that is meant to be consumed by the renderer
+        // Hide front matter data from the user that is meant to be consumed by the renderer
         val user: Map<String, List<String>>
             get() = raw.filterKeys {
                 it != "root" &&
