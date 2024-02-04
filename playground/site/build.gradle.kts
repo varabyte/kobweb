@@ -13,6 +13,14 @@ version = "1.0-SNAPSHOT"
 kobweb {
     markdown {
         imports.add(".components.widgets.*")
+        process.set { markdownEntries ->
+            generateMarkdown("markdown/listing.md", buildString {
+                appendLine("# Listing Index")
+                markdownEntries.forEach { entry ->
+                    appendLine("* [${entry.filePath}](${entry.route})")
+                }
+            })
+        }
     }
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
 }
