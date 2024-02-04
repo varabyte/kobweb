@@ -141,7 +141,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebCopySupplementalResourcesTask = project.tasks
             .register<KobwebCopySupplementalResourcesTask>("kobwebCopySupplementalResources", kobwebBlock.app)
         kobwebCopySupplementalResourcesTask.configure {
-            indexFile = kobwebGenSiteIndexTask.map { it.getGenIndexFile().get() }
+            indexFile.set(kobwebGenSiteIndexTask.map { it.getGenIndexFile().get() })
         }
         val kobwebCopyWorkerJsOutputTask =
             project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock.app)
@@ -262,8 +262,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebGenSiteIndexTask.configure {
                 compileClasspath.from(project.configurations.named(project.jsTarget.compileClasspath))
-                hasFaIconsDependency = project.hasTransitiveJsDependencyNamed("silk-icons-fa")
-                hasMdiIconsDependency = project.hasTransitiveJsDependencyNamed("silk-icons-mdi")
+                hasFaIconsDependency.set(project.hasTransitiveJsDependencyNamed("silk-icons-fa"))
+                hasMdiIconsDependency.set(project.hasTransitiveJsDependencyNamed("silk-icons-mdi"))
             }
 
             project.tasks.named<ProcessResources>(jsTarget.processResources) {
@@ -288,10 +288,10 @@ class KobwebApplicationPlugin @Inject constructor(
             )
 
             kobwebGenSiteEntryTask.configure {
-                kspGenFile = project.kspFrontendFile(jsTarget)
+                kspGenFile.set(project.kspFrontendFile(jsTarget))
                 compileClasspath.from(project.configurations.named(project.jsTarget.compileClasspath))
-                hasKobwebSilkDependency = project.hasTransitiveJsDependencyNamed("kobweb-silk")
-                hasSilkFoundationDependency = project.hasTransitiveJsDependencyNamed("silk-foundation")
+                hasKobwebSilkDependency.set(project.hasTransitiveJsDependencyNamed("kobweb-silk"))
+                hasSilkFoundationDependency.set(project.hasTransitiveJsDependencyNamed("silk-foundation"))
             }
 
             val jsRunTasks = listOf(
@@ -345,6 +345,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebExportTask.configure {
+                compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
                 // before outputting them into a final prod folder.
@@ -374,7 +375,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 .register<KobwebGenerateApisFactoryTask>("kobwebGenApisFactory", kobwebBlock.app)
 
             kobwebGenApisFactoryTask.configure {
-                kspGenFile = project.kspBackendFile(jvmTarget)
+                kspGenFile.set(project.kspBackendFile(jvmTarget))
                 compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
             }
 

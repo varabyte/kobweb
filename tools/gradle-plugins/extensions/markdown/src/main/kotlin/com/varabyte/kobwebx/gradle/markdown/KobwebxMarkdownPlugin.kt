@@ -41,9 +41,9 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 resources.set(project.getResourceSources(jsTarget))
             }
             convertTask.configure {
-                resources = project.getResourceSources(jsTarget)
-                generatedMarkdownDir = processTask.map { it.getGenResDir().get() }
-                pagesPackage = kobwebBlock.pagesPackage
+                resources.set(project.getResourceSources(jsTarget))
+                generatedMarkdownDir.set(processTask.map { it.getGenResDir().get() })
+                pagesPackage.set(kobwebBlock.pagesPackage)
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
