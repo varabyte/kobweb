@@ -123,7 +123,7 @@ class KotlinRenderer(
                 appendLine()
 
                 append("@Page")
-                getRouteOverride(filePath, frontMatterData)?.let { append("(\"$it\")") }
+                getPageRouteOverride(filePath, frontMatterData)?.let { append("(\"$it\")") }
                 appendLine()
 
                 appendLine("@Composable")
@@ -145,8 +145,8 @@ class KotlinRenderer(
         }
     }
 
-    private fun getRouteOverride(filePath: String, frontMatterData: FrontMatterData?): String? {
-        return RouteUtils.getRouteOverride(File(filePath), frontMatterData?.routeOverride, filenameToSlug)
+    private fun getPageRouteOverride(filePath: String, frontMatterData: FrontMatterData?): String? {
+        return RouteUtils.getPageRouteOverride(File(filePath), frontMatterData?.routeOverride, filenameToSlug)
     }
 
     private fun RenderVisitor.visitAndFinish(node: Node) {
@@ -371,7 +371,7 @@ class KotlinRenderer(
                         destinationNode.accept(this)
                         this.data
                     }
-                    val route = Route(getRouteOverride(destinationPath, frontMatterData) ?: "")
+                    val route = Route(getPageRouteOverride(destinationPath, frontMatterData) ?: "")
                     if (route.isDynamic) {
                         error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
                     }
