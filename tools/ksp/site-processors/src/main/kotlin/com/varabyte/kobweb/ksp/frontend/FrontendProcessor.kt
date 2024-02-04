@@ -18,6 +18,8 @@ import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
+import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_BASE_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_BASE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
@@ -29,6 +31,7 @@ import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
+import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
@@ -244,15 +247,12 @@ class FrontendProcessor(
         val styleClassDeclarations = frontendVisitor.cssStyleClasses.groupBy { it.simpleName.asString() }
 
         cssStyles += frontendVisitor.propertyDeclarations.mapNotNull { property ->
-            val potentialClasses = styleClassDeclarations[property.type.toString()] ?: return@mapNotNull null
-            val matchingClass = potentialClasses
-                .firstOrNull { it.qualifiedName?.asString() == property.type.resolve().declaration.qualifiedName?.asString() }
-                ?: return@mapNotNull null
-
-            property to matchingClass
-        }.map { (property, matchingClass) ->
-            val fullName = matchingClass.simpleName.asString() + property.simpleName.asString()
-            CssStyleEntry(property.qualifiedName!!.asString(), fullName.titleCamelCaseToKebabCase())
+            val potentialClasses = styleClassDeclarations[property.type.toString()].orEmpty()
+            if (potentialClasses.none { it.qualifiedName?.asString() == property.type.resolveQualifiedName() }) {
+                return@mapNotNull null
+            }
+            fileDependencies.add(property.containingFile!!)
+            processCssStyle(property)
         }
 
         // pages are processed here as they rely on packageMappings, which may be populated over several rounds
@@ -296,6 +296,40 @@ class FrontendProcessor(
      * files that contained relevant declarations.
      */
     data class Result(val data: FrontendData, val fileDependencies: List<KSFile>)
+}
+
+fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
+    fun KSAnnotated.getAnnotationValue(fqn: String): String? {
+        return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
+    }
+
+    val propertyCssName = property.getAnnotationValue(CSS_NAME_FQN)
+        ?: property.simpleName.asString().titleCamelCaseToKebabCase()
+
+    fun getCssStyleEntry(prefix: String?, containedName: String? = null): CssStyleEntry {
+        val finalName = buildString {
+            prefix?.let { append("$it-") }
+            containedName?.let { append("${it}_") }
+            append(propertyCssName)
+        }
+        return CssStyleEntry(property.qualifiedName!!.asString(), finalName)
+    }
+
+    val propertyPrefix = property.getAnnotationValue(CSS_PREFIX_FQN)
+
+    val parent = property.parentDeclaration as? KSClassDeclaration
+        ?: return getCssStyleEntry(propertyPrefix)
+
+    val parentNameOverride = parent.getAnnotationValue(CSS_NAME_FQN)
+
+    val containerName = if (parentNameOverride != null) {
+        parentNameOverride
+    } else {
+        val relevantParent = if (parent.isCompanionObject) parent.parentDeclaration!! else parent
+        relevantParent.simpleName.asString().titleCamelCaseToKebabCase()
+    }
+
+    return getCssStyleEntry(propertyPrefix ?: parent.getAnnotationValue(CSS_PREFIX_FQN), containerName)
 }
 
 /**
