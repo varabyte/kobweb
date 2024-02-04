@@ -93,13 +93,14 @@ abstract class ProcessMarkdownTask @Inject constructor(
                     .parse(file.readText())
                     .accept(visitor)
                 add(
+                    @Suppress("DEPRECATION") // routeOverride supported for legacy codebases
                     MarkdownEntry(
                         filePath = relativePath.invariantSeparatorsPathString,
                         frontMatter = visitor.frontMatter,
                         route = RouteUtils.getRoute(
                             relativePath.toFile(),
                             visitor.frontMatter,
-                            markdownBlock.filenameToSlug.orNull
+                            markdownBlock.filenameToSlug.orNull ?: markdownBlock.routeOverride.orNull,
                         )
                     )
                 )
