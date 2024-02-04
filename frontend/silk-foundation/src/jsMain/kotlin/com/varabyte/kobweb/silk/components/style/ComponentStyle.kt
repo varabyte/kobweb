@@ -465,11 +465,11 @@ fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
  * This is useful if you need to convert a style into something directly consumable by a Compose HTML widget.
  */
 @Composable
-fun <T : Element, A : AttrsScope<T>> ComponentStyle.toAttrs(
-    variant: ComponentVariant? = null,
+fun <A : AttrsScope<*>> ComponentStyle.toAttrs(
+    vararg variant: ComponentVariant?,
     finalHandler: (A.() -> Unit)? = null
 ): A.() -> Unit {
-    return this.toModifier(variant).toAttrs(finalHandler)
+    return this.toModifier(*variant).toAttrs(finalHandler)
 }
 
 /**
@@ -488,6 +488,6 @@ fun Iterable<ComponentStyle>.toModifier(): Modifier {
  * A convenience method for chaining a collection of styles into a single [AttrsScope] builder.
  */
 @Composable
-fun <T : Element, A : AttrsScope<T>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <A : AttrsScope<*>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
 }
