@@ -45,7 +45,10 @@ kobwebPublication {
     description.set(DESCRIPTION)
 }
 
-val serverJar by configurations.registering { isTransitive = false }
+val serverJar by configurations.registering {
+    isCanBeConsumed = false
+    isTransitive = false
+}
 dependencies {
     @Suppress("UnstableApiUsage")
     serverJar(project(projects.backend.server.dependencyProject.path, configuration = "shadow"))
