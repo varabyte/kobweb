@@ -88,6 +88,7 @@ class KobwebApplicationPlugin @Inject constructor(
         // A Kobweb Server Plugin is one which is loaded by the Kobweb server when it starts up. It's a way for users to
         // configure their ktor server in ways that Kobweb does not currently expose.
         project.configurations.register(KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME) {
+            isCanBeConsumed = false
             isTransitive = false
         }
 
