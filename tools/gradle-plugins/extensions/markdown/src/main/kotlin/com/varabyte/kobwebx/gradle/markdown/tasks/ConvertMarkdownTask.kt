@@ -2,7 +2,6 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.toPackageName
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.gradle.core.util.getBuildScripts
@@ -13,6 +12,8 @@ import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
 import org.commonmark.node.Node
 import org.commonmark.parser.Parser
+import org.gradle.api.file.Directory
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.model.ObjectFactory
@@ -33,10 +34,8 @@ import javax.inject.Inject
 import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
 
-abstract class ConvertMarkdownTask @Inject constructor(
-    private val kobwebBlock: KobwebBlock,
-    private val markdownBlock: MarkdownBlock,
-) : KobwebTask("Convert markdown files found in the project's resources path to source code in the final project") {
+abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock: MarkdownBlock) :
+    KobwebTask("Convert markdown files found in the project's resources path to source code in the final project") {
 
     // Use changing the build script as a proxy for changing markdownBlock or kobwebBlock values.
     @InputFiles
@@ -48,6 +47,9 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
     @get:Inject
     abstract val objectFactory: ObjectFactory
+
+    @get:Input
+    abstract val pagesPackage: Property<String>
 
     @get:Internal
     abstract val resources: Property<SourceDirectorySet>
@@ -65,16 +67,21 @@ abstract class ConvertMarkdownTask @Inject constructor(
     }
 
     @get:InputDirectory
-    abstract val generatedMarkdownDir: Property<File>
+    abstract val generatedMarkdownDir: DirectoryProperty
 
     @OutputDirectory
-    fun getGenDir(): File = kobwebBlock.getGenJsSrcRoot<MarkdownBlock>(projectLayout).resolve(
-        project.prefixQualifiedPackage(kobwebBlock.pagesPackage.get()).replace(".", "/")
-    )
+    fun getGenDir(): Provider<Directory> {
+        return markdownBlock.getGenJsSrcRoot().zip(pagesPackage) { genRoot, pagesPackage ->
+            genRoot.dir(project.prefixQualifiedPackage(pagesPackage).replace(".", "/"))
+        }
+    }
 
     @TaskAction
     fun execute() {
-        val cache = NodeCache(markdownFeatures.createParser(), getMarkdownRoots().get() + generatedMarkdownDir.get())
+        val cache = NodeCache(
+            parser = markdownFeatures.createParser(),
+            roots = getMarkdownRoots().get() + generatedMarkdownDir.asFileTree
+        )
         val markdownFiles = getMarkdownResources().get() + objectFactory.fileTree().setDir(generatedMarkdownDir)
 
         val rootPath = Path(markdownBlock.markdownPath.get())
@@ -96,7 +103,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
                     val subpackage = packageParts.subList(0, i + 1)
 
-                    File(getGenDir(), "${subpackage.joinToString("/")}/PackageMapping.kt")
+                    File(getGenDir().get().asFile, "${subpackage.joinToString("/")}/PackageMapping.kt")
                         // Multiple markdown files in the same folder will try to write this over and over again; we
                         // can skip after the first time
                         .takeIf { !it.exists() }
@@ -108,9 +115,7 @@ abstract class ConvertMarkdownTask @Inject constructor(
 
                                 package ${
                                     project.prefixQualifiedPackage(
-                                        kobwebBlock.pagesPackage.get().packageConcat(
-                                            subpackage.joinToString(".")
-                                        )
+                                        pagesPackage.get().packageConcat(subpackage.joinToString("."))
                                     )
                                 }
 
@@ -122,10 +127,10 @@ abstract class ConvertMarkdownTask @Inject constructor(
             }
 
             val ktFileName = mdFile.nameWithoutExtension
-            File(getGenDir(), "${packageParts.joinToString("/")}/$ktFileName.kt").let { outputFile ->
+            File(getGenDir().get().asFile, "${packageParts.joinToString("/")}/$ktFileName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
                 val mdPackage = project.prefixQualifiedPackage(
-                    kobwebBlock.pagesPackage.get().packageConcat(packageParts.joinToString("."))
+                    pagesPackage.get().packageConcat(packageParts.joinToString("."))
                 )
 
                 // The suggested replacement for "capitalize" is awful

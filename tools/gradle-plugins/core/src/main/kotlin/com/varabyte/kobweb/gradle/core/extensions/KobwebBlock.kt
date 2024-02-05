@@ -4,11 +4,9 @@ package com.varabyte.kobweb.gradle.core.extensions
 
 import com.varabyte.kobweb.gradle.core.util.KobwebVersionUtil
 import org.gradle.api.Project
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.getByType
-import java.io.File
 
 /**
  * A gradle block used for initializing values that configure a Kobweb project.
@@ -82,21 +80,6 @@ abstract class KobwebBlock : ExtensionAware {
         apiPackage.convention(".api")
         publicPath.convention("public")
         kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-site-processors:${KobwebVersionUtil.version}")
-    }
-
-    inline fun <reified T : FileGeneratingBlock> getGenJsSrcRoot(layout: ProjectLayout): File {
-        val genDir = extensions.getByType<T>().genDir.get()
-        return layout.buildDirectory.dir("$genDir/src/jsMain/kotlin").get().asFile
-    }
-
-    inline fun <reified T : FileGeneratingBlock> getGenJsResRoot(layout: ProjectLayout): File {
-        val genDir = extensions.getByType<T>().genDir.get()
-        return layout.buildDirectory.dir("$genDir/src/resources/kotlin").get().asFile
-    }
-
-    inline fun <reified T : FileGeneratingBlock> getGenJvmSrcRoot(layout: ProjectLayout): File {
-        val genDir = extensions.getByType<T>().genDir.get()
-        return layout.buildDirectory.dir("$genDir/src/jvmMain/kotlin").get().asFile
     }
 }
 

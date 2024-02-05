@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.RegularFile
@@ -14,19 +13,16 @@ import org.gradle.api.tasks.util.PatternSet
 import javax.inject.Inject
 
 abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
-    kobwebBlock: KobwebBlock,
+    private val appBlock: AppBlock,
     @get:InputFile val indexFile: Provider<RegularFile>,
-) : KobwebCopyTask(
-    kobwebBlock,
-    "Copy and make available index.html & all public/ resources from any libraries to the final site"
-) {
+) : KobwebCopyTask("Copy and make available index.html & all public/ resources from any libraries to the final site") {
     @InputFiles
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
     @OutputDirectory
-    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("app")
+    fun getGenResDir() = appBlock.getGenJsResRoot("supplemental")
 
-    private fun getGenPublicRoot() = getGenResDir().resolve(kobwebBlock.publicPath.get())
+    private fun getGenPublicRoot() = getGenResDir().get().asFile.resolve(publicPath.get())
 
     @TaskAction
     fun execute() {

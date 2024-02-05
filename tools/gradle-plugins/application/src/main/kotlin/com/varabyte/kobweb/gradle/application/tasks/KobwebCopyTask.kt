@@ -1,8 +1,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.path.invariantSeparatorsPath
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_MODULE
 import org.gradle.api.artifacts.Configuration
@@ -10,6 +9,8 @@ import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.FileTree
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
 import javax.inject.Inject
@@ -17,7 +18,7 @@ import javax.inject.Inject
 /**
  * Common base class for all "Kobweb copy" tasks, with convenience methods for processing & copying files.
  */
-abstract class KobwebCopyTask(kobwebBlock: KobwebBlock, desc: String) : KobwebModuleTask(kobwebBlock, desc) {
+abstract class KobwebCopyTask(desc: String) : KobwebTask(desc) {
     @get:Inject
     abstract val fileSystemOperations: FileSystemOperations
 
@@ -26,6 +27,9 @@ abstract class KobwebCopyTask(kobwebBlock: KobwebBlock, desc: String) : KobwebMo
 
     @get:Inject
     abstract val archiveOperations: ArchiveOperations
+
+    @get:Input
+    abstract val publicPath: Property<String>
 
     private val kobwebModulePattern = PatternSet().apply {
         include(KOBWEB_METADATA_MODULE)

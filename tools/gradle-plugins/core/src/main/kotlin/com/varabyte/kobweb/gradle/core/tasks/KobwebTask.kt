@@ -1,8 +1,11 @@
 package com.varabyte.kobweb.gradle.core.tasks
 
+import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.project.KobwebApplication
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.Directory
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import javax.inject.Inject
 
@@ -23,6 +26,21 @@ abstract class KobwebTask @Inject constructor(desc: String) : DefaultTask() {
      */
     @get:Internal
     val kobwebApplication get() = KobwebApplication(projectLayout.projectDirectory.asFile.toPath())
+
+    protected fun KobwebBlock.FileGeneratingBlock.getGenJsSrcRoot(subDirectory: String? = null): Provider<Directory> {
+        return genDir.flatMap { genDir ->
+            projectLayout.buildDirectory.dir("$genDir${subDirectory?.let { "/$it" } ?: ""}/src/jsMain/kotlin")
+        }
+    }
+
+    protected fun KobwebBlock.FileGeneratingBlock.getGenJsResRoot(subDirectory: String? = null): Provider<Directory> {
+        return genDir.flatMap { genDir ->
+            projectLayout.buildDirectory.dir("$genDir${subDirectory?.let { "/$it" } ?: ""}/src/jsMain/resources")
+        }
+    }
+
+    protected fun KobwebBlock.FileGeneratingBlock.getGenJvmSrcRoot(): Provider<Directory> =
+        genDir.flatMap { projectLayout.buildDirectory.dir("$it/src/jvmMain/kotlin") }
 
     init {
         group = "kobweb"
