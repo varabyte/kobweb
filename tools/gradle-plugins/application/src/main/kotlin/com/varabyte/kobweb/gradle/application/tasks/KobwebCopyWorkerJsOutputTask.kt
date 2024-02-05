@@ -1,12 +1,10 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER_SUBFOLDER
 import com.varabyte.kobweb.ksp.KOBWEB_PUBLIC_WORKER_ROOT
 import org.gradle.api.GradleException
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternSet
@@ -18,9 +16,6 @@ import javax.inject.Inject
 abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appBlock: AppBlock) : KobwebCopyTask(
     "Copy any JS output files from any Kobweb worker dependencies and copy them to the final site's resources"
 ) {
-    @InputFiles
-    fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
-
     @OutputDirectory
     fun getGenResDir() = appBlock.getGenJsResRoot("worker")
 
@@ -28,7 +23,6 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appB
 
     @TaskAction
     fun execute() {
-        val classpath = getRuntimeClasspath().get()
         val workerOutpusFilesPattern = PatternSet().apply {
             include("$KOBWEB_METADATA_WORKER_SUBFOLDER/**")
         }
@@ -38,7 +32,7 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appB
         // will have to be the same across different projects. But it could happen if a user duplicates a
         // worker project and forgets to update either the group name or worker name.
         val copiedFiles = mutableMapOf<String, String>()
-        val workerOutputData = classpath.toKobwebOutputByPattern(workerOutpusFilesPattern)
+        val workerOutputData = runtimeClasspath.toKobwebOutputByPattern(workerOutpusFilesPattern)
 
         fileSystemOperations.sync {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE

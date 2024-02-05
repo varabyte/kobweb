@@ -6,13 +6,13 @@ import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -29,8 +29,8 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @get:InputFile
     abstract val kspGenFile: RegularFileProperty
 
-    @InputFiles
-    fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
+    @get:InputFiles
+    abstract val compileClasspath: ConfigurableFileCollection
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
     fun getGenMainFile() = kobwebBlock.app.getGenJsSrcRoot()
@@ -41,7 +41,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
         val mainFile = getGenMainFile().get().asFile.resolve("main.kt")
 
         val libData = buildList {
-            getCompileClasspath().get().files.forEach { file ->
+            compileClasspath.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
                     add(Json.decodeFromString<FrontendData>(bytes.decodeToString()))
                 }

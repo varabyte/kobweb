@@ -263,6 +263,11 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebGenSiteEntryTask.configure {
                 kspGenFile.set(project.kspFrontendFile(jsTarget))
+                compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
+            }
+
+            kobwebGenSiteIndexTask.configure {
+                compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
             }
 
             val jsRunTasks = listOf(
@@ -288,6 +293,7 @@ class KobwebApplicationPlugin @Inject constructor(
             // configure both kobwebCopySupplementalResourcesTask & kobwebCopyWorkerJsOutputTask
             project.tasks.withType<KobwebCopyTask>().configureEach {
                 publicPath.set(kobwebBlock.publicPath)
+                runtimeClasspath.from(project.configurations.named(jsTarget.runtimeClasspath))
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
@@ -316,6 +322,7 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebExportTask.configure {
                 appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
+                compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
                 // before outputting them into a final prod folder.
                 check(env == ServerEnvironment.DEV)
@@ -345,6 +352,7 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebGenApisFactoryTask.configure {
                 kspGenFile.set(project.kspBackendFile(jvmTarget))
+                compileClasspath.from(project.configurations.named(jvmTarget.compileClasspath))
             }
 
             // Register generated sources directly to compileKotlin task so that KSP doesn't process them
