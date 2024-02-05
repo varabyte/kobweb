@@ -16,26 +16,6 @@ abstract class KobwebModuleTask(@get:Internal val kobwebBlock: KobwebBlock, desc
         .filter { rootAndFile -> rootAndFile.relativeFile.invariantSeparatorsPath.startsWith("${getPublicPath()}/") }
 
     /**
-     * The root package of all pages.
-     *
-     * Any composable function not under this root will be ignored, even if annotated by @Page.
-     *
-     * An initial '.' means this should be prefixed by the project group, e.g. ".pages" -> "com.example.pages"
-     */
-    @Input
-    fun getPagesPackage(): String = kobwebBlock.pagesPackage.get()
-
-    /**
-     * The root package of all API handlers.
-     *
-     * Any handler not under this root will be ignored, even if annotated by @Api.
-     *
-     * An initial '.' means this should be prefixed by the project group, e.g. ".api" -> "com.example.api"
-     */
-    @Input
-    fun getApiPackage(): String = kobwebBlock.apiPackage.get()
-
-    /**
      * The path of public resources inside the project's resources folder, e.g. "public" ->
      * "src/jsMain/resources/public"
      */
