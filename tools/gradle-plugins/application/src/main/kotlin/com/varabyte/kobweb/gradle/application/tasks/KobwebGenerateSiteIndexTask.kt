@@ -22,6 +22,8 @@ import kotlinx.html.link
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
@@ -68,7 +70,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
 
     @OutputFile
-    fun getGenIndexFile() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("index.html")
+    fun getGenIndexFile(): Provider<RegularFile> = kobwebBlock.app.getGenJsResRoot().map { it.file("index.html") }
 
     @TaskAction
     fun execute() {
@@ -175,7 +177,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         }
 
         val routePrefix = RoutePrefix(confInputs.routePrefix)
-        getGenIndexFile().writeText(
+        getGenIndexFile().get().asFile.writeText(
             createIndexFile(
                 confInputs.title,
                 headInitializers,

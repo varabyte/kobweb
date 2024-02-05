@@ -9,6 +9,7 @@ import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyWorkerJsOutputTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportConfInputs
@@ -136,11 +137,11 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(
             "kobwebCopySupplementalResources",
-            kobwebBlock,
+            kobwebBlock.app,
             kobwebGenSiteIndexTask.map { RegularFile { it.outputs.files.singleFile } }
         )
         val kobwebCopyWorkerJsOutputTask =
-            project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock)
+            project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock.app)
 
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
@@ -282,6 +283,11 @@ class KobwebApplicationPlugin @Inject constructor(
             // Register generated sources directly to compileKotlin task so that KSP doesn't process them
             project.tasks.named<Kotlin2JsCompile>(jsTarget.compileKotlin) {
                 source(kobwebGenSiteEntryTask)
+            }
+
+            // configure both kobwebCopySupplementalResourcesTask & kobwebCopyWorkerJsOutputTask
+            project.tasks.withType<KobwebCopyTask>().configureEach {
+                publicPath.set(kobwebBlock.publicPath)
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {

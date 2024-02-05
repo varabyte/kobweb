@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock
+import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jvmTarget
@@ -34,7 +34,7 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
     } ?: DefaultProvider { project.objects.fileCollection() }
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
-    fun getGenApisFactoryFile() = kobwebBlock.getGenJvmSrcRoot<AppBlock>(projectLayout)
+    fun getGenApisFactoryFile() = kobwebBlock.app.getGenJvmSrcRoot()
 
     @TaskAction
     fun execute() {
@@ -49,7 +49,7 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: Ko
             }
         }.merge(throwError = { throw GradleException(it) })
 
-        val apisFactoryFile = getGenApisFactoryFile().resolve("ApisFactoryImpl.kt")
+        val apisFactoryFile = getGenApisFactoryFile().get().asFile.resolve("ApisFactoryImpl.kt")
         apisFactoryFile.writeText(createApisFactoryImpl(backendData))
     }
 }

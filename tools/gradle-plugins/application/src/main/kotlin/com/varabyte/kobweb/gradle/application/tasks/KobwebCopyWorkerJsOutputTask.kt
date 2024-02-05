@@ -1,7 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_WORKER_SUBFOLDER
 import com.varabyte.kobweb.ksp.KOBWEB_PUBLIC_WORKER_ROOT
@@ -16,17 +15,16 @@ import javax.inject.Inject
 /**
  * Copy JS output which is automatically packaged into metadata by the Kobweb worker plugin.
  */
-abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(kobwebBlock: KobwebBlock) : KobwebCopyTask(
-    kobwebBlock,
+abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appBlock: AppBlock) : KobwebCopyTask(
     "Copy any JS output files from any Kobweb worker dependencies and copy them to the final site's resources"
 ) {
     @InputFiles
     fun getRuntimeClasspath() = project.configurations.named(project.jsTarget.runtimeClasspath)
 
     @OutputDirectory
-    fun getGenResDir() = kobwebBlock.getGenJsResRoot<AppBlock>(projectLayout).resolve("worker")
+    fun getGenResDir() = appBlock.getGenJsResRoot("worker")
 
-    private fun getGenPublicRoot() = getGenResDir().resolve(kobwebBlock.publicPath.get())
+    private fun getGenPublicRoot() = getGenResDir().get().asFile.resolve(publicPath.get())
 
     @TaskAction
     fun execute() {
