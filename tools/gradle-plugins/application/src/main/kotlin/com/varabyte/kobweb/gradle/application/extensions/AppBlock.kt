@@ -310,6 +310,16 @@ abstract class AppBlock @Inject constructor(
         internal abstract val traceConfig: Property<TraceConfig>
 
         /**
+         * Force the static export task to always copy files when supporting legacy route redirecting.
+         *
+         * Normally, the export task tries to use symbolic links if it can, as it is a more elegant, efficient solution.
+         *
+         * However, there may be static hosting providers that don't support symbolic links, so this option is provided
+         * to force copying instead.
+         */
+        abstract val forceCopyingForRedirects: Property<Boolean>
+
+        /**
          * Enable traces for your export.
          *
          * Traces are a feature provided by Playwright (the engine we use to download a browser and take export
@@ -343,6 +353,7 @@ abstract class AppBlock @Inject constructor(
             browser.convention(legacyExportBlock.browser)
             legacyExportBlock.includeSourceMap.convention(true)
             includeSourceMap.convention(legacyExportBlock.includeSourceMap)
+            forceCopyingForRedirects.convention(false)
         }
     }
 
@@ -361,6 +372,42 @@ abstract class AppBlock @Inject constructor(
      * Defaults to `true`.
      */
     abstract val cleanUrls: Property<Boolean>
+
+    /**
+     * The strategy for whether to allow flexibility around supporting legacy route formats.
+     *
+     * When Kobweb was first released, it used very simple strategies for generating routes from your Kotlin project:
+     * - filenames would be lowercased
+     * - packages were converted into routes as is
+     *
+     * This is fine for most sites, where filenames and packages are usually single words. But this was problematic for
+     * multi-word scenarios.
+     *
+     * For example, if you have a page called "StateOfArt.kt", this creates "stateofart"... where users would likely
+     * prefer "state-of-art" instead, both for clarity and to avoid its flatulence-adjacent misreading.
+     *
+     * Hyphens are pretty common in clean URLs, so Kobweb has changed to support them as the default behavior. However,
+     * this leaves users of old sites in a bit of a pickle. If they have built up links and SEO around the old link
+     * formats, forcing them to change overnight could be a bit of a problem.
+     *
+     * Therefore, for older sites, allowing the old formats to continue to work is probably a safe idea, during which
+     * time you may want to audit your links. Newer sites are encouraged to disallow these legacy redirects, since they
+     * don't have to worry about potentially stale links in this case.
+     *
+     * If this property isn't set explicitly, it will default to [WARN] in development and [ALLOW] in production.
+     */
+    // NOTE: This enum should be kept in sync with Router.LegacyRouteRedirectStrategy. If you screw up, don't worry --
+    // you'll get a compile error when you try to run the site!
+    enum class LegacyRouteRedirectStrategy {
+        ALLOW,
+        WARN,
+        DISALLOW,
+    }
+
+    /**
+     * @see LegacyRouteRedirectStrategy
+     */
+    abstract val legacyRouteRedirectStrategy: Property<LegacyRouteRedirectStrategy>
 
     init {
         globals.set(mapOf("title" to conf.site.title))

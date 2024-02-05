@@ -9,7 +9,6 @@ import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
-import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeTicks
@@ -48,7 +47,6 @@ import org.commonmark.node.ThematicBreak
 import org.commonmark.renderer.Renderer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import java.io.File
 import java.util.*
 import kotlin.io.path.Path
 
@@ -72,8 +70,6 @@ fun String.yamlStringToKotlinString(): String {
  * @property filePath The path to the markdown file being processed (relative from its `markdown` folder root).
  * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
  * @property pkg The package that the generated file should be placed in.
- * @property filenameToSlug A function that can be used to override the name of a given markdown file. If not
- *   specified, the default format is to simply lowercase the name of the file.
  * @property funName The name of the page function that will be generated.
  * @property reporter A reporter that can be used to log warnings and errors.
  */
@@ -84,7 +80,6 @@ class KotlinRenderer(
     private val filePath: String,
     private val handlers: MarkdownHandlers,
     private val pkg: String,
-    private val filenameToSlug: ((String) -> String)?,
     private val funName: String,
     private val reporter: Reporter,
 ) : Renderer {
@@ -123,7 +118,7 @@ class KotlinRenderer(
                 appendLine()
 
                 append("@Page")
-                getPageRouteOverride(filePath, frontMatterData)?.let { append("(\"$it\")") }
+                frontMatterData?.routeOverride?.let { append("(\"$it\")") }
                 appendLine()
 
                 appendLine("@Composable")
@@ -143,10 +138,6 @@ class KotlinRenderer(
         return buildString {
             render(node, this)
         }
-    }
-
-    private fun getPageRouteOverride(filePath: String, frontMatterData: FrontMatterData?): String? {
-        return RouteUtils.getPageRouteOverride(File(filePath), frontMatterData?.routeOverride, filenameToSlug)
     }
 
     private fun RenderVisitor.visitAndFinish(node: Node) {
@@ -371,7 +362,7 @@ class KotlinRenderer(
                         destinationNode.accept(this)
                         this.data
                     }
-                    val route = Route(getPageRouteOverride(destinationPath, frontMatterData) ?: "")
+                    val route = Route(frontMatterData?.routeOverride ?: "")
                     if (route.isDynamic) {
                         error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
                     }

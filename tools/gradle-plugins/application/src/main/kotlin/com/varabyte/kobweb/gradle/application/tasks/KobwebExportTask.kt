@@ -10,6 +10,7 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
+import com.varabyte.kobweb.gradle.application.util.kebabCaseToCamelCase
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.project.conf.KobwebConf
@@ -19,6 +20,7 @@ import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Nested
@@ -27,7 +29,12 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
 import java.io.File
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
 import javax.inject.Inject
+import kotlin.io.path.exists
+import kotlin.io.path.name
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 import kotlin.time.DurationUnit
@@ -54,6 +61,11 @@ abstract class KobwebExportTask @Inject constructor(
 ) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
     @get:InputFile
     abstract val appDataFile: RegularFileProperty
+
+    @get:Input
+    @get:Optional
+    val legacyRouteRedirectStrategy: Provider<AppBlock.LegacyRouteRedirectStrategy> =
+        kobwebBlock.app.legacyRouteRedirectStrategy
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -270,6 +282,74 @@ abstract class KobwebExportTask @Inject constructor(
                                 SiteLayout.STATIC -> logger.error("e: $noPagesExportedMessage")
                             }
                         }
+
+                    // If we're exporting a static site and we want to support legacy site routes, then we need to walk
+                    // through the pages we just exported and create copies of them at their legacy locations. We'll do
+                    // two passes -- a first pass where we try to create symbolic links, which works on *nix systems
+                    // and Windows *if* the user has the right permissions. If that fails, we'll do a second pass where
+                    // we copy the files over manually.
+                    val legacyRouteRedirectStrategy =
+                        legacyRouteRedirectStrategy.getOrElse(AppBlock.LegacyRouteRedirectStrategy.WARN)
+                    if (siteLayout == SiteLayout.STATIC && legacyRouteRedirectStrategy != AppBlock.LegacyRouteRedirectStrategy.DISALLOW) {
+                        val pagesRootPath = pagesRoot.toPath()
+                        var duplicationOccurred = false
+                        var symbolicLinksUsed = false
+                        fun reportPathDuplicatedForLegacySupport(modernPath: Path, legacyPath: Path) {
+                            duplicationOccurred = true
+                            logger.lifecycle("\nDuplicating \"/${pagesRootPath.relativize(modernPath)}\" as \"${legacyPath.name}\".")
+                        }
+
+                        try {
+                            if (kobwebBlock.app.export.forceCopyingForRedirects.get()) throw IOException("Forcefully abort symbolic link step")
+
+                            pagesRoot.walkTopDown().forEach { file ->
+                                if (file.isDirectory) {
+                                    // In legacy Kobweb, a package called "multiWord" became the folder "multiWord".
+                                    // Now it would become "multi-word".
+                                    if (file.name.contains('-')) {
+                                        val modernPath = file.toPath()
+                                        val legacyPath =
+                                            modernPath.parent.resolve(modernPath.name.kebabCaseToCamelCase())
+                                        if (!legacyPath.exists()) Files.createSymbolicLink(legacyPath, modernPath)
+                                    }
+                                } else {
+                                    // In legacy Kobweb, a source file called "MultiWord.kt" became the file
+                                    // "multiworld.html". Now it would become "multi-word.html".
+                                    if (file.extension == "html" && file.name.contains('-')) {
+                                        val modernPath = file.toPath()
+                                        val legacyPath = modernPath.parent.resolve(modernPath.name.replace("-", ""))
+                                        if (!legacyPath.exists()) {
+                                            Files.createSymbolicLink(legacyPath, modernPath)
+                                            reportPathDuplicatedForLegacySupport(modernPath, legacyPath)
+                                        }
+                                    }
+                                }
+                            }
+
+                            symbolicLinksUsed = true
+                        } catch (_: IOException) {
+                            // If here, symbolic links aren't supported on this system. We'll fall back to manual
+                            // copying. In this case, we will only copy the html files and leave the paths alone.
+                            pagesRoot.walkTopDown().forEach { file ->
+                                if (file.isFile && file.extension == "html" && file.nameWithoutExtension.contains('-')) {
+                                    val modernPath = file.toPath()
+                                    val legacyPath = modernPath.parent.resolve(modernPath.name.replace("-", ""))
+                                    if (!legacyPath.exists()) {
+                                        Files.copy(modernPath, legacyPath)
+                                        reportPathDuplicatedForLegacySupport(modernPath, legacyPath)
+                                    }
+                                }
+                            }
+                        }
+
+                        if (duplicationOccurred && legacyRouteRedirectStrategy == AppBlock.LegacyRouteRedirectStrategy.WARN) {
+                            logger.lifecycle("") // Blank line before warning
+                            logger.warn("w: At least one page was intentionally duplicated because your site is configured to support legacy routes. You can read more about this at https://github.com/varabyte/kobweb#legacy-routes. You can disable this behavior by setting `kobweb.app.legacyRouteRedirectStrategy` to `DISALLOW` in your site's build script. Alternately, if you set it to `ALLOW`, this message will not be shown.")
+                            if (symbolicLinksUsed) {
+                                logger.lifecycle("\n⚠\uFE0F Symbolic links were used to perform the duplication(s). If this causes issues with your static hosting provider, you can set the `kobweb.export.forceCopyingForRedirects` property to true and try again.")
+                            }
+                        }
+                    }
                 }
             }
         }

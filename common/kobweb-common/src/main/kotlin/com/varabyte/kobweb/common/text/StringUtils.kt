@@ -39,3 +39,13 @@ fun String.splitCamelCase(): List<String> {
 
     return words
 }
+
+/**
+ * Convert a String for a name that is using TitleCamelCase into kebab-case.
+ *
+ * For example, "ExampleText" to "example-text"
+ *
+ * Note that there's special handling for acronyms, so "ExampleABC" will be converted to "example-abc", and "ABCExample"
+ * will be converted to "abc-example" (not "example-a-b-c" and "a-b-c-example").
+ */
+fun String.camelCaseToKebabCase(): String = splitCamelCase().joinToString("-") { it.lowercase() }

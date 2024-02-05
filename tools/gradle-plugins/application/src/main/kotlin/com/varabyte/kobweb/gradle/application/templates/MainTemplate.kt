@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.withIndent
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.project.frontend.AppData
 
 private const val KOBWEB_GROUP = "com.varabyte.kobweb"
@@ -23,7 +24,8 @@ fun createMainFunction(
     appGlobals: Map<String, String>,
     cleanUrls: Boolean,
     routePrefix: RoutePrefix,
-    target: BuildTarget
+    target: BuildTarget,
+    legacyRouteRedirectStrategy: AppBlock.LegacyRouteRedirectStrategy,
 ): String {
     val usingSilkFoundation = silkSupport != SilkSupport.NONE
     val usingSilkWidgets = silkSupport == SilkSupport.FULL
@@ -173,6 +175,7 @@ fun createMainFunction(
                     }
                 }
                 addStatement("}")
+                addStatement("router.setLegacyRouteRedirectStrategy(Router.LegacyRouteRedirectStrategy.${legacyRouteRedirectStrategy.name})")
                 if (cleanUrls) {
                     addStatement("router.addRouteInterceptor {")
                     withIndent {

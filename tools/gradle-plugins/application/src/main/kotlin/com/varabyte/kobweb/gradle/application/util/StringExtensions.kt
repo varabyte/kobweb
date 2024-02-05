@@ -6,3 +6,6 @@ internal fun String.kebabCaseToTitleCamelCase(): String {
     // The suggested replacement for "capitalize" is awful
     @Suppress("DEPRECATION") return this.split("-").joinToString("") { it.capitalize() }
 }
+
+// e.g. "example-text" to "exampleText"
+internal fun String.kebabCaseToCamelCase() = kebabCaseToTitleCamelCase().replaceFirstChar { it.lowercase() }

@@ -5,6 +5,8 @@ import com.varabyte.kobweb.browser.util.CancellableActionHandle
 import com.varabyte.kobweb.browser.util.setInterval
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
+import com.varabyte.kobweb.navigation.Router.LegacyRouteRedirectStrategy.DISALLOW
+import com.varabyte.kobweb.navigation.Router.LegacyRouteRedirectStrategy.WARN
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.url.URL
@@ -76,6 +78,37 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
  * The class responsible for navigating to different pages in a user's app.
  */
 class Router {
+    /**
+     * Strategy for allowing flexibility when trying to resolve legacy, non-hyphenated routes.
+     *
+     * When enabled, multi-word pages will be visitable both by typing in their hyphenated slug and their non-hyphenated
+     * slug as well.
+     *
+     * Newer sites that aren't concerned with legacy may want to set this to [DISALLOW]. However, this defaults to
+     * [WARN] for now to avoid breaking old sites.
+     *
+     * Note that this strategy will also affect the key name for dynamic routes associated with multi-word pages.
+     * If allowed, then a dynamic route associated with a page like "UserPost.kt" can access the dynamic value either
+     * using "userpost" or "user-post". If disallowed, then only "user-post" will work.
+     */
+    enum class LegacyRouteRedirectStrategy {
+        /** Allow redirecting permissively. */
+        ALLOW,
+
+        /**
+         * Redirect, but warn the user that it happened.
+         *
+         * This could be a good way to discover / clean up old links and fix them up before changing the strategy to
+         * disallow them.
+         */
+        WARN,
+
+        /**
+         * Do not allow redirects.
+         */
+        DISALLOW,
+    }
+
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
@@ -208,6 +241,10 @@ class Router {
         routeTree.errorHandler = errorHandler
     }
 
+    fun setLegacyRouteRedirectStrategy(strategy: LegacyRouteRedirectStrategy) {
+        routeTree.legacyRouteRedirectStrategy = strategy
+    }
+
     /**
      * If set, get a chance to modify the page's route before Kobweb navigates to it.
      *
@@ -280,7 +317,8 @@ class Router {
         var pathQueryAndFragment = pathQueryAndFragment
         if (Route.isRoute(pathQueryAndFragment)) {
             pathQueryAndFragment = pathQueryAndFragment.normalize()
-            // Here, we check a common edge case where the site has registered "slug" and the user typed "slug/"
+
+            // Next, we check a common edge case where the site has registered "slug" and the user typed "slug/"
             // OR vice versa ("slug/" and user typed "slug"). Let's help the user find the right place.
 
             // Note: We don't touch the path if it has queries or fragments. Because in that case, if the original route
@@ -291,10 +329,14 @@ class Router {
                 if (!routeTree.isRegistered(route)) {
                     if (route.endsWith('/')) {
                         val withoutSlash = route.removeSuffix("/")
-                        if (routeTree.isRegistered(withoutSlash)) pathQueryAndFragment = withoutSlash
+                        if (routeTree.isRegistered(withoutSlash)) {
+                            pathQueryAndFragment = withoutSlash
+                        }
                     } else {
                         val withSlash = "$route/"
-                        if (routeTree.isRegistered(withSlash)) pathQueryAndFragment = withSlash
+                        if (routeTree.isRegistered(withSlash)) {
+                            pathQueryAndFragment = withSlash
+                        }
                     }
                 }
             }

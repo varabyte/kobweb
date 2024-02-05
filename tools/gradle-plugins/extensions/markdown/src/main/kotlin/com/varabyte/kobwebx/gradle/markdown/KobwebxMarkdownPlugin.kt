@@ -55,7 +55,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             @Suppress("DEPRECATION")
             if (markdownBlock.routeOverride.isPresent) {
                 project.logger.warn(
-                    "The 'routeOverride' property has been deprecated. It has been renamed to 'filenameToSlug' for clarity."
+                    "w: The markdown `routeOverride` property is slated for removal. It was introduced to support kebab-case URLs, but Kobweb has moved to defaulting to them instead."
                 )
             }
         }

@@ -95,37 +95,6 @@ abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock
             val dirParts = parts.subList(0, parts.lastIndex)
             val packageParts = dirParts.map { it.toPackageName() }
 
-            for (i in dirParts.indices) {
-                if (dirParts[i] != packageParts[i]) {
-                    // If not a match, that means the path that the markdown file is coming from is not compatible with
-                    // Java package names, e.g. "2021" was converted to "_2021". This is fine -- we just need to tell
-                    // Kobweb about the mapping.
-
-                    val subpackage = packageParts.subList(0, i + 1)
-
-                    File(getGenDir().get().asFile, "${subpackage.joinToString("/")}/PackageMapping.kt")
-                        // Multiple markdown files in the same folder will try to write this over and over again; we
-                        // can skip after the first time
-                        .takeIf { !it.exists() }
-                        ?.let { mappingFile ->
-                            mappingFile.parentFile.mkdirs()
-                            mappingFile.writeText(
-                                """
-                                @file:PackageMapping("${dirParts[i]}")
-
-                                package ${
-                                    project.prefixQualifiedPackage(
-                                        pagesPackage.get().packageConcat(subpackage.joinToString("."))
-                                    )
-                                }
-
-                                import com.varabyte.kobweb.core.PackageMapping
-                            """.trimIndent()
-                            )
-                        }
-                }
-            }
-
             val ktFileName = mdFile.nameWithoutExtension
             File(getGenDir().get().asFile, "${packageParts.joinToString("/")}/$ktFileName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
@@ -137,7 +106,6 @@ abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock
                 @Suppress("DEPRECATION")
                 val funName = "${ktFileName.capitalize()}Page"
 
-                @Suppress("DEPRECATION") // routeOverride supported for legacy codebases
                 val ktRenderer = KotlinRenderer(
                     project,
                     cache::getRelative,
@@ -145,7 +113,6 @@ abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock
                     mdPathRel,
                     markdownHandlers,
                     mdPackage,
-                    markdownBlock.filenameToSlug.orNull ?: markdownBlock.routeOverride.orNull,
                     funName,
                     LoggingReporter(logger),
                 )

@@ -136,7 +136,7 @@ fun Project.toUidString(): String {
  * abstract class ExampleTask(private val someBlock: SomeBlock) {
  *   @InputFiles
  *   @PathSensitive(PathSensitivity.RELATIVE)
- *   fun getBuildScripts(): List<File> = project.getBuildScripts().toList()
+ *   fun getBuildScripts(): List<File> = projectLayout.getBuildScripts().toList()
  * }
  * ```
  *

@@ -5,7 +5,7 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
-import com.varabyte.kobweb.ksp.symbol.nameWithoutExtension
+import com.varabyte.kobweb.ksp.util.toSlug
 import com.varabyte.kobweb.project.frontend.PageEntry
 
 fun processPagesFun(
@@ -33,7 +33,7 @@ fun processPagesFun(
         if (routeOverride == null || "{}" !in routeOverride.substringBeforeLast("/", missingDelimiterValue = "")) {
             val route = processRoute(
                 pkg = currPackage,
-                slugFromFile = file.nameWithoutExtension.lowercase(),
+                slugFromFile = file.toSlug(),
                 routeOverride = routeOverride,
                 qualifiedPackage = qualifiedPagesPackage,
                 packageMappings = packageMappings,

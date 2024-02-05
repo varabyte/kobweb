@@ -1,8 +1,10 @@
 package com.varabyte.kobweb.common.navigation
 
 import com.varabyte.kobweb.common.path.invariantSeparatorsPath
+import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.common.text.prefixIfNot
+import java.io.File
 
 /**
  * A class which represents a route text value, e.g. "a/b/slug", with relevant utility methods.
@@ -58,7 +60,7 @@ value class Route(private val routeStr: String) {
         }
 
         fun String.emptyIfIndex() = if (this == "index") "" else this
-        val slugFromReferencePath = referencePath.substringAfterLast('/').substringBefore('.').lowercase()
+        val slugFromReferencePath = File(referencePath).nameWithoutExtension.camelCaseToKebabCase()
         val slugFromRoute = routeStr.substringAfterLast('/')
         val slug = when {
             slugFromRoute.isNotEmpty() -> slugFromRoute.emptyIfIndex()

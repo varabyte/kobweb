@@ -3,6 +3,7 @@ package com.varabyte.kobweb.ksp.common
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
+import com.varabyte.kobweb.ksp.util.RouteUtils
 
 // pair corresponds to (current package, override)
 // in theory should only be one, but we'll return a sequence just in case
@@ -20,7 +21,9 @@ fun getPackageMappings(
             val override = packageMappingAnnotation.arguments.first().value!!.let { value ->
                 // {} is a special value which means infer from the current package,
                 // e.g. "{}" under a.b.pkg resolves to "{pkg}"
-                if (value != "{}") value.toString() else "{${currPackage.substringAfterLast('.')}}"
+                if (value != "{}") value.toString() else "{${
+                    RouteUtils.packagePartToRoutePart(currPackage.substringAfterLast('.'))
+                }}"
             }
             currPackage to override
         } else {

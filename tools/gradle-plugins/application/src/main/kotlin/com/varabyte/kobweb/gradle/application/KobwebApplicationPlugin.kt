@@ -203,7 +203,12 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebCacheAppDataTask = project.tasks.register<KobwebCacheAppDataTask>("kobwebCacheAppData")
         val kobwebExportTask = project.tasks
-            .register<KobwebExportTask>("kobwebExport", KobwebExportConfInputs(kobwebConf), exportLayout, kobwebBlock)
+            .register<KobwebExportTask>(
+                "kobwebExport",
+                KobwebExportConfInputs(kobwebConf),
+                exportLayout,
+                kobwebBlock
+            )
 
         val kobwebListRoutesTask = project.tasks.register<KobwebListRoutesTask>("kobwebListRoutes")
 
@@ -265,7 +270,10 @@ class KobwebApplicationPlugin @Inject constructor(
             project.setupKspJs(jsTarget, kspProcessorMode)
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
-                "kobwebGenSiteEntry", kobwebConf.site.routePrefix, buildTarget, kobwebBlock
+                "kobwebGenSiteEntry",
+                kobwebConf.site.routePrefix,
+                buildTarget,
+                kobwebBlock
             )
 
             kobwebCacheAppDataTask.configure {

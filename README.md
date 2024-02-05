@@ -393,7 +393,8 @@ this will create a page that I can then visit by going to `mysite.com/admin/sett
 > [!IMPORTANT]
 > The last part of a URL, here `settings`, is called a *slug*.
 
-By default, the slug comes from the file name, but this behavior can be overridden (more on that shortly).
+By default, the slug comes from the file name, which is converted into kebab-case, e.g. `AboutUs.kt` would transform into
+`about-us`. However, this can be overridden to whatever you want (more on that shortly).
 
 The file name `Index.kt` is special. If a page is defined inside such a file, it will be treated as the default page
 under that URL. For example, a page defined in `.../pages/admin/Index.kt` will be visited if the user visits
@@ -419,7 +420,7 @@ The above would create a page you could visit by going to `mysite.com/admin/conf
 meaning.
 
 * Begins with a slash - represent the whole route from the root
-* Ends with a slash - a slug will still be generated from the filename and appended to the route.
+* Ends with a slash - a slug will still be generated from the filename and appended to the route override.
 
 And if you set the override to "index", that behaves the same as setting the file to `Index.kt` as described above.
 
@@ -448,31 +449,45 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 > [Dynamic Routes▼](https://github.com/varabyte/kobweb?tab=readme-ov-file#dynamic-routes) section) or enabling a URL
 > name that uses characters which aren't allowed in Kotlin filenames.
 
-### PackageMapping
+### Package
 
-If you don't want to change your slug but you *do* want to change a part of the route, you don't have to use a `Page`
-annotation for this. You can instead register a package mapping with a `PackageMapping` file annotation. Doing so looks
-like this:
+While the slug is derived from the filename, earlier parts of the route are derived from the file's package.
+
+A package will be converted into a route part by removing any leading or trailing underscores (as these are often used
+to work around limitations into what values and keywords are allowed in a package name, e.g. `site.pages.blog._2022` and
+`site.events.fun_`) and converting camelCase packages into hyphenated words (so `site.pages.team.ourValues` generates
+the route `/team/our-values/`).
+
+#### PackageMapping
+
+If you'd like to override the route part generated for a package, you can use the `PackageMapping` annotation.
+
+For example, let's say your team prefers not to use camelCase packages for aesthetic reasons. Or perhaps you
+intentionally want to add a leading underscore into your site's route part for some emphasis (since earlier we mentioned
+that leading underscores get removed automatically), such as in the route `/team/_internal/contact-numbers`. You can
+use package mappings for this.
+
+You apply the package mapping annotation to the current file. Using it looks like this:
 
 ```kotlin
-// site/pages/blog/_2022/PackageMapping.kt
-@file:PackageMapping("2022")
+// site/pages/team/values/PackageMapping.kt
+@file:PackageMapping("our-values")
 
-package site.pages.blog._2022
+package site.pages.blog.values
 
 import com.varabyte.kobweb.core.PackageMapping
 ```
 
-As with the `Page` route overrides, the main reason you'd want to do this is that Java / Kotlin package naming
-requirements are much stricter than what you might want to allow in a URL part. `site.com/blog/2022/mypost` reads way
-better than `site.com/blog/_2022/mypost`.
+With the above package mapping in place, a file that lives at `site/pages/team/values/Mission.kt` will be visitable at
+`/team/our-values/mission`.
 
 ### Page context
 
 Every page method provides access to its `PageContext` via the `rememberPageContext()` method.
 
-A page's context provides it access to a router, allowing you to navigate to other pages, as well as other dynamic
-information about the current page's URL (discussed in the next section).
+Critically, a page's context provides it access to a router, allowing you to navigate to other pages.
+
+It also provides dynamic information about the current page's URL (discussed in the next section).
 
 ```kotlin
 @Page
@@ -507,8 +522,9 @@ enum class Mode {
 @Composable
 fun Posts() {
     val ctx = rememberPageContext()
-    // Here, I'm assuming these params are always present, but you can
-    // use `get` instead of `getValue` to handle the nullable case.
+    // Here, I'm assuming these params are always present, but you can use
+    // `get` instead of `getValue` to handle the nullable case. Care should
+    // also be taken to parse invalid values without throwing an exception.
     val postId = ctx.route.params.getValue("id").toInt()
     val mode = Mode.from(ctx.route.params.getValue("mode"))
     /* ... */
@@ -1715,7 +1731,7 @@ This allows you to give your URL a name that normal Kotlin filename rules don't 
 
 ```markdown
 ---
-routeOverride: a-star-demo
+routeOverride: a*-demo
 ---
 ```
 
@@ -1723,40 +1739,10 @@ The above will generate code like the following:
 
 ```kotlin
 @Composable
-@Page("a-star-demo")
+@Page("a*-demo")
 fun AStarDemoPage() { /* ... */
 }
 ```
-
-You can additionally override the algorithm used for converting ALL markdown files to their final name, by setting the
-markdown block's `filenameToSlug` callback:
-
-```kotlin
-kobweb {
-  markdown { //
-    // Given "Example.md", `name` will be "Example" and output will be "post_example"
-    filenameToSlug.set { name -> "post_${name.lowercase()}" }
-  }
-}
-```
-
-This callback will be triggered on all Markdown pages *except* `Index.md` files.
-
-Some common algorithms are provided which you can use instead of writing your own:
-
-```kotlin
-import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock.TextTransformers
-
-kobweb {
-  markdown {
-    filenameToSlug.set(TextTransformers.KebabCase) // e.g. "ExamplePage" to "example-page"
-  }
-}
-```
-
-If you specify a front matter `routeOverride` that points to a concrete slug, it will take precedence -- the
-`filenameToSlug` callback will be ignored. However, if your override ends with a "/", then if the `filenameToSlug`
-handler is also set, their outputs will be combined into the final route.
 
 ### Kobweb Call
 
@@ -3339,6 +3325,131 @@ $ kobweb create examples/chat
 ```
 
 which demonstrates a chat application with its auth and chat functionality each managed in their own separate modules.
+
+## Legacy Routes
+
+> [!NOTE]
+> If you...
+>
+> * created your site after Kobweb v0.15.5 *OR*
+> * only have single word page names, e.g. "About.kt" and "Login.kt", as well as packages that are all lowercased...
+>
+> then congratulations, you don't have to worry at all about the concerns presented in this section. You should ensure
+> that your build script's `kobweb.app.legacyRouteRedirectStrategy` is set to `DISALLOW`.
+
+When Kobweb was first released, it used very simple logic for generating routes from code in your Kotlin project:
+- filenames for pages would be lowercased and turned into a slug
+- packages were converted into route parts as is
+
+`pages/home/About.kt` would become `https://example.com/home/about`, in other words.
+
+This is fine for most sites! Especially since route overrides were possible through Kobweb's `@Page` and
+`@PackageMapping` annotations.
+
+However, this choice becomes a problem when you start considering parts of a URL that represent multiple words. It is a
+common practice to use hyphens for this case, e.g. `state-of-art`, but Kobweb was not generating them, resulting in
+slugs that could sometimes be hard to read, e.g. `stateofart`.
+
+Because of this, some users had to create a lot of overrides in their site. This is fragile, as it means it can be easy
+to refactor a site later without realizing that stale names remain embedded in the code.
+
+As a result, in v0.15.5, we made the choice to change the route generating algorithms to split words up with hyphens.
+
+As a concrete example, for the page `pages/silkWidgets/SimpleGrid.kt`, Kobweb *used* to
+generate `https://example.com/silkWidgets/simplegrid`, whereas now it
+generates `https://example.com/silk-widgets/simple-grid`.
+
+If we just changed the route generation logic from one version to the next, that would totally break existing sites!
+Perhaps a user has a Kobweb site that search engines have already indexed. Or maybe there are many internal links in
+their site referencing route paths that are now no longer there.
+
+So of course, we didn't. Instead, we introduced the idea of legacy route redirects.
+
+### Legacy route redirect strategy
+
+Kobweb now defaults to supporting users visiting both the old *and* new route paths. Using the "simple-grid"
+link example above, if a user ran their site with latest, *either* path would work.
+
+However, this is not an ideal state of affairs. It is much better for a site to have a single, canonical URL for each
+route in your site. This is not only better for SEO, but it also makes it easier to reason about your site's structure.
+Therefore, Kobweb allows you to disable this feature.
+
+In fact, disabling these redirects are encouraged. New sites should disable them from the start (the `kobweb create app`
+templates started doing this with the introduction of this feature). Older sites should consider auditing their codebase
+with an eye towards disabling redirects in the near future.
+
+It is easy to set the route redirect strategy in your project's build script:
+
+```kotlin
+kobweb {
+  app {
+    legacyRouteRedirectStrategy.set(LegacyRouteRedirectStrategy.DISALLOW)
+  }
+}
+```
+
+There are actually three strategies available: `ALLOW`, `WARN`, and `DISALLOW`. If nothing is set explicitly, the
+strategy will default to `WARN` in development and `ALLOW` in production.
+
+`ALLOW` and `WARN` are functionally the same, except `WARN` will log a warning to the dev console when a redirect
+happens. It will also be chattier about things that are happening during export time.
+
+### Redirects and static exports
+
+Even though a Kobweb site, once loaded locally, can handle redirects just fine, many users will be hosting their site on
+a static hosting provider that doesn't know anything about Kobweb. So what happens if a regular visitor bookmarked
+`https://example.com/someroute` which has since migrated to `https://example.com/some-route`? They would get a 404, and
+Kobweb wouldn't even get a chance to run its redirect logic.
+
+To prevent this from happening, Kobweb checks at export time if legacy route redirects are enabled, and if so, it will
+generate a copy of each route that has hyphens in it with alternate versions matching the old legacy way.
+
+So in the above static hosting site example, Kobweb will actually generate a snapshot for
+`https://example.com/some-route` and then a copy of the snapshot for `https://example.com/someroute`
+
+This works in a pinch. However, you should review how your static hosting provider prefers to be communicated about
+redirects. It is preferable to disable legacy route redirects in Kobweb and leverage your static hosting provider for
+this instead, as they will likely do it in a way that communicates the situation better to search engine crawlers.
+
+### Symbolic links
+
+By default, Kobweb creates a "copy" of an export snapshot using symbolic links instead of directly copying the file.
+This is a much more efficient solution, especially if pages are very large. However, if this fails for any reason
+(Windows famously require admin privileges for users to create them), this will fall back to a direct copy.
+
+Although I didn't notice any issue with my own testing, there may be static hosting providers out there that don't
+handle symbolic links well. In that case, you can force copying to happen instead:
+
+```kotlin
+kobweb {
+  app {
+    export {
+      forceCopyingForRedirects.set(true)
+    }
+  }
+}
+```
+
+### Disabling legacy route redirects
+
+If you have a pre-0.15.5 site, there are three steps you need to do, after which you can consider disabling legacy route
+redirects.
+
+1. In your site directory, run `./gradlew kobwebListRoutes` and look for any routes that have hyphens in them.
+2. Search through your codebase to see if there are any versions of those links but with hyphens removed. If so,
+   update them.
+3. Check your static hosting provider for ways to notify them of redirects. Often, this can be done with a configuration
+   file.
+
+> [!CAUTION]
+> Although leaving legacy route redirects on will work for a while, it should be considered deprecated and is slated for
+> eventual removal.
+
+> [!TIP]
+> This [target commit](https://github.com/bitspittle/bitspittle.dev/commit/9a2f8a77a72c9712bbee8d87a08848a915df2240)
+> demonstrates how I upgraded my blog site (which uses Firebase) to move away from Kobweb legacy route redirecting. It's
+> way better to let Firebase handle it, because it will communicate necessary information to search engine crawlers so
+> they too can update their own indexes.
 
 ## Generating site code at compile time
 

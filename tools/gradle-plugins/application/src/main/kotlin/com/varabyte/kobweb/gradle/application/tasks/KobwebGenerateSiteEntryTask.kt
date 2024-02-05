@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
@@ -13,6 +14,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
@@ -24,6 +26,11 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
 ) : KobwebGenerateTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:Input
     val cleanUrls: Provider<Boolean> = kobwebBlock.app.cleanUrls
+
+    @get:Input
+    @get:Optional
+    val legacyRouteRedirectStrategy: Provider<AppBlock.LegacyRouteRedirectStrategy> =
+        kobwebBlock.app.legacyRouteRedirectStrategy
 
     @get:Input
     val globals: Provider<Map<String, String>> = kobwebBlock.app.globals
@@ -50,7 +57,10 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                 globals.get(),
                 cleanUrls.get(),
                 RoutePrefix(routePrefix),
-                buildTarget
+                buildTarget,
+                legacyRouteRedirectStrategy.getOrElse(
+                    if (buildTarget == BuildTarget.DEBUG) AppBlock.LegacyRouteRedirectStrategy.WARN else AppBlock.LegacyRouteRedirectStrategy.ALLOW
+                )
             )
         )
     }

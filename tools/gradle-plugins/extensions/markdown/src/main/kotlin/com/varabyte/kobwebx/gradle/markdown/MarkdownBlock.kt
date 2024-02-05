@@ -9,30 +9,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
 abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGeneratingBlock {
-    object TextTransformers {
-        /**
-         * An algorithm for converting a markdown filename into a URL name that preserves the original filename.
-         *
-         * For example, a markdown filename like "ExamplePost.md" will be converted into "ExamplePost".
-         */
-        val Preserve: (String) -> String = { it }
-
-        /**
-         * An algorithm for converting a markdown filename into a kebab-case URL name.
-         *
-         * For example, a markdown filename like "ExamplePost.md" will be converted into "example-post".
-         */
-        val KebabCase: (String) -> String = { it.splitCamelCase().joinToString("-") { word -> word.lowercase() } }
-
-        /**
-         * An algorithm for converting a markdown filename into a snake-case URL name.
-         *
-         * For example, a markdown filename like "ExamplePost.md" will be converted into "example_post".
-         */
-        val SnakeCase: (String) -> String = { it.splitCamelCase().joinToString("_") { word -> word.lowercase() } }
-    }
-
-    @Deprecated("Use `TextTransformers` instead. Please change a line like `routeOverride.set(RouteOverride.KebabCase)` to `filenameToSlug.set(TextTransformers.KebabCase).")
+    @Deprecated("The markdown `routeOverride` feature is slated for removal. This was introduced to support kebab-case URLs, but Kobweb has moved to defaulting to them instead. Users should remove this code and configure the feature further using the `kobweb.app.legacyRouteRedirectStrategy` property.")
     object RouteOverride {
         /**
          * An algorithm for converting a markdown filename into a URL name that preserves the original filename.
@@ -103,28 +80,6 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      */
     @Deprecated("This property has migrated over to `filenameToSlug` for clarity.")
     abstract val routeOverride: Property<(String) -> String>
-
-    /**
-     * Logic to configure how a markdown filename should be converted into a final URL name.
-     *
-     * By default, a markdown filename like "ExamplePost.md" will be converted into lowercase, i.e. "examplepost".
-     * However, you can use this property to override this default behavior.
-     *
-     * If you set this, then for the filename "ExamplePost.md", your callback will be invoked with the string
-     * "ExamplePost". Note that the extension will already be removed, and you do not have to do that yourself.
-     *
-     * You can set this to any logic you want, but a [TextTransformers] object is provided with some common
-     * choices.
-     *
-     * For example:
-     *
-     * ```kotlin
-     * markdown {
-     *   filenameToSlug.set(TextTransformers.KebabCase)
-     * }
-     * ```
-     */
-    abstract val filenameToSlug: Property<(String) -> String>
 
     /**
      * Register a handler which will be triggered with a list of all markdown files in this project.

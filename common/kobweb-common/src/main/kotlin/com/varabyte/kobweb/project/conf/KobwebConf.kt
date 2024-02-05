@@ -17,8 +17,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * @param title The title of the site. See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title
- * @param routePrefix If specified, it means all content for this site live under a subfolder. So if this value is
+ * @property title The title of the site. See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title
+ * @property routePrefix If specified, it means all content for this site live under a subfolder. So if this value is
  *   "/a/b/c", then the root index.html file will be visited by the user going to `mysite.com/a/b/c/`. This should
  *   rarely need to be used, but it may be required by some server configurations which nest your site to a
  *   subdirectory.
