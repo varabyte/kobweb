@@ -11,7 +11,6 @@ import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
@@ -23,6 +22,7 @@ import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
@@ -58,12 +58,11 @@ abstract class KobwebExportTask @Inject constructor(
     @get:Input val siteLayout: SiteLayout,
     kobwebBlock: KobwebBlock,
 ) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
-
-    @InputFiles
-    fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
-
     @get:InputFile
     abstract val appFrontendMetadataFile: RegularFileProperty
+
+    @get:InputFiles
+    abstract val compileClasspath: ConfigurableFileCollection
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -177,7 +176,7 @@ abstract class KobwebExportTask @Inject constructor(
         val appData = Json.decodeFromString<AppData>(appFrontendMetadataFile.get().asFile.readText())
         val frontendData = buildList {
             add(appData.frontendData)
-            getCompileClasspath().get().files.forEach { file ->
+            compileClasspath.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
                     add(Json.decodeFromString<FrontendData>(bytes.decodeToString()))
                 }

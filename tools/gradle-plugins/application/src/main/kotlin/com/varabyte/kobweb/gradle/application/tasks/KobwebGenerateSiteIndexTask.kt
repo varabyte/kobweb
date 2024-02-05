@@ -9,7 +9,6 @@ import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
@@ -22,6 +21,7 @@ import kotlinx.html.link
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
@@ -66,8 +66,8 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             .map { it.file }
             .toList()
 
-    @InputFiles
-    fun getCompileClasspath() = project.configurations.named(project.jsTarget.compileClasspath)
+    @get:InputFiles
+    abstract val compileClasspath: ConfigurableFileCollection
 
     @OutputFile
     fun getGenIndexFile(): Provider<RegularFile> = kobwebBlock.app.getGenJsResRoot().map { it.file("index.html") }
@@ -109,7 +109,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // allowed to declare some as well. If they do, they will have embedded serialized html in their library
         // artifacts.
         val headInitializers = kobwebBlock.app.index.head.get().toMutableList()
-        getCompileClasspath().get().files.forEach { file ->
+        compileClasspath.forEach { file ->
             var libraryMetadata: LibraryMetadata? = null
 
             file.searchZipFor(KOBWEB_METADATA_LIBRARY) { bytes ->
