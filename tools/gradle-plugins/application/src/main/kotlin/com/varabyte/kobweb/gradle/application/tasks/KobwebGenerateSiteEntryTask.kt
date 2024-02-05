@@ -14,6 +14,7 @@ import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -26,6 +27,12 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @get:Input val buildTarget: BuildTarget,
     kobwebBlock: KobwebBlock,
 ) : KobwebGenerateTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
+    @get:Input
+    val cleanUrls: Provider<Boolean> = kobwebBlock.app.cleanUrls
+
+    @get:Input
+    val globals: Provider<Map<String, String>> = kobwebBlock.app.globals
+
     @get:InputFile
     abstract val kspGenFile: RegularFileProperty
 
@@ -57,7 +64,8 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                     project.hasTransitiveJsDependencyNamed("silk-foundation") -> SilkSupport.FOUNDATION
                     else -> SilkSupport.NONE
                 },
-                kobwebBlock.app,
+                globals.get(),
+                cleanUrls.get(),
                 RoutePrefix(routePrefix),
                 buildTarget
             )
