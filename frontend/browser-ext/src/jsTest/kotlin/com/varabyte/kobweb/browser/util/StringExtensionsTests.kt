@@ -22,7 +22,7 @@ class StringExtensionsTests {
     }
 
     @Test
-    fun kebabCaseToTitleCaseWorksAsExpected() {
+    fun kebabCaseToTitleCamelCaseWorksAsExpected() {
         val beforeAfterCases: List<Pair<String, String>> = listOf(
             "example-text" to "ExampleText",
             "example-text-part-two" to "ExampleTextPartTwo",
@@ -31,6 +31,33 @@ class StringExtensionsTests {
 
         beforeAfterCases.forEach { (before, after) ->
             assertThat(before.kebabCaseToTitleCamelCase()).isEqualTo(after)
+        }
+    }
+
+    @Test
+    fun camelCaseToKebabCaseWorksAsExpected() {
+        val beforeAfterCases: List<Pair<String, String>> = listOf(
+            "exampleText" to "example-text",
+            "exampleTextPartTwo" to "example-text-part-two",
+            "exampleABC" to "example-abc",
+            "lowercase" to "lowercase",
+        )
+
+        beforeAfterCases.forEach { (before, after) ->
+            assertThat(before.camelCaseToKebabCase()).isEqualTo(after)
+        }
+    }
+
+    @Test
+    fun kebabCaseToCamelCaseWorksAsExpected() {
+        val beforeAfterCases: List<Pair<String, String>> = listOf(
+            "example-text" to "exampleText",
+            "example-text-part-two" to "exampleTextPartTwo",
+            "lowercase" to "lowercase",
+        )
+
+        beforeAfterCases.forEach { (before, after) ->
+            assertThat(before.kebabCaseToCamelCase()).isEqualTo(after)
         }
     }
 
