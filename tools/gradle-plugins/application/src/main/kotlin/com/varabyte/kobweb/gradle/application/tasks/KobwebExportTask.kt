@@ -12,21 +12,15 @@ import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
-import com.varabyte.kobweb.gradle.core.util.searchZipFor
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_FRONTEND
 import com.varabyte.kobweb.project.conf.KobwebConf
-import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.project.frontend.FrontendData
-import com.varabyte.kobweb.project.frontend.merge
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
@@ -59,10 +53,7 @@ abstract class KobwebExportTask @Inject constructor(
     kobwebBlock: KobwebBlock,
 ) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
     @get:InputFile
-    abstract val appFrontendMetadataFile: RegularFileProperty
-
-    @get:InputFiles
-    abstract val compileClasspath: ConfigurableFileCollection
+    abstract val frontendDataFile: RegularFileProperty
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -173,16 +164,7 @@ abstract class KobwebExportTask @Inject constructor(
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 
-        val appData = Json.decodeFromString<AppData>(appFrontendMetadataFile.get().asFile.readText())
-        val frontendData = buildList {
-            add(appData.frontendData)
-            compileClasspath.forEach { file ->
-                file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
-                    add(Json.decodeFromString<FrontendData>(bytes.decodeToString()))
-                }
-            }
-        }
-            .merge(throwError = { throw GradleException(it) })
+        val frontendData = Json.decodeFromString<FrontendData>(frontendDataFile.get().asFile.readText())
             .also { data ->
                 data.pages.toList().let { entries ->
                     if (entries.isEmpty()) {

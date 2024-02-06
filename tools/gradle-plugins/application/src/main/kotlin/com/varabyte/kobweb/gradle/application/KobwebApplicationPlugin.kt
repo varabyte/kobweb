@@ -8,6 +8,7 @@ import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebCacheFrontendDataTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopySupplementalResourcesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebCopyWorkerJsOutputTask
@@ -19,6 +20,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTas
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteEntryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateTask
+import com.varabyte.kobweb.gradle.application.tasks.KobwebListRoutesTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStartTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebStopTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebUnpackServerJarTask
@@ -197,8 +199,12 @@ class KobwebApplicationPlugin @Inject constructor(
                 project.delete(kobwebFolder.resolve("server"))
             }
         }
+
+        val kobwebCacheFrontendDataTask = project.tasks.register<KobwebCacheFrontendDataTask>("kobwebCacheFrontendData")
         val kobwebExportTask = project.tasks
             .register<KobwebExportTask>("kobwebExport", KobwebExportConfInputs(kobwebConf), exportLayout, kobwebBlock)
+
+        val kobwebListRoutesTask = project.tasks.register<KobwebListRoutesTask>("kobwebListRoutes")
 
         project.tasks.register<KobwebBrowserCacheIdTask>("kobwebBrowserCacheId") {
             browser.set(kobwebBlock.app.export.browser)
@@ -320,9 +326,14 @@ class KobwebApplicationPlugin @Inject constructor(
                 }
             }
 
-            kobwebExportTask.configure {
+            kobwebCacheFrontendDataTask.configure {
                 appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
+                frontendDataFile.set(project.layout.buildDirectory.file("kobweb/cache/frontendData.json"))
+            }
+
+            kobwebExportTask.configure {
+                frontendDataFile.set(kobwebCacheFrontendDataTask.flatMap { it.frontendDataFile })
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
                 // before outputting them into a final prod folder.
                 check(env == ServerEnvironment.DEV)
@@ -331,6 +342,10 @@ class KobwebApplicationPlugin @Inject constructor(
                 dependsOn(kobwebCreateServerScriptsTask)
                 dependsOn(kobwebStartTask)
                 dependsOn(project.tasks.namedOrNull(jsTarget.browserProductionWebpack))
+            }
+
+            kobwebListRoutesTask.configure {
+                frontendDataFile.set(kobwebCacheFrontendDataTask.flatMap { it.frontendDataFile })
             }
         }
         project.buildTargets.withType<KotlinJvmTarget>().configureEach {
