@@ -39,6 +39,7 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
+import com.varabyte.kobweb.gradle.core.util.kobwebCacheFile
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
@@ -329,7 +330,7 @@ class KobwebApplicationPlugin @Inject constructor(
             kobwebCacheFrontendDataTask.configure {
                 appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
-                frontendDataFile.set(project.layout.buildDirectory.file("kobweb/cache/frontendData.json"))
+                frontendDataFile.set(this.kobwebCacheFile("frontendData.json"))
             }
 
             kobwebExportTask.configure {
