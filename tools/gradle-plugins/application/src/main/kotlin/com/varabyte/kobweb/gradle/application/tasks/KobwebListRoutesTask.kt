@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
-import com.varabyte.kobweb.project.frontend.FrontendData
+import com.varabyte.kobweb.project.frontend.AppData
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
@@ -9,11 +9,11 @@ import org.gradle.api.tasks.TaskAction
 
 abstract class KobwebListRoutesTask : KobwebTask("Enumerate all routes for your site managed by Kobweb") {
     @get:InputFile
-    abstract val frontendDataFile: RegularFileProperty
+    abstract val appDataFile: RegularFileProperty
 
     @TaskAction
     fun execute() {
-        val pageEntries = Json.decodeFromString<FrontendData>(frontendDataFile.asFile.get().readText()).pages
+        val pageEntries = Json.decodeFromString<AppData>(appDataFile.asFile.get().readText()).frontendData.pages
         if (pageEntries.isNotEmpty()) {
             println("Your site defines the following routes:")
             pageEntries.map { it.route }.sorted().forEach { route ->

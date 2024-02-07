@@ -17,9 +17,33 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 // NOTE: This task in meant as an internal API so it does not inherit from KobwebTask
-abstract class KobwebCacheFrontendDataTask : DefaultTask() {
+/**
+ * Collect all app data from the current site and all library dependencies, writing the result to [appDataFile].
+ *
+ * This is done so that multiple tasks can read the same values from a single, cached file. Those tasks should take
+ * `appDataFile` as an input and then deserialize it in their execute method:
+ *
+ * ```
+ * // Configuring the task
+ * myAppDataUsingTask.configure {
+ *   appDataFile.set(kobwebCacheAppDataTask.flatMap { it.appDataFile })
+ * }
+ *
+ * // Inside the task
+ * @get:InputFile
+ * abstract val appDataFile: RegularFileProperty
+ *
+ * @TaskAction
+ * fun execute() {
+ *   val appData = Json.decodeFromString<AppData>(appDataFile.get().asFile.readText())
+ *   // ...
+ * }
+ * ```
+ */
+abstract class KobwebCacheAppDataTask : DefaultTask() {
     init {
-        description = "Search the project and merge all frontend data, saving it into a file, at which point it can be looked up by downstream tasks that need it."
+        description =
+            "Search the project and merge all app data, saving it into a file, at which point it can be looked up by downstream tasks that need it."
     }
 
     @get:InputFile
@@ -29,12 +53,12 @@ abstract class KobwebCacheFrontendDataTask : DefaultTask() {
     abstract val compileClasspath: ConfigurableFileCollection
 
     @get:OutputFile
-    abstract val frontendDataFile: RegularFileProperty
+    abstract val appDataFile: RegularFileProperty
 
     @TaskAction
     fun execute() {
         val appData = Json.decodeFromString<AppData>(appFrontendMetadataFile.get().asFile.readText())
-        val frontendData = buildList {
+        val mergedFrontendData = buildList {
             add(appData.frontendData)
             compileClasspath.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_FRONTEND) { bytes ->
@@ -44,6 +68,6 @@ abstract class KobwebCacheFrontendDataTask : DefaultTask() {
         }
             .merge(throwError = { throw GradleException(it) })
 
-        frontendDataFile.get().asFile.writeText(Json.encodeToString(frontendData))
+        appDataFile.get().asFile.writeText(Json.encodeToString(AppData(appData.appEntry, mergedFrontendData)))
     }
 }
