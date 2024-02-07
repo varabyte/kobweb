@@ -13,7 +13,7 @@ import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.project.conf.KobwebConf
-import com.varabyte.kobweb.project.frontend.FrontendData
+import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
@@ -53,7 +53,7 @@ abstract class KobwebExportTask @Inject constructor(
     kobwebBlock: KobwebBlock,
 ) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
     @get:InputFile
-    abstract val frontendDataFile: RegularFileProperty
+    abstract val appDataFile: RegularFileProperty
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -164,7 +164,7 @@ abstract class KobwebExportTask @Inject constructor(
         // Sever should be running since "kobwebStart" is a prerequisite for this task
         val port = ServerStateFile(kobwebApplication.kobwebFolder).content!!.port
 
-        val frontendData = Json.decodeFromString<FrontendData>(frontendDataFile.get().asFile.readText())
+        val frontendData = Json.decodeFromString<AppData>(appDataFile.get().asFile.readText()).frontendData
             .also { data ->
                 data.pages.toList().let { entries ->
                     if (entries.isEmpty()) {
