@@ -2506,8 +2506,8 @@ either of these scripts (depending on the server's platform).
 Going in more detail than this is outside the scope of this README. However, you can read my blog posts for a lot more
 information and some clear, concrete examples:
 
-* [Static site generation and deployment with Kobweb](https://bitspittle.dev/blog/2022/staticdeploy)
-* [Deploying Kobweb into the cloud](https://bitspittle.dev/blog/2023/clouddeploy)
+* [Static site generation and deployment with Kobweb](https://bitspittle.dev/blog/2022/static-deploy)
+* [Deploying Kobweb into the cloud](https://bitspittle.dev/blog/2023/cloud-deploy)
 
 <!-- Create a shorter ID for convenience to access a popular section -->
 ## <span id="server">Communicating with the server</span>
@@ -3250,7 +3250,7 @@ your site is rooted at `https://example.com/products/myproduct/`, then the value
 > [!NOTE]
 > If you are planning to host your site on GitHub Pages using the default `github.io` domain, you will need to set an
 > appropriate `routePrefix` value. For a concrete example of setting `routePrefix` for GitHub Pages,
-> [check out this relevant section](https://bitspittle.dev/blog/2022/staticdeploy#github-pages) from my blog post about
+> [check out this relevant section](https://bitspittle.dev/blog/2022/static-deploy#github-pages) from my blog post about
 > exporting static layout sites.
 
 Outside of setting your `routePrefix` in the `conf.yaml` file, you can design your site without explicitly mentioning
