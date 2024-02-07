@@ -127,7 +127,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
 
             libraryMetadata?.index?.headElements?.let { headElementsStr ->
-                println("\tWE GOT $headElementsStr")
                 val document = Jsoup.parse(headElementsStr)
                 val headElements = document.head().children()
 
