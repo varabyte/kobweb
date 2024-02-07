@@ -1,4 +1,4 @@
-[![version: 0.15.5](https://img.shields.io/badge/kobweb-0.15.5-blue)](COMPATIBILITY.md)
+[![version: 0.16.0](https://img.shields.io/badge/kobweb-0.16.0-blue)](COMPATIBILITY.md)
 [![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
 [![kotlin: 1.9.21](https://img.shields.io/badge/kotlin-1.9.21-blue?logo=kotlin)](COMPATIBILITY.md)
@@ -3331,7 +3331,7 @@ which demonstrates a chat application with its auth and chat functionality each 
 > [!NOTE]
 > If you...
 >
-> * created your site after Kobweb v0.15.5 *OR*
+> * created your site after Kobweb v0.16.0 *OR*
 > * only have single word page names, e.g. "About.kt" and "Login.kt", as well as packages that are all lowercased...
 >
 > then congratulations, you don't have to worry at all about the concerns presented in this section. You should ensure
@@ -3353,7 +3353,7 @@ slugs that could sometimes be hard to read, e.g. `stateofart`.
 Because of this, some users had to create a lot of overrides in their site. This is fragile, as it means it can be easy
 to refactor a site later without realizing that stale names remain embedded in the code.
 
-As a result, in v0.15.5, we made the choice to change the route generating algorithms to split words up with hyphens.
+As a result, in v0.16.0, we made the choice to change the route generating algorithms to split words up with hyphens.
 
 As a concrete example, for the page `pages/silkWidgets/SimpleGrid.kt`, Kobweb *used* to
 generate `https://example.com/silkWidgets/simplegrid`, whereas now it
@@ -3432,7 +3432,7 @@ kobweb {
 
 ### Disabling legacy route redirects
 
-If you have a pre-0.15.5 site, there are three steps you need to do, after which you can consider disabling legacy route
+If you have a pre-0.16.0 site, there are three steps you need to do, after which you can consider disabling legacy route
 redirects.
 
 1. In your site directory, run `./gradlew kobwebListRoutes` and look for any routes that have hyphens in them.
