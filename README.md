@@ -3446,7 +3446,7 @@ redirects.
 > eventual removal.
 
 > [!TIP]
-> This [target commit](https://github.com/bitspittle/bitspittle.dev/commit/9a2f8a77a72c9712bbee8d87a08848a915df2240)
+> This [target commit](https://github.com/bitspittle/bitspittle.dev/commit/08b508ffcbb8503d1b3a7242213c8183aa9f15f3)
 > demonstrates how I upgraded my blog site (which uses Firebase) to move away from Kobweb legacy route redirecting. It's
 > way better to let Firebase handle it, because it will communicate necessary information to search engine crawlers so
 > they too can update their own indexes.
