@@ -1,8 +1,8 @@
 [![version: 0.16.1](https://img.shields.io/badge/kobweb-0.16.1-blue)](COMPATIBILITY.md)
 [![version: 0.9.13](https://img.shields.io/badge/kobweb_cli-0.9.13-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
-[![kotlin: 1.9.21](https://img.shields.io/badge/kotlin-1.9.21-blue?logo=kotlin)](COMPATIBILITY.md)
-[![compose: 1.5.11](https://img.shields.io/badge/compose-1.5.11-blue?logo=jetpackcompose)](COMPATIBILITY.md)
+[![kotlin: 1.9.22](https://img.shields.io/badge/kotlin-1.9.22-blue?logo=kotlin)](COMPATIBILITY.md)
+[![compose: 1.5.12](https://img.shields.io/badge/compose-1.5.12-blue?logo=jetpackcompose)](COMPATIBILITY.md)
 [![ktor: 2.3.6](https://img.shields.io/badge/ktor-2.3.6-blue)](https://ktor.io/)
 <br>
 [![Varabyte Discord](https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/5NZ2GKV5Cs)
