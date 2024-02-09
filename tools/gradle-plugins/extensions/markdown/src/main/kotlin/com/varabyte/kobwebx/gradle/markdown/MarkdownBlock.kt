@@ -78,7 +78,7 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      * }
      * ```
      */
-    @Deprecated("This property has migrated over to `filenameToSlug` for clarity.")
+    @Deprecated("This property is no longer used. Unfortunately this feature cannot be easily supported for technical reasons. It was deprecated after Kobweb globally changed its route generation to kebab-case, which was the original reason people asked for this feature. Consider using Frontmatter route overrides if you need to customize the final URL.")
     abstract val routeOverride: Property<(String) -> String>
 
     /**
