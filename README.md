@@ -3480,7 +3480,8 @@ val generateCodeTask = tasks.register("generateCode") {
   // You may not need an input file or dir for your task, and if so, you can exclude the next line. If you do need one,
   // I'm assuming it is a data file or files in your resources somewhere.
   val resInputDir = layout.projectDirectory.dir("src/jsMain/resources")
-  val genOutputDir = layout.buildDirectory.dir("generated/$group/src/jsMain/kotlin")
+  // $name here to create a unique output directory just for this task
+  val genOutputDir = layout.buildDirectory.dir("generated/$group/$name/src/jsMain/kotlin")
 
   inputs.dir(resInputDir).withPathSensitivity(PathSensitivity.RELATIVE)
   outputs.dir(genOutputDir)
@@ -3506,9 +3507,41 @@ kotlin {
 }
 ```
 
-If you want to see this working in action, you
-can [check out my blog site's build script here](https://github.com/bitspittle/bitspittle.dev/blob/f7208543046e25337e73b5ede07ff576623962b0/site/build.gradle.kts#L104),
-where it is used to generate a listing page for all blog posts.
+### Generating resources
+
+In case you want to generate *resources* that end up in your final site as files (e.g. `mysite.com/rss.xml`) and not
+code, the main change you need to make is migrating the line `kotlin.srcDir` to `resources.srcDir`:
+
+```kotlin
+// e.g. site/build.gradle.kts
+
+val generateResourceTask = tasks.register("generateResource") {
+  group = "myproject"
+  // $name here to create a unique output directory just for this task
+  val genOutputDir = layout.buildDirectory.dir("generated/$group/$name/src/jsMain/resources")
+
+  outputs.dir(genOutputDir)
+
+  doLast {
+    // NOTE: Use "public/" here so the export pass will find it and put it into the final site
+    genOutputDir.get().file("public/rss.xml").asFile.apply {
+      parentFile.mkdirs()
+      writeText(/* ... */)
+
+      println("Generated $absolutePath")
+    }
+  }
+}
+
+kotlin {
+  configAsKobwebApplication()
+  commonMain.dependencies { /* ... */ }
+  jsMain {
+    resources.srcDir(generateResourceTask) // <----- Set your task here
+    dependencies { /* ... */ }
+  }
+}
+```
 
 ## Adding Kobweb to an existing project
 
