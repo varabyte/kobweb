@@ -10,8 +10,6 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.FileTree
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
@@ -29,9 +27,6 @@ abstract class KobwebCopyTask(desc: String) : KobwebTask(desc) {
 
     @get:Inject
     abstract val archiveOperations: ArchiveOperations
-
-    @get:Input
-    abstract val publicPath: Property<String>
 
     @get:InputFiles
     abstract val runtimeClasspath: ConfigurableFileCollection

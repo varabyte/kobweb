@@ -312,7 +312,6 @@ class KobwebApplicationPlugin @Inject constructor(
 
             // configure both kobwebCopySupplementalResourcesTask & kobwebCopyWorkerJsOutputTask
             project.tasks.withType<KobwebCopyTask>().configureEach {
-                publicPath.set(kobwebBlock.publicPath)
                 runtimeClasspath.from(project.configurations.named(jsTarget.runtimeClasspath))
             }
 

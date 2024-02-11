@@ -367,8 +367,7 @@ abstract class KobwebExportTask @Inject constructor(
         // export layouts but shouldn't be copied over in static layouts as those should only include pages explicitly
         // defined by the site.
         getResourceFilesJsWithRoots().forEach { rootAndFile ->
-            // Drop the leading slash so we don't confuse File resolve logic
-            val relativePath = rootAndFile.relativeFile.invariantSeparatorsPath.substringAfter(getPublicPath()).drop(1)
+            val relativePath = rootAndFile.relativeFile.invariantSeparatorsPath.substringAfter("public/")
             if (relativePath == "index.html" && siteLayout != SiteLayout.KOBWEB) return@forEach
 
             (if (relativePath != "index.html") resourcesRoot else systemRoot)

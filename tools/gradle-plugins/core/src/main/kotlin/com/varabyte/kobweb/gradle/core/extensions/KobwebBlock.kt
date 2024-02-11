@@ -61,12 +61,6 @@ abstract class KobwebBlock : ExtensionAware {
      */
     abstract val apiPackage: Property<String>
 
-    /**
-     * The path of public resources inside the project's resources folder, e.g. "public" ->
-     * "src/jsMain/resources/public"
-     */
-    abstract val publicPath: Property<String>
-
     /** The KSP processor dependency that should be applied to the project, in string dependency notation. */
     abstract val kspProcessorDependency: Property<String>
 
@@ -78,7 +72,6 @@ abstract class KobwebBlock : ExtensionAware {
         }
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
-        publicPath.convention("public")
         kspProcessorDependency.convention("com.varabyte.kobweb:kobweb-ksp-site-processors:${KobwebVersionUtil.version}")
     }
 }

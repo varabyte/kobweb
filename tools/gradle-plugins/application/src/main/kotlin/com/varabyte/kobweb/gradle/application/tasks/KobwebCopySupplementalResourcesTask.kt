@@ -17,7 +17,7 @@ abstract class KobwebCopySupplementalResourcesTask @Inject constructor(
     @OutputDirectory
     fun getGenResDir() = appBlock.getGenJsResRoot("supplemental")
 
-    private fun getGenPublicRoot() = getGenResDir().get().asFile.resolve(publicPath.get())
+    private fun getGenPublicRoot() = getGenResDir().get().asFile.resolve("public")
 
     @TaskAction
     fun execute() {
