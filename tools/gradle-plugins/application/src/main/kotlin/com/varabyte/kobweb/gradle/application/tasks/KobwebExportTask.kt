@@ -307,10 +307,18 @@ abstract class KobwebExportTask @Inject constructor(
                                     // In legacy Kobweb, a package called "multiWord" became the folder "multiWord".
                                     // Now it would become "multi-word".
                                     if (file.name.contains('-')) {
-                                        val modernPath = file.toPath()
-                                        val legacyPath =
-                                            modernPath.parent.resolve(modernPath.name.kebabCaseToCamelCase())
-                                        if (!legacyPath.exists()) Files.createSymbolicLink(legacyPath, modernPath)
+                                        run { // Reverse camel case: exampleRoute -> example-route
+                                            val modernPath = file.toPath()
+                                            val legacyPath =
+                                                modernPath.parent.resolve(modernPath.name.kebabCaseToCamelCase())
+                                            if (!legacyPath.exists()) Files.createSymbolicLink(legacyPath, modernPath)
+                                        }
+                                        run { // Reverse snake case -> example_route -> example-route
+                                            val modernPath = file.toPath()
+                                            val legacyPath =
+                                                modernPath.parent.resolve(modernPath.name.replace('-', '_'))
+                                            if (!legacyPath.exists()) Files.createSymbolicLink(legacyPath, modernPath)
+                                        }
                                     }
                                 } else {
                                     // In legacy Kobweb, a source file called "MultiWord.kt" became the file

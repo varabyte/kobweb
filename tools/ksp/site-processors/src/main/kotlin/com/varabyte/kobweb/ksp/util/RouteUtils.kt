@@ -18,6 +18,7 @@ object RouteUtils {
         require('.' !in packagePart) { "Invalid package part: $packagePart" }
         return packagePart.dropWhile { it == '_' }
             .dropLastWhile { it == '_' }
+            .replace('_', '-')
             .camelCaseToKebabCase()
     }
 
@@ -35,9 +36,15 @@ object RouteUtils {
      * - convert camelCase to kebab-case
      * - remove leading underscores (because these are usually used as a workaround for numbers, e.g. _123)
      * - remove trailing underscores (because these are usually used as a workaround for reserved words, e.g. `fun_`)
+     * - replace any remaining underscores with hyphens (*)
      *
-     * If for some reason you intentionally wanted to have a leading underscore in your URL part, the recommended
+     * If for some reason you intentionally wanted to include the underscore in your URL route, the recommended
      * solution is to use a package mapping for that, e.g. "corp.internal" to "_internal"
+     *
+     * (*) Note that Kotlin convention encourages camel casing for multi-words and discourages underscores, so users
+     * should prefer that; however, Java devs use underscores, so we decided to support that as well, even if we
+     * ourselves don't recommend using it. See [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html#naming-rules)
+     * and [Java package naming conventions](https://docs.oracle.com/javase/tutorial/java/package/namingpkgs.html).
      *
      * @param packageRoot The root package that the [pkg] should live under. Passing it in prevents us from
      * including it in the final route.

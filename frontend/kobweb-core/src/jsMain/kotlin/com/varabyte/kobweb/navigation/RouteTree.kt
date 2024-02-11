@@ -232,11 +232,12 @@ internal class RouteTree {
                 ) {
                     // We can't be sure if the legacy version of this hyphenated string was a camelCase one (in the
                     // case of route parts generated from packages) or a lower-case one (in the case of route parts
-                    // generated from filenames). That is, "example-path" might now have been either "examplepath" OR
-                    // "examplePath" in previous versions of Kobweb. It's not too harmful in just supporting both to be
-                    // extra safe.
+                    // generated from filenames). That is, "example-path" now might have been either "examplepath" OR
+                    // "examplePath" OR "example_path" in previous versions of Kobweb. It's not too harmful in just
+                    // supporting all to be extra safe.
                     dynamicParams[resolvedEntry.node.name.replace("-", "")] = resolvedEntry.routePart
                     dynamicParams[resolvedEntry.node.name.kebabCaseToCamelCase()] = resolvedEntry.routePart
+                    dynamicParams[resolvedEntry.node.name.replace('-', '_')] = resolvedEntry.routePart
                 }
             }
         }
