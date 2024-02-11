@@ -326,7 +326,10 @@ class Router {
             // come after queries / fragments).
             if (pathQueryAndFragment.all { it != '#' && it != '?' }) {
                 val route = pathQueryAndFragment
-                if (!routeTree.isRegistered(route)) {
+
+                // Unlikely but if user never defines a root page, `isRegistered("/")` will return false. We don't want
+                // to add or remove slashes in that case!
+                if (!routeTree.isRegistered(route) && route != "/") {
                     if (route.endsWith('/')) {
                         val withoutSlash = route.removeSuffix("/")
                         if (routeTree.isRegistered(withoutSlash)) {

@@ -36,7 +36,8 @@ internal class PageData(
  */
 internal class RouteTree {
     sealed class Node(val name: String, var method: PageMethod?) {
-        private val children = mutableListOf<Node>()
+        private val _children = mutableListOf<Node>()
+        val children: List<Node> = _children
 
         protected open fun matches(name: String): Boolean {
             return this.name == name
@@ -48,16 +49,16 @@ internal class RouteTree {
             } else {
                 StaticNode(routePart, method).also { node ->
                     if (routePart.contains('-')) {
-                        children.add(ProxyStaticNode(node))
+                        _children.add(ProxyStaticNode(node))
                     }
                 }
             }
-            children.add(node)
+            _children.add(node)
             return node
         }
 
         open fun findChild(routePart: String): Node? =
-            children.partition { it !is ProxyStaticNode }.let { (normalNodes, proxyNodes) ->
+            _children.partition { it !is ProxyStaticNode }.let { (normalNodes, proxyNodes) ->
                 // Deprioritize proxy nodes in searches; user defined nodes take precedence
                 return (normalNodes + proxyNodes).find { it.matches(routePart) }
             }
@@ -82,8 +83,8 @@ internal class RouteTree {
                         parent = parents[parent]
                     }
                     yield(nodePath)
-                    node.children.forEach { child -> parents[child] = node }
-                    nodeQueue.addAll(node.children)
+                    node._children.forEach { child -> parents[child] = node }
+                    nodeQueue.addAll(node._children)
                 }
             }
     }
@@ -167,6 +168,8 @@ internal class RouteTree {
      * 404 error).
      */
     private fun checkRoute(route: String): String? {
+        require(root.children.isNotEmpty()) { "No routes were ever registered. This is unexpected and probably means no `@Page` was defined (or pages were defined in the wrong place where Kobweb couldn't discover them)."}
+
         require(route.startsWith('/')) { "When checking a route, it must begin with a slash. Got: \"$route\"" }
         fun List<ResolvedEntry>.toRegisteredRouteString() = "/" + joinToString("/") {
             if (it.node !is ProxyStaticNode) it.routePart else it.node.targetNode.name
