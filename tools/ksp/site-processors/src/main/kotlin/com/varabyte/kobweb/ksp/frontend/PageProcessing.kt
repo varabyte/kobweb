@@ -5,7 +5,6 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
-import com.varabyte.kobweb.ksp.util.toSlug
 import com.varabyte.kobweb.project.frontend.PageEntry
 
 fun processPagesFun(
@@ -32,10 +31,10 @@ fun processPagesFun(
         // e.g. "/dynamic/{example}/route/{}" is OK but "/dynamic/{}/route/{example}" is not
         if (routeOverride == null || "{}" !in routeOverride.substringBeforeLast("/", missingDelimiterValue = "")) {
             val route = processRoute(
+                packageRoot = qualifiedPagesPackage,
                 pkg = currPackage,
-                slugFromFile = file.toSlug(),
+                file = file,
                 routeOverride = routeOverride,
-                qualifiedPackage = qualifiedPagesPackage,
                 packageMappings = packageMappings,
                 supportDynamicRoute = true,
             ).let { if (it.endsWith("/index")) it.removeSuffix("index") else it }

@@ -22,7 +22,6 @@ import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
-import com.varabyte.kobweb.ksp.util.toSlug
 import com.varabyte.kobweb.project.backend.ApiEntry
 import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
@@ -131,10 +130,10 @@ class BackendProcessor(
                 .firstNotNullOfOrNull { it.arguments.firstOrNull()?.value?.toString() }
 
             val resolvedRoute = processRoute(
+                packageRoot = qualifiedApiPackage,
                 pkg = property.packageName.asString(),
-                slugFromFile = property.containingFile!!.toSlug(),
+                file = property.containingFile!!,
                 routeOverride = routeOverride,
-                qualifiedPackage = qualifiedApiPackage,
                 packageMappings = packageMappings,
                 supportDynamicRoute = false,
             )
@@ -170,10 +169,10 @@ private fun processApiFun(
 
     return if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedApiPackage)) {
         val resolvedRoute = processRoute(
+            packageRoot = qualifiedApiPackage,
             pkg = annotatedFun.packageName.asString(),
-            slugFromFile = file.toSlug(),
+            file = file,
             routeOverride = routeOverride,
-            qualifiedPackage = qualifiedApiPackage,
             packageMappings = packageMappings,
             supportDynamicRoute = false,
         )

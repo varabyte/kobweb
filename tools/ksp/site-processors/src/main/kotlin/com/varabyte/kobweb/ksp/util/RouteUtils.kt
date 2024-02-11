@@ -2,6 +2,7 @@ package com.varabyte.kobweb.ksp.util
 
 import com.google.devtools.ksp.symbol.KSFile
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
+import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.ksp.symbol.nameWithoutExtension
 
 object RouteUtils {
@@ -22,8 +23,13 @@ object RouteUtils {
 
 
     /**
-     * Given a package, e.g. "corp.ourteam.ourvalues", and some mappings, e.g. "corp.ourteam" to "our-team" and
-     * "corp.ourteam.ourvalues" to "our-values"", generate a final route, e.g. "corp/our-team/our-values/".
+     * Convert an incoming Kotlin package into a final, absolute URL route.
+     *
+     * Given a package, e.g. `mysite.pages.corp.ourteam.ourvalues`, a package root, e.g. `mysite.pages`, and some
+     * mappings, e.g. `{"mysite.pages.corp.ourteam":"our-team", "mysite.pages.corp.ourteam.ourvalues":"our-values"}`,
+     * generate a final absolute route, e.g. "/corp/our-team/our-values/".
+     *
+     * The final route will begin with a slash and end with a slash.
      *
      * We also perform some additional processing on any remaining package parts that don't have mappings:
      * - convert camelCase to kebab-case
@@ -32,8 +38,11 @@ object RouteUtils {
      *
      * If for some reason you intentionally wanted to have a leading underscore in your URL part, the recommended
      * solution is to use a package mapping for that, e.g. "corp.internal" to "_internal"
+     *
+     * @param packageRoot The root package that the [pkg] should live under. Passing it in prevents us from
+     * including it in the final route.
      */
-    fun resolve(packageMappings: Map<String, String>, pkg: String): String {
+    fun convertPackageToRoute(packageRoot: String, packageMappings: Map<String, String>, pkg: String): String {
         // We have a bunch of potential package to URL mappings, which work on fully qualified packages, so
         // we process each part of the package separately, going back to front. An example will help here.
         //
@@ -62,12 +71,12 @@ object RouteUtils {
         @Suppress("NAME_SHADOWING") // Make pkg writable
         var pkg = pkg
         val transformedParts = mutableListOf<String>()
-        while (pkg.isNotEmpty()) {
+        while (pkg.isNotEmpty() && pkg != packageRoot) {
             val transformedPart = packageMappings[pkg] ?: packagePartToRoutePart(pkg.substringAfterLast('.'))
             transformedParts.add(0, transformedPart)
             pkg = (pkg.takeIf { it.contains('.') } ?: "").substringBeforeLast('.')
         }
-        return transformedParts.joinToString("/")
+        return (transformedParts.joinToString("/") + "/").prefixIfNot("/")
     }
 }
 
