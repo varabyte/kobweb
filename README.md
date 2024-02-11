@@ -1879,13 +1879,13 @@ kobweb {
   markdown {
     process.set { markdownEntries ->
       generateMarkdown("blog/index.md", buildString {
-        appendLine("# Blog Index")  
+        appendLine("# Blog Index")
         markdownEntries.forEach { entry ->
           if (entry.filePath.startsWith("blog/")) {
-            val title = entry.frontMatter["title"] ?: "Untitled"      
+            val title = entry.frontMatter["title"] ?: "Untitled"
             appendLine("* [$title](${entry.route})")
           }
-        }  
+        }
       })
     }
   }
