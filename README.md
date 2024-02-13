@@ -139,7 +139,7 @@ $ sdk install kobweb
 
 ### Don't see your favorite package manager?
 
-Please see: https://github.com/varabyte/kobweb/issues/117 and consider leaving a comment!
+Please see: https://github.com/varabyte/kobweb-cli/issues/11 and consider leaving a comment!
 
 ## Download the Kobweb binary
 
