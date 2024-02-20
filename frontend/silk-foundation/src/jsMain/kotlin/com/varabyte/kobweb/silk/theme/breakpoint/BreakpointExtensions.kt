@@ -1,12 +1,13 @@
 package com.varabyte.kobweb.silk.theme.breakpoint
 
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointUnitValue
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Window
 
-private fun Breakpoint.toValue(): BreakpointUnitValue<CSSUnitValue>? {
+private fun Breakpoint.toValue(): BreakpointUnitValue<CSSLengthNumericValue>? {
     return when (this) {
         Breakpoint.ZERO -> null
         Breakpoint.SM -> SilkTheme.breakpoints.sm
@@ -19,14 +20,14 @@ private fun Breakpoint.toValue(): BreakpointUnitValue<CSSUnitValue>? {
 /**
  * Convenience method for fetching the associated `SilkTheme.breakpoints` value for the current [Breakpoint] value.
  */
-fun Breakpoint.toWidth(): CSSUnitValue {
-    return this.toValue()?.width ?: 0.px
+fun Breakpoint.toWidth(): CSSLengthNumericValue {
+    return (this.toValue()?.width ?: 0.px)
 }
 
 /**
  * Convenience method for fetching the associated `SilkTheme.breakpoints` value for the current [Breakpoint] value.
  */
-fun Breakpoint.toPx(): CSSUnitValue {
+fun Breakpoint.toPx(): CSSpxValue {
     return this.toValue()?.toPx() ?: 0.px
 }
 

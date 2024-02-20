@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.components.style.breakpoint
 
+import com.varabyte.kobweb.compose.css.*
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Window
@@ -13,7 +14,7 @@ private val Window.bodyFontSize: Number
     }
 
 
-sealed class BreakpointUnitValue<out T : CSSUnitValue>(val width: T) {
+sealed class BreakpointUnitValue<out T : CSSLengthNumericValue>(val width: T) {
     abstract fun toPx(): CSSpxValue
 
     class Px(value: CSSpxValue) : BreakpointUnitValue<CSSpxValue>(value) {
@@ -38,7 +39,7 @@ sealed class BreakpointUnitValue<out T : CSSUnitValue>(val width: T) {
 /**
  * A class used for storing generic values associated with breakpoints.
  */
-data class BreakpointValues<out T : CSSUnitValue>(
+data class BreakpointValues<out T : CSSLengthNumericValue>(
     val sm: BreakpointUnitValue<T>,
     val md: BreakpointUnitValue<T>,
     val lg: BreakpointUnitValue<T>,

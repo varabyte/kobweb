@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.theme
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.ComponentBaseModifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifier
@@ -37,7 +38,7 @@ class MutableSilkTheme {
     val palettes = MutablePalettes()
     internal val legacyPalettes = LegacyMutableSilkPalettes(palettes)
 
-    var breakpoints: BreakpointValues<CSSUnitValue> = BreakpointSizes(
+    var breakpoints: BreakpointValues<CSSLengthNumericValue> = BreakpointSizes(
         30.cssRem,
         48.cssRem,
         62.cssRem,
