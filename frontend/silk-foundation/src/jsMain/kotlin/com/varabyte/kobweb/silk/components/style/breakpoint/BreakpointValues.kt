@@ -80,10 +80,10 @@ fun BreakpointSizes(
  * A convenience class for constructing an association of breakpoints to CSS rem sizes.
  */
 fun BreakpointSizes(
-    sm: CSSSizeValue<CSSUnit.rem> = 0.cssRem,
-    md: CSSSizeValue<CSSUnit.rem> = sm,
-    lg: CSSSizeValue<CSSUnit.rem> = md,
-    xl: CSSSizeValue<CSSUnit.rem> = lg,
+    sm: CSSSizeValue<CSSUnit.rem>,
+    md: CSSSizeValue<CSSUnit.rem>,
+    lg: CSSSizeValue<CSSUnit.rem>,
+    xl: CSSSizeValue<CSSUnit.rem>,
 ) = BreakpointValues(
     BreakpointUnitValue.Rem(sm),
     BreakpointUnitValue.Rem(md),
