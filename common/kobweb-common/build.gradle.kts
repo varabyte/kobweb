@@ -10,7 +10,9 @@ group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.libs.get()
 
 dependencies {
-    implementation(libs.kaml)
+    // Expose kaml as an API dependency. If you use kobweb-common, many classes are associated with yaml files. Using
+    // kobweb-common and your own different version of kaml can result in runtime exceptions, so just expose this one.
+    api(libs.kaml)
     implementation(libs.kotlinx.coroutines)
 
     testImplementation(kotlin("test"))
