@@ -4,8 +4,6 @@ root: .components.layouts.PageLayout("MARKDOWN")
 
 ## Markdown Example
 
-This is [an example][id] reference-style link.
-
 This site is generated from Markdown.
 
 Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose HTML](https://github.com/JetBrains/compose-multiplatform#compose-html).
@@ -46,6 +44,10 @@ You can link to other Markdown documents with their route overrides resolved cor
 
 You can use <span id="md-inline-demo">inlined html</span> tags. You can inspect this page to see that "inlined html" is
 wrapped in a span.
+
+This is [an example][id] reference-style link.
+
+Here is an example of [a link using `code` formatting](https://example.com).
 
 You can also use block tags, like `<a>` and `<pre>`. Here, we use html blocks to create a Discord badge:
 

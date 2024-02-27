@@ -239,15 +239,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         br.convention { "$JB_DOM.Br" }
         a.convention { link ->
             if (useSilk.get()) {
-                val linkText = link.children()
-                    .filterIsInstance<Text>()
-                    .firstOrNull()
-                    ?.literal
-                    ?.escapeSingleQuotedText()
-                    .orEmpty()
-
-                childrenOverride = listOf() // We "consumed" the children, no more need to visit them
-                "$SILK.navigation.Link(\"${link.destination}\", \"$linkText\")"
+                "$SILK.navigation.Link(\"${link.destination}\")"
             } else {
                 "$JB_DOM.A(\"${link.destination}\")"
             }
