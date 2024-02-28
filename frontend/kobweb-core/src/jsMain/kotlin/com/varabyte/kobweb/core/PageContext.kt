@@ -3,6 +3,7 @@ package com.varabyte.kobweb.core
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.navigation.Route
 import com.varabyte.kobweb.navigation.Router
+import kotlinx.browser.window
 
 /**
  * Various contextual information useful for a page.
@@ -27,6 +28,15 @@ class PageContext internal constructor(val router: Router) {
         }
 
     class RouteInfo internal constructor(private val route: Route, private val dynamicParams: Map<String, String>) {
+        /**
+         * The origin of the current page.
+         *
+         * In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", the origin is "https://example.com"
+         *
+         * This property is equivalent to `window.location.origin` but provided here as a convenience property.
+         */
+        val origin: String get() = window.location.origin
+
         /**
          * The slug for the current page.
          *
@@ -89,7 +99,15 @@ class PageContext internal constructor(val router: Router) {
          */
         val fragment: String? = route.fragment
 
-        override fun toString() = route.toString()
+        /**
+         * The full path of the current route, including any query parameters and fragment.
+         *
+         *In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", this will return
+         * "/a/b/c/slug?x=1&y=2#id"
+         */
+        val pathQueryAndFragment get() = route.toString()
+
+        override fun toString() = pathQueryAndFragment
 
         override fun equals(other: Any?): Boolean {
             return (other is RouteInfo
