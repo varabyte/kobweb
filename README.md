@@ -2492,6 +2492,25 @@ Once exported, you can test your site by running it locally before uploading. Yo
 `kobweb run --env prod --layout static` and a full stack site with `kobweb run --env prod --layout kobweb` (or just
 `kobweb run --env prod`).
 
+### Dynamic routes and exporting
+
+Dynamic routes are skipped over by the export process. After all, it's not possible to know all the possible values that
+could be passed into a dynamic route.
+
+However, if you have a specific instance of a dynamic route that you'd like to export, you can configure your site's
+build script as follows:
+
+```kotlin
+kobweb {
+  app {
+    export {
+      // "/users/{user}/posts/{post}" has special handling for the "default" / "0" case
+      addExtraRoute("/users/default/posts/0", "users/index.html")
+    }
+  }
+}
+```
+
 ### Deploying
 
 A static site gets exported into `.kobweb/site` by default (you can configure this location in your `.kobweb/conf.yaml`

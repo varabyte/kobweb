@@ -291,6 +291,9 @@ abstract class AppBlock @Inject constructor(
          * a copy of an existing route to a different location.
          *
          * Note that any added [filter] will NOT be applied to these routes.
+         *
+         * @param exportPath The final path to export the route to, including a trailing extension
+         *   (e.g. "settings/admin.html"). If not specified, it will be auto-determined from the route.
          */
         fun addExtraRoute(route: String, exportPath: String? = null) {
             extraRoutes.add(RouteConfig(route, exportPath))
