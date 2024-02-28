@@ -1,10 +1,10 @@
 [versions]
 playwright = "1.39.0"
 commonmark = "0.21.0"
-compose = "1.5.12"
+compose = "1.6.0"
 jsoup = "1.16.2"
 kaml = "0.55.0"
-kobweb-libs = "0.16.3"
+kobweb-libs = "0.17.0-SNAPSHOT"
 kotlin = "1.9.22"
 kotlinpoet = "1.14.2"
 kotlinx-coroutines = "1.7.3"

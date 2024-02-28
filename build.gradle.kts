@@ -15,6 +15,7 @@ subprojects {
     repositories {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        google()
     }
 
     // Require Java 11 for a few APIs. A very important one is ProcessHandle, used for detecting if a

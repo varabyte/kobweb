@@ -1,7 +1,7 @@
 [versions]
-jetbrains-compose = "1.5.12"
+jetbrains-compose = "1.6.0"
 kotlin = "1.9.22"
-kotlinx-serialization = "1.6.0"
+kotlinx-serialization = "1.6.3"
 
 [libraries]
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core" }
