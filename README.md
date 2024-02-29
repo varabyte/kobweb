@@ -2454,27 +2454,38 @@ fun makeHorizontalDividersFillWidth(ctx: InitSilkContext) {
 
 There are two flavors of Kobweb sites: *static* and *full stack*.
 
+### Static layout sites
+
 A *static* site (or, more completely, a *static layout* site) is one where you export a bunch of frontend files (e.g.
-`html`, `js`, and public resources) into a single, organized folder that gets served in a direct way by
-a [static website hosting provider](https://en.wikipedia.org/wiki/Web_hosting_service#Static_page_hosting). In other
-words, the name *static* does not refer to the behavior of your site but rather that of your hosting provider solution.
+`html`, `js`, and public resources) into a single, organized folder that gets served directly by
+a [static website hosting provider](https://en.wikipedia.org/wiki/Web_hosting_service#Static_page_hosting).
 
-A *full stack* site is one where you write both the logic that runs on the frontend (i.e. on the user's machine) as well
-as the logic that runs on the backend (i.e. on a server somewhere). This custom server must serve requested files (much
-like a static web hosting service does) plus it should also define endpoints providing unique functionality tailored to
-your site's needs.
+In other words, you don't write a single line of server code. The server is provided for you in this case and uses a
+fairly straightforward algorithm - it hosts all the content you upload to it as raw, static assets.
 
-> [!NOTE]
-> Kobweb supports full stack sites using a non-standard file layout that a Kobweb server knows how to consume. It was
-> designed to support a powerful, live-reloading experience during development. This layout is called the "kobweb"
-> layout, to emphasize how tightly coupled it is to a Kobweb server.
+The name *static* does not refer to the behavior of your site but rather that of your hosting provider solution. If
+someone makes a request for a page, the same response bytes get served every time (even if that page is full of
+custom code that allows it to behave in very interactive ways).
+
+### Full stack sites
+
+A *full stack* site is one where you write both the logic that runs on the frontend (i.e. on the user's machine) and the
+logic that runs on the backend (i.e. on a server somewhere). This custom server must at least serve requested files
+(exactly the same job that a static web hosting service does) plus it likely also defines endpoints providing custom
+functionality tailored to your site's needs.
+
+For example, maybe you define an endpoint which, given a user ID and an authentication token, returns that user's
+profile information.
+
+### Choosing the right site layout for your project
 
 When Kobweb was first written, it only provided the full stack solution, as being able to write your own server logic
 enabled a maximum amount of power and flexibility. The mental model for using Kobweb during this early time was simple
 and clear.
 
-However, in practice, most projects didn't need this power. A website can give users a very clean, dynamic experience
-simply by writing responsive frontend logic to make it look good, e.g. with animations and delightful user interactions.
+However, in practice, most projects don't need the power afforded by a full stack setup. A website can give users a
+very clean, dynamic experience simply by writing responsive frontend logic to make it look good, e.g. with animations
+and delightful user interactions.
 
 Additionally, many "*Feature* as a Service" solutions have popped up over the years, which can provide a ton of
 convenient functionality that used to require a custom server. These days, you can easily integrate auth, database, and
@@ -2484,7 +2495,7 @@ The process for exporting a bunch of files in a way that can be consumed by a st
 *much* faster *and* cheaper than using a full stack solution. Therefore, you should prefer a static site layout unless
 you have a specific need for a full stack approach.
 
-Some possible reasons to use a custom server are:
+Some possible reasons to use a custom server (and, therefore, a full stack approach) are:
 * needing to communicate with other, private backend services in your company.
 * intercepting requests as an intermediary for some third-party service where you own a very sensitive API key that you
   don't want to leak (such as a service that delegates to ChatGPT).
@@ -2495,7 +2506,9 @@ easier to migrate from a static layout site to a full stack site later than the 
 
 ### Exporting and running
 
-Both site flavors require an export. To export your site with a static layout, use the `kobweb export --layout static`
+Both site flavors require an export.
+
+To export your site with a static layout, use the `kobweb export --layout static`
 command, while for full stack the command is `kobweb export --layout kobweb` (or just `kobweb export` since `kobweb` is
 the default layout as it originally was the only way).
 
