@@ -125,9 +125,10 @@ class KobwebApplicationPlugin @Inject constructor(
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
         val runLayout =
-            project.findProperty("kobwebRunLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.KOBWEB
+            project.findProperty("kobwebRunLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.FULLSTACK
         val exportLayout =
-            project.findProperty("kobwebExportLayout")?.let { SiteLayout.valueOf(it.toString()) } ?: SiteLayout.KOBWEB
+            project.findProperty("kobwebExportLayout")?.let { SiteLayout.valueOf(it.toString()) }
+                ?: SiteLayout.FULLSTACK
 
         project.extra["kobwebBuildTarget"] =
             project.findProperty("kobwebBuildTarget")?.let { BuildTarget.valueOf(it.toString()) }

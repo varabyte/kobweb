@@ -305,10 +305,10 @@ Gradle run configurations for each of the Kobweb commands.
   * The `-t` argument (or, `--continuous`) tells Gradle to watch for file changes, which gives you live loading behavior.
 * To stop a running Kobweb server, use the `kobwebStop` command.
 * To export a site, use<br>
-  `kobwebExport -PkobwebReuseServer=false -PkobwebEnv=DEV -PkobwebRunLayout=KOBWEB -PkobwebBuildTarget=RELEASE -PkobwebExportLayout=KOBWEB`
+  `kobwebExport -PkobwebReuseServer=false -PkobwebEnv=DEV -PkobwebRunLayout=FULLSTACK -PkobwebBuildTarget=RELEASE -PkobwebExportLayout=FULLSTACK`
   * If you want to export a static layout instead, change the last argument to<br>`-PkobwebExportLayout=STATIC`.
 * To run an exported site, use<br>
-  `kobwebStart -PkobwebEnv=PROD -PkobwebRunLayout=KOBWEB`
+  `kobwebStart -PkobwebEnv=PROD -PkobwebRunLayout=FULLSTACK`
   * If your site was exported using a static layout, change the last argument to<br>`-PkobwebRunLayout=STATIC`.
 
 You can read all about [IntelliJ's Gradle integration here](https://www.jetbrains.com/help/idea/gradle.html). Or to just jump straight into how to create run

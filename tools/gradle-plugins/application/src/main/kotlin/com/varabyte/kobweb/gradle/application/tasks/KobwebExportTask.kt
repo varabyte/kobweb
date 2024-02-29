@@ -189,9 +189,9 @@ abstract class KobwebExportTask @Inject constructor(
                 }
             }
 
-        val (pagesRoot, resourcesRoot, systemRoot) = when (siteLayout) {
-            SiteLayout.KOBWEB -> Triple("pages", "resources", "system").map { getSiteDir().resolve(it) }
-            SiteLayout.STATIC -> getSiteDir().toTriple()
+        val (pagesRoot, resourcesRoot, systemRoot) = when {
+            siteLayout.isFullstack -> Triple("pages", "resources", "system").map { getSiteDir().resolve(it) }
+            else -> getSiteDir().toTriple()
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
@@ -260,7 +260,7 @@ abstract class KobwebExportTask @Inject constructor(
                             } catch (ex: TimeoutError) {
                                 logger.error(buildString {
                                     append("e: Export for \"${routeConfig.route}\" skipped due to timeout.")
-                                    if (siteLayout == SiteLayout.KOBWEB) {
+                                    if (siteLayout.isFullstack) {
                                         append(" It might be worth reviewing if any of your API routes have blocking logic in them (e.g. a database failing to connect), as this can eventually cause the Kobweb server to hang if too many blocking calls accumulate.")
                                     }
                                     append(" In your build script, consider calling `kobweb.app.export.enableTraces(...)` to generate snapshots which can help understanding. Finally, you can try increasing the timeout by setting `kobweb.app.export.timeout`.")
@@ -277,9 +277,9 @@ abstract class KobwebExportTask @Inject constructor(
                             // This case is an error in static layout mode, because with no pages, there's nothing for
                             // the user to visit. For a kobweb layout, however, there is always at least a minimal
                             // index.html file included.
-                            when (siteLayout) {
-                                SiteLayout.KOBWEB -> logger.warn("w: $noPagesExportedMessage")
-                                SiteLayout.STATIC -> logger.error("e: $noPagesExportedMessage")
+                            when {
+                                siteLayout.isFullstack -> logger.warn("w: $noPagesExportedMessage")
+                                else -> logger.error("e: $noPagesExportedMessage")
                             }
                         }
 
@@ -290,7 +290,7 @@ abstract class KobwebExportTask @Inject constructor(
                     // we copy the files over manually.
                     val legacyRouteRedirectStrategy =
                         legacyRouteRedirectStrategy.getOrElse(AppBlock.LegacyRouteRedirectStrategy.WARN)
-                    if (siteLayout == SiteLayout.STATIC && legacyRouteRedirectStrategy != AppBlock.LegacyRouteRedirectStrategy.DISALLOW) {
+                    if (siteLayout.isStatic && legacyRouteRedirectStrategy != AppBlock.LegacyRouteRedirectStrategy.DISALLOW) {
                         val pagesRootPath = pagesRoot.toPath()
                         var duplicationOccurred = false
                         var symbolicLinksUsed = false
@@ -369,7 +369,7 @@ abstract class KobwebExportTask @Inject constructor(
         getResourceFilesJsWithRoots().forEach { rootAndFile ->
             // Drop the leading slash so we don't confuse File resolve logic
             val relativePath = rootAndFile.relativeFile.invariantSeparatorsPath.substringAfter(getPublicPath()).drop(1)
-            if (relativePath == "index.html" && siteLayout != SiteLayout.KOBWEB) return@forEach
+            if (relativePath == "index.html" && siteLayout.isStatic) return@forEach
 
             (if (relativePath != "index.html") resourcesRoot else systemRoot)
                 .resolve(relativePath)
@@ -401,8 +401,8 @@ abstract class KobwebExportTask @Inject constructor(
             scriptMapFile.copyTo(destFile, overwrite = true)
         }
 
-        // API routes are only supported by the Kobweb layout
-        if (siteLayout == SiteLayout.KOBWEB) {
+        // API routes are only supported by the fullstack layout
+        if (siteLayout.isFullstack) {
             // The api.jar is not guaranteed to exist -- not every project needs to have API routes defined.
             confInputs.api?.let { apiFile ->
                 val apiJarFile = projectLayout.projectDirectory.file(apiFile).asFile

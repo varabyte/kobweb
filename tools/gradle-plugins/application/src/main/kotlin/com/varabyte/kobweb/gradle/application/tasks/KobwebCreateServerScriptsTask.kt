@@ -24,7 +24,7 @@ abstract class KobwebCreateServerScriptsTask :
     fun execute() {
         val javaArgs = listOf(
             ServerEnvironment.PROD.toSystemPropertyParam(),
-            SiteLayout.KOBWEB.toSystemPropertyParam(),
+            SiteLayout.FULLSTACK.toSystemPropertyParam(),
             "-Dio.ktor.development=false",
             "-jar",
             kobwebApplication.kobwebFolder.getServerJar().absolutePath.let {

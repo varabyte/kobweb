@@ -105,15 +105,15 @@ fun Application.configureRouting(
         )
     }
 
-    when (siteLayout) {
-        SiteLayout.KOBWEB -> {
+    when {
+        siteLayout.isFullstack -> {
             when (env) {
                 ServerEnvironment.DEV -> configureDevRouting(env, conf, globals, events, logger)
                 ServerEnvironment.PROD -> configureProdRouting(env, conf, events, logger)
             }
         }
 
-        SiteLayout.STATIC -> configureStaticRouting(conf)
+        else -> configureStaticRouting(conf)
     }
 }
 
