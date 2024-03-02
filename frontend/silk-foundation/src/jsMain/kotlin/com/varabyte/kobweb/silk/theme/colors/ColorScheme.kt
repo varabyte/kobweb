@@ -28,7 +28,7 @@ interface ColorScheme {
 @Suppress("unused")
 object ColorSchemes {
     /** A color scheme which ranges from near white (_50) to near black (_900). */
-    val Monochrome = object : ColorScheme {
+    object Monochrome : ColorScheme {
         override val _50 = Color.rgb(0XF2F2F2)
         override val _100 = Color.rgb(0XE6E6E6)
         override val _200 = Color.rgb(0XCCCCCC)
@@ -41,7 +41,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0X1A1A1A)
     }
 
-    val Red = object : ColorScheme {
+    object Red : ColorScheme {
         override val _50 = Color.rgb(0xFFEBEE)
         override val _100 = Color.rgb(0xFFCDD2)
         override val _200 = Color.rgb(0xEF9A9A)
@@ -54,7 +54,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xB71C1C)
     }
 
-    val Pink = object : ColorScheme {
+    object Pink : ColorScheme {
         override val _50 = Color.rgb(0xFCE4EC)
         override val _100 = Color.rgb(0xF8BBD0)
         override val _200 = Color.rgb(0xF48FB1)
@@ -67,7 +67,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x880E4F)
     }
 
-    val Purple = object : ColorScheme {
+    object Purple : ColorScheme {
         override val _50 = Color.rgb(0xF3E5F5)
         override val _100 = Color.rgb(0xE1BEE7)
         override val _200 = Color.rgb(0xCE93D8)
@@ -80,7 +80,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x4A148C)
     }
 
-    val DeepPurple = object : ColorScheme {
+    object DeepPurple : ColorScheme {
         override val _50 = Color.rgb(0xEDE7F6)
         override val _100 = Color.rgb(0xD1C4E9)
         override val _200 = Color.rgb(0xB39DDB)
@@ -93,7 +93,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x311B92)
     }
 
-    val Indigo = object : ColorScheme {
+    object Indigo : ColorScheme {
         override val _50 = Color.rgb(0xE8EAF6)
         override val _100 = Color.rgb(0xC5CAE9)
         override val _200 = Color.rgb(0x9FA8DA)
@@ -106,7 +106,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x1A237E)
     }
 
-    val Blue = object : ColorScheme {
+    object Blue : ColorScheme {
         override val _50 = Color.rgb(0xE3F2FD)
         override val _100 = Color.rgb(0xBBDEFB)
         override val _200 = Color.rgb(0x90CAF9)
@@ -119,7 +119,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x0D47A1)
     }
 
-    val LightBlue = object : ColorScheme {
+    object LightBlue : ColorScheme {
         override val _50 = Color.rgb(0xE1F5FE)
         override val _100 = Color.rgb(0xB3E5FC)
         override val _200 = Color.rgb(0x81D4FA)
@@ -132,7 +132,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x01579B)
     }
 
-    val Cyan = object : ColorScheme {
+    object Cyan : ColorScheme {
         override val _50 = Color.rgb(0xE0F7FA)
         override val _100 = Color.rgb(0xB2EBF2)
         override val _200 = Color.rgb(0x80DEEA)
@@ -145,7 +145,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x006064)
     }
 
-    val Teal = object : ColorScheme {
+    object Teal : ColorScheme {
         override val _50 = Color.rgb(0xE0F2F1)
         override val _100 = Color.rgb(0xB2DFDB)
         override val _200 = Color.rgb(0x80CBC4)
@@ -158,7 +158,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x004D40)
     }
 
-    val Green = object : ColorScheme {
+    object Green : ColorScheme {
         override val _50 = Color.rgb(0xE8F5E9)
         override val _100 = Color.rgb(0xC8E6C9)
         override val _200 = Color.rgb(0xA5D6A7)
@@ -171,7 +171,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x1B5E20)
     }
 
-    val LightGreen = object : ColorScheme {
+    object LightGreen : ColorScheme {
         override val _50 = Color.rgb(0xF1F8E9)
         override val _100 = Color.rgb(0xDCEDC8)
         override val _200 = Color.rgb(0xC5E1A5)
@@ -184,7 +184,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x33691E)
     }
 
-    val Lime = object : ColorScheme {
+    object Lime : ColorScheme {
         override val _50 = Color.rgb(0xF9FBE7)
         override val _100 = Color.rgb(0xF0F4C3)
         override val _200 = Color.rgb(0xE6EE9C)
@@ -197,7 +197,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x827717)
     }
 
-    val Yellow = object : ColorScheme {
+    object Yellow : ColorScheme {
         override val _50 = Color.rgb(0xFFFDE7)
         override val _100 = Color.rgb(0xFFF9C4)
         override val _200 = Color.rgb(0xFFF59D)
@@ -210,7 +210,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xF57F17)
     }
 
-    val Amber = object : ColorScheme {
+    object Amber : ColorScheme {
         override val _50 = Color.rgb(0xFFF8E1)
         override val _100 = Color.rgb(0xFFECB3)
         override val _200 = Color.rgb(0xFFE082)
@@ -223,7 +223,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xFF6F00)
     }
 
-    val Orange = object : ColorScheme {
+    object Orange : ColorScheme {
         override val _50 = Color.rgb(0xFFF3E0)
         override val _100 = Color.rgb(0xFFE0B2)
         override val _200 = Color.rgb(0xFFCC80)
@@ -236,7 +236,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xE65100)
     }
 
-    val DeepOrange = object : ColorScheme {
+    object DeepOrange : ColorScheme {
         override val _50 = Color.rgb(0xFBE9E7)
         override val _100 = Color.rgb(0xFFCCBC)
         override val _200 = Color.rgb(0xFFAB91)
@@ -249,7 +249,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xBF360C)
     }
 
-    val Brown = object : ColorScheme {
+    object Brown : ColorScheme {
         override val _50 = Color.rgb(0xEFEBE9)
         override val _100 = Color.rgb(0xD7CCC8)
         override val _200 = Color.rgb(0xBCAAA4)
@@ -262,7 +262,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x3E2723)
     }
 
-    val Gray = object : ColorScheme {
+    object Gray : ColorScheme {
         override val _50 = Color.rgb(0xFAFAFA)
         override val _100 = Color.rgb(0xF5F5F5)
         override val _200 = Color.rgb(0xEEEEEE)
@@ -275,7 +275,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x212121)
     }
 
-    val BlueGray = object : ColorScheme {
+    object BlueGray : ColorScheme {
         override val _50 = Color.rgb(0xECEFF1)
         override val _100 = Color.rgb(0xCFD8DC)
         override val _200 = Color.rgb(0xB0BEC5)
