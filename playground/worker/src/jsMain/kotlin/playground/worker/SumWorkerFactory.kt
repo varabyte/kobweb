@@ -1,5 +1,6 @@
 package playground.worker
 
+import com.varabyte.kobweb.worker.OutputDispatcher
 import com.varabyte.kobweb.worker.WorkerFactory
 import com.varabyte.kobweb.worker.WorkerStrategy
 import com.varabyte.kobwebx.worker.kotlinx.serialization.util.createIOSerializer
@@ -13,7 +14,7 @@ data class SumInputs(val a: Int, val b: Int)
 data class SumOutput(val sum: Int)
 
 internal class SumWorkerFactory : WorkerFactory<SumInputs, SumOutput> {
-    override fun createStrategy(postOutput: (SumOutput) -> Unit) = WorkerStrategy<SumInputs> { input ->
+    override fun createStrategy(postOutput: OutputDispatcher<SumOutput>) = WorkerStrategy<SumInputs> { input ->
         postOutput(SumOutput(input.a + input.b))
     }
 
