@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.worker
 
+class WorkerContext(val transferables: Transferables)
+
 /**
  * Interface for a Kobweb worker.
  *
@@ -17,12 +19,12 @@ interface Worker<I, O> {
     /**
      * A callback that will be invoked when the worker posts a message communicating finished work.
      */
-    var onOutput: (O) -> Unit
+    var onOutput: WorkerContext.(O) -> Unit
 
     /**
      * Send a message to the worker.
      */
-    fun postInput(input: I)
+    fun postInput(input: I, transferables: Transferables = Transferables.Empty)
 
     /**
      * Immediately terminate the worker, interrupting any processing it might still be doing.

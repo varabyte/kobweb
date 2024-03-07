@@ -27,14 +27,15 @@ abstract class WorkerStrategy<I> {
     /**
      * Receive and handle a message from the application.
      */
-    abstract fun onInput(input: I)
+    abstract fun onInput(inputMessage: InputMessage<I>)
 }
 
-class WorkerStrategyContext(val self: DedicatedWorkerGlobalScope)
+class WorkerStrategyContext(val self: DedicatedWorkerGlobalScope, val transferables: Transferables)
 
 /**
  * Convenience method to create a [WorkerStrategy] from a lambda.
  */
 fun <I> WorkerStrategy(handleInput: WorkerStrategyContext.(I) -> Unit) = object : WorkerStrategy<I>() {
-    override fun onInput(input: I) = WorkerStrategyContext(self).handleInput(input)
+    override fun onInput(inputMessage: InputMessage<I>) =
+        WorkerStrategyContext(self, inputMessage.transferables).handleInput(inputMessage.input)
 }
