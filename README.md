@@ -3675,7 +3675,7 @@ kobweb {
 If you have a pre-0.16.0 site, there are three steps you need to do, after which you can consider disabling legacy route
 redirects.
 
-1. In your site directory, run `./gradlew kobwebListRoutes` and look for any routes that have hyphens in them.
+1. In your site directory, run `../gradlew kobwebListRoutes` and look for any routes that have hyphens in them.
 2. Search through your codebase to see if there are any versions of those links but with hyphens removed. If so,
    update them.
 3. Check your static hosting provider for ways to notify them of redirects. Often, this can be done with a configuration
