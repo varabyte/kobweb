@@ -4,7 +4,7 @@ Note that, when this module is depended on, Kobweb adds the following entry to t
 template:
 
 ```html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 ```
 
 which adds to the size of your page, something you should be mindful of if you don't plan to use any of these (awesome!)
