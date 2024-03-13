@@ -987,7 +987,7 @@ val CustomStyle by ComponentStyle {
 ```
 
 > [!TIP]
-> When testing your breakpoint-conditinal styles, you should be aware that browser dev tools let you simulate window
+> When testing your breakpoint-conditional styles, you should be aware that browser dev tools let you simulate window
 > dimensions to see how your site looks at different sizes. For example, on Chrome, you can follow these instructions:
 > https://developer.chrome.com/docs/devtools/device-mode
 
@@ -2490,7 +2490,7 @@ fun initSilk(ctx: InitSilkContext) {
 
 > [!TIP]
 > The `registerStyleBase` method is commonly used for registering styles with minimal code, but you can also use
-> `registerStyle`, especially if you want to add some support for one or more psuedo-classes (
+> `registerStyle`, especially if you want to add some support for one or more pseudo-classes (
 > e.g. `hover`, `focus`, `active`):
 >
 > ```kotlin
@@ -3413,9 +3413,9 @@ a [full list of supported transferable objects](https://developer.mozilla.org/en
 > [filing an issue](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
 > and we might wrap the JavaScript class into Kobweb directly and update the Transferables API.
 
-Despite official limitations, Kobweb actualy offers support for a few additional types for convenience. If it's possible
-for the object to be unwrapped, have its contents transferred, and then be rebuilt on the other end, we are happy to
-support such values.
+Despite official limitations, Kobweb actually offers support for a few additional types for convenience. If it's
+possible for the object to be unwrapped, have its contents transferred, and then be rebuilt on the other end, we are
+happy to support such values.
 
 Typed arrays are a great example. They are actually not transferable! Only their internal `ArrayBuffer` is. However,
 when you ask Kobweb to transfer, say, an `Int8Array` for you, it will instead transfer its contents for you and
@@ -4414,7 +4414,7 @@ issues.
 Debugging the backend first requires configuring the Kobweb server to support remote debugging. This is easy to do by
 modifying the `kobweb` block in your build script to enable remote debugging:
 
-```kotiln
+```kotlin
 kobweb {
   app {
     server {
