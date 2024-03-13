@@ -29,13 +29,7 @@ import com.varabyte.kobweb.api.log.Logger
  *    handlers in ktor. However, we can create a single streaming endpoint and multiplex the incoming messages to the
  *    appropriate stream handlers.
  */
-abstract class ApiStream() {
-    @Deprecated(
-        "`routeOverride` is now specified as an annotation on the property itself (`@Api(routeOverride) val stream = object : ApiStream { ... }`)",
-        ReplaceWith("ApiStream()"),
-    )
-    constructor(@Suppress("UNUSED_PARAMETER") routeOverride: String = "") : this()
-
+abstract class ApiStream {
     class ClientConnectedContext(
         val stream: Stream,
         val clientId: StreamClientId,
@@ -64,15 +58,6 @@ abstract class ApiStream() {
     abstract suspend fun onTextReceived(ctx: TextReceivedContext)
     open suspend fun onClientDisconnected(ctx: ClientDisconnectedContext) = Unit
 }
-
-@Deprecated(
-    "`routeOverride` is now specified as an annotation on the property itself (`@Api(routeOverride) val stream = ApiStream { ... }`)",
-    ReplaceWith("ApiStream(block)")
-)
-fun ApiStream(
-    @Suppress("UNUSED_PARAMETER") routeOverride: String = "",
-    block: suspend (ApiStream.TextReceivedContext) -> Unit
-) = ApiStream(block)
 
 fun ApiStream(block: suspend (ApiStream.TextReceivedContext) -> Unit) =
     object : ApiStream() {

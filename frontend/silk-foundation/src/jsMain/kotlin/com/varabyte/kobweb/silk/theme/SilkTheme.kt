@@ -14,8 +14,6 @@ import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointValues
 import com.varabyte.kobweb.silk.init.SilkConfig
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.LegacyMutableSilkPalettes
-import com.varabyte.kobweb.silk.theme.colors.SilkPalettes
 import com.varabyte.kobweb.silk.theme.colors.palette.MutablePalettes
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
 import com.varabyte.kobweb.silk.theme.colors.palette.Palettes
@@ -36,7 +34,6 @@ class MutableSilkTheme {
     private val overriddenVariants = mutableSetOf<String>()
 
     val palettes = MutablePalettes()
-    internal val legacyPalettes = LegacyMutableSilkPalettes(palettes)
 
     var breakpoints: BreakpointValues<CSSLengthNumericValue> = BreakpointSizes(
         30.cssRem,
@@ -346,8 +343,6 @@ fun MutableSilkTheme.modifyComponentVariantBase(
 
 
 class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
-    @Deprecated("Palettes have been redesigned from the ground up to be extensible, so `SilkPalettes` is being turned down, and new colors will not be added to it.")
-    internal val legacyPalettes = mutableSilkTheme.legacyPalettes as SilkPalettes
     val palettes = mutableSilkTheme.palettes as Palettes
 
     val palette: Palette
@@ -390,14 +385,3 @@ val SilkTheme: ImmutableSilkTheme
     get() {
         return _SilkTheme ?: error("You can't access SilkTheme before first calling SilkApp")
     }
-
-/**
- * Convenience method for fetching the silk palette associated with the target color mode, useful for when you aren't
- * in a `@Composable` scope (which is common when defining ComponentStyles).
- */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Please migrate to `toPalette`, a more general, extensible API. Afterwards, you will need to additionally import palette properties (as they are extension properties).",
-    ReplaceWith("this.toPalette()", "com.varabyte.kobweb.silk.theme.colors.palette.toPalette")
-)
-fun ColorMode.toSilkPalette() = SilkTheme.legacyPalettes[this]
