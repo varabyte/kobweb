@@ -1605,7 +1605,7 @@ FaSpider(Modifier.color(Colors.Red))
 
 ### Material Design Icons
 
-Kobweb provides the `kobweb-silk-icons-mdi` artifact which you can use in your project if you want access to all the
+Kobweb provides the `silk-icons-mdi` artifact which you can use in your project if you want access to all the
 free Material Design icons.
 
 Using it is easy! Search the [Material Icons gallery](https://fonts.google.com/icons?icon.set=Material+Icons), choose an
@@ -1626,7 +1626,7 @@ search link above to verify what styles are supported by your icon. You can iden
 it into the method's `style` parameter:
 
 ```kotlin
-MdiLightMode(style = IconStyle.TWO_TONE)
+MdiLightMode(style = IconStyle.TWO_TONED)
 ```
 
 All Material Design Icon composables accept a modifier parameter, so you can tweak it further:
