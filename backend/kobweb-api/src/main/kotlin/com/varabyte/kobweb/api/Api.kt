@@ -8,7 +8,7 @@ import com.varabyte.kobweb.api.stream.ApiStream
  * By default, the route of the API method or API stream will be automatically determined from its file path,
  * e.g. "src/api/user/Fetch.kt" -> "/api/user/fetch".
  *
- * Additionally, the name transformation lowercases the route, e.g. "ReserveId.kt" -> "reserveid"
+ * Additionally, the name is converted into kebab-case, e.g. "ReserveId.kt" -> "reserve-id"
  *
  * ### API method
  *
