@@ -11,12 +11,6 @@ class Width private constructor(private val value: String) : StylePropertyValue 
         // Keyword
         val FitContent get() = Width("fit-content")
         val MaxContent get() = Width("max-content")
-
-        @Deprecated(
-            "Misspelling fixed. Please use `MaxContent` instead.",
-            ReplaceWith("Width.MaxContent", "com.varabyte.kobweb.compose.css.Width")
-        )
-        val MaxContext get() = MaxContent
         val MinContent get() = Width("min-content")
 
         // Global
@@ -48,13 +42,6 @@ class Height private constructor(private val value: String) : StylePropertyValue
         // Keyword
         val FitContent get() = Height("fit-content")
         val MaxContent get() = Height("max-content")
-
-        @Deprecated(
-            "Misspelling fixed. Please use `MaxContent` instead.",
-            ReplaceWith("Height.MaxContent", "com.varabyte.kobweb.compose.css.Height")
-        )
-        val MaxContext get() = MaxContent
-
         val MinContent get() = Height("min-content")
 
         // Global
@@ -86,13 +73,6 @@ class MaxWidth private constructor(private val value: String) : StylePropertyVal
         // Keyword
         val FitContent get() = MaxWidth("fit-content")
         val MaxContent get() = MaxWidth("max-content")
-
-        @Deprecated(
-            "Misspelling fixed. Please use `MaxContent` instead.",
-            ReplaceWith("MaxWidth.MaxContent", "com.varabyte.kobweb.compose.css.MaxWidth")
-        )
-        val MaxContext get() = MaxContent
-
         val MinContent get() = MaxWidth("min-content")
         val None get() = MaxWidth("none")
 
@@ -116,13 +96,6 @@ class MaxHeight private constructor(private val value: String) : StylePropertyVa
         // Keyword
         val FitContent get() = MaxHeight("fit-content")
         val MaxContent get() = MaxHeight("max-content")
-
-        @Deprecated(
-            "Misspelling fixed. Please use `MaxContent` instead.",
-            ReplaceWith("MaxHeight.MaxContent", "com.varabyte.kobweb.compose.css.MaxHeight")
-        )
-        val MaxContext get() = MaxContent
-
         val MinContent get() = MaxHeight("min-content")
         val None get() = MaxHeight("none")
 

@@ -25,15 +25,6 @@ abstract class KobwebBlock : ExtensionAware {
     }
 
     /**
-     * The string path to the root where generated code will be written to, relative to the project build directory.
-     */
-    @Deprecated(
-        "Use `baseGenDir` to specify the base path for all generated content, or use the `genDir` property of sub-blocks to configure the location of specific outputs.",
-        ReplaceWith("baseGenDir")
-    )
-    abstract val genDir: Property<String>
-
-    /**
      * The path to the root where all generated content will be written to by default,
      * relative to the project build directory.
      *
@@ -71,11 +62,7 @@ abstract class KobwebBlock : ExtensionAware {
     abstract val kspProcessorDependency: Property<String>
 
     init {
-        @Suppress("DEPRECATION")
-        genDir.apply {
-            convention("generated/kobweb")
-            baseGenDir.convention(this)
-        }
+        baseGenDir.convention("generated/kobweb")
         pagesPackage.convention(".pages")
         apiPackage.convention(".api")
         publicPath.convention("public")

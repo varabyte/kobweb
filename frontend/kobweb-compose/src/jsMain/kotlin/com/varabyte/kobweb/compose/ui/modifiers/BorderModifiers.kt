@@ -72,9 +72,6 @@ fun Modifier.borderCollapse(borderCollapse: BorderCollapse) = styleModifier {
     borderCollapse(borderCollapse)
 }
 
-@Deprecated("Use border { color(...) } instead.", ReplaceWith("border { color(color) }"))
-fun Modifier.borderColor(color: CSSColorValue) = border { color(color) }
-
 class BorderSideScope internal constructor(private val styleScope: StyleScope, private val side: String) {
     fun color(color: CSSColorValue) = styleScope.property("border$side-color", color)
     fun style(lineStyle: LineStyle) = styleScope.property("border$side-style", lineStyle)
@@ -226,29 +223,3 @@ class BorderRadiusScope internal constructor(private val styleScope: StyleScope)
 fun Modifier.borderRadius(scope: BorderRadiusScope.() -> Unit) = styleModifier {
     BorderRadiusScope(this).apply(scope)
 }
-
-@Deprecated("Use border { style(...) } instead.", ReplaceWith("border { style(lineStyle) }"))
-fun Modifier.borderStyle(lineStyle: LineStyle) = border { style(lineStyle) }
-
-@Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(width) }"))
-fun Modifier.borderWidth(width: CSSLengthNumericValue) = border { width(width) }
-
-@Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(topAndBottom, leftAndRight) }"))
-fun Modifier.borderWidth(topAndBottom: CSSLengthNumericValue, leftAndRight: CSSLengthNumericValue) = border {
-    width(topAndBottom, leftAndRight)
-}
-
-@Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(top, leftAndRight, bottom) }"))
-fun Modifier.borderWidth(
-    top: CSSLengthNumericValue,
-    leftAndRight: CSSLengthNumericValue,
-    bottom: CSSLengthNumericValue
-) = border { width(top, leftAndRight, bottom) }
-
-@Deprecated("Use border { width(...) } instead.", ReplaceWith("border { width(top, right, bottom, left) }"))
-fun Modifier.borderWidth(
-    top: CSSLengthNumericValue,
-    right: CSSLengthNumericValue,
-    bottom: CSSLengthNumericValue,
-    left: CSSLengthNumericValue
-) = border { width(top, right, bottom, left) }

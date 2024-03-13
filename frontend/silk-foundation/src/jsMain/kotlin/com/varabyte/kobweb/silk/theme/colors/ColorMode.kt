@@ -42,21 +42,6 @@ enum class ColorMode {
             DARK -> LIGHT
         }
 
-    @Deprecated("Use `isLight` property instead.", ReplaceWith("isLight"))
-    @JsName("isLight_Deprecated")
-    fun isLight() = (this == LIGHT)
-
-    @Deprecated("Use `isDark` property instead.", ReplaceWith("isDark"))
-    @JsName("isDark_Deprecated")
-    fun isDark() = (this == DARK)
-
-    @Deprecated("Use `opposite` property instead.", ReplaceWith("opposite"))
-    @JsName("opposite_Deprecated")
-    fun opposite() = when (this) {
-        LIGHT -> DARK
-        DARK -> LIGHT
-    }
-
     /**
      * Provide this color, useful within a [CompositionLocalProvider] call.
      *
@@ -104,12 +89,3 @@ fun Color.shifted(colorMode: ColorMode, byPercent: Float = Color.DEFAULT_SHIFTIN
 @Composable
 @ReadOnlyComposable
 fun Color.shifted(byPercent: Float = Color.DEFAULT_SHIFTING_PERCENT) = shifted(ColorMode.current, byPercent)
-
-@Deprecated("Use `ColorMode.currentState` instead.", ReplaceWith("ColorMode.currentState"))
-@Composable
-fun rememberColorMode() = ColorMode.currentState
-
-@Deprecated("Use `ColorMode.current` instead.", ReplaceWith("ColorMode.current"))
-@Composable
-@ReadOnlyComposable
-fun getColorMode(): ColorMode = ColorMode.current

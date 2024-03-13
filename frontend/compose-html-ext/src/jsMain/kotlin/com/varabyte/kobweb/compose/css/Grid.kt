@@ -320,62 +320,6 @@ abstract class GridBuilderInAuto {
     protected var rows: List<GridEntry>? = null
     protected var autoBuilder: GridBuilder? = null
 
-    @Deprecated(
-        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
-        ReplaceWith("columns { size(value) }")
-    )
-    fun col(value: CSSLengthOrPercentageNumericValue) {
-        columns { size(value) }
-    }
-
-    @Deprecated(
-        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
-        ReplaceWith("columns { size(value) }")
-    )
-    fun col(value: CSSFlexNumericValue) {
-        columns { size(value) }
-    }
-
-    @Deprecated(
-        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
-        ReplaceWith("columns { size(value) }")
-    )
-    fun column(value: CSSLengthOrPercentageNumericValue) {
-        columns { size(value) }
-    }
-
-    @Deprecated(
-        "All grid column convenience APIs are being removed, and code should migrate to use `columns { ... }` for clarity and consistency with CSS APIs.",
-        ReplaceWith("columns { size(value) }")
-    )
-    fun column(value: CSSFlexNumericValue) {
-        columns { size(value) }
-    }
-
-    @Deprecated(
-        "All grid row convenience APIs are being removed, and code should migrate to use `rows { ... }` for clarity and consistency with CSS APIs.",
-        ReplaceWith("rows { size(value) }")
-    )
-    fun row(value: CSSLengthOrPercentageNumericValue) {
-        rows { size(value) }
-    }
-
-    @Deprecated(
-        "All grid row convenience APIs are being removed, and code should migrate to use `rows { ... }` for clarity and consistency with CSS APIs.",
-        ReplaceWith("rows { size(value) }")
-    )
-    fun row(value: CSSFlexNumericValue) {
-        rows { size(value) }
-    }
-
-    @Deprecated(
-        "`cols` has been renamed to `columns` to be more consistent with CSS API naming.",
-        ReplaceWith("columns(block)")
-    )
-    fun cols(block: GridTrackBuilder.() -> Unit) {
-        columns(block)
-    }
-
     fun columns(block: GridTrackBuilder.() -> Unit) {
         columns = GridTrackBuilder().apply(block).tracks
     }

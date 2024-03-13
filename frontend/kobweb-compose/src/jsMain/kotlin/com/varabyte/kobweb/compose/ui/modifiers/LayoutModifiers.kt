@@ -4,7 +4,6 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 fun Modifier.aspectRatio(ratio: Number) = styleModifier {
     aspectRatio(ratio)
@@ -104,13 +103,6 @@ fun Modifier.overflow(scope: OverflowScope.() -> Unit) = styleModifier {
     OverflowScope(this).scope()
 }
 
-// TODO(#168): Remove these before v1.0
-@Deprecated("Use overflow { x(overflowX) } instead.", ReplaceWith("overflow { x(overflowX) }"))
-fun Modifier.overflowX(overflowX: Overflow) = overflow { x(overflowX) }
-
-@Deprecated("Use overflow { y(overflowY) } instead.", ReplaceWith("overflow { y(overflowY) }"))
-fun Modifier.overflowY(overflowY: Overflow) = overflow { y(overflowY) }
-
 fun Modifier.overflowWrap(overflowWrap: OverflowWrap) = styleModifier {
     overflowWrap(overflowWrap)
 }
@@ -170,13 +162,6 @@ fun Modifier.paddingInline(scope: PaddingInlineScope.() -> Unit) = styleModifier
     PaddingInlineScope(this).scope()
 }
 
-// TODO(#168): Remove these before v1.0
-@Deprecated("Use paddingInline { start(value) } instead.", ReplaceWith("paddingInline { start(value) }"))
-fun Modifier.paddingInlineStart(value: CSSLengthOrPercentageNumericValue) = paddingInline { start(value) }
-
-@Deprecated("Use paddingInline { end(value) } instead.", ReplaceWith("paddingInline { end(value) }"))
-fun Modifier.paddingInlineEnd(value: CSSLengthOrPercentageNumericValue) = paddingInline { end(value) }
-
 fun Modifier.paddingBlock(
     start: CSSLengthOrPercentageNumericValue = 0.px,
     end: CSSLengthOrPercentageNumericValue = 0.px,
@@ -192,13 +177,6 @@ class PaddingBlockScope internal constructor(private val styleScope: StyleScope)
 fun Modifier.paddingBlock(scope: PaddingBlockScope.() -> Unit) = styleModifier {
     PaddingBlockScope(this).scope()
 }
-
-// TODO(#168): Remove these before v1.0
-@Deprecated("Use paddingBlock { start(value) } instead.", ReplaceWith("paddingBlock { start(value) }"))
-fun Modifier.paddingBlockStart(value: CSSLengthOrPercentageNumericValue) = paddingBlock { start(value) }
-
-@Deprecated("Use paddingBlock { end(value) } instead.", ReplaceWith("paddingBlock { end(value) }"))
-fun Modifier.paddingBlockEnd(value: CSSLengthOrPercentageNumericValue) = paddingBlock { end(value) }
 
 fun Modifier.resize(resize: Resize) = styleModifier {
     resize(resize)

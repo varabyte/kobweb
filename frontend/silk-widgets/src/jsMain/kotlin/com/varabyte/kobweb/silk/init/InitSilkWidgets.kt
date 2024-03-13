@@ -66,10 +66,8 @@ import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderColorVar
-import com.varabyte.kobweb.silk.components.text.DivTextStyle
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
-import com.varabyte.kobweb.silk.theme.colors.palette.SilkWidgetColorGroups
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
 import com.varabyte.kobweb.silk.theme.colors.palette.button
@@ -218,7 +216,6 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerComponentStyle(CheckboxIconContainerStyle)
     mutableTheme.registerComponentStyle(CheckboxIconStyle)
     mutableTheme.registerComponentVariants(CheckedCheckboxIconContainerVariant, UncheckedCheckboxIconContainerVariant)
-    mutableTheme.registerComponentStyle(DivTextStyle)
     mutableTheme.registerComponentStyle(OverlayStyle)
     mutableTheme.registerComponentStyle(PopupStyle)
     mutableTheme.registerComponentStyle(SimpleGridStyle)
