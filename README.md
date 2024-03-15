@@ -3263,7 +3263,7 @@ kotlin {
   configAsKobwebWorker()
   jsMain.dependencies {
     implementation(libs.kotlinx.serialization.json) // or "org.jetbrains.kotlinx:kotlinx-serialization-json"
-    implementation(libs.kobwebx.worker.kotlinx.serialization) // or "com.varabyte.kobweb:kobwebx-serialization-kotlinx"
+    implementation(libs.kobwebx.worker.kotlinx.serialization) // or "com.varabyte.kobwebx:kobwebx-serialization-kotlinx"
   }
 }
 ```
