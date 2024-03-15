@@ -3357,7 +3357,8 @@ define multiple types of messages that your worker can receive and respond to.
 ### Transferables
 
 Occasionally, you may find yourself with a very large blob of data in your main application that you want to pass to a
-worker. For example, maybe your worker will be responsible for processing a potentially large, multi-megabyte image.
+worker (or vice versa!). For example, maybe your worker will be responsible for processing a potentially large,
+multi-megabyte image.
 
 Serializing a large amount of data can be expensive! In fact, you may find that even though your worker can run
 efficiently on a background thread, sending a large amount of data to it can cause your site to experience a significant
@@ -3416,10 +3417,10 @@ Despite official limitations, Kobweb actually offers support for a few additiona
 possible for the object to be unwrapped, have its contents transferred, and then be rebuilt on the other end, we are
 happy to support such values.
 
-Typed arrays are a great example. They are actually not transferable! Only their internal `ArrayBuffer` is. However,
-when you ask Kobweb to transfer, say, an `Int8Array` for you, it will instead transfer its contents for you and
-regenerate the outer `Int8Array` for you seamlessly on the other end. This is just boilerplate code that you would have
-had to write yourself anyway.
+Typed arrays, such as `Int8Array` are a great example. They are actually not transferable! Only their internal
+`ArrayBuffer` is. However, when you ask Kobweb to transfer a typed array, it will instead transfer its contents for you
+and regenerate the outer array seamlessly on the other end. This is just boilerplate code that you would have had to
+write yourself anyway.
 
 > [!TIP]
 > The `examples/imageprocessor` template demonstrates workers leveraging `Transferables` to pass image data from the
