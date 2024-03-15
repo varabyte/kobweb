@@ -3364,10 +3364,12 @@ Serializing a large amount of data can be expensive! In fact, you may find that 
 efficiently on a background thread, sending a large amount of data to it can cause your site to experience a significant
 pause during the copy. This can easily be seconds if the data is large enough!
 
-To support this use-case, the web workers API introduced the concept
+This isn't just an issue with Kobweb. This was originally a problem with standard web APIs. To support this use-case,
+web workers introduced the concept
 of [transferable objects](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects).
-Instead of data being copied over, its ownership is transferred over from one thread to another. Attempts to use the
-object in the original thread after that point will throw an exception.
+
+Instead of an object being copied over, its ownership is transferred over from one thread to another. Attempts to use
+the object in the original thread after that point will throw an exception.
 
 Kobweb workers support transferable objects in a type-safe, Kotlin-idiomatic way, via the `Transferables` class. Using
 it, you can register named objects in one thread and then retrieve them by that name in another.
@@ -3390,6 +3392,7 @@ And, of course, workers can send transferable objects back to the main applicati
 
 ```kotlin
 // In the worker:
+val largeArray = Uint8Array(1024 * 1024 * 8).apply { /* initialize it */ }
 postOutput(WorkerOutput(), Transferables {
   add("largeArray", largeArray)
 })
@@ -3413,14 +3416,15 @@ a [full list of supported transferable objects](https://developer.mozilla.org/en
 > [filing an issue](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
 > and we might wrap the JavaScript class into Kobweb directly and update the Transferables API.
 
-Despite official limitations, Kobweb actually offers support for a few additional types for convenience. If it's
-possible for the object to be unwrapped, have its contents transferred, and then be rebuilt on the other end, we are
-happy to support such values.
+Despite official limitations, Kobweb actually offers support for a few additional types, as a convenience. If it is
+possible to extract transferable content from an object, transfer *that*, and then build the original object back up on
+the other end, we are happy to do that for you.
 
-Typed arrays, such as `Int8Array` are a great example. They are actually not transferable! Only their internal
-`ArrayBuffer` is. However, when you ask Kobweb to transfer a typed array, it will instead transfer its contents for you
-and regenerate the outer array seamlessly on the other end. This is just boilerplate code that you would have had to
-write yourself anyway.
+Typed arrays, such as `Int8Array`, are a great example. They are actually not transferable! Only their internal
+`ArrayBuffer` is.
+
+However, when you ask Kobweb to transfer a typed array, it will instead transfer its contents for you and regenerate the
+outer array seamlessly on the other end. This is just boilerplate code that you would have had to write yourself anyway.
 
 > [!TIP]
 > The `examples/imageprocessor` template demonstrates workers leveraging `Transferables` to pass image data from the
