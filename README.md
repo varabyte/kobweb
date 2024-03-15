@@ -3271,42 +3271,41 @@ kotlin {
 Then, define the worker factory:
 
 ```kotlin
-// Worker module
 @Serializable
 data class FindPrimesInput(val max: Int)
 
 @Serializable
 data class FindPrimesOutput(val max: Int, val primes: List<Int>)
 
+private fun findPrimes(max: Int): List<Int> {
+  // Loop through all numbers, taking out multiples of each prime
+  // e.g. 2 will take out 4, 6, 8, 10, etc.
+  // then 3 will take out 9, 15, 21, etc. (6, 12, and 18 were already removed)
+  val primes = (1..max).toMutableList()
+  var primeIndex = 1 // Skip index 0, which is 1.
+  while (primeIndex < primes.lastIndex) {
+    val prime = primes[primeIndex]
+    var maybePrimeIndex = primeIndex + 1
+    while (maybePrimeIndex <= primes.lastIndex) {
+      if (primes[maybePrimeIndex] % prime == 0) {
+        primes.removeAt(maybePrimeIndex)
+      } else {
+        ++maybePrimeIndex
+      }
+    }
+    primeIndex++
+  }
+  return primes
+}
+
 internal class FindPrimesWorkerFactory: WorkerFactory<FindPrimesInput, FindPrimesOutput> {
   override fun createStrategy(postOutput: OutputDispatcher<FindPrimesOutput>) =
     object : WorkerStrategy<FindPrimesInput>() {
-    private fun findPrimes(max: Int): List<Int> {
-      // Loop through all numbers, taking out multiples of each prime
-      // e.g. 2 will take out 4, 6, 8, 10, etc.
-      // then 3 will take out 9, 15, 21, etc. (6, 12, and 18 were already removed)
-      val primes = (1..max).toMutableList()
-      var primeIndex = 1 // Skip index 0, which is 1.
-      while (primeIndex < primes.lastIndex) {
-        val prime = primes[primeIndex]
-        var maybePrimeIndex = primeIndex + 1
-        while (maybePrimeIndex <= primes.lastIndex) {
-          if (primes[maybePrimeIndex] % prime == 0) {
-            primes.removeAt(maybePrimeIndex)
-          } else {
-            ++maybePrimeIndex
-          }
-        }
-        primeIndex++
-      }
-      return primes
-    }
-
       override fun onInput(inputMessage: InputMessage<FindPrimesInput>) {
         val input = inputMessage.input
-      postOutput(FindPrimesOutput(input.max, findPrimes(input.max)))
+        postOutput(FindPrimesOutput(input.max, findPrimes(input.max)))
+      }
     }
-  }
 
   override fun createIOSerializer() = Json.createIOSerializer<FindPrimesInput, FindPrimesOutput>()
 }
