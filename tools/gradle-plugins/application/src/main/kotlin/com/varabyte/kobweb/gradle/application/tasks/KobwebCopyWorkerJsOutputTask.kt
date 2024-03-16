@@ -23,7 +23,7 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appB
 
     @TaskAction
     fun execute() {
-        val workerOutpusFilesPattern = PatternSet().apply {
+        val workerOutputsFilesPattern = PatternSet().apply {
             include("$KOBWEB_METADATA_WORKER_SUBFOLDER/**")
         }
 
@@ -32,7 +32,7 @@ abstract class KobwebCopyWorkerJsOutputTask @Inject constructor(private val appB
         // will have to be the same across different projects. But it could happen if a user duplicates a
         // worker project and forgets to update either the group name or worker name.
         val copiedFiles = mutableMapOf<String, String>()
-        val workerOutputData = runtimeClasspath.toKobwebOutputByPattern(workerOutpusFilesPattern)
+        val workerOutputData = runtimeClasspath.toKobwebOutputByPattern(workerOutputsFilesPattern)
 
         fileSystemOperations.sync {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE

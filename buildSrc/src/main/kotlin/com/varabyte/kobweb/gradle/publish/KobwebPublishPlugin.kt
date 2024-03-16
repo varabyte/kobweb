@@ -90,7 +90,7 @@ fun Property<(String) -> String>.set(value: String) {
 /**
  * Convenience setter for handling all artifact targets for a multiplatform module.
  *
- * A multiplatform target often generates N + 1 artficats given N targets (e.g. js, jvm, and multiplatform metadata).
+ * A multiplatform target often generates N + 1 artifacts given N targets (e.g. js, jvm, and multiplatform metadata).
  */
 fun Property<(String) -> String>.setForMultiplatform(value: String) {
     this.set { value + if (it == "kotlinMultiplatform") "" else "-$it" }
