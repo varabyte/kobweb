@@ -3409,6 +3409,8 @@ val worker = rememberWorker {
 Finally, it's worth noting that not every object can be transferred. In fact, very few can! You can
 refer to the official docs for
 a [full list of supported transferable objects](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects#supported_objects).
+When building a `Transferables` object, the `add` method is type-safe, meaning you cannot add an object that cannot then
+be transferred over.
 
 > [!CAUTION]
 > Kotlin/JS does not support a majority of the classes listed here, so neither does Kobweb as a result. If you find
