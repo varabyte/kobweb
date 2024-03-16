@@ -19,20 +19,13 @@ import org.w3c.dom.Element
 
 abstract class CssStyle(
     internal val init: ComponentModifiers.() -> Unit,
-    internal val extraModifiers: @Composable () -> Modifier,
+    internal val extraModifiers: @Composable () -> Modifier = { Modifier },
 ) {
-    // Note: setting a default value for `extraModifiers` in the main constructor causes a compilation error
-    // TODO: "dummy" parameter is used to disambiguate from the builder functions, this shouldn't be necessary
-    //  once the default value can be set in the main constructor
-    @Suppress("UNUSED_PARAMETER")
-    constructor(init: ComponentModifiers.() -> Unit, dummy: Unit) : this(init, { Modifier })
 
     abstract class Base(
         init: ComponentBaseModifier.() -> Modifier,
-        extraModifiers: @Composable () -> Modifier,
-    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers) {
-        constructor(init: ComponentBaseModifier.() -> Modifier) : this(init, { Modifier })
-    }
+        extraModifiers: @Composable () -> Modifier = { Modifier },
+    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers)
 
     /**
      * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
