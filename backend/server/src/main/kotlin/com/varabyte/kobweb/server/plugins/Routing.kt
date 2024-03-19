@@ -96,11 +96,11 @@ fun Application.configureRouting(
     if (siteLayout == SiteLayout.STATIC && env != ServerEnvironment.PROD) {
         log.warn(
             """
-            Static site layout is configured for a development server.
+            Static site layout was requested to run in development mode.
 
-            This isn't expected, as development servers expect to read their values from the user's project. Static
-            layouts are really only designed to be used in production. The server will still run in static mode as
-            requested, but live-reloading, server APIs, etc. will not work with this configuration.
+            However, static layouts currently support production environments only. They do not support live-reloading,
+            and they require a static layout export to be run first. The server will still run, but the request for a
+            dev environment is essentially ignored.
         """.trimIndent()
         )
     }
