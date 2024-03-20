@@ -93,27 +93,21 @@ fun Application.configureRouting(
         override fun error(message: String) = log.error(message)
     }
 
-    if (siteLayout == SiteLayout.STATIC && env != ServerEnvironment.PROD) {
-        log.warn(
-            """
-            Static site layout was requested to run in development mode.
-
-            However, static layouts currently support production environments only. They do not support live-reloading,
-            and they require a static layout export to be run first. The server will still run, but the request for a
-            dev environment is essentially ignored.
-        """.trimIndent()
-        )
-    }
-
     when {
         siteLayout.isFullstack -> {
             when (env) {
-                ServerEnvironment.DEV -> configureDevRouting(env, conf, globals, events, logger)
-                ServerEnvironment.PROD -> configureProdRouting(env, conf, events, logger)
+                ServerEnvironment.DEV -> configureFullstackDevRouting(conf, globals, events, logger)
+                ServerEnvironment.PROD -> configureFullstackProdRouting(conf, events, logger)
             }
         }
 
-        else -> configureStaticRouting(conf)
+        else -> {
+            check(siteLayout.isStatic)
+            when (env) {
+                ServerEnvironment.DEV -> configureStaticDevRouting(conf, globals, logger)
+                ServerEnvironment.PROD -> configureStaticProdRouting(conf)
+            }
+        }
     }
 }
 
@@ -440,17 +434,13 @@ private fun Path?.createApiJar(
 }
 
 private fun Application.configureDevRouting(
-    env: ServerEnvironment,
+    apiJar: ApiJarFile?,
     conf: KobwebConf,
     globals: ServerGlobals,
-    events: EventDispatcher,
     logger: Logger
 ) {
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
-    val apiJar = conf.server.files.dev.api
-        ?.let { Path(it) }
-        .createApiJar(env, logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
@@ -517,8 +507,24 @@ private fun Application.configureDevRouting(
     }
 }
 
-private fun Application.configureProdRouting(
-    env: ServerEnvironment,
+private fun Application.configureFullstackDevRouting(
+    conf: KobwebConf,
+    globals: ServerGlobals,
+    events: EventDispatcher,
+    logger: Logger
+) {
+    val apiJar = conf.server.files.dev.api
+        ?.let { Path(it) }
+        .createApiJar(
+            ServerEnvironment.DEV,
+            logger,
+            events,
+            conf.server.nativeLibraries.associate { it.name to it.path })
+
+    configureDevRouting(apiJar, conf, globals, logger)
+}
+
+private fun Application.configureFullstackProdRouting(
     conf: KobwebConf,
     events: EventDispatcher,
     logger: Logger
@@ -543,7 +549,11 @@ private fun Application.configureProdRouting(
     val apiJar = conf.server.files.dev.api
         ?.substringAfterLast("/")
         ?.let { systemRoot.resolve(it) }
-        .createApiJar(env, logger, events, conf.server.nativeLibraries.associate { it.name to it.path })
+        .createApiJar(
+            ServerEnvironment.PROD,
+            logger,
+            events,
+            conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
         val routePrefix = conf.site.routePrefixNormalized
@@ -553,7 +563,7 @@ private fun Application.configureProdRouting(
             // Since prod doesn't have live reloading, we can avoid setting up streaming if there are no API streams
             // declared at this point.
             if (apiJar.apis.numApiStreams > 0) {
-                setupStreaming(ServerEnvironment.PROD, this@configureProdRouting, conf, apiJar, logger)
+                setupStreaming(ServerEnvironment.PROD, this@configureFullstackProdRouting, conf, apiJar, logger)
             }
         }
 
@@ -580,13 +590,28 @@ private fun Application.configureProdRouting(
     }
 }
 
+// A static layout server in dev mode is pretty much identical to a fullstack server without API handling.
+//
+// Note that a real static layout server loads files from disk in a location where they were exported, while dev mode
+// fakes this experience, by loading files from the project's build directory. This means that a static server in dev
+// mode may seem to work fine but might not actually work when exported. However, we still do this as it lets users
+// iterate on a static layout project while failing fast if they accidentally try using API routes or API streams.
+private fun Application.configureStaticDevRouting(
+    conf: KobwebConf,
+    globals: ServerGlobals,
+    logger: Logger
+) {
+    configureDevRouting(null, conf, globals, logger)
+}
+
+
 /**
  * Run a Kobweb server as a dumb, static server.
  *
  * This is kind of a waste of a Kobweb server, since it has all the smarts removed, but at the same time, it's supported
  * so a user can test-run the static site experience which will ultimately be provided by some external provider.
  */
-private fun Application.configureStaticRouting(conf: KobwebConf) {
+private fun Application.configureStaticProdRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
 
     routing {
