@@ -1990,7 +1990,7 @@ Let's walk through an example of layering CSS effects on top of a basic element.
 
 > [!TIP]
 > Two of the best learning resources for CSS properties are `https://developer.mozilla.org`
-> and `https://www.w3schools.com`. Keep an eye out for these when you do a search.
+> and `https://www.w3schools.com`. Keep an eye out for these when you do a web search.
 
 We'll create the bordered, floating, oscillating element we discussed earlier. Rereading it now, here are the concepts
 we need to figure out how to do:
