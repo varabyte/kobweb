@@ -275,7 +275,7 @@ abstract class KobwebExportTask @Inject constructor(
                                 }
                             }
                             // This case is an error in static layout mode, because with no pages, there's nothing for
-                            // the user to visit. For a kobweb layout, however, there is always at least a minimal
+                            // the user to visit. For a fullstack layout, however, there is always at least a minimal
                             // index.html file included.
                             when {
                                 siteLayout.isFullstack -> logger.warn("w: $noPagesExportedMessage")
