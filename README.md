@@ -137,6 +137,24 @@ $ brew install varabyte/tap/kobweb
 $ sdk install kobweb
 ```
 
+### Arch Linux
+
+*Thanks a ton to [aksh1618](https://github.com/aksh1618) for adding support for this target!*
+
+With an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers), e.g.:
+
+```shell
+$ trizen -S kobweb
+```
+
+Without an AUR helper:
+
+```shell
+$ git clone https://aur.archlinux.org/kobweb.git
+$ cd kobweb
+$ makepkg -si
+```
+
 ### Don't see your favorite package manager?
 
 Please see: https://github.com/varabyte/kobweb-cli/issues/11 and consider leaving a comment!
@@ -229,6 +247,7 @@ you installed it.
 | Homebrew                  | `brew update`<br/>`brew upgrade kobweb`                                                                                              |
 | Scoop                     | `scoop update kobweb`                                                                                                                |
 | SDKMAN!                   | `sdk upgrade kobweb`                                                                                                                 |
+| Arch Linux                | Rerunning [install steps](#arch-linux) should work. If using an AUR helper, you may need to review its manual.                       |
 | Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.15). You can find both a zip and tar file there. |
 
 ## Create your Kobweb site
