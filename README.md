@@ -144,6 +144,8 @@ $ sdk install kobweb
 With an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers), e.g.:
 
 ```shell
+$ yay -S kobweb
+$ paru -S kobweb
 $ trizen -S kobweb
 ```
 
