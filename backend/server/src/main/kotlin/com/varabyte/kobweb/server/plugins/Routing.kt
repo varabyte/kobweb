@@ -12,6 +12,7 @@ import com.varabyte.kobweb.api.stream.StreamClientId
 import com.varabyte.kobweb.api.stream.StreamEvent
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.project.conf.Server.Redirect
 import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -394,6 +395,15 @@ private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(
     }
 }
 
+private fun Routing.configureRedirects(routePrefix: String, redirects: List<Redirect>) {
+    redirects.forEach { redirect ->
+        get("$routePrefix/${redirect.from.removePrefix("/")}") {
+            call.respondRedirect("$routePrefix/${redirect.to.removePrefix("/")}")
+        }
+    }
+}
+
+
 // Note: This should be defined LAST in the routing { ... } block and it used to handle general URLs. The site script
 // itself looks at the user's current URL to figure out how to route itself, so in many cases, just returning
 // "index.html" most of the time is enough for the client to figure out what to render next.
@@ -586,6 +596,7 @@ private fun Application.configureFullstackProdRouting(
             }
         }
 
+        configureRedirects(routePrefix, conf.server.redirects)
         configureCatchAllRouting(script, fallbackIndex, routePrefix)
     }
 }
@@ -613,11 +624,14 @@ private fun Application.configureStaticDevRouting(
  */
 private fun Application.configureStaticProdRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
+    val routePrefix = conf.site.routePrefixNormalized
 
     routing {
         staticFiles(conf.site.routePrefixNormalized, siteRoot.toFile()) {
             extensions("html")
             default("404.html")
         }
+
+        configureRedirects(routePrefix, conf.server.redirects)
     }
 }

@@ -11,4 +11,8 @@ server:
       script: "build/dist/js/productionExecutable/playground.js"
       siteRoot: ".kobweb/site"
 
+  redirects:
+    - from: "/echo"
+      to: "/echo2"
+
   port: 8080

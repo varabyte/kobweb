@@ -35,6 +35,7 @@ class Server(
     val port: Int = 8080,
     val logging: Logging = Logging(),
     val cors: Cors = Cors(),
+    val redirects: List<Redirect>,
     val streaming: Streaming = Streaming(),
     val nativeLibraries: List<NativeLibrary> = emptyList(),
 ) {
@@ -128,6 +129,22 @@ class Server(
     @Serializable
     class Cors(
         val hosts: List<Host> = listOf(),
+    )
+
+    /**
+     * URL redirect mappings.
+     *
+     * Specifying a mapping like "/legacy-name" to "/new-name" will cause the Kobweb server to issue a 301 redirect if
+     * the [from] path is visited.
+     *
+     * A leading underscore will be added for you if omitted.
+     *
+     * See also: https://ktor.io/docs/responses.html#redirect
+     */
+    @Serializable
+    class Redirect(
+        val from: String,
+        val to: String,
     )
 
     /**
