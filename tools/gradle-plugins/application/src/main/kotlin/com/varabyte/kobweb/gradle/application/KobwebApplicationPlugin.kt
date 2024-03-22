@@ -16,6 +16,7 @@ import com.varabyte.kobweb.gradle.application.tasks.KobwebCreateServerScriptsTas
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportConfInputs
 import com.varabyte.kobweb.gradle.application.tasks.KobwebExportTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenIndexConfInputs
+import com.varabyte.kobweb.gradle.application.tasks.KobwebGenSiteEntryConfInputs
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateApisFactoryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteEntryTask
 import com.varabyte.kobweb.gradle.application.tasks.KobwebGenerateSiteIndexTask
@@ -65,8 +66,6 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import javax.inject.Inject
 import kotlin.io.path.exists
-import kotlin.io.path.readText
-import kotlin.io.path.writeText
 
 val Project.kobwebFolder: KobwebFolder
     get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
@@ -91,22 +90,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebFolder = project.kobwebFolder
         val kobwebConf = with(KobwebConfFile(kobwebFolder)) {
-            // TODO(#310): Remove this hack before Kobweb v1.0. At that point, users are very likely to have picked up
-            //  this update by then (or created a new app, where templates will have been updated).
             if (!path.exists()) {
-                throw GradleException("Missing conf.yaml file from Kobweb folder")
-            }
-
-            val originalText = path.readText()
-            val updatedText = originalText
-                .replace("build/developmentExecutable", "build/dist/js/developmentExecutable")
-                .replace("build/distributions", "build/dist/js/productionExecutable")
-
-            if (originalText != updatedText) {
-                project.logger.warn(
-                    "The Compose HTML team changed the location of some output files in 1.5.1. In order to keep you working, we have automatically updated your `.kobweb/conf.yaml` file to reflect these changes."
-                )
-                path.writeText(updatedText)
+                throw GradleException("Missing conf.yaml file from Kobweb folder. Did you delete it?")
             }
             content!!
         }
@@ -268,7 +253,8 @@ class KobwebApplicationPlugin @Inject constructor(
                 "kobwebGenSiteEntry",
                 kobwebConf.site.routePrefix,
                 buildTarget,
-                kobwebBlock
+                kobwebBlock,
+                KobwebGenSiteEntryConfInputs(kobwebConf),
             )
 
             kobwebCacheAppDataTask.configure {

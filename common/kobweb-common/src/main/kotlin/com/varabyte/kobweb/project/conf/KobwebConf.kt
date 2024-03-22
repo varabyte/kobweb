@@ -35,6 +35,7 @@ class Server(
     val port: Int = 8080,
     val logging: Logging = Logging(),
     val cors: Cors = Cors(),
+    val redirects: List<Redirect> = emptyList(),
     val streaming: Streaming = Streaming(),
     val nativeLibraries: List<NativeLibrary> = emptyList(),
 ) {
@@ -128,6 +129,25 @@ class Server(
     @Serializable
     class Cors(
         val hosts: List<Host> = listOf(),
+    )
+
+    /**
+     * URL redirect mappings.
+     *
+     * Specifying a mapping like "/legacy-name" to "/new-name" will cause the Kobweb server to issue a 301 redirect if
+     * the [from] path is visited.
+     *
+     * The `from` path supports regexes, and capture groups can be substituted into the `to` path using `$1`, `$2`, etc.
+     * For example, a mapping like "/old/([^/]*)" to "/new/$1" will redirect "/old/abc" to "/new/abc".
+     *
+     * IMPORTANT: The user must remember to add a leading slash. Unfortunately, we cannot simply detect a missing slash
+     * ourselves because `(.+)/old` is a valid `from` value. If the user does not include a leading slash, then their
+     * `from` pattern will never match.
+     */
+    @Serializable
+    class Redirect(
+        val from: String,
+        val to: String,
     )
 
     /**

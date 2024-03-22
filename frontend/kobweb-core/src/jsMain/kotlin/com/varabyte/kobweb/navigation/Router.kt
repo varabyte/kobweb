@@ -204,6 +204,16 @@ class Router {
     }
 
     /**
+     * Split a URL into its path part and the rest of the URL.
+     *
+     * For example, `/path?query#fragment` would return `/path` and `?query#fragment`.
+     */
+    private fun String.partitionPath(): Pair<String, String> {
+        val pathPart = this.substringBefore('?').substringBefore('#')
+        return pathPart to this.removePrefix(pathPart)
+    }
+
+    /**
      * Register a route, mapping it to some target composable method that will get called when that path is requested by
      * the browser.
      *
@@ -235,6 +245,18 @@ class Router {
                 pageMethod
             )
         ) { "Registration failure. Path is already registered: $route" }
+    }
+
+    @Suppress("unused") // Called by generated code
+    fun registerRedirect(fromRoute: String, toRoute: String, autoPrefix: Boolean = true) {
+        listOf(fromRoute, toRoute).forEach {
+            require(Route.isRoute(it) && it.startsWith('/')) { "Registration only allowed for rooted routes, e.g. `/example/path`. Got: $it" }
+        }
+
+        // Don't use RoutePrefix.prepend here because `fromRoute` and `toRoute` are not strictly routes (the first is a
+        // regex and the latter is a route that might have variables in it).
+        val prefix = if (autoPrefix) RoutePrefix.value.removeSuffix("/") else ""
+        routeTree.registerRedirect(prefix + fromRoute, prefix + toRoute)
     }
 
     fun setErrorHandler(errorHandler: ErrorPageMethod) {
@@ -351,6 +373,13 @@ class Router {
         }
 
         return if (PageContext.instance.updatePageContext(pathQueryAndFragment)) {
+            // Although 99.9% of the time, the URL we request to visit will be the same as the one visited, if any parts
+            // of the URL are set up to use redirects, then it will be different. Here, we update just the path part
+            // *just in case* it changed, but keep the query parameters / fragment parts the same as before.
+            // So if we visit "blah.com/old-page#hash?a=b" and get redirected, the final URL will be
+            // "blah.com/new-page#hash?a=b"
+            pathQueryAndFragment = PageContext.instance.route.path + pathQueryAndFragment.partitionPath().second
+
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->
                 if (window.location.href != url) {

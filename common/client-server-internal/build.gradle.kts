@@ -19,10 +19,14 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.serialization.core)
         }
+        commonTest.dependencies {
+            implementation(libs.truthish)
+            implementation(kotlin("test"))
+        }
     }
 }
 
 kobwebPublication {
-    artifactId.setForMultiplatform("kobweb-client-server-models")
-    description.set("Model classes that get shared between a Kobweb server (JVM) and client (JS) via serialization")
+    artifactId.setForMultiplatform("kobweb-client-server-internal")
+    description.set("Miscellaneous multiplatform common classes and utilities shared between Kobweb core and server codebases")
 }

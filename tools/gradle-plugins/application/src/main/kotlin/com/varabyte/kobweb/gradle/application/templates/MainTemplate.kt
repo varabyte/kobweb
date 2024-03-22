@@ -8,6 +8,7 @@ import com.squareup.kotlinpoet.withIndent
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
+import com.varabyte.kobweb.project.conf.Server
 import com.varabyte.kobweb.project.frontend.AppData
 
 private const val KOBWEB_GROUP = "com.varabyte.kobweb"
@@ -24,6 +25,7 @@ fun createMainFunction(
     appGlobals: Map<String, String>,
     cleanUrls: Boolean,
     routePrefix: RoutePrefix,
+    redirects: List<Server.Redirect>,
     target: BuildTarget,
     legacyRouteRedirectStrategy: AppBlock.LegacyRouteRedirectStrategy,
 ): String {
@@ -166,6 +168,9 @@ fun createMainFunction(
                 withIndent {
                     frontendData.pages.sortedBy { it.route }.forEach { entry ->
                         addStatement("""ctx.router.register("${entry.route}") { ${entry.fqn}() }""")
+                    }
+                    redirects.sortedBy { it.to }.forEach { entry ->
+                        addStatement("""ctx.router.registerRedirect("${entry.from}", "${entry.to}")""")
                     }
                     addStatement("")
 

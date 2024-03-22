@@ -17,7 +17,7 @@ dependencies {
     implementation(projects.backend.kobwebApi)
     implementation(projects.backend.serverPlugin)
     implementation(projects.common.kobwebCommon)
-    implementation(projects.common.clientServerModels)
+    implementation(projects.common.clientServerInternal)
 
     testImplementation(libs.truthish)
     testImplementation(libs.ktor.server.tests)

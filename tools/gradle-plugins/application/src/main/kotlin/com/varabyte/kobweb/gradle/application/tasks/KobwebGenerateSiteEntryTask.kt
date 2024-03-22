@@ -8,21 +8,36 @@ import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
+import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.project.conf.Server
 import com.varabyte.kobweb.project.frontend.AppData
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
+class KobwebGenSiteEntryConfInputs(
+    @get:Nested val redirects: List<Redirect>,
+) {
+    class Redirect(
+        @get:Input val from: String,
+        @get:Input val to: String
+    )
+
+    constructor(kobwebConf: KobwebConf) : this(kobwebConf.server.redirects.map { Redirect(it.from, it.to) })
+}
+
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @get:Input val routePrefix: String,
     @get:Input val buildTarget: BuildTarget,
     kobwebBlock: KobwebBlock,
+    @get:Nested val confInputs: KobwebGenSiteEntryConfInputs,
 ) : KobwebGenerateTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:Input
     val cleanUrls: Provider<Boolean> = kobwebBlock.app.cleanUrls
@@ -57,6 +72,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                 globals.get(),
                 cleanUrls.get(),
                 RoutePrefix(routePrefix),
+                confInputs.redirects.map { Server.Redirect(it.from, it.to) },
                 buildTarget,
                 legacyRouteRedirectStrategy.getOrElse(
                     if (buildTarget == BuildTarget.DEBUG) AppBlock.LegacyRouteRedirectStrategy.WARN else AppBlock.LegacyRouteRedirectStrategy.ALLOW

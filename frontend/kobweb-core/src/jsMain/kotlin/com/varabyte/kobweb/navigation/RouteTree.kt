@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.util.kebabCaseToCamelCase
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.util.text.PatternMapper
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
@@ -35,131 +36,138 @@ internal class PageData(
  * A tree data structure that represents a parsed route, such as `/example/path` or `/{dynamic}/path`
  */
 internal class RouteTree {
-    sealed class Node(val name: String, var method: PageMethod?) {
+    sealed class Node(val parent: Node? = null, val name: String, var method: PageMethod?) {
+        companion object {
+            // When true, we tweak the route name testing logic to be a bit more lenient to support the legacy way
+            // Kobweb used to generate routes. This should only get set to true if `legacyRouteRedirectStrategy` is
+            // enabled, which we actually encourage users to disable as soon as possible. This code will be deleted
+            // before Kobweb 1.0.
+            var UseLegacySearch: Boolean = false
+        }
+
         private val _children = mutableListOf<Node>()
         val children: List<Node> = _children
 
         protected open fun matches(name: String): Boolean {
-            return this.name == name
+            return this.name == name || if (UseLegacySearch && this.name.contains('-')) {
+                val isLastPart = children.isEmpty()
+                if (isLastPart) {
+                    // The name "example-page" would have been "examplepage" before
+                    this.name.replace("-", "") == name
+                } else {
+                    // The name "example-page" would have been "examplePage" before
+                    this.name.kebabCaseToCamelCase() == name
+                }
+            } else false
         }
 
         fun createChild(routePart: String, method: PageMethod?): Node {
             val node = if (routePart.startsWith('{') && routePart.endsWith('}')) {
-                DynamicNode(routePart.substring(1, routePart.length - 1), method)
+                DynamicNode(this, routePart.substring(1, routePart.length - 1), method)
             } else {
-                StaticNode(routePart, method).also { node ->
-                    if (routePart.contains('-')) {
-                        _children.add(ProxyStaticNode(node))
-                    }
-                }
+                StaticNode(this, routePart, method)
             }
             _children.add(node)
             return node
         }
 
-        open fun findChild(routePart: String): Node? =
-            _children.partition { it !is ProxyStaticNode }.let { (normalNodes, proxyNodes) ->
-                // Deprioritize proxy nodes in searches; user defined nodes take precedence
-                return (normalNodes + proxyNodes).find { it.matches(routePart) }
-            }
+        fun findChild(routePart: String): Node? = _children.find { it.matches(routePart) }
 
         /**
          * A sequence of all nodes from this node (including itself) in a breadth first order
          */
         val nodes
             get() = sequence<List<Node>> {
-                val parents = mutableMapOf<Node, Node>()
-
                 val nodeQueue = mutableListOf(this@Node)
                 while (nodeQueue.isNotEmpty()) {
                     val node = nodeQueue.removeFirst()
-                    if (node is ProxyStaticNode) continue
-
                     val nodePath = mutableListOf<Node>()
                     nodePath.add(node)
-                    var parent = parents[node]
+                    var parent = node.parent
                     while (parent != null) {
                         nodePath.add(0, parent)
-                        parent = parents[parent]
+                        parent = parent.parent
                     }
                     yield(nodePath)
-                    node._children.forEach { child -> parents[child] = node }
                     nodeQueue.addAll(node._children)
                 }
             }
     }
 
-    class RootNode : Node("", null)
+    class RootNode : Node(parent = null, name = "", method = null)
+
+    sealed class ChildNode(parent: Node, name: String, method: PageMethod?) : Node(parent, name, method)
 
     /** A node representing a normal part of the route, such as "example" in "/example/path" */
-    class StaticNode(name: String, method: PageMethod?) : Node(name, method)
-
-    /**
-     * A transient node which allows for catching alternate spellings, such as "examplepath" for "example-path"
-     *
-     * This node was introduced in order to migrate Kobweb to use kebab-case for routes without breaking sites in the
-     * wild using legacy lowercase routes.
-     *
-     * This node should be considered for internal use only and should be filtered out of any APIs that return nodes to
-     * the user.
-     */
-    class ProxyStaticNode(val targetNode: StaticNode) : Node(targetNode.name.replace("-", ""), targetNode.method) {
-        init {
-            check(name != targetNode.name) { "Invalid proxy node contains same name as target node ($name). Please report this issue at https://github.com/varabyte/kobweb/issues/" }
-        }
-
-        override fun matches(name: String): Boolean {
-            return this.name.equals(name, ignoreCase = true)
-        }
-
-        override fun findChild(routePart: String) = targetNode.findChild(routePart)
-    }
+    class StaticNode(parent: Node, name: String, method: PageMethod?) : ChildNode(parent, name, method)
 
     /** A node representing a dynamic part of the route, such as "{dynamic}" in "/{dynamic}/path" */
-    class DynamicNode(name: String, method: PageMethod?) : Node(name, method) {
+    class DynamicNode(parent: Node, name: String, method: PageMethod?) : ChildNode(parent, name, method) {
         override fun matches(name: String) = true // Dynamic nodes eat all possible inputs
     }
 
-    private class ResolvedEntry(val node: Node, val routePart: String)
+    private fun List<Node>.toRouteString() = "/" + joinToString("/") { it.name }
 
     private val root = RootNode()
+
+    private val redirects = mutableListOf<PatternMapper>()
 
     var errorHandler: ErrorPageMethod = { errorCode -> ErrorPage(errorCode) }
 
     var legacyRouteRedirectStrategy: Router.LegacyRouteRedirectStrategy = Router.LegacyRouteRedirectStrategy.WARN
 
     /**
-     * Parse a route and associate its split up parts with a [Node] instance.
+     * Parse a route and associate its split up parts with [Node] instances.
      *
-     * Although resolving static nodes isn't particularly interesting (their route part will always be the same as their
-     * name), this is important for connecting dynamic nodes to a concrete value. It can also be useful to identify
-     * proxy static nodes, to see what the route part being captured here was originally (by checking
-     * `targetNode.name`).
+     * This is particularly useful for handling dynamic route parts (e.g. the "b" in a route registered like
+     * "/a/{b}/c"). The returned node will contain the captured name.
+     *
+     * Note that this method does not handle redirect logic. Call [resolveAllowingRedirects] if you want to handle that
+     * case.
      *
      * @return null if no matching route was found. It is possible to return en empty list if the route being resolved
      *   is "/".
      */
-    private fun resolve(
-        route: String,
-        excludeProxyNodes: Boolean = legacyRouteRedirectStrategy == Router.LegacyRouteRedirectStrategy.DISALLOW
-    ): List<ResolvedEntry>? {
+    private fun resolve(route: String): List<Node>? {
         val routeParts = route.split('/')
 
-        val resolved = mutableListOf<ResolvedEntry>()
+        val resolved = mutableListOf<Node>()
         var currNode: Node = root
         require(routeParts[0] == root.name) // Will be true as long as incoming route starts with '/'
 
         for (i in 1 until routeParts.size) {
             val routePart = routeParts[i]
             currNode = currNode.findChild(routePart) ?: return null
-            if (currNode is ProxyStaticNode && excludeProxyNodes) {
-                return null
-            }
-            resolved.add(ResolvedEntry(currNode, routePart))
+            resolved.add(currNode)
         }
 
         return resolved
     }
+
+    @Suppress("NAME_SHADOWING")
+    private fun resolveAllowingRedirects(route: String, showLegacyWarning: Boolean): List<Node>? {
+        val redirectedRoute = redirects.fold(route) { route, redirect ->
+            redirect.map(route) ?: route
+        }
+        var resolvedNodes = resolve(redirectedRoute)
+
+        if (resolvedNodes == null && legacyRouteRedirectStrategy != Router.LegacyRouteRedirectStrategy.DISALLOW) {
+            Node.UseLegacySearch = true
+            try {
+                resolvedNodes = resolve(route)?.also { resolvedNodes ->
+                    if (showLegacyWarning) {
+                        console.warn("Legacy route \"$route\" is automatically being redirected to \"${resolvedNodes.toRouteString()}\". The site owner can disable this by setting `kobweb.app.legacyRouteRedirectStrategy` to `DISALLOW` in the site's build script, or they can register an explicit redirect in the `conf.yaml` file which would also make this warning go away.")
+                    }
+                }
+            } finally {
+                Node.UseLegacySearch = false
+            }
+        }
+
+        return resolvedNodes
+    }
+
+
 
     /**
      * Check if a route is registered, and if so, return the route that it was registered as.
@@ -168,26 +176,12 @@ internal class RouteTree {
      * 404 error).
      */
     private fun checkRoute(route: String): String? {
-        require(root.children.isNotEmpty()) { "No routes were ever registered. This is unexpected and probably means no `@Page` was defined (or pages were defined in the wrong place where Kobweb couldn't discover them)."}
-
+        require(root.children.isNotEmpty()) { "No routes were ever registered. This is unexpected and probably means no `@Page` was defined (or pages were defined in the wrong place where Kobweb couldn't discover them)." }
         require(route.startsWith('/')) { "When checking a route, it must begin with a slash. Got: \"$route\"" }
-        fun List<ResolvedEntry>.toRegisteredRouteString() = "/" + joinToString("/") {
-            if (it.node !is ProxyStaticNode) it.routePart else it.node.targetNode.name
-        }
 
-        val resolvedEntries = resolve(route) ?: return null
-        if (resolvedEntries.lastOrNull()?.node?.method == null) return null
-
-        val resolvedString = resolvedEntries.toRegisteredRouteString()
-
-        if (resolvedEntries.any { it.node is ProxyStaticNode }) {
-            if (legacyRouteRedirectStrategy == Router.LegacyRouteRedirectStrategy.DISALLOW) return null
-            if (legacyRouteRedirectStrategy == Router.LegacyRouteRedirectStrategy.WARN) {
-                console.warn("Legacy route \"$route\" is not itself registered but is being handled as \"$resolvedString\". The site owner can disable this redirect by setting `kobweb.app.legacyRouteRedirectStrategy` to `DISALLOW` in the site's build script.")
-            }
-        }
-
-        return resolvedString
+        // Only show legacy warning when trying to actually navigate to the route (in `createPageData`).
+        val resolvedNodes = resolveAllowingRedirects(route, showLegacyWarning = false) ?: return null
+        return resolvedNodes.toRouteString()
     }
 
     /**
@@ -205,31 +199,54 @@ internal class RouteTree {
      * Register [route] with this tree, or return false if it was already added.
      */
     fun register(route: String, method: PageMethod): Boolean {
-        // Ignore proxy nodes during creation; they should only matter at query time.
-        if (resolve(route, excludeProxyNodes = true) != null) return false
+        // Make sure the route isn't already registered.
+        // Avoid considering redirects here; they should only be used at query time.
+        if (resolve(route) != null) return false
 
         val routeParts = route.split('/')
-
         var currNode: Node = root
         require(routeParts[0] == root.name) // Will be true if incoming route starts with '/'
         for (i in 1 until routeParts.size) {
             val routePart = routeParts[i]
-            currNode = currNode.findChild(routePart).takeUnless { it is ProxyStaticNode }
-                ?: currNode.createChild(routePart, method.takeIf { i == routeParts.lastIndex })
+            currNode = currNode.findChild(routePart) ?: currNode.createChild(
+                routePart,
+                method.takeIf { i == routeParts.lastIndex })
         }
 
         return true
     }
 
+    /**
+     * Register an intermediate route that will immediately redirect to another route when a user tries to visit it.
+     *
+     * For example, say that after a team rename, we want to move "/team/old-name/" to "/team/new-name/". At this point,
+     * someone would actually move to page to the new location (so content would now be hosted at "/team/new-name") and
+     * then add a redirect: `registerRedirect("/team/old-name/", "/team/new-name/")`. Now, when someone tries to visit
+     * "/team/old-name/", they will be immediately redirected to "/team/new-name/".
+     */
+    fun registerRedirect(redirectRoute: String, actualRoute: String) {
+        redirects.add(PatternMapper("^$redirectRoute\$", actualRoute))
+    }
+
     internal fun createPageData(route: Route): PageData {
-        val resolvedEntries = resolve(route.path)
-        val pageMethod: PageMethod = resolvedEntries?.last()?.node?.method ?: @Composable { errorHandler(404) }
+        val errorPageMethod = @Composable { errorHandler(404) }
+        val resolvedNodes = resolveAllowingRedirects(
+            route.path,
+            showLegacyWarning = legacyRouteRedirectStrategy == Router.LegacyRouteRedirectStrategy.WARN
+        ) ?: return PageData(
+            errorPageMethod,
+            PageContext.RouteInfo(route, emptyMap())
+        )
+
+        val pageMethod: PageMethod = resolvedNodes.last().method ?: errorPageMethod
 
         val dynamicParams = mutableMapOf<String, String>()
-        resolvedEntries?.forEach { resolvedEntry ->
-            if (resolvedEntry.node is DynamicNode) {
-                dynamicParams[resolvedEntry.node.name] = resolvedEntry.routePart
-                if (legacyRouteRedirectStrategy != Router.LegacyRouteRedirectStrategy.DISALLOW && resolvedEntry.node.name.contains(
+        resolvedNodes.forEach { resolvedNode ->
+            if (resolvedNode is DynamicNode) {
+                val routePart = resolvedNode.name
+
+                dynamicParams[resolvedNode.name] = routePart
+                if (legacyRouteRedirectStrategy != Router.LegacyRouteRedirectStrategy.DISALLOW && resolvedNode.name.contains(
                         '-'
                     )
                 ) {
@@ -238,13 +255,21 @@ internal class RouteTree {
                     // generated from filenames). That is, "example-path" now might have been either "examplepath" OR
                     // "examplePath" OR "example_path" in previous versions of Kobweb. It's not too harmful in just
                     // supporting all to be extra safe.
-                    dynamicParams[resolvedEntry.node.name.replace("-", "")] = resolvedEntry.routePart
-                    dynamicParams[resolvedEntry.node.name.kebabCaseToCamelCase()] = resolvedEntry.routePart
-                    dynamicParams[resolvedEntry.node.name.replace('-', '_')] = resolvedEntry.routePart
+                    dynamicParams[resolvedNode.name.replace("-", "")] = routePart
+                    dynamicParams[resolvedNode.name.kebabCaseToCamelCase()] = routePart
+                    dynamicParams[resolvedNode.name.replace('-', '_')] = routePart
                 }
             }
         }
-        return PageData(pageMethod, PageContext.RouteInfo(route, dynamicParams))
+
+        return PageData(
+            pageMethod,
+            // Update RouteInfo with the latest path, just in case a redirect happened
+            PageContext.RouteInfo(
+                Route(resolvedNodes.toRouteString(), route.queryParams, route.fragment),
+                dynamicParams
+            )
+        )
     }
 
     /**

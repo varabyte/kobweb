@@ -11,7 +11,9 @@ import com.varabyte.kobweb.api.stream.Stream
 import com.varabyte.kobweb.api.stream.StreamClientId
 import com.varabyte.kobweb.api.stream.StreamEvent
 import com.varabyte.kobweb.common.error.KobwebException
+import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.project.conf.Server.Redirect
 import com.varabyte.kobweb.project.conf.Site
 import com.varabyte.kobweb.server.ServerGlobals
 import com.varabyte.kobweb.server.api.ServerEnvironment
@@ -19,6 +21,7 @@ import com.varabyte.kobweb.server.api.SiteLayout
 import com.varabyte.kobweb.server.io.ApiJarFile
 import com.varabyte.kobweb.streams.StreamMessage
 import com.varabyte.kobweb.streams.StreamMessage.Payload
+import com.varabyte.kobweb.util.text.PatternMapper
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
@@ -348,51 +351,74 @@ private fun Routing.configureApiRouting(
     }
 }
 
+private suspend fun PipelineContext<*, ApplicationCall>.serveScriptFiles(
+    path: String, script: Path, scriptMap: Path): Boolean {
+    val filename = path.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: return false
+
+    when (filename) {
+        script.name -> call.respondFile(script.toFile())
+        scriptMap.name -> call.respondFile(scriptMap.toFile())
+        else -> return false
+    }
+    return true
+}
+
+// Abort early on missing resources, so we don't serve giant html pages simply because someone forgot to
+// add a favicon.ico file, for example.
+private suspend fun PipelineContext<*, ApplicationCall>.abortIfNotHtml(path: String): Boolean {
+    val ext = File(path).extension.takeIf { it.isNotEmpty() } ?: return false
+
+    return if (ext != "html") {
+        call.respond(HttpStatusCode.NotFound)
+        true
+    } else false
+}
+
+// As a fallback, server the 'index.html' file if no other resource is matched by the path. The index file
+// contains general logic which can figure out what to do (e.g. show the user a 404 page)
+private suspend fun PipelineContext<*, ApplicationCall>.serveIndexFile(index: Path) {
+    call.respondFile(index.toFile())
+}
+
 /**
  * Common handler used by [configureCatchAllRouting] since we have multiple route patterns which need the same handling
  */
 private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(
-    script: Path,
-    scriptMap: Path,
-    index: Path,
     pathParts: List<String>,
-    extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean
+    vararg handlers: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean,
 ) {
-    var handled = false
-    val filename = pathParts.lastOrNull()
+    val pathString = pathParts.joinToString("/")
 
-    // Add special handling for script requests, since they may live in a totally different path based on server config
-    if (filename != null) {
-        handled = true
-        when (filename) {
-            script.name -> call.respondFile(script.toFile())
-            scriptMap.name -> call.respondFile(scriptMap.toFile())
-            else -> handled = false
-        }
-    }
-
-    if (!handled) {
-        handled = extraHandler(pathParts.joinToString("/"))
-    }
-
-    if (!handled) {
-        if (filename != null) {
-            // Abort early on missing resources, so we don't serve giant html pages simply because someone forgot to
-            // add a favicon.ico file, for example.
-            val ext = File(filename).extension.takeIf { it.isNotEmpty() }
-            if (ext != null && ext != "html") {
-                call.respond(HttpStatusCode.NotFound)
-                handled = true
-            }
-        }
-    }
-
-    // If unhandled at this point, we have a URL that should either generate a real page or an error page. Return
-    // the main index.html which, by referencing our site's script, should have the logic which handles this.
-    if (!handled) {
-        call.respondFile(index.toFile())
+    for (handler in handlers) {
+        if (handler(pathString)) break
     }
 }
+
+private fun List<Redirect>.toPatternMappers(): List<PatternMapper> {
+    return this.map { redirect -> PatternMapper("^${redirect.from}\$", redirect.to) }
+}
+
+@Suppress("NAME_SHADOWING")
+private suspend fun PipelineContext<*, ApplicationCall>.handleRedirect(
+    routePrefix: String,
+    path: String,
+    redirects: List<PatternMapper>
+): Boolean {
+    val path = path.prefixIfNot("/")
+    val redirectedPath = redirects.fold(path) { path, patternMapper -> patternMapper.map(path) ?: path }
+    return if (redirectedPath != path) {
+        call.respondRedirect("$routePrefix/${redirectedPath.removePrefix("/")}".prefixIfNot("/"), permanent = true)
+        true
+    } else false
+}
+
+private fun Routing.configureRedirects(routePrefix: String, redirects: List<PatternMapper>) {
+    get("$routePrefix/{$KOBWEB_PARAMS...}") {
+        val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
+        handleRedirect(routePrefix, pathParts.joinToString("/"), redirects)
+    }
+}
+
 
 // Note: This should be defined LAST in the routing { ... } block and it used to handle general URLs. The site script
 // itself looks at the user's current URL to figure out how to route itself, so in many cases, just returning
@@ -403,16 +429,25 @@ private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(
  * @param extraHandler An optional handler so callers can configure additional, one-off handling.
  */
 private fun Routing.configureCatchAllRouting(
+    conf: KobwebConf,
     script: Path,
     index: Path,
     routePrefix: String,
     extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean = { false }
 ) {
     val scriptMap = Path("$script.map")
+    val patternMappers = conf.server.redirects.toPatternMappers()
 
     get("$routePrefix/{$KOBWEB_PARAMS...}") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
-        handleCatchAllRouting(script, scriptMap, index, pathParts, extraHandler)
+        handleCatchAllRouting(
+            pathParts,
+            { path -> serveScriptFiles(path, script, scriptMap) },
+            { path -> handleRedirect(routePrefix, path, patternMappers) },
+            { path -> extraHandler(path) },
+            { path -> abortIfNotHtml(path) },
+            { serveIndexFile(index); true },
+        )
     }
 }
 
@@ -494,7 +529,7 @@ private fun Application.configureDevRouting(
         }
 
         val contentRootFile = contentRoot.toFile()
-        configureCatchAllRouting(script, contentRoot.resolve("index.html"), routePrefix) { path ->
+        configureCatchAllRouting(conf, script, contentRoot.resolve("index.html"), routePrefix) { path ->
             contentRootFile.resolve(path).let { contentFile ->
                 if (contentFile.isFile && contentFile.exists()) {
                     call.respondFile(contentFile)
@@ -586,7 +621,7 @@ private fun Application.configureFullstackProdRouting(
             }
         }
 
-        configureCatchAllRouting(script, fallbackIndex, routePrefix)
+        configureCatchAllRouting(conf, script, fallbackIndex, routePrefix)
     }
 }
 
@@ -613,11 +648,14 @@ private fun Application.configureStaticDevRouting(
  */
 private fun Application.configureStaticProdRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
+    val routePrefix = conf.site.routePrefixNormalized
 
     routing {
         staticFiles(conf.site.routePrefixNormalized, siteRoot.toFile()) {
             extensions("html")
             default("404.html")
         }
+
+        configureRedirects(routePrefix, conf.server.redirects.toPatternMappers())
     }
 }
