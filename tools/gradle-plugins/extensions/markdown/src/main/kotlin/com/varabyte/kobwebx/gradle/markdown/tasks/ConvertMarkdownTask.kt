@@ -12,7 +12,9 @@ import org.commonmark.parser.Parser
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -42,6 +44,9 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
 
     @get:Inject
     abstract val objectFactory: ObjectFactory
+
+    @get:Input
+    abstract val dependsOnMarkdownArtifact: Property<Boolean>
 
     @get:InputDirectory
     abstract val generatedMarkdownDir: DirectoryProperty
@@ -86,6 +91,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                     markdownHandlers,
                     mdPackage,
                     funName,
+                    dependsOnMarkdownArtifact.get(),
                     LoggingReporter(logger),
                 )
                 outputFile.writeText(ktRenderer.render(cache[mdFile]))

@@ -10,7 +10,7 @@ import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
-import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_INDEX
@@ -24,11 +24,14 @@ import kotlinx.html.link
 import kotlinx.html.unsafe
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -72,6 +75,17 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:InputFiles
     abstract val compileClasspath: ConfigurableFileCollection
 
+    @get:Internal
+    abstract val dependencies: ListProperty<ResolvedDependencyResult>
+
+    @get:Input
+    val hasFaDependency: Provider<Boolean>
+        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-fa")
+
+    @get:Input
+    val hasMdiDependency: Provider<Boolean>
+        get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-mdi")
+
     @OutputFile
     fun getGenIndexFile(): Provider<RegularFile> = kobwebBlock.app.getGenJsResRoot().map { it.file("index.html") }
 
@@ -82,7 +96,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // artifacts.
         val headElements = mutableListOf(indexBlock.serializedHead.get())
 
-        if (project.hasTransitiveJsDependencyNamed("silk-icons-fa")) {
+        if (hasFaDependency.get()) {
             headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
@@ -91,7 +105,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             })
         }
 
-        if (project.hasTransitiveJsDependencyNamed("silk-icons-mdi")) {
+        if (hasMdiDependency.get()) {
             headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"

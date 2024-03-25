@@ -6,15 +6,18 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
-import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Server
 import com.varabyte.kobweb.project.frontend.AppData
 import kotlinx.serialization.json.Json
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
@@ -51,6 +54,16 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @get:InputFile
     abstract val appDataFile: RegularFileProperty
 
+    @get:Internal
+    abstract val dependencies: ListProperty<ResolvedDependencyResult>
+
+    @get:Input
+    val silkSupport: Provider<SilkSupport>
+        get() = dependencies.hasDependencyNamed("com.varabyte.kobweb:kobweb-silk")
+            .zip(dependencies.hasDependencyNamed("com.varabyte.kobweb:silk-foundation")) { left, right ->
+                if (left) SilkSupport.FULL else if (right) SilkSupport.FOUNDATION else SilkSupport.NONE
+            }
+
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
     fun getGenMainFile() = kobwebBlock.app.getGenJsSrcRoot()
 
@@ -62,11 +75,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
         mainFile.writeText(
             createMainFunction(
                 appData,
-                when {
-                    project.hasTransitiveJsDependencyNamed("kobweb-silk") -> SilkSupport.FULL
-                    project.hasTransitiveJsDependencyNamed("silk-foundation") -> SilkSupport.FOUNDATION
-                    else -> SilkSupport.NONE
-                },
+                silkSupport.get(),
                 globals.get(),
                 cleanUrls.get(),
                 RoutePrefix(routePrefix),

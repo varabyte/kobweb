@@ -4,7 +4,8 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.Key
 import com.varabyte.kobweb.common.collect.TypedMap
-import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
+import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import org.commonmark.ext.gfm.tables.TableBlock
@@ -204,9 +205,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
     }
 
     init {
-        project.afterEvaluate {
-            useSilk.convention(project.hasJsDependencyNamed("kobweb-silk"))
-        }
+        useSilk.convention(project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobweb-silk"))
 
         generateHeaderIds.convention(true)
         idGenerator.convention { text ->
@@ -316,6 +315,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
                 append("}")
             }
         }
+
         // Create relevant `(attrs = { ... })` call parameters for a table cell
         fun TableCell.toCallParams(): String {
             val alignment = alignment ?: return ""

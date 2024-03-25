@@ -4,7 +4,9 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.JsTarget
 import com.varabyte.kobweb.gradle.core.kmp.buildTargets
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
+import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.getResourceSources
+import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.tasks.ConvertMarkdownTask
 import com.varabyte.kobwebx.gradle.markdown.tasks.ProcessMarkdownTask
 import org.gradle.api.GradleException
@@ -44,6 +46,9 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 resources.set(project.getResourceSources(jsTarget))
                 generatedMarkdownDir.set(processTask.map { it.getGenResDir().get() })
                 pagesPackage.set(kobwebBlock.pagesPackage)
+                dependsOnMarkdownArtifact.set(
+                    project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobwebx-markdown")
+                )
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
