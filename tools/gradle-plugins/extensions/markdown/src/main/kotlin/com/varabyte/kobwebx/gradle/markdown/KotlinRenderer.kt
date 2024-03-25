@@ -4,7 +4,6 @@ import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.Reporter
-import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
@@ -83,13 +82,13 @@ class KotlinRenderer(
     private val handlers: MarkdownHandlers,
     private val pkg: String,
     private val funName: String,
+    // If true, we have access to the `MarkdownContext` class and CompositionLocal
+    private val dependsOnMarkdownArtifact: Boolean,
     private val reporter: Reporter,
 ) : Renderer {
     private var indentCount = 0
     private val indent get() = NodeScope(TypedMap()).indent(indentCount)
 
-    // If true, we have access to the `MarkdownContext` class and CompositionLocal
-    private val dependsOnMarkdownArtifact = project.hasJsDependencyNamed("kobwebx-markdown")
 
     // Flexible data which can be used by Node handlers however they need
     private val data = TypedMap()

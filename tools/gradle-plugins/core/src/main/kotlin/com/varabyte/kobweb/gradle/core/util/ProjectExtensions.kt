@@ -5,9 +5,11 @@ import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -61,29 +63,29 @@ fun Project.prefixQualifiedPackage(relPathMaybe: String): String {
     }
 }
 
-/**
- * Returns true if one of this module's direct dependencies (no transitive dependencies included) is named [name].
- *
- * This method should be called in an [Project.afterEvaluate] block, or else it will always return false.
- */
-fun Project.hasJsDependencyNamed(name: String): Boolean {
-    check(project.state.executed)
-    return configurations.asSequence()
-        .flatMap { config -> config.dependencies }
-        .any { dependency -> dependency.name == name }
+private fun Project.getDependencyResultsFromConfiguration(configurationName: String): List<ResolvedDependencyResult> {
+    return configurations[configurationName].incoming.resolutionResult.allDependencies
+        .mapNotNull { it as? ResolvedDependencyResult }
 }
 
 /**
- * Like [hasJsDependencyNamed] but includes transitive dependencies as well.
+ * Lazily returns a list of this module's direct JS dependencies (no transitive dependencies included).
  *
- * This method should only be called after a project is finished being configured, e.g. inside a task action.
+ * @see getTransitiveJsDependencyResults
+ * @see hasDependencyNamed for a way to check if a specific dependency is included in this list.
  */
-fun Project.hasTransitiveJsDependencyNamed(name: String): Boolean {
-    return configurations.findByName(jsTarget.runtimeClasspath)
-        ?.resolvedConfiguration
-        ?.resolvedArtifacts
-        ?.any { artifact -> artifact.moduleVersion.id.name == name }
-        ?: false
+fun Project.getJsDependencyResults(): Provider<List<ResolvedDependencyResult>> {
+    return provider { getDependencyResultsFromConfiguration(jsTarget.compileClasspath) }
+}
+
+/**
+ * Lazily returns a list of this module's direct & transitive JS dependencies.
+ *
+ * @see getJsDependencyResults
+ * @see hasDependencyNamed for a way to check if a specific dependency is included in this list.
+ */
+fun Project.getTransitiveJsDependencyResults(): Provider<List<ResolvedDependencyResult>> {
+    return provider { getDependencyResultsFromConfiguration(jsTarget.runtimeClasspath) }
 }
 
 /**

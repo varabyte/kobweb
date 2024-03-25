@@ -41,6 +41,7 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.registerMigrationTasks
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
+import com.varabyte.kobweb.gradle.core.util.getTransitiveJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.kobwebCacheFile
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
@@ -263,10 +264,12 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebGenSiteEntryTask.configure {
                 appDataFile.set(kobwebCacheAppDataTask.flatMap { it.appDataFile })
+                dependencies.set(project.getTransitiveJsDependencyResults())
             }
 
             kobwebGenSiteIndexTask.configure {
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
+                dependencies.set(project.getTransitiveJsDependencyResults())
             }
 
             val jsRunTasks = listOf(
