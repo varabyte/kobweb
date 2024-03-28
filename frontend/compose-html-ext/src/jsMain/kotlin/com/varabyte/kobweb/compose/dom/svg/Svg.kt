@@ -1343,8 +1343,7 @@ class SVGTextAttrsScope private constructor(attrs: AttrsScope<SVGTextElement>) :
  */
 @Composable
 fun ElementScope<SVGElement>.Text(text: String, attrs: SVGTextAttrsScope.() -> Unit) {
-    @Suppress("RemoveExplicitTypeArguments") // IDE wants to remove generic type but that causes a compile error
-    GenericTag<SVGTextElement>("text", "http://www.w3.org/2000/svg", SVGTextAttrsScope(attrs)) {
+    GenericTag("text", "http://www.w3.org/2000/svg", SVGTextAttrsScope(attrs)) {
         Text(text)
     }
 }
