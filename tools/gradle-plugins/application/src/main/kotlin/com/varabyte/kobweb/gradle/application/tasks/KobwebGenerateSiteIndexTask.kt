@@ -11,6 +11,7 @@ import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
+import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
@@ -28,9 +29,12 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import org.jsoup.Jsoup
+import java.io.File
 import javax.inject.Inject
 
 class KobwebGenIndexConfInputs(
@@ -50,6 +54,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Input val buildTarget: BuildTarget,
     block: KobwebBlock,
 ) : KobwebGenerateTask(block, "Generate an index.html file for this Kobweb project") {
+    // Use changing the build script as a proxy for changing IndexBlock (most importantly `head`) values.
+    @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
+    fun getBuildScripts(): List<File> = projectLayout.getBuildScripts()
 
     // No one should define their own root `public/index.html` files anywhere in their resources.
     @InputFiles
