@@ -260,7 +260,7 @@ private sealed interface StyleGroup {
     class ColorAware(val lightStyles: ComparableStyleScope, val darkStyles: ComparableStyleScope) : StyleGroup
 
     companion object {
-        @Suppress("NAME_SHADOWING") // Shadowing used to turn nullable into non-null
+        //        @Suppress("NAME_SHADOWING") // Shadowing used to turn nullable into non-null
         fun from(lightModifiers: Modifier?, darkModifiers: Modifier?): StyleGroup? {
             val lightStyles = lightModifiers?.let { lightModifiers ->
                 ComparableStyleScope().apply { lightModifiers.toStyles().invoke(this) }

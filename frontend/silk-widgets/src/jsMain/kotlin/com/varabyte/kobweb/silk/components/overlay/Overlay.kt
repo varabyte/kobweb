@@ -51,7 +51,7 @@ val OverlayStyle by ComponentStyle.base(prefix = "silk") {
 @Composable
 fun Overlay(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     contentAlignment: Alignment = Alignment.TopCenter,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}

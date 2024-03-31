@@ -45,7 +45,7 @@ val SpanTextStyle by ComponentStyle(prefix = "silk") {}
 fun SpanText(
     text: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     ref: ElementRefScope<HTMLSpanElement>? = null,
 ) {
     val finalModifier = SpanTextStyle

@@ -11,12 +11,10 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
-import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
+import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import org.w3c.dom.HTMLElement
 
@@ -48,7 +46,7 @@ val SurfaceStyle by ComponentStyle(prefix = "silk") {
 @Composable
 fun Surface(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     colorModeOverride: ColorMode? = null,
     contentAlignment: Alignment = Alignment.TopStart,
     ref: ElementRefScope<HTMLElement>? = null,

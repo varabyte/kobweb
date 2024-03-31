@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.style.ComponentBaseModifier
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentModifier
 import com.varabyte.kobweb.silk.components.style.ComponentModifiers
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -27,12 +28,12 @@ import org.jetbrains.compose.web.css.*
  * Unlike [SilkConfig] values, theme values are expected to be accessible in user projects via the [SilkTheme] object.
  */
 class MutableSilkTheme {
-    private val _componentStyles = mutableMapOf<String, ComponentStyle>()
-    internal val componentStyles: Map<String, ComponentStyle> = _componentStyles
+    private val _componentStyles = mutableMapOf<String, ComponentStyle<*>>()
+    internal val componentStyles: Map<String, ComponentStyle<*>> = _componentStyles
     private val overriddenStyles = mutableSetOf<String>()
 
-    private val _componentVariants = mutableMapOf<String, ComponentVariant>()
-    internal val componentVariants: Map<String, ComponentVariant> = _componentVariants
+    private val _componentVariants = mutableMapOf<String, ComponentVariant<*>>()
+    internal val componentVariants: Map<String, ComponentVariant<*>> = _componentVariants
     private val overriddenVariants = mutableSetOf<String>()
 
     private val _cssStyles = mutableMapOf<String, CssStyle>()
@@ -84,7 +85,7 @@ class MutableSilkTheme {
      *
      * @see replaceComponentStyle
      */
-    fun registerComponentStyle(style: ComponentStyle) {
+    fun registerComponentStyle(style: ComponentStyle<*>) {
         check(componentStyles[style.name].let { it == null || it === style }) {
             """
                 Attempting to register a second style with a name that's already used: "${style.name}"
@@ -110,22 +111,22 @@ class MutableSilkTheme {
      * }
      * ```
      */
-    fun replaceComponentStyle(
-        style: ComponentStyle,
+    fun <T : ComponentKind> replaceComponentStyle(
+        style: ComponentStyle<T>,
         extraModifiers: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         replaceComponentStyle(style, { extraModifiers }, init)
     }
 
-    fun replaceComponentStyle(
-        style: ComponentStyle,
+    fun <T : ComponentKind> replaceComponentStyle(
+        style: ComponentStyle<T>,
         extraModifiers: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
         check(overriddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
-        _componentStyles[style.name] = ComponentStyle(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
+        _componentStyles[style.name] = ComponentStyle<T>(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
     }
 
     /**
@@ -133,8 +134,8 @@ class MutableSilkTheme {
      *
      * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
      */
-    fun registerComponentVariants(vararg variants: ComponentVariant) {
-        variants.filterIsInstance<SimpleComponentVariant>().forEach { variant ->
+    fun registerComponentVariants(vararg variants: ComponentVariant<*>) {
+        variants.filterIsInstance<SimpleComponentVariant<*>>().forEach { variant ->
             check(componentVariants[variant.cssStyle.selector].let { it == null || it === variant }) {
                 """
                 Attempting to register a second variant with a name that's already used: "${variant.cssStyle.selector}"
@@ -163,16 +164,16 @@ class MutableSilkTheme {
      * }
      * ```
      */
-    fun replaceComponentVariant(
-        variant: ComponentVariant,
+    fun <T : ComponentKind> replaceComponentVariant(
+        variant: ComponentVariant<T>,
         extraModifiers: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         replaceComponentVariant(variant, { extraModifiers }, init)
     }
 
-    fun replaceComponentVariant(
-        variant: ComponentVariant,
+    fun <T : ComponentKind> replaceComponentVariant(
+        variant: ComponentVariant<T>,
         extraModifiers: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
@@ -190,16 +191,16 @@ class MutableSilkTheme {
 /**
  * Convenience method when you want to replace an upstream style but only need to define a base style.
  */
-fun MutableSilkTheme.replaceComponentStyleBase(
-    style: ComponentStyle,
+fun <T : ComponentKind> MutableSilkTheme.replaceComponentStyleBase(
+    style: ComponentStyle<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
     replaceComponentStyleBase(style, { extraModifiers }, init)
 }
 
-fun MutableSilkTheme.replaceComponentStyleBase(
-    style: ComponentStyle,
+fun <T : ComponentKind> MutableSilkTheme.replaceComponentStyleBase(
+    style: ComponentStyle<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
@@ -213,8 +214,8 @@ fun MutableSilkTheme.replaceComponentStyleBase(
 /**
  * Convenience method when you want to replace an upstream variant but only need to define a base style.
  */
-fun MutableSilkTheme.replaceComponentVariantBase(
-    variant: ComponentVariant,
+fun <T : ComponentKind> MutableSilkTheme.replaceComponentVariantBase(
+    variant: ComponentVariant<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
@@ -224,8 +225,8 @@ fun MutableSilkTheme.replaceComponentVariantBase(
 /**
  * Convenience method when you want to replace an upstream variant but only need to define a base style.
  */
-fun MutableSilkTheme.replaceComponentVariantBase(
-    variant: ComponentVariant,
+fun <T : ComponentKind> MutableSilkTheme.replaceComponentVariantBase(
+    variant: ComponentVariant<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
@@ -251,16 +252,16 @@ fun MutableSilkTheme.replaceComponentVariantBase(
  * }
  * ```
  */
-fun MutableSilkTheme.modifyComponentStyle(
-    style: ComponentStyle,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
+    style: ComponentStyle<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
     modifyComponentStyle(style, { extraModifiers }, init)
 }
 
-fun MutableSilkTheme.modifyComponentStyle(
-    style: ComponentStyle,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
+    style: ComponentStyle<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
@@ -276,16 +277,16 @@ fun MutableSilkTheme.modifyComponentStyle(
     }
 }
 
-fun MutableSilkTheme.modifyComponentStyleBase(
-    style: ComponentStyle,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyleBase(
+    style: ComponentStyle<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
     modifyComponentStyleBase(style, { extraModifiers }, init)
 }
 
-fun MutableSilkTheme.modifyComponentStyleBase(
-    style: ComponentStyle,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyleBase(
+    style: ComponentStyle<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
@@ -311,16 +312,16 @@ fun MutableSilkTheme.modifyComponentStyleBase(
  * }
  * ```
  */
-fun MutableSilkTheme.modifyComponentVariant(
-    variant: ComponentVariant,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
+    variant: ComponentVariant<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
     modifyComponentVariant(variant, { extraModifiers }, init)
 }
 
-fun MutableSilkTheme.modifyComponentVariant(
-    variant: ComponentVariant,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
+    variant: ComponentVariant<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
@@ -340,16 +341,16 @@ fun MutableSilkTheme.modifyComponentVariant(
     }
 }
 
-fun MutableSilkTheme.modifyComponentVariantBase(
-    variant: ComponentVariant,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
+    variant: ComponentVariant<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
     modifyComponentVariantBase(variant, { extraModifiers }, init)
 }
 
-fun MutableSilkTheme.modifyComponentVariantBase(
-    variant: ComponentVariant,
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
+    variant: ComponentVariant<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
@@ -390,7 +391,7 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         val componentStyles = mutableSilkTheme.componentStyles.values
             .associate { it.cssStyle.selector to it.cssStyle }
         // Variants should be defined after base styles to make sure they take priority if used
-        val componentVariants = mutableSilkTheme.componentVariants.values.filterIsInstance<SimpleComponentVariant>()
+        val componentVariants = mutableSilkTheme.componentVariants.values.filterIsInstance<SimpleComponentVariant<*>>()
             .associate { it.cssStyle.selector to it.cssStyle }
 
         val allCssStyles = componentStyles + componentVariants + mutableSilkTheme.cssStyles
