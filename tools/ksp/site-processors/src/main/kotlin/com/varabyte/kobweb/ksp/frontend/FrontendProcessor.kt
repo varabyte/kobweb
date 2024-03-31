@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.ksp.frontend
 
+import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.containingFile
+import com.google.devtools.ksp.getKotlinClassByName
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -12,6 +14,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
@@ -20,8 +23,6 @@ import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
-import com.varabyte.kobweb.ksp.common.CSS_STYLE_BASE_FQN
-import com.varabyte.kobweb.ksp.common.CSS_STYLE_BASE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
@@ -70,7 +71,14 @@ class FrontendProcessor(
     // will be skipped if the only change is deleted file(s) that we do not depend on.
     private val fileDependencies = mutableListOf<KSFile>()
 
+    // TODO: is this the best way to have this set up
+    lateinit var cssStyleType: KSType
+
+    @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        // TODO: handle non-Silk usages
+        cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(emptyList())
+
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
@@ -124,11 +132,11 @@ class FrontendProcessor(
         )
         private val declarations = listOf(styleDeclaration, variantDeclaration, keyframesDeclaration)
 
-        val cssStyleClasses = mutableListOf<KSClassDeclaration>()
-        val propertyDeclarations = mutableListOf<KSPropertyDeclaration>()
-
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
-            propertyDeclarations.add(property)
+            val isCssStyle = cssStyleType.isAssignableFrom(property.type.resolve())
+            if (isCssStyle) {
+                cssStyles.add(processCssStyle(property))
+            }
 
             val type = property.type.toString()
 
@@ -205,15 +213,6 @@ class FrontendProcessor(
         )
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-            val isCssStyleClass = classDeclaration.superTypes
-                .filter { it.toString() == CSS_STYLE_SIMPLE_NAME || it.toString() == CSS_STYLE_BASE_SIMPLE_NAME }
-                .any {
-                    val fqn = it.resolveQualifiedName()
-                    fqn == CSS_STYLE_FQN || fqn == CSS_STYLE_BASE_FQN
-                }
-            if (isCssStyleClass) {
-                cssStyleClasses.add(classDeclaration)
-            }
             classDeclaration.declarations.forEach { it.accept(this, Unit) }
         }
 
@@ -244,17 +243,6 @@ class FrontendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
-        val styleClassDeclarations = frontendVisitor.cssStyleClasses.groupBy { it.simpleName.asString() }
-
-        cssStyles += frontendVisitor.propertyDeclarations.mapNotNull { property ->
-            val potentialClasses = styleClassDeclarations[property.type.toString()].orEmpty()
-            if (potentialClasses.none { it.qualifiedName?.asString() == property.type.resolveQualifiedName() }) {
-                return@mapNotNull null
-            }
-            fileDependencies.add(property.containingFile!!)
-            processCssStyle(property)
-        }
-
         // pages are processed here as they rely on packageMappings, which may be populated over several rounds
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
