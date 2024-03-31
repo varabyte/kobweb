@@ -88,7 +88,7 @@ fun Link(
     path: String,
     text: String? = null,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
@@ -108,7 +108,7 @@ fun Link(
 fun Link(
     path: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,

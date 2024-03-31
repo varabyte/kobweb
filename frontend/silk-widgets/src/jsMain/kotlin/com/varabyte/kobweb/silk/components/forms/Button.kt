@@ -120,7 +120,7 @@ class ButtonSize(
 fun Button(
     onClick: (evt: SyntheticMouseEvent) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     type: ButtonType = ButtonType.Button,
     enabled: Boolean = true,
     size: ButtonSize = ButtonSize.MD,

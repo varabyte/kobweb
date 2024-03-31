@@ -144,7 +144,7 @@ fun Switch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
     shape: SwitchShape = SwitchShape.PILL,

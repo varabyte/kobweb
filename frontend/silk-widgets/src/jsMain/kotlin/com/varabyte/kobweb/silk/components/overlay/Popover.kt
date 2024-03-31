@@ -258,7 +258,7 @@ private class PopoverElements(
 fun Popover(
     target: ElementTarget,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     placementTarget: ElementTarget? = null,
@@ -302,7 +302,7 @@ fun AdvancedPopover(
     target: ElementTarget,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
     openCloseStrategy: OpenClosePopupStrategy? = null,

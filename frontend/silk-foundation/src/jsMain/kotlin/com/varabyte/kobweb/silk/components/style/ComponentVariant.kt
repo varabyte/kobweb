@@ -1,13 +1,13 @@
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import org.jetbrains.compose.web.css.*
 
-sealed class ComponentVariant {
-    infix fun then(next: ComponentVariant): ComponentVariant {
+sealed class ComponentVariant<T : ComponentKind> {
+    infix fun then(next: ComponentVariant<T>): ComponentVariant<T> {
         return CompositeComponentVariant(this, next)
     }
 
@@ -28,8 +28,11 @@ sealed class ComponentVariant {
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
  */
-internal class SimpleComponentVariant(val cssStyle: SimpleCssStyle, val baseStyle: ComponentStyle) :
-    ComponentVariant() {
+internal class SimpleComponentVariant<T : ComponentKind>(
+    val cssStyle: SimpleCssStyle,
+    val baseStyle: ComponentStyle<T>
+) :
+    ComponentVariant<T>() {
     /**
      * The raw variant name, unqualified by its parent base style.
      *
@@ -51,8 +54,10 @@ internal class SimpleComponentVariant(val cssStyle: SimpleCssStyle, val baseStyl
     fun intoImmutableStyle(classSelectors: ClassSelectors) = cssStyle.intoImmutableStyle(classSelectors)
 }
 
-private class CompositeComponentVariant(private val head: ComponentVariant, private val tail: ComponentVariant) :
-    ComponentVariant() {
+private class CompositeComponentVariant<T : ComponentKind>(
+    private val head: ComponentVariant<T>,
+    private val tail: ComponentVariant<T>
+) : ComponentVariant<T>() {
     override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         return head.addStylesInto(styleSheet) + tail.addStylesInto(styleSheet)
     }
@@ -61,19 +66,31 @@ private class CompositeComponentVariant(private val head: ComponentVariant, priv
     override fun toModifier() = head.toModifier().then(tail.toModifier())
 }
 
-fun ComponentVariant.thenIf(condition: Boolean, produce: () -> ComponentVariant): ComponentVariant {
+fun <T : ComponentKind> ComponentVariant<T>.thenIf(
+    condition: Boolean,
+    produce: () -> ComponentVariant<T>
+): ComponentVariant<T> {
     return if (condition) this.then(produce()) else this
 }
 
-fun ComponentVariant.thenUnless(condition: Boolean, produce: () -> ComponentVariant): ComponentVariant {
+fun <T : ComponentKind> ComponentVariant<T>.thenUnless(
+    condition: Boolean,
+    produce: () -> ComponentVariant<T>
+): ComponentVariant<T> {
     return this.thenIf(!condition, produce)
 }
 
-fun ComponentVariant.thenIf(condition: Boolean, other: ComponentVariant): ComponentVariant {
+fun <T : ComponentKind> ComponentVariant<T>.thenIf(
+    condition: Boolean,
+    other: ComponentVariant<T>
+): ComponentVariant<T> {
     return this.thenIf(condition) { other }
 }
 
-fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): ComponentVariant {
+fun <T : ComponentKind> ComponentVariant<T>.thenUnless(
+    condition: Boolean,
+    other: ComponentVariant<T>
+): ComponentVariant<T> {
     return this.thenUnless(condition) { other }
 }
 
@@ -83,7 +100,7 @@ fun ComponentVariant.thenUnless(condition: Boolean, other: ComponentVariant): Co
  * Returns `null` if the collection is empty or entirely `null`.
  */
 @Composable
-fun Iterable<ComponentVariant?>.combine(): ComponentVariant? {
+fun <T : ComponentKind> Iterable<ComponentVariant<T>?>.combine(): ComponentVariant<T>? {
     return reduceOrNull { acc, variant ->
         if (acc != null && variant != null) acc.then(variant) else acc ?: variant
     }
@@ -92,12 +109,12 @@ fun Iterable<ComponentVariant?>.combine(): ComponentVariant? {
 /**
  * A delegate provider class which allows you to create a [ComponentVariant] via the `by` keyword.
  */
-class ComponentVariantProvider internal constructor(
-    private val style: ComponentStyle,
+class ComponentVariantProvider<T : ComponentKind> internal constructor(
+    private val style: ComponentStyle<T>,
     private val extraModifiers: @Composable () -> Modifier,
     private val init: ComponentModifiers.() -> Unit,
-) : CacheByPropertyNameDelegate<ComponentVariant>() {
-    override fun create(propertyName: String): ComponentVariant {
+) : CacheByPropertyNameDelegate<ComponentVariant<T>>() {
+    override fun create(propertyName: String): ComponentVariant<T> {
         // Given a style called "ExampleStyle", we want to support the following variant name simplifications:
         // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
         // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
@@ -116,16 +133,25 @@ class ComponentVariantProvider internal constructor(
     }
 }
 
-fun ComponentStyle.addVariant(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit) =
+fun <T : ComponentKind> ComponentStyle<T>.addVariant(
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) =
     addVariant({ extraModifiers }, init)
 
-fun ComponentStyle.addVariant(extraModifiers: @Composable () -> Modifier, init: ComponentModifiers.() -> Unit) =
+fun <T : ComponentKind> ComponentStyle<T>.addVariant(
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifiers.() -> Unit
+) =
     ComponentVariantProvider(this, extraModifiers, init)
 
-fun ComponentStyle.addVariantBase(extraModifiers: Modifier = Modifier, init: ComponentBaseModifier.() -> Modifier) =
+fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
+    extraModifiers: Modifier = Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+) =
     addVariantBase({ extraModifiers }, init)
 
-fun ComponentStyle.addVariantBase(
+fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
     extraModifiers: @Composable () -> Modifier,
     init: ComponentBaseModifier.() -> Modifier
 ) = ComponentVariantProvider(this, extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) } })
@@ -136,11 +162,11 @@ fun ComponentStyle.addVariantBase(
  * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.addVariantBase(
+fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
     name: String,
     extraModifiers: Modifier = Modifier,
     init: ComponentBaseModifier.() -> Modifier
-): ComponentVariant {
+): ComponentVariant<T> {
     return addVariant(name, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)

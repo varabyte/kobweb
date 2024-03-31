@@ -78,7 +78,7 @@ private class TocEntry(val text: String, val id: String, val indent: Int)
 @Composable
 fun Toc(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     minHeaderLevel: Int = 2,
     maxHeaderLevel: Int = 3,
     indent: CSSLengthOrPercentageNumericValue = 1.cssRem,
