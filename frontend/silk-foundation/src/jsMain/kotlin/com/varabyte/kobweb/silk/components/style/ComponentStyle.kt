@@ -11,7 +11,9 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
-import org.w3c.dom.Element
+
+// TODO: docs
+interface ComponentKind
 
 /**
  * A class which allows a user to define styles that get added to the page's stylesheet, instead of inline styles.
@@ -25,7 +27,7 @@ import org.w3c.dom.Element
  * val CustomStyle = ComponentStyle("my-style") { ... }
  *
  * @Composable
- * fun CustomWidget(..., variant: ComponentVariant? = null, ...) {
+ * fun CustomWidget(..., variant: ComponentVariant<*>? = null, ...) {
  *   val modifier = CustomStyle.toModifier(variant).then(...)
  *   // ^ This modifier is now set with your registered styles.
  * }
@@ -42,7 +44,7 @@ import org.w3c.dom.Element
  *   `"silk-button"`). Also, when creating a variant by delegation, it is useful to know the non-prefixed name of the
  *   style it is based on when creating a name for it.
  */
-class ComponentStyle(
+class ComponentStyle<T : ComponentKind>(
     name: String,
     internal val extraModifiers: @Composable () -> Modifier,
     val prefix: String? = null,
@@ -75,7 +77,7 @@ class ComponentStyle(
         name: String,
         extraModifiers: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
-    ): ComponentVariant {
+    ): ComponentVariant<T> {
         return addVariant(name, { extraModifiers }, init)
     }
 
@@ -89,7 +91,7 @@ class ComponentStyle(
         name: String,
         extraModifiers: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
-    ): ComponentVariant {
+    ): ComponentVariant<T> {
         return SimpleComponentVariant(
             SimpleCssStyle(".${this.name}.$name", init, extraModifiers),
             baseStyle = this
@@ -130,19 +132,19 @@ internal value class ClassSelectors(private val value: List<String>) {
  * You may still wish to construct a [ComponentStyle] directly instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun ComponentStyle.Companion.base(
+fun <T : ComponentKind> ComponentStyle.Companion.base(
     className: String,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
-): ComponentStyle {
-    return base(className, { extraModifiers }, init)
+): ComponentStyle<T> {
+    return base<T>(className, { extraModifiers }, init)
 }
 
-fun ComponentStyle.Companion.base(
+fun <T : ComponentKind> ComponentStyle.Companion.base(
     className: String,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
-): ComponentStyle {
+): ComponentStyle<T> {
     return ComponentStyle(className, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
@@ -153,38 +155,42 @@ fun ComponentStyle.Companion.base(
 /**
  * A delegate provider class which allows you to create a [ComponentStyle] via the `by` keyword.
  */
-class ComponentStyleProvider internal constructor(
+class ComponentStyleProvider<T : ComponentKind> internal constructor(
     private val extraModifiers: @Composable () -> Modifier,
     private val prefix: String? = null,
     private val init: ComponentModifiers.() -> Unit,
-) : CacheByPropertyNameDelegate<ComponentStyle>() {
-    override fun create(propertyName: String): ComponentStyle {
+) : CacheByPropertyNameDelegate<ComponentStyle<T>>() {
+    override fun create(propertyName: String): ComponentStyle<T> {
         // e.g. "TitleTextStyle" to "title-text"
         val name = propertyName.removeSuffix("Style").titleCamelCaseToKebabCase()
         return ComponentStyle(name, extraModifiers, prefix, init)
     }
 }
 
-fun ComponentStyle(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit) =
-    ComponentStyle({ extraModifiers }, prefix, init)
+fun <T : ComponentKind> ComponentStyle(
+    extraModifiers: Modifier = Modifier,
+    prefix: String? = null,
+    init: ComponentModifiers.() -> Unit
+) =
+    ComponentStyle<T>({ extraModifiers }, prefix, init)
 
-fun ComponentStyle(
+fun <T : ComponentKind> ComponentStyle(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
     init: ComponentModifiers.() -> Unit
-) = ComponentStyleProvider(extraModifiers, prefix, init)
+) = ComponentStyleProvider<T>(extraModifiers, prefix, init)
 
-fun ComponentStyle.Companion.base(
+fun <T : ComponentKind> ComponentStyle.Companion.base(
     extraModifiers: Modifier = Modifier,
     prefix: String? = null,
     init: ComponentBaseModifier.() -> Modifier
-) = base({ extraModifiers }, prefix, init)
+) = base<T>({ extraModifiers }, prefix, init)
 
-fun ComponentStyle.Companion.base(
+fun <T : ComponentKind> ComponentStyle.Companion.base(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
     init: ComponentBaseModifier.() -> Modifier
-) = ComponentStyleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+) = ComponentStyleProvider<T>(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
 
 /**
  * Convert a user's component style into a [Modifier].
@@ -195,7 +201,8 @@ fun ComponentStyle.Companion.base(
  *   not.
  */
 @Composable
-fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
+// TODO: remove "in" once not needed backwards compatibility (?)
+fun <T : ComponentKind> ComponentStyle<in T>.toModifier(vararg variants: ComponentVariant<T>?): Modifier {
     return cssStyle.toModifier()
         .then(variants.toList().combine()?.toModifier() ?: Modifier)
 }
@@ -206,8 +213,8 @@ fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
  * This is useful if you need to convert a style into something directly consumable by a Compose HTML widget.
  */
 @Composable
-fun <A : AttrsScope<*>> ComponentStyle.toAttrs(
-    vararg variant: ComponentVariant?,
+fun <A : AttrsScope<*>, T : ComponentKind> ComponentStyle<T>.toAttrs(
+    vararg variant: ComponentVariant<T>?,
     finalHandler: (A.() -> Unit)? = null
 ): A.() -> Unit {
     return this.toModifier(*variant).toAttrs(finalHandler)
@@ -221,7 +228,7 @@ fun <A : AttrsScope<*>> ComponentStyle.toAttrs(
  * `Style1.toModifier().then(Style2.toModifier())...`
  */
 @Composable
-fun Iterable<ComponentStyle>.toModifier(): Modifier {
+fun Iterable<ComponentStyle<*>>.toModifier(): Modifier {
     return fold<_, Modifier>(Modifier) { acc, style -> acc.then(style.toModifier()) }
 }
 
@@ -229,6 +236,48 @@ fun Iterable<ComponentStyle>.toModifier(): Modifier {
  * A convenience method for chaining a collection of styles into a single [AttrsScope] builder.
  */
 @Composable
-fun <A : AttrsScope<*>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <A : AttrsScope<*>> Iterable<ComponentStyle<*>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
 }
+
+// Deprecations
+
+@Deprecated("TODO: CssStyle")
+fun ComponentStyle.Companion.base(
+    className: String,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+): ComponentStyle<ComponentKind> = base<ComponentKind>(className, { extraModifiers }, init)
+
+@Deprecated("TODO: CssStyle")
+fun ComponentStyle.Companion.base(
+    className: String,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+): ComponentStyle<ComponentKind> = base<ComponentKind>(className, extraModifiers, init)
+
+
+@Deprecated("TODO: CssStyle")
+fun ComponentStyle(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit) =
+    ComponentStyle<ComponentKind>({ extraModifiers }, prefix, init)
+
+@Deprecated("TODO: CssStyle")
+fun ComponentStyle(
+    extraModifiers: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: ComponentModifiers.() -> Unit
+) = ComponentStyle<ComponentKind>(extraModifiers, prefix, init)
+
+@Deprecated("TODO: CssStyle")
+fun ComponentStyle.Companion.base(
+    extraModifiers: Modifier = Modifier,
+    prefix: String? = null,
+    init: ComponentBaseModifier.() -> Modifier
+) = base<ComponentKind>({ extraModifiers }, prefix, init)
+
+@Deprecated("TODO: CssStyle")
+fun ComponentStyle.Companion.base(
+    extraModifiers: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: ComponentBaseModifier.() -> Modifier
+) = base<ComponentKind>(extraModifiers, prefix, init)

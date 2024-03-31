@@ -46,7 +46,7 @@ val FitWidthImageVariant by ImageStyle.addVariantBase {
 fun Image(
     src: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     width: Int? = null,
     height: Int? = null,
     alt: String = "",
@@ -85,7 +85,7 @@ fun Image(
     src: String,
     description: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     width: Int? = null,
     height: Int? = null,
     autoPrefix: Boolean = true,

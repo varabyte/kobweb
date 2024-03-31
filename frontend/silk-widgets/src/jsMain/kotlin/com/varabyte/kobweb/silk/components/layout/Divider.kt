@@ -25,7 +25,7 @@ object DividerVars {
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
 ) {
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
@@ -48,7 +48,7 @@ val DividerStyle = HorizontalDividerStyle
 @Composable
 fun HorizontalDivider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
 ) {
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
@@ -65,7 +65,7 @@ val VerticalDividerStyle by ComponentStyle.base(prefix = "silk") {
 @Composable
 fun VerticalDivider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
 ) {
     Hr(VerticalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }

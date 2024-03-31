@@ -67,7 +67,7 @@ fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = 
 fun SimpleGrid(
     numColumns: ResponsiveValues<Int>,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {

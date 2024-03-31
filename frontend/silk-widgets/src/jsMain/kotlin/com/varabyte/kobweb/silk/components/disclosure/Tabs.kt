@@ -257,9 +257,9 @@ fun TabsScope.TabPanel(
 @Composable
 fun Tabs(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
-    tabVariant: ComponentVariant? = null,
-    panelVariant: ComponentVariant? = null,
+    variant: ComponentVariant<*>? = null,
+    tabVariant: ComponentVariant<*>? = null,
+    panelVariant: ComponentVariant<*>? = null,
     commonTabModifier: Modifier = Modifier,
     commonPanelModifier: Modifier = Modifier,
     onTabSelected: (Int) -> Unit = {},
