@@ -17,6 +17,7 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.CssStyle
 import com.varabyte.kobweb.silk.components.style.active
 import com.varabyte.kobweb.silk.components.style.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
@@ -93,42 +94,24 @@ val ButtonStyle by ComponentStyle(prefix = "silk") {
     }
 }
 
-interface ButtonSize {
-    val fontSize: CSSLengthNumericValue
-    val height: CSSLengthNumericValue
-    val horizontalPadding: CSSLengthNumericValue
-
-    object XS : ButtonSize {
-        override val fontSize = FontSizeVars.XS.value()
-        override val height = 1.5.cssRem
-        override val horizontalPadding = 0.5.cssRem
-    }
-
-    object SM : ButtonSize {
-        override val fontSize = FontSizeVars.SM.value()
-        override val height = 2.cssRem
-        override val horizontalPadding = 0.75.cssRem
-    }
-
-    object MD : ButtonSize {
-        override val fontSize = FontSizeVars.MD.value()
-        override val height = 2.5.cssRem
-        override val horizontalPadding = 1.cssRem
-    }
-
-    object LG : ButtonSize {
-        override val fontSize = FontSizeVars.LG.value()
-        override val height = 3.cssRem
-        override val horizontalPadding = 1.5.cssRem
-    }
-}
-
-fun ButtonSize.toModifier(): Modifier {
-    return Modifier
+class ButtonSize(
+    val fontSize: CSSLengthNumericValue,
+    val height: CSSLengthNumericValue,
+    val horizontalPadding: CSSLengthNumericValue,
+) : CssStyle.Base({
+    Modifier
         .setVariable(ButtonVars.FontSize, fontSize)
         .setVariable(ButtonVars.Height, height)
         .setVariable(ButtonVars.PaddingHorizontal, horizontalPadding)
+}) {
+    companion object {
+        val XS = ButtonSize(FontSizeVars.XS.value(), 1.5.cssRem, 0.5.cssRem)
+        val SM = ButtonSize(FontSizeVars.SM.value(), 2.cssRem, 0.75.cssRem)
+        val MD = ButtonSize(FontSizeVars.MD.value(), 2.5.cssRem, 1.cssRem)
+        val LG = ButtonSize(FontSizeVars.LG.value(), 3.cssRem, 1.5.cssRem)
+    }
 }
+
 
 /**
  * A button widget.

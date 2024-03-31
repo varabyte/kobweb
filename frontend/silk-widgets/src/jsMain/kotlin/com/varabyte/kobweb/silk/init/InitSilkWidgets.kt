@@ -11,22 +11,26 @@ import com.varabyte.kobweb.silk.components.disclosure.TabsPanelStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsTabRowStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsTabStyle
+import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonVars
 import com.varabyte.kobweb.silk.components.forms.CheckboxEnabledAnim
 import com.varabyte.kobweb.silk.components.forms.CheckboxIconContainerStyle
 import com.varabyte.kobweb.silk.components.forms.CheckboxIconStyle
 import com.varabyte.kobweb.silk.components.forms.CheckboxInputVariant
+import com.varabyte.kobweb.silk.components.forms.CheckboxSize
 import com.varabyte.kobweb.silk.components.forms.CheckboxStyle
 import com.varabyte.kobweb.silk.components.forms.CheckboxVars
 import com.varabyte.kobweb.silk.components.forms.CheckedCheckboxIconContainerVariant
 import com.varabyte.kobweb.silk.components.forms.FilledInputVariant
 import com.varabyte.kobweb.silk.components.forms.FlushedInputVariant
 import com.varabyte.kobweb.silk.components.forms.InputGroupStyle
+import com.varabyte.kobweb.silk.components.forms.InputSize
 import com.varabyte.kobweb.silk.components.forms.InputStyle
 import com.varabyte.kobweb.silk.components.forms.InputVars
 import com.varabyte.kobweb.silk.components.forms.OutlinedInputVariant
 import com.varabyte.kobweb.silk.components.forms.SwitchInputVariant
+import com.varabyte.kobweb.silk.components.forms.SwitchSize
 import com.varabyte.kobweb.silk.components.forms.SwitchStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchThumbStyle
 import com.varabyte.kobweb.silk.components.forms.SwitchTrackStyle
@@ -262,6 +266,23 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerComponentStyle(TooltipTextContainerStyle)
 
     ctx.stylesheet.registerKeyframes(CheckboxEnabledAnim)
+
+    // TODO (double): we definitely want to automate this
+    //  Note: B sure to add @CssPrefix to the relevant objects (or account for the prefix some other way)
+    mutableTheme.registerCssStyle("silk-button-size_xs", ButtonSize.XS)
+    mutableTheme.registerCssStyle("silk-button-size_sm", ButtonSize.SM)
+    mutableTheme.registerCssStyle("silk-button-size_md", ButtonSize.MD)
+    mutableTheme.registerCssStyle("silk-button-size_lg", ButtonSize.LG)
+    mutableTheme.registerCssStyle("silk-checkbox-size_sm", CheckboxSize.SM)
+    mutableTheme.registerCssStyle("silk-checkbox-size_md", CheckboxSize.MD)
+    mutableTheme.registerCssStyle("silk-checkbox-size_lg", CheckboxSize.LG)
+    mutableTheme.registerCssStyle("silk-input-size_xs", InputSize.XS)
+    mutableTheme.registerCssStyle("silk-input-size_sm", InputSize.SM)
+    mutableTheme.registerCssStyle("silk-input-size_md", InputSize.MD)
+    mutableTheme.registerCssStyle("silk-input-size_lg", InputSize.LG)
+    mutableTheme.registerCssStyle("silk-switch-size_sm", SwitchSize.SM)
+    mutableTheme.registerCssStyle("silk-switch-size_md", SwitchSize.MD)
+    mutableTheme.registerCssStyle("silk-switch-size_lg", SwitchSize.LG)
 }
 
 val SilkColorsStyle by ComponentStyle.base {
