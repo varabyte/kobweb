@@ -12,7 +12,6 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
@@ -438,7 +437,7 @@ interface InputSize {
     object LG : InputSize {
         override val fontSize = FontSizeVars.LG.value()
         override val height = 2.5.cssRem
-        override val padding = 0.375.cssRem
+        override val padding = 0.75.cssRem
         override val borderRadius = BorderRadiusVars.MD.value() // Intentionally same as MD
     }
 }
