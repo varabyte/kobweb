@@ -11,6 +11,7 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.CssStyle
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.base
@@ -85,31 +86,22 @@ val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
         .transition(CSSTransition("translate", duration = SwitchVars.TransitionDuration.value()))
 }
 
-interface SwitchSize {
-    val width: CSSLengthNumericValue
-    val height: CSSLengthNumericValue
-    val padding: CSSLengthNumericValue get() = 0.188.cssRem
-
-    object SM : SwitchSize {
-        override val width = 1.375.cssRem
-        override val height = 0.75.cssRem
-    }
-
-    object MD : SwitchSize {
-        override val width = 1.875.cssRem
-        override val height = 1.cssRem
-    }
-
-    object LG : SwitchSize {
-        override val width = 2.875.cssRem
-        override val height = 1.5.cssRem
+class SwitchSize(
+    val width: CSSLengthNumericValue,
+    val height: CSSLengthNumericValue,
+    val padding: CSSLengthNumericValue = 0.188.cssRem
+) : CssStyle.Base({
+    Modifier
+        .setVariable(SwitchVars.TrackWidth, width)
+        .setVariable(SwitchVars.TrackHeight, height)
+        .setVariable(SwitchVars.TrackPadding, padding)
+}) {
+    companion object {
+        val SM = SwitchSize(1.375.cssRem, 0.75.cssRem)
+        val MD = SwitchSize(1.875.cssRem, 1.cssRem)
+        val LG = SwitchSize(2.875.cssRem, 1.5.cssRem)
     }
 }
-
-fun SwitchSize.toModifier() = Modifier
-    .setVariable(SwitchVars.TrackWidth, width)
-    .setVariable(SwitchVars.TrackHeight, height)
-    .setVariable(SwitchVars.TrackPadding, padding)
 
 enum class SwitchShape {
     PILL,

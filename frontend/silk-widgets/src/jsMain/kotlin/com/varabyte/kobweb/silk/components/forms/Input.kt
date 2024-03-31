@@ -16,6 +16,7 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.CssStyle
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.ariaInvalid
 import com.varabyte.kobweb.silk.components.style.base
@@ -410,47 +411,26 @@ fun InputGroupScope.TextInput(
     )
 }
 
-
-interface InputSize {
-    val fontSize: CSSLengthNumericValue
-    val height: CSSLengthNumericValue
-    val padding: CSSLengthNumericValue
-    val borderRadius: CSSLengthNumericValue
-
-    object XS : InputSize {
-        override val fontSize = FontSizeVars.XS.value()
-        override val height = 1.25.cssRem
-        override val padding = 0.375.cssRem
-        override val borderRadius = BorderRadiusVars.XS.value()
-    }
-
-    object SM : InputSize {
-        override val fontSize = FontSizeVars.SM.value()
-        override val height = 1.75.cssRem
-        override val padding = 0.5.cssRem
-        override val borderRadius = BorderRadiusVars.SM.value()
-    }
-
-    object MD : InputSize {
-        override val fontSize = FontSizeVars.MD.value()
-        override val height = 2.25.cssRem
-        override val padding = 0.625.cssRem
-        override val borderRadius = BorderRadiusVars.MD.value()
-    }
-
-    object LG : InputSize {
-        override val fontSize = FontSizeVars.LG.value()
-        override val height = 2.5.cssRem
-        override val padding = 0.75.cssRem
-        override val borderRadius = BorderRadiusVars.MD.value() // Intentionally same as MD
+class InputSize(
+    val fontSize: CSSLengthNumericValue,
+    val height: CSSLengthNumericValue,
+    val padding: CSSLengthNumericValue,
+    val borderRadius: CSSLengthNumericValue,
+) : CssStyle.Base({
+    Modifier
+        .setVariable(InputVars.FontSize, fontSize)
+        .setVariable(InputVars.Height, height)
+        .setVariable(InputVars.Padding, padding)
+        .setVariable(InputVars.BorderRadius, borderRadius)
+}) {
+    companion object {
+        val XS = InputSize(FontSizeVars.XS.value(), 1.25.cssRem, 0.375.cssRem, BorderRadiusVars.XS.value())
+        val SM = InputSize(FontSizeVars.SM.value(), 1.75.cssRem, 0.5.cssRem, BorderRadiusVars.SM.value())
+        val MD = InputSize(FontSizeVars.MD.value(), 2.25.cssRem, 0.625.cssRem, BorderRadiusVars.MD.value())
+        // Border radius intentionally same as MD
+        val LG = InputSize(FontSizeVars.LG.value(), 2.5.cssRem, 0.75.cssRem, BorderRadiusVars.MD.value())
     }
 }
-
-fun InputSize.toModifier() = Modifier
-    .setVariable(InputVars.BorderRadius, borderRadius)
-    .setVariable(InputVars.FontSize, fontSize)
-    .setVariable(InputVars.Height, height)
-    .setVariable(InputVars.Padding, padding)
 
 private fun PlaceholderColor.toModifier(): Modifier {
     return Modifier

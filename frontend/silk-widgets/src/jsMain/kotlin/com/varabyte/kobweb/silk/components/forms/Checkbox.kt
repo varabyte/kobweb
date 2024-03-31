@@ -18,6 +18,7 @@ import com.varabyte.kobweb.silk.components.icons.CheckIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.CssStyle
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.addVariantBase
 import com.varabyte.kobweb.silk.components.style.base
@@ -150,34 +151,22 @@ val CheckboxInputVariant by InputStyle.addVariant {
     }
 }
 
-interface CheckboxSize {
-    val boxSize: CSSLengthNumericValue
-    val iconSize: CSSLengthNumericValue
-    val fontSize: CSSLengthNumericValue
-
-    object SM : CheckboxSize {
-        override val boxSize = 0.875.cssRem
-        override val iconSize = 0.45.cssRem
-        override val fontSize = FontSizeVars.SM.value()
-    }
-
-    object MD : CheckboxSize {
-        override val boxSize = 1.cssRem
-        override val iconSize = 0.625.cssRem
-        override val fontSize = FontSizeVars.MD.value()
-    }
-
-    object LG : CheckboxSize {
-        override val boxSize = 1.25.cssRem
-        override val iconSize = 0.8.cssRem
-        override val fontSize = FontSizeVars.LG.value()
+class CheckboxSize(
+    val boxSize: CSSLengthNumericValue,
+    val iconSize: CSSLengthNumericValue,
+    val fontSize: CSSLengthNumericValue,
+) : CssStyle.Base({
+    Modifier
+        .setVariable(CheckboxVars.Size, boxSize)
+        .setVariable(CheckboxVars.IconSize, iconSize)
+        .setVariable(CheckboxVars.FontSize, fontSize)
+}) {
+    companion object {
+        val SM = CheckboxSize(0.875.cssRem, 0.45.cssRem, FontSizeVars.SM.value())
+        val MD = CheckboxSize(1.cssRem, 0.625.cssRem, FontSizeVars.MD.value())
+        val LG = CheckboxSize(1.25.cssRem, 0.8.cssRem, FontSizeVars.LG.value())
     }
 }
-
-fun CheckboxSize.toModifier() = Modifier
-    .setVariable(CheckboxVars.Size, boxSize)
-    .setVariable(CheckboxVars.IconSize, iconSize)
-    .setVariable(CheckboxVars.FontSize, fontSize)
 
 class CheckboxIconScope internal constructor(val indeterminate: Boolean, val colorMode: ColorMode)
 
