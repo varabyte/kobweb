@@ -16,7 +16,9 @@ import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
 import com.varabyte.kobweb.silk.components.overlay.Tooltip
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.CssStyle
 import com.varabyte.kobweb.silk.components.style.addVariant
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
@@ -29,7 +31,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.css.*
 
-val NavHeaderStyle by ComponentStyle.base(extraModifiers = { SmoothColorStyle.toModifier() }) {
+val NavHeaderStyle by CssStyle.base(extraModifiers = { SmoothColorStyle.toModifier() }) {
     Modifier
         .fillMaxWidth()
         .height(50.px)
@@ -37,7 +39,9 @@ val NavHeaderStyle by ComponentStyle.base(extraModifiers = { SmoothColorStyle.to
         .backgroundColor(colorMode.toPalette().color)
 }
 
-val NavItemStyle by ComponentStyle {
+interface NavItemKind : ComponentKind
+
+val NavItemStyle by ComponentStyle<NavItemKind> {
     base { Modifier.margin(leftRight = 15.px) }
 }
 
