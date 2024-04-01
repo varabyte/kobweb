@@ -67,9 +67,8 @@ import com.varabyte.kobweb.silk.components.overlay.Popover
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
 import com.varabyte.kobweb.silk.components.overlay.Tooltip
 import com.varabyte.kobweb.silk.components.overlay.manual
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.CssStyle
 import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.palette.background
@@ -83,20 +82,20 @@ import org.jetbrains.compose.web.dom.Text
 import playground.components.layouts.PageLayout
 import playground.components.widgets.GoHomeLink
 
-val WidgetSectionStyle by ComponentStyle.base {
+val WidgetSectionStyle by CssStyle.base {
     Modifier
         .fillMaxWidth()
         .border(1.px, LineStyle.Solid, colorMode.toPalette().border)
         .position(Position.Relative)
 }
 
-val WidgetPaddingStyle by ComponentStyle.base {
+val WidgetPaddingStyle by CssStyle.base {
     Modifier
         .fillMaxSize()
         .padding(1.cssRem)
 }
 
-val WidgetLabelStyle by ComponentStyle.base {
+val WidgetLabelStyle by CssStyle.base {
     Modifier
         .position(Position.Relative)
         .fontSize(0.8.cssRem)
@@ -106,7 +105,7 @@ val WidgetLabelStyle by ComponentStyle.base {
         .backgroundColor(colorMode.toPalette().background)
 }
 
-val IconContainerStyle by ComponentStyle.base {
+val IconContainerStyle by CssStyle.base {
     Modifier
         .padding(0.2.cssRem)
         .border(1.px, LineStyle.Solid, colorMode.toPalette().border)
