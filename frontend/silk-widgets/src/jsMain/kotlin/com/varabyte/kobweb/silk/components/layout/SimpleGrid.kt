@@ -7,6 +7,7 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
@@ -20,7 +21,9 @@ private val columnVariables = Breakpoint.entries.associateWith { breakpoint ->
     StyleVariable.NumberValue<Int>("simple-grid-col-count-${breakpoint.name.lowercase()}", prefix = "silk")
 }
 
-val SimpleGridStyle by ComponentStyle(prefix = "silk") {
+interface SimpleGridKind : ComponentKind
+
+val SimpleGridStyle by ComponentStyle<SimpleGridKind>(prefix = "silk") {
     base {
         Modifier.display(DisplayStyle.Grid)
     }
@@ -67,7 +70,7 @@ fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = 
 fun SimpleGrid(
     numColumns: ResponsiveValues<Int>,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<SimpleGridKind>? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {

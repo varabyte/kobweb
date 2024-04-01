@@ -61,7 +61,7 @@ import com.varabyte.kobweb.silk.components.overlay.TooltipVars
 import com.varabyte.kobweb.silk.components.overlay.TopLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopTooltipArrowVariant
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
+import com.varabyte.kobweb.silk.components.style.CssStyle
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
@@ -85,9 +85,6 @@ import com.varabyte.kobweb.silk.theme.colors.palette.switch
 import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.tooltip
-import com.varabyte.kobweb.silk.theme.colors.suffixedWith
-import kotlinx.dom.addClass
-import kotlinx.dom.removeClass
 import org.w3c.dom.Document
 import org.w3c.dom.HTMLElement
 
@@ -207,7 +204,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
         }
     }
 
-    mutableTheme.registerComponentStyle(SilkColorsStyle)
+    mutableTheme.registerCssStyle(null, SilkColorsStyle)
 
     // TODO: Automate the creation of this list (with a Gradle task?)
     mutableTheme.registerComponentStyle(DisabledStyle)
@@ -285,7 +282,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerCssStyle("silk-switch-size_lg", SwitchSize.LG)
 }
 
-val SilkColorsStyle by ComponentStyle.base {
+val SilkColorsStyle by CssStyle.base {
     val palette = colorMode.toPalette()
     Modifier
         // region General color vars
@@ -338,6 +335,7 @@ fun HTMLElement.setSilkWidgetVariables() {
 }
 
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
-    removeClass(SilkColorsStyle.name.suffixedWith(colorMode.opposite))
-    addClass(SilkColorsStyle.name.suffixedWith(colorMode))
+    // TODO: IMPORTANT figure out how this should work
+//    removeClass(SilkColorsStyle.name.suffixedWith(colorMode.opposite))
+//    addClass(SilkColorsStyle.name.suffixedWith(colorMode))
 }

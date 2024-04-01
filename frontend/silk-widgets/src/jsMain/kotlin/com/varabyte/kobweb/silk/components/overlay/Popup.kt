@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.foundation.layout.LayoutScopeMarker
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
@@ -21,7 +22,9 @@ object PopupVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
 }
 
-val PopupStyle by ComponentStyle.base(prefix = "silk") {
+interface PopupKind : ComponentKind
+
+val PopupStyle by ComponentStyle.base<PopupKind>(prefix = "silk") {
     // NOTE: If any user replaces this style in their own project, they should make sure they still keep this "opacity"
     // transition in their version, even if they change the duration. Otherwise, the popup will break, as it currently
     // uses the "opacity" transition event to detect when it should close.

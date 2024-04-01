@@ -16,6 +16,7 @@ import com.varabyte.kobweb.silk.components.animation.Keyframes
 import com.varabyte.kobweb.silk.components.animation.toAnimation
 import com.varabyte.kobweb.silk.components.icons.CheckIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.CssStyle
@@ -79,7 +80,9 @@ object CheckboxVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.VeryFast.value())
 }
 
-val CheckboxStyle by ComponentStyle(
+interface CheckboxKind : ComponentKind
+
+val CheckboxStyle by ComponentStyle<CheckboxKind>(
     prefix = "silk",
     extraModifiers = Modifier.rowClasses(verticalAlignment = Alignment.CenterVertically)
 ) {
@@ -217,7 +220,7 @@ fun TriCheckbox(
     checked: CheckedState,
     onCheckedChange: (CheckedState) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<CheckboxKind>? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
@@ -333,7 +336,7 @@ fun Checkbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<CheckboxKind>? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,

@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.navigation.Link
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariantBase
@@ -29,7 +30,9 @@ object TocVars {
     val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
 }
 
-val TocStyle by ComponentStyle.base(prefix = "silk") {
+interface TocKind : ComponentKind
+
+val TocStyle by ComponentStyle.base<TocKind>(prefix = "silk") {
     Modifier
         .listStyle(ListStyleType.None)
         .textAlign(TextAlign.Start)
@@ -78,7 +81,7 @@ private class TocEntry(val text: String, val id: String, val indent: Int)
 @Composable
 fun Toc(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<TocKind>? = null,
     minHeaderLevel: Int = 2,
     maxHeaderLevel: Int = 3,
     indent: CSSLengthOrPercentageNumericValue = 1.cssRem,

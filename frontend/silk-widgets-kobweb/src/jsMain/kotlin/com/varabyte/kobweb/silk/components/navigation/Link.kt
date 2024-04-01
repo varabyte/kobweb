@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariant
@@ -27,10 +28,12 @@ object LinkVars {
     val VisitedColor by StyleVariable<CSSColorValue>(prefix = "silk")
 }
 
+interface LinkKind : ComponentKind
+
 /**
  * Style to use with [A] tags to give them Silk-themed colors.
  */
-val LinkStyle by ComponentStyle(prefix = "silk") {
+val LinkStyle by ComponentStyle<LinkKind>(prefix = "silk") {
     base {
         Modifier.textDecorationLine(TextDecorationLine.None)
     }
@@ -88,7 +91,7 @@ fun Link(
     path: String,
     text: String? = null,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<LinkKind>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
@@ -108,7 +111,7 @@ fun Link(
 fun Link(
     path: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<LinkKind>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,

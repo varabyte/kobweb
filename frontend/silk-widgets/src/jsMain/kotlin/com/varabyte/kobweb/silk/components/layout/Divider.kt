@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
@@ -25,12 +26,14 @@ object DividerVars {
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<HorizontalDividerKind>? = null,
 ) {
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
 
-val HorizontalDividerStyle by ComponentStyle.base(prefix = "silk") {
+interface HorizontalDividerKind : ComponentKind
+
+val HorizontalDividerStyle by ComponentStyle.base<HorizontalDividerKind>(prefix = "silk") {
     Modifier
         .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
         .width(DividerVars.Length.value())
@@ -48,12 +51,14 @@ val DividerStyle = HorizontalDividerStyle
 @Composable
 fun HorizontalDivider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<HorizontalDividerKind>? = null,
 ) {
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
 
-val VerticalDividerStyle by ComponentStyle.base(prefix = "silk") {
+interface VerticalDividerKind : ComponentKind
+
+val VerticalDividerStyle by ComponentStyle.base<VerticalDividerKind>(prefix = "silk") {
     Modifier
         .borderLeft(1.px, LineStyle.Solid, DividerVars.Color.value())
         .height(DividerVars.Length.value())
@@ -65,7 +70,7 @@ val VerticalDividerStyle by ComponentStyle.base(prefix = "silk") {
 @Composable
 fun VerticalDivider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<VerticalDividerKind>? = null,
 ) {
     Hr(VerticalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
