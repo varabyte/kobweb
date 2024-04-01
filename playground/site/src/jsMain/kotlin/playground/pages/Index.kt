@@ -7,6 +7,10 @@ import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
 import playground.components.layouts.PageLayout
 
+//object MyButtonSize {
+//    val XS = ButtonSize(1.13.cssRem, 1.13.cssRem, 0.5.cssRem)
+//}
+
 @Page
 @Composable
 fun HomePage() {
@@ -16,5 +20,11 @@ fun HomePage() {
         TextInput(name, onTextChanged = { name = it })
         P()
         Text("Hello ${name.takeIf { it.isNotBlank() } ?: "World"}!")
+//        Button(
+//            onClick = {},
+//            size = MyButtonSize.XS
+//        ) {
+//            Text("Click me!")
+//        }
     }
 }

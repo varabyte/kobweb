@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.base
@@ -21,7 +22,9 @@ object OverlayVars {
     val BackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
 }
 
-val OverlayStyle by ComponentStyle.base(prefix = "silk") {
+interface OverlayKind : ComponentKind
+
+val OverlayStyle by ComponentStyle.base<OverlayKind>(prefix = "silk") {
     Modifier.backgroundColor(OverlayVars.BackgroundColor.value())
 }
 
@@ -51,7 +54,7 @@ val OverlayStyle by ComponentStyle.base(prefix = "silk") {
 @Composable
 fun Overlay(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<OverlayKind>? = null,
     contentAlignment: Alignment = Alignment.TopCenter,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}

@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -23,7 +24,9 @@ object SurfaceVars {
     val Color by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
 }
 
-val SurfaceStyle by ComponentStyle(prefix = "silk") {
+interface SurfaceKind : ComponentKind
+
+val SurfaceStyle by ComponentStyle<SurfaceKind>(prefix = "silk") {
     base {
         Modifier
             .backgroundColor(SurfaceVars.BackgroundColor.value())
@@ -46,7 +49,7 @@ val SurfaceStyle by ComponentStyle(prefix = "silk") {
 @Composable
 fun Surface(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<SurfaceKind>? = null,
     colorModeOverride: ColorMode? = null,
     contentAlignment: Alignment = Alignment.TopStart,
     ref: ElementRefScope<HTMLElement>? = null,

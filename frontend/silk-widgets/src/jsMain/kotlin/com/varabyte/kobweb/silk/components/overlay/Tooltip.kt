@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariantBase
@@ -58,7 +59,12 @@ object TooltipVars {
     val Color by StyleVariable<CSSColorValue>(prefix = "silk")
 }
 
-val TooltipStyle by ComponentStyle.base(prefix = "silk") {
+interface TooltipKind : ComponentKind {
+    interface Arrow : ComponentKind
+    interface TextContainer : ComponentKind
+}
+
+val TooltipStyle by ComponentStyle.base<TooltipKind>(prefix = "silk") {
     Modifier
         .position(Position.Relative) // So arrow is positioned relative to tooltip area
         .backgroundColor(TooltipVars.BackgroundColor.value())
@@ -66,7 +72,7 @@ val TooltipStyle by ComponentStyle.base(prefix = "silk") {
         .borderRadius(6.px)
 }
 
-val TooltipArrowStyle by ComponentStyle.base(prefix = "silk") {
+val TooltipArrowStyle by ComponentStyle.base<TooltipKind.Arrow>(prefix = "silk") {
     Modifier
         .position(Position.Absolute)
         .border {
@@ -170,7 +176,7 @@ val BottomRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleUp(TooltipVars.BackgroundColor.value())
 }
 
-val TooltipTextContainerStyle = ComponentStyle.base("tooltip-text") {
+val TooltipTextContainerStyle = ComponentStyle.base<TooltipKind.TextContainer>("tooltip-text") {
     Modifier.padding(5.px)
 }
 
@@ -192,7 +198,7 @@ val TooltipTextContainerStyle = ComponentStyle.base("tooltip-text") {
 fun Tooltip(
     target: ElementTarget,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<TooltipKind>? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
@@ -235,7 +241,7 @@ fun Tooltip(
     target: ElementTarget,
     text: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<TooltipKind>? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
@@ -274,7 +280,7 @@ fun AdvancedTooltip(
     target: ElementTarget,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<TooltipKind>? = null,
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
@@ -336,7 +342,7 @@ fun AdvancedTooltip(
     text: String,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<TooltipKind>? = null,
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,

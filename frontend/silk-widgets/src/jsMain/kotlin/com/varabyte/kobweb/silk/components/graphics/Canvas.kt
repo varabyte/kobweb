@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -24,7 +25,9 @@ import kotlin.js.Date
 import kotlin.math.max
 import kotlin.math.min
 
-val CanvasStyle by ComponentStyle(prefix = "silk") {}
+interface CanvasKind : ComponentKind
+
+val CanvasStyle by ComponentStyle<CanvasKind>(prefix = "silk") {}
 
 /**
  * Arguments passed to the user's `render` callback.
@@ -103,7 +106,7 @@ private inline fun <C : RenderingContext> Canvas(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<CanvasKind>? = null,
     minDeltaMs: Number = 0f,
     maxDeltaMs: Number = 500f,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -160,7 +163,7 @@ fun Canvas2d(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<CanvasKind>? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     ref: ElementRefScope<HTMLElement>? = null,
@@ -197,7 +200,7 @@ fun CanvasGl(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<CanvasKind>? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     ref: ElementRefScope<HTMLElement>? = null,
