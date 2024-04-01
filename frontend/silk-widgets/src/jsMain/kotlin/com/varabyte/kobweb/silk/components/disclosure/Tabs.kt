@@ -12,6 +12,7 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.active
@@ -44,13 +45,21 @@ object TabVars {
     )
 }
 
-val TabsStyle by ComponentStyle(prefix = "silk") {}
-val TabsTabRowStyle by ComponentStyle.base(prefix = "silk") {
+interface TabsKind : ComponentKind {
+    interface TabRow : ComponentKind
+    interface Tab : ComponentKind
+    interface Panel : ComponentKind
+}
+
+val TabsStyle by ComponentStyle<TabsKind>(prefix = "silk") {}
+
+// TODO: should this take a variant? currently it's used without one
+val TabsTabRowStyle by ComponentStyle.base<TabsKind.TabRow>(prefix = "silk") {
     Modifier
         .fillMaxWidth()
         .borderBottom(TabVars.BorderThickness.value(), LineStyle.Solid, TabVars.BorderColor.value())
 }
-val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.tabIndex(0) }) {
+val TabsTabStyle by ComponentStyle<TabsKind.Tab>(prefix = "silk", extraModifiers = { Modifier.tabIndex(0) }) {
     base {
         Modifier
             .cursor(Cursor.Pointer)
@@ -80,7 +89,7 @@ val TabsTabStyle by ComponentStyle(prefix = "silk", extraModifiers = { Modifier.
     }
 }
 
-val TabsPanelStyle by ComponentStyle.base(prefix = "silk") {
+val TabsPanelStyle by ComponentStyle.base<TabsKind.Panel>(prefix = "silk") {
     Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflow { y(Overflow.Auto) }
 }
 
@@ -257,9 +266,9 @@ fun TabsScope.TabPanel(
 @Composable
 fun Tabs(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
-    tabVariant: ComponentVariant<*>? = null,
-    panelVariant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<TabsKind>? = null,
+    tabVariant: ComponentVariant<TabsKind.Tab>? = null,
+    panelVariant: ComponentVariant<TabsKind.Panel>? = null,
     commonTabModifier: Modifier = Modifier,
     commonPanelModifier: Modifier = Modifier,
     onTabSelected: (Int) -> Unit = {},

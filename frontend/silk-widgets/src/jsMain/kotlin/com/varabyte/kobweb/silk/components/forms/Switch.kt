@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.CssStyle
@@ -47,12 +48,19 @@ object SwitchVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
 }
 
+interface SwitchKind : ComponentKind {
+    interface Track : ComponentKind
+    interface Thumb : ComponentKind
+}
 val SwitchStyle by ComponentStyle.base(prefix = "silk") {
     Modifier
         .position(Position.Relative) // So the hidden <input> is positioned relative to the switch root
 }
 
-val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifier.tabIndex(-1).ariaHidden()) {
+val SwitchTrackStyle by ComponentStyle<SwitchKind.Track>(
+    prefix = "silk",
+    extraModifiers = Modifier.tabIndex(-1).ariaHidden()
+) {
     base {
         Modifier
             .width(SwitchVars.TrackWidth.value())
@@ -78,7 +86,7 @@ val SwitchInputVariant by InputStyle.addVariant {
     }
 }
 
-val SwitchThumbStyle by ComponentStyle.base(prefix = "silk") {
+val SwitchThumbStyle by ComponentStyle.base<SwitchKind.Thumb>(prefix = "silk") {
     Modifier.size(SwitchVars.TrackHeight.value())
         .borderRadius(SwitchVars.BorderRadius.value())
         .backgroundColor(SwitchVars.ThumbColor.value())
@@ -139,12 +147,13 @@ internal fun SwitchShape.toModifier() = Modifier
  * @param ref Provides a reference to the *container* of the switch. Its direct children will be the underlying checkbox
  *   element and the switch track, whose direct child will be the thumb element.
  */
+// TODO: should this take a trackVariant and thumbVariant, like Tabs does?
 @Composable
 fun Switch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<SwitchKind>? = null,
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
     shape: SwitchShape = SwitchShape.PILL,

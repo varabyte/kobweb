@@ -14,6 +14,7 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.CssStyle
@@ -101,7 +102,10 @@ object InputVars {
     val InsetRightWidth by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
 }
 
-val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
+interface InputGroupKind : ComponentKind
+interface InputKind : ComponentKind
+
+val InputGroupStyle by ComponentStyle.base<InputGroupKind>(prefix = "silk") {
     Modifier
         .outline(0.px, LineStyle.Solid, Colors.Transparent) // Disable, we'll use box shadow instead
         .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
@@ -111,7 +115,7 @@ val InputGroupStyle by ComponentStyle.base(prefix = "silk") {
         .fontSize(InputVars.FontSize.value())
 }
 
-val InputStyle by ComponentStyle(prefix = "silk") {
+val InputStyle by ComponentStyle<InputKind>(prefix = "silk") {
     base {
         Modifier
             .appearance(Appearance.None) // Disable browser styles
@@ -201,7 +205,7 @@ internal class InputParams<T : Any?>(
     private val value: T,
     private val onValueChanged: (T) -> Unit,
     private val modifier: Modifier = Modifier,
-    private val variant: ComponentVariant<*>? = InputDefaults.Variant,
+    private val variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
     private val placeholder: String? = null,
     private val placeholderColor: PlaceholderColor? = null,
     private val focusBorderColor: CSSColorValue? = null,
@@ -257,7 +261,7 @@ class InputGroupScope {
         value: T,
         onValueChanged: (T) -> Unit,
         modifier: Modifier = Modifier,
-        variant: ComponentVariant<*>? = InputDefaults.Variant,
+        variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
         placeholder: String? = null,
         enabled: Boolean = InputDefaults.Enabled,
         valid: Boolean = InputDefaults.Valid,
@@ -375,7 +379,7 @@ fun InputGroupScope.TextInput(
     text: String,
     onTextChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = InputDefaults.Variant,
+    variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
     placeholderColor: PlaceholderColor? = null,
     focusBorderColor: CSSColorValue? = null,
@@ -444,7 +448,7 @@ private fun <T : Any?> _Input(
     value: T,
     onValueChanged: (T) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<InputKind>? = null,
     placeholder: String? = null,
     enabled: Boolean = InputDefaults.Enabled,
     valid: Boolean = InputDefaults.Valid,
@@ -527,7 +531,7 @@ fun TextInput(
     text: String,
     onTextChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = InputDefaults.Variant,
+    variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
     placeholderColor: PlaceholderColor? = null,
     focusBorderColor: CSSColorValue? = null,
@@ -601,7 +605,7 @@ fun <T : Any?> Input(
     value: T,
     onValueChanged: (T) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = InputDefaults.Variant,
+    variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
     size: InputSize = InputDefaults.Size,
     enabled: Boolean = InputDefaults.Enabled,
@@ -667,7 +671,7 @@ fun <T : Any?> Input(
 @Composable
 fun InputGroup(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<InputGroupKind>? = null,
     size: InputSize = InputDefaults.Size,
     block: InputGroupScope.() -> Unit,
 ) {

@@ -15,6 +15,7 @@ import com.varabyte.kobweb.compose.ui.graphics.isBright
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.CssStyle
@@ -54,7 +55,9 @@ object ButtonVars {
     val PaddingHorizontal by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
 }
 
-val ButtonStyle by ComponentStyle(prefix = "silk") {
+interface ButtonKind : ComponentKind
+
+val ButtonStyle by ComponentStyle<ButtonKind>(prefix = "silk") {
     base {
         Modifier
             .color(ButtonVars.Color.value())
@@ -120,7 +123,7 @@ class ButtonSize(
 fun Button(
     onClick: (evt: SyntheticMouseEvent) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<ButtonKind>? = null,
     type: ButtonType = ButtonType.Button,
     enabled: Boolean = true,
     size: ButtonSize = ButtonSize.MD,

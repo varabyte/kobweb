@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.prependIf
+import com.varabyte.kobweb.silk.components.style.ComponentKind
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.addVariantBase
@@ -18,7 +19,9 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
 import org.w3c.dom.HTMLImageElement
 
-val ImageStyle by ComponentStyle(prefix = "silk") {}
+interface ImageKind : ComponentKind
+
+val ImageStyle by ComponentStyle<ImageKind>(prefix = "silk") {}
 
 val FitWidthImageVariant by ImageStyle.addVariantBase {
     Modifier
@@ -46,7 +49,7 @@ val FitWidthImageVariant by ImageStyle.addVariantBase {
 fun Image(
     src: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<ImageKind>? = null,
     width: Int? = null,
     height: Int? = null,
     alt: String = "",
@@ -85,7 +88,7 @@ fun Image(
     src: String,
     description: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<*>? = null,
+    variant: ComponentVariant<ImageKind>? = null,
     width: Int? = null,
     height: Int? = null,
     autoPrefix: Boolean = true,
