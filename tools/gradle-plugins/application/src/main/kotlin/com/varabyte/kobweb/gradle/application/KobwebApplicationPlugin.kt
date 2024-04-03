@@ -74,8 +74,6 @@ val Project.kobwebFolder: KobwebFolder
     get() = KobwebFolder.fromChildPath(layout.projectDirectory.asFile.toPath())
         ?: throw GradleException("This project is not a Kobweb project but is applying the Kobweb plugin.")
 
-internal const val KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME = "kobwebServerPlugin"
-
 @Suppress("unused") // KobwebApplicationPlugin is found by Gradle via reflection
 class KobwebApplicationPlugin @Inject constructor(
     private val buildEventsListenerRegistry: BuildEventsListenerRegistry
@@ -88,7 +86,7 @@ class KobwebApplicationPlugin @Inject constructor(
 
         // A Kobweb Server Plugin is one which is loaded by the Kobweb server when it starts up. It's a way for users to
         // configure their ktor server in ways that Kobweb does not currently expose.
-        project.configurations.register(KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME) {
+        val kobwebServerPluginConfiguration = project.configurations.register("kobwebServerPlugin") {
             isCanBeConsumed = false
             isTransitive = false
         }
@@ -156,7 +154,7 @@ class KobwebApplicationPlugin @Inject constructor(
             group = "kobweb"
             description = "Copy all Kobweb server plugin jars (if any) into the server's plugins directory"
 
-            from(project.configurations.named(KOBWEB_SERVER_PLUGIN_CONFIGURATION_NAME))
+            from(kobwebServerPluginConfiguration)
             into(project.projectDir.resolve(".kobweb/server/plugins"))
         }
 
