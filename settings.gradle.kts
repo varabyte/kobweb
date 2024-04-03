@@ -10,8 +10,9 @@ plugins {
 }
 
 develocity {
-    if (System.getenv("CI") != null) {
-        buildScan {
+    buildScan {
+        publishing.onlyIf { false }
+        if (System.getenv("CI") != null) {
             termsOfUseUrl = "https://gradle.com/terms-of-service"
             termsOfUseAgree = "yes"
         }
