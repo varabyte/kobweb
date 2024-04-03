@@ -3,6 +3,7 @@ package playground.pages
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.dom.ElementTarget
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.foundation.layout.Column
@@ -10,7 +11,9 @@ import com.varabyte.kobweb.compose.foundation.layout.Row
 import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
@@ -57,7 +60,13 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
 import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
 import com.varabyte.kobweb.silk.components.icons.fa.IconStyle
+import com.varabyte.kobweb.silk.components.layout.SimpleGrid
+import com.varabyte.kobweb.silk.components.layout.numColumns
+import com.varabyte.kobweb.silk.components.overlay.KeepPopupOpenStrategy
+import com.varabyte.kobweb.silk.components.overlay.Popover
+import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
 import com.varabyte.kobweb.silk.components.overlay.Tooltip
+import com.varabyte.kobweb.silk.components.overlay.manual
 import com.varabyte.kobweb.silk.components.style.ComponentStyle
 import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.toModifier
@@ -365,6 +374,125 @@ fun WidgetsPage() {
                                 }
                             }
                         }
+                    }
+                }
+            }
+
+            WidgetSection("Popovers and Tooltips") {
+                Column(Modifier.gap(1.cssRem).padding(0.5.cssRem)) {
+                    SimpleGrid(numColumns(3), Modifier.gap(0.5.cssRem)) {
+                        for (y in -1..1) {
+                            for (x in -1..1) {
+                                Box(
+                                    Modifier.size(150.px).backgroundColor(Colors.Blue)
+                                        .borderRadius(5.px),
+                                )
+                                if (y != 0 || x != 0) {
+                                    val placement = when {
+                                        y == -1 && x == -1 -> PopupPlacement.TopLeft
+                                        y == -1 && x == 0 -> PopupPlacement.Top
+                                        y == -1 && x == 1 -> PopupPlacement.TopRight
+                                        y == 0 && x == -1 -> PopupPlacement.Left
+                                        y == 0 && x == 1 -> PopupPlacement.Right
+                                        y == 1 && x == -1 -> PopupPlacement.BottomLeft
+                                        y == 1 && x == 0 -> PopupPlacement.Bottom
+                                        y == 1 && x == 1 -> PopupPlacement.BottomRight
+                                        else -> error("Unexpected coordinates ($x, $y)")
+                                    }
+
+                                    Popover(
+                                        ElementTarget.PreviousSibling,
+                                        placement = placement,
+                                    ) {
+                                        Box(Modifier.backgroundColor(Colors.Green).padding(0.3.cssRem)) {
+                                            Text(placement.name)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Column { // Conditional popup
+                        Row(Modifier.gap(0.3.cssRem)) {
+                            var count by remember { mutableStateOf(0) }
+                            Button({ count++ }) { Text("Click to increment popup value") }
+                            if (count < 10) {
+                                Tooltip(
+                                    ElementTarget.PreviousSibling,
+                                    "Lorem ipsum $count",
+                                )
+                            }
+                            Button({ count = 0 }, enabled = count > 0) { Text("Reset") }
+                        }
+                    }
+
+                    Column { // Should still show even if already mouse over
+                        var showTooltipOnClick by remember { mutableStateOf(false) }
+                        Button({ showTooltipOnClick = true },
+                            Modifier.onMouseOut { showTooltipOnClick = false }
+                                .onFocusOut { showTooltipOnClick = false }) { Text("Click to show tooltip") }
+                        if (showTooltipOnClick) {
+                            Tooltip(
+                                ElementTarget.PreviousSibling,
+                                "You clicked me!",
+                                placement = PopupPlacement.Right,
+                            )
+                        }
+                    }
+
+                    Column(Modifier.gap(1.cssRem)) { // Translate + margin popup
+                        val manualStrat = remember { KeepPopupOpenStrategy.manual() }
+                        Button(onClick = { manualStrat.shouldKeepOpen = false }) {
+                            Text("Click to close tooltip")
+                        }
+                        Tooltip(
+                            ElementTarget.PreviousSibling,
+                            "tooltip",
+                            placement = PopupPlacement.Right,
+                            keepOpenStrategy = manualStrat
+                        )
+                    }
+
+                    Box(
+                        Modifier.border(1.px, LineStyle.Solid, Colors.Black).borderRadius(5.px).padding(0.5.cssRem)
+                    ) { // changing target / placement while popup is up
+                        var targetId by remember { mutableStateOf("a") }
+                        var placementId by remember { mutableStateOf("c") }
+                        Column(Modifier.gap(0.5.cssRem)) {
+                            SpanText(
+                                "Mouse over the target element (\"Element $targetId\") to show the popup, which will be associated with the placement element (\"Element $placementId\")",
+                                Modifier.textAlign(TextAlign.Left).fontStyle(FontStyle.Italic)
+                            )
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Box(
+                                    Modifier.id("a").thenIf(targetId == "a", Modifier.fontWeight(FontWeight.Bold))
+                                ) { SpanText("Element a") }
+                                Box(
+                                    Modifier.id("b").thenIf(targetId == "b", Modifier.fontWeight(FontWeight.Bold))
+                                ) { SpanText("Element b") }
+                                Box(
+                                    Modifier.id("c").thenIf(placementId == "c", Modifier.fontStyle(FontStyle.Italic))
+                                ) { SpanText("Element c") }
+                                Box(
+                                    Modifier.id("d").thenIf(placementId == "d", Modifier.fontStyle(FontStyle.Italic))
+                                ) { SpanText("Element d") }
+                            }
+                            Row(Modifier.gap(0.3.cssRem)) {
+                                Button({
+                                    targetId = if (targetId == "a") "b" else "a"
+                                }) { Text("Toggle Target ($targetId)") }
+                                Button({
+                                    placementId = if (placementId == "c") "d" else "c"
+                                }) { Text("Toggle Placement ($placementId)") }
+                            }
+                        }
+                        Tooltip(
+                            ElementTarget.withId(targetId),
+                            "Popup",
+                            placement = PopupPlacement.Top,
+                            placementTarget = ElementTarget.withId(placementId),
+                        )
                     }
                 }
             }
