@@ -24,10 +24,8 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-val applicationClass = "com.varabyte.kobweb.server.ApplicationKt"
-project.setProperty("mainClassName", applicationClass)
 application {
-    mainClass.set(applicationClass)
+    mainClass = "com.varabyte.kobweb.server.ApplicationKt"
 }
 
 tasks.withType<ShadowJar>().configureEach {
