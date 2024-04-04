@@ -46,12 +46,14 @@ object SwitchVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
 }
 
-val SwitchStyle by ComponentStyle(prefix = "silk") {}
+val SwitchStyle by ComponentStyle.base(prefix = "silk") {
+    Modifier
+        .position(Position.Relative) // So the hidden <input> is positioned relative to the switch root
+}
 
 val SwitchTrackStyle by ComponentStyle(prefix = "silk", extraModifiers = Modifier.tabIndex(-1).ariaHidden()) {
     base {
         Modifier
-            .position(Position.Relative) // So input can be positioned absolutely without affecting the layout
             .width(SwitchVars.TrackWidth.value())
             .minWidth(SwitchVars.TrackWidth.value())
             .height(SwitchVars.TrackHeight.value())

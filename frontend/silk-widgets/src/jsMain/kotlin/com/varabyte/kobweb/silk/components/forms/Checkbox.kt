@@ -88,6 +88,7 @@ val CheckboxStyle by ComponentStyle(
             .userSelect(UserSelect.None)
             .fontSize(CheckboxVars.FontSize.value())
             .cursor(Cursor.Pointer)
+            .position(Position.Relative) // So the hidden <input> is positioned relative to the checkbox root
     }
 }
 

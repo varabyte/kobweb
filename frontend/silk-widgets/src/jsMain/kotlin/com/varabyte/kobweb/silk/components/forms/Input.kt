@@ -53,6 +53,10 @@ import org.w3c.dom.HTMLInputElement
  * We have several widgets which wrap an input but provide their own custom rendering. In this case, we still want to do
  * some tricks which keep the final widget a11y-friendly by only limiting its size/appearance (instead of explicitly
  * hiding it). This matches the approach of many other JS libraries out there.
+ *
+ * Note that this uses `Position.Absolute`, which positions the element relative to the closest non-static ancestor.
+ * This ancestor should generally be part of the same component, often a `Label` with `Position.Relative`, to avoid
+ * unintended effects on the larger layout.
  */
 internal val HiddenInputModifier = Modifier
     .border(0.px)
