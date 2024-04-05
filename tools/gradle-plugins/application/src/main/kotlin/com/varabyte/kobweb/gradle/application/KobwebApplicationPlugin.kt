@@ -163,9 +163,10 @@ class KobwebApplicationPlugin @Inject constructor(
             serverPluginsDir.set(kobwebSyncServerPluginJarsTask.map {
                 project.objects.directoryProperty().apply { set(it.destinationDir) }.get()
             })
+            val devScript = kobwebConf.server.files.dev.script
+            val devScriptFile = project.file(devScript)
             doLast {
-                val devScript = kobwebConf.server.files.dev.script
-                if (env == ServerEnvironment.DEV && !project.file(devScript).exists()) {
+                if (env == ServerEnvironment.DEV && !devScriptFile.exists()) {
                     throw GradleException(
                         "e: Your .kobweb/conf.yaml dev script (\"$devScript\") could not be found. This will cause " +
                             "the page to fail to load with a 500 error. Perhaps search your build/ directory for " +
