@@ -71,6 +71,7 @@ private fun BODY.buildIndicator() {
 
 fun createIndexFile(
     title: String,
+    lang: String,
     headInitializers: Iterable<HEAD.() -> Unit>,
     src: String,
     scriptAttributes: Map<String, String>,
@@ -79,7 +80,9 @@ fun createIndexFile(
     return document {
         append {
             html {
-                lang = "en"
+                if (lang.isNotEmpty()) {
+                    this.lang = lang
+                }
 
                 head {
                     title(content = title)

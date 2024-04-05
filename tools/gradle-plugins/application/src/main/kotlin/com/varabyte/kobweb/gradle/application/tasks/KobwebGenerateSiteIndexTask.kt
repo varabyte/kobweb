@@ -187,6 +187,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         getGenIndexFile().get().asFile.writeText(
             createIndexFile(
                 confInputs.title,
+                kobwebBlock.app.index.lang.get(),
                 headInitializers,
                 // Our script will always exist at the root folder, so be sure to ground it,
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
