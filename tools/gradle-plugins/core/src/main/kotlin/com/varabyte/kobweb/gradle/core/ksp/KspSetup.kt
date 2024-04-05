@@ -97,3 +97,12 @@ fun Project.configureKspTask(target: TargetPlatform<*>, action: Task.() -> Unit)
     // use `matching` instead of `named()` because the task may not exist yet
     tasks.matching { it.name == target.kspKotlin }.configureEach(action)
 }
+
+/**
+ * KSP's [KspExtension.excludedSources] property, which allows excluding files (and the tasks that generate them) from
+ * being processed/depended-on by KSP.
+ *
+ * This is exposed for use in Kobweb plugins and is not generally meant to be used by end-users.
+ */
+val Project.kspExcludedSources
+    get() = kspExtension.excludedSources
