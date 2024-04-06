@@ -27,7 +27,7 @@ enum class ColorMode {
          * The current color mode.
          *
          * By default, this will be a global color mode that affects the whole site. However, if you check this value
-         * within a `ColorMode(colorModeOverride) { ... }` block, it will fetch the local color mode instead.
+         * within a `Surface` that sets the `colorModeOverride` parameter, it will fetch the local color mode instead.
          *
          * See also [currentState] if you need to modify the current color.
          */
