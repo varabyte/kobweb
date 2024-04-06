@@ -4170,9 +4170,6 @@ block:
 
 ```kotlin
 // site/build.gradle.kts
-import com.varabyte.kobweb.gradle.application.artifacts.kobwebServerPlugin
-
-/* ... */
 
 dependencies {
   kobwebServerPlugin(project(":demo-server-plugin"))
