@@ -2814,7 +2814,7 @@ fun getUsers(ctx: ApiContext) {
 }
 ```
 
-### Define API streams
+### <span id="api-stream">Define API streams</span>
 
 Kobweb servers also support persistent connections via streams. Streams are essentially named channels that maintain
 continuous contact between the client and the server, allowing either to send messages to the other at any time. This is
@@ -4784,22 +4784,24 @@ kotlin {
 <!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
 ## <span id="what-about-multiplatform-widgets"><span id="what-about-compose-for-web-canvas">What about Compose Multiplatform for Web?</span></span>
 
-Jetbrains is working on a project called "Compose Multiplatform", which will allow developers to use the same Compose
-API across Android, iOS, Desktop, and the Web. And it may seem like the Kobweb + Silk approach will be obsoleted by it.
+Jetbrains is working on the "Compose Multiplatform UI Framework", which allows developers to use the same codebase
+across Android, iOS, Desktop, and the Web. And it may seem like the Kobweb + Silk approach is obsoleted by it.
 
-It's first worth understanding the core difference between the two approaches. With Multiplatform Compose, the framework
-owns its own rendering pipeline, drawing to a buffer, while Compose HTML modifies an HTML / CSS DOM tree and leaves it
-up to the browser to do the final rendering.
+It's first worth understanding the core difference between the two approaches. With Compose Multiplatform, the framework
+owns its own rendering pipeline, drawing to a buffer. In contrast, Compose HTML modifies an HTML / CSS DOM tree and
+leaves it up to the browser to do the final rendering.
 
-This has major implications on how similar the two APIs can get. For example, in Desktop / Android, the order you apply
-modifiers matters, while in HTML, this action simply sets html style properties under the hood, where order does not
-matter.
+This has major implications on how similar the two APIs can get. For example, in Compose Multiplatform, the order you
+apply modifiers matters. However, in Compose HTML, this action simply sets html style properties under the hood, where
+order does not matter.
 
-Ditching HTML / CSS entirely at first can seem like a total win, but this approach has several limits:
+Due to its reputation, ditching HTML / CSS entirely at first can seem like a total win, but this approach has several
+limitations:
 
 * robots would lose the ability to crawl and index your site, hurting SEO.
-* your initial render may take longer.
-* your site will need to allocate a large canvas buffer, which could be *very* expensive on high res, wide-screen
+* your initial render may take longer (as nothing will be rendered until your site's logic is downloaded and run for one
+  frame).
+* your site will need to allocate a large canvas buffer, which could be *very* expensive on high-res, wide-screen
   desktops.
 * your UI will be opaque to the powerful suite of devtools that come bundled with browsers.
 * you won't have the ability to style unvisited vs visited links differently (this information is hidden from you by
@@ -4809,19 +4811,22 @@ Ditching HTML / CSS entirely at first can seem like a total win, but this approa
 
 It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there.
 
+Finally, Kobweb is more than just Kotlin-ifying HTML / CSS. It also provides rich integration with powerful web
+technologies like [web workers▲](#worker) and [websockets▲](#api-stream).
+
 For now, I am making a bet that there will always be value in embracing the web, providing a framework that sticks to
-HTML / CSS but offers a growing suite of UI widgets that hopefully makes it relatively rare for the developer to need to
-worry about it.
+HTML / CSS but offers a growing suite of UI widgets, layouts, and other features that make it a more comfortable
+experience for the Kotlin developer.
 
-For example, [flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) is a very powerful CSS concept, but
-you'll find it's much easier to compose `Row`s and `Column`s together than trying to remember if you should be
-justifying your items or aligning your content, even if `Row`s and `Column`s are just creating the correct HTML / CSS
-for you behind the scenes.
+For example, [the flexbox layout](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) is a very powerful concept,
+but it can be very tricky to use. In most cases, you'll find it's much easier to compose `Row`s and `Column`s together
+than trying to remember if you should be justifying your items or aligning your content, even if `Row`s and `Column`s
+are just configuring the correct HTML / CSS for you behind the scenes.
 
-Ultimately, I believe there is room for both approaches. If you want to make an app experience that feels the same on
-Android, iOS, Desktop, and Web, then "Multiplatform Compose" could be great for you. However, if you just want to make a
-traditional website but want to use Kotlin instead of TypeScript, Kobweb can provide an excellent development experience
-for that case.
+Ultimately, I believe there is room for both Compose Multiplatform *and* Kobweb. If you want to make an app experience
+that feels the same on Android, iOS, Desktop, and Web, then Compose Multiplatform could be the right choice for you.
+However, if you just want to make a traditional website but want to use Kotlin instead of TypeScript, Kobweb can provide
+an excellent development experience for that case.
 
 # Can We Kobweb Yet
 
