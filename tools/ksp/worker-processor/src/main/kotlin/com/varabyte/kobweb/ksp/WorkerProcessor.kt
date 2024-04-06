@@ -1,6 +1,9 @@
 package com.varabyte.kobweb.ksp
 
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.getConstructors
+import com.google.devtools.ksp.getKotlinClassByName
 import com.google.devtools.ksp.isInternal
 import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.isPublic
@@ -43,12 +46,13 @@ class WorkerProcessor(
     private val classNameOverride = workerFqcnOverride?.substringAfterLast('.')?.takeIf { it.isNotBlank() }
     private val classPackageOverride = workerFqcnOverride?.substringBeforeLast('.')?.takeIf { it.isNotBlank() }
 
+    @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val allFiles = resolver.getAllFiles()
-
-        val visitor = WorkerFactoryVisitor()
-
-        allFiles.forEach { file ->
+        // If no WorkerFactory class is found, then we are somehow applying this KSP processor to a non-worker codebase
+        // We don't expect this to happen, but it is easy enough to handle it by early aborting.
+        val workerFactoryClass = resolver.getKotlinClassByName(WORKER_FACTORY_FQN) ?: return emptyList()
+        val visitor = WorkerFactoryVisitor(workerFactoryClass)
+        resolver.getAllFiles().forEach { file ->
             file.accept(visitor, Unit)
         }
 
@@ -255,43 +259,43 @@ class WorkerProcessor(
      * Ideally, a Kobweb worker module has exactly one implementation. If there are none or multiple, an error should be
      * reported to the user, but this is handled at a higher level.
      */
-    private inner class WorkerFactoryVisitor : KSVisitorVoid() {
+    private inner class WorkerFactoryVisitor(workerFactoryClass: KSClassDeclaration) : KSVisitorVoid() {
         private val _workerStrategies = mutableListOf<WorkerFactoryInfo>()
         val workerStrategies: List<WorkerFactoryInfo> = _workerStrategies
+
+        // The star-projected KSType is useful to use for checking if a class is a subclass of this one
+        private val workerFactoryClassStarProjected = workerFactoryClass.asStarProjectedType()
 
         override fun visitFile(file: KSFile, data: Unit) {
             file.declarations.forEach { it.accept(this, Unit) }
         }
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
+            // Quick check / early abort first to see if this class is even a subclass of WorkerFactory. If so, we'll do
+            // more expensive checks later.
+            if (!workerFactoryClassStarProjected.isAssignableFrom(classDeclaration.asStarProjectedType())) return
+
             val workerFactoryBaseClass = classDeclaration
-                .superTypes
-                .filter { it.toString() == WORKER_FACTORY_SIMPLE_NAME }
-                .mapNotNull {
-                    it.resolve()
-                        .takeIf { resolved -> resolved.declaration.qualifiedName?.asString() == WORKER_FACTORY_FQN }
-                }
-                .firstOrNull()
+                .getAllSuperTypes()
+                .first { it.declaration.qualifiedName?.asString() == WORKER_FACTORY_FQN }
 
-            if (workerFactoryBaseClass != null) {
-                val resolvedTypes = workerFactoryBaseClass.arguments.mapNotNull { it.type?.resolve() }
+            val resolvedTypes = workerFactoryBaseClass.arguments.mapNotNull { it.type?.resolve() }
 
-                // WorkerFactory<I, O>
-                check(resolvedTypes.size == 2) {
-                    "Unexpected error parsing $WORKER_FACTORY_SIMPLE_NAME subclass. Expected 2 type arguments, got ${resolvedTypes.size}: [${
-                        resolvedTypes.joinToString {
-                            it.declaration.qualifiedName?.asString() ?: "?"
-                        }
-                    }]"
-                }
-                _workerStrategies.add(
-                    WorkerFactoryInfo(
-                        classDeclaration,
-                        inputTypeDeclaration = resolvedTypes[0].declaration,
-                        outputTypeDeclaration = resolvedTypes[1].declaration,
-                    )
-                )
+            // WorkerFactory<I, O>
+            check(resolvedTypes.size == 2) {
+                "Unexpected error parsing $WORKER_FACTORY_SIMPLE_NAME subclass. Expected 2 type arguments, got ${resolvedTypes.size}: [${
+                    resolvedTypes.joinToString {
+                        it.declaration.qualifiedName?.asString() ?: "?"
+                    }
+                }]"
             }
+            _workerStrategies.add(
+                WorkerFactoryInfo(
+                    classDeclaration,
+                    inputTypeDeclaration = resolvedTypes[0].declaration,
+                    outputTypeDeclaration = resolvedTypes[1].declaration,
+                )
+            )
         }
     }
 }
