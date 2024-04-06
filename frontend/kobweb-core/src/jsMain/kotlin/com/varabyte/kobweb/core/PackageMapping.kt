@@ -6,19 +6,24 @@ package com.varabyte.kobweb.core
  * This is useful as package names are constrained more than URL names, and occasionally you want to be more expressive
  * than they allow.
  *
- * This is particularly useful for dates, since packages cannot be pure numerics. So you might find yourself wanting to
- * map `_2022._01` to the URL `2022/01`. Much cleaner!
- *
- * This annotation only works on the tail of the current package, so for the `_2022._01` example above, you'd need two
- * `PackageMapping` annotations, one in a file inside the `_2022` package and one inside the `_01` one:
+ * To declare a package mapping, create a file (the name doesn't matter, but we recommend `PackageMapping.kt` as a
+ * convention) and tag the file with the mapping you want.
  *
  * ```
- * // pages/example/subpath/_2022/PackageMapping.kt
- * @file:PackageMapping("2022")
+ * // pages/aAndB/PackageMapping.kt
+ * @file:PackageMapping("a+b")
  *
- * // pages/example/subpath/_2022/_01/PackageMapping.kt
- * @file:PackageMapping("01")
+ * package pages.aAndB
+ *
+ * import com.varabyte.kobweb.core.PackageMapping
  * ```
+ *
+ * This annotation only works on the tail of the current package (i.e. `c` in package `a.b.c`), so if you want to affect
+ * multiple folders in a path, each part should have its own `PackageMapping` annotation.
+ *
+ * Finally, note that leading underscores are automatically removed, and camelcase package names are converted into
+ * kebab-case automatically, so you don't need to do anything for those cases. For example, "pages.exampleFolder._2022"
+ * will automatically be converted to "/example-folder/2022".
  *
  * @param value The part inside the final URL that this package should map to.
  */

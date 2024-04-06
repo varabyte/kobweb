@@ -6,19 +6,24 @@ package com.varabyte.kobweb.api
  * This is useful as package names are constrained more than URL names, and occasionally you want to be more expressive
  * than they allow.
  *
- * For example, maybe you want your API route to contain a reserved keyword, like `int`. You could create a package
- * called `_int` and map it to `int`, so for example you could support mapping `api.id._as._int` to `api/id/as/int`
- *
- * This annotation only works on the tail of the current package, so for the `_as._int` example above, you'd need two
- * `PackageMapping` annotations, one in a file inside the `_as` package and one inside the `_int` one:
+ * To declare a package mapping, create a file (the name doesn't matter, but we recommend `PackageMapping.kt` as a
+ * convention) and tag the file with the mapping you want.
  *
  * ```
- * // api/id/_as/PackageMapping.kt
- * @file:PackageMapping("as")
+ * // api/aAndB/PackageMapping.kt
+ * @file:PackageMapping("a+b")
  *
- * // api/id/_as/_int/PackageMapping.kt
- * @file:PackageMapping("int")
+ * package api.aAndB
+ *
+ * import com.varabyte.kobweb.api.PackageMapping
  * ```
+ *
+ * This annotation only works on the tail of the current package (i.e. `c` in package `a.b.c`), so if you want to affect
+ * multiple folders in a path, each part should have its own `PackageMapping` annotation.
+ *
+ * Finally, note that leading underscores are automatically removed, and camelcase package names are converted into
+ * kebab-case automatically, so you don't need to do anything for those cases. For example, "pages.exampleApi._int"
+ * will automatically be converted to "/example-api/int".
  *
  * @param value The part inside the final URL that this package should map to.
  */
