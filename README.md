@@ -2211,7 +2211,7 @@ section, and someone in the community can probably help!
 
 ## Exporting your site
 
-One of Kobweb's major additions on top of  Compose HTML is the export process.
+One of Kobweb's major additions on top of Compose HTML is the export process.
 
 This feature elevates the framework from one that produces a single-page application to one that produces a whole,
 navigable site. The export process takes snapshots of every page, resulting in better SEO support and a quicker initial
@@ -2699,7 +2699,7 @@ It's easiest to let Kobweb do it for you. In your site's build script, make sure
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
 
 plugins {
-    alias(libs.plugins.kobweb.multiplatform)
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.kobweb.application)
 }
