@@ -458,21 +458,19 @@ internal fun KobwebBlock.createAppBlock(kobwebFolder: KobwebFolder, conf: Kobweb
 }
 
 /**
- * A convenience method for the common case of specifying a direct dependency with the [excludeTags][AppBlock.IndexBlock.excludeTags] method.
+ * A convenience method for the common case of specifying direct dependencies for the
+ * [excludeTags][AppBlock.IndexBlock.excludeTags] property.
  *
- * The value passed into this method is a prefix, so for example, the names "kotlin-bootstrap", "kotlin-bootstrap-js",
+ * The values passed into this method are prefixes, so for example, the names "kotlin-bootstrap", "kotlin-bootstrap-js",
  * "kotlin-bootstrap-js-1.0", and "kotlin-bootstrap-js-1.0.klib" would all work to opt-out of accepting head elements
  * from the "kotlin-bootstrap-js-1.0.klib" artifact.
  *
  * When Kobweb detects a dependency that adds head elements, it will print a warning message that includes the value
  * of the artifact name which you can use here.
- *
- * If you call this method multiple times with different dependencies, the effect is additive.
  */
-fun AppBlock.IndexBlock.excludeTagsForDependency(dependencyNamePrefix: String) {
+fun AppBlock.IndexBlock.excludeTagsForDependency(vararg dependencyNamePrefixes: String) {
     excludeTags.set {
-        val ctx = this
-        name.startsWith(dependencyNamePrefix) || excludeTags.get().invoke(ctx)
+        dependencyNamePrefixes.any { name.startsWith(it) }
     }
     excludeTags.disallowChanges()
 }
