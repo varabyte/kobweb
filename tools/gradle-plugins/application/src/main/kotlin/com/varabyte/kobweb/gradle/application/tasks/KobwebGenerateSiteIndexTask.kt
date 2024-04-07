@@ -149,7 +149,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                             appendLine("Dependency artifact \"${file.name}\" will add the following <head> elements to your site's index.html:")
                             appendLine(headElements.joinToString("\n") { "   " + it.outerHtml() })
                             append(
-                                "Add `kobweb { app { index { excludeTagsForDependency(\"${
+                                "Add `kobweb { app { index { excludeTagsForDependencies(\"${
                                     file.nameWithoutExtension.substringBeforeLast("-js-")
                                 }\") } } }` to your build.gradle.kts file to opt-out."
                             )

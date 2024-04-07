@@ -128,10 +128,10 @@ abstract class AppBlock @Inject constructor(
          *   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
          *   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
          *   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-         * Add `kobweb { app { index { excludeTagsForDependency("kotlin-bootstrap") } } }` to your build.gradle.kts file to opt-out.
+         * Add `kobweb { app { index { excludeTagsForDependencies("kotlin-bootstrap", /* "other-dependency" */) } } }` to your build.gradle.kts file to opt-out.
          * ```
          *
-         * You can use [excludeTagsForDependency], or you can handle it yourself by using [excludeTags] directly:
+         * You can use [excludeTagsForDependencies], or you can handle it yourself by using [excludeTags] directly:
          *
          * ```
          * excludeTags.set { name.startsWith("kotlin-bootstrap") }
@@ -468,7 +468,7 @@ internal fun KobwebBlock.createAppBlock(kobwebFolder: KobwebFolder, conf: Kobweb
  * When Kobweb detects a dependency that adds head elements, it will print a warning message that includes the value
  * of the artifact name which you can use here.
  */
-fun AppBlock.IndexBlock.excludeTagsForDependency(vararg dependencyNamePrefixes: String) {
+fun AppBlock.IndexBlock.excludeTagsForDependencies(vararg dependencyNamePrefixes: String) {
     excludeTags.set {
         dependencyNamePrefixes.any { name.startsWith(it) }
     }
