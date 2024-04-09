@@ -25,9 +25,6 @@ fun Project.applyKspPlugin() = pluginManager.apply(KspGradleSubplugin::class.jav
 
 fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE_KEY to mode.name)
 
-// TODO: we currently set KSP_*_PACKAGE_KEY using task.project.group since the project.group of where the plugin is
-//  applied may be different. However, task.project is not recommended to be used, what are our alternatives?
-
 /** Add & configure the Kobweb KSP processor for JS sources. */
 fun Project.setupKspJs(target: JsTarget, mode: ProcessorMode) {
     addKspDependency(target)
@@ -35,7 +32,7 @@ fun Project.setupKspJs(target: JsTarget, mode: ProcessorMode) {
     configureKspTask(target) {
         addKspArguments(
             KSP_PAGES_PACKAGE_KEY to PackageUtils.resolvePackageShortcut(
-                this@configureKspTask.project.group.toString(),
+                this@setupKspJs.group.toString(),
                 kobwebBlock.pagesPackage.get()
             )
         )
@@ -55,7 +52,7 @@ fun Project.setupKspJvm(target: JvmTarget) {
 
     configureKspTask(target) {
         val apiPackage =
-            PackageUtils.resolvePackageShortcut(this.project.group.toString(), kobwebBlock.apiPackage.get())
+            PackageUtils.resolvePackageShortcut(this@setupKspJvm.group.toString(), kobwebBlock.apiPackage.get())
         addKspArguments(KSP_API_PACKAGE_KEY to apiPackage)
     }
 }
