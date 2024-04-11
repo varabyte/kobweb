@@ -140,20 +140,26 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
                 if (headElements.isNotEmpty()) {
                     val optedOut =
+                        kobwebBlock.app.index.excludeHtmlForDependencies.get().any { file.name.startsWith(it) }
+                            ||
                         kobwebBlock.app.index.excludeTags.orNull?.invoke(AppBlock.IndexBlock.ExcludeTagsContext(file.name))
                             ?: false
 
                     if (!optedOut) {
-                        logger.warn(buildString {
-                            appendLine()
-                            appendLine("Dependency artifact \"${file.name}\" will add the following <head> elements to your site's index.html:")
-                            appendLine(headElements.joinToString("\n") { "   " + it.outerHtml() })
-                            append(
-                                "Add `kobweb { app { index { excludeTagsForDependency(\"${
-                                    file.nameWithoutExtension.substringBeforeLast("-js-")
-                                }\") } } }` to your build.gradle.kts file to opt-out."
-                            )
-                        })
+                        if (kobwebBlock.app.index.suppressHtmlWarningsForDependencies.get()
+                                .none { file.name.startsWith(it) }
+                        ) {
+                            val dep = file.nameWithoutExtension.substringBeforeLast("-js-")
+                            logger.warn(buildString {
+                                appendLine()
+                                appendLine("Dependency artifact \"${file.name}\" will add the following <head> elements to your site's index.html:")
+                                appendLine(headElements.joinToString("\n") { "   " + it.outerHtml() })
+                                appendLine("You likely want to let them do this, as it is probably necessary for the library's functionality, but you should still audit what they're doing.")
+                                append(
+                                    "Add `kobweb { app { index { excludeHtmlForDependencies.add(\"$dep\") } } }` to your build.gradle.kts file to reject these elements (or `suppressHtmlWarningsForDependencies.add(\"$dep\")` to hide this message)."
+                                )
+                            })
+                        }
 
                         headInitializers.add {
                             document.head().children().forEach { element ->

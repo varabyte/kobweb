@@ -5,6 +5,7 @@ import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.export
+import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.ksp.kspBackendFile
 import com.varabyte.kobweb.gradle.application.ksp.kspFrontendFile
 import com.varabyte.kobweb.gradle.application.tasks.KobwebBrowserCacheIdTask
@@ -368,6 +369,15 @@ class KobwebApplicationPlugin @Inject constructor(
             description = "Run all Kobweb code generation tasks"
 
             dependsOn(project.tasks.withType<KobwebGenerateTask>())
+        }
+
+        project.afterEvaluate {
+            @Suppress("DEPRECATION")
+            if (kobwebBlock.app.index.excludeTags.isPresent) {
+                project.logger.warn(
+                    "w: The `excludeTags` property is slated for removal. Use `excludeHtmlForDependencies` instead."
+                )
+            }
         }
     }
 }
