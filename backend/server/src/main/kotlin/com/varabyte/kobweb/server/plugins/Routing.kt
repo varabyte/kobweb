@@ -404,6 +404,8 @@ private suspend fun PipelineContext<*, ApplicationCall>.handleRedirect(
     path: String,
     redirects: List<PatternMapper>
 ): Boolean {
+    if (redirects.isEmpty()) return false
+
     val path = path.prefixIfNot("/")
     val redirectedPath = redirects.fold(path) { path, patternMapper -> patternMapper.map(path) ?: path }
     return if (redirectedPath != path) {
@@ -413,6 +415,7 @@ private suspend fun PipelineContext<*, ApplicationCall>.handleRedirect(
 }
 
 private fun Routing.configureRedirects(routePrefix: String, redirects: List<PatternMapper>) {
+    if (redirects.isEmpty()) return
     get("$routePrefix/{$KOBWEB_PARAMS...}") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
         handleRedirect(routePrefix, pathParts.joinToString("/"), redirects)
