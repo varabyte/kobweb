@@ -2374,11 +2374,11 @@ easier to migrate from a static layout site to a full stack site later than the 
 Both site flavors require an export.
 
 To export your site with a static layout, use the `kobweb export --layout static`
-command, while for full stack the command is `kobweb export --layout kobweb` (or just `kobweb export` since `kobweb` is
-the default layout as it originally was the only way).
+command, while for full stack the command is `kobweb export --layout fullstack` (or just `kobweb export` since
+`fullstack` is the default layout as it originally was the only way).
 
 Once exported, you can test your site by running it locally before uploading. You run a static site with
-`kobweb run --env prod --layout static` and a full stack site with `kobweb run --env prod --layout kobweb` (or just
+`kobweb run --env prod --layout static` and a full stack site with `kobweb run --env prod --layout fullstack` (or just
 `kobweb run --env prod`).
 
 ### Dynamic routes and exporting
