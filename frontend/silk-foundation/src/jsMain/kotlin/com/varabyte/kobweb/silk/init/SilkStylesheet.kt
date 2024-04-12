@@ -143,26 +143,6 @@ fun SilkStylesheet.registerStyleBase(
     }
 }
 
-@Deprecated(
-    "Method has been renamed to `registerStyleBase` for consistency (e.g. with `addVariantBase`, `replaceComponentStyleBase`, etc.)",
-    ReplaceWith("registerStyleBase(cssSelector, extraModifiers, init)")
-)
-fun SilkStylesheet.registerBaseStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
-    registerStyleBase(cssSelector, extraModifiers, init)
-}
-
-@Deprecated(
-    "Method has been renamed to `registerStyleBase` for consistency (e.g. with `addVariantBase`, `replaceComponentStyleBase`, etc.)",
-    ReplaceWith("registerStyleBase(cssSelector, extraModifiers, init)")
-)
-fun SilkStylesheet.registerBaseStyle(
-    cssSelector: String,
-    extraModifiers: @Composable () -> Modifier,
-    init: () -> Modifier
-) {
-    registerStyleBase(cssSelector, extraModifiers, init)
-}
-
 internal object SilkStylesheetInstance : SilkStylesheet {
     private val styles = mutableListOf<ComponentStyle>()
     private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
