@@ -25,11 +25,14 @@ typealias BackdropFilter = Filter
 
 fun StyleScope.backdropFilter(backdropFilter: BackdropFilter) {
     property("backdrop-filter", backdropFilter)
+    property("-webkit-backdrop-filter", backdropFilter) // For safari
 }
 
 fun StyleScope.backdropFilter(vararg filters: CSSFilter) {
     if (filters.isNotEmpty()) {
-        property("backdrop-filter", filters.joinToString(" "))
+        val backdropFilter = filters.joinToString(" ")
+        property("backdrop-filter", backdropFilter)
+        property("-webkit-backdrop-filter", backdropFilter) // For safari
     }
 }
 
