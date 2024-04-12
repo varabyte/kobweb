@@ -94,6 +94,9 @@ https://user-images.githubusercontent.com/43705986/135570277-2d67033a-f647-4b04-
 > It's easy to start with a static layout site first and migrate to a full stack site later. (You can read more
 > about [Static layout vs. Full stack sites▼](#static-layout-vs-full-stack-sites) below.)
 
+> [!TIP]
+> A YouTube channel called SkyFish created a tutorial video on [how to build a fullstack site with Kobweb](https://www.youtube.com/watch?v=VVNq6yovU_0).
+
 # Trying it out yourself
 
 The first step is to get the Kobweb binary. You can install it, download it, and/or build it, so we'll include
