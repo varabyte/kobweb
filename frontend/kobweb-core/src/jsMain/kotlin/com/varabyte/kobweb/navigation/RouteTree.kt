@@ -106,7 +106,18 @@ internal class RouteTree {
         override fun matches(name: String) = true // Dynamic nodes eat all possible inputs
     }
 
-    private fun List<Node>.toRouteString() = "/" + joinToString("/") { it.name }
+    private fun List<ResolvedEntry>.toRouteString() = "/" + joinToString("/") { it.capturedRoutePart }
+
+    /**
+     * Resolved entry within a route.
+     *
+     * For example, if the route "/a/b/c" is resolved, then there would be three resolved entries.
+     *
+     * In most cases, the node name and its captured route part will be the same. However, this is not true for dynamic
+     * routes, where a route registered as "/users/{user}" when visiting "/users/bitspittle" would have a resolved entry
+     * with a node name of "user" and a captured route part of "bitspittle".
+     */
+    private class ResolvedEntry(val node: Node, val capturedRoutePart: String)
 
     private val root = RootNode()
 
@@ -128,33 +139,33 @@ internal class RouteTree {
      * @return null if no matching route was found. It is possible to return en empty list if the route being resolved
      *   is "/".
      */
-    private fun resolve(route: String): List<Node>? {
+    private fun resolve(route: String): List<ResolvedEntry>? {
         val routeParts = route.split('/')
 
-        val resolved = mutableListOf<Node>()
+        val resolved = mutableListOf<ResolvedEntry>()
         var currNode: Node = root
         require(routeParts[0] == root.name) // Will be true as long as incoming route starts with '/'
 
         for (i in 1 until routeParts.size) {
             val routePart = routeParts[i]
             currNode = currNode.findChild(routePart) ?: return null
-            resolved.add(currNode)
+            resolved.add(ResolvedEntry(currNode, routePart))
         }
 
         return resolved
     }
 
     @Suppress("NAME_SHADOWING")
-    private fun resolveAllowingRedirects(route: String, showLegacyWarning: Boolean): List<Node>? {
+    private fun resolveAllowingRedirects(route: String, showLegacyWarning: Boolean): List<ResolvedEntry>? {
         val redirectedRoute = redirects.fold(route) { route, redirect ->
             redirect.map(route) ?: route
         }
-        var resolvedNodes = resolve(redirectedRoute)
+        var resolvedEntries = resolve(redirectedRoute)
 
-        if (resolvedNodes == null && legacyRouteRedirectStrategy != Router.LegacyRouteRedirectStrategy.DISALLOW) {
+        if (resolvedEntries == null && legacyRouteRedirectStrategy != Router.LegacyRouteRedirectStrategy.DISALLOW) {
             Node.UseLegacySearch = true
             try {
-                resolvedNodes = resolve(route)?.also { resolvedNodes ->
+                resolvedEntries = resolve(route)?.also { resolvedNodes ->
                     if (showLegacyWarning) {
                         console.warn("Legacy route \"$route\" is automatically being redirected to \"${resolvedNodes.toRouteString()}\". The site owner can disable this by setting `kobweb.app.legacyRouteRedirectStrategy` to `DISALLOW` in the site's build script, or they can register an explicit redirect in the `conf.yaml` file which would also make this warning go away.")
                     }
@@ -164,7 +175,7 @@ internal class RouteTree {
             }
         }
 
-        return resolvedNodes
+        return resolvedEntries
     }
 
 
@@ -230,7 +241,7 @@ internal class RouteTree {
 
     internal fun createPageData(route: Route): PageData {
         val errorPageMethod = @Composable { errorHandler(404) }
-        val resolvedNodes = resolveAllowingRedirects(
+        val resolvedEntries = resolveAllowingRedirects(
             route.path,
             showLegacyWarning = legacyRouteRedirectStrategy == Router.LegacyRouteRedirectStrategy.WARN
         ) ?: return PageData(
@@ -238,26 +249,24 @@ internal class RouteTree {
             PageContext.RouteInfo(route, emptyMap())
         )
 
-        val pageMethod: PageMethod = resolvedNodes.last().method ?: errorPageMethod
+        val pageMethod: PageMethod = resolvedEntries.last().node.method ?: errorPageMethod
 
         val dynamicParams = mutableMapOf<String, String>()
-        resolvedNodes.forEach { resolvedNode ->
-            if (resolvedNode is DynamicNode) {
-                val routePart = resolvedNode.name
-
-                dynamicParams[resolvedNode.name] = routePart
-                if (legacyRouteRedirectStrategy != Router.LegacyRouteRedirectStrategy.DISALLOW && resolvedNode.name.contains(
-                        '-'
-                    )
+        resolvedEntries.forEach { resolvedEntry ->
+            if (resolvedEntry.node is DynamicNode) {
+                dynamicParams[resolvedEntry.node.name] = resolvedEntry.capturedRoutePart
+                if (
+                    legacyRouteRedirectStrategy != Router.LegacyRouteRedirectStrategy.DISALLOW
+                    && resolvedEntry.node.name.contains('-')
                 ) {
                     // We can't be sure if the legacy version of this hyphenated string was a camelCase one (in the
                     // case of route parts generated from packages) or a lower-case one (in the case of route parts
                     // generated from filenames). That is, "example-path" now might have been either "examplepath" OR
                     // "examplePath" OR "example_path" in previous versions of Kobweb. It's not too harmful in just
                     // supporting all to be extra safe.
-                    dynamicParams[resolvedNode.name.replace("-", "")] = routePart
-                    dynamicParams[resolvedNode.name.kebabCaseToCamelCase()] = routePart
-                    dynamicParams[resolvedNode.name.replace('-', '_')] = routePart
+                    dynamicParams[resolvedEntry.node.name.replace("-", "")] = resolvedEntry.capturedRoutePart
+                    dynamicParams[resolvedEntry.node.name.kebabCaseToCamelCase()] = resolvedEntry.capturedRoutePart
+                    dynamicParams[resolvedEntry.node.name.replace('-', '_')] = resolvedEntry.capturedRoutePart
                 }
             }
         }
@@ -266,7 +275,7 @@ internal class RouteTree {
             pageMethod,
             // Update RouteInfo with the latest path, just in case a redirect happened
             PageContext.RouteInfo(
-                Route(resolvedNodes.toRouteString(), route.queryParams, route.fragment),
+                Route(resolvedEntries.toRouteString(), route.queryParams, route.fragment),
                 dynamicParams
             )
         )
