@@ -27,6 +27,10 @@ and `inline` code as well.
 * list
 * items
 
+and image links:
+
+![Kobweb logo](/logo.png)
+
 ---
 
 You can use blockquotes:
