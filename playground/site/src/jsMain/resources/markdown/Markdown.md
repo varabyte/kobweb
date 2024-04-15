@@ -27,9 +27,9 @@ and `inline` code as well.
 * list
 * items
 
-and image links:
+and images:
 
-![Kobweb logo](/logo.png)
+![Kobweb logo](/logo.png 'Unused title')
 
 ---
 
