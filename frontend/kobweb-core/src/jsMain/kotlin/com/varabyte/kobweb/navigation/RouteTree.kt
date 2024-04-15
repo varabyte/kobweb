@@ -120,8 +120,11 @@ internal class RouteTree {
      * Note that this method does not handle redirect logic. Call [resolveAllowingRedirects] if you want to handle that
      * case.
      *
-     * @return null if no matching route was found. It is possible to return en empty list if the route being resolved
-     *   is "/".
+     * Partial routes will not get resolved! That is, "a/b" will not get resolved if there is no page associated with
+     * it, even if "a/b/c" is registered.
+     *
+     * @return null if no matching route (associated with a `@Page`) was found. It is possible to return en empty list
+     *   if the route being resolved is "/".
      */
     private fun resolve(route: String): List<ResolvedEntry>? {
         val routeParts = route.split('/')
@@ -136,7 +139,7 @@ internal class RouteTree {
             resolved.add(ResolvedEntry(currNode, routePart))
         }
 
-        return resolved
+        return resolved.takeIf { it.isEmpty() || it.last().node.method != null }
     }
 
     @Suppress("NAME_SHADOWING")
