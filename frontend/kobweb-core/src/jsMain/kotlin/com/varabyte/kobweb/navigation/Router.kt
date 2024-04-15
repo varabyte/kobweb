@@ -259,6 +259,23 @@ class Router {
         routeTree.registerRedirect(prefix + fromRoute, prefix + toRoute)
     }
 
+    /**
+     * Set a handler to call to render a page when the route is not found.
+     *
+     * Using this in your project would look like this:
+     *
+     * ```
+     * @InitKobweb
+     * fun initKobweb(ctx: InitKobwebContext) {
+     *   ctx.router.setErrorHandler { errorCode ->
+     *     // NOTE: This callback is a @Composable function
+     *     if (errorCode == 404) {
+     *       // Render a 404 page
+     *     }
+     *   }
+     * }
+     * ```
+     */
     fun setErrorHandler(errorHandler: ErrorPageMethod) {
         routeTree.errorHandler = errorHandler
     }
