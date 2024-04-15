@@ -163,6 +163,45 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
     fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
     fun String.escapeTripleQuotedText() = escapeDollars()
 
+    /**
+     * Data pulled out of an [Image] node into an easier-to-consume format.
+     *
+     * @see processImage
+     */
+    class ImageData(val title: String, val destination: String, val altText: String)
+
+    /**
+     * Helper function to process an [Image] node, passing information to a callback to generate the final output.
+     *
+     * Users can override the `img` handler like so:
+     *
+     * ```
+     * kobweb {
+     *   markdown {
+     *     handlers {
+     *       img.set {
+     *         processImage(it) { data ->
+     *           "com.myproject.components.widgets.ImageWidget(\"${data.destination}\", \"${data.altText}\")"
+     *         }
+     *       }
+     *     }
+     *   }
+     * }
+     * ```
+     *
+     * Users can of course process the [Image] node directly, but they should know that it carries its alt text as
+     * children nodes, which this logic abstracts away.
+     */
+    fun NodeScope.processImage(image: Image, output: (ImageData) -> String): String {
+        val altText = image.children()
+            .filterIsInstance<Text>()
+            .map { it.literal.escapeSingleQuotedText() }
+            .joinToString("")
+        this.childrenOverride = emptyList()
+
+        return output(ImageData(image.title, image.destination, altText))
+    }
+
     init {
         project.afterEvaluate {
             useSilk.convention(project.hasJsDependencyNamed("kobweb-silk"))
@@ -193,17 +232,12 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         // region Markdown Node handlers
 
         text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeSingleQuotedText()}\")" }
-        img.convention { img ->
-            val altText = img.children()
-                .filterIsInstance<Text>()
-                .map { it.literal.escapeSingleQuotedText() }
-                .joinToString("")
-            this.childrenOverride = emptyList()
-
-            if (useSilk.get()) {
-                """$SILK.graphics.Image("${img.destination}", "$altText")"""
-            } else {
-                """$JB_DOM.Img("${img.destination}", "$altText")"""
+        img.convention { image ->
+            processImage(image) { data ->
+                buildString {
+                    append(if (useSilk.get()) "$SILK.graphics.Image" else "$JB_DOM.Img")
+                    append("""("${data.destination}", "${data.altText}")""")
+                }
             }
         }
         heading.convention { heading ->
