@@ -8,29 +8,13 @@ import com.varabyte.kobweb.util.text.PatternMapper
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 
-typealias PageMethod = @Composable () -> Unit
-/**
- * Typealias for a composable method which takes an error code as its first and only argument (e.g. 404).
- *
- * Use [Router.setErrorHandler] to override with your own custom handler.
- */
-typealias ErrorPageMethod = @Composable (Int) -> Unit
-
-/**
- * The default error page logic used by Kobweb.
- */
 @Page
 @Composable
-private fun ErrorPage(errorCode: Int) {
+private fun DefaultErrorPage(errorCode: Int) {
     Div {
         Text("Error code: $errorCode")
     }
 }
-
-internal class PageData(
-    val pageMethod: PageMethod,
-    val routeInfo: PageContext.RouteInfo,
-)
 
 /**
  * A tree data structure that represents a parsed route, such as `/example/path` or `/{dynamic}/path`
@@ -123,7 +107,7 @@ internal class RouteTree {
 
     private val redirects = mutableListOf<PatternMapper>()
 
-    var errorHandler: ErrorPageMethod = { errorCode -> ErrorPage(errorCode) }
+    var errorHandler: ErrorPageMethod = { errorCode -> DefaultErrorPage(errorCode) }
 
     var legacyRouteRedirectStrategy: Router.LegacyRouteRedirectStrategy = Router.LegacyRouteRedirectStrategy.WARN
 
