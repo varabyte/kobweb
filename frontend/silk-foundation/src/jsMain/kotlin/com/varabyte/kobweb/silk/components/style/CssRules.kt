@@ -136,7 +136,7 @@ val StyleModifiers.default get() = CssRule.OfPseudoClass(this, "default")
 val StyleModifiers.checked get() = CssRule.OfPseudoClass(this, "checked")
 
 /**
- * Matches when elements, such as checkboxes and radio buttons, are toggled on.
+ * Matches when elements, such as checkboxes and radio buttons, are in an indeterminate state.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate">:indeterminate</a>
  */
