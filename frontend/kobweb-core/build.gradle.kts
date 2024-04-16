@@ -25,6 +25,11 @@ kotlin {
             implementation(projects.common.clientServerInternal)
             api(projects.frontend.kobwebWorkerInterface)
         }
+
+        jsTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.truthish)
+        }
     }
 }
 
