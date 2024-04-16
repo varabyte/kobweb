@@ -60,7 +60,6 @@ val StyleModifiers.hover get() = CssRule.OfPseudoClass(this, "hover")
  */
 val StyleModifiers.active get() = CssRule.OfPseudoClass(this, "active")
 
-
 /**
  * Styles to apply to components when they have focus.
  *
@@ -74,6 +73,13 @@ val StyleModifiers.focus get() = CssRule.OfPseudoClass(this, "focus")
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">:focus-visible</a>
  */
 val StyleModifiers.focusVisible get() = CssRule.OfPseudoClass(this, "focus-visible")
+
+/**
+ * Styles to apply to components when they or any descendants have focus.
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within">:focus-within</a>
+ */
+val StyleModifiers.focusWithin get() = CssRule.OfPseudoClass(this, "focus-within")
 
 //endregion
 
