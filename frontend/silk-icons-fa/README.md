@@ -4,7 +4,7 @@ Note that, when this module is depended on, Kobweb adds the following entry to t
 template:
 
 ```html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 ```
 
 which adds to the size of your page, something you should be mindful of if you don't plan to use any of these (awesome!)
@@ -17,7 +17,7 @@ this project.
 
 To populate it, I visited the
 [Font Awesome free icon search](https://fontawesome.com/search?o=a&m=free&f=classic%2Cbrands), inspected the site using
-dev tools, and visited each of the 12 pages, copying the DOM subtree under the `<div id="icon-results">` element into a
+dev tools, and visited each of the 12 pages, copying the DOM subtree under the `<div id="icons-results">` element into a
 temporary text file.
 
 I then manually reorganized the results (into solid, regular, and brand subsets) and migrated the XML format into the
