@@ -168,7 +168,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
      *
      * @see processImage
      */
-    class ImageData(val title: String, val destination: String, val altText: String)
+    class ImageData(val destination: String, val altText: String, val title: String?)
 
     /**
      * Helper function to process an [Image] node, passing information to a callback to generate the final output.
@@ -199,7 +199,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             .joinToString("")
         this.childrenOverride = emptyList()
 
-        return output(ImageData(image.title, image.destination, altText))
+        return output(ImageData(image.destination, altText, image.title))
     }
 
     init {
