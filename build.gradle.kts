@@ -16,6 +16,11 @@ subprojects {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         google()
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+            content {
+                includeGroup("com.varabyte.truthish")
+            }
+        }
     }
 
     // Require Java 11 for a few APIs. A very important one is ProcessHandle, used for detecting if a
