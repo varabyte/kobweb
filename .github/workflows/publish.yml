@@ -21,6 +21,12 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
+          build-scan-terms-of-use-agree: "yes"
+          cache-read-only: false
+          validate-wrappers: true
 
       - name: Add secret Gradle properties
         env:
@@ -31,4 +37,4 @@ jobs:
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
 
       - name: Publish Kobweb artifacts
-        run: ./gradlew publish --scan
+        run: ./gradlew publish
