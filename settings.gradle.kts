@@ -5,20 +5,6 @@ pluginManagement {
     }
 }
 
-plugins {
-    id("com.gradle.develocity") version "3.17"
-}
-
-develocity {
-    buildScan {
-        publishing.onlyIf { false }
-        if (System.getenv("CI") != null) {
-            termsOfUseUrl = "https://gradle.com/terms-of-service"
-            termsOfUseAgree = "yes"
-        }
-    }
-}
-
 rootProject.name = "kobweb"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

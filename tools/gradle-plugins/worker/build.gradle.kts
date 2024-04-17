@@ -14,6 +14,9 @@ dependencies {
     // Common Gradle plugin used by Library, Application, and Worker plugins
     api(projects.tools.gradlePlugins.core)
 
+    // Used by the "core" plugin & required to satisfy the validatePlugins task
+    implementation(projects.common.kobwebCommon)
+
     implementation(libs.kotlinx.serialization.json)
 }
 
