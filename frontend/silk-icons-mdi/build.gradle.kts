@@ -169,7 +169,6 @@ val generateIconsTask = tasks.register("generateIcons") {
 kotlin {
     js {
         browser()
-        binaries.executable()
     }
 
     sourceSets {

@@ -13,7 +13,6 @@ version = libs.versions.kobweb.libs.get()
 kotlin {
     js {
         browser()
-        binaries.executable()
     }
 
     sourceSets {
