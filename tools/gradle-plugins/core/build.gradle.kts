@@ -43,6 +43,7 @@ kobwebPublication {
 val generateVersionProperties by tasks.registering {
     val projectVersion = version.toString() // store outside of task action for configuration cache compatibility
     val generatedVersionDir = layout.buildDirectory.dir("generated-version")
+    inputs.property("projectVersion", projectVersion)
     outputs.dir(generatedVersionDir)
     doLast {
         val properties = Properties()
