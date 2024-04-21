@@ -23,25 +23,25 @@ fun Modifier.size(size: CSSLengthOrPercentageNumericValue): Modifier = size(widt
 
 fun Modifier.size(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): Modifier =
     styleModifier {
-    width(width)
-    height(height)
-}
+        width(width)
+        height(height)
+    }
 
 fun Modifier.minSize(size: CSSLengthOrPercentageNumericValue): Modifier = minSize(width = size, height = size)
 
 fun Modifier.minSize(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): Modifier =
     styleModifier {
-    minWidth(width)
-    minHeight(height)
-}
+        minWidth(width)
+        minHeight(height)
+    }
 
 fun Modifier.maxSize(size: CSSLengthOrPercentageNumericValue): Modifier = maxSize(width = size, height = size)
 
 fun Modifier.maxSize(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): Modifier =
     styleModifier {
-    maxWidth(width)
-    maxHeight(height)
-}
+        maxWidth(width)
+        maxHeight(height)
+    }
 
 fun Modifier.width(size: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     width(size)
@@ -97,4 +97,33 @@ fun Modifier.maxHeight(size: CSSLengthOrPercentageNumericValue): Modifier = styl
 
 fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
     maxHeight(maxHeight)
+}
+
+// Mimics Jetpack Compose API https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/package-summary#(androidx.compose.ui.Modifier).widthIn(androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp)
+fun Modifier.widthIn(
+    min: CSSLengthOrPercentageNumericValue? = null, max: CSSLengthOrPercentageNumericValue? = null
+): Modifier = styleModifier {
+    min?.let { minWidth(it) }
+    max?.let { maxWidth(it) }
+}
+
+// Mimics Jetpack Compose API https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/package-summary#(androidx.compose.ui.Modifier).heightIn(androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp)
+fun Modifier.heightIn(
+    min: CSSLengthOrPercentageNumericValue? = null, max: CSSLengthOrPercentageNumericValue? = null
+): Modifier = styleModifier {
+    min?.let { minHeight(it) }
+    max?.let { maxHeight(it) }
+}
+
+// Mimics Jetpack Compose API https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/package-summary#(androidx.compose.ui.Modifier).sizeIn(androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp)
+fun Modifier.sizeIn(
+    minWidth: CSSLengthOrPercentageNumericValue? = null,
+    minHeight: CSSLengthOrPercentageNumericValue? = null,
+    maxWidth: CSSLengthOrPercentageNumericValue? = null,
+    maxHeight: CSSLengthOrPercentageNumericValue? = null
+): Modifier = styleModifier {
+    minWidth?.let { minWidth(it) }
+    minHeight?.let { minHeight(it) }
+    maxWidth?.let { maxWidth(it) }
+    maxHeight?.let { maxHeight(it) }
 }
