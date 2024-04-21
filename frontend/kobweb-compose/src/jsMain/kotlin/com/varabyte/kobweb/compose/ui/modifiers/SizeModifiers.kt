@@ -23,25 +23,25 @@ fun Modifier.size(size: CSSLengthOrPercentageNumericValue): Modifier = size(widt
 
 fun Modifier.size(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): Modifier =
     styleModifier {
-    width(width)
-    height(height)
-}
+        width(width)
+        height(height)
+    }
 
 fun Modifier.minSize(size: CSSLengthOrPercentageNumericValue): Modifier = minSize(width = size, height = size)
 
 fun Modifier.minSize(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): Modifier =
     styleModifier {
-    minWidth(width)
-    minHeight(height)
-}
+        minWidth(width)
+        minHeight(height)
+    }
 
 fun Modifier.maxSize(size: CSSLengthOrPercentageNumericValue): Modifier = maxSize(width = size, height = size)
 
 fun Modifier.maxSize(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): Modifier =
     styleModifier {
-    maxWidth(width)
-    maxHeight(height)
-}
+        maxWidth(width)
+        maxHeight(height)
+    }
 
 fun Modifier.width(size: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     width(size)
@@ -98,3 +98,28 @@ fun Modifier.maxHeight(size: CSSLengthOrPercentageNumericValue): Modifier = styl
 fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
     maxHeight(maxHeight)
 }
+
+fun Modifier.widthIn(min: CSSLengthOrPercentageNumericValue, max: CSSLengthOrPercentageNumericValue): Modifier =
+    styleModifier {
+        minWidth(min)
+        maxWidth(max)
+    }
+
+fun Modifier.widthIn(min: MinWidth, max: MaxWidth): Modifier = styleModifier {
+    minWidth(min)
+    maxWidth(max)
+}
+
+fun Modifier.heightIn(min: CSSLengthOrPercentageNumericValue, max: CSSLengthOrPercentageNumericValue): Modifier =
+    styleModifier {
+        minHeight(min)
+        maxHeight(max)
+    }
+
+fun Modifier.heightIn(min: MinHeight, max: MaxHeight): Modifier = styleModifier {
+    minHeight(min)
+    maxHeight(max)
+}
+
+fun Modifier.sizeIn(min: CSSLengthOrPercentageNumericValue, max: CSSLengthOrPercentageNumericValue): Modifier =
+    minSize(min).maxSize(max)
