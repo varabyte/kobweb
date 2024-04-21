@@ -98,3 +98,16 @@ fun Modifier.maxHeight(size: CSSLengthOrPercentageNumericValue): Modifier = styl
 fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
     maxHeight(maxHeight)
 }
+
+fun Modifier.wrapContentWidth(): Modifier = styleModifier {
+    width(Width.FitContent)
+}
+
+fun Modifier.wrapContentHeight(): Modifier = styleModifier {
+    height(Height.FitContent)
+}
+
+fun Modifier.wrapContentSize(): Modifier = styleModifier {
+    width(Width.FitContent)
+    height(Height.FitContent)
+}
