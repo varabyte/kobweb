@@ -27,6 +27,9 @@ fun Modifier.size(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrP
     height(height)
 }
 
+fun Modifier.size(width: Width, height: Height): Modifier =
+    width(width).height(height)
+
 fun Modifier.minSize(size: CSSLengthOrPercentageNumericValue): Modifier = minSize(width = size, height = size)
 
 fun Modifier.minSize(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): Modifier =
