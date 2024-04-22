@@ -99,27 +99,31 @@ fun Modifier.maxHeight(maxHeight: MaxHeight): Modifier = styleModifier {
     maxHeight(maxHeight)
 }
 
-fun Modifier.widthIn(min: CSSLengthOrPercentageNumericValue, max: CSSLengthOrPercentageNumericValue): Modifier =
-    styleModifier {
-        minWidth(min)
-        maxWidth(max)
-    }
-
-fun Modifier.widthIn(min: MinWidth, max: MaxWidth): Modifier = styleModifier {
-    minWidth(min)
-    maxWidth(max)
+// Mimics Jetpack Compose API https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/package-summary#(androidx.compose.ui.Modifier).widthIn(androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp)
+fun Modifier.widthIn(
+    min: CSSLengthOrPercentageNumericValue? = null, max: CSSLengthOrPercentageNumericValue? = null
+): Modifier = styleModifier {
+    min?.let { minWidth(it) }
+    max?.let { maxWidth(it) }
 }
 
-fun Modifier.heightIn(min: CSSLengthOrPercentageNumericValue, max: CSSLengthOrPercentageNumericValue): Modifier =
-    styleModifier {
-        minHeight(min)
-        maxHeight(max)
-    }
-
-fun Modifier.heightIn(min: MinHeight, max: MaxHeight): Modifier = styleModifier {
-    minHeight(min)
-    maxHeight(max)
+// Mimics Jetpack Compose API https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/package-summary#(androidx.compose.ui.Modifier).heightIn(androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp)
+fun Modifier.heightIn(
+    min: CSSLengthOrPercentageNumericValue? = null, max: CSSLengthOrPercentageNumericValue? = null
+): Modifier = styleModifier {
+    min?.let { minHeight(it) }
+    max?.let { maxHeight(it) }
 }
 
-fun Modifier.sizeIn(min: CSSLengthOrPercentageNumericValue, max: CSSLengthOrPercentageNumericValue): Modifier =
-    minSize(min).maxSize(max)
+// Mimics Jetpack Compose API https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/package-summary#(androidx.compose.ui.Modifier).sizeIn(androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp,androidx.compose.ui.unit.Dp)
+fun Modifier.sizeIn(
+    minWidth: CSSLengthOrPercentageNumericValue? = null,
+    minHeight: CSSLengthOrPercentageNumericValue? = null,
+    maxWidth: CSSLengthOrPercentageNumericValue? = null,
+    maxHeight: CSSLengthOrPercentageNumericValue? = null
+): Modifier = styleModifier {
+    minWidth?.let { minWidth(it) }
+    minHeight?.let { minHeight(it) }
+    maxWidth?.let { maxWidth(it) }
+    maxHeight?.let { maxHeight(it) }
+}
