@@ -47,7 +47,7 @@ abstract class LibraryBlock : ExtensionAware {
          * values (usually scripts or stylesheets) independently of one another.
          */
         @Deprecated("The`head` property has been reworked. Replace `head.add { ... }` with `addToHead { ... }`")
-        // TODO: Rename `newHead` to `head` when removing this property
+        // TODO(#168): Remove this property & rename `newHead` to `head`
         abstract val head: ListProperty<HEAD.() -> Unit>
     }
 

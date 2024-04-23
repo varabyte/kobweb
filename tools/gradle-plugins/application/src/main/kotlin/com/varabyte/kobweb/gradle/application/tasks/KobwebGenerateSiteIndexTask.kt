@@ -6,13 +6,11 @@ import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
-import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.extensions.serializeHeadContents
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
-import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
@@ -34,12 +32,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.util.prefixIfNot
 import org.jsoup.Jsoup
-import java.io.File
 import javax.inject.Inject
 
 class KobwebGenIndexConfInputs(
@@ -58,16 +53,8 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Nested val confInputs: KobwebGenIndexConfInputs,
     @get:Input val buildTarget: BuildTarget,
     block: KobwebBlock,
+    @get:Nested val indexBlock: AppBlock.IndexBlock
 ) : KobwebGenerateTask(block, "Generate an index.html file for this Kobweb project") {
-    private val indexBlock = block.app.index
-
-    @get:Input
-    val newHead = block.app.index.newHead
-
-    // Use changing the build script as a proxy for changing IndexBlock (most importantly `head`) values.
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
-    fun getBuildScripts(): List<File> = projectLayout.getBuildScripts()
 
     // No one should define their own root `public/index.html` files anywhere in their resources.
     @InputFiles
@@ -92,23 +79,30 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
     @TaskAction
     fun execute() {
+        // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
+        // allowed to declare some as well. If they do, they will have embedded serialized html in their library
+        // artifacts.
+        val headElements = indexBlock.newHead.get().toMutableList().apply {
+            addAll(indexBlock.head.get().map { block -> serializeHeadContents(block) })
+        }
+
         if (project.hasTransitiveJsDependencyNamed("silk-icons-fa")) {
-            indexBlock.addToHead {
+            headElements.add(serializeHeadContents {
                 link {
                     rel = "stylesheet"
                     href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
                 }
-            }
+            })
         }
 
         if (project.hasTransitiveJsDependencyNamed("silk-icons-mdi")) {
-            indexBlock.addToHead {
+            headElements.add(serializeHeadContents {
                 link {
                     rel = "stylesheet"
                     href =
                         "https://fonts.googleapis.com/css2?family=Material+Icons&family=Material+Icons+Outlined&family=Material+Icons+Two+Tone&family=Material+Icons+Round&family=Material+Icons+Sharp"
                 }
-            }
+            })
         }
 
         getUserDefinedRootIndexFiles()
@@ -122,13 +116,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                     }"
                 )
             }
-
-        // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
-        // allowed to declare some as well. If they do, they will have embedded serialized html in their library
-        // artifacts.
-        val headElements = indexBlock.newHead.get().toMutableList().apply {
-            addAll(indexBlock.head.get().map { block -> serializeHeadContents(block) })
-        }
 
         compileClasspath.forEach { file ->
             var libraryMetadata: LibraryMetadata? = null
