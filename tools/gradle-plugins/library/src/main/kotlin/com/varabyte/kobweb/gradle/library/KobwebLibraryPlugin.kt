@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION") // Providing legacy support for deprecated `LibraryIndexMetadata`
+@file:Suppress("DEPRECATION") // Providing legacy support for deprecated `LibraryIndexMetadata`, `index.head`
 
 package com.varabyte.kobweb.gradle.library
 
@@ -39,7 +39,8 @@ class KobwebLibraryPlugin : Plugin<Project> {
             project.tasks.register<KobwebGenerateIndexMetadataTask>("kobwebGenerateIndexMetadata")
         val kobwebGenerateLibraryMetadataTask = project.tasks
             .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
-                indexHead.set(project.kobwebBlock.library.index.head)
+                legacyIndexHead.set(project.kobwebBlock.library.index.head)
+                indexHead.set(project.kobwebBlock.library.index.newHead)
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)

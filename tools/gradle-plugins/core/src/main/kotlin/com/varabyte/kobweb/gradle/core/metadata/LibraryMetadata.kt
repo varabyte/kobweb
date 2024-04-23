@@ -12,7 +12,7 @@ class LibraryMetadata(val index: Index) {
     /**
      * Serialized data from the `kobweb { library { index { ... } } }` block.
      *
-     * @param headElements If set, a list of DOM elements to be added to the <head> of the user's site.
+     * @param headElements If set, a string of DOM nodes to be added to the `<head>` of the user's site.
      */
     @Serializable
     class Index(val headElements: String?)

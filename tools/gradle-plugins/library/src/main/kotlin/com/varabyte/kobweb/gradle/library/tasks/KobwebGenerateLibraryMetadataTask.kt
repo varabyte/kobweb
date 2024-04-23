@@ -17,7 +17,10 @@ abstract class KobwebGenerateLibraryMetadataTask :
     KobwebTask("Generate a library.json metadata file into this project's jar metadata, which identifies this artifact as a Kobweb library.") {
 
     @get:Input
-    abstract val indexHead: ListProperty<HEAD.() -> Unit>
+    abstract val legacyIndexHead: ListProperty<HEAD.() -> Unit>
+
+    @get:Input
+    abstract val indexHead: ListProperty<String>
 
     @OutputDirectory
     fun getGenResDir() = projectLayout.buildDirectory.dir("generated/kobweb/library/metadata")
@@ -28,16 +31,19 @@ abstract class KobwebGenerateLibraryMetadataTask :
         libraryMetadataFile.asFile.apply {
             parentFile.mkdirs()
 
-            val headElements = indexHead.orNull?.takeIf { it.isNotEmpty() }
+            val headElements = indexHead.orNull?.takeIf { it.isNotEmpty() }?.joinToString("")
+                ?: run {
+                    legacyIndexHead.orNull?.takeIf { it.isNotEmpty() }?.let {
+                        createHTML().head {
+                            it.forEach { element -> element() }
+                        }
+                    }
+                }
             writeText(
                 Json.encodeToString(
                     LibraryMetadata(
                         LibraryMetadata.Index(
-                            headElements = headElements?.let {
-                                createHTML().head {
-                                    it.forEach { element -> element() }
-                                }
-                            }
+                            headElements = headElements
                         )
                     )
                 )

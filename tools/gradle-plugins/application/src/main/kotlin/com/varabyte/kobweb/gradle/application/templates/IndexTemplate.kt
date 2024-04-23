@@ -2,7 +2,6 @@ package com.varabyte.kobweb.gradle.application.templates
 
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import kotlinx.html.BODY
-import kotlinx.html.HEAD
 import kotlinx.html.body
 import kotlinx.html.div
 import kotlinx.html.dom.append
@@ -72,7 +71,7 @@ private fun BODY.buildIndicator() {
 fun createIndexFile(
     title: String,
     lang: String,
-    headInitializers: Iterable<HEAD.() -> Unit>,
+    headElements: Iterable<String>,
     src: String,
     scriptAttributes: Map<String, String>,
     buildTarget: BuildTarget
@@ -86,7 +85,9 @@ fun createIndexFile(
 
                 head {
                     title(content = title)
-                    headInitializers.forEach { element -> this.element() }
+                    headElements.forEach { elements ->
+                        unsafe { raw(elements) }
+                    }
                 }
 
                 body {
