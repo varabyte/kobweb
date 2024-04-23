@@ -30,14 +30,15 @@ import org.jetbrains.compose.web.css.*
 class MutableSilkTheme {
     private val _componentStyles = mutableMapOf<String, ComponentStyle<*>>()
     internal val componentStyles: Map<String, ComponentStyle<*>> = _componentStyles
-    private val overriddenStyles = mutableSetOf<String>()
+    private val overriddenComponentStyles = mutableSetOf<String>()
 
     private val _componentVariants = mutableMapOf<String, ComponentVariant<*>>()
     internal val componentVariants: Map<String, ComponentVariant<*>> = _componentVariants
-    private val overriddenVariants = mutableSetOf<String>()
+    private val overriddenComponentVariants = mutableSetOf<String>()
 
     private val _cssStyles = mutableMapOf<String, CssStyle>()
     internal val cssStyles: Map<String, CssStyle> = _cssStyles
+    private val overriddenCssStyles = mutableSetOf<String>()
 
     val palettes = MutablePalettes()
 
@@ -47,19 +48,6 @@ class MutableSilkTheme {
         62.cssRem,
         80.cssRem,
     )
-
-    fun registerCssStyle(name: String?, style: CssStyle) {
-        // currently using `null` name to represent simple `CssStyle {}` declarations, which are SimpleCssStyle
-        val selector = name?.let { ".$it" } ?: (style as SimpleCssStyle).selector
-        check(cssStyles[selector].let { it == null || it === style }) {
-            """
-                Attempting to register a second CssStyle with a name that's already used: "$name"
-
-                If this was an intentional override, you should use `replaceCssStyle` instead.
-            """.trimIndent()
-        }
-        _cssStyles[selector] = style
-    }
 
     /**
      * Register a new component style with this theme.
@@ -125,7 +113,7 @@ class MutableSilkTheme {
         init: ComponentModifiers.() -> Unit
     ) {
         check(componentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
-        check(overriddenStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
+        check(overriddenComponentStyles.add(style.name)) { "Attempting to override style \"${style.name}\" twice" }
         _componentStyles[style.name] = ComponentStyle<T>(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
     }
 
@@ -182,9 +170,32 @@ class MutableSilkTheme {
             ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
         check(componentVariants.contains(variant.cssStyle.selector)) { "Attempting to replace a variant that was never registered: \"${variant.cssStyle.selector}\"" }
-        check(overriddenVariants.add(variant.cssStyle.selector)) { "Attempting to override variant \"${variant.cssStyle.selector}\" twice" }
+        check(overriddenComponentVariants.add(variant.cssStyle.selector)) { "Attempting to override variant \"${variant.cssStyle.selector}\" twice" }
         _componentVariants[variant.cssStyle.selector] =
             variant.baseStyle.addVariant(variant.name, extraModifiers, init)
+    }
+
+    fun registerCssStyle(name: String?, style: CssStyle) {
+        // currently using `null` name to represent simple `CssStyle {}` declarations, which are SimpleCssStyle
+        val selector = name?.let { ".$it" } ?: (style as SimpleCssStyle).selector
+        check(cssStyles[selector].let { it == null || it === style }) {
+            """
+                Attempting to register a second CssStyle with a name that's already used: "$name"
+
+                If this was an intentional override, you should use `replaceCssStyle` instead.
+            """.trimIndent()
+        }
+        _cssStyles[selector] = style
+    }
+
+    fun MutableSilkTheme.replaceCssStyle(
+        style: CssStyle,
+        extraModifiers: @Composable () -> Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        val selector = cssStyles.entries.find { it.value == style }?.key ?: error("Attempting to replace a CSS style that was never registered.")
+        check(overriddenCssStyles.add(selector)) { "Attempting to override style \"${selector}\" twice" }
+        _cssStyles[selector] = SimpleCssStyle(selector, init, extraModifiers)
     }
 }
 
@@ -236,7 +247,6 @@ fun <T : ComponentKind> MutableSilkTheme.replaceComponentVariantBase(
         }
     }
 }
-
 /**
  * Use this method to tweak a style previously registered using [MutableSilkTheme.registerComponentStyle].
  *
@@ -355,6 +365,64 @@ fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
     init: ComponentModifier.() -> Modifier
 ) {
     modifyComponentVariant(variant, extraModifiers) {
+        base {
+            ComponentBaseModifier(colorMode).let(init)
+        }
+    }
+}
+
+/**
+ * Use this method to tweak a style previously registered using [MutableSilkTheme.registerCssStyle].
+ *
+ * This is particularly useful if you want to supplement changes to styles provided by Silk.
+ *
+ * ```
+ * @InitSilk
+ * fun initSilk(ctx: InitSilkContext) {
+ *   ctx.theme.modifyCssStyle(ButtonSize.MD) {
+ *     base { Modifier.fontWeight(FontWeight.Bold) }
+ *   }
+ * }
+ * ```
+ */
+fun MutableSilkTheme.modifyCssStyle(
+    style: CssStyle,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyCssStyle(style, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.modifyCssStyle(
+    style: CssStyle,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    val existingExtraModifiers = style.extraModifiers
+    val existingInit = style.init
+
+    replaceCssStyle(style, {
+        existingExtraModifiers().then(extraModifiers())
+    }) {
+        existingInit.invoke(this)
+        init.invoke(this)
+    }
+}
+
+fun MutableSilkTheme.modifyCssStyleBase(
+    style: CssStyle,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyCssStyleBase(style, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.modifyCssStyleBase(
+    style: CssStyle,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyCssStyle(style, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
