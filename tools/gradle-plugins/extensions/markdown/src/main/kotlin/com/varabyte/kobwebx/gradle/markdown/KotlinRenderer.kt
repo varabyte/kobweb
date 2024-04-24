@@ -66,6 +66,7 @@ fun String.yamlStringToKotlinString(): String {
  * @property project The Gradle project that owns these markdown files.
  * @property markdownNodeGetter A function that can be used to retrieve the AST for a given markdown file. This allows
  *   avoiding needing to do redundant parsing.
+ * @property defaultRoot The default root layout to use if not specified in the markdown file.
  * @property imports A list of additional imports to include at the top of the generated file.
  * @property filePath The path to the markdown file being processed (relative from its `markdown` folder root).
  * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
@@ -76,6 +77,7 @@ fun String.yamlStringToKotlinString(): String {
 class KotlinRenderer(
     private val project: Project,
     private val markdownNodeGetter: (path: String) -> Node?,
+    defaultRoot: String?,
     private val imports: List<String>,
     private val filePath: String,
     private val handlers: MarkdownHandlers,
@@ -83,9 +85,10 @@ class KotlinRenderer(
     private val funName: String,
     private val reporter: Reporter,
 ) : Renderer {
-    private val defaultRoot: String? = handlers.defaultRoot.get().takeIf { it.isNotBlank() }
     private var indentCount = 0
     private val indent get() = NodeScope(TypedMap()).indent(indentCount)
+
+    private val defaultRoot = defaultRoot ?: "com.varabyte.kobweb.compose.foundation.layout.Column"
 
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact = project.hasJsDependencyNamed("kobwebx-markdown")
@@ -225,16 +228,13 @@ class KotlinRenderer(
                 // If "root" is set in the YAML block, that represents a top level composable which should wrap
                 // everything else.
                 val root = frontMatterData.root ?: defaultRoot
-                if (root != null) {
-                    visit(KobwebCall(root, appendBrace = true))
-                    ++indentCount
-                }
+                visit(KobwebCall(root, appendBrace = true))
+                ++indentCount
 
                 onFinish += {
-                    if (root != null) {
-                        --indentCount
-                        output.appendLine("$indent}")
-                    }
+                    // Close root indent
+                    --indentCount
+                    output.appendLine("$indent}")
 
                     if (contextCreated) {
                         --indentCount
@@ -287,7 +287,7 @@ class KotlinRenderer(
 
         override fun visit(document: Document) {
             // The Yaml block normally provides a root node, but it definitely won't if not present!
-            if (document.children().none { it is YamlFrontMatterBlock } && defaultRoot != null) {
+            if (document.children().none { it is YamlFrontMatterBlock }) {
                 visit(KobwebCall(defaultRoot, appendBrace = true))
                 ++indentCount
 

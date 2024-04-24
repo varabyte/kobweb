@@ -91,6 +91,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
      * they may not need to specify a root at all here (since that could just add an unnecessary extra layer to the DOM
      * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
      */
+    @Deprecated("Use the `defaultRoot` property in the parent markdown block instead.")
     abstract val defaultRoot: Property<String>
 
     /**
@@ -206,8 +207,6 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         project.afterEvaluate {
             useSilk.convention(project.hasJsDependencyNamed("kobweb-silk"))
         }
-
-        defaultRoot.convention("com.varabyte.kobweb.compose.foundation.layout.Column")
 
         generateHeaderIds.convention(true)
         idGenerator.convention { text ->

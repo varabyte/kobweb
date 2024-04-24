@@ -109,6 +109,7 @@ abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock
                 val ktRenderer = KotlinRenderer(
                     project,
                     cache::getRelative,
+                    markdownBlock.defaultRoot.orNull ?: @Suppress("DEPRECATION") markdownHandlers.defaultRoot.orNull,
                     markdownBlock.imports.get(),
                     mdPathRel,
                     markdownHandlers,

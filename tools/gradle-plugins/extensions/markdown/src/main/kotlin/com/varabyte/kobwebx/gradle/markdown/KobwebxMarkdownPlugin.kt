@@ -11,6 +11,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
@@ -51,11 +52,19 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             }
         }
 
+        // Handle deprecation warnings
+        @Suppress("DEPRECATION")
         project.afterEvaluate {
-            @Suppress("DEPRECATION")
             if (markdownBlock.routeOverride.isPresent) {
                 project.logger.warn(
-                    "w: The markdown `routeOverride` property is slated for removal. It was introduced to support kebab-case URLs, but Kobweb has moved to defaulting to them instead."
+                    "w: The markdown `markdown.routeOverride` property is slated for removal. It was introduced to support kebab-case URLs, but Kobweb has moved to defaulting to them instead."
+                )
+            }
+
+            val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
+            if (markdownHandlers.defaultRoot.isPresent) {
+                project.logger.warn(
+                    "w: The `markdown.handlers.defaultRoot` property has moved to the parent markdown block instead, and this property is slated for removal. Use `markdown { defaultRoot.set(...) }` instead."
                 )
             }
         }

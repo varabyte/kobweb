@@ -1756,6 +1756,19 @@ fun KobwebPage() {
 }
 ```
 
+If you have a default root that you'd like to use in most / all of your markdown files, you can specify it in the
+markdown block in your build script:
+
+```kotlin
+// site/build.gradle.kts
+
+kobweb {
+  markdown {
+    defaultRoot.set(".components.layout.MarkdownLayout")
+  }
+}
+```
+
 #### Route Override
 
 Kobweb Markdown front matter supports a `routeOverride` key. If present, its value will be passed into the

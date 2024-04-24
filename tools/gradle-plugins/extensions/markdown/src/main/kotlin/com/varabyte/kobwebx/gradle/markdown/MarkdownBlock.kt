@@ -41,6 +41,20 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
     abstract val markdownPath: Property<String>
 
     /**
+     * The root composable to use as a fallback if no other root is provided.
+     *
+     * All markdown files, when converted to code, should have some root composable called first, wrapping all content.
+     * This root is often done set a YAML block, but we should handle the case where one is not specified (either
+     * because the YAML block doesn't include it or when there's no YAML block at all). This is because Kobweb's default
+     * layouts use a Box as the root, which just stacks elements on top of each other.
+     *
+     * Note that a user might have overridden the Kobweb default root layout via the `@App` annotation, in which case,
+     * they may not need to specify a root at all here (since that could just add an unnecessary extra layer to the DOM
+     * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
+     */
+    abstract val defaultRoot: Property<String>
+
+    /**
      * A list of imports that should be added to the top of every generated markdown file.
      *
      * If an import starts with a ".", it will be prepended with the current site's root package.
