@@ -50,7 +50,8 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      *
      * Note that a user might have overridden the Kobweb default root layout via the `@App` annotation, in which case,
      * they may not need to specify a root at all here (since that could just add an unnecessary extra layer to the DOM
-     * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
+     * tree). To indicate this (expectedly rare) case, this value may be set to the empty string (or `null as String?`)
+     * to disable it.
      */
     abstract val defaultRoot: Property<String>
 
@@ -160,6 +161,7 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
 
     init {
         markdownPath.convention("markdown")
+        defaultRoot.convention("com.varabyte.kobweb.compose.foundation.layout.Column")
         imports.set(emptyList())
         genDir.convention(baseGenDir.map { "$it/markdown" })
     }
