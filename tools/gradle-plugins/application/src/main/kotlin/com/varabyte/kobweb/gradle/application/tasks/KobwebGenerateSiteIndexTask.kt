@@ -10,7 +10,7 @@ import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
-import com.varabyte.kobweb.gradle.core.util.IndexHead
+import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
@@ -82,10 +82,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // Collect all <head> elements together. These will almost always be defined only by the app, but libraries are
         // allowed to declare some as well. If they do, they will have embedded serialized html in their library
         // artifacts.
-        val headElements = mutableListOf(indexBlock.head.get())
+        val headElements = mutableListOf(indexBlock.serializedHead.get())
 
         if (project.hasTransitiveJsDependencyNamed("silk-icons-fa")) {
-            headElements.add(IndexHead.serializeHeadContents {
+            headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
                     href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -94,7 +94,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         }
 
         if (project.hasTransitiveJsDependencyNamed("silk-icons-mdi")) {
-            headElements.add(IndexHead.serializeHeadContents {
+            headElements.add(HtmlUtil.serializeHeadContents {
                 link {
                     rel = "stylesheet"
                     href =
@@ -137,7 +137,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 val headElementsStr = if (headElementsData.startsWith("<head")) {
                     val document = Jsoup.parse(headElementsData)
                     val elements = document.head().children()
-                    IndexHead.serializeHeadContents {
+                    HtmlUtil.serializeHeadContents {
                         elements.forEach { element ->
                             // Weird hack alert -- void elements (like <link>, <meta>), which are common in <head> tags, are
                             // considered by JSoup as self-closing even without a trailing slash. This is valid HTML but

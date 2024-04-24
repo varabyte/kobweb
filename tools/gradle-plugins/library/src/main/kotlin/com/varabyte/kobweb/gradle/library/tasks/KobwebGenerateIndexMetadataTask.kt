@@ -32,7 +32,7 @@ abstract class KobwebGenerateIndexMetadataTask @Inject constructor(private val p
             parentFile.mkdirs()
 
             val libraryBlock = project.kobwebBlock.library
-            val headElements = libraryBlock.index.head.get().takeIf { it.isNotBlank() } ?: return@apply
+            val headElements = libraryBlock.index.serializedHead.get().takeIf { it.isNotBlank() } ?: return@apply
 
             writeText(
                 Json.encodeToString(

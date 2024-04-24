@@ -39,7 +39,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
             project.tasks.register<KobwebGenerateIndexMetadataTask>("kobwebGenerateIndexMetadata")
         val kobwebGenerateLibraryMetadataTask = project.tasks
             .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
-                indexHead.set(project.kobwebBlock.library.index.head)
+                indexHead.set(project.kobwebBlock.library.index.serializedHead)
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)

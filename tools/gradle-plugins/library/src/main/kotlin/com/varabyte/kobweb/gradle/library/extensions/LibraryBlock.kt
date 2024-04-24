@@ -3,9 +3,10 @@
 package com.varabyte.kobweb.gradle.library.extensions
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.util.IndexHead
+import com.varabyte.kobweb.gradle.core.util.HtmlUtil
+import kotlinx.html.HEAD
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.Nested
+import org.gradle.api.provider.ListProperty
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 
@@ -22,20 +23,24 @@ abstract class LibraryBlock : ExtensionAware {
      */
     abstract class IndexBlock : ExtensionAware {
         /**
-         * A hook for adding elements to the `<head>` of the app's generated `index.html` file.
+         * A list of element builders to add to the `<head>` of the app's generated `index.html` file.
          *
-         * You should normally use [IndexHead.add] to add new elements to the head block:
+         * You should normally use [ListProperty.add] to add new elements to the head block:
          * ```
          * kobweb.library.index.head.add {
          *    link(href = "styles.css", rel = "stylesheet")
          * }
          * ```
-         * Use [IndexHead.set] to override any previously set values.
+         * Use [ListProperty.set] to override any previously set values.
          *
          * Note that apps will have the option to opt-out of including these elements.
          */
-        @get:Nested
-        abstract val head: IndexHead
+        abstract val head: ListProperty<HEAD.() -> Unit>
+
+        /** The serialized version of the [head] elements, intended for use as a Gradle task input. */
+        internal val serializedHead = head.map { list ->
+            list.joinToString("") { HtmlUtil.serializeHeadContents(it) }
+        }
     }
 
     init {

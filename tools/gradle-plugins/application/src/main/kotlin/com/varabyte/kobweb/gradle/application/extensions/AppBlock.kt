@@ -8,9 +8,10 @@ import com.varabyte.kobweb.gradle.application.Browser
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.ALLOW
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.WARN
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
-import com.varabyte.kobweb.gradle.core.util.IndexHead
+import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConf
+import kotlinx.html.HEAD
 import kotlinx.html.consumers.filter
 import kotlinx.html.link
 import kotlinx.html.meta
@@ -21,7 +22,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
@@ -60,19 +60,25 @@ abstract class AppBlock @Inject constructor(
         class ExcludeTagsContext(val name: String)
 
         /**
-         * A hook for adding elements to the `<head>` of the generated `index.html` file.
+         * A list of element builders to add to the `<head>` of the generated `index.html` file.
          *
-         * You should normally use [IndexHead.add] to add new elements to the head block:
+         * You should normally use [ListProperty.add] to add new elements to the head block:
          * ```
          * kobweb.app.index.head.add {
          *    link(href = "styles.css", rel = "stylesheet")
          * }
          * ```
-         * which will preserve the default entries added by Kobweb. Use [IndexHead.set] to override the defaults with
+         * which will preserve the default entries added by Kobweb. Use [ListProperty.set] to override the defaults with
          * custom entries.
          */
-        @get:Nested
-        abstract val head: IndexHead
+        @get:Internal
+        abstract val head: ListProperty<HEAD.() -> Unit>
+
+        /** The serialized version of the [head] elements, intended for use as a Gradle task input. */
+        @get:Input
+        internal val serializedHead = head.map { list ->
+            list.joinToString("") { HtmlUtil.serializeHeadContents(it) }
+        }
 
         /**
          * The default description to set in the meta tag.
@@ -183,7 +189,8 @@ abstract class AppBlock @Inject constructor(
             description.convention("Powered by Kobweb")
             faviconPath.convention("/favicon.ico")
             lang.convention("en")
-            head.add {
+
+            head.set(listOf {
                 meta {
                     name = "description"
                     content = description.get()
@@ -196,7 +203,7 @@ abstract class AppBlock @Inject constructor(
                 // Viewport content chosen for a good mobile experience.
                 // See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag#viewport_basics
                 meta("viewport", "width=device-width, initial-scale=1")
-            }
+            })
         }
     }
 
