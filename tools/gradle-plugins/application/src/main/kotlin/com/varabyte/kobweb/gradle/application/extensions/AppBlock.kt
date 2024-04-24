@@ -62,8 +62,14 @@ abstract class AppBlock @Inject constructor(
         /**
          * A hook for adding elements to the `<head>` of the generated `index.html` file.
          *
-         * @see IndexHead.add
-         * @see IndexHead.set
+         * You should normally use [IndexHead.add] to add new elements to the head block:
+         * ```
+         * kobweb.app.index.head.add {
+         *    link(href = "styles.css", rel = "stylesheet")
+         * }
+         * ```
+         * which will preserve the default entries added by Kobweb. Use [IndexHead.set] to override the defaults with
+         * custom entries.
          */
         @get:Nested
         abstract val head: IndexHead

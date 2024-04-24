@@ -22,12 +22,17 @@ abstract class LibraryBlock : ExtensionAware {
      */
     abstract class IndexBlock : ExtensionAware {
         /**
-         * A hook for adding elements to the `<head>` of the generated `index.html` file.
+         * A hook for adding elements to the `<head>` of the app's generated `index.html` file.
+         *
+         * You should normally use [IndexHead.add] to add new elements to the head block:
+         * ```
+         * kobweb.library.index.head.add {
+         *    link(href = "styles.css", rel = "stylesheet")
+         * }
+         * ```
+         * Use [IndexHead.set] to override any previously set values.
          *
          * Note that apps will have the option to opt-out of including these elements.
-         *
-         * @see IndexHead.add
-         * @see IndexHead.set
          */
         @get:Nested
         abstract val head: IndexHead
