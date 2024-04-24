@@ -4580,7 +4580,7 @@ This code should be converted into Kotlin and added to the `kobweb` block of you
 kobweb {
   app {
     index {
-      addToHead {
+      head.add {
         link(rel = "preconnect", href = "https://fonts.googleapis.com")
         link(rel = "preconnect", href = "https://fonts.gstatic.com") { attributes["crossorigin"] = "" }
         link(
@@ -4648,7 +4648,7 @@ Now, you need to reference this CSS file from your `build.gradle.kts` script:
 kobweb {
   app {
     index {
-      addToHead {
+      head.add {
         link(rel = "stylesheet", href = "/fonts/faces.css")
       }
     }

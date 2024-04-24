@@ -8,22 +8,20 @@ import com.varabyte.kobweb.gradle.application.Browser
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.ALLOW
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.WARN
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
+import com.varabyte.kobweb.gradle.core.util.IndexHead
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConf
-import kotlinx.html.HEAD
-import kotlinx.html.TagConsumer
 import kotlinx.html.consumers.filter
 import kotlinx.html.link
 import kotlinx.html.meta
-import kotlinx.html.stream.createHTML
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
@@ -61,39 +59,14 @@ abstract class AppBlock @Inject constructor(
         @Deprecated("Don't use `excludeTags`. Use `excludeHtmlForDependencies` instead.")
         class ExcludeTagsContext(val name: String)
 
-        @get:Inject
-        internal abstract val providerFactory: ProviderFactory
-
-        @get:Input
-        internal abstract val newHead: ListProperty<String>
-
-        /** Add a block of HTML elements to the `<head>` of the generated `index.html` file. */
-        fun addToHead(block: HEAD.() -> Unit) {
-            // Wrap computation with a provider in case it references any lazy properties
-            newHead.add(providerFactory.provider { serializeHeadContents(block) })
-        }
-
         /**
-         * Set the `<head>` of the generated `index.html` file.
+         * A hook for adding elements to the `<head>` of the generated `index.html` file.
          *
-         * Note that this will override all default and previously set values.
+         * @see IndexHead.add
+         * @see IndexHead.set
          */
-        @JvmName("setHeadTo") // Gradle doesn't like having a "head" property and a "setHead" method
-        fun setHead(block: HEAD.() -> Unit) {
-            newHead.set(providerFactory.provider { listOf(serializeHeadContents(block)) })
-            newHead.disallowChanges()
-        }
-
-        /**
-         * A list of head element builders to add to the generated index.html file.
-         *
-         * The reason this is exposed as a list instead of a property is so that different tasks can add their own
-         * values (usually scripts or stylesheets) independently of one another.
-         */
-        @Deprecated("The`head` property has been reworked. Replace `head.add { ... }` with `addToHead { ... }`. To override default values, use `setHead { ... }` instead.")
-        // TODO(#168): Remove this property & rename `newHead` to `head`
-        @get:Internal
-        abstract val head: ListProperty<HEAD.() -> Unit>
+        @get:Nested
+        abstract val head: IndexHead
 
         /**
          * The default description to set in the meta tag.
@@ -204,7 +177,7 @@ abstract class AppBlock @Inject constructor(
             description.convention("Powered by Kobweb")
             faviconPath.convention("/favicon.ico")
             lang.convention("en")
-            addToHead {
+            head.add {
                 meta {
                     name = "description"
                     content = description.get()
@@ -542,17 +515,3 @@ fun AppBlock.IndexBlock.excludeAllHtmlFromDependencies() {
     excludeHtmlForDependencies.set(listOf(""))
     excludeHtmlForDependencies.disallowChanges()
 }
-
-// TODO: de-duplicate from LibraryBlock.kt
-
-// Generate the html nodes without the containing <head> tag
-// See: https://github.com/Kotlin/kotlinx.html/issues/228
-private inline fun <T, C : TagConsumer<T>> C.headFragment(crossinline block: HEAD.() -> Unit): T {
-    HEAD(emptyMap(), this).block()
-    return this.finalize()
-}
-
-// Use `xhtmlCompatible = true` to include a closing slash as currently kotlinx.html needs them when adding raw text.
-// See: https://github.com/Kotlin/kotlinx.html/issues/247
-internal fun serializeHeadContents(block: HEAD.() -> Unit): String =
-    createHTML(prettyPrint = false, xhtmlCompatible = true).headFragment(block)
