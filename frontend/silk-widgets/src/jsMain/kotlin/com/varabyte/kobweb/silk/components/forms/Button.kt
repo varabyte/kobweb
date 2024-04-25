@@ -98,15 +98,15 @@ val ButtonStyle by ComponentStyle<ButtonKind>(prefix = "silk") {
 }
 
 class ButtonSize(
-    val fontSize: CSSLengthNumericValue,
-    val height: CSSLengthNumericValue,
-    val horizontalPadding: CSSLengthNumericValue,
-) : CssStyle.Base({
+    fontSize: CSSLengthNumericValue,
+    height: CSSLengthNumericValue,
+    horizontalPadding: CSSLengthNumericValue,
+) : CssStyle.Base(
     Modifier
         .setVariable(ButtonVars.FontSize, fontSize)
         .setVariable(ButtonVars.Height, height)
         .setVariable(ButtonVars.PaddingHorizontal, horizontalPadding)
-}) {
+) {
     companion object {
         val XS = ButtonSize(FontSizeVars.XS.value(), 1.5.cssRem, 0.5.cssRem)
         val SM = ButtonSize(FontSizeVars.SM.value(), 2.cssRem, 0.75.cssRem)

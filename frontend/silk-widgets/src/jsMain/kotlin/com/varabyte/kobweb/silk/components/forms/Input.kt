@@ -420,13 +420,13 @@ class InputSize(
     val height: CSSLengthNumericValue,
     val padding: CSSLengthNumericValue,
     val borderRadius: CSSLengthNumericValue,
-) : CssStyle.Base({
+) : CssStyle.Base(
     Modifier
         .setVariable(InputVars.FontSize, fontSize)
         .setVariable(InputVars.Height, height)
         .setVariable(InputVars.Padding, padding)
         .setVariable(InputVars.BorderRadius, borderRadius)
-}) {
+) {
     companion object {
         val XS = InputSize(FontSizeVars.XS.value(), 1.25.cssRem, 0.375.cssRem, BorderRadiusVars.XS.value())
         val SM = InputSize(FontSizeVars.SM.value(), 1.75.cssRem, 0.5.cssRem, BorderRadiusVars.SM.value())

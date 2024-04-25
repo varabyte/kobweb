@@ -155,15 +155,15 @@ val CheckboxInputVariant by InputStyle.addVariant {
 }
 
 class CheckboxSize(
-    val boxSize: CSSLengthNumericValue,
-    val iconSize: CSSLengthNumericValue,
-    val fontSize: CSSLengthNumericValue,
-) : CssStyle.Base({
+    boxSize: CSSLengthNumericValue,
+    iconSize: CSSLengthNumericValue,
+    fontSize: CSSLengthNumericValue,
+) : CssStyle.Base(
     Modifier
         .setVariable(CheckboxVars.Size, boxSize)
         .setVariable(CheckboxVars.IconSize, iconSize)
         .setVariable(CheckboxVars.FontSize, fontSize)
-}) {
+) {
     companion object {
         val SM = CheckboxSize(0.875.cssRem, 0.45.cssRem, FontSizeVars.SM.value())
         val MD = CheckboxSize(1.cssRem, 0.625.cssRem, FontSizeVars.MD.value())
