@@ -106,13 +106,6 @@ abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock
                 @Suppress("DEPRECATION")
                 val funName = "${ktFileName.capitalize()}Page"
 
-                // Until we remove markdownHandlers.defaultRoot, support the case where a user set the legacy property
-                // and not the main property. When markdownHandlers.defaultRoot is removed, this if block can be deleted.
-                @Suppress("DEPRECATION")
-                if (markdownHandlers.defaultRoot.isPresent) {
-                    markdownBlock.defaultRoot.convention(markdownHandlers.defaultRoot)
-                }
-
                 val ktRenderer = KotlinRenderer(
                     project,
                     cache::getRelative,

@@ -73,7 +73,7 @@ class NodeScope(val data: TypedMap, private val indentCountBase: Int = 0) {
  * }
  * ```
  */
-abstract class MarkdownHandlers @Inject constructor(project: Project) {
+abstract class MarkdownHandlers @Inject constructor(project: Project, newDefaultRoot: Property<String>) {
     companion object {
         /** Key used by [Heading] nodes to store IDs they generated for themselves. */
         val HeadingIdsKey = Key.create<MutableMap<Heading, String>>("md.heading.ids")
@@ -92,7 +92,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
      * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
      */
     @Deprecated("Use the `defaultRoot` property in the parent markdown block instead.")
-    abstract val defaultRoot: Property<String>
+    val defaultRoot: Property<String> = newDefaultRoot
 
     /**
      * Use Silk components instead of Compose HTML components when relevant.
