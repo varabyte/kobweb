@@ -98,12 +98,12 @@ class SwitchSize(
     val width: CSSLengthNumericValue,
     val height: CSSLengthNumericValue,
     val padding: CSSLengthNumericValue = 0.188.cssRem
-) : CssStyle.Base({
+) : CssStyle.Base(
     Modifier
         .setVariable(SwitchVars.TrackWidth, width)
         .setVariable(SwitchVars.TrackHeight, height)
         .setVariable(SwitchVars.TrackPadding, padding)
-}) {
+) {
     companion object {
         val SM = SwitchSize(1.375.cssRem, 0.75.cssRem)
         val MD = SwitchSize(1.875.cssRem, 1.cssRem)

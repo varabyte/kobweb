@@ -25,7 +25,12 @@ abstract class CssStyle(
     abstract class Base(
         init: ComponentBaseModifier.() -> Modifier,
         extraModifiers: @Composable () -> Modifier = { Modifier },
-    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers)
+    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers) {
+        constructor(init: Modifier, extraModifiers: @Composable () -> Modifier = { Modifier }) : this(
+            { init },
+            extraModifiers
+        )
+    }
 
     /**
      * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
