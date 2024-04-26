@@ -28,6 +28,13 @@ import org.jetbrains.compose.web.css.*
  * Unlike [SilkConfig] values, theme values are expected to be accessible in user projects via the [SilkTheme] object.
  */
 class MutableSilkTheme {
+    private val _cssStyles = mutableMapOf<String, CssStyle>()
+    internal val cssStyles: Map<String, CssStyle> = _cssStyles
+    private val overriddenCssStyles = mutableSetOf<String>()
+
+    internal val _cssStyleNames = mutableMapOf<CssStyle, String>()
+    internal val cssStyleNames: Map<CssStyle, String> = _cssStyleNames
+
     private val _componentStyles = mutableMapOf<String, ComponentStyle<*>>()
     internal val componentStyles: Map<String, ComponentStyle<*>> = _componentStyles
     private val overriddenComponentStyles = mutableSetOf<String>()
@@ -35,12 +42,6 @@ class MutableSilkTheme {
     private val _componentVariants = mutableMapOf<String, ComponentVariant<*>>()
     internal val componentVariants: Map<String, ComponentVariant<*>> = _componentVariants
     private val overriddenComponentVariants = mutableSetOf<String>()
-
-    private val _cssStyles = mutableMapOf<String, CssStyle>()
-    internal val cssStyles: Map<String, CssStyle> = _cssStyles
-    internal val _cssStyleNames = mutableMapOf<CssStyle, String>()
-    internal val cssStyleNames: Map<CssStyle, String> = _cssStyleNames
-    private val overriddenCssStyles = mutableSetOf<String>()
 
     val palettes = MutablePalettes()
 
@@ -50,6 +51,37 @@ class MutableSilkTheme {
         62.cssRem,
         80.cssRem,
     )
+
+    fun registerStyle(name: String, style: CssStyle) {
+        val selector = (style as? SimpleCssStyle)?.selector ?: ".$name"
+        check(cssStyles[selector].let { it == null || it === style }) {
+            """
+                Attempting to register a second CssStyle with a name that's already used: "$name"
+
+                If this was an intentional override, you should use `replaceStyle` instead.
+            """.trimIndent()
+        }
+        _cssStyles[selector] = style
+        _cssStyleNames[style] = name
+    }
+
+    fun MutableSilkTheme.replaceStyle(
+        style: CssStyle,
+        extraModifiers: @Composable () -> Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        val selector = cssStyles.entries.find { it.value == style }?.key
+            ?: error("Attempting to replace a CSS style that was never registered.")
+        check(overriddenCssStyles.add(selector)) { "Attempting to override style \"${selector}\" twice" }
+        _cssStyles[selector] = SimpleCssStyle(selector, init, extraModifiers)
+        // No need to add to `_cssStyleNames` here, as we only will ever need to return names for the originally registered Style
+    }
+
+
+    @Deprecated("Name simplified to `registerStyle`", ReplaceWith("registerStyle(style)"))
+    fun registerComponentStyle(style: ComponentStyle<*>) {
+        registerStyle(style)
+    }
 
     /**
      * Register a new component style with this theme.
@@ -73,9 +105,9 @@ class MutableSilkTheme {
      * SomeWidget(SomeStyle.toModifier()) // <-- Pass Style to the target widget
      * ```
      *
-     * @see replaceComponentStyle
+     * @see replaceStyle
      */
-    fun registerComponentStyle(style: ComponentStyle<*>) {
+    fun registerStyle(style: ComponentStyle<*>) {
         check(componentStyles[style.name].let { it == null || it === style }) {
             """
                 Attempting to register a second style with a name that's already used: "${style.name}"
@@ -86,8 +118,34 @@ class MutableSilkTheme {
         _componentStyles[style.name] = style
     }
 
+    @Deprecated("Name simplified to `replaceStyle`", ReplaceWith("replaceStyle(style, extraModifiers, init)"))
+    fun <T : ComponentKind> replaceComponentStyle(
+        style: ComponentStyle<T>,
+        extraModifiers: Modifier = Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        replaceStyle(style, extraModifiers, init)
+    }
+
+    @Deprecated("Name simplified to `replaceStyle`", ReplaceWith("replaceStyle(style, extraModifiers, init)"))
+    fun <T : ComponentKind> replaceComponentStyle(
+        style: ComponentStyle<T>,
+        extraModifiers: @Composable () -> Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        replaceStyle(style, extraModifiers, init)
+    }
+
+    fun <T : ComponentKind> replaceStyle(
+        style: ComponentStyle<T>,
+        extraModifiers: Modifier = Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        replaceStyle(style, { extraModifiers }, init)
+    }
+
     /**
-     * Use this method to override a style previously registered using [registerComponentStyle].
+     * Use this method to override a style previously registered using [registerStyle].
      *
      * This is particularly useful if you want to change styles provided by Silk.
      *
@@ -101,15 +159,7 @@ class MutableSilkTheme {
      * }
      * ```
      */
-    fun <T : ComponentKind> replaceComponentStyle(
-        style: ComponentStyle<T>,
-        extraModifiers: Modifier = Modifier,
-        init: ComponentModifiers.() -> Unit
-    ) {
-        replaceComponentStyle(style, { extraModifiers }, init)
-    }
-
-    fun <T : ComponentKind> replaceComponentStyle(
+    fun <T : ComponentKind> replaceStyle(
         style: ComponentStyle<T>,
         extraModifiers: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
@@ -119,12 +169,17 @@ class MutableSilkTheme {
         _componentStyles[style.name] = ComponentStyle<T>(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
     }
 
+    @Deprecated("Name simplified to `registerVariants`", ReplaceWith("registerVariants(*variants)"))
+    fun registerComponentVariants(vararg variants: ComponentVariant<*>) {
+        registerVariants(*variants)
+    }
+
     /**
      * Register variants associated with a base style.
      *
      * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
      */
-    fun registerComponentVariants(vararg variants: ComponentVariant<*>) {
+    fun registerVariants(vararg variants: ComponentVariant<*>) {
         variants.filterIsInstance<SimpleComponentVariant<*>>().forEach { variant ->
             check(componentVariants[variant.cssStyle.selector].let { it == null || it === variant }) {
                 """
@@ -138,8 +193,34 @@ class MutableSilkTheme {
         }
     }
 
+    @Deprecated("Name simplified to `replaceVariant`", ReplaceWith("replaceVariant(variant, extraModifiers, init)"))
+    fun <T : ComponentKind> replaceComponentVariant(
+        variant: ComponentVariant<T>,
+        extraModifiers: Modifier = Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        replaceVariant(variant, extraModifiers, init)
+    }
+
+    @Deprecated("Name simplified to `replaceVariant`", ReplaceWith("replaceVariant(variant, extraModifiers, init)"))
+    fun <T : ComponentKind> replaceComponentVariant(
+        variant: ComponentVariant<T>,
+        extraModifiers: @Composable () -> Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        replaceVariant(variant, extraModifiers, init)
+    }
+
+    fun <T : ComponentKind> replaceVariant(
+        variant: ComponentVariant<T>,
+        extraModifiers: Modifier = Modifier,
+        init: ComponentModifiers.() -> Unit
+    ) {
+        replaceVariant(variant, { extraModifiers }, init)
+    }
+
     /**
-     * Use this method to override a variant previously registered using [registerComponentVariants].
+     * Use this method to override a variant previously registered using [registerVariants].
      *
      * This is particularly useful if you want to change variants provided by Silk.
      *
@@ -154,15 +235,7 @@ class MutableSilkTheme {
      * }
      * ```
      */
-    fun <T : ComponentKind> replaceComponentVariant(
-        variant: ComponentVariant<T>,
-        extraModifiers: Modifier = Modifier,
-        init: ComponentModifiers.() -> Unit
-    ) {
-        replaceComponentVariant(variant, { extraModifiers }, init)
-    }
-
-    fun <T : ComponentKind> replaceComponentVariant(
+    fun <T : ComponentKind> replaceVariant(
         variant: ComponentVariant<T>,
         extraModifiers: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
@@ -176,81 +249,200 @@ class MutableSilkTheme {
         _componentVariants[variant.cssStyle.selector] =
             variant.baseStyle.addVariant(variant.name, extraModifiers, init)
     }
+}
 
-    fun registerCssStyle(name: String, style: CssStyle) {
-        val selector = (style as? SimpleCssStyle)?.selector ?: ".$name"
-        check(cssStyles[selector].let { it == null || it === style }) {
-            """
-                Attempting to register a second CssStyle with a name that's already used: "$name"
+/**
+ * Use this method to tweak a style previously registered using [MutableSilkTheme.registerStyle].
+ *
+ * This is particularly useful if you want to supplement changes to styles provided by Silk.
+ *
+ * ```
+ * @InitSilk
+ * fun initSilk(ctx: InitSilkContext) {
+ *   ctx.theme.modifyStyle(ButtonSize.MD) {
+ *     base { Modifier.fontWeight(FontWeight.Bold) }
+ *   }
+ * }
+ * ```
+ */
+fun MutableSilkTheme.modifyStyle(
+    style: CssStyle,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyStyle(style, { extraModifiers }, init)
+}
 
-                If this was an intentional override, you should use `replaceCssStyle` instead.
-            """.trimIndent()
-        }
-        _cssStyles[selector] = style
-        _cssStyleNames[style] = name
-    }
+fun MutableSilkTheme.modifyStyle(
+    style: CssStyle,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    val existingExtraModifiers = style.extraModifiers
+    val existingInit = style.init
 
-    fun MutableSilkTheme.replaceCssStyle(
-        style: CssStyle,
-        extraModifiers: @Composable () -> Modifier,
-        init: ComponentModifiers.() -> Unit
-    ) {
-        val selector = cssStyles.entries.find { it.value == style }?.key ?: error("Attempting to replace a CSS style that was never registered.")
-        check(overriddenCssStyles.add(selector)) { "Attempting to override style \"${selector}\" twice" }
-        _cssStyles[selector] = SimpleCssStyle(selector, init, extraModifiers)
-        // No need to add to `_cssStyleNames` here, as we only will ever need to return names for the originally registered Style
+    replaceStyle(style, {
+        existingExtraModifiers().then(extraModifiers())
+    }) {
+        existingInit.invoke(this)
+        init.invoke(this)
     }
 }
+
+fun MutableSilkTheme.modifyStyleBase(
+    style: CssStyle,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyStyleBase(style, { extraModifiers }, init)
+}
+
+fun MutableSilkTheme.modifyStyleBase(
+    style: CssStyle,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyStyle(style, extraModifiers) {
+        base {
+            ComponentBaseModifier(colorMode).let(init)
+        }
+    }
+}
+
+@Deprecated("Name simplified to `replaceStyleBase`.", ReplaceWith("replaceStyleBase(style, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.replaceComponentStyleBase(
+    style: ComponentStyle<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceStyleBase(style, extraModifiers, init)
+}
+
+@Deprecated("Name simplified to `replaceStyleBase`.", ReplaceWith("replaceStyleBase(style, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.replaceComponentStyleBase(
+    style: ComponentStyle<T>,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceStyleBase(style, extraModifiers, init)
+}
+
+fun <T : ComponentKind> MutableSilkTheme.replaceStyleBase(
+    style: ComponentStyle<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceStyleBase(style, { extraModifiers }, init)
+}
+
 /**
  * Convenience method when you want to replace an upstream style but only need to define a base style.
  */
-fun <T : ComponentKind> MutableSilkTheme.replaceComponentStyleBase(
-    style: ComponentStyle<T>,
-    extraModifiers: Modifier = Modifier,
-    init: ComponentModifier.() -> Modifier
-) {
-    replaceComponentStyleBase(style, { extraModifiers }, init)
-}
-
-fun <T : ComponentKind> MutableSilkTheme.replaceComponentStyleBase(
+fun <T : ComponentKind> MutableSilkTheme.replaceStyleBase(
     style: ComponentStyle<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceComponentStyle(style, extraModifiers) {
+    replaceStyle(style, extraModifiers, fun ComponentModifiers.() {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
-    }
+    })
 }
 
-/**
- * Convenience method when you want to replace an upstream variant but only need to define a base style.
- */
+@Deprecated(
+    "Name simplified to `replaceVariantBase`.",
+    ReplaceWith("replaceVariantBase(variant, extraModifiers, init)")
+)
 fun <T : ComponentKind> MutableSilkTheme.replaceComponentVariantBase(
     variant: ComponentVariant<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceComponentVariantBase(variant, { extraModifiers }, init)
+    replaceVariantBase(variant, extraModifiers, init)
 }
 
-/**
- * Convenience method when you want to replace an upstream variant but only need to define a base style.
- */
+@Deprecated(
+    "Name simplified to `replaceVariantBase`.",
+    ReplaceWith("replaceVariantBase(variant, extraModifiers, init)")
+)
 fun <T : ComponentKind> MutableSilkTheme.replaceComponentVariantBase(
     variant: ComponentVariant<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceComponentVariant(variant, extraModifiers) {
+    replaceVariantBase(variant, extraModifiers, init)
+}
+
+fun <T : ComponentKind> MutableSilkTheme.replaceVariantBase(
+    variant: ComponentVariant<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceVariantBase(variant, { extraModifiers }, init)
+}
+
+/**
+ * Convenience method when you want to replace an upstream variant but only need to define a base style.
+ */
+fun <T : ComponentKind> MutableSilkTheme.replaceVariantBase(
+    variant: ComponentVariant<T>,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    replaceVariant(variant, extraModifiers, fun ComponentModifiers.() {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
-    }
+    })
 }
+
+@Deprecated("Name simplified to `modifyStyle`", ReplaceWith("modifyStyle(style, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
+    style: ComponentStyle<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyStyle(style, extraModifiers, init)
+}
+
+@Deprecated("Name simplified to `modifyStyle`", ReplaceWith("modifyStyle(style, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
+    style: ComponentStyle<T>,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyStyle(style, extraModifiers, init)
+}
+
+@Deprecated("Name simplified to `modifyStyleBase`", ReplaceWith("modifyStyleBase(style, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyleBase(
+    style: ComponentStyle<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyStyleBase(style, extraModifiers, init)
+}
+
+@Deprecated("Name simplified to `modifyStyleBase`", ReplaceWith("modifyStyleBase(style, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyleBase(
+    style: ComponentStyle<T>,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyStyleBase(style, extraModifiers, init)
+}
+
+fun <T : ComponentKind> MutableSilkTheme.modifyStyle(
+    style: ComponentStyle<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyStyle(style, { extraModifiers }, init)
+}
+
 /**
- * Use this method to tweak a style previously registered using [MutableSilkTheme.registerComponentStyle].
+ * Use this method to tweak a style previously registered using [MutableSilkTheme.registerStyle].
  *
  * This is particularly useful if you want to supplement changes to styles provided by Silk.
  *
@@ -258,21 +450,13 @@ fun <T : ComponentKind> MutableSilkTheme.replaceComponentVariantBase(
  * @InitSilk
  * fun initSilk(ctx: InitSilkContext) {
  *   // TextStyle comes from Silk
- *   ctx.theme.modifyComponentStyle(SpanTextStyle) {
+ *   ctx.theme.modifyStyle(SpanTextStyle) {
  *     base { Modifier.fontWeight(FontWeight.Bold) }
  *   }
  * }
  * ```
  */
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
-    style: ComponentStyle<T>,
-    extraModifiers: Modifier = Modifier,
-    init: ComponentModifiers.() -> Unit
-) {
-    modifyComponentStyle(style, { extraModifiers }, init)
-}
-
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
+fun <T : ComponentKind> MutableSilkTheme.modifyStyle(
     style: ComponentStyle<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
@@ -281,7 +465,7 @@ fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
     val existingExtraModifiers = style.extraModifiers
     val existingInit = style.init
 
-    replaceComponentStyle(style, {
+    replaceStyle(style, {
         existingExtraModifiers().then(extraModifiers())
     }) {
         existingInit.invoke(this)
@@ -289,24 +473,68 @@ fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyle(
     }
 }
 
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyleBase(
+fun <T : ComponentKind> MutableSilkTheme.modifyStyleBase(
     style: ComponentStyle<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyComponentStyleBase(style, { extraModifiers }, init)
+    modifyStyleBase(style, { extraModifiers }, init)
 }
 
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyleBase(
+fun <T : ComponentKind> MutableSilkTheme.modifyStyleBase(
     style: ComponentStyle<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyComponentStyle(style, extraModifiers) {
+    modifyStyle(style, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
     }
+}
+
+@Deprecated("Name simplified to `modifyVariant`", ReplaceWith("modifyVariant(variant, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
+    variant: ComponentVariant<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyVariant(variant, extraModifiers, init)
+}
+
+@Deprecated("Name simplified to `modifyVariant`", ReplaceWith("modifyVariant(variant, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
+    variant: ComponentVariant<T>,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyVariant(variant, extraModifiers, init)
+}
+
+@Deprecated("Name simplified to `modifyVariantBase`", ReplaceWith("modifyVariantBase(variant, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
+    variant: ComponentVariant<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyVariantBase(variant, extraModifiers, init)
+}
+
+@Deprecated("Name simplified to `modifyVariantBase`", ReplaceWith("modifyVariantBase(variant, extraModifiers, init)"))
+fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
+    variant: ComponentVariant<T>,
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentModifier.() -> Modifier
+) {
+    modifyVariantBase(variant, extraModifiers, init)
+}
+
+fun <T : ComponentKind> MutableSilkTheme.modifyVariant(
+    variant: ComponentVariant<T>,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentModifiers.() -> Unit
+) {
+    modifyVariant(variant, { extraModifiers }, init)
 }
 
 /**
@@ -318,21 +546,13 @@ fun <T : ComponentKind> MutableSilkTheme.modifyComponentStyleBase(
  * @InitSilk
  * fun initSilk(ctx: InitSilkContext) {
  *   // UndecoratedLinkVariant comes from Silk
- *   ctx.theme.modifyComponentVariant(UndecoratedLinkVariant) {
+ *   ctx.theme.modifyVariant(UndecoratedLinkVariant) {
  *     base { Modifier.fontStyle(FontStyle.Italic) }
  *   }
  * }
  * ```
  */
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
-    variant: ComponentVariant<T>,
-    extraModifiers: Modifier = Modifier,
-    init: ComponentModifiers.() -> Unit
-) {
-    modifyComponentVariant(variant, { extraModifiers }, init)
-}
-
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
+fun <T : ComponentKind> MutableSilkTheme.modifyVariant(
     variant: ComponentVariant<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
@@ -345,7 +565,7 @@ fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
     val existingExtraModifiers = variant.cssStyle.extraModifiers
     val existingInit = variant.cssStyle.init
 
-    replaceComponentVariant(variant, {
+    replaceVariant(variant, {
         existingExtraModifiers().then(extraModifiers())
     }) {
         existingInit.invoke(this)
@@ -353,84 +573,25 @@ fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariant(
     }
 }
 
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
+fun <T : ComponentKind> MutableSilkTheme.modifyVariantBase(
     variant: ComponentVariant<T>,
     extraModifiers: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyComponentVariantBase(variant, { extraModifiers }, init)
+    modifyVariantBase(variant, { extraModifiers }, init)
 }
 
-fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
+fun <T : ComponentKind> MutableSilkTheme.modifyVariantBase(
     variant: ComponentVariant<T>,
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyComponentVariant(variant, extraModifiers) {
+    modifyVariant(variant, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
     }
 }
-
-/**
- * Use this method to tweak a style previously registered using [MutableSilkTheme.registerCssStyle].
- *
- * This is particularly useful if you want to supplement changes to styles provided by Silk.
- *
- * ```
- * @InitSilk
- * fun initSilk(ctx: InitSilkContext) {
- *   ctx.theme.modifyCssStyle(ButtonSize.MD) {
- *     base { Modifier.fontWeight(FontWeight.Bold) }
- *   }
- * }
- * ```
- */
-fun MutableSilkTheme.modifyCssStyle(
-    style: CssStyle,
-    extraModifiers: Modifier = Modifier,
-    init: ComponentModifiers.() -> Unit
-) {
-    modifyCssStyle(style, { extraModifiers }, init)
-}
-
-fun MutableSilkTheme.modifyCssStyle(
-    style: CssStyle,
-    extraModifiers: @Composable () -> Modifier,
-    init: ComponentModifiers.() -> Unit
-) {
-    val existingExtraModifiers = style.extraModifiers
-    val existingInit = style.init
-
-    replaceCssStyle(style, {
-        existingExtraModifiers().then(extraModifiers())
-    }) {
-        existingInit.invoke(this)
-        init.invoke(this)
-    }
-}
-
-fun MutableSilkTheme.modifyCssStyleBase(
-    style: CssStyle,
-    extraModifiers: Modifier = Modifier,
-    init: ComponentModifier.() -> Modifier
-) {
-    modifyCssStyleBase(style, { extraModifiers }, init)
-}
-
-fun MutableSilkTheme.modifyCssStyleBase(
-    style: CssStyle,
-    extraModifiers: @Composable () -> Modifier,
-    init: ComponentModifier.() -> Modifier
-) {
-    modifyCssStyle(style, extraModifiers) {
-        base {
-            ComponentBaseModifier(colorMode).let(init)
-        }
-    }
-}
-
 
 class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     val palettes = mutableSilkTheme.palettes as Palettes

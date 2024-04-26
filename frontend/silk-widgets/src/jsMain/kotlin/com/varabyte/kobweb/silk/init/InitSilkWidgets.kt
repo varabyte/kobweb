@@ -208,48 +208,48 @@ fun initSilkWidgets(ctx: InitSilkContext) {
         }
     }
 
-    mutableTheme.registerCssStyle("silk-colors", SilkColorsStyle)
+    mutableTheme.registerStyle("silk-colors", SilkColorsStyle)
 
     // TODO: Automate the creation of this list (with a Gradle task?)
-    mutableTheme.registerComponentStyle(DisabledStyle)
-    mutableTheme.registerComponentStyle(SmoothColorStyle)
+    mutableTheme.registerStyle(DisabledStyle)
+    mutableTheme.registerStyle(SmoothColorStyle)
 
-    mutableTheme.registerComponentStyle(ButtonStyle)
-    mutableTheme.registerComponentStyle(CanvasStyle)
-    mutableTheme.registerComponentStyle(CheckboxStyle)
-    mutableTheme.registerComponentVariants(CheckboxInputVariant)
-    mutableTheme.registerComponentStyle(CheckboxIconContainerStyle)
-    mutableTheme.registerComponentStyle(CheckboxIconStyle)
-    mutableTheme.registerComponentVariants(CheckedCheckboxIconContainerVariant, UncheckedCheckboxIconContainerVariant)
-    mutableTheme.registerComponentStyle(OverlayStyle)
-    mutableTheme.registerComponentStyle(PopupStyle)
-    mutableTheme.registerComponentStyle(SimpleGridStyle)
-    mutableTheme.registerComponentStyle(SurfaceStyle)
+    mutableTheme.registerStyle(ButtonStyle)
+    mutableTheme.registerStyle(CanvasStyle)
+    mutableTheme.registerStyle(CheckboxStyle)
+    mutableTheme.registerVariants(CheckboxInputVariant)
+    mutableTheme.registerStyle(CheckboxIconContainerStyle)
+    mutableTheme.registerStyle(CheckboxIconStyle)
+    mutableTheme.registerVariants(CheckedCheckboxIconContainerVariant, UncheckedCheckboxIconContainerVariant)
+    mutableTheme.registerStyle(OverlayStyle)
+    mutableTheme.registerStyle(PopupStyle)
+    mutableTheme.registerStyle(SimpleGridStyle)
+    mutableTheme.registerStyle(SurfaceStyle)
 
-    mutableTheme.registerComponentStyle(HorizontalDividerStyle)
-    mutableTheme.registerComponentStyle(VerticalDividerStyle)
+    mutableTheme.registerStyle(HorizontalDividerStyle)
+    mutableTheme.registerStyle(VerticalDividerStyle)
 
-    mutableTheme.registerComponentStyle(SwitchStyle)
-    mutableTheme.registerComponentStyle(SwitchTrackStyle)
-    mutableTheme.registerComponentStyle(SwitchThumbStyle)
-    mutableTheme.registerComponentVariants(SwitchInputVariant)
+    mutableTheme.registerStyle(SwitchStyle)
+    mutableTheme.registerStyle(SwitchTrackStyle)
+    mutableTheme.registerStyle(SwitchThumbStyle)
+    mutableTheme.registerVariants(SwitchInputVariant)
 
-    mutableTheme.registerComponentStyle(TabsStyle)
-    mutableTheme.registerComponentStyle(TabsTabRowStyle)
-    mutableTheme.registerComponentStyle(TabsTabStyle)
-    mutableTheme.registerComponentStyle(TabsPanelStyle)
+    mutableTheme.registerStyle(TabsStyle)
+    mutableTheme.registerStyle(TabsTabRowStyle)
+    mutableTheme.registerStyle(TabsTabStyle)
+    mutableTheme.registerStyle(TabsPanelStyle)
 
-    mutableTheme.registerComponentStyle(InputStyle)
-    mutableTheme.registerComponentVariants(
+    mutableTheme.registerStyle(InputStyle)
+    mutableTheme.registerVariants(
         OutlinedInputVariant,
         FilledInputVariant,
         FlushedInputVariant,
         UnstyledInputVariant
     )
-    mutableTheme.registerComponentStyle(InputGroupStyle)
+    mutableTheme.registerStyle(InputGroupStyle)
 
-    mutableTheme.registerComponentStyle(TooltipArrowStyle)
-    mutableTheme.registerComponentVariants(
+    mutableTheme.registerStyle(TooltipArrowStyle)
+    mutableTheme.registerVariants(
         TopLeftTooltipArrowVariant,
         TopTooltipArrowVariant,
         TopRightTooltipArrowVariant,
@@ -263,27 +263,27 @@ fun initSilkWidgets(ctx: InitSilkContext) {
         BottomTooltipArrowVariant,
         BottomRightTooltipArrowVariant
     )
-    mutableTheme.registerComponentStyle(TooltipStyle)
-    mutableTheme.registerComponentStyle(TooltipTextContainerStyle)
+    mutableTheme.registerStyle(TooltipStyle)
+    mutableTheme.registerStyle(TooltipTextContainerStyle)
 
     ctx.stylesheet.registerKeyframes(CheckboxEnabledAnim)
 
     // TODO (double): we definitely want to automate this
-    //  Note: B sure to add @CssPrefix to the relevant objects (or account for the prefix some other way)
-    mutableTheme.registerCssStyle("silk-button-size_xs", ButtonSize.XS)
-    mutableTheme.registerCssStyle("silk-button-size_sm", ButtonSize.SM)
-    mutableTheme.registerCssStyle("silk-button-size_md", ButtonSize.MD)
-    mutableTheme.registerCssStyle("silk-button-size_lg", ButtonSize.LG)
-    mutableTheme.registerCssStyle("silk-checkbox-size_sm", CheckboxSize.SM)
-    mutableTheme.registerCssStyle("silk-checkbox-size_md", CheckboxSize.MD)
-    mutableTheme.registerCssStyle("silk-checkbox-size_lg", CheckboxSize.LG)
-    mutableTheme.registerCssStyle("silk-input-size_xs", InputSize.XS)
-    mutableTheme.registerCssStyle("silk-input-size_sm", InputSize.SM)
-    mutableTheme.registerCssStyle("silk-input-size_md", InputSize.MD)
-    mutableTheme.registerCssStyle("silk-input-size_lg", InputSize.LG)
-    mutableTheme.registerCssStyle("silk-switch-size_sm", SwitchSize.SM)
-    mutableTheme.registerCssStyle("silk-switch-size_md", SwitchSize.MD)
-    mutableTheme.registerCssStyle("silk-switch-size_lg", SwitchSize.LG)
+    //  Note: Be sure to add @CssPrefix to the relevant objects (or account for the prefix some other way)
+    mutableTheme.registerStyle("silk-button-size_xs", ButtonSize.XS)
+    mutableTheme.registerStyle("silk-button-size_sm", ButtonSize.SM)
+    mutableTheme.registerStyle("silk-button-size_md", ButtonSize.MD)
+    mutableTheme.registerStyle("silk-button-size_lg", ButtonSize.LG)
+    mutableTheme.registerStyle("silk-checkbox-size_sm", CheckboxSize.SM)
+    mutableTheme.registerStyle("silk-checkbox-size_md", CheckboxSize.MD)
+    mutableTheme.registerStyle("silk-checkbox-size_lg", CheckboxSize.LG)
+    mutableTheme.registerStyle("silk-input-size_xs", InputSize.XS)
+    mutableTheme.registerStyle("silk-input-size_sm", InputSize.SM)
+    mutableTheme.registerStyle("silk-input-size_md", InputSize.MD)
+    mutableTheme.registerStyle("silk-input-size_lg", InputSize.LG)
+    mutableTheme.registerStyle("silk-switch-size_sm", SwitchSize.SM)
+    mutableTheme.registerStyle("silk-switch-size_md", SwitchSize.MD)
+    mutableTheme.registerStyle("silk-switch-size_lg", SwitchSize.LG)
 }
 
 val SilkColorsStyle = CssStyle.base {

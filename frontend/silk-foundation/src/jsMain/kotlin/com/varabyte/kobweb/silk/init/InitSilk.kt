@@ -53,7 +53,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
     val config = MutableSilkConfig()
 
-    mutableTheme.registerComponentStyle(SpanTextStyle)
+    mutableTheme.registerStyle(SpanTextStyle)
 
     val ctx = InitSilkContext(config, SilkStylesheetInstance, mutableTheme)
     additionalInit(ctx)
@@ -84,7 +84,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
         DisplayUntilLgStyle,
         DisplayUntilXlStyle,
     )
-    displayStyles.forEach { mutableTheme.registerComponentStyle(it) }
+    displayStyles.forEach { mutableTheme.registerStyle(it) }
     // Next, run through all styles in the stylesheet and update the ones associated with our display styles. Note that
     // a real solution would be if the Compose HTML APIs allowed us to identify a style as important, but currently, as
     // you can see with their code here: https://github.com/JetBrains/compose-multiplatform/blob/9e25001e9e3a6be96668e38c7f0bd222c54d1388/html/core/src/jsMain/kotlin/org/jetbrains/compose/web/elements/Style.kt#L116

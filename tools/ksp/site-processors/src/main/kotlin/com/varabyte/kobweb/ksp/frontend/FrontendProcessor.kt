@@ -109,13 +109,13 @@ class FrontendProcessor(
             name = COMPONENT_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
             displayString = "component style",
-            function = "ctx.theme.registerComponentStyle",
+            function = "ctx.theme.registerStyle",
         )
         private val variantDeclaration = DeclarationType(
             name = COMPONENT_VARIANT_SIMPLE_NAME,
             qualifiedName = COMPONENT_VARIANT_FQN,
             displayString = "component variant",
-            function = "ctx.theme.registerComponentVariants",
+            function = "ctx.theme.registerVariants",
         )
         private val keyframesDeclaration = DeclarationType(
             name = KEYFRAMES_SIMPLE_NAME,

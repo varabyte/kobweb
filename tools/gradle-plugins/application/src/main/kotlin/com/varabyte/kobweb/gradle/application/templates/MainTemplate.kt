@@ -199,14 +199,14 @@ fun createMainFunction(
                             addStatement("com.varabyte.kobweb.silk.init.initSilkWidgets(ctx)")
                             addStatement("com.varabyte.kobweb.silk.init.initSilkWidgetsKobweb(ctx)")
                         }
+                        frontendData.cssStyles.forEach { entry ->
+                            addStatement("ctx.theme.registerStyle(\"${entry.name}\", ${entry.fqcn})")
+                        }
                         frontendData.silkStyles.forEach { entry ->
-                            addStatement("ctx.theme.registerComponentStyle(${entry.fqcn})")
+                            addStatement("ctx.theme.registerStyle(${entry.fqcn})")
                         }
                         frontendData.silkVariants.forEach { entry ->
-                            addStatement("ctx.theme.registerComponentVariants(${entry.fqcn})")
-                        }
-                        frontendData.cssStyles.forEach { entry ->
-                            addStatement("ctx.theme.registerCssStyle(\"${entry.name}\", ${entry.fqcn})")
+                            addStatement("ctx.theme.registerVariants(${entry.fqcn})")
                         }
                         frontendData.keyframesList.forEach { entry ->
                             addStatement("ctx.stylesheet.registerKeyframes(${entry.fqcn})")
