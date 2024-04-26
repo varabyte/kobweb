@@ -888,7 +888,7 @@ Box(CustomStyle.toModifier()) { /* ... */ }
 >
 > @InitSilk
 > fun registerPrivateStyle(ctx: InitSilkContext) {
->   ctx.theme.registerComponentStyle(SomeCustomStyle)
+>   ctx.theme.registerStyle(SomeCustomStyle)
 > }
 > ```
 >

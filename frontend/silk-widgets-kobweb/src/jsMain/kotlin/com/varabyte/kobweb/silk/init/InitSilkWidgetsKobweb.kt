@@ -14,8 +14,7 @@ import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.theme.colors.palette.link
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
-import com.varabyte.kobweb.silk.theme.modifyComponentStyleBase
-import com.varabyte.kobweb.silk.theme.modifyCssStyle
+import com.varabyte.kobweb.silk.theme.modifyStyle
 
 // Note: This expects to be called after `initSilkWidgets` is called first.
 fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
@@ -36,7 +35,7 @@ fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
         }
     }
 
-    mutableTheme.modifyCssStyle(SilkColorsStyle) {
+    mutableTheme.modifyStyle(SilkColorsStyle) {
         val palette = colorMode.toPalette()
         Modifier
             .setVariable(LinkVars.DefaultColor, palette.link.default)
@@ -45,16 +44,16 @@ fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
 
     // TODO: Automate the creation of this list (with a Gradle task?)
 
-    mutableTheme.registerComponentStyle(ImageStyle)
-    mutableTheme.registerComponentVariants(FitWidthImageVariant)
+    mutableTheme.registerStyle(ImageStyle)
+    mutableTheme.registerVariants(FitWidthImageVariant)
 
-    mutableTheme.registerComponentStyle(LinkStyle)
-    mutableTheme.registerComponentVariants(
+    mutableTheme.registerStyle(LinkStyle)
+    mutableTheme.registerVariants(
         UncoloredLinkVariant,
         UndecoratedLinkVariant,
         AlwaysUnderlinedLinkVariant,
     )
 
-    mutableTheme.registerComponentStyle(TocStyle)
-    mutableTheme.registerComponentVariants(TocBorderedVariant)
+    mutableTheme.registerStyle(TocStyle)
+    mutableTheme.registerVariants(TocBorderedVariant)
 }
