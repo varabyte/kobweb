@@ -2,14 +2,12 @@ package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.util.kebabCaseToTitleCamelCase
-import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
-import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -17,12 +15,71 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 
-abstract class CssStyle(
+/**
+ * A [CssStyle] is a collection of [StyleModifiers] that will be processed by Kobweb and added into a CSS stylesheet.
+ *
+ * For example, you can declare a style like this:
+ *
+ * ```
+ * val NonInteractiveStyle = CssStyle {
+ *   hover { Modifier.cursor(Cursor.NotAllowed) }
+ * }
+ * ```
+ *
+ * which will result in a CSS rule in your site's stylesheet like this:
+ *
+ * ```css
+ * .non-interactive:hover {
+ *   cursor: not-allowed;
+ * }
+ * ```
+ *
+ * While most developers will never see that this is happening, it's still very helpful for debugging, for if you
+ * inspect an element that is applying this style in your browser's dev tools, you'll see it applied like so:
+ *
+ * ```html
+ * <div class="non-interactive">...</div>
+ * ```
+ *
+ * This is much easier to understand at a glance than if all the styles were inlined directly into the HTML.
+ *
+ * You can also subclass [CssStyle] to create a new style that extends an existing one:
+ *
+ * ```
+ * class WidgetSize(
+ *     fontSize: CSSLengthNumericValue,
+ *     height: CSSLengthNumericValue,
+ * ) : CssStyle.Base(Modifier.fontSize(fontSize).height(height) ) {
+ *     companion object {
+ *         val XS = WidgetSize(...)
+ *         val SM = WidgetSize(...)
+ *         val MD = WidgetSize(...)
+ *         val LG = WidgetSize(...)
+ *     }
+ * }
+ * ```
+ *
+ * which here will create four classes: `widget-size_xs`, `widget-size_sm`, `widget-size_md`, and `widget-size_lg`.
+ * At this point, you can take `Widget` as a method parameter:
+ *
+ * ```
+ * @Composable
+ * fun Widget(..., size: WidgetSize, ...) {
+ *   val modifier = WidgetStyle.toModifier().then(size.toModifier())
+ *   ...
+ * }
+ * ```
+ *
+ * resulting in an element like `<div class="widget widget-size_md">...</div>`.
+ */
+abstract class CssStyle protected constructor(
     internal val init: ComponentModifiers.() -> Unit,
     internal val extraModifiers: @Composable () -> Modifier = { Modifier },
 ) {
-
-    abstract class Base(
+    /**
+     * A [CssStyle] when you know you only want to specify the base style, and not any other modifiers like hover.
+     */
+    abstract class Base protected constructor(
         init: ComponentBaseModifier.() -> Modifier,
         extraModifiers: @Composable () -> Modifier = { Modifier },
     ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers) {
@@ -189,6 +246,9 @@ abstract class CssStyle(
     companion object // for extensions
 }
 
+/**
+ * A basic [CssStyle] implementation associated with a CSS selector value.
+ */
 internal class SimpleCssStyle(
     val selector: String,
     init: ComponentModifiers.() -> Unit,
@@ -287,36 +347,20 @@ private sealed interface StyleGroup {
     }
 }
 
-class SimpleCssStyleProvider internal constructor(
-    private val extraModifiers: @Composable () -> Modifier,
-    private val prefix: String? = null,
-    private val init: ComponentModifiers.() -> Unit,
-) : CacheByPropertyNameDelegate<CssStyle>() {
-    override fun create(propertyName: String): CssStyle {
-        val prefix = prefix?.let { "$it-" } ?: ""
-        // e.g. "TitleTextStyle" to "title-text"
-        val name = prefix + propertyName.removeSuffix("Style").titleCamelCaseToKebabCase()
-        return SimpleCssStyle(".$name", init, extraModifiers)
-    }
-}
-
-fun CssStyle(extraModifiers: Modifier = Modifier, prefix: String? = null, init: ComponentModifiers.() -> Unit) =
-    CssStyle({ extraModifiers }, prefix, init)
+fun CssStyle(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit) =
+    object : CssStyle(init, { extraModifiers }) {}
 
 fun CssStyle(
     extraModifiers: @Composable () -> Modifier,
-    prefix: String? = null,
     init: ComponentModifiers.() -> Unit
-) = SimpleCssStyleProvider(extraModifiers, prefix, init)
+) = object : CssStyle(init, extraModifiers) {}
 
 fun CssStyle.Companion.base(
     extraModifiers: Modifier = Modifier,
-    prefix: String? = null,
     init: ComponentBaseModifier.() -> Modifier
-) = base({ extraModifiers }, prefix, init)
+) = base({ extraModifiers }, init)
 
 fun CssStyle.Companion.base(
     extraModifiers: @Composable () -> Modifier,
-    prefix: String? = null,
     init: ComponentBaseModifier.() -> Modifier
-) = SimpleCssStyleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+) = object : CssStyle(init = { base { ComponentBaseModifier(colorMode).let(init) } }, extraModifiers) {}

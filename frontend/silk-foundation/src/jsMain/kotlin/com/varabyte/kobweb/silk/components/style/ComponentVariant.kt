@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.*
 
 sealed class ComponentVariant<T : ComponentKind> {
@@ -39,7 +40,7 @@ internal class SimpleComponentVariant<T : ComponentKind>(
      * This name is not guaranteed to be unique across all variants. If you need that, check `style.name` instead.
      */
     val name: String
-        get() = cssStyle.selector.removePrefix(".${baseStyle.name}.")
+        get() = SilkTheme.nameFor(cssStyle).removePrefix("${baseStyle.name}-")
 
     override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         // If you are using a variant, require it be associated with a tag already associated with the base style

@@ -38,6 +38,8 @@ class MutableSilkTheme {
 
     private val _cssStyles = mutableMapOf<String, CssStyle>()
     internal val cssStyles: Map<String, CssStyle> = _cssStyles
+    internal val _cssStyleNames = mutableMapOf<CssStyle, String>()
+    internal val cssStyleNames: Map<CssStyle, String> = _cssStyleNames
     private val overriddenCssStyles = mutableSetOf<String>()
 
     val palettes = MutablePalettes()
@@ -175,9 +177,8 @@ class MutableSilkTheme {
             variant.baseStyle.addVariant(variant.name, extraModifiers, init)
     }
 
-    fun registerCssStyle(name: String?, style: CssStyle) {
-        // currently using `null` name to represent simple `CssStyle {}` declarations, which are SimpleCssStyle
-        val selector = name?.let { ".$it" } ?: (style as SimpleCssStyle).selector
+    fun registerCssStyle(name: String, style: CssStyle) {
+        val selector = (style as? SimpleCssStyle)?.selector ?: ".$name"
         check(cssStyles[selector].let { it == null || it === style }) {
             """
                 Attempting to register a second CssStyle with a name that's already used: "$name"
@@ -186,6 +187,7 @@ class MutableSilkTheme {
             """.trimIndent()
         }
         _cssStyles[selector] = style
+        _cssStyleNames[style] = name
     }
 
     fun MutableSilkTheme.replaceCssStyle(
@@ -196,9 +198,9 @@ class MutableSilkTheme {
         val selector = cssStyles.entries.find { it.value == style }?.key ?: error("Attempting to replace a CSS style that was never registered.")
         check(overriddenCssStyles.add(selector)) { "Attempting to override style \"${selector}\" twice" }
         _cssStyles[selector] = SimpleCssStyle(selector, init, extraModifiers)
+        // No need to add to `_cssStyleNames` here, as we only will ever need to return names for the originally registered Style
     }
 }
-
 /**
  * Convenience method when you want to replace an upstream style but only need to define a base style.
  */
@@ -443,6 +445,22 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     private val _cssStyles = mutableMapOf<CssStyle, ImmutableCssStyle>()
     internal val cssStyles: Map<CssStyle, ImmutableCssStyle> = _cssStyles
 
+    /**
+     * Return the name associated with the given [CssStyle].
+     *
+     * Any CSS style that has been declared as a property (e.g. `val MyStyle = CssStyle { ... }`), even as a subclass of
+     * one (e.g. `val SM = ButtonSize()`) will have a name.
+     *
+     * A handful of cases are not named, however. Users shouldn't have to worry about this too much because these are
+     * generally internal cases (e.g. `stylesheet.registerStyleBase("#some-id") { ... }` creates a nameless CssStyle
+     * behind the scenes).
+     *
+     * As a result, it is possible for this method to crash if triggered with such a transient CssStyle. However, the
+     * user would have to go out of their way to make this happen in practice, which is why the API was designed to
+     * assume this won't crash.
+     */
+    fun nameFor(style: CssStyle): String = mutableSilkTheme.cssStyleNames.getValue(style)
+
     // Note: We separate this function out from the SilkTheme constructor so we can construct it first and then call
     // this later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
     //  val TextStyle by ComponentStyle {
@@ -465,8 +483,8 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         val allCssStyles = componentStyles + componentVariants + mutableSilkTheme.cssStyles
 
         allCssStyles.forEach { (selector, style) ->
-            val classNames = style.addStylesInto(selector, componentStyleSheet)
-            _cssStyles[style] = style.intoImmutableStyle(classNames)
+            val classSelectors = style.addStylesInto(selector, componentStyleSheet)
+            _cssStyles[style] = style.intoImmutableStyle(classSelectors)
         }
     }
 }

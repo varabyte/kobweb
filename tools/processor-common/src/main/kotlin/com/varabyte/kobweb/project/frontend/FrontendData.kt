@@ -105,6 +105,10 @@ class ComponentStyleEntry(val fqcn: String)
 @Serializable
 class ComponentVariantEntry(val fqcn: String)
 
-// null name means SimpleCssStyle aka `CssStyle {}` declaration
+/**
+ * Metadata for code like `val MyStyle = CssStyle { ... }`
+ *
+ * The name of the style will come either from a `@CssName` annotation OR from the property name itself.
+ */
 @Serializable
-class CssStyleEntry(val fqcn: String, val name: String?)
+class CssStyleEntry(val fqcn: String, val name: String)
