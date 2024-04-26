@@ -31,7 +31,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.css.*
 
-val NavHeaderStyle by CssStyle.base(extraModifiers = { SmoothColorStyle.toModifier() }) {
+val NavHeaderStyle = CssStyle.base(extraModifiers = { SmoothColorStyle.toModifier() }) {
     Modifier
         .fillMaxWidth()
         .height(50.px)

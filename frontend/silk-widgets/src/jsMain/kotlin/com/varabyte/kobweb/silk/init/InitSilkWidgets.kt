@@ -70,6 +70,7 @@ import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderColorVar
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.palette.background
@@ -85,6 +86,9 @@ import com.varabyte.kobweb.silk.theme.colors.palette.switch
 import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.tooltip
+import com.varabyte.kobweb.silk.theme.colors.suffixedWith
+import kotlinx.dom.addClass
+import kotlinx.dom.removeClass
 import org.w3c.dom.Document
 import org.w3c.dom.HTMLElement
 
@@ -204,7 +208,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
         }
     }
 
-    mutableTheme.registerCssStyle(null, SilkColorsStyle)
+    mutableTheme.registerCssStyle("silk-colors", SilkColorsStyle)
 
     // TODO: Automate the creation of this list (with a Gradle task?)
     mutableTheme.registerComponentStyle(DisabledStyle)
@@ -282,7 +286,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerCssStyle("silk-switch-size_lg", SwitchSize.LG)
 }
 
-val SilkColorsStyle by CssStyle.base {
+val SilkColorsStyle = CssStyle.base {
     val palette = colorMode.toPalette()
     Modifier
         // region General color vars
@@ -335,7 +339,8 @@ fun HTMLElement.setSilkWidgetVariables() {
 }
 
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
-    // TODO: IMPORTANT figure out how this should work
-//    removeClass(SilkColorsStyle.name.suffixedWith(colorMode.opposite))
-//    addClass(SilkColorsStyle.name.suffixedWith(colorMode))
+    SilkTheme.nameFor(SilkColorsStyle).let { silkColorsStyleName ->
+        removeClass(silkColorsStyleName.suffixedWith(colorMode.opposite))
+        addClass(silkColorsStyleName.suffixedWith(colorMode))
+    }
 }

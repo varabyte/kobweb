@@ -82,20 +82,20 @@ import org.jetbrains.compose.web.dom.Text
 import playground.components.layouts.PageLayout
 import playground.components.widgets.GoHomeLink
 
-val WidgetSectionStyle by CssStyle.base {
+val WidgetSectionStyle = CssStyle.base {
     Modifier
         .fillMaxWidth()
         .border(1.px, LineStyle.Solid, colorMode.toPalette().border)
         .position(Position.Relative)
 }
 
-val WidgetPaddingStyle by CssStyle.base {
+val WidgetPaddingStyle = CssStyle.base {
     Modifier
         .fillMaxSize()
         .padding(1.cssRem)
 }
 
-val WidgetLabelStyle by CssStyle.base {
+val WidgetLabelStyle = CssStyle.base {
     Modifier
         .position(Position.Relative)
         .fontSize(0.8.cssRem)
@@ -105,7 +105,7 @@ val WidgetLabelStyle by CssStyle.base {
         .backgroundColor(colorMode.toPalette().background)
 }
 
-val IconContainerStyle by CssStyle.base {
+val IconContainerStyle = CssStyle.base {
     Modifier
         .padding(0.2.cssRem)
         .border(1.px, LineStyle.Solid, colorMode.toPalette().border)

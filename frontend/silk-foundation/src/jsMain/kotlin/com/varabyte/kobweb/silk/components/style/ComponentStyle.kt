@@ -56,6 +56,7 @@ class ComponentStyle<T : ComponentKind>(
 
     internal val nameWithoutPrefix = name
     val name = prefix?.let { "$it-$name" } ?: name
+    internal val cssStyle = SimpleCssStyle(".${this.name}", init, extraModifiers)
 
     constructor(
         name: String,
@@ -93,18 +94,16 @@ class ComponentStyle<T : ComponentKind>(
         init: ComponentModifiers.() -> Unit
     ): ComponentVariant<T> {
         return SimpleComponentVariant(
-            SimpleCssStyle(".${this.name}.$name", init, extraModifiers),
+            SimpleCssStyle(".${this.name}-$name", init, extraModifiers),
             baseStyle = this
         )
     }
-
-    internal val cssStyle = SimpleCssStyle(".${this.name}", init, extraModifiers)
 }
 
 /** Represents the class selectors associated with a [ComponentStyle]. */
 internal value class ClassSelectors(private val value: List<String>) {
-    // Selectors may be ".someStyle" or ".someStyle.someVariant" - only the last part is relevant to the specific style
-    val classNames get() = value.map { it.substringAfterLast('.') }
+    // Convert selectors (".someClass") to class names ("someClass")
+    val classNames get() = value.map { it.removePrefix(".") }
     operator fun plus(other: ClassSelectors) = ClassSelectors(value + other.value)
 }
 

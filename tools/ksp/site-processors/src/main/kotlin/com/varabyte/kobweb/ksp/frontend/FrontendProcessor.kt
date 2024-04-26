@@ -24,7 +24,6 @@ import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
-import com.varabyte.kobweb.ksp.common.CSS_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
@@ -69,7 +68,7 @@ class FrontendProcessor(
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
     // will be skipped if the only change is deleted file(s) that we do not depend on.
-    private val fileDependencies = mutableListOf<KSFile>()
+    private val fileDependencies = mutableSetOf<KSFile>()
 
     // TODO: is this the best way to have this set up
     lateinit var cssStyleType: KSType
@@ -106,12 +105,6 @@ class FrontendProcessor(
     }
 
     private inner class FrontendVisitor : KSVisitorVoid() {
-        private val cssStyleDeclaration = DeclarationType(
-            name = CSS_STYLE_SIMPLE_NAME,
-            qualifiedName = CSS_STYLE_FQN,
-            displayString = "style rule",
-            function = "ctx.theme.registerCssStyle",
-        )
         private val styleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
@@ -133,11 +126,6 @@ class FrontendProcessor(
         private val declarations = listOf(styleDeclaration, variantDeclaration, keyframesDeclaration)
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
-            val isCssStyle = cssStyleType.isAssignableFrom(property.type.resolve())
-            if (isCssStyle) {
-                cssStyles.add(processCssStyle(property))
-            }
-
             val type = property.type.toString()
 
             val matchingByProvider = declarations.firstOrNull { type == it.providerName }
@@ -167,11 +155,12 @@ class FrontendProcessor(
                     keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
                 }
 
-                cssStyleDeclaration.qualifiedName -> {
-                    cssStyles.add(CssStyleEntry(property.qualifiedName!!.asString(), null))
+                else -> {
+                    when {
+                        cssStyleType.isAssignableFrom(property.type.resolve()) -> cssStyles.add(processCssStyle(property))
+                        else -> null
+                    }
                 }
-
-                else -> null
             }?.also { fileDependencies.add(property.containingFile!!) }
         }
 
@@ -276,7 +265,7 @@ class FrontendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
-        return Result(frontendData, fileDependencies)
+        return Result(frontendData, fileDependencies.toList())
     }
 
     /**
@@ -292,7 +281,7 @@ fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
     }
 
     val propertyCssName = property.getAnnotationValue(CSS_NAME_FQN)
-        ?: property.simpleName.asString().titleCamelCaseToKebabCase()
+        ?: property.simpleName.asString().removeSuffix("Style").titleCamelCaseToKebabCase()
 
     fun getCssStyleEntry(prefix: String?, containedName: String? = null): CssStyleEntry {
         val finalName = buildString {
@@ -300,6 +289,7 @@ fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
             containedName?.let { append("${it}_") }
             append(propertyCssName)
         }
+
         return CssStyleEntry(property.qualifiedName!!.asString(), finalName)
     }
 
