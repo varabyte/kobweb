@@ -140,8 +140,8 @@ sealed class DataSize(val amount: Long, private val factor: Int) {
         /**
          * Parse a string into a [DataSize] object.
          *
-         * The string must be in the format of "<number><unit>" where the unit is one of
-         * ["B", "K", "M", "G", "KB", "MB", "GB", "KiB", "MiB", "GiB"] (not case sensitive).
+         * The string must be in the format of `<number><unit>` where the unit is one of
+         * `["B", "K", "M", "G", "KB", "MB", "GB", "KiB", "MiB", "GiB"]` (not case-sensitive).
          *
          * @param forceBinarySize If true, always return the data size that's a power of 2. For example,
          *   `parse("1KB", forceBinarySize = true)` will return 1024B, not 1000B as it otherwise would. This is because
