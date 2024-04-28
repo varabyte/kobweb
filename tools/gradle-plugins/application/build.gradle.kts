@@ -18,7 +18,6 @@ dependencies {
 
     // For generating code / html
     implementation(libs.kotlinpoet)
-    api(libs.kotlinx.html) // Exposed as api dependency because it's exposed by the kobweb.app.index API anyway.
 
     // Export
     implementation(libs.playwright)

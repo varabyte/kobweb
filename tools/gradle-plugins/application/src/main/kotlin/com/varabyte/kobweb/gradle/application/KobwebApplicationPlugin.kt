@@ -115,7 +115,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val buildTarget = project.kobwebBuildTarget
 
         val kobwebGenSiteIndexTask = project.tasks.register<KobwebGenerateSiteIndexTask>(
-            "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock
+            "kobwebGenSiteIndex", KobwebGenIndexConfInputs(kobwebConf), buildTarget, kobwebBlock, kobwebBlock.app.index
         )
 
         val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(

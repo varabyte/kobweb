@@ -15,6 +15,7 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ksp.plugin)
+    api(libs.kotlinx.html) // Exposed in app & library index.html configuration
 
     implementation(projects.common.kobwebCommon)
     api(projects.tools.processorCommon)

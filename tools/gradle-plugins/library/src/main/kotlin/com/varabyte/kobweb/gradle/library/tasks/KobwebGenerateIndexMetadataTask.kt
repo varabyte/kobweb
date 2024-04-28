@@ -8,8 +8,6 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.library.extensions.index
 import com.varabyte.kobweb.gradle.library.extensions.library
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_INDEX
-import kotlinx.html.head
-import kotlinx.html.stream.createHTML
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project
@@ -34,14 +32,12 @@ abstract class KobwebGenerateIndexMetadataTask @Inject constructor(private val p
             parentFile.mkdirs()
 
             val libraryBlock = project.kobwebBlock.library
-            val headElements = libraryBlock.index.head.orNull?.takeIf { it.isNotEmpty() } ?: return@apply
+            val headElements = libraryBlock.index.serializedHead.get().takeIf { it.isNotBlank() } ?: return@apply
 
             writeText(
                 Json.encodeToString(
                     LibraryIndexMetadata(
-                        headElements = createHTML().head {
-                            headElements.forEach { element -> element() }
-                        }
+                        headElements = headElements
                     )
                 )
             )

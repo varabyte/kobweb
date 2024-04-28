@@ -3,6 +3,7 @@
 package com.varabyte.kobweb.gradle.library.extensions
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
+import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import kotlinx.html.HEAD
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
@@ -22,12 +23,24 @@ abstract class LibraryBlock : ExtensionAware {
      */
     abstract class IndexBlock : ExtensionAware {
         /**
-         * A list of head element builders to add to the generated index.html file.
+         * A list of element builders to add to the `<head>` of the app's generated `index.html` file.
          *
-         * The reason this is exposed as a list instead of a property is so that different tasks can add their own
-         * values (usually scripts or stylesheets) independently of one another.
+         * You should normally use [ListProperty.add] to add new elements to the head block:
+         * ```
+         * kobweb.library.index.head.add {
+         *    link(href = "styles.css", rel = "stylesheet")
+         * }
+         * ```
+         * Use [ListProperty.set] to override any previously set values.
+         *
+         * Note that apps will have the option to opt-out of including these elements.
          */
         abstract val head: ListProperty<HEAD.() -> Unit>
+
+        /** The serialized version of the [head] elements, intended for use as a Gradle task input. */
+        internal val serializedHead = head.map { list ->
+            list.joinToString("") { HtmlUtil.serializeHeadContents(it) }
+        }
     }
 
     init {
