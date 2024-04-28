@@ -15,21 +15,21 @@ import com.varabyte.kobweb.compose.ui.graphics.isBright
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.CssStyle
-import com.varabyte.kobweb.silk.components.style.active
-import com.varabyte.kobweb.silk.components.style.ariaDisabled
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.focusVisible
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.not
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.selector.active
+import com.varabyte.kobweb.silk.style.selector.ariaDisabled
+import com.varabyte.kobweb.silk.style.selector.focusVisible
+import com.varabyte.kobweb.silk.style.selector.hover
+import com.varabyte.kobweb.silk.style.selector.not
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.color
@@ -57,7 +57,7 @@ object ButtonVars {
 
 interface ButtonKind : ComponentKind
 
-val ButtonStyle by ComponentStyle<ButtonKind>(prefix = "silk") {
+val ButtonStyle = ComponentStyle<ButtonKind> {
     base {
         Modifier
             .color(ButtonVars.Color.value())

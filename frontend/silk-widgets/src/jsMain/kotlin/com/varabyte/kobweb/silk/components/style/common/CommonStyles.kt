@@ -3,18 +3,17 @@ package com.varabyte.kobweb.silk.components.style.common
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.base
 
 // Note: CSS provides a `disabled` selector, but disabling elements using HTML properties prevents mouse events from
 // firing, and this is bad because you might want to show tooltips even for a disabled element. Some solutions online
 // solve this by wrapping disabled elements in a parent element, but this can screw up things like flexbox rows and
 // columns, which act on their direct children and *not* children of children (e.g. missing a `flex-grow` setting on
 // an element just because you wrapped it with a tooltip).
-// Instead, we just immitate disabled behavior ourselves in silk.
-val DisabledStyle by ComponentStyle.base(
-    prefix = "silk",
+// Instead, we just imitate disabled behavior ourselves in silk.
+val DisabledStyle = CssStyle.base(
     extraModifiers = { Modifier.ariaDisabled().tabIndex(-1) }
 ) {
     Modifier.opacity(0.5).cursor(Cursor.NotAllowed)
@@ -50,6 +49,6 @@ val SmoothColorTransitionDurationVar by StyleVariable(
  * Note: This is shared as a style instead of a simple modifier so that a user can tweak the timing in their own site by
  * overriding the style if they'd like.
  */
-val SmoothColorStyle by ComponentStyle.base(prefix = "silk") {
+val SmoothColorStyle = CssStyle.base {
     Modifier.transition(CSSTransition("background-color", SmoothColorTransitionDurationVar.value()))
 }

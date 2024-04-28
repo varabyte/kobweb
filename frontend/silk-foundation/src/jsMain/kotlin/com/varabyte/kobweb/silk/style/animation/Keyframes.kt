@@ -1,20 +1,82 @@
-@file:Suppress("DEPRECATION")
-
-package com.varabyte.kobweb.silk.components.animation
+package com.varabyte.kobweb.silk.style.animation
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
-import com.varabyte.kobweb.silk.init.SilkStylesheet
-import com.varabyte.kobweb.silk.style.animation.KeyframesBuilder
+import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
+
+class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
+    private val keyframeStyles = mutableMapOf<CSSKeyframe, Modifier>()
+
+    private val comparableKeyframeStyles
+        get() = keyframeStyles.mapValues { (_, modifier) ->
+            ComparableStyleScope().apply {
+                modifier.toStyles().invoke(this)
+            }
+        }
+
+    /** Describe the style of the element when this animation starts. */
+    fun from(createStyle: () -> Modifier) {
+        keyframeStyles += CSSKeyframe.From to createStyle()
+    }
+
+    /** Describe the style of the element when this animation ends. */
+    fun to(createStyle: () -> Modifier) {
+        keyframeStyles += CSSKeyframe.To to createStyle()
+    }
+
+    /** Describe the style of the element when the animation reaches some percent completion. */
+    operator fun CSSSizeValue<CSSUnit.percent>.invoke(createStyle: () -> Modifier) {
+        keyframeStyles += CSSKeyframe.Percentage(this) to createStyle()
+    }
+
+    /**
+     * A way to assign multiple percentage values with the same style.
+     *
+     * For example, this can be useful if you have an animation that changes, then stops for a bit, and then continues
+     * to change again.
+     *
+     * ```
+     * val Example by Keyframes {
+     *    from { Modifier.opacity(0) }
+     *    each(20.percent, 80.percent) { Modifier.opacity(1) }
+     *    to { Modifier.opacity(1) }
+     * }
+     * ```
+     */
+    fun each(vararg keys: CSSSizeValue<CSSUnit.percent>, createStyle: () -> Modifier) {
+        keyframeStyles += CSSKeyframe.Combine(keys.toList()) to createStyle()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is KeyframesBuilder) return false
+        return this === other || this.comparableKeyframeStyles == other.comparableKeyframeStyles
+    }
+
+    override fun hashCode(): Int {
+        return comparableKeyframeStyles.hashCode()
+    }
+
+    internal fun addKeyframesIntoStylesheet(stylesheet: StyleSheet, keyframesName: String) {
+        val keyframeRules = keyframeStyles.map { (keyframe, modifier) ->
+            val styles = modifier.toStyles()
+
+            val cssRuleBuilder = StyleScopeBuilder()
+            styles.invoke(cssRuleBuilder)
+
+            CSSKeyframeRuleDeclaration(keyframe, cssRuleBuilder)
+        }
+
+        stylesheet.add(CSSKeyframesRuleDeclaration(keyframesName, keyframeRules))
+    }
+}
 
 /**
  * Define a set of keyframes that can later be references in animations.
@@ -64,10 +126,7 @@ import org.jetbrains.compose.web.css.*
  *
  * Otherwise, the Kobweb Gradle plugin will do this for you.
  */
-@Deprecated("Use `com.varabyte.kobweb.silk.components.animation.Keyframes` instead. Use `@CssName` and `@CssPrefix` to specify a custom name or prefix if necessary.")
-class Keyframes(name: String, prefix: String? = null, internal val init: KeyframesBuilder.() -> Unit) {
-    val name = prefix?.let { "$it-$name" } ?: name
-
+class Keyframes(internal val init: KeyframesBuilder.() -> Unit) {
     companion object {
         internal fun isColorModeAgnostic(build: KeyframesBuilder.() -> Unit): Boolean {
             // A user can use colorMode checks to change the keyframes builder, either by completely changing what sort
@@ -83,51 +142,6 @@ class Keyframes(name: String, prefix: String? = null, internal val init: Keyfram
     // Silk's initialization.
     val usesColorMode by lazy { !isColorModeAgnostic(init) }
 }
-
-/**
- * A delegate provider class which allows you to create a [Keyframes] instance via the `by` keyword.
- */
-class KeyframesProvider internal constructor(
-    private val prefix: String?,
-    private val init: KeyframesBuilder.() -> Unit
-) : CacheByPropertyNameDelegate<Keyframes>() {
-    override fun create(propertyName: String): Keyframes {
-        val name = propertyName
-            .removeSuffix("Anim")
-            .removeSuffix("Animation")
-            .removeSuffix("Keyframes")
-            .titleCamelCaseToKebabCase()
-        return Keyframes(name, prefix, init)
-    }
-}
-
-@Deprecated("Please call `SilkTheme.registerKeyframes` instead.")
-fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(keyframes.name, keyframes.init)
-
-/**
- * Construct a [Keyframes] instance where the name comes from the variable name.
- *
- * For example,
- *
- * ```
- * val Bounce by Keyframes { ... }
- * ```
- *
- * creates a keyframe entry into the site stylesheet (provided by Silk) with the name "bounce".
- *
- * Title camel case gets converted to snake case, so if the variable was called "AnimBounce", the final name added to
- * the style sheet would be "anim-bounce"
- *
- * Note: You can always construct a [Keyframes] object directly if you need to control the name, e.g.
- *
- * ```
- * // Renamed "Bounce" to "LegacyBounce" but don't want to break some old code.
- * val LegacyBounce = Keyframes("bounce") { ... }
- * ```
- */
-@Suppress("FunctionName") // name chosen to look like a constructor intentionally
-@Deprecated("Use `com.varabyte.kobweb.silk.components.animation.Keyframes` instead. Use `@CssName` and `@CssPrefix` to specify a custom name or prefix if necessary.")
-fun Keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = KeyframesProvider(prefix, init)
 
 /**
  * A convenience method to convert this [Keyframes] instance into an object that can be passed into [Modifier.animation].
@@ -180,6 +194,8 @@ fun Keyframes.toAnimation(
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null,
 ): CSSAnimation {
+    val name = SilkTheme.nameFor(this)
+
     @Suppress("NAME_SHADOWING")
     val colorMode = if (this.usesColorMode) {
         colorMode ?: error("Animation $name depends on the site's color mode but no color mode was specified.")
@@ -187,14 +203,9 @@ fun Keyframes.toAnimation(
         null
     }
 
-    val finalName = if (colorMode != null) {
-        this.name.suffixedWith(colorMode)
-    } else {
-        this.name
-    }
-
+    val nameWithColorMode = if (colorMode != null) name.suffixedWith(colorMode) else name
     return CSSAnimation(
-        finalName,
+        nameWithColorMode,
         duration,
         timingFunction,
         delay,

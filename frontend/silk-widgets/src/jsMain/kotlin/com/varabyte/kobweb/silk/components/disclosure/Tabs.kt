@@ -12,18 +12,18 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.active
-import com.varabyte.kobweb.silk.components.style.ariaDisabled
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.not
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.selector.active
+import com.varabyte.kobweb.silk.style.selector.ariaDisabled
+import com.varabyte.kobweb.silk.style.selector.hover
+import com.varabyte.kobweb.silk.style.selector.not
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
@@ -51,15 +51,15 @@ interface TabsKind : ComponentKind {
     interface Panel : ComponentKind
 }
 
-val TabsStyle by ComponentStyle<TabsKind>(prefix = "silk") {}
+val TabsStyle = ComponentStyle<TabsKind> {}
 
 // TODO: should this take a variant? currently it's used without one
-val TabsTabRowStyle by ComponentStyle.base<TabsKind.TabRow>(prefix = "silk") {
+val TabsTabRowStyle = ComponentStyle.base<TabsKind.TabRow> {
     Modifier
         .fillMaxWidth()
         .borderBottom(TabVars.BorderThickness.value(), LineStyle.Solid, TabVars.BorderColor.value())
 }
-val TabsTabStyle by ComponentStyle<TabsKind.Tab>(prefix = "silk", extraModifiers = { Modifier.tabIndex(0) }) {
+val TabsTabStyle = ComponentStyle<TabsKind.Tab>(extraModifiers = { Modifier.tabIndex(0) }) {
     base {
         Modifier
             .cursor(Cursor.Pointer)
@@ -89,7 +89,7 @@ val TabsTabStyle by ComponentStyle<TabsKind.Tab>(prefix = "silk", extraModifiers
     }
 }
 
-val TabsPanelStyle by ComponentStyle.base<TabsKind.Panel>(prefix = "silk") {
+val TabsPanelStyle = ComponentStyle.base<TabsKind.Panel> {
     Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflow { y(Overflow.Auto) }
 }
 

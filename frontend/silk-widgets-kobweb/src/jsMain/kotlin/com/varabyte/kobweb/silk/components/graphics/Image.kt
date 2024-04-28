@@ -9,11 +9,11 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.prependIf
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.addVariantBase
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.addVariantBase
+import com.varabyte.kobweb.silk.style.component.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
@@ -21,9 +21,9 @@ import org.w3c.dom.HTMLImageElement
 
 interface ImageKind : ComponentKind
 
-val ImageStyle by ComponentStyle<ImageKind>(prefix = "silk") {}
+val ImageStyle = ComponentStyle<ImageKind> {}
 
-val FitWidthImageVariant by ImageStyle.addVariantBase {
+val FitWidthImageVariant = ImageStyle.addVariantBase {
     Modifier
         .width(100.percent)
         .objectFit(ObjectFit.ScaleDown)

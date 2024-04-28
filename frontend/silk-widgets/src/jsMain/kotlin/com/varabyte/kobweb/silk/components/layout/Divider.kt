@@ -5,12 +5,12 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Hr
 
@@ -33,7 +33,7 @@ fun Divider(
 
 interface HorizontalDividerKind : ComponentKind
 
-val HorizontalDividerStyle by ComponentStyle.base<HorizontalDividerKind>(prefix = "silk") {
+val HorizontalDividerStyle = ComponentStyle.base<HorizontalDividerKind> {
     Modifier
         .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
         .width(DividerVars.Length.value())
@@ -58,7 +58,7 @@ fun HorizontalDivider(
 
 interface VerticalDividerKind : ComponentKind
 
-val VerticalDividerStyle by ComponentStyle.base<VerticalDividerKind>(prefix = "silk") {
+val VerticalDividerStyle = ComponentStyle.base<VerticalDividerKind> {
     Modifier
         .borderLeft(1.px, LineStyle.Solid, DividerVars.Color.value())
         .height(DividerVars.Length.value())

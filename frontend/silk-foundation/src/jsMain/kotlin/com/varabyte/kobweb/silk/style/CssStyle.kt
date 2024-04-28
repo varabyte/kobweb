@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.silk.components.style
+package com.varabyte.kobweb.silk.style
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.util.kebabCaseToTitleCamelCase
@@ -8,6 +8,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.style.component.ClassSelectors
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -121,7 +122,7 @@ abstract class CssStyle protected constructor(
 
     // Collect all CSS selectors (e.g. all base, hover, breakpoints, etc. modifiers) and, if we ever find multiple
     // definitions for the same selector, just combine them together. One way this is useful is you can use
-    // `MutableSilkTheme.modifyComponentStyle` to layer additional styles on top of a base style. In almost all
+    // `MutableSilkTheme.modifyStyle` to layer additional styles on top of a base style. In almost all
     // practical cases, however, there will only ever be a single selector of each type per component style.
     private fun ComponentModifiers.mergeCssModifiers(init: ComponentModifiers.() -> Unit): Map<CssModifier.Key, CssModifier> {
         return apply(init).cssModifiers
@@ -191,7 +192,13 @@ abstract class CssStyle protected constructor(
         }
     }
 
-    // TODO: docs
+    /**
+     * Adds styles into the given stylesheet for the specified selector.
+     *
+     * @return The CSS class selectors that were added to the stylesheet, always including the base class, and
+     *  potentially additional classes if the style is color mode aware. This lets us avoid applying unnecessary
+     *  classnames, making it easier to debug CSS issues in the browser.
+     */
     internal fun addStylesInto(selector: String, styleSheet: StyleSheet): ClassSelectors {
         // Always add the base selector name, even if the ComponentStyle is empty. Callers may use empty
         // component styles as classnames, which can still be useful for targeting one element from another, or
@@ -325,7 +332,7 @@ private sealed interface StyleGroup {
     class ColorAware(val lightStyles: ComparableStyleScope, val darkStyles: ComparableStyleScope) : StyleGroup
 
     companion object {
-        //        @Suppress("NAME_SHADOWING") // Shadowing used to turn nullable into non-null
+        @Suppress("NAME_SHADOWING") // Shadowing used to turn nullable into non-null
         fun from(lightModifiers: Modifier?, darkModifiers: Modifier?): StyleGroup? {
             val lightStyles = lightModifiers?.let { lightModifiers ->
                 ComparableStyleScope().apply { lightModifiers.toStyles().invoke(this) }

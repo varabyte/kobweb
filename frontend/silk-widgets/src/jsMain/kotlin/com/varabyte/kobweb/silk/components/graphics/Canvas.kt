@@ -6,10 +6,10 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -27,7 +27,7 @@ import kotlin.math.min
 
 interface CanvasKind : ComponentKind
 
-val CanvasStyle by ComponentStyle<CanvasKind>(prefix = "silk") {}
+val CanvasStyle = ComponentStyle<CanvasKind> {}
 
 /**
  * Arguments passed to the user's `render` callback.

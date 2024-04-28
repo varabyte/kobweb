@@ -12,23 +12,22 @@ import com.varabyte.kobweb.compose.ui.graphics.isBright
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.animation.Keyframes
-import com.varabyte.kobweb.silk.components.animation.toAnimation
 import com.varabyte.kobweb.silk.components.icons.CheckIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.CssStyle
-import com.varabyte.kobweb.silk.components.style.addVariant
-import com.varabyte.kobweb.silk.components.style.addVariantBase
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.animation.Keyframes
+import com.varabyte.kobweb.silk.style.animation.toAnimation
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.addVariantBase
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
@@ -80,10 +79,12 @@ object CheckboxVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.VeryFast.value())
 }
 
-interface CheckboxKind : ComponentKind
+interface CheckboxKind : ComponentKind {
+    interface Container : ComponentKind
+    interface Icon : ComponentKind
+}
 
-val CheckboxStyle by ComponentStyle<CheckboxKind>(
-    prefix = "silk",
+val CheckboxStyle = ComponentStyle<CheckboxKind>(
     extraModifiers = Modifier.rowClasses(verticalAlignment = Alignment.CenterVertically)
 ) {
     base {
@@ -96,12 +97,12 @@ val CheckboxStyle by ComponentStyle<CheckboxKind>(
     }
 }
 
-val CheckboxEnabledAnim by Keyframes(prefix = "silk") {
+val CheckboxEnabledAnim = Keyframes {
     from { Modifier.opacity(0) }
     to { Modifier.opacity(1) }
 }
 
-val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
+val CheckboxIconContainerStyle = ComponentStyle<CheckboxKind.Container> {
     base {
         Modifier
             .fontSize(CheckboxVars.IconSize.value())
@@ -118,11 +119,11 @@ val CheckboxIconContainerStyle by ComponentStyle(prefix = "silk") {
     }
 }
 
-val UncheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariantBase {
+val UncheckedCheckboxIconContainerVariant = CheckboxIconContainerStyle.addVariantBase {
     Modifier.backgroundColor(CheckboxVars.UncheckedBackgroundColor.value())
 }
 
-val CheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant {
+val CheckedCheckboxIconContainerVariant = CheckboxIconContainerStyle.addVariant {
     base {
         Modifier
             .backgroundColor(CheckboxVars.IconBackgroundColor.value())
@@ -130,13 +131,13 @@ val CheckedCheckboxIconContainerVariant by CheckboxIconContainerStyle.addVariant
     }
 }
 
-val CheckboxIconStyle by ComponentStyle.base(prefix = "silk") {
+val CheckboxIconStyle = ComponentStyle.base<CheckboxKind.Icon> {
     Modifier
         .size(CheckboxVars.Size.value())
         .color(CheckboxVars.IconColor.value())
 }
 
-val CheckboxInputVariant by InputStyle.addVariant {
+val CheckboxInputVariant = InputStyle.addVariant {
     base { HiddenInputModifier }
 
     // Since the checkbox is hidden, we highlight its sibling (a div which renders a checkbox icon) when the checkbox is

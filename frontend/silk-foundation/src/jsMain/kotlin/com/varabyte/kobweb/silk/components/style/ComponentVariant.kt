@@ -1,14 +1,23 @@
+@file:Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION") // ReplaceWith doesn't work great for extension methods
+
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
-import com.varabyte.kobweb.silk.theme.SilkTheme
+import com.varabyte.kobweb.silk.style.ComponentBaseModifier
+import com.varabyte.kobweb.silk.style.ComponentModifiers
+import com.varabyte.kobweb.silk.style.SimpleCssStyle
+import com.varabyte.kobweb.silk.style.component.ClassSelectors
+import com.varabyte.kobweb.silk.style.component.ComponentKind
 import org.jetbrains.compose.web.css.*
+import com.varabyte.kobweb.silk.style.component.ComponentStyle as NewComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant as NewComponentVariant
 
-sealed class ComponentVariant<T : ComponentKind> {
-    infix fun then(next: ComponentVariant<T>): ComponentVariant<T> {
+@Deprecated("You need to migrate your use of `ComponentStyle` to the new, typed `ComponentStyle<T>` version. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+sealed class ComponentVariant {
+    infix fun then(next: ComponentVariant): ComponentVariant {
         return CompositeComponentVariant(this, next)
     }
 
@@ -29,19 +38,12 @@ sealed class ComponentVariant<T : ComponentKind> {
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
  */
-internal class SimpleComponentVariant<T : ComponentKind>(
+@Deprecated("Code should migrate to `com.varabyte.kobweb.silk.style.SimpleComponentVariant`")
+internal class SimpleComponentVariant(
+    val name: String,
     val cssStyle: SimpleCssStyle,
-    val baseStyle: ComponentStyle<T>
-) :
-    ComponentVariant<T>() {
-    /**
-     * The raw variant name, unqualified by its parent base style.
-     *
-     * This name is not guaranteed to be unique across all variants. If you need that, check `style.name` instead.
-     */
-    val name: String
-        get() = SilkTheme.nameFor(cssStyle).removePrefix("${baseStyle.name}-")
-
+    val baseStyle: ComponentStyle
+) : ComponentVariant() {
     override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         // If you are using a variant, require it be associated with a tag already associated with the base style
         // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
@@ -55,10 +57,10 @@ internal class SimpleComponentVariant<T : ComponentKind>(
     fun intoImmutableStyle(classSelectors: ClassSelectors) = cssStyle.intoImmutableStyle(classSelectors)
 }
 
-private class CompositeComponentVariant<T : ComponentKind>(
-    private val head: ComponentVariant<T>,
-    private val tail: ComponentVariant<T>
-) : ComponentVariant<T>() {
+private class CompositeComponentVariant(
+    private val head: ComponentVariant,
+    private val tail: ComponentVariant
+) : ComponentVariant() {
     override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         return head.addStylesInto(styleSheet) + tail.addStylesInto(styleSheet)
     }
@@ -67,31 +69,31 @@ private class CompositeComponentVariant<T : ComponentKind>(
     override fun toModifier() = head.toModifier().then(tail.toModifier())
 }
 
-fun <T : ComponentKind> ComponentVariant<T>.thenIf(
+fun ComponentVariant.thenIf(
     condition: Boolean,
-    produce: () -> ComponentVariant<T>
-): ComponentVariant<T> {
+    produce: () -> ComponentVariant
+): ComponentVariant {
     return if (condition) this.then(produce()) else this
 }
 
-fun <T : ComponentKind> ComponentVariant<T>.thenUnless(
+fun ComponentVariant.thenUnless(
     condition: Boolean,
-    produce: () -> ComponentVariant<T>
-): ComponentVariant<T> {
+    produce: () -> ComponentVariant
+): ComponentVariant {
     return this.thenIf(!condition, produce)
 }
 
-fun <T : ComponentKind> ComponentVariant<T>.thenIf(
+fun ComponentVariant.thenIf(
     condition: Boolean,
-    other: ComponentVariant<T>
-): ComponentVariant<T> {
+    other: ComponentVariant
+): ComponentVariant {
     return this.thenIf(condition) { other }
 }
 
-fun <T : ComponentKind> ComponentVariant<T>.thenUnless(
+fun ComponentVariant.thenUnless(
     condition: Boolean,
-    other: ComponentVariant<T>
-): ComponentVariant<T> {
+    other: ComponentVariant
+): ComponentVariant {
     return this.thenUnless(condition) { other }
 }
 
@@ -101,7 +103,7 @@ fun <T : ComponentKind> ComponentVariant<T>.thenUnless(
  * Returns `null` if the collection is empty or entirely `null`.
  */
 @Composable
-fun <T : ComponentKind> Iterable<ComponentVariant<T>?>.combine(): ComponentVariant<T>? {
+fun Iterable<ComponentVariant?>.combine(): ComponentVariant? {
     return reduceOrNull { acc, variant ->
         if (acc != null && variant != null) acc.then(variant) else acc ?: variant
     }
@@ -110,12 +112,12 @@ fun <T : ComponentKind> Iterable<ComponentVariant<T>?>.combine(): ComponentVaria
 /**
  * A delegate provider class which allows you to create a [ComponentVariant] via the `by` keyword.
  */
-class ComponentVariantProvider<T : ComponentKind> internal constructor(
-    private val style: ComponentStyle<T>,
+class ComponentVariantProvider internal constructor(
+    private val style: ComponentStyle,
     private val extraModifiers: @Composable () -> Modifier,
     private val init: ComponentModifiers.() -> Unit,
-) : CacheByPropertyNameDelegate<ComponentVariant<T>>() {
-    override fun create(propertyName: String): ComponentVariant<T> {
+) : CacheByPropertyNameDelegate<ComponentVariant>() {
+    override fun create(propertyName: String): ComponentVariant {
         // Given a style called "ExampleStyle", we want to support the following variant name simplifications:
         // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
         // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
@@ -134,25 +136,25 @@ class ComponentVariantProvider<T : ComponentKind> internal constructor(
     }
 }
 
-fun <T : ComponentKind> ComponentStyle<T>.addVariant(
+fun ComponentStyle.addVariant(
     extraModifiers: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) =
     addVariant({ extraModifiers }, init)
 
-fun <T : ComponentKind> ComponentStyle<T>.addVariant(
+fun ComponentStyle.addVariant(
     extraModifiers: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) =
     ComponentVariantProvider(this, extraModifiers, init)
 
-fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
+fun ComponentStyle.addVariantBase(
     extraModifiers: Modifier = Modifier,
     init: ComponentBaseModifier.() -> Modifier
 ) =
     addVariantBase({ extraModifiers }, init)
 
-fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
+fun ComponentStyle.addVariantBase(
     extraModifiers: @Composable () -> Modifier,
     init: ComponentBaseModifier.() -> Modifier
 ) = ComponentVariantProvider(this, extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) } })
@@ -163,14 +165,49 @@ fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
  * You may still wish to use [ComponentStyle.addVariant] instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
+fun ComponentStyle.addVariantBase(
     name: String,
     extraModifiers: Modifier = Modifier,
     init: ComponentBaseModifier.() -> Modifier
-): ComponentVariant<T> {
+): ComponentVariant {
     return addVariant(name, extraModifiers) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
     }
 }
+
+// region Deprecated
+
+// The following methods are only provided so that a user's old code will still compile.
+// For example, `LinkStyle` used to be a `silk.components.style.ComponentStyle`, but now it's a
+// `silk.style.component.ComponentStyle<T>`. If the user has `LinkStyle.addVariant { ... }` in their code, it should
+// continue to compile!
+
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
+fun <T : ComponentKind> NewComponentStyle<T>.addVariantBase(
+    extraModifiers: Modifier = Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+) = addVariantBase({ extraModifiers }, init)
+
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
+fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
+    extraModifiers: @Composable () -> Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+): NewComponentVariant<T> {
+    return addVariant(extraModifiers) {
+        base {
+            ComponentBaseModifier(colorMode).let(init)
+        }
+    }
+}
+
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`. You should use `@CssName` to specify the custom name for this variant (but leading with a dash; so `name = \"example\"` becomes `CssName(\"-example\")`.")
+fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
+    @Suppress("UNUSED_PARAMETER") name: String,
+    extraModifiers: Modifier = Modifier,
+    init: ComponentBaseModifier.() -> Modifier
+) = addVariantBase(extraModifiers, init)
+
+
+// endregion

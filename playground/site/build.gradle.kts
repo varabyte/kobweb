@@ -12,14 +12,6 @@ group = "playground"
 version = "1.0-SNAPSHOT"
 
 kobweb {
-    app.index {
-        head.add {
-            val x = description.get()
-            meta {
-                this.name = x
-            }
-        }
-    }
     markdown {
         imports.add(".components.widgets.*")
         process.set { markdownEntries ->
@@ -56,23 +48,5 @@ kotlin {
             implementation("com.varabyte.kobweb:kobweb-api")
             implementation(project(":sitelib"))
         }
-    }
-}
-
-fun Project.hasJsDependencyNamed(name: String): Boolean {
-    check(project.state.executed)
-    return configurations.asSequence()
-        .flatMap { config -> config.dependencies }
-        .any { dependency -> dependency.name == name }
-}
-
-project.afterEvaluate {
-    project.afterEvaluate {
-        println("Has silk: ${hasJsDependencyNamed("kobweb-silk")}")
-//    println(kobweb.markdown.handlers.useSilk.get())
-//        println(tasks.named<ConvertMarkdownTask>("kobwebxMarkdownConvert").get().dependsOnMarkdownArtifact.get())
-//        println(tasks.named<KobwebGenerateSiteIndexTask>("kobwebGenSiteIndex").get().hasFaDependency.get())
-//        println(tasks.named<KobwebGenerateSiteIndexTask>("kobwebGenSiteIndex").get().hasMdiDependency.get())
-//        println(tasks.named<KobwebGenerateSiteEntryTask>("kobwebGenSiteEntry").get().silkSupport.get())
     }
 }

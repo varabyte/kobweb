@@ -67,9 +67,9 @@ import com.varabyte.kobweb.silk.components.overlay.Popover
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
 import com.varabyte.kobweb.silk.components.overlay.Tooltip
 import com.varabyte.kobweb.silk.components.overlay.manual
-import com.varabyte.kobweb.silk.components.style.CssStyle
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border

@@ -7,12 +7,12 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.components.style.breakpoint.ResponsiveValues
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.breakpoint.ResponsiveValues
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -23,7 +23,7 @@ private val columnVariables = Breakpoint.entries.associateWith { breakpoint ->
 
 interface SimpleGridKind : ComponentKind
 
-val SimpleGridStyle by ComponentStyle<SimpleGridKind>(prefix = "silk") {
+val SimpleGridStyle = ComponentStyle<SimpleGridKind> {
     base {
         Modifier.display(DisplayStyle.Grid)
     }

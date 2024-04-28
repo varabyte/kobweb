@@ -14,9 +14,9 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
-import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
+import com.varabyte.kobweb.ksp.common.COMPONENT_KIND_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
@@ -28,11 +28,13 @@ import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
+import com.varabyte.kobweb.ksp.common.LEGACY_COMPONENT_STYLE_FQN
+import com.varabyte.kobweb.ksp.common.LEGACY_COMPONENT_VARIANT_FQN
+import com.varabyte.kobweb.ksp.common.LEGACY_KEYFRAMES_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
-import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
 import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
@@ -58,8 +60,8 @@ class FrontendProcessor(
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
-    private val silkStyles = mutableListOf<ComponentStyleEntry>()
-    private val silkVariants = mutableListOf<ComponentVariantEntry>()
+    private val componentStyles = mutableListOf<ComponentStyleEntry>()
+    private val componentVariants = mutableListOf<ComponentVariantEntry>()
     private val keyframesList = mutableListOf<KeyframesEntry>()
 
     // fqPkg to subdir, e.g. "blog._2022._01" to "01"
@@ -71,12 +73,23 @@ class FrontendProcessor(
     private val fileDependencies = mutableSetOf<KSFile>()
 
     // TODO: is this the best way to have this set up
-    lateinit var cssStyleType: KSType
-
     @OptIn(KspExperimental::class)
+    private class KSTypes(resolver: Resolver) {
+        val cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(emptyList())
+        val componentStyleType = resolver.getKotlinClassByName(COMPONENT_STYLE_FQN)!!.asStarProjectedType()
+        val componentVariantType = resolver.getKotlinClassByName(COMPONENT_VARIANT_FQN)!!.asStarProjectedType()
+        val keyframesType = resolver.getKotlinClassByName(KEYFRAMES_FQN)!!.asType(emptyList())
+        val legacyComponentStyleType = resolver.getKotlinClassByName(LEGACY_COMPONENT_STYLE_FQN)!!.asType(emptyList())
+        val legacyComponentVariantType = resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
+        val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
+        val kindType = resolver.getKotlinClassByName(COMPONENT_KIND_FQN)!!.asType(emptyList())
+    }
+    private lateinit var types: KSTypes
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         // TODO: handle non-Silk usages
-        cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(emptyList())
+
+        types = KSTypes(resolver)
 
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
@@ -105,13 +118,19 @@ class FrontendProcessor(
     }
 
     private inner class FrontendVisitor : KSVisitorVoid() {
-        private val styleDeclaration = DeclarationType(
+        private val cssStyleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
             displayString = "component style",
             function = "ctx.theme.registerStyle",
         )
-        private val variantDeclaration = DeclarationType(
+        private val componentStyleDeclaration = DeclarationType(
+            name = COMPONENT_STYLE_SIMPLE_NAME,
+            qualifiedName = COMPONENT_STYLE_FQN,
+            displayString = "component style",
+            function = "ctx.theme.registerStyle",
+        )
+        private val componentVariantDeclaration = DeclarationType(
             name = COMPONENT_VARIANT_SIMPLE_NAME,
             qualifiedName = COMPONENT_VARIANT_FQN,
             displayString = "component variant",
@@ -123,45 +142,33 @@ class FrontendProcessor(
             displayString = "keyframes",
             function = "ctx.stylesheet.registerKeyframes",
         )
-        private val declarations = listOf(styleDeclaration, variantDeclaration, keyframesDeclaration)
+        private val declarations =
+            listOf(cssStyleDeclaration, componentStyleDeclaration, componentVariantDeclaration, keyframesDeclaration)
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val type = property.type.toString()
-
-            val matchingByProvider = declarations.firstOrNull { type == it.providerName }
-            if (matchingByProvider != null) {
-                logger.warn(
-                    "Expected `by`, not assignment. Change \"val ${property.simpleName.asString()} = ...\" to \"val ${property.simpleName.asString()} by ...\"?",
-                    property
-                )
-                return
-            }
 
             val matchingByType = declarations.firstOrNull { type == it.name }
             if (matchingByType != null && !validateOrWarnAboutDeclaration(property, matchingByType)) {
                 return
             }
 
-            when (property.type.resolveQualifiedName()) {
-                styleDeclaration.qualifiedName -> {
-                    silkStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
-                }
+            val propertyType = property.type.resolve()
+            var addFileDependency = true
+            when {
+                types.cssStyleType.isAssignableFrom(propertyType) -> cssStyles.add(processCssStyle(property))
+                types.componentStyleType.isAssignableFrom(propertyType) -> componentStyles.add(processComponentStyle(property))
+                types.componentVariantType.isAssignableFrom(propertyType) -> componentVariants.add(processComponentVariant(property))
+                types.keyframesType == propertyType -> keyframesList.add(processKeyframes(property))
+                types.legacyComponentStyleType == propertyType -> componentStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
+                types.legacyComponentVariantType == propertyType -> componentVariants.add(ComponentVariantEntry(property.qualifiedName!!.asString()))
+                types.legacyKeyframesType == propertyType -> keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
+                else -> addFileDependency = false
+            }
 
-                variantDeclaration.qualifiedName -> {
-                    silkVariants.add(ComponentVariantEntry(property.qualifiedName!!.asString()))
-                }
-
-                keyframesDeclaration.qualifiedName -> {
-                    keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
-                }
-
-                else -> {
-                    when {
-                        cssStyleType.isAssignableFrom(property.type.resolve()) -> cssStyles.add(processCssStyle(property))
-                        else -> null
-                    }
-                }
-            }?.also { fileDependencies.add(property.containingFile!!) }
+            if (addFileDependency) {
+                fileDependencies.add(property.containingFile!!)
+            }
         }
 
         private fun validateOrWarnAboutDeclaration(
@@ -257,8 +264,8 @@ class FrontendProcessor(
             pages,
             kobwebInits,
             silkInits,
-            silkStyles,
-            silkVariants,
+            componentStyles,
+            componentVariants,
             keyframesList,
             cssStyles,
         ).also {
@@ -275,25 +282,45 @@ class FrontendProcessor(
     data class Result(val data: FrontendData, val fileDependencies: List<KSFile>)
 }
 
-fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
-    fun KSAnnotated.getAnnotationValue(fqn: String): String? {
-        return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
-    }
+fun KSAnnotated.getAnnotationValue(fqn: String): String? {
+    return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
+}
 
-    val propertyCssName = property.getAnnotationValue(CSS_NAME_FQN)
-        ?: property.simpleName.asString().removeSuffix("Style").titleCamelCaseToKebabCase()
+/**
+ * Get the CSS name for some target property, e.g. "BoldItalicStyle" -> "bold-italic"
+ *
+ * This method takes callbacks which further process the name transformation steps; however, neither will be called if
+ * the property has a `@CssName` annotation tied to it.
+ */
+private fun KSPropertyDeclaration.getCssName(
+    processCssName: (String) -> String = { it },
+    processPropertyName: (String) -> String,
+): String {
+    return this.getAnnotationValue(CSS_NAME_FQN)
+        ?: this.simpleName.asString().let(processPropertyName).titleCamelCaseToKebabCase().let(processCssName)
+}
+
+private fun KSAnnotated.getCssPrefix(): String? {
+    return this.getAnnotationValue(CSS_PREFIX_FQN)
+}
+
+private fun String.prefixed(prefix: String?, containedName: String? = null): String {
+    val self = this
+    return buildString {
+        prefix?.let { append("$it-") }
+        containedName?.let { append("${it}_") }
+        append(self)
+    }
+}
+
+private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
+    val propertyCssName = property.getCssName { it.removeSuffix("Style") }
 
     fun getCssStyleEntry(prefix: String?, containedName: String? = null): CssStyleEntry {
-        val finalName = buildString {
-            prefix?.let { append("$it-") }
-            containedName?.let { append("${it}_") }
-            append(propertyCssName)
-        }
-
-        return CssStyleEntry(property.qualifiedName!!.asString(), finalName)
+        return CssStyleEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix, containedName))
     }
 
-    val propertyPrefix = property.getAnnotationValue(CSS_PREFIX_FQN)
+    val propertyPrefix = property.getCssPrefix()
 
     val parent = property.parentDeclaration as? KSClassDeclaration
         ?: return getCssStyleEntry(propertyPrefix)
@@ -307,8 +334,69 @@ fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
         relevantParent.simpleName.asString().titleCamelCaseToKebabCase()
     }
 
-    return getCssStyleEntry(propertyPrefix ?: parent.getAnnotationValue(CSS_PREFIX_FQN), containerName)
+    return getCssStyleEntry(propertyPrefix ?: parent.getCssPrefix(), containerName)
 }
+
+fun processComponentStyle(property: KSPropertyDeclaration): ComponentStyleEntry {
+    val propertyCssName = property.getCssName { it.removeSuffix("Style") }
+
+    fun getComponentStyleEntry(prefix: String?): ComponentStyleEntry {
+        return ComponentStyleEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
+    }
+
+    val propertyPrefix = property.getCssPrefix()
+
+    return getComponentStyleEntry(propertyPrefix)
+}
+
+fun processComponentVariant(property: KSPropertyDeclaration): ComponentVariantEntry {
+    // Remove the kind part from the variant name, e.g. "val RedButtonVariant = ComponentVariant<ButtonKind>" -> "red"
+    // (after removing "button"). In this way, we can append the variant on top of the style without repeating the kind,
+    // e.g. "button-red" and not "button-button-red"
+    val variantKindName = run {
+        val variantKindType = property.type.resolve().arguments.first().type!!.resolve()
+        val variantKindFqn = variantKindType.declaration.qualifiedName!!.asString()
+        variantKindFqn.substringAfterLast(".").removeSuffix("Kind")
+    }
+
+    val propertyCssName = property.getCssName(
+        processCssName = { "-$it" }, // Indicate the variant should extend the base style name
+    ) { propertyName ->
+        val withoutVariantSuffix = propertyName.removeSuffix("Variant")
+        // Given a variant of kind "ExampleKind" (which gets stripped to just "Example"), we want to support the
+        // following variant name simplifications:
+        // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
+        // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
+        // - "OutlinedVariant"        -> "outlined" // But really the user should have kept "Example" in the name
+        // - "ExampleVariant"         -> "example" // In other words, protect against empty strings!
+        withoutVariantSuffix.removePrefix(variantKindName).removeSuffix(variantKindName).takeIf { it.isNotEmpty() }
+            ?: withoutVariantSuffix
+    }
+
+    fun getComponentVariantEntry(prefix: String?): ComponentVariantEntry {
+        return ComponentVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
+    }
+
+    val propertyPrefix = property.getCssPrefix()
+
+    return getComponentVariantEntry(propertyPrefix)
+}
+
+fun processKeyframes(property: KSPropertyDeclaration): KeyframesEntry {
+    val propertyCssName = property.getCssName {
+        it.removeSuffix("Anim")
+            .removeSuffix("Animation")
+            .removeSuffix("Keyframes")
+    }
+
+    fun getKeyframesEntry(prefix: String?): KeyframesEntry {
+        return KeyframesEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
+    }
+
+    val propertyPrefix = property.getCssPrefix()
+    return getKeyframesEntry(propertyPrefix)
+}
+
 
 /**
  * Convert a String for a name that is using TitleCamelCase into kebab-case.

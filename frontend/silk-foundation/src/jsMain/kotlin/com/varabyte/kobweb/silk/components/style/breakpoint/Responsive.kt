@@ -1,12 +1,6 @@
 package com.varabyte.kobweb.silk.components.style.breakpoint
 
-/**
- * A class used for storing generic values associated with breakpoints plus a base style.
- */
-class ResponsiveValues<T>(
-    val base: T,
-    val sm: T,
-    val md: T,
-    val lg: T,
-    val xl: T,
-)
+import com.varabyte.kobweb.silk.style.breakpoint.ResponsiveValues
+
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.breakpoint.ResponsiveValues`")
+typealias ResponsiveValues<T> = ResponsiveValues<T>

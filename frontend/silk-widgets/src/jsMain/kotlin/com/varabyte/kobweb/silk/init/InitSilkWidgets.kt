@@ -5,7 +5,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.animation.registerKeyframes
 import com.varabyte.kobweb.silk.components.disclosure.TabVars
 import com.varabyte.kobweb.silk.components.disclosure.TabsPanelStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsStyle
@@ -61,8 +60,6 @@ import com.varabyte.kobweb.silk.components.overlay.TooltipVars
 import com.varabyte.kobweb.silk.components.overlay.TopLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopTooltipArrowVariant
-import com.varabyte.kobweb.silk.components.style.CssStyle
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
 import com.varabyte.kobweb.silk.components.style.vars.color.BackgroundColorVar
@@ -70,6 +67,8 @@ import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderColorVar
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
@@ -210,63 +209,62 @@ fun initSilkWidgets(ctx: InitSilkContext) {
 
     mutableTheme.registerStyle("silk-colors", SilkColorsStyle)
 
-    // TODO: Automate the creation of this list (with a Gradle task?)
-    mutableTheme.registerStyle(DisabledStyle)
-    mutableTheme.registerStyle(SmoothColorStyle)
+    // Register InputStyle early as it's wrapped by other components
+    mutableTheme.registerStyle("silk-input", InputStyle)
+    mutableTheme.registerVariant("-outlined", OutlinedInputVariant)
+    mutableTheme.registerVariant("-filled", FilledInputVariant)
+    mutableTheme.registerVariant("-flushed", FlushedInputVariant)
+    mutableTheme.registerVariant("-unstyled", UnstyledInputVariant)
+    mutableTheme.registerStyle("silk-input-group", InputGroupStyle)
 
-    mutableTheme.registerStyle(ButtonStyle)
-    mutableTheme.registerStyle(CanvasStyle)
-    mutableTheme.registerStyle(CheckboxStyle)
-    mutableTheme.registerVariants(CheckboxInputVariant)
-    mutableTheme.registerStyle(CheckboxIconContainerStyle)
-    mutableTheme.registerStyle(CheckboxIconStyle)
-    mutableTheme.registerVariants(CheckedCheckboxIconContainerVariant, UncheckedCheckboxIconContainerVariant)
-    mutableTheme.registerStyle(OverlayStyle)
-    mutableTheme.registerStyle(PopupStyle)
-    mutableTheme.registerStyle(SimpleGridStyle)
-    mutableTheme.registerStyle(SurfaceStyle)
+    // TODO: Automate the creation of this list (by refactoring KSP processor into something we can use?)
+    mutableTheme.registerStyle("silk-disabled", DisabledStyle)
+    mutableTheme.registerStyle("silk-smooth-color", SmoothColorStyle)
 
-    mutableTheme.registerStyle(HorizontalDividerStyle)
-    mutableTheme.registerStyle(VerticalDividerStyle)
+    mutableTheme.registerStyle("silk-button", ButtonStyle)
+    mutableTheme.registerStyle("silk-canvas", CanvasStyle)
+    mutableTheme.registerStyle("silk-checkbox", CheckboxStyle)
+    mutableTheme.registerVariant("-checkbox", CheckboxInputVariant)
+    mutableTheme.registerStyle("silk-checkbox-icon-container", CheckboxIconContainerStyle)
+    mutableTheme.registerStyle("silk-checkbox-icon", CheckboxIconStyle)
+    mutableTheme.registerVariant("-checked", CheckedCheckboxIconContainerVariant)
+    mutableTheme.registerVariant("-unchecked", UncheckedCheckboxIconContainerVariant)
+    mutableTheme.registerStyle("silk-overlay", OverlayStyle)
+    mutableTheme.registerStyle("silk-popup", PopupStyle)
+    mutableTheme.registerStyle("silk-simple-grid", SimpleGridStyle)
+    mutableTheme.registerStyle("silk-surface", SurfaceStyle)
 
-    mutableTheme.registerStyle(SwitchStyle)
-    mutableTheme.registerStyle(SwitchTrackStyle)
-    mutableTheme.registerStyle(SwitchThumbStyle)
-    mutableTheme.registerVariants(SwitchInputVariant)
+    mutableTheme.registerStyle("silk-horizontal-divider", HorizontalDividerStyle)
+    mutableTheme.registerStyle("silk-vertical-divider", VerticalDividerStyle)
 
-    mutableTheme.registerStyle(TabsStyle)
-    mutableTheme.registerStyle(TabsTabRowStyle)
-    mutableTheme.registerStyle(TabsTabStyle)
-    mutableTheme.registerStyle(TabsPanelStyle)
+    mutableTheme.registerStyle("silk-switch", SwitchStyle)
+    mutableTheme.registerStyle("silk-switch-track", SwitchTrackStyle)
+    mutableTheme.registerStyle("silk-switch-thumb", SwitchThumbStyle)
+    mutableTheme.registerVariant("-switch", SwitchInputVariant)
 
-    mutableTheme.registerStyle(InputStyle)
-    mutableTheme.registerVariants(
-        OutlinedInputVariant,
-        FilledInputVariant,
-        FlushedInputVariant,
-        UnstyledInputVariant
-    )
-    mutableTheme.registerStyle(InputGroupStyle)
+    mutableTheme.registerStyle("silk-tabs", TabsStyle)
+    mutableTheme.registerStyle("silk-tabs-tab-row", TabsTabRowStyle)
+    mutableTheme.registerStyle("silk-tabs-tab", TabsTabStyle)
+    mutableTheme.registerStyle("silk-tabs-panel", TabsPanelStyle)
 
-    mutableTheme.registerStyle(TooltipArrowStyle)
-    mutableTheme.registerVariants(
-        TopLeftTooltipArrowVariant,
-        TopTooltipArrowVariant,
-        TopRightTooltipArrowVariant,
-        LeftTopTooltipArrowVariant,
-        LeftTooltipArrowVariant,
-        LeftBottomTooltipArrowVariant,
-        RightTopTooltipArrowVariant,
-        RightTooltipArrowVariant,
-        RightBottomTooltipArrowVariant,
-        BottomLeftTooltipArrowVariant,
-        BottomTooltipArrowVariant,
-        BottomRightTooltipArrowVariant
-    )
-    mutableTheme.registerStyle(TooltipStyle)
-    mutableTheme.registerStyle(TooltipTextContainerStyle)
+    mutableTheme.registerStyle("silk-tooltip-arrow", TooltipArrowStyle)
+    mutableTheme.registerVariant("-top-left", TopLeftTooltipArrowVariant)
+    mutableTheme.registerVariant("-top", TopTooltipArrowVariant)
+    mutableTheme.registerVariant("-top-right", TopRightTooltipArrowVariant)
+    mutableTheme.registerVariant("-left-top", LeftTopTooltipArrowVariant)
+    mutableTheme.registerVariant("-left", LeftTooltipArrowVariant)
+    mutableTheme.registerVariant("-left-bottom", LeftBottomTooltipArrowVariant)
+    mutableTheme.registerVariant("-right-top", RightTopTooltipArrowVariant)
+    mutableTheme.registerVariant("-right", RightTooltipArrowVariant)
+    mutableTheme.registerVariant("-right-bottom", RightBottomTooltipArrowVariant)
+    mutableTheme.registerVariant("-bottom-left", BottomLeftTooltipArrowVariant)
+    mutableTheme.registerVariant("-bottom", BottomTooltipArrowVariant)
+    mutableTheme.registerVariant("-bottom-right", BottomRightTooltipArrowVariant)
 
-    ctx.stylesheet.registerKeyframes(CheckboxEnabledAnim)
+    mutableTheme.registerStyle("silk-tooltip", TooltipStyle)
+    mutableTheme.registerStyle("silk-tooltip-text", TooltipTextContainerStyle)
+
+    mutableTheme.registerKeyframes("silk-checkbox-enabled", CheckboxEnabledAnim)
 
     // TODO (double): we definitely want to automate this
     //  Note: Be sure to add @CssPrefix to the relevant objects (or account for the prefix some other way)

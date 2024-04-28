@@ -9,19 +9,18 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.CssStyle
-import com.varabyte.kobweb.silk.components.style.addVariant
-import com.varabyte.kobweb.silk.components.style.ariaDisabled
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.not
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.selector.ariaDisabled
+import com.varabyte.kobweb.silk.style.selector.hover
+import com.varabyte.kobweb.silk.style.selector.not
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
@@ -52,13 +51,12 @@ interface SwitchKind : ComponentKind {
     interface Track : ComponentKind
     interface Thumb : ComponentKind
 }
-val SwitchStyle by ComponentStyle.base(prefix = "silk") {
+val SwitchStyle = ComponentStyle.base<SwitchKind> {
     Modifier
         .position(Position.Relative) // So the hidden <input> is positioned relative to the switch root
 }
 
-val SwitchTrackStyle by ComponentStyle<SwitchKind.Track>(
-    prefix = "silk",
+val SwitchTrackStyle = ComponentStyle<SwitchKind.Track>(
     extraModifiers = Modifier.tabIndex(-1).ariaHidden()
 ) {
     base {
@@ -77,7 +75,7 @@ val SwitchTrackStyle by ComponentStyle<SwitchKind.Track>(
     (hover + not(ariaDisabled)) { Modifier.cursor(Cursor.Pointer) }
 }
 
-val SwitchInputVariant by InputStyle.addVariant {
+val SwitchInputVariant = InputStyle.addVariant {
     base { HiddenInputModifier }
 
     // Since the checkbox is hidden, we highlight its sibling (the switch track) when the checkbox is focused(-visible).
@@ -86,7 +84,7 @@ val SwitchInputVariant by InputStyle.addVariant {
     }
 }
 
-val SwitchThumbStyle by ComponentStyle.base<SwitchKind.Thumb>(prefix = "silk") {
+val SwitchThumbStyle = ComponentStyle.base<SwitchKind.Thumb> {
     Modifier.size(SwitchVars.TrackHeight.value())
         .borderRadius(SwitchVars.BorderRadius.value())
         .backgroundColor(SwitchVars.ThumbColor.value())
