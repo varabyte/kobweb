@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.silk.theme.breakpoint
 
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.components.style.breakpoint.BreakpointUnitValue
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.breakpoint.BreakpointUnitValue
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Window

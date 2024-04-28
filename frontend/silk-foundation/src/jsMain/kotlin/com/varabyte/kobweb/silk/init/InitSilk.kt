@@ -2,17 +2,17 @@ package com.varabyte.kobweb.silk.init
 
 import com.varabyte.kobweb.browser.util.invokeLater
 import com.varabyte.kobweb.silk.SilkStyleSheet
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastLgStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastMdStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastSmStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastXlStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayIfAtLeastZeroStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilLgStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilMdStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilSmStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilXlStyle
-import com.varabyte.kobweb.silk.components.layout.breakpoint.DisplayUntilZeroStyle
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayIfAtLeastLgStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayIfAtLeastMdStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayIfAtLeastSmStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayIfAtLeastXlStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayIfAtLeastZeroStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilLgStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilMdStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilSmStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilXlStyle
+import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilZeroStyle
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -53,7 +53,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
     val config = MutableSilkConfig()
 
-    mutableTheme.registerStyle(SpanTextStyle)
+    mutableTheme.registerStyle("silk-span-text", SpanTextStyle)
 
     val ctx = InitSilkContext(config, SilkStylesheetInstance, mutableTheme)
     additionalInit(ctx)
@@ -73,25 +73,28 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     // `grid` sets the display type to "grid", which overrides the `display: none` from `displayIfAtLeast`
     // See below for where we find these styles and update them to use !important.
     val displayStyles = listOf(
-        DisplayIfAtLeastZeroStyle,
-        DisplayIfAtLeastSmStyle,
-        DisplayIfAtLeastMdStyle,
-        DisplayIfAtLeastLgStyle,
-        DisplayIfAtLeastXlStyle,
-        DisplayUntilZeroStyle,
-        DisplayUntilSmStyle,
-        DisplayUntilMdStyle,
-        DisplayUntilLgStyle,
-        DisplayUntilXlStyle,
+        DisplayIfAtLeastZeroStyle to "silk-display-if-at-least-zero",
+        DisplayIfAtLeastSmStyle to "silk-display-if-at-least-sm",
+        DisplayIfAtLeastMdStyle to "silk-display-if-at-least-md",
+        DisplayIfAtLeastLgStyle to "silk-display-if-at-least-lg",
+        DisplayIfAtLeastXlStyle to "silk-display-if-at-least-xl",
+        DisplayUntilZeroStyle to "silk-display-until-zero",
+        DisplayUntilSmStyle to "silk-display-until-sm",
+        DisplayUntilMdStyle to "silk-display-until-md",
+        DisplayUntilLgStyle to "silk-display-until-lg",
+        DisplayUntilXlStyle to "silk-display-until-xl",
     )
-    displayStyles.forEach { mutableTheme.registerStyle(it) }
+
+    displayStyles.forEach { (style, name) ->
+        mutableTheme.registerStyle(name, style)
+    }
     // Next, run through all styles in the stylesheet and update the ones associated with our display styles. Note that
     // a real solution would be if the Compose HTML APIs allowed us to identify a style as important, but currently, as
     // you can see with their code here: https://github.com/JetBrains/compose-multiplatform/blob/9e25001e9e3a6be96668e38c7f0bd222c54d1388/html/core/src/jsMain/kotlin/org/jetbrains/compose/web/elements/Style.kt#L116
     // they don't support it. (There would have to be a version of the API that takes an additional priority parameter,
     // as in `setProperty("x", "y", "important")`)
     window.invokeLater { // invokeLater gives the engine time to register Silk styles into the stylesheet objects first
-        val displayStyleSelectorNames = displayStyles.map { ".${it.name}" }.toSet()
+        val displayStyleSelectorNames = displayStyles.map { (_, name) -> ".${name}" }.toSet()
         document.styleSheets.asList()
             .filterIsInstance<CSSStyleSheet>()
             // Trying to peek at external stylesheets causes a security exception so step over them
@@ -118,6 +121,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     MutableSilkConfigInstance = config
 
     _SilkTheme = ImmutableSilkTheme(mutableTheme)
+    SilkTheme.registerKeyframesInto(SilkStylesheetInstance)
     SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
-    SilkTheme.registerStyles(SilkStyleSheet)
+    SilkTheme.registerStylesInto(SilkStyleSheet)
 }

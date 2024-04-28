@@ -9,13 +9,13 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.addVariantBase
-import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.addVariantBase
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Li
@@ -32,14 +32,14 @@ object TocVars {
 
 interface TocKind : ComponentKind
 
-val TocStyle by ComponentStyle.base<TocKind>(prefix = "silk") {
+val TocStyle = ComponentStyle.base<TocKind> {
     Modifier
         .listStyle(ListStyleType.None)
         .textAlign(TextAlign.Start)
         .padding(0.cssRem) // Clear default UL padding
 }
 
-val TocBorderedVariant by TocStyle.addVariantBase {
+val TocBorderedVariant = TocStyle.addVariantBase {
     Modifier
         .borderRadius(5.px)
         .border(1.px, LineStyle.Solid, TocVars.BorderColor.value())

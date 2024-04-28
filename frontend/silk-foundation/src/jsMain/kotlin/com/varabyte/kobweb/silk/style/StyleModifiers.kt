@@ -1,7 +1,7 @@
-package com.varabyte.kobweb.silk.components.style
+package com.varabyte.kobweb.silk.style
 
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import org.jetbrains.compose.web.css.*
 

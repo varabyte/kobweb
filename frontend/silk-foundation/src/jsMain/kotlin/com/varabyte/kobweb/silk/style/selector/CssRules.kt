@@ -1,54 +1,8 @@
-@file:Suppress("DeprecatedCallableAddReplaceWith") // ReplaceWith doesn't work great for extension methods
-
-package com.varabyte.kobweb.silk.components.style
+package com.varabyte.kobweb.silk.style.selector
 
 import com.varabyte.kobweb.silk.style.CssRule
 import com.varabyte.kobweb.silk.style.StyleModifiers
-import com.varabyte.kobweb.silk.style.selector.active
-import com.varabyte.kobweb.silk.style.selector.after
-import com.varabyte.kobweb.silk.style.selector.anyLink
-import com.varabyte.kobweb.silk.style.selector.ariaDisabled
-import com.varabyte.kobweb.silk.style.selector.ariaInvalid
-import com.varabyte.kobweb.silk.style.selector.ariaRequired
-import com.varabyte.kobweb.silk.style.selector.autofill
-import com.varabyte.kobweb.silk.style.selector.before
-import com.varabyte.kobweb.silk.style.selector.checked
-import com.varabyte.kobweb.silk.style.selector.default
-import com.varabyte.kobweb.silk.style.selector.disabled
-import com.varabyte.kobweb.silk.style.selector.empty
-import com.varabyte.kobweb.silk.style.selector.enabled
-import com.varabyte.kobweb.silk.style.selector.firstChild
-import com.varabyte.kobweb.silk.style.selector.firstLetter
-import com.varabyte.kobweb.silk.style.selector.firstLine
-import com.varabyte.kobweb.silk.style.selector.firstOfType
-import com.varabyte.kobweb.silk.style.selector.focus
-import com.varabyte.kobweb.silk.style.selector.focusVisible
-import com.varabyte.kobweb.silk.style.selector.focusWithin
-import com.varabyte.kobweb.silk.style.selector.hover
-import com.varabyte.kobweb.silk.style.selector.inRange
-import com.varabyte.kobweb.silk.style.selector.indeterminate
-import com.varabyte.kobweb.silk.style.selector.invalid
-import com.varabyte.kobweb.silk.style.selector.lastChild
-import com.varabyte.kobweb.silk.style.selector.lastOfType
-import com.varabyte.kobweb.silk.style.selector.link
-import com.varabyte.kobweb.silk.style.selector.mediaPrint
-import com.varabyte.kobweb.silk.style.selector.not
-import com.varabyte.kobweb.silk.style.selector.onlyChild
-import com.varabyte.kobweb.silk.style.selector.onlyOfType
-import com.varabyte.kobweb.silk.style.selector.optional
-import com.varabyte.kobweb.silk.style.selector.outOfRange
-import com.varabyte.kobweb.silk.style.selector.placeholder
-import com.varabyte.kobweb.silk.style.selector.placeholderShown
-import com.varabyte.kobweb.silk.style.selector.readOnly
-import com.varabyte.kobweb.silk.style.selector.readWrite
-import com.varabyte.kobweb.silk.style.selector.required
-import com.varabyte.kobweb.silk.style.selector.root
-import com.varabyte.kobweb.silk.style.selector.selection
-import com.varabyte.kobweb.silk.style.selector.target
-import com.varabyte.kobweb.silk.style.selector.userInvalid
-import com.varabyte.kobweb.silk.style.selector.userValid
-import com.varabyte.kobweb.silk.style.selector.valid
-import com.varabyte.kobweb.silk.style.selector.visited
+import org.jetbrains.compose.web.css.*
 
 //region Pseudo classes
 
@@ -59,8 +13,7 @@ import com.varabyte.kobweb.silk.style.selector.visited
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:any-link">:any-link</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.anyLink`")
-val StyleModifiers.anyLink get() = anyLink
+val StyleModifiers.anyLink get() = CssRule.OfPseudoClass(this, "any-link")
 
 /**
  * Styles to apply to components that represent navigation links which have not yet been visited.
@@ -69,16 +22,14 @@ val StyleModifiers.anyLink get() = anyLink
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:link">:link</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.link`")
-val StyleModifiers.link get() = link
+val StyleModifiers.link get() = CssRule.OfPseudoClass(this, "link")
 
 /**
  * Styles to apply to elements that are targets of links in the same document.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:target">:target</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.target`")
-val StyleModifiers.target get() = target
+val StyleModifiers.target get() = CssRule.OfPseudoClass(this, "target")
 
 /**
  * Styles to apply to components that represent navigation links which have previously been visited.
@@ -87,8 +38,7 @@ val StyleModifiers.target get() = target
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:visited">:visited</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.visited`")
-val StyleModifiers.visited get() = visited
+val StyleModifiers.visited get() = CssRule.OfPseudoClass(this, "visited")
 
 //endregion
 
@@ -101,8 +51,7 @@ val StyleModifiers.visited get() = visited
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:hover">:hover</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.hover`")
-val StyleModifiers.hover get() = hover
+val StyleModifiers.hover get() = CssRule.OfPseudoClass(this, "hover")
 
 /**
  * Styles to apply to components when a cursor is interacting with them.
@@ -111,32 +60,28 @@ val StyleModifiers.hover get() = hover
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:active">:active</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.active`")
-val StyleModifiers.active get() = active
+val StyleModifiers.active: CssRule.OfPseudoClass get() = CssRule.OfPseudoClass(this, "active")
 
 /**
  * Styles to apply to components when they have focus.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus">:focus</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focus`")
-val StyleModifiers.focus get() = focus
+val StyleModifiers.focus get() = CssRule.OfPseudoClass(this, "focus")
 
 /**
  * Styles to apply to components when they have keyboard / a11y-assisted focus.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">:focus-visible</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focusVisible`")
-val StyleModifiers.focusVisible get() = focusVisible
+val StyleModifiers.focusVisible get() = CssRule.OfPseudoClass(this, "focus-visible")
 
 /**
  * Styles to apply to components when they or any descendants have focus.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within">:focus-within</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focusWithin`")
-val StyleModifiers.focusWithin get() = focusWithin
+val StyleModifiers.focusWithin get() = CssRule.OfPseudoClass(this, "focus-within")
 
 //endregion
 
@@ -147,96 +92,84 @@ val StyleModifiers.focusWithin get() = focusWithin
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill">:autofill</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.autofill`")
-val StyleModifiers.autofill get() = autofill
+val StyleModifiers.autofill get() = CssRule.OfPseudoClass(this, "autofill")
 
 /**
  * Represents a user interface element that is in an enabled state.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled">:enabled</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.enabled`")
-val StyleModifiers.enabled get() = enabled
+val StyleModifiers.enabled get() = CssRule.OfPseudoClass(this, "enabled")
 
 /**
  * Represents a user interface element that is in a disabled state.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled">:disabled</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.disabled`")
-val StyleModifiers.disabled get() = disabled
+val StyleModifiers.disabled get() = CssRule.OfPseudoClass(this, "disabled")
 
 /**
  * Represents any element that cannot be changed by the user.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only">:read-only</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.readOnly`")
-val StyleModifiers.readOnly get() = readOnly
+val StyleModifiers.readOnly get() = CssRule.OfPseudoClass(this, "read-only")
 
 /**
  * Represents any element that is user-editable.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write">:read-write</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.readWrite`")
-val StyleModifiers.readWrite get() = readWrite
+val StyleModifiers.readWrite get() = CssRule.OfPseudoClass(this, "read-write")
 
 /**
  * Matches an input element that is displaying placeholder text.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown">:placeholder-shown</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.placeholderShown`")
-val StyleModifiers.placeholderShown get() = placeholderShown
+val StyleModifiers.placeholderShown get() = CssRule.OfPseudoClass(this, "placeholder-shown")
 
 /**
  * Matches one or more UI elements that are the default among a set of elements.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:default">:default</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.default`")
-val StyleModifiers.default get() = default
+val StyleModifiers.default get() = CssRule.OfPseudoClass(this, "default")
 
 /**
  * Matches an element, such as checkboxes and radio buttons, that are checked or toggled to an `on` state.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:checked">:checked</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.checked`")
-val StyleModifiers.checked get() = checked
+val StyleModifiers.checked get() = CssRule.OfPseudoClass(this, "checked")
 
 /**
  * Matches when elements, such as checkboxes and radio buttons, are in an indeterminate state.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate">:indeterminate</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.indeterminate`")
-val StyleModifiers.indeterminate get() = indeterminate
+val StyleModifiers.indeterminate get() = CssRule.OfPseudoClass(this, "indeterminate")
 
 /**
  * Matches an element with valid contents. For example, an input element with type 'email' which contains a validly formed email address.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:valid">:valid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.valid`")
-val StyleModifiers.valid get() = valid
+val StyleModifiers.valid get() = CssRule.OfPseudoClass(this, "valid")
 
 /**
  * Matches an element with invalid contents. For example, an input element with type 'email' with a name entered.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid">:invalid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.invalid`")
-val StyleModifiers.invalid get() = invalid
+val StyleModifiers.invalid get() = CssRule.OfPseudoClass(this, "invalid")
 
 /**
  * Applies to elements with range limitations, for example a slider control, when the selected value is in the allowed range.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range">:in-range</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.inRange`")
-val StyleModifiers.inRange get() = inRange
+val StyleModifiers.inRange get() = CssRule.OfPseudoClass(this, "in-range")
 
 /**
  * Applies to elements with range limitations, for example a slider control, when the selected value is outside the
@@ -244,40 +177,35 @@ val StyleModifiers.inRange get() = inRange
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range">:out-of-range</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.outOfRange`")
-val StyleModifiers.outOfRange get() = outOfRange
+val StyleModifiers.outOfRange get() = CssRule.OfPseudoClass(this, "out-of-range")
 
 /**
  * Matches when a form element is required.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:required">:required</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.required`")
-val StyleModifiers.required get() = required
+val StyleModifiers.required get() = CssRule.OfPseudoClass(this, "required")
 
 /**
  * Matches when a form element is optional.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:optional">:optional</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.optional`")
-val StyleModifiers.optional get() = optional
+val StyleModifiers.optional get() = CssRule.OfPseudoClass(this, "optional")
 
 /**
  * Represents an element with correct input, but only when the user has interacted with it.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-valid">:user-valid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.userValid`")
-val StyleModifiers.userValid get() = userValid
+val StyleModifiers.userValid get() = CssRule.OfPseudoClass(this, "user-valid")
 
 /**
  * Represents an element with incorrect input, but only when the user has interacted with it.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid">:user-invalid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.userInvalid`")
-val StyleModifiers.userInvalid get() = userInvalid
+val StyleModifiers.userInvalid get() = CssRule.OfPseudoClass(this, "user-invalid")
 
 //endregion
 
@@ -288,64 +216,56 @@ val StyleModifiers.userInvalid get() = userInvalid
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:root">:root</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.root`")
-val StyleModifiers.root get() = root
+val StyleModifiers.root get() = CssRule.OfPseudoClass(this, "root")
 
 /**
  * Represents an element with no children other than white-space characters.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:empty">:empty</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.empty`")
-val StyleModifiers.empty get() = empty
+val StyleModifiers.empty get() = CssRule.OfPseudoClass(this, "empty")
 
 /**
  * Matches an element that is the first of its siblings.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child">:first-child</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstChild`")
-val StyleModifiers.firstChild get() = firstChild
+val StyleModifiers.firstChild get() = CssRule.OfPseudoClass(this, "first-child")
 
 /**
  * Matches an element that is the last of its siblings.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child">:last-child</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.lastChild`")
-val StyleModifiers.lastChild get() = lastChild
+val StyleModifiers.lastChild get() = CssRule.OfPseudoClass(this, "last-child")
 
 /**
  * Matches an element that has no siblings. For example, a list item with no other list items in that list.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child">:only-child</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.onlyChild`")
-val StyleModifiers.onlyChild get() = onlyChild
+val StyleModifiers.onlyChild get() = CssRule.OfPseudoClass(this, "only-child")
 
 /**
  * Matches an element that is the first of its siblings, and also matches a certain type selector.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type">:first-of-type</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstOfType`")
-val StyleModifiers.firstOfType get() = firstOfType
+val StyleModifiers.firstOfType get() = CssRule.OfPseudoClass(this, "first-of-type")
 
 /**
  * Matches an element that is the last of its siblings, and also matches a certain type selector.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type">:last-of-type</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.lastOfType`")
-val StyleModifiers.lastOfType get() = lastOfType
+val StyleModifiers.lastOfType get() = CssRule.OfPseudoClass(this, "last-of-type")
 
 /**
  * Matches an element that has no siblings of the chosen type selector.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type">:only-of-type</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.onlyOfType`")
-val StyleModifiers.onlyOfType get() = onlyOfType
+val StyleModifiers.onlyOfType get() = CssRule.OfPseudoClass(this, "only-of-type")
 
 //endregion
 
@@ -358,40 +278,35 @@ val StyleModifiers.onlyOfType get() = onlyOfType
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::before">::before</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.before`")
-val StyleModifiers.before get() = before
+val StyleModifiers.before get() = CssRule.OfPseudoElement(this, "before")
 
 /**
  * Styles to apply to a virtual element that is created after the last element in some container.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::after">::after</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.after`")
-val StyleModifiers.after get() = after
+val StyleModifiers.after get() = CssRule.OfPseudoElement(this, "after")
 
 /**
  * Styles to apply to the selected part of a document.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::selection">::selection</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.selection`")
-val StyleModifiers.selection get() = selection
+val StyleModifiers.selection get() = CssRule.OfPseudoElement(this, "selection")
 
 /**
  * Styles to apply to the first letter in a block of text.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter">::first-letter</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstLetter`")
-val StyleModifiers.firstLetter get() = firstLetter
+val StyleModifiers.firstLetter get() = CssRule.OfPseudoElement(this, "first-letter")
 
 /**
  * Styles to apply to the first line in a block of text.
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line">::first-line</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstLine`")
-val StyleModifiers.firstLine get() = firstLine
+val StyleModifiers.firstLine get() = CssRule.OfPseudoElement(this, "first-line")
 
 /**
  * Matches the placeholder text within an input element that is displaying placeholder text.
@@ -400,8 +315,7 @@ val StyleModifiers.firstLine get() = firstLine
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder">::placeholder</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.placeholder`")
-val StyleModifiers.placeholder get() = placeholder
+val StyleModifiers.placeholder get() = CssRule.OfPseudoElement(this, "placeholder")
 
 //endregion
 
@@ -410,15 +324,13 @@ val StyleModifiers.placeholder get() = placeholder
 /**
  * Used to indicate styles which should only be applied when the page is being printed.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.mediaPrint`")
-val StyleModifiers.mediaPrint get() = mediaPrint
+val StyleModifiers.mediaPrint get() = CssRule.OfMedia(this, CSSMediaQuery.MediaType(CSSMediaQuery.MediaType.Enum.Print))
 
 //endregion
 
 // region Functional pseudo classes
 
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.not`")
-fun StyleModifiers.not(vararg params: CssRule.NonMediaCssRule) = not(*params)
+fun StyleModifiers.not(vararg params: CssRule.NonMediaCssRule) = CssRule.OfFunctionalPseudoClass(this, "not", *params)
 
 //endregion
 
@@ -431,8 +343,7 @@ fun StyleModifiers.not(vararg params: CssRule.NonMediaCssRule) = not(*params)
  * the HTML version; for example, some elements don't support `disabled` and also `disabled` elements don't fire
  * mouse events, which can be useful e.g. when implementing tooltips.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaDisabled`")
-val StyleModifiers.ariaDisabled get() = ariaDisabled
+val StyleModifiers.ariaDisabled get() = CssRule.OfAttributeSelector(this, """aria-disabled="true"""")
 
 /**
  * A way to select elements that have been tagged with an `aria-invalid` attribute.
@@ -441,8 +352,7 @@ val StyleModifiers.ariaDisabled get() = ariaDisabled
  * widget supports a general invalidation algorithm (like an email type input with an invalid email address), but the
  * `ariaInvalid` version can be used to support custom invalidation strategies.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaInvalid`")
-val StyleModifiers.ariaInvalid get() = ariaInvalid
+val StyleModifiers.ariaInvalid get() = CssRule.OfAttributeSelector(this, """aria-invalid="true"""")
 
 /**
  * A way to select elements that have been tagged with an `aria-required` attribute.
@@ -451,7 +361,6 @@ val StyleModifiers.ariaInvalid get() = ariaInvalid
  * using elements that don't support the `required` attribute, like elements created from divs, as a way to communicate
  * their required state to accessibility readers.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaRequired`")
-val StyleModifiers.ariaRequired get() = ariaRequired
+val StyleModifiers.ariaRequired get() = CssRule.OfAttributeSelector(this, """aria-required="true"""")
 
 //endregion

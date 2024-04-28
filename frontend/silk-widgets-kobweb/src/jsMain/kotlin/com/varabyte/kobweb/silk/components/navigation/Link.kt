@@ -9,15 +9,14 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.addVariant
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.link
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
-import com.varabyte.kobweb.silk.components.style.visited
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.selector.hover
+import com.varabyte.kobweb.silk.style.selector.link
+import com.varabyte.kobweb.silk.style.selector.visited
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
@@ -33,7 +32,7 @@ interface LinkKind : ComponentKind
 /**
  * Style to use with [A] tags to give them Silk-themed colors.
  */
-val LinkStyle by ComponentStyle<LinkKind>(prefix = "silk") {
+val LinkStyle = ComponentStyle<LinkKind> {
     base {
         Modifier.textDecorationLine(TextDecorationLine.None)
     }
@@ -49,19 +48,19 @@ val LinkStyle by ComponentStyle<LinkKind>(prefix = "silk") {
     }
 }
 
-val UndecoratedLinkVariant by LinkStyle.addVariant {
+val UndecoratedLinkVariant = LinkStyle.addVariant {
     hover {
         Modifier.textDecorationLine(TextDecorationLine.None)
     }
 }
 
-val UncoloredLinkVariant by LinkStyle.addVariant {
+val UncoloredLinkVariant = LinkStyle.addVariant {
     val colorModifier = Modifier.color(ColorVar.value())
     link { colorModifier }
     visited { colorModifier }
 }
 
-val AlwaysUnderlinedLinkVariant by LinkStyle.addVariant {
+val AlwaysUnderlinedLinkVariant = LinkStyle.addVariant {
     base {
         Modifier.textDecorationLine(TextDecorationLine.Underline)
     }

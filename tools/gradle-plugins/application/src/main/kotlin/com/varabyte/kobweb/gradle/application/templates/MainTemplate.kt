@@ -65,9 +65,6 @@ fun createMainFunction(
         if (frontendData.kobwebInits.any { it.acceptsContext }) {
             add("$KOBWEB_GROUP.core.init.InitKobwebContext")
         }
-        if (frontendData.keyframesList.isNotEmpty()) {
-            add("$KOBWEB_GROUP.silk.components.animation.registerKeyframes")
-        }
         if (usingSilkFoundation) {
             add("$KOBWEB_GROUP.silk.defer.renderWithDeferred")
         }
@@ -203,13 +200,25 @@ fun createMainFunction(
                             addStatement("ctx.theme.registerStyle(\"${entry.name}\", ${entry.fqcn})")
                         }
                         frontendData.silkStyles.forEach { entry ->
-                            addStatement("ctx.theme.registerStyle(${entry.fqcn})")
+                            entry.name?.let { styleName ->
+                                addStatement("ctx.theme.registerStyle(\"$styleName\", ${entry.fqcn})")
+                            } ?: run {
+                                addStatement("ctx.theme.registerStyle(${entry.fqcn})")
+                            }
                         }
                         frontendData.silkVariants.forEach { entry ->
-                            addStatement("ctx.theme.registerVariants(${entry.fqcn})")
+                            entry.name?.let { variantName ->
+                                addStatement("ctx.theme.registerVariant(\"$variantName\", ${entry.fqcn})")
+                            } ?: run {
+                                addStatement("ctx.theme.registerVariants(${entry.fqcn})")
+                            }
                         }
                         frontendData.keyframesList.forEach { entry ->
-                            addStatement("ctx.stylesheet.registerKeyframes(${entry.fqcn})")
+                            entry.name?.let { keyframesName ->
+                                addStatement("ctx.theme.registerKeyframes(\"$keyframesName\", ${entry.fqcn})")
+                            } ?: run {
+                                addStatement("ctx.theme.registerKeyframes(${entry.fqcn})")
+                            }
                         }
                         frontendData.silkInits.forEach { init ->
                             addStatement("${init.fqn}(ctx)")

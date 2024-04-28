@@ -16,15 +16,15 @@ import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
 import com.varabyte.kobweb.silk.components.overlay.Tooltip
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.CssStyle
-import com.varabyte.kobweb.silk.components.style.addVariant
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
-import com.varabyte.kobweb.silk.components.style.link
-import com.varabyte.kobweb.silk.components.style.toModifier
-import com.varabyte.kobweb.silk.components.style.visited
+import com.varabyte.kobweb.silk.style.CssName
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.selector.link
+import com.varabyte.kobweb.silk.style.selector.visited
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.color
@@ -41,11 +41,11 @@ val NavHeaderStyle = CssStyle.base(extraModifiers = { SmoothColorStyle.toModifie
 
 interface NavItemKind : ComponentKind
 
-val NavItemStyle by ComponentStyle<NavItemKind> {
+val NavItemStyle = ComponentStyle<NavItemKind> {
     base { Modifier.margin(leftRight = 15.px) }
 }
 
-val NavLinkVariant by LinkStyle.addVariant {
+val NavLinkVariant = LinkStyle.addVariant {
     // Intentionally invert the header colors from the rest of the page
     val linkColor = colorMode.toPalette().background
 
@@ -53,7 +53,8 @@ val NavLinkVariant by LinkStyle.addVariant {
     visited { Modifier.color(linkColor) }
 }
 
-val NavButtonVariant = NavItemStyle.addVariant("button") {
+@CssName("-button")
+val NavButtonVariant = NavItemStyle.addVariant {
     base { Modifier.padding(0.px).borderRadius(50.percent) }
 }
 

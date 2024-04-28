@@ -14,20 +14,7 @@ import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.CssStyle
-import com.varabyte.kobweb.silk.components.style.addVariant
-import com.varabyte.kobweb.silk.components.style.ariaInvalid
-import com.varabyte.kobweb.silk.components.style.base
 import com.varabyte.kobweb.silk.components.style.common.PlaceholderColor
-import com.varabyte.kobweb.silk.components.style.disabled
-import com.varabyte.kobweb.silk.components.style.focusVisible
-import com.varabyte.kobweb.silk.components.style.hover
-import com.varabyte.kobweb.silk.components.style.not
-import com.varabyte.kobweb.silk.components.style.placeholder
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
@@ -36,6 +23,18 @@ import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderOpacityVar
 import com.varabyte.kobweb.silk.components.style.vars.size.BorderRadiusVars
 import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.selector.ariaInvalid
+import com.varabyte.kobweb.silk.style.selector.disabled
+import com.varabyte.kobweb.silk.style.selector.focusVisible
+import com.varabyte.kobweb.silk.style.selector.hover
+import com.varabyte.kobweb.silk.style.selector.not
+import com.varabyte.kobweb.silk.style.selector.placeholder
 import com.varabyte.kobweb.silk.theme.shapes.RectF
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import org.jetbrains.compose.web.attributes.AutoComplete
@@ -105,7 +104,7 @@ object InputVars {
 interface InputGroupKind : ComponentKind
 interface InputKind : ComponentKind
 
-val InputGroupStyle by ComponentStyle.base<InputGroupKind>(prefix = "silk") {
+val InputGroupStyle = ComponentStyle.base<InputGroupKind> {
     Modifier
         .outline(0.px, LineStyle.Solid, Colors.Transparent) // Disable, we'll use box shadow instead
         .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
@@ -115,7 +114,7 @@ val InputGroupStyle by ComponentStyle.base<InputGroupKind>(prefix = "silk") {
         .fontSize(InputVars.FontSize.value())
 }
 
-val InputStyle by ComponentStyle<InputKind>(prefix = "silk") {
+val InputStyle = ComponentStyle<InputKind> {
     base {
         Modifier
             .appearance(Appearance.None) // Disable browser styles
@@ -145,7 +144,7 @@ private fun Modifier.inputPadding(): Modifier {
     return this.paddingInline(start = padding, end = padding)
 }
 
-val OutlinedInputVariant by InputStyle.addVariant {
+val OutlinedInputVariant = InputStyle.addVariant {
     fun Modifier.bordered(color: CSSColorValue): Modifier {
         return this.border(1.px, LineStyle.Solid, color).boxShadow(spreadRadius = 1.px, color = color)
     }
@@ -162,7 +161,7 @@ val OutlinedInputVariant by InputStyle.addVariant {
     (focusVisible + not(disabled)) { Modifier.bordered(InputVars.BorderFocusColor.value()) }
 }
 
-val FilledInputVariant by InputStyle.addVariant {
+val FilledInputVariant = InputStyle.addVariant {
     fun Modifier.bordered(color: CSSColorValue): Modifier {
         return this.border { color(color) }.boxShadow(spreadRadius = 1.px, color = color)
     }
@@ -183,7 +182,7 @@ val FilledInputVariant by InputStyle.addVariant {
     }
 }
 
-val FlushedInputVariant by InputStyle.addVariant {
+val FlushedInputVariant = InputStyle.addVariant {
     fun Modifier.bordered(color: CSSColorValue): Modifier {
         return this.border { color(color) }.boxShadow(offsetY = 1.px, color = color)
     }
@@ -194,7 +193,7 @@ val FlushedInputVariant by InputStyle.addVariant {
     (focusVisible + not(disabled)) { Modifier.bordered(InputVars.BorderFocusColor.value()) }
 }
 
-val UnstyledInputVariant by InputStyle.addVariant {}
+val UnstyledInputVariant = InputStyle.addVariant {}
 
 @DslMarker
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)

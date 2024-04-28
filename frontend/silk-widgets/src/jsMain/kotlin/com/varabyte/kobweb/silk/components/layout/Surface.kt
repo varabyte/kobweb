@@ -9,13 +9,13 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import org.w3c.dom.HTMLElement
 
@@ -26,7 +26,7 @@ object SurfaceVars {
 
 interface SurfaceKind : ComponentKind
 
-val SurfaceStyle by ComponentStyle<SurfaceKind>(prefix = "silk") {
+val SurfaceStyle = ComponentStyle<SurfaceKind> {
     base {
         Modifier
             .backgroundColor(SurfaceVars.BackgroundColor.value())

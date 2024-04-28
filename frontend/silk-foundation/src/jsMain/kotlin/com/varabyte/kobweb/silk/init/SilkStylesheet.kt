@@ -2,9 +2,9 @@ package com.varabyte.kobweb.silk.init
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.components.animation.KeyframesBuilder
-import com.varabyte.kobweb.silk.components.style.SimpleCssStyle
-import com.varabyte.kobweb.silk.components.style.StyleModifiers
+import com.varabyte.kobweb.silk.style.SimpleCssStyle
+import com.varabyte.kobweb.silk.style.StyleModifiers
+import com.varabyte.kobweb.silk.style.animation.KeyframesBuilder
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*

@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.silk.components.style
+package com.varabyte.kobweb.silk.style
 
 // TODO: docs
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)

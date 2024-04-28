@@ -2,10 +2,10 @@ package com.varabyte.kobweb.silk.theme.breakpoint
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.components.layout.breakpoint.displayBetween
-import com.varabyte.kobweb.silk.components.layout.breakpoint.displayIfAtLeast
-import com.varabyte.kobweb.silk.components.layout.breakpoint.displayUntil
-import com.varabyte.kobweb.silk.components.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
+import com.varabyte.kobweb.silk.style.breakpoint.displayBetween
+import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
+import com.varabyte.kobweb.silk.style.breakpoint.displayUntil
 import kotlinx.browser.window
 import org.w3c.dom.events.EventListener
 

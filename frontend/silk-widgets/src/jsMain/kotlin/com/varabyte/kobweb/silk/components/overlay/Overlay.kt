@@ -8,13 +8,13 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import com.varabyte.kobweb.silk.style.component.ComponentKind
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
@@ -24,7 +24,7 @@ object OverlayVars {
 
 interface OverlayKind : ComponentKind
 
-val OverlayStyle by ComponentStyle.base<OverlayKind>(prefix = "silk") {
+val OverlayStyle = ComponentStyle.base<OverlayKind> {
     Modifier.backgroundColor(OverlayVars.BackgroundColor.value())
 }
 

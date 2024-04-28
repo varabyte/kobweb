@@ -77,10 +77,14 @@ class InitSilkEntry(
 class InitKobwebEntry(val fqn: String, val acceptsContext: Boolean)
 
 /**
- * Metadata about code like `val Bounce = Keyframes("bounce")` or `val Bounce by Keyframes`
+ * Metadata about code like `val Bounce = Keyframes { ... }`
+ *
+ * For legacy Keyframes usages, the name comes from the Keyframes object itself
+ * (e.g. `val MyStyle = Keyframes("bounce") { ... }`) but by Kobweb 1.0 this code should be removed and the
+ * `name` field below should become non-null.
  */
 @Serializable
-class KeyframesEntry(val fqcn: String)
+class KeyframesEntry(val fqcn: String, val name: String? = null)
 
 /**
  * Information about a method in the user's code targeted by an `@Page` annotation.
@@ -94,21 +98,33 @@ class KeyframesEntry(val fqcn: String)
 class PageEntry(val fqn: String, val route: String)
 
 /**
- * Metadata about code like `val MyStyle = ComponentStyle("my-style")`
- */
-@Serializable
-class ComponentStyleEntry(val fqcn: String)
-
-/**
- * Metadata about code like `val MyVariant = MyStyle.addVariant("my-variant")`
- */
-@Serializable
-class ComponentVariantEntry(val fqcn: String)
-
-/**
- * Metadata for code like `val MyStyle = CssStyle { ... }`
+ * Metadata about code like `val MyStyle = ComponentStyle { ... }`
  *
- * The name of the style will come either from a `@CssName` annotation OR from the property name itself.
+ * The name of the style will come from a `@CssName` annotation or, if not specified, the property name itself.
+ *
+ * For legacy ComponentStyle usages, the name comes from the ComponentStyle itself
+ * (e.g. `val MyStyle = ComponentStyle("my-style") { ... }`) but by Kobweb 1.0 this code should be removed and the
+ * `name` field below should become non-null.
+ */
+@Serializable
+class ComponentStyleEntry(val fqcn: String, val name: String? = null)
+
+/**
+ * Metadata about code like `val MyVariant = MyStyle.addVariant { ... }`
+ *
+ * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
+ *
+ * For legacy ComponentVariant usages, the name comes from the ComponentVariant itself
+ * (e.g. `val MyStyle = ComponentVariant("my-variant") { ... }`) but by Kobweb 1.0 this code should be removed and the
+ * `name` field below should become non-null.
+ */
+@Serializable
+class ComponentVariantEntry(val fqcn: String, val name: String? = null)
+
+/**
+ * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)
+ *
+ * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
  */
 @Serializable
 class CssStyleEntry(val fqcn: String, val name: String)

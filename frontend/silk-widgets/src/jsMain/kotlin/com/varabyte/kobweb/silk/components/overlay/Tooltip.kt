@@ -9,14 +9,14 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.silk.components.style.ComponentKind
-import com.varabyte.kobweb.silk.components.style.ComponentStyle
-import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.components.style.addVariantBase
-import com.varabyte.kobweb.silk.components.style.base
-import com.varabyte.kobweb.silk.components.style.toModifier
+import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import com.varabyte.kobweb.silk.style.component.ComponentStyle
+import com.varabyte.kobweb.silk.style.component.ComponentVariant
+import com.varabyte.kobweb.silk.style.component.addVariantBase
+import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.component.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Br
 import org.w3c.dom.HTMLElement
@@ -64,7 +64,7 @@ interface TooltipKind : ComponentKind {
     interface TextContainer : ComponentKind
 }
 
-val TooltipStyle by ComponentStyle.base<TooltipKind>(prefix = "silk") {
+val TooltipStyle = ComponentStyle.base<TooltipKind> {
     Modifier
         .position(Position.Relative) // So arrow is positioned relative to tooltip area
         .backgroundColor(TooltipVars.BackgroundColor.value())
@@ -72,7 +72,7 @@ val TooltipStyle by ComponentStyle.base<TooltipKind>(prefix = "silk") {
         .borderRadius(6.px)
 }
 
-val TooltipArrowStyle by ComponentStyle.base<TooltipKind.Arrow>(prefix = "silk") {
+val TooltipArrowStyle = ComponentStyle.base<TooltipKind.Arrow> {
     Modifier
         .position(Position.Absolute)
         .border {
@@ -81,14 +81,14 @@ val TooltipArrowStyle by ComponentStyle.base<TooltipKind.Arrow>(prefix = "silk")
         }
 }
 
-val TopLeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val TopLeftTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(left = TRIANGLE_WIDTH_2X, top = -TRIANGLE_WIDTH_2X)
         .top(0.px)
         .triangleDown(TooltipVars.BackgroundColor.value())
 }
 
-val TopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val TopTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(left = -TRIANGLE_WIDTH, top = -TRIANGLE_WIDTH_2X)
         .left(50.percent)
@@ -96,7 +96,7 @@ val TopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleDown(TooltipVars.BackgroundColor.value())
 }
 
-val TopRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val TopRightTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(right = TRIANGLE_WIDTH_2X, top = -TRIANGLE_WIDTH_2X)
         .right(0.px)
@@ -104,7 +104,7 @@ val TopRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleDown(TooltipVars.BackgroundColor.value())
 }
 
-val LeftTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val LeftTopTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(top = TRIANGLE_WIDTH_2X, left = -TRIANGLE_WIDTH_2X)
         .left(0.px)
@@ -112,7 +112,7 @@ val LeftTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleLeft(TooltipVars.BackgroundColor.value())
 }
 
-val LeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val LeftTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(top = -TRIANGLE_WIDTH, left = -TRIANGLE_WIDTH_2X)
         .left(0.px)
@@ -120,7 +120,7 @@ val LeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleLeft(TooltipVars.BackgroundColor.value())
 }
 
-val LeftBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val LeftBottomTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(bottom = TRIANGLE_WIDTH_2X, left = -TRIANGLE_WIDTH_2X)
         .left(0.px)
@@ -128,7 +128,7 @@ val LeftBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleLeft(TooltipVars.BackgroundColor.value())
 }
 
-val RightTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val RightTopTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(top = TRIANGLE_WIDTH_2X, right = -TRIANGLE_WIDTH_2X)
         .right(0.px)
@@ -136,7 +136,7 @@ val RightTopTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleRight(TooltipVars.BackgroundColor.value())
 }
 
-val RightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val RightTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(top = -TRIANGLE_WIDTH, right = -TRIANGLE_WIDTH_2X)
         .right(0.px)
@@ -144,7 +144,7 @@ val RightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleRight(TooltipVars.BackgroundColor.value())
 }
 
-val RightBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val RightBottomTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(bottom = TRIANGLE_WIDTH_2X, right = -TRIANGLE_WIDTH_2X)
         .right(0.px)
@@ -152,7 +152,7 @@ val RightBottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleRight(TooltipVars.BackgroundColor.value())
 }
 
-val BottomLeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val BottomLeftTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(left = TRIANGLE_WIDTH_2X, bottom = -TRIANGLE_WIDTH_2X)
         .left(0.px)
@@ -160,7 +160,7 @@ val BottomLeftTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleUp(TooltipVars.BackgroundColor.value())
 }
 
-val BottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val BottomTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(left = -TRIANGLE_WIDTH, bottom = -TRIANGLE_WIDTH_2X)
         .left(50.percent)
@@ -168,7 +168,7 @@ val BottomTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleUp(TooltipVars.BackgroundColor.value())
 }
 
-val BottomRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
+val BottomRightTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
     Modifier
         .margin(right = TRIANGLE_WIDTH_2X, bottom = -TRIANGLE_WIDTH_2X)
         .right(0.px)
@@ -176,7 +176,7 @@ val BottomRightTooltipArrowVariant by TooltipArrowStyle.addVariantBase {
         .triangleUp(TooltipVars.BackgroundColor.value())
 }
 
-val TooltipTextContainerStyle = ComponentStyle.base<TooltipKind.TextContainer>("tooltip-text") {
+val TooltipTextContainerStyle = ComponentStyle.base<TooltipKind.TextContainer> {
     Modifier.padding(5.px)
 }
 
