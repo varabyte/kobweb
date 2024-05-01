@@ -75,18 +75,18 @@ import org.w3c.dom.Element
  */
 abstract class CssStyle protected constructor(
     internal val init: ComponentModifiers.() -> Unit,
-    internal val extraModifiers: @Composable () -> Modifier = { Modifier },
+    internal val extraModifier: @Composable () -> Modifier = { Modifier },
 ) {
     /**
      * A [CssStyle] when you know you only want to specify the base style, and not any other modifiers like hover.
      */
     abstract class Base protected constructor(
         init: ComponentBaseModifier.() -> Modifier,
-        extraModifiers: @Composable () -> Modifier = { Modifier },
-    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifiers) {
-        constructor(init: Modifier, extraModifiers: @Composable () -> Modifier = { Modifier }) : this(
+        extraModifier: @Composable () -> Modifier = { Modifier },
+    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifier) {
+        constructor(init: Modifier, extraModifier: @Composable () -> Modifier = { Modifier }) : this(
             { init },
-            extraModifiers
+            extraModifier
         )
     }
 
@@ -139,7 +139,7 @@ abstract class CssStyle protected constructor(
             if (attrsScope.attributes.isEmpty()) return@onEach
 
             error(buildString {
-                appendLine("ComponentStyle declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the ComponentStyle's `extraModifiers` parameter.")
+                appendLine("ComponentStyle declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the ComponentStyle's `extraModifier` parameter.")
                 appendLine()
                 appendLine("Details:")
 
@@ -181,7 +181,7 @@ abstract class CssStyle protected constructor(
                     |   }
                     |   
                     |   // After
-                    |   val ExampleStyle by ComponentStyle(extraModifiers = Modifier.tabIndex(0)) {
+                    |   val ExampleStyle by ComponentStyle(extraModifier = Modifier.tabIndex(0)) {
                     |       base {
                     |           Modifier.backgroundColor(Colors.Magenta)
                     |       }
@@ -245,7 +245,7 @@ abstract class CssStyle protected constructor(
     }
 
     internal fun intoImmutableStyle(classSelectors: ClassSelectors) =
-        ImmutableCssStyle(classSelectors, extraModifiers)
+        ImmutableCssStyle(classSelectors, extraModifier)
 
     @Composable
     fun toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
@@ -259,8 +259,8 @@ abstract class CssStyle protected constructor(
 internal class SimpleCssStyle(
     val selector: String,
     init: ComponentModifiers.() -> Unit,
-    extraModifiers: @Composable () -> Modifier,
-) : CssStyle(init, extraModifiers) {
+    extraModifier: @Composable () -> Modifier,
+) : CssStyle(init, extraModifier) {
     internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         return addStylesInto(selector, styleSheet)
     }
@@ -271,12 +271,12 @@ internal class SimpleCssStyle(
  *
  * @param classSelectors The CSS class selectors associated with this style, including the base class and any
  *  color mode specific classes, used to determine the exact classnames to apply when this style is used.
- * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
+ * @param extraModifier Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
  */
 internal class ImmutableCssStyle(
     classSelectors: ClassSelectors,
-    private val extraModifiers: @Composable () -> Modifier
+    private val extraModifier: @Composable () -> Modifier
 ) {
     private val classNames = classSelectors.classNames.toSet()
 
@@ -284,7 +284,7 @@ internal class ImmutableCssStyle(
     fun toModifier(): Modifier {
         val currentClassNames = classNames.filterNot { it.endsWith(ColorMode.current.opposite.name.lowercase()) }
         return (if (currentClassNames.isNotEmpty()) Modifier.classNames(*currentClassNames.toTypedArray()) else Modifier)
-            .then(extraModifiers())
+            .then(extraModifier())
     }
 }
 
@@ -354,20 +354,20 @@ private sealed interface StyleGroup {
     }
 }
 
-fun CssStyle(extraModifiers: Modifier = Modifier, init: ComponentModifiers.() -> Unit) =
-    object : CssStyle(init, { extraModifiers }) {}
+fun CssStyle(extraModifier: Modifier = Modifier, init: ComponentModifiers.() -> Unit) =
+    object : CssStyle(init, { extraModifier }) {}
 
 fun CssStyle(
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
-) = object : CssStyle(init, extraModifiers) {}
+) = object : CssStyle(init, extraModifier) {}
 
 fun CssStyle.Companion.base(
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentBaseModifier.() -> Modifier
-) = base({ extraModifiers }, init)
+) = base({ extraModifier }, init)
 
 fun CssStyle.Companion.base(
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentBaseModifier.() -> Modifier
-) = object : CssStyle(init = { base { ComponentBaseModifier(colorMode).let(init) } }, extraModifiers) {}
+) = object : CssStyle(init = { base { ComponentBaseModifier(colorMode).let(init) } }, extraModifier) {}

@@ -37,10 +37,10 @@ internal class SimpleComponentVariant<T : ComponentKind>(
 ) : ComponentVariant<T>() {
     constructor(
         init: ComponentModifiers.() -> Unit,
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         baseStyle: ComponentStyle<T>
     )
-        : this(object : CssStyle(init, extraModifiers) {}, baseStyle)
+        : this(object : CssStyle(init, extraModifier) {}, baseStyle)
 
     @Composable
     override fun toModifier() = cssStyle.toModifier()
@@ -96,9 +96,9 @@ fun <T : ComponentKind> Iterable<ComponentVariant<T>?>.combine(): ComponentVaria
 }
 
 fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentBaseModifier.() -> Modifier
-) = addVariantBase({ extraModifiers }, init)
+) = addVariantBase({ extraModifier }, init)
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
@@ -107,7 +107,7 @@ fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
  * you'll want to add additional, non-base styles.
  */
 fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentBaseModifier.() -> Modifier
 ): ComponentVariant<T> =
-    SimpleComponentVariant(init = { base { ComponentBaseModifier(colorMode).let(init) } }, extraModifiers, this)
+    SimpleComponentVariant(init = { base { ComponentBaseModifier(colorMode).let(init) } }, extraModifier, this)

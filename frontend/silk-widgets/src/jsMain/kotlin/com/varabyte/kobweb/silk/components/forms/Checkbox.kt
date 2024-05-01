@@ -85,7 +85,7 @@ interface CheckboxKind : ComponentKind {
 }
 
 val CheckboxStyle = ComponentStyle<CheckboxKind>(
-    extraModifiers = Modifier.rowClasses(verticalAlignment = Alignment.CenterVertically)
+    extraModifier = Modifier.rowClasses(verticalAlignment = Alignment.CenterVertically)
 ) {
     base {
         Modifier

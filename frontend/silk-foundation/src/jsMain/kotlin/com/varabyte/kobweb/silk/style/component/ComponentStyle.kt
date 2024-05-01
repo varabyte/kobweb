@@ -35,42 +35,42 @@ interface ComponentKind
  * }
  * ```
  *
-  * @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for including
+ * @param extraModifier Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
  */
 abstract class ComponentStyle<T : ComponentKind>(
     internal val init: ComponentModifiers.() -> Unit,
-    internal val extraModifiers: @Composable () -> Modifier,
+    internal val extraModifier: @Composable () -> Modifier,
 ) {
-    internal val cssStyle = object : CssStyle(init, extraModifiers) {}
+    internal val cssStyle = object : CssStyle(init, extraModifier) {}
 
     companion object // for extensions
 
     /**
      * Create a new variant that builds on top of this style.
      *
-     *  @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for
+     *  @param extraModifier Additional modifiers that can be tacked onto this component style, convenient for
      *    including non-style attributes that should always get applied whenever this variant style is applied.
      */
     fun addVariant(
-        extraModifiers: Modifier = Modifier,
+        extraModifier: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ): ComponentVariant<T> {
-        return addVariant({ extraModifiers }, init)
+        return addVariant({ extraModifier }, init)
     }
 
     /**
      * Create a new variant that builds on top of this style.
      *
-     *  @param extraModifiers Additional modifiers that can be tacked onto this component style, convenient for
+     *  @param extraModifier Additional modifiers that can be tacked onto this component style, convenient for
      *    including non-style attributes that should always get applied whenever this variant style is applied.
      */
     fun addVariant(
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ): ComponentVariant<T> {
         return SimpleComponentVariant(
-            object : CssStyle(init, extraModifiers) {},
+            object : CssStyle(init, extraModifier) {},
             baseStyle = this
         )
     }
@@ -108,42 +108,42 @@ internal value class ClassSelectors(private val value: List<String>) {
  * you'll want to add additional, non-base styles.
  */
 fun <T : ComponentKind> ComponentStyle.Companion.base(
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ): ComponentStyle<T> {
-    return base({ extraModifiers }, init)
+    return base({ extraModifier }, init)
 }
 
 fun <T : ComponentKind> ComponentStyle.Companion.base(
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ): ComponentStyle<T> {
     return object : ComponentStyle<T>(init = {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
-    }, extraModifiers) {}
+    }, extraModifier) {}
 }
 
 fun <T : ComponentKind> ComponentStyle(
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
-) = ComponentStyle<T>({ extraModifiers }, init)
+) = ComponentStyle<T>({ extraModifier }, init)
 
 fun <T : ComponentKind> ComponentStyle(
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
-) = object : ComponentStyle<T>(init, extraModifiers) {}
+) = object : ComponentStyle<T>(init, extraModifier) {}
 
 fun <T : ComponentKind> ComponentStyle.Companion.base(
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentBaseModifier.() -> Modifier
-) = base<T>({ extraModifiers }, init)
+) = base<T>({ extraModifier }, init)
 
 fun <T : ComponentKind> ComponentStyle.Companion.base(
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentBaseModifier.() -> Modifier
-) = ComponentStyle<T>(extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+) = ComponentStyle<T>(extraModifier, init = { base { ComponentBaseModifier(colorMode).let(init) } })
 
 /**
  * Convert a user's component style into a [Modifier].

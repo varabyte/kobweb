@@ -94,14 +94,14 @@ class MutableSilkTheme {
 
     fun MutableSilkTheme.replaceStyle(
         style: CssStyle,
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         val selector = cssStyles.entries.find { it.value == style }?.key
             ?: error("Attempting to replace a CSS style that was never registered.")
 
         check(!_replacedCssStyles.contains(style)) { "Attempting to override style \"${selector}\" twice" }
-        val newStyle = SimpleCssStyle(selector, init, extraModifiers)
+        val newStyle = SimpleCssStyle(selector, init, extraModifier)
         _cssStyles[selector] = newStyle
         _replacedCssStyles[style] = newStyle
     }
@@ -192,10 +192,10 @@ class MutableSilkTheme {
 
     fun <T : ComponentKind> replaceStyle(
         style: ComponentStyle<T>,
-        extraModifiers: Modifier = Modifier,
+        extraModifier: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
-        replaceStyle(style, { extraModifiers }, init)
+        replaceStyle(style, { extraModifier }, init)
     }
 
     /**
@@ -215,13 +215,13 @@ class MutableSilkTheme {
      */
     fun <T : ComponentKind> replaceStyle(
         style: ComponentStyle<T>,
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         val styleName = _cssNames[style] ?: error("Attempting to replace a style that was never registered.")
         check(componentStyles.contains(styleName)) { "Attempting to replace a style that was never registered: \"${styleName}\"" }
         check(!_replacedCssStyles.contains(style.cssStyle)) { "Attempting to override style \"${styleName}\" twice" }
-        val newStyle = ComponentStyle<T>(extraModifiers, init)
+        val newStyle = ComponentStyle<T>(extraModifier, init)
         _componentStyles[styleName] = newStyle
         _cssNames[newStyle] = styleName
         _replacedCssStyles[style.cssStyle] = newStyle.cssStyle
@@ -229,21 +229,21 @@ class MutableSilkTheme {
 
     fun replaceStyle(
         style: LegacyComponentStyle,
-        extraModifiers: Modifier = Modifier,
+        extraModifier: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
-        replaceStyle(style, { extraModifiers }, init)
+        replaceStyle(style, { extraModifier }, init)
     }
 
     fun replaceStyle(
         style: LegacyComponentStyle,
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         check(legacyComponentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
         check(!_replacedCssStyles.contains(style.cssStyle)) { "Attempting to override style \"${style.name}\" twice" }
 
-        val newStyle = LegacyComponentStyle(style.nameWithoutPrefix, extraModifiers, style.prefix, init)
+        val newStyle = LegacyComponentStyle(style.nameWithoutPrefix, extraModifier, style.prefix, init)
         _legacyComponentStyles[style.name] = newStyle
         _cssNames[newStyle] = style.name
         _replacedCssStyles[style.cssStyle] = newStyle.cssStyle
@@ -351,10 +351,10 @@ class MutableSilkTheme {
 
     fun <T : ComponentKind> replaceVariant(
         variant: ComponentVariant<T>,
-        extraModifiers: Modifier = Modifier,
+        extraModifier: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
-        replaceVariant(variant, { extraModifiers }, init)
+        replaceVariant(variant, { extraModifier }, init)
     }
 
     /**
@@ -375,7 +375,7 @@ class MutableSilkTheme {
      */
     fun <T : ComponentKind> replaceVariant(
         variant: ComponentVariant<T>,
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         @Suppress("NAME_SHADOWING")
@@ -386,7 +386,7 @@ class MutableSilkTheme {
             ?: error("Attempting to replace a variant that was never registered.")
 
         check(!_replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${name}\" twice" }
-        val newVariant = variant.baseStyle.addVariant(extraModifiers, init) as SimpleComponentVariant<T>
+        val newVariant = variant.baseStyle.addVariant(extraModifier, init) as SimpleComponentVariant<T>
         _componentVariants[name] = newVariant
         _cssNames[variant] = name
         _replacedCssStyles[variant.cssStyle] = newVariant.cssStyle
@@ -394,10 +394,10 @@ class MutableSilkTheme {
 
     fun replaceVariant(
         variant: LegacyComponentVariant,
-        extraModifiers: Modifier = Modifier,
+        extraModifier: Modifier = Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
-        replaceVariant(variant, { extraModifiers }, init)
+        replaceVariant(variant, { extraModifier }, init)
     }
 
     /**
@@ -418,7 +418,7 @@ class MutableSilkTheme {
      */
     fun replaceVariant(
         variant: LegacyComponentVariant,
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         init: ComponentModifiers.() -> Unit
     ) {
         @Suppress("NAME_SHADOWING")
@@ -427,7 +427,7 @@ class MutableSilkTheme {
 
         check(legacyComponentVariants.contains(variant.cssStyle.selector)) { "Attempting to replace a variant that was never registered: \"${variant.cssStyle.selector}\"" }
         check(!_replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${variant.cssStyle.selector}\" twice" }
-        val newVariant = variant.baseStyle.addVariant(variant.name, extraModifiers, init) as LegacySimpleComponentVariant
+        val newVariant = variant.baseStyle.addVariant(variant.name, extraModifier, init) as LegacySimpleComponentVariant
         _legacyComponentVariants[variant.cssStyle.selector] = newVariant
         _cssNames[variant] = variant.name
         _replacedCssStyles[variant.cssStyle] = newVariant.cssStyle
@@ -470,24 +470,24 @@ class MutableSilkTheme {
  */
 fun MutableSilkTheme.modifyStyle(
     style: CssStyle,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
-    modifyStyle(style, { extraModifiers }, init)
+    modifyStyle(style, { extraModifier }, init)
 }
 
 fun MutableSilkTheme.modifyStyle(
     style: CssStyle,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
     val styleName = _cssNames[style] ?: error("Attempting to modify a style that was never registered.")
     check(cssStyles.contains(".$styleName")) { "Attempting to modify a style that was never registered: \"${styleName}\"" }
-    val existingExtraModifiers = style.extraModifiers
+    val existingExtraModifier = style.extraModifier
     val existingInit = style.init
 
     replaceStyle(style, {
-        existingExtraModifiers().then(extraModifiers())
+        existingExtraModifier().then(extraModifier())
     }) {
         existingInit.invoke(this)
         init.invoke(this)
@@ -496,18 +496,18 @@ fun MutableSilkTheme.modifyStyle(
 
 fun MutableSilkTheme.modifyStyleBase(
     style: CssStyle,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyStyleBase(style, { extraModifiers }, init)
+    modifyStyleBase(style, { extraModifier }, init)
 }
 
 fun MutableSilkTheme.modifyStyleBase(
     style: CssStyle,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyStyle(style, extraModifiers) {
+    modifyStyle(style, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -552,10 +552,10 @@ fun MutableSilkTheme.replaceComponentStyleBase(
 
 fun <T : ComponentKind> MutableSilkTheme.replaceStyleBase(
     style: ComponentStyle<T>,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceStyleBase(style, { extraModifiers }, init)
+    replaceStyleBase(style, { extraModifier }, init)
 }
 
 /**
@@ -563,10 +563,10 @@ fun <T : ComponentKind> MutableSilkTheme.replaceStyleBase(
  */
 fun <T : ComponentKind> MutableSilkTheme.replaceStyleBase(
     style: ComponentStyle<T>,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceStyle(style, extraModifiers) {
+    replaceStyle(style, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -575,10 +575,10 @@ fun <T : ComponentKind> MutableSilkTheme.replaceStyleBase(
 
 fun MutableSilkTheme.replaceStyleBase(
     style: LegacyComponentStyle,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceStyleBase(style, { extraModifiers }, init)
+    replaceStyleBase(style, { extraModifier }, init)
 }
 
 /**
@@ -586,10 +586,10 @@ fun MutableSilkTheme.replaceStyleBase(
  */
 fun MutableSilkTheme.replaceStyleBase(
     style: LegacyComponentStyle,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceStyle(style, extraModifiers) {
+    replaceStyle(style, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -646,10 +646,10 @@ fun MutableSilkTheme.replaceComponentVariantBase(
 
 fun <T : ComponentKind> MutableSilkTheme.replaceVariantBase(
     variant: ComponentVariant<T>,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceVariantBase(variant, { extraModifiers }, init)
+    replaceVariantBase(variant, { extraModifier }, init)
 }
 
 /**
@@ -657,10 +657,10 @@ fun <T : ComponentKind> MutableSilkTheme.replaceVariantBase(
  */
 fun <T : ComponentKind> MutableSilkTheme.replaceVariantBase(
     variant: ComponentVariant<T>,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceVariant(variant, extraModifiers) {
+    replaceVariant(variant, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -669,18 +669,18 @@ fun <T : ComponentKind> MutableSilkTheme.replaceVariantBase(
 
 fun MutableSilkTheme.replaceVariantBase(
     variant: LegacyComponentVariant,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceVariantBase(variant, { extraModifiers }, init)
+    replaceVariantBase(variant, { extraModifier }, init)
 }
 
 fun MutableSilkTheme.replaceVariantBase(
     variant: LegacyComponentVariant,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    replaceVariant(variant, extraModifiers) {
+    replaceVariant(variant, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -761,10 +761,10 @@ fun MutableSilkTheme.modifyComponentStyleBase(
 
 fun <T : ComponentKind> MutableSilkTheme.modifyStyle(
     style: ComponentStyle<T>,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
-    modifyStyle(style, { extraModifiers }, init)
+    modifyStyle(style, { extraModifier }, init)
 }
 
 /**
@@ -784,16 +784,16 @@ fun <T : ComponentKind> MutableSilkTheme.modifyStyle(
  */
 fun <T : ComponentKind> MutableSilkTheme.modifyStyle(
     style: ComponentStyle<T>,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
     val styleName = _cssNames[style] ?: error("Attempting to modify a style that was never registered.")
     check(componentStyles.contains(styleName)) { "Attempting to modify a style that was never registered: \"${styleName}\"" }
-    val existingExtraModifiers = style.extraModifiers
+    val existingExtraModifier = style.extraModifier
     val existingInit = style.init
 
     replaceStyle(style, {
-        existingExtraModifiers().then(extraModifiers())
+        existingExtraModifier().then(extraModifier())
     }) {
         existingInit.invoke(this)
         init.invoke(this)
@@ -802,18 +802,18 @@ fun <T : ComponentKind> MutableSilkTheme.modifyStyle(
 
 fun <T : ComponentKind> MutableSilkTheme.modifyStyleBase(
     style: ComponentStyle<T>,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyStyleBase(style, { extraModifiers }, init)
+    modifyStyleBase(style, { extraModifier }, init)
 }
 
 fun <T : ComponentKind> MutableSilkTheme.modifyStyleBase(
     style: ComponentStyle<T>,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyStyle(style, extraModifiers) {
+    modifyStyle(style, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -822,23 +822,23 @@ fun <T : ComponentKind> MutableSilkTheme.modifyStyleBase(
 
 fun MutableSilkTheme.modifyStyle(
     style: LegacyComponentStyle,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
-    modifyStyle(style, { extraModifiers }, init)
+    modifyStyle(style, { extraModifier }, init)
 }
 
 fun MutableSilkTheme.modifyStyle(
     style: LegacyComponentStyle,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
     check(legacyComponentStyles.contains(style.name)) { "Attempting to modify a style that was never registered: \"${style.name}\"" }
-    val existingExtraModifiers = style.extraModifiers
+    val existingExtraModifier = style.extraModifiers
     val existingInit = style.init
 
     replaceStyle(style, {
-        existingExtraModifiers().then(extraModifiers())
+        existingExtraModifier().then(extraModifier())
     }) {
         existingInit.invoke(this)
         init.invoke(this)
@@ -847,18 +847,18 @@ fun MutableSilkTheme.modifyStyle(
 
 fun MutableSilkTheme.modifyStyleBase(
     style: LegacyComponentStyle,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyStyleBase(style, { extraModifiers }, init)
+    modifyStyleBase(style, { extraModifier }, init)
 }
 
 fun MutableSilkTheme.modifyStyleBase(
     style: LegacyComponentStyle,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyStyle(style, extraModifiers) {
+    modifyStyle(style, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -903,10 +903,10 @@ fun <T : ComponentKind> MutableSilkTheme.modifyComponentVariantBase(
 
 fun <T : ComponentKind> MutableSilkTheme.modifyVariant(
     variant: ComponentVariant<T>,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
-    modifyVariant(variant, { extraModifiers }, init)
+    modifyVariant(variant, { extraModifier }, init)
 }
 
 /**
@@ -926,7 +926,7 @@ fun <T : ComponentKind> MutableSilkTheme.modifyVariant(
  */
 fun <T : ComponentKind> MutableSilkTheme.modifyVariant(
     variant: ComponentVariant<T>,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
     @Suppress("NAME_SHADOWING")
@@ -935,11 +935,11 @@ fun <T : ComponentKind> MutableSilkTheme.modifyVariant(
 
     val variantName = _cssNames[variant] ?: error("Attempting to modify a variant that was never registered.")
     check(componentVariants.contains(variantName)) { "Attempting to modify a style that was never registered: \"${variantName}\"" }
-    val existingExtraModifiers = variant.cssStyle.extraModifiers
+    val existingExtraModifier = variant.cssStyle.extraModifier
     val existingInit = variant.cssStyle.init
 
     replaceVariant(variant, {
-        existingExtraModifiers().then(extraModifiers())
+        existingExtraModifier().then(extraModifier())
     }) {
         existingInit.invoke(this)
         init.invoke(this)
@@ -948,18 +948,18 @@ fun <T : ComponentKind> MutableSilkTheme.modifyVariant(
 
 fun <T : ComponentKind> MutableSilkTheme.modifyVariantBase(
     variant: ComponentVariant<T>,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyVariantBase(variant, { extraModifiers }, init)
+    modifyVariantBase(variant, { extraModifier }, init)
 }
 
 fun <T : ComponentKind> MutableSilkTheme.modifyVariantBase(
     variant: ComponentVariant<T>,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyVariant(variant, extraModifiers) {
+    modifyVariant(variant, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
@@ -968,15 +968,15 @@ fun <T : ComponentKind> MutableSilkTheme.modifyVariantBase(
 
 fun MutableSilkTheme.modifyVariant(
     variant: LegacyComponentVariant,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
-    modifyVariant(variant, { extraModifiers }, init)
+    modifyVariant(variant, { extraModifier }, init)
 }
 
 fun MutableSilkTheme.modifyVariant(
     variant: LegacyComponentVariant,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifiers.() -> Unit
 ) {
     @Suppress("NAME_SHADOWING")
@@ -984,11 +984,11 @@ fun MutableSilkTheme.modifyVariant(
         ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
     check(legacyComponentVariants.contains(variant.cssStyle.selector)) { "Attempting to modify a variant that was never registered: \"${variant.cssStyle.selector}\"" }
-    val existingExtraModifiers = variant.cssStyle.extraModifiers
+    val existingExtraModifier = variant.cssStyle.extraModifier
     val existingInit = variant.cssStyle.init
 
     replaceVariant(variant, {
-        existingExtraModifiers().then(extraModifiers())
+        existingExtraModifier().then(extraModifier())
     }) {
         existingInit.invoke(this)
         init.invoke(this)
@@ -997,18 +997,18 @@ fun MutableSilkTheme.modifyVariant(
 
 fun MutableSilkTheme.modifyVariantBase(
     variant: LegacyComponentVariant,
-    extraModifiers: Modifier = Modifier,
+    extraModifier: Modifier = Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyVariantBase(variant, { extraModifiers }, init)
+    modifyVariantBase(variant, { extraModifier }, init)
 }
 
 fun MutableSilkTheme.modifyVariantBase(
     variant: LegacyComponentVariant,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: ComponentModifier.() -> Modifier
 ) {
-    modifyVariant(variant, extraModifiers) {
+    modifyVariant(variant, extraModifier) {
         base {
             ComponentBaseModifier(colorMode).let(init)
         }
