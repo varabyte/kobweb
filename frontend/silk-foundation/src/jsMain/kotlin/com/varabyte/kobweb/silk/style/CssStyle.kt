@@ -15,6 +15,7 @@ import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
+import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
 
 /**
  * A class which allows a user to define styles that will be added into the site's CSS stylesheet.
@@ -96,7 +97,10 @@ abstract class CssStyle protected constructor(
     /**
      * @param cssRule A selector plus an optional pseudo keyword (e.g. "a", "a:link", and "a::selection")
      */
-    private fun <T : StyleScope> GenericStyleSheetBuilder<T>.addStyles(cssRule: String, styles: ComparableStyleScope) {
+    private fun <T : JbStyleScope> GenericStyleSheetBuilder<T>.addStyles(
+        cssRule: String,
+        styles: ComparableStyleScope
+    ) {
         cssRule style {
             styles.properties.forEach { entry -> property(entry.key, entry.value) }
             styles.variables.forEach { entry -> variable(entry.key, entry.value) }
@@ -292,7 +296,7 @@ internal class ImmutableCssStyle(
 }
 
 /**
- * An extension to [StyleModifiers] which adds extra information only relevant to [CssStyle] blocks.
+ * An extension to [StyleScope] which adds extra information only relevant to [CssStyle] blocks.
  *
  * For example, color mode is supported here:
  *
@@ -314,7 +318,7 @@ internal class ImmutableCssStyle(
  * }
  * ```
  */
-class CssStyleScope internal constructor(val colorMode: ColorMode) : StyleModifiers()
+class CssStyleScope internal constructor(val colorMode: ColorMode) : StyleScope()
 
 /**
  * A simplified subset of [CssStyleScope].
