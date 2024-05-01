@@ -77,16 +77,16 @@ import org.w3c.dom.Element
  * resulting in an element like `<div class="widget widget-size_md">...</div>`.
  */
 abstract class CssStyle protected constructor(
-    internal val init: ComponentModifiers.() -> Unit,
+    internal val init: CssStyleScope.() -> Unit,
     internal val extraModifier: @Composable () -> Modifier = { Modifier },
 ) {
     /**
      * A [CssStyle] when you know you only want to specify the base style, and not any other modifiers like hover.
      */
     abstract class Base protected constructor(
-        init: ComponentBaseModifier.() -> Modifier,
+        init: CssStyleBaseScope.() -> Modifier,
         extraModifier: @Composable () -> Modifier = { Modifier },
-    ) : CssStyle({ base { ComponentBaseModifier(colorMode).init() } }, extraModifier) {
+    ) : CssStyle({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
         constructor(init: Modifier, extraModifier: @Composable () -> Modifier = { Modifier }) : this(
             { init },
             extraModifier
@@ -127,7 +127,7 @@ abstract class CssStyle protected constructor(
     // definitions for the same selector, just combine them together. One way this is useful is you can use
     // `MutableSilkTheme.modifyStyle` to layer additional styles on top of a base style. In almost all
     // practical cases, however, there will only ever be a single selector of each type per component style.
-    private fun ComponentModifiers.mergeCssModifiers(init: ComponentModifiers.() -> Unit): Map<CssModifier.Key, CssModifier> {
+    private fun CssStyleScope.mergeCssModifiers(init: CssStyleScope.() -> Unit): Map<CssModifier.Key, CssModifier> {
         return apply(init).cssModifiers
             .groupBy { it.key }
             .mapValues { (_, group) ->
@@ -208,9 +208,9 @@ abstract class CssStyle protected constructor(
         // searching for all elements tagged with a certain class.
         val classNames = mutableListOf(selector)
 
-        val lightModifiers = ComponentModifiers(ColorMode.LIGHT).mergeCssModifiers(init)
+        val lightModifiers = CssStyleScope(ColorMode.LIGHT).mergeCssModifiers(init)
             .assertNoAttributeModifiers(selector)
-        val darkModifiers = ComponentModifiers(ColorMode.DARK).mergeCssModifiers(init)
+        val darkModifiers = CssStyleScope(ColorMode.DARK).mergeCssModifiers(init)
             .assertNoAttributeModifiers(selector)
 
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
@@ -261,7 +261,7 @@ abstract class CssStyle protected constructor(
  */
 internal class SimpleCssStyle(
     val selector: String,
-    init: ComponentModifiers.() -> Unit,
+    init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
 ) : CssStyle(init, extraModifier) {
     internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
@@ -292,12 +292,24 @@ internal class ImmutableCssStyle(
 }
 
 /**
- * State specific to [CssStyle] initialization but not the more general [StyleModifiers] case.
+ * Properties that all css style scope implementations promise to support.
+ *
+ * Note: the "Base" suffix here is different from the concept of a base style (e.g. base `{ ... }`). This is confusing
+ * and we, the authors of the codebase, express our deepest apologies! In practice, this class will never be imported
+ * directly by user code.
+ */
+interface CssStyleScopeBase {
+    val colorMode: ColorMode
+}
+
+/**
+ * An extension to [StyleModifiers] which adds extra information only relevant to [CssStyle] blocks.
  *
  * For example, color mode is supported here:
  *
  * ```
  * val MyWidgetStyle = CssStyle {
+ *    if (colorMode.isDark()) { ... }
  *    ...
  * }
  * ```
@@ -313,20 +325,15 @@ internal class ImmutableCssStyle(
  * }
  * ```
  */
-interface ComponentModifier {
-    /**
-     * The current color mode, which may impact the look and feel of the current component style.
-     */
-    val colorMode: ColorMode
-}
-
-class ComponentModifiers internal constructor(override val colorMode: ColorMode) : ComponentModifier, StyleModifiers()
+class CssStyleScope internal constructor(override val colorMode: ColorMode) : CssStyleScopeBase, StyleModifiers()
 
 /**
- * Class provided for cases where you only generate a single style (e.g. base), unlike [ComponentModifiers] where you
+ * A simplified subset of [CssStyleScope].
+ *
+ * This scope is provided for cases where you only generate a single style (e.g. base), unlike [CssStyleScope] where you
  * can define a collection of styles.
  */
-class ComponentBaseModifier internal constructor(override val colorMode: ColorMode) : ComponentModifier
+class CssStyleBaseScope internal constructor(override val colorMode: ColorMode) : CssStyleScopeBase
 
 private sealed interface StyleGroup {
     class Light(val styles: ComparableStyleScope) : StyleGroup
@@ -357,20 +364,20 @@ private sealed interface StyleGroup {
     }
 }
 
-fun CssStyle(extraModifier: Modifier = Modifier, init: ComponentModifiers.() -> Unit) =
+fun CssStyle(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
     object : CssStyle(init, { extraModifier }) {}
 
 fun CssStyle(
     extraModifier: @Composable () -> Modifier,
-    init: ComponentModifiers.() -> Unit
+    init: CssStyleScope.() -> Unit
 ) = object : CssStyle(init, extraModifier) {}
 
 fun CssStyle.Companion.base(
     extraModifier: Modifier = Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ) = base({ extraModifier }, init)
 
 fun CssStyle.Companion.base(
     extraModifier: @Composable () -> Modifier,
-    init: ComponentBaseModifier.() -> Modifier
-) = object : CssStyle(init = { base { ComponentBaseModifier(colorMode).let(init) } }, extraModifier) {}
+    init: CssStyleBaseScope.() -> Modifier
+) = object : CssStyle(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}

@@ -6,13 +6,14 @@ import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.style.CssStyleScopeBase
 import com.varabyte.kobweb.silk.style.component.ComponentStyle
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
 
-class KeyframesBuilder internal constructor(val colorMode: ColorMode) {
+class KeyframesBuilder internal constructor(override val colorMode: ColorMode) : CssStyleScopeBase {
     private val keyframeStyles = mutableMapOf<CSSKeyframe, Modifier>()
 
     private val comparableKeyframeStyles
