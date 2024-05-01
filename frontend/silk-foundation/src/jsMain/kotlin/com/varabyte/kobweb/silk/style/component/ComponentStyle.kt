@@ -91,8 +91,8 @@ abstract class ComponentStyle<T : ComponentKind>(
 
 /** Represents the class selectors associated with a [ComponentStyle]. */
 internal value class ClassSelectors(private val value: List<String>) {
-    // Convert selectors (".someClass") to class names ("someClass")
-    val classNames get() = value.map { it.removePrefix(".") }
+    // Selectors may be ".someStyle" or ".someStyle.someVariant" - only the last part is relevant to the specific style
+    val classNames get() = value.map { it.substringAfterLast('.') }
     operator fun plus(other: ClassSelectors) = ClassSelectors(value + other.value)
 }
 

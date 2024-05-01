@@ -1058,14 +1058,15 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         check(_SilkTheme != null)
         val componentStyles = mutableSilkTheme.componentStyles.values
             .associate { ".${this.nameFor(it)}" to it.cssStyle }
-        // Variants should be defined after base styles to make sure they take priority if used
+        // Variant selectors should be defined in a way that guarantees it will have more specificity than the base style
         val componentVariants = mutableSilkTheme.componentVariants.values.filterIsInstance<SimpleComponentVariant<*>>()
-            .associate { ".${this.nameFor(it)}" to it.cssStyle }
+            .associate { ".${this.nameFor(it.baseStyle)}.${this.nameFor(it)}" to it.cssStyle }
 
         val legacyComponentStyles = mutableSilkTheme.legacyComponentStyles.values
             .associate { ".${it.name}" to it.cssStyle }
+        // Variant selectors should be defined in a way that guarantees it will have more specificity than the base style
         val legacyComponentVariants = mutableSilkTheme.legacyComponentVariants.values.filterIsInstance<LegacySimpleComponentVariant>()
-            .associate { ".${it.name}" to it.cssStyle }
+            .associate { ".${it.baseStyle.name}.${it.name}" to it.cssStyle }
 
         val allCssStyles = componentStyles + legacyComponentStyles + componentVariants  + legacyComponentVariants + mutableSilkTheme.cssStyles
         allCssStyles.forEach { (selector, style) ->
