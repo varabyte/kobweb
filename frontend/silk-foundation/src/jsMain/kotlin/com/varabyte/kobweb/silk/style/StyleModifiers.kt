@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.css.*
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
  * [Modifier]s).
  *
- * See also [ComponentModifiers] for places where you can define component styles which have a few extra features
+ * See also [CssStyleScope] for places where you can define component styles which have a few extra features
  * enabled for them.
  */
 abstract class StyleModifiers {
@@ -60,7 +60,7 @@ abstract class StyleModifiers {
      * ```
      *
      * Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
-     * (here, we'd need to access both "Breakpoint" and "ComponentModifiers")
+     * (here, we'd need to access both "Breakpoint" and "StyleModifiers")
      */
     operator fun Breakpoint.invoke(createModifier: () -> Modifier) {
         cssRule(this.toMinWidthQuery(), createModifier)

@@ -9,9 +9,8 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
-import com.varabyte.kobweb.silk.style.ComponentBaseModifier
-import com.varabyte.kobweb.silk.style.ComponentModifier
-import com.varabyte.kobweb.silk.style.ComponentModifiers
+import com.varabyte.kobweb.silk.style.CssStyleBaseScope
+import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.style.component.combine
@@ -56,7 +55,7 @@ class ComponentStyle(
     name: String,
     internal val extraModifiers: @Composable () -> Modifier,
     val prefix: String? = null,
-    internal val init: ComponentModifiers.() -> Unit,
+    internal val init: CssStyleScope.() -> Unit,
 ) {
     init {
         require(name.isNotEmpty()) { "ComponentStyle name must not be empty" }
@@ -70,7 +69,7 @@ class ComponentStyle(
         name: String,
         extraModifiers: Modifier = Modifier,
         prefix: String? = null,
-        init: ComponentModifiers.() -> Unit
+        init: CssStyleScope.() -> Unit
     )
         : this(name, { extraModifiers }, prefix, init)
 
@@ -85,7 +84,7 @@ class ComponentStyle(
     fun addVariant(
         name: String,
         extraModifiers: Modifier = Modifier,
-        init: ComponentModifiers.() -> Unit
+        init: CssStyleScope.() -> Unit
     ): ComponentVariant {
         return addVariant(name, { extraModifiers }, init)
     }
@@ -99,7 +98,7 @@ class ComponentStyle(
     fun addVariant(
         name: String,
         extraModifiers: @Composable () -> Modifier,
-        init: ComponentModifiers.() -> Unit
+        init: CssStyleScope.() -> Unit
     ): ComponentVariant {
         val fullName = "${this.name}-$name"
         return SimpleComponentVariant(
@@ -138,7 +137,7 @@ class ComponentStyle(
 fun ComponentStyle.Companion.base(
     className: String,
     extraModifiers: Modifier = Modifier,
-    init: ComponentModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ): ComponentStyle {
     return base(className, { extraModifiers }, init)
 }
@@ -147,11 +146,11 @@ fun ComponentStyle.Companion.base(
 fun ComponentStyle.Companion.base(
     className: String,
     extraModifiers: @Composable () -> Modifier,
-    init: ComponentModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ): ComponentStyle {
     return ComponentStyle(className, extraModifiers) {
         base {
-            ComponentBaseModifier(colorMode).let(init)
+            CssStyleBaseScope(colorMode).let(init)
         }
     }
 }
@@ -162,7 +161,7 @@ fun ComponentStyle.Companion.base(
 class ComponentStyleProvider internal constructor(
     private val extraModifiers: @Composable () -> Modifier,
     private val prefix: String? = null,
-    private val init: ComponentModifiers.() -> Unit,
+    private val init: CssStyleScope.() -> Unit,
 ) : CacheByPropertyNameDelegate<ComponentStyle>() {
     override fun create(propertyName: String): ComponentStyle {
         // e.g. "TitleTextStyle" to "title-text"
@@ -175,7 +174,7 @@ class ComponentStyleProvider internal constructor(
 fun ComponentStyle(
     extraModifiers: Modifier = Modifier,
     prefix: String? = null,
-    init: ComponentModifiers.() -> Unit
+    init: CssStyleScope.() -> Unit
 ) =
     ComponentStyle({ extraModifiers }, prefix, init)
 
@@ -183,22 +182,22 @@ fun ComponentStyle(
 fun ComponentStyle(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
-    init: ComponentModifiers.() -> Unit
+    init: CssStyleScope.() -> Unit
 ) = ComponentStyleProvider(extraModifiers, prefix, init)
 
 @Deprecated("You probably want to use `CssStyle.base` instead. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
 fun ComponentStyle.Companion.base(
     extraModifiers: Modifier = Modifier,
     prefix: String? = null,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ) = base({ extraModifiers }, prefix, init)
 
 @Deprecated("You probably want to use `CssStyle.base` instead. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
 fun ComponentStyle.Companion.base(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
-    init: ComponentBaseModifier.() -> Modifier
-) = ComponentStyleProvider(extraModifiers, prefix, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+    init: CssStyleBaseScope.() -> Modifier
+) = ComponentStyleProvider(extraModifiers, prefix, init = { base { CssStyleBaseScope(colorMode).let(init) } })
 
 /**
  * Convert a user's component style into a [Modifier].

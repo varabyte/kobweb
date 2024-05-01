@@ -2,9 +2,9 @@ package com.varabyte.kobweb.silk.style.component
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.style.ComponentBaseModifier
-import com.varabyte.kobweb.silk.style.ComponentModifiers
 import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleBaseScope
+import com.varabyte.kobweb.silk.style.CssStyleScope
 import kotlin.reflect.KProperty
 
 abstract class ComponentVariant<T : ComponentKind> {
@@ -36,7 +36,7 @@ internal class SimpleComponentVariant<T : ComponentKind>(
     val baseStyle: ComponentStyle<T>
 ) : ComponentVariant<T>() {
     constructor(
-        init: ComponentModifiers.() -> Unit,
+        init: CssStyleScope.() -> Unit,
         extraModifier: @Composable () -> Modifier,
         baseStyle: ComponentStyle<T>
     )
@@ -97,7 +97,7 @@ fun <T : ComponentKind> Iterable<ComponentVariant<T>?>.combine(): ComponentVaria
 
 fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
     extraModifier: Modifier = Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ) = addVariantBase({ extraModifier }, init)
 
 /**
@@ -108,6 +108,6 @@ fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
  */
 fun <T : ComponentKind> ComponentStyle<T>.addVariantBase(
     extraModifier: @Composable () -> Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ): ComponentVariant<T> =
-    SimpleComponentVariant(init = { base { ComponentBaseModifier(colorMode).let(init) } }, extraModifier, this)
+    SimpleComponentVariant(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier, this)

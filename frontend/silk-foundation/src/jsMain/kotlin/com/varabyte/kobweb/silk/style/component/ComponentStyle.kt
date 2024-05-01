@@ -7,10 +7,9 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.style.ComponentBaseModifier
-import com.varabyte.kobweb.silk.style.ComponentModifier
-import com.varabyte.kobweb.silk.style.ComponentModifiers
 import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleBaseScope
+import com.varabyte.kobweb.silk.style.CssStyleScope
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 
@@ -52,7 +51,7 @@ interface ComponentKind
  * @see CssStyle
  */
 abstract class ComponentStyle<T : ComponentKind>(
-    internal val init: ComponentModifiers.() -> Unit,
+    internal val init: CssStyleScope.() -> Unit,
     internal val extraModifier: @Composable () -> Modifier,
 ) {
     internal val cssStyle = object : CssStyle(init, extraModifier) {}
@@ -67,7 +66,7 @@ abstract class ComponentStyle<T : ComponentKind>(
      */
     fun addVariant(
         extraModifier: Modifier = Modifier,
-        init: ComponentModifiers.() -> Unit
+        init: CssStyleScope.() -> Unit
     ): ComponentVariant<T> {
         return addVariant({ extraModifier }, init)
     }
@@ -80,7 +79,7 @@ abstract class ComponentStyle<T : ComponentKind>(
      */
     fun addVariant(
         extraModifier: @Composable () -> Modifier,
-        init: ComponentModifiers.() -> Unit
+        init: CssStyleScope.() -> Unit
     ): ComponentVariant<T> {
         return SimpleComponentVariant(
             object : CssStyle(init, extraModifier) {},
@@ -95,6 +94,17 @@ internal value class ClassSelectors(private val value: List<String>) {
     val classNames get() = value.map { it.substringAfterLast('.') }
     operator fun plus(other: ClassSelectors) = ClassSelectors(value + other.value)
 }
+
+fun <T : ComponentKind> ComponentStyle(
+    extraModifier: Modifier = Modifier,
+    init: CssStyleScope.() -> Unit
+) = ComponentStyle<T>({ extraModifier }, init)
+
+fun <T : ComponentKind> ComponentStyle(
+    extraModifier: @Composable () -> Modifier,
+    init: CssStyleScope.() -> Unit
+) = object : ComponentStyle<T>(init, extraModifier) {}
+
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
@@ -122,41 +132,13 @@ internal value class ClassSelectors(private val value: List<String>) {
  */
 fun <T : ComponentKind> ComponentStyle.Companion.base(
     extraModifier: Modifier = Modifier,
-    init: ComponentModifier.() -> Modifier
-): ComponentStyle<T> {
-    return base({ extraModifier }, init)
-}
-
-fun <T : ComponentKind> ComponentStyle.Companion.base(
-    extraModifier: @Composable () -> Modifier,
-    init: ComponentModifier.() -> Modifier
-): ComponentStyle<T> {
-    return object : ComponentStyle<T>(init = {
-        base {
-            ComponentBaseModifier(colorMode).let(init)
-        }
-    }, extraModifier) {}
-}
-
-fun <T : ComponentKind> ComponentStyle(
-    extraModifier: Modifier = Modifier,
-    init: ComponentModifiers.() -> Unit
-) = ComponentStyle<T>({ extraModifier }, init)
-
-fun <T : ComponentKind> ComponentStyle(
-    extraModifier: @Composable () -> Modifier,
-    init: ComponentModifiers.() -> Unit
-) = object : ComponentStyle<T>(init, extraModifier) {}
-
-fun <T : ComponentKind> ComponentStyle.Companion.base(
-    extraModifier: Modifier = Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ) = base<T>({ extraModifier }, init)
 
 fun <T : ComponentKind> ComponentStyle.Companion.base(
     extraModifier: @Composable () -> Modifier,
-    init: ComponentBaseModifier.() -> Modifier
-) = ComponentStyle<T>(extraModifier, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+    init: CssStyleBaseScope.() -> Modifier
+) = ComponentStyle<T>(extraModifier, init = { base { CssStyleBaseScope(colorMode).let(init) } })
 
 /**
  * Convert a user's component style into a [Modifier].
