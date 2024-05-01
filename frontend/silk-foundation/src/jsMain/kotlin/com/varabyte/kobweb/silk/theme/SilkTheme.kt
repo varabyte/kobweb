@@ -109,25 +109,6 @@ class MutableSilkTheme {
     /**
      * Register a new component style with this theme.
      *
-     * **NOTE:** You shouldn't have to call this yourself. Kobweb detects styles in your code at compile and calls this
-     * method for you.
-     *
-     * Once a style is registered, you can reference it in your Composable widget by calling `toModifier` on it:
-     *
-     * ```
-     * // Your widget code
-     * @Composable
-     * fun SomeWidget(modifier: Modifier = Modifier) { ... }
-     *
-     * // Your view code:
-     * val SomeStyle by ComponentStyle { // Registered automatically by Kobweb
-     *   base { Modifier.background(Colors.Grey) }
-     * }
-     *
-     * // Later...
-     * SomeWidget(SomeStyle.toModifier()) // <-- Pass Style to the target widget
-     * ```
-     *
      * @see replaceStyle
      */
     fun registerStyle(name: String, style: ComponentStyle<*>) {
@@ -258,7 +239,7 @@ class MutableSilkTheme {
      * For example,
      *
      * ```
-     * val ButtonStyle = ComponentStyle { ... }
+     * val ButtonStyle = ComponentStyle<ButtonKind> { ... }
      *
      * // Here, the final name --> "button-brand"
      * // Without a CssName, the final name would be "button-brand-aware-orange-red"
@@ -1049,7 +1030,7 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
 
     // Note: We separate these function out from the SilkTheme constructor so we can construct it first and then call
     // them later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
-    //  val TextStyle by ComponentStyle {
+    //  val TextStyle = CssStyle {
     //    base {
     //      Modifier.color(SilkTheme.palettes[colorMode].color)
     //                     ^^^^^^^^^

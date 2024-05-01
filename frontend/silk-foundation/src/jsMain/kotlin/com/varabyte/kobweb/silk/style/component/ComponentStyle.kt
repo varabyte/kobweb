@@ -18,25 +18,38 @@ import org.jetbrains.compose.web.css.*
 interface ComponentKind
 
 /**
- * A class which allows a user to define styles that get added to the page's stylesheet, instead of inline styles.
+ * A class which allows a user to define styles that drive the look and feel of a component.
  *
- * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
- * media queries, and pseudo classes.
+ * You should compare this with [CssStyle], which is more broadly applicable and most often what users are expected to
+ * use.
  *
- * If defining a style for a custom widget, you should call the [toModifier] method to apply it:
+ * In contrast, `ComponentStyle` is a specific kind of `CssStyle` which allows users to create variants of its styles
+ * that tweak them. For example, you might have a button style which renders rectangular by default, but you can provide
+ * a circular variant, or a semi-transparent variant, etc.
+ *
+ * To create a new component style, you must first declare a new [ComponentKind] that is uniquely associated with your
+ * widget. This will allow you to enjoy type safety when layering variants on top of the style.
+
+ * Once the style is defined, you can simply use the [toModifier] method to apply it:
  *
  * ```
- * val CustomStyle = ComponentStyle("my-style") { ... }
+ * val CustomKind : ComponentKind
+ * val CustomStyle by ComponentStyle<CustomKind> { ... }
  *
  * @Composable
- * fun CustomWidget(..., variant: ComponentVariant<*>? = null, ...) {
+ * fun CustomWidget(..., variant: ComponentVariant<CustomKind>? = null, ...) {
  *   val modifier = CustomStyle.toModifier(variant).then(...)
  *   // ^ This modifier is now set with your registered styles.
  * }
  * ```
  *
+ * NOTE: Even if you don't provide any variants yourself, it is a good practice to accept a nullable variant in your
+ * widget's parameters. This way, a user can create their own variants and pass them in.
+ *
  * @param extraModifier Additional modifiers that can be tacked onto this component style, convenient for including
  *   non-style attributes whenever this style is applied.
+ *
+ * @see CssStyle
  */
 abstract class ComponentStyle<T : ComponentKind>(
     internal val init: ComponentModifiers.() -> Unit,
