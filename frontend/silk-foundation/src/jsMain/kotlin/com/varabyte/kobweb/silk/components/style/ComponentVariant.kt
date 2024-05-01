@@ -6,8 +6,8 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
-import com.varabyte.kobweb.silk.style.ComponentBaseModifier
-import com.varabyte.kobweb.silk.style.ComponentModifiers
+import com.varabyte.kobweb.silk.style.CssStyleBaseScope
+import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.component.ClassSelectors
 import com.varabyte.kobweb.silk.style.component.ComponentKind
@@ -92,7 +92,7 @@ fun Iterable<ComponentVariant?>.combine(): ComponentVariant? {
 class ComponentVariantProvider internal constructor(
     private val style: ComponentStyle,
     private val extraModifiers: @Composable () -> Modifier,
-    private val init: ComponentModifiers.() -> Unit,
+    private val init: CssStyleScope.() -> Unit,
 ) : CacheByPropertyNameDelegate<ComponentVariant>() {
     override fun create(propertyName: String): ComponentVariant {
         // Given a style called "ExampleStyle", we want to support the following variant name simplifications:
@@ -115,26 +115,26 @@ class ComponentVariantProvider internal constructor(
 
 fun ComponentStyle.addVariant(
     extraModifiers: Modifier = Modifier,
-    init: ComponentModifiers.() -> Unit
+    init: CssStyleScope.() -> Unit
 ) =
     addVariant({ extraModifiers }, init)
 
 fun ComponentStyle.addVariant(
     extraModifiers: @Composable () -> Modifier,
-    init: ComponentModifiers.() -> Unit
+    init: CssStyleScope.() -> Unit
 ) =
     ComponentVariantProvider(this, extraModifiers, init)
 
 fun ComponentStyle.addVariantBase(
     extraModifiers: Modifier = Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ) =
     addVariantBase({ extraModifiers }, init)
 
 fun ComponentStyle.addVariantBase(
     extraModifiers: @Composable () -> Modifier,
-    init: ComponentBaseModifier.() -> Modifier
-) = ComponentVariantProvider(this, extraModifiers, init = { base { ComponentBaseModifier(colorMode).let(init) } })
+    init: CssStyleBaseScope.() -> Modifier
+) = ComponentVariantProvider(this, extraModifiers, init = { base { CssStyleBaseScope(colorMode).let(init) } })
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
@@ -145,11 +145,11 @@ fun ComponentStyle.addVariantBase(
 fun ComponentStyle.addVariantBase(
     name: String,
     extraModifiers: Modifier = Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ): ComponentVariant {
     return addVariant(name, extraModifiers) {
         base {
-            ComponentBaseModifier(colorMode).let(init)
+            CssStyleBaseScope(colorMode).let(init)
         }
     }
 }
@@ -164,17 +164,17 @@ fun ComponentStyle.addVariantBase(
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
 fun <T : ComponentKind> NewComponentStyle<T>.addVariantBase(
     extraModifiers: Modifier = Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ) = addVariantBase({ extraModifiers }, init)
 
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
 fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
     extraModifiers: @Composable () -> Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ): NewComponentVariant<T> {
     return addVariant(extraModifiers) {
         base {
-            ComponentBaseModifier(colorMode).let(init)
+            CssStyleBaseScope(colorMode).let(init)
         }
     }
 }
@@ -183,7 +183,7 @@ fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
 fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
     @Suppress("UNUSED_PARAMETER") name: String,
     extraModifiers: Modifier = Modifier,
-    init: ComponentBaseModifier.() -> Modifier
+    init: CssStyleBaseScope.() -> Modifier
 ) = addVariantBase(extraModifiers, init)
 
 
