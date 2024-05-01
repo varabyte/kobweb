@@ -70,7 +70,7 @@ class CancellableActionHandle(id: Int, private var isInterval: Boolean = false) 
  * This is equivalent to `window.setTimeout(block, 0)` but with a parameter order that takes advantage of Kotlin's
  * lambda syntax.
  *
- * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
 fun WindowOrWorkerGlobalScope.invokeLater(block: () -> Unit): CancellableActionHandle {
     return setTimeout(0.milliseconds, block)
@@ -79,7 +79,7 @@ fun WindowOrWorkerGlobalScope.invokeLater(block: () -> Unit): CancellableActionH
 /**
  * A more Kotlin-friendly version of `window.setTimeout` (with a [Duration] & the lambda parameter last).
  *
- * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
 fun WindowOrWorkerGlobalScope.setTimeout(timeout: Duration, block: () -> Unit): CancellableActionHandle {
     val id = setTimeout(block, timeout.inWholeMilliseconds.toInt())
@@ -89,7 +89,7 @@ fun WindowOrWorkerGlobalScope.setTimeout(timeout: Duration, block: () -> Unit): 
 /**
  * A more Kotlin-friendly version of `window.setInterval` (with a [Duration] & the lambda parameter last).
  *
- * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
 fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
     val id = setInterval(block, delay.inWholeMilliseconds.toInt())
@@ -102,7 +102,7 @@ fun WindowOrWorkerGlobalScope.setInterval(delay: Duration, block: () -> Unit): C
  * This can be useful if you need to fire something immediately but then have a different delay for subsequent
  * invocations.
  *
- * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
 fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duration, block: () -> Unit): CancellableActionHandle {
     lateinit var handle: CancellableActionHandle
@@ -120,7 +120,7 @@ fun WindowOrWorkerGlobalScope.setInterval(initialDelay: Duration, delay: Duratio
  * this version expresses a more explicit intent. Also, this version invokes the callback *immediately* unlike the
  * `setInterval(0.milliseconds)` method which invokes the callback on the next event loop at the earliest.
  *
- * @return An [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
+ * @return A [CancellableActionHandle] to the action being invoked. Use [CancellableActionHandle.cancel] to cancel the action.
  */
 fun WindowOrWorkerGlobalScope.invokeThenInterval(delay: Duration, block: () -> Unit): CancellableActionHandle {
     block()
