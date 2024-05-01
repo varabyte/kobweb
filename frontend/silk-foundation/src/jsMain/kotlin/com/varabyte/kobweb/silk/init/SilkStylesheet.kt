@@ -3,7 +3,7 @@ package com.varabyte.kobweb.silk.init
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
-import com.varabyte.kobweb.silk.style.StyleModifiers
+import com.varabyte.kobweb.silk.style.StyleScope
 import com.varabyte.kobweb.silk.style.animation.KeyframesBuilder
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -62,11 +62,11 @@ interface SilkStylesheet {
      * }
      * ```
      */
-    fun registerStyle(cssSelector: String, extraModifier: Modifier = Modifier, init: StyleModifiers.() -> Unit) {
+    fun registerStyle(cssSelector: String, extraModifier: Modifier = Modifier, init: StyleScope.() -> Unit) {
         registerStyle(cssSelector, { extraModifier }, init)
     }
 
-    fun registerStyle(cssSelector: String, extraModifier: @Composable () -> Modifier, init: StyleModifiers.() -> Unit)
+    fun registerStyle(cssSelector: String, extraModifier: @Composable () -> Modifier, init: StyleScope.() -> Unit)
 
     /**
      * An alternate way to register keyframes via Silk instead of using a Compose HTML StyleSheet directly.
@@ -150,7 +150,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
     override fun registerStyle(
         cssSelector: String,
         extraModifier: @Composable () -> Modifier,
-        init: StyleModifiers.() -> Unit
+        init: StyleScope.() -> Unit
     ) {
         styles.add(SimpleCssStyle(cssSelector, init, extraModifier))
     }

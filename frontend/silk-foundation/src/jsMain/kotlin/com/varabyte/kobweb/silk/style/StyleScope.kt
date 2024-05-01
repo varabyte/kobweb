@@ -5,14 +5,19 @@ import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import org.jetbrains.compose.web.css.*
 
+@Deprecated(
+    "The name `StyleModifiers` has been renamed to `StyleScope`.",
+    replaceWith = ReplaceWith("StyleScope", "com.varabyte.kobweb.silk.style.StyleScope")
+)
+typealias StyleModifiers = StyleScope
+
 /**
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
  * [Modifier]s).
  *
- * See also [CssStyleScope] for places where you can define component styles which have a few extra features
- * enabled for them.
+ * See also [CssStyleScope] which extends this class to provide additional functionality for defining `CssStyle` blocks.
  */
-abstract class StyleModifiers {
+abstract class StyleScope {
     private val _cssModifiers = mutableListOf<CssModifier>()
     internal val cssModifiers: List<CssModifier> = _cssModifiers
 
@@ -60,7 +65,7 @@ abstract class StyleModifiers {
      * ```
      *
      * Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
-     * (here, we'd need to access both "Breakpoint" and "StyleModifiers")
+     * (here, we'd need to access both "Breakpoint" and "StyleScope")
      */
     operator fun Breakpoint.invoke(createModifier: () -> Modifier) {
         cssRule(this.toMinWidthQuery(), createModifier)
@@ -78,7 +83,7 @@ abstract class StyleModifiers {
  *
  * but when people use a breakpoint, like Breakpoint.MD, they almost always want to use the min-width query.
  */
-fun StyleModifiers.cssRule(breakpoint: Breakpoint, suffix: String?, createModifier: () -> Modifier) {
+fun StyleScope.cssRule(breakpoint: Breakpoint, suffix: String?, createModifier: () -> Modifier) {
     cssRule(breakpoint.toMinWidthQuery(), suffix, createModifier)
 }
 

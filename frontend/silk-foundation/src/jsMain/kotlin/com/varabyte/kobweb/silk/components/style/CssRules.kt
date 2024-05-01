@@ -3,7 +3,7 @@
 package com.varabyte.kobweb.silk.components.style
 
 import com.varabyte.kobweb.silk.style.CssRule
-import com.varabyte.kobweb.silk.style.StyleModifiers
+import com.varabyte.kobweb.silk.style.StyleScope
 import com.varabyte.kobweb.silk.style.selector.active
 import com.varabyte.kobweb.silk.style.selector.after
 import com.varabyte.kobweb.silk.style.selector.anyLink
@@ -60,7 +60,7 @@ import com.varabyte.kobweb.silk.style.selector.visited
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:any-link">:any-link</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.anyLink`")
-val StyleModifiers.anyLink get() = anyLink
+val StyleScope.anyLink get() = anyLink
 
 /**
  * Styles to apply to components that represent navigation links which have not yet been visited.
@@ -70,7 +70,7 @@ val StyleModifiers.anyLink get() = anyLink
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:link">:link</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.link`")
-val StyleModifiers.link get() = link
+val StyleScope.link get() = link
 
 /**
  * Styles to apply to elements that are targets of links in the same document.
@@ -78,7 +78,7 @@ val StyleModifiers.link get() = link
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:target">:target</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.target`")
-val StyleModifiers.target get() = target
+val StyleScope.target get() = target
 
 /**
  * Styles to apply to components that represent navigation links which have previously been visited.
@@ -88,7 +88,7 @@ val StyleModifiers.target get() = target
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:visited">:visited</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.visited`")
-val StyleModifiers.visited get() = visited
+val StyleScope.visited get() = visited
 
 //endregion
 
@@ -102,7 +102,7 @@ val StyleModifiers.visited get() = visited
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:hover">:hover</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.hover`")
-val StyleModifiers.hover get() = hover
+val StyleScope.hover get() = hover
 
 /**
  * Styles to apply to components when a cursor is interacting with them.
@@ -112,7 +112,7 @@ val StyleModifiers.hover get() = hover
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:active">:active</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.active`")
-val StyleModifiers.active get() = active
+val StyleScope.active get() = active
 
 /**
  * Styles to apply to components when they have focus.
@@ -120,7 +120,7 @@ val StyleModifiers.active get() = active
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus">:focus</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focus`")
-val StyleModifiers.focus get() = focus
+val StyleScope.focus get() = focus
 
 /**
  * Styles to apply to components when they have keyboard / a11y-assisted focus.
@@ -128,7 +128,7 @@ val StyleModifiers.focus get() = focus
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">:focus-visible</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focusVisible`")
-val StyleModifiers.focusVisible get() = focusVisible
+val StyleScope.focusVisible get() = focusVisible
 
 /**
  * Styles to apply to components when they or any descendants have focus.
@@ -136,7 +136,7 @@ val StyleModifiers.focusVisible get() = focusVisible
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within">:focus-within</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focusWithin`")
-val StyleModifiers.focusWithin get() = focusWithin
+val StyleScope.focusWithin get() = focusWithin
 
 //endregion
 
@@ -148,7 +148,7 @@ val StyleModifiers.focusWithin get() = focusWithin
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill">:autofill</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.autofill`")
-val StyleModifiers.autofill get() = autofill
+val StyleScope.autofill get() = autofill
 
 /**
  * Represents a user interface element that is in an enabled state.
@@ -156,7 +156,7 @@ val StyleModifiers.autofill get() = autofill
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled">:enabled</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.enabled`")
-val StyleModifiers.enabled get() = enabled
+val StyleScope.enabled get() = enabled
 
 /**
  * Represents a user interface element that is in a disabled state.
@@ -164,7 +164,7 @@ val StyleModifiers.enabled get() = enabled
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled">:disabled</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.disabled`")
-val StyleModifiers.disabled get() = disabled
+val StyleScope.disabled get() = disabled
 
 /**
  * Represents any element that cannot be changed by the user.
@@ -172,7 +172,7 @@ val StyleModifiers.disabled get() = disabled
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only">:read-only</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.readOnly`")
-val StyleModifiers.readOnly get() = readOnly
+val StyleScope.readOnly get() = readOnly
 
 /**
  * Represents any element that is user-editable.
@@ -180,7 +180,7 @@ val StyleModifiers.readOnly get() = readOnly
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write">:read-write</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.readWrite`")
-val StyleModifiers.readWrite get() = readWrite
+val StyleScope.readWrite get() = readWrite
 
 /**
  * Matches an input element that is displaying placeholder text.
@@ -188,7 +188,7 @@ val StyleModifiers.readWrite get() = readWrite
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown">:placeholder-shown</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.placeholderShown`")
-val StyleModifiers.placeholderShown get() = placeholderShown
+val StyleScope.placeholderShown get() = placeholderShown
 
 /**
  * Matches one or more UI elements that are the default among a set of elements.
@@ -196,7 +196,7 @@ val StyleModifiers.placeholderShown get() = placeholderShown
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:default">:default</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.default`")
-val StyleModifiers.default get() = default
+val StyleScope.default get() = default
 
 /**
  * Matches an element, such as checkboxes and radio buttons, that are checked or toggled to an `on` state.
@@ -204,7 +204,7 @@ val StyleModifiers.default get() = default
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:checked">:checked</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.checked`")
-val StyleModifiers.checked get() = checked
+val StyleScope.checked get() = checked
 
 /**
  * Matches when elements, such as checkboxes and radio buttons, are in an indeterminate state.
@@ -212,7 +212,7 @@ val StyleModifiers.checked get() = checked
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate">:indeterminate</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.indeterminate`")
-val StyleModifiers.indeterminate get() = indeterminate
+val StyleScope.indeterminate get() = indeterminate
 
 /**
  * Matches an element with valid contents. For example, an input element with type 'email' which contains a validly formed email address.
@@ -220,7 +220,7 @@ val StyleModifiers.indeterminate get() = indeterminate
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:valid">:valid</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.valid`")
-val StyleModifiers.valid get() = valid
+val StyleScope.valid get() = valid
 
 /**
  * Matches an element with invalid contents. For example, an input element with type 'email' with a name entered.
@@ -228,7 +228,7 @@ val StyleModifiers.valid get() = valid
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid">:invalid</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.invalid`")
-val StyleModifiers.invalid get() = invalid
+val StyleScope.invalid get() = invalid
 
 /**
  * Applies to elements with range limitations, for example a slider control, when the selected value is in the allowed range.
@@ -236,7 +236,7 @@ val StyleModifiers.invalid get() = invalid
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range">:in-range</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.inRange`")
-val StyleModifiers.inRange get() = inRange
+val StyleScope.inRange get() = inRange
 
 /**
  * Applies to elements with range limitations, for example a slider control, when the selected value is outside the
@@ -245,7 +245,7 @@ val StyleModifiers.inRange get() = inRange
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range">:out-of-range</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.outOfRange`")
-val StyleModifiers.outOfRange get() = outOfRange
+val StyleScope.outOfRange get() = outOfRange
 
 /**
  * Matches when a form element is required.
@@ -253,7 +253,7 @@ val StyleModifiers.outOfRange get() = outOfRange
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:required">:required</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.required`")
-val StyleModifiers.required get() = required
+val StyleScope.required get() = required
 
 /**
  * Matches when a form element is optional.
@@ -261,7 +261,7 @@ val StyleModifiers.required get() = required
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:optional">:optional</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.optional`")
-val StyleModifiers.optional get() = optional
+val StyleScope.optional get() = optional
 
 /**
  * Represents an element with correct input, but only when the user has interacted with it.
@@ -269,7 +269,7 @@ val StyleModifiers.optional get() = optional
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-valid">:user-valid</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.userValid`")
-val StyleModifiers.userValid get() = userValid
+val StyleScope.userValid get() = userValid
 
 /**
  * Represents an element with incorrect input, but only when the user has interacted with it.
@@ -277,7 +277,7 @@ val StyleModifiers.userValid get() = userValid
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid">:user-invalid</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.userInvalid`")
-val StyleModifiers.userInvalid get() = userInvalid
+val StyleScope.userInvalid get() = userInvalid
 
 //endregion
 
@@ -289,7 +289,7 @@ val StyleModifiers.userInvalid get() = userInvalid
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:root">:root</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.root`")
-val StyleModifiers.root get() = root
+val StyleScope.root get() = root
 
 /**
  * Represents an element with no children other than white-space characters.
@@ -297,7 +297,7 @@ val StyleModifiers.root get() = root
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:empty">:empty</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.empty`")
-val StyleModifiers.empty get() = empty
+val StyleScope.empty get() = empty
 
 /**
  * Matches an element that is the first of its siblings.
@@ -305,7 +305,7 @@ val StyleModifiers.empty get() = empty
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child">:first-child</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstChild`")
-val StyleModifiers.firstChild get() = firstChild
+val StyleScope.firstChild get() = firstChild
 
 /**
  * Matches an element that is the last of its siblings.
@@ -313,7 +313,7 @@ val StyleModifiers.firstChild get() = firstChild
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child">:last-child</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.lastChild`")
-val StyleModifiers.lastChild get() = lastChild
+val StyleScope.lastChild get() = lastChild
 
 /**
  * Matches an element that has no siblings. For example, a list item with no other list items in that list.
@@ -321,7 +321,7 @@ val StyleModifiers.lastChild get() = lastChild
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child">:only-child</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.onlyChild`")
-val StyleModifiers.onlyChild get() = onlyChild
+val StyleScope.onlyChild get() = onlyChild
 
 /**
  * Matches an element that is the first of its siblings, and also matches a certain type selector.
@@ -329,7 +329,7 @@ val StyleModifiers.onlyChild get() = onlyChild
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type">:first-of-type</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstOfType`")
-val StyleModifiers.firstOfType get() = firstOfType
+val StyleScope.firstOfType get() = firstOfType
 
 /**
  * Matches an element that is the last of its siblings, and also matches a certain type selector.
@@ -337,7 +337,7 @@ val StyleModifiers.firstOfType get() = firstOfType
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type">:last-of-type</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.lastOfType`")
-val StyleModifiers.lastOfType get() = lastOfType
+val StyleScope.lastOfType get() = lastOfType
 
 /**
  * Matches an element that has no siblings of the chosen type selector.
@@ -345,7 +345,7 @@ val StyleModifiers.lastOfType get() = lastOfType
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type">:only-of-type</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.onlyOfType`")
-val StyleModifiers.onlyOfType get() = onlyOfType
+val StyleScope.onlyOfType get() = onlyOfType
 
 //endregion
 
@@ -359,7 +359,7 @@ val StyleModifiers.onlyOfType get() = onlyOfType
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::before">::before</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.before`")
-val StyleModifiers.before get() = before
+val StyleScope.before get() = before
 
 /**
  * Styles to apply to a virtual element that is created after the last element in some container.
@@ -367,7 +367,7 @@ val StyleModifiers.before get() = before
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::after">::after</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.after`")
-val StyleModifiers.after get() = after
+val StyleScope.after get() = after
 
 /**
  * Styles to apply to the selected part of a document.
@@ -375,7 +375,7 @@ val StyleModifiers.after get() = after
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::selection">::selection</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.selection`")
-val StyleModifiers.selection get() = selection
+val StyleScope.selection get() = selection
 
 /**
  * Styles to apply to the first letter in a block of text.
@@ -383,7 +383,7 @@ val StyleModifiers.selection get() = selection
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter">::first-letter</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstLetter`")
-val StyleModifiers.firstLetter get() = firstLetter
+val StyleScope.firstLetter get() = firstLetter
 
 /**
  * Styles to apply to the first line in a block of text.
@@ -391,7 +391,7 @@ val StyleModifiers.firstLetter get() = firstLetter
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line">::first-line</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstLine`")
-val StyleModifiers.firstLine get() = firstLine
+val StyleScope.firstLine get() = firstLine
 
 /**
  * Matches the placeholder text within an input element that is displaying placeholder text.
@@ -401,7 +401,7 @@ val StyleModifiers.firstLine get() = firstLine
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder">::placeholder</a>
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.placeholder`")
-val StyleModifiers.placeholder get() = placeholder
+val StyleScope.placeholder get() = placeholder
 
 //endregion
 
@@ -411,14 +411,14 @@ val StyleModifiers.placeholder get() = placeholder
  * Used to indicate styles which should only be applied when the page is being printed.
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.mediaPrint`")
-val StyleModifiers.mediaPrint get() = mediaPrint
+val StyleScope.mediaPrint get() = mediaPrint
 
 //endregion
 
 // region Functional pseudo classes
 
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.not`")
-fun StyleModifiers.not(vararg params: CssRule.NonMediaCssRule) = not(*params)
+fun StyleScope.not(vararg params: CssRule.NonMediaCssRule) = not(*params)
 
 //endregion
 
@@ -432,7 +432,7 @@ fun StyleModifiers.not(vararg params: CssRule.NonMediaCssRule) = not(*params)
  * mouse events, which can be useful e.g. when implementing tooltips.
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaDisabled`")
-val StyleModifiers.ariaDisabled get() = ariaDisabled
+val StyleScope.ariaDisabled get() = ariaDisabled
 
 /**
  * A way to select elements that have been tagged with an `aria-invalid` attribute.
@@ -442,7 +442,7 @@ val StyleModifiers.ariaDisabled get() = ariaDisabled
  * `ariaInvalid` version can be used to support custom invalidation strategies.
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaInvalid`")
-val StyleModifiers.ariaInvalid get() = ariaInvalid
+val StyleScope.ariaInvalid get() = ariaInvalid
 
 /**
  * A way to select elements that have been tagged with an `aria-required` attribute.
@@ -452,6 +452,6 @@ val StyleModifiers.ariaInvalid get() = ariaInvalid
  * their required state to accessibility readers.
  */
 @Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaRequired`")
-val StyleModifiers.ariaRequired get() = ariaRequired
+val StyleScope.ariaRequired get() = ariaRequired
 
 //endregion
