@@ -11,7 +11,6 @@ import com.varabyte.kobweb.silk.style.ComponentModifiers
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.component.ClassSelectors
 import com.varabyte.kobweb.silk.style.component.ComponentKind
-import org.jetbrains.compose.web.css.*
 import com.varabyte.kobweb.silk.style.component.ComponentStyle as NewComponentStyle
 import com.varabyte.kobweb.silk.style.component.ComponentVariant as NewComponentVariant
 
@@ -20,16 +19,6 @@ sealed class ComponentVariant {
     infix fun then(next: ComponentVariant): ComponentVariant {
         return CompositeComponentVariant(this, next)
     }
-
-    /**
-     * Add this [ComponentVariant]'s styles to the target [StyleSheet].
-     *
-     * @return The CSS class selectors associated specifically with this variant. For example, if the selector
-     *  for this variant is `.some-style.some-variant`, then this method will only contain `some-variant`.
-     *
-     *  @see ComponentStyle.addStylesInto
-     */
-    internal abstract fun addStylesInto(styleSheet: StyleSheet): ClassSelectors
 
     @Composable
     internal abstract fun toModifier(): Modifier
@@ -44,14 +33,6 @@ internal class SimpleComponentVariant(
     val cssStyle: SimpleCssStyle,
     val baseStyle: ComponentStyle
 ) : ComponentVariant() {
-    override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
-        // If you are using a variant, require it be associated with a tag already associated with the base style
-        // e.g. if you have a link variant ("silk-link-undecorated") it should only be applied if the tag is also
-        // a link (so this would be registered as ".silk-link.silk-link-undecorated").
-        // To put it another way, if you use a link variant with a surface widget, it won't be applied.
-        return cssStyle.addStylesInto(styleSheet)
-    }
-
     @Composable
     override fun toModifier() = cssStyle.toModifier()
     fun intoImmutableStyle(classSelectors: ClassSelectors) = cssStyle.intoImmutableStyle(classSelectors)
@@ -61,10 +42,6 @@ private class CompositeComponentVariant(
     private val head: ComponentVariant,
     private val tail: ComponentVariant
 ) : ComponentVariant() {
-    override fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
-        return head.addStylesInto(styleSheet) + tail.addStylesInto(styleSheet)
-    }
-
     @Composable
     override fun toModifier() = head.toModifier().then(tail.toModifier())
 }
