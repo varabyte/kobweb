@@ -6,7 +6,7 @@ import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import org.jetbrains.compose.web.css.*
 
 /**
- * A class which can be used to set CSS rules on a target [StyleModifiers] instance using types to prevent
+ * A class which can be used to set CSS rules on a target [StyleScope] instance using types to prevent
  * invalid combinations.
  *
  * A CSS rule can consist of an optional breakpoint, zero or more pseudo-classes, and an optional trailing
@@ -23,16 +23,16 @@ import org.jetbrains.compose.web.css.*
  * ```
  *
  * It's not expected for an end user to use this class directly. It's provided for libraries that want to provide
- * additional extension properties to the [StyleModifiers] class (like `hover` and `after`)
+ * additional extension properties to the [StyleScope] class (like `hover` and `after`)
  */
-sealed class CssRule(val target: StyleModifiers) {
+sealed class CssRule(val target: StyleScope) {
     companion object {
         /**
          * A CSS rule that represents a functional pseudo-class.
          *
          * For example, passing in "not" would result in: `:not(...)`
          */
-        fun OfFunctionalPseudoClass(target: StyleModifiers, pseudoClass: String, vararg params: NonMediaCssRule) =
+        fun OfFunctionalPseudoClass(target: StyleScope, pseudoClass: String, vararg params: NonMediaCssRule) =
             OfPseudoClass(target, "$pseudoClass(${params.mapNotNull { it.toSelectorText() }.joinToString()})")
     }
 
@@ -63,7 +63,7 @@ sealed class CssRule(val target: StyleModifiers) {
      *
      * For example, could result in: `@media (max-width: 1234px)`
      */
-    class OfMedia(target: StyleModifiers, override val mediaQuery: CSSMediaQuery) : CssRule(target) {
+    class OfMedia(target: StyleScope, override val mediaQuery: CSSMediaQuery) : CssRule(target) {
         operator fun plus(other: OfPseudoClass) =
             CompositeOpen(target, mediaQuery, emptyList(), listOf(other))
 
@@ -71,14 +71,14 @@ sealed class CssRule(val target: StyleModifiers) {
             CompositeClosed(target, mediaQuery, emptyList(), emptyList(), other)
     }
 
-    sealed class NonMediaCssRule(target: StyleModifiers) : CssRule(target)
+    sealed class NonMediaCssRule(target: StyleScope) : CssRule(target)
 
     /**
      * A CSS rule that represents an attribute selector.
      *
      * For example, passing in "aria-disabled" would result in: `[aria-disabled]`
      */
-    class OfAttributeSelector(target: StyleModifiers, val attributeSelector: String) : NonMediaCssRule(target) {
+    class OfAttributeSelector(target: StyleScope, val attributeSelector: String) : NonMediaCssRule(target) {
         override fun toSelectorText() = buildSelectorText(listOf(this), emptyList(), null)
 
         operator fun plus(other: OfAttributeSelector) =
@@ -97,7 +97,7 @@ sealed class CssRule(val target: StyleModifiers) {
      *
      * For example, passing in "hover" would result in: `:hover`
      */
-    class OfPseudoClass(target: StyleModifiers, val pseudoClass: String) : NonMediaCssRule(target) {
+    class OfPseudoClass(target: StyleScope, val pseudoClass: String) : NonMediaCssRule(target) {
         override fun toSelectorText() = buildSelectorText(emptyList(), listOf(this), null)
 
         operator fun plus(other: OfPseudoClass) =
@@ -112,7 +112,7 @@ sealed class CssRule(val target: StyleModifiers) {
      *
      * For example, passing in "after" would result in: `::after`
      */
-    class OfPseudoElement(target: StyleModifiers, val pseudoElement: String) : NonMediaCssRule(target) {
+    class OfPseudoElement(target: StyleScope, val pseudoElement: String) : NonMediaCssRule(target) {
         override fun toSelectorText() = buildSelectorText(emptyList(), emptyList(), this)
     }
 
@@ -121,7 +121,7 @@ sealed class CssRule(val target: StyleModifiers) {
      * pseudo-element.
      */
     class CompositeOpen(
-        target: StyleModifiers,
+        target: StyleScope,
         override val mediaQuery: CSSMediaQuery?,
         val attributeSelectors: List<OfAttributeSelector>,
         val pseudoClasses: List<OfPseudoClass>
@@ -143,7 +143,7 @@ sealed class CssRule(val target: StyleModifiers) {
      * be invoked at this point.
      */
     class CompositeClosed(
-        target: StyleModifiers,
+        target: StyleScope,
         override val mediaQuery: CSSMediaQuery?,
         val attributeSelectors: List<OfAttributeSelector>,
         val pseudoClasses: List<OfPseudoClass>,
