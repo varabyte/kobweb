@@ -20,8 +20,8 @@ object Arrangement {
      * For example:
      *
      * ```
-     * // We want to use ComponentStyle + breakpoints to control the layout of our row
-     * val ResponsiveStyle by ComponentStyle {
+     * // We want to use CssStyle + breakpoints to control the layout of our row
+     * val ResponsiveStyle = CssStyle {
      *   base { Modifier.justifyContent(Start) }
      *   Breakpoint.MD { Modifier.justifyContent(SpaceEvenly) }
      * }

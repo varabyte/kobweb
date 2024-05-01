@@ -41,7 +41,7 @@ val SmoothColorTransitionDurationVar by StyleVariable(
  * smooth styles, you can use this `extraModifier` pattern:
  *
  * ```
- * val ExampleStyle by ComponentStyle(extraModifier = { SmoothColorStyle.toModifier() }) {
+ * val ExampleStyle = CssStyle(extraModifier = { SmoothColorStyle.toModifier() }) {
  *    ...
  * }
  * ```

@@ -31,10 +31,10 @@ import com.varabyte.kobweb.silk.style.component.ComponentVariant as NewComponent
  * If defining a style for a custom widget, you should call the [toModifier] method to apply it:
  *
  * ```
- * val CustomStyle = ComponentStyle("my-style") { ... }
+ * val CustomStyle by ComponentStyle { ... }
  *
  * @Composable
- * fun CustomWidget(..., variant: ComponentVariant<*>? = null, ...) {
+ * fun CustomWidget(..., variant: ComponentVariant? = null, ...) {
  *   val modifier = CustomStyle.toModifier(variant).then(...)
  *   // ^ This modifier is now set with your registered styles.
  * }

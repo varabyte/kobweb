@@ -18,16 +18,16 @@ import kotlin.reflect.KProperty
  *
  * ```
  * val bgColor by StyleVariable<Color>()
- * val MainAreaStyle by ComponentStyle.base {
+ * val MainAreaStyle = CssStyle.base {
  *   Modifier.setVariable(bgColor, Colors.Black)
  * }
  *
- * val InvertedAreaStyle by ComponentStyle.base {
+ * val InvertedAreaStyle = CssStyle.base {
  *   Modifier.setVariable(bgColor, Colors.White)
  * }
  *
  * // Box style is expected to be applied underneath a root element using either MainAreaStyle or InvertedAreaStyle
- * val BoxStyle by ComponentStyle.base {
+ * val BoxStyle = CssStyle.base {
  *   // Will be black if rendered in the main area or white in the inverted area.
  *   Modifier.backgroundColor(bgColor.value())
  * }

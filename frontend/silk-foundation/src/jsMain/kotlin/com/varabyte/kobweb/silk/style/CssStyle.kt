@@ -17,7 +17,10 @@ import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 
 /**
- * A [CssStyle] is a collection of [StyleModifiers] that will be processed by Kobweb and added into a CSS stylesheet.
+ * A class which allows a user to define styles that will be added into the site's CSS stylesheet.
+ *
+ * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
+ * media queries, and pseudo classes.
  *
  * For example, you can declare a style like this:
  *
@@ -289,12 +292,12 @@ internal class ImmutableCssStyle(
 }
 
 /**
- * State specific to [ComponentStyle] initialization but not the more general [StyleModifiers] case.
+ * State specific to [CssStyle] initialization but not the more general [StyleModifiers] case.
  *
  * For example, color mode is supported here:
  *
  * ```
- * val MyWidgetStyle by ComponentStyle {
+ * val MyWidgetStyle = CssStyle {
  *    ...
  * }
  * ```

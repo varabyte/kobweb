@@ -177,7 +177,7 @@ fun Keyframes.toAnimation(
  * It can be useful to call this method from within a [ComponentStyle]. For example:
  *
  * ```
- * val MyAnimatedStyle by ComponentStyle {
+ * val MyAnimatedStyle = CssStyle {
  *   after {
  *     Modifier.animation(AnimOut.toAnimation(colorMode, ...))
  *   }
