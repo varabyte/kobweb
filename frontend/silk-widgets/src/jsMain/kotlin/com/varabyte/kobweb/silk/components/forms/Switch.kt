@@ -57,7 +57,7 @@ val SwitchStyle = ComponentStyle.base<SwitchKind> {
 }
 
 val SwitchTrackStyle = ComponentStyle<SwitchKind.Track>(
-    extraModifiers = Modifier.tabIndex(-1).ariaHidden()
+    extraModifier = Modifier.tabIndex(-1).ariaHidden()
 ) {
     base {
         Modifier

@@ -62,11 +62,11 @@ interface SilkStylesheet {
      * }
      * ```
      */
-    fun registerStyle(cssSelector: String, extraModifiers: Modifier = Modifier, init: StyleModifiers.() -> Unit) {
-        registerStyle(cssSelector, { extraModifiers }, init)
+    fun registerStyle(cssSelector: String, extraModifier: Modifier = Modifier, init: StyleModifiers.() -> Unit) {
+        registerStyle(cssSelector, { extraModifier }, init)
     }
 
-    fun registerStyle(cssSelector: String, extraModifiers: @Composable () -> Modifier, init: StyleModifiers.() -> Unit)
+    fun registerStyle(cssSelector: String, extraModifier: @Composable () -> Modifier, init: StyleModifiers.() -> Unit)
 
     /**
      * An alternate way to register keyframes via Silk instead of using a Compose HTML StyleSheet directly.
@@ -127,16 +127,16 @@ interface SilkStylesheet {
  * }
  * ```
  */
-fun SilkStylesheet.registerStyleBase(cssSelector: String, extraModifiers: Modifier = Modifier, init: () -> Modifier) {
-    registerStyleBase(cssSelector, { extraModifiers }, init)
+fun SilkStylesheet.registerStyleBase(cssSelector: String, extraModifier: Modifier = Modifier, init: () -> Modifier) {
+    registerStyleBase(cssSelector, { extraModifier }, init)
 }
 
 fun SilkStylesheet.registerStyleBase(
     cssSelector: String,
-    extraModifiers: @Composable () -> Modifier,
+    extraModifier: @Composable () -> Modifier,
     init: () -> Modifier
 ) {
-    registerStyle(cssSelector, extraModifiers) {
+    registerStyle(cssSelector, extraModifier) {
         base {
             init()
         }
@@ -149,10 +149,10 @@ internal object SilkStylesheetInstance : SilkStylesheet {
 
     override fun registerStyle(
         cssSelector: String,
-        extraModifiers: @Composable () -> Modifier,
+        extraModifier: @Composable () -> Modifier,
         init: StyleModifiers.() -> Unit
     ) {
-        styles.add(SimpleCssStyle(cssSelector, init, extraModifiers))
+        styles.add(SimpleCssStyle(cssSelector, init, extraModifier))
     }
 
     override fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit) {

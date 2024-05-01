@@ -14,7 +14,7 @@ import com.varabyte.kobweb.silk.style.base
 // an element just because you wrapped it with a tooltip).
 // Instead, we just imitate disabled behavior ourselves in silk.
 val DisabledStyle = CssStyle.base(
-    extraModifiers = { Modifier.ariaDisabled().tabIndex(-1) }
+    extraModifier = { Modifier.ariaDisabled().tabIndex(-1) }
 ) {
     Modifier.opacity(0.5).cursor(Cursor.NotAllowed)
 }
@@ -38,10 +38,10 @@ val SmoothColorTransitionDurationVar by StyleVariable(
  * to color mode changes, since in CSS, transitions are not inherited.
  *
  * Pro-tip: If you are defining your own ComponentStyle that updates the background color and want it to also apply
- * smooth styles, you can use this `extraModifiers` pattern:
+ * smooth styles, you can use this `extraModifier` pattern:
  *
  * ```
- * val ExampleStyle by ComponentStyle(extraModifiers = { SmoothColorStyle.toModifier() }) {
+ * val ExampleStyle by ComponentStyle(extraModifier = { SmoothColorStyle.toModifier() }) {
  *    ...
  * }
  * ```

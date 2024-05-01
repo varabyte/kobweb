@@ -59,7 +59,7 @@ val TabsTabRowStyle = ComponentStyle.base<TabsKind.TabRow> {
         .fillMaxWidth()
         .borderBottom(TabVars.BorderThickness.value(), LineStyle.Solid, TabVars.BorderColor.value())
 }
-val TabsTabStyle = ComponentStyle<TabsKind.Tab>(extraModifiers = { Modifier.tabIndex(0) }) {
+val TabsTabStyle = ComponentStyle<TabsKind.Tab>(extraModifier = { Modifier.tabIndex(0) }) {
     base {
         Modifier
             .cursor(Cursor.Pointer)
