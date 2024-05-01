@@ -155,7 +155,7 @@ abstract class CssStyle protected constructor(
                 append(" (do you declare a property called ")
                 // ".example" likely comes from `ExampleStyle` while ".example.example-outlined" likely
                 // comes from ExampleOutlinedVariant or OutlinedExampleVariant
-                val isStyle = selectorName.count { it == '.' } == 1// "Variant" else "Style"
+                val isStyle = selectorName.count { it == '.' } == 1
                 val styleName = selectorName.substringAfter(".").substringBefore(".")
 
                 if (isStyle) {
