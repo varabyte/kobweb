@@ -3,8 +3,8 @@
 package com.varabyte.kobweb.silk.components.style
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.compose.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
 import com.varabyte.kobweb.silk.style.ComponentBaseModifier
 import com.varabyte.kobweb.silk.style.ComponentModifiers
