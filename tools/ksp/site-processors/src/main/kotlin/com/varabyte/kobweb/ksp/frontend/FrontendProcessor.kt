@@ -320,7 +320,7 @@ class FrontendProcessor(
                 }
                 return false
             }
-            if (declarationInfo.name == COMPONENT_STYLE_SIMPLE_NAME) {
+            if (declarationInfo.type == types.componentStyleType) {
                 val variantKindDeclaration = property.type.resolve().arguments.first().type!!.resolve().declaration
                 if (property.containingFile != variantKindDeclaration.containingFile) {
                     val kindTypeName = variantKindDeclaration.simpleName.asString()
