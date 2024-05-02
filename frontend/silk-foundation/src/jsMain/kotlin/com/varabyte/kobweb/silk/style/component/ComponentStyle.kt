@@ -7,11 +7,14 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.components.style.combine
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
+import com.varabyte.kobweb.silk.components.style.ComponentStyle as LegacyComponentStyle
+import com.varabyte.kobweb.silk.components.style.ComponentVariant as LegacyComponentVariant
 
 // TODO: docs
 interface ComponentKind
@@ -185,4 +188,37 @@ fun Iterable<ComponentStyle<*>>.toModifier(): Modifier {
 @Composable
 fun <A : AttrsScope<*>> Iterable<ComponentStyle<*>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
+}
+
+// Create an extra modifier here for legacy styles; this will allow codebases that are incrementally migrating away from
+// old component style types will still have a modifier they can use.
+@Composable
+fun LegacyComponentStyle.toModifier(vararg variants: LegacyComponentVariant?): Modifier {
+    return cssStyle.toModifier()
+        .then(variants.toList().combine()?.toModifier() ?: Modifier)
+}
+
+/**
+ * Convert a user's component style into an [AttrsScope] builder.
+ *
+ * This is useful if you need to convert a style into something directly consumable by a Compose HTML widget.
+ */
+@Composable
+fun <A : AttrsScope<*>> LegacyComponentStyle.toAttrs(
+    vararg variant: LegacyComponentVariant?,
+    finalHandler: (A.() -> Unit)? = null
+): A.() -> Unit {
+    return this.toModifier(*variant).toAttrs(finalHandler)
+}
+
+/**
+ * A convenience method for chaining a collection of styles into a single modifier.
+ *
+ * This can be useful as sometimes you might break up many css rules across multiple styles for re-usability, and it's
+ * much easier to type `listOf(Style1, Style2, Style3).toModifier()` than
+ * `Style1.toModifier().then(Style2.toModifier())...`
+ */
+@Composable
+fun Iterable<LegacyComponentStyle>.toModifier(): Modifier {
+    return fold<_, Modifier>(Modifier) { acc, style -> acc.then(style.toModifier()) }
 }
