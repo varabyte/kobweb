@@ -217,6 +217,18 @@ class FrontendProcessor(
                 }
                 return false
             }
+            if (declarationInfo.name == COMPONENT_STYLE_SIMPLE_NAME) {
+                val variantKindDeclaration = property.type.resolve().arguments.first().type!!.resolve().declaration
+                if (property.containingFile != variantKindDeclaration.containingFile) {
+                    val kindTypeName = variantKindDeclaration.simpleName.asString()
+                    logger.error(
+                        "`val $propertyName = ${COMPONENT_STYLE_SIMPLE_NAME}<$kindTypeName>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` interface in the same file and use that one, or declare your `ComponentStyle` in the same file as the `$kindTypeName` definition.",
+                        property
+                    )
+                    return false
+                }
+            }
+
             return true
         }
 
