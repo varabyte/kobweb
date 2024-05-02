@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 class KobwebLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
-        project.kobwebBlock.createLibraryBlock()
+        val libraryBlock = project.kobwebBlock.createLibraryBlock()
         project.applyKspPlugin()
         project.setKspMode(ProcessorMode.LIBRARY)
 
@@ -42,7 +42,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
-            project.setupKspJs(jsTarget)
+            project.setupKspJs(jsTarget, libraryBlock.cssPrefix)
             project.generateModuleMetadataFor(jsTarget)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 resources.srcDir(kobwebGenerateLibraryMetadataTask)

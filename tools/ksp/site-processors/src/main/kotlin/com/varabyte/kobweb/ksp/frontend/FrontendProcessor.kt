@@ -53,6 +53,7 @@ class FrontendProcessor(
     private val logger: KSPLogger,
     private val genFile: String,
     private val qualifiedPagesPackage: String,
+    private val defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
     private val frontendVisitor = FrontendVisitor() // ComponentStyle, ComponentVariant, Keyframes
 
@@ -183,7 +184,7 @@ class FrontendProcessor(
         }
 
         private fun KSAnnotated.getCssPrefix(): String? {
-            return this.getAnnotationValue(CSS_PREFIX_FQN)
+            return (this.getAnnotationValue(CSS_PREFIX_FQN) ?: defaultCssPrefix)
                 ?.takeIf { it.isNotEmpty() } // If the CssPrefix annotation is set to "", that should disable the prefix
         }
 

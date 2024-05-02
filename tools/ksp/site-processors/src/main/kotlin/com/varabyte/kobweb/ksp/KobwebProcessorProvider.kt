@@ -41,6 +41,7 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                             logger = environment.logger,
                             genFile = genFile,
                             qualifiedPagesPackage = pagesPackage,
+                            defaultCssPrefix = environment.options[KSP_DEFAULT_CSS_PREFIX_KEY],
                         )
                     }
                 }
