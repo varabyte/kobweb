@@ -14,21 +14,19 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.splitCamelCase
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
-import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
-import com.varabyte.kobweb.ksp.common.CSS_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
-import com.varabyte.kobweb.ksp.common.KEYFRAMES_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.LEGACY_COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.LEGACY_COMPONENT_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.LEGACY_KEYFRAMES_FQN
@@ -55,8 +53,6 @@ class FrontendProcessor(
     private val qualifiedPagesPackage: String,
     private val defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
-    private val frontendVisitor = FrontendVisitor() // ComponentStyle, ComponentVariant, Keyframes
-
     private val pageDeclarations = mutableListOf<KSFunctionDeclaration>()
 
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
@@ -74,24 +70,8 @@ class FrontendProcessor(
     // will be skipped if the only change is deleted file(s) that we do not depend on.
     private val fileDependencies = mutableSetOf<KSFile>()
 
-    // TODO: is this the best way to have this set up
-    @OptIn(KspExperimental::class)
-    private class KSTypes(resolver: Resolver) {
-        val cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(emptyList())
-        val componentStyleType = resolver.getKotlinClassByName(COMPONENT_STYLE_FQN)!!.asStarProjectedType()
-        val componentVariantType = resolver.getKotlinClassByName(COMPONENT_VARIANT_FQN)!!.asStarProjectedType()
-        val keyframesType = resolver.getKotlinClassByName(KEYFRAMES_FQN)!!.asType(emptyList())
-        val legacyComponentStyleType = resolver.getKotlinClassByName(LEGACY_COMPONENT_STYLE_FQN)!!.asType(emptyList())
-        val legacyComponentVariantType = resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
-        val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
-    }
-    private lateinit var types: KSTypes
-
     override fun process(resolver: Resolver): List<KSAnnotated> {
         // TODO: handle non-Silk usages
-
-        types = KSTypes(resolver)
-
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
@@ -105,6 +85,7 @@ class FrontendProcessor(
         }
 
         // only process files that are new to this round, since prior declarations are unchanged
+        val frontendVisitor = FrontendVisitor(resolver)
         resolver.getNewFiles().forEach { file ->
             file.accept(frontendVisitor, Unit)
 
@@ -118,43 +99,50 @@ class FrontendProcessor(
         return emptyList()
     }
 
-    private inner class FrontendVisitor : KSVisitorVoid() {
-        private val cssStyleDeclaration = DeclarationType(
-            name = CSS_STYLE_SIMPLE_NAME,
-            qualifiedName = COMPONENT_STYLE_FQN,
-            function = "ctx.theme.registerStyle",
-        )
-        private val componentStyleDeclaration = DeclarationType(
-            name = COMPONENT_STYLE_SIMPLE_NAME,
-            qualifiedName = COMPONENT_STYLE_FQN,
-            function = "ctx.theme.registerStyle",
-        )
-        private val componentVariantDeclaration = DeclarationType(
-            name = COMPONENT_VARIANT_SIMPLE_NAME,
-            qualifiedName = COMPONENT_VARIANT_FQN,
-            function = "ctx.theme.registerVariants",
-        )
-        private val keyframesDeclaration = DeclarationType(
-            name = KEYFRAMES_SIMPLE_NAME,
-            qualifiedName = KEYFRAMES_FQN,
-            function = "ctx.stylesheet.registerKeyframes",
-        )
-        private val legacyComponentStyleDeclaration = DeclarationType(
-            name = componentStyleDeclaration.name,
-            qualifiedName = LEGACY_COMPONENT_STYLE_FQN,
-            function = componentStyleDeclaration.function,
-        )
-        private val legacyComponentVariantDeclaration = DeclarationType(
-            name = componentVariantDeclaration.name,
-            qualifiedName = COMPONENT_VARIANT_FQN,
-            function = componentVariantDeclaration.function,
-        )
-        private val legacyKeyframesDeclaration = DeclarationType(
-            name = KEYFRAMES_SIMPLE_NAME,
-            qualifiedName = KEYFRAMES_FQN,
-            function = keyframesDeclaration.function,
-        )
-        private val declarations =
+    @OptIn(KspExperimental::class)
+    private class KSTypes(resolver: Resolver) {
+        val cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(emptyList())
+        val componentStyleType = resolver.getKotlinClassByName(COMPONENT_STYLE_FQN)!!.asStarProjectedType()
+        val componentVariantType = resolver.getKotlinClassByName(COMPONENT_VARIANT_FQN)!!.asStarProjectedType()
+        val keyframesType = resolver.getKotlinClassByName(KEYFRAMES_FQN)!!.asType(emptyList())
+        val legacyComponentStyleType = resolver.getKotlinClassByName(LEGACY_COMPONENT_STYLE_FQN)!!.asType(emptyList())
+        val legacyComponentVariantType =
+            resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
+        val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
+    }
+
+    private inner class FrontendVisitor(resolver: Resolver) : KSVisitorVoid() {
+        private val types = KSTypes(resolver)
+        private val declarations = run {
+            val cssStyleDeclaration = DeclarationType(
+                types.cssStyleType,
+                "ctx.theme.registerStyle",
+            )
+            val componentStyleDeclaration = DeclarationType(
+                types.componentStyleType,
+                "ctx.theme.registerStyle",
+            )
+            val componentVariantDeclaration = DeclarationType(
+                types.componentVariantType,
+                "ctx.theme.registerVariant",
+            )
+            val keyframesDeclaration = DeclarationType(
+                types.keyframesType,
+                "ctx.stylesheet.registerKeyframes",
+            )
+            val legacyComponentStyleDeclaration = DeclarationType(
+                types.legacyComponentStyleType,
+                componentStyleDeclaration.function,
+            )
+            val legacyComponentVariantDeclaration = DeclarationType(
+                types.legacyComponentVariantType,
+                "ctx.theme.registerVariants",
+            )
+            val legacyKeyframesDeclaration = DeclarationType(
+                types.legacyKeyframesType,
+                keyframesDeclaration.function,
+            )
+
             listOf(
                 cssStyleDeclaration,
                 componentStyleDeclaration,
@@ -164,6 +152,7 @@ class FrontendProcessor(
                 legacyComponentVariantDeclaration,
                 legacyKeyframesDeclaration
             )
+        }
 
         fun KSAnnotated.getAnnotationValue(fqn: String): String? {
             return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
@@ -287,29 +276,23 @@ class FrontendProcessor(
         }
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
-            val type = property.type.toString()
+            val propertyType = property.type.resolve()
 
-            val matchingByType = declarations.firstOrNull { type.startsWith(it.name) }
-            if (matchingByType != null && !validateOrWarnAboutDeclaration(property, matchingByType)) {
+            val matchingByType = declarations.firstOrNull { it.type.isAssignableFrom(propertyType) } ?: return
+            if (!validateOrWarnAboutDeclaration(property, matchingByType)) {
                 return
             }
 
-            val propertyType = property.type.resolve()
-            var addFileDependency = true
-            when {
-                types.cssStyleType.isAssignableFrom(propertyType) -> cssStyles.add(processCssStyle(property))
-                types.componentStyleType.isAssignableFrom(propertyType) -> componentStyles.add(processComponentStyle(property))
-                types.componentVariantType.isAssignableFrom(propertyType) -> componentVariants.add(processComponentVariant(property))
-                types.keyframesType == propertyType -> keyframesList.add(processKeyframes(property))
-                types.legacyComponentStyleType == propertyType -> componentStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
-                types.legacyComponentVariantType == propertyType -> componentVariants.add(ComponentVariantEntry(property.qualifiedName!!.asString()))
-                types.legacyKeyframesType == propertyType -> keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
-                else -> addFileDependency = false
+            when (matchingByType.type) {
+                types.cssStyleType -> cssStyles.add(processCssStyle(property))
+                types.componentStyleType -> componentStyles.add(processComponentStyle(property))
+                types.componentVariantType -> componentVariants.add(processComponentVariant(property))
+                types.keyframesType -> keyframesList.add(processKeyframes(property))
+                types.legacyComponentStyleType -> componentStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
+                types.legacyComponentVariantType -> componentVariants.add(ComponentVariantEntry(property.qualifiedName!!.asString()))
+                types.legacyKeyframesType -> keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
             }
-
-            if (addFileDependency) {
-                fileDependencies.add(property.containingFile!!)
-            }
+            fileDependencies.add(property.containingFile!!)
         }
 
         private fun validateOrWarnAboutDeclaration(
@@ -353,13 +336,13 @@ class FrontendProcessor(
         }
 
         private inner class DeclarationType(
-            val name: String,
-            val qualifiedName: String,
+            val type: KSType,
             val function: String,
-            val displayString: String = name.splitCamelCase().joinToString(" ") { it.lowercase() },
-            val providerName: String = "${name}Provider",
+        ) {
+            val name = type.declaration.simpleName.asString()
+            val displayString: String = name.splitCamelCase().joinToString(" ") { it.lowercase() }
             val suppressionName: String = displayString.split(" ").joinToString("_") { it.uppercase() }
-        )
+        }
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
             classDeclaration.declarations.forEach { it.accept(this, Unit) }
