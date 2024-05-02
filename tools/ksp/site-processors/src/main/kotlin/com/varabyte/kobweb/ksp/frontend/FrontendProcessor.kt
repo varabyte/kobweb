@@ -17,7 +17,6 @@ import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.splitCamelCase
-import com.varabyte.kobweb.ksp.common.COMPONENT_KIND_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
@@ -84,7 +83,6 @@ class FrontendProcessor(
         val legacyComponentStyleType = resolver.getKotlinClassByName(LEGACY_COMPONENT_STYLE_FQN)!!.asType(emptyList())
         val legacyComponentVariantType = resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
         val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
-        val kindType = resolver.getKotlinClassByName(COMPONENT_KIND_FQN)!!.asType(emptyList())
     }
     private lateinit var types: KSTypes
 
