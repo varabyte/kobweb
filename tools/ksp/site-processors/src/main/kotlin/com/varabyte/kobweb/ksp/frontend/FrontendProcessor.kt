@@ -16,6 +16,7 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
+import com.varabyte.kobweb.common.text.splitCamelCase
 import com.varabyte.kobweb.ksp.common.COMPONENT_KIND_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
@@ -24,6 +25,7 @@ import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
+import com.varabyte.kobweb.ksp.common.CSS_STYLE_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
@@ -119,36 +121,55 @@ class FrontendProcessor(
 
     private inner class FrontendVisitor : KSVisitorVoid() {
         private val cssStyleDeclaration = DeclarationType(
-            name = COMPONENT_STYLE_SIMPLE_NAME,
+            name = CSS_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
-            displayString = "component style",
             function = "ctx.theme.registerStyle",
         )
         private val componentStyleDeclaration = DeclarationType(
             name = COMPONENT_STYLE_SIMPLE_NAME,
             qualifiedName = COMPONENT_STYLE_FQN,
-            displayString = "component style",
             function = "ctx.theme.registerStyle",
         )
         private val componentVariantDeclaration = DeclarationType(
             name = COMPONENT_VARIANT_SIMPLE_NAME,
             qualifiedName = COMPONENT_VARIANT_FQN,
-            displayString = "component variant",
             function = "ctx.theme.registerVariants",
         )
         private val keyframesDeclaration = DeclarationType(
             name = KEYFRAMES_SIMPLE_NAME,
             qualifiedName = KEYFRAMES_FQN,
-            displayString = "keyframes",
             function = "ctx.stylesheet.registerKeyframes",
         )
+        private val legacyComponentStyleDeclaration = DeclarationType(
+            name = componentStyleDeclaration.name,
+            qualifiedName = LEGACY_COMPONENT_STYLE_FQN,
+            function = componentStyleDeclaration.function,
+        )
+        private val legacyComponentVariantDeclaration = DeclarationType(
+            name = componentVariantDeclaration.name,
+            qualifiedName = COMPONENT_VARIANT_FQN,
+            function = componentVariantDeclaration.function,
+        )
+        private val legacyKeyframesDeclaration = DeclarationType(
+            name = KEYFRAMES_SIMPLE_NAME,
+            qualifiedName = KEYFRAMES_FQN,
+            function = keyframesDeclaration.function,
+        )
         private val declarations =
-            listOf(cssStyleDeclaration, componentStyleDeclaration, componentVariantDeclaration, keyframesDeclaration)
+            listOf(
+                cssStyleDeclaration,
+                componentStyleDeclaration,
+                componentVariantDeclaration,
+                keyframesDeclaration,
+                legacyComponentStyleDeclaration,
+                legacyComponentVariantDeclaration,
+                legacyKeyframesDeclaration
+            )
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val type = property.type.toString()
 
-            val matchingByType = declarations.firstOrNull { type == it.name }
+            val matchingByType = declarations.firstOrNull { type.startsWith(it.name) }
             if (matchingByType != null && !validateOrWarnAboutDeclaration(property, matchingByType)) {
                 return
             }
@@ -202,8 +223,8 @@ class FrontendProcessor(
         private inner class DeclarationType(
             val name: String,
             val qualifiedName: String,
-            val displayString: String,
             val function: String,
+            val displayString: String = name.splitCamelCase().joinToString(" ") { it.lowercase() },
             val providerName: String = "${name}Provider",
             val suppressionName: String = displayString.split(" ").joinToString("_") { it.uppercase() }
         )
