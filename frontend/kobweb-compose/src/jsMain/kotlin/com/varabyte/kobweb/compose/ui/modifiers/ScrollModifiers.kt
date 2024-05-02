@@ -5,6 +5,32 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
+fun Modifier.overscrollBehavior(overscrollBehavior: OverscrollBehavior) = styleModifier {
+    overscrollBehavior(overscrollBehavior)
+}
+
+fun Modifier.overscrollBehavior(x: OverscrollBehavior.RepeatableValue, y: OverscrollBehavior.RepeatableValue) =
+    styleModifier {
+        overscrollBehavior(OverscrollBehavior.of(x, y))
+    }
+
+fun Modifier.overscrollBehaviorBlock(x: OverscrollBehavior.SingleValue) = styleModifier {
+    overscrollBehaviorBlock(x)
+}
+
+fun Modifier.overscrollBehaviorInline(y: OverscrollBehavior.SingleValue) = styleModifier {
+    overscrollBehaviorInline(y)
+}
+
+class OverscrollBehaviorScope internal constructor(private val styleScope: StyleScope) {
+    fun x(overscrollBehavior: OverscrollBehavior.SingleValue) = styleScope.overscrollBehaviorX(overscrollBehavior)
+    fun y(overscrollBehavior: OverscrollBehavior.SingleValue) = styleScope.overscrollBehaviorY(overscrollBehavior)
+}
+
+fun Modifier.overscrollBehavior(scope: OverscrollBehaviorScope.() -> Unit) = styleModifier {
+    OverscrollBehaviorScope(this).scope()
+}
+
 fun Modifier.scrollBehavior(scrollBehavior: ScrollBehavior) = styleModifier {
     scrollBehavior(scrollBehavior)
 }

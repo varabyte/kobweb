@@ -2,6 +2,50 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+sealed class OverscrollBehavior private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    sealed class SingleValue(value: String) : OverscrollBehavior(value)
+    class RepeatableValue internal constructor(value: String) : SingleValue(value)
+    private class Keyword(value: String) : SingleValue(value)
+    private class TwoValue(x: RepeatableValue, y: RepeatableValue) : OverscrollBehavior("$x $y")
+
+    companion object {
+        // Keyword
+        val Auto get() = RepeatableValue("auto")
+        val Contain get() = RepeatableValue("contain")
+        val None get() = RepeatableValue("none")
+
+        fun of(x: RepeatableValue, y: RepeatableValue): OverscrollBehavior = TwoValue(x, y)
+
+        // Global
+        val Inherit: SingleValue get() = Keyword("inherit")
+        val Initial: SingleValue get() = Keyword("initial")
+        val Revert: SingleValue get() = Keyword("revert")
+        val Unset: SingleValue get() = Keyword("unset")
+    }
+}
+
+fun StyleScope.overscrollBehavior(overscrollBehavior: OverscrollBehavior) {
+    property("overscroll-behavior", overscrollBehavior)
+}
+
+fun StyleScope.overscrollBehaviorBlock(overscrollBehavior: OverscrollBehavior.SingleValue) {
+    property("overscroll-behavior-block", overscrollBehavior)
+}
+
+fun StyleScope.overscrollBehaviorInline(overscrollBehavior: OverscrollBehavior.SingleValue) {
+    property("overscroll-behavior-inline", overscrollBehavior)
+}
+
+fun StyleScope.overscrollBehaviorX(overscrollBehavior: OverscrollBehavior.SingleValue) {
+    property("overscroll-behavior-x", overscrollBehavior)
+}
+
+fun StyleScope.overscrollBehaviorY(overscrollBehavior: OverscrollBehavior.SingleValue) {
+    property("overscroll-behavior-y", overscrollBehavior)
+}
+
 class ScrollBehavior private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
