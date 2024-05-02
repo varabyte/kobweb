@@ -79,8 +79,7 @@ class KobwebApplicationPlugin @Inject constructor(
     override fun apply(project: Project) {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         project.applyKspPlugin()
-        val kspProcessorMode = ProcessorMode.APP
-        project.setKspMode(kspProcessorMode)
+        project.setKspMode(ProcessorMode.APP)
 
         // A Kobweb Server Plugin is one which is loaded by the Kobweb server when it starts up. It's a way for users to
         // configure their ktor server in ways that Kobweb does not currently expose.
@@ -248,7 +247,7 @@ class KobwebApplicationPlugin @Inject constructor(
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
 
-            project.setupKspJs(jsTarget, kspProcessorMode)
+            project.setupKspJs(jsTarget)
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
                 "kobwebGenSiteEntry",

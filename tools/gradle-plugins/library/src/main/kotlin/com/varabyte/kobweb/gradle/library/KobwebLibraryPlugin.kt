@@ -32,8 +32,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
         project.pluginManager.apply(KobwebCorePlugin::class.java)
         project.kobwebBlock.createLibraryBlock()
         project.applyKspPlugin()
-        val kspProcessorMode = ProcessorMode.LIBRARY
-        project.setKspMode(kspProcessorMode)
+        project.setKspMode(ProcessorMode.LIBRARY)
 
         val kobwebGenerateIndexMetadataTask =
             project.tasks.register<KobwebGenerateIndexMetadataTask>("kobwebGenerateIndexMetadata")
@@ -43,7 +42,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
             }
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
-            project.setupKspJs(jsTarget, kspProcessorMode)
+            project.setupKspJs(jsTarget)
             project.generateModuleMetadataFor(jsTarget)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 resources.srcDir(kobwebGenerateLibraryMetadataTask)

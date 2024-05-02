@@ -25,9 +25,14 @@ fun Project.applyKspPlugin() = pluginManager.apply(KspGradleSubplugin::class.jav
 
 fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE_KEY to mode.name)
 
-/** Add & configure the Kobweb KSP processor for JS sources. */
-fun Project.setupKspJs(target: JsTarget, mode: ProcessorMode) {
+/**
+ * Add & configure the Kobweb KSP processor for JS sources.
+ *
+ * This must be called after [setKspMode].
+ */
+fun Project.setupKspJs(target: JsTarget) {
     addKspDependency(target)
+    val mode = ProcessorMode.valueOf(kspExtension.arguments.getValue(KSP_PROCESSOR_MODE_KEY))
 
     configureKspTask(target) {
         addKspArguments(

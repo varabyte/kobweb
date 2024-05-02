@@ -164,6 +164,127 @@ class FrontendProcessor(
                 legacyKeyframesDeclaration
             )
 
+        fun KSAnnotated.getAnnotationValue(fqn: String): String? {
+            return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
+        }
+
+        /**
+         * Get the CSS name for some target property, e.g. "BoldItalicStyle" -> "bold-italic"
+         *
+         * This method takes callbacks which further process the name transformation steps; however, neither will be called if
+         * the property has a `@CssName` annotation tied to it.
+         */
+        private fun KSPropertyDeclaration.getCssName(
+            processCssName: (String) -> String = { it },
+            processPropertyName: (String) -> String,
+        ): String {
+            return this.getAnnotationValue(CSS_NAME_FQN)
+                ?: this.simpleName.asString().let(processPropertyName).titleCamelCaseToKebabCase().let(processCssName)
+        }
+
+        private fun KSAnnotated.getCssPrefix(): String? {
+            return this.getAnnotationValue(CSS_PREFIX_FQN)
+                ?.takeIf { it.isNotEmpty() } // If the CssPrefix annotation is set to "", that should disable the prefix
+        }
+
+        private fun String.prefixed(prefix: String?, containedName: String? = null): String {
+            val self = this
+            return buildString {
+                prefix?.let { append("$it-") }
+                containedName?.let { append("${it}_") }
+                append(self)
+            }
+        }
+
+        private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
+            val propertyCssName = property.getCssName { it.removeSuffix("Style") }
+
+            fun getCssStyleEntry(prefix: String?, containedName: String? = null): CssStyleEntry {
+                return CssStyleEntry(
+                    property.qualifiedName!!.asString(),
+                    propertyCssName.prefixed(prefix, containedName)
+                )
+            }
+
+            val propertyPrefix = property.getCssPrefix()
+
+            val parent = property.parentDeclaration as? KSClassDeclaration
+                ?: return getCssStyleEntry(propertyPrefix)
+
+            val parentNameOverride = parent.getAnnotationValue(CSS_NAME_FQN)
+
+            val containerName = if (parentNameOverride != null) {
+                parentNameOverride
+            } else {
+                val relevantParent = if (parent.isCompanionObject) parent.parentDeclaration!! else parent
+                relevantParent.simpleName.asString().titleCamelCaseToKebabCase()
+            }
+
+            return getCssStyleEntry(propertyPrefix ?: parent.getCssPrefix(), containerName)
+        }
+
+        fun processComponentStyle(property: KSPropertyDeclaration): ComponentStyleEntry {
+            val propertyCssName = property.getCssName { it.removeSuffix("Style") }
+
+            fun getComponentStyleEntry(prefix: String?): ComponentStyleEntry {
+                return ComponentStyleEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
+            }
+
+            val propertyPrefix = property.getCssPrefix()
+
+            return getComponentStyleEntry(propertyPrefix)
+        }
+
+        fun processComponentVariant(property: KSPropertyDeclaration): ComponentVariantEntry {
+            // Remove the kind part from the variant name, e.g. "val RedButtonVariant = ComponentVariant<ButtonKind>" -> "red"
+            // (after removing "button"). In this way, we can append the variant on top of the style without repeating the kind,
+            // e.g. "button-red" and not "button-button-red"
+            val variantKindName = run {
+                val variantKindType = property.type.resolve().arguments.first().type!!.resolve()
+                val variantKindFqn = variantKindType.declaration.qualifiedName!!.asString()
+                variantKindFqn.substringAfterLast(".").removeSuffix("Kind")
+            }
+
+            val propertyCssName = property.getCssName(
+                processCssName = { "-$it" }, // Indicate the variant should extend the base style name
+            ) { propertyName ->
+                val withoutVariantSuffix = propertyName.removeSuffix("Variant")
+                // Given a variant of kind "ExampleKind" (which gets stripped to just "Example"), we want to support the
+                // following variant name simplifications:
+                // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
+                // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
+                // - "OutlinedVariant"        -> "outlined" // But really the user should have kept "Example" in the name
+                // - "ExampleVariant"         -> "example" // In other words, protect against empty strings!
+                withoutVariantSuffix.removePrefix(variantKindName).removeSuffix(variantKindName)
+                    .takeIf { it.isNotEmpty() }
+                    ?: withoutVariantSuffix
+            }
+
+            fun getComponentVariantEntry(prefix: String?): ComponentVariantEntry {
+                return ComponentVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
+            }
+
+            val propertyPrefix = if (!propertyCssName.startsWith('-')) {
+                property.getCssPrefix()
+            } else null
+            return getComponentVariantEntry(propertyPrefix)
+        }
+
+        fun processKeyframes(property: KSPropertyDeclaration): KeyframesEntry {
+            val propertyCssName = property.getCssName {
+                it.removeSuffix("Anim")
+                    .removeSuffix("Animation")
+                    .removeSuffix("Keyframes")
+            }
+
+            fun getKeyframesEntry(prefix: String?): KeyframesEntry {
+                return KeyframesEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
+            }
+
+            val propertyPrefix = property.getCssPrefix()
+            return getKeyframesEntry(propertyPrefix)
+        }
+
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val type = property.type.toString()
 
@@ -312,122 +433,6 @@ class FrontendProcessor(
      */
     data class Result(val data: FrontendData, val fileDependencies: List<KSFile>)
 }
-
-fun KSAnnotated.getAnnotationValue(fqn: String): String? {
-    return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
-}
-
-/**
- * Get the CSS name for some target property, e.g. "BoldItalicStyle" -> "bold-italic"
- *
- * This method takes callbacks which further process the name transformation steps; however, neither will be called if
- * the property has a `@CssName` annotation tied to it.
- */
-private fun KSPropertyDeclaration.getCssName(
-    processCssName: (String) -> String = { it },
-    processPropertyName: (String) -> String,
-): String {
-    return this.getAnnotationValue(CSS_NAME_FQN)
-        ?: this.simpleName.asString().let(processPropertyName).titleCamelCaseToKebabCase().let(processCssName)
-}
-
-private fun KSAnnotated.getCssPrefix(): String? {
-    return this.getAnnotationValue(CSS_PREFIX_FQN)
-}
-
-private fun String.prefixed(prefix: String?, containedName: String? = null): String {
-    val self = this
-    return buildString {
-        prefix?.let { append("$it-") }
-        containedName?.let { append("${it}_") }
-        append(self)
-    }
-}
-
-private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
-    val propertyCssName = property.getCssName { it.removeSuffix("Style") }
-
-    fun getCssStyleEntry(prefix: String?, containedName: String? = null): CssStyleEntry {
-        return CssStyleEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix, containedName))
-    }
-
-    val propertyPrefix = property.getCssPrefix()
-
-    val parent = property.parentDeclaration as? KSClassDeclaration
-        ?: return getCssStyleEntry(propertyPrefix)
-
-    val parentNameOverride = parent.getAnnotationValue(CSS_NAME_FQN)
-
-    val containerName = if (parentNameOverride != null) {
-        parentNameOverride
-    } else {
-        val relevantParent = if (parent.isCompanionObject) parent.parentDeclaration!! else parent
-        relevantParent.simpleName.asString().titleCamelCaseToKebabCase()
-    }
-
-    return getCssStyleEntry(propertyPrefix ?: parent.getCssPrefix(), containerName)
-}
-
-fun processComponentStyle(property: KSPropertyDeclaration): ComponentStyleEntry {
-    val propertyCssName = property.getCssName { it.removeSuffix("Style") }
-
-    fun getComponentStyleEntry(prefix: String?): ComponentStyleEntry {
-        return ComponentStyleEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
-    }
-
-    val propertyPrefix = property.getCssPrefix()
-
-    return getComponentStyleEntry(propertyPrefix)
-}
-
-fun processComponentVariant(property: KSPropertyDeclaration): ComponentVariantEntry {
-    // Remove the kind part from the variant name, e.g. "val RedButtonVariant = ComponentVariant<ButtonKind>" -> "red"
-    // (after removing "button"). In this way, we can append the variant on top of the style without repeating the kind,
-    // e.g. "button-red" and not "button-button-red"
-    val variantKindName = run {
-        val variantKindType = property.type.resolve().arguments.first().type!!.resolve()
-        val variantKindFqn = variantKindType.declaration.qualifiedName!!.asString()
-        variantKindFqn.substringAfterLast(".").removeSuffix("Kind")
-    }
-
-    val propertyCssName = property.getCssName(
-        processCssName = { "-$it" }, // Indicate the variant should extend the base style name
-    ) { propertyName ->
-        val withoutVariantSuffix = propertyName.removeSuffix("Variant")
-        // Given a variant of kind "ExampleKind" (which gets stripped to just "Example"), we want to support the
-        // following variant name simplifications:
-        // - "OutlinedExampleVariant" -> "outlined" // Preferred variant naming style
-        // - "ExampleOutlinedVariant" -> "outlined" // Acceptable variant naming style
-        // - "OutlinedVariant"        -> "outlined" // But really the user should have kept "Example" in the name
-        // - "ExampleVariant"         -> "example" // In other words, protect against empty strings!
-        withoutVariantSuffix.removePrefix(variantKindName).removeSuffix(variantKindName).takeIf { it.isNotEmpty() }
-            ?: withoutVariantSuffix
-    }
-
-    fun getComponentVariantEntry(prefix: String?): ComponentVariantEntry {
-        return ComponentVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
-    }
-
-    val propertyPrefix = property.getCssPrefix()
-
-    return getComponentVariantEntry(propertyPrefix)
-}
-
-fun processKeyframes(property: KSPropertyDeclaration): KeyframesEntry {
-    val propertyCssName = property.getCssName {
-        it.removeSuffix("Anim")
-            .removeSuffix("Animation")
-            .removeSuffix("Keyframes")
-    }
-
-    fun getKeyframesEntry(prefix: String?): KeyframesEntry {
-        return KeyframesEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
-    }
-
-    val propertyPrefix = property.getCssPrefix()
-    return getKeyframesEntry(propertyPrefix)
-}
-
 
 /**
  * Convert a String for a name that is using TitleCamelCase into kebab-case.
