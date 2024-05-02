@@ -11,11 +11,13 @@ import com.varabyte.kobweb.gradle.core.kmp.JvmTarget
 import com.varabyte.kobweb.gradle.core.kmp.TargetPlatform
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.ksp.KSP_API_PACKAGE_KEY
+import com.varabyte.kobweb.ksp.KSP_DEFAULT_CSS_PREFIX_KEY
 import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.KSP_PROCESSOR_MODE_KEY
 import com.varabyte.kobweb.project.common.PackageUtils
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
@@ -30,7 +32,7 @@ fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE
  *
  * This must be called after [setKspMode].
  */
-fun Project.setupKspJs(target: JsTarget) {
+fun Project.setupKspJs(target: JsTarget, defaultCssPrefix: Property<String>? = null) {
     addKspDependency(target)
     val mode = ProcessorMode.valueOf(kspExtension.arguments.getValue(KSP_PROCESSOR_MODE_KEY))
 
@@ -41,6 +43,9 @@ fun Project.setupKspJs(target: JsTarget) {
                 kobwebBlock.pagesPackage.get()
             )
         )
+        defaultCssPrefix?.orNull?.let {
+            addKspArguments(KSP_DEFAULT_CSS_PREFIX_KEY to it)
+        }
     }
 
     // js resources are not automatically hooked up to processResources, see: https://github.com/google/ksp/issues/1539

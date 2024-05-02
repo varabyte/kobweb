@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import kotlinx.html.HEAD
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 
@@ -29,6 +30,23 @@ abstract class LibraryBlock : ExtensionAware {
          */
         abstract val head: ListProperty<HEAD.() -> Unit>
     }
+
+    /**
+     * If set, add a prefix to all CSS names generated for this library.
+     *
+     * This includes CssStyle, ComponentStyle, ComponentVariant, and Keyframes properties.
+     *
+     * For example, if you are working on a bootstrap library and set the default prefix to "bs", then a property like
+     * `val ButtonStyle = CssStyle { ... }` would generate a CSS classname `bs-button` instead of just `button`.
+     *
+     * NOTE: You can override prefixes on a case-by-case basis by setting the `@CssPrefix` annotation on the property
+     * itself.
+     *
+     * If you are writing an app and simply refactoring it into pieces for organizational purposes, then you don't need
+     * to set this. However, if you plan to publish your library for others to use, then setting a prefix is a good
+     * practice to reduce the chance of name collisions for when they are defining their own styles.
+     */
+    abstract val cssPrefix: Property<String>
 
     init {
         extensions.create<IndexBlock>("index")

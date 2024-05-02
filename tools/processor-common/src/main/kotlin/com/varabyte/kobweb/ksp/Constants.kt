@@ -3,6 +3,7 @@ package com.varabyte.kobweb.ksp
 const val KSP_PAGES_PACKAGE_KEY = "kobweb.pagesPackage"
 const val KSP_API_PACKAGE_KEY = "kobweb.apiPackage"
 const val KSP_PROCESSOR_MODE_KEY = "kobweb.mode"
+const val KSP_DEFAULT_CSS_PREFIX_KEY = "kobweb.default.css.prefix"
 const val KSP_WORKER_OUTPUT_PATH_KEY = "kobweb.worker.outputPath"
 const val KSP_WORKER_FQCN_KEY = "kobweb.worker.fqcn"
 
