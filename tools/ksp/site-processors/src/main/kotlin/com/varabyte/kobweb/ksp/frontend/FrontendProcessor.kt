@@ -16,10 +16,10 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.google.devtools.ksp.symbol.Variance
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.splitCamelCase
-import com.varabyte.kobweb.ksp.common.CSS_KIND_INHERITED_FQN
-import com.varabyte.kobweb.ksp.common.CSS_KIND_UNSPECIFIED_FQN
+import com.varabyte.kobweb.ksp.common.CSS_KIND_COMPONENT_FQN
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
@@ -109,8 +109,15 @@ class FrontendProcessor(
         val legacyComponentVariantType =
             resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
         val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
-        val inheritedKindType = resolver.getKotlinClassByName(CSS_KIND_INHERITED_FQN)!!.asType(emptyList())
-        val unspecifiedKindType = resolver.getKotlinClassByName(CSS_KIND_UNSPECIFIED_FQN)!!.asType(emptyList())
+
+        // Not CssStyle<*> but CssStyle<out ComponentKind> specifically. Useful for confirming if we have a
+        // component-specific CSS style.
+        val cssStyleComponentKindType = run {
+            val componentKindType = resolver.getKotlinClassByName(CSS_KIND_COMPONENT_FQN)!!.asType(emptyList())
+            val typeRef = resolver.createKSTypeReferenceFromKSType(componentKindType)
+            val typeArg = resolver.getTypeArgument(typeRef, Variance.COVARIANT)
+            resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(listOf(typeArg))
+        }
     }
 
     private inner class FrontendVisitor(resolver: Resolver) : KSVisitorVoid() {
@@ -305,18 +312,32 @@ class FrontendProcessor(
                 return false
             }
             if (declarationInfo.type == types.cssStyleType) {
-                // If a CssStyle tied to a ComponentKind, make sure it was declared in the same file as the kind
-                val variantKindType = property.type.resolve().arguments.first().type!!.resolve()
-                if (variantKindType == types.unspecifiedKindType || variantKindType == types.inheritedKindType)
-                // This was created by a non-typed CssStyle { ... } block, so we don't need to check the kind any
-                // further
+                // If a CssStyle is associated with a ComponentKind, make sure it was declared in the same file as the
+                // kind.
+                //
+                // For example, in:
+                // ```
+                // interface ButtonKind : ComponentKind
+                // val ButtonStyle = CssStyle<ButtonKind>
+                // ```
+                // we are checking that ButtonKind and the ButtonStyle property live near each other.
+                // You can think of this as a poor man's sealed class kind of implementation.
+
+                val propertyType = property.type.resolve()
+                if (!types.cssStyleComponentKindType.isAssignableFrom(propertyType)) {
+                    // This CssStyle implementation is either a CssStyle subclass of CssStyle.Base or, more likely, it
+                    // was created by a non-typed `CssStyle { ... }` block. These cases are safe.
                     return true
+                }
+
+                // If here, we're sure we have a CssStyle<ComponentKind>. Make sure they're in the same file
+                val variantKindType = propertyType.arguments.first().type!!.resolve()
                 val variantKindDeclaration = variantKindType.declaration
 
                 if (property.containingFile != variantKindDeclaration.containingFile) {
                     val kindTypeName = variantKindType.declaration.simpleName.asString()
                     logger.error(
-                        "`val $propertyName = ${declarationInfo.name}<$kindTypeName>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` interface in the same file and use that one, or declare your `ComponentStyle` in the same file as the `$kindTypeName` definition.",
+                        "`val $propertyName = ${declarationInfo.name}<$kindTypeName>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` implementation in the same file and use that one, or declare your `${declarationInfo.name}<$kindTypeName>` in the same file as the `$kindTypeName` definition.",
                         property
                     )
                     return false
