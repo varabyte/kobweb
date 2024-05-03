@@ -289,6 +289,43 @@ internal class SimpleCssStyle(
 }
 
 /**
+ * A [CssStyle] that, when applied, should always ALSO apply the style it depends on and layer on top of it.
+ *
+ * This may seem similar to defining variants for [ComponentKind] styles, except this doesn't enforce type safety, which
+ * variants are good for. Also, this is more a case where the user will interact with the extended CSS style directly,
+ * vs. variants where the user will interact with the base style and then specify zero or more variants on top of it.
+ *
+ * ```
+ * // Extending:
+ * val BaseStyle = CssStyle { ... }
+ * val ExtendedStyle = BaseStyle.extended { ... }
+ *
+ * Box(ExtendedStyle.toModifier()) // includes BaseStyle automatically
+ *
+ * // Variants:
+ * interface LabelKind : ComponentKind
+ * val LabelStyle = CssStyle<LabelKind> { ... }
+ * val BoldLabelVariant = LabelStyle.addVariant { ... }
+ * val ItalicLabelVariant = LabelStyle.addVariant { ... }
+ *
+ * Box(LabelStyle.toModifier(BoldLabelVariant, ItalicLabelVariant))
+ * ```
+ */
+internal class ExtendedCssStyle(
+    init: CssStyleScope.() -> Unit,
+    extraModifier: @Composable () -> Modifier,
+    val baseStyle: CssStyle<UnspecifiedKind>
+) : CssStyle<UnspecifiedKind>(init, extraModifier = {
+    var currBaseStyle: CssStyle<UnspecifiedKind>? = baseStyle
+    val classNames = mutableSetOf<String>()
+    while (currBaseStyle != null) {
+        classNames.add(SilkTheme.nameFor(currBaseStyle!!))
+        currBaseStyle = (currBaseStyle as? ExtendedCssStyle)?.baseStyle
+    }
+    Modifier.classNames(*classNames.toTypedArray()).then(extraModifier())
+})
+
+/**
  * A [CssStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
  *
  * @param classSelectors The CSS class selectors associated with this style, including the base class and any
@@ -418,6 +455,14 @@ fun <K : ComponentKind> CssStyle.Companion.base(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
 ) = object : CssStyle<K>(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
+
+fun CssStyle<UnspecifiedKind>.extended(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
+    extended({ extraModifier }, init)
+
+fun CssStyle<UnspecifiedKind>.extended(
+    extraModifier: @Composable () -> Modifier,
+    init: CssStyleScope.() -> Unit
+): CssStyle<UnspecifiedKind> = ExtendedCssStyle(init, extraModifier, this)
 
 @Composable
 fun CssStyle<UnspecifiedKind>.toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
