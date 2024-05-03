@@ -8,10 +8,10 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLSpanElement
@@ -24,7 +24,7 @@ interface SpanTextKind : ComponentKind
 
 // Normally, the color of the text is inherited from its parent (see SurfaceStyle), but users may still want to
 // override text styles globally in their own app, so we still register a style here even if it's empty
-val SpanTextStyle = ComponentStyle<SpanTextKind> {}
+val SpanTextStyle = CssStyle<SpanTextKind> {}
 
 /**
  * A span of text, which can be styled based on a passed-in `Modifier`.
@@ -48,7 +48,7 @@ val SpanTextStyle = ComponentStyle<SpanTextKind> {}
 fun SpanText(
     text: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<SpanTextKind>? = null,
+    variant: CssStyleVariant<SpanTextKind>? = null,
     ref: ElementRefScope<HTMLSpanElement>? = null,
 ) {
     val finalModifier = SpanTextStyle

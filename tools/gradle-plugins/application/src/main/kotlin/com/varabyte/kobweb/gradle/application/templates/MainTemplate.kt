@@ -199,19 +199,14 @@ fun createMainFunction(
                         frontendData.cssStyles.forEach { entry ->
                             addStatement("ctx.theme.registerStyle(\"${entry.name}\", ${entry.fqcn})")
                         }
+                        frontendData.cssStyleVariants.forEach { entry ->
+                            addStatement("ctx.theme.registerVariant(\"${entry.name}\", ${entry.fqcn})")
+                        }
                         frontendData.silkStyles.forEach { entry ->
-                            entry.name?.let { styleName ->
-                                addStatement("ctx.theme.registerStyle(\"$styleName\", ${entry.fqcn})")
-                            } ?: run {
-                                addStatement("ctx.theme.registerStyle(${entry.fqcn})")
-                            }
+                            addStatement("ctx.theme.registerStyle(${entry.fqcn})")
                         }
                         frontendData.silkVariants.forEach { entry ->
-                            entry.name?.let { variantName ->
-                                addStatement("ctx.theme.registerVariant(\"$variantName\", ${entry.fqcn})")
-                            } ?: run {
-                                addStatement("ctx.theme.registerVariants(${entry.fqcn})")
-                            }
+                            addStatement("ctx.theme.registerVariants(${entry.fqcn})")
                         }
                         frontendData.keyframesList.forEach { entry ->
                             entry.name?.let { keyframesName ->

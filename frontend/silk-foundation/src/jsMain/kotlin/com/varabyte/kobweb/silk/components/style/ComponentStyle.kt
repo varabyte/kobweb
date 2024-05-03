@@ -9,17 +9,19 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.InheritedKind
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.combine
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.UnspecifiedKind
+import com.varabyte.kobweb.silk.style.combine
+import com.varabyte.kobweb.silk.style.toAttrs
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
-import com.varabyte.kobweb.silk.style.component.ComponentStyle as NewComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant as NewComponentVariant
-
 
 /**
  * A class which allows a user to define styles that get added to the page's stylesheet, instead of inline styles.
@@ -115,7 +117,7 @@ class ComponentStyle(
  * So this:
  *
  * ```
- * ComponentStyle.base {
+ * CssStyle.base {
  *   Modifier.fontSize(48.px)
  * }
  * ```
@@ -254,35 +256,38 @@ fun <A : AttrsScope<*>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> 
 
 // The following methods are only provided so that a user's old code will still compile.
 // For example, `LinkStyle` used to be a `silk.components.style.ComponentStyle`, but now it's a
-// `silk.style.component.ComponentStyle<T>`. If the user has `LinkStyle.toModifier()` in their code, it should continue
+// `silk.style.component.CssStyle<T>`. If the user has `LinkStyle.toModifier()` in their code, it should continue
 // to compile!
 
 @Composable
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toModifier`.")
-fun <T : ComponentKind> NewComponentStyle<T>.toModifier(vararg variants: NewComponentVariant<T>?): Modifier {
-    return cssStyle.toModifier()
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
+fun <K : ComponentKind> CssStyle<K>.toModifier(vararg variants: CssStyleVariant<K>?): Modifier {
+    return toModifier()
         .then(variants.toList().combine()?.toModifier() ?: Modifier)
 }
 
 @Composable
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toAttrs`.")
-fun <A : AttrsScope<*>, T : ComponentKind> NewComponentStyle<T>.toAttrs(
-    vararg variant: NewComponentVariant<T>?,
-    finalHandler: (A.() -> Unit)? = null
-): A.() -> Unit {
-    return this.toModifier(*variant).toAttrs(finalHandler)
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
+fun CssStyle<UnspecifiedKind>.toModifier(): Modifier {
+    return toModifier()
 }
 
 @Composable
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toModifier`.")
-fun Iterable<NewComponentStyle<*>>.toModifier(): Modifier {
-    return fold<_, Modifier>(Modifier) { acc, style -> acc.then(style.toModifier()) }
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
+fun CssStyle<InheritedKind>.toModifier(): Modifier {
+    return toModifier()
 }
 
 @Composable
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toAttrs`.")
-fun <A : AttrsScope<*>> Iterable<NewComponentStyle<*>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
-    return this.toModifier().toAttrs(finalHandler)
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
+fun Iterable<CssStyle<UnspecifiedKind>>.toModifier(): Modifier {
+    return toModifier()
+}
+
+@Composable
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toAttrs`.")
+fun <A : AttrsScope<*>> Iterable<CssStyle<UnspecifiedKind>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+    return toAttrs(finalHandler)
 }
 
 // endregion

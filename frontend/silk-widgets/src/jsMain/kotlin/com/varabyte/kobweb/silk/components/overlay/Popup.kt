@@ -6,10 +6,10 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.foundation.layout.LayoutScopeMarker
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.base
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.base
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.DOMRect
@@ -24,7 +24,7 @@ object PopupVars {
 
 interface PopupKind : ComponentKind
 
-val PopupStyle = ComponentStyle.base<PopupKind> {
+val PopupStyle = CssStyle.base<PopupKind> {
     // NOTE: If any user replaces this style in their own project, they should make sure they still keep this "opacity"
     // transition in their version, even if they change the duration. Otherwise, the popup will break, as it currently
     // uses the "opacity" transition event to detect when it should close.

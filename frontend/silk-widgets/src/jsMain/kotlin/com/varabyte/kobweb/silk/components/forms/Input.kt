@@ -23,18 +23,18 @@ import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.PlaceholderOpacityVar
 import com.varabyte.kobweb.silk.components.style.vars.size.BorderRadiusVars
 import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
+import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariant
+import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selector.ariaInvalid
 import com.varabyte.kobweb.silk.style.selector.disabled
 import com.varabyte.kobweb.silk.style.selector.focusVisible
 import com.varabyte.kobweb.silk.style.selector.hover
 import com.varabyte.kobweb.silk.style.selector.not
 import com.varabyte.kobweb.silk.style.selector.placeholder
+import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.shapes.RectF
 import com.varabyte.kobweb.silk.theme.shapes.clip
 import org.jetbrains.compose.web.attributes.AutoComplete
@@ -104,7 +104,7 @@ object InputVars {
 interface InputGroupKind : ComponentKind
 interface InputKind : ComponentKind
 
-val InputGroupStyle = ComponentStyle.base<InputGroupKind> {
+val InputGroupStyle = CssStyle.base<InputGroupKind> {
     Modifier
         .outline(0.px, LineStyle.Solid, Colors.Transparent) // Disable, we'll use box shadow instead
         .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
@@ -114,7 +114,7 @@ val InputGroupStyle = ComponentStyle.base<InputGroupKind> {
         .fontSize(InputVars.FontSize.value())
 }
 
-val InputStyle = ComponentStyle<InputKind> {
+val InputStyle = CssStyle<InputKind> {
     base {
         Modifier
             .appearance(Appearance.None) // Disable browser styles
@@ -204,7 +204,7 @@ internal class InputParams<T : Any?>(
     private val value: T,
     private val onValueChanged: (T) -> Unit,
     private val modifier: Modifier = Modifier,
-    private val variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
+    private val variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     private val placeholder: String? = null,
     private val placeholderColor: PlaceholderColor? = null,
     private val focusBorderColor: CSSColorValue? = null,
@@ -260,7 +260,7 @@ class InputGroupScope {
         value: T,
         onValueChanged: (T) -> Unit,
         modifier: Modifier = Modifier,
-        variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
+        variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
         placeholder: String? = null,
         enabled: Boolean = InputDefaults.Enabled,
         valid: Boolean = InputDefaults.Valid,
@@ -378,7 +378,7 @@ fun InputGroupScope.TextInput(
     text: String,
     onTextChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
+    variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
     placeholderColor: PlaceholderColor? = null,
     focusBorderColor: CSSColorValue? = null,
@@ -447,7 +447,7 @@ private fun <T : Any?> _Input(
     value: T,
     onValueChanged: (T) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<InputKind>? = null,
+    variant: CssStyleVariant<InputKind>? = null,
     placeholder: String? = null,
     enabled: Boolean = InputDefaults.Enabled,
     valid: Boolean = InputDefaults.Valid,
@@ -530,7 +530,7 @@ fun TextInput(
     text: String,
     onTextChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
+    variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
     placeholderColor: PlaceholderColor? = null,
     focusBorderColor: CSSColorValue? = null,
@@ -604,7 +604,7 @@ fun <T : Any?> Input(
     value: T,
     onValueChanged: (T) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<InputKind>? = InputDefaults.Variant,
+    variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
     size: InputSize = InputDefaults.Size,
     enabled: Boolean = InputDefaults.Enabled,
@@ -670,7 +670,7 @@ fun <T : Any?> Input(
 @Composable
 fun InputGroup(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<InputGroupKind>? = null,
+    variant: CssStyleVariant<InputGroupKind>? = null,
     size: InputSize = InputDefaults.Size,
     block: InputGroupScope.() -> Unit,
 ) {

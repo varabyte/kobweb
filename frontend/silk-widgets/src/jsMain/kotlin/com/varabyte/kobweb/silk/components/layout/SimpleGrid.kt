@@ -7,12 +7,12 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.breakpoint.ResponsiveValues
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -23,7 +23,7 @@ private val columnVariables = Breakpoint.entries.associateWith { breakpoint ->
 
 interface SimpleGridKind : ComponentKind
 
-val SimpleGridStyle = ComponentStyle<SimpleGridKind> {
+val SimpleGridStyle = CssStyle<SimpleGridKind> {
     base {
         Modifier.display(DisplayStyle.Grid)
     }
@@ -70,7 +70,7 @@ fun numColumns(base: Int, sm: Int = base, md: Int = sm, lg: Int = md, xl: Int = 
 fun SimpleGrid(
     numColumns: ResponsiveValues<Int>,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<SimpleGridKind>? = null,
+    variant: CssStyleVariant<SimpleGridKind>? = null,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {

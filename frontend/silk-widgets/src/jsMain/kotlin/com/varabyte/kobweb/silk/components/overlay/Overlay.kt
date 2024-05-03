@@ -10,11 +10,11 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLElement
 
@@ -24,7 +24,7 @@ object OverlayVars {
 
 interface OverlayKind : ComponentKind
 
-val OverlayStyle = ComponentStyle.base<OverlayKind> {
+val OverlayStyle = CssStyle.base<OverlayKind> {
     Modifier.backgroundColor(OverlayVars.BackgroundColor.value())
 }
 
@@ -54,7 +54,7 @@ val OverlayStyle = ComponentStyle.base<OverlayKind> {
 @Composable
 fun Overlay(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<OverlayKind>? = null,
+    variant: CssStyleVariant<OverlayKind>? = null,
     contentAlignment: Alignment = Alignment.TopCenter,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}

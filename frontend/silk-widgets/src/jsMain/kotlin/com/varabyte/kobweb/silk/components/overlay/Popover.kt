@@ -11,8 +11,8 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.defer.deferRender
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.toModifier
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -258,7 +258,7 @@ private class PopoverElements(
 fun Popover(
     target: ElementTarget,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<PopupKind>? = null,
+    variant: CssStyleVariant<PopupKind>? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
     placementTarget: ElementTarget? = null,
@@ -302,7 +302,7 @@ fun AdvancedPopover(
     target: ElementTarget,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
-    variant: ComponentVariant<PopupKind>? = null,
+    variant: CssStyleVariant<PopupKind>? = null,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
     openCloseStrategy: OpenClosePopupStrategy? = null,

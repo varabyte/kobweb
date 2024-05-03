@@ -12,15 +12,15 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
+import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariant
+import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selector.ariaDisabled
 import com.varabyte.kobweb.silk.style.selector.hover
 import com.varabyte.kobweb.silk.style.selector.not
+import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
@@ -51,12 +51,13 @@ interface SwitchKind : ComponentKind {
     interface Track : ComponentKind
     interface Thumb : ComponentKind
 }
-val SwitchStyle = ComponentStyle.base<SwitchKind> {
+
+val SwitchStyle = CssStyle.base<SwitchKind> {
     Modifier
         .position(Position.Relative) // So the hidden <input> is positioned relative to the switch root
 }
 
-val SwitchTrackStyle = ComponentStyle<SwitchKind.Track>(
+val SwitchTrackStyle = CssStyle<SwitchKind.Track>(
     extraModifier = Modifier.tabIndex(-1).ariaHidden()
 ) {
     base {
@@ -84,7 +85,7 @@ val SwitchInputVariant = InputStyle.addVariant {
     }
 }
 
-val SwitchThumbStyle = ComponentStyle.base<SwitchKind.Thumb> {
+val SwitchThumbStyle = CssStyle.base<SwitchKind.Thumb> {
     Modifier.size(SwitchVars.TrackHeight.value())
         .borderRadius(SwitchVars.BorderRadius.value())
         .backgroundColor(SwitchVars.ThumbColor.value())
@@ -151,7 +152,7 @@ fun Switch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<SwitchKind>? = null,
+    variant: CssStyleVariant<SwitchKind>? = null,
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
     shape: SwitchShape = SwitchShape.PILL,

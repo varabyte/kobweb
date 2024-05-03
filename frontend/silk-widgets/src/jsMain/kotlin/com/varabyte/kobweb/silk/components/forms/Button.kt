@@ -20,16 +20,15 @@ import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurati
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
+import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.selector.active
 import com.varabyte.kobweb.silk.style.selector.ariaDisabled
 import com.varabyte.kobweb.silk.style.selector.focusVisible
 import com.varabyte.kobweb.silk.style.selector.hover
 import com.varabyte.kobweb.silk.style.selector.not
+import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.color
@@ -57,7 +56,7 @@ object ButtonVars {
 
 interface ButtonKind : ComponentKind
 
-val ButtonStyle = ComponentStyle<ButtonKind> {
+val ButtonStyle = CssStyle<ButtonKind> {
     base {
         Modifier
             .color(ButtonVars.Color.value())
@@ -123,7 +122,7 @@ class ButtonSize(
 fun Button(
     onClick: (evt: SyntheticMouseEvent) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<ButtonKind>? = null,
+    variant: CssStyleVariant<ButtonKind>? = null,
     type: ButtonType = ButtonType.Button,
     enabled: Boolean = true,
     size: ButtonSize = ButtonSize.MD,

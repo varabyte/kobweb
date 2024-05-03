@@ -18,12 +18,12 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.splitCamelCase
-import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_FQN
-import com.varabyte.kobweb.ksp.common.COMPONENT_STYLE_SIMPLE_NAME
-import com.varabyte.kobweb.ksp.common.COMPONENT_VARIANT_FQN
+import com.varabyte.kobweb.ksp.common.CSS_KIND_INHERITED_FQN
+import com.varabyte.kobweb.ksp.common.CSS_KIND_UNSPECIFIED_FQN
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
+import com.varabyte.kobweb.ksp.common.CSS_STYLE_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
@@ -38,6 +38,7 @@ import com.varabyte.kobweb.ksp.symbol.suppresses
 import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
 import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
+import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.InitKobwebEntry
 import com.varabyte.kobweb.project.frontend.InitSilkEntry
@@ -58,10 +59,10 @@ class FrontendProcessor(
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
+    private val cssStyleVariants = mutableListOf<CssStyleVariantEntry>()
     private val componentStyles = mutableListOf<ComponentStyleEntry>()
     private val componentVariants = mutableListOf<ComponentVariantEntry>()
     private val keyframesList = mutableListOf<KeyframesEntry>()
-
     // fqPkg to subdir, e.g. "blog._2022._01" to "01"
     private val packageMappings = mutableMapOf<String, String>()
 
@@ -101,14 +102,15 @@ class FrontendProcessor(
 
     @OptIn(KspExperimental::class)
     private class KSTypes(resolver: Resolver) {
-        val cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(emptyList())
-        val componentStyleType = resolver.getKotlinClassByName(COMPONENT_STYLE_FQN)!!.asStarProjectedType()
-        val componentVariantType = resolver.getKotlinClassByName(COMPONENT_VARIANT_FQN)!!.asStarProjectedType()
+        val cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asStarProjectedType()
+        val cssStyleVariantType = resolver.getKotlinClassByName(CSS_STYLE_VARIANT_FQN)!!.asStarProjectedType()
         val keyframesType = resolver.getKotlinClassByName(KEYFRAMES_FQN)!!.asType(emptyList())
         val legacyComponentStyleType = resolver.getKotlinClassByName(LEGACY_COMPONENT_STYLE_FQN)!!.asType(emptyList())
         val legacyComponentVariantType =
             resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
         val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
+        val inheritedKindType = resolver.getKotlinClassByName(CSS_KIND_INHERITED_FQN)!!.asType(emptyList())
+        val unspecifiedKindType = resolver.getKotlinClassByName(CSS_KIND_UNSPECIFIED_FQN)!!.asType(emptyList())
     }
 
     private inner class FrontendVisitor(resolver: Resolver) : KSVisitorVoid() {
@@ -118,12 +120,8 @@ class FrontendProcessor(
                 types.cssStyleType,
                 "ctx.theme.registerStyle",
             )
-            val componentStyleDeclaration = DeclarationType(
-                types.componentStyleType,
-                "ctx.theme.registerStyle",
-            )
-            val componentVariantDeclaration = DeclarationType(
-                types.componentVariantType,
+            val cssStyleVariantDeclaration = DeclarationType(
+                types.cssStyleVariantType,
                 "ctx.theme.registerVariant",
             )
             val keyframesDeclaration = DeclarationType(
@@ -132,7 +130,7 @@ class FrontendProcessor(
             )
             val legacyComponentStyleDeclaration = DeclarationType(
                 types.legacyComponentStyleType,
-                componentStyleDeclaration.function,
+                "ctx.theme.registerStyle",
             )
             val legacyComponentVariantDeclaration = DeclarationType(
                 types.legacyComponentVariantType,
@@ -145,8 +143,7 @@ class FrontendProcessor(
 
             listOf(
                 cssStyleDeclaration,
-                componentStyleDeclaration,
-                componentVariantDeclaration,
+                cssStyleVariantDeclaration,
                 keyframesDeclaration,
                 legacyComponentStyleDeclaration,
                 legacyComponentVariantDeclaration,
@@ -213,26 +210,14 @@ class FrontendProcessor(
             return getCssStyleEntry(propertyPrefix ?: parent.getCssPrefix(), containerName)
         }
 
-        fun processComponentStyle(property: KSPropertyDeclaration): ComponentStyleEntry {
-            val propertyCssName = property.getCssName { it.removeSuffix("Style") }
-
-            fun getComponentStyleEntry(prefix: String?): ComponentStyleEntry {
-                return ComponentStyleEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
-            }
-
-            val propertyPrefix = property.getCssPrefix()
-
-            return getComponentStyleEntry(propertyPrefix)
-        }
-
-        fun processComponentVariant(property: KSPropertyDeclaration): ComponentVariantEntry {
-            // Remove the kind part from the variant name, e.g. "val RedButtonVariant = ComponentVariant<ButtonKind>" -> "red"
+        fun processCssStyleVariant(property: KSPropertyDeclaration): CssStyleVariantEntry {
+            // Remove the kind part from the variant name, e.g. "val RedButtonVariant = CssStyleVariant<ButtonKind>" -> "red"
             // (after removing "button"). In this way, we can append the variant on top of the style without repeating the kind,
             // e.g. "button-red" and not "button-button-red"
             val variantKindName = run {
                 val variantKindType = property.type.resolve().arguments.first().type!!.resolve()
                 val variantKindFqn = variantKindType.declaration.qualifiedName!!.asString()
-                variantKindFqn.substringAfterLast(".").removeSuffix("Kind")
+                variantKindFqn.substringAfterLast(".").removeSuffix("ComponentKind").removeSuffix("Kind")
             }
 
             val propertyCssName = property.getCssName(
@@ -250,14 +235,14 @@ class FrontendProcessor(
                     ?: withoutVariantSuffix
             }
 
-            fun getComponentVariantEntry(prefix: String?): ComponentVariantEntry {
-                return ComponentVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
+            fun getCssStyleVariantEntry(prefix: String?): CssStyleVariantEntry {
+                return CssStyleVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
             }
 
             val propertyPrefix = if (!propertyCssName.startsWith('-')) {
                 property.getCssPrefix()
             } else null
-            return getComponentVariantEntry(propertyPrefix)
+            return getCssStyleVariantEntry(propertyPrefix)
         }
 
         fun processKeyframes(property: KSPropertyDeclaration): KeyframesEntry {
@@ -285,8 +270,7 @@ class FrontendProcessor(
 
             when (matchingByType.type) {
                 types.cssStyleType -> cssStyles.add(processCssStyle(property))
-                types.componentStyleType -> componentStyles.add(processComponentStyle(property))
-                types.componentVariantType -> componentVariants.add(processComponentVariant(property))
+                types.cssStyleVariantType -> cssStyleVariants.add(processCssStyleVariant(property))
                 types.keyframesType -> keyframesList.add(processKeyframes(property))
                 types.legacyComponentStyleType -> componentStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
                 types.legacyComponentVariantType -> componentVariants.add(ComponentVariantEntry(property.qualifiedName!!.asString()))
@@ -320,12 +304,19 @@ class FrontendProcessor(
                 }
                 return false
             }
-            if (declarationInfo.type == types.componentStyleType) {
-                val variantKindDeclaration = property.type.resolve().arguments.first().type!!.resolve().declaration
+            if (declarationInfo.type == types.cssStyleType) {
+                // If a CssStyle tied to a ComponentKind, make sure it was declared in the same file as the kind
+                val variantKindType = property.type.resolve().arguments.first().type!!.resolve()
+                if (variantKindType == types.unspecifiedKindType || variantKindType == types.inheritedKindType)
+                // This was created by a non-typed CssStyle { ... } block, so we don't need to check the kind any
+                // further
+                    return true
+                val variantKindDeclaration = variantKindType.declaration
+
                 if (property.containingFile != variantKindDeclaration.containingFile) {
-                    val kindTypeName = variantKindDeclaration.simpleName.asString()
+                    val kindTypeName = variantKindType.declaration.simpleName.asString()
                     logger.error(
-                        "`val $propertyName = ${COMPONENT_STYLE_SIMPLE_NAME}<$kindTypeName>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` interface in the same file and use that one, or declare your `ComponentStyle` in the same file as the `$kindTypeName` definition.",
+                        "`val $propertyName = ${declarationInfo.name}<$kindTypeName>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` interface in the same file and use that one, or declare your `ComponentStyle` in the same file as the `$kindTypeName` definition.",
                         property
                     )
                     return false
@@ -404,6 +395,7 @@ class FrontendProcessor(
             componentVariants,
             keyframesList,
             cssStyles,
+            cssStyleVariants,
         ).also {
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }

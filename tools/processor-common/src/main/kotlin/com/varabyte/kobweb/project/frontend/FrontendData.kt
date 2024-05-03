@@ -13,13 +13,14 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class FrontendData(
-    val pages: List<PageEntry>,
-    val kobwebInits: List<InitKobwebEntry>,
-    val silkInits: List<InitSilkEntry>,
-    val silkStyles: List<ComponentStyleEntry>,
-    val silkVariants: List<ComponentVariantEntry>,
-    val keyframesList: List<KeyframesEntry>,
-    val cssStyles: List<CssStyleEntry>,
+    val pages: List<PageEntry> = mutableListOf(),
+    val kobwebInits: List<InitKobwebEntry> = mutableListOf(),
+    val silkInits: List<InitSilkEntry> = mutableListOf(),
+    val silkStyles: List<ComponentStyleEntry> = mutableListOf(),
+    val silkVariants: List<ComponentVariantEntry> = mutableListOf(),
+    val keyframesList: List<KeyframesEntry> = mutableListOf(),
+    val cssStyles: List<CssStyleEntry> = mutableListOf(),
+    val cssStyleVariants: List<CssStyleVariantEntry> = mutableListOf(),
 )
 
 /**
@@ -36,6 +37,7 @@ fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
         this.flatMap { it.silkVariants },
         this.flatMap { it.keyframesList },
         this.flatMap { it.cssStyles },
+        this.flatMap { it.cssStyleVariants },
     ).also { it.assertValid(throwError) }
 }
 
@@ -100,26 +102,18 @@ class PageEntry(val fqn: String, val route: String)
 /**
  * Metadata about code like `val MyStyle = ComponentStyle { ... }`
  *
- * The name of the style will come from a `@CssName` annotation or, if not specified, the property name itself.
- *
- * For legacy ComponentStyle usages, the name comes from the ComponentStyle itself
- * (e.g. `val MyStyle = ComponentStyle("my-style") { ... }`) but by Kobweb 1.0 this code should be removed and the
- * `name` field below should become non-null.
+ * `ComponentStyle` is a legacy class. The name of the variant comes from the property name itself.
  */
 @Serializable
-class ComponentStyleEntry(val fqcn: String, val name: String? = null)
+class ComponentStyleEntry(val fqcn: String)
 
 /**
  * Metadata about code like `val MyVariant = MyStyle.addVariant { ... }`
  *
- * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
- *
- * For legacy ComponentVariant usages, the name comes from the ComponentVariant itself
- * (e.g. `val MyStyle = ComponentVariant("my-variant") { ... }`) but by Kobweb 1.0 this code should be removed and the
- * `name` field below should become non-null.
+ * `ComponentVariant` is a legacy class. The name of the variant comes from the property name itself.
  */
 @Serializable
-class ComponentVariantEntry(val fqcn: String, val name: String? = null)
+class ComponentVariantEntry(val fqcn: String)
 
 /**
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)
@@ -128,3 +122,11 @@ class ComponentVariantEntry(val fqcn: String, val name: String? = null)
  */
 @Serializable
 class CssStyleEntry(val fqcn: String, val name: String)
+
+/**
+ * Metadata for code like `val BoldLabelVariant = LabelStyle.addVariant { ... }` or `val SM = ButtonSize()`
+ *
+ * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
+ */
+@Serializable
+class CssStyleVariantEntry(val fqcn: String, val name: String)
