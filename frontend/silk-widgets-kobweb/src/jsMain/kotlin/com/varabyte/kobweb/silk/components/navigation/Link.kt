@@ -10,13 +10,14 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.silk.components.style.vars.color.ColorVar
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.selector.hover
 import com.varabyte.kobweb.silk.style.selector.link
 import com.varabyte.kobweb.silk.style.selector.visited
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Text
@@ -32,7 +33,7 @@ interface LinkKind : ComponentKind
 /**
  * Style to use with [A] tags to give them Silk-themed colors.
  */
-val LinkStyle = ComponentStyle<LinkKind> {
+val LinkStyle = CssStyle<LinkKind> {
     base {
         Modifier.textDecorationLine(TextDecorationLine.None)
     }
@@ -90,7 +91,7 @@ fun Link(
     path: String,
     text: String? = null,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<LinkKind>? = null,
+    variant: CssStyleVariant<LinkKind>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,
@@ -110,7 +111,7 @@ fun Link(
 fun Link(
     path: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<LinkKind>? = null,
+    variant: CssStyleVariant<LinkKind>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     autoPrefix: Boolean = true,

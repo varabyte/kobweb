@@ -15,15 +15,15 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.selector.active
 import com.varabyte.kobweb.silk.style.selector.ariaDisabled
 import com.varabyte.kobweb.silk.style.selector.hover
 import com.varabyte.kobweb.silk.style.selector.not
+import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
@@ -51,15 +51,15 @@ interface TabsKind : ComponentKind {
     interface Panel : ComponentKind
 }
 
-val TabsStyle = ComponentStyle<TabsKind> {}
+val TabsStyle = CssStyle<TabsKind> {}
 
 // TODO: should this take a variant? currently it's used without one
-val TabsTabRowStyle = ComponentStyle.base<TabsKind.TabRow> {
+val TabsTabRowStyle = CssStyle.base<TabsKind.TabRow> {
     Modifier
         .fillMaxWidth()
         .borderBottom(TabVars.BorderThickness.value(), LineStyle.Solid, TabVars.BorderColor.value())
 }
-val TabsTabStyle = ComponentStyle<TabsKind.Tab>(extraModifier = { Modifier.tabIndex(0) }) {
+val TabsTabStyle = CssStyle<TabsKind.Tab>(extraModifier = { Modifier.tabIndex(0) }) {
     base {
         Modifier
             .cursor(Cursor.Pointer)
@@ -89,7 +89,7 @@ val TabsTabStyle = ComponentStyle<TabsKind.Tab>(extraModifier = { Modifier.tabIn
     }
 }
 
-val TabsPanelStyle = ComponentStyle.base<TabsKind.Panel> {
+val TabsPanelStyle = CssStyle.base<TabsKind.Panel> {
     Modifier.padding(1.cssRem).fillMaxWidth().flexGrow(1).overflow { y(Overflow.Auto) }
 }
 
@@ -266,9 +266,9 @@ fun TabsScope.TabPanel(
 @Composable
 fun Tabs(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<TabsKind>? = null,
-    tabVariant: ComponentVariant<TabsKind.Tab>? = null,
-    panelVariant: ComponentVariant<TabsKind.Panel>? = null,
+    variant: CssStyleVariant<TabsKind>? = null,
+    tabVariant: CssStyleVariant<TabsKind.Tab>? = null,
+    panelVariant: CssStyleVariant<TabsKind.Panel>? = null,
     commonTabModifier: Modifier = Modifier,
     commonPanelModifier: Modifier = Modifier,
     onTabSelected: (Int) -> Unit = {},

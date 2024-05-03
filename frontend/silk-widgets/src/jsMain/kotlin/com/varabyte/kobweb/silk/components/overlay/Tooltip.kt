@@ -9,14 +9,14 @@ import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
-import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.defer.renderWithDeferred
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.addVariantBase
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariantBase
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Br
 import org.w3c.dom.HTMLElement
@@ -64,7 +64,7 @@ interface TooltipKind : ComponentKind {
     interface TextContainer : ComponentKind
 }
 
-val TooltipStyle = ComponentStyle.base<TooltipKind> {
+val TooltipStyle = CssStyle.base<TooltipKind> {
     Modifier
         .position(Position.Relative) // So arrow is positioned relative to tooltip area
         .backgroundColor(TooltipVars.BackgroundColor.value())
@@ -72,7 +72,7 @@ val TooltipStyle = ComponentStyle.base<TooltipKind> {
         .borderRadius(6.px)
 }
 
-val TooltipArrowStyle = ComponentStyle.base<TooltipKind.Arrow> {
+val TooltipArrowStyle = CssStyle.base<TooltipKind.Arrow> {
     Modifier
         .position(Position.Absolute)
         .border {
@@ -176,7 +176,7 @@ val BottomRightTooltipArrowVariant = TooltipArrowStyle.addVariantBase {
         .triangleUp(TooltipVars.BackgroundColor.value())
 }
 
-val TooltipTextContainerStyle = ComponentStyle.base<TooltipKind.TextContainer> {
+val TooltipTextContainerStyle = CssStyle.base<TooltipKind.TextContainer> {
     Modifier.padding(5.px)
 }
 
@@ -198,7 +198,7 @@ val TooltipTextContainerStyle = ComponentStyle.base<TooltipKind.TextContainer> {
 fun Tooltip(
     target: ElementTarget,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<TooltipKind>? = null,
+    variant: CssStyleVariant<TooltipKind>? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
@@ -241,7 +241,7 @@ fun Tooltip(
     target: ElementTarget,
     text: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<TooltipKind>? = null,
+    variant: CssStyleVariant<TooltipKind>? = null,
     placement: PopupPlacement = PopupPlacement.Bottom,
     hasArrow: Boolean = true,
     offsetPixels: Number = DEFAULT_POPUP_OFFSET_PX,
@@ -280,7 +280,7 @@ fun AdvancedTooltip(
     target: ElementTarget,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
-    variant: ComponentVariant<TooltipKind>? = null,
+    variant: CssStyleVariant<TooltipKind>? = null,
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,
@@ -342,7 +342,7 @@ fun AdvancedTooltip(
     text: String,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
-    variant: ComponentVariant<TooltipKind>? = null,
+    variant: CssStyleVariant<TooltipKind>? = null,
     hasArrow: Boolean = true,
     showDelayMs: Int = 0,
     hideDelayMs: Int = 0,

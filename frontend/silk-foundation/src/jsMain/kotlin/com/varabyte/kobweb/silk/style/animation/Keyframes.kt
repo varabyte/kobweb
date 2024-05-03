@@ -6,8 +6,8 @@ import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleScopeBase
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -175,7 +175,7 @@ fun Keyframes.toAnimation(
  * null. Alternately, if the [Keyframes] doesn't reference the site's color mode in its definition, then whatever color
  * mode is passed in is ignored.
  *
- * It can be useful to call this method from within a [ComponentStyle]. For example:
+ * It can be useful to call this method from within a [CssStyle]. For example:
  *
  * ```
  * val MyAnimatedStyle = CssStyle {

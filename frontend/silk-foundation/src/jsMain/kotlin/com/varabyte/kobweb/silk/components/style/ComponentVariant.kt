@@ -6,15 +6,17 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.util.internal.CacheByPropertyNameDelegate
+import com.varabyte.kobweb.silk.style.ClassSelectors
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
+import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
-import com.varabyte.kobweb.silk.style.component.ClassSelectors
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle as NewComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant as NewComponentVariant
+import com.varabyte.kobweb.silk.style.addVariant
+import com.varabyte.kobweb.silk.style.toModifier
 
-@Deprecated("You need to migrate your use of `ComponentStyle` to the new, typed `ComponentStyle<T>` version. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You need to migrate your use of `ComponentStyle` to the new, typed `CssStyle<T>` version. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
 sealed class ComponentVariant {
     infix fun then(next: ComponentVariant): ComponentVariant {
         return CompositeComponentVariant(this, next)
@@ -158,20 +160,20 @@ fun ComponentStyle.addVariantBase(
 
 // The following methods are only provided so that a user's old code will still compile.
 // For example, `LinkStyle` used to be a `silk.components.style.ComponentStyle`, but now it's a
-// `silk.style.component.ComponentStyle<T>`. If the user has `LinkStyle.addVariant { ... }` in their code, it should
+// `silk.style.component.CssStyle<T>`. If the user has `LinkStyle.addVariant { ... }` in their code, it should
 // continue to compile!
 
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
-fun <T : ComponentKind> NewComponentStyle<T>.addVariantBase(
+fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     extraModifiers: Modifier = Modifier,
     init: CssStyleBaseScope.() -> Modifier
 ) = addVariantBase({ extraModifiers }, init)
 
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
-fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
+fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     extraModifiers: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
-): NewComponentVariant<T> {
+): CssStyleVariant<K> {
     return addVariant(extraModifiers) {
         base {
             CssStyleBaseScope(colorMode).let(init)
@@ -180,7 +182,7 @@ fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
 }
 
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`. You should use `@CssName` to specify the custom name for this variant (but leading with a dash; so `name = \"example\"` becomes `CssName(\"-example\")`.")
-fun <T: ComponentKind> NewComponentStyle<T>.addVariantBase(
+fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     @Suppress("UNUSED_PARAMETER") name: String,
     extraModifiers: Modifier = Modifier,
     init: CssStyleBaseScope.() -> Modifier

@@ -8,7 +8,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
-import com.varabyte.kobweb.silk.style.component.ClassSelectors
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -16,6 +15,25 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
+
+// TODO: Docs
+interface CssKind
+
+// TODO: Docs
+interface InheritedKind : CssKind
+
+// TODO: Docs
+interface UnspecifiedKind : CssKind
+
+// TODO: Docs
+interface ComponentKind : CssKind
+
+/** Represents a list of CSS selectors that target classes. */
+internal value class ClassSelectors(private val value: List<String>) {
+    // Selectors may be ".someStyle" or ".someStyle.someVariant" - only the last part is relevant to the specific style
+    val classNames get() = value.map { it.substringAfterLast('.') }
+    operator fun plus(other: ClassSelectors) = ClassSelectors(value + other.value)
+}
 
 /**
  * A class which allows a user to define styles that will be added into the site's CSS stylesheet.
@@ -77,7 +95,7 @@ import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
  *
  * resulting in an element like `<div class="widget widget-size_md">...</div>`.
  */
-abstract class CssStyle protected constructor(
+abstract class CssStyle<K : CssKind> protected constructor(
     internal val init: CssStyleScope.() -> Unit,
     internal val extraModifier: @Composable () -> Modifier = { Modifier },
 ) {
@@ -87,7 +105,7 @@ abstract class CssStyle protected constructor(
     abstract class Base protected constructor(
         init: CssStyleBaseScope.() -> Modifier,
         extraModifier: @Composable () -> Modifier = { Modifier },
-    ) : CssStyle({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
+    ) : CssStyle<InheritedKind>({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
         constructor(init: Modifier, extraModifier: @Composable () -> Modifier = { Modifier }) : this(
             { init },
             extraModifier
@@ -254,9 +272,6 @@ abstract class CssStyle protected constructor(
     internal fun intoImmutableStyle(classSelectors: ClassSelectors) =
         ImmutableCssStyle(classSelectors, extraModifier)
 
-    @Composable
-    fun toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
-
     companion object // for extensions
 }
 
@@ -267,7 +282,7 @@ internal class SimpleCssStyle(
     val selector: String,
     init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
-) : CssStyle(init, extraModifier) {
+) : CssStyle<UnspecifiedKind>(init, extraModifier) {
     internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         return addStylesInto(selector, styleSheet)
     }
@@ -369,12 +384,12 @@ private sealed interface StyleGroup {
 }
 
 fun CssStyle(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
-    object : CssStyle(init, { extraModifier }) {}
+    object : CssStyle<UnspecifiedKind>(init, { extraModifier }) {}
 
 fun CssStyle(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
-) = object : CssStyle(init, extraModifier) {}
+) = object : CssStyle<UnspecifiedKind>(init, extraModifier) {}
 
 fun CssStyle.Companion.base(
     extraModifier: Modifier = Modifier,
@@ -384,4 +399,49 @@ fun CssStyle.Companion.base(
 fun CssStyle.Companion.base(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
-) = object : CssStyle(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
+) = object : CssStyle<UnspecifiedKind>(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
+
+fun <K : ComponentKind> CssStyle(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
+    object : CssStyle<K>(init, { extraModifier }) {}
+
+fun <K : ComponentKind> CssStyle(
+    extraModifier: @Composable () -> Modifier,
+    init: CssStyleScope.() -> Unit
+) = object : CssStyle<K>(init, extraModifier) {}
+
+fun <K : ComponentKind> CssStyle.Companion.base(
+    extraModifier: Modifier = Modifier,
+    init: CssStyleBaseScope.() -> Modifier
+) = base<K>({ extraModifier }, init)
+
+fun <K : ComponentKind> CssStyle.Companion.base(
+    extraModifier: @Composable () -> Modifier,
+    init: CssStyleBaseScope.() -> Modifier
+) = object : CssStyle<K>(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
+
+@Composable
+fun CssStyle<UnspecifiedKind>.toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
+
+@Composable
+fun <A : AttrsScope<*>> CssStyle<UnspecifiedKind>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+    return this.toModifier().toAttrs(finalHandler)
+}
+
+@Composable
+fun CssStyle<InheritedKind>.toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
+
+@Composable
+fun <K : ComponentKind> CssStyle<K>.toModifier(vararg variants: CssStyleVariant<K>?): Modifier {
+    return SilkTheme.cssStyles.getValue(this).toModifier()
+        .then(variants.toList().combine()?.toModifier() ?: Modifier)
+}
+
+@Composable
+fun Iterable<CssStyle<UnspecifiedKind>>.toModifier(): Modifier {
+    return fold<_, Modifier>(Modifier) { acc, style -> acc.then(style.toModifier()) }
+}
+
+@Composable
+fun <A : AttrsScope<*>> Iterable<CssStyle<UnspecifiedKind>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+    return this.toModifier().toAttrs(finalHandler)
+}

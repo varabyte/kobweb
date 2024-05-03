@@ -9,13 +9,13 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.addVariantBase
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariantBase
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toModifier
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Li
@@ -32,7 +32,7 @@ object TocVars {
 
 interface TocKind : ComponentKind
 
-val TocStyle = ComponentStyle.base<TocKind> {
+val TocStyle = CssStyle.base<TocKind> {
     Modifier
         .listStyle(ListStyleType.None)
         .textAlign(TextAlign.Start)
@@ -81,7 +81,7 @@ private class TocEntry(val text: String, val id: String, val indent: Int)
 @Composable
 fun Toc(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<TocKind>? = null,
+    variant: CssStyleVariant<TocKind>? = null,
     minHeaderLevel: Int = 2,
     maxHeaderLevel: Int = 3,
     indent: CSSLengthOrPercentageNumericValue = 1.cssRem,

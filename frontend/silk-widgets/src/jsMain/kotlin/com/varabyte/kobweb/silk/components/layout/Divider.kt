@@ -5,12 +5,12 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.style.component.ComponentKind
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Hr
 
@@ -26,14 +26,14 @@ object DividerVars {
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<HorizontalDividerKind>? = null,
+    variant: CssStyleVariant<HorizontalDividerKind>? = null,
 ) {
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
 
 interface HorizontalDividerKind : ComponentKind
 
-val HorizontalDividerStyle = ComponentStyle.base<HorizontalDividerKind> {
+val HorizontalDividerStyle = CssStyle.base<HorizontalDividerKind> {
     Modifier
         .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
         .width(DividerVars.Length.value())
@@ -51,14 +51,14 @@ val DividerStyle = HorizontalDividerStyle
 @Composable
 fun HorizontalDivider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<HorizontalDividerKind>? = null,
+    variant: CssStyleVariant<HorizontalDividerKind>? = null,
 ) {
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
 
 interface VerticalDividerKind : ComponentKind
 
-val VerticalDividerStyle = ComponentStyle.base<VerticalDividerKind> {
+val VerticalDividerStyle = CssStyle.base<VerticalDividerKind> {
     Modifier
         .borderLeft(1.px, LineStyle.Solid, DividerVars.Color.value())
         .height(DividerVars.Length.value())
@@ -70,7 +70,7 @@ val VerticalDividerStyle = ComponentStyle.base<VerticalDividerKind> {
 @Composable
 fun VerticalDivider(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<VerticalDividerKind>? = null,
+    variant: CssStyleVariant<VerticalDividerKind>? = null,
 ) {
     Hr(VerticalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }

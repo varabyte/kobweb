@@ -6,10 +6,10 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -27,7 +27,7 @@ import kotlin.math.min
 
 interface CanvasKind : ComponentKind
 
-val CanvasStyle = ComponentStyle<CanvasKind> {}
+val CanvasStyle = CssStyle<CanvasKind> {}
 
 /**
  * Arguments passed to the user's `render` callback.
@@ -106,7 +106,7 @@ private inline fun <C : RenderingContext> Canvas(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<CanvasKind>? = null,
+    variant: CssStyleVariant<CanvasKind>? = null,
     minDeltaMs: Number = 0f,
     maxDeltaMs: Number = 500f,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -163,7 +163,7 @@ fun Canvas2d(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<CanvasKind>? = null,
+    variant: CssStyleVariant<CanvasKind>? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     ref: ElementRefScope<HTMLElement>? = null,
@@ -200,7 +200,7 @@ fun CanvasGl(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<CanvasKind>? = null,
+    variant: CssStyleVariant<CanvasKind>? = null,
     minDeltaMs: Number = 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     ref: ElementRefScope<HTMLElement>? = null,

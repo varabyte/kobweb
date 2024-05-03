@@ -19,15 +19,15 @@ import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurati
 import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
+import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariant
+import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.animation.toAnimation
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.addVariantBase
-import com.varabyte.kobweb.silk.style.component.base
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
@@ -84,7 +84,7 @@ interface CheckboxKind : ComponentKind {
     interface Icon : ComponentKind
 }
 
-val CheckboxStyle = ComponentStyle<CheckboxKind>(
+val CheckboxStyle = CssStyle<CheckboxKind>(
     extraModifier = Modifier.rowClasses(verticalAlignment = Alignment.CenterVertically)
 ) {
     base {
@@ -102,7 +102,7 @@ val CheckboxEnabledAnim = Keyframes {
     to { Modifier.opacity(1) }
 }
 
-val CheckboxIconContainerStyle = ComponentStyle<CheckboxKind.Container> {
+val CheckboxIconContainerStyle = CssStyle<CheckboxKind.Container> {
     base {
         Modifier
             .fontSize(CheckboxVars.IconSize.value())
@@ -131,7 +131,7 @@ val CheckedCheckboxIconContainerVariant = CheckboxIconContainerStyle.addVariant 
     }
 }
 
-val CheckboxIconStyle = ComponentStyle.base<CheckboxKind.Icon> {
+val CheckboxIconStyle = CssStyle.base<CheckboxKind.Icon> {
     Modifier
         .size(CheckboxVars.Size.value())
         .color(CheckboxVars.IconColor.value())
@@ -221,7 +221,7 @@ fun TriCheckbox(
     checked: CheckedState,
     onCheckedChange: (CheckedState) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<CheckboxKind>? = null,
+    variant: CssStyleVariant<CheckboxKind>? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
@@ -337,7 +337,7 @@ fun Checkbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<CheckboxKind>? = null,
+    variant: CssStyleVariant<CheckboxKind>? = null,
     enabled: Boolean = CheckboxDefaults.Enabled,
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,

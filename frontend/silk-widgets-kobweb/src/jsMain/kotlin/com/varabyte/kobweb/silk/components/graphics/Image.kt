@@ -9,11 +9,11 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.prependIf
-import com.varabyte.kobweb.silk.style.component.ComponentKind
-import com.varabyte.kobweb.silk.style.component.ComponentStyle
-import com.varabyte.kobweb.silk.style.component.ComponentVariant
-import com.varabyte.kobweb.silk.style.component.addVariantBase
-import com.varabyte.kobweb.silk.style.component.toModifier
+import com.varabyte.kobweb.silk.style.ComponentKind
+import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariantBase
+import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
@@ -21,7 +21,7 @@ import org.w3c.dom.HTMLImageElement
 
 interface ImageKind : ComponentKind
 
-val ImageStyle = ComponentStyle<ImageKind> {}
+val ImageStyle = CssStyle<ImageKind> {}
 
 val FitWidthImageVariant = ImageStyle.addVariantBase {
     Modifier
@@ -49,7 +49,7 @@ val FitWidthImageVariant = ImageStyle.addVariantBase {
 fun Image(
     src: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<ImageKind>? = null,
+    variant: CssStyleVariant<ImageKind>? = null,
     width: Int? = null,
     height: Int? = null,
     alt: String = "",
@@ -88,7 +88,7 @@ fun Image(
     src: String,
     description: String,
     modifier: Modifier = Modifier,
-    variant: ComponentVariant<ImageKind>? = null,
+    variant: CssStyleVariant<ImageKind>? = null,
     width: Int? = null,
     height: Int? = null,
     autoPrefix: Boolean = true,
