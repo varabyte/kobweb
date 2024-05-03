@@ -13,9 +13,10 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.ExtendedCssStyle
 import com.varabyte.kobweb.silk.style.ImmutableCssStyle
-import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.SimpleCssStyleVariant
+import com.varabyte.kobweb.silk.style.UnspecifiedKind
 import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.breakpoint.BreakpointSizes
@@ -36,16 +37,24 @@ import com.varabyte.kobweb.silk.components.style.SimpleComponentVariant as Legac
  * Unlike [SilkConfig] values, theme values are expected to be accessible in user projects via the [SilkTheme] object.
  */
 class MutableSilkTheme {
-    // Map of selector to style
+    // Map of name to style
     private val _cssStyles = mutableMapOf<String, CssStyle<*>>()
     internal val cssStyles: Map<String, CssStyle<*>> = _cssStyles
+
+    // Map of name to variant
     private val _cssStyleVariants = mutableMapOf<String, CssStyleVariant<*>>()
     internal val cssStyleVariants: Map<String, CssStyleVariant<*>> = _cssStyleVariants
 
     internal val _cssNames = mutableMapOf<Any, String>()
     internal val cssNames: Map<Any, String> = _cssNames
+
     private val _replacedCssStyles = mutableMapOf<CssStyle<*>, CssStyle<*>>()
     internal val replacedCssStyles: Map<CssStyle<*>, CssStyle<*>> = _replacedCssStyles
+
+    // If present in the map, "A to [B, C, D]" means that A depends on B, C, and D (and must be registered in the
+    // stylesheet after them to ensure its styles take precedence)
+    private val _cssStyleDependencies = mutableMapOf<CssStyle<*>, MutableList<CssStyle<*>>>()
+    internal val cssStyleDependencies: Map<CssStyle<*>, List<CssStyle<*>>> = _cssStyleDependencies
 
     // Map of name to style
     private val _legacyComponentStyles = mutableMapOf<String, LegacyComponentStyle>()
@@ -73,16 +82,30 @@ class MutableSilkTheme {
     )
 
     fun registerStyle(name: String, style: CssStyle<*>) {
-        val selector = ".$name"
-        check(cssStyles[selector].let { it == null || it === style }) {
+        check(cssStyles[name].let { it == null || it === style }) {
             """
                 Attempting to register a second CssStyle with a name that's already used: "$name"
 
                 If this was an intentional override, you should use `replaceStyle` instead.
             """.trimIndent()
         }
-        _cssStyles[selector] = style
+        _cssStyles[name] = style
         _cssNames[style] = name
+
+        if (style is ExtendedCssStyle) {
+            _cssStyleDependencies.getOrPut(style) { mutableListOf() }.add(style.baseStyle)
+        }
+    }
+
+    private fun updateReplaced(originalStyle: CssStyle<*>, newStyle: CssStyle<*>) {
+        _replacedCssStyles[originalStyle] = newStyle
+
+        _cssStyleDependencies.remove(originalStyle)?.let { dependencies ->
+            _cssStyleDependencies[newStyle] = dependencies
+        }
+        _cssStyleDependencies.values.forEach {
+            if (it.remove(originalStyle)) it.add(newStyle)
+        }
     }
 
     fun MutableSilkTheme.replaceStyle(
@@ -90,13 +113,12 @@ class MutableSilkTheme {
         extraModifier: @Composable () -> Modifier,
         init: CssStyleScope.() -> Unit
     ) {
-        val selector = cssStyles.entries.find { it.value == style }?.key
-            ?: error("Attempting to replace a CSS style that was never registered.")
-
-        check(!_replacedCssStyles.contains(style)) { "Attempting to override style \"${selector}\" twice" }
-        val newStyle = SimpleCssStyle(selector, init, extraModifier)
-        _cssStyles[selector] = newStyle
-        _replacedCssStyles[style] = newStyle
+        val name = cssNames[style] ?: error("Attempting to replace a CSS style that was never registered.")
+        check(!replacedCssStyles.contains(style)) { "Attempting to override style \"${name}\" twice" }
+        val newStyle = object : CssStyle<UnspecifiedKind>(init, extraModifier) {}
+        _cssStyles[name] = newStyle
+        _cssNames[newStyle] = name
+        updateReplaced(style, newStyle)
     }
 
     fun MutableSilkTheme.replaceStyle(
@@ -169,12 +191,12 @@ class MutableSilkTheme {
         init: CssStyleScope.() -> Unit
     ) {
         check(legacyComponentStyles.contains(style.name)) { "Attempting to replace a style that was never registered: \"${style.name}\"" }
-        check(!_replacedCssStyles.contains(style.cssStyle)) { "Attempting to override style \"${style.name}\" twice" }
+        check(!replacedCssStyles.contains(style.cssStyle)) { "Attempting to override style \"${style.name}\" twice" }
 
         val newStyle = LegacyComponentStyle(style.nameWithoutPrefix, extraModifier, style.prefix, init)
         _legacyComponentStyles[style.name] = newStyle
-        _cssNames[newStyle] = style.name
-        _replacedCssStyles[style.cssStyle] = newStyle.cssStyle
+        _cssNames[newStyle.cssStyle] = style.name
+        updateReplaced(style.cssStyle, newStyle.cssStyle)
     }
 
     /**
@@ -218,7 +240,8 @@ class MutableSilkTheme {
         """.trimIndent()
         }
         _cssStyleVariants[name] = variant
-        _cssNames[variant] = name
+        _cssNames[variant.cssStyle] = name
+        _cssStyleDependencies.getOrPut(simpleVariant.cssStyle) { mutableListOf() }.add(simpleVariant.baseStyle)
     }
 
     /**
@@ -237,7 +260,8 @@ class MutableSilkTheme {
             """.trimIndent()
             }
             _legacyComponentVariants[variant.cssStyle.selector] = variant
-            _cssNames[variant] = variant.name
+            _cssNames[variant.cssStyle] = variant.name
+            _cssStyleDependencies.getOrPut(variant.cssStyle) { mutableListOf() }.add(variant.baseStyle.cssStyle)
         }
     }
 
@@ -310,14 +334,14 @@ class MutableSilkTheme {
         val variant = variant as? SimpleCssStyleVariant<K>
             ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
-        val name = _cssNames[variant]
+        val name = _cssNames[variant.cssStyle]
             ?: error("Attempting to replace a variant that was never registered.")
 
-        check(!_replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${name}\" twice" }
+        check(!replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${name}\" twice" }
         val newVariant = variant.baseStyle.addVariant(extraModifier, init) as SimpleCssStyleVariant<K>
         _cssStyleVariants[name] = newVariant
-        _cssNames[variant] = name
-        _replacedCssStyles[variant.cssStyle] = newVariant.cssStyle
+        _cssNames[variant.cssStyle] = name
+        updateReplaced(variant.cssStyle, newVariant.cssStyle)
     }
 
     fun replaceVariant(
@@ -354,11 +378,11 @@ class MutableSilkTheme {
             ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
         check(legacyComponentVariants.contains(variant.cssStyle.selector)) { "Attempting to replace a variant that was never registered: \"${variant.cssStyle.selector}\"" }
-        check(!_replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${variant.cssStyle.selector}\" twice" }
+        check(!replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${variant.cssStyle.selector}\" twice" }
         val newVariant = variant.baseStyle.addVariant(variant.name, extraModifier, init) as LegacySimpleComponentVariant
         _legacyComponentVariants[variant.cssStyle.selector] = newVariant
-        _cssNames[variant] = variant.name
-        _replacedCssStyles[variant.cssStyle] = newVariant.cssStyle
+        _cssNames[variant.cssStyle] = variant.name
+        updateReplaced(variant.cssStyle, newVariant.cssStyle)
     }
 
     fun registerKeyframes(name: String, keyframes: Keyframes) {
@@ -409,8 +433,8 @@ fun MutableSilkTheme.modifyStyle(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
 ) {
-    val styleName = _cssNames[style] ?: error("Attempting to modify a style that was never registered.")
-    check(cssStyles.contains(".$styleName")) { "Attempting to modify a style that was never registered: \"${styleName}\"" }
+    val styleName = cssNames[style] ?: error("Attempting to modify a style that was never registered.")
+    check(cssStyles.contains(styleName)) { "Attempting to modify a style that was never registered: \"${styleName}\"" }
     val existingExtraModifier = style.extraModifier
     val existingInit = style.init
 
@@ -820,7 +844,7 @@ fun <K : ComponentKind> MutableSilkTheme.modifyVariant(
     val variant = variant as? SimpleCssStyleVariant<K>
         ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
-    val variantName = _cssNames[variant] ?: error("Attempting to modify a variant that was never registered.")
+    val variantName = cssNames[variant] ?: error("Attempting to modify a variant that was never registered.")
     check(cssStyleVariants.contains(variantName)) { "Attempting to modify a style that was never registered: \"${variantName}\"" }
     val existingExtraModifier = variant.cssStyle.extraModifier
     val existingInit = variant.cssStyle.init
@@ -930,7 +954,6 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
      * assume this won't crash.
      */
     fun nameFor(style: CssStyle<*>): String = mutableSilkTheme.cssNames.getValue(style)
-    fun nameFor(variant: CssStyleVariant<*>): String = mutableSilkTheme.cssNames.getValue(variant)
     fun nameFor(keyframes: Keyframes): String = mutableSilkTheme.cssNames.getValue(keyframes)
 
     // Note: We separate these function out from the SilkTheme constructor so we can construct it first and then call
@@ -962,20 +985,36 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         // initialization blocks can reference `SilkTheme`.
         check(_SilkTheme != null)
 
-        // Variant selectors should be defined in a way that guarantees it will have more specificity than the base style
-        val cssStyleVariants = mutableSilkTheme.cssStyleVariants.values.filterIsInstance<SimpleCssStyleVariant<*>>()
-            .associate { ".${this.nameFor(it.baseStyle)}.${this.nameFor(it)}" to it.cssStyle }
+        // For a list like [E, D, B, C, A] where D, B, and C all depend on A, we get a final ordering: [E, A, D, B, C]
+        fun orderStyles(
+            styles: List<CssStyle<*>>,
+            dependencies: Map<CssStyle<*>, List<CssStyle<*>>>
+        ): List<CssStyle<*>> {
+            val orderedStyles = mutableListOf<CssStyle<*>>()
+            val visited = mutableSetOf<CssStyle<*>>()
 
-        val legacyComponentStyles = mutableSilkTheme.legacyComponentStyles.values
-            .associate { ".${it.name}" to it.cssStyle }
-        // Variant selectors should be defined in a way that guarantees it will have more specificity than the base style
-        val legacyComponentVariants = mutableSilkTheme.legacyComponentVariants.values.filterIsInstance<LegacySimpleComponentVariant>()
-            .associate { ".${it.baseStyle.name}.${it.name}" to it.cssStyle }
+            fun visit(style: CssStyle<*>) {
+                if (style in visited) return
+                visited.add(style)
+                dependencies[style]?.forEach { visit(it) }
+                orderedStyles.add(style)
+            }
+
+            styles.forEach { visit(it) }
+            return orderedStyles
+        }
 
         val allCssStyles =
-            mutableSilkTheme.cssStyles + legacyComponentStyles + cssStyleVariants + legacyComponentVariants
-        allCssStyles.forEach { (selector, style) ->
-            val classSelectors = style.addStylesInto(selector, stylesheet)
+            mutableSilkTheme.cssStyles.values +
+                mutableSilkTheme.legacyComponentStyles.values.map { it.cssStyle } +
+                mutableSilkTheme.cssStyleVariants.values.filterIsInstance<SimpleCssStyleVariant<*>>()
+                    .map { it.cssStyle } +
+                mutableSilkTheme.legacyComponentVariants.values.filterIsInstance<LegacySimpleComponentVariant>()
+                    .map { it.cssStyle }
+
+        val allCssStylesSorted = orderStyles(allCssStyles, mutableSilkTheme.cssStyleDependencies)
+        allCssStylesSorted.forEach { style ->
+            val classSelectors = style.addStylesInto(".${nameFor(style)}", stylesheet)
             _cssStyles[style] = style.intoImmutableStyle(classSelectors)
         }
 
