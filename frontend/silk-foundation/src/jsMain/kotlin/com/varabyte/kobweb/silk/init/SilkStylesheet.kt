@@ -162,8 +162,8 @@ internal object SilkStylesheetInstance : SilkStylesheet {
 
     // This method is not part of the public API and should only be called by Silk itself at initialization time
     fun registerStylesAndKeyframesInto(siteStyleSheet: StyleSheet) {
-        styles.forEach { componentStyle ->
-            componentStyle.addStylesInto(siteStyleSheet)
+        styles.forEach { cssStyle ->
+            cssStyle.addStylesInto(siteStyleSheet)
         }
 
         keyframes.map { (name, build) ->
