@@ -17,13 +17,13 @@ import org.w3c.dom.Element
 import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
 
 // TODO: Docs
-interface CssKind
+sealed interface CssKind
 
 // TODO: Docs
-interface RestrictedKind : CssKind
+sealed interface RestrictedKind : CssKind
 
 // TODO: Docs
-interface UnspecifiedKind : CssKind
+sealed interface UnspecifiedKind : CssKind
 
 // TODO: Docs
 interface ComponentKind : CssKind
@@ -142,7 +142,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
         abstract class Base(
             init: CssStyleBaseScope.() -> Modifier,
             extraModifier: @Composable () -> Modifier = { Modifier },
-        ) : CssStyle<RestrictedKind>({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
+        ) : Restricted({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
             constructor(init: Modifier, extraModifier: @Composable () -> Modifier = { Modifier }) : this(
                 { init },
                 extraModifier
