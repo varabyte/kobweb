@@ -454,7 +454,7 @@ fun <K : ComponentKind> CssStyle.Companion.base(
 fun <K : ComponentKind> CssStyle.Companion.base(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
-) = object : CssStyle<K>(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
+) = CssStyle<K>(extraModifier) { base { CssStyleBaseScope(colorMode).let(init) } }
 
 fun CssStyle<UnspecifiedKind>.extendedBy(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
     extendedBy({ extraModifier }, init)
@@ -463,6 +463,19 @@ fun CssStyle<UnspecifiedKind>.extendedBy(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
 ): CssStyle<UnspecifiedKind> = ExtendingCssStyle(init, extraModifier, this)
+
+fun CssStyle<UnspecifiedKind>.extendedByBase(
+    extraModifier: Modifier = Modifier,
+    init: CssStyleBaseScope.() -> Modifier
+) =
+    extendedByBase({ extraModifier }, init)
+
+fun CssStyle<UnspecifiedKind>.extendedByBase(
+    extraModifier: @Composable () -> Modifier,
+    init: CssStyleBaseScope.() -> Modifier
+) = extendedBy(extraModifier) {
+    base { CssStyleBaseScope(colorMode).let(init) }
+}
 
 @Composable
 fun CssStyle<UnspecifiedKind>.toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
