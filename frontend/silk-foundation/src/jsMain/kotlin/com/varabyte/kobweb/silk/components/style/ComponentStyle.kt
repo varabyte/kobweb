@@ -14,7 +14,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.CssStyleVariant
-import com.varabyte.kobweb.silk.style.InheritedKind
+import com.varabyte.kobweb.silk.style.RestrictedKind
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.UnspecifiedKind
 import com.varabyte.kobweb.silk.style.combine
@@ -274,7 +274,7 @@ fun CssStyle<UnspecifiedKind>.toModifier(): Modifier {
 
 @Composable
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
-fun CssStyle<InheritedKind>.toModifier(): Modifier {
+fun CssStyle<RestrictedKind>.toModifier(): Modifier {
     return toModifier()
 }
 

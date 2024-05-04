@@ -419,7 +419,7 @@ class InputSize(
     val height: CSSLengthNumericValue,
     val padding: CSSLengthNumericValue,
     val borderRadius: CSSLengthNumericValue,
-) : CssStyle.Inherited.Base(
+) : CssStyle.Restricted.Base(
     Modifier
         .setVariable(InputVars.FontSize, fontSize)
         .setVariable(InputVars.Height, height)

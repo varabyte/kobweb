@@ -97,7 +97,7 @@ class SwitchSize(
     val width: CSSLengthNumericValue,
     val height: CSSLengthNumericValue,
     val padding: CSSLengthNumericValue = 0.188.cssRem
-) : CssStyle.Inherited.Base(
+) : CssStyle.Restricted.Base(
     Modifier
         .setVariable(SwitchVars.TrackWidth, width)
         .setVariable(SwitchVars.TrackHeight, height)
