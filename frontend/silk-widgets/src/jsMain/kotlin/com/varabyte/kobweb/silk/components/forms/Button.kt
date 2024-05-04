@@ -100,7 +100,7 @@ class ButtonSize(
     fontSize: CSSLengthNumericValue,
     height: CSSLengthNumericValue,
     horizontalPadding: CSSLengthNumericValue,
-) : CssStyle.Inherited.Base(
+) : CssStyle.Restricted.Base(
     Modifier
         .setVariable(ButtonVars.FontSize, fontSize)
         .setVariable(ButtonVars.Height, height)

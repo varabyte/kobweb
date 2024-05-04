@@ -20,7 +20,7 @@ import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
 interface CssKind
 
 // TODO: Docs
-interface InheritedKind : CssKind
+interface RestrictedKind : CssKind
 
 // TODO: Docs
 interface UnspecifiedKind : CssKind
@@ -66,13 +66,14 @@ internal value class ClassSelectors(private val value: List<String>) {
  *
  * This is much easier to understand at a glance than if all the styles were inlined directly into the HTML.
  *
- * You can also subclass [CssStyle] to create a new style that extends an existing one:
+ * You can also subclass [CssStyle] to create a way to limit the parameters that users can specify in order to generate
+ * a style:
  *
  * ```
  * class WidgetSize(
  *     fontSize: CSSLengthNumericValue,
  *     height: CSSLengthNumericValue,
- * ) : CssStyle.Inherited.Base(Modifier.fontSize(fontSize).height(height) ) {
+ * ) : CssStyle.Restricted.Base(Modifier.fontSize(fontSize).height(height) ) {
  *     companion object {
  *         val XS = WidgetSize(...)
  *         val SM = WidgetSize(...)
@@ -83,7 +84,9 @@ internal value class ClassSelectors(private val value: List<String>) {
  * ```
  *
  * which here will create four classes: `widget-size_xs`, `widget-size_sm`, `widget-size_md`, and `widget-size_lg`.
- * At this point, you can take `Widget` as a method parameter:
+ *
+ * This is a particularly useful pattern for when you want to allow users to pass in a parameter into a method that you
+ * provide:
  *
  * ```
  * @Composable
@@ -93,23 +96,53 @@ internal value class ClassSelectors(private val value: List<String>) {
  * }
  * ```
  *
- * resulting in an element like `<div class="widget widget-size_md">...</div>`.
+ * which would result in an element like `<div class="widget widget-size_md">...</div>`.
  */
 abstract class CssStyle<K : CssKind> internal constructor(
     internal val init: CssStyleScope.() -> Unit,
     internal val extraModifier: @Composable () -> Modifier = { Modifier },
 ) {
     /**
-     * A [CssStyle] when you know you only want to specify the base style, and not any other modifiers like hover.
+     * A type of [CssStyle] where you restrict it to a few, fixed parameters.
+     *
+     * Whereas most CSS styles are open-ended and let you define any combination of modifiers that you want, it can
+     * sometimes be very useful to present a user with a constructor of fixed parameters instead, at which point the
+     * style is created behind the scenes.
+     *
+     * For example:
+     *
+     * ```
+     * class MyButtonBehavior(fontSize: CSSLengthNumericValue, hoverColor: Color) : CssStyle.Restricted(init = {
+     *   base { Modifier.fontSize(fontSize) }
+     *   hover { Modifier.backgroundColor(hoverColor) }
+     * }) {
+     *   companion object {
+     *     val Quiet = MyButtonBehavior(1.rem, Color.Gray)
+     *     val Loud = MyButtonBehavior(2.rem, Color.Red)
+     *   }
+     * }
+     * ```
+     *
+     * A user can declare their own instances of this class in their own code:
+     *
+     * ```
+     * val UserButtonBehavior = MyButtonBehavior(1.5.rem, Color.Blue)
+     * ```
+     *
+     * At this point, you can convert the class instance into a modifier using `toModifier()` and get the benefits of a
+     * constrained style that ultimately ends up in the user's stylesheet.
      */
-    abstract class Inherited(
+    abstract class Restricted(
         init: CssStyleScope.() -> Unit,
         extraModifier: @Composable () -> Modifier = { Modifier },
-    ) : CssStyle<InheritedKind>(init, extraModifier) {
+    ) : CssStyle<RestrictedKind>(init, extraModifier) {
+        /**
+         * Like [Restricted] but when you know you only want to specify the base style.
+         */
         abstract class Base(
             init: CssStyleBaseScope.() -> Modifier,
             extraModifier: @Composable () -> Modifier = { Modifier },
-        ) : CssStyle<InheritedKind>({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
+        ) : CssStyle<RestrictedKind>({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
             constructor(init: Modifier, extraModifier: @Composable () -> Modifier = { Modifier }) : this(
                 { init },
                 extraModifier
@@ -496,7 +529,7 @@ fun <A : AttrsScope<*>> CssStyle<UnspecifiedKind>.toAttrs(finalHandler: (A.() ->
 }
 
 @Composable
-fun CssStyle<InheritedKind>.toModifier(): Modifier = _toModifier()
+fun CssStyle<RestrictedKind>.toModifier(): Modifier = _toModifier()
 
 @Composable
 fun <K : ComponentKind> CssStyle<K>.toModifier(vararg variants: CssStyleVariant<K>?): Modifier {
