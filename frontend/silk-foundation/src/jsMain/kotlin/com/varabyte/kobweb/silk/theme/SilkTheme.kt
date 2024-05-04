@@ -13,7 +13,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.CssStyleVariant
-import com.varabyte.kobweb.silk.style.ExtendedCssStyle
+import com.varabyte.kobweb.silk.style.ExtendingCssStyle
 import com.varabyte.kobweb.silk.style.ImmutableCssStyle
 import com.varabyte.kobweb.silk.style.SimpleCssStyleVariant
 import com.varabyte.kobweb.silk.style.UnspecifiedKind
@@ -92,7 +92,7 @@ class MutableSilkTheme {
         _cssStyles[name] = style
         _cssNames[style] = name
 
-        if (style is ExtendedCssStyle) {
+        if (style is ExtendingCssStyle) {
             _cssStyleDependencies.getOrPut(style) { mutableListOf() }.add(style.baseStyle)
         }
     }

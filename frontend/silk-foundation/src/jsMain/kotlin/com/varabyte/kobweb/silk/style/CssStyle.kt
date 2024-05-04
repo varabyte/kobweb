@@ -311,7 +311,7 @@ internal class SimpleCssStyle(
  * Box(LabelStyle.toModifier(BoldLabelVariant, ItalicLabelVariant))
  * ```
  */
-internal class ExtendedCssStyle(
+internal class ExtendingCssStyle(
     init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
     val baseStyle: CssStyle<UnspecifiedKind>
@@ -320,7 +320,7 @@ internal class ExtendedCssStyle(
     val classNames = mutableSetOf<String>()
     while (currBaseStyle != null) {
         classNames.add(SilkTheme.nameFor(currBaseStyle!!))
-        currBaseStyle = (currBaseStyle as? ExtendedCssStyle)?.baseStyle
+        currBaseStyle = (currBaseStyle as? ExtendingCssStyle)?.baseStyle
     }
     Modifier.classNames(*classNames.toTypedArray()).then(extraModifier())
 })
@@ -456,13 +456,13 @@ fun <K : ComponentKind> CssStyle.Companion.base(
     init: CssStyleBaseScope.() -> Modifier
 ) = object : CssStyle<K>(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
 
-fun CssStyle<UnspecifiedKind>.extended(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
-    extended({ extraModifier }, init)
+fun CssStyle<UnspecifiedKind>.extendedBy(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
+    extendedBy({ extraModifier }, init)
 
-fun CssStyle<UnspecifiedKind>.extended(
+fun CssStyle<UnspecifiedKind>.extendedBy(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
-): CssStyle<UnspecifiedKind> = ExtendedCssStyle(init, extraModifier, this)
+): CssStyle<UnspecifiedKind> = ExtendingCssStyle(init, extraModifier, this)
 
 @Composable
 fun CssStyle<UnspecifiedKind>.toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
