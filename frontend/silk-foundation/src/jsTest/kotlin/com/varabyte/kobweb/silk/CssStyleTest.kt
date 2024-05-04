@@ -8,6 +8,9 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.init.initSilk
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.SimpleCssStyleVariant
+import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.extendedBy
@@ -27,72 +30,64 @@ import kotlin.test.Test
 class CssStyleTest {
     @Test
     fun componentVariantStylesSheetOrder() {
-        // Styles must be non-empty to be registered
         val stylesheet = StyleSheet()
+        // Styles must be non-empty to be registered
         val BaseStyle = CssStyle.base<ComponentKind> { Modifier.color(Colors.Red) }
-        val BaseStyleName = "base-style"
         val Variant = BaseStyle.addVariantBase { Modifier.color(Colors.Red) }
-        val VariantName = "secondary-style"
         _SilkTheme = MutableSilkTheme().apply {
             // Intentionally register out of order
-            registerVariant(VariantName, Variant)
-            registerStyle(BaseStyleName, BaseStyle)
+            registerVariant("variant-style", Variant)
+            registerStyle("base-style", BaseStyle)
         }.let(::ImmutableSilkTheme)
         SilkTheme.registerStylesInto(stylesheet)
 
         assertThat(stylesheet.cssRules.toList().map { it.header })
-            .containsExactly(".${BaseStyleName}", ".${VariantName}")
+            .containsExactly(".${BaseStyle.name}", ".${Variant.name}")
             .inOrder()
     }
 
     @Test
     fun cssStyleExtendedStylesheetOrder() {
-        // Styles must be non-empty to be registered
         val stylesheet = StyleSheet()
+        // Styles must be non-empty to be registered
         val BaseStyle = CssStyle.base { Modifier.color(Colors.Red) }
-        val BaseStyleName = "base-style"
         val SecondaryStyle = BaseStyle.extendedByBase { Modifier.color(Colors.Red) }
-        val SecondaryStyleName = "secondary-style"
         val TertiaryStyle = SecondaryStyle.extendedByBase { Modifier.color(Colors.Red) }
-        val TertiaryStyleName = "tertiary-style"
         _SilkTheme = MutableSilkTheme().apply {
             // Intentionally register out of order
-            registerStyle(TertiaryStyleName, TertiaryStyle)
-            registerStyle(BaseStyleName, BaseStyle)
-            registerStyle(SecondaryStyleName, SecondaryStyle)
+            registerStyle("tertiary-style", TertiaryStyle)
+            registerStyle("base-style", BaseStyle)
+            registerStyle("secondary-style", SecondaryStyle)
         }.let(::ImmutableSilkTheme)
         SilkTheme.registerStylesInto(stylesheet)
 
         assertThat(stylesheet.cssRules.toList().map { it.header })
-            .containsExactly(".${BaseStyleName}", ".${SecondaryStyleName}", ".${TertiaryStyleName}")
+            .containsExactly(".${BaseStyle.name}", ".${SecondaryStyle.name}", ".${TertiaryStyle.name}")
             .inOrder()
     }
 
     @Test
     fun cssStyleExtendedClasses() {
         val BaseStyle = CssStyle { }
-        val BaseStyleName = "base-style"
         val SecondaryStyle = BaseStyle.extendedBy { }
-        val SecondaryStyleName = "secondary-style"
         val TertiaryStyle = SecondaryStyle.extendedBy { }
-        val TertiaryStyleName = "tertiary-style"
         initSilk {
             with(it.theme) {
-                registerStyle(BaseStyleName, BaseStyle)
-                registerStyle(TertiaryStyleName, TertiaryStyle)
-                registerStyle(SecondaryStyleName, SecondaryStyle)
+                registerStyle("base-style", BaseStyle)
+                registerStyle("secondary-style", TertiaryStyle)
+                registerStyle("tertiary-style", SecondaryStyle)
             }
         }
 
         callComposable {
             ComparableAttrsScope<Element>().apply(BaseStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(BaseStyleName)
+                assertThat(classes).containsExactly(BaseStyle.name)
             }
             ComparableAttrsScope<Element>().apply(SecondaryStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(SecondaryStyleName, BaseStyleName)
+                assertThat(classes).containsExactly(SecondaryStyle.name, BaseStyle.name)
             }
             ComparableAttrsScope<Element>().apply(TertiaryStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(TertiaryStyleName, SecondaryStyleName, BaseStyleName)
+                assertThat(classes).containsExactly(TertiaryStyle.name, SecondaryStyle.name, BaseStyle.name)
             }
         }
     }
@@ -100,38 +95,63 @@ class CssStyleTest {
     @Test
     fun cssStyleExtendedWithColorModeClasses() {
         val BaseStyle = CssStyle.base { Modifier.color(if (colorMode.isLight) Colors.White else Colors.Black) }
-        val BaseStyleName = "base-style"
         val SecondaryStyle = BaseStyle.extendedByBase {
             Modifier.color(if (colorMode.isLight) Colors.White else Colors.Black)
         }
-        val SecondaryStyleName = "secondary-style"
         initSilk {
             with(it.theme) {
-                registerStyle(BaseStyleName, BaseStyle)
-                registerStyle(SecondaryStyleName, SecondaryStyle)
+                registerStyle("base-style", BaseStyle)
+                registerStyle("secondary-style", SecondaryStyle)
             }
         }
 
         callComposable {
             ColorMode.currentState.value = ColorMode.LIGHT
             ComparableAttrsScope<Element>().apply(BaseStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(BaseStyleName, "${BaseStyleName}_light")
+                assertThat(classes).containsExactly(BaseStyle.name, "${BaseStyle.name}_light")
             }
             ComparableAttrsScope<Element>().apply(SecondaryStyle.toModifier().toAttrs()).run {
                 assertThat(classes).containsExactly(
-                    SecondaryStyleName, "${SecondaryStyleName}_light", BaseStyleName, "${BaseStyleName}_light"
+                    SecondaryStyle.name, "${SecondaryStyle.name}_light", BaseStyle.name, "${BaseStyle.name}_light"
                 )
             }
-
             ColorMode.currentState.value = ColorMode.DARK
             ComparableAttrsScope<Element>().apply(BaseStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(BaseStyleName, "${BaseStyleName}_dark")
+                assertThat(classes).containsExactly(BaseStyle.name, "${BaseStyle.name}_dark")
             }
             ComparableAttrsScope<Element>().apply(SecondaryStyle.toModifier().toAttrs()).run {
                 assertThat(classes).containsExactly(
-                    SecondaryStyleName, "${SecondaryStyleName}_dark", BaseStyleName, "${BaseStyleName}_dark"
+                    SecondaryStyle.name, "${SecondaryStyle.name}_dark", BaseStyle.name, "${BaseStyle.name}_dark"
                 )
             }
         }
     }
+
+    @Test
+    fun cssStyleNameFor() {
+        val BaseStyle = CssStyle { }
+        val BaseStyleName = "base-style"
+        val SecondaryStyle = BaseStyle.extendedBy { }
+        val SecondaryStyleName = "secondary-style"
+        val ComponentStyle = CssStyle<ComponentKind> { }
+        val ComponentStyleName = "component-style"
+        val VariantStyle = ComponentStyle.addVariant { }
+        val VariantStyleName = "variant-style"
+        initSilk {
+            with(it.theme) {
+                registerStyle(BaseStyleName, BaseStyle)
+                registerStyle(SecondaryStyleName, SecondaryStyle)
+                registerStyle(ComponentStyleName, ComponentStyle)
+                registerVariant(VariantStyleName, VariantStyle)
+            }
+        }
+
+        assertThat(BaseStyle.name).isEqualTo(BaseStyleName)
+        assertThat(SecondaryStyle.name).isEqualTo(SecondaryStyleName)
+        assertThat(ComponentStyle.name).isEqualTo(ComponentStyleName)
+        assertThat(VariantStyle.name).isEqualTo(VariantStyleName)
+    }
+
+    private val CssStyle<*>.name get() = SilkTheme.nameFor(this)
+    private val CssStyleVariant<*>.name get() = SilkTheme.nameFor((this as SimpleCssStyleVariant<*>).cssStyle)
 }
