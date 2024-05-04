@@ -102,6 +102,7 @@ class FrontendProcessor(
 
     @OptIn(KspExperimental::class)
     private class KSTypes(resolver: Resolver) {
+        val componentKindType = resolver.getKotlinClassByName(CSS_KIND_COMPONENT_FQN)!!.asType(emptyList())
         val cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asStarProjectedType()
         val cssStyleVariantType = resolver.getKotlinClassByName(CSS_STYLE_VARIANT_FQN)!!.asStarProjectedType()
         val keyframesType = resolver.getKotlinClassByName(KEYFRAMES_FQN)!!.asType(emptyList())
@@ -113,7 +114,6 @@ class FrontendProcessor(
         // Not CssStyle<*> but CssStyle<out ComponentKind> specifically. Useful for confirming if we have a
         // component-specific CSS style.
         val cssStyleComponentKindType = run {
-            val componentKindType = resolver.getKotlinClassByName(CSS_KIND_COMPONENT_FQN)!!.asType(emptyList())
             val typeRef = resolver.createKSTypeReferenceFromKSType(componentKindType)
             val typeArg = resolver.getTypeArgument(typeRef, Variance.COVARIANT)
             resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(listOf(typeArg))
@@ -157,6 +157,11 @@ class FrontendProcessor(
                 legacyKeyframesDeclaration
             )
         }
+
+        // Map of KindType to the CssStyle property it is associated with
+        // e.g. `val ExampleStyle = CssStyle<ExampleKind>`: ExampleKind -> ExampleStyle
+        // There should only ever be one style per component kind.
+        private val consumedComponentKinds = mutableMapOf<KSType, KSPropertyDeclaration>()
 
         fun KSAnnotated.getAnnotationValue(fqn: String): String? {
             return this.getAnnotationsByName(fqn).firstOrNull()?.let { it.arguments.first().value.toString() }
@@ -325,11 +330,20 @@ class FrontendProcessor(
                 // If here, we're sure we have a CssStyle<ComponentKind>. Make sure they're in the same file
                 val variantKindType = propertyType.arguments.first().type!!.resolve()
                 val variantKindDeclaration = variantKindType.declaration
+                val kindTypeName = variantKindDeclaration.simpleName.asString()
+
+                (consumedComponentKinds.putIfAbsent(variantKindType, property))?.let { previousProperty ->
+                    val previousPropertyName = previousProperty.simpleName.asString()
+                    logger.error(
+                        "`${kindTypeName}` can only be associated with a single CSS style. `val $propertyName = ${declarationInfo.name}<$kindTypeName>` was declared after `val $previousPropertyName = ${declarationInfo.name}<$kindTypeName>`. Either remove one of these style declarations, or create a new `${types.componentKindType.declaration.simpleName.asString()}` type for one of them.",
+                        property
+                    )
+                    return false
+                }
 
                 if (property.containingFile != variantKindDeclaration.containingFile) {
-                    val kindTypeName = variantKindType.declaration.simpleName.asString()
                     logger.error(
-                        "`val $propertyName = ${declarationInfo.name}<$kindTypeName>` is using a kind type defined in a different file, which is not allowed. Please declare a new `ComponentKind` implementation in the same file and use that one, or declare your `${declarationInfo.name}<$kindTypeName>` in the same file as the `$kindTypeName` definition.",
+                        "`val $propertyName = ${declarationInfo.name}<$kindTypeName>` is using a kind type defined in a different file, which is not allowed. Please declare a new `${types.componentKindType.declaration.simpleName.asString()}` implementation in the same file and use that one, or declare your `${declarationInfo.name}<$kindTypeName>` in the same file as the `$kindTypeName` definition.",
                         property
                     )
                     return false
