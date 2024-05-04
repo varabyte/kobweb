@@ -477,8 +477,12 @@ fun CssStyle<UnspecifiedKind>.extendedByBase(
     base { CssStyleBaseScope(colorMode).let(init) }
 }
 
+@Suppress("FunctionName") // Inline so it can be called from @Composable methods
 @Composable
-fun CssStyle<UnspecifiedKind>.toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
+private fun CssStyle<*>._toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
+
+@Composable
+fun CssStyle<UnspecifiedKind>.toModifier(): Modifier = _toModifier()
 
 @Composable
 fun <A : AttrsScope<*>> CssStyle<UnspecifiedKind>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
@@ -486,11 +490,11 @@ fun <A : AttrsScope<*>> CssStyle<UnspecifiedKind>.toAttrs(finalHandler: (A.() ->
 }
 
 @Composable
-fun CssStyle<InheritedKind>.toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
+fun CssStyle<InheritedKind>.toModifier(): Modifier = _toModifier()
 
 @Composable
 fun <K : ComponentKind> CssStyle<K>.toModifier(vararg variants: CssStyleVariant<K>?): Modifier {
-    return SilkTheme.cssStyles.getValue(this).toModifier()
+    return _toModifier()
         .then(variants.toList().combine()?.toModifier() ?: Modifier)
 }
 
