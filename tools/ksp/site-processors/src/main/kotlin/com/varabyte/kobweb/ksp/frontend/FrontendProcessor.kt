@@ -242,14 +242,10 @@ class FrontendProcessor(
                     ?: withoutVariantSuffix
             }
 
-            fun getCssStyleVariantEntry(prefix: String?): CssStyleVariantEntry {
-                return CssStyleVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
-            }
-
             val propertyPrefix = if (!propertyCssName.startsWith('-')) {
                 property.getCssPrefix()
             } else null
-            return getCssStyleVariantEntry(propertyPrefix)
+            return CssStyleVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(propertyPrefix))
         }
 
         fun processKeyframes(property: KSPropertyDeclaration): KeyframesEntry {
@@ -259,12 +255,8 @@ class FrontendProcessor(
                     .removeSuffix("Keyframes")
             }
 
-            fun getKeyframesEntry(prefix: String?): KeyframesEntry {
-                return KeyframesEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(prefix))
-            }
-
             val propertyPrefix = property.getCssPrefix()
-            return getKeyframesEntry(propertyPrefix)
+            return KeyframesEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(propertyPrefix))
         }
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
