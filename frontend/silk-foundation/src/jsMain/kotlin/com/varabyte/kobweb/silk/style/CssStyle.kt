@@ -317,12 +317,13 @@ internal class ExtendingCssStyle(
     val baseStyle: CssStyle<UnspecifiedKind>
 ) : CssStyle<UnspecifiedKind>(init, extraModifier = {
     var currBaseStyle: CssStyle<UnspecifiedKind>? = baseStyle
-    val classNames = mutableSetOf<String>()
+    var finalModifier = extraModifier()
+    // Handle "extended" chains (like Base <- Extended <- MoreExtended; MoreExtended should include both)
     while (currBaseStyle != null) {
-        classNames.add(SilkTheme.nameFor(currBaseStyle!!))
+        finalModifier = finalModifier.then(currBaseStyle!!.toModifier())
         currBaseStyle = (currBaseStyle as? ExtendingCssStyle)?.baseStyle
     }
-    Modifier.classNames(*classNames.toTypedArray()).then(extraModifier())
+    finalModifier
 })
 
 /**
