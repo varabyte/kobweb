@@ -159,7 +159,7 @@ class CheckboxSize(
     boxSize: CSSLengthNumericValue,
     iconSize: CSSLengthNumericValue,
     fontSize: CSSLengthNumericValue,
-) : CssStyle.Base(
+) : CssStyle.Inherited.Base(
     Modifier
         .setVariable(CheckboxVars.Size, boxSize)
         .setVariable(CheckboxVars.IconSize, iconSize)

@@ -72,7 +72,7 @@ internal value class ClassSelectors(private val value: List<String>) {
  * class WidgetSize(
  *     fontSize: CSSLengthNumericValue,
  *     height: CSSLengthNumericValue,
- * ) : CssStyle.Base(Modifier.fontSize(fontSize).height(height) ) {
+ * ) : CssStyle.Inherited.Base(Modifier.fontSize(fontSize).height(height) ) {
  *     companion object {
  *         val XS = WidgetSize(...)
  *         val SM = WidgetSize(...)
@@ -95,21 +95,26 @@ internal value class ClassSelectors(private val value: List<String>) {
  *
  * resulting in an element like `<div class="widget widget-size_md">...</div>`.
  */
-abstract class CssStyle<K : CssKind> protected constructor(
+abstract class CssStyle<K : CssKind> internal constructor(
     internal val init: CssStyleScope.() -> Unit,
     internal val extraModifier: @Composable () -> Modifier = { Modifier },
 ) {
     /**
      * A [CssStyle] when you know you only want to specify the base style, and not any other modifiers like hover.
      */
-    abstract class Base protected constructor(
-        init: CssStyleBaseScope.() -> Modifier,
+    abstract class Inherited(
+        init: CssStyleScope.() -> Unit,
         extraModifier: @Composable () -> Modifier = { Modifier },
-    ) : CssStyle<InheritedKind>({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
-        constructor(init: Modifier, extraModifier: @Composable () -> Modifier = { Modifier }) : this(
-            { init },
-            extraModifier
-        )
+    ) : CssStyle<InheritedKind>(init, extraModifier) {
+        abstract class Base(
+            init: CssStyleBaseScope.() -> Modifier,
+            extraModifier: @Composable () -> Modifier = { Modifier },
+        ) : CssStyle<InheritedKind>({ base { CssStyleBaseScope(colorMode).init() } }, extraModifier) {
+            constructor(init: Modifier, extraModifier: @Composable () -> Modifier = { Modifier }) : this(
+                { init },
+                extraModifier
+            )
+        }
     }
 
     /**
