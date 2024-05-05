@@ -415,10 +415,10 @@ fun InputGroupScope.TextInput(
 }
 
 class InputSize(
-    val fontSize: CSSLengthNumericValue,
-    val height: CSSLengthNumericValue,
-    val padding: CSSLengthNumericValue,
-    val borderRadius: CSSLengthNumericValue,
+    fontSize: CSSLengthNumericValue,
+    height: CSSLengthNumericValue,
+    padding: CSSLengthNumericValue,
+    borderRadius: CSSLengthNumericValue,
 ) : CssStyle.Restricted.Base(
     Modifier
         .setVariable(InputVars.FontSize, fontSize)
