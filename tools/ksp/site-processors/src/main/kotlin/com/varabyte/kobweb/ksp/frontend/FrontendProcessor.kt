@@ -294,10 +294,24 @@ class FrontendProcessor(
             // Remove the kind part from the variant name, e.g. "val RedButtonVariant = CssStyleVariant<ButtonKind>" -> "red"
             // (after removing "button"). In this way, we can append the variant on top of the style without repeating the kind,
             // e.g. "button-red" and not "button-button-red"
-            val variantKindName = run {
-                val variantKindType = property.type.resolve().arguments.first().type!!.resolve()
-                val variantKindFqn = variantKindType.declaration.qualifiedName!!.asString()
-                variantKindFqn.substringAfterLast(".").removeSuffix("ComponentKind").removeSuffix("Kind")
+            val variantKindName = buildString {
+                // Note that we support nested component kinds, e.g.
+                // sealed interface SwitchKind : ComponentKind {
+                //    sealed interface Track : ComponentKind
+                //    sealed interface Thumb : ComponentKind
+                // }
+                // which should generate three kind names: "Switch", "SwitchTrack", and "SwitchThumb"
+                var variantKindType: KSType? = property.type.resolve().arguments.first().type!!.resolve()
+                while (variantKindType != null) {
+                    insert(
+                        0,
+                        variantKindType.declaration.simpleName.asString()
+                            .removeSuffix("ComponentKind").removeSuffix("Kind")
+                    )
+                    variantKindType = (variantKindType.declaration.parentDeclaration as? KSClassDeclaration)
+                        ?.takeIf { types.componentKindType.isAssignableFrom(it.asType(emptyList())) }
+                        ?.asType(emptyList())
+                }
             }
 
             val propertyCssName = property.getCssName(
