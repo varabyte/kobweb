@@ -23,6 +23,10 @@ kotlin {
             implementation(projects.frontend.composeHtmlExt)
             api(projects.frontend.kobwebCompose)
         }
+        jsTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.truthish)
+        }
     }
 }
 
