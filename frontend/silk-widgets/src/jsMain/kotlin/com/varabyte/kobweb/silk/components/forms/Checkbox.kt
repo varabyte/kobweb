@@ -14,11 +14,6 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.components.icons.CheckIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
-import com.varabyte.kobweb.silk.components.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.components.style.vars.animation.TransitionDurationVars
-import com.varabyte.kobweb.silk.components.style.vars.color.BorderColorVar
-import com.varabyte.kobweb.silk.components.style.vars.color.FocusOutlineColorVar
-import com.varabyte.kobweb.silk.components.style.vars.size.FontSizeVars
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
@@ -27,7 +22,12 @@ import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.animation.toAnimation
 import com.varabyte.kobweb.silk.style.base
+import com.varabyte.kobweb.silk.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.style.toModifier
+import com.varabyte.kobweb.silk.style.vars.animation.TransitionDurationVars
+import com.varabyte.kobweb.silk.style.vars.color.BorderColorVar
+import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
+import com.varabyte.kobweb.silk.style.vars.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
