@@ -103,34 +103,33 @@ abstract class CssStyle<K : CssKind> internal constructor(
     internal val extraModifier: @Composable () -> Modifier = { Modifier },
 ) {
     /**
-     * A type of [CssStyle] where you restrict it to a few, fixed parameters.
+     * A [CssStyle] for creating custom style types restricted to fixed parameters.
      *
-     * Whereas most CSS styles are open-ended and let you define any combination of modifiers that you want, it can
-     * sometimes be very useful to present a user with a constructor of fixed parameters instead, at which point the
-     * style is created behind the scenes.
+     * Whereas CSS styles are by default open-ended and let you define any combination of modifiers that you want, it
+     * can sometimes be useful to present a user with a constructor of fixed parameters, having the style then created
+     * for it behind the scenes.
      *
      * For example:
      *
      * ```
-     * class MyButtonBehavior(fontSize: CSSLengthNumericValue, hoverColor: Color) : CssStyle.Restricted(init = {
+     * class MyButtonBehavior(fontSize: CSSLengthNumericValue, hoverColor: CSSColorValue) : CssStyle.Restricted(init = {
      *   base { Modifier.fontSize(fontSize) }
      *   hover { Modifier.backgroundColor(hoverColor) }
      * }) {
      *   companion object {
-     *     val Quiet = MyButtonBehavior(1.rem, Color.Gray)
-     *     val Loud = MyButtonBehavior(2.rem, Color.Red)
+     *     val Quiet = MyButtonBehavior(1.cssRem, Colors.Gray)
+     *     val Loud = MyButtonBehavior(2.cssRem, Colors.Red)
      *   }
      * }
      * ```
      *
-     * A user can declare their own instances of this class in their own code:
+     * A user can declare an instance of this class in their own code:
      *
      * ```
-     * val UserButtonBehavior = MyButtonBehavior(1.5.rem, Color.Blue)
+     * val UserButtonBehavior = MyButtonBehavior(1.5.cssRem, Colors.Blue)
      * ```
      *
-     * At this point, you can convert the class instance into a modifier using `toModifier()` and get the benefits of a
-     * constrained style that ultimately ends up in the user's stylesheet.
+     * which will automatically create a CSS class corresponding to the property.
      */
     abstract class Restricted(
         init: CssStyleScope.() -> Unit,
