@@ -119,9 +119,24 @@ class ComponentVariantEntry(val fqcn: String)
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)
  *
  * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
+ *
+ * ## A note on imports
+ * We support extension properties for CSS styles, useful to extend companion objects, such as in the
+ * following code:
+ *
+ * ```
+ * package some.example.pkg
+ *
+ * private val _XXL: ButtonSize
+ * val ButtonSize.Companion.XXL: ButtonSize get() = _XXL
+ * ```
+ *
+ * Because of how extension properties work, an import has to be provided for main.kt to add, because otherwise Kotlin
+ * can't reference extension methods without an import statement. In the above example, `fqcn` will be set to
+ * `ButtonSize.XXL` and `import` will be set to `some.example.pkg.XXL`
  */
 @Serializable
-class CssStyleEntry(val fqcn: String, val name: String)
+class CssStyleEntry(val fqcn: String, val name: String, val import: String? = null)
 
 /**
  * Metadata for code like `val BoldLabelVariant = LabelStyle.addVariant { ... }` or `val SM = ButtonSize()`

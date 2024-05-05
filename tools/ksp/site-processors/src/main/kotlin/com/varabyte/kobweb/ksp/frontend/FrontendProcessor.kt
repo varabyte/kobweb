@@ -22,6 +22,7 @@ import com.google.devtools.ksp.symbol.Variance
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.splitCamelCase
 import com.varabyte.kobweb.ksp.common.CSS_KIND_COMPONENT_FQN
+import com.varabyte.kobweb.ksp.common.CSS_KIND_RESTRICTED_FQN
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
@@ -104,8 +105,9 @@ class FrontendProcessor(
 
     @OptIn(KspExperimental::class)
     private class KSTypes(resolver: Resolver) {
-        val componentKindType = resolver.getKotlinClassByName(CSS_KIND_COMPONENT_FQN)!!.asType(emptyList())
-        val cssStyleType = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asStarProjectedType()
+        private val cssStyleClassDeclaration = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!
+
+        val cssStyleType = cssStyleClassDeclaration.asStarProjectedType()
         val cssStyleVariantType = resolver.getKotlinClassByName(CSS_STYLE_VARIANT_FQN)!!.asStarProjectedType()
         val keyframesType = resolver.getKotlinClassByName(KEYFRAMES_FQN)!!.asType(emptyList())
         val legacyComponentStyleType = resolver.getKotlinClassByName(LEGACY_COMPONENT_STYLE_FQN)!!.asType(emptyList())
@@ -113,12 +115,21 @@ class FrontendProcessor(
             resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
         val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
 
-        // Not CssStyle<*> but CssStyle<out ComponentKind> specifically. Useful for confirming if we have a
-        // component-specific CSS style.
+        val componentKindType = resolver.getKotlinClassByName(CSS_KIND_COMPONENT_FQN)!!.asType(emptyList())
+        val restrictedKindType = resolver.getKotlinClassByName(CSS_KIND_RESTRICTED_FQN)!!.asType(emptyList())
+
+        // Not CssStyle<*> but CssStyle<out ComponentKind> specifically.
         val cssStyleComponentKindType = run {
             val typeRef = resolver.createKSTypeReferenceFromKSType(componentKindType)
             val typeArg = resolver.getTypeArgument(typeRef, Variance.COVARIANT)
-            resolver.getKotlinClassByName(CSS_STYLE_FQN)!!.asType(listOf(typeArg))
+            cssStyleClassDeclaration.asType(listOf(typeArg))
+        }
+
+        // Not CssStyle<*> but CssStyle<out RestrictedKind> specifically.
+        val cssStyleRestrictedKindType = run {
+            val typeRef = resolver.createKSTypeReferenceFromKSType(restrictedKindType)
+            val typeArg = resolver.getTypeArgument(typeRef, Variance.COVARIANT)
+            cssStyleClassDeclaration.asType(listOf(typeArg))
         }
     }
 
@@ -183,9 +194,14 @@ class FrontendProcessor(
                 ?: this.simpleName.asString().let(processPropertyName).titleCamelCaseToKebabCase().let(processCssName)
         }
 
-        private fun KSAnnotated.getCssPrefix(): String? {
-            return (this.getAnnotationValue(CSS_PREFIX_FQN) ?: defaultCssPrefix)
-                ?.takeIf { it.isNotEmpty() } // If the CssPrefix annotation is set to "", that should disable the prefix
+        private fun KSAnnotated.getCssPrefix(): String? = listOf(this).getCssPrefix()
+
+        // The order of the list should be in the order of precedence, with the first element being the highest
+        // precedence. So, property first, then container, for example.
+        private fun List<KSAnnotated>.getCssPrefix(): String? {
+            return (
+                this.asSequence().mapNotNull { it.getAnnotationValue(CSS_PREFIX_FQN) }.firstOrNull() ?: defaultCssPrefix
+                )?.takeIf { it.isNotEmpty() } // If the CssPrefix annotation is set to "", that should disable the prefix
         }
 
         private fun String.prefixed(prefix: String?, containedName: String? = null): String {
@@ -217,22 +233,61 @@ class FrontendProcessor(
                 }
             }
 
-        private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
-            val propertyCssName = property.getCssName { it.removeSuffix("Style") }
-            val propertyPrefix = property.getCssPrefix()
-            val propertyQualifiedName = property.qualifiedName!!.asString()
-
-            val parentSingleton = property.parentDeclaration as? KSClassDeclaration
-                ?: return CssStyleEntry(propertyQualifiedName, propertyCssName.prefixed(propertyPrefix))
+        private fun KSPropertyDeclaration.findCssPrefixAndContainerName(): Pair<String?, String?> {
+            val parentSingleton = this.owningSingletonClassDeclaration
+                ?: return this.getCssPrefix() to null
 
             val containerName =
                 parentSingleton.getAnnotationValue(CSS_NAME_FQN)
-                    ?: parentSingleton.simpleName.asString().removeSuffix("Styles").titleCamelCaseToKebabCase()
+                    ?: parentSingleton.simpleName.asString().titleCamelCaseToKebabCase()
 
-            return CssStyleEntry(
-                propertyQualifiedName,
-                propertyCssName.prefixed(propertyPrefix ?: parentSingleton.getCssPrefix(), containerName)
-            )
+            return listOf(this, parentSingleton).getCssPrefix() to containerName
+        }
+
+        private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
+            val propertyCssName = property.getCssName { it.removeSuffix("Style") }
+
+            // Although rare, we check here if we have an extension property. For example:
+            //
+            // ```
+            // package com.example
+            // private val _XXL = ButtonSize(...)
+            // val ButtonSize.Companion.XXL get() = _XXL
+            // ```
+            //
+            // This would result in a CssStyleEntry with the following properties:
+            // import = "com.example.XXL"
+            // fqcn = "com.varabyte.kobweb.silk.components.forms.ButtonSize.XXL"
+            // name = "button-size_xxl"
+            //
+            // We only support this specifically for restricted-type CSS styles, as in this case, the pattern is useful
+            // to extend them with more options.
+            property.extensionReceiver?.let { receiver ->
+                if (types.cssStyleRestrictedKindType.isAssignableFrom(property.type.resolve())) {
+                    val receiverType = receiver.resolve()
+                    (receiverType.declaration as? KSClassDeclaration)?.let { receiverDeclaration ->
+                        if (receiverDeclaration.isCompanionObject) {
+                            val owningClassDeclaration = receiverDeclaration.parentDeclaration as KSClassDeclaration
+                            return CssStyleEntry(
+                                import = property.qualifiedName!!.asString(),
+                                fqcn = "${receiverDeclaration.parentDeclaration!!.qualifiedName!!.asString()}.${property.simpleName.asString()}",
+                                name = propertyCssName.prefixed(
+                                    listOf(property, owningClassDeclaration).getCssPrefix(),
+                                    owningClassDeclaration.getAnnotationValue(CSS_NAME_FQN)
+                                        ?: owningClassDeclaration.simpleName.asString().titleCamelCaseToKebabCase()
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            property.findCssPrefixAndContainerName().let { (prefix, containerName) ->
+                return CssStyleEntry(
+                    fqcn = property.qualifiedName!!.asString(),
+                    name = propertyCssName.prefixed(prefix, containerName)
+                )
+            }
         }
 
         fun processCssStyleVariant(property: KSPropertyDeclaration): CssStyleVariantEntry {
@@ -260,10 +315,23 @@ class FrontendProcessor(
                     ?: withoutVariantSuffix
             }
 
-            val propertyPrefix = if (!propertyCssName.startsWith('-')) {
-                property.getCssPrefix()
-            } else null
-            return CssStyleVariantEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(propertyPrefix))
+            val propertyQualifiedName = property.qualifiedName!!.asString()
+
+            // If extending a base style name, then we don't need to check anything else for the prefix or container
+            // name, as we'll just use what the style itself is using.
+            return if (propertyCssName.startsWith('-')) {
+                CssStyleVariantEntry(
+                    fqcn = propertyQualifiedName,
+                    name = propertyCssName
+                )
+            } else {
+                property.findCssPrefixAndContainerName().let { (prefix, containerName) ->
+                    CssStyleVariantEntry(
+                        fqcn = propertyQualifiedName,
+                        name = propertyCssName.prefixed(prefix, containerName)
+                    )
+                }
+            }
         }
 
         fun processKeyframes(property: KSPropertyDeclaration): KeyframesEntry {
@@ -273,8 +341,12 @@ class FrontendProcessor(
                     .removeSuffix("Keyframes")
             }
 
-            val propertyPrefix = property.getCssPrefix()
-            return KeyframesEntry(property.qualifiedName!!.asString(), propertyCssName.prefixed(propertyPrefix))
+            return property.findCssPrefixAndContainerName().let { (prefix, containerName) ->
+                KeyframesEntry(
+                    fqcn = property.qualifiedName!!.asString(),
+                    name = propertyCssName.prefixed(prefix, containerName)
+                )
+            }
         }
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
@@ -312,10 +384,16 @@ class FrontendProcessor(
                 return false
             }
             if (!property.isPublic()) {
+                // If this looks like a backing property, ignore it! We expect another property to follow up soon
+                // after that will be public. For example:
+                // private val _XXL = ButtonSize(...)
+                // val ButtonSize.Companion.XXL: ButtonSize get() = _XXL
+                if (propertyName.startsWith('_')) return false
+
                 val privateSuppression = "PRIVATE_${declarationInfo.suppressionName}"
                 if (!property.suppresses(privateSuppression)) {
                     logger.warn(
-                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
+                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation or prepending the name with an underscore.",
                         property
                     )
                 }

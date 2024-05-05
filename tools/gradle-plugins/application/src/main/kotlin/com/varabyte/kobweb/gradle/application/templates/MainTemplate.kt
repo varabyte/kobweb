@@ -38,7 +38,7 @@ fun createMainFunction(
     val frontendData = appData.frontendData
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
-    buildList {
+    buildSet {
         val defaultImports = listOf(
             "androidx.compose.runtime.CompositionLocalProvider",
             "$KOBWEB_GROUP.core.AppGlobals",
@@ -68,6 +68,7 @@ fun createMainFunction(
         if (usingSilkFoundation) {
             add("$KOBWEB_GROUP.silk.defer.renderWithDeferred")
         }
+        frontendData.cssStyles.mapNotNull { it.import }.forEach { add(it) }
     }.sorted().forEach { import ->
         fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.'))
     }
