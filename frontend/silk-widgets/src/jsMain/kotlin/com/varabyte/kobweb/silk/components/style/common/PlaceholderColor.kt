@@ -1,5 +1,4 @@
 package com.varabyte.kobweb.silk.components.style.common
 
-import org.jetbrains.compose.web.css.*
-
-class PlaceholderColor(val color: CSSColorValue, val opacity: Number = 1)
+@Deprecated("Please replace your import with `com.varabyte.kobweb.silk.style.common.PlaceholderColor`")
+typealias PlaceholderColor = com.varabyte.kobweb.silk.style.common.PlaceholderColor
