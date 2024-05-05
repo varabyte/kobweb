@@ -24,7 +24,7 @@ object SurfaceVars {
     val Color by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
 }
 
-interface SurfaceKind : ComponentKind
+sealed interface SurfaceKind : ComponentKind
 
 val SurfaceStyle = CssStyle<SurfaceKind> {
     base {

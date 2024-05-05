@@ -59,9 +59,9 @@ object TooltipVars {
     val Color by StyleVariable<CSSColorValue>(prefix = "silk")
 }
 
-interface TooltipKind : ComponentKind {
-    interface Arrow : ComponentKind
-    interface TextContainer : ComponentKind
+sealed interface TooltipKind : ComponentKind {
+    sealed interface Arrow : ComponentKind
+    sealed interface TextContainer : ComponentKind
 }
 
 val TooltipStyle = CssStyle.base<TooltipKind> {

@@ -54,7 +54,7 @@ object ButtonVars {
     val PaddingHorizontal by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
 }
 
-interface ButtonKind : ComponentKind
+sealed interface ButtonKind : ComponentKind
 
 val ButtonStyle = CssStyle<ButtonKind> {
     base {

@@ -31,7 +31,7 @@ fun Divider(
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
 
-interface HorizontalDividerKind : ComponentKind
+sealed interface HorizontalDividerKind : ComponentKind
 
 val HorizontalDividerStyle = CssStyle.base<HorizontalDividerKind> {
     Modifier
@@ -56,7 +56,7 @@ fun HorizontalDivider(
     Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
 }
 
-interface VerticalDividerKind : ComponentKind
+sealed interface VerticalDividerKind : ComponentKind
 
 val VerticalDividerStyle = CssStyle.base<VerticalDividerKind> {
     Modifier

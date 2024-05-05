@@ -45,10 +45,10 @@ object TabVars {
     )
 }
 
-interface TabsKind : ComponentKind {
-    interface TabRow : ComponentKind
-    interface Tab : ComponentKind
-    interface Panel : ComponentKind
+sealed interface TabsKind : ComponentKind {
+    sealed interface TabRow : ComponentKind
+    sealed interface Tab : ComponentKind
+    sealed interface Panel : ComponentKind
 }
 
 val TabsStyle = CssStyle<TabsKind> {}

@@ -21,7 +21,7 @@ private val columnVariables = Breakpoint.entries.associateWith { breakpoint ->
     StyleVariable.NumberValue<Int>("simple-grid-col-count-${breakpoint.name.lowercase()}", prefix = "silk")
 }
 
-interface SimpleGridKind : ComponentKind
+sealed interface SimpleGridKind : ComponentKind
 
 val SimpleGridStyle = CssStyle<SimpleGridKind> {
     base {

@@ -39,7 +39,7 @@ val NavHeaderStyle = CssStyle.base(extraModifier = { SmoothColorStyle.toModifier
         .backgroundColor(colorMode.toPalette().color)
 }
 
-interface NavItemKind : ComponentKind
+sealed interface NavItemKind : ComponentKind
 
 val NavItemStyle = CssStyle<NavItemKind> {
     base { Modifier.margin(leftRight = 15.px) }

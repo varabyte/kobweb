@@ -405,7 +405,7 @@ class FrontendProcessor(
                 //
                 // For example, in:
                 // ```
-                // interface ButtonKind : ComponentKind
+                // sealed interface ButtonKind : ComponentKind
                 // val ButtonStyle = CssStyle<ButtonKind>
                 // ```
                 // we are checking that ButtonKind and the ButtonStyle property live near each other.
