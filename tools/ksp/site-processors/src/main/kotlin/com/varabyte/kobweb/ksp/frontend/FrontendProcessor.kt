@@ -9,10 +9,12 @@ import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
@@ -195,31 +197,42 @@ class FrontendProcessor(
             }
         }
 
+        /**
+         * If this object is contained in some sort of singleton scope, return the relevant class declaration.
+         *
+         * More specifically, if the element is inside an object, then return the object. Otherwise, if in a companion
+         * object, return the parent class itself.
+         *
+         * This is useful because we fetch the name from this container class and use it to namespace the CSS style
+         * name.
+         */
+        private val KSNode.owningSingletonClassDeclaration: KSClassDeclaration?
+            get() {
+                return (parent as? KSClassDeclaration)?.let { parentClass ->
+                    when {
+                        parentClass.isCompanionObject -> parentClass.parentDeclaration as KSClassDeclaration
+                        parentClass.classKind == ClassKind.OBJECT -> parentClass
+                        else -> null
+                    }
+                }
+            }
+
         private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
             val propertyCssName = property.getCssName { it.removeSuffix("Style") }
-
-            fun getCssStyleEntry(prefix: String?, containedName: String? = null): CssStyleEntry {
-                return CssStyleEntry(
-                    property.qualifiedName!!.asString(),
-                    propertyCssName.prefixed(prefix, containedName)
-                )
-            }
-
             val propertyPrefix = property.getCssPrefix()
+            val propertyQualifiedName = property.qualifiedName!!.asString()
 
-            val parent = property.parentDeclaration as? KSClassDeclaration
-                ?: return getCssStyleEntry(propertyPrefix)
+            val parentSingleton = property.parentDeclaration as? KSClassDeclaration
+                ?: return CssStyleEntry(propertyQualifiedName, propertyCssName.prefixed(propertyPrefix))
 
-            val parentNameOverride = parent.getAnnotationValue(CSS_NAME_FQN)
+            val containerName =
+                parentSingleton.getAnnotationValue(CSS_NAME_FQN)
+                    ?: parentSingleton.simpleName.asString().removeSuffix("Styles").titleCamelCaseToKebabCase()
 
-            val containerName = if (parentNameOverride != null) {
-                parentNameOverride
-            } else {
-                val relevantParent = if (parent.isCompanionObject) parent.parentDeclaration!! else parent
-                relevantParent.simpleName.asString().titleCamelCaseToKebabCase()
-            }
-
-            return getCssStyleEntry(propertyPrefix ?: parent.getCssPrefix(), containerName)
+            return CssStyleEntry(
+                propertyQualifiedName,
+                propertyCssName.prefixed(propertyPrefix ?: parentSingleton.getCssPrefix(), containerName)
+            )
         }
 
         fun processCssStyleVariant(property: KSPropertyDeclaration): CssStyleVariantEntry {
@@ -288,7 +301,7 @@ class FrontendProcessor(
             declarationInfo: DeclarationType
         ): Boolean {
             val propertyName = property.simpleName.asString()
-            if (property.parent !is KSFile) {
+            if (property.parent !is KSFile && (property.owningSingletonClassDeclaration == null)) {
                 val topLevelSuppression = "TOP_LEVEL_${declarationInfo.suppressionName}"
                 if (!property.suppresses(topLevelSuppression)) {
                     logger.warn(
