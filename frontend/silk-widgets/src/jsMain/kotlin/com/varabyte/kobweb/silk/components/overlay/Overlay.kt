@@ -22,7 +22,7 @@ object OverlayVars {
     val BackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
 }
 
-interface OverlayKind : ComponentKind
+sealed interface OverlayKind : ComponentKind
 
 val OverlayStyle = CssStyle.base<OverlayKind> {
     Modifier.backgroundColor(OverlayVars.BackgroundColor.value())

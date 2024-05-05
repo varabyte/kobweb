@@ -19,7 +19,7 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
 import org.w3c.dom.HTMLImageElement
 
-interface ImageKind : ComponentKind
+sealed interface ImageKind : ComponentKind
 
 val ImageStyle = CssStyle<ImageKind> {}
 

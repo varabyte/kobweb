@@ -30,7 +30,7 @@ object TocVars {
     val BorderColor by StyleVariable(prefix = "silk", defaultFallback = BorderColorVar.value())
 }
 
-interface TocKind : ComponentKind
+sealed interface TocKind : ComponentKind
 
 val TocStyle = CssStyle.base<TocKind> {
     Modifier

@@ -340,13 +340,16 @@ internal class SimpleCssStyle(
  * Box(ExtendedStyle.toModifier()) // includes BaseStyle automatically
  *
  * // Variants:
- * interface LabelKind : ComponentKind
+ * sealed interface LabelKind : ComponentKind
  * val LabelStyle = CssStyle<LabelKind> { ... }
  * val BoldLabelVariant = LabelStyle.addVariant { ... }
  * val ItalicLabelVariant = LabelStyle.addVariant { ... }
  *
  * Box(LabelStyle.toModifier(BoldLabelVariant, ItalicLabelVariant))
  * ```
+ *
+ * Note: The `ComponentKind` interface you create does not HAVE to be sealed. However, it's a recommended best practice
+ * as a way to indicate your intention that this interface is unique and tied specifically to a CSS style.
  */
 internal class ExtendingCssStyle(
     init: CssStyleScope.() -> Unit,

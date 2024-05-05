@@ -28,7 +28,7 @@ object LinkVars {
     val VisitedColor by StyleVariable<CSSColorValue>(prefix = "silk")
 }
 
-interface LinkKind : ComponentKind
+sealed interface LinkKind : ComponentKind
 
 /**
  * Style to use with [A] tags to give them Silk-themed colors.

@@ -79,9 +79,9 @@ object CheckboxVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.VeryFast.value())
 }
 
-interface CheckboxKind : ComponentKind {
-    interface Container : ComponentKind
-    interface Icon : ComponentKind
+sealed interface CheckboxKind : ComponentKind {
+    sealed interface Container : ComponentKind
+    sealed interface Icon : ComponentKind
 }
 
 val CheckboxStyle = CssStyle<CheckboxKind>(

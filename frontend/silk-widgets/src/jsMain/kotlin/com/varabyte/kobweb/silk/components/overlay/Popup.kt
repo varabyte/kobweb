@@ -22,7 +22,7 @@ object PopupVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
 }
 
-interface PopupKind : ComponentKind
+sealed interface PopupKind : ComponentKind
 
 val PopupStyle = CssStyle.base<PopupKind> {
     // NOTE: If any user replaces this style in their own project, they should make sure they still keep this "opacity"

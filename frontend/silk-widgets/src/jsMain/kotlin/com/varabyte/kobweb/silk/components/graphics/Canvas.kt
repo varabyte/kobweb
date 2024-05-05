@@ -25,7 +25,7 @@ import kotlin.js.Date
 import kotlin.math.max
 import kotlin.math.min
 
-interface CanvasKind : ComponentKind
+sealed interface CanvasKind : ComponentKind
 
 val CanvasStyle = CssStyle<CanvasKind> {}
 

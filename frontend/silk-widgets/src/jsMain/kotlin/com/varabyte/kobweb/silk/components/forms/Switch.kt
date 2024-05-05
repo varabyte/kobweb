@@ -47,9 +47,9 @@ object SwitchVars {
     val TransitionDuration by StyleVariable(prefix = "silk", defaultFallback = TransitionDurationVars.Fast.value())
 }
 
-interface SwitchKind : ComponentKind {
-    interface Track : ComponentKind
-    interface Thumb : ComponentKind
+sealed interface SwitchKind : ComponentKind {
+    sealed interface Track : ComponentKind
+    sealed interface Thumb : ComponentKind
 }
 
 val SwitchStyle = CssStyle.base<SwitchKind> {

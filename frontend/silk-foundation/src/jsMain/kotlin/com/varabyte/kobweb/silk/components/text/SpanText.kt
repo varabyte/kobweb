@@ -16,7 +16,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLSpanElement
 
-interface SpanTextKind : ComponentKind
+sealed interface SpanTextKind : ComponentKind
 
 // NOTE: This component lives in `silk-foundation` and not `silk-widgets` because it's not really a widget, but rather
 // a fairly general, useful, opinionated convenience pattern that people might want to use even if they don't want to

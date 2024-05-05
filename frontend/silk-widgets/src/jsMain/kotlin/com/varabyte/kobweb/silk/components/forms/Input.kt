@@ -101,8 +101,8 @@ object InputVars {
     val InsetRightWidth by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 2.25.cssRem)
 }
 
-interface InputGroupKind : ComponentKind
-interface InputKind : ComponentKind
+sealed interface InputGroupKind : ComponentKind
+sealed interface InputKind : ComponentKind
 
 val InputGroupStyle = CssStyle.base<InputGroupKind> {
     Modifier
