@@ -29,7 +29,7 @@ sealed class ComponentVariant {
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
  */
-@Deprecated("Code should migrate to `com.varabyte.kobweb.silk.style.SimpleComponentVariant`")
+@Deprecated("Code should migrate to `com.varabyte.kobweb.silk.style.SimpleCssStyleVariant`")
 internal class SimpleComponentVariant(
     val name: String,
     val cssStyle: SimpleCssStyle,
@@ -163,13 +163,13 @@ fun ComponentStyle.addVariantBase(
 // `silk.style.component.CssStyle<T>`. If the user has `LinkStyle.addVariant { ... }` in their code, it should
 // continue to compile!
 
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.addVariantBase`.")
 fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     extraModifiers: Modifier = Modifier,
     init: CssStyleBaseScope.() -> Modifier
 ) = addVariantBase({ extraModifiers }, init)
 
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`.")
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.addVariantBase`.")
 fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     extraModifiers: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
@@ -181,7 +181,7 @@ fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     }
 }
 
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.addVariantBase`. You should use `@CssName` to specify the custom name for this variant (but leading with a dash; so `name = \"example\"` becomes `CssName(\"-example\")`.")
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.addVariantBase`. You should use `@CssName` to specify the custom name for this variant (but leading with a dash; so `name = \"example\"` becomes `CssName(\"-example\")`.")
 fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     @Suppress("UNUSED_PARAMETER") name: String,
     extraModifiers: Modifier = Modifier,

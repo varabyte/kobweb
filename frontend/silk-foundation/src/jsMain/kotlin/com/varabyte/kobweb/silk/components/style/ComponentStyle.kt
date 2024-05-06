@@ -209,7 +209,7 @@ fun ComponentStyle.Companion.base(
  *   it's easier to just accept null here rather than require users to branch based on whether the variant is null or
  *   not.
  */
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toModifier`.")
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
 @Composable
 fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
     return cssStyle.toModifier()
@@ -222,7 +222,7 @@ fun ComponentStyle.toModifier(vararg variants: ComponentVariant?): Modifier {
  * This is useful if you need to convert a style into something directly consumable by a Compose HTML widget.
  */
 @Composable
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toAttrs`.")
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toAttrs`.")
 fun <A : AttrsScope<*>> ComponentStyle.toAttrs(
     vararg variant: ComponentVariant?,
     finalHandler: (A.() -> Unit)? = null
@@ -238,7 +238,7 @@ fun <A : AttrsScope<*>> ComponentStyle.toAttrs(
  * `Style1.toModifier().then(Style2.toModifier())...`
  */
 @Composable
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toModifier`.")
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
 fun Iterable<ComponentStyle>.toModifier(): Modifier {
     return fold<_, Modifier>(Modifier) { acc, style -> acc.then(style.toModifier()) }
 }
@@ -247,7 +247,7 @@ fun Iterable<ComponentStyle>.toModifier(): Modifier {
  * A convenience method for chaining a collection of styles into a single [AttrsScope] builder.
  */
 @Composable
-@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.component.toAttrs`.")
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toAttrs`.")
 fun <A : AttrsScope<*>> Iterable<ComponentStyle>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
 }
