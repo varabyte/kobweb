@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.animation.registerKeyframes
+import com.varabyte.kobweb.silk.init.FRAMEWORK_LAYER_NAME
 import com.varabyte.kobweb.silk.init.SilkConfig
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 import com.varabyte.kobweb.silk.style.ComponentKind
@@ -48,8 +49,10 @@ class MutableSilkTheme {
     private val _cssStyleVariants = mutableMapOf<String, CssStyleVariant<*>>()
     internal val cssStyleVariants: Map<String, CssStyleVariant<*>> = _cssStyleVariants
 
-    internal val _cssNames = mutableMapOf<Any, String>()
-    internal val cssNames: Map<Any, String> = _cssNames
+    private val _cssNamesFor = mutableMapOf<Any, String>()
+    internal val cssNamesFor: Map<Any, String> = _cssNamesFor
+    private val _cssLayersFor = mutableMapOf<String, String>()
+    internal val cssLayersFor: Map<String, String> = _cssLayersFor
 
     internal val _cssKinds = mutableMapOf<CssStyle<*>, KClass<out CssKind>>()
     internal val cssKinds: Map<CssStyle<*>, KClass<out CssKind>> = _cssKinds
@@ -87,7 +90,9 @@ class MutableSilkTheme {
         80.cssRem,
     )
 
-    private fun _registerStyle(name: String, style: CssStyle<*>, kind: KClass<out CssKind>) {
+    val cssLayers = mutableListOf(FRAMEWORK_LAYER_NAME)
+
+    private fun _registerStyle(name: String, style: CssStyle<*>, kind: KClass<out CssKind>, layer: String?) {
         check(cssStyles[name].let { it == null || it === style }) {
             """
                 Attempting to register a second CssStyle with a name that's already used: "$name"
@@ -96,22 +101,23 @@ class MutableSilkTheme {
             """.trimIndent()
         }
         _cssStyles[name] = style
-        _cssNames[style] = name
+        _cssNamesFor[style] = name
         _cssKinds[style] = kind
+        layer?.let { _cssLayersFor[name] = it }
 
         if (style is ExtendingCssStyle) {
             _cssStyleDependencies.getOrPut(style) { mutableListOf() }.add(style.baseStyle)
         }
     }
 
-    fun <K : ComponentKind> registerStyle(name: String, style: CssStyle<K>) =
-        _registerStyle(name, style, ComponentKind::class)
+    fun <K : ComponentKind> registerStyle(name: String, style: CssStyle<K>, layer: String? = null) =
+        _registerStyle(name, style, ComponentKind::class, layer)
 
-    fun registerStyle(name: String, style: CssStyle<RestrictedKind>) =
-        _registerStyle(name, style, RestrictedKind::class)
+    fun registerStyle(name: String, style: CssStyle<RestrictedKind>, layer: String? = null) =
+        _registerStyle(name, style, RestrictedKind::class, layer)
 
-    fun registerStyle(name: String, style: CssStyle<UnspecifiedKind>) =
-        _registerStyle(name, style, UnspecifiedKind::class)
+    fun registerStyle(name: String, style: CssStyle<UnspecifiedKind>, layer: String? = null) =
+        _registerStyle(name, style, UnspecifiedKind::class, layer)
 
     private fun updateReplaced(originalStyle: CssStyle<*>, newStyle: CssStyle<*>) {
         _replacedCssStyles[originalStyle] = newStyle
@@ -131,11 +137,11 @@ class MutableSilkTheme {
         extraModifier: @Composable () -> Modifier,
         init: CssStyleScope.() -> Unit
     ) {
-        val name = cssNames[style] ?: error("Attempting to replace a CSS style that was never registered.")
+        val name = cssNamesFor[style] ?: error("Attempting to replace a CSS style that was never registered.")
         check(!replacedCssStyles.contains(style)) { "Attempting to override style \"${name}\" twice" }
         val newStyle = object : CssStyle<UnspecifiedKind>(init, extraModifier) {}
         _cssStyles[name] = newStyle
-        _cssNames[newStyle] = name
+        _cssNamesFor[newStyle] = name
         updateReplaced(style, newStyle)
     }
 
@@ -156,7 +162,7 @@ class MutableSilkTheme {
             """.trimIndent()
         }
         _legacyComponentStyles[style.name] = style
-        _cssNames[style] = style.name
+        _cssNamesFor[style] = style.name
     }
 
     @Deprecated("Name simplified to `replaceStyle`", ReplaceWith("replaceStyle(style, extraModifiers, init)"))
@@ -213,7 +219,7 @@ class MutableSilkTheme {
 
         val newStyle = LegacyComponentStyle(style.nameWithoutPrefix, extraModifier, style.prefix, init)
         _legacyComponentStyles[style.name] = newStyle
-        _cssNames[newStyle.cssStyle] = style.name
+        _cssNamesFor[newStyle.cssStyle] = style.name
         updateReplaced(style.cssStyle, newStyle.cssStyle)
     }
 
@@ -237,13 +243,13 @@ class MutableSilkTheme {
      *
      * **NOTE:** Most of the time, you don't have to call this yourself, as the Gradle plugin will call it for you.
      */
-    fun <K : ComponentKind> registerVariant(name: String, variant: CssStyleVariant<K>) {
+    fun <K : ComponentKind> registerVariant(name: String, variant: CssStyleVariant<K>, layer: String? = null) {
         val simpleVariant = variant as? SimpleCssStyleVariant<K>
             ?: error("You can only register variants created by `addVariant` or `addVariantBase`.")
 
         @Suppress("NAME_SHADOWING")
         val name = if (name.startsWith('-')) {
-            val baseStyleName = _cssNames[simpleVariant.baseStyle]
+            val baseStyleName = _cssNamesFor[simpleVariant.baseStyle]
                 ?: error("When registering variant \"$name\", somehow its base style was not registered correctly. This is not expected, so please report the issue.")
 
             baseStyleName + name
@@ -258,7 +264,8 @@ class MutableSilkTheme {
         """.trimIndent()
         }
         _cssStyleVariants[name] = variant
-        _cssNames[variant.cssStyle] = name
+        _cssNamesFor[variant.cssStyle] = name
+        layer?.let { _cssLayersFor[name] = it }
     }
 
     /**
@@ -277,7 +284,7 @@ class MutableSilkTheme {
             """.trimIndent()
             }
             _legacyComponentVariants[variant.cssStyle.selector] = variant
-            _cssNames[variant.cssStyle] = variant.name
+            _cssNamesFor[variant.cssStyle] = variant.name
         }
     }
 
@@ -350,13 +357,13 @@ class MutableSilkTheme {
         val variant = variant as? SimpleCssStyleVariant<K>
             ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
-        val name = _cssNames[variant.cssStyle]
+        val name = _cssNamesFor[variant.cssStyle]
             ?: error("Attempting to replace a variant that was never registered.")
 
         check(!replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${name}\" twice" }
         val newVariant = variant.baseStyle.addVariant(extraModifier, init) as SimpleCssStyleVariant<K>
         _cssStyleVariants[name] = newVariant
-        _cssNames[variant.cssStyle] = name
+        _cssNamesFor[variant.cssStyle] = name
         updateReplaced(variant.cssStyle, newVariant.cssStyle)
     }
 
@@ -397,18 +404,19 @@ class MutableSilkTheme {
         check(!replacedCssStyles.contains(variant.cssStyle)) { "Attempting to override variant \"${variant.cssStyle.selector}\" twice" }
         val newVariant = variant.baseStyle.addVariant(variant.name, extraModifier, init) as LegacySimpleComponentVariant
         _legacyComponentVariants[variant.cssStyle.selector] = newVariant
-        _cssNames[variant.cssStyle] = variant.name
+        _cssNamesFor[variant.cssStyle] = variant.name
         updateReplaced(variant.cssStyle, newVariant.cssStyle)
     }
 
-    fun registerKeyframes(name: String, keyframes: Keyframes) {
+    fun registerKeyframes(name: String, keyframes: Keyframes, layer: String? = null) {
         check(_keyframes[name].let { it == null || it === keyframes }) {
             """
                 Attempting to register a second keyframes with a name that's already used: "$name"
             """.trimIndent()
         }
         _keyframes[name] = keyframes
-        _cssNames[keyframes] = name
+        _cssNamesFor[keyframes] = name
+        layer?.let { _cssLayersFor[name] = it }
     }
 
     fun registerKeyframes(keyframes: LegacyKeyframes) {
@@ -418,7 +426,7 @@ class MutableSilkTheme {
             """.trimIndent()
         }
         _legacyKeyframes[keyframes.name] = keyframes
-        _cssNames[keyframes] = keyframes.name
+        _cssNamesFor[keyframes] = keyframes.name
     }
 }
 
@@ -449,7 +457,7 @@ fun MutableSilkTheme.modifyStyle(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
 ) {
-    val styleName = cssNames[style] ?: error("Attempting to modify a style that was never registered.")
+    val styleName = cssNamesFor[style] ?: error("Attempting to modify a style that was never registered.")
     check(cssStyles.contains(styleName)) { "Attempting to modify a style that was never registered: \"${styleName}\"" }
     val existingExtraModifier = style.extraModifier
     val existingInit = style.init
@@ -860,7 +868,7 @@ fun <K : ComponentKind> MutableSilkTheme.modifyVariant(
     val variant = variant as? SimpleCssStyleVariant<K>
         ?: error("You can only replace variants created by `addVariant` or `addVariantBase`.")
 
-    val variantName = cssNames[variant] ?: error("Attempting to modify a variant that was never registered.")
+    val variantName = cssNamesFor[variant] ?: error("Attempting to modify a variant that was never registered.")
     check(cssStyleVariants.contains(variantName)) { "Attempting to modify a style that was never registered: \"${variantName}\"" }
     val existingExtraModifier = variant.cssStyle.extraModifier
     val existingInit = variant.cssStyle.init
@@ -951,6 +959,7 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         get() = palettes[ColorMode.current]
 
     val breakpoints = mutableSilkTheme.breakpoints
+    val cssLayers: List<String> = mutableSilkTheme.cssLayers
 
     private val _cssStyles = mutableMapOf<CssStyle<*>, ImmutableCssStyle>()
     internal val cssStyles: Map<CssStyle<*>, ImmutableCssStyle> = _cssStyles
@@ -969,8 +978,9 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
      * user would have to go out of their way to make this happen in practice, which is why the API was designed to
      * assume this won't crash.
      */
-    fun nameFor(style: CssStyle<*>): String = mutableSilkTheme.cssNames.getValue(style)
-    fun nameFor(keyframes: Keyframes): String = mutableSilkTheme.cssNames.getValue(keyframes)
+    fun nameFor(style: CssStyle<*>): String = mutableSilkTheme.cssNamesFor.getValue(style)
+    fun nameFor(keyframes: Keyframes): String = mutableSilkTheme.cssNamesFor.getValue(keyframes)
+    fun layerFor(className: String): String? = mutableSilkTheme.cssLayersFor[className]
 
     // Note: We separate these function out from the SilkTheme constructor so we can construct it first and then call
     // them later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
