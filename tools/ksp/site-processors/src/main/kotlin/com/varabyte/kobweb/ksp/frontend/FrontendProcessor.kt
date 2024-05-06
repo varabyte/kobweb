@@ -214,28 +214,70 @@ class FrontendProcessor(
         }
 
         /**
-         * If this object is contained in some sort of singleton scope, return the relevant class declaration.
+         * Given a class context which represents an object or a companion object, return the relevant container class.
          *
-         * More specifically, if the element is inside an object, then return the object. Otherwise, if in a companion
-         * object, return the parent class itself.
+         * More specifically, the class is an object, then return it. Otherwise, if a companion object, return the
+         * parent class itself.
          *
          * This is useful because we fetch the name from this container class and use it to namespace the CSS style
          * name.
          */
+        private fun KSClassDeclaration.asSingletonContainer(): KSClassDeclaration? {
+            return when {
+                this.isCompanionObject -> this.parentDeclaration as KSClassDeclaration
+                this.classKind == ClassKind.OBJECT -> this
+                else -> null
+            }
+        }
+
         private val KSNode.owningSingletonClassDeclaration: KSClassDeclaration?
+            get() = (parent as? KSClassDeclaration)?.asSingletonContainer()
+
+        /**
+         * Returning the relevant singleton container for an extension property.
+         *
+         * Although expected to be rare, we support code like this:
+         *
+         * ```
+         * //--------------------------------
+         * package com.somelib.styles
+         *
+         * object SomeLibStyling { ... }
+         *
+         * //--------------------------------
+         * package com.example
+         *
+         * import com.somelib.styles.*
+         * import com.varabyte.kobweb.silk.components.forms.ButtonSize
+         *
+         * private val _XXL = ButtonSize(...)
+         * val ButtonSize.Companion.XXL get() = _XXL // container name = "button-size"
+         *
+         * private val _MyVariant = SomeLibStyle.addVariant { ... }
+         * val SomeLibStyling.MyVariant get() = _MyVariant // container name = "some-lib-styling"
+         * ```
+         *
+         * Note that callers that reference such an extension object will need to include appropriate imports in the
+         * final generated code, because Kotlin requires that to use extension methods.
+         *
+         * For example, for the XXL property above, the final generated code should look like this:
+         *
+         * ```
+         * import com.example.XXL
+         *
+         * registerStyle("button-size_xxl", com.varabyte.kobweb.silk.components.forms.ButtonSize.XXL)
+         * ```
+         */
+        private val KSPropertyDeclaration.receiverSingletonClassDeclaration: KSClassDeclaration?
             get() {
-                return (parent as? KSClassDeclaration)?.let { parentClass ->
-                    when {
-                        parentClass.isCompanionObject -> parentClass.parentDeclaration as KSClassDeclaration
-                        parentClass.classKind == ClassKind.OBJECT -> parentClass
-                        else -> null
-                    }
-                }
+                val receiverTypeReference = this.extensionReceiver ?: return null
+                val receiverType = receiverTypeReference.resolve()
+                val receiverClassDeclaration = (receiverType.declaration as? KSClassDeclaration) ?: return null
+                return receiverClassDeclaration.asSingletonContainer()
             }
 
-        private fun KSPropertyDeclaration.findCssPrefixAndContainerName(): Pair<String?, String?> {
-            val parentSingleton = this.owningSingletonClassDeclaration
-                ?: return this.getCssPrefix() to null
+        private fun KSPropertyDeclaration.findCssPrefixAndContainerName(parentSingleton: KSClassDeclaration?): Pair<String?, String?> {
+            if (parentSingleton == null) return this.getCssPrefix() to null
 
             val containerName =
                 parentSingleton.getAnnotationValue(CSS_NAME_FQN)
@@ -244,47 +286,36 @@ class FrontendProcessor(
             return listOf(this, parentSingleton).getCssPrefix() to containerName
         }
 
-        private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
-            val propertyCssName = property.getCssName { it.removeSuffix("Style") }
-
-            // Although rare, we check here if we have an extension property. For example:
-            //
-            // ```
-            // package com.example
-            // private val _XXL = ButtonSize(...)
-            // val ButtonSize.Companion.XXL get() = _XXL
-            // ```
-            //
-            // This would result in a CssStyleEntry with the following properties:
-            // import = "com.example.XXL"
-            // fqcn = "com.varabyte.kobweb.silk.components.forms.ButtonSize.XXL"
-            // name = "button-size_xxl"
-            //
-            // We only support this specifically for restricted-type CSS styles, as in this case, the pattern is useful
-            // to extend them with more options.
-            property.extensionReceiver?.let { receiver ->
-                if (types.cssStyleRestrictedKindType.isAssignableFrom(property.type.resolve())) {
-                    val receiverType = receiver.resolve()
-                    (receiverType.declaration as? KSClassDeclaration)?.let { receiverDeclaration ->
-                        if (receiverDeclaration.isCompanionObject) {
-                            val owningClassDeclaration = receiverDeclaration.parentDeclaration as KSClassDeclaration
-                            return CssStyleEntry(
-                                import = property.qualifiedName!!.asString(),
-                                fqcn = "${receiverDeclaration.parentDeclaration!!.qualifiedName!!.asString()}.${property.simpleName.asString()}",
-                                name = propertyCssName.prefixed(
-                                    listOf(property, owningClassDeclaration).getCssPrefix(),
-                                    owningClassDeclaration.getAnnotationValue(CSS_NAME_FQN)
-                                        ?: owningClassDeclaration.simpleName.asString().titleCamelCaseToKebabCase()
-                                )
-                            )
-                        }
-                    }
+        // Common functionality that generate data useful for all cases that need to create metadata entries
+        private inline fun <T> KSPropertyDeclaration.createEntry(callback: (import: String?, fqcn: String, prefix: String?, containerName: String?) -> T): T {
+            val property = this // for readability
+            property.receiverSingletonClassDeclaration?.let { receiverSingleton ->
+                property.findCssPrefixAndContainerName(receiverSingleton).let { (prefix, containerName) ->
+                    return callback(
+                        property.qualifiedName!!.asString(),
+                        "${receiverSingleton.qualifiedName!!.asString()}.${property.simpleName.asString()}",
+                        prefix,
+                        containerName
+                    )
                 }
             }
 
-            property.findCssPrefixAndContainerName().let { (prefix, containerName) ->
-                return CssStyleEntry(
-                    fqcn = property.qualifiedName!!.asString(),
+            property.findCssPrefixAndContainerName(property.owningSingletonClassDeclaration)
+                .let { (prefix, containerName) ->
+                    return callback(
+                        null,
+                        property.qualifiedName!!.asString(),
+                        prefix, containerName
+                    )
+                }
+        }
+
+        private fun processCssStyle(property: KSPropertyDeclaration): CssStyleEntry {
+            val propertyCssName = property.getCssName { it.removeSuffix("Style") }
+            return property.createEntry { import, fqcn, prefix, containerName ->
+                CssStyleEntry(
+                    import = import,
+                    fqcn = fqcn,
                     name = propertyCssName.prefixed(prefix, containerName)
                 )
             }
@@ -329,22 +360,15 @@ class FrontendProcessor(
                     ?: withoutVariantSuffix
             }
 
-            val propertyQualifiedName = property.qualifiedName!!.asString()
-
             // If extending a base style name, then we don't need to check anything else for the prefix or container
             // name, as we'll just use what the style itself is using.
-            return if (propertyCssName.startsWith('-')) {
+            val isRelativeCssName = propertyCssName.startsWith('-')
+            return property.createEntry { import, fqcn, prefix, containerName ->
                 CssStyleVariantEntry(
-                    fqcn = propertyQualifiedName,
-                    name = propertyCssName
+                    import = import,
+                    fqcn = fqcn,
+                    name = if (isRelativeCssName) propertyCssName else propertyCssName.prefixed(prefix, containerName)
                 )
-            } else {
-                property.findCssPrefixAndContainerName().let { (prefix, containerName) ->
-                    CssStyleVariantEntry(
-                        fqcn = propertyQualifiedName,
-                        name = propertyCssName.prefixed(prefix, containerName)
-                    )
-                }
             }
         }
 
@@ -355,9 +379,10 @@ class FrontendProcessor(
                     .removeSuffix("Keyframes")
             }
 
-            return property.findCssPrefixAndContainerName().let { (prefix, containerName) ->
+            return property.createEntry { import, fqcn, prefix, containerName ->
                 KeyframesEntry(
-                    fqcn = property.qualifiedName!!.asString(),
+                    import = import,
+                    fqcn = fqcn,
                     name = propertyCssName.prefixed(prefix, containerName)
                 )
             }

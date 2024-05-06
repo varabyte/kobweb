@@ -69,6 +69,9 @@ fun createMainFunction(
             add("$KOBWEB_GROUP.silk.defer.renderWithDeferred")
         }
         frontendData.cssStyles.mapNotNull { it.import }.forEach { add(it) }
+        frontendData.cssStyleVariants.mapNotNull { it.import }.forEach { add(it) }
+        frontendData.keyframesList.mapNotNull { it.import }.forEach { add(it) }
+
     }.sorted().forEach { import ->
         fileBuilder.addImport(import.substringBeforeLast('.'), import.substringAfterLast('.'))
     }

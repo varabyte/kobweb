@@ -2,6 +2,21 @@ package com.varabyte.kobweb.project.frontend
 
 import kotlinx.serialization.Serializable
 
+// A note on imports
+//
+// We support extension properties for CSS styles, variants, and keyframes. For example, here is code that extends the
+// `ButtonSize` style:
+// *
+// * ```
+// * package some.example.pkg
+// *
+// * private val _XXL: ButtonSize
+// * val ButtonSize.Companion.XXL: ButtonSize get() = _XXL
+// * ```
+// *
+// * Because of how extension properties work, an import has to be provided for main.kt to add, because otherwise Kotlin
+// * can't reference extension methods without it.
+
 /**
  * Useful Kobweb-related information discovered while parsing a frontend module.
  *
@@ -86,7 +101,7 @@ class InitKobwebEntry(val fqn: String, val acceptsContext: Boolean)
  * `name` field below should become non-null.
  */
 @Serializable
-class KeyframesEntry(val fqcn: String, val name: String? = null)
+class KeyframesEntry(val fqcn: String, val name: String? = null, val import: String? = null)
 
 /**
  * Information about a method in the user's code targeted by an `@Page` annotation.
@@ -119,21 +134,6 @@ class ComponentVariantEntry(val fqcn: String)
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)
  *
  * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
- *
- * ## A note on imports
- * We support extension properties for CSS styles, useful to extend companion objects, such as in the
- * following code:
- *
- * ```
- * package some.example.pkg
- *
- * private val _XXL: ButtonSize
- * val ButtonSize.Companion.XXL: ButtonSize get() = _XXL
- * ```
- *
- * Because of how extension properties work, an import has to be provided for main.kt to add, because otherwise Kotlin
- * can't reference extension methods without an import statement. In the above example, `fqcn` will be set to
- * `ButtonSize.XXL` and `import` will be set to `some.example.pkg.XXL`
  */
 @Serializable
 class CssStyleEntry(val fqcn: String, val name: String, val import: String? = null)
@@ -144,4 +144,4 @@ class CssStyleEntry(val fqcn: String, val name: String, val import: String? = nu
  * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
  */
 @Serializable
-class CssStyleVariantEntry(val fqcn: String, val name: String)
+class CssStyleVariantEntry(val fqcn: String, val name: String, val import: String? = null)
