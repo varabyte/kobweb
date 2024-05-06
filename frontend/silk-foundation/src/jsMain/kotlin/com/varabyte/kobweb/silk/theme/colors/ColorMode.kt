@@ -66,6 +66,9 @@ enum class ColorMode {
 // would have "style_dark", "style_light", "style-dark_dark", and "style-dark_light"
 fun String.suffixedWith(colorMode: ColorMode) = "${this}_${colorMode.name.lowercase()}"
 
+// Reverse operation of `suffixedWith`
+fun String.withColorSuffixRemoved() = this.removeSuffix("_${ColorMode.LIGHT.name.lowercase()}").removeSuffix("_${ColorMode.DARK.name.lowercase()}")
+
 /**
  * Lighten or darken the color, as appropriate, based on the specified color mode.
  *
