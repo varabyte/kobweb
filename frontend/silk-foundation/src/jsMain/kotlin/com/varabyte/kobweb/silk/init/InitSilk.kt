@@ -17,6 +17,7 @@ import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme._SilkTheme
+import com.varabyte.kobweb.silk.theme.colors.withColorSuffixRemoved
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.asList
@@ -145,7 +146,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                 this.asList().forEachIndexed { i, cssRule ->
                     extractClassName(cssRule.cssText)?.let { className ->
                         // e.g. `silk-button_dark` should be associated with the same layer that `silk-button` is
-                        (SilkTheme.layerFor(className) ?: SilkTheme.layerFor(className.substringBeforeLast('_')))
+                        (SilkTheme.layerFor(className) ?: SilkTheme.layerFor(className.withColorSuffixRemoved()))
                             ?.let { layer ->
                                 deleteRule(i)
                                 insertRule("@layer $layer { ${cssRule.cssText} }", i)
