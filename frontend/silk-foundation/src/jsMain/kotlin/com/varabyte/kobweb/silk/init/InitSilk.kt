@@ -22,6 +22,7 @@ import kotlinx.browser.window
 import org.w3c.dom.asList
 import org.w3c.dom.css.CSSGroupingRule
 import org.w3c.dom.css.CSSRule
+import org.w3c.dom.css.CSSRuleList
 import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.CSSStyleSheet
 
@@ -48,6 +49,8 @@ class InitSilkContext(val config: MutableSilkConfig, val stylesheet: SilkStylesh
 // initialization directly there. In the case of Kobweb projects, where code gets automatically processed at compile
 // time looking for `@InitSilk` methods, it is easier to generate code and then set it using this property.
 var additionalSilkInitialization: (InitSilkContext) -> Unit = {}
+
+const val FRAMEWORK_LAYER_NAME = "framework"
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
@@ -86,36 +89,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     )
 
     displayStyles.forEach { (style, name) ->
-        mutableTheme.registerStyle(name, style)
-    }
-    // Next, run through all styles in the stylesheet and update the ones associated with our display styles. Note that
-    // a real solution would be if the Compose HTML APIs allowed us to identify a style as important, but currently, as
-    // you can see with their code here: https://github.com/JetBrains/compose-multiplatform/blob/9e25001e9e3a6be96668e38c7f0bd222c54d1388/html/core/src/jsMain/kotlin/org/jetbrains/compose/web/elements/Style.kt#L116
-    // they don't support it. (There would have to be a version of the API that takes an additional priority parameter,
-    // as in `setProperty("x", "y", "important")`)
-    window.invokeLater { // invokeLater gives the engine time to register Silk styles into the stylesheet objects first
-        val displayStyleSelectorNames = displayStyles.map { (_, name) -> ".${name}" }.toSet()
-        document.styleSheets.asList()
-            .filterIsInstance<CSSStyleSheet>()
-            // Trying to peek at external stylesheets causes a security exception so step over them
-            .filter { it.href == null }
-            .forEach { styleSheet ->
-                styleSheet.cssRules.asList()
-                    .filterIsInstance<CSSGroupingRule>()
-                    // Note: We know all display styles use media rules, but if we ever want to support
-                    // "important" more generally, we'd have to handle at least STYLE_RULE as well
-                    .filter { rule -> rule.type == CSSRule.MEDIA_RULE }
-                    .forEach { rule ->
-                        rule.cssRules.asList().filterIsInstance<CSSStyleRule>().forEach { innerRule ->
-                            val selectorText = innerRule.selectorText
-                            val innerStyle = innerRule.style
-                            if (selectorText in displayStyleSelectorNames) {
-                                val displayValue = innerStyle.getPropertyValue("display")
-                                innerStyle.setProperty("display", displayValue, "important")
-                            }
-                        }
-                    }
-            }
+        mutableTheme.registerStyle(name, style, FRAMEWORK_LAYER_NAME)
     }
 
     MutableSilkConfigInstance = config
@@ -124,4 +98,75 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     SilkTheme.registerKeyframesInto(SilkStylesheetInstance)
     SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
     SilkTheme.registerStylesInto(SilkStyleSheet)
+
+    window.invokeLater { // invokeLater gives the engine time to register Silk styles into the stylesheet objects first
+        run {
+            // Run through all styles in the stylesheet and update the ones associated with our display styles, making
+            // them important. This means that responsive designs will always work -- that another style that sets the
+            // `display` property will never accidentally overrule it.
+            // Note that a real solution would be if the Compose HTML APIs allowed us to identify a style as important,
+            // but currently, as you can see with their code here:
+            // https://github.com/JetBrains/compose-multiplatform/blob/9e25001e9e3a6be96668e38c7f0bd222c54d1388/html/core/src/jsMain/kotlin/org/jetbrains/compose/web/elements/Style.kt#L116
+            // they don't support it. (It would have been nice to be a version of the API that takes an additional
+            // priority parameter, as in `setProperty("x", "y", "important")`)
+            val displayStyleSelectorNames = displayStyles.map { (_, name) -> ".${name}" }.toSet()
+            document.styleSheets.asList()
+                .filterIsInstance<CSSStyleSheet>()
+                // Trying to peek at external stylesheets causes a security exception so step over them
+                .filter { it.href == null }
+                .forEach { styleSheet ->
+                    styleSheet.cssRules.asList()
+                        .filterIsInstance<CSSGroupingRule>()
+                        // Note: We know all display styles use media rules, but if we ever want to support
+                        // "important" more generally, we'd have to handle at least STYLE_RULE as well
+                        .filter { rule -> rule.type == CSSRule.MEDIA_RULE }
+                        .forEach { rule ->
+                            rule.cssRules.asList().filterIsInstance<CSSStyleRule>().forEach { innerRule ->
+                                val selectorText = innerRule.selectorText
+                                val innerStyle = innerRule.style
+                                if (selectorText in displayStyleSelectorNames) {
+                                    val displayValue = innerStyle.getPropertyValue("display")
+                                    innerStyle.setProperty("display", displayValue, "important")
+                                }
+                            }
+                        }
+                }
+        }
+
+        run {
+            // Apply CSS cascading layers at runtime (since Compose HTML doesn't have an API that supports them)
+
+            val classNameRegex = "^\\.([a-zA-Z0-9_-]*).*".toRegex()
+            fun extractClassName(selectorText: String): String? {
+                return classNameRegex.find(selectorText)?.groups?.get(1)?.value
+            }
+
+            fun CSSRuleList.insertLayers(deleteRule: (Int) -> Unit, insertRule: (String, Int) -> Unit) {
+                this.asList().forEachIndexed { i, cssRule ->
+                    extractClassName(cssRule.cssText)?.let { className ->
+                        // e.g. `silk-button_dark` should be associated with the same layer that `silk-button` is
+                        (SilkTheme.layerFor(className) ?: SilkTheme.layerFor(className.substringBeforeLast('_')))
+                            ?.let { layer ->
+                                deleteRule(i)
+                                insertRule("@layer $layer { ${cssRule.cssText} }", i)
+                            }
+                    }
+                }
+            }
+
+            document.styleSheets.asList()
+                .filterIsInstance<CSSStyleSheet>()
+                // Trying to peek at external stylesheets causes a security exception so step over them
+                .filter { it.href == null }
+                .forEach { styleSheet ->
+                    SilkTheme.cssLayers.takeIf { it.isNotEmpty() }?.let { cssLayers ->
+                        styleSheet.insertRule("@layer ${cssLayers.joinToString(",")};", 0)
+                    }
+                    styleSheet.cssRules.asList().filterIsInstance<CSSGroupingRule>().forEach { groupingRule ->
+                        groupingRule.cssRules.insertLayers(groupingRule::deleteRule, groupingRule::insertRule)
+                    }
+                    styleSheet.cssRules.insertLayers(styleSheet::deleteRule, styleSheet::insertRule)
+                }
+        }
+    }
 }
