@@ -94,8 +94,8 @@ val SwitchThumbStyle = CssStyle.base<SwitchKind.Thumb> {
 }
 
 class SwitchSize(
-    internal val width: CSSLengthNumericValue,
-    internal val height: CSSLengthNumericValue,
+    width: CSSLengthNumericValue,
+    height: CSSLengthNumericValue,
     padding: CSSLengthNumericValue = 0.188.cssRem
 ) : CssStyle.Restricted.Base(
     Modifier
@@ -197,7 +197,7 @@ fun Switch(
                 SwitchThumbStyle.toModifier()
                     .setVariable(
                         SwitchVars.ThumbOffset,
-                        if (checked) size.width - size.height else 0.percent
+                        if (checked) SwitchVars.TrackWidth.value() - SwitchVars.TrackHeight.value() else 0.percent
                     )
             )
         }
