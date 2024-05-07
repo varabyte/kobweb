@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.init
 
+import com.varabyte.kobweb.browser.dom.css.CSSLayerBlockRule
 import com.varabyte.kobweb.browser.util.invokeLater
 import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
@@ -20,8 +21,7 @@ import com.varabyte.kobweb.silk.theme._SilkTheme
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.asList
-import org.w3c.dom.css.CSSGroupingRule
-import org.w3c.dom.css.CSSRule
+import org.w3c.dom.css.CSSMediaRule
 import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.CSSStyleSheet
 
@@ -113,22 +113,22 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                 .filterIsInstance<CSSStyleSheet>()
                 // Trying to peek at external stylesheets causes a security exception so step over them
                 .filter { it.href == null }
-                .forEach { styleSheet ->
+                .flatMap { styleSheet ->
+                    // Note: We know all display styles use media rules & layers blocks, but if we ever want to support
+                    // "important" more generally, we'd have to handle at least rules at all levels.
                     styleSheet.cssRules.asList()
-                        .filterIsInstance<CSSGroupingRule>()
-                        // Note: We know all display styles use media rules, but if we ever want to support
-                        // "important" more generally, we'd have to handle at least STYLE_RULE as well
-                        .filter { rule -> rule.type == CSSRule.MEDIA_RULE }
-                        .forEach { rule ->
-                            rule.cssRules.asList().filterIsInstance<CSSStyleRule>().forEach { innerRule ->
-                                val selectorText = innerRule.selectorText
-                                val innerStyle = innerRule.style
-                                if (selectorText in displayStyleSelectorNames) {
-                                    val displayValue = innerStyle.getPropertyValue("display")
-                                    innerStyle.setProperty("display", displayValue, "important")
-                                }
-                            }
-                        }
+                        .filterIsInstance<CSSMediaRule>()
+                        .flatMap { it.cssRules.asList() }
+                        .mapNotNull { rule ->
+                            (rule as? CSSLayerBlockRule)?.takeIf { it.name == FRAMEWORK_LAYER_NAME }
+                        }.flatMap { it.cssRules.asList().filterIsInstance<CSSStyleRule>() }
+                }.forEach { rule ->
+                    val selectorText = rule.selectorText
+                    val innerStyle = rule.style
+                    if (selectorText in displayStyleSelectorNames) {
+                        val displayValue = innerStyle.getPropertyValue("display")
+                        innerStyle.setProperty("display", displayValue, "important")
+                    }
                 }
         }
 
