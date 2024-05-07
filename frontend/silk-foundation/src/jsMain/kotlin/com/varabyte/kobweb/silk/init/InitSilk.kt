@@ -55,7 +55,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
     val config = MutableSilkConfig()
 
-    mutableTheme.registerStyle("silk-span-text", SpanTextStyle)
+    mutableTheme.registerStyle("silk-span-text", SpanTextStyle, FRAMEWORK_LAYER_NAME)
 
     val ctx = InitSilkContext(config, SilkStylesheetInstance, mutableTheme)
     additionalInit(ctx)
