@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.core
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
 import org.jetbrains.compose.web.css.*
 
 /**
@@ -44,15 +45,17 @@ fun KobwebApp(content: @Composable () -> Unit) {
 
 object DefaultStyleSheet : StyleSheet() {
     init {
-        "html, body" style {
-            // Allow our app to stretch the full screen
-            padding(0.px)
-            margin(0.px)
-        }
+        layer("reset") {
+            "html, body" style {
+                // Allow our app to stretch the full screen
+                padding(0.px)
+                margin(0.px)
+            }
 
-        "*" style {
-            // See also: https://css-tricks.com/box-sizing
-            boxSizing("border-box")
+            "*" style {
+                // See also: https://css-tricks.com/box-sizing
+                boxSizing("border-box")
+            }
         }
     }
 }

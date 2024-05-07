@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.animation.registerKeyframes
-import com.varabyte.kobweb.silk.init.FRAMEWORK_LAYER_NAME
 import com.varabyte.kobweb.silk.init.SilkConfig
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 import com.varabyte.kobweb.silk.style.ComponentKind
@@ -92,8 +91,6 @@ class MutableSilkTheme {
         62.cssRem,
         80.cssRem,
     )
-
-    val cssLayers = mutableListOf(FRAMEWORK_LAYER_NAME)
 
     private fun _registerStyle(name: String, style: CssStyle<*>, kind: KClass<out CssKind>, layer: String?) {
         check(cssStyles[name].let { it == null || it === style }) {
@@ -962,7 +959,6 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         get() = palettes[ColorMode.current]
 
     val breakpoints = mutableSilkTheme.breakpoints
-    val cssLayers: List<String> = mutableSilkTheme.cssLayers
 
     private val _cssStyles = mutableMapOf<CssStyle<*>, ImmutableCssStyle>()
     internal val cssStyles: Map<CssStyle<*>, ImmutableCssStyle> = _cssStyles
@@ -983,7 +979,6 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
      */
     fun nameFor(style: CssStyle<*>): String = mutableSilkTheme.cssStyleNames.getValue(style)
     fun nameFor(keyframes: Keyframes): String = mutableSilkTheme.cssKeyframesNames.getValue(keyframes)
-    fun layerFor(className: String): String? = mutableSilkTheme.cssLayersFor[className]
 
     // Note: We separate these function out from the SilkTheme constructor so we can construct it first and then call
     // them later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
@@ -1077,7 +1072,9 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
 
         val allCssStylesSorted = orderStyles(allCssStyles, mutableSilkTheme.cssStyleDependencies)
         allCssStylesSorted.forEach { style ->
-            val classSelectors = style.addStylesInto(".${nameFor(style)}", stylesheet)
+            val className = nameFor(style)
+            val layer = mutableSilkTheme.cssLayersFor[className]
+            val classSelectors = style.addStylesInto(".$className", stylesheet, layer)
             _cssStyles[style] = style.intoImmutableStyle(classSelectors)
         }
 

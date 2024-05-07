@@ -261,7 +261,31 @@ abstract class CssStyle<K : CssKind> internal constructor(
      *  potentially additional classes if the style is color mode aware. This lets us avoid applying unnecessary
      *  classnames, making it easier to debug CSS issues in the browser.
      */
-    internal fun addStylesInto(selector: String, styleSheet: StyleSheet): ClassSelectors {
+    internal fun addStylesInto(selector: String, styleSheet: StyleSheet, layer: String?): ClassSelectors {
+        // Wrap with a @media block if a query is specified, or in place otherwise
+        fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.mediaOrInPlace(
+            query: String?,
+            rulesBuild: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.() -> Unit
+        ) {
+            if (query == null) {
+                this.apply(rulesBuild)
+            } else {
+                media(query, rulesBuild)
+            }
+        }
+
+        // Wrap with a @layer block if a query is specified, or in place otherwise
+        fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.layerOrInPlace(
+            name: String?,
+            rulesBuild: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.() -> Unit
+        ) {
+            if (name == null) {
+                this.apply(rulesBuild)
+            } else {
+                layer(name, rulesBuild)
+            }
+        }
+
         // Always add the base selector name, even if the ComponentStyle is empty. Callers may use empty
         // component styles as classnames, which can still be useful for targeting one element from another, or
         // searching for all elements tagged with a certain class.
@@ -277,7 +301,9 @@ abstract class CssStyle<K : CssKind> internal constructor(
                 withFinalSelectorName(selector, group) { name, styles ->
                     if (styles.isNotEmpty()) {
                         classNames.add(name)
-                        styleSheet.addStyles(name, styles)
+                        styleSheet.layerOrInPlace(layer) {
+                            addStyles(name, styles)
+                        }
                     }
                 }
             }
@@ -291,14 +317,10 @@ abstract class CssStyle<K : CssKind> internal constructor(
                     classNames.add(name)
 
                     val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
-                    if (cssRuleKey.mediaQuery != null) {
-                        styleSheet.apply {
-                            media(cssRuleKey.mediaQuery) {
-                                addStyles(cssRule, styles)
-                            }
+                    styleSheet.mediaOrInPlace(cssRuleKey.mediaQuery) {
+                        layerOrInPlace(layer) {
+                            addStyles(cssRule, styles)
                         }
-                    } else {
-                        styleSheet.addStyles(cssRule, styles)
                     }
                 }
             }
@@ -319,9 +341,10 @@ internal class SimpleCssStyle(
     val selector: String,
     init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
+    val layer: String?
 ) : CssStyle<UnspecifiedKind>(init, extraModifier) {
     internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
-        return addStylesInto(selector, styleSheet)
+        return addStylesInto(selector, styleSheet, layer)
     }
 }
 

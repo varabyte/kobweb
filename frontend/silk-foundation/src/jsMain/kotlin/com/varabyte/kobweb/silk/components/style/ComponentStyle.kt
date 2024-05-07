@@ -65,7 +65,7 @@ class ComponentStyle(
 
     internal val nameWithoutPrefix = name
     val name = prefix?.let { "$it-$name" } ?: name
-    internal val cssStyle = SimpleCssStyle(".${this.name}", init, extraModifiers)
+    internal val cssStyle = SimpleCssStyle(".${this.name}", init, extraModifiers, layer = null)
 
     constructor(
         name: String,
@@ -105,7 +105,7 @@ class ComponentStyle(
         val fullName = "${this.name}-$name"
         return SimpleComponentVariant(
             fullName,
-            SimpleCssStyle(".$fullName", init, extraModifiers),
+            SimpleCssStyle(".$fullName", init, extraModifiers, layer = null),
             baseStyle = this
         )
     }
