@@ -144,7 +144,10 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
 
             fun CSSRuleList.insertLayers(deleteRule: (Int) -> Unit, insertRule: (String, Int) -> Unit) {
                 this.asList().forEachIndexed { i, cssRule ->
-                    extractClassName(cssRule.cssText)?.let { className ->
+                    // Smartcast so we can access selectorText. Don't use `filterIsInstance` because it messes up the
+                    // original indices of the rules we are modifying in place.
+                    if (cssRule !is CSSStyleRule) return@forEachIndexed
+                    extractClassName(cssRule.selectorText)?.let { className ->
                         // e.g. `silk-button_dark` should be associated with the same layer that `silk-button` is
                         (SilkTheme.layerFor(className) ?: SilkTheme.layerFor(className.withColorSuffixRemoved()))
                             ?.let { layer ->
