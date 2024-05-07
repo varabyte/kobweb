@@ -188,5 +188,26 @@ fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     init: CssStyleBaseScope.() -> Modifier
 ) = addVariantBase(extraModifiers, init)
 
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.addVariant`.")
+fun <K : ComponentKind> CssStyle<K>.addVariant(
+    extraModifiers: Modifier = Modifier,
+    init: CssStyleScope.() -> Unit
+) = addVariant({ extraModifiers }, init)
+
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.addVariant`.")
+fun <K : ComponentKind> CssStyle<K>.addVariant(
+    extraModifiers: @Composable () -> Modifier,
+    init: CssStyleScope.() -> Unit
+): CssStyleVariant<K> {
+    return addVariant(extraModifiers, init)
+}
+
+@Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.addVariant`. You should use `@CssName` to specify the custom name for this variant (but leading with a dash; so `name = \"example\"` becomes `CssName(\"-example\")`.")
+fun <K : ComponentKind> CssStyle<K>.addVariant(
+    @Suppress("UNUSED_PARAMETER") name: String,
+    extraModifiers: Modifier = Modifier,
+    init: CssStyleScope.() -> Unit
+) = addVariant(extraModifiers, init)
+
 
 // endregion
