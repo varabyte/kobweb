@@ -17,13 +17,11 @@ import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme._SilkTheme
-import com.varabyte.kobweb.silk.theme.colors.withColorSuffixRemoved
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.asList
 import org.w3c.dom.css.CSSGroupingRule
 import org.w3c.dom.css.CSSRule
-import org.w3c.dom.css.CSSRuleList
 import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.CSSStyleSheet
 
@@ -134,43 +132,13 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                 }
         }
 
-        run {
-            // Apply CSS cascading layers at runtime (since Compose HTML doesn't have an API that supports them)
-
-            val classNameRegex = "^\\.([a-zA-Z0-9_-]*).*".toRegex()
-            fun extractClassName(selectorText: String): String? {
-                return classNameRegex.find(selectorText)?.groups?.get(1)?.value
+        document.styleSheets.asList()
+            .filterIsInstance<CSSStyleSheet>()
+            // Trying to peek at external stylesheets causes a security exception so step over them
+            .filter { it.href == null }
+            .forEach { styleSheet ->
+                val cssLayers = (listOf("reset", "framework") + SilkStylesheetInstance.cssLayers)
+                styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
             }
-
-            fun CSSRuleList.insertLayers(deleteRule: (Int) -> Unit, insertRule: (String, Int) -> Unit) {
-                this.asList().forEachIndexed { i, cssRule ->
-                    // Smartcast so we can access selectorText. Don't use `filterIsInstance` because it messes up the
-                    // original indices of the rules we are modifying in place.
-                    if (cssRule !is CSSStyleRule) return@forEachIndexed
-                    extractClassName(cssRule.selectorText)?.let { className ->
-                        // e.g. `silk-button_dark` should be associated with the same layer that `silk-button` is
-                        (SilkTheme.layerFor(className) ?: SilkTheme.layerFor(className.withColorSuffixRemoved()))
-                            ?.let { layer ->
-                                deleteRule(i)
-                                insertRule("@layer $layer { ${cssRule.cssText} }", i)
-                            }
-                    }
-                }
-            }
-
-            document.styleSheets.asList()
-                .filterIsInstance<CSSStyleSheet>()
-                // Trying to peek at external stylesheets causes a security exception so step over them
-                .filter { it.href == null }
-                .forEach { styleSheet ->
-                    SilkTheme.cssLayers.takeIf { it.isNotEmpty() }?.let { cssLayers ->
-                        styleSheet.insertRule("@layer ${cssLayers.joinToString(",")};", 0)
-                    }
-                    styleSheet.cssRules.asList().filterIsInstance<CSSGroupingRule>().forEach { groupingRule ->
-                        groupingRule.cssRules.insertLayers(groupingRule::deleteRule, groupingRule::insertRule)
-                    }
-                    styleSheet.cssRules.insertLayers(styleSheet::deleteRule, styleSheet::insertRule)
-                }
-        }
     }
 }

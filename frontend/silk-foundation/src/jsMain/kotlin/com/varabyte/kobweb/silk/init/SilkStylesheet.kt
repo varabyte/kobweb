@@ -9,13 +9,11 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
 
-/**
- * Access to useful methods that can append CSS styles and keyframes to the global stylesheet provided by Silk.
- *
- * You can use this as a replacement for defining your own stylesheet using Compose HTML. In addition to being fewer
- * lines of code, this provides an API that lets you work with [Modifier]s for providing styles.
- */
-interface SilkStylesheet {
+interface CssStyleRegistrar {
+    fun registerStyle(cssSelector: String, extraModifier: Modifier = Modifier, init: StyleScope.() -> Unit) {
+        registerStyle(cssSelector, { extraModifier }, init)
+    }
+
     /**
      * An alternate way to register global styles with Silk instead of using a Compose HTML StyleSheet directly.
      *
@@ -62,48 +60,42 @@ interface SilkStylesheet {
      * }
      * ```
      */
-    fun registerStyle(cssSelector: String, extraModifier: Modifier = Modifier, init: StyleScope.() -> Unit) {
-        registerStyle(cssSelector, { extraModifier }, init)
-    }
-
     fun registerStyle(cssSelector: String, extraModifier: @Composable () -> Modifier, init: StyleScope.() -> Unit)
+}
 
+/**
+ * Access to useful methods that can append CSS styles and keyframes to the global stylesheet provided by Silk.
+ *
+ * You can use this as a replacement for defining your own stylesheet using Compose HTML. In addition to being fewer
+ * lines of code, this provides an API that lets you work with [Modifier]s for providing styles.
+ */
+interface SilkStylesheet : CssStyleRegistrar {
     /**
-     * An alternate way to register keyframes via Silk instead of using a Compose HTML StyleSheet directly.
+     * Users can specify custom CSS layers here, in order of precedence (lowest to highest).
      *
-     * So this:
+     * Two layers will be added before these layers by the system -- `reset` and `framework` -- meaning user layers
+     * will always show up on top of them.
      *
-     * ```
-     * @InitSilk
-     * fun initStyles(ctx: InitSilkContext) {
-     *   ctx.stylesheet.registerKeyframes("bounce") {
-     *     from { Modifier.translateX((-50).percent) }
-     *     to { Modifier.translateX(50.percent) }
-     *   }
-     * }
-     * ```
-     *
-     * is a replacement for:
-     *
-     * ```
-     * object MyStyleSheet : StyleSheet() {
-     *   val pulse by keyframes {
-     *     from { property("transform", "translateX(-50%)") }
-     *     to { property("transform", "translateX(50%)") }
-     *   }
-     * }
-     *
-     * @App
-     * @Composable
-     * fun AppEntry(content: @Composable () -> Unit) {
-     *   SilkApp {
-     *     Style(MyStyleSheet)
-     *     ...
-     *   }
-     * }
-     * ```
+     * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@layer">the official @layer docs</a>
      */
+    val cssLayers: MutableList<String>
+    fun layer(name: String, block: CssStyleRegistrar.() -> Unit)
     fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit)
+}
+
+private class CssStyleRegistrarImpl : CssStyleRegistrar {
+    class Entry(val cssSelector: String, val extraModifier: @Composable () -> Modifier, val init: StyleScope.() -> Unit)
+
+    private val _entries = mutableListOf<Entry>()
+    val entries: List<Entry> = _entries
+
+    override fun registerStyle(
+        cssSelector: String,
+        extraModifier: @Composable () -> Modifier,
+        init: StyleScope.() -> Unit
+    ) {
+        _entries.add(Entry(cssSelector, extraModifier, init))
+    }
 }
 
 /**
@@ -127,11 +119,15 @@ interface SilkStylesheet {
  * }
  * ```
  */
-fun SilkStylesheet.registerStyleBase(cssSelector: String, extraModifier: Modifier = Modifier, init: () -> Modifier) {
+fun CssStyleRegistrar.registerStyleBase(
+    cssSelector: String,
+    extraModifier: Modifier = Modifier,
+    init: () -> Modifier
+) {
     registerStyleBase(cssSelector, { extraModifier }, init)
 }
 
-fun SilkStylesheet.registerStyleBase(
+fun CssStyleRegistrar.registerStyleBase(
     cssSelector: String,
     extraModifier: @Composable () -> Modifier,
     init: () -> Modifier
@@ -147,12 +143,20 @@ internal object SilkStylesheetInstance : SilkStylesheet {
     private val styles = mutableListOf<SimpleCssStyle>()
     private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
 
+    override val cssLayers = mutableListOf<String>()
+
     override fun registerStyle(
         cssSelector: String,
         extraModifier: @Composable () -> Modifier,
         init: StyleScope.() -> Unit
     ) {
-        styles.add(SimpleCssStyle(cssSelector, init, extraModifier))
+        styles.add(SimpleCssStyle(cssSelector, init, extraModifier, layer = null))
+    }
+
+    override fun layer(name: String, block: CssStyleRegistrar.() -> Unit) {
+        CssStyleRegistrarImpl().apply(block).entries.forEach { entry ->
+            styles.add(SimpleCssStyle(entry.cssSelector, entry.init, entry.extraModifier, layer = name))
+        }
     }
 
     override fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit) {
@@ -162,9 +166,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
 
     // This method is not part of the public API and should only be called by Silk itself at initialization time
     fun registerStylesAndKeyframesInto(siteStyleSheet: StyleSheet) {
-        styles.forEach { cssStyle ->
-            cssStyle.addStylesInto(siteStyleSheet)
-        }
+        styles.forEach { cssStyle -> cssStyle.addStylesInto(siteStyleSheet) }
 
         keyframes.map { (name, build) ->
             val lightBuilder = KeyframesBuilder(ColorMode.LIGHT).apply(build)
