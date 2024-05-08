@@ -16,16 +16,38 @@ import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
 
-// TODO: Docs
+/**
+ * A base interface for all [CssStyle] types.
+ *
+ * There are three families of CSS kinds:
+ *
+ * - [UnspecifiedKind]: Represents a general style, defined without any specific constraints. This is the most common
+ *   type of style, declared with `CssStyle { ... }`.
+ *
+ * - [ComponentKind]: Represents a style that is tied to a specific component. This is especially useful for library
+ *   authors who want to expose widgets to users that internally use a style but potentially expose a few public tweaks
+ *   to that style which users can apply.
+ *
+ * - [RestrictedKind]: Represents a style that is restricted to a fixed set of parameters. This is applied for users
+ *   that subclass [CssStyle], as in: `class SomeRestrictedStyle(...) : CssStyle.Restricted(...) { ... }`. A common
+ *   use-case for this is creating an enumeration of fixed styles, like `WidgetSize.SM`, `WidgetSize.MD`, etc.
+ */
 sealed interface CssKind
 
-// TODO: Docs
+/**
+ * @see CssKind
+ * @see CssStyle.Restricted
+ */
 sealed interface RestrictedKind : CssKind
 
-// TODO: Docs
+/**
+ * @see CssKind
+ */
 sealed interface UnspecifiedKind : CssKind
 
-// TODO: Docs
+/**
+ * @see CssKind
+ */
 interface ComponentKind : CssKind
 
 /** Represents a list of CSS selectors that target classes. */
@@ -39,7 +61,8 @@ internal value class ClassSelectors(private val value: List<String>) {
  * A class which allows a user to define styles that will be added into the site's CSS stylesheet.
  *
  * This is important because some functionality is only available when defined in the stylesheet, e.g. link colors,
- * media queries, and pseudo classes.
+ * media queries, and pseudo classes. The name for the style is generated automatically based on the style property's
+ * name (possibly tweaked by a prefix and/or containing singleton class).
  *
  * For example, you can declare a style like this:
  *
@@ -97,6 +120,8 @@ internal value class ClassSelectors(private val value: List<String>) {
  * ```
  *
  * which would result in an element like `<div class="widget widget-size_md">...</div>`.
+ *
+ * You can use [CssName] and [CssPrefix] annotations to customize the name of the CSS class generated for a style.
  */
 abstract class CssStyle<K : CssKind> internal constructor(
     internal val init: CssStyleScope.() -> Unit,
