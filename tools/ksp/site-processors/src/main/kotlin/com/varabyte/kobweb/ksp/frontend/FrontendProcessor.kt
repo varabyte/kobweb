@@ -405,6 +405,13 @@ class FrontendProcessor(
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val propertyType = property.type.resolve()
+            if (propertyType.declaration.qualifiedName!!.asString() == "kotlin.Any") {
+                // In Kotlin/JS, the dynamic type is showing up as "Any" is KSP. However, if we let it passed here, it
+                // ends up returning true on a bunch of our type checks. So abort early; we never need to support "Any"
+                // anyway. There is a `KSDynamicReference` class in KSP, but I can't figure out how to check it here.
+                // To hit this case yourself, you can declare `val test = js("123")` as a top level property.
+                return
+            }
 
             val matchingByType = declarations.firstOrNull { it.type.isAssignableFrom(propertyType) } ?: return
             if (!validateOrWarnAboutDeclaration(property, matchingByType)) {
