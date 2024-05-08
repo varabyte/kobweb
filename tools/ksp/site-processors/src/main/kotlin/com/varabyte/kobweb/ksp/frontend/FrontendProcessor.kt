@@ -50,6 +50,7 @@ import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+@OptIn(KspExperimental::class)
 class FrontendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
@@ -89,12 +90,24 @@ class FrontendProcessor(
         }
 
         // only process files that are new to this round, since prior declarations are unchanged
-        val frontendVisitor = FrontendVisitor(resolver)
-        resolver.getNewFiles().forEach { file ->
-            file.accept(frontendVisitor, Unit)
 
-            // TODO: consider including this as part of the first visitor? does that matter for performance?
-            packageMappings += getPackageMappings(file, qualifiedPagesPackage, PACKAGE_MAPPING_PAGE_FQN, logger).toMap()
+        val silkVisitor = run {
+            // It's rare but some projects may just use Kobweb core for routing and no silk at all
+            // Here, we prevent KSP from crashing trying to resolve types that won't be found.
+            val hasSilkDependency = resolver.getKotlinClassByName(CSS_STYLE_FQN) != null
+            if (hasSilkDependency) {
+                SilkVisitor(resolver)
+            } else null
+        }
+        resolver.getNewFiles().forEach { file ->
+            silkVisitor?.let { file.accept(it, Unit) }
+
+            packageMappings += getPackageMappings(
+                file,
+                qualifiedPagesPackage,
+                PACKAGE_MAPPING_PAGE_FQN,
+                logger
+            ).toMap()
                 .also { if (it.isNotEmpty()) fileDependencies.add(file) }
         }
 
@@ -103,8 +116,7 @@ class FrontendProcessor(
         return emptyList()
     }
 
-    @OptIn(KspExperimental::class)
-    private class KSTypes(resolver: Resolver) {
+    private class SilkTypes(resolver: Resolver) {
         private val cssStyleClassDeclaration = resolver.getKotlinClassByName(CSS_STYLE_FQN)!!
 
         val cssStyleType = cssStyleClassDeclaration.asStarProjectedType()
@@ -133,8 +145,11 @@ class FrontendProcessor(
         }
     }
 
-    private inner class FrontendVisitor(resolver: Resolver) : KSVisitorVoid() {
-        private val types = KSTypes(resolver)
+    /**
+     * Search the user's code for references to silk types and generate metadata for them
+     */
+    private inner class SilkVisitor(resolver: Resolver) : KSVisitorVoid() {
+        private val types = SilkTypes(resolver)
         private val declarations = run {
             val cssStyleDeclaration = DeclarationType(
                 types.cssStyleType,
