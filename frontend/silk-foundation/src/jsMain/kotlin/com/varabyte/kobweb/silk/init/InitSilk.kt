@@ -49,13 +49,44 @@ class InitSilkContext(val config: MutableSilkConfig, val stylesheet: SilkStylesh
 // time looking for `@InitSilk` methods, it is easier to generate code and then set it using this property.
 var additionalSilkInitialization: (InitSilkContext) -> Unit = {}
 
-const val FRAMEWORK_LAYER_NAME = "framework"
+// Precedence for styles, from lowest to highest:
+// component styles < component variants < restricted styles < unspecified styles
+//
+// Imagine code like this:
+// ```
+// interface WidgetKind
+// val WidgetStyle = CssStyle<WidgetKind> { ... }
+// class SomeParam(...) : CssStyle.Restricted(...)
+// fun Widget(modifier: Modifier, variant: CssStyleVariant<WidgetKind>, someParam: SomeParam) {
+//   val finalModifier = WidgetStyle.toModifier(variant)
+//      .then(someParam.toModifier())
+//      .then(modifier)
+// }
+// ```
+//
+// Called like this:
+// ```
+// val MyStyle = CssStyle { ... }
+// val MyWidgetVariant = WidgetStyle.addVariant { ... }
+// Widget(MyStyle.toModifier(), MyWidgetVariant, SomeParam.Value)
+// ```
+// Here, we would expect any variant to override the style, any parameter to override the variant, and any
+// user style passed into the modifier value to override everything else.
+//
+// The reset layer is reserved for global default styles (like changing the box-sizing property to border-box)
+internal object SilkCssLayerNames {
+    const val RESET = "reset"
+    const val COMPONENT_STYLES = "component-styles"
+    const val COMPONENT_VARIANTS = "component-variants"
+    const val RESTRICTED_STYLES = "restricted-styles"
+    const val UNSPECIFIED_STYLES = "unspecified-styles"
+}
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
     val config = MutableSilkConfig()
 
-    mutableTheme.registerStyle("silk-span-text", SpanTextStyle, FRAMEWORK_LAYER_NAME)
+    mutableTheme.registerStyle("silk-span-text", SpanTextStyle)
 
     val ctx = InitSilkContext(config, SilkStylesheetInstance, mutableTheme)
     additionalInit(ctx)
@@ -88,7 +119,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     )
 
     displayStyles.forEach { (style, name) ->
-        mutableTheme.registerStyle(name, style, FRAMEWORK_LAYER_NAME)
+        mutableTheme.registerStyle(name, style)
     }
 
     MutableSilkConfigInstance = config
@@ -120,7 +151,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                         .filterIsInstance<CSSMediaRule>()
                         .flatMap { it.cssRules.asList() }
                         .mapNotNull { rule ->
-                            (rule as? CSSLayerBlockRule)?.takeIf { it.name == FRAMEWORK_LAYER_NAME }
+                            (rule as? CSSLayerBlockRule)?.takeIf { it.name == SilkCssLayerNames.UNSPECIFIED_STYLES }
                         }.flatMap { it.cssRules.asList().filterIsInstance<CSSStyleRule>() }
                 }.forEach { rule ->
                     val selectorText = rule.selectorText
@@ -137,7 +168,13 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
             // Trying to peek at external stylesheets causes a security exception so step over them
             .filter { it.href == null }
             .forEach { styleSheet ->
-                val cssLayers = (listOf("reset", "framework") + SilkStylesheetInstance.cssLayers)
+                val cssLayers = (listOf(
+                    SilkCssLayerNames.RESET,
+                    SilkCssLayerNames.COMPONENT_STYLES,
+                    SilkCssLayerNames.COMPONENT_VARIANTS,
+                    SilkCssLayerNames.RESTRICTED_STYLES,
+                    SilkCssLayerNames.UNSPECIFIED_STYLES
+                ) + SilkStylesheetInstance.cssLayers)
                 styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
             }
     }

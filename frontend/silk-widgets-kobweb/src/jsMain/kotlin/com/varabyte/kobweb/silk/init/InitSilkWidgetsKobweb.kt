@@ -44,15 +44,15 @@ fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
 
     // TODO: Automate the creation of this list (with a Gradle task?)
 
-    mutableTheme.registerStyle("silk-image", ImageStyle, FRAMEWORK_LAYER_NAME)
-    mutableTheme.registerVariant("-fit-width", FitWidthImageVariant, FRAMEWORK_LAYER_NAME)
+    mutableTheme.registerStyle("silk-image", ImageStyle)
+    mutableTheme.registerVariant("-fit-width", FitWidthImageVariant)
 
-    mutableTheme.registerStyle("silk-link", LinkStyle, FRAMEWORK_LAYER_NAME)
-    mutableTheme.registerVariant("-uncolored", UncoloredLinkVariant, FRAMEWORK_LAYER_NAME)
-    mutableTheme.registerVariant("-uncolored", UncoloredLinkVariant, FRAMEWORK_LAYER_NAME)
-    mutableTheme.registerVariant("-undecorated", UndecoratedLinkVariant, FRAMEWORK_LAYER_NAME)
-    mutableTheme.registerVariant("-always-underlined", AlwaysUnderlinedLinkVariant, FRAMEWORK_LAYER_NAME)
+    mutableTheme.registerStyle("silk-link", LinkStyle)
+    mutableTheme.registerVariant("-uncolored", UncoloredLinkVariant)
+    mutableTheme.registerVariant("-uncolored", UncoloredLinkVariant)
+    mutableTheme.registerVariant("-undecorated", UndecoratedLinkVariant)
+    mutableTheme.registerVariant("-always-underlined", AlwaysUnderlinedLinkVariant)
 
-    mutableTheme.registerStyle("silk-toc", TocStyle, FRAMEWORK_LAYER_NAME)
-    mutableTheme.registerVariant("-bordered", TocBorderedVariant, FRAMEWORK_LAYER_NAME)
+    mutableTheme.registerStyle("silk-toc", TocStyle)
+    mutableTheme.registerVariant("-bordered", TocBorderedVariant)
 }
