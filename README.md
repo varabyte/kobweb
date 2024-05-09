@@ -266,11 +266,11 @@ $ kobweb create app
 You'll be asked a few questions required for setting up your project.
 
 You don't need to create a root folder for your project ahead of time - the setup process will prompt you for one to
-create.
+create. For the remaining parts of this section, let's say you choose the folder "my-project" when asked.
 
-When finished, you'll have a basic project with three pages - a home page, an about page, and a markdown page - and some
-components (which are collections of reusable, composable pieces). Your own directory structure should look something
-like this:
+When finished, you'll have a basic project with two pages - a home page and an about page (with the about page written
+in markdown) - and some components (which are collections of reusable, composable pieces). Your own directory structure
+should look something like this:
 
 ```
 my-project
@@ -278,17 +278,18 @@ my-project
     ├── kotlin.org.example.myproject
     │   ├── components
     │   │   ├── layouts
+    │   │   │   ├── MarkdownLayout.kt
     │   │   │   └── PageLayout.kt
     │   │   ├── sections
+    │   │   │   ├── Footer.kt
     │   │   │   └── NavHeader.kt
     │   │   └── widgets
-    │   │       └── GoHomeLink.kt
+    │   │       └── IconButton.kt
     │   ├── pages
-    │   │   ├── About.kt
     │   │   └── Index.kt
-    │   └── MyApp.kt
+    │   └── AppEntry.kt
     └── resources/markdown
-        └── Markdown.md
+        └── About.md
 ```
 
 Note that there's no index.html or routing logic anywhere! We generate that for you automatically when you run Kobweb.
@@ -297,7 +298,7 @@ This brings us to the next section...
 ## Run your Kobweb site
 
 ```bash
-$ cd /path/to/projects/your-project/site
+$ cd your-project/site
 $ kobweb run
 ```
 
