@@ -386,11 +386,15 @@ update your own project by editing `gradle/libs.version.toml` and updating the `
 # Beginner topics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
-Compose HTML app, such as routing and configuring basic CSS styles.
+Compose HTML app, such as routing and configuring basic CSS styles. There is also a Kobweb Gradle plugin which runs over
+your codebase and is responsible for generating relevant boilerplate code as a result.
 
 Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and/or
 running a Compose HTML app. We want to get that stuff out of the way, so you can enjoy focusing on the more
 interesting work!
+
+(To learn more about Compose HTML, please
+visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/HTML/Getting_Started)).
 
 ## Create a page
 
@@ -649,19 +653,7 @@ your Kobweb project at `jsMain/resources/public/assets/images/logo.png`.
 In other words, anything under your project resources' `public/` directory will be automatically copied over to your
 final site (not including the `public/` part).
 
-## Silk
-
-Silk is a UI layer included with Kobweb and built upon Compose HTML. (To learn more about Compose HTML, please
-visit [the official tutorials](https://github.com/JetBrains/compose-jb/tree/master/tutorials/HTML/Getting_Started)).
-
-While Compose HTML requires you to understand underlying HTML / CSS concepts, Silk attempts to abstract some of that
-away, providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
-"div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
-
-We consider Silk a pretty important part of the Kobweb experience, but it's worth pointing out that it's designed as an
-optional component. You can absolutely use Kobweb without Silk. (You can also use Silk without Kobweb!).
-
-You can also interleave Silk and Compose HTML components easily (as Silk is just composing them itself).
+## HTML Styling
 
 ### Inline vs StyleSheet
 
@@ -699,6 +691,10 @@ And you could use that stylesheet to style the following document:
 </body>
 ```
 
+> [!NOTE]
+> When conflicting styles are present both in a stylesheet and as an inline declaration, the inline styles take
+> precedence.
+
 There's no hard and fast rule, but in general, when writing HTML / CSS by hand, stylesheets are often preferred over
 inline styles as it better maintains a separation of concerns. That is, the HTML should represent the content of your
 site, while the CSS controls the look and feel.
@@ -706,8 +702,8 @@ site, while the CSS controls the look and feel.
 However! We're not writing HTML / CSS by hand. We're using Compose HTML! Should we even care about this in Kotlin?
 
 As it turns out, there are times when you have to use stylesheets, because without them, you can't define styles for
-advanced behaviors
-(particularly [pseudo classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes), [pseudo elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements),
+advanced behaviors (particularly
+[pseudo-classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes), [pseudo-elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements),
 and [media queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Using_media_queries)). For example,
 you can't override the color of visited links without using a stylesheet approach. So it's worth realizing there are
 fundamental differences.
@@ -718,55 +714,32 @@ vs. `<div style="color:yellow; background-color:black; font-size: 24px; ...">`).
 
 ---
 
-We'll be introducing and discussing modifiers and component styles in more detail shortly. But in general, when you pass
-modifiers directly into a composable widget in Silk, those will result in inline styles, whereas if you use a component
-style to define your styles, those will get embedded into the site's stylesheet:
+We'll be introducing and discussing modifiers and CSS style blocks in more detail shortly. But in general, when you pass
+modifiers directly into a composable widget in Silk, those will result in inline styles, whereas if you use a CSS
+style block to define your styles, those will get embedded into the site's stylesheet:
 
 ```kotlin
 // Uses inline styles
 Box(Modifier.color(Colors.Red)) { /* ... */ }
 
 // Uses a stylesheet
-val BoxStyle by ComponentStyle {
+val BoxStyle = CssStyle {
     base { Modifier.Color(Colors.Red) }
 }
 Box(BoxStyle.toModifier()) { /* ... */ }
 ```
 
 As a beginner, or even as an advanced user when prototyping, feel free to use inline modifiers as much as you can,
-pivoting to component styles if you find yourself needing to use pseudo-classes, pseudo-elements, or media queries. It
+pivoting to CSS style blocks if you find yourself needing to use pseudo-classes, pseudo-elements, or media queries. It
 is fairly easy to migrate inline styles over to stylesheets in Kobweb.
 
 In my own projects, I tend to use inline styles for really simple layout elements (e.g. `Row(Modifier.fillMaxWidth())`)
-and component styles for complex and/or re-usable widgets. It actually becomes a nice organizational convention to have
+and CSS style blocks for complex and/or re-usable widgets. It actually becomes a nice organizational convention to have
 all your styles grouped together in one place above the widget itself.
-
-### `@InitSilk` methods
-
-Before going further, we want to quickly mention you can annotate a method with `@InitSilk`, which will be called when
-your site starts up.
-
-This method must take a single `InitSilkContext` parameter. A context contains various properties that allow for
-adjusting Silk defaults and which will be demonstrated in more detail in sections below.
-
-```kotlin
-@InitSilk
-fun initSilk(ctx: InitSilkContext) {
-  // `ctx` has a handful of properties which allow you to adjust Silk's default behavior.
-}
-```
-
-> [!TIP]
-> The names of your `@InitSilk` methods don't matter, as long as they're public, take a single `InitSilkContext`
-> parameter, and don't collide with another method of the same name. You are encouraged to choose a name for readability
-> purposes.
->
-> You can define as many `@InitSilk` methods as you want, so feel free to break them up into relevant, clearly named
-> pieces, instead of declaring a single, monolithic, generically named `fun initSilk(ctx)` method that does everything.
 
 ### Modifier
 
-Silk introduces the `Modifier` class, in order to provide an experience similar to what you find in Jetpack Compose.
+Kobweb introduces the `Modifier` class, in order to provide an experience similar to what you find in Jetpack Compose.
 (You can read [more about them here](https://developer.android.com/jetpack/compose/modifiers) if you're unfamiliar with
 the concept).
 
@@ -851,12 +824,48 @@ If you end up needing to use `attr` or `property` in your own codebase, consider
 [filing an issue](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
 with us so that we can add the missing modifier to the library.
 
-### ComponentStyle
+## Silk
+
+Silk is a UI layer included with Kobweb and built upon Compose HTML.
+
+While Compose HTML requires you to understand underlying HTML / CSS concepts, Silk attempts to abstract some of that
+away, providing an API more akin to what you might experience developing a Compose app on Android or Desktop. Less
+"div, span, flexbox, attrs, styles, classes" and more "Rows, Columns, Boxes, and Modifiers".
+
+We consider Silk a pretty important part of the Kobweb experience, but it's worth pointing out that it's designed as an
+optional component. You can absolutely use Kobweb without Silk. (You can also use Silk without Kobweb!).
+
+You can also interleave Silk and Compose HTML components easily (as Silk is just composing them itself).
+
+### `@InitSilk` methods
+
+Before going further, we want to quickly mention you can annotate a method with `@InitSilk`, which will be called when
+your site starts up.
+
+This method must take a single `InitSilkContext` parameter. A context contains various properties that allow for
+adjusting Silk defaults and which will be demonstrated in more detail in sections below.
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+  // `ctx` has a handful of properties which allow you to adjust Silk's default behavior.
+}
+```
+
+> [!TIP]
+> The names of your `@InitSilk` methods don't matter, as long as they're public, take a single `InitSilkContext`
+> parameter, and don't collide with another method of the same name. You are encouraged to choose a name for readability
+> purposes.
+>
+> You can define as many `@InitSilk` methods as you want, so feel free to break them up into relevant, clearly named
+> pieces, instead of declaring a single, monolithic, generically named `fun initSilk(ctx)` method that does everything.
+
+### CssStyle
 
 With Silk, you can define a style like so, using the `base` block:
 
 ```kotlin
-val CustomStyle by ComponentStyle {
+val CustomStyle = CssStyle {
     base {
         Modifier.background(Colors.Red)
     }
@@ -875,7 +884,7 @@ Box(CustomStyle.toModifier()) { /* ... */ }
 ```
 
 > [!IMPORTANT]
-> When you declare a `ComponentStyle`, it must be public. This is because code gets generated inside a `main.kt` file by
+> When you declare a `CssStyle`, it must be public. This is because code gets generated inside a `main.kt` file by
 > the Kobweb Gradle plugin, and that code needs to be able to access your style in order to register it.
 >
 > In general, it's a good idea to think of styles as global anyway, since technically they all live in a globally
@@ -885,7 +894,7 @@ Box(CustomStyle.toModifier()) { /* ... */ }
 >
 > ```kotlin
 > @Suppress("PRIVATE_COMPONENT_STYLE")
-> private val SomeCustomStyle by ComponentStyle { /* ... */ }
+> private val SomeCustomStyle = CssStyle { /* ... */ }
 >
 > @InitSilk
 > fun registerPrivateStyle(ctx: InitSilkContext) {
@@ -893,54 +902,70 @@ Box(CustomStyle.toModifier()) { /* ... */ }
 > }
 > ```
 >
+> Using a leading underscore to suppress the warning is also supported:
+>
+> ```kotlin
+> private val _SomeCustomStyle = CssStyle { /* ... */ }
+>
+> @InitSilk
+> fun registerPrivateStyle(ctx: InitSilkContext) {
+>   ctx.theme.registerStyle(_SomeCustomStyle)
+> }
+> ```
+>
 > However, you are encouraged to keep your styles public and let the Kobweb Gradle plugin handle everything for you.
 
-#### `ComponentStyle.base`
+#### `CssStyle.base`
 
-You can simplify the syntax of basic component styles a bit further with the `ComponentStyle.base` declaration:
+You can simplify the syntax of basic style blocks a bit further with the `CssStyle.base` declaration:
 
 ```kotlin
-val CustomStyle by ComponentStyle.base {
+val CustomStyle = CssStyle.base {
     Modifier.background(Colors.Red)
 }
 ```
 
 Just be aware you may have to break this out again if you find yourself needing to
-support [additional states▼](#additional-states).
+support [additional selectors▼](#additional-selectors).
 
-#### ComponentStyle name
+#### CssStyle name
 
-Note above we used the `by` keyword above to create a component style. This automatically generates a name for your
-style under the hood, derived from the property name itself but using [Kebab Case](https://www.freecodecamp.org/news/snake-case-vs-camel-case-vs-pascal-case-vs-kebab-case-whats-the-difference/#kebab-case).
+The Kobweb Gradle plugin automatically detects your `CssStyle` properties and generates a name for it for you, derived
+from the property name itself but
+using [Kebab Case](https://www.freecodecamp.org/news/snake-case-vs-camel-case-vs-pascal-case-vs-kebab-case-whats-the-difference/#kebab-case).
 
-For example, if you write `val TitleTextStyle by ComponentStyle`, its name behind the scenes will be "title-text".
+For example, if you write `val TitleTextStyle = CssStyle { ... }`, its name will be "title-text".
 
 You usually won't need to care about this name, but there are niche cases where it can be useful to understand that is
 what's going on.
 
-If you need to set a name manually, there's an alternate constructor version (notice the use of assignment instead of
-the `by` keyword):
+If you need to set a name manually, there's a special `CssName` annotation you can use to override the default name:
 
 ```kotlin
-val CustomStyle = ComponentStyle("my-custom-name") {
+@CssName("my-custom-name")
+val CustomStyle = CssStyle {
     base {
         Modifier.background(Colors.Red)
     }
 }
 ```
 
-#### Additional states
+#### Additional selectors
 
 So, what's up with the `base` block?
 
-True, it looks a bit verbose on its own. However, you can define additional styles that take effect conditionally. The
-base style will always apply first, but then additional styles can be applied based on what state the element is in. (If
-multiple states are applicable at the same time, they will be applied in the order specified.)
+True, it looks a bit verbose on its own. However, you can define additional selector blocks that take effect
+conditionally. The base style will always apply first, but then any additional selectors will be applied based on what
+state the element is in.
 
-Here, we create a style which is red by default, but green when the mouse hovers over it:
+> [!CAUTION]
+> The order of defining the additional selectors matter, if more than one of them modify the same target CSS property at
+> the same time.
+
+Here, we create a style which is red by default but green when the mouse hovers over it:
 
 ```kotlin
-val CustomStyle by ComponentStyle {
+val CustomStyle = CssStyle {
     base {
         Modifier.color(Colors.Red)
     }
@@ -951,13 +976,13 @@ val CustomStyle by ComponentStyle {
 }
 ```
 
-Kobweb provides a bunch of these state blocks for you for convenience, but for those who are CSS-savvy, you can always
-define the CSS rule directly to enable more complex combinations or reference states that Kobweb hasn't added yet.
+Kobweb provides a bunch of standard selectors for you for convenience, but for those who are CSS-savvy, you can always
+define the CSS rule directly to enable more complex combinations or selectors that Kobweb hasn't added yet.
 
 For example, this is identical to the above style definition:
 
 ```kotlin
-val CustomStyle by ComponentStyle {
+val CustomStyle = CssStyle {
     base {
         Modifier.color(Colors.Red)
     }
@@ -998,10 +1023,10 @@ fun initializeBreakpoints(ctx: InitSilkContext) {
 }
 ```
 
-To reference a breakpoint in a `ComponentStyle`, just invoke it:
+To reference a breakpoint in a `CssStyle`, just invoke it:
 
 ```kotlin
-val CustomStyle by ComponentStyle {
+val CustomStyle = CssStyle {
     base {
         Modifier.fontSize(24.px)
     }
@@ -1019,13 +1044,11 @@ val CustomStyle by ComponentStyle {
 
 #### Color-mode aware
 
-When you define a `ComponentStyle`, an optional field is available for you to use called `colorMode`:
+When you define a `CssStyle`, an optional field is available for you to use called `colorMode`:
 
 ```kotlin
-val CustomStyle by ComponentStyle {
-    base {
-        Modifier.color(if (colorMode.isLight) Colors.Red else Colors.Pink)
-    }
+val CustomStyle = CssStyle.base {
+    Modifier.color(if (colorMode.isLight) Colors.Red else Colors.Pink)
 }
 ```
 
@@ -1033,10 +1056,8 @@ Silk defines a bunch of light and dark colors for all of its widgets, and if you
 own widget, you can query them using `colorMode.toPalette()`:
 
 ```kotlin
-val CustomStyle by ComponentStyle {
-    base {
-        Modifier.color(colorMode.toPalette().link.default)
-    }
+val CustomStyle = CssStyle.base {
+    Modifier.color(colorMode.toPalette().link.default)
 }
 ```
 
@@ -1055,110 +1076,175 @@ fun overrideSilkTheme(ctx: InitSilkContext) {
 }
 ```
 
-#### ComponentVariant
+#### Extending CSS styles
 
-With a style, you can also create a variant of that style (that is, additional modifications that are always applied
-_on top of_ the style).
+You may find yourself occasionally wanting to define a style that should only be applied along with / after another
+style.
 
-You define one using the `ComponentStyle.addVariant` method, but otherwise the declaration looks the same as defining a
-`ComponentStyle`:
+The easiest way to accomplish this is by extending the base CSS style block, using the `extendedBy` method:
 
 ```kotlin
-val HighlightedCustomVariant by CustomStyle.addVariant {
-    base {
-        Modifier.backgroundColor(Colors.Green)
-    }
+val GeneralTextStyle = CssStyle {
+    base { Modifier.fontSize(16.px).fontFamily("...") }
 }
+val EmphasizedTextStyle = GenerateTextStyle.extendedBy {
+    base { Modifier.fontWeight(FontWeight.Bold) }    
+}
+
+// Or, using the `base` methods:
+// val GeneralTextStyle = CssStyle.base {
+//   Modifier.fontSize(16.px).fontFamily("...")
+// }
+// val EmphasizedTextStyle = GenerateTextStyle.extendedByBase {
+//   Modifier.fontWeight(FontWeight.Bold)
+// }
+```
+
+Once extended, you only need to call `toModifier` on the extended style to include both styles automatically:
+
+```kotlin
+SpanText("WARNING", EmphasizedTextStyle.toModifier())
+// You do NOT need to reference the base style, i.e.
+// GeneralTextStyle.toModifier().then(EmphasizedTextStyle.toModifier())
+```
+
+#### Component styles
+
+So far, we've discussed CSS style blocks as defining a general assortment of CSS style properties. However, there is a
+way to type CSS style blocks, which is useful as it lets you generate typed variants associated with and only compatible
+with that base style.
+
+The base style in this case is called a *component style* because the pattern is effective when defining widget
+components. In fact, it is the standard pattern that Silk uses for every single one of its widgets.
+
+We'll discuss this full pattern around building widgets using component styles later, but to start we'll demonstrate how
+to declare one. You create a marker interface of type `ComponentKind` and then pass that into your `CssStyle`
+declaration block.
+
+For example, if you were creating your own `Button` widget:
+
+```kotlin
+sealed interface ButtonKind : ComponentKind
+val ButtonStyle = CssStyle<ButtonKind> { /* ... */ }
+```
+
+Notice two points about our interface declaration:
+
+1. It is marked `sealed`. This is technically not necessary to do, but we recommend it as a best practice to express
+   your intention that no one else is going to subclass it further.
+2. The interface is empty. It is just a marker interface, useful only in enforcing typing for variants. This is
+   discussed more in the next section.
+
+Like normal `CssStyle` blocks, its associated name is derived from its property name. You can use a `@CssName`
+annotation to override this behavior.
+
+#### Component variants
+
+The power of component styles is they can generate *component variants*, using the `addVariant` method:
+
+```kotlin
+val OutlineButtonVariant = ButtonStyle.addVariant { /* ... */ }
 ```
 
 > [!NOTE]
-> A common naming convention for variants is to take their associated style and use its name as a suffix plus the word
-> "Variant", e.g. "ButtonStyle" -> "GhostButtonVariant" and "TextStyle" -> "OutlinedTextVariant".
+> The recommended naming convention for variants is to take their associated style and use its name as a suffix plus the
+> word "Variant", e.g. "ButtonStyle" -> "OutlineButtonVariant" and "TextStyle" -> "EmphasizedTextVariant".
 
 > [!IMPORTANT]
-> Like a `ComponentStyle`, your `ComponentVariant` must be public. This is for the same reason: because code gets
-> generated inside a `main.kt` file by the Kobweb Gradle plugin, and that code needs to be able to access your variant
-> in order to register it.
+> Like a `CssStyle`, your `CssStyleVariant` must be public. This is for the same reason: because code gets generated
+> inside a `main.kt` file by the Kobweb Gradle plugin, and that code needs to be able to access your variant in order to
+> register it.
 >
 > You can technically make a variant private if you add a bit of boilerplate to handle the registration yourself:
 >
 > ```kotlin
 > @Suppress("PRIVATE_COMPONENT_VARIANT")
-> private val SomeCustomVariant by SomeCustomStyle.addVariant {
+> private val SomeCustomVariant = SomeCustomStyle.addVariant {
 >   /* ... */
 > }
+> // Or, `private val _SomeCustomVariant`
 >
 > @InitSilk
 > fun registerPrivateVariant(ctx: InitSilkContext) {
->   ctx.theme.registerComponentVariant(SomeCustomStyle)
+>   ctx.theme.registerVariant(SomeCustomStyle)
 > }
 > ```
 >
 > However, you are encouraged to keep your variants public and let the Kobweb Gradle plugin handle everything for you.
 
-Variants can be particularly useful if you're defining a custom widget that has default styles, but you want to give
-callers an easy way to deviate from it in special cases.
+The idea behind component variants is that it gives the widget author power to define some base style along with one or
+more common tweaks that users might want to apply on top of it. (And even if a widget author doesn't provide any
+variants for the style, any user can always define their own in their own codebase.)
 
-For example, maybe you define a button widget (perhaps you're not happy with the one provided by Silk):
+Let's revisit the button style example, bringing everything together.
 
 ```kotlin
-val ButtonStyle by ComponentStyle { /* ... */ }
+sealed interface ButtonKind : ComponentKind
 
-// Note: Creates a style called "button-outline"
-val OutlineButtonVariant by ButtonStyle.addVariant { /* ... */ }
+val ButtonStyle = CssStyle<ButtonKind> { /* ... */ }
 
-// Note: Creates a style called "button-inverted"
-val InvertedButtonVariant by ButtonStyle.addVariant { /* ... */ }
+// Note: Creates a CSS style called "button-outline"
+val OutlineButtonVariant = ButtonStyle.addVariant { /* ... */ }
+
+// Note: Creates a CSS style called "button-inverted"
+val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ }
 ```
 
-The `ComponentStyle.toModifier(...)` method, mentioned earlier, optionally takes a variant parameter. When passed in,
-both styles will be applied -- the base style followed by the variant style.
+When used with a component style, the `toModifier()` method optionally takes a variant parameter. When a variant is
+passed in, both styles will be applied -- the base style followed by the variant style.
 
-For example, `MyButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first followed by additional
-outline styling.
+For example, `ButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first layered on top with
+some additional outline styling.
 
-> [!CAUTION]
-> Using a variant that was created from a different style will have no effect. In other words,
-> `LinkStyle.toModifier(OutlineButtonVariant)` will ignore the button variant in that case.
+You can annotate style variants with the `@CssName` annotation, exactly like you can with `CssStyle`. For example:
 
-##### `ComponentVariant.addVariantBase`
+```kotlin
+@CssName("custom-name")
+val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ }
+```
 
-Like `ComponentStyle.base`, variants that don't need to support additional states can use `addVariantBase` instead to
+##### `addVariantBase`
+
+Like `CssStyle.base`, variants that don't need to support additional selectors can use `addVariantBase` instead to
 slightly simplify their declaration:
 
 ```kotlin
 val HighlightedCustomVariant by CustomStyle.addVariantBase {
     Modifier.backgroundColor(Colors.Green)
 }
+
+// Short for
+// val HighlightedCustomVariant by CustomStyle.addVariant {
+//   base { Modifier.backgroundColor(Colors.Green) }
+// }
 ```
 
-##### ComponentVariantName
+#### Structuring code around component styles
 
-Like component styles created using the `by` keyword, variants have their name autogenerated for you. If you need to
-control this name for any reason, you can use assignment instead and pass a name into `addVariant`, e.g.
-`val InvertedButtonVariant = ButtonStyle.addVariant("custom-name") { /* ... */ }`
-
-#### Writing custom widgets
-
-While Silk methods are all written to support component styles and variants, if you ever want to write your own custom
-widget that mimics Silk, your code should look something like:
+Silk uses component styles when defining its widgets and you can to! The full pattern looks like this:
 
 ```kotlin
-val CustomWidgetStyle by ComponentStyle { /* ... */ }
+sealed interface CustomWidgetKind : ComponentKind
+
+val CustomWidgetStyle = CssStyle<CustomWidgetKind> { /* ... */ }
 
 @Composable
 fun CustomWidget(
     modifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: CssStyleVariant<CustomWidgetKind>? = null,
     @Composable content: () -> Unit
 ) {
     val finalModifier = CustomWidgetStyle.toModifier(variant).then(modifier)
-    Box(finalModifier, content)
+    /* ... */
 }
 ```
 
-In other words, you should take in an optional `ComponentVariant` parameter, and then you should apply the modifiers in
-order of: base style, then variant, then finally user overrides.
+In other words:
+* you define a composable widget method
+* it should take in a `modifier` as its first optional parameter.
+* it should take in an optional `CssStyleVariant` parameter (typed to your unique `ComponentKind` implementation)
+* inside your widget, you should apply the modifiers in order of: base style, then variant, then user modifier.
+* it should end with a `@Composable` context lambda parameter (unless this widget doesn't support custom content)
 
 A caller might call your widget one of several ways:
 
@@ -1172,7 +1258,7 @@ CustomWidget(variant = TransparentWidgetVariant) { /* ... */ }
 // Approach #3: Tweak default styling with user overrides
 CustomWidget(Modifier.backgroundColor(Colors.Blue)) { /* ... */ }
 
-// Approach #4: Tweak default styling with a variant and then user overrides
+// Approach #4: Tweak default styling with both a variant as well as user overrides
 CustomWidget(Modifier.backgroundColor(Colors.Blue), variant = TransparentWidgetVariant) { /* ... */ }
 ```
 
@@ -1200,10 +1286,10 @@ div {
 }
 ```
 
-Kobweb lets you define your keyframes in code by using the `by Keyframes` pattern:
+Kobweb lets you define your keyframes in code by using a `Keyframes` block:
 
 ```kotlin
-val ShiftRightKeyframes by Keyframes {
+val ShiftRightKeyframes = Keyframes {
     from { Modifier.left(0.px) }
     to { Modifier.left(200.px) }
 }
@@ -1235,7 +1321,9 @@ an animation that uses them, which you can pass into the `Modifier.animation` mo
 >
 > ```kotlin
 > @Suppress("PRIVATE_KEYFRAMES")
-> private val SomeKeyframes by Keyframes { /* ... */ }
+> private val SomeKeyframes = Keyframes { /* ... */ }
+> // Or, `private val _SomeKeyframes`
+
 >
 > @InitSilk
 > fun registerPrivateAnim(ctx: InitSilkContext) {
@@ -1380,9 +1468,10 @@ can initialize it within a style using `Modifier.setVariable(...)`:
 ```kotlin
 val dialogWidth by StyleVariable<CSSLengthNumericValue>()
 
-// This style will be applied to a div that wraps the whole page
-val RootStyle by ComponentStyle {
-  base { Modifier.setVariable(dialogWidth, 600.px) }
+// This style will be applied to a div that lives at the root, so that
+// this variable value will be made available to all children.
+val RootStyle = CssStyle.base {
+  Modifier.setVariable(dialogWidth, 600.px)
 }
 ```
 
@@ -1391,12 +1480,14 @@ val RootStyle by ComponentStyle {
 > provides a `CSSLengthNumericValue` type which represents the concept more generally, e.g. as the result of
 > intermediate calculations. There are `CSS*NumericValue` types provided for all relevant units, and it is recommended
 > to use them when declaring style variables as they more naturally support being used in calculations.
+>
+> We discuss [CSSNumericValue types▼](#cssnumeric) in more detail later in this document.
 
 You can later query variables using the `value()` method to extract their current value:
 
 ```kotlin
-val DialogStyle by ComponentStyle {
-  base { Modifier.width(dialogWidth.value()) }
+val DialogStyle = CssStyle.base {
+  Modifier.width(dialogWidth.value())
 }
 ```
 
@@ -1404,36 +1495,36 @@ You can also provide a fallback value, which, if present, would be used in the c
 set previously:
 
 ```kotlin
-val DialogStyle by ComponentStyle {
+val DialogStyle = CssStyle.base {
   // Will be the value of the dialogWidth variable if it was set, otherwise 500px
-  base { Modifier.width(dialogWidth.value(500.px)) }
+  Modifier.width(dialogWidth.value(500.px))
 }
 ```
 
 Additionally, you can also provide a default fallback value when declaring the variable:
 
 ```kotlin
+// Note the default fallback: 100px
 val dialogWidth by StyleVariable<CSSLengthNumericValue>(100.px)
 
-// This style will be applied to a div that wraps the whole page
-val DialogStyle100 by ComponentStyle {
+val DialogStyle100 = CssStyle.base {
   // Uses default fallback. width = 100px
-  base { Modifier.width(dialogWidth.value()) }
+  Modifier.width(dialogWidth.value())
 }
-val DialogStyle200 by ComponentStyle {
+val DialogStyle200 = CssStyle.base {
   // Uses specific fallback. width = 200px
-  base { Modifier.width(dialogWidth.value(200.px)) } // Uses fallback = 200.px
+  Modifier.width(dialogWidth.value(200.px))
 }
-val DialogStyle300 by ComponentStyle {
-  // Fallback ignored because variable is set explicitly. width = 300px
-  base { Modifier.setVariable(dialogWidth, 300.px).width(dialogWidth.value(400.px)) }
+val DialogStyle300 = CssStyle.base {
+  // Fallback (400px) ignored because variable is set explicitly. width = 300px
+  Modifier.setVariable(dialogWidth, 300.px).width(dialogWidth.value(400.px))
 }
 ```
 
 > [!CAUTION]
 > In the above example in the `DialogStyle300` style, we set a variable and query it in the same line, which we did
 > purely for demonstration purposes. In practice, you would probably never do this -- the variable would have been set
-> separately elsewhere.
+> separately elsewhere, e.g. in an inline style or on a parent container.
 
 To demonstrate these concepts all together, below we declare a background color variable, create a root container scope
 which sets it, a child style that uses it, and, finally, a child style variant that overrides it:
@@ -1442,14 +1533,14 @@ which sets it, a child style that uses it, and, finally, a child style variant t
 // Default to a debug color, so if we see it, it indicates we forgot to set it later
 val bgColor by StyleVariable<CSSColorValue>(Colors.Magenta)
 
-val ContainerStyle by ComponentStyle {
-    base { Modifier.setVariable(bgColor, Colors.Blue) }
+val ContainerStyle = CssStyle.base {
+    Modifier.setVariable(bgColor, Colors.Blue)
 }
-val SquareStyle by ComponentStyle {
-    base { Modifier.size(100.px).backgroundColor(bgColor.value()) }
+val SquareStyle = CssStyle.base {
+    Modifier.size(100.px).backgroundColor(bgColor.value())
 }
-val RedSquareVariant by SquareStyle.addVariant {
-    base { Modifier.setVariable(bgColor, Colors.Red) }
+val RedSquareStyle = SquareStyle.extendedByBase {
+    Modifier.setVariable(bgColor, Colors.Red)
 }
 ```
 
@@ -1462,10 +1553,10 @@ fun ColoredSquares() {
     Box(ContainerStyle.toModifier()) {
         Column {
             Row {
-                // 1: Read color from ancestor's component style
+                // 1: Read color from ContainerStyle
                 Box(SquareStyle.toModifier())
-                // 2: Override color via variant
-                Box(SquareStyle.toModifier(RedSquareVariant))
+                // 2: Override color via RedSquareStyle
+                Box(RedSquareStyle.toModifier())
             }
             Row {
                 // 3: Override color via inline styles
@@ -1495,10 +1586,8 @@ from the colors of the rainbow:
 // won't otherwise be set until the user clicks a button.
 val bgColor by StyleVariable<CSSColorValue>(Colors.Red)
 
-val ScreenStyle by ComponentStyle {
-    base {
-        Modifier.fillMaxSize().backgroundColor(bgColor.value())
-    }
+val ScreenStyle = CssStyle.base {
+    Modifier.fillMaxSize().backgroundColor(bgColor.value())
 }
 
 @Page
@@ -1522,7 +1611,7 @@ The above results in the following UI:
 
 ![Kobweb CSS Variables, Rainbow example](https://github.com/varabyte/media/raw/main/kobweb/screencasts/kobweb-variable-roygbiv-example.gif)
 
-#### In most cases, don't use CSS Variables
+#### In many cases, don't use CSS Variables
 
 Most of the time, you can actually get away with not using CSS Variables! Your Kotlin code is often a more natural place
 to describe dynamic behavior than HTML / CSS is.
@@ -1531,8 +1620,8 @@ Let's revisit the "colored squares" example from above. Note it's much easier to
 at all.
 
 ```kotlin
-val SquareStyle by ComponentStyle {
-    base { Modifier.size(100.px) }
+val SquareStyle = CssStyle.base {
+    Modifier.size(100.px)
 }
 
 @Composable
@@ -1554,8 +1643,8 @@ And the "rainbow background" example is similarly easier to read by using Kotlin
 (i.e. `var someValue by remember { mutableStateOf(...) }`) instead of CSS variables:
 
 ```kotlin
-val ScreenStyle by ComponentStyle {
-    base { Modifier.fillMaxSize() }
+val ScreenStyle = CssStyle.base {
+    Modifier.fillMaxSize()
 }
 
 @Page
@@ -1969,7 +2058,7 @@ improvement over writing CSS in text files which fail silently at runtime.
 Next, layout widgets like `Box`, `Column`, and `Row` can get you up and running quickly with rich, complex layouts
 before ever having to understand what a "flex layout" is.
 
-Meanwhile, using `ComponentStyle` can help you break your CSS up into smaller, more manageable
+Meanwhile, using `CssStyle` can help you break your CSS up into smaller, more manageable
 pieces that live close to the code that actually uses them, allowing your project to avoid a giant, monolithic CSS file.
 (Such giant CSS files are one of the reasons CSS has an intimidating reputation).
 
@@ -2001,7 +2090,7 @@ can migrate to this in Kobweb:
 ```kotlin
 //------------------ CriticalInformation.kt
 
-val ImportantStyle by ComponentStyle {
+val ImportantStyle = CssStyle {
   base {
     Modifier.backgroundColor(Colors.Red).fontWeight(FontWeight.Bold)
   }
@@ -2013,7 +2102,7 @@ val ImportantStyle by ComponentStyle {
 
 //------------------ Post.kt
 
-val PostTitleStyle by ComponentStyle.base { Modifier.fontSize(24.px) }
+val PostTitleStyle = CssStyle.base { Modifier.fontSize(24.px) }
 ```
 
 Next, Silk provides a `deferRender` method which lets you declare code that won't get rendered until the rest of the
@@ -2142,7 +2231,7 @@ requires declaring a top-level `Keyframes` block which then gets referenced insi
 
 ```kotlin
 // Top level property
-val WobbleKeyframes by Keyframes {
+val WobbleKeyframes = Keyframes {
   from { Modifier.rotate((-5).deg) }
   to { Modifier.rotate(5.deg) }
 }
@@ -2179,7 +2268,7 @@ we were able to experiment with our idea incrementally.
 ### CSS 2 Kobweb
 
 One of our main project contributors created a site called [CSS 2 Kobweb](https://opletter.github.io/css2kobweb/)
-which aims to simplify the process of converting CSS examples to equivalent Kobweb ComponentStyle and/or Modifier
+which aims to simplify the process of converting CSS examples to equivalent Kobweb `CssStyle` and/or `Modifier`
 declarations.
 
 ![CSS 2 Kobweb example](https://github.com/varabyte/media/raw/main/kobweb/images/css/css2kobweb.png)
@@ -2503,8 +2592,8 @@ to tweak at least some of them. A very common example of this is the default web
 your site look a bit archaic.
 
 Most traditional sites overwrite styles by creating a CSS stylesheet and then linking to it in their HTML. However, if
-you are using Silk in your Kobweb application, you can use an approach very similar to `ComponentStyle` discussed above
-but for general HTML elements.
+you are using Silk in your Kobweb application, you can use an approach very similar to `CssStyle` discussed above but
+for general HTML elements.
 
 To do this, create an `@InitSilk` method. The context parameter includes a `stylesheet` property that represents the CSS
 stylesheet for your site, providing a Silk-idiomatic API for adding CSS rules to it.
@@ -2613,7 +2702,7 @@ perhaps:
 ```kotlin
 // components/widgets/SiteVersion.kt
 
-val VersionTextStyle by ComponentStyle.base {
+val VersionTextStyle = CssStyle.base {
   Modifier.fontSize(0.6.cssRem)
 }
 
@@ -2625,15 +2714,15 @@ fun SiteVersion(modifier: Modifier = Modifier) {
 
 ## Globally replacing Silk widget styles
 
-Silk widgets all use [component styles▲](#componentstyle) to power their look and feel.
+As mentioned earlier, Silk widgets all use [component styles▲](#componentstyle) to power their look and feel.
 
 Normally, if you want to tweak a style in select locations within your site, you just create a variant from that style:
 
 ```kotlin
-val TweakedButtonStyle by ButtonStyle.addVariantBase { /* ... */ }
+val TweakedButtonVariant = ButtonStyle.addVariantBase { /* ... */ }
 
 // Later...
-Button(variant = TweakedButtonStyle) { /* ... */ }
+Button(variant = TweakedButtonVariant) { /* ... */ }
 ```
 
 But what if you want to globally change the look and feel of a widget across your entire site?
@@ -2650,10 +2739,10 @@ property, which provides the following family of methods for rewriting styles an
 ```kotlin
 @InitSilk
 fun replaceStylesAndOrVariants(ctx: InitSilkContext) {
-  ctx.theme.replaceComponentStyle(SomeStyle) { /* ... */ }
-  ctx.theme.replaceComponentVariant(SomeStyle) { /* ... */ }
-  ctx.theme.modifyComponentStyle(SomeStyle) { /* ... */ }
-  ctx.theme.modifyComponentVariant(SomeStyle) { /* ... */ }
+  ctx.theme.replaceStyle(SomeStyle) { /* ... */ }
+  ctx.theme.replaceVariant(SomeVariant) { /* ... */ }
+  ctx.theme.modifyStyle(SomeStyle) { /* ... */ }
+  ctx.theme.modifyVariant(SomeVariant) { /* ... */ }
 }
 ```
 
@@ -2677,7 +2766,7 @@ automatically scale down to fit their container:
 ```kotlin
 @InitSilk
 fun replaceSilkImageStyle(ctx: InitSilkContext) {
-  ctx.theme.replaceComponentStyleBase(ImageStyle) {
+  ctx.theme.replaceStyleBase(ImageStyle) {
     Modifier
       .clip(Rect(cornerRadius = 8.px))
       .fillMaxWidth()
@@ -2691,7 +2780,7 @@ and here's an example for a site that always wants its horizontal dividers to fi
 ```kotlin
 @InitSilk
 fun makeHorizontalDividersFillWidth(ctx: InitSilkContext) {
-  ctx.theme.modifyComponentStyleBase(HorizontalDividerStyle) {
+  ctx.theme.modifyStyleBase(HorizontalDividerStyle) {
     Modifier.fillMaxWidth()
   }
 }
@@ -4364,7 +4453,7 @@ won't have access to Kobweb's API routes, API streams, or live reloading support
 improve someday ([link to tracking issue](https://github.com/varabyte/kobweb/issues/22)), but we don't have enough
 resources to be able to prioritize resolving this for a 1.0 release.
 
-## `CSSNumericValue` type-aliases
+## <span id="cssnumeric">`CSSNumericValue` type-aliases</span>
 
 Kobweb introduces a handful of type-aliases for CSS unit values, basing them off of the `CSSNumericValue` class and
 extending the set defined by Compose HTML:
