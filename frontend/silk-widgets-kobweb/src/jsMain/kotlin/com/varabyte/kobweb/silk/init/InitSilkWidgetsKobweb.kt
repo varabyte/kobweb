@@ -49,7 +49,6 @@ fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
 
     mutableTheme.registerStyle("silk-link", LinkStyle)
     mutableTheme.registerVariant("-uncolored", UncoloredLinkVariant)
-    mutableTheme.registerVariant("-uncolored", UncoloredLinkVariant)
     mutableTheme.registerVariant("-undecorated", UndecoratedLinkVariant)
     mutableTheme.registerVariant("-always-underlined", AlwaysUnderlinedLinkVariant)
 

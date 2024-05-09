@@ -114,7 +114,6 @@ class ButtonSize(
     }
 }
 
-
 /**
  * A button widget.
  */

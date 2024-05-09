@@ -215,7 +215,7 @@ class FrontendProcessor(
         // precedence. So, property first, then container, for example.
         private fun List<KSAnnotated>.getCssPrefix(): String? {
             return (
-                this.asSequence().mapNotNull { it.getAnnotationValue(CSS_PREFIX_FQN) }.firstOrNull() ?: defaultCssPrefix
+                this.firstNotNullOfOrNull { it.getAnnotationValue(CSS_PREFIX_FQN) } ?: defaultCssPrefix
                 )?.takeIf { it.isNotEmpty() } // If the CssPrefix annotation is set to "", that should disable the prefix
         }
 

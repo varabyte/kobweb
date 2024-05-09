@@ -338,7 +338,7 @@ class MutableSilkTheme {
     }
 
     /**
-     * Use this method to override a variant previously registered using [registerVariants].
+     * Use this method to override a variant previously registered using [registerVariant].
      *
      * This is particularly useful if you want to change variants provided by Silk.
      *
@@ -381,7 +381,7 @@ class MutableSilkTheme {
     }
 
     /**
-     * Use this method to override a variant previously registered using [registerVariants].
+     * Use this method to override a variant previously registered using [registerVariant].
      *
      * This is particularly useful if you want to change variants provided by Silk.
      *
