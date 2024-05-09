@@ -33,12 +33,33 @@ For example, `enabled` and `checked`, not `isEnabled` and `isChecked`.
 However, sometimes a boolean parameter name is a noun, and in that case, we do use the `is` prefix. For example,
 `isDefault` and not `default`.
 
-#### Define a ComponentStyle
+#### Define a component style
 
-You MUST define a `ComponentStyle` for your widget, even if empty, and set its prefix to `"silk"`
+You MUST define a `ComponentKind` sealed interface implementation and associated `CssStyle` for your widget, even if
+empty.
+
+You MUST match the name of the style with the name of the kind (minus the "Kind" and "Style" suffixes).
 
 ```kotlin
-val MyWidgetStyle by ComponentStyle(prefix = "silk") { /* ... */ }
+sealed interface WidgetKind : ComponentKind
+
+val WidgetStyle = CssStyle<WidgetKind> { /* ... */ }
+```
+
+If a complex style contains multiple inner component styles, you SHOULD nest any additional component kinds inside the
+main kind. The inner component kinds MUST NOT end with "Kind" while the main one MUST:
+
+```kotlin
+sealed interface TabsKind : ComponentKind {
+  sealed interface TabRow : ComponentKind
+  sealed interface Tab : ComponentKind
+  sealed interface Panel : ComponentKind
+}
+
+val TabsStyle = CssStyle<TabsKind> { /* ... */ }
+val TabsTabRowStyle = CssStyle<TabsKind.TabRow> { /* ... */ }
+val TabsTabStyle = CssStyle<TabsKind.Tab> { /* ... */ }
+val TabsPanelStyle = CssStyle<TabsKind.Panel> { /* ... */ }
 ```
 
 #### Single `Modifier` parameter
@@ -117,8 +138,8 @@ lot and, therefore, more readable. In these cases, it is acceptable to provide a
 multiple modifiers and delegates to the standard `Tab` and `Panel` methods:
 
 ```kotlin
-val tm = Modifier.flexGrow(1)
-val pm = Modifier.fillMaxSize().padding(20.px)
+private val tm = Modifier.flexGrow(1)
+private val pm = Modifier.fillMaxSize().padding(20.px)
 
 Tabs {
     TabPanel("Tab", tabModifier = tm, panelModifier = pm) {
@@ -139,26 +160,28 @@ Tabs {
 // }
 ```
 
-#### The `ComponentVariant` parameter
+#### The `CssStyleVariant` parameter
 
-You MUST declare a parameter `variant: ComponentVariant?` right after the `modifier` parameter, which SHOULD default to
-`null`.
+You MUST declare a parameter `variant: CssStyleVariant<K>?` parameter right after the `modifier` parameter, which SHOULD
+default to `null`. The type of `K` here will be determined by the `CssStyle<K>` it is associated with.
 
 Variants encourage users to tweak a widget's appearance in standard ways that build on top of its initial style. As a
 mental model, it's useful to think of them as modifier tweaks. As such, it helps to keep variants close to the initial
 `modifier` parameter so users can understand that they are related.
 
-As a widget designer, you are of course encouraged to provide variants if appropriate, but even if you don't, you should
-still provide the parameter, since a Kobweb user may always create and share their own variant.
+As a widget designer, you are of course encouraged to provide variants if appropriate, but even if you don't, you MUST
+still provide the parameter, since a Kobweb user may always create and use their own variant.
 
 *Do*
 
 ```kotlin
-val MyWidgetStyle by ComponentStyle(prefix = "silk") { /* ... */ }
-val MyWidgetItalicizedVariant by MyWidgetStyle.addVariant { /* ... */ }
+sealed interface WidgetKind : ComponentKind
+
+val WidgetStyle = CssStyle<WidgetKind> { /* ... */ }
+val ItalicizedWidgetVariant = WidgetStyle.addVariant { /* ... */ }
 
 @Composable
-fun MyWidget(modifier: Modifier = Modifier, variant: ComponentVariant? = null, enabled: Boolean = true, ...) {
+fun Widget(modifier: Modifier = Modifier, variant: CssStyleVariant<WidgetKind>? = null, ...) {
     /* ... */
 }
 ```
@@ -167,8 +190,16 @@ fun MyWidget(modifier: Modifier = Modifier, variant: ComponentVariant? = null, e
 
 ```kotlin
 @Composable
-fun MyWidget(modifier: Modifier = Modifier, enabled: Boolean = true, ..., variant: ComponentVariant? = null) {
+fun Widget(modifier: Modifier = Modifier, ..., variant: CssStyleVariant<WidgetKind>? = null) {
     /* ... */
+}
+```
+
+```kotlin
+// Missing variant parameter
+@Composable
+fun Widget(modifier: Modifier = Modifier) {
+  /* ... */
 }
 ```
 
@@ -183,7 +214,7 @@ fun Tooltip(
     text: String,
     modifier: Modifier = Modifier,
     hiddenModifier: Modifier = Modifier,
-    variant: ComponentVariant? = null,
+    variant: CssStyleVariant<TooltipKind>? = null,
 )
 ```
 
@@ -196,13 +227,13 @@ makes some sense as an element's state often effects is visual appearance, and s
 
 ```kotlin
 @Composable
-fun MyWidget(
+fun Widget(
   text: String,
   modifier: Modifier = Modifier,
-  variant: ComponentVariant? = null,
+  variant: CssStyleVariant<WidgetKind>? = null,
   enabled: Boolean,
   invalid: Boolean,
-  size: MyWidgetSize = MyWidgetSize.MD,
+  size: WidgetSize = WidgetSize.MD,
   colorScheme: ColorScheme? = null,
   focusOutlineColor: Color? = null,
   ref: ...) {
@@ -212,12 +243,12 @@ fun MyWidget(
 
 ```kotlin
 @Composable
-fun MyWidget(
+fun Widget(
   ...,
-  variant: ComponentVariant? = null,
+  variant: CssStyleVariant<WidgetKind>? = null,
   enabled: Boolean,
   colorScheme: ColorScheme? = null,
-  size: MyWidgetSize,
+  size: WidgetSize,
   enabled: Boolean,
   invalid: Boolean,
   ...) {
@@ -233,42 +264,38 @@ consistent way across the whole application.
 Size names MUST be named after abbreviated T-shirt sizes, with at least SM, MD, and LG sizes defined.
 You CAN additionally define XS, XL, and XXL sizes if they seem relevant, but they are not required.
 
+Size properties MUST be declared in a companion object inside the size class.
+
 Sizes SHOULD be `cssRem` values, so a site will dynamically resize around a larger font if designed with one.
 
-Sizes MUST be an interface so users can implement their own custom sizes if they prefer.
+Sizes MUST extend `CssStyle.Restricted` or `CssStyle.Restricted.Base`.
 
 The default size SHOULD be set to MD.
 
 *Do*
 
 ```kotlin
-interface MyWidgetSize {
-  val fontSize: CSSLengthNumericValue
-  object SM : MyWidgetSize { /* ... */ }
-  object MD : MyWidgetSize {
-      override val fontSize = 1.cssRem
+class WidgetSize(fontSize: CSSLengthNumericValue) :
+  CssStyle.Restricted.Base(Modifier.setVariable(WdigetFontSizeVar, fontSize)) {
+  companion object {
+    val SM = WidgetSize(0.75.cssRem)
+    val MD = WidgetSize(1.cssRem)
+    val LG = WidgetSize(1.25.cssRem)
   }
-  object LG : MyWidgetSize { /* ... */ }
-}
-
-private fun MyWidgetSize.toModifier(): Modifier {
-    return Modifier
-      .setVariable(MyWidgetFontSizeVar, fontSize)
 }
 
 @Composable
-fun MyWidget(
+fun Widget(
   modifier: Modifier = Modifier,
-  variant: ComponentVariant? = null,
-  size: MyWidgetSize = MyWidgetSize.MD,
-  colorScheme: ColorScheme? = null,
-  ...) {
+  variant: CssStyleVariant<WidgetKind>? = null,
+  size: WidgetSize = WidgetSize.MD,
+  ...
+) {
     Box(
-      MyWidgetStyle.toModifier(variant)
+      WidgetStyle.toModifier(variant)
         .then(size.toModifier())
-        .thenIf(colorScheme != null) {
-            Modifier.setVariable(MyWidgetColorVar, if (ColorMode.current.isDark) colorScheme._200 else colorScheme._700)
-        }
+        .then(...
+    )
     )
 }
 ```
@@ -281,12 +308,12 @@ style.
 *Do*
 
 ```kotlin
-val MyWidgetStyle by ComponentStyle(prefix = "silk") { /* ... */ }
+val WidgetStyle = CssStyle<WidgetKind> { /* ... */ }
 
 @Composable
-fun MyWidget(modifier: Modifier = Modifier, variant: ComponentVariant? = null) {
+fun Widget(modifier: Modifier = Modifier, variant: CssStyleVariant<WidgetKind>? = null) {
     Box(
-        modifier = MyWidgetStyle.toModifier(variant).then(modifier)
+      modifier = WidgetStyle.toModifier(variant).then(modifier)
     )
 }
 ```
@@ -297,16 +324,15 @@ It's also OK to have additional explicit modifiers inserted into the chain, as l
 after the base style:
 
 ```kotlin
-val MyWidgetStyle by ComponentStyle(prefix = "silk") { /* ... */ }
+val WidgetStyle = CssStyle<WidgetKind> { /* ... */ }
 
 @Composable
-fun MyWidget(modifier: Modifier = Modifier, variant: ComponentVariant? = null) {
+fun Widget(modifier: Modifier = Modifier, variant: CssStyleVariant<WidgetKind>? = null) {
     Box(
-        modifier = MyWidgetStyle
+      modifier = WidgetStyle
             .toModifier(variant)
             .position(Position.Relative)
             .then(modifier)
-            .onClick { /* ... */ }
     )
 }
 ```
@@ -314,13 +340,33 @@ fun MyWidget(modifier: Modifier = Modifier, variant: ComponentVariant? = null) {
 *Don't*
 
 ```kotlin
-val MyWidgetStyle by ComponentStyle(prefix = "silk") { /* ... */ }
+val WidgetStyle = CssStyle<WidgetKind> { /* ... */ }
 
 @Composable
-fun MyWidget(modifier: Modifier = Modifier, variant: ComponentVariant? = null) {
+fun Widget(modifier: Modifier = Modifier, variant: CssStyleVariant<WidgetKind>? = null) {
     Box(
-        modifier = modifier.then(MyWidgetStyle.toModifier(variant))
+      modifier = modifier.then(WidgetStyle.toModifier(variant))
     )
+}
+```
+
+*Exception*
+
+Here, we define an on click handler AFTER the user's modifier is applied. If this is done, presumably the click handler
+is a core part of the widget's functionality, and we don't want the user overriding it.
+
+```kotlin
+val ButtonStyle = CssStyle<ButtonKind> { /* ... */ }
+
+@Composable
+fun Button(modifier: Modifier = Modifier, variant: CssStyleVariant<ButtonKind>? = null) {
+  Box(
+    modifier = WidgetStyle
+      .toModifier(variant)
+      .position(Position.Relative)
+      .then(modifier)
+      .onClick { /* ... */ }
+  )
 }
 ```
 
@@ -333,8 +379,8 @@ The parameter SHOULD be last *unless* the last parameter is reserved for a lambd
 
 The `ref` parameter allows users to access the underlying DOM element of a widget.
 
-It is usually fine to can use `HTMLElement` as the generic type, but in some cases a more specific type can be
-appropriate, such as `HTMLTextAreaElement` for a styled `TextArea` widget.
+It is usually fine to use `HTMLElement` as the generic type, but in some cases a more specific type can be appropriate,
+such as `HTMLTextAreaElement` for a styled `TextArea` widget.
 
 However, you shouldn't necessarily use a more specific type just because you technically can, as the backing element can
 sometimes be an implementation detail. For example, `Box` uses a `Div` under the hood, but that fact is abstracted away
@@ -344,9 +390,9 @@ from the user because it shouldn't really matter.
 
 ```kotlin
 @Composable
-fun MyWidget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composable () -> Unit) {
+fun Widget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composable () -> Unit) {
     Box(
-        modifier = MyWidgetStyle.toModifier(variant).then(modifier),
+      modifier = WidgetStyle.toModifier(variant).then(modifier),
         ref = ref
     ) {
         content
@@ -358,9 +404,9 @@ fun MyWidget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composabl
 
 ```kotlin
 @Composable
-fun MyWidget(..., ref: ElementRefScope<HTMLElement>? = null) {
+fun Widget(..., ref: ElementRefScope<HTMLElement>? = null) {
     Box(
-        modifier = MyWidgetStyle.toModifier(variant).then(modifier),
+      modifier = WidgetStyle.toModifier(variant).then(modifier),
         ref = ref
     )
 }
@@ -372,9 +418,9 @@ Use `registerRefScope` when working with Compose HTML widgets.
 
 ```kotlin
 @Composable
-fun MyWidget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composable () -> Unit) {
+fun Widget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composable () -> Unit) {
     Div(
-        modifier = MyWidgetStyle.toModifier(variant).then(modifier).toAttrs,
+      modifier = WidgetStyle.toModifier(variant).then(modifier).toAttrs,
     ) {
         registerRefScope(ref)
     }
@@ -385,7 +431,7 @@ fun MyWidget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composabl
 
 ```kotlin
 @Composable
-fun MyWidget(modifier: Modifier = Modifier, ref: ElementRefScope<HTMLElement>? = null, enabled: Boolean = true, ...) {
+fun Widget(modifier: Modifier = Modifier, ref: ElementRefScope<HTMLElement>? = null, enabled: Boolean = true, ...) {
     /* ... */
 }
 ```
@@ -401,7 +447,7 @@ If relevant to the target widget, you SHOULD handle the disabled state in a cons
 *Do*
 
 ```kotlin
-val ButtonStyle by ComponentStyle(prefix = "silk") {
+val ButtonStyle = CssStyle<ButtonKind> {
 
     base { /* ... */ }
 
@@ -423,7 +469,7 @@ fun Button(..., enabled: Boolean = true, ...) {
 *Don't*
 
 ```kotlin
-val ButtonStyle by ComponentStyle(prefix = "silk") {
+val ButtonStyle = CssStyle<ButtonKind> {
 
     base { /* ... */ }
 
@@ -452,19 +498,21 @@ StyleVariable entries for each color and hook those variables up to the right pa
 Using palettes makes it easier for Kobweb users to globally change the colors of their whole app without needing to
 override any component styles.
 
-Using variables allows users to override color values for a targeted subset of buttons, if necessary, by using
-`Modifier.setVariable(...)` on either a specific button or a parent container that the button is a child of.
+Using variables allows users to override color values for a targeted subset of widgets, if necessary, by using
+`Modifier.setVariable(...)` on either a specific widget or a parent container that the widget is a child of.
 
 *Do*
 
 ```kotlin
 // Button.kt -------------------------------------------------
-val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
-val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>(prefix = "silk")
+val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>
+val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>
+val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>
+val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>
 
-val ButtonStyle by ComponentStyle(prefix = "silk") {
+sealed interface ButtonKind : ComponentKind
+
+val ButtonStyle = CssStyle<ButtonKind> {
     base {
         Modifier
             .color(ButtonBackgroundDefaultColorVar)
@@ -531,7 +579,7 @@ setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
 Short version: If you're hardcoding any colors in your Silk widget styles, that will need to be fixed.
 
 ```kotlin
-val ButtonStyle by ComponentStyle(prefix = "silk") {
+val ButtonStyle = CssStyle<ButtonKind> {
     base {
         Modifier
             .color(Colors.Red)
