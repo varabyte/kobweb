@@ -23,8 +23,24 @@ class CSSLayerRuleDeclaration(
  * Wrap some styles with a `@layer` block.
  *
  * For example:
+ * ```
+ * object DefaultStyleSheet : StyleSheet() {
+ *     init {
+ *         layer("reset") {
+ *             "html, body" style {
+ *                 // Allow our app to stretch the full screen
+ *                 padding(0.px)
+ *                 margin(0.px)
+ *             }
  *
- *
+ *             "*" style {
+ *                 // See also: https://css-tricks.com/box-sizing
+ *                 boxSizing("border-box")
+ *             }
+ *         }
+ *     }
+ * }
+ * ```
  */
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.layer(
     name: String,
