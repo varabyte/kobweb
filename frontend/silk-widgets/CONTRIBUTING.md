@@ -220,10 +220,10 @@ fun Tooltip(
 
 #### State and style parameters
 
-You SHOULD declare state parameters right after the `variant` parameter, followed by style parameters.
+You SHOULD declare optional state parameters right after the `variant` parameter, followed by style parameters.
 
 This order is chosen to mimic the order used by Jetpack Compose widgets, which appear to do the same thing. It also
-makes some sense as an element's state often effects is visual appearance, and should therefore be prioritized earlier.
+makes some sense as an element's state often affects is visual appearance, and should therefore be prioritized earlier.
 
 ```kotlin
 @Composable
@@ -231,11 +231,11 @@ fun Widget(
   text: String,
   modifier: Modifier = Modifier,
   variant: CssStyleVariant<WidgetKind>? = null,
-  enabled: Boolean,
-  invalid: Boolean,
+  enabled: Boolean = true,
+  invalid: Boolean = false,
   size: WidgetSize = WidgetSize.MD,
   colorScheme: ColorScheme? = null,
-  focusOutlineColor: Color? = null,
+  focusOutlineColor: CSSColorValue? = null,
   ref: ...) {
 ```
 
@@ -249,7 +249,6 @@ fun Widget(
   enabled: Boolean,
   colorScheme: ColorScheme? = null,
   size: WidgetSize,
-  enabled: Boolean,
   invalid: Boolean,
   ...) {
     /* ... */
@@ -294,8 +293,7 @@ fun Widget(
     Box(
       WidgetStyle.toModifier(variant)
         .then(size.toModifier())
-        .then(...
-    )
+        .then(...)
     )
 }
 ```
@@ -392,7 +390,7 @@ from the user because it shouldn't really matter.
 @Composable
 fun Widget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composable () -> Unit) {
     Box(
-      modifier = WidgetStyle.toModifier(variant).then(modifier),
+        modifier = WidgetStyle.toModifier(variant).then(modifier),
         ref = ref
     ) {
         content
@@ -406,7 +404,7 @@ fun Widget(..., ref: ElementRefScope<HTMLElement>? = null, content: @Composable 
 @Composable
 fun Widget(..., ref: ElementRefScope<HTMLElement>? = null) {
     Box(
-      modifier = WidgetStyle.toModifier(variant).then(modifier),
+        modifier = WidgetStyle.toModifier(variant).then(modifier),
         ref = ref
     )
 }
@@ -505,30 +503,33 @@ Using variables allows users to override color values for a targeted subset of w
 
 ```kotlin
 // Button.kt -------------------------------------------------
-val ButtonBackgroundDefaultColorVar by StyleVariable<CSSColorValue>
-val ButtonBackgroundFocusColorVar by StyleVariable<CSSColorValue>
-val ButtonBackgroundHoverColorVar by StyleVariable<CSSColorValue>
-val ButtonBackgroundPressedColorVar by StyleVariable<CSSColorValue>
+object ButtonVars {
+    val Color by StyleVariable<CSSColorValue>(prefix = "silk")
+    val DefaultColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val FocusColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val HoverColor by StyleVariable<CSSColorValue>(prefix = "silk")
+    val PressedColor by StyleVariable<CSSColorValue>(prefix = "silk")
+}
 
 sealed interface ButtonKind : ComponentKind
 
 val ButtonStyle = CssStyle<ButtonKind> {
     base {
         Modifier
-            .color(ButtonBackgroundDefaultColorVar)
-            .backgroundColor(buttonColors.default)
+            .color(ButtonVars.Color.value())
+            .backgroundColor(ButtonVars.DefaultColor.value())
     }
 
     (hover + not(ariaDisabled)) {
-        Modifier.backgroundColor(buttonColors.hover)
+        Modifier.backgroundColor(ButtonVars.HoverColor.value())
     }
 
     (focusVisible + not(ariaDisabled)) {
-        Modifier.boxShadow(spreadRadius = 3.px, color = buttonColors.focus)
+        Modifier.boxShadow(spreadRadius = 3.px, color = ButtonVars.FocusColor.value())
     }
 
     (active + not(ariaDisabled)) {
-        Modifier.backgroundColor(buttonColors.pressed)
+        Modifier.backgroundColor(ButtonVars.PressedColor.value())
     }
 }
 
@@ -568,10 +569,10 @@ class MutableSilkPalettes(
 ) : SilkPalettes
 
 // InitSilk.kt -------------------------------------------------
-setVariable(ButtonBackgroundDefaultColorVar, palette.button.default)
-setVariable(ButtonBackgroundFocusColorVar, palette.button.focus)
-setVariable(ButtonBackgroundHoverColorVar, palette.button.hover)
-setVariable(ButtonBackgroundPressedColorVar, palette.button.pressed)
+setVariable(ButtonVars.DefaultColor, palette.button.default)
+setVariable(ButtonVars.FocusColor, palette.button.focus)
+setVariable(ButtonVars.HoverColor, palette.button.hover)
+setVariable(ButtonVars.PressedColor, palette.button.pressed)
 ```
 
 *Don't*
@@ -596,7 +597,8 @@ Variables which are based on global Silk values (like border color) should be co
 declaration point, and not in `InitSilk.kt`:
 
 ```kotlin
-val ButtonColorVar by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
+// in object ButtonVars
+val Color by StyleVariable(prefix = "silk", defaultFallback = ColorVar.value())
 ```
 
 #### evt.stopPropagation
