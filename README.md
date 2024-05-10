@@ -894,15 +894,15 @@ Box(CustomStyle.toModifier()) { /* ... */ }
 >
 > ```kotlin
 > @Suppress("PRIVATE_COMPONENT_STYLE")
-> private val SomeCustomStyle = CssStyle { /* ... */ }
+> private val ExampleCustomStyle = CssStyle { /* ... */ }
 > // Or use a leading underscore to automatically suppress the warning
-> private val _SomeOtherCustomStyle = CssStyle { /* ... */ }
+> private val _ExampleOtherCustomStyle = CssStyle { /* ... */ }
 >
 > @InitSilk
 > fun registerPrivateStyle(ctx: InitSilkContext) {
 >   // Kobweb will not be able to detect the property name, so a name must be provided manually
->   ctx.theme.registerStyle("some-custom", SomeCustomStyle)
->   ctx.theme.registerStyle("some-other-custom", _SomeCustomStyle)
+>   ctx.theme.registerStyle("example-custom", ExampleCustomStyle)
+>   ctx.theme.registerStyle("example-other-custom", _ExampleOtherCustomStyle)
 > }
 > ```
 >
@@ -1152,14 +1152,16 @@ val OutlinedButtonVariant: CssStyleVariant<ButtonKind> = ButtonStyle.addVariant 
 >
 > ```kotlin
 > @Suppress("PRIVATE_COMPONENT_VARIANT")
-> private val SomeCustomVariant = SomeCustomStyle.addVariant {
+> private val ExampleCustomVariant = ButtonStyle.addVariant {
 >   /* ... */
 > }
-> // Or, `private val _SomeCustomVariant`
+> // Or, `private val _ExampleCustomVariant`
 >
 > @InitSilk
 > fun registerPrivateVariant(ctx: InitSilkContext) {
->   ctx.theme.registerVariant("some-custom", SomeCustomVariant)
+>   // When registering variants, using a leading dash will automatically prepend the bast style name. 
+>   // This example here will generate the final name "button-example".
+>   ctx.theme.registerVariant("-example", ExampleCustomVariant)
 > }
 > ```
 >
@@ -1189,11 +1191,15 @@ passed in, both styles will be applied -- the base style followed by the variant
 For example, `ButtonStyle.toModifier(OutlinedButtonVariant)` applies the main button style first layered on top with
 some additional outline styling.
 
-You can annotate style variants with the `@CssName` annotation, exactly like you can with `CssStyle`. For example:
+You can annotate style variants with the `@CssName` annotation, exactly like you can with `CssStyle`. Using a leading
+dash will automatically prepend the base style name. For example:
 
 ```kotlin
 @CssName("custom-name")
-val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ }
+val OutlinedButtonVariant = ButtonStyle.addVariant { /* ... */ } // Creates a CSS style called "custom-name"
+
+@CssName("-custom-name")
+val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ } // Creates a CSS style called "button-custom-name"
 ```
 
 ##### `addVariantBase`
@@ -1314,13 +1320,13 @@ an animation that uses them, which you can pass into the `Modifier.animation` mo
 >
 > ```kotlin
 > @Suppress("PRIVATE_KEYFRAMES")
-> private val SomeKeyframes = Keyframes { /* ... */ }
-> // Or, `private val _SomeKeyframes`
+> private val ExampleKeyframes = Keyframes { /* ... */ }
+> // Or, `private val _ExampleKeyframes`
 
 >
 > @InitSilk
 > fun registerPrivateAnim(ctx: InitSilkContext) {
-> ctx.stylesheet.registerKeyframes("some-keyframes", SomeKeyframes)
+> ctx.stylesheet.registerKeyframes("example", ExampleKeyframes)
 > }
 > ```
 >
