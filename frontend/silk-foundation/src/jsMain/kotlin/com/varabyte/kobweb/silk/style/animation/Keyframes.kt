@@ -45,7 +45,7 @@ class KeyframesBuilder internal constructor(override val colorMode: ColorMode) :
      * to change again.
      *
      * ```
-     * val Example by Keyframes {
+     * val Example = Keyframes {
      *    from { Modifier.opacity(0) }
      *    each(20.percent, 80.percent) { Modifier.opacity(1) }
      *    to { Modifier.opacity(1) }
@@ -80,12 +80,12 @@ class KeyframesBuilder internal constructor(override val colorMode: ColorMode) :
 }
 
 /**
- * Define a set of keyframes that can later be references in animations.
+ * Define a set of keyframes that can later be referenced in animations.
  *
  * For example,
  *
  * ```
- * val BounceKeyframes = Keyframes("bounce") {
+ * val BounceKeyframes = Keyframes {
  *   from { Modifier.translateX((-50).percent) }
  *   to { Modifier.translateX((50).percent) }
  * }
@@ -104,25 +104,16 @@ class KeyframesBuilder internal constructor(override val colorMode: ColorMode) :
  * )
  * ```
  *
- * Note: You should prefer to create keyframes using the [Keyframes] delegate method to avoid needing to duplicate the
- * property name, e.g.
+ * If you are not using Kobweb, e.g. if you're using these widgets as a standalone library, you will have to manually
+ * register your keyframes:
  *
  * ```
- * val BounceKeyframes by Keyframes {
- *   from { Modifier.translateX((-50).percent) }
- *   to { Modifier.translateX((50).percent) }
- * }
- * ```
- *
- * If you are not using Kobweb, e.g. if you're using these widgets as a standalone library, you will have to use an
- * `@InitSilk` block to register your keyframes:
- *
- * ```
- * val BounceKeyframes = Keyframes("bounce") { ... }
- * @InitSilk
- * fun initSilk(ctx: InitSilkContext) {
- *   ctx.stylesheet.registerKeyframes(BounceKeyframes)
- * }
+ * prepareSilkFoundation(
+ *   initSilk = { ctx ->
+ *     /*...*/
+ *     ctx.theme.registerKeyframes("bounce", BounceKeyframes)
+ *   }
+ * )
  * ```
  *
  * Otherwise, the Kobweb Gradle plugin will do this for you.
