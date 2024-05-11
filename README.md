@@ -386,8 +386,8 @@ update your own project by editing `gradle/libs.version.toml` and updating the `
 # Beginner topics
 
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
-Compose HTML app, such as routing and configuring basic CSS styles. There is also a Kobweb Gradle plugin which runs over
-your codebase and is responsible for generating relevant boilerplate code as a result.
+Compose HTML app, such as routing and configuring basic CSS styles. Kobweb further provides a Gradle plugin which
+analyzes your codebase and generates relevant boilerplate code.
 
 Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and/or
 running a Compose HTML app. We want to get that stuff out of the way, so you can enjoy focusing on the more
@@ -842,8 +842,8 @@ You can also interleave Silk and Compose HTML components easily (as Silk is just
 Before going further, we want to quickly mention you can annotate a method with `@InitSilk`, which will be called when
 your site starts up.
 
-This method must take a single `InitSilkContext` parameter. A context contains various properties that allow for
-adjusting Silk defaults and which will be demonstrated in more detail in sections below.
+This method must take a single `InitSilkContext` parameter. A context contains various properties that allow
+adjusting Silk defaults, which will be demonstrated in more detail in sections below.
 
 ```kotlin
 @InitSilk
@@ -862,7 +862,7 @@ fun initSilk(ctx: InitSilkContext) {
 
 ### CssStyle
 
-With Silk, you can define a style like so, using the `base` block:
+With Silk, you can define a style like so, using the `CssStyle` function and the `base` block:
 
 ```kotlin
 val CustomStyle = CssStyle {
@@ -894,22 +894,15 @@ Box(CustomStyle.toModifier()) { /* ... */ }
 >
 > ```kotlin
 > @Suppress("PRIVATE_COMPONENT_STYLE")
-> private val SomeCustomStyle = CssStyle { /* ... */ }
+> private val ExampleCustomStyle = CssStyle { /* ... */ }
+> // Or use a leading underscore to automatically suppress the warning
+> private val _ExampleOtherCustomStyle = CssStyle { /* ... */ }
 >
 > @InitSilk
 > fun registerPrivateStyle(ctx: InitSilkContext) {
->   ctx.theme.registerStyle(SomeCustomStyle)
-> }
-> ```
->
-> Using a leading underscore to suppress the warning is also supported:
->
-> ```kotlin
-> private val _SomeCustomStyle = CssStyle { /* ... */ }
->
-> @InitSilk
-> fun registerPrivateStyle(ctx: InitSilkContext) {
->   ctx.theme.registerStyle(_SomeCustomStyle)
+>   // Kobweb will not be able to detect the property name, so a name must be provided manually
+>   ctx.theme.registerStyle("example-custom", ExampleCustomStyle)
+>   ctx.theme.registerStyle("example-other-custom", _ExampleOtherCustomStyle)
 > }
 > ```
 >
@@ -939,7 +932,7 @@ For example, if you write `val TitleTextStyle = CssStyle { ... }`, its name will
 You usually won't need to care about this name, but there are niche cases where it can be useful to understand that is
 what's going on.
 
-If you need to set a name manually, there's a special `CssName` annotation you can use to override the default name:
+If you need to set a name manually, you can use the `CssName` annotation to override the default name:
 
 ```kotlin
 @CssName("my-custom-name")
@@ -955,12 +948,12 @@ val CustomStyle = CssStyle {
 So, what's up with the `base` block?
 
 True, it looks a bit verbose on its own. However, you can define additional selector blocks that take effect
-conditionally. The base style will always apply first, but then any additional selectors will be applied based on what
-state the element is in.
+conditionally. The base style will always apply first, but then any additional styles will be applied based on the
+specific selector's rules.
 
 > [!CAUTION]
-> The order of defining the additional selectors matter, if more than one of them modify the same target CSS property at
-> the same time.
+> Order matters when defining additional selectors, particularly if more than one of them modify the same CSS property
+> at the same time.
 
 Here, we create a style which is red by default but green when the mouse hovers over it:
 
@@ -1044,7 +1037,7 @@ val CustomStyle = CssStyle {
 
 #### Color-mode aware
 
-When you define a `CssStyle`, an optional field is available for you to use called `colorMode`:
+When you define a `CssStyle`, a field called `colorMode` is available for you to use:
 
 ```kotlin
 val CustomStyle = CssStyle.base {
@@ -1111,14 +1104,14 @@ SpanText("WARNING", EmphasizedTextStyle.toModifier())
 #### Component styles
 
 So far, we've discussed CSS style blocks as defining a general assortment of CSS style properties. However, there is a
-way to type CSS style blocks, which is useful as it lets you generate typed variants associated with and only compatible
-with that base style.
+way to define typed CSS style blocks, which let you generate typed variants associated with, and only compatible
+with, a specific base style.
 
 The base style in this case is called a *component style* because the pattern is effective when defining widget
 components. In fact, it is the standard pattern that Silk uses for every single one of its widgets.
 
 We'll discuss this full pattern around building widgets using component styles later, but to start we'll demonstrate how
-to declare one. You create a marker interface of type `ComponentKind` and then pass that into your `CssStyle`
+to declare one. You create a marker interface that implements `ComponentKind` and then pass that into your `CssStyle`
 declaration block.
 
 For example, if you were creating your own `Button` widget:
@@ -1130,12 +1123,12 @@ val ButtonStyle = CssStyle<ButtonKind> { /* ... */ }
 
 Notice two points about our interface declaration:
 
-1. It is marked `sealed`. This is technically not necessary to do, but we recommend it as a best practice to express
-   your intention that no one else is going to subclass it further.
+1. It is marked `sealed`. This is technically not necessary to do, but we recommend it as a way to express your
+   intention that no one else is going to subclass it further.
 2. The interface is empty. It is just a marker interface, useful only in enforcing typing for variants. This is
    discussed more in the next section.
 
-Like normal `CssStyle` blocks, its associated name is derived from its property name. You can use a `@CssName`
+Like normal `CssStyle` declarations, the associated name is derived from its property name. You can use a `@CssName`
 annotation to override this behavior.
 
 #### Component variants
@@ -1143,12 +1136,12 @@ annotation to override this behavior.
 The power of component styles is they can generate *component variants*, using the `addVariant` method:
 
 ```kotlin
-val OutlineButtonVariant = ButtonStyle.addVariant { /* ... */ }
+val OutlinedButtonVariant: CssStyleVariant<ButtonKind> = ButtonStyle.addVariant { /* ... */ }
 ```
 
 > [!NOTE]
 > The recommended naming convention for variants is to take their associated style and use its name as a suffix plus the
-> word "Variant", e.g. "ButtonStyle" -> "OutlineButtonVariant" and "TextStyle" -> "EmphasizedTextVariant".
+> word "Variant", e.g. "ButtonStyle" -> "OutlinedButtonVariant" and "TextStyle" -> "EmphasizedTextVariant".
 
 > [!IMPORTANT]
 > Like a `CssStyle`, your `CssStyleVariant` must be public. This is for the same reason: because code gets generated
@@ -1159,20 +1152,22 @@ val OutlineButtonVariant = ButtonStyle.addVariant { /* ... */ }
 >
 > ```kotlin
 > @Suppress("PRIVATE_COMPONENT_VARIANT")
-> private val SomeCustomVariant = SomeCustomStyle.addVariant {
+> private val ExampleCustomVariant = ButtonStyle.addVariant {
 >   /* ... */
 > }
-> // Or, `private val _SomeCustomVariant`
+> // Or, `private val _ExampleCustomVariant`
 >
 > @InitSilk
 > fun registerPrivateVariant(ctx: InitSilkContext) {
->   ctx.theme.registerVariant(SomeCustomStyle)
+>   // When registering variants, using a leading dash will automatically prepend the bast style name. 
+>   // This example here will generate the final name "button-example".
+>   ctx.theme.registerVariant("-example", ExampleCustomVariant)
 > }
 > ```
 >
 > However, you are encouraged to keep your variants public and let the Kobweb Gradle plugin handle everything for you.
 
-The idea behind component variants is that it gives the widget author power to define some base style along with one or
+The idea behind component variants is that they give the widget author power to define a base style along with one or
 more common tweaks that users might want to apply on top of it. (And even if a widget author doesn't provide any
 variants for the style, any user can always define their own in their own codebase.)
 
@@ -1183,8 +1178,8 @@ sealed interface ButtonKind : ComponentKind
 
 val ButtonStyle = CssStyle<ButtonKind> { /* ... */ }
 
-// Note: Creates a CSS style called "button-outline"
-val OutlineButtonVariant = ButtonStyle.addVariant { /* ... */ }
+// Note: Creates a CSS style called "button-outlined"
+val OutlinedButtonVariant = ButtonStyle.addVariant { /* ... */ }
 
 // Note: Creates a CSS style called "button-inverted"
 val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ }
@@ -1193,14 +1188,18 @@ val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ }
 When used with a component style, the `toModifier()` method optionally takes a variant parameter. When a variant is
 passed in, both styles will be applied -- the base style followed by the variant style.
 
-For example, `ButtonStyle.toModifier(OutlineButtonVariant)` applies the main button style first layered on top with
+For example, `ButtonStyle.toModifier(OutlinedButtonVariant)` applies the main button style first layered on top with
 some additional outline styling.
 
-You can annotate style variants with the `@CssName` annotation, exactly like you can with `CssStyle`. For example:
+You can annotate style variants with the `@CssName` annotation, exactly like you can with `CssStyle`. Using a leading
+dash will automatically prepend the base style name. For example:
 
 ```kotlin
 @CssName("custom-name")
-val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ }
+val OutlinedButtonVariant = ButtonStyle.addVariant { /* ... */ } // Creates a CSS style called "custom-name"
+
+@CssName("-custom-name")
+val InvertedButtonVariant = ButtonStyle.addVariant { /* ... */ } // Creates a CSS style called "button-custom-name"
 ```
 
 ##### `addVariantBase`
@@ -1221,7 +1220,7 @@ val HighlightedCustomVariant by CustomStyle.addVariantBase {
 
 #### Structuring code around component styles
 
-Silk uses component styles when defining its widgets and you can to! The full pattern looks like this:
+Silk uses component styles when defining its widgets, and you can too! The full pattern looks like this:
 
 ```kotlin
 sealed interface CustomWidgetKind : ComponentKind
@@ -1255,10 +1254,10 @@ CustomWidget { /* ... */ }
 // Approach #2: Tweak default styling with a variant
 CustomWidget(variant = TransparentWidgetVariant) { /* ... */ }
 
-// Approach #3: Tweak default styling with user overrides
+// Approach #3: Tweak default styling with inline overrides
 CustomWidget(Modifier.backgroundColor(Colors.Blue)) { /* ... */ }
 
-// Approach #4: Tweak default styling with both a variant as well as user overrides
+// Approach #4: Tweak default styling with both a variant and inline overrides
 CustomWidget(Modifier.backgroundColor(Colors.Blue), variant = TransparentWidgetVariant) { /* ... */ }
 ```
 
@@ -1302,7 +1301,7 @@ Div(
             duration = 5.s,
             iterationCount = AnimationIterationCount.Infinite
         ))
-      .toAttrs()
+        .toAttrs()
 )
 ```
 
@@ -1321,13 +1320,13 @@ an animation that uses them, which you can pass into the `Modifier.animation` mo
 >
 > ```kotlin
 > @Suppress("PRIVATE_KEYFRAMES")
-> private val SomeKeyframes = Keyframes { /* ... */ }
-> // Or, `private val _SomeKeyframes`
+> private val ExampleKeyframes = Keyframes { /* ... */ }
+> // Or, `private val _ExampleKeyframes`
 
 >
 > @InitSilk
 > fun registerPrivateAnim(ctx: InitSilkContext) {
->   ctx.stylesheet.registerKeyframes(SomeKeyframes)
+> ctx.stylesheet.registerKeyframes("example", ExampleKeyframes)
 > }
 > ```
 >
@@ -2714,7 +2713,7 @@ fun SiteVersion(modifier: Modifier = Modifier) {
 
 ## Globally replacing Silk widget styles
 
-As mentioned earlier, Silk widgets all use [component styles▲](#componentstyle) to power their look and feel.
+As mentioned earlier, Silk widgets all use [component styles▲](#component-styles) to power their look and feel.
 
 Normally, if you want to tweak a style in select locations within your site, you just create a variant from that style:
 
