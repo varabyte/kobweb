@@ -16,7 +16,7 @@ import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.toModifier
 
-@Deprecated("You need to migrate your use of `ComponentStyle` to the new, typed `CssStyle<T>` version. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You need to migrate your use of `ComponentStyle` to the new, typed `CssStyle<T>` version. Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 sealed class ComponentVariant {
     infix fun then(next: ComponentVariant): ComponentVariant {
         return CompositeComponentVariant(this, next)

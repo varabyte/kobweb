@@ -52,7 +52,7 @@ import org.jetbrains.compose.web.css.*
  *   `"silk-button"`). Also, when creating a variant by delegation, it is useful to know the non-prefixed name of the
  *   style it is based on when creating a name for it.
  */
-@Deprecated("You probably want to use `CssStyle` instead. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You probably want to use `CssStyle` instead. Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 class ComponentStyle(
     name: String,
     internal val extraModifiers: @Composable () -> Modifier,
@@ -135,7 +135,7 @@ class ComponentStyle(
  * You may still wish to construct a [ComponentStyle] directly instead if you expect that at some point in the future
  * you'll want to add additional, non-base styles.
  */
-@Deprecated("You probably want to use `CssStyle.base` instead (and use `@CssName` to specify your custom name). Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You probably want to use `CssStyle.base` instead (and use `@CssName` to specify your custom name). Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 fun ComponentStyle.Companion.base(
     className: String,
     extraModifiers: Modifier = Modifier,
@@ -144,7 +144,7 @@ fun ComponentStyle.Companion.base(
     return base(className, { extraModifiers }, init)
 }
 
-@Deprecated("You probably want to use `CssStyle.base` instead (and use `@CssName` to specify your custom name). Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You probably want to use `CssStyle.base` instead (and use `@CssName` to specify your custom name). Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 fun ComponentStyle.Companion.base(
     className: String,
     extraModifiers: @Composable () -> Modifier,
@@ -172,7 +172,7 @@ class ComponentStyleProvider internal constructor(
     }
 }
 
-@Deprecated("You probably want to use `CssStyle` instead. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You probably want to use `CssStyle` instead. Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 fun ComponentStyle(
     extraModifiers: Modifier = Modifier,
     prefix: String? = null,
@@ -180,21 +180,21 @@ fun ComponentStyle(
 ) =
     ComponentStyle({ extraModifiers }, prefix, init)
 
-@Deprecated("You probably want to use `CssStyle` instead. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You probably want to use `CssStyle` instead. Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 fun ComponentStyle(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
     init: CssStyleScope.() -> Unit
 ) = ComponentStyleProvider(extraModifiers, prefix, init)
 
-@Deprecated("You probably want to use `CssStyle.base` instead. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You probably want to use `CssStyle.base` instead. Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 fun ComponentStyle.Companion.base(
     extraModifiers: Modifier = Modifier,
     prefix: String? = null,
     init: CssStyleBaseScope.() -> Modifier
 ) = base({ extraModifiers }, prefix, init)
 
-@Deprecated("You probably want to use `CssStyle.base` instead. Please see https://github.com/varabyte/docs/css-style#migration for more guidance.")
+@Deprecated("You probably want to use `CssStyle.base` instead. Please see https://github.com/varabyte/docs/css-style.md#migration for more guidance.")
 fun ComponentStyle.Companion.base(
     extraModifiers: @Composable () -> Modifier,
     prefix: String? = null,
