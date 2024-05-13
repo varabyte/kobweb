@@ -64,7 +64,7 @@ import org.jetbrains.compose.web.css.*
  *
  * Otherwise, the Kobweb Gradle plugin will do this for you.
  */
-@Deprecated("Use `com.varabyte.kobweb.silk.components.animation.Keyframes` instead. Use `@CssName` and `@CssPrefix` to specify a custom name or prefix if necessary.")
+@Deprecated("Use `com.varabyte.kobweb.silk.style.animation.Keyframes` instead. Use `@CssName` and `@CssPrefix` to specify a custom name or prefix if necessary.")
 class Keyframes(name: String, prefix: String? = null, internal val init: KeyframesBuilder.() -> Unit) {
     val name = prefix?.let { "$it-$name" } ?: name
 
@@ -126,7 +126,7 @@ fun SilkStylesheet.registerKeyframes(keyframes: Keyframes) = registerKeyframes(k
  * ```
  */
 @Suppress("FunctionName") // name chosen to look like a constructor intentionally
-@Deprecated("Use `com.varabyte.kobweb.silk.components.animation.Keyframes` instead. Use `@CssName` and `@CssPrefix` to specify a custom name or prefix if necessary.")
+@Deprecated("Use `com.varabyte.kobweb.silk.style.animation.Keyframes` instead. Use `@CssName` and `@CssPrefix` to specify a custom name or prefix if necessary.")
 fun Keyframes(prefix: String? = null, init: KeyframesBuilder.() -> Unit) = KeyframesProvider(prefix, init)
 
 /**
