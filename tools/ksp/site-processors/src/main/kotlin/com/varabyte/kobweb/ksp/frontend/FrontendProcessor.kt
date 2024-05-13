@@ -405,6 +405,10 @@ class FrontendProcessor(
 
         override fun visitPropertyDeclaration(property: KSPropertyDeclaration, data: Unit) {
             val propertyType = property.type.resolve()
+            // If "qualifiedName" is ever null, we will definitely crash later, so just abort now. This can happen due
+            // to temporarily unresolvable code, e.g. something that might have produced a compile error; however, KSP
+            // is throwing the error first, which hides the real issue.
+            if (propertyType.declaration.qualifiedName == null) return
             if (propertyType.declaration.qualifiedName!!.asString() == "kotlin.Any") {
                 // In Kotlin/JS, the dynamic type is showing up as "Any" is KSP. However, if we let it passed here, it
                 // ends up returning true on a bunch of our type checks. So abort early; we never need to support "Any"
