@@ -25,6 +25,7 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                     ?: error("KobwebProcessorProvider: Missing pages package ($KSP_PAGES_PACKAGE_KEY)")
 
                 val genFile = processorMode.frontendFile
+                val defaultCssPrefix = environment.options[KSP_DEFAULT_CSS_PREFIX_KEY]
                 when (processorMode) {
                     ProcessorMode.APP -> {
                         AppProcessor(
@@ -32,6 +33,7 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                             logger = environment.logger,
                             genFile = genFile,
                             qualifiedPagesPackage = pagesPackage,
+                            defaultCssPrefix = defaultCssPrefix,
                         )
                     }
 
@@ -41,7 +43,7 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                             logger = environment.logger,
                             genFile = genFile,
                             qualifiedPagesPackage = pagesPackage,
-                            defaultCssPrefix = environment.options[KSP_DEFAULT_CSS_PREFIX_KEY],
+                            defaultCssPrefix = defaultCssPrefix,
                         )
                     }
                 }

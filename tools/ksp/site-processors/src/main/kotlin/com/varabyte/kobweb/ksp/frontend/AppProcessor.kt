@@ -20,6 +20,7 @@ class AppProcessor(
     private val logger: KSPLogger,
     private val genFile: String,
     qualifiedPagesPackage: String,
+    defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
     private val fileDependencies = mutableListOf<KSFile>()
     private var appFqn: String? = null
@@ -30,6 +31,7 @@ class AppProcessor(
         logger = logger,
         genFile = "",
         qualifiedPagesPackage = qualifiedPagesPackage,
+        defaultCssPrefix = defaultCssPrefix,
     )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {

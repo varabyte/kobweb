@@ -97,9 +97,8 @@ class KobwebApplicationPlugin @Inject constructor(
             content!!
         }
 
-        val kobwebBlock = project.kobwebBlock.apply {
-            createAppBlock(kobwebFolder, kobwebConf)
-        }
+        val kobwebBlock = project.kobwebBlock
+        val appBlock = kobwebBlock.createAppBlock(kobwebFolder, kobwebConf)
 
         val env =
             project.findProperty("kobwebEnv")?.let { ServerEnvironment.valueOf(it.toString()) } ?: ServerEnvironment.DEV
@@ -247,7 +246,7 @@ class KobwebApplicationPlugin @Inject constructor(
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
 
-            project.setupKspJs(jsTarget)
+            project.setupKspJs(jsTarget, appBlock.cssPrefix)
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
                 "kobwebGenSiteEntry",
