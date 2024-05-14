@@ -6,7 +6,6 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.hasTransitiveJsDependencyNamed
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Server
@@ -36,9 +35,8 @@ class KobwebGenSiteEntryConfInputs(
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     @get:Input val routePrefix: String,
     @get:Input val buildTarget: BuildTarget,
-    kobwebBlock: KobwebBlock,
     @get:Nested val confInputs: KobwebGenSiteEntryConfInputs,
-) : KobwebGenerateTask(kobwebBlock, "Generate entry code (i.e. main.kt) for this Kobweb project") {
+) : KobwebGenerateTask("Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:Input
     val cleanUrls: Provider<Boolean> = kobwebBlock.app.cleanUrls
 

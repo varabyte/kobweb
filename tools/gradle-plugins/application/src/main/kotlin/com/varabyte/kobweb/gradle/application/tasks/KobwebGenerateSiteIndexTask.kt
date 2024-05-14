@@ -7,7 +7,6 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
@@ -52,9 +51,8 @@ class KobwebGenIndexConfInputs(
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     @get:Nested val confInputs: KobwebGenIndexConfInputs,
     @get:Input val buildTarget: BuildTarget,
-    block: KobwebBlock,
     @get:Nested val indexBlock: AppBlock.IndexBlock
-) : KobwebGenerateTask(block, "Generate an index.html file for this Kobweb project") {
+) : KobwebGenerateTask("Generate an index.html file for this Kobweb project") {
 
     // No one should define their own root `public/index.html` files anywhere in their resources.
     @InputFiles

@@ -11,7 +11,6 @@ import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.application.util.kebabCaseToCamelCase
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppData
@@ -57,8 +56,7 @@ class KobwebExportConfInputs(
 abstract class KobwebExportTask @Inject constructor(
     @get:Nested val confInputs: KobwebExportConfInputs,
     @get:Input val siteLayout: SiteLayout,
-    kobwebBlock: KobwebBlock,
-) : KobwebModuleTask(kobwebBlock, "Export the Kobweb project into a static site") {
+) : KobwebModuleTask("Export the Kobweb project into a static site") {
     @get:InputFile
     abstract val appDataFile: RegularFileProperty
 

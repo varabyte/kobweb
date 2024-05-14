@@ -2,7 +2,6 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
 import com.varabyte.kobweb.project.backend.BackendData
@@ -16,10 +15,9 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import javax.inject.Inject
 
-abstract class KobwebGenerateApisFactoryTask @Inject constructor(kobwebBlock: KobwebBlock) :
-    KobwebGenerateTask(kobwebBlock, "Generate Kobweb code for the server") {
+abstract class KobwebGenerateApisFactoryTask :
+    KobwebGenerateTask("Generate Kobweb code for the server") {
     @get:Optional
     @get:InputFile
     abstract val kspGenFile: RegularFileProperty
