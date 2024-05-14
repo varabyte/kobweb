@@ -130,7 +130,7 @@ abstract class KobwebMigrateToCssStyleTask :
             println()
             println("$numUpdatedFiles file(s) were updated.")
             if (addVariantCount > 0) {
-                println("NOTE: Some users may get compile errors around style variants, despite our best efforts. If this happens to you, please see https://github.com/varabyte/docs/css-style.md#migration for more information.")
+                println("NOTE: Some users may get compile errors around style variants, despite our best efforts. If this happens to you, please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#migration for more information.")
             }
         }
     }
