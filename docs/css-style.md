@@ -460,9 +460,36 @@ writing `SomeStyle.toModifier().then(AnotherStyle.toModifier())`
 ## <span id="migration">Migrating code</span>
 
 The good news is that the migration should be trivial in most cases. The bad news is `ComponentStyle` was a very early
-Kobweb concept, so we expect that many users will get hit with a bunch of deprecation warnings when upgrading.
+Kobweb concept, so we expect that many users will get hit with a bunch of deprecation warnings when upgrading. Some
+issues will require manual intervention.
 
 This section should help you handle every warning case you might encounter.
+
+### Automatic migration
+
+The version of Kobweb that introduced this feature also includes a Gradle task `kobwebMigrateToCssStyle`. You should
+absolutely run this first, although make sure you're in a safe environment where you can revert your changes if
+something goes wrong.
+
+```bash
+$ cd site
+$ ../gradlew kobwebMigrateToCssStyle
+
+> Task :site:kobwebMigrateToCssStyle
+Updated com/example/site/components/layouts/PageLayout.kt
+Updated com/example/site/components/sections/Footer.kt
+Updated com/example/site/App.kt
+
+3 file(s) were updated.
+```
+
+> [!TIP]
+> You may want to optimize imports on all files that were changed by the migration process, in case now some imports are
+> unused and stale.
+
+At this point, try to run `kobweb run` on your project. Hopefully, everything will work seamlessly. However, there may
+be deprecation warnings or errors that show up after the migration, and you should pay attention to them. When resolving
+these issues, please review the remaining sections to understand what you may need to do.
 
 ### Updating imports
 
@@ -470,9 +497,8 @@ A lot of classes moved from the package `com.varabyte.kobweb.silk.components.sty
 `com.varabyte.kobweb.silk.style` – in other words, we dropped the `components` package (since, after all, this whole
 document describes how we're moving away from `ComponentStyle`s to `CssStyle`s).
 
-All import deprecation warnings should give you the exact import you need to change, but in general, doing a
-find / replace of `import com.varabyte.kobweb.silk.components.style` to `import com.varabyte.kobweb.silk.style` should
-capture everything in one go.
+Doing a find / replace of `import com.varabyte.kobweb.silk.components.style` to `import com.varabyte.kobweb.silk.style`
+can catch most of these.
 
 ```kotlin
 // Before
@@ -481,7 +507,8 @@ import com.varabyte.kobweb.silk.components.style.toModifier
 import com.varabyte.kobweb.silk.components.style.common.SmoothColorStyle
 
 Box(SmoothColorStyle.toModifier().fillMaxSize())
-
+```
+```kotlin
 // After
 
 import com.varabyte.kobweb.silk.style.toModifier
@@ -489,6 +516,37 @@ import com.varabyte.kobweb.silk.style.common.SmoothColorStyle
 
 Box(SmoothColorStyle.toModifier().fillMaxSize())
 ```
+
+One exception is all the provided psuedo-class and psueo-element selectors, like `hover` for example. Those have all
+moved from `com.varabyte.kobweb.silk.components.style` into their own new package at
+`com.varabyte.kobweb.silk.style.selector`.
+
+```kotlin
+// Before
+
+import com.varabyte.kobweb.silk.components.style.hover
+
+CssStyle {
+    base { /* ... */ }
+    hover { /* ... */ }
+}
+```
+```kotlin
+// Before
+
+import com.varabyte.kobweb.silk.style.selector.hover
+
+CssStyle {
+  base { /* ... */ }
+  hover { /* ... */ }
+}
+```
+
+Finally, it might be worth knowing that animation code moved from `com.varabyte.kobweb.silk.components.style.animation`
+to `com.varabyte.kobweb.silk.style.animation`, and design breakpoint code moved from
+`com.varabyte.kobweb.silk.components.style.breakpoint` to `com.varabyte.kobweb.silk.style.breakpoint`. These should have
+gotten handled automatically by the find / replace steps recommended earlier in this section, but we mention it here in
+case there's a codebase where somehow such an import was missed.
 
 ### Converting a ComponentStyle to an unspecified CssStyle
 
@@ -500,7 +558,8 @@ This probably covers almost every, if not every, case in most codebases. You sho
 val SomeStyle by ComponentStyle {
     ...
 }
-
+```
+```kotlin
 // After
 
 val SomeStyle = CssStyle { // A, B
@@ -534,7 +593,8 @@ fun Widget(
     val finalModifier = WidgetStyle.toModifier(variant).then(modifier)
     ...
 }
-
+```
+```kotlin
 // After
 
 sealed interface WidgetKind : ComponentKind // A
@@ -588,7 +648,8 @@ val ExtendingVariant by BaseStyle.addVariant {
 }
 
 Box(BaseStyle.toModifier(ExtendingVariant))
-
+```
+```kotlin
 // After
 
 val BaseStyle = CssStyle { // A, B
@@ -617,10 +678,13 @@ If you see any message about `getValue` being deprecated, that means you need to
 // Before
 
 val MyButtonVariant by ButtonStyle.addVariant { ... }
-
+val MyKeyframes by Keyframes { ... }
+```
+```kotlin
 // After
 
 val MyButtonVariant = ButtonStyle.addVariant { ... }
+val MyKeyframes = Keyframes { ... }
 ```
 
 For legacy support, we are temporarily supporting the `by` keyword for the new `CssStyle` type, so this can happen if
