@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // Remove this after deleting ComponentVariant references
+
 package com.varabyte.kobweb.silk.style
 
 import androidx.compose.runtime.*
@@ -8,6 +10,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -596,3 +599,85 @@ fun Iterable<CssStyle<UnspecifiedKind>>.toModifier(): Modifier {
 fun <A : AttrsScope<*>> Iterable<CssStyle<UnspecifiedKind>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
 }
+
+// region Deprecated
+
+// The following methods are only added to prevent potential compile errors when migrating code over to the new
+// CssStyle APIs. They should be removed when we remove ComponentStyle from the codebase.
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun CssStyle(name: String, extraModifier: Modifier = Modifier, prefix: String? = null, init: CssStyleScope.() -> Unit) =
+    CssStyle(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun CssStyle(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+) = CssStyle(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun CssStyle.Companion.base(
+    name: String,
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+) = base(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun CssStyle.Companion.base(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+) = base(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle(
+    name: String,
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+) =
+    CssStyle<K>(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+) = CssStyle<K>(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle.Companion.base(
+    name: String,
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+) = base<K>(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle.Companion.base(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+) = base<K>(extraModifier, init)
+
+@Composable
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. It seems like you were intentionally using the `ComponentStyle` / `ComponentVariant` pattern, which now requires specifying a `ComponentKind` interface. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.toModifier(first: ComponentVariant?, vararg rest: ComponentVariant?): Modifier =
+    this.toModifier()
+
+// endregion

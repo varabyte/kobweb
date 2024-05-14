@@ -1,7 +1,11 @@
+@file:Suppress("DEPRECATION") // Remove this after deleting ComponentVariant references
+
 package com.varabyte.kobweb.silk.style
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.components.style.StubbedComponentVariant
 import kotlin.reflect.KProperty
 
 abstract class CssStyleVariant<K : ComponentKind> {
@@ -98,7 +102,6 @@ fun <K : ComponentKind> CssStyle<K>.addVariant(
     return addVariant({ extraModifier }, init)
 }
 
-
 fun <K : ComponentKind> CssStyle<K>.addVariant(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
@@ -109,11 +112,16 @@ fun <K : ComponentKind> CssStyle<K>.addVariant(
     )
 }
 
-
+/**
+ * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
+ *
+ * You may still wish to use [CssStyle.addVariant] instead if you expect that at some point in the future
+ * you'll want to add additional, non-base styles.
+ */
 fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     extraModifier: Modifier = Modifier,
     init: CssStyleBaseScope.() -> Modifier
-) = addVariantBase({ extraModifier }, init)
+): CssStyleVariant<K> = addVariantBase({ extraModifier }, init)
 
 /**
  * Convenience method when you only care about registering the base style, which can help avoid a few extra lines.
@@ -126,3 +134,116 @@ fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     init: CssStyleBaseScope.() -> Modifier
 ): CssStyleVariant<K> =
     SimpleCssStyleVariant(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier, this)
+
+// region Deprecated
+
+// The following methods are only added to prevent potential compile errors when migrating code over to the new
+// CssStyle APIs. They should be removed when we remove ComponentStyle from the codebase.
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle<K>.addVariant(
+    name: String,
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+): CssStyleVariant<K> = addVariant(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle<K>.addVariant(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+): CssStyleVariant<K> = addVariant(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle<K>.addVariantBase(
+    name: String,
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+): CssStyleVariant<K> = addVariantBase(extraModifier, init)
+
+@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
+@Deprecated("You are likely seeing this after a migration to use `CssStyle`. You should now use `@CssName` to specify the custom name for this style (`name = \"example\"` becomes `CssName(\"example\")`.")
+fun <K : ComponentKind> CssStyle<K>.addVariantBase(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+): CssStyleVariant<K> = addVariantBase(extraModifier, init)
+
+private fun stubbedComponentVariant() = StubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariant(
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+): ComponentVariant = stubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariant(
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+): ComponentVariant = stubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariantBase(
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+): ComponentVariant = stubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariantBase(
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+): ComponentVariant = stubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariant(
+    name: String,
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+): ComponentVariant = stubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariant(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleScope.() -> Unit
+): ComponentVariant = stubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariantBase(
+    name: String,
+    extraModifier: Modifier = Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+): ComponentVariant = stubbedComponentVariant()
+
+@Suppress("UNUSED_PARAMETER", "UnusedReceiverParameter")
+@Deprecated("This call to `addVariant` is not supported for untyped `CssStyle`s and is likely the result of an incomplete migration. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
+fun CssStyle<UnspecifiedKind>.addVariantBase(
+    name: String,
+    extraModifier: @Composable () -> Modifier,
+    prefix: String? = null,
+    init: CssStyleBaseScope.() -> Modifier
+): ComponentVariant = stubbedComponentVariant()
+
+// endregion

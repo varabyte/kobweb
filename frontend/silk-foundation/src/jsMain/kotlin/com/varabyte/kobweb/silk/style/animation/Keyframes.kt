@@ -8,10 +8,12 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleScopeBase
+import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
+import kotlin.reflect.KProperty
 
 class KeyframesBuilder internal constructor(override val colorMode: ColorMode) : CssStyleScopeBase {
     private val keyframeStyles = mutableMapOf<CSSKeyframe, Modifier>()
@@ -133,6 +135,19 @@ class Keyframes(internal val init: KeyframesBuilder.() -> Unit) {
     // Note: Need to postpone checking this value, because color modes aren't ready until after a certain point in
     // Silk's initialization.
     val usesColorMode by lazy { !isColorModeAgnostic(init) }
+
+    // This weird operator is provided for legacy code purposes.
+    // Old code: `val ExampleKeyframes by Keyframes { ... }`
+    // New code: `val ExampleKeyframes = Keyframes { ... }`
+    // This lets us support the `by` keyword for now, although we will remove it eventually.
+    @Deprecated("Please change the `by` keyword here to an `=` assignment instead.")
+    operator fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>
+    ): Keyframes {
+        return this
+    }
+
 }
 
 /**

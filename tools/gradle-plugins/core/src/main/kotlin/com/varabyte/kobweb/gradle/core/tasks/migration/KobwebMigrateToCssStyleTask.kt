@@ -52,16 +52,6 @@ abstract class KobwebMigrateToCssStyleTask :
     )
 
     private val replacements = buildMap<Regex, String> {
-        // If a user is using "*" imports, we need to split that into two "*" imports just in case, even if they
-        // don't use the new `selector` package in their code. Better an unused import than a compile error!
-        put(
-            "import com.varabyte.kobweb.silk.components.style.*",
-            listOf(
-                "import com.varabyte.kobweb.silk.style.*",
-                "import com.varabyte.kobweb.silk.style.selector.*"
-            ).joinToString("\n")
-        )
-
         put(
             "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
             "import com.varabyte.kobweb.silk.style.CssStyle"
@@ -73,6 +63,17 @@ abstract class KobwebMigrateToCssStyleTask :
             )
         }
         put("import com.varabyte.kobweb.silk.components.style", "import com.varabyte.kobweb.silk.style")
+        // If a user is using "*" imports, we need to split that into two "*" imports just in case, even if they
+        // don't use the new `selector` package in their code. Better an unused import than a compile error!
+        put(
+            "import com.varabyte.kobweb.silk.style.*",
+            listOf(
+                "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
+                "import com.varabyte.kobweb.silk.components.style.ComponentVariant",
+                "import com.varabyte.kobweb.silk.style.*",
+                "import com.varabyte.kobweb.silk.style.selector.*",
+            ).joinToString("\n")
+        )
         // Restore ComponentVariant import to not break existing references like `variant: ComponentVariant? = null`
         put(
             "import com.varabyte.kobweb.silk.style.ComponentVariant",
@@ -90,8 +91,11 @@ abstract class KobwebMigrateToCssStyleTask :
         )
 
         put("by ComponentStyle", "= CssStyle")
+        put("= ComponentStyle", "= CssStyle")
         put("by (.+).addVariant".toRegex(), "= $1.addVariant")
+        put("= (.+).addVariant".toRegex(), "= $1.addVariant")
         put("by Keyframes", "= Keyframes")
+        put("= Keyframes", "= Keyframes")
 
         put("(modify|replace)Component([a-zA-Z]+)".toRegex(), "$1$2")
 
@@ -135,7 +139,7 @@ abstract class KobwebMigrateToCssStyleTask :
             println()
             println("$numUpdatedFiles file(s) were updated.")
             if (addVariantCount > 0) {
-                println("NOTE: Some users may get compile errors around style variants, despite our best efforts. If this happens to you, please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#migration for more information.")
+                println("NOTE: Some users may get compile errors and/or deprecation warnings around component styles and variants, despite our best efforts. If this happens to you, please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#migration for more information.")
             }
         }
     }

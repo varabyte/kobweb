@@ -26,6 +26,12 @@ sealed class ComponentVariant {
     internal abstract fun toModifier(): Modifier
 }
 
+@Suppress("CanSealedSubClassBeObject")
+internal class StubbedComponentVariant : ComponentVariant() {
+    @Composable
+    override fun toModifier() = Modifier
+}
+
 /**
  * A default [ComponentVariant] implementation that represents a single variant style.
  */
