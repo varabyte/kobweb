@@ -5,10 +5,11 @@ import com.varabyte.kobweb.gradle.core.extensions.YarnLockChangedStrategy
 import com.varabyte.kobweb.gradle.core.extensions.createYarnBlock
 import com.varabyte.kobweb.gradle.core.extensions.yarn
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
-import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
+import com.varabyte.kobweb.gradle.core.tasks.migration.KobwebMigrateToCssStyleTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.withType
@@ -47,4 +48,10 @@ class KobwebCorePlugin : Plugin<Project> {
 
         project.tasks.register("kobwebGenerateModuleMetadata", KobwebGenerateModuleMetadataTask::class.java)
     }
+}
+
+// We don't simply do this ourselves in the core plugin apply method because they don't apply to the worker plugin.
+// TODO: We should consider creating a new module which is just for "application" and "library" plugins.
+fun TaskContainer.registerMigrationTasks() {
+    register("kobwebMigrateToCssStyle", KobwebMigrateToCssStyleTask::class.java)
 }

@@ -47,6 +47,10 @@ fun Project.getResourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<Roo
     return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.resources }
 }
 
+fun Project.getSourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootAndFile> {
+    return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.kotlin }
+}
+
 /**
  * Using a [Project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"
  */

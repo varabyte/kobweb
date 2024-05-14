@@ -5,6 +5,7 @@ import com.varabyte.kobweb.gradle.core.extensions.kobwebBlock
 import com.varabyte.kobweb.gradle.core.kmp.jsTarget
 import com.varabyte.kobweb.gradle.core.util.RootAndFile
 import com.varabyte.kobweb.gradle.core.util.getResourceFilesWithRoots
+import com.varabyte.kobweb.gradle.core.util.getSourceFilesWithRoots
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 
@@ -18,6 +19,9 @@ abstract class KobwebModuleTask(desc: String) : KobwebTask(desc) {
     @Internal
     fun getResourceFilesJsWithRoots(): Sequence<RootAndFile> = project.getResourceFilesWithRoots(project.jsTarget)
         .filter { rootAndFile -> rootAndFile.relativeFile.invariantSeparatorsPath.startsWith("${getPublicPath()}/") }
+
+    @Internal
+    fun getSourceFilesJsWithRoots(): Sequence<RootAndFile> = project.getSourceFilesWithRoots(project.jsTarget)
 
     /**
      * The path of public resources inside the project's resources folder, e.g. "public" ->

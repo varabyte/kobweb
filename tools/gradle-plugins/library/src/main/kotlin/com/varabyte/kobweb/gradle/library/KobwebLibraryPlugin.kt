@@ -13,6 +13,7 @@ import com.varabyte.kobweb.gradle.core.ksp.applyKspPlugin
 import com.varabyte.kobweb.gradle.core.ksp.setKspMode
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
+import com.varabyte.kobweb.gradle.core.registerMigrationTasks
 import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.library.extensions.createLibraryBlock
 import com.varabyte.kobweb.gradle.library.extensions.index
@@ -55,5 +56,7 @@ class KobwebLibraryPlugin : Plugin<Project> {
             project.setupKspJvm(jvmTarget)
             project.generateModuleMetadataFor(jvmTarget)
         }
+
+        project.tasks.registerMigrationTasks()
     }
 }
