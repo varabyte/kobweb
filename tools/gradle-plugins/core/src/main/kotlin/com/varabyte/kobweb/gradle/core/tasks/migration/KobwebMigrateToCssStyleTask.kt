@@ -66,6 +66,10 @@ abstract class KobwebMigrateToCssStyleTask :
             "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
             "import com.varabyte.kobweb.silk.style.CssStyle"
         )
+        put(
+            "import com.varabyte.kobweb.silk.components.style.ComponentVariant",
+            "import com.varabyte.kobweb.silk.style.CssStyleVariant"
+        )
         migratedSelectors.forEach { selector ->
             put(
                 "import com.varabyte.kobweb.silk.components.style.$selector",
