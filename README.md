@@ -4978,6 +4978,8 @@ limitations:
   the browser for security reasons and can only be set through HTML / CSS).
 * you won't have the ability to turn elements on / off when printing the page.
 * accessibility tools for browsers might not work.
+* the download size of the rendering components is not insignificant and apparently not very compressible, often
+  resulting in a site's basic footprint being 4-6x larger total (e.g. 200-400K vs. 2-3MB for small sites).
 
 It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there.
 
