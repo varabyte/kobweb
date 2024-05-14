@@ -59,7 +59,7 @@ abstract class KobwebMigrateToCssStyleTask :
         migratedSelectors.forEach { selector ->
             put(
                 "import com.varabyte.kobweb.silk.components.style.$selector",
-                "import com.varabyte.kobweb.silk.style.selector.$selector"
+                "import com.varabyte.kobweb.silk.style.selectors.$selector"
             )
         }
         put("import com.varabyte.kobweb.silk.components.style", "import com.varabyte.kobweb.silk.style")
@@ -71,7 +71,7 @@ abstract class KobwebMigrateToCssStyleTask :
                 "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
                 "import com.varabyte.kobweb.silk.components.style.ComponentVariant",
                 "import com.varabyte.kobweb.silk.style.*",
-                "import com.varabyte.kobweb.silk.style.selector.*",
+                "import com.varabyte.kobweb.silk.style.selectors.*",
             ).joinToString("\n")
         )
         // Restore ComponentVariant import to not break existing references like `variant: ComponentVariant? = null`

@@ -17,10 +17,10 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.common.DisabledStyle
-import com.varabyte.kobweb.silk.style.selector.active
-import com.varabyte.kobweb.silk.style.selector.ariaDisabled
-import com.varabyte.kobweb.silk.style.selector.hover
-import com.varabyte.kobweb.silk.style.selector.not
+import com.varabyte.kobweb.silk.style.selectors.active
+import com.varabyte.kobweb.silk.style.selectors.ariaDisabled
+import com.varabyte.kobweb.silk.style.selectors.hover
+import com.varabyte.kobweb.silk.style.selectors.not
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.style.vars.color.BorderColorVar

@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.silk.style.selector
+package com.varabyte.kobweb.silk.style.selectors
 
 import com.varabyte.kobweb.silk.style.CssRule
 import com.varabyte.kobweb.silk.style.StyleScope

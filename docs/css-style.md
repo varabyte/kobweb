@@ -519,7 +519,7 @@ Box(SmoothColorStyle.toModifier().fillMaxSize())
 
 One exception is all the provided psuedo-class and psueo-element selectors, like `hover` for example. Those have all
 moved from `com.varabyte.kobweb.silk.components.style` into their own new package at
-`com.varabyte.kobweb.silk.style.selector`.
+`com.varabyte.kobweb.silk.style.selectors`.
 
 ```kotlin
 // Before
@@ -534,7 +534,7 @@ CssStyle {
 ```kotlin
 // Before
 
-import com.varabyte.kobweb.silk.style.selector.hover
+import com.varabyte.kobweb.silk.style.selectors.hover
 
 CssStyle {
   base { /* ... */ }

@@ -13,9 +13,9 @@ import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.addVariant
-import com.varabyte.kobweb.silk.style.selector.hover
-import com.varabyte.kobweb.silk.style.selector.link
-import com.varabyte.kobweb.silk.style.selector.visited
+import com.varabyte.kobweb.silk.style.selectors.hover
+import com.varabyte.kobweb.silk.style.selectors.link
+import com.varabyte.kobweb.silk.style.selectors.visited
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
 import org.jetbrains.compose.web.css.*

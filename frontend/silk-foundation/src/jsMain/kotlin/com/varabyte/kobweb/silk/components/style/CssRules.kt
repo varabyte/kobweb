@@ -4,51 +4,51 @@ package com.varabyte.kobweb.silk.components.style
 
 import com.varabyte.kobweb.silk.style.CssRule
 import com.varabyte.kobweb.silk.style.StyleScope
-import com.varabyte.kobweb.silk.style.selector.active
-import com.varabyte.kobweb.silk.style.selector.after
-import com.varabyte.kobweb.silk.style.selector.anyLink
-import com.varabyte.kobweb.silk.style.selector.ariaDisabled
-import com.varabyte.kobweb.silk.style.selector.ariaInvalid
-import com.varabyte.kobweb.silk.style.selector.ariaRequired
-import com.varabyte.kobweb.silk.style.selector.autofill
-import com.varabyte.kobweb.silk.style.selector.before
-import com.varabyte.kobweb.silk.style.selector.checked
-import com.varabyte.kobweb.silk.style.selector.default
-import com.varabyte.kobweb.silk.style.selector.disabled
-import com.varabyte.kobweb.silk.style.selector.empty
-import com.varabyte.kobweb.silk.style.selector.enabled
-import com.varabyte.kobweb.silk.style.selector.firstChild
-import com.varabyte.kobweb.silk.style.selector.firstLetter
-import com.varabyte.kobweb.silk.style.selector.firstLine
-import com.varabyte.kobweb.silk.style.selector.firstOfType
-import com.varabyte.kobweb.silk.style.selector.focus
-import com.varabyte.kobweb.silk.style.selector.focusVisible
-import com.varabyte.kobweb.silk.style.selector.focusWithin
-import com.varabyte.kobweb.silk.style.selector.hover
-import com.varabyte.kobweb.silk.style.selector.inRange
-import com.varabyte.kobweb.silk.style.selector.indeterminate
-import com.varabyte.kobweb.silk.style.selector.invalid
-import com.varabyte.kobweb.silk.style.selector.lastChild
-import com.varabyte.kobweb.silk.style.selector.lastOfType
-import com.varabyte.kobweb.silk.style.selector.link
-import com.varabyte.kobweb.silk.style.selector.mediaPrint
-import com.varabyte.kobweb.silk.style.selector.not
-import com.varabyte.kobweb.silk.style.selector.onlyChild
-import com.varabyte.kobweb.silk.style.selector.onlyOfType
-import com.varabyte.kobweb.silk.style.selector.optional
-import com.varabyte.kobweb.silk.style.selector.outOfRange
-import com.varabyte.kobweb.silk.style.selector.placeholder
-import com.varabyte.kobweb.silk.style.selector.placeholderShown
-import com.varabyte.kobweb.silk.style.selector.readOnly
-import com.varabyte.kobweb.silk.style.selector.readWrite
-import com.varabyte.kobweb.silk.style.selector.required
-import com.varabyte.kobweb.silk.style.selector.root
-import com.varabyte.kobweb.silk.style.selector.selection
-import com.varabyte.kobweb.silk.style.selector.target
-import com.varabyte.kobweb.silk.style.selector.userInvalid
-import com.varabyte.kobweb.silk.style.selector.userValid
-import com.varabyte.kobweb.silk.style.selector.valid
-import com.varabyte.kobweb.silk.style.selector.visited
+import com.varabyte.kobweb.silk.style.selectors.active
+import com.varabyte.kobweb.silk.style.selectors.after
+import com.varabyte.kobweb.silk.style.selectors.anyLink
+import com.varabyte.kobweb.silk.style.selectors.ariaDisabled
+import com.varabyte.kobweb.silk.style.selectors.ariaInvalid
+import com.varabyte.kobweb.silk.style.selectors.ariaRequired
+import com.varabyte.kobweb.silk.style.selectors.autofill
+import com.varabyte.kobweb.silk.style.selectors.before
+import com.varabyte.kobweb.silk.style.selectors.checked
+import com.varabyte.kobweb.silk.style.selectors.default
+import com.varabyte.kobweb.silk.style.selectors.disabled
+import com.varabyte.kobweb.silk.style.selectors.empty
+import com.varabyte.kobweb.silk.style.selectors.enabled
+import com.varabyte.kobweb.silk.style.selectors.firstChild
+import com.varabyte.kobweb.silk.style.selectors.firstLetter
+import com.varabyte.kobweb.silk.style.selectors.firstLine
+import com.varabyte.kobweb.silk.style.selectors.firstOfType
+import com.varabyte.kobweb.silk.style.selectors.focus
+import com.varabyte.kobweb.silk.style.selectors.focusVisible
+import com.varabyte.kobweb.silk.style.selectors.focusWithin
+import com.varabyte.kobweb.silk.style.selectors.hover
+import com.varabyte.kobweb.silk.style.selectors.inRange
+import com.varabyte.kobweb.silk.style.selectors.indeterminate
+import com.varabyte.kobweb.silk.style.selectors.invalid
+import com.varabyte.kobweb.silk.style.selectors.lastChild
+import com.varabyte.kobweb.silk.style.selectors.lastOfType
+import com.varabyte.kobweb.silk.style.selectors.link
+import com.varabyte.kobweb.silk.style.selectors.mediaPrint
+import com.varabyte.kobweb.silk.style.selectors.not
+import com.varabyte.kobweb.silk.style.selectors.onlyChild
+import com.varabyte.kobweb.silk.style.selectors.onlyOfType
+import com.varabyte.kobweb.silk.style.selectors.optional
+import com.varabyte.kobweb.silk.style.selectors.outOfRange
+import com.varabyte.kobweb.silk.style.selectors.placeholder
+import com.varabyte.kobweb.silk.style.selectors.placeholderShown
+import com.varabyte.kobweb.silk.style.selectors.readOnly
+import com.varabyte.kobweb.silk.style.selectors.readWrite
+import com.varabyte.kobweb.silk.style.selectors.required
+import com.varabyte.kobweb.silk.style.selectors.root
+import com.varabyte.kobweb.silk.style.selectors.selection
+import com.varabyte.kobweb.silk.style.selectors.target
+import com.varabyte.kobweb.silk.style.selectors.userInvalid
+import com.varabyte.kobweb.silk.style.selectors.userValid
+import com.varabyte.kobweb.silk.style.selectors.valid
+import com.varabyte.kobweb.silk.style.selectors.visited
 
 //region Pseudo classes
 
@@ -59,7 +59,7 @@ import com.varabyte.kobweb.silk.style.selector.visited
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:any-link">:any-link</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.anyLink`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.anyLink`")
 val StyleScope.anyLink get() = anyLink
 
 /**
@@ -69,7 +69,7 @@ val StyleScope.anyLink get() = anyLink
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:link">:link</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.link`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.link`")
 val StyleScope.link get() = link
 
 /**
@@ -77,7 +77,7 @@ val StyleScope.link get() = link
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:target">:target</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.target`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.target`")
 val StyleScope.target get() = target
 
 /**
@@ -87,7 +87,7 @@ val StyleScope.target get() = target
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:visited">:visited</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.visited`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.visited`")
 val StyleScope.visited get() = visited
 
 //endregion
@@ -101,7 +101,7 @@ val StyleScope.visited get() = visited
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:hover">:hover</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.hover`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.hover`")
 val StyleScope.hover get() = hover
 
 /**
@@ -111,7 +111,7 @@ val StyleScope.hover get() = hover
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:active">:active</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.active`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.active`")
 val StyleScope.active get() = active
 
 /**
@@ -119,7 +119,7 @@ val StyleScope.active get() = active
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus">:focus</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focus`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.focus`")
 val StyleScope.focus get() = focus
 
 /**
@@ -127,7 +127,7 @@ val StyleScope.focus get() = focus
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible">:focus-visible</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focusVisible`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.focusVisible`")
 val StyleScope.focusVisible get() = focusVisible
 
 /**
@@ -135,7 +135,7 @@ val StyleScope.focusVisible get() = focusVisible
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within">:focus-within</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.focusWithin`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.focusWithin`")
 val StyleScope.focusWithin get() = focusWithin
 
 //endregion
@@ -147,7 +147,7 @@ val StyleScope.focusWithin get() = focusWithin
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:autofill">:autofill</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.autofill`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.autofill`")
 val StyleScope.autofill get() = autofill
 
 /**
@@ -155,7 +155,7 @@ val StyleScope.autofill get() = autofill
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:enabled">:enabled</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.enabled`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.enabled`")
 val StyleScope.enabled get() = enabled
 
 /**
@@ -163,7 +163,7 @@ val StyleScope.enabled get() = enabled
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:disabled">:disabled</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.disabled`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.disabled`")
 val StyleScope.disabled get() = disabled
 
 /**
@@ -171,7 +171,7 @@ val StyleScope.disabled get() = disabled
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-only">:read-only</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.readOnly`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.readOnly`")
 val StyleScope.readOnly get() = readOnly
 
 /**
@@ -179,7 +179,7 @@ val StyleScope.readOnly get() = readOnly
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:read-write">:read-write</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.readWrite`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.readWrite`")
 val StyleScope.readWrite get() = readWrite
 
 /**
@@ -187,7 +187,7 @@ val StyleScope.readWrite get() = readWrite
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:placeholder-shown">:placeholder-shown</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.placeholderShown`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.placeholderShown`")
 val StyleScope.placeholderShown get() = placeholderShown
 
 /**
@@ -195,7 +195,7 @@ val StyleScope.placeholderShown get() = placeholderShown
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:default">:default</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.default`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.default`")
 val StyleScope.default get() = default
 
 /**
@@ -203,7 +203,7 @@ val StyleScope.default get() = default
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:checked">:checked</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.checked`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.checked`")
 val StyleScope.checked get() = checked
 
 /**
@@ -211,7 +211,7 @@ val StyleScope.checked get() = checked
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:indeterminate">:indeterminate</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.indeterminate`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.indeterminate`")
 val StyleScope.indeterminate get() = indeterminate
 
 /**
@@ -219,7 +219,7 @@ val StyleScope.indeterminate get() = indeterminate
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:valid">:valid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.valid`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.valid`")
 val StyleScope.valid get() = valid
 
 /**
@@ -227,7 +227,7 @@ val StyleScope.valid get() = valid
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid">:invalid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.invalid`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.invalid`")
 val StyleScope.invalid get() = invalid
 
 /**
@@ -235,7 +235,7 @@ val StyleScope.invalid get() = invalid
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:in-range">:in-range</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.inRange`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.inRange`")
 val StyleScope.inRange get() = inRange
 
 /**
@@ -244,7 +244,7 @@ val StyleScope.inRange get() = inRange
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:out-of-range">:out-of-range</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.outOfRange`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.outOfRange`")
 val StyleScope.outOfRange get() = outOfRange
 
 /**
@@ -252,7 +252,7 @@ val StyleScope.outOfRange get() = outOfRange
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:required">:required</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.required`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.required`")
 val StyleScope.required get() = required
 
 /**
@@ -260,7 +260,7 @@ val StyleScope.required get() = required
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:optional">:optional</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.optional`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.optional`")
 val StyleScope.optional get() = optional
 
 /**
@@ -268,7 +268,7 @@ val StyleScope.optional get() = optional
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-valid">:user-valid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.userValid`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.userValid`")
 val StyleScope.userValid get() = userValid
 
 /**
@@ -276,7 +276,7 @@ val StyleScope.userValid get() = userValid
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:user-invalid">:user-invalid</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.userInvalid`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.userInvalid`")
 val StyleScope.userInvalid get() = userInvalid
 
 //endregion
@@ -288,7 +288,7 @@ val StyleScope.userInvalid get() = userInvalid
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:root">:root</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.root`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.root`")
 val StyleScope.root get() = root
 
 /**
@@ -296,7 +296,7 @@ val StyleScope.root get() = root
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:empty">:empty</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.empty`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.empty`")
 val StyleScope.empty get() = empty
 
 /**
@@ -304,7 +304,7 @@ val StyleScope.empty get() = empty
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-child">:first-child</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstChild`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.firstChild`")
 val StyleScope.firstChild get() = firstChild
 
 /**
@@ -312,7 +312,7 @@ val StyleScope.firstChild get() = firstChild
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-child">:last-child</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.lastChild`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.lastChild`")
 val StyleScope.lastChild get() = lastChild
 
 /**
@@ -320,7 +320,7 @@ val StyleScope.lastChild get() = lastChild
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-child">:only-child</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.onlyChild`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.onlyChild`")
 val StyleScope.onlyChild get() = onlyChild
 
 /**
@@ -328,7 +328,7 @@ val StyleScope.onlyChild get() = onlyChild
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:first-of-type">:first-of-type</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstOfType`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.firstOfType`")
 val StyleScope.firstOfType get() = firstOfType
 
 /**
@@ -336,7 +336,7 @@ val StyleScope.firstOfType get() = firstOfType
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:last-of-type">:last-of-type</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.lastOfType`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.lastOfType`")
 val StyleScope.lastOfType get() = lastOfType
 
 /**
@@ -344,7 +344,7 @@ val StyleScope.lastOfType get() = lastOfType
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:only-of-type">:only-of-type</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.onlyOfType`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.onlyOfType`")
 val StyleScope.onlyOfType get() = onlyOfType
 
 //endregion
@@ -358,7 +358,7 @@ val StyleScope.onlyOfType get() = onlyOfType
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::before">::before</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.before`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.before`")
 val StyleScope.before get() = before
 
 /**
@@ -366,7 +366,7 @@ val StyleScope.before get() = before
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::after">::after</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.after`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.after`")
 val StyleScope.after get() = after
 
 /**
@@ -374,7 +374,7 @@ val StyleScope.after get() = after
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::selection">::selection</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.selection`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.selection`")
 val StyleScope.selection get() = selection
 
 /**
@@ -382,7 +382,7 @@ val StyleScope.selection get() = selection
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-letter">::first-letter</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstLetter`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.firstLetter`")
 val StyleScope.firstLetter get() = firstLetter
 
 /**
@@ -390,7 +390,7 @@ val StyleScope.firstLetter get() = firstLetter
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::first-line">::first-line</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.firstLine`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.firstLine`")
 val StyleScope.firstLine get() = firstLine
 
 /**
@@ -400,7 +400,7 @@ val StyleScope.firstLine get() = firstLine
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/::placeholder">::placeholder</a>
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.placeholder`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.placeholder`")
 val StyleScope.placeholder get() = placeholder
 
 //endregion
@@ -410,14 +410,14 @@ val StyleScope.placeholder get() = placeholder
 /**
  * Used to indicate styles which should only be applied when the page is being printed.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.mediaPrint`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.mediaPrint`")
 val StyleScope.mediaPrint get() = mediaPrint
 
 //endregion
 
 // region Functional pseudo classes
 
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.not`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.not`")
 fun StyleScope.not(vararg params: CssRule.NonMediaCssRule) = not(*params)
 
 //endregion
@@ -431,7 +431,7 @@ fun StyleScope.not(vararg params: CssRule.NonMediaCssRule) = not(*params)
  * the HTML version; for example, some elements don't support `disabled` and also `disabled` elements don't fire
  * mouse events, which can be useful e.g. when implementing tooltips.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaDisabled`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.ariaDisabled`")
 val StyleScope.ariaDisabled get() = ariaDisabled
 
 /**
@@ -441,7 +441,7 @@ val StyleScope.ariaDisabled get() = ariaDisabled
  * widget supports a general invalidation algorithm (like an email type input with an invalid email address), but the
  * `ariaInvalid` version can be used to support custom invalidation strategies.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaInvalid`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.ariaInvalid`")
 val StyleScope.ariaInvalid get() = ariaInvalid
 
 /**
@@ -451,7 +451,7 @@ val StyleScope.ariaInvalid get() = ariaInvalid
  * using elements that don't support the `required` attribute, like elements created from divs, as a way to communicate
  * their required state to accessibility readers.
  */
-@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selector.ariaRequired`")
+@Deprecated("Please change your import to `com.varabyte.kobweb.silk.style.selectors.ariaRequired`")
 val StyleScope.ariaRequired get() = ariaRequired
 
 //endregion
