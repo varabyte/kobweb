@@ -134,7 +134,7 @@ class MutableSilkTheme {
         }
     }
 
-    fun MutableSilkTheme.replaceStyle(
+    fun replaceStyle(
         style: CssStyle<*>,
         extraModifier: @Composable () -> Modifier,
         init: CssStyleScope.() -> Unit
@@ -147,9 +147,9 @@ class MutableSilkTheme {
         updateReplaced(style, newStyle)
     }
 
-    fun MutableSilkTheme.replaceStyle(
+    fun replaceStyle(
         style: CssStyle<*>,
-        extraModifier: Modifier,
+        extraModifier: Modifier = Modifier,
         init: CssStyleScope.() -> Unit
     ) {
         replaceStyle(style, { extraModifier }, init)
