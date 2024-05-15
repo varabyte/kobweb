@@ -743,26 +743,6 @@ fun MutableSilkTheme.modifyComponentStyleBase(
     modifyStyleBase(style, extraModifiers, init)
 }
 
-fun <K : ComponentKind> MutableSilkTheme.modifyStyleBase(
-    style: CssStyle<K>,
-    extraModifier: Modifier = Modifier,
-    init: CssStyleBaseScope.() -> Modifier
-) {
-    modifyStyleBase(style, { extraModifier }, init)
-}
-
-fun <K : ComponentKind> MutableSilkTheme.modifyStyleBase(
-    style: CssStyle<K>,
-    extraModifier: @Composable () -> Modifier,
-    init: CssStyleBaseScope.() -> Modifier
-) {
-    modifyStyle(style, extraModifier) {
-        base {
-            CssStyleBaseScope(colorMode).let(init)
-        }
-    }
-}
-
 fun MutableSilkTheme.modifyStyle(
     style: LegacyComponentStyle,
     extraModifier: Modifier = Modifier,
