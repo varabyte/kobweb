@@ -529,8 +529,8 @@ fun MutableSilkTheme.replaceComponentStyleBase(
     replaceStyleBase(style, extraModifiers, init)
 }
 
-fun <K : ComponentKind> MutableSilkTheme.replaceStyleBase(
-    style: CssStyle<K>,
+fun MutableSilkTheme.replaceStyleBase(
+    style: CssStyle<*>,
     extraModifier: Modifier = Modifier,
     init: CssStyleBaseScope.() -> Modifier
 ) {
@@ -540,8 +540,8 @@ fun <K : ComponentKind> MutableSilkTheme.replaceStyleBase(
 /**
  * Convenience method when you want to replace an upstream style but only need to define a base style.
  */
-fun <K : ComponentKind> MutableSilkTheme.replaceStyleBase(
-    style: CssStyle<K>,
+fun MutableSilkTheme.replaceStyleBase(
+    style: CssStyle<*>,
     extraModifier: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
 ) {
