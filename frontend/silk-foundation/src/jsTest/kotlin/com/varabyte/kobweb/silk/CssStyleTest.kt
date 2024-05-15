@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk
 
 import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -41,7 +42,9 @@ class CssStyleTest {
         }.let(::ImmutableSilkTheme)
         SilkTheme.registerStylesInto(stylesheet)
 
-        assertThat(stylesheet.cssRules.toList().map { it.header })
+        assertThat(stylesheet.cssRules.flatMap { ruleBlock ->
+            (ruleBlock as CSSLayerRuleDeclaration).rules.map { it.header }
+        })
             .containsExactly(".${BaseStyle.name}", ".${Variant.name}")
             .inOrder()
     }
@@ -61,7 +64,9 @@ class CssStyleTest {
         }.let(::ImmutableSilkTheme)
         SilkTheme.registerStylesInto(stylesheet)
 
-        assertThat(stylesheet.cssRules.toList().map { it.header })
+        assertThat(stylesheet.cssRules.flatMap { ruleBlock ->
+            (ruleBlock as CSSLayerRuleDeclaration).rules.map { it.header }
+        })
             .containsExactly(".${BaseStyle.name}", ".${SecondaryStyle.name}", ".${TertiaryStyle.name}")
             .inOrder()
     }
