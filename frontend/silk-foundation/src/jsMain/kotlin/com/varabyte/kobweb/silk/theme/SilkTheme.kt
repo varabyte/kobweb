@@ -16,6 +16,7 @@ import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.ExtendingCssStyle
+import com.varabyte.kobweb.silk.style.ExtendingCssStyleVariant
 import com.varabyte.kobweb.silk.style.ImmutableCssStyle
 import com.varabyte.kobweb.silk.style.RestrictedKind
 import com.varabyte.kobweb.silk.style.SimpleCssStyleVariant
@@ -271,6 +272,10 @@ class MutableSilkTheme {
         val finalLayer = (layer ?: SilkCssLayerNames.COMPONENT_VARIANTS)
             .takeIf { it.isNotEmpty() } // In case user passes in ""
         finalLayer?.let { _cssLayersFor[name] = it }
+
+        if (variant is ExtendingCssStyleVariant) {
+            _cssStyleDependencies.getOrPut(variant.cssStyle) { mutableListOf() }.add(variant.baseVariant.cssStyle)
+        }
     }
 
     /**

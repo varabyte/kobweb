@@ -32,7 +32,7 @@ abstract class CssStyleVariant<K : ComponentKind> {
 /**
  * A default [CssStyleVariant] implementation that represents a single variant style.
  */
-internal class SimpleCssStyleVariant<K : ComponentKind>(
+internal open class SimpleCssStyleVariant<K : ComponentKind>(
     val cssStyle: CssStyle<K>,
     val baseStyle: CssStyle<K>
 ) : CssStyleVariant<K>() {
@@ -53,6 +53,28 @@ private class CompositeCssStyleVariant<K : ComponentKind>(
 ) : CssStyleVariant<K>() {
     @Composable
     override fun toModifier() = head.toModifier().then(tail.toModifier())
+}
+
+internal class ExtendingCssStyleVariant<K : ComponentKind>(
+    init: CssStyleScope.() -> Unit,
+    extraModifier: @Composable () -> Modifier,
+    internal val baseVariant: SimpleCssStyleVariant<K>
+) : SimpleCssStyleVariant<K>(init, extraModifier, baseVariant.baseStyle) {
+
+    @Composable
+    override fun toModifier(): Modifier {
+        // We usually will only be extending a single variant, but we might be extending a variant that extends another
+        val baseVariants = mutableListOf<CssStyleVariant<K>>()
+        var currBaseVariant: CssStyleVariant<K>? = baseVariant
+        while (currBaseVariant != null) {
+            baseVariants.add(currBaseVariant)
+            currBaseVariant = (currBaseVariant as? ExtendingCssStyleVariant<K>)?.baseVariant
+        }
+        return baseVariants
+            // `as` required to avoid a compiler ambiguity error between Modifier and Modifier.Companion
+            .fold(Modifier as Modifier) { acc, curr -> acc.then(curr.toModifier()) }
+            .then(this.cssStyle.toModifier())
+    }
 }
 
 fun <K : ComponentKind> CssStyleVariant<K>.thenIf(
@@ -134,6 +156,31 @@ fun <K : ComponentKind> CssStyle<K>.addVariantBase(
     init: CssStyleBaseScope.() -> Modifier
 ): CssStyleVariant<K> =
     SimpleCssStyleVariant(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier, this)
+
+fun <K : ComponentKind> CssStyleVariant<K>.extendedBy(
+    extraModifier: Modifier = Modifier,
+    init: CssStyleScope.() -> Unit
+) =
+    extendedBy({ extraModifier }, init)
+
+fun <K : ComponentKind> CssStyleVariant<K>.extendedBy(
+    extraModifier: @Composable () -> Modifier,
+    init: CssStyleScope.() -> Unit
+): CssStyleVariant<K> = ExtendingCssStyleVariant(init, extraModifier, this as SimpleCssStyleVariant<K>)
+
+fun <K : ComponentKind> CssStyleVariant<K>.extendedByBase(
+    extraModifier: Modifier = Modifier,
+    init: CssStyleBaseScope.() -> Modifier
+) =
+    extendedByBase({ extraModifier }, init)
+
+fun <K : ComponentKind> CssStyleVariant<K>.extendedByBase(
+    extraModifier: @Composable () -> Modifier,
+    init: CssStyleBaseScope.() -> Modifier
+) = extendedBy(extraModifier) {
+    base { CssStyleBaseScope(colorMode).let(init) }
+}
+
 
 // region Deprecated
 

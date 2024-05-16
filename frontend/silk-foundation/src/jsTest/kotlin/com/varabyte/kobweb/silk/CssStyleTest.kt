@@ -29,6 +29,8 @@ import kotlin.test.Test
 
 @Suppress("LocalVariableName")
 class CssStyleTest {
+    sealed interface TestKind : ComponentKind
+
     @Test
     fun componentVariantStylesSheetOrder() {
         val stylesheet = StyleSheet()
@@ -131,6 +133,38 @@ class CssStyleTest {
             }
         }
     }
+
+    @Test
+    fun cssStyleExtendedVariants() {
+
+        val TestStyle = CssStyle<TestKind> { }
+        val BaseTestVariant = TestStyle.addVariant { }
+        val PrimaryBaseTestVariant = BaseTestVariant.extendedBy { }
+        val SecondaryBaseTestVariant = PrimaryBaseTestVariant.extendedBy { }
+        val TertiaryBaseTestVariant = SecondaryBaseTestVariant.extendedBy { }
+        initSilk {
+            with(it.theme) {
+                registerStyle("test", TestStyle)
+                registerVariant("-base", BaseTestVariant)
+                registerVariant("-primary-base", PrimaryBaseTestVariant)
+                registerVariant("-secondary-base", SecondaryBaseTestVariant)
+                registerVariant("-tertiary-base", TertiaryBaseTestVariant)
+            }
+        }
+
+        callComposable {
+            ComparableAttrsScope<Element>().apply(TestStyle.toModifier(TertiaryBaseTestVariant).toAttrs()).run {
+                assertThat(classes).containsExactly(
+                    TestStyle.name,
+                    BaseTestVariant.name,
+                    PrimaryBaseTestVariant.name,
+                    SecondaryBaseTestVariant.name,
+                    TertiaryBaseTestVariant.name
+                )
+            }
+        }
+    }
+
 
     @Test
     fun cssStyleNameFor() {
