@@ -59,23 +59,7 @@ internal class ExtendingCssStyleVariant<K : ComponentKind>(
     init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
     internal val baseVariant: SimpleCssStyleVariant<K>
-) : SimpleCssStyleVariant<K>(init, extraModifier, baseVariant.baseStyle) {
-
-    @Composable
-    override fun toModifier(): Modifier {
-        // We usually will only be extending a single variant, but we might be extending a variant that extends another
-        val baseVariants = mutableListOf<CssStyleVariant<K>>()
-        var currBaseVariant: CssStyleVariant<K>? = baseVariant
-        while (currBaseVariant != null) {
-            baseVariants.add(currBaseVariant)
-            currBaseVariant = (currBaseVariant as? ExtendingCssStyleVariant<K>)?.baseVariant
-        }
-        return baseVariants
-            // `as` required to avoid a compiler ambiguity error between Modifier and Modifier.Companion
-            .fold(Modifier as Modifier) { acc, curr -> acc.then(curr.toModifier()) }
-            .then(this.cssStyle.toModifier())
-    }
-}
+) : SimpleCssStyleVariant<K>(init, { extraModifier().then(baseVariant.toModifier()) }, baseVariant.baseStyle)
 
 fun <K : ComponentKind> CssStyleVariant<K>.thenIf(
     condition: Boolean,

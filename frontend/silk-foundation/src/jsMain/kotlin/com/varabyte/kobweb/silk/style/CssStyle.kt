@@ -406,16 +406,7 @@ internal class ExtendingCssStyle(
     init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
     val baseStyle: CssStyle<UnspecifiedKind>
-) : CssStyle<UnspecifiedKind>(init, extraModifier = {
-    var currBaseStyle: CssStyle<UnspecifiedKind>? = baseStyle
-    var finalModifier = extraModifier()
-    // Handle "extended" chains (like Base <- Extended <- MoreExtended; MoreExtended should include both)
-    while (currBaseStyle != null) {
-        finalModifier = finalModifier.then(currBaseStyle!!.toModifier())
-        currBaseStyle = (currBaseStyle as? ExtendingCssStyle)?.baseStyle
-    }
-    finalModifier
-})
+) : CssStyle<UnspecifiedKind>(init, extraModifier = { extraModifier().then(baseStyle.toModifier()) })
 
 /**
  * A [CssStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
