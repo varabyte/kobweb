@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.util
 
-// TODO: merge with compose-html-ext com.varabyte.kobweb.compose.util.StringExtensions.kt?
+// TODO: merge with browser-ext com.varabyte.kobweb.browser.util.StringExtensions.kt?
 
 // e.g. "example-text" to "ExampleText"
 internal fun String.kebabCaseToTitleCamelCase(): String {

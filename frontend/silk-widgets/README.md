@@ -63,7 +63,7 @@ fun main() {
         prepareSilkFoundation(
             initSilk = { ctx ->
                 /* ... */
-                ctx.theme.registerStyle(CustomStyle)
+                ctx.theme.registerStyle("custom", CustomStyle)
             }
         ) {
             /* ... */
