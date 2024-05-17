@@ -182,6 +182,8 @@ class FrontendProcessor(
         // Map of KindType to the CssStyle property it is associated with
         // e.g. `val ExampleStyle = CssStyle<ExampleKind>`: ExampleKind -> ExampleStyle
         // There should only ever be one style per component kind.
+        // This cache only has to be valid over the lifetime of visiting a single file, since kinds and styles are
+        // enforced to be declared in the same file.
         private val consumedComponentKinds = mutableMapOf<KSType, KSPropertyDeclaration>()
 
         fun KSAnnotated.getAnnotationValue(fqn: String): String? {
@@ -517,6 +519,7 @@ class FrontendProcessor(
 
         override fun visitFile(file: KSFile, data: Unit) {
             file.declarations.forEach { it.accept(this, Unit) }
+            consumedComponentKinds.clear()
         }
     }
 
