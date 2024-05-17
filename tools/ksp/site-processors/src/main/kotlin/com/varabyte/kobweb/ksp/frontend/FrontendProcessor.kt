@@ -136,13 +136,6 @@ class FrontendProcessor(
             val typeArg = resolver.getTypeArgument(typeRef, Variance.COVARIANT)
             cssStyleClassDeclaration.asType(listOf(typeArg))
         }
-
-        // Not CssStyle<*> but CssStyle<out RestrictedKind> specifically.
-        val cssStyleRestrictedKindType = run {
-            val typeRef = resolver.createKSTypeReferenceFromKSType(restrictedKindType)
-            val typeArg = resolver.getTypeArgument(typeRef, Variance.COVARIANT)
-            cssStyleClassDeclaration.asType(listOf(typeArg))
-        }
     }
 
     /**
