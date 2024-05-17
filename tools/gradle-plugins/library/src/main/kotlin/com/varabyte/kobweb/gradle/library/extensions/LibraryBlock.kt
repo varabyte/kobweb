@@ -47,7 +47,7 @@ abstract class LibraryBlock : ExtensionAware {
     /**
      * If set, add a prefix to all CSS names generated for this library.
      *
-     * This includes CssStyle, ComponentStyle, ComponentVariant, and Keyframes properties.
+     * This applies to CssStyle and Keyframes properties.
      *
      * For example, if you are working on a bootstrap library and set the default prefix to "bs", then a property like
      * `val ButtonStyle = CssStyle { ... }` would generate a CSS classname `bs-button` instead of just `button`.
