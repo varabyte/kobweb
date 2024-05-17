@@ -73,8 +73,10 @@ interface SilkStylesheet : CssStyleRegistrar {
     /**
      * Users can specify custom CSS layers here, in order of precedence (lowest to highest).
      *
-     * Two layers will be added before these layers by the system -- `reset` and `framework` -- meaning user layers
-     * will always show up on top of them.
+     * Several layers will already be added by the Silk framework -- `reset`, `component-styles`, `component-variants`,
+     * `restricted-styles`, and `unspecified-styles`. These should work well for almost every practice case, but if
+     * necessary, a user can add their own layers here, at which point they will always take precedence over anything
+     * produced by Silk.
      *
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@layer">the official @layer docs</a>
      */
