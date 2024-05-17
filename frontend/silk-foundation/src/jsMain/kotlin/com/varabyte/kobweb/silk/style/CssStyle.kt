@@ -3,7 +3,6 @@
 package com.varabyte.kobweb.silk.style
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.util.kebabCaseToTitleCamelCase
 import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -11,6 +10,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
+import com.varabyte.kobweb.silk.init.SilkCssLayerNames
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -55,7 +55,7 @@ interface ComponentKind : CssKind
 
 /** Represents a list of CSS selectors that target classes. */
 internal value class ClassSelectors(private val value: List<String>) {
-    // Selectors may be ".someStyle" or ".someStyle.someVariant" - only the last part is relevant to the specific style
+    // Selector for classname "some-style" is ".some-style"
     val classNames get() = value.map { it.substringAfterLast('.') }
     operator fun plus(other: ClassSelectors) = ClassSelectors(value + other.value)
 }
@@ -222,14 +222,17 @@ abstract class CssStyle<K : CssKind> internal constructor(
             }
     }
 
-    private fun Map<CssModifier.Key, CssModifier>.assertNoAttributeModifiers(selectorName: String): Map<CssModifier.Key, CssModifier> {
+    private fun Map<CssModifier.Key, CssModifier>.assertNoAttributeModifiers(
+        selectorName: String,
+        layer: String?
+    ): Map<CssModifier.Key, CssModifier> {
         return this.onEach { (_, cssModifier) ->
             val attrsScope = ComparableAttrsScope<Element>()
             cssModifier.modifier.toAttrs<AttrsScope<Element>>().invoke(attrsScope)
             if (attrsScope.attributes.isEmpty()) return@onEach
 
             error(buildString {
-                appendLine("ComponentStyle declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the ComponentStyle's `extraModifier` parameter.")
+                appendLine("Style block declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the `extraModifier` parameter.")
                 appendLine()
                 appendLine("Details:")
 
@@ -237,32 +240,19 @@ abstract class CssStyle<K : CssKind> internal constructor(
                 append("\"$selectorName")
                 if (cssModifier.mediaQuery != null) append(cssModifier.mediaQuery)
                 if (cssModifier.suffix != null) append(cssModifier.suffix)
-                append("\"")
-
-                append(" (do you declare a property called ")
-                // ".example" likely comes from `ExampleStyle` while ".example.example-outlined" likely
-                // comes from ExampleOutlinedVariant or OutlinedExampleVariant
-                val isStyle = selectorName.count { it == '.' } == 1
-                val styleName = selectorName.substringAfter(".").substringBefore(".")
-
-                if (isStyle) {
-                    append("`${styleName.kebabCaseToTitleCamelCase()}Style`")
-                } else {
-                    // Convert ".example.example-outlined" to "outlined". This could come from a variant
-                    // property called OutlinedExampleVariant or ExampleOutlinedVariant
-                    val variantPart = selectorName.substringAfterLast(".").removePrefix("$styleName-")
-                    append("`${"$styleName-$variantPart".kebabCaseToTitleCamelCase()}Variant`")
-                    append(" or ")
-                    append("`${"$variantPart-$styleName".kebabCaseToTitleCamelCase()}Variant`")
-                }
-                appendLine("?)")
+                appendLine("\"")
                 appendLine("\tAttribute(s): ${attrsScope.attributes.keys.joinToString(", ") { "\"$it\"" }}")
                 appendLine()
-                appendLine("An example of how to fix this:")
+                val styleDeclaration = when {
+                    layer == SilkCssLayerNames.COMPONENT_VARIANTS -> "val SomeExampleVariant = ExampleStyle.addVariant"
+                    layer == SilkCssLayerNames.COMPONENT_STYLES -> "val ExampleStyle = CssStyle<ExampleKind>"
+                    else -> "val ExampleStyle = CssStyle"
+                }
+                appendLine("An example of how to fix this (if the offending attribute was `tab-index`):")
                 appendLine(
                     """
                     |   // Before
-                    |   val ExampleStyle by ComponentStyle {
+                    |   $styleDeclaration {
                     |       base {
                     |          Modifier
                     |              .backgroundColor(Colors.Magenta))
@@ -271,7 +261,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
                     |   }
                     |   
                     |   // After
-                    |   val ExampleStyle by ComponentStyle(extraModifier = Modifier.tabIndex(0)) {
+                    |   $styleDeclaration(extraModifier = Modifier.tabIndex(0)) {
                     |       base {
                     |           Modifier.backgroundColor(Colors.Magenta)
                     |       }
@@ -320,9 +310,9 @@ abstract class CssStyle<K : CssKind> internal constructor(
         val classNames = mutableListOf(selector)
 
         val lightModifiers = CssStyleScope(ColorMode.LIGHT).mergeCssModifiers(init)
-            .assertNoAttributeModifiers(selector)
+            .assertNoAttributeModifiers(selector, layer)
         val darkModifiers = CssStyleScope(ColorMode.DARK).mergeCssModifiers(init)
-            .assertNoAttributeModifiers(selector)
+            .assertNoAttributeModifiers(selector, layer)
 
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
