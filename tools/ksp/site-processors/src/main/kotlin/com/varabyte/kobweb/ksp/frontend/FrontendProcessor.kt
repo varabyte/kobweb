@@ -432,10 +432,10 @@ class FrontendProcessor(
         ): Boolean {
             val propertyName = property.simpleName.asString()
             if (property.parent !is KSFile && (property.owningSingletonClassDeclaration == null)) {
-                val topLevelSuppression = "TOP_LEVEL_${declarationInfo.suppressionName}"
-                if (!property.suppresses(topLevelSuppression)) {
+                val localSuppression = "LOCAL_${declarationInfo.suppressionName}"
+                if (!property.suppresses(localSuppression)) {
                     logger.warn(
-                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$topLevelSuppression\")` annotation.",
+                        "Not registering ${declarationInfo.displayString} `val $propertyName`, as local style block declarations are not supported. You can only declare them globally, either at a top level or inside an object singleton. Although fixing this is recommended, you can manually register your ${declarationInfo.displayString} inside an @InitSilk block instead (`${declarationInfo.function}($propertyName)`). Suppress this message by adding a `@Suppress(\"$localSuppression\")` annotation.",
                         property
                     )
                 }
