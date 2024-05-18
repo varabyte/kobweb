@@ -330,6 +330,14 @@ abstract class AppBlock @Inject constructor(
          *
          * If this isn't set, then all discovered pages will be exported.
          *
+         * In general, it's important to have an exported file for every page you want to have SEO for. Let's say we
+         * want to exclude some admin pages, as they won't need SEO, as this would reduce export time and the final disk
+         * size needed for our site:
+         *
+         * ```kotlin
+         * filter.set { !route.startsWith("/admin/") }
+         * ```
+         *
          * @see ExportFilterContext
          */
         abstract val filter: Property<ExportFilterContext.() -> Boolean>
