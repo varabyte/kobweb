@@ -28,6 +28,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Label
+import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
 
 object SwitchVars {
@@ -166,11 +167,13 @@ fun Switch(
     // Use a label so it intercepts clicks and passes them to the inner Input
     Label(
         attrs = SwitchStyle.toModifier(variant)
+            .fontSize(0.px)
             .then(size.toModifier())
             .then(shape.toModifier())
             .then(modifier)
             .toAttrs()
     ) {
+        Text("Switch")
         registerRefScope(ref)
         // We base Switch on a checkbox input for a11y + built-in input/keyboard support, but hide the checkbox itself
         // and render the switch separately. We do however allow it to be focused, which combined with the outer label
