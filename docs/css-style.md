@@ -16,13 +16,14 @@ This document explains why we are introducing the `CssStyle` concept and how it 
 ## Background
 
 > [!IMPORTANT]
-> For readers who just want to migrate their project, you can jump straight to the [code migration](#migration) section.
+> For readers who just want to migrate their project, you can jump straight to the [code migration](#migration) section.<br><br>
+> For readers who don't care about background but still want to read up on the new feature, you can jump straight to the [CSS style](#cssstyle) section.
 
 > [!NOTE]
 > This document assumes some minimal familiarity
 > with [CSS styles and stylesheets](https://www.w3schools.com/html/html_css.asp).
 
-### Component styles
+### The introduction of component styles
 
 One of the earliest features touted in Kobweb was support of something called *component styles*. A component style
 represents a collection of style properties, which are a group of styles meant to describe the look and feel of some
@@ -75,15 +76,15 @@ your element.
 
 #### How Component Styles work
 
-To understand what's happening behind the scenes, first know that Kobweb does generates a global in-memory stylesheet.
+To understand what's happening behind the scenes, first know that Kobweb generates a global in-memory stylesheet.
 
 > [!NOTE]
-> Even though I just made fun of monolithic stylesheets the previous section, it's not a problem in Kobweb because here
-> it is a hidden implementation detail that you never look at directly. In other words, it's generated and not
-> maintained by hand, which is a significant difference.
+> Even though I just called out monolithic stylesheets as a major issue in the previous section, it's not a problem in
+> Kobweb because there it is a hidden implementation detail that you never look at directly. In other words, it is
+> generated at runtime and not managed manually, which is a significant difference for codebase maintenance.
 
 When you compile your project, the Kobweb Gradle Plugin will search your codebase, find all top-level `ComponentStyle`
-declarations, and register them into the global stylesheet.
+declarations, and register them into the in-memory stylesheet.
 
 You can see this code for yourself if you open up the `main.kt` file that gets created under your project's
 `build/generated` folder as part of the build process (e.g. after you run `kobweb run`).
@@ -121,7 +122,7 @@ original design.
 
 We will not spend too long talking about *component variants*, since they aren't critical to understanding the new
 `CssStyle` concept. However, we will still mention them as they are an important part of understanding how to migrate
-your code.
+your code and how to think about the different purposes that style groups can serve.
 
 When you define a component style, you can additionally create a variant from it:
 
@@ -142,10 +143,10 @@ If both a base style *and* its variant are combined, the base styles will be app
 layered on top of them.
 
 Variants were designed to allow a library author to create widgets with a core style plus many alternate varieties of
-that style. As a bonus, an end user to could add their own custom variants, perhaps something more relevant to their
-site's brand.
+that style. As a bonus, an end user to could add their own custom variants in their own project, perhaps something more
+relevant to their site's brand.
 
-All Silk widgets allow for a variant to be set as an optional parameter:
+All Silk widgets allow for a variant to be passed in as an optional parameter:
 
 ```kotlin
 @Composable
@@ -158,7 +159,7 @@ fun Link(..., variant: ComponentVariant? = null, ...) {
 // For example, `Link(variant = UndecoratedLinkVariant)`
 ```
 
-Anyway, the main thing to take away from this section is that component variants were designed as an essential piece of
+Ultimately, the main takeaway from this section is that component variants were designed as an essential piece of
 component styles. In other words, a component style is not just a collection of styles, but it is a *tweakable*
 collection of styles.
 
@@ -235,7 +236,7 @@ While this gets us close, this approach unfortunately has a major problem: you l
 parameter.
 
 There's nothing that prevents you from passing any component style into that parameter. Pass in a size like you're
-supported to? That's fine. But pass in a `LinkStyle`? Yikes, that shouldn't work.
+supposed to? Great! But pass in a `LinkStyle` which is *also* a `ComponentStyle`? Yikes, that shouldn't work.
 
 It was quickly clear that this lack of type information was a deal-breaker.
 
@@ -244,7 +245,7 @@ It was quickly clear that this lack of type information was a deal-breaker.
 Kobweb needed a new class which:
 
 1. lets you declare `Modifier`s that get converted into stylesheet entries (like `ComponentStyle` currently does)
-2. allows subclassing, for type safety (so we can declare a base class called `ButtonSize` for example)
+2. allows subclassing if needed for type safety (so we can declare a base class called `ButtonSize` for example)
 
 Since the concept of this new class would be larger than just components, we decided to name it `CssStyle`, to emphasize
 that generality.
@@ -256,12 +257,12 @@ Let's review some examples in the next section.
 
 ### CssStyle cases
 
-#### A general style declaration
+#### A general style group declaration
 
 > [!NOTE]
 > This case is also referred to as *unspecified kind* styles.
 
-This is probably the most common way users will use `CssStyle` – basically, almost all old code that used to use
+This is the most common way users will use `CssStyle` – basically, almost all old code that used to use
 `ComponentStyle` will simply use `CssStyle` instead:
 
 ```kotlin
@@ -283,18 +284,18 @@ In legacy Kobweb, `ComponentStyle`s and `ComponentVariant`s were not typed, mean
 variant for one widget to an unrelated one.
 
 ```kotlin
-// ❌ Bad code, do not copy!
+// ❌ Bad code, do not copy! Passing a button variant into a link widget
 Link("https://bad.example.on.purpose.com", variant = SomeButtonVariant) 
 //                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ```
 
-After `CssStyle`, this is no longer possible, because moving forward, the widget style will be bound to a specific
-component type (called a *component kind*).
+After `CssStyle`, this is no longer possible, because moving forward, styles for components will be bound by a type
+(called a *component kind*).
 
-To create such a style, you must implement the `ComponentKind` interface (the implementation is expected to be empty;
-it's just a marker interface) and pass it as a generic type to the `CssStyle` builder.
+To create such a typed style, you must first implement the `ComponentKind` interface (the implementation is expected to
+be empty; it's just a marker interface) and pass it as a generic type to the `CssStyle` builder.
 
-Here is the new pattern in action:
+Here is the new pattern in action, for a loading `Spinner` widget:
 
 ```kotlin
 sealed interface SpinnerKind : ComponentKind
@@ -316,12 +317,15 @@ fun Spinner(
 > In the code snippet above, we use a sealed class to express the intention that no one else should ever implement it.
 > However, `interface MyWidgetKind : ComponentKind` would technically work as well.
 
-This type of `CssStyle` supports the `addVariant` extension method, which behaves exactly as it did with
-`ComponentStyle`.
+In the same way the legacy `ComponentStyle` provides an `addVariant` method, component-kind `CssStyle`s support
+them as well. Additionally, typed CSS styles will created typed variants (which can be seen with the
+`CssStyleVariant<SpinnerKind>` parameter in the example above), ensuring type safety now that didn't exist before.
 
 > [!TIP]
 > Any legacy `ComponentStyle` property that has calls to `addVariant` made on it somewhere is a likely candidate for
-> this new style type.
+> this new style type. It's almost certainly the right choice if you wrote a widget method that takes a
+> `ComponentVariant` parameter. You should also read the [extending styles▼](#extending-styles) section, as that is a
+> new, alternate option.
 
 #### A restricted style declaration
 
@@ -415,7 +419,7 @@ You may find yourself occasionally wanting to define a partial style that should
 also applied first.
 
 You might think, "I can use component styles and variants for this!" And it's not exactly an unreasonable approach -- in
-fact, during internal test runs, that's what we would recommend to our early adopters.
+fact, during early, internal test migrations, that's what we would recommend to our early adopters.
 
 However, it wasn't a perfect fit because the requirement to create a `ComponentKind` interface when you didn't care
 about it was annoying. If the extra type information was something the user didn't need, it could even get in the way.
@@ -448,9 +452,9 @@ SpanText("WARNING", EmphasizedTextStyle.toModifier())
 At first, it can be confusing to know when to use extended styles and when to use variants. Just realize that their
 purposes are different:
 
-* variants are meant to be useless on their own; they are only valid within the context of a base style that is tied to
+* Variants are meant to be useless on their own; they are only valid within the context of a base style that is tied to
   exactly one widget. They are meant to be passed in as a parameter to a widget composable.
-* extended styles are meant to feel like a stand-alone style, and the fact they extend a base style is an
+* Extended styles are meant to feel like a stand-alone style, and the fact they extend a base style is an
   invisible implementation detail for the caller. Extended styles can and are expected to be used across many different
   widgets as they are considered generally applicable and not specific to a single element type only.
 
@@ -467,9 +471,9 @@ This section should help you handle every warning case you might encounter.
 
 ### Automatic migration
 
-The version of Kobweb that introduced this feature also includes a Gradle task `kobwebMigrateToCssStyle`. You should
-absolutely run this first, although make sure you're in a safe environment where you can revert your changes if
-something goes wrong.
+The version of Kobweb that introduced `CssStyle` also includes a Gradle task `kobwebMigrateToCssStyle`. You are
+encouraged to run this as soon as possible after updating to this new version, although you should make sure you're in a
+safe environment where you can revert your changes if something goes wrong.
 
 ```bash
 $ cd site
@@ -489,9 +493,11 @@ Updated com/example/site/App.kt
 
 At this point, try to run `kobweb run` on your project. Hopefully, everything will work seamlessly. However, there may
 be deprecation warnings or errors that show up after the migration, and you should pay attention to them. When resolving
-these issues, please review the remaining sections to understand what you may need to do.
+these issues, please review the following "manual migration" sections as they should cover what you need to do.
 
-### Updating imports
+### Manual migration
+
+#### Updating imports
 
 A lot of classes moved from the package `com.varabyte.kobweb.silk.components.style` to
 `com.varabyte.kobweb.silk.style` – in other words, we dropped the `components` package (since, after all, this whole
@@ -548,7 +554,7 @@ to `com.varabyte.kobweb.silk.style.animation`, and design breakpoint code moved 
 gotten handled automatically by the find / replace steps recommended earlier in this section, but we mention it here in
 case there's a codebase where somehow such an import was missed.
 
-### Converting a ComponentStyle to an unspecified CssStyle
+#### Converting a ComponentStyle to an unspecified CssStyle
 
 This probably covers almost every, if not every, case in most codebases. You should always try it first:
 
@@ -570,7 +576,7 @@ val SomeStyle = CssStyle { // A, B
 * A: `by` changes to `=`
 * B: `ComponentStyle` changes to `CssStyle`
 
-### Converting a legacy ComponentStyle into a CssStyle<ComponentKind>
+#### Converting a legacy ComponentStyle into a CssStyle<ComponentKind>
 
 If you're using `addVariant` anywhere in your code, this case may be for you.
 
@@ -625,7 +631,7 @@ fun Widget(
 * D: `by` changes to `=`
 * E: `ComponentVariant` changes to `CssStyleVariant<ComponentKind>`. Hooray, we have compiler-enforced type safety now!
 
-### Using CssStyle.extendedBy
+#### Using CssStyle.extendedBy
 
 There are cases we've seen where users used `addVariant` to essentially bind two styles together, even though
 conceptually it was more that they were defining a new style that happened to build on top of another one, rather than
@@ -670,7 +676,7 @@ Box(ExtendedStyle.toModifier()) // F
 * E: `addVariant` changes to `extendedBy`
 * F: `ComponentStyle.toModifier(ComponentVariant)` changes to `ExtendedStyle.toModifier()`.
 
-### Bye-bye by
+#### Bye-bye by
 
 If you see any message about `getValue` being deprecated, that means you need to change a `by` to an `=`.
 
