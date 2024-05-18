@@ -182,7 +182,7 @@ fun Switch(
             variant = SwitchInputVariant,
             enabled = enabled,
             modifier = Modifier
-                .ariaLabel("switch")
+                .ariaLabel("switch"),
         )
         Box(
             SwitchTrackStyle.toModifier()
