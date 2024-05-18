@@ -377,7 +377,18 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
                     el.childNodes().forEach { child ->
                         if (child is TextNode) {
                             if (child.text().isNotBlank()) {
-                                sb.appendLine(indent(indentCount + 1) + text.get().invoke(this, Text(child.text().trim())))
+                                // child text of inline html seem to begin with a newline that we don't want to treat as
+                                // part of the final text.
+                                // e.g.
+                                // <pre>
+                                // test
+                                // </pre>
+                                // should be the string "test", not "\ntest"
+                                sb.appendLine(
+                                    "${indent(indentCount + 1)}$JB_DOM.Text(\"\"\"${
+                                        child.wholeText.removePrefix("\n").escapeSingleQuotedText()
+                                    }\"\"\")"
+                                )
                             }
                         } else if (child is Element) {
                             renderNode(child, indentCount + 1, sb)
