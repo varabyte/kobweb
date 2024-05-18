@@ -51,61 +51,93 @@ abstract class KobwebMigrateToCssStyleTask :
         "visited",
     )
 
-    private val replacements = buildMap<Regex, String> {
-        put(
-            "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
-            "import com.varabyte.kobweb.silk.style.CssStyle"
+    private class Replacement(val from: Regex, val to: String, val skipIf: Replacement.(String) -> Boolean = { false }) {
+        constructor(rawText: String, to: String, skipIf: Replacement.(String) -> Boolean = { false }) : this(
+            Regex.escape(rawText).toRegex(), to, skipIf
+        )
+
+        fun replace(content: String): String {
+            if (skipIf(content)) return content
+            return from.replace(content, to)
+        }
+    }
+
+    private val replacements = buildList {
+        add(
+            Replacement(
+                "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
+                "import com.varabyte.kobweb.silk.style.CssStyle",
+                skipIf = { text -> text.contains("import com.varabyte.kobweb.silk.style.*") }
+                // skipIf because we might be running this task a second time, at which point the ComponentStyle might
+                // be in here because it was added by us (below).
+            )
         )
         migratedSelectors.forEach { selector ->
-            put(
-                "import com.varabyte.kobweb.silk.components.style.$selector",
-                "import com.varabyte.kobweb.silk.style.selectors.$selector"
+            add(
+                Replacement(
+                    "import com.varabyte.kobweb.silk.components.style.$selector",
+                    "import com.varabyte.kobweb.silk.style.selectors.$selector"
+                )
             )
         }
-        put("import com.varabyte.kobweb.silk.components.style", "import com.varabyte.kobweb.silk.style")
         // If a user is using "*" imports, we need to split that into two "*" imports just in case, even if they
         // don't use the new `selector` package in their code. Better an unused import than a compile error!
-        put(
-            "import com.varabyte.kobweb.silk.style.*",
-            listOf(
-                "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
-                "import com.varabyte.kobweb.silk.components.style.ComponentVariant",
-                "import com.varabyte.kobweb.silk.style.*",
-                "import com.varabyte.kobweb.silk.style.selectors.*",
-            ).joinToString("\n")
+        // We also keep the old ComponentStyle and ComponentVariant imports around just in case they're used (but do NOT
+        // import "silk.components.style.*" because that would pull in conflicting `toModifier` etc. extension methods.
+        add(
+            Replacement(
+                "import com.varabyte.kobweb.silk.components.style.*",
+                listOf(
+                    "import com.varabyte.kobweb.silk.components.style.ComponentStyle",
+                    "import com.varabyte.kobweb.silk.components.style.ComponentVariant",
+                    "import com.varabyte.kobweb.silk.style.*",
+                    "import com.varabyte.kobweb.silk.style.selectors.*",
+                ).joinToString("\n")
+            )
         )
-        // Restore ComponentVariant import to not break existing references like `variant: ComponentVariant? = null`
-        put(
-            "import com.varabyte.kobweb.silk.style.ComponentVariant",
-            "import com.varabyte.kobweb.silk.components.style.ComponentVariant"
+        // Aggressive catch-all find/replace
+        add(Replacement("import com.varabyte.kobweb.silk.components.style", "import com.varabyte.kobweb.silk.style"))
+        // If ComponentStyle/ComponentVariant got moved over from the previous aggressive find/replace, put them back
+        // because they don't exist in the new package.
+        add(
+            Replacement(
+                "import com.varabyte.kobweb.silk.style.ComponentVariant",
+                "import com.varabyte.kobweb.silk.components.style.ComponentVariant"
+            )
+        )
+        add(
+            Replacement(
+                "import com.varabyte.kobweb.silk.style.ComponentStyle",
+                "import com.varabyte.kobweb.silk.components.style.ComponentStyle"
+            )
         )
 
-        put(
-            "import com.varabyte.kobweb.silk.components.layout.breakpoint",
-            "import com.varabyte.kobweb.silk.style.breakpoint"
+        add(
+            Replacement(
+                "import com.varabyte.kobweb.silk.components.layout.breakpoint",
+                "import com.varabyte.kobweb.silk.style.breakpoint"
+            )
         )
 
-        put(
-            "import com.varabyte.kobweb.silk.components.animation",
-            "import com.varabyte.kobweb.silk.style.animation"
+        add(
+            Replacement(
+                "import com.varabyte.kobweb.silk.components.animation",
+                "import com.varabyte.kobweb.silk.style.animation"
+            )
         )
 
-        put("by ComponentStyle", "= CssStyle")
-        put("= ComponentStyle", "= CssStyle")
-        put("by (.+).addVariant".toRegex(), "= $1.addVariant")
-        put("= (.+).addVariant".toRegex(), "= $1.addVariant")
-        put("by Keyframes", "= Keyframes")
-        put("= Keyframes", "= Keyframes")
+        add(Replacement("by ComponentStyle", "= CssStyle"))
+        add(Replacement("= ComponentStyle", "= CssStyle"))
+        add(Replacement("by (.+).addVariant".toRegex(), "= $1.addVariant"))
+        add(Replacement("= (.+).addVariant".toRegex(), "= $1.addVariant"))
+        add(Replacement("by Keyframes", "= Keyframes"))
+        add(Replacement("= Keyframes", "= Keyframes"))
 
-        put("(modify|replace)Component([a-zA-Z]+)".toRegex(), "$1$2")
+        add(Replacement("(modify|replace)Component([a-zA-Z]+)".toRegex(), "$1$2"))
 
-        put("extraModifiers =", "extraModifier =")
+        add(Replacement("extraModifiers =", "extraModifier ="))
     }
 
-
-    private fun MutableMap<Regex, String>.put(rawText: String, to: String) {
-        put(Regex.escape(rawText).toRegex(), to)
-    }
 
     @TaskAction
     fun execute() {
@@ -119,9 +151,7 @@ abstract class KobwebMigrateToCssStyleTask :
                 val file = rootAndFile.file
                 val originalContent = file.readText()
                 var content = originalContent
-                replacements.forEach { (find, replace) ->
-                    content = find.replace(content, replace)
-                }
+                replacements.forEach { content = it.replace(content) }
                 if (originalContent != content) {
                     println("Updated ${rootAndFile.relativeFile}")
                     file.writeText(content)
