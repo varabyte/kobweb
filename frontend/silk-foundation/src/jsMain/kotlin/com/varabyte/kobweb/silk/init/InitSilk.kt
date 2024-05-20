@@ -73,9 +73,14 @@ var additionalSilkInitialization: (InitSilkContext) -> Unit = {}
 // Here, we would expect any variant to override the style, any parameter to override the variant, and any
 // user style passed into the modifier value to override everything else.
 //
-// The reset layer is reserved for global default styles (like changing the box-sizing property to border-box)
+// The reset layer is reserved for global default styles (like changing the box-sizing property to border-box).
+//
+// The base layer is intended for global styles, often defined in `@InitSilk` blocks with code like
+// `ctx.stylesheet.registerStyle("a") { ... }` which apply globally to the whole site but which should get overridden if
+// any other style also tries to set it.
 internal object SilkCssLayerNames {
     const val RESET = "reset"
+    const val BASE = "base"
     const val COMPONENT_STYLES = "component-styles"
     const val COMPONENT_VARIANTS = "component-variants"
     const val RESTRICTED_STYLES = "restricted-styles"
@@ -170,6 +175,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
             .forEach { styleSheet ->
                 val cssLayers = (listOf(
                     SilkCssLayerNames.RESET,
+                    SilkCssLayerNames.BASE,
                     SilkCssLayerNames.COMPONENT_STYLES,
                     SilkCssLayerNames.COMPONENT_VARIANTS,
                     SilkCssLayerNames.RESTRICTED_STYLES,

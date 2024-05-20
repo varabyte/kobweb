@@ -73,14 +73,21 @@ interface SilkStylesheet : CssStyleRegistrar {
     /**
      * Users can specify custom CSS layers here, in order of precedence (lowest to highest).
      *
-     * Several layers will already be added by the Silk framework -- `reset`, `component-styles`, `component-variants`,
-     * `restricted-styles`, and `general-styles`. These should work well for almost every practice case, but if
-     * necessary, a user can add their own layers here, at which point they will always take precedence over anything
-     * produced by Silk.
+     * Several layers will already be added by the Silk framework -- `reset`, `base`, `component-styles`,
+     * `component-variants`, `restricted-styles`, and `general-styles`. These should work well for almost every practice
+     * case, but if necessary, a user can add their own layers here, at which point they will always take precedence
+     * over anything produced by Silk.
      *
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@layer">the official @layer docs</a>
      */
     val cssLayers: MutableList<String>
+
+    /**
+     * Create a layer which then wraps a collection of CSS styles.
+     *
+     * @param name The name of the layer. If empty, this will be treated as an anonymous layer (which has precedence
+     * over all other layers).
+     */
     fun layer(name: String, block: CssStyleRegistrar.() -> Unit)
     fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit)
 }
@@ -152,12 +159,19 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         extraModifier: @Composable () -> Modifier,
         init: StyleScope.() -> Unit
     ) {
-        styles.add(SimpleCssStyle(cssSelector, init, extraModifier, layer = null))
+        styles.add(SimpleCssStyle(cssSelector, init, extraModifier, layer = "base"))
     }
 
     override fun layer(name: String, block: CssStyleRegistrar.() -> Unit) {
         CssStyleRegistrarImpl().apply(block).entries.forEach { entry ->
-            styles.add(SimpleCssStyle(entry.cssSelector, entry.init, entry.extraModifier, layer = name))
+            styles.add(
+                SimpleCssStyle(
+                    entry.cssSelector,
+                    entry.init,
+                    entry.extraModifier,
+                    layer = name.takeIf { it.isNotEmpty() }
+                )
+            )
         }
     }
 
