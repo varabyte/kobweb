@@ -50,7 +50,7 @@ class InitSilkContext(val config: MutableSilkConfig, val stylesheet: SilkStylesh
 var additionalSilkInitialization: (InitSilkContext) -> Unit = {}
 
 // Precedence for styles, from lowest to highest:
-// component styles < component variants < restricted styles < unspecified styles
+// component styles < component variants < restricted styles < general styles
 //
 // Imagine code like this:
 // ```
@@ -79,7 +79,7 @@ internal object SilkCssLayerNames {
     const val COMPONENT_STYLES = "component-styles"
     const val COMPONENT_VARIANTS = "component-variants"
     const val RESTRICTED_STYLES = "restricted-styles"
-    const val UNSPECIFIED_STYLES = "unspecified-styles"
+    const val GENERAL_STYLES = "general-styles"
 }
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
@@ -151,7 +151,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                         .filterIsInstance<CSSMediaRule>()
                         .flatMap { it.cssRules.asList() }
                         .mapNotNull { rule ->
-                            (rule as? CSSLayerBlockRule)?.takeIf { it.name == SilkCssLayerNames.UNSPECIFIED_STYLES }
+                            (rule as? CSSLayerBlockRule)?.takeIf { it.name == SilkCssLayerNames.GENERAL_STYLES }
                         }.flatMap { it.cssRules.asList().filterIsInstance<CSSStyleRule>() }
                 }.forEach { rule ->
                     val selectorText = rule.selectorText
@@ -173,7 +173,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                     SilkCssLayerNames.COMPONENT_STYLES,
                     SilkCssLayerNames.COMPONENT_VARIANTS,
                     SilkCssLayerNames.RESTRICTED_STYLES,
-                    SilkCssLayerNames.UNSPECIFIED_STYLES
+                    SilkCssLayerNames.GENERAL_STYLES
                 ) + SilkStylesheetInstance.cssLayers)
                 styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
             }

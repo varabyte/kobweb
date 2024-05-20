@@ -14,9 +14,9 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleBaseScope
 import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.GeneralKind
 import com.varabyte.kobweb.silk.style.RestrictedKind
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
-import com.varabyte.kobweb.silk.style.UnspecifiedKind
 import com.varabyte.kobweb.silk.style.combine
 import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
@@ -268,7 +268,7 @@ fun <K : ComponentKind> CssStyle<K>.toModifier(vararg variants: CssStyleVariant<
 
 @Composable
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
-fun CssStyle<UnspecifiedKind>.toModifier(): Modifier {
+fun CssStyle<GeneralKind>.toModifier(): Modifier {
     return toModifier()
 }
 
@@ -280,13 +280,13 @@ fun CssStyle<RestrictedKind>.toModifier(): Modifier {
 
 @Composable
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toModifier`.")
-fun Iterable<CssStyle<UnspecifiedKind>>.toModifier(): Modifier {
+fun Iterable<CssStyle<GeneralKind>>.toModifier(): Modifier {
     return toModifier()
 }
 
 @Composable
 @Deprecated("Please change the import for this extension method to `com.varabyte.kobweb.silk.style.toAttrs`.")
-fun <A : AttrsScope<*>> Iterable<CssStyle<UnspecifiedKind>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <A : AttrsScope<*>> Iterable<CssStyle<GeneralKind>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return toAttrs(finalHandler)
 }
 

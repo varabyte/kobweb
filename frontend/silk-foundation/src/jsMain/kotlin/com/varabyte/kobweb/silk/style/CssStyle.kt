@@ -24,7 +24,7 @@ import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
  *
  * There are three families of CSS kinds:
  *
- * - [UnspecifiedKind]: Represents a general style, defined without any specific constraints. This is the most common
+ * - [GeneralKind]: Represents a general style, defined without any specific constraints. This is the most common
  *   type of style, declared with `CssStyle { ... }`.
  *
  * - [ComponentKind]: Represents a style that is tied to a specific component. This is especially useful for library
@@ -39,14 +39,14 @@ sealed interface CssKind
 
 /**
  * @see CssKind
- * @see CssStyle.Restricted
  */
-sealed interface RestrictedKind : CssKind
+sealed interface GeneralKind : CssKind
 
 /**
  * @see CssKind
+ * @see CssStyle.Restricted
  */
-sealed interface UnspecifiedKind : CssKind
+sealed interface RestrictedKind : CssKind
 
 /**
  * @see CssKind
@@ -360,7 +360,7 @@ internal class SimpleCssStyle(
     init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
     val layer: String?
-) : CssStyle<UnspecifiedKind>(init, extraModifier) {
+) : CssStyle<GeneralKind>(init, extraModifier) {
     internal fun addStylesInto(styleSheet: StyleSheet): ClassSelectors {
         return addStylesInto(selector, styleSheet, layer)
     }
@@ -395,8 +395,8 @@ internal class SimpleCssStyle(
 internal class ExtendingCssStyle(
     init: CssStyleScope.() -> Unit,
     extraModifier: @Composable () -> Modifier,
-    val baseStyle: CssStyle<UnspecifiedKind>
-) : CssStyle<UnspecifiedKind>(init, extraModifier = { extraModifier().then(baseStyle.toModifier()) })
+    val baseStyle: CssStyle<GeneralKind>
+) : CssStyle<GeneralKind>(init, extraModifier = { extraModifier().then(baseStyle.toModifier()) })
 
 /**
  * A [CssStyle] pared down to read-only data only, which should happen shortly after Silk initializes.
@@ -494,12 +494,12 @@ private sealed interface StyleGroup {
 }
 
 fun CssStyle(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
-    object : CssStyle<UnspecifiedKind>(init, { extraModifier }) {}
+    object : CssStyle<GeneralKind>(init, { extraModifier }) {}
 
 fun CssStyle(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
-) = object : CssStyle<UnspecifiedKind>(init, extraModifier) {}
+) = object : CssStyle<GeneralKind>(init, extraModifier) {}
 
 fun CssStyle.Companion.base(
     extraModifier: Modifier = Modifier,
@@ -509,7 +509,7 @@ fun CssStyle.Companion.base(
 fun CssStyle.Companion.base(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
-) = object : CssStyle<UnspecifiedKind>(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
+) = object : CssStyle<GeneralKind>(init = { base { CssStyleBaseScope(colorMode).let(init) } }, extraModifier) {}
 
 fun <K : ComponentKind> CssStyle(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
     object : CssStyle<K>(init, { extraModifier }) {}
@@ -529,21 +529,21 @@ fun <K : ComponentKind> CssStyle.Companion.base(
     init: CssStyleBaseScope.() -> Modifier
 ) = CssStyle<K>(extraModifier) { base { CssStyleBaseScope(colorMode).let(init) } }
 
-fun CssStyle<UnspecifiedKind>.extendedBy(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
+fun CssStyle<GeneralKind>.extendedBy(extraModifier: Modifier = Modifier, init: CssStyleScope.() -> Unit) =
     extendedBy({ extraModifier }, init)
 
-fun CssStyle<UnspecifiedKind>.extendedBy(
+fun CssStyle<GeneralKind>.extendedBy(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleScope.() -> Unit
-): CssStyle<UnspecifiedKind> = ExtendingCssStyle(init, extraModifier, this)
+): CssStyle<GeneralKind> = ExtendingCssStyle(init, extraModifier, this)
 
-fun CssStyle<UnspecifiedKind>.extendedByBase(
+fun CssStyle<GeneralKind>.extendedByBase(
     extraModifier: Modifier = Modifier,
     init: CssStyleBaseScope.() -> Modifier
 ) =
     extendedByBase({ extraModifier }, init)
 
-fun CssStyle<UnspecifiedKind>.extendedByBase(
+fun CssStyle<GeneralKind>.extendedByBase(
     extraModifier: @Composable () -> Modifier,
     init: CssStyleBaseScope.() -> Modifier
 ) = extendedBy(extraModifier) {
@@ -555,10 +555,10 @@ fun CssStyle<UnspecifiedKind>.extendedByBase(
 private fun CssStyle<*>._toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
 
 @Composable
-fun CssStyle<UnspecifiedKind>.toModifier(): Modifier = _toModifier()
+fun CssStyle<GeneralKind>.toModifier(): Modifier = _toModifier()
 
 @Composable
-fun <A : AttrsScope<*>> CssStyle<UnspecifiedKind>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <A : AttrsScope<*>> CssStyle<GeneralKind>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
 }
 
@@ -572,12 +572,12 @@ fun <K : ComponentKind> CssStyle<K>.toModifier(vararg variants: CssStyleVariant<
 }
 
 @Composable
-fun Iterable<CssStyle<UnspecifiedKind>>.toModifier(): Modifier {
+fun Iterable<CssStyle<GeneralKind>>.toModifier(): Modifier {
     return fold<_, Modifier>(Modifier) { acc, style -> acc.then(style.toModifier()) }
 }
 
 @Composable
-fun <A : AttrsScope<*>> Iterable<CssStyle<UnspecifiedKind>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
+fun <A : AttrsScope<*>> Iterable<CssStyle<GeneralKind>>.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     return this.toModifier().toAttrs(finalHandler)
 }
 
@@ -658,7 +658,7 @@ fun <K : ComponentKind> CssStyle.Companion.base(
 @Composable
 @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
 @Deprecated("You are likely seeing this after a migration to use `CssStyle`. It seems like you were intentionally using the `ComponentStyle` / `ComponentVariant` pattern, which now requires specifying a `ComponentKind` interface. Please see https://github.com/varabyte/kobweb/blob/main/docs/css-style.md#converting-a-legacy-componentstyle-into-a-cssstyle for more guidance.", level = DeprecationLevel.ERROR)
-fun CssStyle<UnspecifiedKind>.toModifier(first: ComponentVariant?, vararg rest: ComponentVariant?): Modifier =
+fun CssStyle<GeneralKind>.toModifier(first: ComponentVariant?, vararg rest: ComponentVariant?): Modifier =
     this.toModifier()
 
 // endregion

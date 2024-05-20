@@ -74,7 +74,7 @@ interface SilkStylesheet : CssStyleRegistrar {
      * Users can specify custom CSS layers here, in order of precedence (lowest to highest).
      *
      * Several layers will already be added by the Silk framework -- `reset`, `component-styles`, `component-variants`,
-     * `restricted-styles`, and `unspecified-styles`. These should work well for almost every practice case, but if
+     * `restricted-styles`, and `general-styles`. These should work well for almost every practice case, but if
      * necessary, a user can add their own layers here, at which point they will always take precedence over anything
      * produced by Silk.
      *

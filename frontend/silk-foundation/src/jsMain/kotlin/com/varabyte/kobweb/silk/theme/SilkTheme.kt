@@ -17,10 +17,10 @@ import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.ExtendingCssStyle
 import com.varabyte.kobweb.silk.style.ExtendingCssStyleVariant
+import com.varabyte.kobweb.silk.style.GeneralKind
 import com.varabyte.kobweb.silk.style.ImmutableCssStyle
 import com.varabyte.kobweb.silk.style.RestrictedKind
 import com.varabyte.kobweb.silk.style.SimpleCssStyleVariant
-import com.varabyte.kobweb.silk.style.UnspecifiedKind
 import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.breakpoint.BreakpointSizes
@@ -105,7 +105,7 @@ class MutableSilkTheme {
         val finalLayer = layer ?: when (kind) {
             ComponentKind::class -> SilkCssLayerNames.COMPONENT_STYLES
             RestrictedKind::class -> SilkCssLayerNames.RESTRICTED_STYLES
-            UnspecifiedKind::class -> SilkCssLayerNames.UNSPECIFIED_STYLES
+            GeneralKind::class -> SilkCssLayerNames.GENERAL_STYLES
             else -> error("Unknown kind: $kind")
         }.takeIf { it.isNotEmpty() } // In case user passes in ""
         finalLayer?.let { _cssLayersFor[name] = it }
@@ -121,8 +121,8 @@ class MutableSilkTheme {
     fun registerStyle(name: String, style: CssStyle<RestrictedKind>, layer: String? = null) =
         _registerStyle(name, style, RestrictedKind::class, layer)
 
-    fun registerStyle(name: String, style: CssStyle<UnspecifiedKind>, layer: String? = null) =
-        _registerStyle(name, style, UnspecifiedKind::class, layer)
+    fun registerStyle(name: String, style: CssStyle<GeneralKind>, layer: String? = null) =
+        _registerStyle(name, style, GeneralKind::class, layer)
 
     private fun updateReplaced(originalStyle: CssStyle<*>, newStyle: CssStyle<*>) {
         _replacedCssStyles[originalStyle] = newStyle
@@ -142,7 +142,7 @@ class MutableSilkTheme {
     ) {
         val name = cssStyleNames[style] ?: error("Attempting to replace a CSS style that was never registered.")
         check(!replacedCssStyles.contains(style)) { "Attempting to override style \"${name}\" twice" }
-        val newStyle = object : CssStyle<UnspecifiedKind>(init, extraModifier) {}
+        val newStyle = object : CssStyle<GeneralKind>(init, extraModifier) {}
         _cssStyles[name] = newStyle
         _cssStyleNames[newStyle] = name
         updateReplaced(style, newStyle)
