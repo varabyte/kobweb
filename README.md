@@ -2277,7 +2277,7 @@ declarations.
 > For example, see what happens when you paste in the following CSS code:
 > ```css
 > .site-banner {
->   display: relative;
+>   position: relative;
 >   padding-left: 10px;
 >   padding-top: 5%;
 >   animation: slide-in 3s linear 1s infinite;
