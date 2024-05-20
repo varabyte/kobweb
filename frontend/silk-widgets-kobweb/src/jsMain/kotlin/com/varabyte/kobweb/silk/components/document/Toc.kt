@@ -46,6 +46,7 @@ val TocBorderedVariant = TocStyle.addVariantBase {
         .padding(1.cssRem)
 }
 
+// onEach: return true to visit nested elements, false otherwise
 private fun HTMLCollection.walk(onEach: (Element) -> Boolean) {
     (0 until length)
         .mapNotNull { i: Int -> this[i] }
@@ -77,6 +78,9 @@ private class TocEntry(val text: String, val id: String, val indent: Int)
  * @param minHeaderLevel The minimum header level to start paying attention to; any lower level headers will be skipped
  *   over. This defaults to 2 and not 1 because `H1` is usually the title of the page and not included in the TOC.
  * @param maxHeaderLevel The maximum header level to pay attention to; any higher level headers will be skipped over.
+ * @param provideHeadingText A function that takes a header element and returns the text to display in the TOC. By
+ *   default, this is the text content of the header element, but users can override it if necessary, e.g. to strip out
+ *   spanned elements meant for icons.
  */
 @Composable
 fun Toc(
@@ -85,6 +89,7 @@ fun Toc(
     minHeaderLevel: Int = 2,
     maxHeaderLevel: Int = 3,
     indent: CSSLengthOrPercentageNumericValue = 1.cssRem,
+    provideHeadingText: (HTMLHeadingElement) -> String = { it.textContent.orEmpty() },
     ref: ElementRefScope<HTMLUListElement>? = null,
 ) {
     require(minHeaderLevel in 1..6) { "Toc minHeaderLevel must be in range 1..6, got $minHeaderLevel" }
@@ -105,11 +110,14 @@ fun Toc(
                             && child.id.isNotBlank()
                             && child.nodeName in inRangeHeaderNodeNames
                         ) {
-                            val headingText = child.textContent ?: return@walk false
-                            val indentCount =
-                                inRangeHeaderNodeNames.indexOf(child.nodeName).takeIf { it >= 0 } ?: return@walk false
+                            val headingText = provideHeadingText(child)
+                            if (headingText.isNotEmpty()) {
+                                val indentCount =
+                                    inRangeHeaderNodeNames.indexOf(child.nodeName).takeIf { it >= 0 }
+                                        ?: return@walk false
 
-                            tocEntries.add(TocEntry(headingText, child.id, indentCount))
+                                tocEntries.add(TocEntry(headingText, child.id, indentCount))
+                            }
                         }
 
                         when {
