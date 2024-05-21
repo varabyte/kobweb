@@ -25,7 +25,6 @@ import org.commonmark.node.BulletList
 import org.commonmark.node.Code
 import org.commonmark.node.CustomBlock
 import org.commonmark.node.CustomNode
-import org.commonmark.node.Document
 import org.commonmark.node.Emphasis
 import org.commonmark.node.FencedCodeBlock
 import org.commonmark.node.HardLineBreak
@@ -176,12 +175,13 @@ class KotlinRenderer(
         val routeOverride: String? get() = raw["routeOverride"]?.singleOrNull()
 
         // Hide front matter data from the user that is meant to be consumed by the renderer
-        val user: Map<String, List<String>>
-            get() = raw.filterKeys {
+        fun filterUserData(): Map<String, List<String>> {
+            return raw.filterKeys {
                 it != "root" &&
                     it != "imports" &&
                     it != "routeOverride"
             }
+        }
     }
 
     /** Read data out of the front matter block (if present) */
@@ -207,41 +207,42 @@ class KotlinRenderer(
         }
 
         init {
-            if (frontMatterData != null) {
-                var contextCreated = false
-                if (dependsOnMarkdownArtifact) {
-                    val userData = frontMatterData.user
-                        .mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
-                    if (userData.isNotEmpty()) {
-                        val mdCtx = buildString {
-                            append("MarkdownContext(")
-                            append(listOf("\"$filePath\"", userData.serialize()).joinToString())
-                            append(")")
-                        }
-                        output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
-                        ++indentCount
-                        contextCreated = true
-                    }
-                }
+            var contextCreated = false
+            if (dependsOnMarkdownArtifact) {
+                val userData = frontMatterData
+                    ?.filterUserData()
+                    ?.mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
+                    ?: emptyMap()
 
-                // If "root" is set in the YAML block, that represents a top level composable which should wrap
-                // everything else.
-                val root = frontMatterData.root ?: defaultRoot
+                val mdCtx = buildString {
+                    append("MarkdownContext(")
+                    append("\"$filePath\"")
+                    append(", ")
+                    append(userData.serialize())
+                    append(")")
+                }
+                output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
+                ++indentCount
+                contextCreated = true
+            }
+
+            // If "root" is set in the YAML block, that represents a top level composable which should wrap
+            // everything else.
+            val root = frontMatterData?.root ?: defaultRoot
+            if (root != null) {
+                visit(KobwebCall(root, appendBrace = true))
+                ++indentCount
+            }
+
+            onFinish += {
                 if (root != null) {
-                    visit(KobwebCall(root, appendBrace = true))
-                    ++indentCount
+                    --indentCount
+                    output.appendLine("$indent}")
                 }
 
-                onFinish += {
-                    if (root != null) {
-                        --indentCount
-                        output.appendLine("$indent}")
-                    }
-
-                    if (contextCreated) {
-                        --indentCount
-                        output.appendLine("$indent}")
-                    }
+                if (contextCreated) {
+                    --indentCount
+                    output.appendLine("$indent}")
                 }
             }
         }
@@ -285,21 +286,6 @@ class KotlinRenderer(
             } else {
                 output.appendLine()
             }
-        }
-
-        override fun visit(document: Document) {
-            // If the Yaml block is present, then this code is generated in the init {} block instead.
-            if (document.children().none { it is YamlFrontMatterBlock } && defaultRoot != null) {
-                visit(KobwebCall(defaultRoot, appendBrace = true))
-                ++indentCount
-
-                onFinish += {
-                    --indentCount
-                    output.appendLine("$indent}")
-                }
-            }
-
-            super.visit(document)
         }
 
         override fun visit(blockQuote: BlockQuote) {
