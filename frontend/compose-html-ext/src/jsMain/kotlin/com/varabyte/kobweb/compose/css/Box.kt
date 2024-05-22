@@ -121,8 +121,8 @@ fun StyleScope.boxShadow(
  * @see [BoxShadow.Unset]
  * @see [BoxShadow.of]
  */
-fun StyleScope.boxShadow(shadow: BoxShadow) {
-    boxShadow(value = shadow.toString())
+fun StyleScope.boxShadow(boxShadow: BoxShadow) {
+    boxShadow(boxShadow.toString())
 }
 
 /**
@@ -159,9 +159,9 @@ fun StyleScope.boxShadow(shadow: BoxShadow) {
  *             rgba(0, 0, 0, 0.318) 5px 8px 10px -1px;
  * ```
  */
-fun StyleScope.boxShadow(vararg shadows: BoxShadow.Shadow) {
-    if (shadows.isNotEmpty()) {
-        boxShadow(shadows.joinToString(transform = BoxShadow::toString))
+fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Value) {
+    if (boxShadows.isNotEmpty()) {
+        boxShadow(boxShadows.joinToString(transform = BoxShadow::toString))
     }
 }
 
@@ -173,7 +173,7 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
 
     private class Keyword(value: String): BoxShadow(value)
 
-    class Shadow internal constructor(
+    class Value internal constructor(
         offsetX: CSSLengthNumericValue = 0.px,
         offsetY: CSSLengthNumericValue = 0.px,
         blurRadius: CSSLengthNumericValue? = null,
@@ -252,7 +252,7 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
             spreadRadius: CSSLengthNumericValue? = null,
             color: CSSColorValue? = null,
             inset: Boolean = false,
-        ): Shadow = Shadow(
+        ): Value = Value(
             offsetX = offsetX,
             offsetY = offsetY,
             blurRadius = blurRadius,

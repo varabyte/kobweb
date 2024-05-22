@@ -108,8 +108,8 @@ fun Modifier.boxShadow(
  * }
  * ```
  */
-fun Modifier.boxShadow(vararg shadows: BoxShadow.Shadow): Modifier = styleModifier {
-    boxShadow(shadows = shadows)
+fun Modifier.boxShadow(vararg boxShadows: BoxShadow.Value): Modifier = styleModifier {
+    boxShadow(*boxShadows)
 }
 
 /**
@@ -178,6 +178,6 @@ fun Modifier.boxShadow(vararg shadows: BoxShadow.Shadow): Modifier = styleModifi
  * @see [BoxShadow.Unset]
  * @see [BoxShadow.of]
  */
-fun Modifier.boxShadow(shadow: BoxShadow): Modifier = styleModifier {
-    boxShadow(shadow = shadow)
+fun Modifier.boxShadow(boxShadow: BoxShadow): Modifier = styleModifier {
+    boxShadow(boxShadow)
 }
