@@ -1,9 +1,11 @@
 [versions]
-jetbrains-compose = "1.6.2"
-kotlin = "1.9.23"
+jetbrains-compose = "1.6.10"
+kotlin = "2.0.0"
 kotlinx-serialization = "1.6.3"
 
 [libraries]
+compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "jetbrains-compose" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
 kobweb-core = { module = "com.varabyte.kobweb:kobweb-core" }
 kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
@@ -11,7 +13,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 silk-icons-fa = { module = "com.varabyte.kobwebx:silk-icons-fa" }
 
 [plugins]
-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kobweb-application = { id = "com.varabyte.kobweb.application" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

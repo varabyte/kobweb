@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
 }
 
 group = "com.varabyte.kobweb"
@@ -13,8 +13,8 @@ kotlin {
 
     sourceSets {
         jsMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.html.core)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.html.core)
             api(libs.kotlinx.coroutines)
             api(projects.frontend.browserExt) // If you want compose-html-ext, you also want browser-ext
         }

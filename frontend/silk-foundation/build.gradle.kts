@@ -3,7 +3,7 @@ import com.varabyte.kobweb.gradle.publish.set
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
     id("com.varabyte.kobweb.internal.publish")
 }
 
@@ -17,8 +17,8 @@ kotlin {
 
     sourceSets {
         jsMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.html.core)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.html.core)
 
             implementation(projects.frontend.composeHtmlExt)
             api(projects.frontend.kobwebCompose)

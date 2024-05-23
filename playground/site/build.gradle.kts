@@ -3,7 +3,7 @@ import kotlinx.html.meta
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
     id("com.varabyte.kobweb.application")
     id("com.varabyte.kobwebx.markdown")
 }
@@ -31,18 +31,16 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            implementation(libs.compose.runtime)
         }
-        jsMain {
-            dependencies {
-                implementation(compose.html.core)
-                implementation("com.varabyte.kobweb:kobweb-core")
-                implementation("com.varabyte.kobweb:kobweb-silk")
-                implementation("com.varabyte.kobwebx:silk-icons-fa")
-                implementation("com.varabyte.kobwebx:kobwebx-markdown")
-                implementation(project(":sitelib"))
-                implementation(project(":worker"))
-            }
+        jsMain.dependencies {
+            implementation(libs.compose.html.core)
+            implementation("com.varabyte.kobweb:kobweb-core")
+            implementation("com.varabyte.kobweb:kobweb-silk")
+            implementation("com.varabyte.kobwebx:silk-icons-fa")
+            implementation("com.varabyte.kobwebx:kobwebx-markdown")
+            implementation(project(":sitelib"))
+            implementation(project(":worker"))
         }
         jvmMain.dependencies {
             implementation("com.varabyte.kobweb:kobweb-api")

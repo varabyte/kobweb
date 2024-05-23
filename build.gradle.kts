@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     `kotlin-dsl` apply false
     alias(libs.plugins.kotlinx.serialization) apply false
-    alias(libs.plugins.jetbrains.compose) apply false
 }
 
 subprojects {
