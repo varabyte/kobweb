@@ -4,7 +4,7 @@ Kobweb is designed to allow users to use their own UI framework if they'd like. 
 that is extremely useful and general purpose, so it has been extracted into its own library. If a project includes this
 library directly without Silk widgets, they can still:
 
-* define `ComponentStyle`s
+* define `CssStyle`s
 * define `Keyframe`s
 * set the current color mode (light/dark) which they can refer to from their component styles.
 * branch styles and behavior on site breakpoints
