@@ -3,7 +3,7 @@ import com.varabyte.kobweb.gradle.publish.set
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose.compiler)
     id("com.varabyte.kobweb.internal.publish")
 }
 
@@ -175,8 +175,8 @@ kotlin {
         jsMain {
             kotlin.srcDir(generateIconsTask)
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.html.core)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.html.core)
 
                 api(projects.frontend.kobwebCompose)
             }
