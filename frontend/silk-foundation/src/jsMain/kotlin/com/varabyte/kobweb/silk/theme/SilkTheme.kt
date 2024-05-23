@@ -1055,5 +1055,5 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
 internal var _SilkTheme: ImmutableSilkTheme? = null
 val SilkTheme: ImmutableSilkTheme
     get() {
-        return _SilkTheme ?: error("You can't access SilkTheme before first calling SilkApp")
+        return _SilkTheme ?: error("You can't access SilkTheme before first calling `prepareSilkFoundation` (or `SilkApp`, which calls it)")
     }
