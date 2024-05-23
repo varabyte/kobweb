@@ -14,6 +14,7 @@ import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilMdStyle
 import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilSmStyle
 import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilXlStyle
 import com.varabyte.kobweb.silk.style.breakpoint.DisplayUntilZeroStyle
+import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -48,44 +49,6 @@ class InitSilkContext(val config: MutableSilkConfig, val stylesheet: SilkStylesh
 // initialization directly there. In the case of Kobweb projects, where code gets automatically processed at compile
 // time looking for `@InitSilk` methods, it is easier to generate code and then set it using this property.
 var additionalSilkInitialization: (InitSilkContext) -> Unit = {}
-
-// Precedence for styles, from lowest to highest:
-// component styles < component variants < restricted styles < general styles
-//
-// Imagine code like this:
-// ```
-// interface WidgetKind
-// val WidgetStyle = CssStyle<WidgetKind> { ... }
-// class SomeParam(...) : CssStyle.Restricted(...)
-// fun Widget(modifier: Modifier, variant: CssStyleVariant<WidgetKind>, someParam: SomeParam) {
-//   val finalModifier = WidgetStyle.toModifier(variant)
-//      .then(someParam.toModifier())
-//      .then(modifier)
-// }
-// ```
-//
-// Called like this:
-// ```
-// val MyStyle = CssStyle { ... }
-// val MyWidgetVariant = WidgetStyle.addVariant { ... }
-// Widget(MyStyle.toModifier(), MyWidgetVariant, SomeParam.Value)
-// ```
-// Here, we would expect any variant to override the style, any parameter to override the variant, and any
-// user style passed into the modifier value to override everything else.
-//
-// The reset layer is reserved for global default styles (like changing the box-sizing property to border-box).
-//
-// The base layer is intended for global styles, often defined in `@InitSilk` blocks with code like
-// `ctx.stylesheet.registerStyle("a") { ... }` which apply globally to the whole site but which should get overridden if
-// any other style also tries to set it.
-internal object SilkCssLayerNames {
-    const val RESET = "reset"
-    const val BASE = "base"
-    const val COMPONENT_STYLES = "component-styles"
-    const val COMPONENT_VARIANTS = "component-variants"
-    const val RESTRICTED_STYLES = "restricted-styles"
-    const val GENERAL_STYLES = "general-styles"
-}
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
@@ -156,7 +119,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
                         .filterIsInstance<CSSMediaRule>()
                         .flatMap { it.cssRules.asList() }
                         .mapNotNull { rule ->
-                            (rule as? CSSLayerBlockRule)?.takeIf { it.name == SilkCssLayerNames.GENERAL_STYLES }
+                            (rule as? CSSLayerBlockRule)?.takeIf { it.name == SilkLayer.GENERAL_STYLES.layerName }
                         }.flatMap { it.cssRules.asList().filterIsInstance<CSSStyleRule>() }
                 }.forEach { rule ->
                     val selectorText = rule.selectorText
@@ -173,14 +136,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
             // Trying to peek at external stylesheets causes a security exception so step over them
             .filter { it.href == null }
             .forEach { styleSheet ->
-                val cssLayers = (listOf(
-                    SilkCssLayerNames.RESET,
-                    SilkCssLayerNames.BASE,
-                    SilkCssLayerNames.COMPONENT_STYLES,
-                    SilkCssLayerNames.COMPONENT_VARIANTS,
-                    SilkCssLayerNames.RESTRICTED_STYLES,
-                    SilkCssLayerNames.GENERAL_STYLES
-                ) + SilkStylesheetInstance.cssLayers)
+                val cssLayers = SilkLayer.entries.map { it.layerName } + SilkStylesheetInstance.cssLayers
                 styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
             }
     }

@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.StyleScope
 import com.varabyte.kobweb.silk.style.animation.KeyframesBuilder
+import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
@@ -84,13 +85,12 @@ interface SilkStylesheet : CssStyleRegistrar {
 
     /**
      * Create a layer which then wraps a collection of CSS styles.
-     *
-     * @param name The name of the layer. If empty, this will be treated as an anonymous layer (which has precedence
-     * over all other layers).
      */
     fun layer(name: String, block: CssStyleRegistrar.() -> Unit)
     fun registerKeyframes(name: String, build: KeyframesBuilder.() -> Unit)
 }
+
+fun SilkStylesheet.layer(layer: SilkLayer, block: CssStyleRegistrar.() -> Unit) = layer(layer.layerName, block)
 
 private class CssStyleRegistrarImpl : CssStyleRegistrar {
     class Entry(val cssSelector: String, val extraModifier: @Composable () -> Modifier, val init: StyleScope.() -> Unit)
@@ -159,7 +159,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         extraModifier: @Composable () -> Modifier,
         init: StyleScope.() -> Unit
     ) {
-        styles.add(SimpleCssStyle(cssSelector, init, extraModifier, layer = "base"))
+        styles.add(SimpleCssStyle(cssSelector, init, extraModifier, layer = null))
     }
 
     override fun layer(name: String, block: CssStyleRegistrar.() -> Unit) {

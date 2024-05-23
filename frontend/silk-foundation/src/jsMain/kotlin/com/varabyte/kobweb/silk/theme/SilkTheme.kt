@@ -7,7 +7,6 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.components.animation.registerKeyframes
 import com.varabyte.kobweb.silk.init.SilkConfig
-import com.varabyte.kobweb.silk.init.SilkCssLayerNames
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssKind
@@ -25,6 +24,7 @@ import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.breakpoint.BreakpointSizes
 import com.varabyte.kobweb.silk.style.breakpoint.BreakpointValues
+import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.MutablePalettes
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
@@ -103,11 +103,11 @@ class MutableSilkTheme {
         _cssStyleNames[style] = name
 
         val finalLayer = layer ?: when (kind) {
-            ComponentKind::class -> SilkCssLayerNames.COMPONENT_STYLES
-            RestrictedKind::class -> SilkCssLayerNames.RESTRICTED_STYLES
-            GeneralKind::class -> SilkCssLayerNames.GENERAL_STYLES
+            ComponentKind::class -> SilkLayer.COMPONENT_STYLES
+            RestrictedKind::class -> SilkLayer.RESTRICTED_STYLES
+            GeneralKind::class -> SilkLayer.GENERAL_STYLES
             else -> error("Unknown kind: $kind")
-        }.takeIf { it.isNotEmpty() } // In case user passes in ""
+        }.layerName.takeIf { it.isNotEmpty() } // In case user passes in ""
         finalLayer?.let { _cssLayersFor[name] = it }
 
         if (style is ExtendingCssStyle) {
@@ -269,7 +269,7 @@ class MutableSilkTheme {
         _cssStyleVariants[name] = variant
         _cssStyleNames[variant.cssStyle] = name
 
-        val finalLayer = (layer ?: SilkCssLayerNames.COMPONENT_VARIANTS)
+        val finalLayer = (layer ?: SilkLayer.COMPONENT_VARIANTS.layerName)
             .takeIf { it.isNotEmpty() } // In case user passes in ""
         finalLayer?.let { _cssLayersFor[name] = it }
 

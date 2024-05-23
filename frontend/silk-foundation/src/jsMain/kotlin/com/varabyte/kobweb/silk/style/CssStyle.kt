@@ -10,7 +10,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.components.style.ComponentVariant
-import com.varabyte.kobweb.silk.init.SilkCssLayerNames
+import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -244,8 +244,8 @@ abstract class CssStyle<K : CssKind> internal constructor(
                 appendLine("\tAttribute(s): ${attrsScope.attributes.keys.joinToString(", ") { "\"$it\"" }}")
                 appendLine()
                 val styleDeclaration = when {
-                    layer == SilkCssLayerNames.COMPONENT_VARIANTS -> "val SomeExampleVariant = ExampleStyle.addVariant"
-                    layer == SilkCssLayerNames.COMPONENT_STYLES -> "val ExampleStyle = CssStyle<ExampleKind>"
+                    layer == SilkLayer.COMPONENT_VARIANTS.layerName -> "val SomeExampleVariant = ExampleStyle.addVariant"
+                    layer == SilkLayer.COMPONENT_STYLES.layerName -> "val ExampleStyle = CssStyle<ExampleKind>"
                     else -> "val ExampleStyle = CssStyle"
                 }
                 appendLine("An example of how to fix this (if the offending attribute was `tab-index`):")

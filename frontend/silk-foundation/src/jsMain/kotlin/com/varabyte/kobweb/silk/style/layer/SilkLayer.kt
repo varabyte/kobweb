@@ -1,0 +1,67 @@
+package com.varabyte.kobweb.silk.style.layer
+
+import com.varabyte.kobweb.silk.init.SilkStylesheet
+
+/**
+ * A collection of all CSS layers managed by Silk.
+ *
+ * The precedence order is: reset < base < component styles < component variants < restricted styles < general styles
+ *
+ * The **reset** layer is meant for any style that exists to reset / override default styles provided by browsers,
+ * sometimes in order to make behavior consistent when different browsers provide diverging styles, or because browsers
+ * default to legacy styles that exist for backwards compatibility but that most modern sites change (particularly
+ * `box-sizing`). Most users are not expected to use this layer.
+ *
+ * The **base** layer is meant for general low precedence styles, things that the user might want to define as
+ * global styles for their site but that should be overridable by anything else that also targets the same element.
+ *
+ * Silk does not use the base layer itself but exposes it for users. The recommended code pattern for applying styles to
+ * a base layer is:
+ *
+ * ```
+ * @InitSilk
+ * fun initSilk(ctx: InitSilkContext) {
+ *    ctx.stylesheet.apply {
+ *      layer(SilkLayer.BASE) {
+ *        registerStyle("a")
+ *      }
+ *    }
+ * }
+ * ```
+ *
+ *
+ * The remaining styles apply to the different cases of CSS style blocks.
+ *
+ * Imagine code like this:
+ * ```
+ * interface WidgetKind
+ * val WidgetStyle = CssStyle<WidgetKind> { ... }
+ * class SomeParam(...) : CssStyle.Restricted(...)
+ * fun Widget(modifier: Modifier, variant: CssStyleVariant<WidgetKind>, someParam: SomeParam) {
+ *   val finalModifier = WidgetStyle.toModifier(variant)
+ *      .then(someParam.toModifier())
+ *      .then(modifier)
+ * }
+ * ```
+ *
+ * Called like this:
+ * ```
+ * val MyStyle = CssStyle { ... }
+ * val MyWidgetVariant = WidgetStyle.addVariant { ... }
+ * Widget(MyStyle.toModifier(), MyWidgetVariant, SomeParam.Value)
+ * ```
+ *
+ * Here, we would expect any variant to override the style, any parameter to override the variant, and any
+ * user style passed into the modifier value to override everything else.
+ *
+ * Finally, note that users can add their own custom layers that would take precedence over all Silk styles. See
+ * [SilkStylesheet.cssLayers] for more information.
+ */
+enum class SilkLayer(val layerName: String) {
+    RESET("reset"),
+    BASE("base"),
+    COMPONENT_STYLES("component-styles"),
+    COMPONENT_VARIANTS("component-variants"),
+    RESTRICTED_STYLES("restricted-styles"),
+    GENERAL_STYLES("general-styles");
+}
