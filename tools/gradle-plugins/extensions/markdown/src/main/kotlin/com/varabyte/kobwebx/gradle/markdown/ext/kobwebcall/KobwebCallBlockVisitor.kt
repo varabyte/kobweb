@@ -6,7 +6,7 @@ import org.commonmark.node.CustomBlock
 import org.commonmark.node.Node
 
 /** A visitor that should only be used with a [KobwebCallBlock], extracting relevant information from it. */
-class KobwebCallVisitor : AbstractVisitor() {
+class KobwebCallBlockVisitor : AbstractVisitor() {
     var call: KobwebCall? = null
         private set
 

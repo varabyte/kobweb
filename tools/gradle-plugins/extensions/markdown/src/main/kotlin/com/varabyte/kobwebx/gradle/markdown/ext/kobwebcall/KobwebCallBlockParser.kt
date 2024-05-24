@@ -1,9 +1,8 @@
 package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 
 import org.commonmark.node.Block
-import org.commonmark.parser.InlineParser
+import org.commonmark.parser.Parser
 import org.commonmark.parser.SourceLine
-import org.commonmark.parser.SourceLines
 import org.commonmark.parser.block.AbstractBlockParser
 import org.commonmark.parser.block.AbstractBlockParserFactory
 import org.commonmark.parser.block.BlockContinue
@@ -16,7 +15,7 @@ import org.commonmark.parser.block.ParserState
  *
  * @see KobwebCall
  */
-class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockParser() {
+class KobwebCallBlockParser(private val closingDelimiters: String) : AbstractBlockParser() {
     private val block = KobwebCallBlock()
 
     // If true, looks like {{{ MethodCall }}}, otherwise {{{ MethodCall\n...\n}}}
@@ -24,9 +23,7 @@ class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockPar
     private var method: String? = null
     private val lines = mutableListOf<SourceLine>()
 
-    override fun getBlock(): Block {
-        return block
-    }
+    override fun getBlock(): Block = block
 
     override fun tryContinue(state: ParserState): BlockContinue? {
         val content = state.line.content
@@ -41,14 +38,14 @@ class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockPar
         if (method == null) {
             // If the block was a single line, e.g. {{{ call }}},
             // then this will get called BEFORE tryContinue, with trailing delimiters
-            // at the end.
-            var method = line.content.toString().trim()
-            if (method.endsWith(closingDelimiters)) {
+            // at the end (e.g. " call }}}")
+            var trimmedMethod = line.content.toString().trim()
+            if (trimmedMethod.endsWith(closingDelimiters)) {
                 isSingleLine = true
-                method = method.removeSuffix(closingDelimiters).trim()
+                trimmedMethod = trimmedMethod.removeSuffix(closingDelimiters).trim()
             }
 
-            this.method = method
+            this.method = trimmedMethod
 
         } else {
             lines.add(line)
@@ -56,21 +53,21 @@ class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockPar
     }
 
     override fun closeBlock() {
-        while (lines.firstOrNull()?.content?.isBlank() == true) {
-            lines.removeFirst()
-        }
+        method?.takeUnless { it.isBlank() }?.let { method ->
+            val lines = lines
+                .dropWhile { it.content.isBlank() }
+                .dropLastWhile { it.content.isBlank() }
 
-        while (lines.lastOrNull()?.content?.isBlank() == true) {
-            lines.removeLast()
-        }
-
-        method?.let { method ->
             block.appendChild(KobwebCall(method, appendBrace = lines.isNotEmpty()))
-        }
-    }
 
-    override fun parseInlines(inlineParser: InlineParser) {
-        inlineParser.parse(SourceLines.of(lines), block)
+            if (lines.isNotEmpty()) {
+                val baseIndent = lines.minOf { it.sourceSpan.columnIndex }
+                val content = lines
+                    .joinToString("\n") { " ".repeat(it.sourceSpan.columnIndex - baseIndent) + it.content }
+                val innerDocument = Parser.builder().build().parse(content)
+                block.appendChild(innerDocument)
+            }
+        }
     }
 
     class Factory(delimiters: Pair<Char, Char>) : AbstractBlockParserFactory() {
@@ -81,7 +78,7 @@ class KobwebCallParser(private val closingDelimiters: String) : AbstractBlockPar
         override fun tryStart(state: ParserState, mathedBlockParser: MatchedBlockParser): BlockStart? {
             val line = state.line.content.substring(state.nextNonSpaceIndex)
             return if (line.startsWith(OPENING_DELIMITER)) {
-                BlockStart.of(KobwebCallParser(CLOSING_DELIMITER))
+                BlockStart.of(KobwebCallBlockParser(CLOSING_DELIMITER))
                     .atIndex(BLOCK_DELIMITER_LEN)
             } else {
                 BlockStart.none()

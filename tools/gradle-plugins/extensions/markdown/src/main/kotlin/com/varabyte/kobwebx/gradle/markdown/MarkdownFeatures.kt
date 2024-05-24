@@ -8,6 +8,7 @@ import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
+import org.commonmark.parser.IncludeSourceSpans
 import org.commonmark.parser.Parser
 import org.gradle.api.provider.Property
 
@@ -114,6 +115,7 @@ abstract class MarkdownFeatures {
 
         return Parser.builder()
             .extensions(extensions)
+            .includeSourceSpans(IncludeSourceSpans.BLOCKS_AND_INLINES)
             .build()
     }
 }

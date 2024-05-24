@@ -8,7 +8,7 @@ import com.varabyte.kobweb.gradle.core.util.hasJsDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
-import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallVisitor
+import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlockVisitor
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeTicks
@@ -459,7 +459,7 @@ class KotlinRenderer(
         override fun visit(customBlock: CustomBlock) {
             when (customBlock) {
                 is KobwebCallBlock -> {
-                    val visitor = KobwebCallVisitor()
+                    val visitor = KobwebCallBlockVisitor()
                     customBlock.accept(visitor)
                     visitor.call?.let { call ->
                         visit(call)

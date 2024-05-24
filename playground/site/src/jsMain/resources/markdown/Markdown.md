@@ -1,5 +1,7 @@
 ---
 root: .components.layouts.PageLayout("MARKDOWN")
+imports:
+  - .components.widgets.*
 ---
 
 ## Markdown Example
@@ -65,8 +67,23 @@ You can also use block tags, like `<a>` and `<pre>`. Here, we use html blocks to
 </a>
 ```
 
-Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose HTML calls. In fact,
-the following link is actually provided by Kotlin code:
+Alternately, you can use `{{{ code }}}` to call into Kotlin code, which itself can make Compose HTML calls.
+
+For example, here is a widget that turns bullet points into folder icons:
+
+{{{ Folders
+
+* src
+  * main
+    * kotlin
+      * main.kt
+    * resources
+      * public
+        * favicon.ico
+
+}}}
+
+And though it may not appear it, the following link is actually provided by Kotlin code:
 
 {{{ GoHomeLink }}}
 

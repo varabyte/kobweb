@@ -32,7 +32,7 @@ import org.commonmark.parser.Parser.ParserExtension
  */
 class KobwebCallExtension private constructor(private val delimiters: Pair<Char, Char>) : ParserExtension {
     override fun extend(parserBuilder: Parser.Builder) {
-        parserBuilder.customBlockParserFactory(KobwebCallParser.Factory(delimiters))
+        parserBuilder.customBlockParserFactory(KobwebCallBlockParser.Factory(delimiters))
         parserBuilder.customDelimiterProcessor(KobwebCallDelimiterProcessor(delimiters))
     }
 
