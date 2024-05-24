@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.StyleScope
 import com.varabyte.kobweb.silk.style.animation.KeyframesBuilder
+import com.varabyte.kobweb.silk.style.layer.LayerListBuilder
 import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -72,16 +73,13 @@ interface CssStyleRegistrar {
  */
 interface SilkStylesheet : CssStyleRegistrar {
     /**
-     * Users can specify custom CSS layers here, in order of precedence (lowest to highest).
-     *
-     * Several layers will already be added by the Silk framework -- `reset`, `base`, `component-styles`,
-     * `component-variants`, `restricted-styles`, and `general-styles`. These should work well for almost every practice
-     * case, but if necessary, a user can add their own layers here, at which point they will always take precedence
-     * over anything produced by Silk.
+     * Users can specify custom CSS layers here, to extend the initial set provided by Silk.
      *
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@layer">the official @layer docs</a>
+     *
+     * @see SilkLayer
      */
-    val cssLayers: MutableList<String>
+    val cssLayers: LayerListBuilder
 
     /**
      * Create a layer which then wraps a collection of CSS styles.
@@ -152,7 +150,7 @@ internal object SilkStylesheetInstance : SilkStylesheet {
     private val styles = mutableListOf<SimpleCssStyle>()
     private val keyframes = mutableMapOf<String, KeyframesBuilder.() -> Unit>()
 
-    override val cssLayers = mutableListOf<String>()
+    override val cssLayers = LayerListBuilder()
 
     override fun registerStyle(
         cssSelector: String,

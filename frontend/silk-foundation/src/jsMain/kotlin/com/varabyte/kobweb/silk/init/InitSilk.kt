@@ -136,7 +136,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
             // Trying to peek at external stylesheets causes a security exception so step over them
             .filter { it.href == null }
             .forEach { styleSheet ->
-                val cssLayers = SilkLayer.entries.map { it.layerName } + SilkStylesheetInstance.cssLayers
+                val cssLayers = SilkStylesheetInstance.cssLayers.build()
                 styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
             }
     }

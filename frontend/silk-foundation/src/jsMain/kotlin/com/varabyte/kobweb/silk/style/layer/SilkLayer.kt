@@ -54,14 +54,39 @@ import com.varabyte.kobweb.silk.init.SilkStylesheet
  * Here, we would expect any variant to override the style, any parameter to override the variant, and any
  * user style passed into the modifier value to override everything else.
  *
- * Finally, note that users can add their own custom layers that would take precedence over all Silk styles. See
- * [SilkStylesheet.cssLayers] for more information.
+ * Finally, note that users can add their own custom layers, using the [SilkStylesheet.cssLayers] property.
  */
 enum class SilkLayer(val layerName: String) {
+    /**
+     * A layer for resetting default CSS values provided by browsers.
+     *
+     * This layer is useful for cleaning up inconsistencies in different browser styles or overriding legacy styles
+     * that most modern sites don't use but browsers supply for compatibility with older sites.
+     */
     RESET("reset"),
+
+    /**
+     * A fairly low-precedence layer provided to users for specifying styles that should not override CssStyle blocks.
+     */
     BASE("base"),
+
+    /**
+     * A layer used for styles created by `CssStyle<ComponentKind> { ... }` blocks.
+     */
     COMPONENT_STYLES("component-styles"),
+
+    /**
+     * A layer used for styles created by `SomeComponentStyle.addVariant { ... }` blocks.
+     */
     COMPONENT_VARIANTS("component-variants"),
+
+    /**
+     * A layer used for styles created by classes that implement `CssStyle.Restricted`
+     */
     RESTRICTED_STYLES("restricted-styles"),
+
+    /**
+     * A layer used for styles created by `CssStyle { ... }` blocks.
+     */
     GENERAL_STYLES("general-styles");
 }
