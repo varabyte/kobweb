@@ -28,8 +28,7 @@ abstract class MarkdownTask @Inject constructor(
     @get:Input
     abstract val pagesPackage: Property<String>
 
-    @get:Internal
-    protected val rootPath get() = Path(markdownBlock.markdownPath.get())
+    private val rootPath get() = Path(markdownBlock.markdownPath.get())
 
     @get:Internal
     abstract val resources: Property<SourceDirectorySet>

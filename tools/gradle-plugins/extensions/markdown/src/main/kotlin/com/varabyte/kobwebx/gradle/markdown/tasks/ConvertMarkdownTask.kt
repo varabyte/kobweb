@@ -24,6 +24,7 @@ import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.io.path.invariantSeparatorsPathString
 
 abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
     MarkdownTask(
@@ -66,7 +67,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
             val mdFile = file
             val packageParts = packagePartsFor(relativePath)
             val ktFileName = mdFile.nameWithoutExtension.capitalized()
-            val mdPathRel = packageParts.joinToString("/")
+            val mdPathRel = relativePath.toPath().invariantSeparatorsPathString
             File(getGenDir().get().asFile, "$mdPathRel/$ktFileName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
                 val mdPackage = absolutePackageFor(packageParts)
