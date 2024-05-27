@@ -1,8 +1,5 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
-import com.varabyte.kobweb.common.lang.packageConcat
-import com.varabyte.kobweb.common.lang.toPackageName
-import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
@@ -14,28 +11,25 @@ import org.commonmark.node.Node
 import org.commonmark.parser.Parser
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileTree
-import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.io.path.Path
-import kotlin.io.path.invariantSeparatorsPathString
 
-abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock: MarkdownBlock) :
-    KobwebTask("Convert markdown files found in the project's resources path to source code in the final project") {
+abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
+    MarkdownTask(
+        markdownBlock,
+        "Convert markdown files found in the project's resources path to source code in the final project"
+    ) {
 
     // Use changing the build script as a proxy for changing markdownBlock or kobwebBlock values.
     @InputFiles
@@ -47,24 +41,6 @@ abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock
 
     @get:Inject
     abstract val objectFactory: ObjectFactory
-
-    @get:Input
-    abstract val pagesPackage: Property<String>
-
-    @get:Internal
-    abstract val resources: Property<SourceDirectorySet>
-
-    @InputFiles
-    fun getMarkdownRoots(): Provider<List<File>> = resources.map {
-        it.srcDirs.map { root -> root.resolve(markdownBlock.markdownPath.get()) }
-    }
-
-    @InputFiles
-    fun getMarkdownResources(): Provider<FileTree> {
-        return resources.zip(markdownBlock.markdownPath) { fileTree, path ->
-            fileTree.matching { include("$path/**/*.md") }
-        }
-    }
 
     @get:InputDirectory
     abstract val generatedMarkdownDir: DirectoryProperty
@@ -84,28 +60,17 @@ abstract class ConvertMarkdownTask @Inject constructor(private val markdownBlock
         )
         val markdownFiles = getMarkdownResources().get() + objectFactory.fileTree().setDir(generatedMarkdownDir)
 
-        val rootPath = Path(markdownBlock.markdownPath.get())
         markdownFiles.visit {
             if (isDirectory) return@visit
-            val mdFile = this.file
-            val fullPath = Path(relativePath.pathString)
-            val mdPathRel = rootPath.relativize(fullPath).invariantSeparatorsPathString
 
-            val parts = mdPathRel.split('/')
-            val dirParts = parts.subList(0, parts.lastIndex)
-            val packageParts = dirParts.map { it.toPackageName() }
-
-            val ktFileName = mdFile.nameWithoutExtension
-            File(getGenDir().get().asFile, "${packageParts.joinToString("/")}/$ktFileName.kt").let { outputFile ->
+            val mdFile = file
+            val packageParts = packagePartsFor(relativePath)
+            val ktFileName = mdFile.nameWithoutExtension.capitalized()
+            val mdPathRel = packageParts.joinToString("/")
+            File(getGenDir().get().asFile, "$mdPathRel/$ktFileName.kt").let { outputFile ->
                 outputFile.parentFile.mkdirs()
-                val mdPackage = project.prefixQualifiedPackage(
-                    pagesPackage.get().packageConcat(packageParts.joinToString("."))
-                )
-
-                // The suggested replacement for "capitalize" is awful
-                @Suppress("DEPRECATION")
-                val funName = "${ktFileName.capitalize()}Page"
-
+                val mdPackage = absolutePackageFor(packageParts)
+                val funName = funNameFor(mdFile)
                 val ktRenderer = KotlinRenderer(
                     project,
                     cache::getRelative,

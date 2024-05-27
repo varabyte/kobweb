@@ -38,6 +38,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
             processTask.configure {
                 resources.set(project.getResourceSources(jsTarget))
+                pagesPackage.set(kobwebBlock.pagesPackage)
             }
             convertTask.configure {
                 resources.set(project.getResourceSources(jsTarget))

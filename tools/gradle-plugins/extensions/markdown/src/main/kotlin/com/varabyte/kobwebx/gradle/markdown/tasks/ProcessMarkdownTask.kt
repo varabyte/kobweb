@@ -1,6 +1,5 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
-import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
@@ -11,11 +10,7 @@ import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
-import org.gradle.api.file.FileTree
-import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -23,7 +18,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
-import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
 
 private class MarkdownVisitor : AbstractVisitor() {
@@ -44,8 +38,11 @@ private class MarkdownVisitor : AbstractVisitor() {
     }
 }
 
-abstract class ProcessMarkdownTask @Inject constructor(private val markdownBlock: MarkdownBlock) :
-    KobwebTask("Runs the `process` callback registered in the markdown block (which gives the user a chance to generate additional files around all of the markdown resources)") {
+abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
+    MarkdownTask(
+        markdownBlock,
+        "Runs the `process` callback registered in the markdown block (which gives the user a chance to generate additional files around all of the markdown resources)"
+    ) {
 
     // Use changing the build script as a proxy for changing markdownBlock or kobwebBlock values.
     @InputFiles
@@ -53,16 +50,6 @@ abstract class ProcessMarkdownTask @Inject constructor(private val markdownBlock
     fun getBuildScripts(): List<File> = projectLayout.getBuildScripts()
 
     private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
-
-    @get:Internal
-    abstract val resources: Property<FileTree>
-
-    @InputFiles
-    fun getMarkdownFiles(): Provider<FileTree> {
-        return resources.zip(markdownBlock.markdownPath) { fileTree, path ->
-            fileTree.matching { include("$path/**/*.md") }
-        }
-    }
 
     @OutputDirectory
     fun getGenSrcDir() = markdownBlock.getGenJsSrcRoot("process")
@@ -75,24 +62,24 @@ abstract class ProcessMarkdownTask @Inject constructor(private val markdownBlock
         val process = markdownBlock.process.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
-            val rootPath = Path(markdownBlock.markdownPath.get())
-            getMarkdownFiles().get().visit {
+            getMarkdownResources().get().visit {
                 if (isDirectory) return@visit
 
-                val fullPath = Path(relativePath.pathString)
-                val relativePath = rootPath.relativize(fullPath)
+                val mdFile = file
                 val visitor = MarkdownVisitor()
+
                 parser
-                    .parse(file.readText())
+                    .parse(mdFile.readText())
                     .accept(visitor)
                 add(
                     MarkdownEntry(
-                        filePath = relativePath.invariantSeparatorsPathString,
+                        filePath = relativePath.toPath().invariantSeparatorsPathString,
                         frontMatter = visitor.frontMatter,
                         route = RouteUtils.getRoute(
-                            relativePath.toFile(),
+                            relativePath.toPath().toFile(),
                             visitor.frontMatter,
-                        )
+                        ),
+                        "${absolutePackageFor(relativePath)}.${funNameFor(mdFile)}"
                     )
                 )
             }
