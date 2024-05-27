@@ -104,7 +104,7 @@ abstract class MarkdownFeatures {
             extensions.add(YamlFrontMatterExtension.create())
         }
         if (kobwebCall.get()) {
-            extensions.add(KobwebCallExtension.create(kobwebCallDelimiters.get()))
+            extensions.add(KobwebCallExtension.create(kobwebCallDelimiters.get()) { createParser() })
         }
         if (tables.get()) {
             extensions.add(TablesExtension.create())

@@ -30,15 +30,18 @@ import org.commonmark.parser.Parser.ParserExtension
  * }}}
  * ```
  */
-class KobwebCallExtension private constructor(private val delimiters: Pair<Char, Char>) : ParserExtension {
+class KobwebCallExtension private constructor(
+    private val delimiters: Pair<Char, Char>,
+    private val createParser: () -> Parser
+) : ParserExtension {
     override fun extend(parserBuilder: Parser.Builder) {
-        parserBuilder.customBlockParserFactory(KobwebCallBlockParser.Factory(delimiters))
+        parserBuilder.customBlockParserFactory(KobwebCallBlockParser.Factory(delimiters, createParser))
         parserBuilder.customDelimiterProcessor(KobwebCallDelimiterProcessor(delimiters))
     }
 
     companion object {
-        fun create(delimiters: Pair<Char, Char>): Extension {
-            return KobwebCallExtension(delimiters)
+        fun create(delimiters: Pair<Char, Char>, createParser: () -> Parser): Extension {
+            return KobwebCallExtension(delimiters, createParser)
         }
     }
 }

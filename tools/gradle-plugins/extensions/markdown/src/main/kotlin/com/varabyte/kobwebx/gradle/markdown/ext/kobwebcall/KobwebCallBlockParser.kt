@@ -15,23 +15,38 @@ import org.commonmark.parser.block.ParserState
  *
  * @see KobwebCall
  */
-class KobwebCallBlockParser(private val closingDelimiters: String) : AbstractBlockParser() {
+class KobwebCallBlockParser(
+    private val openingDelimiters: String,
+    private val closingDelimiters: String,
+    private val createParser: () -> Parser
+) : AbstractBlockParser() {
     private val block = KobwebCallBlock()
 
     // If true, looks like {{{ MethodCall }}}, otherwise {{{ MethodCall\n...\n}}}
     private var isSingleLine = false
     private var method: String? = null
     private val lines = mutableListOf<SourceLine>()
+    private var nestingDepth = 0 // Don't consume }}} of nested call blocks
 
     override fun getBlock(): Block = block
 
     override fun tryContinue(state: ParserState): BlockContinue? {
         val content = state.line.content
-        return if (content.startsWith(closingDelimiters) || isSingleLine) {
-            return BlockContinue.finished()
-        } else {
-            BlockContinue.atIndex(state.nextNonSpaceIndex)
+        if (content.trimStart().startsWith(openingDelimiters)) {
+            ++nestingDepth
         }
+        val blockContinue: BlockContinue? = when {
+            isSingleLine -> BlockContinue.finished()
+            content.trimStart().startsWith(closingDelimiters) -> {
+                --nestingDepth
+                check(nestingDepth >= 0)
+                if (nestingDepth == 0) BlockContinue.finished() else null
+            }
+
+            else -> null
+        }
+
+        return blockContinue ?: BlockContinue.atIndex(state.nextNonSpaceIndex)
     }
 
     override fun addLine(line: SourceLine) {
@@ -43,6 +58,9 @@ class KobwebCallBlockParser(private val closingDelimiters: String) : AbstractBlo
             if (trimmedMethod.endsWith(closingDelimiters)) {
                 isSingleLine = true
                 trimmedMethod = trimmedMethod.removeSuffix(closingDelimiters).trim()
+            } else {
+                // If here, it means we started with a "{{{" but markdown already consumed it for us
+                ++nestingDepth
             }
 
             this.method = trimmedMethod
@@ -64,13 +82,13 @@ class KobwebCallBlockParser(private val closingDelimiters: String) : AbstractBlo
                 val baseIndent = lines.minOf { it.sourceSpan.columnIndex }
                 val content = lines
                     .joinToString("\n") { " ".repeat(it.sourceSpan.columnIndex - baseIndent) + it.content }
-                val innerDocument = Parser.builder().build().parse(content)
+                val innerDocument = createParser.invoke().parse(content)
                 block.appendChild(innerDocument)
             }
         }
     }
 
-    class Factory(delimiters: Pair<Char, Char>) : AbstractBlockParserFactory() {
+    class Factory(delimiters: Pair<Char, Char>, private val createParser: () -> Parser) : AbstractBlockParserFactory() {
         private val BLOCK_DELIMITER_LEN = 3
         private val OPENING_DELIMITER = delimiters.first.toString().repeat(BLOCK_DELIMITER_LEN)
         private val CLOSING_DELIMITER = delimiters.second.toString().repeat(BLOCK_DELIMITER_LEN)
@@ -78,7 +96,7 @@ class KobwebCallBlockParser(private val closingDelimiters: String) : AbstractBlo
         override fun tryStart(state: ParserState, mathedBlockParser: MatchedBlockParser): BlockStart? {
             val line = state.line.content.substring(state.nextNonSpaceIndex)
             return if (line.startsWith(OPENING_DELIMITER)) {
-                BlockStart.of(KobwebCallBlockParser(CLOSING_DELIMITER))
+                BlockStart.of(KobwebCallBlockParser(OPENING_DELIMITER, CLOSING_DELIMITER, createParser))
                     .atIndex(BLOCK_DELIMITER_LEN)
             } else {
                 BlockStart.none()
