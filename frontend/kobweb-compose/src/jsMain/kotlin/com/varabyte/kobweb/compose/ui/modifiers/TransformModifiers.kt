@@ -80,6 +80,18 @@ fun Modifier.scaleZ(s: CSSPercentageNumericValue) = styleModifier {
     scaleZ(s)
 }
 
+fun Modifier.transformBox(transformBox: TransformBox) = styleModifier {
+    transformBox(transformBox)
+}
+
+fun Modifier.transformOrigin(transformOrigin: TransformOrigin) = styleModifier {
+    transformOrigin(transformOrigin)
+}
+
+fun Modifier.transformStyle(transformStyle: TransformStyle) = styleModifier {
+    transformStyle(transformStyle)
+}
+
 fun Modifier.translate(tx: CSSLengthOrPercentageNumericValue) = styleModifier {
     translate(tx)
 }
