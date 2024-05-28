@@ -42,10 +42,10 @@ class CSSColor private constructor(private val value: String) : StylePropertyVal
         val CurrentColor get() = CSSColor("currentColor")
 
         // Global values
-        val Inherit get() = Color("inherit")
-        val Initial get() = Color("initial")
-        val Revert get() = Color("revert")
-        val Unset get() = Color("unset")
+        val Inherit get() = CSSColor("inherit")
+        val Initial get() = CSSColor("initial")
+        val Revert get() = CSSColor("revert")
+        val Unset get() = CSSColor("unset")
     }
 }
 
