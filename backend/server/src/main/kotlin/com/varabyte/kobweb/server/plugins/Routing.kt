@@ -40,14 +40,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
 import kotlin.time.toJavaDuration
-import java.lang.StackTraceElement as JavaStackTraceElement // Needed to disambiguiate from ktor `StackTraceElement`
+import java.lang.StackTraceElement as JavaStackTraceElement
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
@@ -365,10 +364,9 @@ private suspend fun PipelineContext<*, ApplicationCall>.serveScriptFiles(
 
 // Abort early on missing resources, so we don't serve giant html pages simply because someone forgot to
 // add a favicon.ico file, for example.
-private suspend fun PipelineContext<*, ApplicationCall>.abortIfNotHtml(path: String): Boolean {
-    val ext = File(path).extension.takeIf { it.isNotEmpty() } ?: return false
-
-    return if (ext != "html") {
+private suspend fun PipelineContext<*, ApplicationCall>.abortIfNotHtml(): Boolean {
+    val acceptHeaders = call.request.headers["Accept"]?.split(",")?.toSet().orEmpty()
+    return if (!acceptHeaders.contains("text/html")) {
         call.respond(HttpStatusCode.NotFound)
         true
     } else false
@@ -448,7 +446,7 @@ private fun Routing.configureCatchAllRouting(
             { path -> serveScriptFiles(path, script, scriptMap) },
             { path -> handleRedirect(routePrefix, path, patternMappers) },
             { path -> extraHandler(path) },
-            { path -> abortIfNotHtml(path) },
+            { _ -> abortIfNotHtml() },
             { serveIndexFile(index); true },
         )
     }
