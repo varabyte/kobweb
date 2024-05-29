@@ -32,7 +32,7 @@ class KobwebCallBlockParser(
 
     override fun tryContinue(state: ParserState): BlockContinue? {
         val content = state.line.content
-        if (content.trimStart().startsWith(openingDelimiters)) {
+        if (content.trimStart().startsWith(openingDelimiters) && !content.trimEnd().endsWith(closingDelimiters)) {
             ++nestingDepth
         }
         val blockContinue: BlockContinue? = when {
