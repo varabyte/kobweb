@@ -67,8 +67,13 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
             val mdFile = file
             val packageParts = packagePartsFor(relativePath)
             val ktFileName = mdFile.nameWithoutExtension.capitalized()
-            val mdPathRel = relativePath.toPath().invariantSeparatorsPathString
-            File(getGenDir().get().asFile, "$mdPathRel/$ktFileName.kt").let { outputFile ->
+            val mdPathRel = relativePath.toPath()
+            val mdPathRelStr = mdPathRel.invariantSeparatorsPathString
+
+            File(
+                getGenDir().get().asFile,
+                mdPathRel.resolveSibling("$ktFileName.kt").invariantSeparatorsPathString
+            ).let { outputFile ->
                 outputFile.parentFile.mkdirs()
                 val mdPackage = absolutePackageFor(packageParts)
                 val funName = funNameFor(mdFile)
@@ -77,7 +82,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                     cache::getRelative,
                     markdownBlock.defaultRoot.orNull?.takeUnless { it.isBlank() },
                     markdownBlock.imports.get(),
-                    mdPathRel,
+                    mdPathRelStr,
                     markdownHandlers,
                     mdPackage,
                     funName,
