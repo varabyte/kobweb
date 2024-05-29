@@ -40,6 +40,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.Path
@@ -421,20 +422,20 @@ private fun Routing.configureRedirects(routePrefix: String, redirects: List<Patt
 }
 
 
-// Note: This should be defined LAST in the routing { ... } block and it used to handle general URLs. The site script
+// Note: This should be defined LAST in the routing { ... } block and used to handle general URLs. The site script
 // itself looks at the user's current URL to figure out how to route itself, so in many cases, just returning
 // "index.html" most of the time is enough for the client to figure out what to render next.
 /**
  * @param script The path to the script.js file, which may be in a custom location depending on server configuration
  * @param index The path to the index.html file, which may be in a custom location depending on server configuration
- * @param extraHandler An optional handler so callers can configure additional, one-off handling.
+ * @param findResource An optional handler so callers can notify this caller that a resource was found dynamically.
  */
 private fun Routing.configureCatchAllRouting(
     conf: KobwebConf,
     script: Path,
     index: Path,
     routePrefix: String,
-    extraHandler: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean = { false }
+    findResource: (String) -> File? = { null }
 ) {
     val scriptMap = Path("$script.map")
     val patternMappers = conf.server.redirects.toPatternMappers()
@@ -445,10 +446,36 @@ private fun Routing.configureCatchAllRouting(
             pathParts,
             { path -> serveScriptFiles(path, script, scriptMap) },
             { path -> handleRedirect(routePrefix, path, patternMappers) },
-            { path -> extraHandler(path) },
+            { path ->
+                findResource(path).let { contentFile ->
+                    if (contentFile != null) {
+                        call.respondFile(contentFile)
+                        true
+                    } else false
+                }
+            },
             { _ -> abortIfNotHtml() },
-            { serveIndexFile(index); true },
+            {
+                serveIndexFile(index).also {
+                    application.log.debug(
+                        "Served fallback index.html file in response to \"/${
+                            pathParts.joinToString(
+                                "/"
+                            )
+                        }\""
+                    )
+                }; true
+            },
         )
+    }
+
+    head("$routePrefix/{$KOBWEB_PARAMS...}") {
+        val path = call.parameters.getAll(KOBWEB_PARAMS)!!.joinToString("/")
+        if (findResource(path) != null) {
+            call.respond(HttpStatusCode.OK)
+        } else {
+            call.respond(HttpStatusCode.NotFound)
+        }
     }
 }
 
@@ -531,14 +558,9 @@ private fun Application.configureDevRouting(
 
         val contentRootFile = contentRoot.toFile()
         configureCatchAllRouting(conf, script, contentRoot.resolve("index.html"), routePrefix) { path ->
-            contentRootFile.resolve(path).let { contentFile ->
-                if (contentFile.isFile && contentFile.exists()) {
-                    call.respondFile(contentFile)
-                    true
-                } else {
-                    false
-                }
-            }
+            // We fetch resources dynamically in dev mode because things may get added, removed, or renamed while the
+            // server is running. In prod mode, files are registered at startup time instead.
+            contentRootFile.resolve(path).takeIf { it.isFile && it.exists() }
         }
     }
 }
@@ -605,8 +627,12 @@ private fun Application.configureFullstackProdRouting(
 
         resourcesRoot.toFile().let { resourcesRootFile ->
             resourcesRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
-                get("$routePrefix/${file.relativeTo(resourcesRootFile).invariantSeparatorsPath}") {
+                val resourcePath = "$routePrefix/${file.relativeTo(resourcesRootFile).invariantSeparatorsPath}"
+                get(resourcePath) {
                     call.respondFile(file)
+                }
+                head(resourcePath) {
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }
@@ -653,6 +679,7 @@ private fun Application.configureStaticProdRouting(conf: KobwebConf) {
 
     routing {
         staticFiles(conf.site.routePrefixNormalized, siteRoot.toFile()) {
+            enableAutoHeadResponse()
             extensions("html")
             default("404.html")
         }

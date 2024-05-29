@@ -10,6 +10,7 @@ import com.varabyte.kobweb.navigation.Router.LegacyRouteRedirectStrategy.WARN
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.url.URL
+import org.w3c.xhr.XMLHttpRequest
 import kotlin.time.Duration.Companion.milliseconds
 
 /** How to affect the current history when navigating to a new location */
@@ -342,16 +343,6 @@ class Router {
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE
     ): Boolean {
-        val extension = Route.tryCreate(pathQueryAndFragment)?.slug
-            ?.substringAfterLast('.', missingDelimiterValue = "")
-            ?.takeIf { it.isNotEmpty() }
-        if (extension != null && extension !in setOf("html", "htm")) {
-            // If the user is trying to navigate to a file with an extension that isn't .html or .htm, then we assume
-            // they are trying to open a file hosted on the server. In that case, we aren't routing; instead, treat this
-            // request like a navigation (which means reach out to the server to ask it for the file).
-            return false
-        }
-
         @Suppress("NAME_SHADOWING") // Intentionally transformed
         var pathQueryAndFragment = pathQueryAndFragment
         if (Route.isRoute(pathQueryAndFragment)) {
@@ -364,20 +355,43 @@ class Router {
             // isn't found, we don't want to waste time adding a slash to the end of it (since slashes shouldn't ever
             // come after queries / fragments).
             if (pathQueryAndFragment.all { it != '#' && it != '?' }) {
-                val route = pathQueryAndFragment
-
                 // Unlikely but if user never defines a root page, `isRegistered("/")` will return false. We don't want
                 // to add or remove slashes in that case!
-                if (!routeTree.isRegistered(route) && route != "/") {
-                    if (route.endsWith('/')) {
-                        val withoutSlash = route.removeSuffix("/")
-                        if (routeTree.isRegistered(withoutSlash)) {
-                            pathQueryAndFragment = withoutSlash
+                if (pathQueryAndFragment != "/") {
+                    val originalRoute = pathQueryAndFragment
+                    if (!routeTree.isRegistered(originalRoute)) {
+                        if (originalRoute.endsWith('/')) {
+                            val withoutSlash = originalRoute.removeSuffix("/")
+                            if (routeTree.isRegistered(withoutSlash)) {
+                                pathQueryAndFragment = withoutSlash
+                            }
+                        } else {
+                            val withSlash = "$originalRoute/"
+                            if (routeTree.isRegistered(withSlash)) {
+                                pathQueryAndFragment = withSlash
+                            }
                         }
-                    } else {
-                        val withSlash = "$route/"
-                        if (routeTree.isRegistered(withSlash)) {
-                            pathQueryAndFragment = withSlash
+                    }
+
+                    // If the next check passes, we can't find the path locally, but it's possible that it refers to a
+                    // file that lives on the server e.g. "documents/external.md". So we ask the server if it's there.
+                    // If so, we treat this navigation as "handled" and kick off a request to the server to download
+                    // the file.
+                    if (!routeTree.isRegistered(pathQueryAndFragment)) {
+                        val xhr = XMLHttpRequest()
+                        var fileExistsOnServer = false
+                        xhr.open("HEAD", pathQueryAndFragment, async = false)
+                        xhr.onload = {
+                            fileExistsOnServer = xhr.status == 200.toShort()
+                            Unit
+                        }
+                        xhr.onerror = {}
+                        xhr.onabort = {}
+                        xhr.send(null)
+
+                        if (fileExistsOnServer) {
+                            window.open(pathQueryAndFragment)
+                            return true
                         }
                     }
                 }
