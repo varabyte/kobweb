@@ -75,7 +75,7 @@ class MutablePalettes : Palettes {
 
 /**
  * Convenience method for fetching the silk palette associated with the target color mode, useful for when you aren't
- * in a `@Composable` scope (which is common when defining ComponentStyles).
+ * in a `@Composable` scope (which is common when defining CssStyles).
  */
 fun ColorMode.toPalette() = SilkTheme.palettes[this]
 

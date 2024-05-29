@@ -32,7 +32,7 @@ object ColumnDefaults {
  * This method is public as there may occasionally be cases where users could benefit from using this, but in general
  * you shouldn't reach for this unless you know what you're doing.
  *
- * NOTE: This modifier sets attribute properties and can therefore not be used within ComponentStyles.
+ * NOTE: This modifier sets attribute properties and can therefore not be used within CssStyles.
  */
 fun Modifier.columnClasses(
     verticalArrangement: Arrangement.Vertical = ColumnDefaults.VerticalArrangement,
