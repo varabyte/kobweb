@@ -366,8 +366,8 @@ private suspend fun PipelineContext<*, ApplicationCall>.serveScriptFiles(
 // Abort early on missing resources, so we don't serve giant html pages simply because someone forgot to
 // add a favicon.ico file, for example.
 private suspend fun PipelineContext<*, ApplicationCall>.abortIfNotHtml(): Boolean {
-    val acceptHeaders = call.request.headers["Accept"]?.split(",")?.toSet().orEmpty()
-    return if (!acceptHeaders.contains("text/html")) {
+    val acceptsHtml = call.request.acceptItems().any { it.value == ContentType.Text.Html.toString() }
+    return if (!acceptsHtml) {
         call.respond(HttpStatusCode.NotFound)
         true
     } else false
