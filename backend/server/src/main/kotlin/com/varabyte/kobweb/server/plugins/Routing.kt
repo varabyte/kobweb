@@ -47,7 +47,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
 import kotlin.time.toJavaDuration
-import java.lang.StackTraceElement as JavaStackTraceElement
+import java.lang.StackTraceElement as JavaStackTraceElement // Needed to disambiguate from ktor `StackTraceElement`
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
 private const val KOBWEB_PARAMS = "kobweb-params"
