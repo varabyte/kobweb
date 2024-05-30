@@ -1,23 +1,50 @@
 package com.varabyte.kobweb.compose.style
 
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
+import com.varabyte.kobweb.compose.foundation.layout.SpacedAligned
+import com.varabyte.kobweb.compose.foundation.layout.SpacedHorizontalAligned
+import com.varabyte.kobweb.compose.foundation.layout.SpacedVerticalAligned
+import org.jetbrains.compose.web.css.*
 
-fun Arrangement.Horizontal.toClassName() = when (this) {
-    Arrangement.End -> "kobweb-arrange-end"
-    Arrangement.Start -> "kobweb-arrange-start"
-    is Arrangement.HorizontalOrVertical -> this.toClassName()
+internal const val KOBWEB_ARRANGE_BOTTOM = "kobweb-arrange-bottom"
+internal const val KOBWEB_ARRANGE_CENTER = "kobweb-arrange-center"
+internal const val KOBWEB_ARRANGE_END = "kobweb-arrange-end"
+internal const val KOBWEB_ARRANGE_FROM_STYLE = "kobweb-arrange-from-style"
+internal const val KOBWEB_ARRANGE_SPACED_BY = "kobweb-arrange-spaced-by"
+internal const val KOBWEB_ARRANGE_SPACE_AROUND = "kobweb-arrange-space-around"
+internal const val KOBWEB_ARRANGE_SPACE_BETWEEN = "kobweb-arrange-space-between"
+internal const val KOBWEB_ARRANGE_SPACE_EVENLY = "kobweb-arrange-space-evenly"
+internal const val KOBWEB_ARRANGE_START = "kobweb-arrange-start"
+internal const val KOBWEB_ARRANGE_TOP = "kobweb-arrange-top"
+
+internal val ArrangeSpacedByValue by StyleVariable<CSSNumeric>(prefix = "kobweb")
+
+internal fun KobwebComposeStyleSheet.initArrangeSpacedByStyle() {
+    ".kobweb-row.${KOBWEB_ARRANGE_SPACED_BY}" { gap(ArrangeSpacedByValue.value()) }
+    ".kobweb-col.${KOBWEB_ARRANGE_SPACED_BY}" { gap(ArrangeSpacedByValue.value()) }
 }
 
-fun Arrangement.Vertical.toClassName() = when (this) {
-    Arrangement.Top -> "kobweb-arrange-top"
-    Arrangement.Bottom -> "kobweb-arrange-bottom"
-    is Arrangement.HorizontalOrVertical -> this.toClassName()
+fun Arrangement.Horizontal.toClasses() = when (this) {
+    Arrangement.End -> arrayOf(KOBWEB_ARRANGE_END)
+    Arrangement.Start -> arrayOf(KOBWEB_ARRANGE_START)
+    is Arrangement.HorizontalOrVertical -> this.toClasses()
+    is SpacedHorizontalAligned -> classes
 }
 
-fun Arrangement.HorizontalOrVertical.toClassName() = when (this) {
-    Arrangement.Center -> "kobweb-arrange-center"
-    Arrangement.SpaceAround -> "kobweb-arrange-space-around"
-    Arrangement.SpaceBetween -> "kobweb-arrange-space-between"
-    Arrangement.SpaceEvenly -> "kobweb-arrange-space-evenly"
-    Arrangement.FromStyle -> "kobweb-arrange-from-style"
+fun Arrangement.Vertical.toClasses() = when (this) {
+    Arrangement.Top -> arrayOf(KOBWEB_ARRANGE_TOP)
+    Arrangement.Bottom -> arrayOf(KOBWEB_ARRANGE_BOTTOM)
+    is Arrangement.HorizontalOrVertical -> toClasses()
+    is SpacedAligned -> classes
+    is SpacedVerticalAligned -> classes
+}
+
+fun Arrangement.HorizontalOrVertical.toClasses() = when (this) {
+    Arrangement.Center -> arrayOf(KOBWEB_ARRANGE_CENTER)
+    Arrangement.SpaceAround -> arrayOf(KOBWEB_ARRANGE_SPACE_AROUND)
+    Arrangement.SpaceBetween -> arrayOf(KOBWEB_ARRANGE_SPACE_BETWEEN)
+    Arrangement.SpaceEvenly -> arrayOf(KOBWEB_ARRANGE_SPACE_EVENLY)
+    Arrangement.FromStyle -> arrayOf(KOBWEB_ARRANGE_FROM_STYLE)
+    is SpacedAligned -> classes
 }

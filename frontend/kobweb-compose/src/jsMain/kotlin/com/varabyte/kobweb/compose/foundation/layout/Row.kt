@@ -3,11 +3,14 @@ package com.varabyte.kobweb.compose.foundation.layout
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
+import com.varabyte.kobweb.compose.style.ArrangeSpacedByValue
 import com.varabyte.kobweb.compose.style.toClassName
+import com.varabyte.kobweb.compose.style.toClasses
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -38,7 +41,7 @@ fun Modifier.rowClasses(
     horizontalArrangement: Arrangement.Horizontal = RowDefaults.HorizontalArrangement,
     verticalAlignment: Alignment.Vertical = RowDefaults.VerticalAlignment,
 ) = this
-    .classNames("kobweb-row", horizontalArrangement.toClassName(), verticalAlignment.toClassName())
+    .classNames("kobweb-row", *horizontalArrangement.toClasses(), verticalAlignment.toClassName())
 
 @Composable
 fun Row(
@@ -48,7 +51,16 @@ fun Row(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable RowScope.() -> Unit
 ) {
-    Div(modifier.rowClasses(horizontalArrangement, verticalAlignment).toAttrs()) {
+    Div(
+        attrs = modifier
+            .rowClasses(horizontalArrangement, verticalAlignment)
+            .thenIf(
+                horizontalArrangement is SpacedAligned,
+            ) {
+                Modifier.setVariable(ArrangeSpacedByValue, horizontalArrangement.spacing)
+            }
+            .toAttrs(),
+    ) {
         registerRefScope(ref)
         RowScopeInstance.content()
     }
