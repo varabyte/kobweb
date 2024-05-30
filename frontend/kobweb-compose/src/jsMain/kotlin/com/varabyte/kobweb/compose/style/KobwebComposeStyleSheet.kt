@@ -12,6 +12,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
         initCol()
         initRow()
         initSpacer()
+        initArrangeSpacedByStyle()
     }
 
     private fun initBox() {
@@ -118,12 +119,12 @@ object KobwebComposeStyleSheet : StyleSheet() {
 
         // Default styles for children placement
 
-        ".kobweb-row.kobweb-arrange-start" { justifyContent(JustifyContent.FlexStart) }
-        ".kobweb-row.kobweb-arrange-center" { justifyContent(JustifyContent.Center) }
-        ".kobweb-row.kobweb-arrange-end" { justifyContent(JustifyContent.FlexEnd) }
-        ".kobweb-row.kobweb-arrange-space-evenly" { justifyContent(JustifyContent.SpaceEvenly) }
-        ".kobweb-row.kobweb-arrange-space-between" { justifyContent(JustifyContent.SpaceBetween) }
-        ".kobweb-row.kobweb-arrange-space-around" { justifyContent(JustifyContent.SpaceAround) }
+        ".kobweb-row.$KOBWEB_ARRANGE_START" { justifyContent(JustifyContent.FlexStart) }
+        ".kobweb-row.$KOBWEB_ARRANGE_CENTER" { justifyContent(JustifyContent.Center) }
+        ".kobweb-row.$KOBWEB_ARRANGE_END" { justifyContent(JustifyContent.FlexEnd) }
+        ".kobweb-row.$KOBWEB_ARRANGE_SPACE_EVENLY" { justifyContent(JustifyContent.SpaceEvenly) }
+        ".kobweb-row.$KOBWEB_ARRANGE_SPACE_BETWEEN" { justifyContent(JustifyContent.SpaceBetween) }
+        ".kobweb-row.$KOBWEB_ARRANGE_SPACE_AROUND" { justifyContent(JustifyContent.SpaceAround) }
 
         ".kobweb-row.kobweb-align-top" { alignItems(AlignItems.FlexStart) }
         ".kobweb-row.kobweb-align-center-vert" { alignItems(AlignItems.Center) }
@@ -144,12 +145,12 @@ object KobwebComposeStyleSheet : StyleSheet() {
 
         // Default styles for children placement
 
-        ".kobweb-col.kobweb-arrange-top" { justifyContent(JustifyContent.FlexStart) }
-        ".kobweb-col.kobweb-arrange-center" { justifyContent(JustifyContent.Center) }
-        ".kobweb-col.kobweb-arrange-bottom" { justifyContent(JustifyContent.FlexEnd) }
-        ".kobweb-col.kobweb-arrange-space-evenly" { justifyContent(JustifyContent.SpaceEvenly) }
-        ".kobweb-col.kobweb-arrange-space-between" { justifyContent(JustifyContent.SpaceBetween) }
-        ".kobweb-col.kobweb-arrange-space-around" { justifyContent(JustifyContent.SpaceAround) }
+        ".kobweb-col.$KOBWEB_ARRANGE_TOP" { justifyContent(JustifyContent.FlexStart) }
+        ".kobweb-col.$KOBWEB_ARRANGE_CENTER" { justifyContent(JustifyContent.Center) }
+        ".kobweb-col.$KOBWEB_ARRANGE_BOTTOM" { justifyContent(JustifyContent.FlexEnd) }
+        ".kobweb-col.$KOBWEB_ARRANGE_SPACE_EVENLY" { justifyContent(JustifyContent.SpaceEvenly) }
+        ".kobweb-col.$KOBWEB_ARRANGE_SPACE_BETWEEN" { justifyContent(JustifyContent.SpaceBetween) }
+        ".kobweb-col.$KOBWEB_ARRANGE_SPACE_AROUND" { justifyContent(JustifyContent.SpaceAround) }
 
         ".kobweb-col.kobweb-align-start" { alignItems(AlignItems.FlexStart) }
         ".kobweb-col.kobweb-align-center-horiz" { alignItems(AlignItems.Center) }

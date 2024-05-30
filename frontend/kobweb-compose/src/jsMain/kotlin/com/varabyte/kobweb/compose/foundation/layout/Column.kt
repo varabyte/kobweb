@@ -3,11 +3,14 @@ package com.varabyte.kobweb.compose.foundation.layout
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
+import com.varabyte.kobweb.compose.style.ArrangeSpacedByValue
 import com.varabyte.kobweb.compose.style.toClassName
+import com.varabyte.kobweb.compose.style.toClasses
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -37,7 +40,7 @@ object ColumnDefaults {
 fun Modifier.columnClasses(
     verticalArrangement: Arrangement.Vertical = ColumnDefaults.VerticalArrangement,
     horizontalAlignment: Alignment.Horizontal = ColumnDefaults.HorizontalAlignment,
-) = this.classNames("kobweb-col", verticalArrangement.toClassName(), horizontalAlignment.toClassName())
+) = this.classNames("kobweb-col", *verticalArrangement.toClasses(), horizontalAlignment.toClassName())
 
 @Composable
 fun Column(
@@ -47,7 +50,16 @@ fun Column(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Div(modifier.columnClasses(verticalArrangement, horizontalAlignment).toAttrs()) {
+    Div(
+        attrs = modifier
+            .columnClasses(verticalArrangement, horizontalAlignment)
+            .thenIf(
+                verticalArrangement is SpacedAligned,
+            ) {
+                Modifier.setVariable(ArrangeSpacedByValue, verticalArrangement.spacing)
+            }
+            .toAttrs(),
+    ) {
         registerRefScope(ref)
         ColumnScopeInstance.content()
     }
