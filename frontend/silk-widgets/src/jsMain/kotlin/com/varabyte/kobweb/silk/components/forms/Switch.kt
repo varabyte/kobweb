@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -69,7 +70,7 @@ val SwitchTrackStyle = CssStyle<SwitchKind.Track>(
             .padding(SwitchVars.TrackPadding.value())
             .borderRadius(SwitchVars.BorderRadius.value())
             .backgroundColor(SwitchVars.TrackBackgroundColor.value())
-            .transition(CSSTransition("background-color", duration = SwitchVars.TransitionDuration.value()))
+            .transition(Transition.of("background-color", duration = SwitchVars.TransitionDuration.value()))
             .boxSizing(BoxSizing.ContentBox)
     }
 
@@ -90,7 +91,7 @@ val SwitchThumbStyle = CssStyle.base<SwitchKind.Thumb> {
         .borderRadius(SwitchVars.BorderRadius.value())
         .backgroundColor(SwitchVars.ThumbColor.value())
         .translateX(SwitchVars.ThumbOffset.value())
-        .transition(CSSTransition("translate", duration = SwitchVars.TransitionDuration.value()))
+        .transition(Transition.of("translate", duration = SwitchVars.TransitionDuration.value()))
 }
 
 class SwitchSize(

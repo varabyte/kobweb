@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.components.forms
 import androidx.compose.runtime.*
 import androidx.compose.web.events.SyntheticMouseEvent
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
@@ -72,7 +73,7 @@ val ButtonStyle = CssStyle<ButtonKind> {
             .borderRadius(0.375.cssRem)
             .border { width(0.px) }
             .userSelect(UserSelect.None) // No selecting text within buttons
-            .transition(CSSTransition("background-color", duration = ButtonVars.ColorTransitionDuration.value()))
+            .transition(Transition.of("background-color", duration = ButtonVars.ColorTransitionDuration.value()))
     }
 
     (hover + not(ariaDisabled)) {

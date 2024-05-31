@@ -9,13 +9,27 @@ import com.varabyte.kobweb.compose.events.SyntheticTransitionEvent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
-import org.jetbrains.compose.web.css.*
 
+fun Modifier.transition(transition: Transition) = styleModifier {
+    transition(transition)
+}
+
+fun Modifier.transition(vararg transitions: Transition.Repeatable) = styleModifier {
+    transition(*transitions)
+}
+
+// Convenience method for accepting the output of Transition.group(...)
+fun Modifier.transition(transitions: Array<Transition.Repeatable>) = styleModifier {
+    transition(*transitions)
+}
+
+@Suppress("DEPRECATION")
 fun Modifier.transition(vararg transitions: CSSTransition) = styleModifier {
     transition(*transitions)
 }
 
 // Convenience method for accepting the output of CSSTransition.group(...)
+@Suppress("DEPRECATION")
 fun Modifier.transition(transitions: Array<CSSTransition>) = styleModifier {
     transition(*transitions)
 }

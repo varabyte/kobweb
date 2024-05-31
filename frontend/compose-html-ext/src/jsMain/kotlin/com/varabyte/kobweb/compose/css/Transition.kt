@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
@@ -94,6 +96,102 @@ fun StyleScope.transitionTimingFunction(vararg value: TransitionTimingFunction) 
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition
+sealed class Transition private constructor(private val value: String) : StylePropertyValue {
+    override fun toString(): String = value
+
+    private class Keyword(value: String) : Transition(value)
+
+    class Repeatable internal constructor(
+        property: TransitionProperty,
+        duration: CSSTimeNumericValue?,
+        timingFunction: TransitionTimingFunction?,
+        delay: CSSTimeNumericValue?,
+    ) : Transition(
+        buildList {
+            add(property.toString())
+            // https://developer.mozilla.org/en-US/docs/Web/CSS/transition#syntax
+            duration?.let { add(it.toString()) }
+            timingFunction?.let { add(it.toString()) }
+            if (delay != null) {
+                if (duration == null) {
+                    add("0s") // Needed so parser knows that the next time string is for "delay"
+                }
+                add(delay.toString())
+            }
+        }.joinToString(" ")
+    )
+
+    companion object {
+        // Keyword
+        val None: Transition = Keyword("none")
+
+        // Global Keywords
+        val Inherit: Transition = Keyword("inherit")
+        val Initial: Transition = Keyword("initial")
+        val Revert: Transition = Keyword("revert")
+        val Unset: Transition = Keyword("unset")
+
+        fun of(
+            property: TransitionProperty,
+            duration: CSSTimeNumericValue? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSTimeNumericValue? = null,
+        ): Repeatable = Repeatable(property, duration, timingFunction, delay)
+
+        fun of(
+            property: String,
+            duration: CSSTimeNumericValue? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSTimeNumericValue? = null,
+        ): Repeatable = Repeatable(TransitionProperty.of(property), duration, timingFunction, delay)
+
+        fun all(
+            duration: CSSTimeNumericValue? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSTimeNumericValue? = null,
+        ): Transition = Repeatable(TransitionProperty.All, duration, timingFunction, delay)
+
+        /**
+         * A convenience method for when you want to animate multiple properties with the same values.
+         *
+         * Returns an array, so you can use feed it into [transition] as vararg parameters using the spread operator:
+         *
+         * ```
+         * transition(Transition.group(listOf("width", ...), ...))
+         * ```
+         */
+        @Suppress("RemoveRedundantQualifierName") // Transition.of reads nicer
+        fun group(
+            properties: Iterable<String>,
+            duration: CSSTimeNumericValue? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSTimeNumericValue? = null
+        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay) }.toTypedArray()
+
+        /**
+         * A convenience method for when you want to animate multiple properties with the same values.
+         *
+         * Returns an array, so you can use feed it into [transition] as vararg parameters using the spread operator:
+         *
+         * ```
+         * transition(Transition.group(listOf(TransitionProperty.of("width"), ...), ...))
+         * ```
+         */
+        @Suppress("RemoveRedundantQualifierName") // Transition.of reads nicer
+        fun group(
+            properties: Iterable<TransitionProperty>,
+            duration: CSSTimeNumericValue? = null,
+            timingFunction: TransitionTimingFunction? = null,
+            delay: CSSTimeNumericValue? = null
+        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay) }.toTypedArray()
+    }
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition
+@Deprecated(
+    "Please use `Transition.of` instead.",
+    ReplaceWith("Transition.of(property, duration, timingFunction, delay)")
+)
 data class CSSTransition(
     val property: TransitionProperty,
     val duration: CSSTimeNumericValue? = null,
@@ -111,6 +209,10 @@ data class CSSTransition(
          * transition(*CSSTransition.group(listOf("width", "height"), ...))
          * ```
          */
+        @Deprecated(
+            "Please use `Transition.group` instead.",
+            ReplaceWith("Transition.group(properties, duration, timingFunction, delay)")
+        )
         fun group(
             properties: Iterable<String>,
             duration: CSSTimeNumericValue? = null,
@@ -127,6 +229,10 @@ data class CSSTransition(
          * transition(*CSSTransition.group(listOf(TransitionProperty.of("width"), ...), ...))
          * ```
          */
+        @Deprecated(
+            "Please use `Transition.group` instead.",
+            ReplaceWith("Transition.group(properties, duration, timingFunction, delay)")
+        )
         fun group(
             properties: Iterable<TransitionProperty>,
             duration: CSSTimeNumericValue? = null,
@@ -153,6 +259,16 @@ data class CSSTransition(
             add(delay.toString())
         }
     }.joinToString(" ")
+}
+
+fun StyleScope.transition(transition: Transition) {
+    property("transition", transition)
+}
+
+fun StyleScope.transition(vararg transitions: Transition.Repeatable) {
+    if (transitions.isNotEmpty()) {
+        property("transition", transitions.joinToString())
+    }
 }
 
 fun StyleScope.transition(vararg transitions: CSSTransition) {

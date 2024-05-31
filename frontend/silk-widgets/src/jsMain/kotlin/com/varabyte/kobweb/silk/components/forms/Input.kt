@@ -3,6 +3,7 @@ package com.varabyte.kobweb.silk.components.forms
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.AlignItems
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -125,7 +126,7 @@ val InputStyle = CssStyle<InputKind> {
             .outline(0.px, LineStyle.Solid, Colors.Transparent) // Disable, we'll use box shadow instead
             .border(0.px, LineStyle.Solid, Colors.Transparent) // Overridden by variants
             .transition(
-                CSSTransition.group(
+                Transition.group(
                     listOf("border-color", "box-shadow", "background-color"),
                     duration = InputVars.ColorTransitionDuration.value()
                 )

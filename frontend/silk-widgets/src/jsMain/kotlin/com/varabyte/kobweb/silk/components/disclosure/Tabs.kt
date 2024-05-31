@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.components.disclosure
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Transition
 import com.varabyte.kobweb.compose.css.functions.calc
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
@@ -64,7 +65,7 @@ val TabsTabStyle = CssStyle<TabsKind.Tab>(extraModifier = { Modifier.tabIndex(0)
         Modifier
             .cursor(Cursor.Pointer)
             .transition(
-                *CSSTransition.group(
+                Transition.group(
                     listOf("background-color", "color", "border-color"), TabVars.ColorTransitionDuration.value()
                 )
             )

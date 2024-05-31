@@ -6,6 +6,15 @@ import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.events.SyntheticAnimationEvent
 
+fun Modifier.animation(animation: Animation) = styleModifier {
+    animation(animation)
+}
+
+fun Modifier.animation(vararg animations: Animation.Repeatable) = styleModifier {
+    animation(*animations)
+}
+
+@Suppress("DEPRECATION")
 fun Modifier.animation(vararg animations: CSSAnimation) = styleModifier {
     animation(*animations)
 }

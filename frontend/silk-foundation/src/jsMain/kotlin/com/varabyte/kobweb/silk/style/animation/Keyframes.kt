@@ -2,13 +2,11 @@ package com.varabyte.kobweb.silk.style.animation
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.css.CSSAnimation
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleScopeBase
-import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
@@ -166,7 +164,7 @@ fun Keyframes.toAnimation(
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null
-): CSSAnimation {
+): Animation.Repeatable {
     val colorMode = if (this.usesColorMode) ColorMode.current else null
     return toAnimation(colorMode, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 }
@@ -200,7 +198,7 @@ fun Keyframes.toAnimation(
     direction: AnimationDirection? = null,
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null,
-): CSSAnimation {
+): Animation.Repeatable {
     val name = SilkTheme.nameFor(this)
 
     @Suppress("NAME_SHADOWING")
@@ -211,7 +209,7 @@ fun Keyframes.toAnimation(
     }
 
     val nameWithColorMode = if (colorMode != null) name.suffixedWith(colorMode) else name
-    return CSSAnimation(
+    return Animation.of(
         nameWithColorMode,
         duration,
         timingFunction,

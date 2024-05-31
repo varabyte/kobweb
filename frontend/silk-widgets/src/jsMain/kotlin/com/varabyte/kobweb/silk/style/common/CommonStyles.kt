@@ -50,5 +50,5 @@ val SmoothColorTransitionDurationVar by StyleVariable(
  * overriding the style if they'd like.
  */
 val SmoothColorStyle = CssStyle.base {
-    Modifier.transition(CSSTransition("background-color", SmoothColorTransitionDurationVar.value()))
+    Modifier.transition(Transition.of("background-color", SmoothColorTransitionDurationVar.value()))
 }
