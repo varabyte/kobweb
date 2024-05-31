@@ -159,7 +159,7 @@ fun StyleScope.boxShadow(boxShadow: BoxShadow) {
  *             rgba(0, 0, 0, 0.318) 5px 8px 10px -1px;
  * ```
  */
-fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Value) {
+fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Repeatable) {
     if (boxShadows.isNotEmpty()) {
         boxShadow(boxShadows.joinToString(transform = BoxShadow::toString))
     }
@@ -173,7 +173,7 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
 
     private class Keyword(value: String): BoxShadow(value)
 
-    class Value internal constructor(
+    class Repeatable internal constructor(
         offsetX: CSSLengthNumericValue = 0.px,
         offsetY: CSSLengthNumericValue = 0.px,
         blurRadius: CSSLengthNumericValue? = null,
@@ -252,7 +252,7 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
             spreadRadius: CSSLengthNumericValue? = null,
             color: CSSColorValue? = null,
             inset: Boolean = false,
-        ): Value = Value(
+        ): Repeatable = Repeatable(
             offsetX = offsetX,
             offsetY = offsetY,
             blurRadius = blurRadius,

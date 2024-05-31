@@ -108,7 +108,7 @@ fun Modifier.boxShadow(
  * }
  * ```
  */
-fun Modifier.boxShadow(vararg boxShadows: BoxShadow.Value): Modifier = styleModifier {
+fun Modifier.boxShadow(vararg boxShadows: BoxShadow.Repeatable): Modifier = styleModifier {
     boxShadow(*boxShadows)
 }
 
