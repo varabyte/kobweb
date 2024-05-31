@@ -1,10 +1,10 @@
 package com.varabyte.kobweb.silk.init
 
-import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.StyleScope
 import com.varabyte.kobweb.silk.style.animation.KeyframesBuilder
+import com.varabyte.kobweb.silk.style.assertNoAttributes
 import com.varabyte.kobweb.silk.style.layer.LayerListBuilder
 import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
@@ -12,10 +12,6 @@ import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.css.*
 
 interface CssStyleRegistrar {
-    fun registerStyle(cssSelector: String, extraModifier: Modifier = Modifier, init: StyleScope.() -> Unit) {
-        registerStyle(cssSelector, { extraModifier }, init)
-    }
-
     /**
      * An alternate way to register global styles with Silk instead of using a Compose HTML StyleSheet directly.
      *
@@ -62,7 +58,7 @@ interface CssStyleRegistrar {
      * }
      * ```
      */
-    fun registerStyle(cssSelector: String, extraModifier: @Composable () -> Modifier, init: StyleScope.() -> Unit)
+    fun registerStyle(cssSelector: String, init: StyleScope.() -> Unit)
 }
 
 /**
@@ -91,17 +87,16 @@ interface SilkStylesheet : CssStyleRegistrar {
 fun SilkStylesheet.layer(layer: SilkLayer, block: CssStyleRegistrar.() -> Unit) = layer(layer.layerName, block)
 
 private class CssStyleRegistrarImpl : CssStyleRegistrar {
-    class Entry(val cssSelector: String, val extraModifier: @Composable () -> Modifier, val init: StyleScope.() -> Unit)
+    class Entry(val cssSelector: String, val init: StyleScope.() -> Unit)
 
     private val _entries = mutableListOf<Entry>()
     val entries: List<Entry> = _entries
 
     override fun registerStyle(
         cssSelector: String,
-        extraModifier: @Composable () -> Modifier,
         init: StyleScope.() -> Unit
     ) {
-        _entries.add(Entry(cssSelector, extraModifier, init))
+        _entries.add(Entry(cssSelector, init))
     }
 }
 
@@ -128,18 +123,9 @@ private class CssStyleRegistrarImpl : CssStyleRegistrar {
  */
 fun CssStyleRegistrar.registerStyleBase(
     cssSelector: String,
-    extraModifier: Modifier = Modifier,
     init: () -> Modifier
 ) {
-    registerStyleBase(cssSelector, { extraModifier }, init)
-}
-
-fun CssStyleRegistrar.registerStyleBase(
-    cssSelector: String,
-    extraModifier: @Composable () -> Modifier,
-    init: () -> Modifier
-) {
-    registerStyle(cssSelector, extraModifier) {
+    registerStyle(cssSelector) {
         base {
             init()
         }
@@ -152,21 +138,35 @@ internal object SilkStylesheetInstance : SilkStylesheet {
 
     override val cssLayers = LayerListBuilder()
 
+    private fun (StyleScope.() -> Unit).assertNoAttributeModifiers(selectorName: String) {
+        val simpleStyleScope = object : StyleScope() {}
+        this.invoke(simpleStyleScope)
+
+        simpleStyleScope.cssModifiers.forEach { cssModifier ->
+            cssModifier.assertNoAttributes(
+                selectorName,
+                extraContext = "Please search your `@InitSilk` code for a line like `ctx.stylesheet.registerStyle(\"$selectorName\")` and remove the offending attribute(s)."
+            )
+        }
+    }
+
     override fun registerStyle(
         cssSelector: String,
-        extraModifier: @Composable () -> Modifier,
         init: StyleScope.() -> Unit
     ) {
-        styles.add(SimpleCssStyle(cssSelector, init, extraModifier, layer = null))
+        init.assertNoAttributeModifiers(cssSelector)
+        styles.add(SimpleCssStyle(cssSelector, init, { Modifier }, layer = null))
     }
 
     override fun layer(name: String, block: CssStyleRegistrar.() -> Unit) {
-        CssStyleRegistrarImpl().apply(block).entries.forEach { entry ->
+        val styleEntries = CssStyleRegistrarImpl().apply(block).entries
+        styleEntries.forEach { entry ->
+            entry.init.assertNoAttributeModifiers(entry.cssSelector)
             styles.add(
                 SimpleCssStyle(
                     entry.cssSelector,
                     entry.init,
-                    entry.extraModifier,
+                    { Modifier },
                     layer = name.takeIf { it.isNotEmpty() }
                 )
             )

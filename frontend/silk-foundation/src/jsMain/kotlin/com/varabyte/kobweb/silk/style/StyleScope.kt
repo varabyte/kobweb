@@ -1,9 +1,13 @@
 package com.varabyte.kobweb.silk.style
 
+import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
+import org.w3c.dom.Element
 
 @Deprecated(
     "The name `StyleModifiers` has been renamed to `StyleScope`.",
@@ -129,4 +133,26 @@ internal class CssModifier(
     // Note: We have to convert mediaQuery toString for now because CSSMediaQuery.MediaFeature is not itself defined
     // correctly for equality checking (for some reason, they don't define the hashcode)
     val key get() = Key(mediaQuery?.toString(), suffix)
+}
+
+internal fun CssModifier.assertNoAttributes(selectorName: String, extraContext: String) {
+    val attrsScope = ComparableAttrsScope<Element>()
+    this.modifier.toAttrs<AttrsScope<Element>>().invoke(attrsScope)
+
+    if (attrsScope.attributes.isEmpty()) return
+
+    error(buildString {
+        appendLine("Style block declarations cannot contain Modifiers that specify attributes. Only style modifiers are allowed here.")
+        appendLine()
+        appendLine("Details:")
+
+        append("\tCSS rule: ")
+        append("\"$selectorName")
+        if (mediaQuery != null) append(mediaQuery)
+        if (suffix != null) append(suffix)
+        appendLine("\"")
+        appendLine("\tAttribute(s): ${attrsScope.attributes.keys.joinToString(", ") { "\"$it\"" }}")
+        appendLine()
+        appendLine(extraContext)
+    })
 }

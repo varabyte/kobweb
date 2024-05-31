@@ -3,7 +3,6 @@
 package com.varabyte.kobweb.silk.style
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -16,7 +15,6 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
-import org.w3c.dom.Element
 import org.jetbrains.compose.web.css.StyleScope as JbStyleScope
 
 /**
@@ -227,48 +225,38 @@ abstract class CssStyle<K : CssKind> internal constructor(
         layer: String?
     ): Map<CssModifier.Key, CssModifier> {
         return this.onEach { (_, cssModifier) ->
-            val attrsScope = ComparableAttrsScope<Element>()
-            cssModifier.modifier.toAttrs<AttrsScope<Element>>().invoke(attrsScope)
-            if (attrsScope.attributes.isEmpty()) return@onEach
-
-            error(buildString {
-                appendLine("Style block declarations cannot contain Modifiers that specify attributes. Please move Modifiers associated with attributes to the `extraModifier` parameter.")
-                appendLine()
-                appendLine("Details:")
-
-                append("\tCSS rule: ")
-                append("\"$selectorName")
-                if (cssModifier.mediaQuery != null) append(cssModifier.mediaQuery)
-                if (cssModifier.suffix != null) append(cssModifier.suffix)
-                appendLine("\"")
-                appendLine("\tAttribute(s): ${attrsScope.attributes.keys.joinToString(", ") { "\"$it\"" }}")
-                appendLine()
-                val styleDeclaration = when {
-                    layer == SilkLayer.COMPONENT_VARIANTS.layerName -> "val SomeExampleVariant = ExampleStyle.addVariant"
-                    layer == SilkLayer.COMPONENT_STYLES.layerName -> "val ExampleStyle = CssStyle<ExampleKind>"
-                    else -> "val ExampleStyle = CssStyle"
+            cssModifier.assertNoAttributes(
+                selectorName,
+                extraContext = buildString {
+                    val styleDeclaration = when {
+                        layer == SilkLayer.COMPONENT_VARIANTS.layerName -> "val SomeExampleVariant = ExampleStyle.addVariant"
+                        layer == SilkLayer.COMPONENT_STYLES.layerName -> "val ExampleStyle = CssStyle<ExampleKind>"
+                        else -> "val ExampleStyle = CssStyle"
+                    }
+                    appendLine("Please move Modifiers associated with attributes to the `extraModifier` parameter.")
+                    appendLine()
+                    appendLine("An example of how to fix this (e.g. if the offending attribute was `tab-index`):")
+                    appendLine(
+                        """
+                        |   // Before
+                        |   $styleDeclaration {
+                        |       base {
+                        |          Modifier
+                        |              .backgroundColor(Colors.Magenta))
+                        |              .tabIndex(0) // <-- The offending attribute modifier
+                        |       }
+                        |   }
+                        |
+                        |   // After
+                        |   $styleDeclaration(extraModifier = Modifier.tabIndex(0)) {
+                        |       base {
+                        |           Modifier.backgroundColor(Colors.Magenta)
+                        |       }
+                        |   }
+                        """.trimMargin()
+                    )
                 }
-                appendLine("An example of how to fix this (if the offending attribute was `tab-index`):")
-                appendLine(
-                    """
-                    |   // Before
-                    |   $styleDeclaration {
-                    |       base {
-                    |          Modifier
-                    |              .backgroundColor(Colors.Magenta))
-                    |              .tabIndex(0) // <-- The offending attribute modifier
-                    |       }
-                    |   }
-                    |   
-                    |   // After
-                    |   $styleDeclaration(extraModifier = Modifier.tabIndex(0)) {
-                    |       base {
-                    |           Modifier.backgroundColor(Colors.Magenta)
-                    |       }
-                    |   }
-                    """.trimMargin()
-                )
-            })
+            )
         }
     }
 
