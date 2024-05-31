@@ -7,27 +7,30 @@ import org.jetbrains.compose.web.css.*
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
-class TransitionProperty private constructor(private val value: String) : StylePropertyValue {
+sealed class TransitionProperty private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
+
+    private class Keyword(value: String) : TransitionProperty(value)
+    class Name(value: String) : TransitionProperty(value)
 
     companion object {
         // Custom
-        fun of(customValue: String): TransitionProperty {
+        fun of(customValue: String): Name {
             check(customValue.isNotEmpty() && customValue.none { it.isWhitespace() }) {
                 "Invalid transition property name. A property shouldn't contain any spaces, but got \"$customValue\"."
             }
-            return TransitionProperty(customValue)
+            return Name(customValue)
         }
 
         // Keywords
-        val None get() = TransitionProperty("none")
-        val All get() = TransitionProperty("all")
+        val None: TransitionProperty get() = Keyword("none")
+        val All: TransitionProperty get() = Keyword("all")
 
         // Global values
-        val Inherit get() = TransitionProperty("inherit")
-        val Initial get() = TransitionProperty("initial")
-        val Revert get() = TransitionProperty("revert")
-        val Unset get() = TransitionProperty("unset")
+        val Inherit: TransitionProperty get() = Keyword("inherit")
+        val Initial: TransitionProperty get() = Keyword("initial")
+        val Revert: TransitionProperty get() = Keyword("revert")
+        val Unset: TransitionProperty get() = Keyword("unset")
     }
 }
 
@@ -132,7 +135,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
         val Unset: Transition = Keyword("unset")
 
         fun of(
-            property: TransitionProperty,
+            property: TransitionProperty.Name,
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
@@ -179,7 +182,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
          */
         @Suppress("RemoveRedundantQualifierName") // Transition.of reads nicer
         fun group(
-            properties: Iterable<TransitionProperty>,
+            properties: Iterable<TransitionProperty.Name>,
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null
@@ -193,7 +196,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
     ReplaceWith("Transition.of(property, duration, timingFunction, delay)")
 )
 data class CSSTransition(
-    val property: TransitionProperty,
+    val property: TransitionProperty.Name,
     val duration: CSSTimeNumericValue? = null,
     val timingFunction: TransitionTimingFunction? = null,
     val delay: CSSTimeNumericValue? = null,
@@ -234,7 +237,7 @@ data class CSSTransition(
             ReplaceWith("Transition.group(properties, duration, timingFunction, delay)")
         )
         fun group(
-            properties: Iterable<TransitionProperty>,
+            properties: Iterable<TransitionProperty.Name>,
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null
