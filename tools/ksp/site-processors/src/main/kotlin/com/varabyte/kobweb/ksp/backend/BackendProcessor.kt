@@ -90,7 +90,7 @@ class BackendProcessor(
             if (property.parent !is KSFile) {
                 if (!property.suppresses(topLevelSuppression)) {
                     logger.warn(
-                        "Not registering ApiStream `val $propertyName`, as only top-level component styles are supported at this time. Although fixing this is recommended, you can manually register your API Stream inside an @InitSilk block instead (`ctx.apis.register($propertyName)`). Suppress this message by adding a `@Suppress(\"$topLevelSuppression\")` annotation.",
+                        "Not registering ApiStream `val $propertyName`, as only top-level API streams are supported at this time. Although fixing this is recommended, you can manually register your API Stream inside an @InitApi block instead (`ctx.apis.registerStream(\"route\", $propertyName)`). Suppress this message by adding a `@Suppress(\"$topLevelSuppression\")` annotation.",
                         property
                     )
                 }
@@ -99,7 +99,7 @@ class BackendProcessor(
             if (!property.isPublic()) {
                 if (!property.suppresses(privateSuppression)) {
                     logger.warn(
-                        "Not registering ApiStream `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your API Stream inside an @InitSilk block instead (`ctx.apis.register($propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
+                        "Not registering ApiStream `val $propertyName`, as it is not public. Although fixing this is recommended, you can manually register your API Stream inside an @InitApi block instead (`ctx.apis.registerStream(\"route\", $propertyName)`). Suppress this message by adding a `@Suppress(\"$privateSuppression\")` annotation.",
                         property
                     )
                 }
