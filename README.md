@@ -2843,7 +2843,7 @@ For example, here's a simple method that echoes back an argument passed into it:
 // jvmMain/kotlin/com/mysite/api/Echo.kt
 
 @Api
-fun echo(ctx: ApiContext) {
+suspend fun echo(ctx: ApiContext) {
     // ctx.req is for the incoming request, ctx.res for responding back to the client
 
     // Params are parsed from the URL, e.g. here "/api/echo?message=..."
@@ -2878,6 +2878,59 @@ corresponding "try" version that will return null instead (`tryPost`, `tryPut`, 
 
 If you know what you're doing, you can of course always use [`window.fetch(...)`](https://developer.mozilla.org/en-US/docs/Web/API/fetch)
 directly.
+
+### Responding to an API request
+
+When you define an API route, you are expected to set a status code for the response, or otherwise it will default to
+status code `404`.
+
+In other words, the following API route stub will return a 404:
+
+```kotlin
+@Api
+suspend fun error404(ctx: ApiContext) {
+}
+```
+
+In contrast, this minimal API route returns an OK status code:
+
+```kotlin
+@Api
+suspend fun noActionButOk(ctx: ApiContext) {
+    ctx.res.status = 200
+}
+```
+
+This design was chosen to allow you to conditionally handle API routes based on input conditions. A very common case is
+creating an API route that only handles POST requests:
+
+```kotlin
+@Api
+suspend fun updateUser(ctx: ApiContext) {
+    if (ctx.req.method != HttpMethod.POST) return
+    // ...
+    ctx.res.status = 200
+}
+```
+
+Finally, note that you can add headers to your response. A common endpoint that some servers provide is a redirect (302)
+with an updated URL location. This would look like:
+
+```kotlin
+@Api
+suspend fun redirect(ctx: ApiContext) {
+    if (ctx.req.method != HttpMethod.GET) return
+    ctx.res.headers["Location"] = "..."
+    ctx.res.status = 302
+}
+```
+
+Simple!
+
+> [!NOTE]
+> The `ctx.res.setBodyText` method sets the status code to 200 automatically for you, which is why code in the previous 
+> section worked without setting the status directly. Of course, if you wanted to return a different status code value
+> after setting the body text, you could update it explicitly yourself after the `setBodyText` call.
 
 ### `@InitApi` methods and initializing services
 
@@ -4769,6 +4822,9 @@ Column(Modifier.fontFamily("Lobster")) {
 ## Kobweb server logs
 
 When you run `kobweb run`, the spun-up web server will, by default, log to the `.kobweb/server/logs` directory.
+
+> [!NOTE]
+> You can generate logs using the `ctx.logger` property inside [`@Api` calls▲](#define-api-routes).
 
 You can configure logging behavior by editing the `.kobweb/conf.yaml` file. Below we show setting all parameters to
 their default values:
