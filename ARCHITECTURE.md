@@ -24,7 +24,7 @@ Kobweb is divided into the following parts:
 
 ## Binary
 
-**Folder: `cli`**
+Formerly part of this repository in `cli` folder, it has been moved to its separate repository, refer to [Kobweb CLI](https://github.com/varabyte/kobweb-cli)
 
 The binary will be most users' initial experience with Kobweb.
 
