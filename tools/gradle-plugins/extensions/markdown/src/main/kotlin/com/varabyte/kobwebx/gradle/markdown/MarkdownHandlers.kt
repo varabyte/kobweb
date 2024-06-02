@@ -405,10 +405,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
 
             val sb = StringBuilder()
             val doc = Jsoup.parseBodyFragment(htmlBlock.literal)
-            val body = doc.body()
-            // Children size can be 0 (if input text was a <!-- comment -->) or 1, if we have a single root element
-            check(body.childrenSize() <= 1) { "Unexpected html block in Markdown." }
-            doc.body().children().first()?.let { root -> renderNode(root, indentCount = 0, sb) }
+            doc.body().children().forEach { root -> renderNode(root, indentCount = 0, sb) }
 
             sb.toString()
         }
