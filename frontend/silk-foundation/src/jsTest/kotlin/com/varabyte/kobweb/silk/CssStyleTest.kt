@@ -9,8 +9,6 @@ import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.init.initSilk
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
-import com.varabyte.kobweb.silk.style.CssStyleVariant
-import com.varabyte.kobweb.silk.style.SimpleCssStyleVariant
 import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.addVariantBase
 import com.varabyte.kobweb.silk.style.base
@@ -22,6 +20,7 @@ import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme._SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.name
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
@@ -190,7 +189,4 @@ class CssStyleTest {
         assertThat(ComponentStyle.name).isEqualTo(ComponentStyleName)
         assertThat(VariantStyle.name).isEqualTo(VariantStyleName)
     }
-
-    private val CssStyle<*>.name get() = SilkTheme.nameFor(this)
-    private val CssStyleVariant<*>.name get() = SilkTheme.nameFor((this as SimpleCssStyleVariant<*>).cssStyle)
 }

@@ -952,22 +952,8 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     private val _cssStyles = mutableMapOf<CssStyle<*>, ImmutableCssStyle>()
     internal val cssStyles: Map<CssStyle<*>, ImmutableCssStyle> = _cssStyles
 
-    /**
-     * Return the name associated with the given [CssStyle].
-     *
-     * Any CSS style that has been declared as a property (e.g. `val MyStyle = CssStyle { ... }`), even as a subclass of
-     * one (e.g. `val SM = ButtonSize()`) will have a name.
-     *
-     * A handful of cases are not named, however. Users shouldn't have to worry about this too much because these are
-     * generally internal cases (e.g. `stylesheet.registerStyleBase("#some-id") { ... }` creates a nameless CssStyle
-     * behind the scenes).
-     *
-     * As a result, it is possible for this method to crash if triggered with such a transient CssStyle. However, the
-     * user would have to go out of their way to make this happen in practice, which is why the API was designed to
-     * assume this won't crash.
-     */
-    fun nameFor(style: CssStyle<*>): String = mutableSilkTheme.cssStyleNames.getValue(style)
-    fun nameFor(keyframes: Keyframes): String = mutableSilkTheme.cssKeyframesNames.getValue(keyframes)
+    fun nameFor(style: CssStyle<*>): String? = mutableSilkTheme.cssStyleNames[style]
+    fun nameFor(keyframes: Keyframes): String? = mutableSilkTheme.cssKeyframesNames[keyframes]
 
     // Note: We separate these function out from the SilkTheme constructor so we can construct it first and then call
     // them later. This allows ComponentStyles to reference SilkTheme in their logic, e.g. TextStyle:
@@ -1051,6 +1037,41 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
         }
     }
 }
+
+/**
+ * Return the class name associated with the given [CssStyle].
+ *
+ * While it is technically possible for this to crash (create a `CssStyle` and never register it), it is safe to
+ * dereference this (i.e. `!!`) on any style that has been declared as a
+ * property (e.g. `val MyStyle = CssStyle { ... }`).
+ */
+val CssStyle<*>.name
+    get() = SilkTheme.nameFor(this)
+        ?: error("Name requested for invalid CssStyle. This should only be called on top-level public styles or styles that got manually registered")
+
+/**
+ * Return the class name associated with the given [CssStyleVariant].
+ *
+ * While this can crash if used on a composite variant (e.g. `FirstVariant.then(SecondVariant).name`, it is safe to
+ * dereference this (i.e. `!!`) on any variant that has been declared as a
+ * property (e.g. `val MyVariant = SomeStyle.addVariant { ... }`).
+ */
+val CssStyleVariant<*>.name
+    get() = (this as? SimpleCssStyleVariant<*>)?.let { simpleVariant ->
+        SilkTheme.nameFor(simpleVariant.cssStyle)
+    }
+        ?: error("Name requested for invalid CssStyleVariant. Did you call this on a composite variant (e.g. `FirstVariant.then(SecondVariant)`?)")
+
+/**
+ * Return the class name associated with the given [Keyframes].
+ *
+ * While it is technically possible for this to crash (create a `Keyframes` and never register it), it is safe to
+ * dereference this (i.e. `!!`) on any keyframes that has been declared as a
+ * property (e.g. `val MyKeyframes = Keyframes { ... }`).
+ */
+val Keyframes.name
+    get() = SilkTheme.nameFor(this)
+        ?: error("Name requested for invalid Keyframes. This should only be called on top-level public keyframes or keyframes that got manually registered")
 
 internal var _SilkTheme: ImmutableSilkTheme? = null
 val SilkTheme: ImmutableSilkTheme

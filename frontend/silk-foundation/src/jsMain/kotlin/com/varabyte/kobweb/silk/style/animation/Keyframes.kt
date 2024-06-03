@@ -7,9 +7,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleScopeBase
-import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
+import com.varabyte.kobweb.silk.theme.name
 import org.jetbrains.compose.web.css.*
 import kotlin.reflect.KProperty
 
@@ -199,7 +199,7 @@ fun Keyframes.toAnimation(
     fillMode: AnimationFillMode? = null,
     playState: AnimationPlayState? = null,
 ): Animation.Repeatable {
-    val name = SilkTheme.nameFor(this)
+    val name = this.name
 
     @Suppress("NAME_SHADOWING")
     val colorMode = if (this.usesColorMode) {

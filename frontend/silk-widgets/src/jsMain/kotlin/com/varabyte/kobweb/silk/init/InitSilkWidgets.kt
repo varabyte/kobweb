@@ -69,7 +69,6 @@ import com.varabyte.kobweb.silk.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.color.PlaceholderColorVar
-import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.palette.background
@@ -86,6 +85,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.tooltip
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
+import com.varabyte.kobweb.silk.theme.name
 import kotlinx.dom.addClass
 import kotlinx.dom.removeClass
 import org.w3c.dom.Document
@@ -337,7 +337,7 @@ fun HTMLElement.setSilkWidgetVariables() {
 }
 
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
-    SilkTheme.nameFor(SilkColorsStyle).let { silkColorsStyleName ->
+    SilkColorsStyle.name.let { silkColorsStyleName ->
         removeClass(silkColorsStyleName.suffixedWith(colorMode.opposite))
         addClass(silkColorsStyleName.suffixedWith(colorMode))
     }
