@@ -243,8 +243,8 @@ object Arrangement {
  * @property spacing The spacing value used in the arrangement.
  */
 internal sealed class SpacedAligned(
-    open val spacing: CSSSizeValue<out CSSUnitLength>,
-) {
+    override val spacing: CSSSizeValue<out CSSUnitLength>,
+) : Arrangement.HorizontalOrVertical {
     /**
      * The CSS classes applied to the arrangement.
      */
@@ -258,7 +258,7 @@ internal sealed class SpacedAligned(
  */
 internal data class SpacedAlignedHorizontalOrVertical(
     override val spacing: CSSSizeValue<out CSSUnitLength>,
-) : SpacedAligned(spacing), Arrangement.HorizontalOrVertical {
+) : SpacedAligned(spacing) {
     // Custom classes for default alignment applied for spacing and alignment
     override val classes = arrayOf(KOBWEB_ARRANGE_SPACED_BY, KOBWEB_ARRANGE_START)
 }

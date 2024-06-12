@@ -29,15 +29,12 @@ fun Arrangement.Horizontal.toClasses() = when (this) {
     Arrangement.End -> arrayOf(KOBWEB_ARRANGE_END)
     Arrangement.Start -> arrayOf(KOBWEB_ARRANGE_START)
     is Arrangement.HorizontalOrVertical -> this.toClasses()
-    is SpacedHorizontalAligned -> classes
 }
 
 fun Arrangement.Vertical.toClasses() = when (this) {
     Arrangement.Top -> arrayOf(KOBWEB_ARRANGE_TOP)
     Arrangement.Bottom -> arrayOf(KOBWEB_ARRANGE_BOTTOM)
     is Arrangement.HorizontalOrVertical -> toClasses()
-    is SpacedAligned -> classes
-    is SpacedVerticalAligned -> classes
 }
 
 fun Arrangement.HorizontalOrVertical.toClasses() = when (this) {
