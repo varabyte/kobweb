@@ -248,7 +248,7 @@ internal sealed class SpacedAligned(
     /**
      * The CSS classes applied to the arrangement.
      */
-    abstract val classes: Array<String>
+    abstract val classNames: Array<String>
 }
 
 /**
@@ -260,7 +260,7 @@ internal data class SpacedAlignedHorizontalOrVertical(
     override val spacing: CSSSizeValue<out CSSUnitLength>,
 ) : SpacedAligned(spacing) {
     // Custom classes for default alignment applied for spacing and alignment
-    override val classes = arrayOf(KOBWEB_ARRANGE_SPACED_BY, KOBWEB_ARRANGE_START)
+    override val classNames = arrayOf(KOBWEB_ARRANGE_SPACED_BY, KOBWEB_ARRANGE_START)
 }
 
 /**
@@ -274,7 +274,7 @@ internal data class SpacedVerticalAligned(
     val alignment: Alignment.Vertical,
 ) : SpacedAligned(spacing), Arrangement.Vertical {
     // Custom classes for vertical alignment based on the alignment type
-    override val classes: Array<String> = arrayOf(
+    override val classNames: Array<String> = arrayOf(
         KOBWEB_ARRANGE_SPACED_BY,
         when (alignment) {
             Alignment.Bottom -> KOBWEB_ARRANGE_BOTTOM
@@ -296,7 +296,7 @@ internal data class SpacedHorizontalAligned(
     val alignment: Alignment.Horizontal,
 ) : SpacedAligned(spacing), Arrangement.Horizontal {
     // Custom classes for horizontal alignment based on the alignment type
-    override val classes: Array<String> = arrayOf(
+    override val classNames: Array<String> = arrayOf(
         KOBWEB_ARRANGE_SPACED_BY,
         when (alignment) {
             Alignment.Start -> KOBWEB_ARRANGE_START

@@ -5,7 +5,7 @@ import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.style.ArrangeSpacedByValue
 import com.varabyte.kobweb.compose.style.toClassName
-import com.varabyte.kobweb.compose.style.toClasses
+import com.varabyte.kobweb.compose.style.toClassNames
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
@@ -41,7 +41,7 @@ fun Modifier.rowClasses(
     horizontalArrangement: Arrangement.Horizontal = RowDefaults.HorizontalArrangement,
     verticalAlignment: Alignment.Vertical = RowDefaults.VerticalAlignment,
 ) = this
-    .classNames("kobweb-row", *horizontalArrangement.toClasses(), verticalAlignment.toClassName())
+    .classNames("kobweb-row", *horizontalArrangement.toClassNames(), verticalAlignment.toClassName())
 
 @Composable
 fun Row(
