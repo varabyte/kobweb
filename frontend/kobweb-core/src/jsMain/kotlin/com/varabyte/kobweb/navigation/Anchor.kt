@@ -23,6 +23,10 @@ import org.w3c.dom.HTMLAnchorElement
  *   domain). If not set, this behavior will default to in a new tab. Note that this behavior may be overridden by the
  *   browser based on keyboard/mouse shortcuts.
  *
+ * @param updateHistoryMode If set, follow this behavior when following the link. By default, history will be added
+ *   when visiting the new location (so you can return back to the current page), but [UpdateHistoryMode.REPLACE] can be
+ *   used to create an effect where the new page "takes over" the current page in place.
+ *
  * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. For example,
  *   if the [href] parameter was set to "example/path" and the site's route prefix was set to "parent-site/nested", then
  *   the `href` value will be converted to "parent-site/nested/example/path". You usually want this to be true, unless
@@ -35,6 +39,7 @@ fun Anchor(
     attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
+    updateHistoryMode: UpdateHistoryMode? = null,
     autoPrefix: Boolean = true,
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
@@ -56,6 +61,7 @@ fun Anchor(
                     ?: evt.toOpenLinkStrategy(KobwebConfig.Instance.openLinkStrategies.external)
                 ctx.router.navigateTo(
                     href,
+                    updateHistoryMode ?: UpdateHistoryMode.PUSH,
                     openInternalLinksStrategy = openInternalLinksStrategy,
                     openExternalLinksStrategy = openExternalLinksStrategy
                 )

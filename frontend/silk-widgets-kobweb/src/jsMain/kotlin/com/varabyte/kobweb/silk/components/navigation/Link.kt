@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
+import com.varabyte.kobweb.navigation.UpdateHistoryMode
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
@@ -82,6 +83,10 @@ val AlwaysUnderlinedLinkVariant = LinkStyle.addVariant {
  *   domain). If not set, this behavior will default to in a new tab. Note that this behavior may be overridden by the
  *   browser based on keyboard/mouse shortcuts.
  *
+ * @param updateHistoryMode If set, follow this behavior when following the link. By default, history will be added
+ *   when visiting the new location (so you can return back to the current page), but [UpdateHistoryMode.REPLACE] can be
+ *   used to create an effect where the new page "takes over" the current page in place.
+ *
  * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
  *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
  *   the same domain.
@@ -94,10 +99,20 @@ fun Link(
     variant: CssStyleVariant<LinkKind>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
+    updateHistoryMode: UpdateHistoryMode? = null,
     autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
-    Link(path, modifier, variant, openInternalLinksStrategy, openExternalLinksStrategy, autoPrefix, ref) {
+    Link(
+        path,
+        modifier,
+        variant,
+        openInternalLinksStrategy,
+        openExternalLinksStrategy,
+        updateHistoryMode,
+        autoPrefix,
+        ref
+    ) {
         Text(text ?: path)
     }
 }
@@ -114,6 +129,7 @@ fun Link(
     variant: CssStyleVariant<LinkKind>? = null,
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
+    updateHistoryMode: UpdateHistoryMode? = null,
     autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
@@ -123,6 +139,7 @@ fun Link(
         attrs = LinkStyle.toModifier(variant).then(modifier).toAttrs(),
         openInternalLinksStrategy,
         openExternalLinksStrategy,
+        updateHistoryMode,
         autoPrefix
     ) {
         registerRefScope(ref)
