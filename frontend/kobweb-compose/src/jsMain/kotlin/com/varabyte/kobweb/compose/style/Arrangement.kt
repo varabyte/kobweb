@@ -3,8 +3,6 @@ package com.varabyte.kobweb.compose.style
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.foundation.layout.Arrangement
 import com.varabyte.kobweb.compose.foundation.layout.SpacedAligned
-import com.varabyte.kobweb.compose.foundation.layout.SpacedHorizontalAligned
-import com.varabyte.kobweb.compose.foundation.layout.SpacedVerticalAligned
 import org.jetbrains.compose.web.css.*
 
 internal const val KOBWEB_ARRANGE_BOTTOM = "kobweb-arrange-bottom"
@@ -25,23 +23,23 @@ internal fun KobwebComposeStyleSheet.initArrangeSpacedByStyle() {
     ".kobweb-col.${KOBWEB_ARRANGE_SPACED_BY}" { gap(ArrangeSpacedByValue.value()) }
 }
 
-fun Arrangement.Horizontal.toClasses() = when (this) {
+fun Arrangement.Horizontal.toClassNames() = when (this) {
     Arrangement.End -> arrayOf(KOBWEB_ARRANGE_END)
     Arrangement.Start -> arrayOf(KOBWEB_ARRANGE_START)
-    is Arrangement.HorizontalOrVertical -> this.toClasses()
+    is Arrangement.HorizontalOrVertical -> this.toClassNames()
 }
 
-fun Arrangement.Vertical.toClasses() = when (this) {
+fun Arrangement.Vertical.toClassNames() = when (this) {
     Arrangement.Top -> arrayOf(KOBWEB_ARRANGE_TOP)
     Arrangement.Bottom -> arrayOf(KOBWEB_ARRANGE_BOTTOM)
-    is Arrangement.HorizontalOrVertical -> toClasses()
+    is Arrangement.HorizontalOrVertical -> toClassNames()
 }
 
-fun Arrangement.HorizontalOrVertical.toClasses() = when (this) {
+fun Arrangement.HorizontalOrVertical.toClassNames() = when (this) {
     Arrangement.Center -> arrayOf(KOBWEB_ARRANGE_CENTER)
     Arrangement.SpaceAround -> arrayOf(KOBWEB_ARRANGE_SPACE_AROUND)
     Arrangement.SpaceBetween -> arrayOf(KOBWEB_ARRANGE_SPACE_BETWEEN)
     Arrangement.SpaceEvenly -> arrayOf(KOBWEB_ARRANGE_SPACE_EVENLY)
     Arrangement.FromStyle -> arrayOf(KOBWEB_ARRANGE_FROM_STYLE)
-    is SpacedAligned -> classes
+    is SpacedAligned -> classNames
 }

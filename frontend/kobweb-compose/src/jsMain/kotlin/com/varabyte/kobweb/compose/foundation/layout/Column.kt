@@ -5,7 +5,7 @@ import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.style.ArrangeSpacedByValue
 import com.varabyte.kobweb.compose.style.toClassName
-import com.varabyte.kobweb.compose.style.toClasses
+import com.varabyte.kobweb.compose.style.toClassNames
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
@@ -40,7 +40,7 @@ object ColumnDefaults {
 fun Modifier.columnClasses(
     verticalArrangement: Arrangement.Vertical = ColumnDefaults.VerticalArrangement,
     horizontalAlignment: Alignment.Horizontal = ColumnDefaults.HorizontalAlignment,
-) = this.classNames("kobweb-col", *verticalArrangement.toClasses(), horizontalAlignment.toClassName())
+) = this.classNames("kobweb-col", *verticalArrangement.toClassNames(), horizontalAlignment.toClassName())
 
 @Composable
 fun Column(
