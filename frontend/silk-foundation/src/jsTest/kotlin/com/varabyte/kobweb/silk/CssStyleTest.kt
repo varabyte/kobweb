@@ -21,6 +21,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme._SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.name
+import com.varabyte.kobweb.test.compose.callComposable
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element

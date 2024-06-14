@@ -25,6 +25,7 @@ kotlin {
         }
         jsTest.dependencies {
             implementation(kotlin("test"))
+            implementation(projects.frontend.test.composeTestUtils)
             implementation(libs.truthish)
         }
     }

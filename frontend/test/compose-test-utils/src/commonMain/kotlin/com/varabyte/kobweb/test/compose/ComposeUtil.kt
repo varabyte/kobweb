@@ -1,4 +1,4 @@
-package com.varabyte.kobweb.silk
+package com.varabyte.kobweb.test.compose
 
 import androidx.compose.runtime.*
 import kotlinx.coroutines.CoroutineScope
