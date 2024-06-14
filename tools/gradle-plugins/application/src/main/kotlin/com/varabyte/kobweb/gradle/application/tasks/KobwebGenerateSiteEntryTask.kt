@@ -3,7 +3,6 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
 import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
@@ -36,20 +35,21 @@ class KobwebGenSiteEntryConfInputs(
 }
 
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(
+    private val appBlock: AppBlock,
     @get:Input val routePrefix: String,
     @get:Input val buildTarget: BuildTarget,
     @get:Nested val confInputs: KobwebGenSiteEntryConfInputs,
 ) : KobwebGenerateTask("Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:Input
-    val cleanUrls: Provider<Boolean> = kobwebBlock.app.cleanUrls
+    val cleanUrls: Provider<Boolean> = appBlock.cleanUrls
 
     @get:Input
     @get:Optional
     val legacyRouteRedirectStrategy: Provider<AppBlock.LegacyRouteRedirectStrategy> =
-        kobwebBlock.app.legacyRouteRedirectStrategy
+        appBlock.legacyRouteRedirectStrategy
 
     @get:Input
-    val globals: Provider<Map<String, String>> = kobwebBlock.app.globals
+    val globals: Provider<Map<String, String>> = appBlock.globals
 
     @get:InputFile
     abstract val appDataFile: RegularFileProperty
@@ -65,7 +65,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
             }
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
-    fun getGenMainFile() = kobwebBlock.app.getGenJsSrcRoot()
+    fun getGenMainFile() = appBlock.getGenJsSrcRoot()
 
     @TaskAction
     fun execute() {
