@@ -5,7 +5,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.application.extensions.app
+import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
@@ -52,10 +52,12 @@ class KobwebGenIndexConfInputs(
 }
 
 abstract class KobwebGenerateSiteIndexTask @Inject constructor(
+    private val appBlock: AppBlock,
     @get:Nested val confInputs: KobwebGenIndexConfInputs,
     @get:Input val buildTarget: BuildTarget,
-    @get:Nested val indexBlock: AppBlock.IndexBlock
 ) : KobwebGenerateTask("Generate an index.html file for this Kobweb project") {
+    @get:Nested
+    val indexBlock: AppBlock.IndexBlock = appBlock.index
 
     // No one should define their own root `public/index.html` files anywhere in their resources.
     @InputFiles
@@ -87,7 +89,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         get() = dependencies.hasDependencyNamed("com.varabyte.kobwebx:silk-icons-mdi")
 
     @OutputFile
-    fun getGenIndexFile(): Provider<RegularFile> = kobwebBlock.app.getGenJsResRoot().map { it.file("index.html") }
+    fun getGenIndexFile(): Provider<RegularFile> = appBlock.getGenJsResRoot().map { it.file("index.html") }
 
     @TaskAction
     fun execute() {

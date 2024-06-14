@@ -2,11 +2,8 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.io.consumeAsync
 import com.varabyte.kobweb.common.path.invariantSeparatorsPath
-import com.varabyte.kobweb.gradle.application.extensions.app
-import com.varabyte.kobweb.gradle.application.extensions.remoteDebugging
-import com.varabyte.kobweb.gradle.application.extensions.server
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
-import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerStateFile
@@ -29,10 +26,10 @@ import javax.inject.Inject
  * @param reuseServer If a server is already running, re-use it if possible.
  */
 abstract class KobwebStartTask @Inject constructor(
-    private val block: KobwebBlock,
+    private val remoteDebuggingBlock: AppBlock.ServerBlock.RemoteDebuggingBlock,
     private val env: ServerEnvironment,
     private val siteLayout: SiteLayout,
-    private val reuseServer: Boolean
+    private val reuseServer: Boolean,
 ) : KobwebTask("Start a Kobweb server") {
 
     @get:InputFile
@@ -65,7 +62,7 @@ abstract class KobwebStartTask @Inject constructor(
         }
 
         val javaHome = System.getenv("KOBWEB_JAVA_HOME") ?: System.getProperty("java.home")!!
-        val remoteDebuggingEnabled = (env == ServerEnvironment.DEV && block.app.server.remoteDebugging.enabled.get())
+        val remoteDebuggingEnabled = (env == ServerEnvironment.DEV && remoteDebuggingBlock.enabled.get())
         val processParams = buildList<String> {
             add("${javaHome.invariantSeparatorsPath}/bin/java")
             add(env.toSystemPropertyParam())
@@ -73,7 +70,7 @@ abstract class KobwebStartTask @Inject constructor(
             // See: https://ktor.io/docs/development-mode.html#system-property)
             add("-Dio.ktor.development=${env == ServerEnvironment.DEV}")
             if (env == ServerEnvironment.DEV && remoteDebuggingEnabled) {
-                add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${block.app.server.remoteDebugging.port.get()}")
+                add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${remoteDebuggingBlock.port.get()}")
             }
             add("-jar")
             add(serverJar.get().asFile.absolutePath)
@@ -132,7 +129,7 @@ abstract class KobwebStartTask @Inject constructor(
         stateFile.content?.let { serverState ->
             println("A Kobweb server is now running at ${serverState.toDisplayText()}")
             if (remoteDebuggingEnabled) {
-                println("Remote debugging is enabled. You may attach a debugger to port ${block.app.server.remoteDebugging.port.get()}.")
+                println("Remote debugging is enabled. You may attach a debugger to port ${remoteDebuggingBlock.port.get()}.")
             }
             println()
             println("Run `gradlew kobwebStop` when you're ready to shut it down.")

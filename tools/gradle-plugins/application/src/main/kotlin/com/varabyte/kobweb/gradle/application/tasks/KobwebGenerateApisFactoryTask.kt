@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.gradle.application.extensions.app
+import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
@@ -15,8 +15,9 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import javax.inject.Inject
 
-abstract class KobwebGenerateApisFactoryTask :
+abstract class KobwebGenerateApisFactoryTask @Inject constructor(private val appBlock: AppBlock) :
     KobwebGenerateTask("Generate Kobweb code for the server") {
     @get:Optional
     @get:InputFile
@@ -26,7 +27,7 @@ abstract class KobwebGenerateApisFactoryTask :
     abstract val compileClasspath: ConfigurableFileCollection
 
     @OutputDirectory // needs to be dir to be registered as a kotlin srcDir
-    fun getGenApisFactoryFile() = kobwebBlock.app.getGenJvmSrcRoot()
+    fun getGenApisFactoryFile() = appBlock.getGenJvmSrcRoot()
 
     @TaskAction
     fun execute() {
