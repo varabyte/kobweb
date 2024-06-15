@@ -33,8 +33,7 @@ fun <T : CSSNumericValue<*>> calc(action: CalcScope.() -> T): T = with(CalcScope
 fun <V : Number, T : CalcScope.CalcNum<V>> calc(action: CalcScope.() -> T): V =
     with(CalcScopeInstance, action).unsafeCast<V>()
 
-// TODO(#168): Make this private after deleting ../Calc.kt
-internal object CalcScopeInstance : CalcScope
+private object CalcScopeInstance : CalcScope
 
 sealed interface CalcScope {
     // override the "smart" operations from org.jetbrains.compose.web.css.CSSOperations.kt to use calc() instead

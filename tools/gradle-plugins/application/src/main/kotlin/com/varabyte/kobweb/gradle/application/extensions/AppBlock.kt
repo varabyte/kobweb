@@ -28,20 +28,6 @@ import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.time.Duration
 
-// The "export" block moved into the "app" sub-block. We need to provide an old version for backwards compatibility for
-// a short time.
-// TODO(#168): Remove before Kobweb v1.0
-// NOTE: Gradle doesn't show this top-level deprecation message to users unfortunately, but we leave it here so we can
-// find it easily when searching for `@Deprecated` tags and remember to delete it later.
-@Deprecated("`kobweb { export { ... } }` has moved to `kobweb { app { export { ... } } }`.")
-abstract class LegacyExportBlock {
-    @Deprecated("The `export` block has moved under the `app` block. Use `kobweb { app { export { browser.set(...) } } }` instead.")
-    abstract val browser: Property<Browser>
-
-    @Deprecated("The `export` block has moved under the `app` block. Use `kobweb { app { export { includeSourceMap.set(...) } } }` instead.")
-    abstract val includeSourceMap: Property<Boolean>
-}
-
 /**
  * A sub-block for defining all properties relevant to a Kobweb application.
  */
@@ -49,7 +35,6 @@ abstract class AppBlock @Inject constructor(
     kobwebFolder: KobwebFolder,
     conf: KobwebConf,
     baseGenDir: Property<String>,
-    @Suppress("DEPRECATION") legacyExportBlock: LegacyExportBlock,
 ) : KobwebBlock.FileGeneratingBlock {
 
     /**
@@ -245,10 +230,8 @@ abstract class AppBlock @Inject constructor(
     /**
      * A sub-block for defining properties related to configuring the `kobweb export` step.
      */
-    @Suppress("DEPRECATION")
     abstract class ExportBlock @Inject constructor(
         private val kobwebFolder: KobwebFolder,
-        legacyExportBlock: LegacyExportBlock
     ) {
         /**
          * @property route The route for the current page being exported, including a leading slash
@@ -411,11 +394,8 @@ abstract class AppBlock @Inject constructor(
         }
 
         init {
-            // TODO(#168): When legacy export block is deleted, move defaults straight into the actual properties
-            legacyExportBlock.browser.convention(Browser.Chromium)
-            browser.convention(legacyExportBlock.browser)
-            legacyExportBlock.includeSourceMap.convention(true)
-            includeSourceMap.convention(legacyExportBlock.includeSourceMap)
+            browser.convention(Browser.Chromium)
+            includeSourceMap.convention(true)
             forceCopyingForRedirects.convention(false)
         }
     }
@@ -497,7 +477,7 @@ abstract class AppBlock @Inject constructor(
 
         extensions.create<IndexBlock>("index", RoutePrefix(conf.site.routePrefix))
         extensions.create<ServerBlock>("server")
-        extensions.create<ExportBlock>("export", kobwebFolder, legacyExportBlock)
+        extensions.create<ExportBlock>("export", kobwebFolder)
     }
 }
 
@@ -517,12 +497,7 @@ val KobwebBlock.app: AppBlock
     get() = extensions.getByType<AppBlock>()
 
 internal fun KobwebBlock.createAppBlock(kobwebFolder: KobwebFolder, conf: KobwebConf): AppBlock {
-    // Deprecation is meant to communicate this class is going away eventually, but we still need to support it for a
-    // little while
-    @Suppress("DEPRECATION")
-    val legacyExportBlock = extensions.create<LegacyExportBlock>("export")
-
-    return extensions.create<AppBlock>("app", kobwebFolder, conf, baseGenDir, legacyExportBlock)
+    return extensions.create<AppBlock>("app", kobwebFolder, conf, baseGenDir)
 }
 
 /**

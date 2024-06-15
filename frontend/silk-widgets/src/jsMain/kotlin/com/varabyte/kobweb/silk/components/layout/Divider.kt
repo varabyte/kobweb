@@ -19,18 +19,6 @@ object DividerVars {
     val Length by StyleVariable<CSSLengthOrPercentageNumericValue>(prefix = "silk", defaultFallback = 90.percent)
 }
 
-/**
- * A dividing line (i.e. an `<hr>` tag) which is SilkTheme-aware.
- */
-@Deprecated("Divider was renamed to HorizontalDivider.", ReplaceWith("HorizontalDivider(modifier, variant)"))
-@Composable
-fun Divider(
-    modifier: Modifier = Modifier,
-    variant: CssStyleVariant<HorizontalDividerKind>? = null,
-) {
-    Hr(HorizontalDividerStyle.toModifier(variant).then(modifier).toAttrs())
-}
-
 sealed interface HorizontalDividerKind : ComponentKind
 
 val HorizontalDividerStyle = CssStyle.base<HorizontalDividerKind> {
@@ -38,12 +26,6 @@ val HorizontalDividerStyle = CssStyle.base<HorizontalDividerKind> {
         .borderTop(1.px, LineStyle.Solid, DividerVars.Color.value())
         .width(DividerVars.Length.value())
 }
-
-@Deprecated(
-    "Divider was renamed to HorizontalDivider. Use HorizontalDividerStyle instead.",
-    ReplaceWith("HorizontalDividerStyle")
-)
-val DividerStyle = HorizontalDividerStyle
 
 /**
  * A dividing line (i.e. an `<hr>` tag) which is SilkTheme-aware meant to visually break up elements in a column.

@@ -6,9 +6,6 @@ import org.jetbrains.compose.web.css.*
 @DslMarker
 annotation class GridDslMarker
 
-@Deprecated("Use `CSSFlexNumericValue` instead", ReplaceWith("CSSFlexNumericValue"))
-typealias CSSFlexValue = CSSFlexNumericValue
-
 /**
  * The base class for all values which can be used to configure a CSS grid's rows or columns.
  *

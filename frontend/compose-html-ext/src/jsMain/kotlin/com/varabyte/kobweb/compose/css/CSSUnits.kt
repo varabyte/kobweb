@@ -51,9 +51,6 @@ typealias CSSFlexNumericValue = CSSNumericValue<out CSSUnitFlex>
 /** A CSS numeric value representing a time value. */
 typealias CSSTimeNumericValue = CSSNumericValue<out CSSUnitTime>
 
-@Deprecated("Use `CSSTimeNumericValue` instead", ReplaceWith("CSSTimeNumericValue"))
-typealias CSSTimeValue = CSSTimeNumericValue
-
 fun CSSAngleValue.toDegrees() = when (this.unit.toString()) {
     "deg" -> value
     "grad" -> (value * 0.9f)
