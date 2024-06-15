@@ -227,7 +227,7 @@ object Arrangement {
         SpacedAligned.Horizontal(space, alignment)
 }
 
-/** Sealed class representing a spaced an [Arrangement] with a given spacing. */
+/** Arrangement with spacing between adjacent children. */
 internal sealed class SpacedAligned(
     override val spacing: CSSLengthOrPercentageNumericValue,
 ) : Arrangement.HorizontalOrVertical {
@@ -236,7 +236,7 @@ internal sealed class SpacedAligned(
      */
     abstract val classNames: Array<String>
 
-    /** Representation either horizontal or vertical spaced and aligned arrangement. */
+    /** Represents a spaced (either horizontally or vertically) and aligned arrangement. */
     class HorizontalOrVertical(
         spacing: CSSLengthOrPercentageNumericValue,
     ) : SpacedAligned(spacing) {
@@ -245,7 +245,7 @@ internal sealed class SpacedAligned(
     }
 
     /**
-     * Representation of a vertically spaced and aligned arrangement.
+     * Represents a vertically spaced and aligned arrangement.
      *
      * @param alignment The vertical alignment used in the arrangement.
      */
@@ -266,7 +266,7 @@ internal sealed class SpacedAligned(
     }
 
     /**
-     * Representation of a horizontally spaced and aligned arrangement.
+     * Represents a horizontally spaced and aligned arrangement.
      *
      * @param alignment The horizontal alignment used in the arrangement.
      */
