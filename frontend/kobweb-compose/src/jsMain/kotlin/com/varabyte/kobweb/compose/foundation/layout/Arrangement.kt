@@ -142,7 +142,7 @@ object Arrangement {
      * Expects values between [[0,∞]].
      */
     fun spacedBy(space: CSSSizeValue<out CSSUnitLength>): HorizontalOrVertical =
-        SpacedAlignedHorizontalOrVertical(space)
+        SpacedAligned.HorizontalOrVertical(space)
 
     /**
      * Arranges the children of the container with a fixed [space] for vertical orientations.
@@ -188,7 +188,7 @@ object Arrangement {
      * @see Alignment.Bottom
      */
     fun spacedBy(space: CSSSizeValue<out CSSUnitLength>, alignment: Alignment.Vertical): Vertical =
-        SpacedVerticalAligned(space, alignment)
+        SpacedAligned.Vertical(space, alignment)
 
     /**
      * Arranges the children of the container with a fixed [space] for vertical orientations.
@@ -234,14 +234,10 @@ object Arrangement {
      * @see Alignment.End
      */
     fun spacedBy(space: CSSSizeValue<out CSSUnitLength>, alignment: Alignment.Horizontal): Horizontal =
-        SpacedHorizontalAligned(space, alignment)
+        SpacedAligned.Horizontal(space, alignment)
 }
 
-/**
- * Sealed class representing a spaced an [Arrangement] with a given spacing.
- *
- * @property spacing The spacing value used in the arrangement.
- */
+/** Sealed class representing a spaced an [Arrangement] with a given spacing. */
 internal sealed class SpacedAligned(
     override val spacing: CSSSizeValue<out CSSUnitLength>,
 ) : Arrangement.HorizontalOrVertical {
@@ -249,60 +245,54 @@ internal sealed class SpacedAligned(
      * The CSS classes applied to the arrangement.
      */
     abstract val classNames: Array<String>
-}
 
-/**
- * Representation either horizontal or vertical spaced and aligned arrangement.
- *
- * @property spacing The spacing value used in the arrangement.
- */
-internal data class SpacedAlignedHorizontalOrVertical(
-    override val spacing: CSSSizeValue<out CSSUnitLength>,
-) : SpacedAligned(spacing) {
-    // Custom classes for default alignment applied for spacing and alignment
-    override val classNames = arrayOf(KOBWEB_ARRANGE_SPACED_BY, KOBWEB_ARRANGE_START)
-}
+    /** Representation either horizontal or vertical spaced and aligned arrangement. */
+    class HorizontalOrVertical(
+        spacing: CSSSizeValue<out CSSUnitLength>,
+    ) : SpacedAligned(spacing) {
+        // Custom classes for default alignment applied for spacing and alignment
+        override val classNames = arrayOf(KOBWEB_ARRANGE_SPACED_BY, KOBWEB_ARRANGE_START)
+    }
 
-/**
- * Representation of a vertically spaced and aligned arrangement.
- *
- * @property spacing The spacing value used in the arrangement.
- * @property alignment The vertical alignment used in the arrangement.
- */
-internal data class SpacedVerticalAligned(
-    override val spacing: CSSSizeValue<out CSSUnitLength>,
-    val alignment: Alignment.Vertical,
-) : SpacedAligned(spacing), Arrangement.Vertical {
-    // Custom classes for vertical alignment based on the alignment type
-    override val classNames: Array<String> = arrayOf(
-        KOBWEB_ARRANGE_SPACED_BY,
-        when (alignment) {
-            Alignment.Bottom -> KOBWEB_ARRANGE_BOTTOM
-            Alignment.CenterVertically -> KOBWEB_ARRANGE_CENTER
-            Alignment.FromStyle -> KOBWEB_ARRANGE_FROM_STYLE
-            Alignment.Top -> KOBWEB_ARRANGE_TOP
-        },
-    )
-}
+    /**
+     * Representation of a vertically spaced and aligned arrangement.
+     *
+     * @param alignment The vertical alignment used in the arrangement.
+     */
+    class Vertical(
+        spacing: CSSSizeValue<out CSSUnitLength>,
+        alignment: Alignment.Vertical,
+    ) : SpacedAligned(spacing) {
+        // Custom classes for vertical alignment based on the alignment type
+        override val classNames: Array<String> = arrayOf(
+            KOBWEB_ARRANGE_SPACED_BY,
+            when (alignment) {
+                Alignment.Bottom -> KOBWEB_ARRANGE_BOTTOM
+                Alignment.CenterVertically -> KOBWEB_ARRANGE_CENTER
+                Alignment.FromStyle -> KOBWEB_ARRANGE_FROM_STYLE
+                Alignment.Top -> KOBWEB_ARRANGE_TOP
+            },
+        )
+    }
 
-/**
- * Representation of a horizontally spaced and aligned arrangement.
- *
- * @property spacing The spacing value used in the arrangement.
- * @property alignment The horizontal alignment used in the arrangement.
- */
-internal data class SpacedHorizontalAligned(
-    override val spacing: CSSSizeValue<out CSSUnitLength>,
-    val alignment: Alignment.Horizontal,
-) : SpacedAligned(spacing), Arrangement.Horizontal {
-    // Custom classes for horizontal alignment based on the alignment type
-    override val classNames: Array<String> = arrayOf(
-        KOBWEB_ARRANGE_SPACED_BY,
-        when (alignment) {
-            Alignment.Start -> KOBWEB_ARRANGE_START
-            Alignment.CenterHorizontally -> KOBWEB_ARRANGE_CENTER
-            Alignment.FromStyle -> KOBWEB_ARRANGE_FROM_STYLE
-            Alignment.End -> KOBWEB_ARRANGE_END
-        },
-    )
+    /**
+     * Representation of a horizontally spaced and aligned arrangement.
+     *
+     * @param alignment The horizontal alignment used in the arrangement.
+     */
+    class Horizontal(
+        spacing: CSSSizeValue<out CSSUnitLength>,
+        alignment: Alignment.Horizontal,
+    ) : SpacedAligned(spacing) {
+        // Custom classes for horizontal alignment based on the alignment type
+        override val classNames: Array<String> = arrayOf(
+            KOBWEB_ARRANGE_SPACED_BY,
+            when (alignment) {
+                Alignment.Start -> KOBWEB_ARRANGE_START
+                Alignment.CenterHorizontally -> KOBWEB_ARRANGE_CENTER
+                Alignment.FromStyle -> KOBWEB_ARRANGE_FROM_STYLE
+                Alignment.End -> KOBWEB_ARRANGE_END
+            },
+        )
+    }
 }
