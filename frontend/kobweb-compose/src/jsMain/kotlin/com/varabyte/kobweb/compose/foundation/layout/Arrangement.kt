@@ -111,7 +111,7 @@ object Arrangement {
      * ```
      * The above code will generate the following html:
      * ```html
-     * <div class="kobweb-col kobweb-arrange-spaced-by kobweb-arrange-start kobweb-align-start" style="--kobweb-arrange-spaced-by-value: 10px;">
+     * <div class="kobweb-col kobweb-arrange-spaced-by kobweb-arrange-start kobweb-align-start" style="--kobweb-arrange-spaced-by: 10px;">
      *     <span class="silk-span-text">1</span>
      *     <span class="silk-span-text">2</span>
      *     <span class="silk-span-text">3</span>
@@ -131,7 +131,7 @@ object Arrangement {
      * ```
      * The above code will generate the following html:
      * ```html
-     * <div class="kobweb-row kobweb-arrange-spaced-by kobweb-arrange-start kobweb-align-top" style="--kobweb-arrange-spaced-by-value: 10px;">
+     * <div class="kobweb-row kobweb-arrange-spaced-by kobweb-arrange-start kobweb-align-top" style="--kobweb-arrange-spaced-by: 10px;">
      *     <span class="silk-span-text">1</span>
      *     <span class="silk-span-text">2</span>
      *     <span class="silk-span-text">3</span>
@@ -165,7 +165,7 @@ object Arrangement {
      * ```
      * The above code will generate the following html:
      * ```html
-     * <div class="kobweb-col kobweb-arrange-spaced-by kobweb-arrange-center kobweb-align-start" style="--kobweb-arrange-spaced-by-value: 10px;">
+     * <div class="kobweb-col kobweb-arrange-spaced-by kobweb-arrange-center kobweb-align-start" style="--kobweb-arrange-spaced-by: 10px;">
      *     <span class="silk-span-text">1</span>
      *     <span class="silk-span-text">2</span>
      *     <span class="silk-span-text">3</span>
@@ -211,7 +211,7 @@ object Arrangement {
      * ```
      * The above code will generate the following html:
      * ```html
-     * <div class="kobweb-row kobweb-arrange-spaced-by kobweb-arrange-center kobweb-align-top" style="--kobweb-arrange-spaced-by-value: 10px;">
+     * <div class="kobweb-row kobweb-arrange-spaced-by kobweb-arrange-center kobweb-align-top" style="--kobweb-arrange-spaced-by: 10px;">
      *     <span class="silk-span-text">1</span>
      *     <span class="silk-span-text">2</span>
      *     <span class="silk-span-text">3</span>

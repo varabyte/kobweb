@@ -16,11 +16,11 @@ internal const val KOBWEB_ARRANGE_SPACE_EVENLY = "kobweb-arrange-space-evenly"
 internal const val KOBWEB_ARRANGE_START = "kobweb-arrange-start"
 internal const val KOBWEB_ARRANGE_TOP = "kobweb-arrange-top"
 
-internal val ArrangeSpacedByValue by StyleVariable<CSSNumeric>(prefix = "kobweb")
+internal val ArrangeSpacedByVar by StyleVariable<CSSNumeric>(prefix = "kobweb")
 
 internal fun KobwebComposeStyleSheet.initArrangeSpacedByStyle() {
-    ".kobweb-row.${KOBWEB_ARRANGE_SPACED_BY}" { gap(ArrangeSpacedByValue.value()) }
-    ".kobweb-col.${KOBWEB_ARRANGE_SPACED_BY}" { gap(ArrangeSpacedByValue.value()) }
+    ".kobweb-row.${KOBWEB_ARRANGE_SPACED_BY}" { gap(ArrangeSpacedByVar.value()) }
+    ".kobweb-col.${KOBWEB_ARRANGE_SPACED_BY}" { gap(ArrangeSpacedByVar.value()) }
 }
 
 fun Arrangement.Horizontal.toClassNames() = when (this) {

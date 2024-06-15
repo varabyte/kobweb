@@ -3,7 +3,7 @@ package com.varabyte.kobweb.compose.foundation.layout
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
-import com.varabyte.kobweb.compose.style.ArrangeSpacedByValue
+import com.varabyte.kobweb.compose.style.ArrangeSpacedByVar
 import com.varabyte.kobweb.compose.style.toClassName
 import com.varabyte.kobweb.compose.style.toClassNames
 import com.varabyte.kobweb.compose.ui.Alignment
@@ -56,7 +56,7 @@ fun Column(
             .thenIf(
                 verticalArrangement is SpacedAligned,
             ) {
-                Modifier.setVariable(ArrangeSpacedByValue, verticalArrangement.spacing)
+                Modifier.setVariable(ArrangeSpacedByVar, verticalArrangement.spacing)
             }
             .toAttrs(),
     ) {
