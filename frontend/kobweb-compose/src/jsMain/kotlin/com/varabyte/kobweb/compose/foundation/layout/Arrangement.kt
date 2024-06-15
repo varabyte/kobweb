@@ -21,37 +21,27 @@ object Arrangement {
      * Specifies the horizontal arrangement of the children. Mostly used on [Row].
      */
     sealed interface Horizontal {
-        /**
-         * Spacing added between any two adjacent children.
-         * defaults to `0.px`
-         */
-        val spacing: CSSLengthNumericValue get() = 0.px
+        /** Spacing added between any two adjacent children. Defaults to `0.px`. */
+        val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
     }
 
     /**
      * Specifies the vertical arrangement of the children. Mostly used on [Column].
      */
     sealed interface Vertical {
-        /**
-         * Spacing added between any two adjacent children.
-         * defaults to `0.px`
-         */
-        val spacing: CSSLengthNumericValue get() = 0.px
+        /** Spacing added between any two adjacent children. Defaults to `0.px`. */
+        val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
     }
 
     /**
      * Specifies either horizontal or vertical arrangement, depending on the layout
      * main axis of the container layout.
      *
-     * E.g.: [Row] will take a horizontal arrangement and [Column] takes vertical
+     * For example, [Row] will take a horizontal arrangement and [Column] takes vertical
      * arrangement.
      */
     sealed interface HorizontalOrVertical : Horizontal, Vertical {
-        /**
-         * Spacing added between any two adjacent children.
-         * defaults to `0.px`
-         */
-        override val spacing: CSSLengthNumericValue get() = 0.px
+        override val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
     }
 
     data object End : Horizontal
@@ -97,7 +87,7 @@ object Arrangement {
      * Arranges the children of the container with a fixed [space] for both horizontal and vertical orientations.
      * This function is marked as stable, ensuring that its result can be safely used in recompositions.
      *
-     * **Important: As we use CSS gap to apply the spacing, negative spaces will be ignored.**
+     * **Important: As we use the CSS `gap` property to apply the spacing, negative spaces will be ignored.**
      *
      * **Usage**:
      * ```kotlin
@@ -138,10 +128,10 @@ object Arrangement {
      * </div>
      * ```
      *
-     * @param space The spacing value between elements, defined using CSS size units.
-     * Expects values between [[0,∞]].
+     * @param space The space between adjacent children. If given as a percentage, the value is calculated relative to
+     * the size of the container. Expects a value between [[0,∞]].
      */
-    fun spacedBy(space: CSSSizeValue<out CSSUnitLength>): HorizontalOrVertical =
+    fun spacedBy(space: CSSLengthOrPercentageNumericValue): HorizontalOrVertical =
         SpacedAligned.HorizontalOrVertical(space)
 
     /**
@@ -151,7 +141,7 @@ object Arrangement {
      *
      * This function is marked as stable, ensuring that its result can be safely used in recompositions.
      *
-     * **Important: As we use CSS gap to apply the spacing, negative spaces will be ignored.**
+     * **Important: As we use the CSS `gap` property to apply the spacing, negative spaces will be ignored.**
      *
      * **Usage**:
      * ```kotlin
@@ -181,13 +171,13 @@ object Arrangement {
      *  * [Alignment.Bottom], the `kobweb-arrange-bottom` class is placed together with
      *  `kobweb-arrange-spaced-by`
      *
-     * @param space The spacing value between elements, defined using CSS size units.
-     * Expects value between [[0,∞]].
+     * @param space The space between adjacent children. If given as a percentage, the value is calculated relative to
+     * the size of the container. Expects a value between [[0,∞]].
      * @see Alignment.CenterVertically
      * @see Alignment.Top
      * @see Alignment.Bottom
      */
-    fun spacedBy(space: CSSSizeValue<out CSSUnitLength>, alignment: Alignment.Vertical): Vertical =
+    fun spacedBy(space: CSSLengthOrPercentageNumericValue, alignment: Alignment.Vertical): Vertical =
         SpacedAligned.Vertical(space, alignment)
 
     /**
@@ -197,7 +187,7 @@ object Arrangement {
      *
      * This function is marked as stable, ensuring that its result can be safely used in recompositions.
      *
-     * **Important: As we use CSS gap to apply the spacing, negative spaces will be ignored.**
+     * **Important: As we use the CSS `gap` property to apply the spacing, negative spaces will be ignored.**
      *
      * **Usage**:
      * ```kotlin
@@ -227,19 +217,19 @@ object Arrangement {
      *  * [Alignment.End], the `kobweb-arrange-end` class is placed together with
      *  `kobweb-arrange-spaced-by`
      *
-     * @param space The spacing value between elements, defined using CSS size units.
-     * Expects value between [[0,∞]].
+     * @param space The space between adjacent children. If given as a percentage, the value is calculated relative to
+     * the size of the container. Expects a value between [[0,∞]].
      * @see Alignment.CenterHorizontally
      * @see Alignment.Start
      * @see Alignment.End
      */
-    fun spacedBy(space: CSSSizeValue<out CSSUnitLength>, alignment: Alignment.Horizontal): Horizontal =
+    fun spacedBy(space: CSSLengthOrPercentageNumericValue, alignment: Alignment.Horizontal): Horizontal =
         SpacedAligned.Horizontal(space, alignment)
 }
 
 /** Sealed class representing a spaced an [Arrangement] with a given spacing. */
 internal sealed class SpacedAligned(
-    override val spacing: CSSSizeValue<out CSSUnitLength>,
+    override val spacing: CSSLengthOrPercentageNumericValue,
 ) : Arrangement.HorizontalOrVertical {
     /**
      * The CSS classes applied to the arrangement.
@@ -248,7 +238,7 @@ internal sealed class SpacedAligned(
 
     /** Representation either horizontal or vertical spaced and aligned arrangement. */
     class HorizontalOrVertical(
-        spacing: CSSSizeValue<out CSSUnitLength>,
+        spacing: CSSLengthOrPercentageNumericValue,
     ) : SpacedAligned(spacing) {
         // Custom classes for default alignment applied for spacing and alignment
         override val classNames = arrayOf(KOBWEB_ARRANGE_SPACED_BY, KOBWEB_ARRANGE_START)
@@ -260,7 +250,7 @@ internal sealed class SpacedAligned(
      * @param alignment The vertical alignment used in the arrangement.
      */
     class Vertical(
-        spacing: CSSSizeValue<out CSSUnitLength>,
+        spacing: CSSLengthOrPercentageNumericValue,
         alignment: Alignment.Vertical,
     ) : SpacedAligned(spacing) {
         // Custom classes for vertical alignment based on the alignment type
@@ -281,7 +271,7 @@ internal sealed class SpacedAligned(
      * @param alignment The horizontal alignment used in the arrangement.
      */
     class Horizontal(
-        spacing: CSSSizeValue<out CSSUnitLength>,
+        spacing: CSSLengthOrPercentageNumericValue,
         alignment: Alignment.Horizontal,
     ) : SpacedAligned(spacing) {
         // Custom classes for horizontal alignment based on the alignment type
