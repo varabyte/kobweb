@@ -20,7 +20,7 @@ import org.jetbrains.compose.web.css.*
  */
 object Arrangement {
     /**
-     * Specifies the horizontal arrangement of the children. Mostly used on [Row].
+     * Base class for arrangement values that makes sense in a horizontal direction.
      */
     sealed interface Horizontal {
         /** Spacing added between any two adjacent children. Defaults to `0.px`. */
@@ -28,7 +28,7 @@ object Arrangement {
     }
 
     /**
-     * Specifies the vertical arrangement of the children. Mostly used on [Column].
+     * Base class for arrangement values that makes sense in a vertical direction.
      */
     sealed interface Vertical {
         /** Spacing added between any two adjacent children. Defaults to `0.px`. */
@@ -36,11 +36,7 @@ object Arrangement {
     }
 
     /**
-     * Specifies either horizontal or vertical arrangement, depending on the layout
-     * main axis of the container layout.
-     *
-     * For example, [Row] will take a horizontal arrangement and [Column] takes vertical
-     * arrangement.
+     * Base class for arrangement values that can be passed in as either horizontal or vertical arrangement parameters.
      */
     sealed interface HorizontalOrVertical : Horizontal, Vertical {
         override val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
