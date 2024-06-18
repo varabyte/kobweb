@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.components.overlay
 
+import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.dom.observers.ResizeObserver
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.css.Transition
@@ -73,6 +74,7 @@ enum class PopupPlacement {
  * Note that this is essentially a [BoxScope] with some extra information added to it relevant to popups.
  */
 @LayoutScopeMarker
+@Immutable // TODO(#554): Remove annotation after upstream fix
 class PopupScope(val placement: PopupPlacement?) : BoxScope
 
 private fun HTMLElement.updatePosition(position: PopupPlacementStrategy.Position) {

@@ -16,6 +16,7 @@ import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 
 @LayoutScopeMarker
+@Immutable // TODO(#554): Remove annotation after upstream fix
 interface RowScope : FlexScope {
     fun Modifier.align(alignment: Alignment.Vertical) = attrsModifier {
         classes("${alignment.toClassName()}-self")
