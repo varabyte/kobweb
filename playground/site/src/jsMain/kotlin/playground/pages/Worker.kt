@@ -27,8 +27,8 @@ fun WorkerPage() {
             worker.postInput(SumInputs(a?:0, b?:0))
         }
 
-        Input(InputType.Number, value = a, onValueChanged = { a = it?.toInt() })
-        Input(InputType.Number, value = b, onValueChanged = { b = it?.toInt() })
+        Input(InputType.Number, value = a, onValueChange = { a = it?.toInt() })
+        Input(InputType.Number, value = b, onValueChange = { b = it?.toInt() })
 
         P()
         Text("Sum from worker: $sum")

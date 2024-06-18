@@ -25,7 +25,7 @@ fun EchoPage() {
             text = ""
         }
 
-        TextInput(text, onTextChanged = { text = it }, onCommit = { sendTextAndClear() })
+        TextInput(text, onTextChange = { text = it }, onCommit = { sendTextAndClear() })
         P()
         Button(onClick = { sendTextAndClear() }, enabled = text.isNotBlank()) {
             Text("Send")

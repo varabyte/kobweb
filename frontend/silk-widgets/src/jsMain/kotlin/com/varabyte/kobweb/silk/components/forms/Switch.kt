@@ -179,7 +179,7 @@ fun Switch(
         Input(
             type = InputType.Checkbox,
             value = checked,
-            onValueChanged = { onCheckedChange(!checked) },
+            onValueChange = { onCheckedChange(!checked) },
             variant = SwitchInputVariant,
             enabled = enabled,
         )

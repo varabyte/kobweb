@@ -259,22 +259,22 @@ fun WidgetsPage() {
                                 text,
                                 placeholder = "extra small size",
                                 size = InputSize.XS,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                             TextInput(
                                 text,
                                 placeholder = "small size",
                                 size = InputSize.SM,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                             TextInput(
                                 text,
                                 placeholder = "medium size",
                                 size = InputSize.MD,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                             TextInput(
                                 text,
                                 placeholder = "large size",
                                 size = InputSize.LG,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                         }
 
                         Spacer()
@@ -284,22 +284,22 @@ fun WidgetsPage() {
                                 text,
                                 placeholder = "outlined",
                                 variant = OutlinedInputVariant,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                             TextInput(
                                 text,
                                 placeholder = "filled",
                                 variant = FilledInputVariant,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                             TextInput(
                                 text,
                                 placeholder = "flushed",
                                 variant = FlushedInputVariant,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                             TextInput(
                                 text,
                                 placeholder = "unstyled",
                                 variant = UnstyledInputVariant,
-                                onTextChanged = { text = it })
+                                onTextChange = { text = it })
                         }
                     }
 
@@ -315,18 +315,18 @@ fun WidgetsPage() {
                                     telNum,
                                     placeholder = "phone number",
                                     autoComplete = AutoComplete.telNational,
-                                    onValueChanged = { telNum = it })
+                                    onValueChange = { telNum = it })
                             }
 
                             var url by remember { mutableStateOf("") }
                             InputGroup(size = InputSize.SM) {
                                 LeftAddon { Text("https://") }
-                                TextInput(url, placeholder = "url", onTextChanged = { url = it })
+                                TextInput(url, placeholder = "url", onTextChange = { url = it })
                                 RightAddon { Text(".com") }
                             }
 
                             var dateTime by remember { mutableStateOf("") }
-                            Input(InputType.DateTimeLocal, dateTime, onValueChanged = { dateTime = it })
+                            Input(InputType.DateTimeLocal, dateTime, onValueChange = { dateTime = it })
                         }
 
                         Spacer()
@@ -338,7 +338,7 @@ fun WidgetsPage() {
                                 TextInput(
                                     username,
                                     placeholder = "username",
-                                    onTextChanged = { username = it })
+                                    onTextChange = { username = it })
                             }
 
                             val dollarRegex = Regex("""^(\d{1,3}(,\d{3})*|(\d+))(\.\d{2})?$""")
@@ -348,7 +348,7 @@ fun WidgetsPage() {
                                 TextInput(
                                     amount,
                                     placeholder = "amount",
-                                    onTextChanged = { amount = it })
+                                    onTextChange = { amount = it })
                                 RightInset {
                                     if (dollarRegex.matches(amount)) {
                                         FaCheck(Modifier.color(ColorSchemes.Green._500))
@@ -362,7 +362,7 @@ fun WidgetsPage() {
                                 TextInput(
                                     password,
                                     password = !showPassword,
-                                    onTextChanged = { password = it })
+                                    onTextChange = { password = it })
                                 RightInset(width = 4.5.cssRem) {
                                     Button(
                                         onClick = { showPassword = !showPassword },

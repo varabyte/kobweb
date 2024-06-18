@@ -203,7 +203,7 @@ annotation class InputGroupScopeMarker
 internal class InputParams<T : Any?>(
     private val type: InputType<T>,
     private val value: T,
-    private val onValueChanged: (T) -> Unit,
+    private val onValueChange: (T) -> Unit,
     private val modifier: Modifier = Modifier,
     private val variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     private val placeholder: String? = null,
@@ -224,7 +224,7 @@ internal class InputParams<T : Any?>(
         _Input(
             type,
             value,
-            onValueChanged,
+            onValueChange,
             this.modifier.then(modifier),
             variant,
             placeholder,
@@ -259,7 +259,7 @@ class InputGroupScope {
     fun <T : Any?> Input(
         type: InputType<T>,
         value: T,
-        onValueChanged: (T) -> Unit,
+        onValueChange: (T) -> Unit,
         modifier: Modifier = Modifier,
         variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
         placeholder: String? = null,
@@ -280,7 +280,7 @@ class InputGroupScope {
         inputParams = InputParams(
             type,
             value,
-            onValueChanged,
+            onValueChange,
             modifier,
             variant,
             placeholder,
@@ -377,7 +377,7 @@ class InputGroupScope {
 
 fun InputGroupScope.TextInput(
     text: String,
-    onTextChanged: (String) -> Unit,
+    onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
@@ -397,7 +397,7 @@ fun InputGroupScope.TextInput(
     Input(
         if (password) InputType.Password else InputType.Text,
         text,
-        onValueChanged = { onTextChanged(it) },
+        onValueChange = { onTextChange(it) },
         modifier,
         variant,
         placeholder,
@@ -446,7 +446,7 @@ private fun PlaceholderColor.toModifier(): Modifier {
 private fun <T : Any?> _Input(
     type: InputType<T>,
     value: T,
-    onValueChanged: (T) -> Unit,
+    onValueChange: (T) -> Unit,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<InputKind>? = null,
     placeholder: String? = null,
@@ -499,7 +499,7 @@ private fun <T : Any?> _Input(
                 spellCheck(spellCheck)
                 autoComplete?.let { this.autoComplete(it) }
 
-                onInput { evt -> onValueChanged(type.inputValue(evt.nativeEvent)) }
+                onInput { evt -> onValueChange(type.inputValue(evt.nativeEvent)) }
                 onKeyUp { evt ->
                     if (valid && evt.code == "Enter") {
                         evt.preventDefault()
@@ -521,7 +521,7 @@ private fun <T : Any?> _Input(
  *
  * ```
  * var text by remember { mutableStateOf("") }
- * TextInput(text, onTextChanged = { text = it })
+ * TextInput(text, onTextChange = { text = it })
  * ```
  *
  * See `Input` for an explanation of all the parameters.
@@ -529,7 +529,7 @@ private fun <T : Any?> _Input(
 @Composable
 fun TextInput(
     text: String,
-    onTextChanged: (String) -> Unit,
+    onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
@@ -550,7 +550,7 @@ fun TextInput(
     Input(
         if (!password) InputType.Text else InputType.Password,
         text,
-        onValueChanged = { onTextChanged(it) },
+        onValueChange = { onTextChange(it) },
         modifier,
         variant,
         placeholder,
@@ -577,12 +577,12 @@ fun TextInput(
  *
  * ```
  * var text by remember { mutableStateOf("") }
- * Input(InputType.Text, text, onValueChanged = { text = it })
+ * Input(InputType.Text, text, onValueChange = { text = it })
  * ```
  *
  * @param type The type of input to create. See [InputType] for the full list of choices.
  * @param value The current value of the input.
- * @param onValueChanged An event triggered when input value wants to change (e.g. in response to user input)
+ * @param onValueChange An event triggered when input value wants to change (e.g. in response to user input)
  * @param placeholder Placeholder text to show when the input is empty.
  * @param size The size of the input, with standard T-shirt sizes (XS, SM, MD, LG) available. See also: [InputSize].
  * @param placeholderColor An optional override for the placeholder color.
@@ -603,7 +603,7 @@ fun TextInput(
 fun <T : Any?> Input(
     type: InputType<T>,
     value: T,
-    onValueChanged: (T) -> Unit,
+    onValueChange: (T) -> Unit,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<InputKind>? = InputDefaults.Variant,
     placeholder: String? = null,
@@ -623,7 +623,7 @@ fun <T : Any?> Input(
     _Input(
         type,
         value,
-        onValueChanged,
+        onValueChange,
         size.toModifier().then(modifier),
         variant,
         placeholder,
@@ -657,7 +657,7 @@ fun <T : Any?> Input(
  * var password by remember { mutableStateOf("") }
  * InputGroup {
  *   LeftAddon { Text("Password:") }
- *   TextInput(password, password = true, onTextChanged = { password = it })
+ *   TextInput(password, password = true, onTextChange = { password = it })
  *   RightInset {
  *     if (isValid(password)) {
  *       FaCheck(Modifier.color(Colors.Green))

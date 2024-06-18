@@ -78,7 +78,7 @@ that may be more reusable in new contexts.
 
 ```kotlin
 LabeledBox("User text", Modifier.fillMaxWidth()) {
-    TextArea(Modifier.fillMaxWidth().height(100.px), onTextChanged = { /* ... */ })
+    TextArea(Modifier.fillMaxWidth().height(100.px), onTextChange = { /* ... */ })
 }
 ```
 
@@ -98,7 +98,7 @@ LabeledTextArea(
     "User text",
     containerModifier = Modifier.fillMaxWidth(),
     textAreaModifier = Modifier.fillMaxWidth().height(100.px),
-    onTextChanged = { /* ... */ }
+    onTextChange = { /* ... */ }
 )
 ```
 

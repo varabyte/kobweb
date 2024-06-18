@@ -13,7 +13,7 @@ fun HomePage() {
     PageLayout("Welcome to Kobweb!") {
         Text("Please enter your name")
         var name by remember { mutableStateOf("") }
-        TextInput(name, onTextChanged = { name = it })
+        TextInput(name, onTextChange = { name = it })
         P()
         Text("Hello ${name.takeIf { it.isNotBlank() } ?: "World"}!")
     }

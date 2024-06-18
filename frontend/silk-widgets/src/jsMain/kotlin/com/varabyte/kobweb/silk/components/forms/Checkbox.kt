@@ -270,7 +270,7 @@ fun TriCheckbox(
         Input(
             type = InputType.Checkbox,
             value = checked.toBoolean(),
-            onValueChanged = {
+            onValueChange = {
                 onCheckedChange(
                     when (checked) {
                         CheckedState.Checked -> CheckedState.Unchecked
