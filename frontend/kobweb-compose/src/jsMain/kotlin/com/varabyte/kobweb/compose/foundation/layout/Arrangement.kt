@@ -280,4 +280,19 @@ internal sealed class SpacedAligned(
             },
         )
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        if (other::class != this::class) return false
+        @Suppress("NAME_SHADOWING") val other = other as SpacedAligned
+
+        return this.spacing == other.spacing && this.classNames.contentEquals(other.classNames)
+    }
+
+    override fun hashCode(): Int {
+        var result = spacing.hashCode()
+        result = 31 * result + classNames.contentHashCode()
+        return result
+    }
 }

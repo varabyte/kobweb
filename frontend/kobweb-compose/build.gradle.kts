@@ -22,6 +22,11 @@ kotlin {
 
             api(projects.frontend.composeHtmlExt)
         }
+
+        jsTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.truthish)
+        }
     }
 }
 
