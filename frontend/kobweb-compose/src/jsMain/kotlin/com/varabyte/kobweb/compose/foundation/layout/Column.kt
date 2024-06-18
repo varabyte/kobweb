@@ -11,6 +11,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
+import com.varabyte.kobweb.compose.ui.thenIfNotNull
 import com.varabyte.kobweb.compose.ui.toAttrs
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
@@ -54,10 +55,8 @@ fun Column(
     Div(
         attrs = modifier
             .columnClasses(verticalArrangement, horizontalAlignment)
-            .thenIf(
-                verticalArrangement is SpacedAligned,
-            ) {
-                Modifier.setVariable(ArrangeSpacedByVar, verticalArrangement.spacing)
+            .thenIfNotNull(verticalArrangement as? SpacedAligned) {
+                Modifier.setVariable(ArrangeSpacedByVar, it.spacing)
             }
             .toAttrs(),
     ) {

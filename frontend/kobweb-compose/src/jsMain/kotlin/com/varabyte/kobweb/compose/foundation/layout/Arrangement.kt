@@ -11,7 +11,6 @@ import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_SPACED_BY
 import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_START
 import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_TOP
 import com.varabyte.kobweb.compose.ui.Alignment
-import org.jetbrains.compose.web.css.*
 
 /**
  * Used to specify the arrangement of the layout's children in layouts like
@@ -22,25 +21,17 @@ object Arrangement {
     /**
      * Base class for arrangement values that makes sense in a horizontal direction.
      */
-    sealed interface Horizontal {
-        /** Spacing added between any two adjacent children. Defaults to `0.px`. */
-        val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
-    }
+    sealed interface Horizontal
 
     /**
      * Base class for arrangement values that makes sense in a vertical direction.
      */
-    sealed interface Vertical {
-        /** Spacing added between any two adjacent children. Defaults to `0.px`. */
-        val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
-    }
+    sealed interface Vertical
 
     /**
      * Base class for arrangement values that can be passed in as either horizontal or vertical arrangement parameters.
      */
-    sealed interface HorizontalOrVertical : Horizontal, Vertical {
-        override val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
-    }
+    sealed interface HorizontalOrVertical : Horizontal, Vertical
 
     object End : Horizontal
     object Start : Horizontal
@@ -220,7 +211,7 @@ object Arrangement {
 
 /** Arrangement with spacing between adjacent children. */
 internal sealed class SpacedAligned(
-    override val spacing: CSSLengthOrPercentageNumericValue,
+    val spacing: CSSLengthOrPercentageNumericValue,
 ) : Arrangement.HorizontalOrVertical {
     /**
      * The CSS classes applied to the arrangement.

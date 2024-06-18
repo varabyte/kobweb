@@ -68,6 +68,10 @@ inline fun Modifier.thenIf(condition: Boolean, lazyProduce: () -> Modifier): Mod
     return this.then(if (condition) lazyProduce() else Modifier)
 }
 
+inline fun <T> Modifier.thenIfNotNull(value: T?, consume: (T) -> Modifier): Modifier {
+    return this.thenIf(value != null) { consume(value!!) }
+}
+
 /**
  * Like the version of [thenUnless] which takes in a modifier directly, but it produces that modifier lazily.
  *
