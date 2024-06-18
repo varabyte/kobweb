@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
+import com.varabyte.kobweb.compose.style.toClassNames
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
@@ -38,5 +39,24 @@ class ArrangementTest {
         assertThat(horizSpacedBy10Start).isNotEqualTo(horizSpacedBy20Start)
         assertThat(horizSpacedBy10Start).isNotEqualTo(horizSpacedBy10End)
         assertThat(horizSpacedBy10Start).isNotEqualTo(vertSpacedBy10Top)
+    }
+
+    @Test
+    fun arrangementClassNamesMatchExpected() {
+
+        assertThat(Arrangement.spacedBy(10.px).toClassNames())
+            .containsExactly("kobweb-arrange-spaced-by", "kobweb-arrange-start")
+        assertThat(Arrangement.spacedBy(20.px).toClassNames())
+            .containsExactly("kobweb-arrange-spaced-by", "kobweb-arrange-start")
+
+        assertThat(Arrangement.spacedBy(10.px, Alignment.Start).toClassNames())
+            .containsExactly("kobweb-arrange-spaced-by", "kobweb-arrange-start")
+        assertThat(Arrangement.spacedBy(20.px, Alignment.End).toClassNames())
+            .containsExactly("kobweb-arrange-spaced-by", "kobweb-arrange-end")
+
+        assertThat(Arrangement.spacedBy(10.px, Alignment.Top).toClassNames())
+            .containsExactly("kobweb-arrange-spaced-by", "kobweb-arrange-top")
+        assertThat(Arrangement.spacedBy(20.px, Alignment.Bottom).toClassNames())
+            .containsExactly("kobweb-arrange-spaced-by", "kobweb-arrange-bottom")
     }
 }

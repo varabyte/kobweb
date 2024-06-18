@@ -13,7 +13,7 @@ kotlinx-serialization = "1.6.0"
 ksp = "1.9.23-1.0.20"
 ktor = "2.3.6"
 logback = "1.4.14"
-truthish = "1.0.1"
+truthish = "1.0.2-SNAPSHOT"
 shadow = "8.1.1"
 
 [libraries]

@@ -3,13 +3,6 @@
 package com.varabyte.kobweb.compose.foundation.layout
 
 import com.varabyte.kobweb.compose.css.*
-import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_BOTTOM
-import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_CENTER
-import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_END
-import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_FROM_STYLE
-import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_SPACED_BY
-import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_START
-import com.varabyte.kobweb.compose.style.KOBWEB_ARRANGE_TOP
 import com.varabyte.kobweb.compose.ui.Alignment
 
 /**
@@ -213,18 +206,10 @@ object Arrangement {
 internal sealed class SpacedAligned(
     val spacing: CSSLengthOrPercentageNumericValue,
 ) : Arrangement.HorizontalOrVertical {
-    /**
-     * The CSS classes applied to the arrangement.
-     */
-    abstract val classNames: Array<String>
-
     /** Represents a spaced (either horizontally or vertically) and aligned arrangement. */
     class HorizontalOrVertical(
         spacing: CSSLengthOrPercentageNumericValue,
-    ) : SpacedAligned(spacing) {
-        // Custom classes for default alignment applied for spacing and alignment
-        override val classNames = arrayOf(KOBWEB_ARRANGE_SPACED_BY, KOBWEB_ARRANGE_START)
-    }
+    ) : SpacedAligned(spacing)
 
     /**
      * Represents a vertically spaced and aligned arrangement.
@@ -233,19 +218,8 @@ internal sealed class SpacedAligned(
      */
     class Vertical(
         spacing: CSSLengthOrPercentageNumericValue,
-        alignment: Alignment.Vertical,
-    ) : SpacedAligned(spacing) {
-        // Custom classes for vertical alignment based on the alignment type
-        override val classNames: Array<String> = arrayOf(
-            KOBWEB_ARRANGE_SPACED_BY,
-            when (alignment) {
-                Alignment.Bottom -> KOBWEB_ARRANGE_BOTTOM
-                Alignment.CenterVertically -> KOBWEB_ARRANGE_CENTER
-                Alignment.FromStyle -> KOBWEB_ARRANGE_FROM_STYLE
-                Alignment.Top -> KOBWEB_ARRANGE_TOP
-            },
-        )
-    }
+        internal val alignment: Alignment.Vertical,
+    ) : SpacedAligned(spacing)
 
     /**
      * Represents a horizontally spaced and aligned arrangement.
@@ -254,19 +228,8 @@ internal sealed class SpacedAligned(
      */
     class Horizontal(
         spacing: CSSLengthOrPercentageNumericValue,
-        alignment: Alignment.Horizontal,
-    ) : SpacedAligned(spacing) {
-        // Custom classes for horizontal alignment based on the alignment type
-        override val classNames: Array<String> = arrayOf(
-            KOBWEB_ARRANGE_SPACED_BY,
-            when (alignment) {
-                Alignment.Start -> KOBWEB_ARRANGE_START
-                Alignment.CenterHorizontally -> KOBWEB_ARRANGE_CENTER
-                Alignment.FromStyle -> KOBWEB_ARRANGE_FROM_STYLE
-                Alignment.End -> KOBWEB_ARRANGE_END
-            },
-        )
-    }
+        internal val alignment: Alignment.Horizontal,
+    ) : SpacedAligned(spacing)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -274,12 +237,20 @@ internal sealed class SpacedAligned(
         if (other::class != this::class) return false
         @Suppress("NAME_SHADOWING") val other = other as SpacedAligned
 
-        return this.spacing == other.spacing && this.classNames.contentEquals(other.classNames)
+        return this.spacing == other.spacing && when (this) {
+            is Vertical -> this.alignment == (other as Vertical).alignment
+            is Horizontal -> this.alignment == (other as Horizontal).alignment
+            else -> true
+        }
     }
 
     override fun hashCode(): Int {
         var result = spacing.hashCode()
-        result = 31 * result + classNames.contentHashCode()
+        when (this) {
+            is Vertical -> result += 31 * alignment.hashCode()
+            is Horizontal -> result += 31 * alignment.hashCode()
+            else -> Unit
+        }
         return result
     }
 }
