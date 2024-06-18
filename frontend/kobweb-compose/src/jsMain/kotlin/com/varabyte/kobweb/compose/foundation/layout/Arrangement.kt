@@ -1,3 +1,5 @@
+@file:Suppress("ConvertObjectToDataObject") // Don't create data objects, no need to generate extra code
+
 package com.varabyte.kobweb.compose.foundation.layout
 
 import com.varabyte.kobweb.compose.css.*
@@ -44,21 +46,14 @@ object Arrangement {
         override val spacing: CSSLengthOrPercentageNumericValue get() = 0.px
     }
 
-    data object End : Horizontal
-
-    data object Start : Horizontal
-
-    data object Top : Vertical
-
-    data object Bottom : Vertical
-
-    data object Center : HorizontalOrVertical
-
-    data object SpaceEvenly : HorizontalOrVertical
-
-    data object SpaceBetween : HorizontalOrVertical
-
-    data object SpaceAround : HorizontalOrVertical
+    object End : Horizontal
+    object Start : Horizontal
+    object Top : Vertical
+    object Bottom : Vertical
+    object Center : HorizontalOrVertical
+    object SpaceEvenly : HorizontalOrVertical
+    object SpaceBetween : HorizontalOrVertical
+    object SpaceAround : HorizontalOrVertical
 
     /**
      * A special value indicating that this element's arrangement will be controlled manually using CSS styles.
@@ -81,7 +76,7 @@ object Arrangement {
      * underlying element (flexbox for rows and columns). It will be up to you to use the right `justify` / `align`
      * modifier methods to get the behavior you want.
      */
-    data object FromStyle : HorizontalOrVertical
+    object FromStyle : HorizontalOrVertical
 
     /**
      * Arranges the children of the container with a fixed [space] for both horizontal and vertical orientations.
