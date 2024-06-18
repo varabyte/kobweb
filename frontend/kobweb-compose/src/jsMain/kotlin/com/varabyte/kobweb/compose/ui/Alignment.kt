@@ -1,3 +1,5 @@
+@file:Suppress("ConvertObjectToDataObject") // Don't create data objects, no need to generate extra code
+
 package com.varabyte.kobweb.compose.ui
 
 sealed interface Alignment {
