@@ -21,6 +21,7 @@ import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme._SilkTheme
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.Document
 import org.w3c.dom.asList
 import org.w3c.dom.css.CSSMediaRule
 import org.w3c.dom.css.CSSStyleRule
@@ -49,6 +50,17 @@ class InitSilkContext(val config: MutableSilkConfig, val stylesheet: SilkStylesh
 // initialization directly there. In the case of Kobweb projects, where code gets automatically processed at compile
 // time looking for `@InitSilk` methods, it is easier to generate code and then set it using this property.
 var additionalSilkInitialization: (InitSilkContext) -> Unit = {}
+
+// For iterating over stylesheets that we have created / populated locally
+// This excludes stylesheets imported from external locations (i.e. from inside a <head> block)
+private val Document.localStyleSheets: List<CSSStyleSheet> get() {
+    return document.styleSheets.asList()
+        .filterIsInstance<CSSStyleSheet>()
+        // Trying to peek at external stylesheets causes a security exception so step over them
+        .filter { it.href == null }
+
+}
+
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     val mutableTheme = MutableSilkTheme()
@@ -99,6 +111,37 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
 
     window.invokeLater { // invokeLater gives the engine time to register Silk styles into the stylesheet objects first
         run {
+            // Warn if we detect layers that the user referenced without registering
+            val registeredCssLayers = SilkStylesheetInstance.cssLayers.build().toSet()
+            val referencedCssLayers = document.localStyleSheets.asSequence()
+                .flatMap { it.cssRules.asList().asSequence() }
+                .filterIsInstance<CSSLayerBlockRule>()
+                .map { it.name }
+                .toSet()
+
+            val unregisteredLayers = referencedCssLayers.subtract(registeredCssLayers)
+
+            if (unregisteredLayers.isNotEmpty()) {
+                console.warn(
+                    """
+                        One or more CSS layer(s) were referenced in code but not registered.
+                        
+                        Please add initialization to your project like:
+                        ```
+                        @InitSilk
+                        fun initSilk(ctx: InitSilkContext) {
+                           ctx.stylesheet.cssLayers.add(${unregisteredLayers.sorted().joinToString { "\"$it\"" }})
+                        }
+                        ```
+                        (but change the order of the layers to match your desired priority).
+                        
+                        If you are not the developer of this website, consider reporting this message to them.
+                    """.trimIndent()
+                )
+            }
+        }
+
+        run {
             // Run through all styles in the stylesheet and update the ones associated with our display styles, making
             // them important. This means that responsive designs will always work -- that another style that sets the
             // `display` property will never accidentally overrule it.
@@ -108,10 +151,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
             // they don't support it. (It would have been nice to be a version of the API that takes an additional
             // priority parameter, as in `setProperty("x", "y", "important")`)
             val displayStyleSelectorNames = displayStyles.map { (_, name) -> ".${name}" }.toSet()
-            document.styleSheets.asList()
-                .filterIsInstance<CSSStyleSheet>()
-                // Trying to peek at external stylesheets causes a security exception so step over them
-                .filter { it.href == null }
+            document.localStyleSheets
                 .flatMap { styleSheet ->
                     // Note: We know all display styles use media rules & layers blocks, but if we ever want to support
                     // "important" more generally, we'd have to handle at least rules at all levels.
