@@ -47,7 +47,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 generatedMarkdownDir.set(processTask.map { it.getGenResDir().get() })
                 pagesPackage.set(kobwebBlock.pagesPackage)
                 dependsOnMarkdownArtifact.set(
-                    project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobweb:kobwebx-markdown")
+                    project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
                 )
             }
 
