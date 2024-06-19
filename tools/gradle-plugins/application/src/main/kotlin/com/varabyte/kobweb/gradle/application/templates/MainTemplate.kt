@@ -201,10 +201,22 @@ fun createMainFunction(
                             addStatement("com.varabyte.kobweb.silk.init.initSilkWidgetsKobweb(ctx)")
                         }
                         frontendData.cssStyles.forEach { entry ->
-                            addStatement("ctx.theme.registerStyle(\"${entry.name}\", ${entry.fqcn})")
+                            addStatement(
+                                buildString {
+                                    append("ctx.theme.registerStyle(\"${entry.name}\", ${entry.fqcn}")
+                                    entry.layer?.let { layer -> append(", layer = \"$layer\"") }
+                                    append(")")
+                                }
+                            )
                         }
                         frontendData.cssStyleVariants.forEach { entry ->
-                            addStatement("ctx.theme.registerVariant(\"${entry.name}\", ${entry.fqcn})")
+                            addStatement(
+                                buildString {
+                                    addStatement("ctx.theme.registerVariant(\"${entry.name}\", ${entry.fqcn}")
+                                    entry.layer?.let { layer -> append(", layer = \"$layer\"") }
+                                    append(")")
+                                }
+                            )
                         }
                         frontendData.silkStyles.forEach { entry ->
                             addStatement("ctx.theme.registerStyle(${entry.fqcn})")

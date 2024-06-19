@@ -18,6 +18,7 @@ const val PACKAGE_MAPPING_PAGE_FQN = "${KOBWEB_CORE_FQN_PREFIX}PackageMapping"
 const val PAGE_FQN = "${KOBWEB_CORE_FQN_PREFIX}Page"
 const val CSS_NAME_FQN = "${KOBWEB_SILK_FQN_PREFIX}style.CssName"
 const val CSS_PREFIX_FQN = "${KOBWEB_SILK_FQN_PREFIX}style.CssPrefix"
+const val CSS_LAYER_FQN = "${KOBWEB_SILK_FQN_PREFIX}style.CssLayer"
 
 const val LEGACY_COMPONENT_STYLE_FQN = "${KOBWEB_SILK_FQN_PREFIX}components.style.ComponentStyle"
 const val LEGACY_COMPONENT_VARIANT_FQN = "${KOBWEB_SILK_FQN_PREFIX}components.style.ComponentVariant"

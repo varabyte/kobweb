@@ -23,6 +23,7 @@ import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.splitCamelCase
 import com.varabyte.kobweb.ksp.common.CSS_KIND_COMPONENT_FQN
 import com.varabyte.kobweb.ksp.common.CSS_KIND_RESTRICTED_FQN
+import com.varabyte.kobweb.ksp.common.CSS_LAYER_FQN
 import com.varabyte.kobweb.ksp.common.CSS_NAME_FQN
 import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
@@ -325,7 +326,8 @@ class FrontendProcessor(
                 CssStyleEntry(
                     import = import,
                     fqcn = fqcn,
-                    name = propertyCssName.prefixed(prefix, containerName)
+                    name = propertyCssName.prefixed(prefix, containerName),
+                    layer = property.getAnnotationValue(CSS_LAYER_FQN)
                 )
             }
         }
@@ -376,7 +378,8 @@ class FrontendProcessor(
                 CssStyleVariantEntry(
                     import = import,
                     fqcn = fqcn,
-                    name = if (isRelativeCssName) propertyCssName else propertyCssName.prefixed(prefix, containerName)
+                    name = if (isRelativeCssName) propertyCssName else propertyCssName.prefixed(prefix, containerName),
+                    layer = property.getAnnotationValue(CSS_LAYER_FQN)
                 )
             }
         }

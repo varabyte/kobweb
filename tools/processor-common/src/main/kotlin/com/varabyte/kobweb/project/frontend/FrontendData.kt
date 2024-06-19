@@ -136,7 +136,7 @@ class ComponentVariantEntry(val fqcn: String)
  * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
  */
 @Serializable
-class CssStyleEntry(val fqcn: String, val name: String, val import: String? = null)
+class CssStyleEntry(val fqcn: String, val name: String, val import: String? = null, val layer: String? = null)
 
 /**
  * Metadata for code like `val BoldLabelVariant = LabelStyle.addVariant { ... }` or `val SM = ButtonSize()`
@@ -144,4 +144,4 @@ class CssStyleEntry(val fqcn: String, val name: String, val import: String? = nu
  * The name of the variant will come from a `@CssName` annotation or, if not specified, the property name itself.
  */
 @Serializable
-class CssStyleVariantEntry(val fqcn: String, val name: String, val import: String? = null)
+class CssStyleVariantEntry(val fqcn: String, val name: String, val import: String? = null, val layer: String? = null)
