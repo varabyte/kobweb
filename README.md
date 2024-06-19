@@ -3818,6 +3818,165 @@ server:
 > redundant at that point. However, it may still be useful to do for documentation purposes and to ensure you won't 404
 > due to an old, internal link that you forgot to update.
 
+## CSS Layers
+
+[CSS Layers](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer) are a very powerful but also relatively new CSS
+feature, which allow wrapping CSS style rules inside named layers as a way to control their priorities. In short, CSS
+layers are arbitrary names that you specify the order of. This can be an especially useful tool when dealing with CSS
+style rules that are fighting with each other.
+
+Compose HTML does *not* support CSS layers, but Silk does! Even if you never use layers directly in your own project,
+Silk uses them, so users can still benefit from the feature.
+
+### Default layers
+
+By default, Silk defines six layers (from lowest to highest ordering priority):
+
+1. reset
+2. base
+3. component-styles
+4. component-variants
+5. restricted-styles
+6. general-styles
+
+The *reset* layer is useful for defining CSS rules that exist to compensate for browser defaults that are inconsistent
+with each other or to override values that exist for legacy reasons that modern web design has moved away from.
+
+The *base* layer is actually not used by Silk (this may change someday), but it is provided so users can home general
+CSS styles in there if they want to. It is a useful place to define global styles that should get easily overridden by
+any other CSS rule defined elsewhere in your project, such as inside a `CssStyle`.
+
+The next four styles are associated with the various flavors of `CssStyle` definitions:
+
+```kotlin
+interface SomeKind : ComponentKind
+val SomeStyle = CssStyle<SomeKind> { /* ... */ } // "component-styles"
+val SomeVariant = SomeStyle.addVariant { /* ... */ } // "component-variants"
+class ButtonSize(/*...*/) : CssStyle.Base(/*...*/) // "restricted-styles"
+val GeneralStyle = CssSTyle { /* ... */ } // "general-styles"
+```
+
+We chose this order to ensure that CSS styles are layered in ways that match intuition; for example, a style's variant
+will always layer on top of the base style itself; meanwhile, a user's declared style will always layer over a component
+style defined by Silk.
+
+### Registering layers
+
+You can register your own custom layers inside an `@InitSilk` method, using the `cssLayers` property:
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+    ctx.stylesheet.cssLayers.add("theme", "layout", "utilities")
+}
+```
+
+When declaring new layers, you can anchor them relative to existing layers. This is useful, for example, if you want to
+insert layers between Silk's *base* layer and its `CssStyle` layers:
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+    ctx.stylesheet.cssLayers.add("third-party", after = SilkLayer.BASE)
+}
+```
+
+### `@CssLayer` annotation
+
+If you need to affect the layer for a `CssStyle` block, you can tag it with the `@CssLayer` annotation:
+
+```kotlin
+@CssLayer("important")
+val ImportantStyle = CssStyle { /* ... */ }
+```
+
+> [!NOTE]
+> You should always explicitly register your layers. So, for the code above, you should also declare:
+> ```kotlin
+> @InitSilk
+> fun initSilk(ctx: InitSilkContext) {
+>   ctx.stylesheet.cssLayers.add("important")
+> }
+> ```
+> If you don't do this, the browser will append add any unknown layer to the end of the CSS layer list (i.e. the highest
+> priority spot). In many cases this will be fine, but being explicit both expresses your intention clearly and reduces
+> the chance of your site breaking in subtle ways when a future developer adds a new layer in the future.
+> 
+> Silk will print out a warning to the console if it detects any unregistered layers.
+
+### `layer` blocks
+
+`@InitSilk` blocks let you register general CSS styles. You can wrap them insides layers using `layer` blocks:
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+    ctx.stylesheet.apply {
+        cssLayers.add("headers")
+        layer("headers") {
+            registerStyle("h1") { /* ... */ }
+            registerStyle("h2") { /* ... */ }
+        }
+    }
+}
+```
+
+Of course, you can associate styles with existing layers, such as the *base* layer we mentioned a few sections above:
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+    ctx.stylesheet.apply {
+        layer(SilkLayer.BASE) {
+            registerStyle("div") { /* ... */ }
+            registerStyle("span") { /* ... */ }
+        }
+    }
+}
+```
+
+### Importing third party styles into layers
+
+Finally, if you are working with third party CSS stylesheets, it can be a very useful trick to wrap them in their own
+layer.
+
+For example, let's say you are fighting with a third party library whose styles are a bit too aggressive and are
+interfering with your own styles.
+
+First, inside your build script, import the stylesheet using
+an [`@import` directive](https://developer.mozilla.org/en-US/docs/Web/CSS/@import):
+
+```kotlin
+// BEFORE
+kobweb.app.index.head.add { 
+  link {
+    rel = "stylesheet"
+    href = "/highlight.js/styles/dracula.css"
+  }
+}
+
+// AFTER
+kobweb.app.index.head.add {
+  style {
+    unsafe {
+      raw("@import url(\"/highlight.js/styles/dracula.css\") layer(highlightjs);")
+    }
+  }
+}
+```
+
+Then, register your new layer in an `@InitSilk` block.
+
+```kotlin
+@InitSilk
+fun initSilk(ctx: InitSilkContext) {
+    // Layer(s) referenced in build.gradle.kts
+    ctx.stylesheet.cssLayers.add("highlightjs", after = SilkLayer.BASE)
+}
+```
+
+You've just tamed some wild CSS styles, congratulations!
+
 ## Legacy Routes
 
 > [!NOTE]
