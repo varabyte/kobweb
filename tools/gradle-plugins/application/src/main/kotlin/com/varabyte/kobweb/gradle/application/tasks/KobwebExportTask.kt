@@ -7,8 +7,6 @@ import com.microsoft.playwright.TimeoutError
 import com.microsoft.playwright.Tracing
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
-import com.varabyte.kobweb.gradle.application.extensions.app
-import com.varabyte.kobweb.gradle.application.extensions.export
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.application.util.kebabCaseToCamelCase
 import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
@@ -19,7 +17,7 @@ import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Provider
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Nested
@@ -54,6 +52,7 @@ class KobwebExportConfInputs(
 }
 
 abstract class KobwebExportTask @Inject constructor(
+    private val exportBlock: AppBlock.ExportBlock,
     @get:Nested val confInputs: KobwebExportConfInputs,
     @get:Input val siteLayout: SiteLayout,
 ) : KobwebModuleTask("Export the Kobweb project into a static site") {
@@ -61,9 +60,11 @@ abstract class KobwebExportTask @Inject constructor(
     abstract val appDataFile: RegularFileProperty
 
     @get:Input
+    abstract val publicPath: Property<String>
+
+    @get:Input
     @get:Optional
-    val legacyRouteRedirectStrategy: Provider<AppBlock.LegacyRouteRedirectStrategy> =
-        kobwebBlock.app.legacyRouteRedirectStrategy
+    abstract val legacyRouteRedirectStrategy: Property<AppBlock.LegacyRouteRedirectStrategy>
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -120,8 +121,8 @@ abstract class KobwebExportTask @Inject constructor(
 
     private fun Browser.takeSnapshot(route: String, url: String): String {
         newContext().use { context ->
-            kobwebBlock.app.export.timeout.orNull?.let { context.setDefaultTimeout(it.toDouble(DurationUnit.MILLISECONDS)) }
-            val traceConfig = kobwebBlock.app.export.traceConfig.orNull
+            exportBlock.timeout.orNull?.let { context.setDefaultTimeout(it.toDouble(DurationUnit.MILLISECONDS)) }
+            val traceConfig = exportBlock.traceConfig.orNull
                 ?.takeIf { it.filter(route) }
             if (traceConfig != null) {
                 val traceRoot = traceConfig.root
@@ -193,7 +194,7 @@ abstract class KobwebExportTask @Inject constructor(
         }
 
         frontendData.pages.takeIf { it.isNotEmpty() }?.let { pages ->
-            val browser = kobwebBlock.app.export.browser.get()
+            val browser = exportBlock.browser.get()
             PlaywrightCache().install(browser)
             Playwright.create(
                 Playwright.CreateOptions().setEnv(
@@ -218,7 +219,7 @@ abstract class KobwebExportTask @Inject constructor(
                         .filter { !it.contains('{') }
                         .filter { route ->
                             val ctx = AppBlock.ExportBlock.ExportFilterContext(route)
-                            (kobwebBlock.app.export.filter.orNull?.invoke(ctx) ?: true)
+                            (exportBlock.filter.orNull?.invoke(ctx) ?: true)
                                 .also { shouldExport ->
                                     if (!shouldExport) {
                                         logger.lifecycle("\nSkipped export for \"$route\".")
@@ -228,7 +229,7 @@ abstract class KobwebExportTask @Inject constructor(
                         .map { route -> AppBlock.ExportBlock.RouteConfig(route) }
                         .toSet()
                         .let { pageRoutes ->
-                            pageRoutes + kobwebBlock.app.export.extraRoutes.orNull.orEmpty()
+                            pageRoutes + exportBlock.extraRoutes.orNull.orEmpty()
                         }
                         .takeIf { routes -> routes.isNotEmpty() }
                         ?.forEach { routeConfig ->
@@ -268,7 +269,7 @@ abstract class KobwebExportTask @Inject constructor(
                         ?: run {
                             val noPagesExportedMessage = buildString {
                                 append("No pages were found to export.")
-                                if (kobwebBlock.app.export.filter.isPresent) {
+                                if (exportBlock.filter.isPresent) {
                                     append(" This may be because your build script's `kobweb.app.export.filter` is filtering out all pages.")
                                 }
                             }
@@ -298,7 +299,7 @@ abstract class KobwebExportTask @Inject constructor(
                         }
 
                         try {
-                            if (kobwebBlock.app.export.forceCopyingForRedirects.get()) throw IOException("Forcefully abort symbolic link step")
+                            if (exportBlock.forceCopyingForRedirects.get()) throw IOException("Forcefully abort symbolic link step")
 
                             pagesRoot.walkTopDown().forEach { file ->
                                 if (file.isDirectory) {
@@ -366,7 +367,7 @@ abstract class KobwebExportTask @Inject constructor(
         // defined by the site.
         getResourceFilesJsWithRoots().forEach { rootAndFile ->
             // Drop the leading slash so we don't confuse File resolve logic
-            val relativePath = rootAndFile.relativeFile.invariantSeparatorsPath.substringAfter(getPublicPath()).drop(1)
+            val relativePath = rootAndFile.relativeFile.invariantSeparatorsPath.substringAfter(publicPath.get()).drop(1)
             if (relativePath == "index.html" && siteLayout.isStatic) return@forEach
 
             (if (relativePath != "index.html") resourcesRoot else systemRoot)
@@ -393,7 +394,7 @@ abstract class KobwebExportTask @Inject constructor(
             scriptFile.copyTo(destFile, overwrite = true)
         }
 
-        if (kobwebBlock.app.export.includeSourceMap.get()) {
+        if (exportBlock.includeSourceMap.get()) {
             val scriptMapFile = File("${scriptFile}.map")
             val destFile = systemRoot.resolve(scriptMapFile.name)
             scriptMapFile.copyTo(destFile, overwrite = true)
