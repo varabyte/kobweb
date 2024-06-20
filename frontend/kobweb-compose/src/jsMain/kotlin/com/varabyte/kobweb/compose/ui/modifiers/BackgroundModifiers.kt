@@ -32,12 +32,16 @@ fun Modifier.background(color: CSSColorValue?, vararg backgrounds: Background.Re
     background(color, *backgrounds)
 }
 
-fun Modifier.background(vararg backgrounds: CSSBackground) = styleModifier {
-    background(*backgrounds)
+// Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
+@Suppress("DEPRECATION")
+fun Modifier.background(first: CSSBackground, vararg rest: CSSBackground) = styleModifier {
+    background(first, *rest)
 }
 
-fun Modifier.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) = styleModifier {
-    background(color, *backgrounds)
+// Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
+@Suppress("DEPRECATION")
+fun Modifier.background(color: CSSColorValue?, first: CSSBackground, vararg rest: CSSBackground) = styleModifier {
+    background(color, first, *rest)
 }
 
 fun Modifier.backgroundAttachment(backgroundAttachment: BackgroundAttachment) = styleModifier {

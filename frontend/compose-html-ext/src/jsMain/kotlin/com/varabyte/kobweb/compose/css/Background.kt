@@ -323,13 +323,15 @@ fun StyleScope.background(vararg backgrounds: Background.Repeatable) {
     background(null, *backgrounds)
 }
 
-fun StyleScope.background(vararg backgrounds: CSSBackground) {
-    background(null, *backgrounds)
+// Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
+fun StyleScope.background(first: CSSBackground, vararg rest: CSSBackground) {
+    background(null, first, *rest)
 }
 
-fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) {
+// Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
+fun StyleScope.background(color: CSSColorValue?, first: CSSBackground, vararg rest: CSSBackground) {
     // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
-    @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
+    val backgrounds = listOf(first, *rest).reversed()
     property("background", buildString {
         append(backgrounds.joinToString(", "))
         // backgrounds only allow you to specify a single color. If provided, it must be included with
