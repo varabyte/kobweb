@@ -208,9 +208,78 @@ fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
+sealed class Background private constructor(private val value: String) : StylePropertyValue {
+    override fun toString(): String = value
+
+    private class Keyword(value: String) : Background(value)
+
+    class Repeatable internal constructor(
+        val image: BackgroundImage?,
+        val repeat: BackgroundRepeat?,
+        val size: BackgroundSize?,
+        val position: BackgroundPosition?,
+        val blend: BackgroundBlendMode?, // See StyleScope.background for where this is used
+        val origin: BackgroundOrigin?,
+        val clip: BackgroundClip?,
+        val attachment: BackgroundAttachment?,
+    ) : Background(
+        buildList {
+            image?.let { add(it.toString()) }
+            repeat?.let { add(it) }
+            position?.let { add(it.toString()) }
+            size?.let {
+                // Size must ALWAYS follow position with a slash
+                // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#syntax
+                if (position == null) add(BackgroundPosition.of(CSSPosition.TopLeft))
+                add("/")
+                add(it.toString())
+            }
+            origin?.let {
+                add(it)
+                // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#values
+                if (clip == null) add(BackgroundClip.BorderBox.toString())
+            }
+            clip?.let {
+                // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#values
+                if (origin == null) add(BackgroundOrigin.PaddingBox.toString())
+                add(it)
+            }
+            attachment?.let { add(it) }
+        }.joinToString(" ")
+    )
+
+    companion object {
+        // Keyword
+        val None: Background = Keyword("none")
+
+        // Global Keywords
+        val Inherit: Background = Keyword("inherit")
+        val Initial: Background = Keyword("initial")
+        val Revert: Background = Keyword("revert")
+        val Unset: Background = Keyword("unset")
+
+        fun of(
+            image: BackgroundImage? = null,
+            repeat: BackgroundRepeat? = null,
+            size: BackgroundSize? = null,
+            position: BackgroundPosition? = null,
+            blend: BackgroundBlendMode? = null,
+            origin: BackgroundOrigin? = null,
+            clip: BackgroundClip? = null,
+            attachment: BackgroundAttachment? = null,
+        ): Repeatable = Repeatable(image, repeat, size, position, blend, origin, clip, attachment)
+    }
+}
+
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
 // Note: Color is actually a separate property and intentionally not included here.
 // Note: blend mode *is* specified here but needs to be handled externally, since
 //   (probably for legacy reasons?) the `background` property does not accept it.
+@Deprecated(
+    "Please use `Background.of` instead.",
+    ReplaceWith("Background.of(image, repeat, size, position, blend, origin, clip, attachment)")
+)
 data class CSSBackground(
     val image: BackgroundImage? = null,
     val repeat: BackgroundRepeat? = null,
@@ -246,8 +315,38 @@ data class CSSBackground(
     }.joinToString(" ")
 }
 
+fun StyleScope.background(background: Background) {
+    property("background", background)
+}
+
+fun StyleScope.background(vararg backgrounds: Background.Repeatable) {
+    background(null, *backgrounds)
+}
+
 fun StyleScope.background(vararg backgrounds: CSSBackground) {
     background(null, *backgrounds)
+}
+
+fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) {
+    // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
+    @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
+    property("background", buildString {
+        append(backgrounds.joinToString(", "))
+        // backgrounds only allow you to specify a single color. If provided, it must be included with
+        // the final layer.
+        if (color != null) {
+            if (this.isNotEmpty()) append(' ')
+            append(color)
+        }
+    })
+    val defaultBlendMode = BackgroundBlendMode.Normal
+    val blendModes = backgrounds
+        .map { it.blend ?: defaultBlendMode }
+        // Use toString comparison because otherwise equality checks are against instance
+        .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
+    if (blendModes != null) {
+        property("background-blend-mode", blendModes.joinToString())
+    }
 }
 
 /**
@@ -263,7 +362,9 @@ fun StyleScope.background(vararg backgrounds: CSSBackground) {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/background
  */
-fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) {
+fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: Background.Repeatable) {
+    if (backgrounds.isEmpty()) return
+
     // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
     @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
     property("background", buildString {

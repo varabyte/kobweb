@@ -7,7 +7,11 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
-fun Modifier.background(vararg backgrounds: CSSBackground) = styleModifier {
+fun Modifier.background(background: Background) = styleModifier {
+    background(background)
+}
+
+fun Modifier.background(vararg backgrounds: Background.Repeatable) = styleModifier {
     background(*backgrounds)
 }
 
@@ -24,6 +28,14 @@ fun Modifier.background(vararg backgrounds: CSSBackground) = styleModifier {
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/background
  */
+fun Modifier.background(color: CSSColorValue?, vararg backgrounds: Background.Repeatable) = styleModifier {
+    background(color, *backgrounds)
+}
+
+fun Modifier.background(vararg backgrounds: CSSBackground) = styleModifier {
+    background(*backgrounds)
+}
+
 fun Modifier.background(color: CSSColorValue?, vararg backgrounds: CSSBackground) = styleModifier {
     background(color, *backgrounds)
 }
