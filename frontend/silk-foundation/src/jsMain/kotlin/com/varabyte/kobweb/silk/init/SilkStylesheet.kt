@@ -154,14 +154,12 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         cssSelector: String,
         init: StyleScope.() -> Unit
     ) {
-        init.assertNoAttributeModifiers(cssSelector)
         styles.add(SimpleCssStyle(cssSelector, init, { Modifier }, layer = null))
     }
 
     override fun layer(name: String, block: CssStyleRegistrar.() -> Unit) {
         val styleEntries = CssStyleRegistrarImpl().apply(block).entries
         styleEntries.forEach { entry ->
-            entry.init.assertNoAttributeModifiers(entry.cssSelector)
             styles.add(
                 SimpleCssStyle(
                     entry.cssSelector,
@@ -180,6 +178,11 @@ internal object SilkStylesheetInstance : SilkStylesheet {
 
     // This method is not part of the public API and should only be called by Silk itself at initialization time
     fun registerStylesAndKeyframesInto(siteStyleSheet: StyleSheet) {
+        // NOTE: We delay asserting as long as possible in order to give the rest of Silk some time to initialize
+        styles.forEach { cssStyle ->
+            @Suppress("UNCHECKED_CAST")
+            (cssStyle.init as StyleScope.() -> Unit).assertNoAttributeModifiers(cssStyle.selector)
+        }
         styles.forEach { cssStyle -> cssStyle.addStylesInto(siteStyleSheet) }
 
         keyframes.map { (name, build) ->
