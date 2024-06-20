@@ -190,6 +190,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebExportTask = project.tasks
             .register<KobwebExportTask>(
                 "kobwebExport",
+                appBlock.export,
                 KobwebExportConfInputs(kobwebConf),
                 exportLayout,
             )
@@ -326,6 +327,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
             kobwebExportTask.configure {
                 appDataFile.set(kobwebCacheAppDataTask.flatMap { it.appDataFile })
+                publicPath.set(kobwebBlock.publicPath)
+                legacyRouteRedirectStrategy.set(appBlock.legacyRouteRedirectStrategy)
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
                 // before outputting them into a final prod folder.
                 check(env == ServerEnvironment.DEV)
