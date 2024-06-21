@@ -1,11 +1,8 @@
 package com.varabyte.kobweb.silk
 
-import com.varabyte.kobweb.compose.attributes.ComparableAttrsScope
-import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.init.initSilk
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -15,6 +12,8 @@ import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.extendedBy
 import com.varabyte.kobweb.silk.style.extendedByBase
 import com.varabyte.kobweb.silk.style.toModifier
+import com.varabyte.kobweb.silk.testutils.flattenCssRules
+import com.varabyte.kobweb.silk.testutils.toTestAttrs
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -24,12 +23,17 @@ import com.varabyte.kobweb.silk.theme.name
 import com.varabyte.kobweb.test.compose.callComposable
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
-import org.w3c.dom.Element
+import kotlin.test.AfterTest
 import kotlin.test.Test
 
 @Suppress("LocalVariableName")
 class CssStyleTest {
     sealed interface TestKind : ComponentKind
+
+    @AfterTest
+    fun tearDown() {
+        _SilkTheme = null
+    }
 
     @Test
     fun componentVariantStylesSheetOrder() {
@@ -44,9 +48,7 @@ class CssStyleTest {
         }.let(::ImmutableSilkTheme)
         SilkTheme.registerStylesInto(stylesheet)
 
-        assertThat(stylesheet.cssRules.flatMap { ruleBlock ->
-            (ruleBlock as CSSLayerRuleDeclaration).rules.map { it.header }
-        })
+        assertThat(stylesheet.flattenCssRules().map { it.header })
             .containsExactly(".${BaseStyle.name}", ".${Variant.name}")
             .inOrder()
     }
@@ -66,9 +68,7 @@ class CssStyleTest {
         }.let(::ImmutableSilkTheme)
         SilkTheme.registerStylesInto(stylesheet)
 
-        assertThat(stylesheet.cssRules.flatMap { ruleBlock ->
-            (ruleBlock as CSSLayerRuleDeclaration).rules.map { it.header }
-        })
+        assertThat(stylesheet.flattenCssRules().map { it.header })
             .containsExactly(".${BaseStyle.name}", ".${SecondaryStyle.name}", ".${TertiaryStyle.name}")
             .inOrder()
     }
@@ -87,15 +87,11 @@ class CssStyleTest {
         }
 
         callComposable {
-            ComparableAttrsScope<Element>().apply(BaseStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(BaseStyle.name)
-            }
-            ComparableAttrsScope<Element>().apply(SecondaryStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(SecondaryStyle.name, BaseStyle.name)
-            }
-            ComparableAttrsScope<Element>().apply(TertiaryStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(TertiaryStyle.name, SecondaryStyle.name, BaseStyle.name)
-            }
+            assertThat(BaseStyle.toModifier().toTestAttrs().classes).containsExactly(BaseStyle.name)
+            assertThat(SecondaryStyle.toModifier().toTestAttrs().classes)
+                .containsExactly(SecondaryStyle.name, BaseStyle.name)
+            assertThat(TertiaryStyle.toModifier().toTestAttrs().classes)
+                .containsExactly(TertiaryStyle.name, SecondaryStyle.name, BaseStyle.name)
         }
     }
 
@@ -114,23 +110,18 @@ class CssStyleTest {
 
         callComposable {
             ColorMode.currentState.value = ColorMode.LIGHT
-            ComparableAttrsScope<Element>().apply(BaseStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(BaseStyle.name, "${BaseStyle.name}_light")
-            }
-            ComparableAttrsScope<Element>().apply(SecondaryStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(
-                    SecondaryStyle.name, "${SecondaryStyle.name}_light", BaseStyle.name, "${BaseStyle.name}_light"
-                )
-            }
+            assertThat(BaseStyle.toModifier().toTestAttrs().classes)
+                .containsExactly(BaseStyle.name, "${BaseStyle.name}_light")
+            assertThat(SecondaryStyle.toModifier().toTestAttrs().classes).containsExactly(
+                SecondaryStyle.name, "${SecondaryStyle.name}_light", BaseStyle.name, "${BaseStyle.name}_light"
+            )
+
             ColorMode.currentState.value = ColorMode.DARK
-            ComparableAttrsScope<Element>().apply(BaseStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(BaseStyle.name, "${BaseStyle.name}_dark")
-            }
-            ComparableAttrsScope<Element>().apply(SecondaryStyle.toModifier().toAttrs()).run {
-                assertThat(classes).containsExactly(
-                    SecondaryStyle.name, "${SecondaryStyle.name}_dark", BaseStyle.name, "${BaseStyle.name}_dark"
-                )
-            }
+            assertThat(BaseStyle.toModifier().toTestAttrs().classes)
+                .containsExactly(BaseStyle.name, "${BaseStyle.name}_dark")
+            assertThat(SecondaryStyle.toModifier().toTestAttrs().classes).containsExactly(
+                SecondaryStyle.name, "${SecondaryStyle.name}_dark", BaseStyle.name, "${BaseStyle.name}_dark"
+            )
         }
     }
 
@@ -153,18 +144,15 @@ class CssStyleTest {
         }
 
         callComposable {
-            ComparableAttrsScope<Element>().apply(TestStyle.toModifier(TertiaryBaseTestVariant).toAttrs()).run {
-                assertThat(classes).containsExactly(
-                    TestStyle.name,
-                    BaseTestVariant.name,
-                    PrimaryBaseTestVariant.name,
-                    SecondaryBaseTestVariant.name,
-                    TertiaryBaseTestVariant.name
-                )
-            }
+            assertThat(TestStyle.toModifier(TertiaryBaseTestVariant).toTestAttrs().classes).containsExactly(
+                TestStyle.name,
+                BaseTestVariant.name,
+                PrimaryBaseTestVariant.name,
+                SecondaryBaseTestVariant.name,
+                TertiaryBaseTestVariant.name
+            )
         }
     }
-
 
     @Test
     fun cssStyleNameFor() {
