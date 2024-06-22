@@ -9,17 +9,19 @@ import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.application.util.kebabCaseToCamelCase
-import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.frontend.AppData
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import kotlinx.serialization.json.Json
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
@@ -55,7 +57,7 @@ abstract class KobwebExportTask @Inject constructor(
     private val exportBlock: AppBlock.ExportBlock,
     @get:Nested val confInputs: KobwebExportConfInputs,
     @get:Input val siteLayout: SiteLayout,
-) : KobwebModuleTask("Export the Kobweb project into a static site") {
+) : KobwebTask("Export the Kobweb project into a static site") {
     @get:InputFile
     abstract val appDataFile: RegularFileProperty
 
@@ -65,6 +67,9 @@ abstract class KobwebExportTask @Inject constructor(
     @get:Input
     @get:Optional
     abstract val legacyRouteRedirectStrategy: Property<AppBlock.LegacyRouteRedirectStrategy>
+
+    @get:InputFiles
+    abstract val publicResources: ConfigurableFileCollection
 
     @OutputDirectory
     fun getSiteDir(): File {
@@ -365,15 +370,16 @@ abstract class KobwebExportTask @Inject constructor(
         // Note: The "index.html" file that comes from here is auto-generated and useful as a fallback for dynamic
         // export layouts but shouldn't be copied over in static layouts as those should only include pages explicitly
         // defined by the site.
-        getResourceFilesJsWithRoots().forEach { rootAndFile ->
+        publicResources.asFileTree.visit {
+            if (isDirectory) return@visit
             // Drop the leading slash so we don't confuse File resolve logic
-            val relativePath = rootAndFile.relativeFile.invariantSeparatorsPath.substringAfter(publicPath.get()).drop(1)
-            if (relativePath == "index.html" && siteLayout.isStatic) return@forEach
+            val relativePath = relativePath.pathString.substringAfter("${publicPath.get()}/")
+            if (relativePath == "index.html" && siteLayout.isStatic) return@visit
 
             (if (relativePath != "index.html") resourcesRoot else systemRoot)
                 .resolve(relativePath)
                 .let { destFile ->
-                    rootAndFile.file.copyTo(destFile, overwrite = true)
+                    file.copyTo(destFile, overwrite = true)
                 }
         }
 
