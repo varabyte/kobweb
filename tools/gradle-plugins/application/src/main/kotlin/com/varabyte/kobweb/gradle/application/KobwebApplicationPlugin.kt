@@ -45,6 +45,7 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
 import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobweb.gradle.core.util.getTransitiveJsDependencyResults
+import com.varabyte.kobweb.gradle.core.util.isDescendantOf
 import com.varabyte.kobweb.gradle.core.util.kobwebCacheFile
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
@@ -64,8 +65,10 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.tooling.events.FailureResult
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -258,6 +261,23 @@ class KobwebApplicationPlugin @Inject constructor(
             val jsTarget = JsTarget(this)
 
             project.setupKspJs(jsTarget, appBlock.cssPrefix)
+
+            project.tasks.named<ProcessResources>(jsTarget.processResources) {
+                inputs.property("kobweb.publicPath", kobwebBlock.publicPath)
+                inputs.property("kobweb.genDir", kobwebBlock.app.genDir)
+                // No one should define their own root `public/index.html` files anywhere in their resources.
+                val generatedRoot = project.layout.buildDirectory.dir(kobwebBlock.app.genDir).get().asFile
+                val projectDir = project.projectDir
+                filesMatching("${kobwebBlock.publicPath.get()}/index.html") {
+                    if (!file.isDescendantOf(generatedRoot)) {
+                        throw GradleException(
+                            "You are not supposed to define the root index file yourself. Kobweb provides its own. " +
+                                "Use the `kobweb.app.index { ... }` block if you need to modify the generated index file. " +
+                                "Problematic file: ${file.relativeToOrSelf(projectDir)}"
+                        )
+                    }
+                }
+            }
 
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
                 "kobwebGenSiteEntry",
