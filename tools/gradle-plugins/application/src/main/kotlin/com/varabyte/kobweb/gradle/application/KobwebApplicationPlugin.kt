@@ -43,6 +43,7 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.registerMigrationTasks
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
+import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobweb.gradle.core.util.getTransitiveJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.kobwebCacheFile
 import com.varabyte.kobweb.gradle.core.util.namedOrNull
@@ -333,6 +334,11 @@ class KobwebApplicationPlugin @Inject constructor(
                 appDataFile.set(kobwebCacheAppDataTask.flatMap { it.appDataFile })
                 publicPath.set(kobwebBlock.publicPath)
                 legacyRouteRedirectStrategy.set(appBlock.legacyRouteRedirectStrategy)
+                publicResources.from(kobwebBlock.publicPath.map { publicPath ->
+                    project.getResourceSources(jsTarget).map { srcDirSet ->
+                        srcDirSet.matching { include("$publicPath/**") }
+                    }
+                })
                 // Exporting ALWAYS spins up a dev server, so that way it loads the files it needs from dev locations
                 // before outputting them into a final prod folder.
                 check(env == ServerEnvironment.DEV)
