@@ -538,7 +538,7 @@ CssStyle {
 }
 ```
 ```kotlin
-// Before
+// After
 
 import com.varabyte.kobweb.silk.style.selectors.hover
 
