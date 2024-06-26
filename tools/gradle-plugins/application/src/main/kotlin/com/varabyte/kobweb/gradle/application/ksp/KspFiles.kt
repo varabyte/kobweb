@@ -28,11 +28,12 @@ import org.gradle.api.provider.Provider
  * will ensure that the `printFrontendMetadata` task runs after the frontend metadata file is created by KSP.
  */
 fun Project.kspFrontendFile(jsTarget: JsTarget): Provider<RegularFile> {
-    return tasks.named(jsTarget.kspKotlin).map { kspTask ->
-        RegularFile {
-            kspTask.outputs.files.asFileTree.matching { include(KOBWEB_APP_METADATA_FRONTEND) }.singleFile
+    return project.files(tasks.named(jsTarget.kspKotlin)).asFileTree
+        .matching { include(KOBWEB_APP_METADATA_FRONTEND) }
+        .elements
+        .map {
+            RegularFile { it.single().asFile }
         }
-    }
 }
 
 /**
@@ -46,12 +47,13 @@ fun Project.kspFrontendFile(jsTarget: JsTarget): Provider<RegularFile> {
  * See [kspFrontendFile] for an example of how this can be used for task dependency inference.
  */
 fun Project.kspBackendFile(jvmTarget: JvmTarget): Provider<RegularFile> {
-    // Ideally we'd return null directly in the map function, but that's unsupported
+    // Ideally we'd return null directly in a map {} function, but that's unsupported
     // See: https://github.com/gradle/gradle/issues/12388
     // So, instead, we zip with a dummy provider and return null from there (which is allowed :/)
-    return tasks.named(jvmTarget.kspKotlin).map { kspTask ->
-        kspTask.outputs.files.asFileTree.matching { include(KOBWEB_APP_METADATA_BACKEND) }
-    }.zip(provider {}) { potentialFile, _ ->
-        if (!potentialFile.isEmpty) RegularFile { potentialFile.singleFile } else null
-    }
+    return project.files(tasks.named(jvmTarget.kspKotlin)).asFileTree
+        .matching { include(KOBWEB_APP_METADATA_BACKEND) }
+        .elements
+        .zip(provider {}) { potentialFile, _ ->
+            potentialFile.singleOrNull()?.let { RegularFile { it.asFile } }
+        }
 }
