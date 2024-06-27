@@ -324,11 +324,13 @@ fun StyleScope.background(vararg backgrounds: Background.Repeatable) {
 }
 
 // Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
+@Suppress("DEPRECATION")
 fun StyleScope.background(first: CSSBackground, vararg rest: CSSBackground) {
     background(null, first, *rest)
 }
 
 // Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
+@Suppress("DEPRECATION")
 fun StyleScope.background(color: CSSColorValue?, first: CSSBackground, vararg rest: CSSBackground) {
     // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
     val backgrounds = listOf(first, *rest).reversed()
