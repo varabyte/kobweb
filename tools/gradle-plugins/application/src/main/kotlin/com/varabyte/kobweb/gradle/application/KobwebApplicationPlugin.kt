@@ -127,7 +127,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebCopySupplementalResourcesTask = project.tasks.register<KobwebCopySupplementalResourcesTask>(
             "kobwebCopySupplementalResources",
             kobwebBlock.app,
-            kobwebGenSiteIndexTask.map { RegularFile { it.outputs.files.singleFile } }
+            kobwebGenSiteIndexTask.map { it.getGenIndexFile() }
         )
         val kobwebCopyWorkerJsOutputTask =
             project.tasks.register<KobwebCopyWorkerJsOutputTask>("kobwebCopyWorkerJsOutput", kobwebBlock.app)
@@ -136,7 +136,7 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebCreateServerScriptsTask = project.tasks
             .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts")
         val kobwebStartTask = run {
-            val reuseServer = project.findProperty("kobwebReuseServer")?.let { it.toString().toBoolean() } ?: true
+            val reuseServer = project.findProperty("kobwebReuseServer")?.toString()?.toBoolean() ?: true
             project.tasks.register<KobwebStartTask>(
                 "kobwebStart", kobwebBlock.app.server.remoteDebugging, env, runLayout, reuseServer
             )
