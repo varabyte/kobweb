@@ -1,10 +1,16 @@
 package com.varabyte.kobweb.gradle.core.tasks.migration
 
-import com.varabyte.kobweb.gradle.core.tasks.KobwebModuleTask
+import com.varabyte.kobweb.gradle.core.kmp.jsTarget
+import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
+import com.varabyte.kobweb.gradle.core.util.RootAndFile
+import com.varabyte.kobweb.gradle.core.util.getSourceFilesWithRoots
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 abstract class KobwebMigrateToCssStyleTask :
-    KobwebModuleTask("Make an attempt to automatically migrate this Kobweb codebase to using the new CssStyle API.") {
+    KobwebTask("Make an attempt to automatically migrate this Kobweb codebase to using the new CssStyle API.") {
+    @Internal
+    fun getSourceFilesJsWithRoots(): Sequence<RootAndFile> = project.getSourceFilesWithRoots(project.jsTarget)
 
     // These selectors used to be at the top level (`silk.components.style`) but have since moved into a new
     // subpackage that didn't exist before (`silk.style.selector`). We need special handling for this new location.
@@ -51,7 +57,11 @@ abstract class KobwebMigrateToCssStyleTask :
         "visited",
     )
 
-    private class Replacement(val from: Regex, val to: String, val skipIf: Replacement.(String) -> Boolean = { false }) {
+    private class Replacement(
+        val from: Regex,
+        val to: String,
+        val skipIf: Replacement.(String) -> Boolean = { false }
+    ) {
         constructor(rawText: String, to: String, skipIf: Replacement.(String) -> Boolean = { false }) : this(
             Regex.escape(rawText).toRegex(), to, skipIf
         )

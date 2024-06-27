@@ -45,10 +45,6 @@ private fun Project.getFilesWithRoots(
         }
 }
 
-fun Project.getResourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootAndFile> {
-    return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.resources }
-}
-
 fun Project.getSourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootAndFile> {
     return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.kotlin }
 }
