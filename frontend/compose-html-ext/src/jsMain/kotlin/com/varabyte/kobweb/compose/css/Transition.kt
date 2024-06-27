@@ -24,7 +24,7 @@ sealed class TransitionProperty private constructor(private val value: String) :
 
         // Keywords
         val None: TransitionProperty get() = Keyword("none")
-        val All: TransitionProperty get() = Keyword("all")
+        val All get() = Name("all") // Essentially a special property name
 
         // Global values
         val Inherit: TransitionProperty get() = Keyword("inherit")
@@ -148,11 +148,14 @@ sealed class Transition private constructor(private val value: String) : StylePr
             delay: CSSTimeNumericValue? = null,
         ): Repeatable = Repeatable(TransitionProperty.of(property), duration, timingFunction, delay)
 
+        /**
+         * Specify transition details that should apply to every animatable property on this element.
+         */
         fun all(
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
-        ): Transition = Repeatable(TransitionProperty.All, duration, timingFunction, delay)
+        ): Repeatable = of(TransitionProperty.All, duration, timingFunction, delay)
 
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
