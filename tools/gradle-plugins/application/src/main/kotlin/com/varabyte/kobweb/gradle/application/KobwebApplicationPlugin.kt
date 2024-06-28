@@ -51,9 +51,6 @@ import com.varabyte.kobweb.gradle.core.util.namedOrNull
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
 import com.varabyte.kobweb.server.api.ServerEnvironment
-import com.varabyte.kobweb.server.api.ServerRequest
-import com.varabyte.kobweb.server.api.ServerRequestsFile
-import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -69,7 +66,6 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
-import org.gradle.tooling.events.FailureResult
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -212,48 +208,11 @@ class KobwebApplicationPlugin @Inject constructor(
         // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
         // how else I'm supposed to do this
         val taskListenerService = project.gradle.sharedServices
-            .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {}
-        run {
-            var isBuilding = false
-            var isServerRunning = run {
-                val stateFile = ServerStateFile(kobwebFolder)
-                stateFile.content?.let { serverState ->
-                    ProcessHandle.of(serverState.pid).isPresent
-                }
-            } ?: false
-
-            taskListenerService.get().onFinishCallbacks.add { event ->
-                if (kobwebStartTask.name !in project.gradle.startParameter.taskNames) return@add
-
-                val taskName = event.descriptor.name.substringAfterLast(":")
-                val serverRequestsFile = ServerRequestsFile(kobwebFolder)
-                val taskFailed = event.result is FailureResult
-
-                if (isServerRunning) {
-                    if (taskFailed) {
-                        serverRequestsFile.enqueueRequest(
-                            ServerRequest.SetStatus(
-                                "Failed.",
-                                isError = true,
-                                timeoutMs = 500
-                            )
-                        )
-                    } else {
-                        if (taskName == kobwebStartTask.name) {
-                            serverRequestsFile.enqueueRequest(ServerRequest.ClearStatus())
-                            serverRequestsFile.enqueueRequest(ServerRequest.IncrementVersion())
-                        } else if (!isBuilding) {
-                            serverRequestsFile.enqueueRequest(ServerRequest.SetStatus("Building..."))
-                            isBuilding = true
-                        }
-                    }
-                } else {
-                    if (!taskFailed && taskName == kobwebStartTask.name) {
-                        isServerRunning = true
-                    }
-                }
+            .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
+                parameters.kobwebStartTaskName = kobwebStartTask.name
+                parameters.isKobwebStartBuild = kobwebStartTask.name in project.gradle.startParameter.taskNames
+                parameters.kobwebFolderFile = kobwebFolder.resolve("..").toFile()
             }
-        }
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
         project.tasks.withType<KotlinWebpack>().configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()

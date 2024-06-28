@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.compose) apply false
     id("com.varabyte.kobweb.application") apply false
     id("com.varabyte.kobweb.library") apply false
+    id("com.varabyte.kobweb.worker") apply false
     id("com.varabyte.kobwebx.markdown") apply false
 }
 
