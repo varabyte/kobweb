@@ -33,7 +33,7 @@ fun KotlinJvmTarget.kobwebServerJar(kobwebName: String? = null) {
             exclude("$KOBWEB_METADATA_SUBFOLDER/**")
         }
         val classpathFiles = project.configurations.named(jvmTarget.runtimeClasspath).map { configuration ->
-            configuration.map { if (it.isDirectory) it else project.zipTree(it).matching(patterns) }
+            configuration.map { project.zipTree(it).matching(patterns) }
         }
         from(classpathFiles)
     }
