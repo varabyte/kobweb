@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.functions.CSSUrl
+import com.varabyte.kobweb.compose.css.functions.Gradient
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -222,4 +224,35 @@ class BorderRadiusScope internal constructor(private val styleScope: StyleScope)
 
 fun Modifier.borderRadius(scope: BorderRadiusScope.() -> Unit) = styleModifier {
     BorderRadiusScope(this).apply(scope)
+}
+
+fun Modifier.borderImage(image: BorderImage) = styleModifier {
+    borderImage(image)
+}
+
+class BorderImageScope internal constructor(private val styleScope: StyleScope) {
+    fun source(source: BorderImageSource) = styleScope.borderImageSource(source)
+    fun slice(slice: BorderImageSlice) = styleScope.borderImageSlice(slice)
+    fun width(width: BorderImageWidth) = styleScope.borderImageWidth(width)
+    fun outset(outset: BorderImageOutset) = styleScope.borderImageOutset(outset)
+    fun repeat(repeat: BorderImageRepeat) = styleScope.borderImageRepeat(repeat)
+
+    // Helper functions
+    fun source(url: CSSUrl) = source(BorderImageSource.of(url))
+    fun source(gradient: Gradient) = source(BorderImageSource.of(gradient))
+    fun slice(all: CSSPercentageValue) = slice(BorderImageSlice.of(all))
+    fun slice(all: Number) = slice(BorderImageSlice.of(all))
+    fun slice(block: BorderImageSlice.Builder.() -> Unit) = slice(BorderImageSlice.of(block))
+    fun width(all: CSSLengthOrPercentageNumericValue) = width(BorderImageWidth.of(all))
+    fun width(all: Number) = width(BorderImageWidth.of(all))
+    fun width(block: BorderImageWidth.Builder.() -> Unit) = width(BorderImageWidth.of(block))
+    fun outset(all: CSSLengthNumericValue) = outset(BorderImageOutset.of(all))
+    fun outset(all: Number) = outset(BorderImageOutset.of(all))
+    fun outset(block: BorderImageOutset.Builder.() -> Unit) = outset(BorderImageOutset.of(block))
+    fun repeat(topBottom: BorderImageRepeat.Repeatable, leftRight: BorderImageRepeat.Repeatable) =
+        repeat(BorderImageRepeat.of(topBottom, leftRight))
+}
+
+fun Modifier.borderImage(scope: BorderImageScope.() -> Unit) = styleModifier {
+    BorderImageScope(this).apply(scope)
 }
