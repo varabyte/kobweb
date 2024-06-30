@@ -55,10 +55,12 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     fun getGenSrcDir() = markdownBlock.getGenJsSrcRoot("process")
 
     @OutputDirectory
-    fun getGenResDir() = markdownBlock.getGenJsResRoot()
+    fun getGenResDir() = markdownBlock.getGenJsResRoot("process")
 
     @TaskAction
     fun execute() {
+        getGenSrcDir().get().asFile.clearDirectory()
+        getGenResDir().get().asFile.clearDirectory()
         val process = markdownBlock.process.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {

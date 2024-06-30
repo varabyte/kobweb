@@ -53,13 +53,14 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
 
     @OutputDirectory
     fun getGenDir(): Provider<Directory> {
-        return markdownBlock.getGenJsSrcRoot().zip(pagesPackage) { genRoot, pagesPackage ->
+        return markdownBlock.getGenJsSrcRoot("convert").zip(pagesPackage) { genRoot, pagesPackage ->
             genRoot.dir(project.prefixQualifiedPackage(pagesPackage).replace(".", "/"))
         }
     }
 
     @TaskAction
     fun execute() {
+        getGenDir().get().asFile.clearDirectory()
         val cache = NodeCache(
             parser = markdownFeatures.createParser(),
             roots = getMarkdownRoots().get() + generatedMarkdownDir.asFileTree

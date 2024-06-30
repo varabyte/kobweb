@@ -55,6 +55,12 @@ abstract class MarkdownTask @Inject constructor(
         return rootPath.relativize(Path(this.pathString))
     }
 
+    /** Recursively delete the contents of this directory without deleting the directory itself. */
+    protected fun File.clearDirectory() {
+        deleteRecursively()
+        mkdirs()
+    }
+
     protected fun packagePartsFor(mdFile: RelativePath): List<String> {
         val mdPathRel = mdFile.toPath().invariantSeparatorsPathString
 
