@@ -4,7 +4,7 @@ import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.Reporter
-import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
+import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlockVisitor
@@ -43,7 +43,6 @@ import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.commonmark.renderer.Renderer
-import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import java.util.*
 import kotlin.io.path.Path
@@ -61,7 +60,6 @@ fun String.yamlStringToKotlinString(): String {
 /**
  * A markdown renderer that generates a Kobweb source file given an input markdown file.
  *
- * @property project The Gradle project that owns these markdown files.
  * @property markdownNodeGetter A function that can be used to retrieve the AST for a given markdown file. This allows
  *   avoiding needing to do redundant parsing.
  * @property defaultRoot The default root layout to use if not specified in the markdown file. If null, and no root is
@@ -71,10 +69,10 @@ fun String.yamlStringToKotlinString(): String {
  * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
  * @property pkg The package that the generated file should be placed in.
  * @property funName The name of the page function that will be generated.
+ * @property projectGroup The group of the project, which is used to resolve package shortcuts
  * @property reporter A reporter that can be used to log warnings and errors.
  */
 class KotlinRenderer(
-    private val project: Project,
     private val markdownNodeGetter: (path: String) -> Node?,
     private val defaultRoot: String?,
     private val imports: List<String>,
@@ -82,6 +80,7 @@ class KotlinRenderer(
     private val handlers: MarkdownHandlers,
     private val pkg: String,
     private val funName: String,
+    private val projectGroup: String,
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact: Boolean,
     private val reporter: Reporter,
@@ -112,7 +111,7 @@ class KotlinRenderer(
                     appendLine("import com.varabyte.kobwebx.markdown.*")
                 }
                 (imports + frontMatterData?.imports.orEmpty()).forEach { importPath ->
-                    appendLine("import ${project.prefixQualifiedPackage(importPath)}")
+                    appendLine("import ${PackageUtils.resolvePackageShortcut(projectGroup, importPath)}")
                 }
 
                 appendLine()
@@ -396,7 +395,7 @@ class KotlinRenderer(
         override fun visit(customNode: CustomNode) {
             when (customNode) {
                 is KobwebCall -> {
-                    output.appendLine("$indent${customNode.toFqn(project)}")
+                    output.appendLine("$indent${customNode.toFqn(projectGroup)}")
                 }
 
                 is TableHead -> visit(customNode)

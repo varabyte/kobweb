@@ -1,8 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall
 
-import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
+import com.varabyte.kobweb.project.common.PackageUtils
 import org.commonmark.node.CustomNode
-import org.gradle.api.Project
 
 /**
  * A block which represents a method call to insert into the final output.
@@ -24,9 +23,9 @@ class KobwebCall(val partiallyQualifiedName: String, var appendBrace: Boolean = 
      * * `.test` -> `org.example.myproject.test()`
      * * `test()` -> `test()`
      */
-    fun toFqn(project: Project): String {
+    fun toFqn(projectGroup: String): String {
         return buildString {
-            append(project.prefixQualifiedPackage(partiallyQualifiedName))
+            append(PackageUtils.resolvePackageShortcut(projectGroup, partiallyQualifiedName))
             if (partiallyQualifiedName.last().isLetterOrDigit() && !appendBrace) {
                 append("()")
             }

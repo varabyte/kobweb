@@ -41,11 +41,13 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             processTask.configure {
                 resources.set(project.getResourceSources(jsTarget))
                 pagesPackage.set(kobwebBlock.pagesPackage)
+                projectGroup.set(project.group)
             }
             convertTask.configure {
                 resources.set(project.getResourceSources(jsTarget))
                 generatedMarkdownDir.set(processTask.map { it.getGenResDir().get() })
                 pagesPackage.set(kobwebBlock.pagesPackage)
+                projectGroup.set(project.group)
                 dependsOnMarkdownArtifact.set(
                     project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
                 )
