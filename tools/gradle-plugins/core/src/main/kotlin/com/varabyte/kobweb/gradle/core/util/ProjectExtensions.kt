@@ -49,16 +49,6 @@ fun Project.getSourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootA
     return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.kotlin }
 }
 
-/**
- * Using a [Project], get the fully qualified packages name, e.g. ".pages" -> "org.example.pages"
- */
-fun Project.prefixQualifiedPackage(relPathMaybe: String): String {
-    return when {
-        relPathMaybe.startsWith('.') -> "${project.group}$relPathMaybe"
-        else -> relPathMaybe
-    }
-}
-
 private fun Project.getDependencyResultsFromConfiguration(configurationName: String): List<ResolvedDependencyResult> {
     return configurations[configurationName].incoming.resolutionResult.allDependencies
         .mapNotNull { it as? ResolvedDependencyResult }

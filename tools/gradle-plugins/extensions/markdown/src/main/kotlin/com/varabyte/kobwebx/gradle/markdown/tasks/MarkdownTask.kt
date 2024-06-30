@@ -3,7 +3,7 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 import com.varabyte.kobweb.common.lang.packageConcat
 import com.varabyte.kobweb.common.lang.toPackageName
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
-import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
+import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import org.gradle.api.file.FileTree
 import org.gradle.api.file.RelativePath
@@ -22,11 +22,12 @@ import kotlin.io.path.invariantSeparatorsPathString
 abstract class MarkdownTask @Inject constructor(
     @get:Internal protected val markdownBlock: MarkdownBlock,
     desc: String
-) :
-    KobwebTask(desc) {
-
+) : KobwebTask(desc) {
     @get:Input
     abstract val pagesPackage: Property<String>
+
+    @get:Input
+    abstract val projectGroup: Property<Any>
 
     private val rootPath get() = Path(markdownBlock.markdownPath.get())
 
@@ -70,7 +71,8 @@ abstract class MarkdownTask @Inject constructor(
     }
 
     protected fun absolutePackageFor(packageParts: List<String>): String {
-        return project.prefixQualifiedPackage(
+        return PackageUtils.resolvePackageShortcut(
+            projectGroup.get().toString(),
             pagesPackage.get().packageConcat(packageParts.joinToString("."))
         )
     }

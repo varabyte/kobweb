@@ -2,7 +2,7 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.gradle.core.util.getBuildScripts
-import com.varabyte.kobweb.gradle.core.util.prefixQualifiedPackage
+import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
@@ -53,8 +53,11 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
 
     @OutputDirectory
     fun getGenDir(): Provider<Directory> {
-        return markdownBlock.getGenJsSrcRoot("convert").zip(pagesPackage) { genRoot, pagesPackage ->
-            genRoot.dir(project.prefixQualifiedPackage(pagesPackage).replace(".", "/"))
+        return markdownBlock.getGenJsSrcRoot("convert").flatMap { rootDir ->
+            val subDir = projectGroup.zip(pagesPackage) { group, pagesPackage ->
+                PackageUtils.resolvePackageShortcut(group.toString(), pagesPackage).replace(".", "/")
+            }
+            rootDir.dir(subDir)
         }
     }
 
@@ -84,7 +87,6 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                 val mdPackage = absolutePackageFor(packageParts)
                 val funName = funNameFor(mdFile)
                 val ktRenderer = KotlinRenderer(
-                    project,
                     cache::getRelative,
                     markdownBlock.defaultRoot.orNull?.takeUnless { it.isBlank() },
                     markdownBlock.imports.get(),
@@ -92,6 +94,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                     markdownHandlers,
                     mdPackage,
                     funName,
+                    projectGroup.get().toString(),
                     dependsOnMarkdownArtifact.get(),
                     LoggingReporter(logger),
                 )
