@@ -40,6 +40,7 @@ kotlin {
                 implementation("com.varabyte.kobweb:kobweb-silk")
                 implementation("com.varabyte.kobwebx:silk-icons-fa")
                 implementation("com.varabyte.kobwebx:kobwebx-markdown")
+                implementation("com.varabyte.kobwebx:kobwebx-chrome-ai")
                 implementation(project(":sitelib"))
                 implementation(project(":worker"))
             }

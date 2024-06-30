@@ -76,6 +76,7 @@ fun NavHeader() {
             NavLink("/echo", "ECHO")
             NavLink("/worker", "WORKER")
             NavLink("/markdown", "MARKDOWN")
+            NavLink("/ai", "AI")
             Spacer()
 
             Button(
