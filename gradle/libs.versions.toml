@@ -15,6 +15,7 @@ ktor = "2.3.6"
 logback = "1.4.14"
 truthish = "1.0.2-SNAPSHOT"
 shadow = "8.1.1"
+kotlin-wrappers = "1.0.0-pre.722"
 
 [libraries]
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
@@ -47,6 +48,7 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }
 truthish = { module = "com.varabyte.truthish:truthish", version.ref = "truthish" }
+kotlin-web = { module = "org.jetbrains.kotlin-wrappers:kotlin-web", version.ref = "kotlin-wrappers" }
 
 [bundles]
 commonmark = ["commonmark-core", "commonmark-autolink", "commonmark-frontmatter","commonmark-tables","commonmark-tasklist"]
