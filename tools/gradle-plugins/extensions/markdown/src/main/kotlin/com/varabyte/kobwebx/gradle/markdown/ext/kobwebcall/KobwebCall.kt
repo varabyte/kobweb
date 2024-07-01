@@ -15,8 +15,8 @@ import org.commonmark.node.CustomNode
  */
 class KobwebCall(val partiallyQualifiedName: String, var appendBrace: Boolean = false) : CustomNode() {
     /**
-     * Convert this class's [partiallyQualifiedName] into a fully qualified name, prefixing it with the project's
-     * package if it begins with a period.
+     * Convert this class's [partiallyQualifiedName] into a fully qualified name, prefixing it with the given
+     * [projectGroup] if it begins with a period.
      *
      * Examples:
      * * `test` -> `test()`
