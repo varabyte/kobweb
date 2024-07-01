@@ -250,13 +250,13 @@ sealed class Background private constructor(private val value: String) : StylePr
 
     companion object {
         // Keyword
-        val None: Background = Keyword("none")
+        val None: Background get() = Keyword("none")
 
         // Global Keywords
-        val Inherit: Background = Keyword("inherit")
-        val Initial: Background = Keyword("initial")
-        val Revert: Background = Keyword("revert")
-        val Unset: Background = Keyword("unset")
+        val Inherit: Background get() = Keyword("inherit")
+        val Initial: Background get() = Keyword("initial")
+        val Revert: Background get() = Keyword("revert")
+        val Unset: Background get() = Keyword("unset")
 
         fun of(
             image: BackgroundImage? = null,

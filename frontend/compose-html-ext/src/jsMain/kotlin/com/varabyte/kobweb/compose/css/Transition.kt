@@ -126,13 +126,13 @@ sealed class Transition private constructor(private val value: String) : StylePr
 
     companion object {
         // Keyword
-        val None: Transition = Keyword("none")
+        val None: Transition get() = Keyword("none")
 
         // Global Keywords
-        val Inherit: Transition = Keyword("inherit")
-        val Initial: Transition = Keyword("initial")
-        val Revert: Transition = Keyword("revert")
-        val Unset: Transition = Keyword("unset")
+        val Inherit: Transition get() = Keyword("inherit")
+        val Initial: Transition get() = Keyword("initial")
+        val Revert: Transition get() = Keyword("revert")
+        val Unset: Transition get() = Keyword("unset")
 
         fun of(
             property: TransitionProperty.Name,

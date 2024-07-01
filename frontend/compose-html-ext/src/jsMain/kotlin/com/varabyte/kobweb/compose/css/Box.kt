@@ -171,7 +171,7 @@ fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Repeatable) {
 sealed class BoxShadow private constructor(private val value: String) : StylePropertyValue {
     override fun toString(): String = value
 
-    private class Keyword(value: String): BoxShadow(value)
+    private class Keyword(value: String) : BoxShadow(value)
 
     class Repeatable internal constructor(
         offsetX: CSSLengthNumericValue = 0.px,
@@ -213,12 +213,13 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
 
     companion object {
         // Keyword
-        val None: BoxShadow = Keyword("none")
+        val None: BoxShadow get() = Keyword("none")
+
         // Global Keywords
-        val Inherit: BoxShadow = Keyword("inherit")
-        val Initial: BoxShadow = Keyword("initial")
-        val Revert: BoxShadow = Keyword("revert")
-        val Unset: BoxShadow = Keyword("unset")
+        val Inherit: BoxShadow get() = Keyword("inherit")
+        val Initial: BoxShadow get() = Keyword("initial")
+        val Revert: BoxShadow get() = Keyword("revert")
+        val Unset: BoxShadow get() = Keyword("unset")
 
         // Custom
         /**

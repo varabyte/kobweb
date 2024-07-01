@@ -62,13 +62,13 @@ sealed class Animation private constructor(private val value: String) : StylePro
             Repeatable(name, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 
         // Keyword
-        val None: Animation = Keyword("none")
+        val None: Animation get() = Keyword("none")
 
         // Global Keywords
-        val Inherit: Animation = Keyword("inherit")
-        val Initial: Animation = Keyword("initial")
-        val Revert: Animation = Keyword("revert")
-        val Unset: Animation = Keyword("unset")
+        val Inherit: Animation get() = Keyword("inherit")
+        val Initial: Animation get() = Keyword("initial")
+        val Revert: Animation get() = Keyword("revert")
+        val Unset: Animation get() = Keyword("unset")
     }
 }
 
