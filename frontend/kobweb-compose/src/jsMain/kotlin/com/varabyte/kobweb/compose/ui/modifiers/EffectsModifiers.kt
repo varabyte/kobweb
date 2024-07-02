@@ -10,9 +10,7 @@ fun Modifier.backdropFilter(backdropFilter: BackdropFilter) = styleModifier {
 }
 
 fun Modifier.backdropFilter(vararg filters: CSSFilter) = styleModifier {
-    if (filters.isNotEmpty()) {
-        property("backdrop-filter", filters.joinToString(" "))
-    }
+    backdropFilter(*filters)
 }
 
 fun Modifier.filter(filter: Filter) = styleModifier {
@@ -20,7 +18,5 @@ fun Modifier.filter(filter: Filter) = styleModifier {
 }
 
 fun Modifier.filter(vararg filters: CSSFilter) = styleModifier {
-    if (filters.isNotEmpty()) {
-        property("filter", filters.joinToString(" "))
-    }
+    filter(*filters)
 }
