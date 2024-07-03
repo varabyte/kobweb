@@ -118,7 +118,10 @@ class KotlinRenderer(
                 appendLine()
 
                 append("@Page(\"")
-                append(frontMatterData?.routeOverride ?: filePath.split("/").dropLast(1).joinToString("/").ensureSurrounded("/"))
+                val routeFromFilePath = filePath.split("/").dropLast(1).joinToString("/").ensureSurrounded("/")
+                append(frontMatterData?.routeOverride?.let {
+                    if (it.startsWith("/")) it else routeFromFilePath + it
+                } ?: routeFromFilePath)
                 appendLine("\")")
 
                 appendLine("@Composable")
