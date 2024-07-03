@@ -2,6 +2,7 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
+import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.project.common.PackageUtils
@@ -116,9 +117,9 @@ class KotlinRenderer(
 
                 appendLine()
 
-                append("@Page")
-                frontMatterData?.routeOverride?.let { append("(\"$it\")") }
-                appendLine()
+                append("@Page(\"")
+                append(frontMatterData?.routeOverride ?: filePath.split("/").dropLast(1).joinToString("/").ensureSurrounded("/"))
+                appendLine("\")")
 
                 appendLine("@Composable")
                 appendLine("fun $funName() {")

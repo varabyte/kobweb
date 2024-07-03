@@ -81,42 +81,6 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
             val mdPathRel = relativePath.toPath()
             val mdPathRelStr = mdPathRel.invariantSeparatorsPathString
 
-            run {
-                mdPathRelStr.split('/').dropLast(1).forEachIndexed { i, dirPart ->
-                    val shouldCreatePackageMapping = dirPart.contains('_') || dirPart.splitCamelCase().size > 1
-                    if (!shouldCreatePackageMapping) return@forEachIndexed
-
-                    // If here, this means that the markdown path contains an intentional underscore or camel casing,
-                    // which the Kobweb KSP processor will remove by default (see
-                    // com/varabyte/kobweb/ksp/util/RouteUtils.kt), so here we add a PackageMapping to ensure that won't
-                    // happen.
-
-                    val subpackage = packageParts.subList(0, i + 1)
-
-                    File(getGenDir().get().asFile, "${subpackage.joinToString("/")}/PackageMapping.kt")
-                        // Multiple markdown files in the same folder will try to write this over and over again; we
-                        // can skip after the first time
-                        .takeIf { !it.exists() }
-                        ?.let { mappingFile ->
-
-                            mappingFile.parentFile.mkdirs()
-                            mappingFile.writeText(
-                                """
-                                @file:PackageMapping("$dirPart")
-                                package ${
-                                    PackageUtils.resolvePackageShortcut(
-                                        projectGroup.get().toString(),
-                                        pagesPackage.get().packageConcat(subpackage.joinToString("."))
-                                    )
-                                }
-                                import com.varabyte.kobweb.core.PackageMapping
-                            """.trimIndent()
-                            )
-                        }
-                }
-            }
-
-
             File(
                 getGenDir().get().asFile,
                 mdPathRel.resolveSibling("$ktFileName.kt").invariantSeparatorsPathString
