@@ -64,7 +64,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         val process = markdownBlock.process.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
-            getMarkdownResources().get().visit {
+            markdownResources.asFileTree.visit {
                 if (isDirectory) return@visit
 
                 val mdFile = file

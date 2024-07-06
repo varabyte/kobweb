@@ -8,6 +8,7 @@ import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.tasks.ConvertMarkdownTask
+import com.varabyte.kobwebx.gradle.markdown.tasks.MarkdownTask
 import com.varabyte.kobwebx.gradle.markdown.tasks.ProcessMarkdownTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -38,18 +39,28 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
 
-            processTask.configure {
-                resources.set(project.getResourceSources(jsTarget))
+            // Configures both ProcessMarkdownTask & ConvertMarkdownTask
+            project.tasks.withType<MarkdownTask>().configureEach {
                 pagesPackage.set(kobwebBlock.pagesPackage)
                 projectGroup.set(project.group)
+                markdownResources.from(markdownBlock.markdownPath.map { markdownPath ->
+                    project.getResourceSources(jsTarget).map { srcDirSet ->
+                        srcDirSet.matching { include("$markdownPath/**/*.md") }
+                    }
+                })
             }
+
             convertTask.configure {
-                resources.set(project.getResourceSources(jsTarget))
                 generatedMarkdownDir.set(processTask.map { it.getGenResDir().get() })
-                pagesPackage.set(kobwebBlock.pagesPackage)
-                projectGroup.set(project.group)
                 dependsOnMarkdownArtifact.set(
                     project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
+                )
+                markdownRoots.set(
+                    markdownBlock.markdownPath.flatMap { markdownPath ->
+                        project.getResourceSources(jsTarget).map { srcDirSet ->
+                            srcDirSet.srcDirs.map { root -> root.resolve(markdownPath) }
+                        }
+                    }
                 )
             }
 

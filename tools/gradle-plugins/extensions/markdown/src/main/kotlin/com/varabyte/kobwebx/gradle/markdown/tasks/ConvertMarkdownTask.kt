@@ -1,7 +1,5 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
-import com.varabyte.kobweb.common.lang.packageConcat
-import com.varabyte.kobweb.common.text.splitCamelCase
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.project.common.PackageUtils
@@ -14,6 +12,7 @@ import org.commonmark.parser.Parser
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
@@ -53,6 +52,9 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     @get:InputDirectory
     abstract val generatedMarkdownDir: DirectoryProperty
 
+    @get:InputFiles
+    abstract val markdownRoots: ListProperty<File>
+
     @OutputDirectory
     fun getGenDir(): Provider<Directory> {
         return markdownBlock.getGenJsSrcRoot("convert").flatMap { rootDir ->
@@ -68,9 +70,9 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         getGenDir().get().asFile.clearDirectory()
         val cache = NodeCache(
             parser = markdownFeatures.createParser(),
-            roots = getMarkdownRoots().get() + generatedMarkdownDir.asFileTree
+            roots = markdownRoots.get() + generatedMarkdownDir.asFileTree
         )
-        val markdownFiles = getMarkdownResources().get() + objectFactory.fileTree().setDir(generatedMarkdownDir)
+        val markdownFiles = markdownResources.asFileTree + objectFactory.fileTree().setDir(generatedMarkdownDir)
 
         markdownFiles.visit {
             if (isDirectory) return@visit

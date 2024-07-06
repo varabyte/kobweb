@@ -5,11 +5,9 @@ import com.varabyte.kobweb.common.lang.toPackageName
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
-import org.gradle.api.file.FileTree
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RelativePath
-import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
@@ -29,22 +27,10 @@ abstract class MarkdownTask @Inject constructor(
     @get:Input
     abstract val projectGroup: Property<Any>
 
+    @get:InputFiles
+    abstract val markdownResources: ConfigurableFileCollection
+
     private val rootPath get() = Path(markdownBlock.markdownPath.get())
-
-    @get:Internal
-    abstract val resources: Property<SourceDirectorySet>
-
-    @InputFiles
-    fun getMarkdownRoots(): Provider<List<File>> = resources.map {
-        it.srcDirs.map { root -> root.resolve(markdownBlock.markdownPath.get()) }
-    }
-
-    @InputFiles
-    fun getMarkdownResources(): Provider<FileTree> {
-        return resources.zip(markdownBlock.markdownPath) { fileTree, path ->
-            fileTree.matching { include("$path/**/*.md") }
-        }
-    }
 
     protected fun funNameFor(mdFile: File): String {
         // The suggested replacement for "capitalize" is awful
