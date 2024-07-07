@@ -43,12 +43,6 @@ fun Modifier.scrollSnapType(axis: ScrollSnapType.Axis, strictness: ScrollSnapTyp
     scrollSnapType(ScrollSnapType.of(axis, strictness))
 }
 
-@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
-@Deprecated("`ScrollSnapAxis` and `ScrollSnapMode` are deprecated. Use `ScrollSnapType.Axis` and `ScrollSnapType.Strictness` instead.")
-fun Modifier.scrollSnapType(axis: ScrollSnapAxis, mode: ScrollSnapMode? = null) = styleModifier {
-    scrollSnapType(axis, mode)
-}
-
 fun Modifier.scrollPadding(
     top: CSSLengthOrPercentageNumericValue = 0.px,
     right: CSSLengthOrPercentageNumericValue = 0.px,
