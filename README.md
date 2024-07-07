@@ -1322,11 +1322,10 @@ an animation that uses them, which you can pass into the `Modifier.animation` mo
 > @Suppress("PRIVATE_KEYFRAMES")
 > private val ExampleKeyframes = Keyframes { /* ... */ }
 > // Or, `private val _ExampleKeyframes`
-
 >
 > @InitSilk
 > fun registerPrivateAnim(ctx: InitSilkContext) {
-> ctx.stylesheet.registerKeyframes("example", ExampleKeyframes)
+>     ctx.stylesheet.registerKeyframes("example", ExampleKeyframes)
 > }
 > ```
 >
