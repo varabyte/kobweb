@@ -1,6 +1,9 @@
 package playground
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.storage.getItem
+import com.varabyte.kobweb.browser.storage.setItem
+import com.varabyte.kobweb.browser.storage.createStorageKey
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
@@ -18,11 +21,12 @@ import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import kotlinx.browser.localStorage
 import org.jetbrains.compose.web.css.*
 
-private const val COLOR_MODE_KEY = "playground:app:colorMode"
+private val COLOR_MODE_KEY =
+    ColorMode.entries.createStorageKey("playground:app:colorMode", defaultValue = ColorMode.DARK)
 
 @InitSilk
 fun updateTheme(ctx: InitSilkContext) = ctx.config.apply {
-    initialColorMode = localStorage.getItem(COLOR_MODE_KEY)?.let { ColorMode.valueOf(it) } ?: ColorMode.DARK
+    initialColorMode = localStorage.getItem(COLOR_MODE_KEY)!!
 }
 
 @InitSilk
@@ -62,9 +66,7 @@ fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
 fun AppEntry(content: @Composable () -> Unit) {
     SilkApp {
         val colorMode = ColorMode.current
-        LaunchedEffect(colorMode) {
-            localStorage.setItem(COLOR_MODE_KEY, colorMode.name)
-        }
+        LaunchedEffect(colorMode) { localStorage.setItem(COLOR_MODE_KEY, colorMode) }
 
         Surface(SmoothColorStyle.toModifier().minHeight(100.vh)) {
             content()
