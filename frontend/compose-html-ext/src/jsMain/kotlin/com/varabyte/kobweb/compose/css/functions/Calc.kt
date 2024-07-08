@@ -12,7 +12,7 @@ import kotlin.experimental.ExperimentalTypeInference
  *
  * For example:
  * ```
- * val PaddingVar by StyleVariable(1.cssRem)
+ * val BasePaddingVar by StyleVariable(1.cssRem)
  * Modifier.padding(calc { (BasePaddingVar.value() + 2.px) * 2 })
  * ```
  */
@@ -58,7 +58,7 @@ sealed interface CalcScope {
     operator fun <T : CSSUnit> CSSNumericValue<T>.unaryPlus(): CSSNumericValue<T> =
         "calc(1 * $this)".unsafeCast<CSSNumericValue<T>>()
 
-    /** An extension of [Number] which uses CSS's calc() function to represent operations. */
+    /** An extension of [Number] which uses CSS's `calc()` function to represent operations. */
     class CalcNum<T : Number> internal constructor(private val value: String) : Number() {
         override fun toString(): String = value
 
