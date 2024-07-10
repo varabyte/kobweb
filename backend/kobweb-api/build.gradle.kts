@@ -13,6 +13,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+dependencies {
+    implementation(projects.common.clientServerInternal)
+}
+
 kobwebPublication {
     artifactId.set("kobweb-api")
     description.set("Classes related to extending API routes handled by a Kobweb server")

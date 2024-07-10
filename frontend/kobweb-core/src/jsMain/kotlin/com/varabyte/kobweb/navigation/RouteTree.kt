@@ -19,6 +19,7 @@ private fun DefaultErrorPage(errorCode: Int) {
 /**
  * A tree data structure that represents a parsed route, such as `/example/path` or `/{dynamic}/path`
  */
+// TODO: Delete this class and migrate to the common version once we can remove all the legacy search logic
 internal class RouteTree {
     sealed class Node(val parent: Node? = null, val name: String, var method: PageMethod?) {
         companion object {

@@ -24,7 +24,10 @@ import com.varabyte.kobweb.api.ApiContext
  *
  * @property connection Information about the connection that carried the request.
  * @property method The type of http method this call was sent with.
- * @property params A list of key/value pairs extracted from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
+ * @property params A list of key/value pairs extracted either from the user's [query string](https://en.wikipedia.org/wiki/Query_string)
+ *   or from any dynamic path parts.
+ * @property queryParams Like [params] but only for the query string, just in case a user needs to disambiguate between
+ *   a dynamic path part and a query parameter with the same name.
  * @property headers All headers sent with the request.
  * @property cookies Any cookies sent with the request. Note the value of the cookies will be in a raw format, so you
  *   may need to decode them yourself.
@@ -38,11 +41,23 @@ class Request(
     val connection: Connection,
     val method: HttpMethod,
     val params: Map<String, String>,
+    val queryParams: Map<String, String>,
     val headers: Map<String, List<String>>,
     val cookies: Map<String, String>,
     val body: ByteArray?,
     val contentType: String?,
 ) {
+    /** Convenience constructor if you don't care about dynamic parameters. */
+    constructor(
+        connection: Connection,
+        method: HttpMethod,
+        params: Map<String, String>,
+        headers: Map<String, List<String>>,
+        cookies: Map<String, String>,
+        body: ByteArray?,
+        contentType: String?,
+    ) : this(connection, method, params, params, headers, cookies, body, contentType)
+
     /**
      * Top-level container class for views about a connection for some request.
      *
