@@ -22,7 +22,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.io.IOException
@@ -79,7 +78,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
 
             val mdFile = file
             val packageParts = packagePartsFor(relativePath)
-            val ktFileName = mdFile.nameWithoutExtension.capitalized()
+            val ktFileName = mdFile.nameWithoutExtension.replaceFirstChar { it.uppercase() }
             val mdPathRel = relativePath.toPath()
             val mdPathRelStr = mdPathRel.invariantSeparatorsPathString
 
