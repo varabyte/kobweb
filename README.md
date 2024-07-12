@@ -2931,6 +2931,45 @@ Simple!
 > section worked without setting the status directly. Of course, if you wanted to return a different status code value
 > after setting the body text, you could update it explicitly yourself after the `setBodyText` call.
 
+### Dynamic API routes
+
+Similar to [dynamic `@Page` routes](#dynamic-routes), you can define API routes using curly braces in the same way to
+indicate a dynamic value that should be captured with some binding name.
+
+For example, the following endpoint will capture the value "123" into a key name called
+"article" when querying `articles/123`:
+
+```kotlin
+// jvmMain/kotlin/com/mysite/api/articles/Article.kt
+
+@Api("{}")
+suspend fun fetchArticle(ctx: ApiContext) {
+    val articleId = ctx.req.params["article"] ?: return
+    // ...
+}
+```
+
+Recall from the `@Page` docs that specifying a name inside the curly braces defines the variable name used to capture
+the value. When empty, as above, Kobweb uses the filename to generate it. In other words, you could explicitly specify
+`@Api("{article}")` for the same effect.
+
+Once this API endpoint is defined, you just query it as you would any normal API endpoint:
+
+```kotlin
+coroutineScope.launch {
+  val articleText = window.api.get("articles/123").decodeToString()
+  // ...
+}
+```
+
+Finally, astute readers might notice that (like dynamic `@Page` routes) we use the same property to query dynamic route
+values as well as query parameters.
+
+Captured dynamic values will always take precedence over query parameters in the `params` map. In practice, this should
+never be a problem, because it would be very confusing design to write an API endpoint that got called like
+`articles/123?article=456`. That said, you can also use `ctx.req.queryParams["article"]` to disambiguate this case if
+necessary.
+
 ### `@InitApi` methods and initializing services
 
 Kobweb also supports declaring methods that should be run when your server starts up, which is particularly useful for
