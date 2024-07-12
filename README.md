@@ -2900,8 +2900,19 @@ suspend fun noActionButOk(ctx: ApiContext) {
 }
 ```
 
-This design was chosen to allow you to conditionally handle API routes based on input conditions. A very common case is
-creating an API route that only handles POST requests:
+> [!IMPORTANT]
+> The `ctx.res.setBodyText` method sets the status code to 200 automatically for you, which is why code in the previous
+> section worked without setting the status directly. Of course, if you wanted to return a different status code value
+> after setting the body text, you could explicitly set it right after making the `setBodyText` call. For example:
+> ```kotlin
+> ctx.res.setBodyText("...")
+> ctx.res.status = 201
+> ```
+
+The design for defaulting to 404 was chosen to allow you to conditionally handle API routes based on input conditions,
+where early aborts automatically result in the client getting an error.
+
+A very common case is creating an API route that only handles POST requests:
 
 ```kotlin
 @Api
@@ -2925,11 +2936,6 @@ suspend fun redirect(ctx: ApiContext) {
 ```
 
 Simple!
-
-> [!NOTE]
-> The `ctx.res.setBodyText` method sets the status code to 200 automatically for you, which is why code in the previous 
-> section worked without setting the status directly. Of course, if you wanted to return a different status code value
-> after setting the body text, you could update it explicitly yourself after the `setBodyText` call.
 
 ### Dynamic API routes
 
