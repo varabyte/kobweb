@@ -80,6 +80,19 @@ class RouteInterceptorScope(pathQueryAndFragment: String) {
  */
 class Router {
     /**
+     * A simple data class containing information about a route.
+     *
+     * @property path The route's path, e.g. "/a/b/c". If a route has a dynamic part, that part will be surrounded in
+     *   curly braces, e.g. "/users/{user}/posts/{post}"
+     * @property isDynamic Whether the route has at least one dynamic part, which can be useful in case the user wants
+     *   to filter these out.
+     */
+    class RouteEntry internal constructor(
+        val path: String,
+        val isDynamic: Boolean, // Whether the path is dynamic or not, in case users want to filter them out
+    )
+
+    /**
      * Strategy for allowing flexibility when trying to resolve legacy, non-hyphenated routes.
      *
      * When enabled, multi-word pages will be visitable both by typing in their hyphenated slug and their non-hyphenated
@@ -113,6 +126,29 @@ class Router {
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
+
+    /**
+     * A sequence of all routes registered with this router.
+     *
+     * Users may want to filter out dynamic routes from the final list. Doing that looks like this:
+     *
+     * ```
+     * ctx.router.routes.filter { !it.isDynamic }.map { it.path }.forEach { routePath -> ... }
+     * ```
+     */
+    val routes: Sequence<RouteEntry>
+        get() = routeTree.nodes.map { nodeList ->
+            RouteEntry(
+                nodeList.joinToString("/") { node ->
+                    if (node is RouteTree.DynamicNode) {
+                        "{${node.name}}"
+                    } else {
+                        node.name
+                    }
+                },
+                nodeList.any { it is RouteTree.DynamicNode }
+            )
+        }
 
     init {
         PageContext.init(this)
