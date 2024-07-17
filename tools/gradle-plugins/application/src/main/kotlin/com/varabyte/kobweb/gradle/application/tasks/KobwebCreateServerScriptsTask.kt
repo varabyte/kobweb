@@ -15,10 +15,11 @@ import org.gradle.api.tasks.TaskAction
 abstract class KobwebCreateServerScriptsTask :
     KobwebTask("Create scripts which can be used to start the Kobweb server in production mode") {
     @OutputFile
-    fun getServerStartShellScript() = kobwebApplication.kobwebFolder.resolve(KOBWEB_SERVER_START_SHELL_SCRIPT).toFile()
+    fun getServerStartShellScript() =
+        kobwebApplication.kobwebFolder.path.resolve(KOBWEB_SERVER_START_SHELL_SCRIPT).toFile()
 
     @OutputFile
-    fun getServerStartBatFile() = kobwebApplication.kobwebFolder.resolve(KOBWEB_SERVER_START_BAT_FILE).toFile()
+    fun getServerStartBatFile() = kobwebApplication.kobwebFolder.path.resolve(KOBWEB_SERVER_START_BAT_FILE).toFile()
 
     @TaskAction
     fun execute() {

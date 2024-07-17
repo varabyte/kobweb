@@ -385,7 +385,7 @@ abstract class AppBlock @Inject constructor(
          * @see com.varabyte.kobweb.project.conf.Server.Logging.Level
          */
         fun enableTraces(
-            tracesRoot: Path = kobwebFolder.resolve("export-traces"),
+            tracesRoot: Path = kobwebFolder.path.resolve("export-traces"),
             filter: (String) -> Boolean = { true },
             showScreenshots: Boolean = true,
         ) {

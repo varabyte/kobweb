@@ -41,7 +41,7 @@ open class KobwebReadableTextFile<T : Any>(
     name: String,
     private val deserialize: (String) -> (T),
 ) {
-    private val delegateFile = LiveFile(kobwebFolder.resolve(name))
+    private val delegateFile = LiveFile(kobwebFolder.path.resolve(name))
 
     val path = delegateFile.path
 
