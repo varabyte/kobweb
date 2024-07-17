@@ -23,7 +23,7 @@ abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>,
         var kobwebFolderFile: File
     }
 
-    val kobwebFolder = KobwebFolder.inPath(parameters.kobwebFolderFile.toPath())!!
+    val kobwebFolder = KobwebFolder(parameters.kobwebFolderFile.toPath())
     var isBuilding = false
 
     // NOTE: When a project uses an `includeBuild` for a plugin that needs to be built only after the kobweb application

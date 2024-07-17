@@ -10,5 +10,5 @@ fun ServerState.toDisplayText(): String {
 }
 
 internal fun KobwebFolder.getServerJar(): File {
-    return this.resolve(KOBWEB_SERVER_JAR).toFile()
+    return this.path.resolve(KOBWEB_SERVER_JAR).toFile()
 }

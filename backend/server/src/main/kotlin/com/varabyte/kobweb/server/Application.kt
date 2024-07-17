@@ -1,8 +1,8 @@
 package com.varabyte.kobweb.server
 
+import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.event.dispose.DisposeEvent
 import com.varabyte.kobweb.api.event.dispose.DisposeReason
-import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConfFile
@@ -104,7 +104,7 @@ suspend fun main() {
     // Prepare classloader for plugin jars
     val pluginClassloader = URLClassLoader(
         try {
-            folder.resolve("server/plugins")
+            folder.path.resolve("server/plugins")
                 .listDirectoryEntries("*.jar")
                 .map { it.toUri().toURL() }
                 .toTypedArray()

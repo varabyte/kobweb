@@ -186,7 +186,7 @@ class KobwebApplicationPlugin @Inject constructor(
         kobwebCleanFolderTask.configure {
             dependsOn(kobwebCleanSiteTask)
             doLast {
-                project.delete(kobwebFolder.resolve("server"))
+                project.delete(kobwebFolder.path.resolve("server"))
             }
         }
 
@@ -205,13 +205,11 @@ class KobwebApplicationPlugin @Inject constructor(
             browser.set(kobwebBlock.app.export.browser)
         }
 
-        // Note: I'm pretty sure I'm abusing build service tasks by adding a listener to it directly but I'm not sure
-        // how else I'm supposed to do this
         val taskListenerService = project.gradle.sharedServices
             .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
                 parameters.kobwebStartTaskName = kobwebStartTask.name
                 parameters.isKobwebStartBuild = kobwebStartTask.name in project.gradle.startParameter.taskNames
-                parameters.kobwebFolderFile = kobwebFolder.resolve("..").toFile()
+                parameters.kobwebFolderFile = kobwebFolder.path.toFile()
             }
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
 
