@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // Intentionally supporting legacy API around `LibraryIndexMetadata`
-
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.navigation.RoutePrefix
@@ -7,12 +5,10 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
-import com.varabyte.kobweb.gradle.core.metadata.LibraryIndexMetadata
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
-import com.varabyte.kobweb.ksp.KOBWEB_METADATA_INDEX
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_LIBRARY
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.dom.append
@@ -107,16 +103,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 libraryMetadata = Json.decodeFromString(LibraryMetadata.serializer(), bytes.decodeToString())
             }
 
-            if (libraryMetadata == null) {
-                // It's possible that we're loading a library that was built with an older version of Kobweb that used
-                // the index.json file instead of library.json. If so, we'll try to load it from there.
-                @Suppress("DEPRECATION")
-                file.searchZipFor(KOBWEB_METADATA_INDEX) { bytes ->
-                    libraryMetadata = Json.decodeFromString(LibraryIndexMetadata.serializer(), bytes.decodeToString())
-                        .toLibraryMetadata()
-                }
-            }
-
             libraryMetadata?.index?.headElements?.let { headElementsData ->
                 // Support legacy library metadata that include the <head> tag itself
                 val headElementsStr = if (headElementsData.startsWith("<head")) {
@@ -149,6 +135,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                     append.head { unsafe { raw(headElementsStr) } }
                 }.serialize().lines().drop(3).dropLast(2).joinToString("\n").trimIndent()
 
+                @Suppress("DEPRECATION")
                 val optedOut = indexBlock.excludeHtmlForDependencies.get().any { file.name.startsWith(it) }
                     || indexBlock.excludeTags.orNull?.invoke(AppBlock.IndexBlock.ExcludeTagsContext(file.name)) ?: false
 

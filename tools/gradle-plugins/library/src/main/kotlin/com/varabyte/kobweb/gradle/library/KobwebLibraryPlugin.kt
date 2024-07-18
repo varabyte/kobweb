@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // Providing legacy support for deprecated `LibraryIndexMetadata`
-
 package com.varabyte.kobweb.gradle.library
 
 import com.varabyte.kobweb.ProcessorMode
@@ -18,7 +16,6 @@ import com.varabyte.kobweb.gradle.core.util.generateModuleMetadataFor
 import com.varabyte.kobweb.gradle.library.extensions.createLibraryBlock
 import com.varabyte.kobweb.gradle.library.extensions.index
 import com.varabyte.kobweb.gradle.library.extensions.library
-import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateIndexMetadataTask
 import com.varabyte.kobweb.gradle.library.tasks.KobwebGenerateLibraryMetadataTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -35,8 +32,6 @@ class KobwebLibraryPlugin : Plugin<Project> {
         project.applyKspPlugin()
         project.setKspMode(ProcessorMode.LIBRARY)
 
-        val kobwebGenerateIndexMetadataTask =
-            project.tasks.register<KobwebGenerateIndexMetadataTask>("kobwebGenerateIndexMetadata")
         val kobwebGenerateLibraryMetadataTask = project.tasks
             .register<KobwebGenerateLibraryMetadataTask>("kobwebGenerateLibraryMetadata") {
                 indexHead.set(project.kobwebBlock.library.index.serializedHead)
@@ -47,7 +42,6 @@ class KobwebLibraryPlugin : Plugin<Project> {
             project.generateModuleMetadataFor(jsTarget)
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 resources.srcDir(kobwebGenerateLibraryMetadataTask)
-                resources.srcDir(kobwebGenerateIndexMetadataTask) // Legacy task, kept around for a little while to give users a chance to upgrade
             }
         }
 
