@@ -30,7 +30,10 @@ abstract class MarkdownTask @Inject constructor(
     @get:InputFiles
     abstract val markdownResources: ConfigurableFileCollection
 
-    private val rootPath get() = Path(markdownBlock.markdownPath.get())
+    @get:Input
+    val markdownPath = markdownBlock.markdownPath
+
+    private val rootPath get() = Path(markdownPath.get())
 
     protected fun funNameFor(mdFile: File): String {
         // The suggested replacement for "capitalize" is awful
