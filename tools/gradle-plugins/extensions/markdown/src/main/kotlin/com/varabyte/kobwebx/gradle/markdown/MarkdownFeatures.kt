@@ -11,6 +11,7 @@ import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.parser.IncludeSourceSpans
 import org.commonmark.parser.Parser
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 
 /**
  * List feature extensions to markdown that this plugin supports.
@@ -31,6 +32,7 @@ abstract class MarkdownFeatures {
      *
      * See also: https://github.com/commonmark/commonmark-java#autolink
      */
+    @get:Input
     abstract val autolink: Property<Boolean>
 
     /**
@@ -38,6 +40,7 @@ abstract class MarkdownFeatures {
      *
      * See also: https://github.com/commonmark/commonmark-java#yaml-front-matter
      */
+    @get:Input
     abstract val frontMatter: Property<Boolean>
 
     /**
@@ -53,6 +56,7 @@ abstract class MarkdownFeatures {
      * org.example.myproject.components.widgets.VisitorCounter()
      * ```
      */
+    @get:Input
     abstract val kobwebCall: Property<Boolean>
 
     /**
@@ -61,6 +65,7 @@ abstract class MarkdownFeatures {
      * By default, it is curly braces `{}` but you can change the character if this
      * causes a problem in your project for some unforeseeable reason.
      */
+    @get:Input
     abstract val kobwebCallDelimiters: Property<Pair<Char, Char>>
 
     /**
@@ -69,6 +74,7 @@ abstract class MarkdownFeatures {
      * See also: https://github.com/commonmark/commonmark-java#tables
      * See also: https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables
      */
+    @get:Input
     abstract val tables: Property<Boolean>
 
     /**
@@ -81,6 +87,7 @@ abstract class MarkdownFeatures {
      *
      * See also: https://github.com/commonmark/commonmark-java#task-list-items
      */
+    @get:Input
     abstract val taskList: Property<Boolean>
 
     init {

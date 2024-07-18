@@ -1,7 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
-import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
@@ -18,9 +17,8 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
@@ -33,17 +31,20 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         markdownBlock,
         "Convert markdown files found in the project's resources path to source code in the final project"
     ) {
-
-    // Use changing the build script as a proxy for changing markdownBlock or kobwebBlock values.
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
-    fun getBuildScripts(): List<File> = projectLayout.getBuildScripts()
-
-    private val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
-    private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
-
     @get:Inject
     abstract val objectFactory: ObjectFactory
+
+    @Nested
+    val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
+
+    @Nested
+    val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
+
+    @Input
+    val markdownDefaultRoot = markdownBlock.defaultRoot
+
+    @Input
+    val markdownImports = markdownBlock.imports
 
     @get:Input
     abstract val dependsOnMarkdownArtifact: Property<Boolean>
@@ -91,8 +92,8 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                 val funName = funNameFor(mdFile)
                 val ktRenderer = KotlinRenderer(
                     cache::getRelative,
-                    markdownBlock.defaultRoot.orNull?.takeUnless { it.isBlank() },
-                    markdownBlock.imports.get(),
+                    markdownDefaultRoot.orNull?.takeUnless { it.isBlank() },
+                    markdownImports.get(),
                     mdPathRelStr,
                     markdownHandlers,
                     mdPackage,

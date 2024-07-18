@@ -1,6 +1,5 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
-import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
@@ -10,10 +9,8 @@ import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
@@ -43,13 +40,11 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         markdownBlock,
         "Runs the `process` callback registered in the markdown block (which gives the user a chance to generate additional files around all of the markdown resources)"
     ) {
+    @Nested
+    val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
-    // Use changing the build script as a proxy for changing markdownBlock or kobwebBlock values.
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
-    fun getBuildScripts(): List<File> = projectLayout.getBuildScripts()
-
-    private val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
+    @Nested
+    val markdownProcess = markdownBlock.process
 
     @OutputDirectory
     fun getGenSrcDir() = markdownBlock.getGenJsSrcRoot("process")
@@ -61,7 +56,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     fun execute() {
         getGenSrcDir().get().asFile.clearDirectory()
         getGenResDir().get().asFile.clearDirectory()
-        val process = markdownBlock.process.orNull ?: return
+        val process = markdownProcess.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
             markdownResources.asFileTree.visit {
@@ -89,7 +84,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         val processScope = MarkdownBlock.ProcessScope()
         processScope.process(markdownEntries)
 
-        val genResRoot = getGenResDir().get().asFile.resolve(markdownBlock.markdownPath.get())
+        val genResRoot = getGenResDir().get().asFile.resolve(markdownPath.get())
         processScope.markdownOutput.forEach { processNode ->
             File(genResRoot, processNode.filePath).let { outputFile ->
                 outputFile.parentFile.mkdirs()

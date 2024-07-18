@@ -33,6 +33,9 @@ import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
@@ -93,6 +96,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
      * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
      */
     @Deprecated("Use the `defaultRoot` property in the parent markdown block instead.")
+    @get:Internal
     val defaultRoot: Property<String> = newDefaultRoot
 
     /**
@@ -100,6 +104,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
      *
      * If the user's project doesn't have a dependency on the Silk library, this should be set to false.
      */
+    @get:Input
     abstract val useSilk: Property<Boolean>
 
     /**
@@ -115,6 +120,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
      *
      * See also [idGenerator] if you need to override the default algorithm used for generating these IDs.
      */
+    @get:Input
     abstract val generateHeaderIds: Property<Boolean>
 
     /**
@@ -132,34 +138,59 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
      *
      * @see generateHeaderIds
      */
+    @get:Nested
     abstract val idGenerator: Property<(String) -> String>
 
+    @get:Nested
     abstract val text: Property<NodeScope.(Text) -> String>
+    @get:Nested
     abstract val img: Property<NodeScope.(Image) -> String>
+    @get:Nested
     abstract val heading: Property<NodeScope.(Heading) -> String>
+    @get:Nested
     abstract val p: Property<NodeScope.(Paragraph) -> String>
+    @get:Nested
     abstract val br: Property<NodeScope.(HardLineBreak) -> String>
+    @get:Nested
     abstract val a: Property<NodeScope.(Link) -> String>
+    @get:Nested
     abstract val em: Property<NodeScope.(Emphasis) -> String>
+    @get:Nested
     abstract val strong: Property<NodeScope.(StrongEmphasis) -> String>
+    @get:Nested
     abstract val hr: Property<NodeScope.(ThematicBreak) -> String>
+    @get:Nested
     abstract val ul: Property<NodeScope.(BulletList) -> String>
+    @get:Nested
     abstract val ol: Property<NodeScope.(OrderedList) -> String>
+    @get:Nested
     abstract val li: Property<NodeScope.(ListItem) -> String>
+    @get:Nested
     abstract val code: Property<NodeScope.(FencedCodeBlock) -> String>
+    @get:Nested
     abstract val inlineCode: Property<NodeScope.(Code) -> String>
+    @get:Nested
     abstract val blockquote: Property<NodeScope.(BlockQuote) -> String>
+    @get:Nested
     abstract val table: Property<NodeScope.(TableBlock) -> String>
+    @get:Nested
     abstract val thead: Property<NodeScope.(TableHead) -> String>
+    @get:Nested
     abstract val tbody: Property<NodeScope.(TableBody) -> String>
+    @get:Nested
     abstract val tr: Property<NodeScope.(TableRow) -> String>
+    @get:Nested
     abstract val td: Property<NodeScope.(TableCell) -> String>
+    @get:Nested
     abstract val th: Property<NodeScope.(TableCell) -> String>
 
     /** Handler which is fed the raw text (name and attributes) within an opening tag, e.g. `span id="demo"` */
+    @get:Nested
     abstract val rawTag: Property<NodeScope.(String) -> String>
+    @get:Nested
     abstract val inlineTag: Property<NodeScope.(HtmlInline) -> String>
 
+    @get:Nested
     abstract val html: Property<NodeScope.(HtmlBlock) -> String>
 
     fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
