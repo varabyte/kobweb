@@ -27,7 +27,6 @@ fun createMainFunction(
     routePrefix: RoutePrefix,
     redirects: List<Server.Redirect>,
     target: BuildTarget,
-    legacyRouteRedirectStrategy: AppBlock.LegacyRouteRedirectStrategy,
 ): String {
     val usingSilkFoundation = silkSupport != SilkSupport.NONE
     val usingSilkWidgets = silkSupport == SilkSupport.FULL
@@ -181,7 +180,6 @@ fun createMainFunction(
                     }
                 }
                 addStatement("}")
-                addStatement("router.setLegacyRouteRedirectStrategy(Router.LegacyRouteRedirectStrategy.${legacyRouteRedirectStrategy.name})")
                 if (cleanUrls) {
                     addStatement("router.addRouteInterceptor {")
                     withIndent {

@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.navigation
 
+import com.varabyte.kobweb.navigation.RouteTree.ResolvedEntry
 import com.varabyte.kobweb.util.text.PatternMapper
 
 /**
@@ -10,7 +11,7 @@ import com.varabyte.kobweb.util.text.PatternMapper
  *  - "user" to "bitspittle"
  *  - "post" to "123"
  */
-fun List<RouteTree.ResolvedEntry<*>>.captureDynamicValues(): Map<String, String> {
+fun List<ResolvedEntry<*>>.captureDynamicValues(): Map<String, String> {
     val entries = this
     return buildMap {
         entries.forEach { entry ->
@@ -20,6 +21,8 @@ fun List<RouteTree.ResolvedEntry<*>>.captureDynamicValues(): Map<String, String>
         }
     }
 }
+
+fun List<ResolvedEntry<*>>.toRouteString() = "/" + joinToString("/") { it.capturedRoutePart }
 
 /**
  * A tree data structure that represents a parsed route, such as `/example/path` or `/{dynamic}/path`
@@ -77,8 +80,6 @@ class RouteTree<T> {
     class DynamicNode<T>(parent: Node<T>, name: String, data: T?) : ChildNode<T>(parent, name, data) {
         override fun matches(name: String) = true // Dynamic nodes eat all possible inputs
     }
-
-    private fun List<ResolvedEntry<T>>.toRouteString() = "/" + joinToString("/") { it.capturedRoutePart }
 
     /**
      * Resolved entry within a route.

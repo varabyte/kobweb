@@ -3,15 +3,24 @@ package com.varabyte.kobweb.navigation
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.util.CancellableActionHandle
 import com.varabyte.kobweb.browser.util.setInterval
+import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
-import com.varabyte.kobweb.navigation.Router.LegacyRouteRedirectStrategy.DISALLOW
-import com.varabyte.kobweb.navigation.Router.LegacyRouteRedirectStrategy.WARN
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.url.URL
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.time.Duration.Companion.milliseconds
+
+@Page
+@Composable
+private fun DefaultErrorPage(errorCode: Int) {
+    Div {
+        Text("Error code: $errorCode")
+    }
+}
 
 /** How to affect the current history when navigating to a new location */
 enum class UpdateHistoryMode {
@@ -92,39 +101,8 @@ class Router {
         val isDynamic: Boolean, // Whether the path is dynamic or not, in case users want to filter them out
     )
 
-    /**
-     * Strategy for allowing flexibility when trying to resolve legacy, non-hyphenated routes.
-     *
-     * When enabled, multi-word pages will be visitable both by typing in their hyphenated slug and their non-hyphenated
-     * slug as well.
-     *
-     * Newer sites that aren't concerned with legacy may want to set this to [DISALLOW]. However, this defaults to
-     * [WARN] for now to avoid breaking old sites.
-     *
-     * Note that this strategy will also affect the key name for dynamic routes associated with multi-word pages.
-     * If allowed, then a dynamic route associated with a page like "UserPost.kt" can access the dynamic value either
-     * using "userpost" or "user-post". If disallowed, then only "user-post" will work.
-     */
-    enum class LegacyRouteRedirectStrategy {
-        /** Allow redirecting permissively. */
-        ALLOW,
-
-        /**
-         * Redirect, but warn the user that it happened.
-         *
-         * This could be a good way to discover / clean up old links and fix them up before changing the strategy to
-         * disallow them.
-         */
-        WARN,
-
-        /**
-         * Do not allow redirects.
-         */
-        DISALLOW,
-    }
-
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
-    private val routeTree = RouteTree()
+    private val routeTree = RouteTree<PageMethod>()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
 
     /**
@@ -177,7 +155,7 @@ class Router {
 
         val route = Route.tryCreate(pathQueryAndFragment)
         return if (route != null) {
-            val data = routeTree.createPageData(route)
+            val data = routeTree.createPageData(route, errorPageMethod)
             activePageMethod = data.pageMethod
             this.route = data.routeInfo
             true
@@ -313,12 +291,12 @@ class Router {
      * }
      * ```
      */
-    fun setErrorHandler(errorHandler: ErrorPageMethod) {
-        routeTree.errorHandler = errorHandler
+    fun setErrorHandler(errorPageMethod: ErrorPageMethod) {
+        this.errorPageMethod = errorPageMethod
     }
 
-    fun setLegacyRouteRedirectStrategy(strategy: LegacyRouteRedirectStrategy) {
-        routeTree.legacyRouteRedirectStrategy = strategy
+    private var errorPageMethod: ErrorPageMethod = { errorCode ->
+        DefaultErrorPage(errorCode)
     }
 
     /**

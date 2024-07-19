@@ -18,7 +18,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
@@ -42,11 +41,6 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
 ) : KobwebGenerateTask("Generate entry code (i.e. main.kt) for this Kobweb project") {
     @get:Input
     val cleanUrls: Provider<Boolean> = appBlock.cleanUrls
-
-    @get:Input
-    @get:Optional
-    val legacyRouteRedirectStrategy: Provider<AppBlock.LegacyRouteRedirectStrategy> =
-        appBlock.legacyRouteRedirectStrategy
 
     @get:Input
     val globals: Provider<Map<String, String>> = appBlock.globals
@@ -81,9 +75,6 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                 RoutePrefix(routePrefix),
                 confInputs.redirects.map { Server.Redirect(it.from, it.to) },
                 buildTarget,
-                legacyRouteRedirectStrategy.getOrElse(
-                    if (buildTarget == BuildTarget.DEBUG) AppBlock.LegacyRouteRedirectStrategy.WARN else AppBlock.LegacyRouteRedirectStrategy.ALLOW
-                )
             )
         )
     }

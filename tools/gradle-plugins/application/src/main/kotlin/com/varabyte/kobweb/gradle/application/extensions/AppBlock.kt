@@ -5,8 +5,6 @@ package com.varabyte.kobweb.gradle.application.extensions
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.gradle.application.Browser
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.ALLOW
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.WARN
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.project.KobwebFolder
@@ -457,8 +455,6 @@ abstract class AppBlock @Inject constructor(
      *
      * If this property isn't set explicitly, it will default to [WARN] in development and [ALLOW] in production.
      */
-    // NOTE: This enum should be kept in sync with Router.LegacyRouteRedirectStrategy. If you screw up, don't worry --
-    // you'll get a compile error when you try to run the site!
     enum class LegacyRouteRedirectStrategy {
         ALLOW,
         WARN,
@@ -468,6 +464,7 @@ abstract class AppBlock @Inject constructor(
     /**
      * @see LegacyRouteRedirectStrategy
      */
+    @Deprecated("This property is no longer used and should be removed.")
     abstract val legacyRouteRedirectStrategy: Property<LegacyRouteRedirectStrategy>
 
     init {

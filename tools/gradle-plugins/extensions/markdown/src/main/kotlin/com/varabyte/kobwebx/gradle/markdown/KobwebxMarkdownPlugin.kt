@@ -69,15 +69,5 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 kotlin.srcDir(processTask.map { it.getGenSrcDir() })
             }
         }
-
-        // Handle deprecation warnings
-        project.afterEvaluate {
-            @Suppress("DEPRECATION")
-            if (markdownBlock.routeOverride.isPresent) {
-                project.logger.warn(
-                    "w: The markdown `markdown.routeOverride` property is slated for removal. It was introduced to support kebab-case URLs, but Kobweb has moved to defaulting to them instead."
-                )
-            }
-        }
     }
 }

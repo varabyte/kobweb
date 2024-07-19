@@ -4116,132 +4116,30 @@ fun initSilk(ctx: InitSilkContext) {
 
 You've just tamed some wild CSS styles, congratulations!
 
-## Legacy Routes
+## Removing the legacy route strategy
 
-> [!NOTE]
-> If you...
->
-> * created your site after Kobweb v0.16.0 *OR*
-> * only have single word page names, e.g. "About.kt" and "Login.kt", as well as packages that are all lowercased...
->
-> then congratulations, you don't have to worry at all about the concerns presented in this section. You should ensure
-> that your build script's `kobweb.app.legacyRouteRedirectStrategy` is set to `DISALLOW`.
+Kobweb used to support a feature called legacy routes (you
+can [read more about the feature here](https://github.com/varabyte/kobweb/tree/v0.18.2#legacy-routes) using an earlier
+version of the Kobweb README). This was an emergency feature added to give users time to respond to us fixing a
+long-standing mistake with our initial route naming algorithm without breaking their existing sites.
 
-When Kobweb was first released, it used very simple logic for generating routes from code in your Kotlin project:
-- filenames for pages would be lowercased and turned into a slug
-- packages were converted into route parts as is
+As of v0.18.3, we believe enough time has passed, and legacy route support has finally been removed. As a result, users
+who never migrated away from the feature might be seeing an error pointing them to this section.
 
-`pages/home/About.kt` would become `https://example.com/home/about`, in other words.
-
-This is fine for most sites! Especially since route overrides were possible through Kobweb's `@Page` and
-`@PackageMapping` annotations.
-
-However, this choice becomes a problem when you start considering parts of a URL that represent multiple words. It is a
-common practice to use hyphens for this case, e.g. `state-of-art`, but Kobweb was not generating them, resulting in
-slugs that could sometimes be hard to read, e.g. `stateofart`.
-
-Because of this, some users had to create a lot of overrides in their site. This is fragile, as it means it can be easy
-to refactor a site later without realizing that stale names remain embedded in the code.
-
-As a result, in v0.16.0, we made the choice to change the route generating algorithms to split words up with hyphens.
-
-As a concrete example, for the page `pages/silkWidgets/SimpleGrid.kt`, Kobweb *used* to
-generate `https://example.com/silkWidgets/simplegrid`, whereas now it
-generates `https://example.com/silk-widgets/simple-grid`.
-
-If we just changed the route generation logic from one version to the next, that would totally break existing sites!
-Perhaps a user has a Kobweb site that search engines have already indexed. Or maybe there are many internal links in
-their site referencing route paths that are now no longer there.
-
-So of course, we didn't. Instead, we introduced the idea of legacy route redirects.
-
-### Legacy route redirect strategy
-
-Kobweb now defaults to supporting users visiting both the old *and* new route paths. Using the "simple-grid"
-link example above, if a user ran their site with latest, *either* path would work.
-
-However, this is not an ideal state of affairs. It is much better for a site to have a single, canonical URL for each
-route in your site. This is not only better for SEO, but it also makes it easier to reason about your site's structure.
-Therefore, Kobweb allows you to disable this feature.
-
-In fact, disabling these redirects are encouraged. New sites should disable them from the start (the `kobweb create app`
-templates started doing this with the introduction of this feature). Older sites should consider auditing their codebase
-with an eye towards disabling redirects in the near future.
-
-It is easy to set the route redirect strategy in your project's build script:
-
-```kotlin
-kobweb {
-  app {
-    legacyRouteRedirectStrategy.set(LegacyRouteRedirectStrategy.DISALLOW)
-  }
-}
-```
-
-There are actually three strategies available: `ALLOW`, `WARN`, and `DISALLOW`. If nothing is set explicitly, the
-strategy will default to `WARN` in development and `ALLOW` in production.
-
-`ALLOW` and `WARN` are functionally the same, except `WARN` will log a warning to the dev console when a redirect
-happens. It will also be chattier about things that are happening during export time.
-
-### Redirects and static exports
-
-Even though a Kobweb site, once loaded locally, can handle redirects just fine, many users will be hosting their site on
-a static hosting provider that doesn't know anything about Kobweb. So what happens if a regular visitor bookmarked
-`https://example.com/someroute` which has since migrated to `https://example.com/some-route`? They would get a 404, and
-Kobweb wouldn't even get a chance to run its redirect logic.
-
-To prevent this from happening, Kobweb checks at export time if legacy route redirects are enabled, and if so, it will
-generate a copy of each route that has hyphens in it with alternate versions matching the old legacy way.
-
-So in the above static hosting site example, Kobweb will actually generate a snapshot for
-`https://example.com/some-route` and then a copy of the snapshot for `https://example.com/someroute`
-
-This works in a pinch. However, you should review how your static hosting provider prefers to be communicated about
-redirects. It is preferable to disable legacy route redirects in Kobweb and leverage your static hosting provider for
-this instead, as they will likely do it in a way that communicates the situation better to search engine crawlers.
-
-### Symbolic links
-
-By default, Kobweb creates a "copy" of an export snapshot using symbolic links instead of directly copying the file.
-This is a much more efficient solution, especially if pages are very large. However, if this fails for any reason
-(Windows famously require admin privileges for users to create them), this will fall back to a direct copy.
-
-Although I didn't notice any issue with my own testing, there may be static hosting providers out there that don't
-handle symbolic links well. In that case, you can force copying to happen instead:
-
-```kotlin
-kobweb {
-  app {
-    export {
-      forceCopyingForRedirects.set(true)
-    }
-  }
-}
-```
-
-### Disabling legacy route redirects
-
-If you have a pre-0.16.0 site, there are three steps you need to do, after which you can consider disabling legacy route
-redirects.
+If that is you, please follow these steps:
 
 1. In your site directory, run `../gradlew kobwebListRoutes` and look for any routes that have hyphens in them.
 2. Search through your codebase to see if there are any versions of those links but with hyphens removed. If so,
    update them.
 3. Consider updating the `redirects` section of the `conf.yaml` file to explicitly redirect from the old route to the
    new one. See the [Redirects▲](#redirects) section for more information.
-4. If you are using a third-party service or hosting provider for serving your site, check their documentation to learn
-   how to notify them of these redirects.
-
-> [!CAUTION]
-> Although leaving legacy route redirects on will work for a while, it should be considered deprecated and is slated for
-> eventual removal.
+4. If you are using a third-party hosting provider for serving your site, check their documentation to learn how to
+   notify them of these redirects.
+5. Delete the `legacyRouteRedirectStrategy = ...` line from the `kobweb.app` block in your build script.
 
 > [!TIP]
 > This [target commit](https://github.com/bitspittle/bitspittle.dev/commit/08b508ffcbb8503d1b3a7242213c8183aa9f15f3)
-> demonstrates how I upgraded my blog site (which uses Firebase) to move away from Kobweb legacy route redirecting. It's
-> way better to let Firebase handle it, because it will communicate necessary information to search engine crawlers so
-> they too can update their own indexes.
+> demonstrates how I upgraded my blog site (which uses Firebase) to move away from Kobweb legacy route redirecting.
 
 ## Generating site code at compile time
 
@@ -5450,5 +5348,3 @@ plenty of work to do to get to a 1.0 launch! We are hungry for the community's f
 * Ask us for guidance, especially as there are no tutorials yet (your questions can help us know what to write first!)
 
 Thank you for your support and interest in Kobweb!
-
-

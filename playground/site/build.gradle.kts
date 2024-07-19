@@ -1,5 +1,4 @@
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
-import kotlinx.html.meta
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
