@@ -43,6 +43,7 @@ import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
 import com.varabyte.kobweb.gradle.core.registerMigrationTasks
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
+import com.varabyte.kobweb.gradle.core.util.getBuildScripts
 import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobweb.gradle.core.util.getTransitiveJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.isDescendantOf
@@ -144,6 +145,14 @@ class KobwebApplicationPlugin @Inject constructor(
         }
 
         kobwebStartTask.configure {
+            // Gradle does not consider changes to build logic when running in continuous mode:
+            // https://docs.gradle.org/current/userguide/command_line_interface.html#sec:changes_to_build_logic_are_not_considered
+            // So, we manually add files that affect build logic (build scripts) as inputs to `kobwebStart`,
+            // which ensures that changing these files does in fact cause the build to re-execute in continuous mode.
+            // NOTE: To ensure build scripts from kobweb library modules are also watched for changes, we add
+            // build scripts from all modules as inputs. Users with many non-kobweb modules may choose to override this
+            // value to exclude build scripts from unrelated modules.
+            watchFiles.from(project.rootProject.subprojects.map { it.layout.getBuildScripts() })
             serverJar.set(kobwebUnpackServerJarTask.map { RegularFile { it.getServerJar() } })
             serverPluginsDir.set(kobwebSyncServerPluginJarsTask.map {
                 project.objects.directoryProperty().apply { set(it.destinationDir) }.get()

@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.get
@@ -14,6 +15,7 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
+import java.nio.file.Path
 import java.security.MessageDigest
 
 private fun Project.getRoots(
@@ -111,4 +113,16 @@ fun Project.toUidString(): String {
     val hash = digest.digest(rawText.toByteArray(Charsets.UTF_8))
 
     return hash.joinToString("") { "%02x".format(it) }.uppercase()
+}
+
+/**
+ * Return all Gradle build scripts within the given project layout.
+ *
+ * The method technically returns a collection of files, which could happen if the project has both a `build.gradle` and
+ * a `build.gradle.kts` file. However, in practice, we always expect this to return a single entry, as most projects
+ * would only ever have one or the other.
+ */
+fun ProjectLayout.getBuildScripts(): List<Path> {
+    return listOf("build.gradle", "build.gradle.kts")
+        .mapNotNull { script -> this.projectDirectory.file(script).asFile.takeIf { it.exists() }?.toPath() }
 }
