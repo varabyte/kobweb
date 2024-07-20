@@ -33,7 +33,7 @@ abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>,
     // invalidate the configuration cache, even though there is no need to do so. To the best of our knowledge, there
     // are no Gradle APIs to avoid detecting the file as a configuration cache input. However, one workaround is to
     // ensure the `includeBuild` plugin(s) are built earlier than project configuration by including them in the root
-    // buildscript (e.g. `my-project/build.gradle.kts`) `plugins {}` declaration:
+    // build script (e.g. `my-project/build.gradle.kts`) `plugins {}` declaration:
     // plugins {
     //     alias(libs.plugins.kotlin.multiplatform) apply false
     //     id("<includeBuild plugin>") apply false

@@ -9,6 +9,7 @@ import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.ServerStateFile
 import com.varabyte.kobweb.server.api.SiteLayout
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
@@ -31,6 +32,16 @@ abstract class KobwebStartTask @Inject constructor(
     private val siteLayout: SiteLayout,
     private val reuseServer: Boolean,
 ) : KobwebTask("Start a Kobweb server") {
+
+    /**
+     * A collection of files that Gradle should watch for changes when running `kobwebStart` in continuous mode.
+     *
+     * This is used to ensure that Gradle re-executes the build when a build script is changed, overriding the default
+     * Gradle behavior to ignore such changes.
+     */
+    @Suppress("unused") // Value is not used, but @InputFiles does affect Gradle behavior
+    @get:InputFiles
+    abstract val watchFiles: ConfigurableFileCollection
 
     @get:InputFile
     abstract val serverJar: RegularFileProperty
