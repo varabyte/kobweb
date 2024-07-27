@@ -107,8 +107,10 @@ class MutableSilkTheme {
             RestrictedKind::class -> SilkLayer.RESTRICTED_STYLES
             GeneralKind::class -> SilkLayer.GENERAL_STYLES
             else -> error("Unknown kind: $kind")
-        }.layerName.takeIf { it.isNotEmpty() } // In case user passes in ""
-        finalLayer?.let { _cssLayersFor[name] = it }
+        }.layerName
+        finalLayer
+            .takeIf { it.isNotEmpty() } // If the user passes in "", no layer should be registered
+            ?.let { _cssLayersFor[name] = it }
 
         if (style is ExtendingCssStyle) {
             _cssStyleDependencies.getOrPut(style) { mutableListOf() }.add(style.baseStyle)

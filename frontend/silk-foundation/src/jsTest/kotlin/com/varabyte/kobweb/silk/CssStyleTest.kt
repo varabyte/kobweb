@@ -73,6 +73,21 @@ class CssStyleTest {
             .inOrder()
     }
 
+
+    @Test
+    fun cssStyleEmptyLayerNameResultsInNoLayer() {
+        val stylesheet = StyleSheet()
+        // Styles must be non-empty to be registered
+        val BaseStyle = CssStyle.base<ComponentKind> { Modifier.color(Colors.Red) }
+        _SilkTheme = MutableSilkTheme().apply {
+            registerStyle("base-style", BaseStyle, layer = "")
+        }.let(::ImmutableSilkTheme)
+        SilkTheme.registerStylesInto(stylesheet)
+        val styleRule = stylesheet.cssRules.first()
+        assertThat(styleRule).isInstanceOf<CSSStyleRuleDeclaration>()
+        assertThat(styleRule.header).isEqualTo(".base-style")
+    }
+
     @Test
     fun cssStyleExtendedClasses() {
         val BaseStyle = CssStyle { }
