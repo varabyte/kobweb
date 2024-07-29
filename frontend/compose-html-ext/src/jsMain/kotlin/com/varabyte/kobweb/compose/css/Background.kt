@@ -367,7 +367,7 @@ fun StyleScope.background(color: CSSColorValue?, first: CSSBackground, vararg re
  * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/background
  */
 fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: Background.Repeatable) {
-    if (backgrounds.isEmpty()) return
+    if (color == null && backgrounds.isEmpty()) return
 
     // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
     @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
