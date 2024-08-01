@@ -10,6 +10,7 @@ import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
@@ -44,6 +45,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
     @Nested
+    @Optional
     val markdownProcess = markdownBlock.process
 
     @OutputDirectory
