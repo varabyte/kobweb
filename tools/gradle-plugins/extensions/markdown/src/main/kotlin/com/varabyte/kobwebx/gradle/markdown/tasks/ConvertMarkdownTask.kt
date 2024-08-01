@@ -92,7 +92,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                 val funName = funNameFor(mdFile)
                 val ktRenderer = KotlinRenderer(
                     cache::getRelative,
-                    markdownDefaultRoot.orNull?.takeUnless { it.isBlank() },
+                    markdownDefaultRoot.get().takeUnless { it.isBlank() },
                     markdownImports.get(),
                     mdPathRelStr,
                     markdownHandlers,
