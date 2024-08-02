@@ -11,7 +11,7 @@ import com.varabyte.kobweb.browser.dom.observers.externals.ResizeObserver as Act
 /**
  * A performant mechanism by which code can monitor an element for changes to its size.
  *
- * See https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API">Resize Observer API</a>
  */
 class ResizeObserver(resized: (List<Entry>, ResizeObserver) -> Unit) {
     constructor(resized: (List<Entry>) -> Unit) : this({ entries, _ -> resized.invoke(entries) })

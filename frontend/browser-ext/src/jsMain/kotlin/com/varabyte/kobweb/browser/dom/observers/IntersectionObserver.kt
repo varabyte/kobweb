@@ -9,7 +9,7 @@ import com.varabyte.kobweb.browser.dom.observers.externals.IntersectionObserver 
 /**
  * Provides a way to asynchronously observe changes in the intersection of a target element with an ancestor element.
  *
- * See https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API">Intersection Observer API</a>
  */
 class IntersectionObserver(options: Options? = null, resized: (List<Entry>, IntersectionObserver) -> Unit) {
     constructor(options: Options? = null, resized: (List<Entry>) -> Unit) : this(
