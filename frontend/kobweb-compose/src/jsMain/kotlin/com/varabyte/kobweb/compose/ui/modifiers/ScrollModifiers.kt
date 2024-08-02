@@ -43,29 +43,52 @@ fun Modifier.scrollSnapType(axis: ScrollSnapType.Axis, strictness: ScrollSnapTyp
     scrollSnapType(ScrollSnapType.of(axis, strictness))
 }
 
+fun Modifier.scrollPadding(all: CSSLengthOrPercentageNumericValue) = styleModifier {
+    scrollPadding(all)
+}
+
 fun Modifier.scrollPadding(
-    top: CSSLengthOrPercentageNumericValue = 0.px,
-    right: CSSLengthOrPercentageNumericValue = 0.px,
-    bottom: CSSLengthOrPercentageNumericValue = 0.px,
-    left: CSSLengthOrPercentageNumericValue = 0.px
+    topBottom: CSSLengthOrPercentageNumericValue = autoLength,
+    leftRight: CSSLengthOrPercentageNumericValue = autoLength,
+) = styleModifier {
+    scrollPadding(topBottom, leftRight)
+}
+
+fun Modifier.scrollPadding(
+    top: CSSLengthOrPercentageNumericValue = autoLength,
+    leftRight: CSSLengthOrPercentageNumericValue = autoLength,
+    bottom: CSSLengthOrPercentageNumericValue = autoLength,
+) = styleModifier {
+    scrollPadding(top, leftRight, bottom)
+}
+
+fun Modifier.scrollPadding(
+    top: CSSLengthOrPercentageNumericValue = autoLength,
+    right: CSSLengthOrPercentageNumericValue = autoLength,
+    bottom: CSSLengthOrPercentageNumericValue = autoLength,
+    left: CSSLengthOrPercentageNumericValue = autoLength,
 ) = styleModifier {
     scrollPadding(top, right, bottom, left)
 }
 
-fun Modifier.scrollPadding(value: CSSLengthOrPercentageNumericValue) = styleModifier {
-    scrollPadding(value)
+fun Modifier.scrollPaddingInline(both: CSSLengthOrPercentageNumericValue) = styleModifier {
+    scrollPaddingInline(both)
 }
 
 fun Modifier.scrollPaddingInline(
-    start: CSSLengthOrPercentageNumericValue = 0.px,
-    end: CSSLengthOrPercentageNumericValue = 0.px
+    start: CSSLengthOrPercentageNumericValue = autoLength,
+    end: CSSLengthOrPercentageNumericValue = autoLength,
 ) = styleModifier {
     scrollPaddingInline(start, end)
 }
 
+fun Modifier.scrollPaddingBlock(both: CSSLengthOrPercentageNumericValue) = styleModifier {
+    scrollPaddingBlock(both)
+}
+
 fun Modifier.scrollPaddingBlock(
-    start: CSSLengthOrPercentageNumericValue = 0.px,
-    end: CSSLengthOrPercentageNumericValue = 0.px
+    start: CSSLengthOrPercentageNumericValue = autoLength,
+    end: CSSLengthOrPercentageNumericValue = autoLength,
 ) = styleModifier {
     scrollPaddingBlock(start, end)
 }
@@ -83,23 +106,46 @@ fun Modifier.scrollSnapStop(scrollSnapStop: ScrollSnapStop) = styleModifier {
     scrollSnapStop(scrollSnapStop)
 }
 
+fun Modifier.scrollMargin(all: CSSLengthNumericValue) = styleModifier {
+    scrollMargin(all)
+}
+
+fun Modifier.scrollMargin(
+    topBottom: CSSLengthNumericValue = 0.px,
+    leftRight: CSSLengthNumericValue = 0.px,
+) = styleModifier {
+    scrollMargin(topBottom, leftRight)
+}
+
+fun Modifier.scrollMargin(
+    top: CSSLengthNumericValue = 0.px,
+    leftRight: CSSLengthNumericValue = 0.px,
+    bottom: CSSLengthNumericValue = 0.px,
+) = styleModifier {
+    scrollMargin(top, leftRight, bottom)
+}
+
 fun Modifier.scrollMargin(
     top: CSSLengthNumericValue = 0.px,
     right: CSSLengthNumericValue = 0.px,
     bottom: CSSLengthNumericValue = 0.px,
-    left: CSSLengthNumericValue = 0.px
+    left: CSSLengthNumericValue = 0.px,
 ) = styleModifier {
     scrollMargin(top, right, bottom, left)
 }
 
-fun Modifier.scrollMargin(value: CSSLengthNumericValue) = styleModifier {
-    scrollMargin(value)
+fun Modifier.scrollMarginInline(both: CSSLengthNumericValue) = styleModifier {
+    scrollMarginInline(both)
 }
 
 fun Modifier.scrollMarginInline(start: CSSLengthNumericValue = 0.px, end: CSSLengthNumericValue = 0.px) =
     styleModifier {
         scrollMarginInline(start, end)
     }
+
+fun Modifier.scrollMarginBlock(both: CSSLengthNumericValue) = styleModifier {
+    scrollMarginBlock(both)
+}
 
 fun Modifier.scrollMarginBlock(start: CSSLengthNumericValue = 0.px, end: CSSLengthNumericValue = 0.px) = styleModifier {
     scrollMarginBlock(start, end)

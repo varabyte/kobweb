@@ -110,17 +110,34 @@ fun StyleScope.scrollSnapType(scrollSnapType: ScrollSnapType) {
 
 // region Scroll padding
 
-fun StyleScope.scrollPadding(
-    top: CSSLengthOrPercentageNumericValue = 0.px,
-    right: CSSLengthOrPercentageNumericValue = 0.px,
-    bottom: CSSLengthOrPercentageNumericValue = 0.px,
-    left: CSSLengthOrPercentageNumericValue = 0.px
-) {
-    property("scroll-padding", "$top $right $bottom $left")
+fun StyleScope.scrollPadding(all: CSSLengthOrPercentageNumericValue) {
+    property("scroll-padding", "$all")
 }
 
-fun StyleScope.scrollPadding(value: CSSLengthOrPercentageNumericValue) {
-    property("scroll-padding", "$value")
+// Use `autoLength` as default value to match CSS spec
+
+fun StyleScope.scrollPadding(
+    topBottom: CSSLengthOrPercentageNumericValue = autoLength,
+    leftRight: CSSLengthOrPercentageNumericValue = autoLength,
+) {
+    property("scroll-padding", "$topBottom $leftRight")
+}
+
+fun StyleScope.scrollPadding(
+    top: CSSLengthOrPercentageNumericValue = autoLength,
+    leftRight: CSSLengthOrPercentageNumericValue = autoLength,
+    bottom: CSSLengthOrPercentageNumericValue = autoLength,
+) {
+    property("scroll-padding", "$top $leftRight $bottom")
+}
+
+fun StyleScope.scrollPadding(
+    top: CSSLengthOrPercentageNumericValue = autoLength,
+    right: CSSLengthOrPercentageNumericValue = autoLength,
+    bottom: CSSLengthOrPercentageNumericValue = autoLength,
+    left: CSSLengthOrPercentageNumericValue = autoLength,
+) {
+    property("scroll-padding", "$top $right $bottom $left")
 }
 
 fun StyleScope.scrollPaddingTop(value: CSSLengthOrPercentageNumericValue) {
@@ -139,8 +156,15 @@ fun StyleScope.scrollPaddingLeft(value: CSSLengthOrPercentageNumericValue) {
     property("scroll-padding-left", value)
 }
 
-fun StyleScope.scrollPaddingInline(vararg value: CSSLengthOrPercentageNumericValue) {
-    property("scroll-padding-inline", value.joinToString(" "))
+fun StyleScope.scrollPaddingInline(both: CSSLengthOrPercentageNumericValue) {
+    property("scroll-padding-inline", both)
+}
+
+fun StyleScope.scrollPaddingInline(
+    start: CSSLengthOrPercentageNumericValue = autoLength,
+    end: CSSLengthOrPercentageNumericValue = autoLength,
+) {
+    property("scroll-padding-inline", "$start $end")
 }
 
 fun StyleScope.scrollPaddingInlineStart(value: CSSLengthOrPercentageNumericValue) {
@@ -151,8 +175,15 @@ fun StyleScope.scrollPaddingInlineEnd(value: CSSLengthOrPercentageNumericValue) 
     property("scroll-padding-inline-end", value)
 }
 
-fun StyleScope.scrollPaddingBlock(vararg value: CSSLengthOrPercentageNumericValue) {
-    property("scroll-padding-block", value.joinToString(" "))
+fun StyleScope.scrollPaddingBlock(both: CSSLengthOrPercentageNumericValue) {
+    property("scroll-padding-block", both)
+}
+
+fun StyleScope.scrollPaddingBlock(
+    start: CSSLengthOrPercentageNumericValue = autoLength,
+    end: CSSLengthOrPercentageNumericValue = autoLength,
+) {
+    property("scroll-padding-block", "$start $end")
 }
 
 fun StyleScope.scrollPaddingBlockStart(value: CSSLengthOrPercentageNumericValue) {
@@ -225,17 +256,32 @@ fun StyleScope.scrollSnapStop(scrollSnapStop: ScrollSnapStop) {
 
 // region Scroll margin
 
+fun StyleScope.scrollMargin(all: CSSLengthNumericValue) {
+    property("scroll-margin", all)
+}
+
+fun StyleScope.scrollMargin(
+    topBottom: CSSLengthNumericValue = 0.px,
+    leftRight: CSSLengthNumericValue = 0.px,
+) {
+    property("scroll-margin", "$topBottom $leftRight")
+}
+
+fun StyleScope.scrollMargin(
+    top: CSSLengthNumericValue = 0.px,
+    leftRight: CSSLengthNumericValue = 0.px,
+    bottom: CSSLengthNumericValue = 0.px,
+) {
+    property("scroll-margin", "$top $leftRight $bottom")
+}
+
 fun StyleScope.scrollMargin(
     top: CSSLengthNumericValue = 0.px,
     right: CSSLengthNumericValue = 0.px,
     bottom: CSSLengthNumericValue = 0.px,
-    left: CSSLengthNumericValue = 0.px
+    left: CSSLengthNumericValue = 0.px,
 ) {
     property("scroll-margin", "$top $right $bottom $left")
-}
-
-fun StyleScope.scrollMargin(vararg value: CSSLengthNumericValue) {
-    property("scroll-margin", value.joinToString(" "))
 }
 
 fun StyleScope.scrollMarginTop(value: CSSLengthNumericValue) {
@@ -254,8 +300,12 @@ fun StyleScope.scrollMarginLeft(value: CSSLengthNumericValue) {
     property("scroll-margin-left", value)
 }
 
-fun StyleScope.scrollMarginInline(vararg value: CSSLengthNumericValue) {
-    property("scroll-margin-inline", value.joinToString(" "))
+fun StyleScope.scrollMarginInline(both: CSSLengthNumericValue) {
+    property("scroll-margin-inline", both)
+}
+
+fun StyleScope.scrollMarginInline(start: CSSLengthNumericValue = 0.px, end: CSSLengthNumericValue = 0.px) {
+    property("scroll-margin-inline", "$start $end")
 }
 
 fun StyleScope.scrollMarginInlineStart(value: CSSLengthNumericValue) {
@@ -266,8 +316,12 @@ fun StyleScope.scrollMarginInlineEnd(value: CSSLengthNumericValue) {
     property("scroll-margin-inline-end", value)
 }
 
-fun StyleScope.scrollMarginBlock(vararg value: CSSLengthNumericValue) {
-    property("scroll-margin-block", value.joinToString(" "))
+fun StyleScope.scrollMarginBlock(both: CSSLengthNumericValue) {
+    property("scroll-margin-block", both)
+}
+
+fun StyleScope.scrollMarginBlock(start: CSSLengthNumericValue = 0.px, end: CSSLengthNumericValue = 0.px) {
+    property("scroll-margin-block", "$start $end")
 }
 
 fun StyleScope.scrollMarginBlockStart(value: CSSLengthNumericValue) {
