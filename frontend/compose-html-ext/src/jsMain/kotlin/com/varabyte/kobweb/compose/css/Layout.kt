@@ -77,8 +77,15 @@ fun StyleScope.lineHeight(lineHeight: LineHeight) {
 
 // region margin-block See: https://developer.mozilla.org/en-US/docs/Web/CSS/margin-block
 
-fun StyleScope.marginBlock(vararg value: CSSLengthOrPercentageNumericValue) {
-    property("margin-block", value.joinToString(" "))
+fun StyleScope.marginBlock(both: CSSLengthOrPercentageNumericValue) {
+    property("margin-block", both)
+}
+
+fun StyleScope.marginBlock(
+    start: CSSLengthOrPercentageNumericValue = 0.px,
+    end: CSSLengthOrPercentageNumericValue = 0.px,
+) {
+    property("margin-block", "$start $end")
 }
 
 fun StyleScope.marginBlockStart(value: CSSLengthOrPercentageNumericValue) {
@@ -93,8 +100,15 @@ fun StyleScope.marginBlockEnd(value: CSSLengthOrPercentageNumericValue) {
 
 // region margin-inline See https://developer.mozilla.org/en-US/docs/Web/CSS/margin-inline
 
-fun StyleScope.marginInline(vararg value: CSSLengthOrPercentageNumericValue) {
-    property("margin-inline", value.joinToString(" "))
+fun StyleScope.marginInline(both: CSSLengthOrPercentageNumericValue) {
+    property("margin-inline", both)
+}
+
+fun StyleScope.marginInline(
+    start: CSSLengthOrPercentageNumericValue = 0.px,
+    end: CSSLengthOrPercentageNumericValue = 0.px,
+) {
+    property("margin-inline", "$start $end")
 }
 
 fun StyleScope.marginInlineStart(value: CSSLengthOrPercentageNumericValue) {
@@ -110,8 +124,15 @@ fun StyleScope.marginInlineEnd(value: CSSLengthOrPercentageNumericValue) {
 
 // region padding-inline See: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-inline
 
-fun StyleScope.paddingInline(vararg value: CSSLengthOrPercentageNumericValue) {
-    property("padding-inline", value.joinToString(" "))
+fun StyleScope.paddingInline(both: CSSLengthOrPercentageNumericValue) {
+    property("padding-inline", both)
+}
+
+fun StyleScope.paddingInline(
+    start: CSSLengthOrPercentageNumericValue = 0.px,
+    end: CSSLengthOrPercentageNumericValue = 0.px,
+) {
+    property("padding-inline", "$start $end")
 }
 
 fun StyleScope.paddingInlineStart(value: CSSLengthOrPercentageNumericValue) {
@@ -126,8 +147,15 @@ fun StyleScope.paddingInlineEnd(value: CSSLengthOrPercentageNumericValue) {
 
 // region padding-block See: https://developer.mozilla.org/en-US/docs/Web/CSS/padding-block
 
-fun StyleScope.paddingBlock(vararg value: CSSLengthOrPercentageNumericValue) {
-    property("padding-block", value.joinToString(" "))
+fun StyleScope.paddingBlock(both: CSSLengthOrPercentageNumericValue) {
+    property("padding-block", both)
+}
+
+fun StyleScope.paddingBlock(
+    start: CSSLengthOrPercentageNumericValue = 0.px,
+    end: CSSLengthOrPercentageNumericValue = 0.px
+) {
+    property("padding-block", "$start $end")
 }
 
 fun StyleScope.paddingBlockStart(value: CSSLengthOrPercentageNumericValue) {

@@ -82,6 +82,10 @@ fun Modifier.margin(
     margin(top, right, bottom, left)
 }
 
+fun Modifier.marginInline(both: CSSLengthOrPercentageNumericValue) = styleModifier {
+    marginInline(both)
+}
+
 fun Modifier.marginInline(
     start: CSSLengthOrPercentageNumericValue = 0.px,
     end: CSSLengthOrPercentageNumericValue = 0.px,
@@ -89,11 +93,33 @@ fun Modifier.marginInline(
     marginInline(start, end)
 }
 
+class MarginInlineScope internal constructor(private val styleScope: StyleScope) {
+    fun start(value: CSSLengthOrPercentageNumericValue) = styleScope.marginInlineStart(value)
+    fun end(value: CSSLengthOrPercentageNumericValue) = styleScope.marginInlineEnd(value)
+}
+
+fun Modifier.marginInline(scope: MarginInlineScope.() -> Unit) = styleModifier {
+    MarginInlineScope(this).scope()
+}
+
+fun Modifier.marginBlock(both: CSSLengthOrPercentageNumericValue) = styleModifier {
+    marginBlock(both)
+}
+
 fun Modifier.marginBlock(
     start: CSSLengthOrPercentageNumericValue = 0.px,
     end: CSSLengthOrPercentageNumericValue = 0.px,
 ) = styleModifier {
     marginBlock(start, end)
+}
+
+class MarginBlockScope internal constructor(private val styleScope: StyleScope) {
+    fun start(value: CSSLengthOrPercentageNumericValue) = styleScope.marginBlockStart(value)
+    fun end(value: CSSLengthOrPercentageNumericValue) = styleScope.marginBlockEnd(value)
+}
+
+fun Modifier.marginBlock(scope: MarginBlockScope.() -> Unit) = styleModifier {
+    MarginBlockScope(this).scope()
 }
 
 fun Modifier.overflow(overflow: Overflow) = styleModifier {
@@ -166,6 +192,10 @@ fun Modifier.padding(
     padding(top, right, bottom, left)
 }
 
+fun Modifier.paddingInline(both: CSSLengthOrPercentageNumericValue) = styleModifier {
+    paddingInline(both)
+}
+
 fun Modifier.paddingInline(
     start: CSSLengthOrPercentageNumericValue = 0.px,
     end: CSSLengthOrPercentageNumericValue = 0.px,
@@ -180,6 +210,10 @@ class PaddingInlineScope internal constructor(private val styleScope: StyleScope
 
 fun Modifier.paddingInline(scope: PaddingInlineScope.() -> Unit) = styleModifier {
     PaddingInlineScope(this).scope()
+}
+
+fun Modifier.paddingBlock(both: CSSLengthOrPercentageNumericValue) = styleModifier {
+    paddingBlock(both)
 }
 
 fun Modifier.paddingBlock(
