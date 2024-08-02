@@ -40,6 +40,16 @@ class MarginScope internal constructor(private val styleScope: StyleScope) {
     fun bottom(value: CSSLengthOrPercentageNumericValue) = styleScope.marginBottom(value)
 }
 
+fun MarginScope.topBottom(value: CSSLengthOrPercentageNumericValue) {
+    top(value)
+    bottom(value)
+}
+
+fun MarginScope.leftRight(value: CSSLengthOrPercentageNumericValue) {
+    left(value)
+    right(value)
+}
+
 fun Modifier.margin(all: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
     margin(all)
 }
@@ -112,6 +122,16 @@ class PaddingScope internal constructor(private val styleScope: StyleScope) {
     fun right(value: CSSLengthOrPercentageNumericValue) = styleScope.paddingRight(value)
     fun top(value: CSSLengthOrPercentageNumericValue) = styleScope.paddingTop(value)
     fun bottom(value: CSSLengthOrPercentageNumericValue) = styleScope.paddingBottom(value)
+}
+
+fun PaddingScope.topBottom(value: CSSLengthOrPercentageNumericValue) {
+    top(value)
+    bottom(value)
+}
+
+fun PaddingScope.leftRight(value: CSSLengthOrPercentageNumericValue) {
+    left(value)
+    right(value)
 }
 
 fun Modifier.padding(all: CSSLengthOrPercentageNumericValue): Modifier = styleModifier {
