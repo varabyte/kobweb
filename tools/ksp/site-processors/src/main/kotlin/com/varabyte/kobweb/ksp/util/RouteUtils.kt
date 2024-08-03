@@ -16,10 +16,9 @@ object RouteUtils {
      */
     fun packagePartToRoutePart(packagePart: String): String {
         require('.' !in packagePart) { "Invalid package part: $packagePart" }
-        return packagePart.dropWhile { it == '_' }
-            .dropLastWhile { it == '_' }
-            .replace('_', '-')
+        return packagePart
             .camelCaseToKebabCase()
+            .replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators()
     }
 
 
@@ -87,7 +86,13 @@ object RouteUtils {
     }
 }
 
+// e.g. `___forced__--example_--_` -> `forced-example`
+private fun String.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators() =
+    replace(Regex("_+"), "-").replace(Regex("-+"), "-").removeSurrounding("-")
+
 /**
  * Given some file (which likely represents an annotation's containing file), return the slug for the file.
  */
-fun KSFile.toSlug() = nameWithoutExtension.camelCaseToKebabCase()
+fun KSFile.toSlug() = nameWithoutExtension
+    .camelCaseToKebabCase()
+    .replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators()

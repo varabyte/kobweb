@@ -21,7 +21,14 @@ internal object RouteUtils {
             )
         }
 
-    private fun File.toSlug(): String = this.nameWithoutExtensionIfNotIndex?.camelCaseToKebabCase().orEmpty()
+    // e.g. `___forced__--example_--_` -> `forced-example`
+    private fun String.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators() =
+        replace(Regex("_+"), "-").replace(Regex("-+"), "-").removeSurrounding("-")
+
+    private fun File.toSlug(): String = this.nameWithoutExtensionIfNotIndex
+        ?.camelCaseToKebabCase()
+        ?.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators()
+        .orEmpty()
 
     /**
      * Return the final route that will be generated for this markdown file.
