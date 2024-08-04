@@ -30,15 +30,19 @@ abstract class MarkdownFeatures {
     /**
      * If true, convert URLs and email addresses into links automatically.
      *
-     * See also: https://github.com/commonmark/commonmark-java#autolink
+     * Defaults to `true`.
+     *
+     * @see <a href="https://github.com/commonmark/commonmark-java#autolink">Autolink</a>
      */
     @get:Input
     abstract val autolink: Property<Boolean>
 
     /**
-     * If true, support front matter (a header YAML block at the top of your markdown file with key/value pairs)
+     * If true, support front matter (a header YAML block at the top of your markdown file with key/value pairs).
      *
-     * See also: https://github.com/commonmark/commonmark-java#yaml-front-matter
+     * Defaults to `true`.
+     *
+     * @see <a href="https://github.com/commonmark/commonmark-java#yaml-front-matter">YAML front matter</a>
      */
     @get:Input
     abstract val frontMatter: Property<Boolean>
@@ -55,6 +59,8 @@ abstract class MarkdownFeatures {
      * ```
      * org.example.myproject.components.widgets.VisitorCounter()
      * ```
+     *
+     * Defaults to `true`.
      */
     @get:Input
     abstract val kobwebCall: Property<Boolean>
@@ -62,7 +68,7 @@ abstract class MarkdownFeatures {
     /**
      * The delimiters used to delineate code for the [kobwebCall] feature.
      *
-     * By default, it is curly braces `{}` but you can change the character if this
+     * By default, it is curly braces `{}`, but you can change the character if this
      * causes a problem in your project for some unforeseeable reason.
      */
     @get:Input
@@ -71,8 +77,10 @@ abstract class MarkdownFeatures {
     /**
      * If true, support creating tables via pipe syntax.
      *
-     * See also: https://github.com/commonmark/commonmark-java#tables
-     * See also: https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables
+     * Defaults to `true`.
+     *
+     * @see <a href="https://github.com/commonmark/commonmark-java#tables">Tables</a>
+     * @see <a href="https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables">Organizing information with tables</a>
      */
     @get:Input
     abstract val tables: Property<Boolean>
@@ -85,7 +93,9 @@ abstract class MarkdownFeatures {
      * - [x] task #2
      * ```
      *
-     * See also: https://github.com/commonmark/commonmark-java#task-list-items
+     * Defaults to `true`.
+     *
+     * @see <a href="https://github.com/commonmark/commonmark-java#task-list-items">Task List Items</a>
      */
     @get:Input
     abstract val taskList: Property<Boolean>
