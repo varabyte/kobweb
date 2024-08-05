@@ -8,6 +8,7 @@ import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
+import com.varabyte.kobwebx.gradle.markdown.util.escapeTripleQuotes
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
@@ -194,7 +195,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
     abstract val html: Property<NodeScope.(HtmlBlock) -> String>
 
     fun String.escapeSingleQuotedText() = escapeQuotes().escapeDollars()
-    fun String.escapeTripleQuotedText() = escapeDollars()
+    fun String.escapeTripleQuotedText() = escapeDollars().escapeTripleQuotes()
 
     /**
      * Data pulled out of an [Image] node into an easier-to-consume format.
