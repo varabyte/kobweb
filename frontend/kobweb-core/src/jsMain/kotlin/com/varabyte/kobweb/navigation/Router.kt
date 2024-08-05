@@ -1,8 +1,6 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.util.CancellableActionHandle
-import com.varabyte.kobweb.browser.util.setInterval
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
@@ -10,9 +8,10 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
+import org.w3c.dom.MutationObserver
+import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.url.URL
 import org.w3c.xhr.XMLHttpRequest
-import kotlin.time.Duration.Companion.milliseconds
 
 @Page
 @Composable
@@ -444,29 +443,17 @@ class Router {
                 // Even if the URL hasn't changed, still scroll to the target element if you can. Sometimes a user might
                 // scroll the page and then re-enter the same URL to go back.
                 if (url.contains('#')) {
-                    val fragment = url.substringAfter('#')
-                    // HACK ALERT
                     // We need to give the page a chance to render first, or else the element with the ID might not
-                    // exist yet. There doesn't seem like a great way to do this consistently that I've found, so for
-                    // now, just try a bunch of times in a row, and give up if we continue to fail (at that point, the
-                    // page may never have a matching element).
-                    var attempts = 10
-                    val timeToWaitPerAttempt = 100.milliseconds
-
-                    var handle = CancellableActionHandle.Stub
-                    handle = window.setInterval(timeToWaitPerAttempt) {
-                        val element = document.getElementById(fragment)
-                        if (element != null) {
-                            element.scrollIntoView(js("{behavior: \"smooth\"}"))
-                            attempts = 0
-                        } else {
-                            attempts--
+                    // exist yet.
+                    MutationObserver { mutations, observer ->
+                        mutations.forEach { mutation ->
+                            if (mutation.type == "childList") {
+                                document.getElementById(url.substringAfter('#'))
+                                    ?.scrollIntoView(js("{behavior: \"smooth\"}"))
+                                observer.disconnect()
+                            }
                         }
-
-                        if (attempts == 0) {
-                            handle.cancel()
-                        }
-                    }
+                    }.observe(document.body!!, MutationObserverInit(childList = true, subtree = true))
                 }
             }
 
