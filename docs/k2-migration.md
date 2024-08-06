@@ -1,8 +1,8 @@
-# Updating Your Kobweb Project to Kotlin 2.0.0
+# Updating Your Kobweb Project to Kotlin 2.0.10
 
-[Kotlin 2.0.0 is out](https://kotlinlang.org/docs/whatsnew20.html), featuring support for the new K2 compiler. Kobweb
-supports K2 starting with version 0.19.0. Unfortunately, due to changes in Kotlin & Compose, projects will need to
-update their build scripts when upgrading to Kotlin 2.0.0 and Kobweb 0.19.0.
+[Kotlin 2.0.0 is out](https://kotlinlang.org/docs/whatsnew20.html)[^1], featuring support for the new K2 compiler.
+Kobweb supports K2 beginning with version 0.19.0. Unfortunately, due to changes in Kotlin & Compose, projects will need
+to update their build files when upgrading to Kotlin 2.0.10 and Kobweb 0.19.0.
 
 To ease the migration, we have prepared a Gradle task that will attempt to migrate your project in place. After editing
 your `gradle/libs.versions.toml` file to use Kobweb 0.19.0, run  `./gradlew kobwebMigrateToK2` in the root of your
@@ -27,8 +27,8 @@ Updated site\.kobweb\conf.yaml
 
 The migration task performs the following actions:
 
-- *(Required)* Updates the Kotlin version to `2.0.0`
-- *(Recommended)* Updates the Jetbrains Compose version to `1.6.10` (NOTE: This is *Required* if continuing to use the
+- *(Required)* Updates the Kotlin version to `2.0.10`
+- *(Recommended)* Updates the Jetbrains Compose version to `1.6.11` (NOTE: This is *Required* if continuing to use the
   Jetbrains Compose Gradle plugin)
 - *(Required)* Applies
   the [new Compose compiler Gradle plugin](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler.html)
@@ -67,9 +67,12 @@ The migration task performs the following actions:
   +  script: "build/kotlin-webpack/js/productionExecutable/<site>.js"
   ```
 - *(Recommended)* Updates the project's `.gitignore` file to exclude
-  the [new `.kotlin` Kotlin data directory](https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects)
+  the [new
+  `.kotlin` Kotlin data directory](https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects)
 
 ## Optional Steps
+
+A few additional items to take a look at after migrating your project:
 
 - The Kobweb & Kotlin Gradle plugins now
   support [configuration cache](https://docs.gradle.org/current/userguide/configuration_cache.html) for faster build
@@ -82,7 +85,7 @@ The migration task performs the following actions:
   - jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
   ```
 
-  You may additionally have to remove it from your root `build.gradle.kts` file:
+  You may also have to remove it from your root `build.gradle.kts` file:
 
   ```diff
   - alias(libs.plugins.jetbrains.compose) apply false
@@ -101,9 +104,12 @@ The migration task performs the following actions:
   ```
   This is likely to reduce your site's bundle size.
 
-- Check-out the [rest of the changes in Kotlin 2.0.0](https://kotlinlang.org/docs/whatsnew20.html), especially
-  the  [ones for Kotlin/JS](https://kotlinlang.org/docs/whatsnew20.html#kotlin-js), which include:
+- Check-out the [rest of the changes in Kotlin 2.0](https://kotlinlang.org/docs/whatsnew20.html), especially
+  the [ones for Kotlin/JS](https://kotlinlang.org/docs/whatsnew20.html#kotlin-js), which include:
     - Per-file compilation for Kotlin/JS projects
     - Improved collection interoperability
     - Support for type-safe plain JavaScript objects
     - Support for npm package manager
+
+[^1]: And, importantly, so is Kotlin 2.0.10, which includes a critical bug fix needed for Kobweb projects. We appreciate
+your patience in waiting for this release.

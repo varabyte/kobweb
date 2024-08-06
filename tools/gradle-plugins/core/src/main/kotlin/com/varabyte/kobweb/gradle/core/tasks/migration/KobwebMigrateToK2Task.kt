@@ -14,12 +14,12 @@ import kotlin.io.path.writeText
 
 private const val MIGRATION_DOC = "https://github.com/varabyte/kobweb/blob/main/docs/k2-migration.md"
 
-// Migrate kobweb projects to Kotlin 2.0.0, which includes migrating to the new compose-compiler plugin:
+// Migrate kobweb projects to Kotlin 2.0.10, which includes migrating to the new compose-compiler plugin:
 // https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler.html
 // We also remove the "org.jetbrains.compose" plugin from kobweb projects, as it is no longer necessary
 // (and comes with unnecessary bloat) and instead add explicit catalog entries for the necessary compose dependencies
 abstract class KobwebMigrateToK2Task :
-    KobwebTask("Make an attempt to automatically migrate this Kobweb codebase to Kotlin 2.0.0") {
+    KobwebTask("Make an attempt to automatically migrate this Kobweb codebase to Kotlin 2.0") {
 
     @TaskAction
     fun execute() {
@@ -48,15 +48,16 @@ abstract class KobwebMigrateToK2Task :
         versionsFile.takeIf { project == project.rootProject }?.let { file ->
             val originalText = file.readText()
 
-            if ("kotlin = \"2.0.0\"" in originalText) {
-                println("Project is already using Kotlin 2.0.0.")
+            if ("kotlin = \"2.0.\"" in originalText) {
+                println("Project is already using Kotlin 2.0.")
+                println("If you still want to run the `kobwebMigrateToK2` task, temporarily downgrade the Kotlin version to 1.9.23 and run the task again.")
                 println("See $MIGRATION_DOC for K2 migration instructions if you have any issues.")
                 return
             }
 
             val updatedText = originalText
                 // support migration from all 1.9.2x versions, since users may not have updated to the bugfix releases
-                .replace("kotlin = \"1.9.2[0-5]\"".toRegex(), "kotlin = \"2.0.0\"")
+                .replace("kotlin = \"1.9.2[0-5]\"".toRegex(), "kotlin = \"2.0.10\"")
                 .replace("jetbrains-compose = \"1.6.\\d*\"".toRegex(), "jetbrains-compose = \"1.6.11\"")
                 .replace(
                     """jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }""",
