@@ -1,8 +1,10 @@
 package com.varabyte.kobweb.compose.css
 
+import androidx.compose.runtime.*
 import org.jetbrains.compose.web.css.*
 
 // We need our own implementation of StyleScope, so we can both test equality and pull values out of it later
+@Immutable // TODO: Remove when CMP-5680 is fixed
 class ComparableStyleScope : StyleScope {
     val properties = mutableMapOf<String, String>()
     val variables = mutableMapOf<String, String>()

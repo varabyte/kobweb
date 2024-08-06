@@ -8,6 +8,7 @@ import com.varabyte.kobweb.silk.components.style.ComponentVariant
 import com.varabyte.kobweb.silk.components.style.StubbedComponentVariant
 import kotlin.reflect.KProperty
 
+@Immutable // TODO: Remove when CMP-5680 is fixed
 abstract class CssStyleVariant<K : ComponentKind> {
     infix fun then(next: CssStyleVariant<K>): CssStyleVariant<K> {
         return CompositeCssStyleVariant(this, next)
