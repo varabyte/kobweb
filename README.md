@@ -1,9 +1,9 @@
 [![version: 0.19.0](https://img.shields.io/badge/kobweb-0.19.0-blue)](COMPATIBILITY.md)
 [![version: 0.9.15](https://img.shields.io/badge/kobweb_cli-0.9.15-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
-[![kotlin: 2.0.0](https://img.shields.io/badge/kotlin-2.0.0-blue?logo=kotlin)](COMPATIBILITY.md)
-[![compose: 1.6.10](https://img.shields.io/badge/compose-1.6.10-blue?logo=jetpackcompose)](COMPATIBILITY.md)
-[![ktor: 2.3.6](https://img.shields.io/badge/ktor-2.3.6-blue)](https://ktor.io/)
+[![kotlin: 2.0.10](https://img.shields.io/badge/kotlin-2.0.10-blue?logo=kotlin)](COMPATIBILITY.md)
+[![compose: 1.6.11](https://img.shields.io/badge/compose-1.6.11-blue?logo=jetpackcompose)](COMPATIBILITY.md)
+[![ktor: 2.3.12](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
 <br>
 [![Varabyte Discord](https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/5NZ2GKV5Cs)
 [![Kotlin Slack](https://img.shields.io/badge/%23Kobweb-4A154B?logo=slack&logoColor=white)](https://kotlinlang.slack.com/archives/C04RTD72RQ8)

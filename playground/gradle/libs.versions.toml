@@ -1,7 +1,7 @@
 [versions]
-jetbrains-compose = "1.6.10"
-kotlin = "2.0.10-RC2"
-kotlinx-serialization = "1.6.3"
+jetbrains-compose = "1.6.11"
+kotlin = "2.0.10"
+kotlinx-serialization = "1.7.1"
 
 [libraries]
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "jetbrains-compose" }
