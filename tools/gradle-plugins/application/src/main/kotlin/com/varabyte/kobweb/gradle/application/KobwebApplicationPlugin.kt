@@ -152,7 +152,7 @@ class KobwebApplicationPlugin @Inject constructor(
             // NOTE: To ensure build scripts from kobweb library modules are also watched for changes, we add
             // build scripts from all modules as inputs. Users with many non-kobweb modules may choose to override this
             // value to exclude build scripts from unrelated modules.
-            watchFiles.from(project.rootProject.subprojects.map { it.layout.getBuildScripts() })
+            watchFiles.from(project.provider { project.rootProject.subprojects.map { it.layout.getBuildScripts() } })
             serverJar.set(kobwebUnpackServerJarTask.map { RegularFile { it.getServerJar() } })
             serverPluginsDir.set(kobwebSyncServerPluginJarsTask.map {
                 project.objects.directoryProperty().apply { set(it.destinationDir) }.get()
