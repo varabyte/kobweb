@@ -119,9 +119,9 @@ class KobwebPublishPlugin : Plugin<Project> {
 
             // AbstractPublishToMaven configured both maven local and remote maven publish tasks
             tasks.withType<AbstractPublishToMaven>().configureEach {
-                onlyIf {
-                    config.filter.get().invoke(publication)
-                }
+                // Declare predicate outside of `onlyIf` to avoid configuration cache issues
+                val predicate = project.provider { config.filter.get().invoke(publication) }
+                onlyIf { predicate.get() }
             }
         }
     }
