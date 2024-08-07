@@ -11,7 +11,7 @@ version = libs.versions.kobweb.libs.get()
 
 dependencies {
     // Get access to Kotlin multiplatform source sets
-    implementation(kotlin("gradle-plugin"))
+    compileOnly(kotlin("gradle-plugin"))
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ksp.plugin)
