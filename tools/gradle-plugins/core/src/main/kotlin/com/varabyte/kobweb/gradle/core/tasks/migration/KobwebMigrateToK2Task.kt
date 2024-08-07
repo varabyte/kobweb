@@ -48,7 +48,7 @@ abstract class KobwebMigrateToK2Task :
         versionsFile.takeIf { project == project.rootProject }?.let { file ->
             val originalText = file.readText()
 
-            if ("kotlin = \"2.0.\"" in originalText) {
+            if ("kotlin = \"2.0." in originalText) {
                 println("Project is already using Kotlin 2.0.")
                 println("If you still want to run the `kobwebMigrateToK2` task, temporarily downgrade the Kotlin version to 1.9.23 and run the task again.")
                 println("See $MIGRATION_DOC for K2 migration instructions if you have any issues.")
