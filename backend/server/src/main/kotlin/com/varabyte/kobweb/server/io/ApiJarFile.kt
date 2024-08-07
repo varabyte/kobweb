@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.net.URI
 import java.net.URL
 import java.net.URLConnection
 import java.net.URLStreamHandler
@@ -81,25 +82,37 @@ class ApiJarFile(
                 ?: super.findClass(name)
         }
 
+        init {
+            // Code inspired by org.jetbrains.kotlin.codegen.GeneratedClassLoader and .BytesUrlUtils
+            // See also: toInMemoryUrl
+            URL.setURLStreamHandlerFactory { protocol ->
+                if (protocol == "bytes") {
+                    object : URLStreamHandler() {
+                        override fun openConnection(url: URL): URLConnection {
+                            return object : URLConnection(url) {
+                                override fun connect() {}
+                                override fun getInputStream(): InputStream {
+                                    return ByteArrayInputStream(Base64.getDecoder().decode(url.path))
+                                }
+                            }
+                        }
+                    }
+                } else null
+            }
+        }
+
         // Code inspired by org.jetbrains.kotlin.codegen.GeneratedClassLoader and .BytesUrlUtils
         private fun InputStream.toInMemoryUrl(): URL {
             return this
                 .use { readBytes() }
                 .let { bytes ->
-                    URL(
-                        null,
-                        "bytes:${Base64.getEncoder().encodeToString(bytes)}",
-                        object : URLStreamHandler() {
-                            override fun openConnection(url: URL): URLConnection {
-                                return object : URLConnection(url) {
-                                    override fun connect() {}
-                                    override fun getInputStream(): InputStream {
-                                        return ByteArrayInputStream(Base64.getDecoder().decode(url.path))
-                                    }
-                                }
-                            }
-                        }
-                    )
+                    // Note: In Java 20, URL constructors starting warning of impending deprecation. URI.toURL is now
+                    // recommended.
+                    URI(
+                        "bytes",
+                        Base64.getEncoder().encodeToString(bytes),
+                        null
+                    ).toURL()
                 }
         }
 
