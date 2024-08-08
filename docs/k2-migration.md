@@ -85,6 +85,11 @@ We encourage taking a look at a few additional items after migrating your projec
   support the [configuration cache](https://docs.gradle.org/current/userguide/configuration_cache.html) for faster build
   times. Enable it by adding `org.gradle.configuration-cache=true` to your `gradle.properties` file.
 
+> [!TIP]
+> If you run into any issues when enabling the configuration cache, you may want to
+> read https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:troubleshooting first before
+> giving up and disabling it again.
+
 - If you have a Kobweb-only project, you can likely remove the `jetbrains-compose` plugin entry from your version
   catalog entirely:
 
@@ -112,7 +117,7 @@ We encourage taking a look at a few additional items after migrating your projec
   This is likely to reduce your site's bundle size.
 
 > [!CAUTION]
-> The ES2015 target is still new, and using it may cause bugs.
+> The ES2015 target is still new, and using it may introduce bugs.
 
 - Check-out the [rest of the changes in Kotlin 2.0](https://kotlinlang.org/docs/whatsnew20.html), especially
   the [ones for Kotlin/JS](https://kotlinlang.org/docs/whatsnew20.html#kotlin-js), which include:
