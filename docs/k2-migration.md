@@ -27,6 +27,9 @@ Updated site\.kobweb\conf.yaml
 4 file(s) were updated.
 ```
 
+If everything went well, you will see something like the above output and be done. You may still wish to review the
+[optional post-migration steps](#optional-post-migration-steps) below.
+
 > [!CAUTION]
 > The `kobwebMigrateToK2` task assumes your project follows the standard structure used by the Kobweb templates. For
 > projects with non-standard structure, a manual migration may be required. See below for details on both the required
