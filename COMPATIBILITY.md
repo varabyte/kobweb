@@ -4,7 +4,7 @@ This page lists the versions of Compose and Kotlin that each version of Kobweb i
 
 | Kobweb          | Compose | Kotlin |
 |-----------------|---------|--------|
-| 0.19.0+         | 1.6.11  | 2.0.10 |
+| 0.19.0+[^k2]    | 1.6.11  | 2.0.10 |
 | 0.18.0+         | 1.6.2   | 1.9.23 |
 | 0.17.2+         | 1.6.2   | 1.9.23 |
 | 0.17.1          | 1.6.1   | 1.9.23 |
@@ -26,3 +26,5 @@ This page lists the versions of Compose and Kotlin that each version of Kobweb i
 
 You should consider keeping these versions in sync in your own projects if possible to avoid unexpected
 issues around diverging APIs.
+
+[^k2]: See [migration docs](docs/k2-migration.md) if upgrading to Kobweb 0.19.x from an older project.
