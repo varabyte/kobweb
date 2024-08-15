@@ -20,9 +20,7 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          validate-wrappers: true
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build & Test
         run: ./gradlew build --stacktrace
