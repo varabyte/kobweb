@@ -192,7 +192,9 @@ class KobwebApplicationPlugin @Inject constructor(
         kobwebCleanFolderTask.configure {
             dependsOn(kobwebCleanSiteTask)
             doLast {
-                project.delete(kobwebFolder.path.resolve("server"))
+                projectLayout.projectDirectory.asFile
+                    .resolve(kobwebFolder.path.resolve("server").toFile())
+                    .deleteRecursively()
             }
         }
 
