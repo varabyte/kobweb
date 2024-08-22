@@ -6,16 +6,26 @@ import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.AlignSelf
 import org.jetbrains.compose.web.css.JustifyContent
 
+/**
+ * The name of the CSS layer used by Kobweb Compose widgets.
+ *
+ * These values are wrapped into a layer so that users, if they really want to and know what they are doing, can define
+ * their own styles that override some of these values.
+ */
+const val KOBWEB_COMPOSE_LAYER = "kobweb-compose"
+
 object KobwebComposeStyleSheet : StyleSheet() {
     init {
-        initBox()
-        initCol()
-        initRow()
-        initSpacer()
-        initArrangeSpacedByStyle()
+        layer(KOBWEB_COMPOSE_LAYER) {
+            initBox()
+            initCol()
+            initRow()
+            initSpacer()
+            initArrangeSpacedByStyle()
+        }
     }
 
-    private fun initBox() {
+    private fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.initBox() {
         ".kobweb-box" {
             // The Compose "Box" concept means: all children should be stacked one of top of the other. We do this by
             // setting the current element to grid but then jam all of its children into its top-left (and only) cell.
@@ -111,7 +121,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
         }
     }
 
-    private fun initRow() {
+    private fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.initRow() {
         ".kobweb-row" {
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Row)
@@ -137,7 +147,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
         ".kobweb-row > .kobweb-align-bottom-self" { alignSelf(AlignSelf.FlexEnd) }
     }
 
-    private fun initCol() {
+    private fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.initCol() {
         ".kobweb-col" {
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Column)
@@ -163,7 +173,7 @@ object KobwebComposeStyleSheet : StyleSheet() {
         ".kobweb-col > .kobweb-align-end-self" { alignSelf(AlignSelf.FlexEnd) }
     }
 
-    private fun initSpacer() {
+    private fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.initSpacer() {
         ".kobweb-spacer" {
             flexGrow(1)
         }

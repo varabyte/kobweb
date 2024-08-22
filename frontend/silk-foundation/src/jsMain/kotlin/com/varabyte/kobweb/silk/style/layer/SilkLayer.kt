@@ -1,16 +1,20 @@
 package com.varabyte.kobweb.silk.style.layer
 
+import com.varabyte.kobweb.compose.style.KOBWEB_COMPOSE_LAYER
 import com.varabyte.kobweb.silk.init.SilkStylesheet
 
 /**
  * A collection of all CSS layers managed by Silk.
  *
- * The precedence order is: reset < base < component styles < component variants < restricted styles < general styles
+ * The precedence order is: reset < kobweb-compose < base < component styles < component variants < restricted styles < general styles
  *
  * The **reset** layer is meant for any style that exists to reset / override default styles provided by browsers,
  * sometimes in order to make behavior consistent when different browsers provide diverging styles, or because browsers
  * default to legacy styles that exist for backwards compatibility but that most modern sites change (particularly
  * `box-sizing`). Most users are not expected to use this layer.
+ *
+ * The **kobweb-compose** layer is used by the `kobweb-compose` module, which defines various layout widgets inspired by
+ * Jetpack Compose. When using Silk, we place it here as they are meant to have a fairly low precedence.
  *
  * The **base** layer is meant for general low precedence styles, things that the user might want to define as
  * global styles for their site but that should be overridable by anything else that also targets the same element.
@@ -64,6 +68,11 @@ enum class SilkLayer(val layerName: String) {
      * that most modern sites don't use but browsers supply for compatibility with older sites.
      */
     RESET("reset"),
+
+    /**
+     * A layer reserved for Kobweb Compose widget styles (like `Box`, `Column`, and `Row`).
+     */
+    KOBWEB_COMPOSE(KOBWEB_COMPOSE_LAYER),
 
     /**
      * A fairly low-precedence layer provided to users for specifying styles that should not override CssStyle blocks.

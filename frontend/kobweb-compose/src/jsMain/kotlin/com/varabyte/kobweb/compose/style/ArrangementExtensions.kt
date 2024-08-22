@@ -21,7 +21,7 @@ internal const val KOBWEB_ARRANGE_TOP = "kobweb-arrange-top"
 
 internal val ArrangeSpacedByVar by StyleVariable<CSSLengthOrPercentageNumericValue>(prefix = "kobweb")
 
-internal fun KobwebComposeStyleSheet.initArrangeSpacedByStyle() {
+internal fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.initArrangeSpacedByStyle() {
     // Apply spacing only along the axis of the layout, which is opposite the flow of the layout itself
     ".kobweb-row.${KOBWEB_ARRANGE_SPACED_BY}" { columnGap(ArrangeSpacedByVar.value()) }
     ".kobweb-col.${KOBWEB_ARRANGE_SPACED_BY}" { rowGap(ArrangeSpacedByVar.value()) }
