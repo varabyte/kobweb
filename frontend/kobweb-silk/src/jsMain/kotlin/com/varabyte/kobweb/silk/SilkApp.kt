@@ -1,16 +1,16 @@
 package com.varabyte.kobweb.silk
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.KobwebComposeStyles
 import com.varabyte.kobweb.core.KobwebApp
-import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
-import kotlinx.browser.document
+import com.varabyte.kobweb.silk.init.SilkWidgetVariables
 
 @Composable
 fun SilkApp(content: @Composable () -> Unit) {
     KobwebApp {
-        prepareSilkFoundation {
-            document.setSilkWidgetVariables()
-            content()
-        }
+        KobwebComposeStyles()
+        SilkFoundationStyles()
+        SilkWidgetVariables()
+        content()
     }
 }

@@ -5,39 +5,36 @@ just the widgets -- for example, maybe they have their own existing Compose HTML
 ported to Kobweb, but they still want to use our fancy color mode support or widgets like SimpleGrid.
 
 When using this widget library on its own, you must initialize it yourself, since that's normally something the Kobweb
-plugin does for you. To do that, you must call `prepareSilkFoundation` and `renderWithDeferred` inside the
-`renderComposable` block:
+plugin does for you. To do that, you must call `SilkFoundationStyles`, `SilkWidgetVariables`, and
+`DeferringHost` inside the `renderComposable` block:
 
 ```kotlin
 fun main() {
     renderComposable(rootElementId = "root") {
-        prepareSilkFoundation { // REQUIRED
-            renderWithDeferred { // REQUIRED (if you plan to use `deferRender` or widgets that use it, like tooltips)
-               /* ... your content here ... *
-            }
+        KobwebComposeStyles() // OPTIONAL but recommended for `Box`, `Row`, `Column`, etc. support
+        SilkFoundationStyles() // REQUIRED
+        SilkWidgetVariables() // REQUIRED
+        DeferringHost { // REQUIRED (if you plan to use `Deferred` or widgets that use it like tooltips)
+            /* ... your content here ... */ 
         }
     }
 }
 ```
 
-The `prepareSilkFoundation` additionally includes a way to add custom Silk initialization logic. For example, you can
+The `SilkFoundationStyles` additionally includes a way to add custom Silk initialization logic. For example, you can
 optionally tweak Silk configurations (such as palette colors) or change the initial color mode. You MUST also register
 Silk widget styles here:
 
 ```kotlin
-fun main() {
-    renderComposable(rootElementId = "root") {
-        prepareSilkFoundation(
-            initSilk = { ctx ->
-                com.varabyte.kobweb.silk.init.initSilkWidgets(ctx) // REQUIRED
-                ctx.config.initialColorMode = ColorMode.DARK
-                ctx.theme.palettes.light.color = ...
-                ctx.theme.palettes.dark.color = ...
-            }
-        ) {
-            /* ... */
-        }
+SilkFoundationStyles(
+    initSilk = { ctx ->
+        com.varabyte.kobweb.silk.init.initSilkWidgets(ctx) // REQUIRED
+        ctx.config.initialColorMode = ColorMode.DARK
+        ctx.theme.palettes.light.color = ...
+        ctx.theme.palettes.dark.color = ...
     }
+) {
+    /* ... */
 }
 ```
 
@@ -58,17 +55,13 @@ val CustomStyle by ComponentStyle {
 
 // File: main.kt
 
-fun main() {
-    renderComposable(rootElementId = "root") {
-        prepareSilkFoundation(
-            initSilk = { ctx ->
-                /* ... */
-                ctx.theme.registerStyle("custom", CustomStyle)
-            }
-        ) {
-            /* ... */
-        }
+SilkFoundationStyles(
+    initSilk = { ctx ->
+        /* ... */
+        ctx.theme.registerStyle("custom", CustomStyle)
     }
+) {
+   /* ... */
 }
 ```
 

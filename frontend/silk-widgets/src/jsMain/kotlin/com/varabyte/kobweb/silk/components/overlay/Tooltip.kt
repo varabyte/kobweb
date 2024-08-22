@@ -10,7 +10,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
-import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import com.varabyte.kobweb.silk.defer.DeferringHost
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
@@ -188,7 +188,7 @@ val TooltipTextContainerStyle = CssStyle.base<TooltipKind.TextContainer> {
  *
  * See also: [Popover], which shows information without any outer decoration.
  *
- * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
+k * Note: For users who are only using silk widgets and not kobweb, then you must call [DeferringHost] yourself
  * first, as a parent method that this lives under. See the method for more details.
  *
  * @param keepOpenStrategy The strategy for how to keep the tooltip open. If nothing is specified, then the tooltip

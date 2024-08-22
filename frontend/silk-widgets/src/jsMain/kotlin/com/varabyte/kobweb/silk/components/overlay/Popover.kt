@@ -9,8 +9,8 @@ import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
-import com.varabyte.kobweb.silk.defer.deferRender
-import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import com.varabyte.kobweb.silk.defer.Deferred
+import com.varabyte.kobweb.silk.defer.DeferringHost
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.toModifier
 import kotlinx.browser.window
@@ -240,7 +240,7 @@ private class PopoverElements(
  * See also: [Tooltip], which wraps your composable in a sort of chat bubble, making it particularly well-suited for
  * text tooltips.
  *
- * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
+ * Note: For users who are only using silk widgets and not kobweb, then you must call [DeferringHost] yourself
  * first, as a parent method that this lives under. See the method for more details.
  *
  * @param target Indicates which element should listen for mouse enter and leave events in order to cause this popup to
@@ -345,7 +345,7 @@ fun AdvancedPopover(
         ref = disposableRef(popoverStateController, target, placementTarget) { element ->
             try {
                 val popoverElements = PopoverElements(element, target, placementTarget).apply {
-                    // The popupElement is created in the deferRender block below with its own lifecycle, and it should
+                    // The popupElement is created in the Deferred block below with its own lifecycle, and it should
                     // carry over across this "element finder" element being disposed and recreated.
                     popupElement = (popoverStateController.state as? PopoverState.Initialized)?.elements?.popupElement
                 }
@@ -358,8 +358,8 @@ fun AdvancedPopover(
     )
 
     // Copy into local var for smart casting.
-    deferRender {
-        val visiblePopoverState = (popoverStateController.state as? PopoverState.Visible) ?: return@deferRender
+    Deferred {
+        val visiblePopoverState = (popoverStateController.state as? PopoverState.Visible) ?: return@Deferred
         Box(
             PopupStyle.toModifier(variant)
                 .position(Position.Fixed)

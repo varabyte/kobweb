@@ -45,7 +45,7 @@ annotation class InitSilk
  */
 class InitSilkContext(val config: MutableSilkConfig, val stylesheet: SilkStylesheet, val theme: MutableSilkTheme)
 
-// This is provided as a way to pass silk initialization down to the `prepareSilkFoundation` method if it
+// This is provided as a way to pass silk initialization down to the `SilkFoundationStyles` method if it
 // is otherwise buried within an opaque API. If a user is using `silk-widgets` directly, they will likely set
 // initialization directly there. In the case of Kobweb projects, where code gets automatically processed at compile
 // time looking for `@InitSilk` methods, it is easier to generate code and then set it using this property.

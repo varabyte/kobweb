@@ -86,6 +86,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.tooltip
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import com.varabyte.kobweb.silk.theme.name
+import kotlinx.browser.document
 import kotlinx.dom.addClass
 import kotlinx.dom.removeClass
 import org.w3c.dom.Document
@@ -325,15 +326,42 @@ val SilkColorsStyle = CssStyle.base {
     // endregion
 }
 
+/**
+ * Set all CSS variables needed by the Silk library to work.
+ *
+ * @param provideRootElement An element which must live at a point in the DOM tree above any Silk widgets. This method
+ *   will be called inside a `remember` block, meaning it will only be triggered once per composition.
+ */
 @Composable
-fun Document.setSilkWidgetVariables() {
-    val root = remember { this.getElementById("root") as HTMLElement }
-    root.setSilkWidgetVariables()
+fun SilkWidgetVariables(provideRootElement: () -> HTMLElement) {
+    val rootElement = remember { provideRootElement() }
+    SilkWidgetVariables(rootElement)
 }
 
 @Composable
+fun SilkWidgetVariables(rootElementId: String = "root") {
+    SilkWidgetVariables { document.getElementById(rootElementId) as HTMLElement }
+}
+
+@Deprecated("Use `SilkWidgetVariables` instead, as it is more Compose-idiomatic.",
+    ReplaceWith("SilkWidgetVariables(rootElementId)")
+)
+@Composable
+fun Document.setSilkWidgetVariables(rootElementId: String = "root") {
+    SilkWidgetVariables { this.getElementById(rootElementId) as HTMLElement }
+}
+
+@Composable
+fun SilkWidgetVariables(rootElement: HTMLElement) {
+    rootElement.setSilkWidgetVariables(ColorMode.current)
+}
+
+@Deprecated("Use `SilkWidgetVariables` instead, as it is more Compose-idiomatic.",
+    ReplaceWith("SilkWidgetVariables(this)"),
+)
+@Composable
 fun HTMLElement.setSilkWidgetVariables() {
-    setSilkWidgetVariables(ColorMode.current)
+    SilkWidgetVariables(this)
 }
 
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {

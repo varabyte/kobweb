@@ -65,7 +65,7 @@ fun createMainFunction(
             add("$KOBWEB_GROUP.core.init.InitKobwebContext")
         }
         if (usingSilkFoundation) {
-            add("$KOBWEB_GROUP.silk.defer.renderWithDeferred")
+            add("$KOBWEB_GROUP.silk.defer.DeferringHost")
         }
         frontendData.cssStyles.mapNotNull { it.import }.forEach { add(it) }
         frontendData.cssStyleVariants.mapNotNull { it.import }.forEach { add(it) }
@@ -259,7 +259,7 @@ fun createMainFunction(
                     addStatement("$appFqn {")
                     withIndent {
                         if (usingSilkFoundation) {
-                            addStatement("router.renderActivePage { renderWithDeferred { it() } }")
+                            addStatement("router.renderActivePage { DeferringHost { it() } }")
                         } else {
                             addStatement("router.renderActivePage()")
                         }

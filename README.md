@@ -2115,7 +2115,7 @@ val ImportantStyle = CssStyle {
 val PostTitleStyle = CssStyle.base { Modifier.fontSize(24.px) }
 ```
 
-Next, Silk provides a `deferRender` method which lets you declare code that won't get rendered until the rest of the
+Next, Silk provides a `Deferred` composable which lets you declare code that won't get rendered until the rest of the
 DOM finishes first, meaning it will appear on top of everything else. This is a clean way to avoid setting CSS z-index
 values (another aspect of CSS that has a bad reputation).
 

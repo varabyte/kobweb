@@ -108,7 +108,7 @@ class KeyframesBuilder internal constructor(override val colorMode: ColorMode) :
  * register your keyframes:
  *
  * ```
- * prepareSilkFoundation(
+ * SilkFoundationStyles(
  *   initSilk = { ctx ->
  *     /*...*/
  *     ctx.theme.registerKeyframes("bounce", BounceKeyframes)

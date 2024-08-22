@@ -8,8 +8,8 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.defer.deferRender
-import com.varabyte.kobweb.silk.defer.renderWithDeferred
+import com.varabyte.kobweb.silk.defer.Deferred
+import com.varabyte.kobweb.silk.defer.DeferringHost
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
@@ -48,7 +48,7 @@ val OverlayStyle = CssStyle.base<OverlayKind> {
  * }
  * ```
  *
- * Note: For users who are only using silk widgets and not kobweb, then you must call [renderWithDeferred] yourself
+ * Note: For users who are only using silk widgets and not kobweb, then you must call [DeferringHost] yourself
  * first, as a parent method that this lives under. See the method for more details.
  */
 @Composable
@@ -59,7 +59,7 @@ fun Overlay(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit = {}
 ) {
-    deferRender {
+    Deferred {
         Box(
             OverlayStyle.toModifier(variant)
                 .position(Position.Fixed)

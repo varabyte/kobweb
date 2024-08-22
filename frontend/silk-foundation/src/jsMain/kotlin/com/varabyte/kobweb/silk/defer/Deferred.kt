@@ -44,7 +44,15 @@ private class DeferredComposablesState {
 }
 
 private val LocalDeferred = staticCompositionLocalOf<DeferredComposablesState> {
-    error("Attempting to defer rendering without calling `renderWithDeferred`, a required pre-requisite.")
+    error("Attempting to defer rendering without calling `DeferringHost`, a required pre-requisite.")
+}
+
+@Deprecated("Renamed to `Deferred` to be consistent with official Compose naming conventions.",
+    ReplaceWith("Deferred(content)")
+)
+@Composable
+fun deferRender(content: @Composable () -> Unit) {
+    Deferred(content)
 }
 
 /**
@@ -57,23 +65,40 @@ private val LocalDeferred = staticCompositionLocalOf<DeferredComposablesState> {
  * Render deferral is particularly useful for overlays, like modals and tooltips.
  */
 @Composable
-fun deferRender(content: @Composable () -> Unit) {
+fun Deferred(content: @Composable () -> Unit) {
     val state = LocalDeferred.current
     val deferredEntry = remember(state) { state.append() }
     deferredEntry.content = content
     DisposableEffect(deferredEntry) { onDispose { deferredEntry.dismiss() } }
 }
 
-/**
- * Wraps a target composable with support for allowing deferred render calls.
- *
- * With this method called, any of the children Composables in [content] can trigger [deferRender], which will append
- * a render request which only gets run *after* the main content is finished rendering.
- *
- * You should only have to call this method once. Putting it near the root of your compose hierarchy is suggested.
- */
+@Deprecated("Renamed to `DeferringHost` to be consistent with official Compose naming conventions.",
+    ReplaceWith("DeferringHost(content)")
+)
 @Composable
 fun renderWithDeferred(content: @Composable () -> Unit) {
+    DeferringHost(content)
+}
+
+/**
+ * Wraps a scope within which users can declare [Deferred] blocks.
+ *
+ * Any [Deferred] blocks will be deferred until the end of the scope.
+ *
+ * For example:
+ *
+ * ```
+ * DeferringHost {
+ *   Box()
+ *   Deferred { Row() }
+ *   Column()
+ * }
+ * ```
+ *
+ * is equivalent to declaring `Box()`, `Column()`, then `Row()` in that order.
+ */
+@Composable
+fun DeferringHost(content: @Composable () -> Unit) {
     val state = DeferredComposablesState()
     CompositionLocalProvider(LocalDeferred provides state) {
         content()
@@ -81,7 +106,7 @@ fun renderWithDeferred(content: @Composable () -> Unit) {
             // Deferred content itself may defer more content! Like showing a tooltip within an overlay
             // If we don't do this, we end up with the deferred list constantly getting modified and causing
             // recompositions as a result.
-            entry.content?.let { renderWithDeferred(it) }
+            entry.content?.let { DeferringHost(it) }
         }
     }
 }
