@@ -323,6 +323,16 @@ fun DownloadIcon(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun ExclaimIcon(modifier: Modifier = Modifier) {
+    // From https://github.com/orgs/community/discussions/16925
+    createIcon(ViewBox.sized(16), renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
+        Path {
+            d("M 0 1.75 C 0 0.784 0.784 0 1.75 0 h 12.5 C 15.216 0 16 0.784 16 1.75 v 9.5 A 1.75 1.75 0 0 1 14.25 13 H 8.06 l -2.573 2.573 A 1.458 1.458 0 0 1 3 14.543 V 13 H 1.75 A 1.75 1.75 0 0 1 0 11.25 Z m 1.75 -0.25 a 0.25 0.25 0 0 0 -0.25 0.25 v 9.5 c 0 0.138 0.112 0.25 0.25 0.25 h 2 a 0.75 0.75 0 0 1 0.75 0.75 v 2.19 l 2.72 -2.72 a 0.749 0.749 0 0 1 0.53 -0.22 h 6.5 a 0.25 0.25 0 0 0 0.25 -0.25 v -9.5 a 0.25 0.25 0 0 0 -0.25 -0.25 Z m 7 2.25 v 2.5 a 0.75 0.75 0 0 1 -1.5 0 v -2.5 a 0.75 0.75 0 0 1 1.5 0 Z M 9 9 a 1 1 0 1 1 -2 0 a 1 1 0 0 1 2 0 Z")
+        }
+    }
+}
+
+@Composable
 fun HamburgerIcon(modifier: Modifier = Modifier) {
     createIcon(renderStyle = IconRenderStyle.Stroke(3), attrs = modifier.toAttrs()) {
         for (y in listOf(3, 12, 21)) {
@@ -339,6 +349,26 @@ fun HamburgerIcon(modifier: Modifier = Modifier) {
 @Composable
 fun IndeterminateIcon(modifier: Modifier = Modifier) {
     MinusIcon(modifier)
+}
+
+@Composable
+fun InfoIcon(modifier: Modifier = Modifier) {
+    // From https://github.com/orgs/community/discussions/16925
+    createIcon(ViewBox.sized(16), renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
+        Path {
+            d("M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z")
+        }
+    }
+}
+
+@Composable
+fun LightbulbIcon(modifier: Modifier = Modifier) {
+    // From https://github.com/orgs/community/discussions/16925
+    createIcon(ViewBox.sized(16), renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
+        Path {
+            d("M 8 1.5 c -2.363 0 -4 1.69 -4 3.75 c 0 0.984 0.424 1.625 0.984 2.304 l 0.214 0.253 c 0.223 0.264 0.47 0.556 0.673 0.848 c 0.284 0.411 0.537 0.896 0.621 1.49 a 0.75 0.75 0 0 1 -1.484 0.211 c -0.04 -0.282 -0.163 -0.547 -0.37 -0.847 a 8.456 8.456 0 0 0 -0.542 -0.68 c -0.084 -0.1 -0.173 -0.205 -0.268 -0.32 C 3.201 7.75 2.5 6.766 2.5 5.25 C 2.5 2.31 4.863 0 8 0 s 5.5 2.31 5.5 5.25 c 0 1.516 -0.701 2.5 -1.328 3.259 c -0.095 0.115 -0.184 0.22 -0.268 0.319 c -0.207 0.245 -0.383 0.453 -0.541 0.681 c -0.208 0.3 -0.33 0.565 -0.37 0.847 a 0.751 0.751 0 0 1 -1.485 -0.212 c 0.084 -0.593 0.337 -1.078 0.621 -1.489 c 0.203 -0.292 0.45 -0.584 0.673 -0.848 c 0.075 -0.088 0.147 -0.173 0.213 -0.253 c 0.561 -0.679 0.985 -1.32 0.985 -2.304 c 0 -2.06 -1.637 -3.75 -4 -3.75 Z M 5.75 12 h 4.5 a 0.75 0.75 0 0 1 0 1.5 h -4.5 a 0.75 0.75 0 0 1 0 -1.5 Z M 6 15.25 a 0.75 0.75 0 0 1 0.75 -0.75 h 2.5 a 0.75 0.75 0 0 1 0 1.5 h -2.5 a 0.75 0.75 0 0 1 -0.75 -0.75 Z")
+        }
+    }
 }
 
 @Composable
@@ -398,6 +428,48 @@ fun MoonIcon(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun QuestionIcon(modifier: Modifier = Modifier) {
+    createIcon(renderStyle = IconRenderStyle.Stroke(2), attrs = modifier.toAttrs()) {
+        Path {
+            strokeLineCap(SVGStrokeLineCap.Round)
+            d("M9,9a3,3,0,1,1,4,2.829,1.5,1.5,0,0,0-1,1.415V14.25")
+        }
+        Path {
+            strokeLineCap(SVGStrokeLineCap.Round)
+            d("M12,17.25a.375.375,0,1,0,.375.375A.375.375,0,0,0,12,17.25h0")
+        }
+        Circle {
+            strokeMiterLimit(10)
+            cx(12)
+            cy(12)
+            r(11.25)
+        }
+    }
+}
+
+@Composable
+fun QuoteIcon(modifier: Modifier = Modifier) {
+    // Inspired by https://squidfunk.github.io/mkdocs-material/reference/admonitions/#+type:quote
+    // From https://www.svgbackgrounds.com/elements/quotation-marks/
+    // <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="#FFF"><path d="m175.6 204.73 22.19 46.49C258.61 223.15 278 189.49 278 151.18V48.78H175.6v102.4h51.2c0 15.64-12.42 35.66-51.2 53.55zm-153.6 0 22.19 46.49c60.83-28.07 80.21-61.73 80.21-100.04V48.78H22v102.4h51.2c0 15.64-12.42 35.66-51.2 53.55z"></path></svg>
+    // From url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="%23FFF"><path d="m175.6 204.73 22.19 46.49C258.61 223.15 278 189.49 278 151.18V48.78H175.6v102.4h51.2c0 15.64-12.42 35.66-51.2 53.55zm-153.6 0 22.19 46.49c60.83-28.07 80.21-61.73 80.21-100.04V48.78H22v102.4h51.2c0 15.64-12.42 35.66-51.2 53.55z"></path></svg>')
+    createIcon(viewBox = ViewBox.sized(300), renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
+        Path {
+            d("m175.6 204.73 22.19 46.49C258.61 223.15 278 189.49 278 151.18V48.78H175.6v102.4h51.2c0 15.64-12.42 35.66-51.2 53.55zm-153.6 0 22.19 46.49c60.83-28.07 80.21-61.73 80.21-100.04V48.78H22v102.4h51.2c0 15.64-12.42 35.66-51.2 53.55z")
+        }
+    }
+}
+
+@Composable
+fun StopIcon(modifier: Modifier = Modifier) {
+    // From https://github.com/orgs/community/discussions/16925
+    createIcon(ViewBox.sized(16), renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
+        Path {
+            d("M 4.47 0.22 A 0.749 0.749 0 0 1 5 0 h 6 c 0.199 0 0.389 0.079 0.53 0.22 l 4.25 4.25 c 0.141 0.14 0.22 0.331 0.22 0.53 v 6 a 0.749 0.749 0 0 1 -0.22 0.53 l -4.25 4.25 A 0.749 0.749 0 0 1 11 16 H 5 a 0.749 0.749 0 0 1 -0.53 -0.22 L 0.22 11.53 A 0.749 0.749 0 0 1 0 11 V 5 c 0 -0.199 0.079 -0.389 0.22 -0.53 Z m 0.84 1.28 L 1.5 5.31 v 5.38 l 3.81 3.81 h 5.38 l 3.81 -3.81 V 5.31 L 10.69 1.5 Z M 8 4 a 0.75 0.75 0 0 1 0.75 0.75 v 3.5 a 0.75 0.75 0 0 1 -1.5 0 v -3.5 A 0.75 0.75 0 0 1 8 4 Z m 0 8 a 1 1 0 1 1 0 -2 a 1 1 0 0 1 0 2 Z")
+        }
+    }
+}
 
 @Composable
 fun SunIcon(modifier: Modifier = Modifier) {
@@ -459,6 +531,16 @@ fun SunIcon(modifier: Modifier = Modifier) {
                     lineTo(1.42, -1.42, true)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun WarningIcon(modifier: Modifier = Modifier) {
+    // From https://github.com/orgs/community/discussions/16925
+    createIcon(ViewBox.sized(16), renderStyle = IconRenderStyle.Fill(), attrs = modifier.toAttrs()) {
+        Path {
+            d("M 6.457 1.047 c 0.659 -1.234 2.427 -1.234 3.086 0 l 6.082 11.378 A 1.75 1.75 0 0 1 14.082 15 H 1.918 a 1.75 1.75 0 0 1 -1.543 -2.575 Z m 1.763 0.707 a 0.25 0.25 0 0 0 -0.44 0 L 1.698 13.132 a 0.25 0.25 0 0 0 0.22 0.368 h 12.164 a 0.25 0.25 0 0 0 0.22 -0.368 Z m 0.53 3.996 v 2.5 a 0.75 0.75 0 0 1 -1.5 0 v -2.5 a 0.75 0.75 0 0 1 1.5 0 Z M 9 11 a 1 1 0 1 1 -2 0 a 1 1 0 0 1 2 0 Z")
         }
     }
 }

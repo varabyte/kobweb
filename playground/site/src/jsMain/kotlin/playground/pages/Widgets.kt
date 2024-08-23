@@ -48,13 +48,20 @@ import com.varabyte.kobweb.silk.components.icons.ChevronUpIcon
 import com.varabyte.kobweb.silk.components.icons.CircleIcon
 import com.varabyte.kobweb.silk.components.icons.CloseIcon
 import com.varabyte.kobweb.silk.components.icons.DownloadIcon
+import com.varabyte.kobweb.silk.components.icons.ExclaimIcon
 import com.varabyte.kobweb.silk.components.icons.HamburgerIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
 import com.varabyte.kobweb.silk.components.icons.MinusIcon
 import com.varabyte.kobweb.silk.components.icons.MoonIcon
+import com.varabyte.kobweb.silk.components.icons.InfoIcon
+import com.varabyte.kobweb.silk.components.icons.LightbulbIcon
 import com.varabyte.kobweb.silk.components.icons.PlusIcon
+import com.varabyte.kobweb.silk.components.icons.QuestionIcon
+import com.varabyte.kobweb.silk.components.icons.QuoteIcon
 import com.varabyte.kobweb.silk.components.icons.SquareIcon
+import com.varabyte.kobweb.silk.components.icons.StopIcon
 import com.varabyte.kobweb.silk.components.icons.SunIcon
+import com.varabyte.kobweb.silk.components.icons.WarningIcon
 import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
 import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
@@ -230,13 +237,20 @@ fun WidgetsPage() {
                     "Circle" to { CircleIcon() },
                     "Close" to { CloseIcon() },
                     "Download" to { DownloadIcon() },
+                    "Exclaim" to { ExclaimIcon() },
                     "Hamburger" to { HamburgerIcon() },
                     "Indeterminate" to { IndeterminateIcon() },
+                    "Info" to { InfoIcon() },
+                    "Lightbulb" to { LightbulbIcon() },
                     "Minus" to { MinusIcon() },
                     "Moon" to { MoonIcon() },
                     "Plus" to { PlusIcon() },
+                    "Question" to { QuestionIcon() },
+                    "Quote" to { QuoteIcon() },
                     "Square" to { SquareIcon() },
+                    "Stop" to { StopIcon() },
                     "Sun" to { SunIcon() },
+                    "Warning" to { WarningIcon() },
                 )
 
                 Row(
