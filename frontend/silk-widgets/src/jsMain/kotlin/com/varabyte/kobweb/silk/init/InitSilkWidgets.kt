@@ -10,6 +10,10 @@ import com.varabyte.kobweb.silk.components.disclosure.TabsPanelStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsTabRowStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsTabStyle
+import com.varabyte.kobweb.silk.components.display.CalloutStyle
+import com.varabyte.kobweb.silk.components.display.CalloutType
+import com.varabyte.kobweb.silk.components.display.LeftBorderedCalloutVariant
+import com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonVars
@@ -224,6 +228,9 @@ fun initSilkWidgets(ctx: InitSilkContext) {
 
     mutableTheme.registerStyle("silk-button", ButtonStyle)
     mutableTheme.registerStyle("silk-canvas", CanvasStyle)
+    mutableTheme.registerStyle("silk-callout", CalloutStyle)
+    mutableTheme.registerVariant("-left-bordered", LeftBorderedCalloutVariant)
+    mutableTheme.registerVariant("-outlined", OutlinedCalloutVariant)
     mutableTheme.registerStyle("silk-checkbox", CheckboxStyle)
     mutableTheme.registerVariant("-checkbox", CheckboxInputVariant)
     mutableTheme.registerStyle("silk-checkbox-icon-container", CheckboxIconContainerStyle)
@@ -283,6 +290,14 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerStyle("silk-switch-size_sm", SwitchSize.SM)
     mutableTheme.registerStyle("silk-switch-size_md", SwitchSize.MD)
     mutableTheme.registerStyle("silk-switch-size_lg", SwitchSize.LG)
+
+    mutableTheme.registerStyle("silk-callout-type_caution", CalloutType.CAUTION)
+    mutableTheme.registerStyle("silk-callout-type_important", CalloutType.IMPORTANT)
+    mutableTheme.registerStyle("silk-callout-type_note", CalloutType.NOTE)
+    mutableTheme.registerStyle("silk-callout-type_question", CalloutType.QUESTION)
+    mutableTheme.registerStyle("silk-callout-type_quote", CalloutType.QUOTE)
+    mutableTheme.registerStyle("silk-callout-type_tip", CalloutType.TIP)
+    mutableTheme.registerStyle("silk-callout-type_warning", CalloutType.WARNING)
 }
 
 val SilkColorsStyle = CssStyle.base {

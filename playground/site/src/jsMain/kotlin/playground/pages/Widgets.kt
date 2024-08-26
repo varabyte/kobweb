@@ -17,6 +17,9 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
+import com.varabyte.kobweb.silk.components.display.Callout
+import com.varabyte.kobweb.silk.components.display.CalloutType
+import com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.Checkbox
@@ -149,6 +152,23 @@ fun WidgetsPage() {
                                 Button(onClick = {}, size = size, colorScheme = colorScheme) { Text("Button") }
                             }
                         }
+                    }
+                }
+            }
+
+            WidgetSection("Callout") {
+                Column(Modifier.gap(1.cssRem)) {
+                    listOf(
+                        CalloutType.NOTE,
+                        CalloutType.QUOTE,
+                        CalloutType.TIP,
+                        CalloutType.IMPORTANT,
+                        CalloutType.QUESTION,
+                        CalloutType.CAUTION,
+                        CalloutType.WARNING,
+                    ).forEach { type ->
+                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = OutlinedCalloutVariant)
                     }
                 }
             }
