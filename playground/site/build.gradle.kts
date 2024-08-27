@@ -21,6 +21,7 @@ kobweb {
                 }
             })
         }
+        handlers.calloutLabels.put("QUOTE", "")
     }
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
 }

@@ -91,7 +91,9 @@ class KotlinRenderer(
 
 
     // Flexible data which can be used by Node handlers however they need
-    private val data = TypedMap()
+    private val data = TypedMap().apply {
+        set(MarkdownHandlers.ProjectGroupKey, projectGroup)
+    }
 
     override fun render(node: Node, output: Appendable) {
         node.accept(SoftLineBreakConversionVisitor())

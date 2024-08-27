@@ -6,6 +6,7 @@ import com.varabyte.kobweb.common.collect.Key
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
+import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeTripleQuotes
@@ -33,6 +34,7 @@ import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.gradle.api.Project
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -82,6 +84,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
     companion object {
         /** Key used by [Heading] nodes to store IDs they generated for themselves. */
         val HeadingIdsKey = Key.create<MutableMap<Heading, String>>("md.heading.ids")
+        val ProjectGroupKey = Key.create<String>("md.project.group")
     }
 
     /**
@@ -141,6 +144,40 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
      */
     @get:Nested
     abstract val idGenerator: Property<(String) -> String>
+
+    /**
+     * A key of type names to callout type instances.
+     *
+     * For example, "NOTE" -> "com.varabyte.kobweb.silk.components.display.CalloutType.NOTE"
+     *
+     * Once registered, markdown code can reference these in blockquotes by using `[!TYPE]` syntax, for example:
+     *
+     * ```
+     * > [!NOTE]
+     * > This is a note.
+     * ```
+     *
+     * A default set is provided by Silk but additional types can be registered by users if they want to support new
+     * custom types defined in their own codebase or register additional label names.
+     *
+     * Important: Callouts are only available when a project also ses Silk.
+     */
+    @get:Input
+    abstract val calloutTypes: MapProperty<String, String>
+
+    /**
+     * A key of callout type names to the default label they should use.
+     *
+     * For example, associating `"QUOTE"` with `""` will make it so that `[!QUOTE]` will generate a callout with an
+     * empty label. Of course, a user can override this on a per-callout basis, for example by using
+     * `[!QUOTE "Abraham Lincoln"]`, which will take precedence.
+     *
+     * If a key is registered here that is not also registered in [calloutTypes], it will have no effect.
+     *
+     * @see calloutTypes
+     */
+    @get:Input
+    abstract val calloutLabels: MapProperty<String, String>
 
     @get:Nested
     abstract val text: Property<NodeScope.(Text) -> String>
@@ -259,6 +296,16 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
                 .removeSuffix("-")
         }
 
+        calloutTypes.set(mapOf(
+            "CAUTION" to "$SILK.display.CalloutType.CAUTION",
+            "IMPORTANT" to "$SILK.display.CalloutType.IMPORTANT",
+            "NOTE" to "$SILK.display.CalloutType.NOTE",
+            "QUESTION" to "$SILK.display.CalloutType.QUESTION",
+            "QUOTE" to "$SILK.display.CalloutType.QUOTE",
+            "TIP" to "$SILK.display.CalloutType.TIP",
+            "WARNING" to "$SILK.display.CalloutType.WARNING",
+        ))
+
         // region Markdown Node handlers
 
         text.convention { text -> "$JB_DOM.Text(\"${text.literal.escapeSingleQuotedText()}\")" }
@@ -330,8 +377,31 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
             childrenOverride = listOf(Text(code.literal))
             "$JB_DOM.Code"
         }
-        blockquote.convention {
-            "$KOBWEB_DOM.GenericTag(\"blockquote\")"
+        blockquote.convention { blockQuote ->
+            val silkCallout = if (useSilk.get()) {
+                blockQuote.firstChild.firstChild?.let { firstChild ->
+                    firstChild as Text
+                    val regex = """\[!([^ ]+)( "(.*)")?]""".toRegex()
+                    val typeMatch = regex.find(firstChild.literal) ?: return@let null
+                    firstChild.literal = firstChild.literal.substringAfter(typeMatch.value)
+
+                    val typeId = typeMatch.groupValues[1]
+                    val isLabelSet = typeMatch.groupValues[2].isNotBlank()
+                    val label = typeMatch.groupValues[3].takeIf { isLabelSet } ?: calloutLabels.get()[typeId]
+
+                    val calloutTypeFqn = calloutTypes.get()[typeId]?.let {
+                        PackageUtils.resolvePackageShortcut(data.getValue(ProjectGroupKey), it)
+                    }
+
+                    if (calloutTypeFqn != null) {
+                        """$SILK.display.Callout(type = $calloutTypeFqn, label = ${label?.let { "\"$it\"" }})"""
+                    } else {
+                        """$SILK.display.Callout(type = $SILK.display.CalloutType.UNKNOWN, label = "Invalid callout type [!$typeId]")"""
+                    }
+                }
+            } else null
+
+            silkCallout ?: "$KOBWEB_DOM.GenericTag(\"blockquote\")"
         }
         table.convention { "$JB_DOM.Table" }
         thead.convention { "$JB_DOM.Thead" }

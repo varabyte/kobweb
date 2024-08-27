@@ -1994,6 +1994,90 @@ imports:
 {{{ VisitorCounter }}}
 ```
 
+### Callouts
+
+Kobweb Markdown supports callouts, which are a way to highlight important information in your document. For example,
+you can use them to highlight notes, tips, warnings, or important information.
+
+To use a callout, set the first line of some blockquoted text to `[!TYPE]`, where *TYPE* is one of the following:
+
+* CAUTION - Calls attention to something that the user should be extra careful about.
+* IMPORTANT - Important context that the user should be aware of.
+* NOTE - Neutral information that the user should notice, even when skimming.
+* QUESTION - A question posed whose answer is left as an exercise to the reader.
+* QUOTE - A direct quote.
+* TIP - Advice that the user may find useful.
+* WARNING - Information that a user should be aware of to prevent errors.
+
+```markdown
+> [!NOTE]
+> Lorem ipsum...
+
+> [!QUOTE]
+> Lorem ipsum...
+```
+
+![All markdown callouts](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callouts.png)
+
+If you'd like to change the value of the default title that shows up, you can specify it in quotes:
+
+```markdown
+> [!QUESTION "Something to ponder..."]
+```
+
+As another example, when using quotes, you can set this to the empty string, which looks clean:
+
+```markdown
+> [!QUOTE ""]
+> ...
+```
+
+![Markdown quote callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-quote.png)
+
+If you want to specify a label that should apply globally, you can do so in your project's build script:
+
+```kotlin
+kobweb {
+  markdown {
+    handlers.calloutLabels.put("QUOTE", "")
+  }
+}
+```
+
+#### Custom callouts
+
+If you'd like to register a custom callout, this is done in two parts.
+
+First, declare your custom callout in your code somewhere:
+
+```kotlin
+package com.mysite.components.widgets.callouts
+
+val CustomCallout = CalloutType(
+    /* ... specify icon, label, and colors here ... */
+)
+```
+
+and then register it in your build script:
+
+```kotlin
+kobweb {
+    markdown {
+        handlers.calloutTypes.put("CUSTOM", ".components.widgets.callouts.CustomCallout")
+    }
+}
+```
+
+> [!NOTE]
+> As seen above, you can omit your project's group. Kobweb will automatically prepend it for you.
+
+That's it! At this point, you can use it in your markdown:
+
+```markdown
+> [!CUSTOM]
+> Neat.
+```
+
 ### Iterating over all markdown files
 
 It can be really useful to process all markdown files during your site's build. A common example is to collect all
