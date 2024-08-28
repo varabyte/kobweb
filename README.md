@@ -1092,7 +1092,7 @@ The easiest way to accomplish this is by extending the base CSS style block, usi
 val GeneralTextStyle = CssStyle {
     base { Modifier.fontSize(16.px).fontFamily("...") }
 }
-val EmphasizedTextStyle = GenerateTextStyle.extendedBy {
+val EmphasizedTextStyle = GeneralTextStyle.extendedBy {
     base { Modifier.fontWeight(FontWeight.Bold) }    
 }
 
@@ -1100,7 +1100,7 @@ val EmphasizedTextStyle = GenerateTextStyle.extendedBy {
 // val GeneralTextStyle = CssStyle.base {
 //   Modifier.fontSize(16.px).fontFamily("...")
 // }
-// val EmphasizedTextStyle = GenerateTextStyle.extendedByBase {
+// val EmphasizedTextStyle = GeneralTextStyle.extendedByBase {
 //   Modifier.fontWeight(FontWeight.Bold)
 // }
 ```
