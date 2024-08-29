@@ -92,7 +92,7 @@ class KotlinRenderer(
 
     // Flexible data which can be used by Node handlers however they need
     private val data = TypedMap().apply {
-        set(MarkdownHandlers.ProjectGroupKey, projectGroup)
+        set(MarkdownHandlers.DataKeys.ProjectGroup, projectGroup)
     }
 
     override fun render(node: Node, output: Appendable) {

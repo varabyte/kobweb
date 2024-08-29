@@ -81,10 +81,24 @@ class NodeScope(val data: TypedMap, private val indentCountBase: Int = 0) {
  * ```
  */
 abstract class MarkdownHandlers @Inject constructor(project: Project, newDefaultRoot: Property<String>) {
-    companion object {
+    /**
+     * Keys which can be used to read/write data values into/out of the [NodeScope.data] container.
+     */
+    object DataKeys {
         /** Key used by [Heading] nodes to store IDs they generated for themselves. */
-        val HeadingIdsKey = Key.create<MutableMap<Heading, String>>("md.heading.ids")
-        val ProjectGroupKey = Key.create<String>("md.project.group")
+        val HeadingIds = Key.create<MutableMap<Heading, String>>("md.heading.ids")
+
+        /**
+         * Key used to fetch the project group name.
+         *
+         * Using this instead of `project.group` avoids conflicting with the Gradle build cache.
+         */
+        val ProjectGroup = Key.create<String>("md.project.group")
+    }
+
+    companion object {
+        @Deprecated("Use `MarkdownHandlers.DataKeys.HeadingIds` instead.")
+        val HeadingIdsKey = DataKeys.HeadingIds
     }
 
     /**
@@ -330,7 +344,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
                             }
                         }
                         .joinToString("")
-                    val headingIds = data.computeIfAbsent(HeadingIdsKey) { mutableMapOf() }
+                    val headingIds = data.computeIfAbsent(DataKeys.HeadingIds) { mutableMapOf() }
                     val id = run {
                         val baseId = idGenerator.get().invoke(text)
                         var currId = baseId
@@ -390,7 +404,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
                     val label = typeMatch.groupValues[3].takeIf { isLabelSet } ?: calloutLabels.get()[typeId]
 
                     val calloutTypeFqn = calloutTypes.get()[typeId]?.let {
-                        PackageUtils.resolvePackageShortcut(data.getValue(ProjectGroupKey), it)
+                        PackageUtils.resolvePackageShortcut(data.getValue(DataKeys.ProjectGroup), it)
                     }
 
                     if (calloutTypeFqn != null) {
