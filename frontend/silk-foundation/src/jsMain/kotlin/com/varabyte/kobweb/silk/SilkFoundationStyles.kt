@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.KobwebComposeStyles
 import com.varabyte.kobweb.silk.init.InitSilkContext
 import com.varabyte.kobweb.silk.init.initSilk
+import com.varabyte.kobweb.silk.style.breakpoint.SilkBreakpointDisplayStyles
 import org.jetbrains.compose.web.css.*
 
 /**
@@ -35,4 +36,5 @@ fun SilkFoundationStyles(initSilk: (InitSilkContext) -> Unit = {}) {
     }
 
     Style(SilkStyleSheet)
+    SilkBreakpointDisplayStyles()
 }
