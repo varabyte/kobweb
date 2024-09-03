@@ -1,4 +1,5 @@
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
+import com.varabyte.kobwebx.gradle.markdown.CalloutBlockquoteHandler
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -21,7 +22,7 @@ kobweb {
                 }
             })
         }
-        handlers.calloutLabels.put("QUOTE", "")
+        handlers.blockquote.set(CalloutBlockquoteHandler(labels = mapOf("QUOTE" to "")))
     }
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
 }

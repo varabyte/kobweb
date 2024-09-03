@@ -1996,8 +1996,8 @@ imports:
 
 ### Callouts
 
-Kobweb Markdown supports callouts, which are a way to highlight important information in your document. For example,
-you can use them to highlight notes, tips, warnings, or important information.
+Kobweb Markdown supports callouts, which are a way to highlight pieces of information in your document. For example, you
+can use them to highlight notes, tips, warnings, or important messages.
 
 To use a callout, set the first line of some blockquoted text to `[!TYPE]`, where *TYPE* is one of the following:
 
@@ -2034,21 +2034,46 @@ As another example, when using quotes, you can set this to the empty string, whi
 
 ![Markdown quote callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-quote.png)
 
-If you want to specify a label that should apply globally, you can do so in your project's build script:
+If you want to specify a label that should apply globally, you can do so by overriding the blockquote handler in your
+project's build script, using the convenience method `CalloutBlockquoteHandler` for it:
 
 ```kotlin
 kobweb {
   markdown {
-    handlers.calloutLabels.put("QUOTE", "")
+    handlers.blockquote.set(CalloutBlockquoteHandler(labels = mapOf("QUOTE" to "")))
   }
 }
 ```
+
+> [!CAUTION]
+> Callouts are provided by Silk. If your project does not use Silk and you override the blockquote handler like this,
+> it will generate code that will cause a compile error.
+
+#### Outlined variant
+
+Silk provides an outlined variant for callouts. For example:
+
+![Markdown outlined callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-outlined.png)
+
+If you prefer this style, you can set the `variant` parameter in the `CalloutBlockquoteHandler`:
+
+```kotlin
+kobweb {
+  markdown {
+    handlers.blockquote.set(CalloutBlockquoteHandler(
+      variant = "com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant")
+    )
+  }
+}
+```
+
+Of course, you can also define your own variant in code and pass that in here as well.
 
 #### Custom callouts
 
 If you'd like to register a custom callout, this is done in two parts.
 
-First, declare your custom callout in your code somewhere:
+First, declare your custom callout setup in your code somewhere:
 
 ```kotlin
 package com.mysite.components.widgets.callouts
@@ -2058,18 +2083,24 @@ val CustomCallout = CalloutType(
 )
 ```
 
-and then register it in your build script:
+and then register it in your build script, extending the default list of handlers (i.e. `SilkCalloutTypes`) with your
+custom one:
 
 ```kotlin
 kobweb {
-    markdown {
-        handlers.calloutTypes.put("CUSTOM", ".components.widgets.callouts.CustomCallout")
-    }
+  markdown {
+    handlers.blockquote.set(
+      CalloutBlockquoteHandler(types =
+        SilkCalloutTypes +
+          mapOf("CUSTOM" to ".components.widgets.callouts.CustomCallout")
+      )
+    )
+  }
 }
 ```
 
 > [!NOTE]
-> As seen above, you can omit your project's group. Kobweb will automatically prepend it for you.
+> As seen above, you can omit your project's group (e.g. `com.mysite`). Kobweb will automatically prepend it for you.
 
 That's it! At this point, you can use it in your markdown:
 
