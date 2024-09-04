@@ -29,6 +29,8 @@ import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.palette.callout
+import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -79,7 +81,7 @@ class CalloutType(
         val CAUTION = CalloutType(
             { StopIcon() },
             "Caution",
-            provideColor = { if (it.isDark) Colors.Red else Colors.Crimson },
+            provideColor = { it.toPalette().callout.caution },
         )
 
         /**
@@ -88,7 +90,7 @@ class CalloutType(
         val IMPORTANT = CalloutType(
             { ExclaimIcon() },
             "Important",
-            Colors.DarkOrchid
+            provideColor = { it.toPalette().callout.important },
         )
 
         /**
@@ -97,7 +99,7 @@ class CalloutType(
         val NOTE = CalloutType(
             { InfoIcon() },
             "Note",
-            Colors.DodgerBlue
+            provideColor = { it.toPalette().callout.note },
         )
 
         /**
@@ -106,7 +108,7 @@ class CalloutType(
         val QUESTION = CalloutType(
             { QuestionIcon() },
             "Question",
-            provideColor = { if (it.isDark) Colors.Aquamarine else Colors.SeaGreen },
+            provideColor = { it.toPalette().callout.question },
         )
 
         /**
@@ -115,7 +117,7 @@ class CalloutType(
         val QUOTE = CalloutType(
             { QuoteIcon() },
             "Quote",
-            Colors.Gray
+            provideColor = { it.toPalette().callout.quote },
         )
 
         /**
@@ -124,7 +126,7 @@ class CalloutType(
         val TIP = CalloutType(
             { LightbulbIcon() },
             "Tip",
-            Colors.LimeGreen
+            provideColor = { it.toPalette().callout.tip },
         )
 
         /**
@@ -143,7 +145,7 @@ class CalloutType(
         val WARNING = CalloutType(
             { WarningIcon() },
             "Warning",
-            provideColor = { if (it.isDark) Colors.Orange else Colors.DarkOrange },
+            provideColor = { it.toPalette().callout.warning },
         )
     }
 }

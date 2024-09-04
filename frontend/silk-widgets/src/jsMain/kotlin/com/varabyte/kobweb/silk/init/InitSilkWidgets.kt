@@ -78,6 +78,7 @@ import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
 import com.varabyte.kobweb.silk.theme.colors.palette.button
+import com.varabyte.kobweb.silk.theme.colors.palette.callout
 import com.varabyte.kobweb.silk.theme.colors.palette.checkbox
 import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.focusOutline
@@ -118,6 +119,16 @@ fun initSilkWidgets(ctx: InitSilkContext) {
                 hover = buttonBase.darkened(byPercent = 0.2f),
                 focus = Colors.CornflowerBlue,
                 pressed = buttonBase.darkened(byPercent = 0.4f),
+            )
+
+            light.callout.set(
+                caution = Colors.Crimson,
+                important = Colors.DarkOrchid,
+                note = Colors.DodgerBlue,
+                question = Colors.SeaGreen,
+                quote = Colors.Gray,
+                tip = Colors.LimeGreen,
+                warning = Colors.DarkOrange,
             )
 
             light.checkbox.set(
@@ -172,6 +183,16 @@ fun initSilkWidgets(ctx: InitSilkContext) {
                 hover = buttonBase.lightened(byPercent = 0.2f),
                 focus = Colors.LightSkyBlue,
                 pressed = buttonBase.lightened(byPercent = 0.4f),
+            )
+
+            dark.callout.set(
+                caution = Colors.Red,
+                important = light.callout.important,
+                note = light.callout.note,
+                question = Colors.Aquamarine,
+                quote = light.callout.quote,
+                tip = light.callout.tip,
+                warning = Colors.Orange,
             )
 
             dark.checkbox.set(

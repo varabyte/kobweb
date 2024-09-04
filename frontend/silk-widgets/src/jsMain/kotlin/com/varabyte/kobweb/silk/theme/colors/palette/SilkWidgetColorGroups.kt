@@ -36,6 +36,44 @@ object SilkWidgetColorGroups {
         }
     }
 
+    interface Callout {
+        val caution: Color
+        val important: Color
+        val note: Color
+        val question: Color
+        val quote: Color
+        val tip: Color
+        val warning: Color
+    }
+
+    class MutableCallout(palette: MutablePalette) : MutablePalette.ColorGroup(palette, "callout"), Callout {
+        override var caution by paletteEntry()
+        override var important by paletteEntry()
+        override var note by paletteEntry()
+        override var question by paletteEntry()
+        override var quote by paletteEntry()
+        override var tip by paletteEntry()
+        override var warning by paletteEntry()
+
+        fun set(
+            caution: Color,
+            important: Color,
+            note: Color,
+            question: Color,
+            quote: Color,
+            tip: Color,
+            warning: Color,
+        ) {
+            this.caution = caution
+            this.important = important
+            this.note = note
+            this.question = question
+            this.quote = quote
+            this.tip = tip
+            this.warning = warning
+        }
+    }
+
     interface Checkbox {
         /** The background color of the checkbox icon. */
         val background: Color
@@ -241,6 +279,10 @@ var MutablePalette.placeholder: Color
 val Palette.button: SilkWidgetColorGroups.Button get() = (this as MutablePalette).button
 val MutablePalette.button: SilkWidgetColorGroups.MutableButton
     get() = SilkWidgetColorGroups.MutableButton(this)
+
+val Palette.callout: SilkWidgetColorGroups.Callout get() = (this as MutablePalette).callout
+val MutablePalette.callout: SilkWidgetColorGroups.MutableCallout
+    get() = SilkWidgetColorGroups.MutableCallout(this)
 
 val Palette.checkbox: SilkWidgetColorGroups.Checkbox get() = (this as MutablePalette).checkbox
 val MutablePalette.checkbox: SilkWidgetColorGroups.MutableCheckbox
