@@ -2100,7 +2100,8 @@ kobweb {
 ```
 
 > [!NOTE]
-> As seen above, you can omit your project's group (e.g. `com.mysite`). Kobweb will automatically prepend it for you.
+> As seen above, by using a leading `.`, you can omit your project's group (e.g. `com.mysite`). Kobweb will
+> automatically prepend it for you.
 
 That's it! At this point, you can use it in your markdown:
 
