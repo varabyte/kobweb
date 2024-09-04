@@ -93,7 +93,7 @@ class NodeScope(val data: TypedMap, private val indentCountBase: Int = 0) {
  *
  * ```
  * markdown {
- *    handlers.blockquote = CalloutBlockquoteHandler(
+ *    handlers.blockquote = SilkCalloutBlockquoteHandler(
  *      types = SilkCalloutTypes + mapOf("CUSTOM" to ".components.widgets.callouts.CustomCalloutType")
  *    )
  * }
@@ -111,7 +111,7 @@ class NodeScope(val data: TypedMap, private val indentCountBase: Int = 0) {
  * Finally, you can specify an alternate callout variant to use (perhaps `OutlinedCalloutVariant` or something from
  * your own project) by setting the [variant] parameter.
  */
-fun CalloutBlockquoteHandler(
+fun SilkCalloutBlockquoteHandler(
     types: Map<String, String> = SilkCalloutTypes,
     labels: Map<String, String> = emptyMap(),
     variant: String? = null,
@@ -428,7 +428,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
         }
         blockquote.convention { blockquote ->
             if (useSilk.get()) {
-                CalloutBlockquoteHandler().invoke(this, blockquote)
+                SilkCalloutBlockquoteHandler().invoke(this, blockquote)
             } else {
                 "$KOBWEB_DOM.GenericTag(\"blockquote\")"
             }

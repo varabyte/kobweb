@@ -2035,12 +2035,12 @@ As another example, when using quotes, you can set this to the empty string, whi
 ![Markdown quote callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-quote.png)
 
 If you want to specify a label that should apply globally, you can do so by overriding the blockquote handler in your
-project's build script, using the convenience method `CalloutBlockquoteHandler` for it:
+project's build script, using the convenience method `SilkCalloutBlockquoteHandler` for it:
 
 ```kotlin
 kobweb {
   markdown {
-    handlers.blockquote.set(CalloutBlockquoteHandler(labels = mapOf("QUOTE" to "")))
+    handlers.blockquote.set(SilkCalloutBlockquoteHandler(labels = mapOf("QUOTE" to "")))
   }
 }
 ```
@@ -2055,12 +2055,12 @@ Silk provides an outlined variant for callouts. For example:
 
 ![Markdown outlined callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-outlined.png)
 
-If you prefer this style, you can set the `variant` parameter in the `CalloutBlockquoteHandler`:
+If you prefer this style, you can set the `variant` parameter in the `SilkCalloutBlockquoteHandler`:
 
 ```kotlin
 kobweb {
   markdown {
-    handlers.blockquote.set(CalloutBlockquoteHandler(
+    handlers.blockquote.set(SilkCalloutBlockquoteHandler(
       variant = "com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant")
     )
   }
@@ -2090,7 +2090,7 @@ custom one:
 kobweb {
   markdown {
     handlers.blockquote.set(
-      CalloutBlockquoteHandler(types =
+      SilkCalloutBlockquoteHandler(types =
         SilkCalloutTypes +
           mapOf("CUSTOM" to ".components.widgets.callouts.CustomCallout")
       )
