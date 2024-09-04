@@ -9,6 +9,8 @@ import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlockVisitor
+import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
+import com.varabyte.kobwebx.gradle.markdown.handlers.NodeScope
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeTicks

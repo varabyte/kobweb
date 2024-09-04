@@ -7,6 +7,7 @@ import com.varabyte.kobweb.gradle.core.kmp.kotlin
 import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.getResourceSources
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
+import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.tasks.ConvertMarkdownTask
 import com.varabyte.kobwebx.gradle.markdown.tasks.MarkdownTask
 import com.varabyte.kobwebx.gradle.markdown.tasks.ProcessMarkdownTask

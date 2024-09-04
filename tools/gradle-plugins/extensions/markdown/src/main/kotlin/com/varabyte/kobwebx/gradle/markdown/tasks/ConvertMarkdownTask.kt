@@ -5,7 +5,7 @@ import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
-import com.varabyte.kobwebx.gradle.markdown.MarkdownHandlers
+import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import org.commonmark.node.Node
 import org.commonmark.parser.Parser
 import org.gradle.api.file.Directory

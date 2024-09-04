@@ -1,5 +1,5 @@
 import com.varabyte.kobweb.gradle.application.util.configAsKobwebApplication
-import com.varabyte.kobwebx.gradle.markdown.SilkCalloutBlockquoteHandler
+import com.varabyte.kobwebx.gradle.markdown.handlers.SilkCalloutBlockquoteHandler
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
