@@ -71,7 +71,7 @@ class CalloutType(
         icon,
         label,
         { provideColor(it) },
-        { provideColor(it).toRgb().copyf(alpha = 0.2f) }
+        { provideColor(it).toRgb().copyf(alpha = if (it.isLight) 0.15f else 0.2f) }
     )
 
     companion object {
