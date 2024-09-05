@@ -2497,6 +2497,35 @@ Once exported, you can test your site by running it locally before uploading. Yo
 `kobweb run --env prod --layout static` and a full stack site with `kobweb run --env prod --layout fullstack` (or just
 `kobweb run --env prod`).
 
+#### PageContext.isExporting
+
+Sometimes, you have behavior that should run when an actual user is navigating your site, but you don't want it to run
+at export time. For example, maybe you offer logged-in users an authenticated experience, but you'll never have 
+a logged-in user at export time.
+
+You can determine if your page is being rendered as part of an export by checking the `PageContext.isExporting`property.
+This gives you the opportunity to manipulate the exported HTML or avoid side effects associated with page loading.
+
+```kotlin
+@Composable
+fun AuthenticatedLayout(content: @Composable () -> Unit) {
+    var loggedInUser by remember { mutableStateOf<User?>(null) }
+
+    val ctx = rememberPageContext()
+    if (!ctx.isExporting) {
+        LaunchedEffect(Unit) { 
+            loggedInUser = checkForLoggedInUser() // <- A slow, expensive method  
+        }
+    }
+  
+    if (loggedInUser == null) { 
+        LoggedOutScaffold { content() }
+    } else { 
+        LoggedInScaffold(user) { content() } 
+    }
+}
+```
+
 ### Dynamic routes and exporting
 
 Dynamic routes are skipped over by the export process. After all, it's not possible to know all the possible values that
