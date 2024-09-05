@@ -130,16 +130,6 @@ class CalloutType(
         )
 
         /**
-         * A special fallback type provided so that markdown handling can show something if a specified type is not
-         * recognized.
-         */
-        val UNKNOWN = CalloutType(
-            { CloseIcon() },
-            "???",
-            Colors.Magenta
-        )
-
-        /**
          * Information that a user should be aware of to prevent errors.
          */
         val WARNING = CalloutType(

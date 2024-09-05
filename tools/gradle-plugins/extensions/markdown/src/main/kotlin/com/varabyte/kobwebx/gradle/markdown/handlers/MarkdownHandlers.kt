@@ -4,6 +4,7 @@ package com.varabyte.kobwebx.gradle.markdown.handlers
 
 import com.varabyte.kobweb.common.collect.Key
 import com.varabyte.kobweb.common.collect.TypedMap
+import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.gradle.core.util.getJsDependencyResults
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobwebx.gradle.markdown.children
@@ -50,9 +51,10 @@ internal const val SILK = "com.varabyte.kobweb.silk.components"
 /**
  * Data available to [MarkdownHandlers] callbacks
  *
+ * @param reporter A logger useful for reporting errors or warnings.
  * @param data A simple map that is created once per file and can be used by components however they want to.
  */
-class NodeScope(val data: TypedMap, private val indentCountBase: Int = 0) {
+class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCountBase: Int = 0) {
     /** If set, will cause the Markdown visit to visit these nodes instead of the node's original children. */
     var childrenOverride: List<Node>? = null
 

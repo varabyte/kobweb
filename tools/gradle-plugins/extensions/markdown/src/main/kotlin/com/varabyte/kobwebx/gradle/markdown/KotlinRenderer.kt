@@ -89,7 +89,7 @@ class KotlinRenderer(
     private val reporter: Reporter,
 ) : Renderer {
     private var indentCount = 0
-    private val indent get() = NodeScope(TypedMap()).indent(indentCount)
+    private val indent get() = NodeScope(reporter, TypedMap()).indent(indentCount)
 
 
     // Flexible data which can be used by Node handlers however they need
@@ -254,7 +254,7 @@ class KotlinRenderer(
         }
 
         private fun <N : Node> doVisit(node: N, composableCall: Provider<NodeScope.(N) -> String>) {
-            val scope = NodeScope(data, indentCount)
+            val scope = NodeScope(reporter, data, indentCount)
             composableCall.get().invoke(scope, node).takeIf { it.isNotBlank() }?.let { code ->
                 // Remove leading indentation (if any) because we add it ourselves
                 doVisit(node, code.trimStart(), scope)

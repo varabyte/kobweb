@@ -76,7 +76,8 @@ fun SilkCalloutBlockquoteHandler(
             if (calloutTypeFqn != null) {
                 """$SILK.display.Callout(type = $calloutTypeFqn, label = ${label?.let { "\"$it\"" }}, variant = $variant)"""
             } else {
-                """$SILK.display.Callout(type = $SILK.display.CalloutType.UNKNOWN, label = "Invalid callout type [!$typeId]", variant = $variant)"""
+                reporter.warn("Unknown Markdown callout type: $typeId")
+                null
             }
         }
         silkCallout ?: "$KOBWEB_DOM.GenericTag(\"blockquote\")"

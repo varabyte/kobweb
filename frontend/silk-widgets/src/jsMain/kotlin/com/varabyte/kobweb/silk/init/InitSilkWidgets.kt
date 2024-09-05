@@ -318,7 +318,6 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerStyle("silk-callout-type_question", CalloutType.QUESTION)
     mutableTheme.registerStyle("silk-callout-type_quote", CalloutType.QUOTE)
     mutableTheme.registerStyle("silk-callout-type_tip", CalloutType.TIP)
-    mutableTheme.registerStyle("silk-callout-type_unknown", CalloutType.UNKNOWN)
     mutableTheme.registerStyle("silk-callout-type_warning", CalloutType.WARNING)
 }
 
