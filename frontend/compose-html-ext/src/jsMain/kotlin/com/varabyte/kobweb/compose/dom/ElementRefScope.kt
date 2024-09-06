@@ -13,19 +13,20 @@ import org.w3c.dom.Element
  *   specific element type (e.g. `HTMLDivElement`), you can still register a more generic handler against it
  *   (e.g. an `HTMLElement`)
  */
+@ConsistentCopyVisibility
 data class ElementRefScope<in TElement : Element> internal constructor(
     internal val keyedCallbacks: List<KeysToEffect<TElement>>
 ) {
     internal sealed class RefCallback<in TElement : Element> {
         abstract operator fun invoke(scope: DisposableEffectScope, element: TElement): DisposableEffectResult
-        class Simple<TElement : Element>(val handle: (TElement) -> Unit) : RefCallback<TElement>() {
+        data class Simple<TElement : Element>(val handle: (TElement) -> Unit) : RefCallback<TElement>() {
             override fun invoke(scope: DisposableEffectScope, element: TElement): DisposableEffectResult {
                 handle(element)
                 return scope.onDispose {}
             }
         }
 
-        class Disposable<TElement : Element>(val effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) :
+        data class Disposable<TElement : Element>(val effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) :
             RefCallback<TElement>() {
             override fun invoke(scope: DisposableEffectScope, element: TElement): DisposableEffectResult {
                 return scope.effect(element)
