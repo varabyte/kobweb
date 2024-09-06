@@ -19,6 +19,9 @@ import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.display.Callout
 import com.varabyte.kobweb.silk.components.display.CalloutType
+import com.varabyte.kobweb.silk.components.display.LeftBorderedCalloutVariant
+import com.varabyte.kobweb.silk.components.display.LeftBorderedFilledCalloutVariant
+import com.varabyte.kobweb.silk.components.display.MatchingLinkCalloutVariant
 import com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
@@ -72,6 +75,7 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaUser
 import com.varabyte.kobweb.silk.components.icons.fa.IconStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.overlay.KeepPopupOpenStrategy
 import com.varabyte.kobweb.silk.components.overlay.Popover
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
@@ -88,6 +92,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.attributes.AutoComplete
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Text
 import playground.components.layouts.PageLayout
@@ -157,18 +162,16 @@ fun WidgetsPage() {
             }
 
             WidgetSection("Callout") {
-                Column(Modifier.gap(1.cssRem)) {
+                Div {
                     listOf(
                         CalloutType.NOTE,
-                        CalloutType.QUOTE,
                         CalloutType.TIP,
                         CalloutType.IMPORTANT,
-                        CalloutType.QUESTION,
-                        CalloutType.CAUTION,
                         CalloutType.WARNING,
                     ).forEach { type ->
-                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
-                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = OutlinedCalloutVariant)
+                        Callout(type,  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+                        Callout(type,  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = OutlinedCalloutVariant)
+                        Callout(type,  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = LeftBorderedFilledCalloutVariant)
                     }
                 }
             }

@@ -13,6 +13,8 @@ import com.varabyte.kobweb.silk.components.disclosure.TabsTabStyle
 import com.varabyte.kobweb.silk.components.display.CalloutStyle
 import com.varabyte.kobweb.silk.components.display.CalloutType
 import com.varabyte.kobweb.silk.components.display.LeftBorderedCalloutVariant
+import com.varabyte.kobweb.silk.components.display.LeftBorderedFilledCalloutVariant
+import com.varabyte.kobweb.silk.components.display.MatchingLinkCalloutVariant
 import com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
@@ -251,7 +253,9 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerStyle("silk-canvas", CanvasStyle)
     mutableTheme.registerStyle("silk-callout", CalloutStyle)
     mutableTheme.registerVariant("-left-bordered", LeftBorderedCalloutVariant)
+    mutableTheme.registerVariant("-left-bordered-filled", LeftBorderedFilledCalloutVariant)
     mutableTheme.registerVariant("-outlined", OutlinedCalloutVariant)
+    mutableTheme.registerVariant("-matching-link", MatchingLinkCalloutVariant)
     mutableTheme.registerStyle("silk-checkbox", CheckboxStyle)
     mutableTheme.registerVariant("-checkbox", CheckboxInputVariant)
     mutableTheme.registerStyle("silk-checkbox-icon-container", CheckboxIconContainerStyle)

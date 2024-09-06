@@ -27,6 +27,7 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleScope
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.addVariant
+import com.varabyte.kobweb.silk.style.selectors.descendants
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.palette.callout
@@ -183,6 +184,30 @@ val LeftBorderedCalloutVariant = CalloutStyle.addVariant {
     markdownParagraphHack()
 }
 
+// Style from https://just-the-docs.com/docs/ui-components/callouts/
+val LeftBorderedFilledCalloutVariant = CalloutStyle.addVariant {
+    base {
+        Modifier
+            .borderLeft(0.25.em, LineStyle.Solid, CalloutVars.Color.value())
+            .backgroundColor(CalloutVars.BackgroundColor.value())
+            .borderRadius(4.px)
+            .padding(0.8.cssRem)
+            .boxShadow(
+                BoxShadow.of(0.px, 1.px, 2.px, color = Colors.Black.copyf(alpha = 0.12f)),
+                BoxShadow.of(0.px, 3.px, 10.px, color = Colors.Black.copyf(alpha = 0.08f)),
+            )
+    }
+
+    cssRule(" >.callout-title") {
+        Modifier
+            .color(CalloutVars.Color.value())
+            .margin { bottom(0.25.cssRem) }
+    }
+
+    markdownParagraphHack()
+}
+
+
 // Style from https://squidfunk.github.io/mkdocs-material/reference/admonitions/
 val OutlinedCalloutVariant = CalloutStyle.addVariant {
     base {
@@ -206,6 +231,18 @@ val OutlinedCalloutVariant = CalloutStyle.addVariant {
     }
 
     markdownParagraphHack()
+}
+
+/**
+ * A variant which makes it so any links inside the callout match the callout's color.
+ *
+ * Note that this variant isn't expected to be used on its own; it should be combined with another base variant.
+ * For example, `LeftBorderedCalloutVariant.then(MatchingLinkCalloutVariant)`.
+ */
+val MatchingLinkCalloutVariant = CalloutStyle.addVariant {
+    descendants(":any-link") {
+        Modifier.color(CalloutVars.Color.value())
+    }
 }
 
 object CalloutDefaults {

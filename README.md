@@ -2049,13 +2049,26 @@ kobweb {
 > Callouts are provided by Silk. If your project does not use Silk and you override the blockquote handler like this,
 > it will generate code that will cause a compile error.
 
-#### Outlined variant
+#### Callout variants
 
-Silk provides an outlined variant for callouts. For example:
+Silk provides a handful of variants for callouts.
+
+For example, an outlined variant:
 
 ![Markdown outlined callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-outlined.png)
 
-If you prefer this style, you can set the `variant` parameter in the `SilkCalloutBlockquoteHandler`:
+and a filled variant:
+
+![Markdown filled callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-filled.png)
+
+You can also combine any of the standard variants with an additional matching link variant (e.g.
+`LeftBorderedCalloutVariant.then(MatchingLinkCalloutVariant))`) to make it so that any hyperlinks inside the callout
+will match the color of the callout itself:
+
+![Markdown matching link callouts](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callouts-matching-link.png)
+
+If you prefer any of these styles over the default, you can set the `variant` parameter in the
+`SilkCalloutBlockquoteHandler`, for example here we set it to the outlined variant:
 
 ```kotlin
 kobweb {
@@ -2067,7 +2080,7 @@ kobweb {
 }
 ```
 
-Of course, you can also define your own variant in code and pass that in here as well.
+Of course, you can also define your own variant in your own codebase and pass that in here as well.
 
 #### Custom callouts
 
