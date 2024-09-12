@@ -1,5 +1,5 @@
 [![version: 0.19.2](https://img.shields.io/badge/kobweb-0.19.2-blue)](COMPATIBILITY.md)
-[![version: 0.9.15](https://img.shields.io/badge/kobweb_cli-0.9.15-blue)](https://github.com/varabyte/kobweb-cli)
+[![version: 0.9.16](https://img.shields.io/badge/kobweb_cli-0.9.16-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
 [![kotlin: 2.0.20](https://img.shields.io/badge/kotlin-2.0.20-blue?logo=kotlin)](COMPATIBILITY.md)
 [![compose: 1.6.11](https://img.shields.io/badge/compose-1.6.11-blue?logo=jetpackcompose)](COMPATIBILITY.md)
@@ -180,7 +180,7 @@ Please see: https://github.com/varabyte/kobweb-cli/issues/11 and consider leavin
 ## Download the Kobweb binary
 
 Our binary artifact is hosted on GitHub. To download the latest, you can either
-[grab the zip or tar file from GitHub](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.15) or you can fetch
+[grab the zip or tar file from GitHub](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.16) or you can fetch
 it from your terminal:
 
 ```bash
@@ -188,19 +188,19 @@ $ cd /path/to/applications
 
 # You can either pull down the zip file
 
-$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.15/kobweb-0.9.15.zip
-$ unzip kobweb-0.9.15.zip
+$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.16/kobweb-0.9.16.zip
+$ unzip kobweb-0.9.16.zip
 
 # ... or the tar file
 
-$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.15/kobweb-0.9.15.tar
-$ tar -xvf kobweb-0.9.15.tar
+$ wget https://github.com/varabyte/kobweb-cli/releases/download/v0.9.16/kobweb-0.9.16.tar
+$ tar -xvf kobweb-0.9.16.tar
 ```
 
 and I recommend adding it to your path, either directly:
 
 ```bash
-$ PATH=$PATH:/path/to/applications/kobweb-0.9.15/bin
+$ PATH=$PATH:/path/to/applications/kobweb-0.9.16/bin
 $ kobweb version # to check it's working
 ```
 
@@ -208,7 +208,7 @@ or via symbolic link:
 
 ```bash
 $ cd /path/to/bin # some folder you've created that's in your PATH
-$ ln -s /path/to/applications/kobweb-0.9.15/bin/kobweb kobweb
+$ ln -s /path/to/applications/kobweb-0.9.16/bin/kobweb kobweb
 ```
 
 ## Build the Kobweb binary
@@ -266,7 +266,7 @@ you installed it.
 | Scoop                     | `scoop update kobweb`                                                                                                                |
 | SDKMAN!                   | `sdk upgrade kobweb`                                                                                                                 |
 | Arch Linux                | Rerunning [install steps](#arch-linux) should work. If using an AUR helper, you may need to review its manual.                       |
-| Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.15). You can find both a zip and tar file there. |
+| Downloaded from<br>Github | Visit the [latest release](https://github.com/varabyte/kobweb-cli/releases/tag/v0.9.16). You can find both a zip and tar file there. |
 
 ## Create your Kobweb site
 
@@ -4515,7 +4515,7 @@ jobs:
         shell: bash
 
     env:
-      KOBWEB_CLI_VERSION: 0.9.15
+      KOBWEB_CLI_VERSION: 0.9.16
 
     steps:
       - uses: actions/checkout@v4
