@@ -224,6 +224,8 @@ If you want full control over your JDK install, manually downloading is a good o
 * [Download a JDK for your OS](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
 * Unzip it somewhere
 * Update your `JAVA_HOME` variable to point at it.
+* In case you have set `JAVA_HOME` for the first time, add `%JAVA_HOME%\bin` to your path variable as well
+* Verify the installation by running `java -version` in a command prompt
 
 ```bash
 JAVA_HOME=/path/to/jdks/corretto-11.0.12
