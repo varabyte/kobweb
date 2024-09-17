@@ -8,6 +8,7 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
+import org.w3c.dom.Element
 import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.url.URL
@@ -426,16 +427,18 @@ class Router {
 
             // Update URL to match page we navigated to
             "${window.location.origin}$pathQueryAndFragment".let { url ->
+                // It's possible only the search params or hash changed, in which case we don't want to reset the
+                // current page scroll. (pathname is the part of the URL that is just the path, no origin or search
+                // params or hash).
+                val onNewPage = window.location.pathname != Route.fromUrl(URL(url)).path
+
                 if (window.location.href != url) {
-                    // It's possible only the search params or hash changed, in which case we don't want to reset the
-                    // current page scroll
-                    val newPathname = window.location.pathname != Route.fromUrl(URL(url)).path
                     when (updateHistoryMode) {
                         UpdateHistoryMode.PUSH -> window.history.pushState(window.history.state, "", url)
                         UpdateHistoryMode.REPLACE -> window.history.replaceState(window.history.state, "", url)
                     }
 
-                    if (newPathname) {
+                    if (onNewPage) {
                         document.documentElement?.scrollTop = 0.0
                     }
                 }
@@ -443,17 +446,24 @@ class Router {
                 // Even if the URL hasn't changed, still scroll to the target element if you can. Sometimes a user might
                 // scroll the page and then re-enter the same URL to go back.
                 if (url.contains('#')) {
-                    // We need to give the page a chance to render first, or else the element with the ID might not
-                    // exist yet.
-                    MutationObserver { mutations, observer ->
-                        mutations.forEach { mutation ->
-                            if (mutation.type == "childList") {
-                                document.getElementById(url.substringAfter('#'))
-                                    ?.scrollIntoView(js("{behavior: \"smooth\"}"))
-                                observer.disconnect()
+                    fun Element.scrollIntoViewSmoothly() {
+                        scrollIntoView(js("{behavior: \"smooth\"}"))
+                    }
+
+                    if (onNewPage) {
+                        // We need to give the page a chance to render first, or else the element with the ID might not
+                        // exist yet.
+                        MutationObserver { mutations, observer ->
+                            mutations.forEach { mutation ->
+                                if (mutation.type == "childList") {
+                                    document.getElementById(url.substringAfter('#'))?.scrollIntoViewSmoothly()
+                                    observer.disconnect()
+                                }
                             }
-                        }
-                    }.observe(document.body!!, MutationObserverInit(childList = true, subtree = true))
+                        }.observe(document.body!!, MutationObserverInit(childList = true, subtree = true))
+                    } else {
+                        document.getElementById(url.substringAfter('#'))?.scrollIntoViewSmoothly()
+                    }
                 }
             }
 
