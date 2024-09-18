@@ -31,6 +31,12 @@ fun updateTheme(ctx: InitSilkContext) = ctx.config.apply {
 
 @InitSilk
 fun registerGlobalStyles(ctx: InitSilkContext) = ctx.stylesheet.apply {
+    registerStyle("html") {
+        cssRule(CSSMediaQuery.MediaFeature("prefers-reduced-motion", StylePropertyValue("no-preference"))) {
+            Modifier.scrollBehavior(ScrollBehavior.Smooth)
+        }
+    }
+
     registerStyleBase("body") {
         Modifier
             .fontFamily(

@@ -446,23 +446,20 @@ class Router {
                 // Even if the URL hasn't changed, still scroll to the target element if you can. Sometimes a user might
                 // scroll the page and then re-enter the same URL to go back.
                 if (url.contains('#')) {
-                    fun Element.scrollIntoViewSmoothly() {
-                        scrollIntoView(js("{behavior: \"smooth\"}"))
-                    }
-
+                    fun scrollElementIntoView() = document.getElementById(url.substringAfter('#'))?.scrollIntoView()
                     if (onNewPage) {
                         // We need to give the page a chance to render first, or else the element with the ID might not
                         // exist yet.
                         MutationObserver { mutations, observer ->
                             mutations.forEach { mutation ->
                                 if (mutation.type == "childList") {
-                                    document.getElementById(url.substringAfter('#'))?.scrollIntoViewSmoothly()
+                                    scrollElementIntoView()
                                     observer.disconnect()
                                 }
                             }
                         }.observe(document.body!!, MutationObserverInit(childList = true, subtree = true))
                     } else {
-                        document.getElementById(url.substringAfter('#'))?.scrollIntoViewSmoothly()
+                        scrollElementIntoView()
                     }
                 }
             }
