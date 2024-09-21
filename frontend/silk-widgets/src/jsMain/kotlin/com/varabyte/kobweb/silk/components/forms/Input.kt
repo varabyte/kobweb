@@ -482,13 +482,12 @@ private fun <T : Any?> _Input(
             .then(modifier)
             .toAttrs {
                 if (value != null) {
-                    @Suppress("UNNECESSARY_NOT_NULL_ASSERTION") // value!! or compile error...
                     when (value) {
                         is String -> value(value)
                         is Number -> value(value)
                         is Boolean -> checked(value)
                         is Unit -> {}
-                        else -> error("Unexpected `Input` value type: ${value!!::class}")
+                        else -> error("Unexpected `Input` value type: ${value::class}")
                     }
                 }
 
