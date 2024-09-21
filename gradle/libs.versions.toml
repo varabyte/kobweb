@@ -11,7 +11,7 @@ kotlinx-coroutines = "1.8.1"
 kotlinx-html = "0.11.0"
 kotlinx-serialization = "1.7.1"
 ksp = "2.0.20-1.0.25"
-ktor = "2.3.12"
+ktor = "3.0.0"
 logback = "1.4.14"
 truthish = "1.0.2-SNAPSHOT"
 shadow = "8.3.0"
@@ -44,7 +44,7 @@ ktor-server-default-headers = { module = "io.ktor:ktor-server-default-headers", 
 ktor-server-forwarded-header = { module = "io.ktor:ktor-server-forwarded-header", version.ref = "ktor" }
 ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
-ktor-server-tests = { module = "io.ktor:ktor-server-tests", version.ref = "ktor" }
+ktor-server-tests = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 playwright = { module = "com.microsoft.playwright:playwright", version.ref = "playwright" }

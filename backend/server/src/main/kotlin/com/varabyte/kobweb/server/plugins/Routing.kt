@@ -31,7 +31,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.util.*
-import io.ktor.util.pipeline.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +45,6 @@ import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
-import kotlin.time.toJavaDuration
 import java.lang.StackTraceElement as JavaStackTraceElement // Needed to disambiguate from ktor `StackTraceElement`
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
@@ -136,7 +134,7 @@ private fun RequestConnectionPoint.toRequestConnectionDetails() = Request.Connec
     serverPort = serverPort,
 )
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.handleApiCall(
+private suspend fun RoutingContext.handleApiCall(
     env: ServerEnvironment,
     apiJar: ApiJarFile,
     httpMethod: HttpMethod,
@@ -260,8 +258,8 @@ private fun Routing.setupStreaming(
     logger.info("Initializing Kobweb streams.")
 
     application.install(WebSockets) {
-        pingPeriod = conf.server.streaming.pingPeriod.toJavaDuration()
-        timeout = conf.server.streaming.timeout.toJavaDuration()
+        pingPeriod = conf.server.streaming.pingPeriod
+        timeout = conf.server.streaming.timeout
     }
 
     val sessions = Collections.synchronizedMap(mutableMapOf<WebSocketSession, WebSocketSessionStreamData>())
@@ -351,7 +349,7 @@ private fun Routing.configureApiRouting(
     }
 }
 
-private suspend fun PipelineContext<*, ApplicationCall>.serveScriptFiles(
+private suspend fun RoutingContext.serveScriptFiles(
     path: String, script: Path, scriptMap: Path): Boolean {
     val filename = path.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: return false
 
@@ -365,7 +363,7 @@ private suspend fun PipelineContext<*, ApplicationCall>.serveScriptFiles(
 
 // Abort early on missing resources, so we don't serve giant html pages simply because someone forgot to
 // add a favicon.ico file, for example.
-private suspend fun PipelineContext<*, ApplicationCall>.abortIfNotHtml(): Boolean {
+private suspend fun RoutingContext.abortIfNotHtml(): Boolean {
     val acceptsHtml = call.request.acceptItems().any { it.value == ContentType.Text.Html.toString() }
     return if (!acceptsHtml) {
         call.respond(HttpStatusCode.NotFound)
@@ -375,16 +373,16 @@ private suspend fun PipelineContext<*, ApplicationCall>.abortIfNotHtml(): Boolea
 
 // As a fallback, server the 'index.html' file if no other resource is matched by the path. The index file
 // contains general logic which can figure out what to do (e.g. show the user a 404 page)
-private suspend fun PipelineContext<*, ApplicationCall>.serveIndexFile(index: Path) {
+private suspend fun RoutingContext.serveIndexFile(index: Path) {
     call.respondFile(index.toFile())
 }
 
 /**
  * Common handler used by [configureCatchAllRouting] since we have multiple route patterns which need the same handling
  */
-private suspend fun PipelineContext<*, ApplicationCall>.handleCatchAllRouting(
+private suspend fun RoutingContext.handleCatchAllRouting(
     pathParts: List<String>,
-    vararg handlers: suspend PipelineContext<*, ApplicationCall>.(String) -> Boolean,
+    vararg handlers: suspend RoutingContext.(String) -> Boolean,
 ) {
     val pathString = pathParts.joinToString("/")
 
@@ -398,7 +396,7 @@ private fun List<Redirect>.toPatternMappers(): List<PatternMapper> {
 }
 
 @Suppress("NAME_SHADOWING")
-private suspend fun PipelineContext<*, ApplicationCall>.handleRedirect(
+private suspend fun RoutingContext.handleRedirect(
     routePrefix: String,
     path: String,
     redirects: List<PatternMapper>
