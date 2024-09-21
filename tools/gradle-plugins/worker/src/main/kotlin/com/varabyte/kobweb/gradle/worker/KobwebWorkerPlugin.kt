@@ -28,7 +28,6 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
-import org.jetbrains.kotlin.gradle.utils.provider
 
 @Suppress("unused") // Used by Gradle
 class KobwebWorkerPlugin : Plugin<Project> {
@@ -63,11 +62,10 @@ class KobwebWorkerPlugin : Plugin<Project> {
                 from(kobwebGenerateWorkerMetadataTask)
             }
 
-            val jsBrowserDistributionTask by provider { project.tasks.named(jsTarget.browserDistribution) }
             val copyWorkerJsOutput = project.tasks.register<Sync>("kobwebCopyWorkerJsOutput") {
                 val genResDir = project.layout.buildDirectory.dir("generated/kobweb/worker/output")
 
-                from(jsBrowserDistributionTask)
+                from(project.tasks.named(jsTarget.browserDistribution))
                 // NOTE: I originally also included the .js.map file, but it doesn't seem to get loaded by the browser,
                 // and meanwhile its presence causes the Kotlin/JS compiler to spit out a huuuuuuge warning. So for now
                 // I'm leaving it out, but we may revisit this decision later.
