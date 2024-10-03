@@ -51,7 +51,7 @@ abstract class KobwebCreateServerScriptsTask :
             )
             
             :: Run the java command with the common parameters
-            %java_cmd% $javaArgs
+            "%java_cmd%" $javaArgs
         """.trimIndent()
         )
 
