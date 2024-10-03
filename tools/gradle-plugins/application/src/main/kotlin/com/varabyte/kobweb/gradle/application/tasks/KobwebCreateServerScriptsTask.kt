@@ -6,13 +6,15 @@ import com.varabyte.kobweb.gradle.application.util.getServerJar
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerEnvironment
 import com.varabyte.kobweb.server.api.SiteLayout
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import javax.inject.Inject
 
 /**
  * A simple task for creating scripts which can be used to run the Kobweb server in production mode.
  */
-abstract class KobwebCreateServerScriptsTask :
+abstract class KobwebCreateServerScriptsTask @Inject constructor(@get:Input val siteLayout: SiteLayout) :
     KobwebTask("Create scripts which can be used to start the Kobweb server in production mode") {
     @OutputFile
     fun getServerStartShellScript() =
@@ -25,7 +27,7 @@ abstract class KobwebCreateServerScriptsTask :
     fun execute() {
         val javaArgs = listOf(
             ServerEnvironment.PROD.toSystemPropertyParam(),
-            SiteLayout.FULLSTACK.toSystemPropertyParam(),
+            siteLayout.toSystemPropertyParam(),
             "-Dio.ktor.development=false",
             "-jar",
             kobwebApplication.kobwebFolder.getServerJar().absolutePath.let {

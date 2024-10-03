@@ -128,7 +128,8 @@ class KobwebApplicationPlugin @Inject constructor(
 
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
-            .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts")
+            .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts", exportLayout)
+
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.toString()?.toBoolean() ?: true
             project.tasks.register<KobwebStartTask>(
