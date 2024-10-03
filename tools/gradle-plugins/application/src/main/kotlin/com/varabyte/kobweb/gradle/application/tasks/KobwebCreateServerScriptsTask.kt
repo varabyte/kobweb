@@ -50,7 +50,6 @@ abstract class KobwebCreateServerScriptsTask :
                 set "java_cmd=java"
             )
             
-            :: Run the java command with the common parameters
             "%java_cmd%" $javaArgs
         """.trimIndent()
         )
@@ -67,12 +66,14 @@ abstract class KobwebCreateServerScriptsTask :
                 args="$javaArgs"
                 
                 if [ -n "${'$'}KOBWEB_JAVA_HOME" ]; then
-                    "${'$'}KOBWEB_JAVA_HOME/bin/java" ${'$'}args
+                    java_cmd="${'$'}KOBWEB_JAVA_HOME/bin/java"
                 elif [ -n "${'$'}JAVA_HOME" ]; then
-                    "${'$'}JAVA_HOME/bin/java" ${'$'}args
+                    java_cmd="${'$'}JAVA_HOME/bin/java"
                 else
-                    java ${'$'}args
+                    java_cmd="java"
                 fi
+
+                "${'$'}java_cmd" ${'$'}args
             """.trimIndent()
             )
             setExecutable(true)
