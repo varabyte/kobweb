@@ -7,7 +7,6 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.withIndent
 import com.varabyte.kobweb.common.navigation.RoutePrefix
 import com.varabyte.kobweb.gradle.application.BuildTarget
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.project.conf.Server
 import com.varabyte.kobweb.project.frontend.AppData
 
@@ -119,7 +118,10 @@ fun createMainFunction(
                             }
                             if (lastVersion != version) {
                                 lastVersion = version
-                                if (status.className.isNotEmpty()) {
+                                if (document.asDynamic().hidden) {
+                                    // Reload immediately when the page is not visible as the animation will not run
+                                    forceReloadNow()
+                                } else if (status.className.isNotEmpty()) {
                                     shouldReload = true
                                 } else {
                                     // Not sure if we can get here but if we can't rely on the status transition
