@@ -138,6 +138,7 @@ class WorkerProcessor(
         ).writer().use { writer ->
             val workerFactoryType = workerFactoryInfo.classDeclaration.qualifiedName!!.asString()
 
+            // language=kotlin
             writer.write(
                 """
             ${workerPackage.takeIf { it.isNotEmpty() }?.let { "package $it" } ?: ""}
@@ -199,6 +200,7 @@ class WorkerProcessor(
             packageName = "",
             fileName = "main",
         ).writer().use { writer ->
+            // language=kotlin
             writer.write(
                 """
                     import com.varabyte.kobweb.worker.InputMessage

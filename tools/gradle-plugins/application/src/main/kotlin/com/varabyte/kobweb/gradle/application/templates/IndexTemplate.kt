@@ -18,6 +18,7 @@ import kotlinx.html.unsafe
 
 private fun BODY.buildIndicator() {
     unsafe {
+        // language=html
         raw(
             """
                 <!-- Encoded spinner character is a cobweb -->

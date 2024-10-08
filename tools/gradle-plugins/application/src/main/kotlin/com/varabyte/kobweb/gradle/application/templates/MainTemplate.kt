@@ -91,6 +91,7 @@ fun createMainFunction(
         fileBuilder.addFunction(
             FunSpec.builder("handleServerStatusEvents")
                 .addModifiers(KModifier.PRIVATE)
+                // language=kotlin
                 .addCode(
                     """
                         val status = document.getElementById("status")!!

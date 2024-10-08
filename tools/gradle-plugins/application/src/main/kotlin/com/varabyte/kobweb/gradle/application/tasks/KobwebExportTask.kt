@@ -27,12 +27,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
 import java.io.File
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
 import javax.inject.Inject
-import kotlin.io.path.exists
-import kotlin.io.path.name
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 import kotlin.time.DurationUnit
@@ -93,6 +88,7 @@ abstract class KobwebExportTask @Inject constructor(
         // If we didn't do this, then what would happen is the user would download the page, see raw text unadorned
         // without any styles, and then after a brief period of time (depending on download speeds) styles would pop
         // in, quite jarringly.
+        // language=javascript
         evaluate(
             """
                 for (let s = 0; s < document.styleSheets.length; s++) {
