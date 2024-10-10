@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.compose.compiler)
+    id("kobweb-compose")
 }
 
 group = "com.varabyte.kobweb"
