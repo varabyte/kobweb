@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     id("com.varabyte.kobweb.application")
     id("com.varabyte.kobwebx.markdown")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 group = "playground"
@@ -36,12 +37,14 @@ kotlin {
         }
         jsMain.dependencies {
             implementation(libs.compose.html.core)
+            implementation(libs.kotlinx.serialization.json)
             implementation("com.varabyte.kobweb:kobweb-core")
             implementation("com.varabyte.kobweb:kobweb-silk")
             implementation("com.varabyte.kobwebx:silk-icons-fa")
             implementation("com.varabyte.kobwebx:kobwebx-markdown")
             implementation(project(":sitelib"))
             implementation(project(":worker"))
+            implementation("com.varabyte.kobweb:kobwebx-core-serialization")
         }
         jvmMain.dependencies {
             implementation("com.varabyte.kobweb:kobweb-api")
