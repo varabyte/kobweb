@@ -1,0 +1,1 @@
+This module provides a collection of useful extensions for Kotlinx Serialization, specifically designed for browser APIs. These extensions are not applicable for Node APIs. 
