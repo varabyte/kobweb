@@ -355,8 +355,8 @@ private suspend fun RoutingContext.serveScriptFiles(
     val filename = path.substringAfterLast('/').takeIf { it.isNotEmpty() } ?: return false
 
     when (filename) {
-        script.name -> call.respondFile(script.toFile())
-        scriptMap.name -> call.respondFile(scriptMap.toFile())
+        script.name -> call.respondPath(script)
+        scriptMap.name -> call.respondPath(scriptMap)
         else -> return false
     }
     return true
@@ -375,7 +375,7 @@ private suspend fun RoutingContext.abortIfNotHtml(): Boolean {
 // As a fallback, server the 'index.html' file if no other resource is matched by the path. The index file
 // contains general logic which can figure out what to do (e.g. show the user a 404 page)
 private suspend fun RoutingContext.serveIndexFile(index: Path) {
-    call.respondFile(index.toFile())
+    call.respondPath(index)
 }
 
 /**
