@@ -37,6 +37,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -46,6 +47,7 @@ import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
+import kotlin.time.Duration.Companion.seconds
 import java.lang.StackTraceElement as JavaStackTraceElement // Needed to disambiguate from ktor `StackTraceElement`
 
 /** Somewhat uniqueish parameter key name so it's unlikely to clash with anything a user would choose by chance. */
@@ -514,11 +516,17 @@ private fun Application.configureDevRouting(
                 // If we don't swallow exceptions, sometimes the server freaks out when things are shutting down
                 val swallowExceptionHandler = CoroutineExceptionHandler { _, _ -> }
                 withContext(Dispatchers.IO + swallowExceptionHandler) {
+                    launch {
+                        // Keep the SSE connection alive by sending a message every 15s, as recommended below
+                        // https://html.spec.whatwg.org/multipage/server-sent-events.html#authoring-notes
+                        while (true) {
+                            delay(15.seconds)
+                            send(comments = "keepalive")
+                        }
+                    }
                     var lastVersion: Int? = null
                     var lastStatus: String? = null
                     while (true) {
-                        send(comments = "keepalive")
-
                         if (lastVersion != globals.version) {
                             lastVersion = globals.version
                             send(event = "version", data = lastVersion.toString())
