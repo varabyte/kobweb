@@ -29,6 +29,7 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sse.*
 import io.ktor.server.websocket.*
 import io.ktor.util.*
 import io.ktor.websocket.*
@@ -503,44 +504,36 @@ private fun Application.configureDevRouting(
     val script = Path(conf.server.files.dev.script)
     val contentRoot = Path(conf.server.files.dev.contentRoot)
 
+    install(SSE)
     routing {
         // Set up SSE (server-sent events) for the client to hear about the state of our server
-        get("/api/kobweb-status") {
+        sse("/api/kobweb-status") {
             logger.debug("Client connected and is requesting kobweb status events.")
 
-            call.response.cacheControl(CacheControl.NoCache(null))
             try {
-                call.respondTextWriter(contentType = ContentType.Text.EventStream) {
-                    // If we don't swallow exceptions, sometimes the server freaks out when things are shutting down
-                    val swallowExceptionHandler = CoroutineExceptionHandler { _, _ -> }
-                    withContext(Dispatchers.IO + swallowExceptionHandler) {
-                        var lastVersion: Int? = null
-                        var lastStatus: String? = null
-                        while (true) {
-                            write(": keepalive\n")
-                            write("\n")
+                // If we don't swallow exceptions, sometimes the server freaks out when things are shutting down
+                val swallowExceptionHandler = CoroutineExceptionHandler { _, _ -> }
+                withContext(Dispatchers.IO + swallowExceptionHandler) {
+                    var lastVersion: Int? = null
+                    var lastStatus: String? = null
+                    while (true) {
+                        send(comments = "keepalive")
 
-                            if (lastVersion != globals.version) {
-                                lastVersion = globals.version
-                                write("event: version\n")
-                                write("data: $lastVersion\n")
-                                write("\n")
-                            }
-
-                            if (lastStatus != globals.status) {
-                                lastStatus = globals.status
-                                val statusData = mapOf(
-                                    "text" to globals.status.orEmpty(),
-                                    "isError" to globals.isStatusError.toString(),
-                                )
-                                write("event: status\n")
-                                write("data: ${Json.encodeToString(statusData)}\n")
-                                write("\n")
-                            }
-
-                            flush()
-                            delay(300)
+                        if (lastVersion != globals.version) {
+                            lastVersion = globals.version
+                            send(event = "version", data = lastVersion.toString())
                         }
+
+                        if (lastStatus != globals.status) {
+                            lastStatus = globals.status
+                            val statusData = mapOf(
+                                "text" to globals.status.orEmpty(),
+                                "isError" to globals.isStatusError.toString(),
+                            )
+                            send(event = "status", data = Json.encodeToString(statusData))
+                        }
+
+                        delay(300)
                     }
                 }
             } catch (t: Throwable) {
