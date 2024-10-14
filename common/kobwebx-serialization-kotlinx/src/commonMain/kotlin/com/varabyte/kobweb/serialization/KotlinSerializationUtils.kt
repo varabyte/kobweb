@@ -1,6 +1,5 @@
-package com.varabyte.kobwebx.worker.kotlinx.serialization.util
+package com.varabyte.kobweb.serialization
 
-import com.varabyte.kobweb.serialization.IOSerializer
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -25,7 +24,6 @@ import kotlinx.serialization.encodeToString
  * }
  * ```
  */
-@Deprecated("Method has been reloacted. Please use com.varabyte.kobweb.serialization.createIOSerializer instead.")
 inline fun <reified I, reified O> StringFormat.createIOSerializer() = object : IOSerializer<I, O> {
     override fun serializeInput(input: I): String = encodeToString(input)
     override fun deserializeInput(input: String): I = decodeFromString(input)

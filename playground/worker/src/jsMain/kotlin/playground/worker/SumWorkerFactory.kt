@@ -1,9 +1,9 @@
 package playground.worker
 
+import com.varabyte.kobweb.serialization.createIOSerializer
 import com.varabyte.kobweb.worker.OutputDispatcher
 import com.varabyte.kobweb.worker.WorkerFactory
 import com.varabyte.kobweb.worker.WorkerStrategy
-import com.varabyte.kobwebx.worker.kotlinx.serialization.util.createIOSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
