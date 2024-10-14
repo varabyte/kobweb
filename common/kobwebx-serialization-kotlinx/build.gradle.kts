@@ -19,10 +19,20 @@ kotlin {
             implementation(projects.common.kobwebSerialization)
             implementation(libs.kotlinx.serialization.json)
         }
+
+        jsMain.dependencies {
+            implementation(libs.kotlinx.coroutines)
+            implementation(projects.frontend.kobwebCore)
+        }
+
+        jsTest.dependencies {
+            implementation(kotlin("test-js"))
+            implementation(libs.truthish)
+        }
     }
 }
 
 kobwebPublication {
     artifactId.setForMultiplatform("kobwebx-serialization-kotlinx")
-    description.set("Support code for using Kobweb workers in projects using Kotlinx Serialization")
+    description.set("Generally useful Kotlinx Serialization extensions for various Kobweb APIs.")
 }

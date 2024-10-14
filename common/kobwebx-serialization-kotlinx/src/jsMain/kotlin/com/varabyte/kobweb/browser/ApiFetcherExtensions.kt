@@ -1,20 +1,6 @@
 package com.varabyte.kobweb.browser
 
 import com.varabyte.kobweb.browser.http.AbortController
-import com.varabyte.kobweb.browser.http.delete
-import com.varabyte.kobweb.browser.http.get
-import com.varabyte.kobweb.browser.http.head
-import com.varabyte.kobweb.browser.http.options
-import com.varabyte.kobweb.browser.http.patch
-import com.varabyte.kobweb.browser.http.post
-import com.varabyte.kobweb.browser.http.put
-import com.varabyte.kobweb.browser.http.tryDelete
-import com.varabyte.kobweb.browser.http.tryGet
-import com.varabyte.kobweb.browser.http.tryHead
-import com.varabyte.kobweb.browser.http.tryOptions
-import com.varabyte.kobweb.browser.http.tryPatch
-import com.varabyte.kobweb.browser.http.tryPost
-import com.varabyte.kobweb.browser.http.tryPut
 import kotlinx.browser.window
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
