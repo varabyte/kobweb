@@ -1,10 +1,13 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
+import com.varabyte.kobweb.gradle.application.buildservices.KobwebServerService
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.server.api.ServerRequest
 import com.varabyte.kobweb.server.api.ServerRequestsFile
 import com.varabyte.kobweb.server.api.ServerStateFile
+import org.gradle.api.provider.Property
+import org.gradle.api.services.ServiceReference
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.time.Duration
@@ -17,8 +20,14 @@ private val STOP_TIMEOUT_MS = Duration.ofSeconds(10).toMillis()
  * This task will block until it can confirm the server is no longer running.
  */
 abstract class KobwebStopTask : KobwebTask("Stop a Kobweb server if one is running") {
+    @Suppress("UnstableApiUsage")
+    @get:ServiceReference("kobwebServer")
+    abstract val kobwebServer: Property<KobwebServerService>
+
     @TaskAction
     fun execute() {
+        kobwebServer.get().stop()
+
         val kobwebFolder = kobwebApplication.kobwebFolder
         val stateFile = ServerStateFile(kobwebFolder)
         stateFile.content?.let { serverState ->

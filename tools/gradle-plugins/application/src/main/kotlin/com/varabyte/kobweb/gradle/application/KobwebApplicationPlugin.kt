@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.ProcessorMode
+import com.varabyte.kobweb.gradle.application.buildservices.KobwebServerService
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
@@ -129,6 +130,11 @@ class KobwebApplicationPlugin @Inject constructor(
         val kobwebUnpackServerJarTask = project.tasks.register<KobwebUnpackServerJarTask>("kobwebUnpackServerJar")
         val kobwebCreateServerScriptsTask = project.tasks
             .register<KobwebCreateServerScriptsTask>("kobwebCreateServerScripts", exportLayout)
+
+        project.gradle.sharedServices.registerIfAbsent(
+            "kobwebServer",
+            KobwebServerService::class.java
+        )
 
         val kobwebStartTask = run {
             val reuseServer = project.findProperty("kobwebReuseServer")?.toString()?.toBoolean() ?: true

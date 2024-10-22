@@ -2,6 +2,7 @@ package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.common.io.consumeAsync
 import com.varabyte.kobweb.common.path.invariantSeparatorsPath
+import com.varabyte.kobweb.gradle.application.buildservices.KobwebServerService
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.util.toDisplayText
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
@@ -12,6 +13,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.services.ServiceReference
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
@@ -32,6 +35,10 @@ abstract class KobwebStartTask @Inject constructor(
     private val siteLayout: SiteLayout,
     private val reuseServer: Boolean,
 ) : KobwebTask("Start a Kobweb server") {
+
+    @Suppress("UnstableApiUsage")
+    @get:ServiceReference("kobwebServer")
+    abstract val kobwebServer: Property<KobwebServerService>
 
     /**
      * A collection of files that Gradle should watch for changes when running `kobwebStart` in continuous mode.
@@ -54,6 +61,8 @@ abstract class KobwebStartTask @Inject constructor(
 
     @TaskAction
     fun execute() {
+        kobwebServer.get().start()
+
         val stateFile = ServerStateFile(kobwebApplication.kobwebFolder)
         stateFile.content?.let { serverState ->
             if (serverState.isRunning()) {
