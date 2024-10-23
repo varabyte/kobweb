@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.project.io
 
 import com.varabyte.kobweb.project.KobwebFolder
+import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteIfExists
@@ -24,10 +25,16 @@ class LiveFile(val path: Path) {
             return path
                 .takeIf { it.exists() }
                 ?.let {
-                    val lastModified = path.getLastModifiedTime()
-                    if (this.lastModified != lastModified.toMillis()) {
-                        this.lastModified = lastModified.toMillis()
-                        _contentBytes = path.readBytes()
+                    try {
+                        val lastModified = path.getLastModifiedTime()
+                        if (this.lastModified != lastModified.toMillis()) {
+                            this.lastModified = lastModified.toMillis()
+                            _contentBytes = path.readBytes()
+                        }
+                    } catch (_: IOException) {
+                        // We've seen a case where the file existed in the `takeIf` check but was deleted after that but
+                        // before we could call readBytes on it.
+                        return null
                     }
 
                     _contentBytes
