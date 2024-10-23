@@ -39,21 +39,16 @@ abstract class KobwebTaskListener : BuildService<KobwebTaskListener.Parameters>,
     //     id("<includeBuild plugin>") apply false
     // }
     // Warning: The above approach may cause unnecessary builds depending on project setup, use at your own discretion.
-    var isServerRunning = run {
-        val stateFile = ServerStateFile(kobwebFolder)
-        stateFile.content?.let { serverState ->
-            ProcessHandle.of(serverState.pid).isPresent
-        }
-    } ?: false
+    var isServerRunning = ServerStateFile(kobwebFolder).content?.isRunning() ?: false
 
     override fun onFinish(event: FinishEvent) {
         if (!parameters.isKobwebStartBuild) return
 
         val taskName = event.descriptor.name.substringAfterLast(":")
-        val serverRequestsFile = ServerRequestsFile(kobwebFolder)
         val taskFailed = event.result is FailureResult
 
         if (isServerRunning) {
+            val serverRequestsFile = ServerRequestsFile(kobwebFolder)
             if (taskFailed) {
                 serverRequestsFile.enqueueRequest(
                     ServerRequest.SetStatus(
