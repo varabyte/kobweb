@@ -11,9 +11,12 @@ import org.w3c.dom.css.CSSRule
 import org.w3c.dom.css.CSSStyleSheet
 
 private fun CSSMediaQuery.invert(): CSSMediaQuery {
-    // Note: We invert a min-width query instead of using a max-width query because otherwise there's a width where
-    // both media queries overlap. It seems like you have to include the "not all" for some technical reason; otherwise,
-    // this would just be "Not(this)"
+    // Note: In CSS media queries, both min-width and max-width values are inclusive. However, we want
+    // `min <= width < max`. This is possible since 2023 using CSS media range queries, but for older browsers, we
+    // instead use query inversion instead. In other words, if we want "x < width", we can also do "not (x >= width)".
+    // In other words, inverting an inclusive comparison gives us an exclusive check.
+    // Note 2: It seems like you have to include the "not all" for some technical reason; otherwise, this would just be
+    // "Not(this)"
     // See also: https://stackoverflow.com/a/13611538
     return CSSMediaQuery.Raw("not all and $this")
 }
