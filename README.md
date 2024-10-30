@@ -1047,6 +1047,49 @@ val CustomStyle = CssStyle {
 > dimensions to see how your site looks at different sizes. For example, on Chrome, you can follow these instructions:
 > https://developer.chrome.com/docs/devtools/device-mode
 
+You can also specify that a style should only apply to a specific range of breakpoints using Kotlin range operators:
+
+```kotlin
+val CustomStyle = CssStyle {
+    // The following three declarations are the same, and ensure their style is only active in mobile / tablet modes
+
+    // Option 1: exclusive upper bound
+    (Breakpoint.ZERO ..< Breakpoint.MD) { Modifier.fontSize(24.px) }
+
+    // Option 2: using `until` for `..<`
+    (Breakpoint.ZERO until Breakpoint.MD) { Modifier.fontSize(24.px)  }
+
+    // Option 3: inclusive upper bound
+    (Breakpoint.ZERO .. Breakpoint.SM) { Modifier.fontSize(24.px) }
+
+    Breakpoint.MD { Modifier.fontSize(32.px) }
+}
+```
+
+If you aren't a fan of needing to wrap the expression with parentheses, the `between` method is provided as well, which
+is otherwise identical to the `..<` range operator:
+
+```kotlin
+val CustomStyle = CssStyle {
+    // Style active in mobile / tablet modes
+    between(Breakpoint.ZERO, Breakpoint.MD) { /* ... */ }
+}
+```
+
+Finally, if the first breakpoint in your range is `Breakpoint.ZERO`, you can shorten your expression by using the
+`until` method instead:
+
+```kotlin
+val CustomStyle = CssStyle {
+    // Style active in mobile / tablet modes
+    until(Breakpoint.MD) { /* ... */ }
+}
+```
+
+In fact, you can think of `until` as the inverse to declaring a normal breakpoint. In other words,
+`until(Breakpoint.MD) { ... }` means all breakpoint sizes *up to* the medium size, while `Breakpoint.MD { ... }` means
+medium size and above.
+
 #### Color-mode aware
 
 When you define a `CssStyle`, a field called `colorMode` is available for you to use:

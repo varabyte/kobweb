@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
+import com.varabyte.kobweb.silk.theme.breakpoint.toWidth
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
@@ -54,25 +55,84 @@ abstract class StyleScope {
     }
 
     /**
-     * Convenience function for associating a modifier directly against a breakpoint enum.
+     * Declare a style that appears starting at the current breakpoint.
      *
-     * For example, you can call
+     * That means this style will be visible from the current breakpoint and all larger breakpoints. For example,
+     * `Breakpoint.MD` will apply to desktops, wide screens, and ultra wide screens.
      *
-     * ```
-     * Breakpoint.MD { Modifier.color(...) }
-     * ```
-     *
-     * which is identical to:
-     *
-     * ```
-     * cssRule(CSSMediaQuery.MediaFeature("min-width", ...)) { Modifier.color(...) }
-     * ```
+     * You can use `Breakpoint.MD.only { ... }` to apply styles only to the MD breakpoint.
      *
      * Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
      * (here, we'd need to access both "Breakpoint" and "StyleScope")
      */
     operator fun Breakpoint.invoke(createModifier: () -> Modifier) {
         cssRule(this.toMinWidthQuery(), createModifier)
+    }
+
+    inner class BreakpointRange(
+        private val lower: Breakpoint,
+        private val upper: Breakpoint,
+        private val upperExclusive: Boolean,
+    ) {
+        init {
+            require(lower.ordinal != upper.ordinal) { "Breakpoint range should not be called with the same breakpoint twice ($lower)." }
+            require(lower.ordinal < upper.ordinal) { "Breakpoint range breakpoints passed in wrong order: $lower should be smaller than $upper" }
+        }
+
+        private fun toCSSMediaQuery(lowerInclusive: Breakpoint, upperExclusive: Breakpoint): CSSMediaQuery.Raw {
+            // see also: https://www.miragecraft.com/blog/polyfill-for-media-range-syntax
+            return CSSMediaQuery.Raw("(min-width: ${lowerInclusive.toWidth()}) and (max-width: ${upperExclusive.toWidth()}) and (not (width: ${upperExclusive.toWidth()}))")
+        }
+
+        operator fun invoke(createModifier: () -> Modifier) {
+            if (upperExclusive) {
+                cssRule(toCSSMediaQuery(lower, upper), createModifier)
+            } else {
+                if (upper.ordinal < Breakpoint.entries.lastIndex) {
+                    cssRule(toCSSMediaQuery(lower, Breakpoint.entries[upper.ordinal + 1]), createModifier)
+                } else {
+                    lower.invoke(createModifier)
+                }
+            }
+        }
+    }
+
+    /**
+     * Declare a style that appears between a lower-bound breakpoint (inclusive) and an upper-bound breakpoint (inclusive).
+     *
+     * For example, `(SM .. MD) { ... }` will appear for tablets through desktops but not for mobile devices nor wide screens;
+     * `(ZERO .. ZERO) { ... }` will only apply to mobile devices.
+     *
+     * Note: `(ZERO .. ZERO) { ... }` doesn't read intuitively, and we would recommend `(ZERO until SM) { ... }` or even
+     * just `until(SM) { ... }` in this case.
+     *
+     * Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
+     * (here, we'd need to access both "Breakpoint" and "StyleScope")
+     */
+    operator fun Breakpoint.rangeTo(upper: Breakpoint): BreakpointRange {
+        return BreakpointRange(this, upper, upperExclusive = false)
+    }
+
+    /**
+     * Declare a style that appears between a lower-bound breakpoint (inclusive) and an upper-bound breakpoint (exclusive).
+     *
+     * For example, `(SM ..< LG) { ... }` will appear for tablets through desktops but not for mobile devices nor wide
+     * screens; `(ZERO ..< SM) { ... }` will only apply to mobile devices.
+     *
+     * Note: `(ZERO ..< SM) { ... }` reads OK, but we would probably recommend `until(SM) { ... }` in this case.
+     *
+     * Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
+     * (here, we'd need to access both "Breakpoint" and "StyleScope")
+     */
+    operator fun Breakpoint.rangeUntil(upper: Breakpoint): BreakpointRange {
+        return BreakpointRange(this, upper, upperExclusive = true)
+    }
+
+    /**
+     * Convenience method replacing the [rangeUntil] operator syntax with something more readable.
+     */
+    infix fun Breakpoint.until(upper: Breakpoint): BreakpointRange {
+        return this.rangeUntil(upper)
     }
 }
 
@@ -90,6 +150,29 @@ abstract class StyleScope {
 fun StyleScope.cssRule(breakpoint: Breakpoint, suffix: String?, createModifier: () -> Modifier) {
     cssRule(breakpoint.toMinWidthQuery(), suffix, createModifier)
 }
+
+/**
+ * Declare a style that appears up until the current breakpoint.
+ *
+ * That means this style will NOT be visible at the current breakpoint, but will be for all smaller breakpoints. For
+ *  example, `until(Breakpoint.MD)` will apply to mobile and tablet devices.
+ */
+fun StyleScope.until(breakpoint: Breakpoint, createModifier: () -> Modifier) {
+    (Breakpoint.ZERO ..< breakpoint).invoke(createModifier)
+}
+
+/**
+ * Declare a style that appears between a lower breakpoint (inclusive) and an upper breakpoint (exclusive).
+ *
+ * This is a convenience method which might be easier to discover than requiring parentheses (that is,
+ * `between(SM, LG)` vs `(SM ..< LG)` or `(SM until LG)`)
+ *
+ * @see StyleScope.rangeUntil
+ */
+fun StyleScope.between(lower: Breakpoint, upper: Breakpoint, createModifier: () -> Modifier) {
+    (lower ..< upper).invoke(createModifier)
+}
+
 
 // The
 // For example, ".myclass:hover" separates ".myclass" from ":hover".
