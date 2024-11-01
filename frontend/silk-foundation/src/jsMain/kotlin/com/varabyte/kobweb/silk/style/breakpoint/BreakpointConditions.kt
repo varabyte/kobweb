@@ -75,10 +75,32 @@ private fun CSSStyleSheet.clearCSSRules() {
     }
 }
 
+/**
+ * Display this element only if the current screen is at least as wide as the specified breakpoint.
+ *
+ * Otherwise, the element will not be included in the page's layout.
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/display#none">display: none</a> documentation.
+ */
 fun Modifier.displayIfAtLeast(breakpoint: Breakpoint) =
     this.classNames("silk-display-if-at-least-${breakpoint.name.lowercase()}")
 
+/**
+ * Display this element only if the current screen is narrower than the specified breakpoint.
+ *
+ * Otherwise, the element will not be included in the page's layout.
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/display#none">display: none</a> documentation.
+ */
 fun Modifier.displayUntil(breakpoint: Breakpoint) = this.classNames("silk-display-until-${breakpoint.name.lowercase()}")
+
+/**
+ * Display this element only if the current screen's width lies between the lower breakpoint (inclusive) and upper
+ * breakpoint (exclusive).
+ *
+ * This is essentially a convenience function equivalent to calling both [displayIfAtLeast] and [displayUntil] at the
+ * same time.
+ */
 fun Modifier.displayBetween(breakpointLower: Breakpoint, breakpointUpper: Breakpoint): Modifier {
     require(breakpointLower.ordinal < breakpointUpper.ordinal) { "displayBetween breakpoints passed in wrong order: $breakpointLower should be smaller than $breakpointUpper" }
 
