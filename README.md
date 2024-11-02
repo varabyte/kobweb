@@ -1136,7 +1136,7 @@ val GeneralTextStyle = CssStyle {
     base { Modifier.fontSize(16.px).fontFamily("...") }
 }
 val EmphasizedTextStyle = GeneralTextStyle.extendedBy {
-    base { Modifier.fontWeight(FontWeight.Bold) }    
+    base { Modifier.fontWeight(FontWeight.Bold) }
 }
 
 // Or, using the `base` methods:
@@ -1214,7 +1214,7 @@ val OutlinedButtonVariant: CssStyleVariant<ButtonKind> = ButtonStyle.addVariant 
 >
 > @InitSilk
 > fun registerPrivateVariant(ctx: InitSilkContext) {
->   // When registering variants, using a leading dash will automatically prepend the bast style name. 
+>   // When registering variants, using a leading dash will automatically prepend the bast style name.
 >   // This example here will generate the final name "button-example".
 >   ctx.theme.registerVariant("-example", ExampleCustomVariant)
 > }
@@ -2672,7 +2672,7 @@ Once exported, you can test your site by running it locally before uploading. Yo
 #### PageContext.isExporting
 
 Sometimes, you have behavior that should run when an actual user is navigating your site, but you don't want it to run
-at export time. For example, maybe you offer logged-in users an authenticated experience, but you'll never have 
+at export time. For example, maybe you offer logged-in users an authenticated experience, but you'll never have
 a logged-in user at export time.
 
 You can determine if your page is being rendered as part of an export by checking the `PageContext.isExporting`property.
@@ -2685,15 +2685,15 @@ fun AuthenticatedLayout(content: @Composable () -> Unit) {
 
     val ctx = rememberPageContext()
     if (!ctx.isExporting) {
-        LaunchedEffect(Unit) { 
-            loggedInUser = checkForLoggedInUser() // <- A slow, expensive method  
+        LaunchedEffect(Unit) {
+            loggedInUser = checkForLoggedInUser() // <- A slow, expensive method
         }
     }
-  
-    if (loggedInUser == null) { 
+
+    if (loggedInUser == null) {
         LoggedOutScaffold { content() }
-    } else { 
-        LoggedInScaffold(user) { content() } 
+    } else {
+        LoggedInScaffold(user) { content() }
     }
 }
 ```
@@ -3611,7 +3611,7 @@ abstract class WorkerStrategy<I> {
 }
 ```
 
-The `OutputDispatcher` is a simple class which allows you to send output messages back to the application.   
+The `OutputDispatcher` is a simple class which allows you to send output messages back to the application.
 
 ```kotlin
 class OutputDispatcher<O> {
@@ -4253,7 +4253,7 @@ val ImportantStyle = CssStyle { /* ... */ }
 > If you don't do this, the browser will append add any unknown layer to the end of the CSS layer list (i.e. the highest
 > priority spot). In many cases this will be fine, but being explicit both expresses your intention clearly and reduces
 > the chance of your site breaking in subtle ways when a future developer adds a new layer in the future.
-> 
+>
 > Silk will print out a warning to the console if it detects any unregistered layers.
 
 ### `layer` blocks
@@ -4300,7 +4300,7 @@ an [`@import` directive](https://developer.mozilla.org/en-US/docs/Web/CSS/@impor
 
 ```kotlin
 // BEFORE
-kobweb.app.index.head.add { 
+kobweb.app.index.head.add {
   link {
     rel = "stylesheet"
     href = "/highlight.js/styles/dracula.css"
