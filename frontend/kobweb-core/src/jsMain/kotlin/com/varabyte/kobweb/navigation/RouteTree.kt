@@ -5,13 +5,36 @@ import com.varabyte.kobweb.core.PageContext
 
 internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageContent: @Composable (errorCode: Int) -> Unit): PageData {
     val errorPageMethod = @Composable { errorPageContent(404) }
-    val resolved = this.resolve(route.path, allowRedirects = true)
-        ?: return PageData(
-            errorPageMethod,
-            PageContext.RouteInfo(route, emptyMap())
-        )
+    val self = this
+    val resolved = self.resolve(route.path, allowRedirects = true)
+        ?: route.path
+            // Backwards compatibility hack. For the longest time, Kobweb's router was designed to be unaware of the
+            // site prefix, and code that called it was responsible for prepending it, for example like so:
+            // `ctx.router.tryRoutingTo(RoutePrefix.prepend("/")`.
+            // However, we've seen casees where new users were surprised by this behavior -- that `Link("/")` works but
+            // `ctx.router.tryRoutingTo("/")` doesn't. In fact, even as a veteran Kobweb developer myself, I found I
+            // would have not assumed this to be the case.
+            // So I decided to update the Router code to auto-prepend the route prefix if set. However, this means that
+            // some projects in the wild could break. So, here, we try to detect the case where both a user and Kobweb
+            // prepending the route prefix each, and if so, fall back to a valid route (but emit a warning).
+            .takeIf { RoutePrefix.value.isNotEmpty() }
+            ?.run {
+                // e.g. "/prefix/" --> "/prefix/prefix/"
+                val duplicatedRoutePrefix = RoutePrefix.value.dropLast(1) + RoutePrefix.value
+                if (route.path.startsWith(duplicatedRoutePrefix)) {
+                    self.resolve(route.path.replace(duplicatedRoutePrefix, RoutePrefix.value), allowRedirects = true)
+                        .also { resolved ->
+                            if (resolved != null) {
+                                console.warn("Please report to the site owner: detected a case where the site's route prefix was prepended an extra time (`${route.path}`). `navigateTo` and `tryRoutingTo` now auto-prepend a prefix themselves, so the site owner should search their code for `RoutePrefix.prepend` and remove any that have become unnecessary.")
+                            }
+                        }
+                } else null
+            } ?: return PageData(
+                errorPageMethod,
+                PageContext.RouteInfo(route, emptyMap())
+            )
 
-    val pageMethod : PageMethod = resolved.last().node.data ?: errorPageMethod
+    val pageMethod: PageMethod = resolved.last().node.data ?: errorPageMethod
     val dynamicParams = mutableMapOf<String, String>()
     resolved.forEach { resolvedEntry ->
         if (resolvedEntry.node is RouteTree.DynamicNode) {
