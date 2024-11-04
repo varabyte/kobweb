@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
+import com.varabyte.kobweb.navigation.RoutePrefix
 import com.varabyte.kobweb.navigation.UpdateHistoryMode
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -87,9 +88,11 @@ val AlwaysUnderlinedLinkVariant = LinkStyle.addVariant {
  *   when visiting the new location (so you can return back to the current page), but [UpdateHistoryMode.REPLACE] can be
  *   used to create an effect where the new page "takes over" the current page in place.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
- *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
- *   the same domain.
+ * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front of [path] if
+ *   possible. For example, if the [path] parameter was set to "/about" and the site's route prefix was set to
+ *   "company/our-team", then the `href` value will be converted to "/company/our-team/about". You usually want this to
+ *   be true, unless you are intentionally linking outside this site's root folder while still staying in the same
+ *   domain, e.g. you are linking to "/company/other-team". See [RoutePrefix] for more information.
  */
 @Composable
 fun Link(

@@ -243,16 +243,24 @@ fun createMainFunction(
 
             // Note: Below, we use %S when specifying key/value pairs. This prevents KotlinPoet from breaking
             // our text in the middle of a String.
+            addComment("The initial route used here comes from the browser as a source of truth, so don't auto-add")
+            addComment("a prefix even if this site uses one.")
             addCode(CodeBlock.Builder().apply {
-                addStatement("router.navigateTo(window.location.href.removePrefix(window.location.origin), UpdateHistoryMode.REPLACE)")
+                addStatement("router.navigateTo(window.location.href.removePrefix(window.location.origin), UpdateHistoryMode.REPLACE, autoPrefix = false)")
                 addStatement("")
-                addComment("For SEO, we may bake the contents of a page in at build time. However, we will")
-                addComment("overwrite them the first time we render this page with their composable, dynamic")
-                addComment("versions. Think of this as poor man's hydration :)")
-                addComment("See also: https://en.wikipedia.org/wiki/Hydration_(web_development)")
+            }.build())
+
+            addComment("For SEO, we may bake the contents of a page in at build time. However, we will")
+            addComment("overwrite them the first time we render this page with their composable, dynamic")
+            addComment("versions. Think of this as poor man's hydration :)")
+            addComment("See also: https://en.wikipedia.org/wiki/Hydration_(web_development)")
+            addCode(CodeBlock.Builder().apply {
                 addStatement("val root = document.getElementById(\"root\")!!")
                 addStatement("while (root.firstChild != null) { root.removeChild(root.firstChild!!) }")
                 addStatement("")
+            }.build())
+
+            addCode(CodeBlock.Builder().apply {
                 addStatement(
                     "AppGlobals.initialize(mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()}))",
                     *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()

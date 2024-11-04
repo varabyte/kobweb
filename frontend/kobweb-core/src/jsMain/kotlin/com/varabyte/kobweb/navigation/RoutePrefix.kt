@@ -21,6 +21,14 @@ interface RoutePrefix {
      * Prepend this route prefix onto some target absolute path.
      *
      * If the path is a relative path, it will be returned unchanged.
+     *
+     * For example, if this route prefix's value is "prefix", then...
+     *
+     * * `path == "subdir"` -> `"subdir"`
+     * * `path == "/subdir"` -> `"/prefix/subdir"`
+     *
+     * By only working on absolute routes, we'll never accidentally append a route prefix onto a sub-route where any
+     * middle parts are missing.
      */
     fun prepend(path: String): String
 

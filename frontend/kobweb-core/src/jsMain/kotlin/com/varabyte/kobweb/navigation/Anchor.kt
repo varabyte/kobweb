@@ -27,11 +27,11 @@ import org.w3c.dom.HTMLAnchorElement
  *   when visiting the new location (so you can return back to the current page), but [UpdateHistoryMode.REPLACE] can be
  *   used to create an effect where the new page "takes over" the current page in place.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. For example,
- *   if the [href] parameter was set to "example/path" and the site's route prefix was set to "parent-site/nested", then
- *   the `href` value will be converted to "parent-site/nested/example/path". You usually want this to be true, unless
- *   you are intentionally linking outside this site's root folder while still staying in the same domain, e.g. you are
- *   linking to "parent-site/about".
+ * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front of [href] if
+ *   possible. For example, if the [href] parameter was set to "/about" and the site's route prefix was set to
+ *   "company/our-team", then the `href` value will be converted to "/company/our-team/about". You usually want this to
+ *   be true, unless you are intentionally linking outside this site's root folder while still staying in the same
+ *   domain, e.g. you are linking to "/company/other-team". See [RoutePrefix] for more information.
  */
 @Composable
 fun Anchor(
@@ -63,7 +63,11 @@ fun Anchor(
                     href,
                     updateHistoryMode ?: UpdateHistoryMode.PUSH,
                     openInternalLinksStrategy = openInternalLinksStrategy,
-                    openExternalLinksStrategy = openExternalLinksStrategy
+                    openExternalLinksStrategy = openExternalLinksStrategy,
+                    // No auto-prefix, as we handled it ourselves (see href modification above). We did this so that the
+                    // URL associated with the anchor element (that additionally shows up at the bottom of the browser
+                    // window) matches where we actually navigate to.
+                    autoPrefix = false
                 )
                 evt.preventDefault()
                 evt.stopPropagation()

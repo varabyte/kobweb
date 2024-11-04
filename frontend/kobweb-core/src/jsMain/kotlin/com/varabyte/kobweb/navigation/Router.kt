@@ -8,7 +8,6 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
-import org.w3c.dom.Element
 import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.url.URL
@@ -351,14 +350,21 @@ class Router {
      *   [standards](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) documentation.
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
+     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front of the
+     *   [pathQueryAndFragment] if possible. For example, if the [pathQueryAndFragment] parameter was set to
+     *   "/about" and the site's route prefix was set to "company/our-team", then the `href` value will be converted to
+     *   "/company/our-team/about". You usually want this to be true, unless you are intentionally linking outside this
+     *   site's root folder while still staying in the same domain, e.g. you are linking to "/company/other-team". See
+     *   [RoutePrefix] for more information.
      */
     fun tryRoutingTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
-        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE
+        openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
+        autoPrefix: Boolean = true,
     ): Boolean {
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        var pathQueryAndFragment = pathQueryAndFragment
+        var pathQueryAndFragment = RoutePrefix.prependIf(autoPrefix, pathQueryAndFragment)
         if (Route.isRoute(pathQueryAndFragment)) {
             pathQueryAndFragment = pathQueryAndFragment.normalize()
 
@@ -489,8 +495,9 @@ class Router {
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openInternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
         openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB,
+        autoPrefix: Boolean = true,
     ) {
-        if (!tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy)) {
+        if (!tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy, autoPrefix)) {
             window.open(pathQueryAndFragment, openExternalLinksStrategy)
         }
     }
