@@ -97,6 +97,14 @@ class KobwebApplicationPlugin @Inject constructor(
             }
             content!!
         }
+        @Suppress("DEPRECATION")
+        if (kobwebConf.site.routePrefix.isNotEmpty()) {
+            if (kobwebConf.site.basePath.isEmpty()) {
+                project.logger.warn("w: This project is setting `routePrefix` in `.kobweb/conf.yaml`. Please rename `routePrefix` to `basePath`. We are conforming to a standard name used by many other web frameworks.")
+            } else {
+                project.logger.warn("w: This project is setting `routePrefix` in `.kobweb/conf/yaml` in addition to `basePath`. This value is unused in this case and should be removed.")
+            }
+        }
 
         val kobwebBlock = project.kobwebBlock
         val appBlock = kobwebBlock.createAppBlock(kobwebFolder, kobwebConf)
@@ -248,7 +256,7 @@ class KobwebApplicationPlugin @Inject constructor(
             val kobwebGenSiteEntryTask = project.tasks.register<KobwebGenerateSiteEntryTask>(
                 "kobwebGenSiteEntry",
                 appBlock,
-                kobwebConf.site.routePrefix,
+                kobwebConf.site.basePathOrRoutePrefix,
                 buildTarget,
                 KobwebGenSiteEntryConfInputs(kobwebConf),
             )

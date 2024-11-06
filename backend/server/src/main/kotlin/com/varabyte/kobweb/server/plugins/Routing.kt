@@ -115,13 +115,13 @@ fun Application.configureRouting(
     }
 }
 
-val Site.routePrefixNormalized: String
+val Site.basePathNormalized: String
     get() {
         // While the URL externally may have a prefix, internally they do not. In other words, if this site has the
         // prefix "a/b" and the user visits "a/b/nested/page", that means the local file we're going to serve is
         // "nested/page.html"
         // We remove any slashes here as it results in cleaner code as most routing code adds the slashes explicitly anyway
-        return routePrefix.removePrefix("/").removeSuffix("/")
+        return basePathOrRoutePrefix.removePrefix("/").removeSuffix("/")
     }
 
 private fun RequestConnectionPoint.toRequestConnectionDetails() = Request.Connection.Details(
@@ -335,10 +335,10 @@ private fun Routing.setupStreaming(
 private fun Routing.configureApiRouting(
     env: ServerEnvironment,
     apiJar: ApiJarFile,
-    routePrefix: String,
+    basePath: String,
     logger: Logger
 ) {
-    val path = "$routePrefix/api/{$KOBWEB_PARAMS...}"
+    val path = "$basePath/api/{$KOBWEB_PARAMS...}"
     HttpMethod.entries.forEach { httpMethod ->
         when (httpMethod) {
             HttpMethod.DELETE -> delete(path) { handleApiCall(env, apiJar, httpMethod, logger) }
@@ -400,7 +400,7 @@ private fun List<Redirect>.toPatternMappers(): List<PatternMapper> {
 
 @Suppress("NAME_SHADOWING")
 private suspend fun RoutingContext.handleRedirect(
-    routePrefix: String,
+    basePath: String,
     path: String,
     redirects: List<PatternMapper>
 ): Boolean {
@@ -409,16 +409,16 @@ private suspend fun RoutingContext.handleRedirect(
     val path = path.prefixIfNot("/")
     val redirectedPath = redirects.fold(path) { path, patternMapper -> patternMapper.map(path) ?: path }
     return if (redirectedPath != path) {
-        call.respondRedirect("$routePrefix/${redirectedPath.removePrefix("/")}".prefixIfNot("/"), permanent = true)
+        call.respondRedirect("$basePath/${redirectedPath.removePrefix("/")}".prefixIfNot("/"), permanent = true)
         true
     } else false
 }
 
-private fun Routing.configureRedirects(routePrefix: String, redirects: List<PatternMapper>) {
+private fun Routing.configureRedirects(basePath: String, redirects: List<PatternMapper>) {
     if (redirects.isEmpty()) return
-    get("$routePrefix/{$KOBWEB_PARAMS...}") {
+    get("$basePath/{$KOBWEB_PARAMS...}") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
-        handleRedirect(routePrefix, pathParts.joinToString("/"), redirects)
+        handleRedirect(basePath, pathParts.joinToString("/"), redirects)
     }
 }
 
@@ -435,18 +435,18 @@ private fun Routing.configureCatchAllRouting(
     conf: KobwebConf,
     script: Path,
     index: Path,
-    routePrefix: String,
+    basePath: String,
     findResource: (String) -> File? = { null }
 ) {
     val scriptMap = Path("$script.map")
     val patternMappers = conf.server.redirects.toPatternMappers()
 
-    get("$routePrefix/{$KOBWEB_PARAMS...}") {
+    get("$basePath/{$KOBWEB_PARAMS...}") {
         val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
         handleCatchAllRouting(
             pathParts,
             { path -> serveScriptFiles(path, script, scriptMap) },
-            { path -> handleRedirect(routePrefix, path, patternMappers) },
+            { path -> handleRedirect(basePath, path, patternMappers) },
             { path ->
                 findResource(path).let { contentFile ->
                     if (contentFile != null) {
@@ -470,7 +470,7 @@ private fun Routing.configureCatchAllRouting(
         )
     }
 
-    head("$routePrefix/{$KOBWEB_PARAMS...}") {
+    head("$basePath/{$KOBWEB_PARAMS...}") {
         val path = call.parameters.getAll(KOBWEB_PARAMS)!!.joinToString("/")
         if (findResource(path) != null) {
             call.respond(HttpStatusCode.OK)
@@ -548,15 +548,15 @@ private fun Application.configureDevRouting(
                 logger.debug("Stopped sending kobweb status events, probably because client disconnected or server is shutting down. (${t::class.simpleName}: ${t.message})")
             }
         }
-        val routePrefix = conf.site.routePrefixNormalized
+        val basePath = conf.site.basePathNormalized
 
         if (apiJar != null) {
-            configureApiRouting(ServerEnvironment.DEV, apiJar, routePrefix, logger)
+            configureApiRouting(ServerEnvironment.DEV, apiJar, basePath, logger)
             setupStreaming(ServerEnvironment.DEV, this@configureDevRouting, conf, apiJar, logger)
         }
 
         val contentRootFile = contentRoot.toFile()
-        configureCatchAllRouting(conf, script, contentRoot.resolve("index.html"), routePrefix) { path ->
+        configureCatchAllRouting(conf, script, contentRoot.resolve("index.html"), basePath) { path ->
             // We fetch resources dynamically in dev mode because things may get added, removed, or renamed while the
             // server is running. In prod mode, files are registered at startup time instead.
             contentRootFile.resolve(path).takeIf { it.isFile && it.exists() }
@@ -613,10 +613,10 @@ private fun Application.configureFullstackProdRouting(
             conf.server.nativeLibraries.associate { it.name to it.path })
 
     routing {
-        val routePrefix = conf.site.routePrefixNormalized
+        val basePath = conf.site.basePathNormalized
 
         if (apiJar != null) {
-            configureApiRouting(ServerEnvironment.PROD, apiJar, routePrefix, logger)
+            configureApiRouting(ServerEnvironment.PROD, apiJar, basePath, logger)
             // Since prod doesn't have live reloading, we can avoid setting up streaming if there are no API streams
             // declared at this point.
             if (apiJar.apis.numApiStreams > 0) {
@@ -626,7 +626,7 @@ private fun Application.configureFullstackProdRouting(
 
         resourcesRoot.toFile().let { resourcesRootFile ->
             resourcesRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
-                val resourcePath = "$routePrefix/${file.relativeTo(resourcesRootFile).invariantSeparatorsPath}"
+                val resourcePath = "$basePath/${file.relativeTo(resourcesRootFile).invariantSeparatorsPath}"
                 get(resourcePath) {
                     call.respondFile(file)
                 }
@@ -641,13 +641,13 @@ private fun Application.configureFullstackProdRouting(
                 val name = relativeFile.nameWithoutExtension
                 val parent = relativeFile.parentFile?.let { "${it.invariantSeparatorsPath}/" } ?: ""
 
-                get(if (name != "index") "$routePrefix/$parent$name" else "$routePrefix/$parent") {
+                get(if (name != "index") "$basePath/$parent$name" else "$basePath/$parent") {
                     call.respondFile(file)
                 }
             }
         }
 
-        configureCatchAllRouting(conf, script, fallbackIndex, routePrefix)
+        configureCatchAllRouting(conf, script, fallbackIndex, basePath)
     }
 }
 
@@ -674,15 +674,15 @@ private fun Application.configureStaticDevRouting(
  */
 private fun Application.configureStaticProdRouting(conf: KobwebConf) {
     val siteRoot = Path(conf.server.files.prod.siteRoot)
-    val routePrefix = conf.site.routePrefixNormalized
+    val basePath = conf.site.basePathNormalized
 
     routing {
-        staticFiles(conf.site.routePrefixNormalized, siteRoot.toFile()) {
+        staticFiles(conf.site.basePathNormalized, siteRoot.toFile()) {
             enableAutoHeadResponse()
             extensions("html")
             default("404.html")
         }
 
-        configureRedirects(routePrefix, conf.server.redirects.toPatternMappers())
+        configureRedirects(basePath, conf.server.redirects.toPatternMappers())
     }
 }

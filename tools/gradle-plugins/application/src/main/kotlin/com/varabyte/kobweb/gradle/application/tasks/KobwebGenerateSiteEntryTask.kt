@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.templates.SilkSupport
@@ -35,7 +35,7 @@ class KobwebGenSiteEntryConfInputs(
 
 abstract class KobwebGenerateSiteEntryTask @Inject constructor(
     private val appBlock: AppBlock,
-    @get:Input val routePrefix: String,
+    @get:Input val basePath: String,
     @get:Input val buildTarget: BuildTarget,
     @get:Nested val confInputs: KobwebGenSiteEntryConfInputs,
 ) : KobwebGenerateTask("Generate entry code (i.e. main.kt) for this Kobweb project") {
@@ -72,7 +72,7 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
                 silkSupport.get(),
                 globals.get(),
                 cleanUrls.get(),
-                RoutePrefix(routePrefix),
+                BasePath(basePath),
                 confInputs.redirects.map { Server.Redirect(it.from, it.to) },
                 buildTarget,
             )

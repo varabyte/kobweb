@@ -5,7 +5,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.TimeoutError
 import com.microsoft.playwright.Tracing
-import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.util.PlaywrightCache
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
@@ -35,13 +35,13 @@ import com.varabyte.kobweb.gradle.application.Browser as KobwebBrowser
 
 class KobwebExportConfInputs(
     @get:Input val siteRoot: String,
-    @get:Input val routePrefix: String,
+    @get:Input val basePath: String,
     @get:Input val script: String,
     @get:Input @get:Optional val api: String?,
 ) {
     constructor(kobwebConf: KobwebConf) : this(
         siteRoot = kobwebConf.server.files.prod.siteRoot,
-        routePrefix = kobwebConf.site.routePrefix,
+        basePath = kobwebConf.site.basePathOrRoutePrefix,
         script = kobwebConf.server.files.prod.script,
         api = kobwebConf.server.files.dev.api,
     )
@@ -206,7 +206,7 @@ abstract class KobwebExportTask @Inject constructor(
                     KobwebBrowser.WebKit -> playwright.webkit()
                 }
                 browserType.launch().use { browser ->
-                    val routePrefix = RoutePrefix(confInputs.routePrefix)
+                    val basePath = BasePath(confInputs.basePath)
                     pages
                         .asSequence()
                         .map { it.route }
@@ -232,12 +232,12 @@ abstract class KobwebExportTask @Inject constructor(
                             val route = routeConfig.route
                             logger.lifecycle("\nSnapshotting html for \"$route\"...")
 
-                            val prefixedRoute = routePrefix.prependTo(route)
+                            val fullPath = basePath.prependTo(route)
 
                             try {
                                 val snapshot: String
                                 val elapsedMs = measureTimeMillis {
-                                    snapshot = browser.takeSnapshot(route, "http://localhost:$port$prefixedRoute")
+                                    snapshot = browser.takeSnapshot(route, "http://localhost:$port$fullPath")
                                 }
 
                                 pagesRoot

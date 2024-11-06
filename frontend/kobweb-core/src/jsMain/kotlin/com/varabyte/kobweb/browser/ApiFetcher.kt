@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.http.AbortController
 import com.varabyte.kobweb.browser.http.fetch
 import com.varabyte.kobweb.browser.http.http
-import com.varabyte.kobweb.navigation.RoutePrefix
+import com.varabyte.kobweb.navigation.BasePath
 import com.varabyte.kobweb.navigation.prependIf
 import kotlinx.browser.window
 import org.khronos.webgl.get
@@ -28,13 +28,13 @@ class ApiFetcher(private val window: Window) {
     var logOnError: Boolean by window.http::logOnError
 
     private fun toResource(apiPath: String, autoPrefix: Boolean): String {
-        return RoutePrefix.prependIf(autoPrefix, "/api/${apiPath.trimStart('/')}")
+        return BasePath.prependIf(autoPrefix, "/api/${apiPath.trimStart('/')}")
     }
 
     /**
      * Call DELETE on a target API path.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      *
@@ -65,7 +65,7 @@ class ApiFetcher(private val window: Window) {
     /**
      * Call GET on a target API path.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      *
@@ -96,7 +96,7 @@ class ApiFetcher(private val window: Window) {
     /**
      * Call HEAD on a target API path.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      *
@@ -127,7 +127,7 @@ class ApiFetcher(private val window: Window) {
     /**
      * Call OPTIONS on a target API path.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      *
@@ -158,7 +158,7 @@ class ApiFetcher(private val window: Window) {
     /**
      * Call PATCH on a target API path.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      *
@@ -191,7 +191,7 @@ class ApiFetcher(private val window: Window) {
     /**
      * Call POST on a target API path.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      *
@@ -224,7 +224,7 @@ class ApiFetcher(private val window: Window) {
     /**
      * Call PUT on a target API path.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      *

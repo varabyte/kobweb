@@ -27,11 +27,11 @@ import org.w3c.dom.HTMLAnchorElement
  *   when visiting the new location (so you can return back to the current page), but [UpdateHistoryMode.REPLACE] can be
  *   used to create an effect where the new page "takes over" the current page in place.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front of [href] if
- *   possible. For example, if the [href] parameter was set to "/about" and the site's route prefix was set to
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front of [href] if
+ *   possible. For example, if the [href] parameter was set to "/about" and the site's base path was set to
  *   "company/our-team", then the `href` value will be converted to "/company/our-team/about". You usually want this to
  *   be true, unless you are intentionally linking outside this site's root folder while still staying in the same
- *   domain, e.g. you are linking to "/company/other-team". See [RoutePrefix] for more information.
+ *   domain, e.g. you are linking to "/company/other-team". See [BasePath] for more information.
  */
 @Composable
 fun Anchor(
@@ -44,7 +44,7 @@ fun Anchor(
     content: ContentBuilder<HTMLAnchorElement>? = null
 ) {
     @Suppress("NAME_SHADOWING") // Intentional shadowing for in-place transformation
-    val href = RoutePrefix.prependIf(autoPrefix, href)
+    val href = BasePath.prependIf(autoPrefix, href)
 
     val ctx = rememberPageContext()
     A(

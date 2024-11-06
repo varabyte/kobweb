@@ -7,7 +7,7 @@ import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.navigation.RoutePrefix
+import com.varabyte.kobweb.navigation.BasePath
 import com.varabyte.kobweb.navigation.prependIf
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -41,7 +41,7 @@ val FitWidthImageVariant = ImageStyle.addVariantBase {
  * @param alt An optional description which gets used as alt text for the image. This is useful to include for
  *   accessibility tools.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You usually
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You usually
  *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
  *   the same domain.
  */
@@ -61,7 +61,7 @@ fun Image(
             registerRefScope(ref) { it.nextSibling as HTMLImageElement }
         }
     }
-    Img(RoutePrefix.prependIf(autoPrefix, src), alt, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs {
+    Img(BasePath.prependIf(autoPrefix, src), alt, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs {
         if (width != null) attr("width", width.toString())
         if (height != null) attr("height", height.toString())
     })

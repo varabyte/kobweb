@@ -4041,37 +4041,38 @@ never interact directly with your site's UI.
 
 # Advanced topics
 
-## Setting your site's route prefix
+## Setting your site's base path
 
 Typically, sites live at the top level. This means if you have a root file `index.html` and your site is hosted at
 the domain `https://mysite.com` then that HTML file can be accessed by visiting `https://mysite.com/index.html`.
 
-However, in some cases your site may be hosted under a subfolder, such as `https://example.com/products/myproduct/`, in which case your site's root `index.html` file would live at `https://example.com/products/myproduct/index.html`.
+However, in some cases your site may be hosted under a subfolder, such as `https://example.com/products/myproduct/`, in
+which case your site's root `index.html` file would live at `https://example.com/products/myproduct/index.html`.
 
 Kobweb needs to know about this subfolder structure so that it takes them into account in its routing logic. This can be
-specified in your project's `.kobweb/conf.yaml` file with the `routePrefix` value under the `site` section:
+specified in your project's `.kobweb/conf.yaml` file with the `basePath` value under the `site` section:
 
 ```yaml
 site:
   title: "..."
-  routePrefix: "..."
+  basePath: "..."
 ```
 
-where the value of `routePrefix` is the part between the origin part of the URL and your site's root. For example, if
-your site is rooted at `https://example.com/products/myproduct/`, then the value of `routePrefix` would be `products/myproduct`.
+where the value of `basePath` is the part between the origin part of the URL and your site's root. For example, if
+your site is rooted at `https://example.com/products/myproduct/`, then the value of `basePath` would be `products/myproduct`.
 
 > [!NOTE]
 > If you are planning to host your site on GitHub Pages using the default `github.io` domain, you will need to set an
-> appropriate `routePrefix` value. For a concrete example of setting `routePrefix` for GitHub Pages,
+> appropriate `basePath` value. For a concrete example of setting `basePath` for GitHub Pages,
 > [check out this relevant section](https://bitspittle.dev/blog/2022/static-deploy#github-pages) from my blog post about
 > exporting static layout sites.
 
-Outside of setting your `routePrefix` in the `conf.yaml` file, you can design your site without explicitly mentioning
-it, as Kobweb's composables handle it for you. For example, `Link("docs/manuals/v123.pdf")` (or `Anchor` if you're not
+Outside of setting your `basePath` in the `conf.yaml` file, you can design your site without explicitly mentioning
+it, as Kobweb's composables handle it for you. For example, `Link("/docs/manuals/v123.pdf")` (or `Anchor` if you're not
 using Silk) will automatically resolve to `https://example.com/products/myproduct/docs/manuals/v123.pdf`.
 
-If you do need to access the route prefix in your own code, you can do so by referencing the `RoutePrefix.value`
-companion property or by utilizing the `RoutePrefix.prepend(...)` companion method. This should rarely be required in
+If you do need to access the base path in your own code, you can do so by referencing the `BasePath.value`
+companion property or by utilizing the `BasePath.prepend(...)` companion method. This should rarely be required in
 practice, however.
 
 > [!NOTE]
@@ -4102,7 +4103,7 @@ practice, however.
 > one located under `a/b/c` would use `../../../favicon.ico`.
 >
 > But, in Kobweb, since we're using the same `index.html` file for every page, we use the absolute path `/favicon.ico`,
-> or, in the case of a route prefix being set, `/${routePrefix}/favicon.ico`.
+> or, in the case of a base path being set, `/${basePath}/favicon.ico`.
 
 ## Redirects
 

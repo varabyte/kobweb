@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.withIndent
-import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.project.conf.Server
 import com.varabyte.kobweb.project.frontend.AppData
@@ -23,7 +23,7 @@ fun createMainFunction(
     silkSupport: SilkSupport,
     appGlobals: Map<String, String>,
     cleanUrls: Boolean,
-    routePrefix: RoutePrefix,
+    basePath: BasePath,
     redirects: List<Server.Redirect>,
     target: BuildTarget,
 ): String {
@@ -40,7 +40,7 @@ fun createMainFunction(
         val defaultImports = listOf(
             "androidx.compose.runtime.CompositionLocalProvider",
             "$KOBWEB_GROUP.core.AppGlobals",
-            "$KOBWEB_GROUP.navigation.RoutePrefix",
+            "$KOBWEB_GROUP.navigation.BasePath",
             "$KOBWEB_GROUP.navigation.Router",
             "$KOBWEB_GROUP.navigation.UpdateHistoryMode",
             "kotlinx.browser.document",
@@ -165,7 +165,7 @@ fun createMainFunction(
             }
 
             addCode(CodeBlock.builder().apply {
-                addStatement("RoutePrefix.set(\"$routePrefix\")")
+                addStatement("BasePath.set(\"$basePath\")")
                 addStatement("val router = Router()")
                 addStatement("$KOBWEB_GROUP.core.init.initKobweb(router) { ctx ->")
                 withIndent {

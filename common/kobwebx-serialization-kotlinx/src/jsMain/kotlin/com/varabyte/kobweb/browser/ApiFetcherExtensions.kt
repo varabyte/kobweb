@@ -15,7 +15,7 @@ import kotlinx.serialization.serializer
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
  *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
  *   staying in the same domain.
  */
@@ -57,7 +57,7 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
  *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
  *   staying in the same domain.
  *
@@ -162,7 +162,7 @@ suspend inline fun <reified R> ApiFetcher.tryPost(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
  *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
  *   staying in the same domain.
  *
@@ -273,7 +273,7 @@ suspend inline fun <reified R> ApiFetcher.tryPut(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
  *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
  *   staying in the same domain.
  *
@@ -384,7 +384,7 @@ suspend inline fun <reified R> ApiFetcher.tryPatch(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
  *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
  *   staying in the same domain.
  */
@@ -426,7 +426,7 @@ suspend inline fun <reified R> ApiFetcher.tryDelete(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
  *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
  *   staying in the same domain.
  */
@@ -464,7 +464,7 @@ suspend inline fun <reified R> ApiFetcher.tryHead(
  *
  * Note: you should NOT prepend your path with "api/", as that will be added automatically.
  *
- * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+ * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
  *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
  *   staying in the same domain.
  */

@@ -204,13 +204,13 @@ class Router {
         // as well as relative routes, ensuring the final version is a full path that begins with a leading slash.
         val hrefResolved = Route.fromUrl(URL(this, window.location.href)).toString()
 
-        // By design, whether a site has a route prefix or not should be invisible to the user. So here, we remove a
+        // By design, whether a site has a base path or not should be invisible to the user. So here, we remove a
         // prefix if it is present only to put it back again (in the case that we removed it) after the interceptors
         // all have their pass.
-        val withoutPrefix = RoutePrefix.remove(hrefResolved).takeIf { it.isNotEmpty() } ?: "/"
+        val withoutPrefix = BasePath.remove(hrefResolved).takeIf { it.isNotEmpty() } ?: "/"
         val hadPrefix = withoutPrefix != hrefResolved
 
-        return RoutePrefix.prependIf(hadPrefix, interceptors.fold(Route(withoutPrefix).toString()) { acc, intercept ->
+        return BasePath.prependIf(hadPrefix, interceptors.fold(Route(withoutPrefix).toString()) { acc, intercept ->
             val interceptor = RouteInterceptorScope(acc)
             interceptor.intercept()
             interceptor.pathQueryAndFragment
@@ -246,7 +246,7 @@ class Router {
      * In that case, if the user visited `/users/123456/posts/321`, then that composable method will be visited, with
      * `user = 123456` and `post = 321` passed down in the `PageContext`.
      *
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front. You
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
      *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
      *   staying in the same domain.
      */
@@ -255,7 +255,7 @@ class Router {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(
             routeTree.register(
-                RoutePrefix.prependIf(autoPrefix, route),
+                BasePath.prependIf(autoPrefix, route),
                 pageMethod
             )
         ) { "Registration failure. Path is already registered: $route" }
@@ -267,9 +267,9 @@ class Router {
             require(Route.isRoute(it) && it.startsWith('/')) { "Registration only allowed for rooted routes, e.g. `/example/path`. Got: $it" }
         }
 
-        // Don't use RoutePrefix.prepend here because `fromRoute` and `toRoute` are not strictly routes (the first is a
+        // Don't use BasePath.prepend here because `fromRoute` and `toRoute` are not strictly routes (the first is a
         // regex and the latter is a route that might have variables in it).
-        val prefix = if (autoPrefix) RoutePrefix.value.removeSuffix("/") else ""
+        val prefix = if (autoPrefix) BasePath.value.removeSuffix("/") else ""
         routeTree.registerRedirect(prefix + fromRoute, prefix + toRoute)
     }
 
@@ -350,12 +350,12 @@ class Router {
      *   [standards](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) documentation.
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
-     * @param autoPrefix If true AND if a route prefix is configured for this site, auto-affix it to the front of the
+     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front of the
      *   [pathQueryAndFragment] if possible. For example, if the [pathQueryAndFragment] parameter was set to
-     *   "/about" and the site's route prefix was set to "company/our-team", then the `href` value will be converted to
+     *   "/about" and the site's base path was set to "company/our-team", then the `href` value will be converted to
      *   "/company/our-team/about". You usually want this to be true, unless you are intentionally linking outside this
      *   site's root folder while still staying in the same domain, e.g. you are linking to "/company/other-team". See
-     *   [RoutePrefix] for more information.
+     *   [BasePath] for more information.
      */
     fun tryRoutingTo(
         pathQueryAndFragment: String,
@@ -364,7 +364,7 @@ class Router {
         autoPrefix: Boolean = true,
     ): Boolean {
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        var pathQueryAndFragment = RoutePrefix.prependIf(autoPrefix, pathQueryAndFragment)
+        var pathQueryAndFragment = BasePath.prependIf(autoPrefix, pathQueryAndFragment)
         if (Route.isRoute(pathQueryAndFragment)) {
             pathQueryAndFragment = pathQueryAndFragment.normalize()
 

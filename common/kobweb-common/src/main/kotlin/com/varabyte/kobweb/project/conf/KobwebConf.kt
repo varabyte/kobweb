@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * @property title The title of the site. See also: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title
- * @property routePrefix If specified, it means all content for this site live under a subfolder. So if this value is
+ * @property basePath If specified, it means all content for this site live under a subfolder. So if this value is
  *   "/a/b/c", then the root index.html file will be visited by the user going to `mysite.com/a/b/c/`. This should
  *   rarely need to be used, but it may be required by some server configurations which nest your site to a
  *   subdirectory.
@@ -26,8 +26,14 @@ import kotlin.time.Duration.Companion.seconds
 @Serializable
 class Site(
     val title: String,
+    @Deprecated("`routePrefix` changed to `basePath` as that name is more consistent with what other web frameworks use.")
     val routePrefix: String = "",
-)
+    val basePath: String = "",
+) {
+    /** Temporary fallback until we can remove routePrefix */
+    @Suppress("DEPRECATION")
+    val basePathOrRoutePrefix get() = basePath.takeIf { it.isNotEmpty() } ?: routePrefix
+}
 
 @Serializable
 class Server(

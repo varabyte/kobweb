@@ -1,6 +1,6 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
-import com.varabyte.kobweb.common.navigation.RoutePrefix
+import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
@@ -35,12 +35,12 @@ import javax.inject.Inject
 
 class KobwebGenIndexConfInputs(
     @get:Input val title: String,
-    @get:Input val routePrefix: String,
+    @get:Input val basePath: String,
     @get:Input val script: String,
 ) {
     constructor(kobwebConf: KobwebConf) : this(
         title = kobwebConf.site.title,
-        routePrefix = kobwebConf.site.routePrefix,
+        basePath = kobwebConf.site.basePathOrRoutePrefix,
         script = kobwebConf.server.files.dev.script
     )
 }
@@ -165,7 +165,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        val routePrefix = RoutePrefix(confInputs.routePrefix)
+        val basePath = BasePath(confInputs.basePath)
         getGenIndexFile().get().asFile.writeText(
             createIndexFile(
                 confInputs.title,
@@ -174,7 +174,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 // Our script will always exist at the root folder, so be sure to ground it,
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
-                routePrefix.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
+                basePath.prependTo(confInputs.script.substringAfterLast("/").prefixIfNot("/")),
                 indexBlock.scriptAttributes.get(),
                 buildTarget
             )
