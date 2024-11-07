@@ -60,10 +60,13 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.tasks.Sync
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.attributes.KlibPackaging
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -233,6 +236,24 @@ class KobwebApplicationPlugin @Inject constructor(
         project.tasks.withType<KotlinWebpack>().configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode()
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
+
+            // Beginning with Kotlin 2.1.0, the Kotlin Gradle plugin began using uncompressed klibs for
+            // inter-project dependencies. This breaks our code responsible for detecting and extracting metadata from
+            // kobweb library dependencies, as the required resources (e.g. `KOBWEB_METADATA_FRONTEND`) are not present
+            // in non-packed klibs. Thus, we override this default and explicitly request packed klibs
+            // NOTE: this is not necessary to do for the Jvm target as it is still using jars for its classpath.
+            //
+            // This is intended as a temporary workaround until we find a way to make unpacked klibs compatible with
+            // kobweb libraries.
+            // See also: https://youtrack.jetbrains.com/issue/KT-65285/Use-uncompressed-Klibs
+            @OptIn(ExperimentalKotlinGradlePluginApi::class)
+            run {
+                project.configurations[jsTarget.compileClasspath]
+                    .attributes.attribute(KlibPackaging.ATTRIBUTE, project.objects.named(KlibPackaging.PACKED))
+
+                project.configurations[jsTarget.runtimeClasspath]
+                    .attributes.attribute(KlibPackaging.ATTRIBUTE, project.objects.named(KlibPackaging.PACKED))
+            }
 
             project.setupKspJs(jsTarget, appBlock.cssPrefix)
 

@@ -1,7 +1,7 @@
 [![version: 0.20.0](https://img.shields.io/badge/kobweb-0.20.0-blue)](COMPATIBILITY.md)
 [![version: 0.9.18](https://img.shields.io/badge/kobweb_cli-0.9.18-blue)](https://github.com/varabyte/kobweb-cli)
 <br>
-[![kotlin: 2.0.20](https://img.shields.io/badge/kotlin-2.0.20-blue?logo=kotlin)](COMPATIBILITY.md)
+[![kotlin: 2.1.0](https://img.shields.io/badge/kotlin-2.1.0-blue?logo=kotlin)](COMPATIBILITY.md)
 [![compose: 1.7.1](https://img.shields.io/badge/compose-1.7.1-blue?logo=jetpackcompose)](COMPATIBILITY.md)
 [![ktor: 3.0.0](https://img.shields.io/badge/ktor-3.0.0-blue)](https://ktor.io/)
 <br>
