@@ -5,7 +5,6 @@ import com.varabyte.kobweb.browser.http.AbortController
 import com.varabyte.kobweb.browser.http.fetch
 import com.varabyte.kobweb.browser.http.http
 import com.varabyte.kobweb.navigation.BasePath
-import com.varabyte.kobweb.navigation.prependIf
 import kotlinx.browser.window
 import org.khronos.webgl.get
 import org.w3c.dom.Window
@@ -27,16 +26,12 @@ class ApiFetcher(private val window: Window) {
      */
     var logOnError: Boolean by window.http::logOnError
 
-    private fun toResource(apiPath: String, autoPrefix: Boolean): String {
-        return BasePath.prependIf(autoPrefix, "/api/${apiPath.trimStart('/')}")
+    private fun toResource(apiPath: String): String {
+        return BasePath.prepend("/api/${apiPath.trimStart('/')}")
     }
 
     /**
      * Call DELETE on a target API path.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      *
      * See also [tryDelete], which will return null if the request fails for any reason.
      *
@@ -46,8 +41,7 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray = window.http.delete(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray = window.http.delete(toResource(apiPath), headers, abortController)
 
     /**
      * Like [delete], but returns null if the request failed for any reason.
@@ -59,15 +53,10 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray? = window.http.tryDelete(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray? = window.http.tryDelete(toResource(apiPath), headers, abortController)
 
     /**
      * Call GET on a target API path.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      *
      * See also [tryGet], which will return null if the request fails for any reason.
      *
@@ -77,8 +66,7 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray = window.http.get(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray = window.http.get(toResource(apiPath), headers, abortController)
 
     /**
      * Like [get], but returns null if the request failed for any reason.
@@ -90,15 +78,10 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray? = window.http.tryGet(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray? = window.http.tryGet(toResource(apiPath), headers, abortController)
 
     /**
      * Call HEAD on a target API path.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      *
      * See also [tryHead], which will return null if the request fails for any reason.
      *
@@ -108,8 +91,7 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray = window.http.head(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray = window.http.head(toResource(apiPath), headers, abortController)
 
     /**
      * Like [head], but returns null if the request failed for any reason.
@@ -121,15 +103,10 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray? = window.http.tryHead(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray? = window.http.tryHead(toResource(apiPath), headers, abortController)
 
     /**
      * Call OPTIONS on a target API path.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      *
      * See also [tryOptions], which will return null if the request fails for any reason.
      *
@@ -139,8 +116,7 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray = window.http.options(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray = window.http.options(toResource(apiPath), headers, abortController)
 
     /**
      * Like [options], but returns null if the request failed for any reason.
@@ -152,15 +128,10 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray? = window.http.tryOptions(toResource(apiPath, autoPrefix), headers, abortController)
+    ): ByteArray? = window.http.tryOptions(toResource(apiPath), headers, abortController)
 
     /**
      * Call PATCH on a target API path.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      *
      * See also [tryPatch], which will return null if the request fails for any reason.
      *
@@ -171,8 +142,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray = window.http.patch(toResource(apiPath, autoPrefix), headers, body, abortController)
+    ): ByteArray = window.http.patch(toResource(apiPath), headers, body, abortController)
 
     /**
      * Like [patch], but returns null if the request failed for any reason.
@@ -185,15 +155,10 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray? = window.http.tryPatch(toResource(apiPath, autoPrefix), headers, body, abortController)
+    ): ByteArray? = window.http.tryPatch(toResource(apiPath), headers, body, abortController)
 
     /**
      * Call POST on a target API path.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      *
      * See also [tryPost], which will return null if the request fails for any reason.
      *
@@ -204,8 +169,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray = window.http.post(toResource(apiPath, autoPrefix), headers, body, abortController)
+    ): ByteArray = window.http.post(toResource(apiPath), headers, body, abortController)
 
     /**
      * Like [post], but returns null if the request failed for any reason.
@@ -218,15 +182,10 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray? = window.http.tryPost(toResource(apiPath, autoPrefix), headers, body, abortController)
+    ): ByteArray? = window.http.tryPost(toResource(apiPath), headers, body, abortController)
 
     /**
      * Call PUT on a target API path.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      *
      * See also [tryPut], which will return null if the request fails for any reason.
      *
@@ -237,8 +196,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray = window.http.put(toResource(apiPath, autoPrefix), headers, body, abortController)
+    ): ByteArray = window.http.put(toResource(apiPath), headers, body, abortController)
 
     /**
      * Like [put], but returns null if the request failed for any reason.
@@ -251,8 +209,7 @@ class ApiFetcher(private val window: Window) {
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
         abortController: AbortController? = null,
-        autoPrefix: Boolean = true
-    ): ByteArray? = window.http.tryPut(toResource(apiPath, autoPrefix), headers, body, abortController)
+    ): ByteArray? = window.http.tryPut(toResource(apiPath), headers, body, abortController)
 }
 
 @Suppress("unused") // We tie our class to the "Window" class on purpose, so it can be used instead of `fetch`

@@ -9,7 +9,6 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.Anchor
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
-import com.varabyte.kobweb.navigation.BasePath
 import com.varabyte.kobweb.navigation.UpdateHistoryMode
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -87,12 +86,6 @@ val AlwaysUnderlinedLinkVariant = LinkStyle.addVariant {
  * @param updateHistoryMode If set, follow this behavior when following the link. By default, history will be added
  *   when visiting the new location (so you can return back to the current page), but [UpdateHistoryMode.REPLACE] can be
  *   used to create an effect where the new page "takes over" the current page in place.
- *
- * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front of
- *   [path] if possible. For example, if the [path] parameter was set to "/about" and the site's base path was set to
- *   "company/our-team", then the `href` value will be converted to "/company/our-team/about". You usually want this to
- *   be true, unless you are intentionally linking outside this site's root folder while still staying in the same
- *   domain, e.g. you are linking to "/company/other-team". See [BasePath] for more information.
  */
 @Composable
 fun Link(
@@ -103,7 +96,6 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     updateHistoryMode: UpdateHistoryMode? = null,
-    autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLElement>? = null,
 ) {
     Link(
@@ -113,7 +105,6 @@ fun Link(
         openInternalLinksStrategy,
         openExternalLinksStrategy,
         updateHistoryMode,
-        autoPrefix,
         ref
     ) {
         Text(text ?: path)
@@ -133,7 +124,6 @@ fun Link(
     openInternalLinksStrategy: OpenLinkStrategy? = null,
     openExternalLinksStrategy: OpenLinkStrategy? = null,
     updateHistoryMode: UpdateHistoryMode? = null,
-    autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable () -> Unit
 ) {
@@ -143,7 +133,6 @@ fun Link(
         openInternalLinksStrategy,
         openExternalLinksStrategy,
         updateHistoryMode,
-        autoPrefix
     ) {
         registerRefScope(ref)
         content()

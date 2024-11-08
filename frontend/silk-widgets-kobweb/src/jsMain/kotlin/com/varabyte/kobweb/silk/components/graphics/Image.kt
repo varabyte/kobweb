@@ -8,7 +8,6 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.navigation.BasePath
-import com.varabyte.kobweb.navigation.prependIf
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
@@ -40,10 +39,6 @@ val FitWidthImageVariant = ImageStyle.addVariantBase {
  *
  * @param alt An optional description which gets used as alt text for the image. This is useful to include for
  *   accessibility tools.
- *
- * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You usually
- *   want this to be true, unless you are intentionally linking outside this site's root folder while still staying in
- *   the same domain.
  */
 @Composable
 fun Image(
@@ -53,7 +48,6 @@ fun Image(
     width: Int? = null,
     height: Int? = null,
     alt: String = "",
-    autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLImageElement>? = null,
 ) {
     if (ref != null) {
@@ -61,7 +55,7 @@ fun Image(
             registerRefScope(ref) { it.nextSibling as HTMLImageElement }
         }
     }
-    Img(BasePath.prependIf(autoPrefix, src), alt, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs {
+    Img(BasePath.prepend(src), alt, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs {
         if (width != null) attr("width", width.toString())
         if (height != null) attr("height", height.toString())
     })
@@ -91,8 +85,7 @@ fun Image(
     variant: CssStyleVariant<ImageKind>? = null,
     width: Int? = null,
     height: Int? = null,
-    autoPrefix: Boolean = true,
     ref: ElementRefScope<HTMLImageElement>? = null,
 ) {
-    Image(src, modifier, variant, width, height, description, autoPrefix, ref)
+    Image(src, modifier, variant, width, height, description, ref)
 }

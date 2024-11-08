@@ -245,31 +245,24 @@ class Router {
      *
      * In that case, if the user visited `/users/123456/posts/321`, then that composable method will be visited, with
      * `user = 123456` and `post = 321` passed down in the `PageContext`.
-     *
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front. You
-     *   usually want this to be true, unless you are intentionally linking outside this site's root folder while still
-     *   staying in the same domain.
      */
     @Suppress("unused") // Called by generated code
-    fun register(route: String, autoPrefix: Boolean = true, pageMethod: PageMethod) {
+    fun register(route: String, pageMethod: PageMethod) {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(
-            routeTree.register(
-                BasePath.prependIf(autoPrefix, route),
-                pageMethod
-            )
+            routeTree.register(BasePath.prepend(route), pageMethod)
         ) { "Registration failure. Path is already registered: $route" }
     }
 
     @Suppress("unused") // Called by generated code
-    fun registerRedirect(fromRoute: String, toRoute: String, autoPrefix: Boolean = true) {
+    fun registerRedirect(fromRoute: String, toRoute: String) {
         listOf(fromRoute, toRoute).forEach {
             require(Route.isRoute(it) && it.startsWith('/')) { "Registration only allowed for rooted routes, e.g. `/example/path`. Got: $it" }
         }
 
         // Don't use BasePath.prepend here because `fromRoute` and `toRoute` are not strictly routes (the first is a
         // regex and the latter is a route that might have variables in it).
-        val prefix = if (autoPrefix) BasePath.value.removeSuffix("/") else ""
+        val prefix = BasePath.value.removeSuffix("/")
         routeTree.registerRedirect(prefix + fromRoute, prefix + toRoute)
     }
 
@@ -332,6 +325,9 @@ class Router {
      * Attempt to navigate **internally** within this site, or return false if that's not possible (i.e. because the
      * path is external).
      *
+     * By internally, I mean this method expects a route part of a path only -- no https:// origin in other words. "/",
+     * "/about", "/help/contact", and "user/123" are examples.
+     *
      * You will generally call this method like so:
      *
      * ```
@@ -343,28 +339,27 @@ class Router {
      *
      * That way, either the router handles the navigation or the browser does.
      *
+     * Note that this method will automatically prepend this site's [BasePath] if it is configured and if
+     * [pathQueryAndFragment] is absolute.
+     *
      * See also: [navigateTo], which, if called, handles the external navigation for you.
      *
      * @param pathQueryAndFragment The path to a page, including (optional) search params and hash,
      *   e.g. "/example/path?arg=1234#fragment". See also the
      *   [standards](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) documentation.
+     *
      * @param updateHistoryMode How this new path should affect the history. See [UpdateHistoryMode] docs for more
      *   details. Note that this value will be ignored if [pathQueryAndFragment] refers to an external link.
-     * @param autoPrefix If true AND if a base path is configured for this site, auto-prefix it to the front of the
-     *   [pathQueryAndFragment] if possible. For example, if the [pathQueryAndFragment] parameter was set to
-     *   "/about" and the site's base path was set to "company/our-team", then the `href` value will be converted to
-     *   "/company/our-team/about". You usually want this to be true, unless you are intentionally linking outside this
-     *   site's root folder while still staying in the same domain, e.g. you are linking to "/company/other-team". See
-     *   [BasePath] for more information.
      */
     fun tryRoutingTo(
         pathQueryAndFragment: String,
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openLinkStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
-        autoPrefix: Boolean = true,
     ): Boolean {
+        if (pathQueryAndFragment.contains("://")) return false
+
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        var pathQueryAndFragment = BasePath.prependIf(autoPrefix, pathQueryAndFragment)
+        var pathQueryAndFragment = BasePath.prepend(pathQueryAndFragment)
         if (Route.isRoute(pathQueryAndFragment)) {
             pathQueryAndFragment = pathQueryAndFragment.normalize()
 
@@ -479,6 +474,9 @@ class Router {
     /**
      * Like [tryRoutingTo] but handle the external navigation as well.
      *
+     * In other words, it can handle paths like `/example/route`, which would be considered an internal route, or
+     * `https://example.com/some/route`, which would be considered external.
+     *
      * You will generally call this method like so:
      *
      * ```
@@ -486,6 +484,9 @@ class Router {
      *   evt.preventDefault()
      *   ctx.router.navigateTo(...)
      * ```
+     *
+     * Note that this method will automatically prepend this site's [BasePath] if it is configured and if
+     * [pathQueryAndFragment] is an absolute route.
      *
      * @param updateHistoryMode This parameter is only used for internal site routing. See [tryRoutingTo] for more
      *   information.
@@ -495,9 +496,13 @@ class Router {
         updateHistoryMode: UpdateHistoryMode = UpdateHistoryMode.PUSH,
         openInternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_PLACE,
         openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB,
-        autoPrefix: Boolean = true,
     ) {
-        if (!tryRoutingTo(pathQueryAndFragment, updateHistoryMode, openInternalLinksStrategy, autoPrefix)) {
+        if (!tryRoutingTo(
+                pathQueryAndFragment.removePrefix(window.origin),
+                updateHistoryMode,
+                openInternalLinksStrategy,
+            )
+        ) {
             window.open(pathQueryAndFragment, openExternalLinksStrategy)
         }
     }

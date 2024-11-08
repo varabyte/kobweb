@@ -40,6 +40,7 @@ fun createMainFunction(
         val defaultImports = listOf(
             "androidx.compose.runtime.CompositionLocalProvider",
             "$KOBWEB_GROUP.core.AppGlobals",
+            "$KOBWEB_GROUP.navigation.remove",
             "$KOBWEB_GROUP.navigation.BasePath",
             "$KOBWEB_GROUP.navigation.Router",
             "$KOBWEB_GROUP.navigation.UpdateHistoryMode",
@@ -241,12 +242,8 @@ fun createMainFunction(
                 addStatement("")
             }
 
-            // Note: Below, we use %S when specifying key/value pairs. This prevents KotlinPoet from breaking
-            // our text in the middle of a String.
-            addComment("The initial route used here comes from the browser as a source of truth, so don't auto-add")
-            addComment("a prefix even if this site uses one.")
             addCode(CodeBlock.Builder().apply {
-                addStatement("router.navigateTo(window.location.href.removePrefix(window.location.origin), UpdateHistoryMode.REPLACE, autoPrefix = false)")
+                addStatement("router.tryRoutingTo(BasePath.remove(window.location.href.removePrefix(window.origin)), UpdateHistoryMode.REPLACE)")
                 addStatement("")
             }.build())
 
@@ -261,6 +258,8 @@ fun createMainFunction(
             }.build())
 
             addCode(CodeBlock.Builder().apply {
+                // We use %S when specifying key/value pairs. This prevents KotlinPoet from breaking our text in the
+                // middle of a String.
                 addStatement(
                     "AppGlobals.initialize(mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()}))",
                     *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
