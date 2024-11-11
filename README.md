@@ -7,7 +7,7 @@
 <br>
 [![Varabyte Discord](https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/5NZ2GKV5Cs)
 [![Kotlin Slack](https://img.shields.io/badge/%23Kobweb-4A154B?logo=slack&logoColor=white)](https://kotlinlang.slack.com/archives/C04RTD72RQ8)
-[![Mastodon Follow](https://img.shields.io/mastodon/follow/109382855401210782?domain=https%3A%2F%2Ffosstodon.org&style=social)](https://fosstodon.org/@bitspittle)
+[![Bluesky](https://img.shields.io/badge/Bluesky-0285FF?logo=bluesky&logoColor=fff)](https://bsky.app/profile/bitspittle.bsky.social)
 
 # K🕸️bweb
 
