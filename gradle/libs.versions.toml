@@ -1,7 +1,7 @@
 [versions]
 playwright = "1.45.1"
 commonmark = "0.21.0"
-compose = "1.6.11"
+compose = "1.7.1"
 jsoup = "1.16.2"
 kaml = "0.60.0"
 kobweb-libs = "0.19.3-SNAPSHOT"
