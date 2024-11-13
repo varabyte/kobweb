@@ -166,6 +166,12 @@ fun createMainFunction(
             }
 
             addCode(CodeBlock.builder().apply {
+                // We use %S when specifying key/value pairs. This prevents KotlinPoet from breaking our text in the
+                // middle of a String.
+                addStatement(
+                    "AppGlobals.initialize(mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()}))",
+                    *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
+                )
                 addStatement("BasePath.set(\"$basePath\")")
                 addStatement("val router = Router()")
                 addStatement("$KOBWEB_GROUP.core.init.initKobweb(router) { ctx ->")
@@ -258,12 +264,6 @@ fun createMainFunction(
             }.build())
 
             addCode(CodeBlock.Builder().apply {
-                // We use %S when specifying key/value pairs. This prevents KotlinPoet from breaking our text in the
-                // middle of a String.
-                addStatement(
-                    "AppGlobals.initialize(mapOf(${Array(appGlobals.size) { "%S to %S" }.joinToString()}))",
-                    *appGlobals.flatMap { entry -> listOf(entry.key, entry.value) }.toTypedArray()
-                )
                 addStatement("renderComposable(rootElementId = \"root\") {")
                 withIndent {
                     addStatement("$appFqn {")
