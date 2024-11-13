@@ -2919,7 +2919,12 @@ val VersionTextStyle = CssStyle.base {
 
 @Composable
 fun SiteVersion(modifier: Modifier = Modifier) {
-  SpanText("v" + SiteGlobals.version, VersionTextStyle.toModifier().then(modifier))
+  // Extension method approach
+  val versionLabel = "v" + AppGlobals.version
+  // Wrapper object approach
+  val versionLabel = "v" + SiteGlobals.version
+    
+  SpanText(versionLabel, VersionTextStyle.toModifier().then(modifier))
 }
 ```
 
