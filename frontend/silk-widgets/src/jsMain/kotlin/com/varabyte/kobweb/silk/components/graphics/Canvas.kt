@@ -49,14 +49,43 @@ class RenderScope<C : RenderingContext>(
 )
 
 /**
- * An MS value which, if used, will result in a 60FPS render.
+ * A millisecond value which, if used, will result in a 60FPS render.
+ *
+ * This is a value for the Canvas `minDeltaMs` parameter.
  */
 const val ONE_FRAME_MS_60_FPS = 1000.0f / 60.0f
 
 /**
- * An MS value which, if used, will result in a 30FPS render.
+ * A millisecond value which, if used, will result in a 30FPS render.
+ *
+ * This is a value for the Canvas `minDeltaMs` parameter.
  */
 const val ONE_FRAME_MS_30_FPS = ONE_FRAME_MS_60_FPS * 2.0f
+
+/**
+ * A millisecond value which, if used, will result in a canvas that never repaints on its own.
+ *
+ * This is a value for the Canvas `minDeltaMs` parameter.
+ *
+ * This can be useful for a canvas that only ever is meant to paint exactly once or one whose repaints are triggered
+ * manually by the caller via a [CanvasRepainter].
+ *
+ * If you pass in a repainter and don't expliciltly set the `minDeltaMs` parameter, it will automatically be set to this
+ * value.
+ *
+ * ```
+ * val repainter = remember { CanvasRepainter() }
+ * Canvas2d(
+ *     500, 500,
+ *     Modifier.onClick { repainter.repaint() },
+ *     repainter = repainter // Automatically sets minDeltaMs to REPAINT_CANVAS_MANUALLY
+ * ) {
+ *     ctx.fillStyle = Color.rgb(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
+ *     ctx.fillRect(0.0, 0.0, 500.0, 500.0)
+ * }
+ * ```
+ */
+const val REPAINT_CANVAS_MANUALLY = Float.MAX_VALUE
 
 private class CanvasElementBuilder : ElementBuilder<HTMLCanvasElement> {
     val canvas by lazy { document.createElement("canvas") as HTMLCanvasElement }
@@ -76,11 +105,11 @@ private class RenderCallback<C : RenderingContext>(
     private val minDeltaMs = minDeltaMs.toDouble()
     private val maxDeltaMs = maxDeltaMs.toDouble()
 
-    fun step(colorMode: ColorMode) {
+    fun step(colorMode: ColorMode, force: Boolean = false) {
         val firstRender = lastRenderedTimestamp == 0.0
         val now = Date.now()
         val deltaMs = now - lastRenderedTimestamp
-        if (deltaMs >= minDeltaMs) {
+        if (firstRender || force || deltaMs >= minDeltaMs) {
             val scope = RenderScope(ctx, width, height, colorMode, if (firstRender) 0.0 else min(deltaMs, maxDeltaMs))
             scope.render()
             lastRenderedTimestamp = now
@@ -106,10 +135,11 @@ private inline fun <C : RenderingContext> Canvas(
     width: Int,
     height: Int,
     modifier: Modifier = Modifier,
-    variant: CssStyleVariant<CanvasKind>? = null,
-    minDeltaMs: Number = 0f,
-    maxDeltaMs: Number = 500f,
-    ref: ElementRefScope<HTMLElement>? = null,
+    variant: CssStyleVariant<CanvasKind>?,
+    repainter: CanvasRepainter?,
+    minDeltaMs: Number,
+    maxDeltaMs: Number,
+    ref: ElementRefScope<HTMLElement>?,
     crossinline createContext: (HTMLCanvasElement) -> C?,
     noinline render: RenderScope<C>.() -> Unit,
 ) {
@@ -134,6 +164,9 @@ private inline fun <C : RenderingContext> Canvas(
                     requestId = window.requestAnimationFrame { step(colorMode) }
                 })
                 requestId = window.requestAnimationFrame { callback.step(colorMode) }
+                repainter?.repaintRequested = {
+                    requestId = window.requestAnimationFrame { callback.step(colorMode, force = true) }
+                }
             }
 
             onDispose {
@@ -142,6 +175,30 @@ private inline fun <C : RenderingContext> Canvas(
                 }
             }
         }
+    }
+}
+
+/**
+ * A helper class which lets callers trigger a repaint manually.
+ *
+ * Pass it into a [Canvas2d] (or [CanvasGl]) as follows:
+ *
+ * ```
+ * val repainter = remember { CanvasRepainter() }
+ * Canvas2d(
+ *     500, 500,
+ *     Modifier.onClick { repainter.repaint() },
+ *     repainter = repainter
+ * ) {
+ *     ctx.fillStyle = Color.rgb(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
+ *     ctx.fillRect(0.0, 0.0, 500.0, 500.0)
+ * }
+ * ```
+ */
+class CanvasRepainter {
+    internal var repaintRequested: () -> Unit = {}
+    fun repaint() {
+        repaintRequested()
     }
 }
 
@@ -156,6 +213,8 @@ private inline fun <C : RenderingContext> Canvas(
  * @param maxDeltaMs Ensured that the delta passed into [RenderScope] will be capped. This is useful to make sure that
  *   render behavior doesn't explode after sitting on a breakpoint for a while or get stuck on some edge case long
  *   calculation. By default, it is capped to half a second.
+ * @param repainter If present, provides a handle that lets callers trigger a repaint manually. You should declare the
+ *   [CanvasRepainter] instance inside a [remember] block.
  * @param render A callback which handles rendering a single frame.
  */
 @Composable
@@ -164,7 +223,8 @@ fun Canvas2d(
     height: Int,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<CanvasKind>? = null,
-    minDeltaMs: Number = 0.0,
+    repainter: CanvasRepainter? = null,
+    minDeltaMs: Number = if (repainter != null) REPAINT_CANVAS_MANUALLY else 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     ref: ElementRefScope<HTMLElement>? = null,
     render: RenderScope<CanvasRenderingContext2D>.() -> Unit,
@@ -174,6 +234,7 @@ fun Canvas2d(
         height,
         modifier,
         variant,
+        repainter,
         minDeltaMs,
         maxDeltaMs,
         ref,
@@ -193,6 +254,8 @@ fun Canvas2d(
  * @param maxDeltaMs Ensured that the delta passed into [RenderScope] will be capped. This is useful to make sure that
  *   render behavior doesn't explode after sitting on a breakpoint for a while or get stuck on some edge case long
  *   calculation. By default, it is capped to half a second.
+ * @param repainter If present, provides a handle that lets callers trigger a repaint manually. You should declare the
+ *   [CanvasRepainter] instance inside a [remember] block.
  * @param render A callback which handles rendering a single frame.
  */
 @Composable
@@ -201,7 +264,8 @@ fun CanvasGl(
     height: Int,
     modifier: Modifier = Modifier,
     variant: CssStyleVariant<CanvasKind>? = null,
-    minDeltaMs: Number = 0.0,
+    repainter: CanvasRepainter? = null,
+    minDeltaMs: Number = if (repainter != null) REPAINT_CANVAS_MANUALLY else 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
     ref: ElementRefScope<HTMLElement>? = null,
     render: RenderScope<WebGLRenderingContext>.() -> Unit,
@@ -211,6 +275,7 @@ fun CanvasGl(
         height,
         modifier,
         variant,
+        repainter,
         minDeltaMs,
         maxDeltaMs,
         ref,
