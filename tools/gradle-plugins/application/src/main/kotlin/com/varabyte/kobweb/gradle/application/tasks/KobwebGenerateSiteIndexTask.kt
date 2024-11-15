@@ -103,30 +103,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 libraryMetadata = Json.decodeFromString(LibraryMetadata.serializer(), bytes.decodeToString())
             }
 
-            libraryMetadata?.index?.headElements?.let { headElementsData ->
-                // Support legacy library metadata that include the <head> tag itself
-                val headElementsStr = if (headElementsData.startsWith("<head")) {
-                    val document = Jsoup.parse(headElementsData)
-                    val elements = document.head().children()
-                    HtmlUtil.serializeHeadContents {
-                        elements.forEach { element ->
-                            // Weird hack alert -- void elements (like <link>, <meta>), which are common in <head> tags, are
-                            // considered by JSoup as self-closing even without a trailing slash. This is valid HTML but
-                            // currently kotlinx html can't seem to handle them when specified as raw text, triggering a
-                            // parse error. (See also: https://github.com/Kotlin/kotlinx.html/issues/247). To work around
-                            // this limitation, we force a trailing slash ourselves.
-                            unsafe {
-                                val rawElement = element.outerHtml()
-                                if (element.tag().isSelfClosing && !rawElement.endsWith("/>")) {
-                                    raw(rawElement.removeSuffix(">") + "/>")
-                                } else {
-                                    raw(rawElement)
-                                }
-                            }
-                        }
-                    }
-                } else headElementsData
-
+            libraryMetadata?.index?.headElements?.let { headElementsStr ->
                 if (headElementsStr.isBlank()) {
                     return@forEach
                 }
@@ -135,10 +112,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                     append.head { unsafe { raw(headElementsStr) } }
                 }.serialize().lines().drop(3).dropLast(2).joinToString("\n").trimIndent()
 
-                @Suppress("DEPRECATION")
                 val optedOut = indexBlock.excludeHtmlForDependencies.get().any { file.name.startsWith(it) }
-                    || indexBlock.excludeTags.orNull?.invoke(AppBlock.IndexBlock.ExcludeTagsContext(file.name)) ?: false
-
                 if (!optedOut) {
                     if (indexBlock.suppressHtmlWarningsForDependencies.get()
                             .none { file.name.startsWith(it) }

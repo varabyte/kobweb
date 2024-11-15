@@ -32,13 +32,7 @@ enum class SiteLayout {
      * Kobweb server features and dynamic routing are not supported with this format. However, a huge advantage for this
      * format is it can often be served fast and cheap.
      */
-    STATIC,
-
-    /**
-     * A legacy name which has migrated to [FULLSTACK].
-     */
-    @Deprecated("Use FULLSTACK instead", replaceWith = ReplaceWith("FULLSTACK"))
-    KOBWEB;
+    STATIC;
 
     companion object {
         fun get(): SiteLayout {

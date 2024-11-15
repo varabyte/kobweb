@@ -103,22 +103,6 @@ abstract class MarkdownHandlers @Inject constructor(project: Project, newDefault
     }
 
     /**
-     * The root composable to use as a fallback if no other root is provided.
-     *
-     * All markdown files, when converted to code, should have some root composable called first, wrapping all content.
-     * This root is often done set a YAML block, but we should handle the case where one is not specified (either
-     * because the YAML block doesn't include it or when there's no YAML block at all). This is because Kobweb's default
-     * layouts use a Box as the root, which just stacks elements on top of each other.
-     *
-     * Note that a user might have overridden the Kobweb default root layout via the `@App` annotation, in which case,
-     * they may not need to specify a root at all here (since that could just add an unnecessary extra layer to the DOM
-     * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
-     */
-    @Deprecated("Use the `defaultRoot` property in the parent markdown block instead.")
-    @get:Internal
-    val defaultRoot: Property<String> = newDefaultRoot
-
-    /**
      * Use Silk components instead of Compose HTML components when relevant.
      *
      * If the user's project doesn't have a dependency on the Silk library, this should be set to false.

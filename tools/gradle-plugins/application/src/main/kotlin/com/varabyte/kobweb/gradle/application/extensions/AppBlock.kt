@@ -45,9 +45,6 @@ abstract class AppBlock @Inject constructor(
         @get:Internal
         val routePrefix get() = basePath
 
-        @Deprecated("Don't use `excludeTags`. Use `excludeHtmlForDependencies` instead.")
-        class ExcludeTagsContext(val name: String)
-
         /**
          * A list of element builders to add to the `<head>` of the generated `index.html` file.
          *
@@ -125,16 +122,6 @@ abstract class AppBlock @Inject constructor(
          */
         @get:Input
         abstract val scriptAttributes: MapProperty<String, String>
-
-        /**
-         * Logic to decide if any dependencies should be excluded from generating head elements in the index.html file.
-         *
-         * DEPRECATED. Use [excludeHtmlForDependencies] instead.
-         */
-        @Deprecated("Use `excludeHtmlForDependencies` instead.")
-        @Suppress("DEPRECATION")
-        @get:Internal
-        abstract val excludeTags: Property<ExcludeTagsContext.() -> Boolean>
 
         /**
          * A list of dependencies that should be excluded from generating html elements in the `index.html` file.
@@ -501,31 +488,6 @@ val KobwebBlock.app: AppBlock
 
 internal fun KobwebBlock.createAppBlock(kobwebFolder: KobwebFolder, conf: KobwebConf): AppBlock {
     return extensions.create<AppBlock>("app", kobwebFolder, conf, baseGenDir)
-}
-
-/**
- * A convenience method for the common case of specifying a direct dependency with the [excludeTags][AppBlock.IndexBlock.excludeTags] method.
- *
- * The value passed into this method is a prefix, so for example, the names "kotlin-bootstrap", "kotlin-bootstrap-js",
- * "kotlin-bootstrap-js-1.0", and "kotlin-bootstrap-js-1.0.klib" would all work to opt-out of accepting head elements
- * from the "kotlin-bootstrap-js-1.0.klib" artifact.
- *
- * When Kobweb detects a dependency that adds head elements, it will print a warning message that includes the value
- * of the artifact name which you can use here.
- *
- * If you call this method multiple times with different dependencies, the effect is additive.
- */
-@Deprecated(
-    "Use `excludedDependencies.add(...)` instead.",
-    ReplaceWith("excludedDependencies.add(dependencyNamePrefix)")
-)
-fun AppBlock.IndexBlock.excludeTagsForDependency(dependencyNamePrefix: String) {
-    excludeHtmlForDependencies.add(dependencyNamePrefix)
-}
-
-@Deprecated("Use `excludeAllHtmlFromDependencies` instead.", ReplaceWith("excludeAllHtmlFromDependencies()"))
-fun AppBlock.IndexBlock.excludeAllTags() {
-    excludeAllHtmlFromDependencies()
 }
 
 fun AppBlock.IndexBlock.excludeAllHtmlFromDependencies() {

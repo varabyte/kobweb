@@ -226,18 +226,8 @@ fun createMainFunction(
                                 }
                             )
                         }
-                        frontendData.silkStyles.forEach { entry ->
-                            addStatement("ctx.theme.registerStyle(${entry.fqcn})")
-                        }
-                        frontendData.silkVariants.forEach { entry ->
-                            addStatement("ctx.theme.registerVariants(${entry.fqcn})")
-                        }
                         frontendData.keyframesList.forEach { entry ->
-                            entry.name?.let { keyframesName ->
-                                addStatement("ctx.theme.registerKeyframes(\"$keyframesName\", ${entry.fqcn})")
-                            } ?: run {
-                                addStatement("ctx.theme.registerKeyframes(${entry.fqcn})")
-                            }
+                            addStatement("ctx.theme.registerKeyframes(\"${entry.name}\", ${entry.fqcn})")
                         }
                         frontendData.silkInits.forEach { init ->
                             addStatement("${init.fqn}(ctx)")

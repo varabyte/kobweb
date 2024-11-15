@@ -133,19 +133,6 @@ class Keyframes(internal val init: KeyframesBuilder.() -> Unit) {
     // Note: Need to postpone checking this value, because color modes aren't ready until after a certain point in
     // Silk's initialization.
     val usesColorMode by lazy { !isColorModeAgnostic(init) }
-
-    // This weird operator is provided for legacy code purposes.
-    // Old code: `val ExampleKeyframes by Keyframes { ... }`
-    // New code: `val ExampleKeyframes = Keyframes { ... }`
-    // This lets us support the `by` keyword for now, although we will remove it eventually.
-    @Deprecated("Please change the `by` keyword here to an `=` assignment instead.")
-    operator fun getValue(
-        thisRef: Any?,
-        property: KProperty<*>
-    ): Keyframes {
-        return this
-    }
-
 }
 
 /**

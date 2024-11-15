@@ -10,12 +10,6 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.Element
 
-@Deprecated(
-    "The name `StyleModifiers` has been renamed to `StyleScope`.",
-    replaceWith = ReplaceWith("StyleScope", "com.varabyte.kobweb.silk.style.StyleScope")
-)
-typealias StyleModifiers = StyleScope
-
 /**
  * Class used as the receiver to a callback, allowing the user to define various state-dependent styles (defined via
  * [Modifier]s).

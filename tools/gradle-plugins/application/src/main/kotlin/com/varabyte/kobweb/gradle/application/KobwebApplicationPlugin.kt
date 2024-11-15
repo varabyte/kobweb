@@ -386,13 +386,6 @@ class KobwebApplicationPlugin @Inject constructor(
 
         project.afterEvaluate {
             @Suppress("DEPRECATION")
-            if (kobwebBlock.app.index.excludeTags.isPresent) {
-                project.logger.warn(
-                    "w: The `excludeTags` property is slated for removal. Use `excludeHtmlForDependencies` instead."
-                )
-            }
-
-            @Suppress("DEPRECATION")
             val legacyOverride = kobwebBlock.app.legacyRouteRedirectStrategy.orNull
             if (legacyOverride != null) {
                 project.logger.warn(

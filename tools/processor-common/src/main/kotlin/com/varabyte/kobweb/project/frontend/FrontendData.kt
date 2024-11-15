@@ -23,16 +23,12 @@ import kotlinx.serialization.Serializable
  * @param pages A collection of methods annotated with `@Page` and relevant metadata.
  * @param kobwebInits A collection of methods annotated with `@InitKobweb` and relevant metadata.
  * @param silkInits A collection of methods annotated with `@InitSilk` and relevant metadata.
- * @param silkStyles A collection of fields that represent component style definitions.
- * @param silkVariants A collection of fields that represent component variant definitions.
  */
 @Serializable
 class FrontendData(
     val pages: List<PageEntry> = mutableListOf(),
     val kobwebInits: List<InitKobwebEntry> = mutableListOf(),
     val silkInits: List<InitSilkEntry> = mutableListOf(),
-    val silkStyles: List<ComponentStyleEntry> = mutableListOf(),
-    val silkVariants: List<ComponentVariantEntry> = mutableListOf(),
     val keyframesList: List<KeyframesEntry> = mutableListOf(),
     val cssStyles: List<CssStyleEntry> = mutableListOf(),
     val cssStyleVariants: List<CssStyleVariantEntry> = mutableListOf(),
@@ -48,8 +44,6 @@ fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
         this.flatMap { it.pages },
         this.flatMap { it.kobwebInits },
         this.flatMap { it.silkInits },
-        this.flatMap { it.silkStyles },
-        this.flatMap { it.silkVariants },
         this.flatMap { it.keyframesList },
         this.flatMap { it.cssStyles },
         this.flatMap { it.cssStyleVariants },
@@ -95,13 +89,9 @@ class InitKobwebEntry(val fqn: String, val acceptsContext: Boolean)
 
 /**
  * Metadata about code like `val Bounce = Keyframes { ... }`
- *
- * For legacy Keyframes usages, the name comes from the Keyframes object itself
- * (e.g. `val MyStyle = Keyframes("bounce") { ... }`) but by Kobweb 1.0 this code should be removed and the
- * `name` field below should become non-null.
  */
 @Serializable
-class KeyframesEntry(val fqcn: String, val name: String? = null, val import: String? = null)
+class KeyframesEntry(val fqcn: String, val name: String, val import: String? = null)
 
 /**
  * Information about a method in the user's code targeted by an `@Page` annotation.
@@ -113,22 +103,6 @@ class KeyframesEntry(val fqcn: String, val name: String? = null, val import: Str
  */
 @Serializable
 class PageEntry(val fqn: String, val route: String)
-
-/**
- * Metadata about code like `val MyStyle = ComponentStyle { ... }`
- *
- * `ComponentStyle` is a legacy class. The name of the variant comes from the property name itself.
- */
-@Serializable
-class ComponentStyleEntry(val fqcn: String)
-
-/**
- * Metadata about code like `val MyVariant = MyStyle.addVariant { ... }`
- *
- * `ComponentVariant` is a legacy class. The name of the variant comes from the property name itself.
- */
-@Serializable
-class ComponentVariantEntry(val fqcn: String)
 
 /**
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)

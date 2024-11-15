@@ -31,16 +31,11 @@ import com.varabyte.kobweb.ksp.common.CSS_STYLE_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
-import com.varabyte.kobweb.ksp.common.LEGACY_COMPONENT_STYLE_FQN
-import com.varabyte.kobweb.ksp.common.LEGACY_COMPONENT_VARIANT_FQN
-import com.varabyte.kobweb.ksp.common.LEGACY_KEYFRAMES_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
-import com.varabyte.kobweb.project.frontend.ComponentStyleEntry
-import com.varabyte.kobweb.project.frontend.ComponentVariantEntry
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
@@ -65,8 +60,6 @@ class FrontendProcessor(
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
     private val cssStyleVariants = mutableListOf<CssStyleVariantEntry>()
-    private val componentStyles = mutableListOf<ComponentStyleEntry>()
-    private val componentVariants = mutableListOf<ComponentVariantEntry>()
     private val keyframesList = mutableListOf<KeyframesEntry>()
     // fqPkg to subdir, e.g. "blog._2022._01" to "01"
     private val packageMappings = mutableMapOf<String, String>()
@@ -122,10 +115,6 @@ class FrontendProcessor(
         val cssStyleType = cssStyleClassDeclaration.asStarProjectedType()
         val cssStyleVariantType = resolver.getKotlinClassByName(CSS_STYLE_VARIANT_FQN)!!.asStarProjectedType()
         val keyframesType = resolver.getKotlinClassByName(KEYFRAMES_FQN)!!.asType(emptyList())
-        val legacyComponentStyleType = resolver.getKotlinClassByName(LEGACY_COMPONENT_STYLE_FQN)!!.asType(emptyList())
-        val legacyComponentVariantType =
-            resolver.getKotlinClassByName(LEGACY_COMPONENT_VARIANT_FQN)!!.asType(emptyList())
-        val legacyKeyframesType = resolver.getKotlinClassByName(LEGACY_KEYFRAMES_FQN)!!.asType(emptyList())
 
         val componentKindType = resolver.getKotlinClassByName(CSS_KIND_COMPONENT_FQN)!!.asType(emptyList())
         val restrictedKindType = resolver.getKotlinClassByName(CSS_KIND_RESTRICTED_FQN)!!.asType(emptyList())
@@ -156,26 +145,11 @@ class FrontendProcessor(
                 types.keyframesType,
                 "ctx.stylesheet.registerKeyframes",
             )
-            val legacyComponentStyleDeclaration = DeclarationType(
-                types.legacyComponentStyleType,
-                "ctx.theme.registerStyle",
-            )
-            val legacyComponentVariantDeclaration = DeclarationType(
-                types.legacyComponentVariantType,
-                "ctx.theme.registerVariants",
-            )
-            val legacyKeyframesDeclaration = DeclarationType(
-                types.legacyKeyframesType,
-                keyframesDeclaration.function,
-            )
 
             listOf(
                 cssStyleDeclaration,
                 cssStyleVariantDeclaration,
                 keyframesDeclaration,
-                legacyComponentStyleDeclaration,
-                legacyComponentVariantDeclaration,
-                legacyKeyframesDeclaration
             )
         }
 
@@ -423,9 +397,6 @@ class FrontendProcessor(
                 types.cssStyleType -> cssStyles.add(processCssStyle(property))
                 types.cssStyleVariantType -> cssStyleVariants.add(processCssStyleVariant(property))
                 types.keyframesType -> keyframesList.add(processKeyframes(property))
-                types.legacyComponentStyleType -> componentStyles.add(ComponentStyleEntry(property.qualifiedName!!.asString()))
-                types.legacyComponentVariantType -> componentVariants.add(ComponentVariantEntry(property.qualifiedName!!.asString()))
-                types.legacyKeyframesType -> keyframesList.add(KeyframesEntry(property.qualifiedName!!.asString()))
             }
             fileDependencies.add(property.containingFile!!)
         }
@@ -572,8 +543,6 @@ class FrontendProcessor(
             pages,
             kobwebInits,
             silkInits,
-            componentStyles,
-            componentVariants,
             keyframesList,
             cssStyles,
             cssStyleVariants,
