@@ -98,14 +98,13 @@ private class RenderCallback<C : RenderingContext>(
     private val height: Int,
     minDeltaMs: Number,
     maxDeltaMs: Number,
-    private val render: RenderScope<C>.() -> Unit,
     private val onStepped: RenderCallback<C>.() -> Unit
 ) {
     private var lastRenderedTimestamp: Double = 0.0
     private val minDeltaMs = minDeltaMs.toDouble()
     private val maxDeltaMs = maxDeltaMs.toDouble()
 
-    fun step(colorMode: ColorMode, force: Boolean = false) {
+    fun step(colorMode: ColorMode, force: Boolean = false, render: RenderScope<C>.() -> Unit) {
         val firstRender = lastRenderedTimestamp == 0.0
         val now = Date.now()
         val deltaMs = now - lastRenderedTimestamp
@@ -143,6 +142,12 @@ private inline fun <C : RenderingContext> Canvas(
     crossinline createContext: (HTMLCanvasElement) -> C?,
     noinline render: RenderScope<C>.() -> Unit,
 ) {
+    // Hack-ish alert: We need to wrap `render` because if it changes on a subsequent callback, we do NOT want the
+    // `TagElement` below to get recomposed (that will cause the canvas to flicker as it gets deallocated /
+    // reallocated). Instead, we want to make sure that the closure grabs a wrapper class (here, `renderWrapped`
+    // delegates to a `State<T>` wrapper class) so that the callback can check if the render has changed and if so,
+    // call the new render method instead.
+    val renderWrapped by rememberUpdatedState(newValue = render)
     val builder = remember { CanvasElementBuilder() }
     TagElement(
         builder,
@@ -160,12 +165,14 @@ private inline fun <C : RenderingContext> Canvas(
             var requestId = 0
             val ctx = createContext(scopeElement)
             if (ctx != null) {
-                val callback = RenderCallback(ctx, width, height, minDeltaMs, maxDeltaMs, render, onStepped = {
-                    requestId = window.requestAnimationFrame { step(colorMode) }
+                // Subsequent renders, triggered when enough milliseconds have elapsed
+                val callback: RenderCallback<C> = RenderCallback(ctx, width, height, minDeltaMs, maxDeltaMs, onStepped = {
+                    requestId = window.requestAnimationFrame { step(colorMode, render = renderWrapped) }
                 })
-                requestId = window.requestAnimationFrame { callback.step(colorMode) }
+                // Initial render
+                requestId = window.requestAnimationFrame { callback.step(colorMode, render = renderWrapped) }
                 repainter?.repaintRequested = {
-                    requestId = window.requestAnimationFrame { callback.step(colorMode, force = true) }
+                    requestId = window.requestAnimationFrame { callback.step(colorMode, render = renderWrapped, force = true) }
                 }
             }
 
