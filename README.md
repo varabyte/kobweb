@@ -4051,11 +4051,11 @@ never interact directly with your site's UI.
 Typically, sites live at the top level. This means if you have a root file `index.html` and your site is hosted at
 the domain `https://mysite.com` then that HTML file can be accessed by visiting `https://mysite.com/index.html`.
 
-However, in some cases your site may be hosted under a subfolder, such as `https://example.com/products/myproduct/`, in
+However, in some cases, your site may be hosted under a subfolder, such as `https://example.com/products/myproduct/`, in
 which case your site's root `index.html` file would live at `https://example.com/products/myproduct/index.html`.
 
-Kobweb needs to know about this subfolder structure so that it takes them into account in its routing logic. This can be
-specified in your project's `.kobweb/conf.yaml` file with the `basePath` value under the `site` section:
+Kobweb needs to know about this subfolder structure so that it can take it into account in its routing logic. This can
+be specified in your project's `.kobweb/conf.yaml` file with the `basePath` value under the `site` section:
 
 ```yaml
 site:
@@ -4066,49 +4066,37 @@ site:
 where the value of `basePath` is the part between the origin part of the URL and your site's root. For example, if
 your site is rooted at `https://example.com/products/myproduct/`, then the value of `basePath` would be `products/myproduct`.
 
-> [!NOTE]
-> If you are planning to host your site on GitHub Pages using the default `github.io` domain, you will need to set an
-> appropriate `basePath` value. For a concrete example of setting `basePath` for GitHub Pages,
-> [check out this relevant section](https://bitspittle.dev/blog/2022/static-deploy#github-pages) from my blog post about
-> exporting static layout sites.
+> [!TIP]
+> GitHub Pages is a common web hosting solution that developers use for their sites. By default, this approach hosts
+> your site under a subfolder (set to the project's name).
+>
+> In other words, if you are planning to host your Kobweb site on GitHub Pages, you will need to set an appropriate
+> `basePath` value. For a concrete example of setting `basePath` for GitHub Pages specifically,
+> [check out this relevant section](https://bitspittle.dev/blog/2022/static-deploy#base-path) from my blog site that
+> goes over it.
 
-Outside of setting your `basePath` in the `conf.yaml` file, you can design your site without explicitly mentioning
-it, as Kobweb's composables handle it for you. For example, `Link("/docs/manuals/v123.pdf")` (or `Anchor` if you're not
-using Silk) will automatically resolve to `https://example.com/products/myproduct/docs/manuals/v123.pdf`.
+Once you've set your `basePath` in the `conf.yaml` file, you can generally design your site without explicitly
+mentioning it, as Kobweb provides base-path-aware widgets that handle it for you. For example,
+`Link("/docs/manuals/v123.pdf")` (or `Anchor("/docs/manuals/v123.pdf")` if you're not using Silk) will automatically
+resolve to `https://example.com/products/myproduct/docs/manuals/v123.pdf`.
 
-If you do need to access the base path in your own code, you can do so by referencing the `BasePath.value`
-companion property or by utilizing the `BasePath.prepend(...)` companion method. This should rarely be required in
-practice, however.
+Of course, you may find yourself working with code external to Kobweb that is not base-path aware. If you find you need
+to access the base path value explicitly in your own code, you can do so by using the `BasePath.value` property or by
+calling the `BasePath.prepend` companion method.
 
-> [!NOTE]
-> This note is included for anyone who wants to better understand the reason for this feature's design in Kobweb.
->
-> Normally, websites are flexible enough to be hosted under any subfolder because they can use relative paths.
-> For example, if you are on page `a/b/c` and you need to get to `e/f/g`, you would set your link to `../../../e/f/g`
-> and not `/e/f/g`. In this setup, if you referenced an icon in your top-level `index.html` file, you would use
-> `favicon.ico` (a relative path to a sibling file) and not `/favicon.ico`.
->
-> However, Kobweb is built on top of a reactive framework (Compose HTML) normally meant for SPAs (Single Page
-> Applications). In this setup, the same code is used to handle any URL in your site, at which point it intercepts the
-> URL value and renders the associated content using some giant switch case in its routing logic.
->
-> This means that Kobweb has a single, global `index.html` which is used for all pages on the site. (If you look at it,
-> you'll mainly see a minimal DOM skeleton that acts as a container for your dynamically generated pages, plus a script
-> link to the code of your site.)
->
-> Now, imagine if this `index.html` linked to `favicon.ico`, as in the relative path case. If you were to
-> visit `https://example.com/products/myproduct/a/b/c`, you would ultimately get served the global `index.html`
-> file that would then look for the icon file at `https://example.com/products/myproduct/a/b/c/favicon.ico`, where
-> it doesn't exist. In other words, Kobweb needs help to know that the icon file it is looking for is always at
-> `https://example.com/products/myproduct/favicon.ico`, so that the `index.html` file link is valid in whatever
-> context it is served.
->
-> If you were creating your site the traditional way, you might have one hand-crafted HTML file per page, where each one
-> would have its own unique link to `favicon.ico`. Perhaps the rooted `index.html` file would use `favicon.ico` and the
-> one located under `a/b/c` would use `../../../favicon.ico`.
->
-> But, in Kobweb, since we're using the same `index.html` file for every page, we use the absolute path `/favicon.ico`,
-> or, in the case of a base path being set, `/${basePath}/favicon.ico`.
+```kotlin
+// The Video element comes from Compose HTML and is NOT base-path aware.
+// Therefore, we need to manually prepend the base path to the video source.
+Video(attrs = {
+    attr("width", 320.px.toString())
+    attr("height", 240.px.toString())
+}) {
+    Source(attrs = {
+        attr("type", "video/mp4")
+        attr("src", BasePath.prepend("/videos/demo.mp4"))
+    })
+ }
+```
 
 ## Redirects
 
