@@ -248,11 +248,11 @@ class KobwebApplicationPlugin @Inject constructor(
             // See also: https://youtrack.jetbrains.com/issue/KT-65285/Use-uncompressed-Klibs
             @OptIn(ExperimentalKotlinGradlePluginApi::class)
             run {
-                project.configurations[jsTarget.compileClasspath]
-                    .attributes.attribute(KlibPackaging.ATTRIBUTE, project.objects.named(KlibPackaging.PACKED))
-
-                project.configurations[jsTarget.runtimeClasspath]
-                    .attributes.attribute(KlibPackaging.ATTRIBUTE, project.objects.named(KlibPackaging.PACKED))
+                listOf(jsTarget.compileClasspath, jsTarget.runtimeClasspath).forEach { configurationName ->
+                    project.configurations.named(configurationName).configure {
+                        attributes.attribute(KlibPackaging.ATTRIBUTE, project.objects.named(KlibPackaging.PACKED))
+                    }
+                }
             }
 
             project.setupKspJs(jsTarget, appBlock.cssPrefix)
