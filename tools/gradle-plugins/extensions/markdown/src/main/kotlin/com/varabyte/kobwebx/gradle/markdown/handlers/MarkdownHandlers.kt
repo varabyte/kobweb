@@ -37,7 +37,6 @@ import org.commonmark.node.ThematicBreak
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -81,7 +80,7 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
  * }
  * ```
  */
-abstract class MarkdownHandlers @Inject constructor(project: Project, newDefaultRoot: Property<String>) {
+abstract class MarkdownHandlers @Inject constructor(project: Project) {
     /**
      * Keys which can be used to read/write data values into/out of the [NodeScope.data] container.
      */

@@ -27,7 +27,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
         val markdownBlock = kobwebBlock.extensions.create<MarkdownBlock>("markdown", kobwebBlock.baseGenDir)
         markdownBlock.extensions.apply {
-            create<MarkdownHandlers>("handlers", project, markdownBlock.defaultRoot)
+            create<MarkdownHandlers>("handlers", project)
             create<MarkdownFeatures>("features")
         }
 
