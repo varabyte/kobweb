@@ -61,26 +61,24 @@ fun CSSAngleValue.toDegrees() = when (this.unit.toString()) {
 
 // We can't edit org.jetbrains.compose.web.css.CSSUnit, but maybe some day this can be upstreamed?
 interface CSSUnitExt : CSSUnit {
-    interface svb: CSSUnitRel
-    interface svh: CSSUnitRel
-    interface svi: CSSUnitRel
-    interface svmax: CSSUnitRel
-    interface svmin: CSSUnitRel
-    interface svw: CSSUnitRel
-    interface lvb: CSSUnitRel
-    interface lvh: CSSUnitRel
-    interface lvi: CSSUnitRel
-    interface lvmax: CSSUnitRel
-    interface lvmin: CSSUnitRel
-    interface lvw: CSSUnitRel
-    interface dvb: CSSUnitRel
-    interface dvh: CSSUnitRel
-    interface dvi: CSSUnitRel
-    interface dvmax: CSSUnitRel
-    interface dvmin: CSSUnitRel
-    interface dvw: CSSUnitRel
-    interface vi: CSSUnitRel
-    interface vb: CSSUnitRel
+    interface svb : CSSUnitRel
+    interface svh : CSSUnitRel
+    interface svi : CSSUnitRel
+    interface svmax : CSSUnitRel
+    interface svmin : CSSUnitRel
+    interface svw : CSSUnitRel
+    interface lvb : CSSUnitRel
+    interface lvh : CSSUnitRel
+    interface lvi : CSSUnitRel
+    interface lvmax : CSSUnitRel
+    interface lvmin : CSSUnitRel
+    interface lvw : CSSUnitRel
+    interface dvb : CSSUnitRel
+    interface dvh : CSSUnitRel
+    interface dvi : CSSUnitRel
+    interface dvmax : CSSUnitRel
+    interface dvmin : CSSUnitRel
+    interface dvw : CSSUnitRel
 
     companion object {
         inline val svb get() = "svb".unsafeCast<svb>()
@@ -101,8 +99,6 @@ interface CSSUnitExt : CSSUnit {
         inline val dvmax get() = "dvmax".unsafeCast<dvmax>()
         inline val dvmin get() = "dvmin".unsafeCast<dvmin>()
         inline val dvw get() = "dvw".unsafeCast<dvw>()
-        inline val vb get() = "vb".unsafeCast<vb>()
-        inline val vi get() = "vi".unsafeCast<vi>()
     }
 }
 
@@ -118,7 +114,7 @@ interface CSSUnitExt : CSSUnit {
  * @see lvb
  * @see dvb
  */
-val Number.vb get(): CSSSizeValue<CSSUnitExt.vb> = CSSUnitValueTyped(this.toFloat(), CSSUnitExt.vb)
+val Number.vb get(): CSSSizeValue<CSSUnit.vb> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vb)
 
 /**
  * Represents 1% of the viewport's inline size.
@@ -132,7 +128,7 @@ val Number.vb get(): CSSSizeValue<CSSUnitExt.vb> = CSSUnitValueTyped(this.toFloa
  * @see lvi
  * @see dvi
  */
-val Number.vi get(): CSSSizeValue<CSSUnitExt.vi> = CSSUnitValueTyped(this.toFloat(), CSSUnitExt.vi)
+val Number.vi get(): CSSSizeValue<CSSUnit.vi> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vi)
 
 /**
  * Represents 1% of the small viewport's block size.
