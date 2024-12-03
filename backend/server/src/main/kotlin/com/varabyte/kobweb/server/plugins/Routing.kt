@@ -24,7 +24,6 @@ import com.varabyte.kobweb.streams.StreamMessage.Payload
 import com.varabyte.kobweb.util.text.PatternMapper
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.http.content.*
 import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -677,10 +676,34 @@ private fun Application.configureStaticProdRouting(conf: KobwebConf) {
     val basePath = conf.site.basePathNormalized
 
     routing {
-        staticFiles(conf.site.basePathNormalized, siteRoot.toFile()) {
-            enableAutoHeadResponse()
-            extensions("html")
-            default("404.html")
+        // NOTE: This used to be:
+        //    staticFiles(conf.site.basePathNormalized, siteRoot.toFile()) {
+        //        enableAutoHeadResponse()
+        //        extensions("html")
+        //        default("404.html")
+        //    }
+        // but we ran into a bug where if you had a folder and a file with the same name (e.g. "example.html" and
+        // "example/"), the ktor implementation returns a 404. Our manual implementation avoids this error.
+
+        siteRoot.toFile().let { siteRootFile ->
+            siteRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
+                val relativeFile = file.relativeTo(siteRootFile)
+                val name = relativeFile.name.removeSuffix(".html")
+                val parent = relativeFile.parent?.let { "$it/" } ?: ""
+
+                val path = if (name != "index") "$basePath/$parent$name" else "$basePath/$parent"
+                get(path) { call.respondFile(file) }
+                head(path) { call.respond(HttpStatusCode.OK) }
+            }
+
+            // Anything not found is an error
+            val errorFile = siteRootFile.resolve("404.html")
+            if (errorFile.exists()) {
+                // Catch URLs of the form a/b/c/
+                get("{...}/") { call.respondFile(errorFile) }
+                // Catch URLs of the form a/b/c/slug
+                get("{...}") { call.respondFile(errorFile) }
+            }
         }
 
         configureRedirects(basePath, conf.server.redirects.toPatternMappers())
