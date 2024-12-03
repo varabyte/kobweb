@@ -832,9 +832,20 @@ Modifier.styleModifier {
 }
 ```
 
-If you end up needing to use `attr` or `property` in your own codebase, consider
+Finally, note that styles are, by the design of CSS, applicable to any element, while attributes are often tied to
+specific ones. For example, the `id` attribute can be applied to any element, but `href` can only be applied to an `a`
+tag. Since modifiers don't have context of which element they're being passed into, Kobweb only aims to provide
+attribute modifiers for [global attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes)
+(e.g. `Modifier.id("example")`) and no others.
+
+So using `attrsModifier` (or its shorthand `Modifier.attr`) in your own code as well as `Modifier.toAttrs` (which
+converts a `Modifier` into an attrs block that can be passed into Compose HTML widgets) to set attribute values is
+often acceptable.
+
+However, if you ever end up needing to use `styleModifier { property(key, value) }` in your own codebase, consider
 [filing an issue](https://github.com/varabyte/kobweb/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.md&title=)
-with us so that we can add the missing modifier to the library.
+with us so that we can add the missing modifier to the library. At the very least, you are encouraged to define your own
+extension method to create your own type-safe style modifier.
 
 ## Silk
 
