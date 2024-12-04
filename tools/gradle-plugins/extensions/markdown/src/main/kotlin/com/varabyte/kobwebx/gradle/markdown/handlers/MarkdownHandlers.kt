@@ -66,6 +66,20 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
 }
 
 /**
+ * Convert a [Node] to any text it contains.
+ *
+ * This is useful if you are pretty sure that a node contains some text but it might be deep down in its children. For
+ * example, if a node represents a link, then the text value is contained as a child node.
+ */
+private fun Node.toText(): String {
+    return when (this) {
+        is Text -> this.literal
+        is Code -> this.literal
+        else -> this.children().joinToString { it.toText() }
+    }
+}
+
+/**
  * Register custom handlers for various Markdown elements.
  *
  * For example, if your project declares a fancy, custom horizontal rule, you can register it like so:
@@ -275,15 +289,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             buildString {
                 append("$JB_DOM.H${heading.level}")
                 if (generateHeaderIds.get()) {
-                    val text = heading.children()
-                        .mapNotNull { node ->
-                            when (node) {
-                                is Text -> node.literal
-                                is Code -> node.literal
-                                else -> null
-                            }
-                        }
-                        .joinToString("")
+                    val text = heading.toText()
                     val headingIds = data.computeIfAbsent(DataKeys.HeadingIds) { mutableMapOf() }
                     val id = run {
                         val baseId = idGenerator.get().invoke(text)
