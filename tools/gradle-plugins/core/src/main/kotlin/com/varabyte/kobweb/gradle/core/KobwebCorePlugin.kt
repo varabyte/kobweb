@@ -7,6 +7,8 @@ import com.varabyte.kobweb.gradle.core.extensions.yarn
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
 import com.varabyte.kobweb.gradle.core.tasks.migration.KobwebMigrateToCssStyleTask
 import com.varabyte.kobweb.gradle.core.tasks.migration.KobwebMigrateToK2Task
+import com.varabyte.kobweb.gradle.core.util.KOBWEB_CONFIGURE_COMPOSE_COMPILER
+import com.varabyte.kobweb.gradle.core.util.configureComposeCompiler
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -47,6 +49,10 @@ class KobwebCorePlugin : Plugin<Project> {
         }
 
         project.tasks.register("kobwebGenerateModuleMetadata", KobwebGenerateModuleMetadataTask::class.java)
+
+        if (project.providers.gradleProperty(KOBWEB_CONFIGURE_COMPOSE_COMPILER).getOrElse("true").toBoolean()) {
+            project.configureComposeCompiler()
+        }
     }
 }
 
