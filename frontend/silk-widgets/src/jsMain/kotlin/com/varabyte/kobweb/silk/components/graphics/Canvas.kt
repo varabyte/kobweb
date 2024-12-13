@@ -70,7 +70,7 @@ const val ONE_FRAME_MS_30_FPS = ONE_FRAME_MS_60_FPS * 2.0f
  * This can be useful for a canvas that only ever is meant to paint exactly once or one whose repaints are triggered
  * manually by the caller via a [CanvasRepainter].
  *
- * If you pass in a repainter and don't expliciltly set the `minDeltaMs` parameter, it will automatically be set to this
+ * If you pass in a repainter and don't explicitly set the `minDeltaMs` parameter, it will automatically be set to this
  * value.
  *
  * ```

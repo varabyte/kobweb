@@ -360,7 +360,7 @@ fun <K : ComponentKind> MutableSilkTheme.modifyVariant(
 }
 
 /**
- * Use this method to tweak a variant previously registered using [MutableSilkTheme.registerVariants].
+ * Use this method to tweak a variant previously registered using [MutableSilkTheme.registerVariant].
  *
  * This is particularly useful if you want to change variants provided by Silk.
  *

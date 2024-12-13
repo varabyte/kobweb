@@ -130,7 +130,7 @@ fun StyleScope.boxShadow(boxShadow: BoxShadow) {
  * The property accepts a list of shadows, created by
  * using [BoxShadow.of], ordered from front to back.
  *
- * **The style is not created if no shadows are specified..**
+ * **The style is not created if no shadows are specified.**
  *
  * Usage:
  * ```kotlin
