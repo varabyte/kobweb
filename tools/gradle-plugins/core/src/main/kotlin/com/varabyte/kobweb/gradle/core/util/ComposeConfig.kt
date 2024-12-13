@@ -18,6 +18,7 @@ fun Project.configureComposeCompiler() {
                 is TypeNotPresentException, is ClassNotFoundException, is NoClassDefFoundError -> {
                     project.logger.warn(
                         "w: The Kobweb plugin failed to configure the compose compiler plugin. " +
+                            "This prevents it from applying settings which may improve the size / performance of your site. " +
                             "To fix this, ensure that the plugin `org.jetbrains.kotlin.plugin.compose` is loaded at the same " +
                             "level as the Kobweb plugin. For example, if you load the Kobweb plugin in the project root " +
                             "with `alias(libs.plugins.kobweb.application) apply false`, you should also load the compose " +
@@ -32,9 +33,10 @@ fun Project.configureComposeCompiler() {
             }
         } ?: return@withPlugin
         // Trace markers are "pure overhead" for the JS target & needlessly increase the bundle size, but
-        // must be explicitly disabled until https://youtrack.jetbrains.com/issue/KT-69900 is resolved
+        // must be explicitly disabled until https://youtrack.jetbrains.com/issue/KT-69900 is resolved.
         composeCompilerExt.includeTraceMarkers.set(false)
-        // Kobweb projects only use compose on the frontend, so we disable the compiler plugin for other targets
+        // Unlike standard multiplatform applications, Kobweb projects only use compose on the JS frontend,
+        // so we disable the compiler plugin for other targets.
         composeCompilerExt.targetKotlinPlatforms.set(setOf(KotlinPlatformType.js))
     }
 }
