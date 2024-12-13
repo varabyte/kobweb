@@ -32,10 +32,8 @@ kotlin {
     configAsKobwebApplication(includeServer = true)
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(libs.compose.runtime)
-        }
         jsMain.dependencies {
+            implementation(libs.compose.runtime)
             implementation(libs.compose.html.core)
             implementation(libs.kotlinx.serialization.json)
             implementation("com.varabyte.kobweb:kobweb-core")
