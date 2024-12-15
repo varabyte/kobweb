@@ -213,6 +213,9 @@ sealed class Background private constructor(private val value: String) : StylePr
 
     private class Keyword(value: String) : Background(value)
 
+    // Note: Color is actually a separate property and intentionally not included here.
+    // Note: blend mode *is* specified here but needs to be handled externally, since
+    //   (probably for legacy reasons?) the `background` property does not accept it.
     class Repeatable internal constructor(
         val image: BackgroundImage?,
         val repeat: BackgroundRepeat?,
@@ -272,85 +275,12 @@ sealed class Background private constructor(private val value: String) : StylePr
 }
 
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
-// Note: Color is actually a separate property and intentionally not included here.
-// Note: blend mode *is* specified here but needs to be handled externally, since
-//   (probably for legacy reasons?) the `background` property does not accept it.
-@Deprecated(
-    "Please use `Background.of` instead.",
-    ReplaceWith("Background.of(image, repeat, size, position, blend, origin, clip, attachment)")
-)
-data class CSSBackground(
-    val image: BackgroundImage? = null,
-    val repeat: BackgroundRepeat? = null,
-    val size: BackgroundSize? = null,
-    val position: BackgroundPosition? = null,
-    val blend: BackgroundBlendMode? = null,
-    val origin: BackgroundOrigin? = null,
-    val clip: BackgroundClip? = null,
-    val attachment: BackgroundAttachment? = null,
-) : CSSStyleValue {
-    override fun toString() = buildList {
-        image?.let { add(it.toString()) }
-        repeat?.let { add(it) }
-        position?.let { add(it.toString()) }
-        this@CSSBackground.size?.let {
-            // Size must ALWAYS follow position with a slash
-            // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#syntax
-            if (position == null) add(BackgroundPosition.of(CSSPosition.TopLeft))
-            add("/")
-            add(it.toString())
-        }
-        origin?.let {
-            add(it)
-            // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#values
-            if (clip == null) add(BackgroundClip.BorderBox.toString())
-        }
-        clip?.let {
-            // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background#values
-            if (origin == null) add(BackgroundOrigin.PaddingBox.toString())
-            add(it)
-        }
-        attachment?.let { add(it) }
-    }.joinToString(" ")
-}
-
 fun StyleScope.background(background: Background) {
     property("background", background)
 }
 
 fun StyleScope.background(vararg backgrounds: Background.Repeatable) {
     background(null, *backgrounds)
-}
-
-// Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
-@Suppress("DEPRECATION")
-fun StyleScope.background(first: CSSBackground, vararg rest: CSSBackground) {
-    background(null, first, *rest)
-}
-
-// Note: split into `first` and `rest` to avoid ambiguity errors with other vararg method
-@Suppress("DEPRECATION")
-fun StyleScope.background(color: CSSColorValue?, first: CSSBackground, vararg rest: CSSBackground) {
-    // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
-    val backgrounds = listOf(first, *rest).reversed()
-    property("background", buildString {
-        append(backgrounds.joinToString(", "))
-        // backgrounds only allow you to specify a single color. If provided, it must be included with
-        // the final layer.
-        if (color != null) {
-            if (this.isNotEmpty()) append(' ')
-            append(color)
-        }
-    })
-    val defaultBlendMode = BackgroundBlendMode.Normal
-    val blendModes = backgrounds
-        .map { it.blend ?: defaultBlendMode }
-        // Use toString comparison because otherwise equality checks are against instance
-        .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
-    if (blendModes != null) {
-        property("background-blend-mode", blendModes.joinToString())
-    }
 }
 
 /**

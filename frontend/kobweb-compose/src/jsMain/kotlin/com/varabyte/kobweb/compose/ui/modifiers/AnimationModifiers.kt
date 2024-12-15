@@ -14,11 +14,6 @@ fun Modifier.animation(vararg animations: Animation.Repeatable) = styleModifier 
     animation(*animations)
 }
 
-@Suppress("DEPRECATION")
-fun Modifier.animation(vararg animations: CSSAnimation) = styleModifier {
-    animation(*animations)
-}
-
 fun Modifier.onAnimationEnd(listener: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
     onAnimationEnd(listener)
 }

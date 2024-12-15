@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION") // Remove this after deleting ComponentVariant references
-
 package com.varabyte.kobweb.silk.style
 
 import androidx.compose.runtime.*
