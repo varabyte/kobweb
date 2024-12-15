@@ -4,6 +4,31 @@ import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
+class TransitionBehavior private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keywords
+        val AllowDiscrete get() = TransitionBehavior("allow-discrete")
+        val Normal get() = TransitionBehavior("normal")
+
+        // Global values
+        val Inherit get() = TransitionBehavior("inherit")
+        val Initial get() = TransitionBehavior("initial")
+        val Revert get() = TransitionBehavior("revert")
+        val Unset get() = TransitionBehavior("unset")
+    }
+}
+
+fun StyleScope.transitionBehavior(behavior: TransitionBehavior) {
+    property("transition-behavior", behavior)
+}
+
+fun StyleScope.transitionBehavior(vararg behaviors: TransitionBehavior) {
+    property("transition-behavior", behaviors.joinToString())
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
 sealed class TransitionProperty private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
@@ -107,6 +132,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
         duration: CSSTimeNumericValue?,
         timingFunction: TransitionTimingFunction?,
         delay: CSSTimeNumericValue?,
+        behavior: TransitionBehavior?,
     ) : Transition(
         buildList {
             add(property.toString())
@@ -119,6 +145,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
                 }
                 add(delay.toString())
             }
+            behavior?.let { add(it.toString()) }
         }.joinToString(" ")
     )
 
@@ -137,14 +164,16 @@ sealed class Transition private constructor(private val value: String) : StylePr
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
-        ): Repeatable = Repeatable(property, duration, timingFunction, delay)
+            behavior: TransitionBehavior? = null,
+        ): Repeatable = Repeatable(property, duration, timingFunction, delay, behavior)
 
         fun of(
             property: String,
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
-        ): Repeatable = Repeatable(TransitionProperty.of(property), duration, timingFunction, delay)
+            behavior: TransitionBehavior? = null,
+        ): Repeatable = Repeatable(TransitionProperty.of(property), duration, timingFunction, delay, behavior)
 
         /**
          * Specify transition details that should apply to every animatable property on this element.
@@ -153,7 +182,8 @@ sealed class Transition private constructor(private val value: String) : StylePr
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
-        ): Repeatable = of(TransitionProperty.All, duration, timingFunction, delay)
+            behavior: TransitionBehavior? = null,
+        ): Repeatable = of(TransitionProperty.All, duration, timingFunction, delay, behavior)
 
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
@@ -169,8 +199,10 @@ sealed class Transition private constructor(private val value: String) : StylePr
             properties: Iterable<String>,
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
-            delay: CSSTimeNumericValue? = null
-        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay) }.toTypedArray()
+            delay: CSSTimeNumericValue? = null,
+            behavior: TransitionBehavior? = null,
+        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }
+            .toTypedArray()
 
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
@@ -186,8 +218,10 @@ sealed class Transition private constructor(private val value: String) : StylePr
             properties: Iterable<TransitionProperty.Name>,
             duration: CSSTimeNumericValue? = null,
             timingFunction: TransitionTimingFunction? = null,
-            delay: CSSTimeNumericValue? = null
-        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay) }.toTypedArray()
+            delay: CSSTimeNumericValue? = null,
+            behavior: TransitionBehavior? = null,
+        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }
+            .toTypedArray()
     }
 }
 
