@@ -18,15 +18,16 @@ import com.varabyte.kobweb.silk.init.registerStyleBase
 import com.varabyte.kobweb.silk.style.common.SmoothColorStyle
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.systemPreference
 import kotlinx.browser.localStorage
 import org.jetbrains.compose.web.css.*
 
 private val COLOR_MODE_KEY =
-    ColorMode.entries.createStorageKey("playground:app:colorMode", defaultValue = ColorMode.DARK)
+    ColorMode.entries.createStorageKey("playground:app:colorMode")
 
 @InitSilk
 fun updateTheme(ctx: InitSilkContext) = ctx.config.apply {
-    initialColorMode = localStorage.getItem(COLOR_MODE_KEY)!!
+    initialColorMode = localStorage.getItem(COLOR_MODE_KEY) ?: ColorMode.systemPreference
 }
 
 @InitSilk

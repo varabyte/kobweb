@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.silk.init.SilkConfig
+import kotlinx.browser.window
 import kotlin.math.absoluteValue
 
 private val rootColorModeState by lazy { mutableStateOf(SilkConfig.Instance.initialColorMode) }
@@ -55,6 +56,33 @@ enum class ColorMode {
      */
     fun provide() = LocalColorMode provides mutableStateOf(this)
 }
+
+/**
+ * Returns the system color preference (which represents the user's device color preference).
+ *
+ * It can be useful to set this as your site's initial color mode:
+ *
+ * ```
+ * @InitSilk
+ * fun updateTheme(ctx: InitSilkContext) = ctx.config.apply {
+ *     initialColorMode = ColorMode.systemPreference
+ * }
+ * ```
+ *
+ * as otherwise, the initial color mode will simply default to [ColorMode.LIGHT].
+ *
+ * NOTE: Following the guidelines set out
+ * by the [CSS Working Group](https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme), this value will assume
+ * light mode as a default fallback. (Originally, browsers supported a "no-preference" option but that has since been
+ * removed from the spec.)
+ */
+val ColorMode.Companion.systemPreference: ColorMode get() {
+    return when {
+        window.matchMedia("(prefers-color-scheme: dark)").matches -> ColorMode.DARK
+        else -> ColorMode.LIGHT
+    }
+}
+
 
 // Note: We use an underscore here as a separator instead of a hyphen, since we otherwise use hyphens when generating
 // names, so this makes the separator stand out as something more orthogonal to the base name.
