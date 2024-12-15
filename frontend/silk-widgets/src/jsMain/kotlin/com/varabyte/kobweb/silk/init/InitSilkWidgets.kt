@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.init
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
@@ -328,6 +329,8 @@ fun initSilkWidgets(ctx: InitSilkContext) {
 val SilkColorsStyle = CssStyle.base {
     val palette = colorMode.toPalette()
     Modifier
+        .colorScheme(if (colorMode.isLight) ColorScheme.Light else ColorScheme.Dark)
+
         // region General color vars
         .setVariable(BackgroundColorVar, palette.background)
         .setVariable(ColorVar, palette.color)

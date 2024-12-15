@@ -21,6 +21,10 @@ fun Modifier.color(color: CSSColor) = styleModifier {
     color(color)
 }
 
+fun Modifier.colorScheme(colorScheme: ColorScheme) = styleModifier {
+    colorScheme(colorScheme)
+}
+
 fun Modifier.opacity(value: Number) = styleModifier {
     opacity(value)
 }
