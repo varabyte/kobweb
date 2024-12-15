@@ -23,17 +23,6 @@ fun Modifier.transition(transitions: Array<Transition.Repeatable>) = styleModifi
     transition(*transitions)
 }
 
-@Suppress("DEPRECATION")
-fun Modifier.transition(vararg transitions: CSSTransition) = styleModifier {
-    transition(*transitions)
-}
-
-// Convenience method for accepting the output of CSSTransition.group(...)
-@Suppress("DEPRECATION")
-fun Modifier.transition(transitions: Array<CSSTransition>) = styleModifier {
-    transition(*transitions)
-}
-
 fun Modifier.onTransitionCancel(listener: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {
     onTransitionCancel(listener)
 }
