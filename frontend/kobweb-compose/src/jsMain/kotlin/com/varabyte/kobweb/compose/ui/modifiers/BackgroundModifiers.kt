@@ -26,7 +26,7 @@ fun Modifier.background(vararg backgrounds: Background.Repeatable) = styleModifi
  * * This method accepts a color parameter first (in front of the vararg background layers), which renders on the bottom
  *   of everything else. This sets the expectation that "bottom" values come first.
  *
- * See also: https://developer.mozilla.org/en-US/docs/Web/CSS/background
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background">background</a>
  */
 fun Modifier.background(color: CSSColorValue?, vararg backgrounds: Background.Repeatable) = styleModifier {
     background(color, *backgrounds)
