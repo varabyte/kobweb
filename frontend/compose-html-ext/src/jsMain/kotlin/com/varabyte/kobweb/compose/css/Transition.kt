@@ -34,12 +34,12 @@ sealed class TransitionProperty private constructor(private val value: String) :
     override fun toString() = value
 
     private class Keyword(value: String) : TransitionProperty(value)
-    class Name(value: String) : TransitionProperty(value)
+    class Name internal constructor(value: String) : TransitionProperty(value)
 
     companion object {
         // Custom
         fun of(customValue: String): Name {
-            check(customValue.isNotEmpty() && customValue.none { it.isWhitespace() }) {
+            require(customValue.isNotEmpty() && customValue.none { it.isWhitespace() }) {
                 "Invalid transition property name. A property shouldn't contain any spaces, but got \"$customValue\"."
             }
             return Name(customValue)
@@ -85,8 +85,8 @@ fun StyleScope.transitionDuration(duration: TransitionDuration) {
     property("transition-duration", duration)
 }
 
-fun StyleScope.transitionDuration(vararg duration: CSSTimeNumericValue) {
-    property("transition-duration", duration.joinToString())
+fun StyleScope.transitionDuration(vararg durations: CSSTimeNumericValue) {
+    property("transition-duration", durations.joinToString())
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
@@ -105,20 +105,23 @@ class TransitionDelay private constructor(private val value: String) : StyleProp
     }
 }
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
-fun StyleScope.transitionDelay(vararg delay: CSSTimeNumericValue) {
-    property("transition-delay", delay.joinToString())
-}
-
 fun StyleScope.transitionDelay(delay: TransitionDelay) {
     property("transition-delay", delay)
+}
+
+fun StyleScope.transitionDelay(vararg delays: CSSTimeNumericValue) {
+    property("transition-delay", delays.joinToString())
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
 typealias TransitionTimingFunction = AnimationTimingFunction
 
-fun StyleScope.transitionTimingFunction(vararg value: TransitionTimingFunction) {
-    property("transition-timing-function", value.joinToString { it.value })
+fun StyleScope.transitionTimingFunction(value: TransitionTimingFunction) {
+    property("transition-timing-function", value)
+}
+
+fun StyleScope.transitionTimingFunction(vararg values: TransitionTimingFunction) {
+    property("transition-timing-function", values.joinToString { it.value })
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition
@@ -128,7 +131,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
     private class Keyword(value: String) : Transition(value)
 
     class Repeatable internal constructor(
-        property: TransitionProperty,
+        property: TransitionProperty.Name,
         duration: CSSTimeNumericValue?,
         timingFunction: TransitionTimingFunction?,
         delay: CSSTimeNumericValue?,
