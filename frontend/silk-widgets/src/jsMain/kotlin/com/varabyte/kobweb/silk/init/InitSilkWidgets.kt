@@ -372,18 +372,29 @@ val SilkColorsStyle = CssStyle.base {
 /**
  * Set all CSS variables needed by the Silk library to work.
  *
- * @param provideRootElement An element which must live at a point in the DOM tree above any Silk widgets. This method
+ * @param provideElement An element which must live at a point in the DOM tree above any Silk widgets. This method
  *   will be called inside a `remember` block, meaning it will only be triggered once per composition.
  */
 @Composable
-fun SilkWidgetVariables(provideRootElement: () -> HTMLElement) {
-    val rootElement = remember { provideRootElement() }
+fun SilkWidgetVariables(provideElement: () -> HTMLElement) {
+    val rootElement = remember { provideElement() }
     SilkWidgetVariables(rootElement)
 }
 
+/**
+ * Set all Silk variables on the DOM root.
+ */
 @Composable
-fun SilkWidgetVariables(rootElementId: String = "root") {
-    SilkWidgetVariables { document.getElementById(rootElementId) as HTMLElement }
+fun SilkWidgetVariables() {
+    SilkWidgetVariables { document.documentElement as HTMLElement }
+}
+
+/**
+ * Set all Silk variables on an element with the target ID name.
+ */
+@Composable
+fun SilkWidgetVariables(elementId: String) {
+    SilkWidgetVariables { document.getElementById(elementId) as HTMLElement }
 }
 
 @Deprecated("Use `SilkWidgetVariables` instead, as it is more Compose-idiomatic.",
@@ -395,8 +406,8 @@ fun Document.setSilkWidgetVariables(rootElementId: String = "root") {
 }
 
 @Composable
-fun SilkWidgetVariables(rootElement: HTMLElement) {
-    rootElement.setSilkWidgetVariables(ColorMode.current)
+fun SilkWidgetVariables(element: HTMLElement) {
+    element.setSilkWidgetVariables(ColorMode.current)
 }
 
 @Deprecated("Use `SilkWidgetVariables` instead, as it is more Compose-idiomatic.",
