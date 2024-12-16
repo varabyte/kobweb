@@ -23,7 +23,7 @@ import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorScheme
+import com.varabyte.kobweb.silk.theme.colors.ColorPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
 import com.varabyte.kobweb.silk.theme.colors.palette.switch
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
@@ -140,8 +140,8 @@ internal fun SwitchShape.toModifier() = Modifier
  *   not be interactable.
  * @param size The size of the switch. Defaults to [SwitchSize.MD]. You can implement your own [SwitchSize] if you want
  *   custom sizing.
- * @param colorScheme An optional color scheme to use for the switch. If not provided, the switch will use the
- *   appropriate colors from the [Palette].
+ * @param colorPalette A color palette which, if present, controls the colors for this switch. If not provided, the
+ *   switch will use the relevant colors from the silk theming [Palette].
  * @param thumbColor An optional override for the color of the thumb.
  * @param focusBorderColor An optional override for the border color when the input is focused.
  * @param ref Provides a reference to the *container* of the switch. Its direct children will be the underlying checkbox
@@ -157,7 +157,7 @@ fun Switch(
     enabled: Boolean = true,
     size: SwitchSize = SwitchSize.MD,
     shape: SwitchShape = SwitchShape.PILL,
-    colorScheme: ColorScheme? = null,
+    colorPalette: ColorPalette? = null,
     thumbColor: CSSColorValue? = null,
     focusBorderColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLElement>? = null,
@@ -187,7 +187,7 @@ fun Switch(
             SwitchTrackStyle.toModifier()
                 .setVariable(
                     SwitchVars.TrackBackgroundColor,
-                    if (checked) colorScheme?.let { if (colorMode.isDark) it._200 else it._700 }
+                    if (checked) colorPalette?.let { if (colorMode.isDark) it._200 else it._700 }
                         ?: switchPalette.backgroundOn else switchPalette.backgroundOff
                 )
                 .setVariable(SwitchVars.ThumbColor, thumbColor)

@@ -31,7 +31,7 @@ import com.varabyte.kobweb.silk.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorScheme
+import com.varabyte.kobweb.silk.theme.colors.ColorPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.attributes.ButtonType
@@ -126,7 +126,7 @@ fun Button(
     type: ButtonType = ButtonType.Button,
     enabled: Boolean = true,
     size: ButtonSize = ButtonSize.MD,
-    colorScheme: ColorScheme? = null,
+    colorPalette: ColorPalette? = null,
     focusBorderColor: CSSColorValue? = null,
     ref: ElementRefScope<HTMLButtonElement>? = null,
     content: @Composable RowScope.() -> Unit
@@ -135,17 +135,17 @@ fun Button(
         attrs = ButtonStyle.toModifier(variant)
             .thenIf(!enabled, DisabledStyle.toModifier())
             .then(size.toModifier())
-            .thenIf(colorScheme != null) {
-                @Suppress("NAME_SHADOWING") val colorScheme = colorScheme!!
+            .thenIf(colorPalette != null) {
+                @Suppress("NAME_SHADOWING") val colorPalette = colorPalette!!
                 val isDark = ColorMode.current.isDark
-                val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
+                val isBrightColor = (if (isDark) colorPalette._200 else colorPalette._500).isBright
                 Modifier
                     .setVariable(
                         ButtonVars.Color, (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toPalette().color
                     )
-                    .setVariable(ButtonVars.BackgroundDefaultColor, if (isDark) colorScheme._200 else colorScheme._500)
-                    .setVariable(ButtonVars.BackgroundHoverColor, if (isDark) colorScheme._300 else colorScheme._600)
-                    .setVariable(ButtonVars.BackgroundPressedColor, if (isDark) colorScheme._400 else colorScheme._700)
+                    .setVariable(ButtonVars.BackgroundDefaultColor, if (isDark) colorPalette._200 else colorPalette._500)
+                    .setVariable(ButtonVars.BackgroundHoverColor, if (isDark) colorPalette._300 else colorPalette._600)
+                    .setVariable(ButtonVars.BackgroundPressedColor, if (isDark) colorPalette._400 else colorPalette._700)
 
             }
             .setVariable(ButtonVars.BackgroundFocusColor, focusBorderColor)

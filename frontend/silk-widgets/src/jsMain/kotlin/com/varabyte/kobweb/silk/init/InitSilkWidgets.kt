@@ -77,7 +77,7 @@ import com.varabyte.kobweb.silk.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.color.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
+import com.varabyte.kobweb.silk.theme.colors.ColorPalettes
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
 import com.varabyte.kobweb.silk.theme.colors.palette.button
@@ -104,8 +104,8 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     val mutableTheme = ctx.theme
 
     ctx.theme.palettes.apply {
-        val focusOutline = ColorSchemes.Blue._500.toRgb().copyf(alpha = 0.5f)
-        val placeholder = ColorSchemes.Gray._500
+        val focusOutline = ColorPalettes.Blue._500.toRgb().copyf(alpha = 0.5f)
+        val placeholder = ColorPalettes.Gray._500
 
         run { // init light palette
             val color = Colors.Black
@@ -135,17 +135,17 @@ fun initSilkWidgets(ctx: InitSilkContext) {
             )
 
             light.checkbox.set(
-                background = ColorSchemes.Blue._500,
-                hover = ColorSchemes.Blue._600,
+                background = ColorPalettes.Blue._500,
+                hover = ColorPalettes.Blue._600,
                 color = Colors.White,
             )
 
-            val inputFilled = ColorSchemes.Gray._200
+            val inputFilled = ColorPalettes.Gray._200
             light.input.set(
                 filled = inputFilled,
                 filledFocus = Colors.Transparent,
-                hoveredBorder = ColorSchemes.Gray._500,
-                invalidBorder = ColorSchemes.Red._900,
+                hoveredBorder = ColorPalettes.Gray._500,
+                invalidBorder = ColorPalettes.Red._900,
                 filledHover = inputFilled.darkened(0.1f),
             )
 
@@ -199,17 +199,17 @@ fun initSilkWidgets(ctx: InitSilkContext) {
             )
 
             dark.checkbox.set(
-                background = ColorSchemes.Blue._200,
-                hover = ColorSchemes.Blue._300,
+                background = ColorPalettes.Blue._200,
+                hover = ColorPalettes.Blue._300,
                 color = Colors.Black,
             )
 
-            val inputFilled = ColorSchemes.Gray._900
+            val inputFilled = ColorPalettes.Gray._900
             dark.input.set(
                 filled = inputFilled,
                 filledFocus = Colors.Transparent,
-                hoveredBorder = ColorSchemes.Gray._600,
-                invalidBorder = ColorSchemes.Red._300,
+                hoveredBorder = ColorPalettes.Gray._600,
+                invalidBorder = ColorPalettes.Red._300,
                 filledHover = inputFilled.lightened(0.1f),
             )
 

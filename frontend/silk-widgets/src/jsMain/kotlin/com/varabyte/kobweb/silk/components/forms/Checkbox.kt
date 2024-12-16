@@ -30,7 +30,7 @@ import com.varabyte.kobweb.silk.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import com.varabyte.kobweb.silk.theme.colors.ColorScheme
+import com.varabyte.kobweb.silk.theme.colors.ColorPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
 import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
@@ -204,8 +204,8 @@ enum class CheckedState {
  * @param size The size of the checkbox. Defaults to [CheckboxSize.MD]. You can implement your own [CheckboxSize] if you
  *   want custom sizing.
  * @param spacing An optional spacing parameter to use between the checkbox and any content drawn to the right of it.
- * @param colorScheme An optional color scheme to use for the checkbox. If not provided, the checkbox will use the
- *   appropriate colors from the [Palette].
+ * @param colorPalette A color palette which, if present, controls the colors for this checkbox. If not provided, the
+ *   checkbox will use the relevant colors from the silk theming [Palette].
  * @param borderColor An optional override for the border color of the checkbox when unchecked.
  * @param uncheckedColor An optional override for the background color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
@@ -227,7 +227,7 @@ fun TriCheckbox(
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
     spacing: CSSLengthNumericValue? = null,
-    colorScheme: ColorScheme? = null,
+    colorPalette: ColorPalette? = null,
     borderColor: CSSColorValue? = null,
     uncheckedColor: CSSColorValue? = null,
     iconColor: CSSColorValue? = null,
@@ -245,14 +245,14 @@ fun TriCheckbox(
         attrs = CheckboxStyle
             .toModifier(variant).thenIf(!enabled, DisabledStyle.toModifier()).then(size.toModifier())
             .setVariable(CheckboxVars.Spacing, spacing)
-            .thenIf(colorScheme != null) {
-                @Suppress("NAME_SHADOWING") val colorScheme = colorScheme!!
+            .thenIf(colorPalette != null) {
+                @Suppress("NAME_SHADOWING") val colorPalette = colorPalette!!
                 val isDark = colorMode.isDark
-                val isBrightColor = (if (isDark) colorScheme._200 else colorScheme._500).isBright
+                val isBrightColor = (if (isDark) colorPalette._200 else colorPalette._500).isBright
                 Modifier
-                    .setVariable(CheckboxVars.IconBackgroundColor, if (isDark) colorScheme._200 else colorScheme._500)
+                    .setVariable(CheckboxVars.IconBackgroundColor, if (isDark) colorPalette._200 else colorPalette._500)
                     .setVariable(
-                        CheckboxVars.IconBackgroundHoverColor, if (isDark) colorScheme._300 else colorScheme._600
+                        CheckboxVars.IconBackgroundHoverColor, if (isDark) colorPalette._300 else colorPalette._600
                     ).setVariable(
                         CheckboxVars.IconColor,
                         (if (isBrightColor) ColorMode.LIGHT else ColorMode.DARK).toPalette().color
@@ -321,8 +321,8 @@ fun TriCheckbox(
  * @param size The size of the checkbox. Defaults to [CheckboxSize.MD]. You can implement your own [CheckboxSize] if you
  *   want custom sizing.
  * @param spacing An optional spacing parameter to use between the checkbox and any content drawn to the right of it.
- * @param colorScheme An optional color scheme to use for the checkbox. If not provided, the checkbox will use the
- *   appropriate colors from the [Palette].
+ * @param colorPalette A color palette which, if present, controls the colors for this checkbox. If not provided, the
+ *   checkbox will use the relevant colors from the silk theming [Palette].
  * @param borderColor An optional override for the border color of the checkbox when unchecked.
  * @param uncheckedColor An optional override for the background color of the checkbox when unchecked.
  * @param iconColor An optional override for the color of the icon drawn in the checkbox.
@@ -343,7 +343,7 @@ fun Checkbox(
     icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
     size: CheckboxSize = CheckboxDefaults.Size,
     spacing: CSSLengthNumericValue? = null,
-    colorScheme: ColorScheme? = null,
+    colorPalette: ColorPalette? = null,
     borderColor: CSSColorValue? = null,
     uncheckedColor: CSSColorValue? = null,
     iconColor: CSSColorValue? = null,
@@ -360,7 +360,7 @@ fun Checkbox(
         icon,
         size,
         spacing,
-        colorScheme,
+        colorPalette,
         borderColor,
         uncheckedColor,
         iconColor,

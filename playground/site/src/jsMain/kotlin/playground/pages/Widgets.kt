@@ -19,9 +19,7 @@ import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.display.Callout
 import com.varabyte.kobweb.silk.components.display.CalloutType
-import com.varabyte.kobweb.silk.components.display.LeftBorderedCalloutVariant
 import com.varabyte.kobweb.silk.components.display.LeftBorderedFilledCalloutVariant
-import com.varabyte.kobweb.silk.components.display.MatchingLinkCalloutVariant
 import com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
@@ -75,7 +73,6 @@ import com.varabyte.kobweb.silk.components.icons.fa.FaUser
 import com.varabyte.kobweb.silk.components.icons.fa.IconStyle
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
-import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.overlay.KeepPopupOpenStrategy
 import com.varabyte.kobweb.silk.components.overlay.Popover
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
@@ -85,7 +82,7 @@ import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.toModifier
-import com.varabyte.kobweb.silk.theme.colors.ColorSchemes
+import com.varabyte.kobweb.silk.theme.colors.ColorPalettes
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
@@ -151,10 +148,10 @@ fun WidgetsPage() {
         ) {
             WidgetSection("Button") {
                 Column(Modifier.gap(0.5.cssRem)) {
-                    listOf(null, ColorSchemes.Red, ColorSchemes.Blue, ColorSchemes.Green).forEach { colorScheme ->
+                    listOf(null, ColorPalettes.Red, ColorPalettes.Blue, ColorPalettes.Green).forEach { colorPalette ->
                         Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
                             listOf(ButtonSize.XS, ButtonSize.SM, ButtonSize.MD, ButtonSize.LG).forEach { size ->
-                                Button(onClick = {}, size = size, colorScheme = colorScheme) { Text("Button") }
+                                Button(onClick = {}, size = size, colorPalette = colorPalette) { Text("Button") }
                             }
                         }
                     }
@@ -190,12 +187,12 @@ fun WidgetsPage() {
                     }
 
                     Row(Modifier.gap(1.cssRem), verticalAlignment = Alignment.CenterVertically) {
-                        listOf(ColorSchemes.Red, ColorSchemes.Green, ColorSchemes.Orange).forEach { colorScheme ->
+                        listOf(ColorPalettes.Red, ColorPalettes.Green, ColorPalettes.Orange).forEach { colorPalette ->
                             var checked by remember { mutableStateOf(true) }
                             Checkbox(
                                 checked,
                                 onCheckedChange = { checked = it },
-                                colorScheme = colorScheme
+                                colorPalette = colorPalette
                             ) { Text("Checkbox") }
                         }
                     }
@@ -388,7 +385,7 @@ fun WidgetsPage() {
                                     onTextChange = { amount = it })
                                 RightInset {
                                     if (dollarRegex.matches(amount)) {
-                                        FaCheck(Modifier.color(ColorSchemes.Green._500))
+                                        FaCheck(Modifier.color(ColorPalettes.Green._500))
                                     }
                                 }
                             }

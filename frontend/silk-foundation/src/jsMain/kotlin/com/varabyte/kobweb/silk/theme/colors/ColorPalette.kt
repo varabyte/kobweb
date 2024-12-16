@@ -1,12 +1,22 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import com.varabyte.kobweb.compose.ui.graphics.Color
+import com.varabyte.kobweb.silk.theme.colors.palette.Palette
 
 /**
- * A range of colors related by some unifying overall concept.
+ * A palette that provides a standard, gradient range of colors based on some unifying color concept.
+ *
+ * On the low end, the color should be bright and nearly white and useful in dark themes; on the high end, the color
+ * should be dark and useful in light themes.
+ *
+ * IMPORTANT: This should not be confused with the Silk theme [Palette], which is more for identifying colors targeting
+ * various, named parts of some widget. In general, if a color palette is present in a widget, it will be used to
+ * intelligently color in the silk theme palette.
+ *
+ * @see ColorPalettes
  */
 @Suppress("PropertyName") // Can't start with a number
-interface ColorScheme {
+interface ColorPalette {
     val _50: Color
     val _100: Color
     val _200: Color
@@ -20,15 +30,15 @@ interface ColorScheme {
 }
 
 /**
- * A veritable rainbow of color schemes to choose from.
+ * A veritable rainbow of color palettes to choose from.
  *
  * Special thanks to Chakra UI [here](https://github.com/chakra-ui/chakra-ui/blob/3c946c4b47f36b09d219555ba185e58a62bd2378/packages/components/theme/src/foundations/colors.ts)
  * and Material design [here](https://material.io/design/color/the-color-system.html#tools-for-picking-colors).
  */
 @Suppress("unused")
-object ColorSchemes {
+object ColorPalettes {
     /** A color scheme which ranges from near white (_50) to near black (_900). */
-    object Monochrome : ColorScheme {
+    object Monochrome : ColorPalette {
         override val _50 = Color.rgb(0XF2F2F2)
         override val _100 = Color.rgb(0XE6E6E6)
         override val _200 = Color.rgb(0XCCCCCC)
@@ -41,7 +51,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0X1A1A1A)
     }
 
-    object Red : ColorScheme {
+    object Red : ColorPalette {
         override val _50 = Color.rgb(0xFFEBEE)
         override val _100 = Color.rgb(0xFFCDD2)
         override val _200 = Color.rgb(0xEF9A9A)
@@ -54,7 +64,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xB71C1C)
     }
 
-    object Pink : ColorScheme {
+    object Pink : ColorPalette {
         override val _50 = Color.rgb(0xFCE4EC)
         override val _100 = Color.rgb(0xF8BBD0)
         override val _200 = Color.rgb(0xF48FB1)
@@ -67,7 +77,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x880E4F)
     }
 
-    object Purple : ColorScheme {
+    object Purple : ColorPalette {
         override val _50 = Color.rgb(0xF3E5F5)
         override val _100 = Color.rgb(0xE1BEE7)
         override val _200 = Color.rgb(0xCE93D8)
@@ -80,7 +90,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x4A148C)
     }
 
-    object DeepPurple : ColorScheme {
+    object DeepPurple : ColorPalette {
         override val _50 = Color.rgb(0xEDE7F6)
         override val _100 = Color.rgb(0xD1C4E9)
         override val _200 = Color.rgb(0xB39DDB)
@@ -93,7 +103,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x311B92)
     }
 
-    object Indigo : ColorScheme {
+    object Indigo : ColorPalette {
         override val _50 = Color.rgb(0xE8EAF6)
         override val _100 = Color.rgb(0xC5CAE9)
         override val _200 = Color.rgb(0x9FA8DA)
@@ -106,7 +116,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x1A237E)
     }
 
-    object Blue : ColorScheme {
+    object Blue : ColorPalette {
         override val _50 = Color.rgb(0xE3F2FD)
         override val _100 = Color.rgb(0xBBDEFB)
         override val _200 = Color.rgb(0x90CAF9)
@@ -119,7 +129,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x0D47A1)
     }
 
-    object LightBlue : ColorScheme {
+    object LightBlue : ColorPalette {
         override val _50 = Color.rgb(0xE1F5FE)
         override val _100 = Color.rgb(0xB3E5FC)
         override val _200 = Color.rgb(0x81D4FA)
@@ -132,7 +142,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x01579B)
     }
 
-    object Cyan : ColorScheme {
+    object Cyan : ColorPalette {
         override val _50 = Color.rgb(0xE0F7FA)
         override val _100 = Color.rgb(0xB2EBF2)
         override val _200 = Color.rgb(0x80DEEA)
@@ -145,7 +155,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x006064)
     }
 
-    object Teal : ColorScheme {
+    object Teal : ColorPalette {
         override val _50 = Color.rgb(0xE0F2F1)
         override val _100 = Color.rgb(0xB2DFDB)
         override val _200 = Color.rgb(0x80CBC4)
@@ -158,7 +168,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x004D40)
     }
 
-    object Green : ColorScheme {
+    object Green : ColorPalette {
         override val _50 = Color.rgb(0xE8F5E9)
         override val _100 = Color.rgb(0xC8E6C9)
         override val _200 = Color.rgb(0xA5D6A7)
@@ -171,7 +181,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x1B5E20)
     }
 
-    object LightGreen : ColorScheme {
+    object LightGreen : ColorPalette {
         override val _50 = Color.rgb(0xF1F8E9)
         override val _100 = Color.rgb(0xDCEDC8)
         override val _200 = Color.rgb(0xC5E1A5)
@@ -184,7 +194,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x33691E)
     }
 
-    object Lime : ColorScheme {
+    object Lime : ColorPalette {
         override val _50 = Color.rgb(0xF9FBE7)
         override val _100 = Color.rgb(0xF0F4C3)
         override val _200 = Color.rgb(0xE6EE9C)
@@ -197,7 +207,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x827717)
     }
 
-    object Yellow : ColorScheme {
+    object Yellow : ColorPalette {
         override val _50 = Color.rgb(0xFFFDE7)
         override val _100 = Color.rgb(0xFFF9C4)
         override val _200 = Color.rgb(0xFFF59D)
@@ -210,7 +220,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xF57F17)
     }
 
-    object Amber : ColorScheme {
+    object Amber : ColorPalette {
         override val _50 = Color.rgb(0xFFF8E1)
         override val _100 = Color.rgb(0xFFECB3)
         override val _200 = Color.rgb(0xFFE082)
@@ -223,7 +233,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xFF6F00)
     }
 
-    object Orange : ColorScheme {
+    object Orange : ColorPalette {
         override val _50 = Color.rgb(0xFFF3E0)
         override val _100 = Color.rgb(0xFFE0B2)
         override val _200 = Color.rgb(0xFFCC80)
@@ -236,7 +246,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xE65100)
     }
 
-    object DeepOrange : ColorScheme {
+    object DeepOrange : ColorPalette {
         override val _50 = Color.rgb(0xFBE9E7)
         override val _100 = Color.rgb(0xFFCCBC)
         override val _200 = Color.rgb(0xFFAB91)
@@ -249,7 +259,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0xBF360C)
     }
 
-    object Brown : ColorScheme {
+    object Brown : ColorPalette {
         override val _50 = Color.rgb(0xEFEBE9)
         override val _100 = Color.rgb(0xD7CCC8)
         override val _200 = Color.rgb(0xBCAAA4)
@@ -262,7 +272,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x3E2723)
     }
 
-    object Gray : ColorScheme {
+    object Gray : ColorPalette {
         override val _50 = Color.rgb(0xFAFAFA)
         override val _100 = Color.rgb(0xF5F5F5)
         override val _200 = Color.rgb(0xEEEEEE)
@@ -275,7 +285,7 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x212121)
     }
 
-    object BlueGray : ColorScheme {
+    object BlueGray : ColorPalette {
         override val _50 = Color.rgb(0xECEFF1)
         override val _100 = Color.rgb(0xCFD8DC)
         override val _200 = Color.rgb(0xB0BEC5)
@@ -288,3 +298,9 @@ object ColorSchemes {
         override val _900 = Color.rgb(0x263238)
     }
 }
+
+@Deprecated("Use `ColorPalette` instead. We are moving away from `ColorScheme` because that represents a different concept in CSS. See also: https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme", ReplaceWith("ColorPalette"))
+typealias ColorScheme = ColorPalette
+
+@Deprecated("Use `ColorPalettes` instead. We are moving away from `ColorSchemes` because a color scheme represents a different concept in CSS. See also: https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme", ReplaceWith("ColorPalettes"))
+typealias ColorSchemes = ColorPalettes
