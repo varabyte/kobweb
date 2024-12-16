@@ -31,7 +31,8 @@ private fun BODY.buildIndicator() {
                         body > #status {
                             position: fixed;
                             font-size: 24px;
-                            background: whitesmoke;
+                            color: black;
+                            background-color: whitesmoke;
                             top: 20px;
                             left: 50%;
                             transform: translateX(-50%);
