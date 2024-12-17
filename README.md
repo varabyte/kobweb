@@ -4300,24 +4300,19 @@ layer.
 For example, let's say you are fighting with a third party library whose styles are a bit too aggressive and are
 interfering with your own styles.
 
-First, inside your build script, import the stylesheet using
-an [`@import` directive](https://developer.mozilla.org/en-US/docs/Web/CSS/@import):
+First, inside your build script, import the stylesheet using Kobweb's `importCss` function, which internally uses the 
+CSS [`@import` at-rule](https://developer.mozilla.org/en-US/docs/Web/CSS/@import):
 
 ```kotlin
 // BEFORE
 kobweb.app.index.head.add {
-  link {
-    rel = "stylesheet"
-    href = "/highlight.js/styles/dracula.css"
-  }
+  link(href = "/highlight.js/styles/dracula.css", rel = "stylesheet")
 }
 
 // AFTER
 kobweb.app.index.head.add {
   style {
-    unsafe {
-      raw("@import url(\"/highlight.js/styles/dracula.css\") layer(highlightjs);")
-    }
+    importCss("/highlight.js/styles/dracula.css", layerName = "highlightjs")
   }
 }
 ```
