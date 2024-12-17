@@ -38,13 +38,13 @@ SilkFoundationStyles(
 }
 ```
 
-If you write your own custom widgets and want to take advantage of Silk's powerful `ComponentStyle` support, you'll
+If you write your own custom widgets and want to take advantage of Silk's powerful `CssStyle` support, you'll
 have to remember to register them explicitly (another thing the Kobweb plugin normally does for you):
 
 ```kotlin
 // File: CustomWidget.kt
 
-val CustomStyle by ComponentStyle {
+val CustomStyle = CssStyle {
     base {
         Modifier.background(...)
     }
