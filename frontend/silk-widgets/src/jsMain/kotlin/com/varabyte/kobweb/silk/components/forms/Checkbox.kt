@@ -31,6 +31,7 @@ import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorPalette
+import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
 import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
@@ -192,6 +193,45 @@ enum class CheckedState {
     fun toBoolean() = this != Unchecked
 }
 
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+@Deprecated("Rename the `colorScheme` parameter to `colorPalette`. `ColorScheme` is a legacy name that is going away.")
+@Composable
+fun TriCheckbox(
+    checked: CheckedState,
+    onCheckedChange: (CheckedState) -> Unit,
+    modifier: Modifier = Modifier,
+    variant: CssStyleVariant<CheckboxKind>? = null,
+    enabled: Boolean = CheckboxDefaults.Enabled,
+    icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
+    size: CheckboxSize = CheckboxDefaults.Size,
+    spacing: CSSLengthNumericValue? = null,
+    colorScheme: ColorScheme,
+    borderColor: CSSColorValue? = null,
+    uncheckedColor: CSSColorValue? = null,
+    iconColor: CSSColorValue? = null,
+    focusOutlineColor: CSSColorValue? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
+    content: (@Composable () -> Unit)? = null,
+) {
+    TriCheckbox(
+        checked,
+        onCheckedChange,
+        modifier,
+        variant,
+        enabled,
+        icon,
+        size,
+        spacing,
+        colorPalette = colorScheme,
+        borderColor,
+        uncheckedColor,
+        iconColor,
+        focusOutlineColor,
+        ref,
+        content
+    )
+}
+
 /**
  * Creates a checkbox that supports three states: on, off, and indeterminate.
  *
@@ -307,6 +347,45 @@ fun TriCheckbox(
 
         if (content != null) content()
     }
+}
+
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+@Deprecated("Rename the `colorScheme` parameter to `colorPalette`. `ColorScheme` is a legacy name that is going away.")
+@Composable
+fun Checkbox(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    variant: CssStyleVariant<CheckboxKind>? = null,
+    enabled: Boolean = CheckboxDefaults.Enabled,
+    icon: @Composable CheckboxIconScope.() -> Unit = CheckboxDefaults.IconProvider,
+    size: CheckboxSize = CheckboxDefaults.Size,
+    spacing: CSSLengthNumericValue? = null,
+    colorScheme: ColorScheme,
+    borderColor: CSSColorValue? = null,
+    uncheckedColor: CSSColorValue? = null,
+    iconColor: CSSColorValue? = null,
+    focusOutlineColor: CSSColorValue? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
+    content: (@Composable () -> Unit)? = null,
+) {
+    Checkbox(
+        checked,
+        onCheckedChange,
+        modifier,
+        variant,
+        enabled,
+        icon,
+        size,
+        spacing,
+        colorPalette = colorScheme,
+        borderColor,
+        uncheckedColor,
+        iconColor,
+        focusOutlineColor,
+        ref,
+        content
+    )
 }
 
 /**

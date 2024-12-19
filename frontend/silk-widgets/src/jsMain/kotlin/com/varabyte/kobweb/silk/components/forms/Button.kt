@@ -32,6 +32,7 @@ import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.size.FontSizeVars
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorPalette
+import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.color
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import org.jetbrains.compose.web.attributes.ButtonType
@@ -113,6 +114,35 @@ class ButtonSize(
         val MD = ButtonSize(FontSizeVars.MD.value(), 2.5.cssRem, 1.cssRem)
         val LG = ButtonSize(FontSizeVars.LG.value(), 3.cssRem, 1.5.cssRem)
     }
+}
+
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+@Deprecated("Rename the `colorScheme` parameter to `colorPalette`. `ColorScheme` is a legacy name that is going away.")
+@Composable
+fun Button(
+    onClick: (evt: SyntheticMouseEvent) -> Unit,
+    modifier: Modifier = Modifier,
+    variant: CssStyleVariant<ButtonKind>? = null,
+    type: ButtonType = ButtonType.Button,
+    enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.MD,
+    colorScheme: ColorScheme,
+    focusBorderColor: CSSColorValue? = null,
+    ref: ElementRefScope<HTMLButtonElement>? = null,
+    content: @Composable RowScope.() -> Unit
+) {
+    Button(
+        onClick,
+        modifier,
+        variant,
+        type,
+        enabled,
+        size,
+        colorPalette = colorScheme,
+        focusBorderColor,
+        ref,
+        content
+    )
 }
 
 /**

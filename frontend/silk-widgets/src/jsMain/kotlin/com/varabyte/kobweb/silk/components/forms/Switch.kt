@@ -24,6 +24,7 @@ import com.varabyte.kobweb.silk.style.vars.animation.TransitionDurationVars
 import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorPalette
+import com.varabyte.kobweb.silk.theme.colors.ColorScheme
 import com.varabyte.kobweb.silk.theme.colors.palette.Palette
 import com.varabyte.kobweb.silk.theme.colors.palette.switch
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
@@ -118,6 +119,38 @@ enum class SwitchShape {
 
 internal fun SwitchShape.toModifier() = Modifier
     .thenIf(this == SwitchShape.RECTANGLE) { Modifier.setVariable(SwitchVars.BorderRadius, 0.px) }
+
+@Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+@Deprecated("Rename the `colorScheme` parameter to `colorPalette`. `ColorScheme` is a legacy name that is going away.")
+@Composable
+fun Switch(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    variant: CssStyleVariant<SwitchKind>? = null,
+    enabled: Boolean = true,
+    size: SwitchSize = SwitchSize.MD,
+    shape: SwitchShape = SwitchShape.PILL,
+    colorScheme: ColorScheme,
+    thumbColor: CSSColorValue? = null,
+    focusBorderColor: CSSColorValue? = null,
+    ref: ElementRefScope<HTMLElement>? = null,
+) {
+    Switch(
+        checked,
+        onCheckedChange,
+        modifier,
+        variant,
+        enabled,
+        size,
+        shape,
+        colorPalette = colorScheme,
+        thumbColor,
+        focusBorderColor,
+        ref
+    )
+}
+
 
 /**
  * Creates a toggleable switch.
