@@ -1,6 +1,9 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.storage.createStorageKey
+import com.varabyte.kobweb.browser.storage.getItem
+import com.varabyte.kobweb.browser.storage.setItem
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.silk.init.SilkConfig
@@ -81,6 +84,20 @@ val ColorMode.Companion.systemPreference: ColorMode get() {
         window.matchMedia("(prefers-color-scheme: dark)").matches -> ColorMode.DARK
         else -> ColorMode.LIGHT
     }
+}
+
+private const val DEFAULT_COLOR_MODE_STORAGE_KEY_NAME = "silk-color-mode"
+
+private fun createColorModeStorageKey(key: String) = ColorMode.entries.createStorageKey(key)
+
+fun ColorMode.Companion.loadFromLocalStorage(key: String = DEFAULT_COLOR_MODE_STORAGE_KEY_NAME): ColorMode? {
+    val colorModeKey = createColorModeStorageKey(key)
+    return window.localStorage.getItem(colorModeKey)
+}
+
+fun ColorMode.saveToLocalStorage(key: String = DEFAULT_COLOR_MODE_STORAGE_KEY_NAME) {
+    val colorModeKey = createColorModeStorageKey(key)
+    window.localStorage.setItem(colorModeKey, this)
 }
 
 
