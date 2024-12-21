@@ -1135,6 +1135,58 @@ fun overrideSilkTheme(ctx: InitSilkContext) {
 }
 ```
 
+##### Initial color mode
+
+By default, Kobweb will initialize your site's color mode to `ColorMode.LIGHT`.
+
+However, you can control this by setting the `initialColorMode` property in an `@InitSilk` method:
+
+```kotlin
+@InitSilk
+fun setInitialColorMode(ctx: InitSilkContext) {
+    ctx.theme.initialColorMode = ColorMode.DARK
+}
+```
+
+If you'd like to respect the user's system preferences, you can set `initialColorMode` to `ColorMode.systemPreference`:
+
+```kotlin
+@InitSilk
+fun setInitialColorMode(ctx: InitSilkContext) {
+    ctx.theme.initialColorMode = ColorMode.systemPreference
+}
+```
+
+##### Persisting color-mode preference
+
+If you support toggling the site's color mode, you are encouraged to save the user's last chosen setting into local
+storage and then restore it if the user revisits your site later.
+
+The restoration will happen in your `@InitSilk` block, while the code to save the color mode should happen in your root
+`@App` composable:
+
+```kotlin
+@InitSilk
+fun setInitialColorMode(ctx: InitSilkContext) {
+    ctx.theme.initialColorMode =
+      ColorMode.loadFromLocalStorage() ?: ColorMode.systemPreference
+}
+
+@App
+@Composable
+fun AppEntry(content: @Composable () -> Unit) {
+  SilkApp {
+    val colorMode = ColorMode.current
+    LaunchedEffect(colorMode) {
+        colorMode.saveToLocalStorage()
+    }
+
+    /* ... */
+  }
+}
+```
+
+
 #### Extending CSS styles
 
 You may find yourself occasionally wanting to define a style that should only be applied along with / after another
