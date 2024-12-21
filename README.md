@@ -2986,7 +2986,7 @@ fun SiteVersion(modifier: Modifier = Modifier) {
   val versionLabel = "v" + AppGlobals.version
   // Wrapper object approach
   val versionLabel = "v" + SiteGlobals.version
-    
+
   SpanText(versionLabel, VersionTextStyle.toModifier().then(modifier))
 }
 ```
@@ -4352,7 +4352,7 @@ layer.
 For example, let's say you are fighting with a third party library whose styles are a bit too aggressive and are
 interfering with your own styles.
 
-First, inside your build script, import the stylesheet using Kobweb's `importCss` function, which internally uses the 
+First, inside your build script, import the stylesheet using Kobweb's `importCss` function, which internally uses the
 CSS [`@import` at-rule](https://developer.mozilla.org/en-US/docs/Web/CSS/@import):
 
 ```kotlin
