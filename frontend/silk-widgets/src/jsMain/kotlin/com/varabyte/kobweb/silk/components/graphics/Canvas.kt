@@ -12,19 +12,16 @@ import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
-import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.ElementBuilder
-import org.jetbrains.compose.web.dom.TagElement
 import org.khronos.webgl.WebGLRenderingContext
 import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.RenderingContext
 import kotlin.js.Date
 import kotlin.math.max
 import kotlin.math.min
+import org.jetbrains.compose.web.dom.Canvas as JbCanvas
 
 sealed interface CanvasKind : ComponentKind
 
@@ -88,11 +85,6 @@ const val ONE_FRAME_MS_30_FPS = ONE_FRAME_MS_60_FPS * 2.0f
  */
 const val REPAINT_CANVAS_MANUALLY = Float.MAX_VALUE
 
-private class CanvasElementBuilder : ElementBuilder<HTMLCanvasElement> {
-    val canvas by lazy { document.createElement("canvas") as HTMLCanvasElement }
-    override fun create() = canvas.cloneNode() as HTMLCanvasElement
-}
-
 private class RenderCallback<C : RenderingContext>(
     private val ctx: C,
     private val width: Int,
@@ -144,14 +136,13 @@ private inline fun <C : RenderingContext> Canvas(
     noinline render: RenderScope<C>.() -> Unit,
 ) {
     // Hack-ish alert: We need to wrap `render` because if it changes on a subsequent callback, we do NOT want the
-    // `TagElement` below to get recomposed (that will cause the canvas to flicker as it gets deallocated /
+    // `JbCanvas` below to get recomposed (that will cause the canvas to flicker as it gets deallocated /
     // reallocated). Instead, we want to make sure that the closure grabs a wrapper class (here, `renderWrapped`
     // delegates to a `State<T>` wrapper class) so that the callback can check if the render has changed and if so,
     // call the new render method instead.
     val renderWrapped by rememberUpdatedState(newValue = render)
-    val builder = remember { CanvasElementBuilder() }
-    TagElement(
-        builder,
+
+    JbCanvas(
         CanvasStyle.toModifier(variant)
             .width(width.px).height(height.px)
             .then(modifier).toAttrs {
