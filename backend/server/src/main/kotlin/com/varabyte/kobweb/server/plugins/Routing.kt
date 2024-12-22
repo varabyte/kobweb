@@ -487,7 +487,7 @@ private fun Path?.createApiJar(
 ): ApiJarFile? {
     when {
         this == null -> logger.info("No API jar file specified in conf.yaml. Server API routes will not be available.")
-        !this.exists() -> logger.warn("API jar specified but does not exist! Please fix conf.yaml. Invalid path: \"$this\"")
+        !this.exists() -> logger.warn("API jar specified but does not exist! Please fix conf.yaml, updating the path (or removing the value if you aren't declaring API endpoints). Invalid path: \"$this\"")
         else -> {
             logger.info("API jar found and will be loaded: \"$this\"")
             return ApiJarFile(this, env, events, logger, nativeLibraryMappings)
