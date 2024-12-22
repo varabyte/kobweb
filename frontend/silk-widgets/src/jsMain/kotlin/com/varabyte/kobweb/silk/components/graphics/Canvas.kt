@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.graphics
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.webgl.WebGL2RenderingContext
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.registerRefScope
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -287,6 +288,37 @@ fun CanvasGl(
         maxDeltaMs,
         ref,
         { canvas -> canvas.getContext("webgl") as? WebGLRenderingContext },
+        render
+    )
+}
+
+/**
+ * Renders a [Canvas] using the "webgl2" rendering context.
+ *
+ * See [CanvasGl] for more details about parameters, as they are the same.
+ */
+@Composable
+fun CanvasGl2(
+    width: Int,
+    height: Int,
+    modifier: Modifier = Modifier,
+    variant: CssStyleVariant<CanvasKind>? = null,
+    repainter: CanvasRepainter? = null,
+    minDeltaMs: Number = if (repainter != null) REPAINT_CANVAS_MANUALLY else 0.0,
+    maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
+    ref: ElementRefScope<HTMLCanvasElement>? = null,
+    render: RenderScope<WebGL2RenderingContext>.() -> Unit,
+) {
+    Canvas(
+        width,
+        height,
+        modifier,
+        variant,
+        repainter,
+        minDeltaMs,
+        maxDeltaMs,
+        ref,
+        { canvas -> canvas.getContext("webgl2") as? WebGL2RenderingContext },
         render
     )
 }
