@@ -90,6 +90,10 @@ class Server(
      *   is incredibly verbose, and is mostly intended for locally debugging. It probably shouldn't be used in
      *   production, but it can be helpful when trying to debug a particularly tricky issue (such as a CORS
      *   misconfiguration or a case where the ktor server is sending you back 403s).
+     * @param enableConsoleLogging If true, logs will be written to stdout/stderr.
+     * @param enableFileLogging If true, logs will be written to a file (in addition to stdout/stderr). If false, logs
+     *   will only be written to stdout/stderr. If false, the other file-related properties in this class will
+     *   essentially be ignored.
      * @param logRoot The root directory where logs will be stored. If you change this to a directory that will contain
      *   other files besides just logs, consider setting [clearLogsOnStart] to false.
      * @param clearLogsOnStart If true, all existing files under the log root will be deleted when a server is
@@ -105,6 +109,8 @@ class Server(
     @Serializable
     class Logging(
         val level: Level = Level.DEBUG,
+        val enableConsoleLogging: Boolean = true,
+        val enableFileLogging: Boolean = true,
         val logRoot: String = ".kobweb/server/logs",
         val clearLogsOnStart: Boolean = true,
         val logFileBaseName: String = "kobweb-server",

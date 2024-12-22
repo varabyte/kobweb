@@ -1,29 +1,48 @@
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DEST}/${LOG_NAME}${LOG_SUFFIX}</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- daily rollover -->
-            <fileNamePattern>${LOG_DEST}/${LOG_NAME}.%d{yyyy-MM-dd}${LOG_ROLLOVER_SUFFIX}</fileNamePattern>
+    <if condition='property("LOG_CONSOLE_OUTPUT_ENABLED").equals("true")'>
+        <then>
+            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </then>
+    </if>
 
-            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
-            <totalSizeCap>${LOG_SIZE_CAP}</totalSizeCap>
-            <cleanHistoryOnStart>true</cleanHistoryOnStart>
-        </rollingPolicy>
+    <if condition='property("LOG_FILE_OUTPUT_ENABLED").equals("true")'>
+        <then>
+            <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${LOG_DEST}/${LOG_NAME}${LOG_SUFFIX}</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <!-- daily rollover -->
+                    <fileNamePattern>${LOG_DEST}/${LOG_NAME}.%d{yyyy-MM-dd}${LOG_ROLLOVER_SUFFIX}</fileNamePattern>
+                    <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+                    <totalSizeCap>${LOG_SIZE_CAP}</totalSizeCap>
+                    <cleanHistoryOnStart>true</cleanHistoryOnStart>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </then>
+    </if>
 
-        <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+    <if condition='property("LOG_CONSOLE_OUTPUT_ENABLED").equals("true")'>
+        <then>
+            <root level="${LOG_LEVEL}">
+                <appender-ref ref="STDOUT"/>
+            </root>
+        </then>
+    </if>
 
-    <root level="${LOG_LEVEL}">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </root>
+    <if condition='property("LOG_FILE_OUTPUT_ENABLED").equals("true")'>
+        <then>
+            <root level="${LOG_LEVEL}">
+                <appender-ref ref="FILE"/>
+            </root>
+        </then>
+    </if>
+
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
 </configuration>

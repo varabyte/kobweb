@@ -65,6 +65,8 @@ suspend fun main() {
         }
 
         System.setProperty("LOG_LEVEL", level.name)
+        System.setProperty("LOG_CONSOLE_OUTPUT_ENABLED", enableConsoleLogging.toString())
+        System.setProperty("LOG_FILE_OUTPUT_ENABLED", enableFileLogging.toString())
         System.setProperty("LOG_DEST", logRootPath.absolutePathString())
         System.setProperty("LOG_NAME", logFileBaseName)
         System.setProperty("LOG_SUFFIX", ".log")

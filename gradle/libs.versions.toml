@@ -2,6 +2,7 @@
 playwright = "1.45.1"
 commonmark = "0.21.0"
 compose = "1.7.1"
+janino = "3.1.12"
 jsoup = "1.16.2"
 kaml = "0.60.0"
 kobweb-libs = "0.20.1-SNAPSHOT"
@@ -12,7 +13,7 @@ kotlinx-html = "0.11.0"
 kotlinx-serialization = "1.7.1"
 ksp = "2.1.0-1.0.29"
 ktor = "3.0.0"
-logback = "1.4.14"
+logback = "1.5.15"
 truthish = "1.0.2"
 shadow = "8.3.0"
 
@@ -25,6 +26,7 @@ commonmark-tasklist = { module = "org.commonmark:commonmark-ext-task-list-items"
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose" }
 compose-compiler-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+janino = { module = "org.codehaus.janino:janino", version.ref = "janino" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
@@ -68,7 +70,10 @@ ktor = [
     "ktor-server-netty",
     "ktor-server-sse",
     "ktor-server-websockets",
-    "logback"
+]
+logback = [
+    "logback",
+    "janino", # for <if> conditions in logback.xml
 ]
 
 [plugins]
