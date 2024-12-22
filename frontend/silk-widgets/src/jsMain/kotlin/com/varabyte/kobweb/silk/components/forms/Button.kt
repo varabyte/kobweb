@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // for `import com.varabyte.kobweb.silk.theme.colors.ColorScheme`
+
 package com.varabyte.kobweb.silk.components.forms
 
 import androidx.compose.runtime.*
