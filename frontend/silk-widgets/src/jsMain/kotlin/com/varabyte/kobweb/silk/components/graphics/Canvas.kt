@@ -138,7 +138,7 @@ private inline fun <C : RenderingContext> Canvas(
     repainter: CanvasRepainter?,
     minDeltaMs: Number,
     maxDeltaMs: Number,
-    ref: ElementRefScope<HTMLElement>?,
+    ref: ElementRefScope<HTMLCanvasElement>?,
     crossinline createContext: (HTMLCanvasElement) -> C?,
     noinline render: RenderScope<C>.() -> Unit,
 ) {
@@ -233,7 +233,7 @@ fun Canvas2d(
     repainter: CanvasRepainter? = null,
     minDeltaMs: Number = if (repainter != null) REPAINT_CANVAS_MANUALLY else 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
-    ref: ElementRefScope<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLCanvasElement>? = null,
     render: RenderScope<CanvasRenderingContext2D>.() -> Unit,
 ) {
     Canvas(
@@ -274,7 +274,7 @@ fun CanvasGl(
     repainter: CanvasRepainter? = null,
     minDeltaMs: Number = if (repainter != null) REPAINT_CANVAS_MANUALLY else 0.0,
     maxDeltaMs: Number = max(500.0, minDeltaMs.toDouble()),
-    ref: ElementRefScope<HTMLElement>? = null,
+    ref: ElementRefScope<HTMLCanvasElement>? = null,
     render: RenderScope<WebGLRenderingContext>.() -> Unit,
 ) {
     Canvas(
