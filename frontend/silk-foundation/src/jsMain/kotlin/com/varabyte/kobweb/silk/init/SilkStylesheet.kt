@@ -57,6 +57,25 @@ interface CssStyleRegistrar {
      *   }
      * }
      * ```
+     *
+     * Note that, unlike `CssStyle` blocks, you cannot pass an `extraModifier` parameter here, because you never call
+     * `toModifier()` on these styles (which is when the extra modifier parameter is applied. If you get an error about
+     * an attribute modifier, you should work with the raw underlying elements instead:
+     *
+     * ```
+     * // Before
+     * ctx.stylesheet.registerStyle("html") { Modifier.draggable(false) } // error
+     *
+     * // After
+     * @Composable
+     * @App
+     * fun AppEntry {
+     *   LaunchedEffect {
+     *     val htmlElement = document.documentElement as HTMLElement
+     *     htmlElement.draggable = false
+     *   }
+     * }
+     * ```
      */
     fun registerStyle(cssSelector: String, init: StyleScope.() -> Unit)
 }
