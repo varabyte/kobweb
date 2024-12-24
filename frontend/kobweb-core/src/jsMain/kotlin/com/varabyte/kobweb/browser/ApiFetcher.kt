@@ -1,13 +1,14 @@
 package com.varabyte.kobweb.browser
 
-import androidx.compose.runtime.*
 import com.varabyte.kobweb.browser.http.AbortController
+import com.varabyte.kobweb.browser.http.FetchDefaults
 import com.varabyte.kobweb.browser.http.fetch
 import com.varabyte.kobweb.browser.http.http
 import com.varabyte.kobweb.navigation.BasePath
 import kotlinx.browser.window
 import org.khronos.webgl.get
 import org.w3c.dom.Window
+import org.w3c.fetch.RequestRedirect
 
 /**
  * A class which makes it easier to access a Kobweb API endpoint, instead of using [Window.fetch] directly.
@@ -40,8 +41,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun delete(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.delete(toResource(apiPath), headers, abortController)
+    ): ByteArray = window.http.delete(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Like [delete], but returns null if the request failed for any reason.
@@ -52,8 +54,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun tryDelete(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryDelete(toResource(apiPath), headers, abortController)
+    ): ByteArray? = window.http.tryDelete(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Call GET on a target API path.
@@ -65,8 +68,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun get(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.get(toResource(apiPath), headers, abortController)
+    ): ByteArray = window.http.get(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Like [get], but returns null if the request failed for any reason.
@@ -77,8 +81,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun tryGet(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryGet(toResource(apiPath), headers, abortController)
+    ): ByteArray? = window.http.tryGet(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Call HEAD on a target API path.
@@ -90,8 +95,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun head(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.head(toResource(apiPath), headers, abortController)
+    ): ByteArray = window.http.head(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Like [head], but returns null if the request failed for any reason.
@@ -102,8 +108,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun tryHead(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryHead(toResource(apiPath), headers, abortController)
+    ): ByteArray? = window.http.tryHead(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Call OPTIONS on a target API path.
@@ -115,8 +122,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun options(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.options(toResource(apiPath), headers, abortController)
+    ): ByteArray = window.http.options(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Like [options], but returns null if the request failed for any reason.
@@ -127,8 +135,9 @@ class ApiFetcher(private val window: Window) {
     suspend fun tryOptions(
         apiPath: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryOptions(toResource(apiPath), headers, abortController)
+    ): ByteArray? = window.http.tryOptions(toResource(apiPath), headers, redirect, abortController)
 
     /**
      * Call PATCH on a target API path.
@@ -141,8 +150,9 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.patch(toResource(apiPath), headers, body, abortController)
+    ): ByteArray = window.http.patch(toResource(apiPath), headers, body, redirect, abortController)
 
     /**
      * Like [patch], but returns null if the request failed for any reason.
@@ -154,8 +164,9 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryPatch(toResource(apiPath), headers, body, abortController)
+    ): ByteArray? = window.http.tryPatch(toResource(apiPath), headers, body, redirect, abortController)
 
     /**
      * Call POST on a target API path.
@@ -168,8 +179,9 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.post(toResource(apiPath), headers, body, abortController)
+    ): ByteArray = window.http.post(toResource(apiPath), headers, body, redirect, abortController)
 
     /**
      * Like [post], but returns null if the request failed for any reason.
@@ -181,8 +193,9 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryPost(toResource(apiPath), headers, body, abortController)
+    ): ByteArray? = window.http.tryPost(toResource(apiPath), headers, body, redirect, abortController)
 
     /**
      * Call PUT on a target API path.
@@ -195,8 +208,9 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray = window.http.put(toResource(apiPath), headers, body, abortController)
+    ): ByteArray = window.http.put(toResource(apiPath), headers, body, redirect, abortController)
 
     /**
      * Like [put], but returns null if the request failed for any reason.
@@ -208,8 +222,9 @@ class ApiFetcher(private val window: Window) {
         apiPath: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null,
-    ): ByteArray? = window.http.tryPut(toResource(apiPath), headers, body, abortController)
+    ): ByteArray? = window.http.tryPut(toResource(apiPath), headers, body, redirect, abortController)
 }
 
 @Suppress("unused") // We tie our class to the "Window" class on purpose, so it can be used instead of `fetch`

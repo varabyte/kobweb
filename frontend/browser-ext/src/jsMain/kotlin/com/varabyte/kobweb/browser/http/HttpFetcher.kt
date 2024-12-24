@@ -3,6 +3,7 @@ package com.varabyte.kobweb.browser.http
 import kotlinx.browser.window
 import org.khronos.webgl.get
 import org.w3c.dom.Window
+import org.w3c.fetch.RequestRedirect
 
 /**
  * A class which can be used to abort an API request after it was made.
@@ -66,8 +67,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun delete(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetch(HttpMethod.DELETE, resource, headers, body = null, abortController)
+    ): ByteArray = window.fetch(HttpMethod.DELETE, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [delete], but returns null if the request failed for any reason.
@@ -77,8 +79,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun tryDelete(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetch(HttpMethod.DELETE, resource, headers, body = null, logOnError, abortController)
+    ): ByteArray? = window.tryFetch(HttpMethod.DELETE, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call GET on a target resource.
@@ -88,8 +91,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun get(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetch(HttpMethod.GET, resource, headers, body = null, abortController)
+    ): ByteArray = window.fetch(HttpMethod.GET, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [get], but returns null if the request failed for any reason.
@@ -99,8 +103,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun tryGet(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetch(HttpMethod.GET, resource, headers, body = null, logOnError, abortController)
+    ): ByteArray? = window.tryFetch(HttpMethod.GET, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call HEAD on a target resource.
@@ -110,8 +115,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun head(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetch(HttpMethod.HEAD, resource, headers, body = null, abortController)
+    ): ByteArray = window.fetch(HttpMethod.HEAD, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [head], but returns null if the request failed for any reason.
@@ -121,8 +127,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun tryHead(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetch(HttpMethod.HEAD, resource, headers, body = null, logOnError, abortController)
+    ): ByteArray? = window.tryFetch(HttpMethod.HEAD, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call OPTIONS on a target resource.
@@ -132,8 +139,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun options(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetch(HttpMethod.OPTIONS, resource, headers, body = null, abortController)
+    ): ByteArray = window.fetch(HttpMethod.OPTIONS, resource, headers, body = null, redirect, abortController)
 
     /**
      * Like [options], but returns null if the request failed for any reason.
@@ -143,8 +151,9 @@ class HttpFetcher(private val window: Window) {
     suspend fun tryOptions(
         resource: String,
         headers: Map<String, Any>? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetch(HttpMethod.OPTIONS, resource, headers, body = null, logOnError, abortController)
+    ): ByteArray? = window.tryFetch(HttpMethod.OPTIONS, resource, headers, body = null, redirect, logOnError, abortController)
 
     /**
      * Call PATCH on a target resource.
@@ -155,8 +164,9 @@ class HttpFetcher(private val window: Window) {
         resource: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetch(HttpMethod.PATCH, resource, headers, body, abortController)
+    ): ByteArray = window.fetch(HttpMethod.PATCH, resource, headers, body, redirect, abortController)
 
     /**
      * Like [patch], but returns null if the request failed for any reason.
@@ -167,8 +177,9 @@ class HttpFetcher(private val window: Window) {
         resource: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetch(HttpMethod.PATCH, resource, headers, body, logOnError, abortController)
+    ): ByteArray? = window.tryFetch(HttpMethod.PATCH, resource, headers, body, redirect, logOnError, abortController)
 
     /**
      * Call POST on a target resource.
@@ -179,8 +190,9 @@ class HttpFetcher(private val window: Window) {
         resource: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetch(HttpMethod.POST, resource, headers, body, abortController)
+    ): ByteArray = window.fetch(HttpMethod.POST, resource, headers, body, redirect, abortController)
 
     /**
      * Like [post], but returns null if the request failed for any reason.
@@ -191,8 +203,9 @@ class HttpFetcher(private val window: Window) {
         resource: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetch(HttpMethod.POST, resource, headers, body, logOnError, abortController)
+    ): ByteArray? = window.tryFetch(HttpMethod.POST, resource, headers, body, redirect, logOnError, abortController)
 
     /**
      * Call PUT on a target resource.
@@ -203,8 +216,9 @@ class HttpFetcher(private val window: Window) {
         resource: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray = window.fetch(HttpMethod.PUT, resource, headers, body, abortController)
+    ): ByteArray = window.fetch(HttpMethod.PUT, resource, headers, body, redirect, abortController)
 
     /**
      * Like [put], but returns null if the request failed for any reason.
@@ -215,8 +229,9 @@ class HttpFetcher(private val window: Window) {
         resource: String,
         headers: Map<String, Any>? = null,
         body: ByteArray? = null,
+        redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
-    ): ByteArray? = window.tryFetch(HttpMethod.PUT, resource, headers, body, logOnError, abortController)
+    ): ByteArray? = window.tryFetch(HttpMethod.PUT, resource, headers, body, redirect, logOnError, abortController)
 }
 
 @Suppress("unused") // We tie our class to the "Window" class on purpose, so it can be used instead of `fetch`

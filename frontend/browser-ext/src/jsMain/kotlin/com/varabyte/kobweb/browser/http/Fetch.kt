@@ -9,6 +9,7 @@ import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
 import org.w3c.dom.Window
 import org.w3c.fetch.RequestInit
+import org.w3c.fetch.RequestRedirect
 import org.w3c.fetch.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -75,6 +76,13 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
 )
 
 /**
+ * Default values for [fetch] (or methods that delegate to fetch).
+ */
+object FetchDefaults {
+    var Redirect: RequestRedirect? = null
+}
+
+/**
  * A Kotlin-idiomatic version of the standard library's [Window.fetch] function.
  *
  * @param headers An optional map of headers to send with the request. Note: If a body is specified, the
@@ -85,6 +93,7 @@ suspend fun Window.fetch(
     resource: String,
     headers: Map<String, Any>? = null,
     body: ByteArray? = null,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null
 ): ByteArray {
     val responseBytesDeferred = CompletableDeferred<ByteArray>()
@@ -105,6 +114,7 @@ suspend fun Window.fetch(
         method = method.name,
         headers = headersJson ?: undefined,
         body = body ?: undefined,
+        redirect = redirect ?: undefined,
     )
     if (abortController != null) {
         // Hack: Workaround since Compose HTML's `RequestInit` doesn't have a `signal` property
@@ -132,11 +142,12 @@ suspend fun Window.tryFetch(
     resource: String,
     headers: Map<String, Any>? = null,
     body: ByteArray? = null,
+    redirect: RequestRedirect? = FetchDefaults.Redirect,
     logOnError: Boolean = false,
     abortController: AbortController? = null
 ): ByteArray? {
     return try {
-        fetch(method, resource, headers, body, abortController)
+        fetch(method, resource, headers, body, redirect, abortController)
     } catch (t: Throwable) {
         if (logOnError) {
             console.log("Error fetching resource \"$resource\"\n\n$t")
