@@ -1394,7 +1394,7 @@ div {
   height: 100px;
   background: red;
   position: relative;
-  animation: mymove 5s infinite;
+  animation: shift-right 5s infinite;
 }
 
 @keyframes shift-right {
