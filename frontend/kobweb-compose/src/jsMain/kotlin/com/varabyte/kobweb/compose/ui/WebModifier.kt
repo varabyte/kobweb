@@ -74,12 +74,12 @@ fun Modifier.styleModifier(styles: (StyleScope.() -> Unit)) = this then StyleMod
 fun <A : AttrsScope<Element>> Modifier.toAttrs(finalHandler: (A.() -> Unit)? = null): A.() -> Unit {
     val firstModifier = this
     return {
-        firstModifier.fold(Unit) { _, element ->
-            if (element is AttrsModifier) {
-                element.attrs.invoke(this)
-            } else if (element is StyleModifier) {
+        firstModifier.fold(Unit) { _, modifierElement ->
+            if (modifierElement is AttrsModifier) {
+                modifierElement.attrs.invoke(this)
+            } else if (modifierElement is StyleModifier) {
                 style {
-                    element.styles.invoke(this)
+                    modifierElement.styles.invoke(this)
                 }
             }
         }
@@ -97,9 +97,9 @@ fun <A : AttrsScope<Element>> Modifier.toAttrs(finalHandler: (A.() -> Unit)? = n
 fun Modifier.toStyles(finalHandler: (StyleScope.() -> Unit)? = null): StyleScope.() -> Unit {
     val firstModifier = this
     return {
-        firstModifier.fold(Unit) { _, element ->
-            if (element is StyleModifier) {
-                element.styles.invoke(this)
+        firstModifier.fold(Unit) { _, modifierElement ->
+            if (modifierElement is StyleModifier) {
+                modifierElement.styles.invoke(this)
             }
         }
 
