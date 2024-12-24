@@ -4,6 +4,7 @@ import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.templates.createApisFactoryImpl
 import com.varabyte.kobweb.gradle.core.util.searchZipFor
 import com.varabyte.kobweb.ksp.KOBWEB_METADATA_BACKEND
+import com.varabyte.kobweb.project.backend.AppBackendData
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.merge
 import kotlinx.serialization.json.Json
@@ -31,10 +32,12 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(private val app
 
     @TaskAction
     fun execute() {
-        val backendData = buildList {
-            kspGenFile.orNull?.let {
-                add(Json.decodeFromString<BackendData>(it.asFile.readText()))
-            }
+        val unmergedAppBackendData =
+            kspGenFile.orNull?.let { Json.decodeFromString<AppBackendData>(it.asFile.readText()) }
+                ?: AppBackendData()
+
+        val mergedBackendData = buildList {
+            add(unmergedAppBackendData.backendData)
             compileClasspath.forEach { file ->
                 file.searchZipFor(KOBWEB_METADATA_BACKEND) { bytes ->
                     add(Json.decodeFromString<BackendData>(bytes.decodeToString()))
@@ -42,7 +45,12 @@ abstract class KobwebGenerateApisFactoryTask @Inject constructor(private val app
             }
         }.merge(throwError = { throw GradleException(it) })
 
+        val appBackendData = AppBackendData(
+            unmergedAppBackendData.apiInterceptorMethod,
+            mergedBackendData
+        )
+
         val apisFactoryFile = getGenApisFactoryFile().get().asFile.resolve("ApisFactoryImpl.kt")
-        apisFactoryFile.writeText(createApisFactoryImpl(backendData))
+        apisFactoryFile.writeText(createApisFactoryImpl(appBackendData))
     }
 }

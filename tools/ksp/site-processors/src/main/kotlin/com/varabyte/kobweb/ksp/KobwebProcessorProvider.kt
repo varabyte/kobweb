@@ -11,6 +11,7 @@ import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.backendFile
 import com.varabyte.kobweb.frontendFile
 import com.varabyte.kobweb.ksp.backend.BackendProcessor
+import com.varabyte.kobweb.ksp.backend.AppBackendProcessor
 import com.varabyte.kobweb.ksp.frontend.AppFrontendProcessor
 import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 
@@ -54,12 +55,26 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                 val apiPackage = environment.options[KSP_API_PACKAGE_KEY]
                     ?: error("KobwebProcessorProvider: Missing api package ($KSP_API_PACKAGE_KEY)")
 
-                BackendProcessor(
-                    codeGenerator = environment.codeGenerator,
-                    logger = environment.logger,
-                    genFile = processorMode.backendFile,
-                    qualifiedApiPackage = apiPackage,
-                )
+                when (processorMode) {
+                    ProcessorMode.APP -> {
+                        AppBackendProcessor(
+                            codeGenerator = environment.codeGenerator,
+                            logger = environment.logger,
+                            genFile = processorMode.backendFile,
+                            qualifiedApiPackage = apiPackage,
+                        )
+                    }
+
+                    ProcessorMode.LIBRARY -> {
+                        BackendProcessor(
+                            isLibrary = true,
+                            codeGenerator = environment.codeGenerator,
+                            logger = environment.logger,
+                            genFile = processorMode.backendFile,
+                            qualifiedApiPackage = apiPackage,
+                        )
+                    }
+                }
             }
 
             else -> {

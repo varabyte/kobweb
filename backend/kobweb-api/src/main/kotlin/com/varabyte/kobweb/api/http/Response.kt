@@ -2,6 +2,10 @@ package com.varabyte.kobweb.api.http
 
 import com.varabyte.kobweb.api.ApiContext
 
+private val VALID_REDIRECT_STATUS_CODES = setOf(301, 302, 303, 307, 308)
+private const val API_PREFIX = "/api"
+private const val API_PREFIX_WITH_TRAILING_SLASH = "$API_PREFIX/"
+
 /** A convenience value you can use if you want to express intention that your body should be empty */
 val EMPTY_BODY = ByteArray(0)
 
@@ -59,4 +63,24 @@ class Response {
  */
 fun Response.setBodyText(text: String) {
     body = text.toByteArray(Charsets.UTF_8)
+}
+
+/**
+ * Set this to a response that tells the client that the requested resource has moved to a new location.
+ *
+ * @param status The specific redirect status code to use. See
+ *   [MDN docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) for more information. Defaults to
+ *   307 (temporary redirect).
+ *
+ * @param isApiPath If true, [newPath] will be prefixed with the "/api" prefix (unless already prefixed). This is useful
+ *   if you're redirecting the user away from one API endpoint to another. You can of course just prepend "/api" to the
+ *   path yourself, but in most cases, Kobweb tries to hide the "/api" prefix from the user, so it's a bit strange for
+ *   us to force them to manually reference it here. Therefore, this parameter is provided as a convenience and as a way
+ *   to document this situation.
+ */
+fun Response.setAsRedirect(newPath: String, status: Int = 307, isApiPath: Boolean = false) {
+    check(status in VALID_REDIRECT_STATUS_CODES) { "Redirect status code is invalid ($status); must be one of $VALID_REDIRECT_STATUS_CODES" }
+    this.status = status
+    headers["Location"] =
+        if (!isApiPath || newPath.startsWith(API_PREFIX_WITH_TRAILING_SLASH)) newPath else "$API_PREFIX$newPath"
 }

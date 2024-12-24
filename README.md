@@ -3218,6 +3218,68 @@ suspend fun redirect(ctx: ApiContext) {
 
 Simple!
 
+### Intercepting API routes
+
+Kobweb provides a way to intercept all incoming API requests, getting a first chance to handle them before they get
+passed to the actual API route handler.
+
+To intercept all routes, declare a suspend method annotated with `@ApiInterceptor`. This method must take a
+`ApiInterceptorContext` parameter and return a `Response`:
+
+```kotlin
+@ApiInterceptor
+suspend fun interceptRequest(ctx: ApiInterceptorContext): Response {
+    return when {
+        ctx.path == "/example" -> Response().apply { setBodyText("Intercepted!") }
+        // Default: pass request to the route it is normally handled by
+        else -> ctx.dispatcher.dispatch()
+    }
+}
+```
+
+The `ApiInterceptorContext` class provides access to a mutable version of the incoming request, which gives you a chance
+to modify it first (e.g. adding cookies, updating headers) before it gets handled, which can be useful.
+
+The `ctx.dispatcher.dispatch` method takes an optional path you can specify so that you can delegate a request to a
+different API route:
+
+```kotlin
+@ApiInterceptor
+suspend fun interceptRequest(ctx: ApiInterceptorContext): Response {
+    return when {
+        // User will think "/legacy" handled the request;
+        // actually, "/new" did
+        ctx.path == "/legacy" -> ctx.dispatcher.dispatch("/new")
+        else -> ctx.dispatcher.dispatch()
+    }
+}
+```
+
+Perhaps you aren't interested in interfering with any incoming requests, but you want to modify all responses before
+they get sent back to the client. You can use this pattern for that:
+
+```kotlin
+@ApiInterceptor
+suspend fun interceptResponse(ctx: ApiInterceptorContext): Response {
+    return ctx.dispatcher.dispatch().also { res ->
+        res.headers["X-Intercepted"] = "true"
+    }
+}
+```
+
+> [!CAUTION]
+> API interceptors only work for API routes, not static files or other resources. In other words, although you *can* use
+> an interceptor to intercept a call to "/api/users/edit", the feature is not designed to handle a user navigating to
+> "/admin/dashboard" and then getting redirected to "/login" instead.
+>
+> Navigation logic has to be handled client-side, because Kobweb apps are single-page applications, meaning all pages
+> are downloaded from the server at the same time. This should be fine in practice -- the `/admin/dashboard` page should
+> not contain any secrets itself, but the data it tries to download from the server (via an API call) is the part that
+> should be protected.
+>
+> API interceptors also do not work for API streams, since there's nothing general to intercept there. API streams are
+> set up once and then persisted.
+
 ### Dynamic API routes
 
 Similar to [dynamic `@Page` routes](#dynamic-routes), you can define API routes using curly braces in the same way to

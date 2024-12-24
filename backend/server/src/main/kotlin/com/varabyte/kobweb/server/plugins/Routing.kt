@@ -4,6 +4,7 @@ import com.varabyte.kobweb.api.Apis
 import com.varabyte.kobweb.api.event.EventDispatcher
 import com.varabyte.kobweb.api.http.EMPTY_BODY
 import com.varabyte.kobweb.api.http.HttpMethod
+import com.varabyte.kobweb.api.http.MutableRequest
 import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.api.stream.ApiStream
@@ -157,12 +158,13 @@ private suspend fun RoutingContext.handleApiCall(
             .toMap()
 
         val headers = call.request.headers.entries().associate { it.key to it.value }
-        val request = Request(
+        val request = MutableRequest(
             Request.Connection(
                 origin = call.request.origin.toRequestConnectionDetails(),
                 local = call.request.local.toRequestConnectionDetails(),
             ),
             httpMethod,
+            query,
             query,
             headers,
             call.request.cookies.rawCookies,
@@ -171,19 +173,15 @@ private suspend fun RoutingContext.handleApiCall(
         )
         try {
             val response = apiJar.apis.handle("/$pathStr", request)
-            if (response != null) {
-                response.headers.forEach { (key, value) ->
-                    call.response.headers.append(key, value)
-                }
-                call.respondBytes(
-                    response.body.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
-                    status = HttpStatusCode.fromValue(response.status),
-                    contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }
-                        ?.let { ContentType.parse(it) }
-                )
-            } else {
-                call.respond(HttpStatusCode.NotFound)
+            response.headers.forEach { (key, value) ->
+                call.response.headers.append(key, value)
             }
+            call.respondBytes(
+                response.body.takeIf { httpMethod != HttpMethod.HEAD } ?: EMPTY_BODY,
+                status = HttpStatusCode.fromValue(response.status),
+                contentType = response.contentType?.takeIf { httpMethod != HttpMethod.HEAD }
+                    ?.let { ContentType.parse(it) }
+            )
         } catch (t: Throwable) {
             val fullErrorString = t.stackTraceToString()
             logger.error(fullErrorString)

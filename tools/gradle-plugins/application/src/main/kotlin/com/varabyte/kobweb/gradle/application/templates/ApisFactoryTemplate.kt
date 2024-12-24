@@ -7,15 +7,15 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeSpec
-import com.varabyte.kobweb.project.backend.BackendData
+import com.varabyte.kobweb.project.backend.AppBackendData
 
-fun createApisFactoryImpl(backendData: BackendData): String {
+fun createApisFactoryImpl(appBackendData: AppBackendData): String {
     // Final code should look something like:
     //
     // class ApisFactoryImpl : ApisFactory {
     //    override fun create(env: Environment, events: Events, logger: Logger): Apis {
     //        val data = MutableData()
-    //        val apis = Apis(env, data, logger)
+    //        val apis = Apis(env, data, logger, apiInterceptor = { ctx -> example.api.interceptRequest(ctx) })
     //        apis.register("/add") { ctx -> example.api.add(ctx) }
     //        apis.register("/remove") { ctx -> example.api.remove(ctx) }
     //        apis.registerStream("/echo") { ctx -> example.api.echo }
@@ -36,6 +36,7 @@ fun createApisFactoryImpl(backendData: BackendData): String {
     val classEvents = ClassName("$apiPackage.event", "Events")
     val classInitApiContext = ClassName("$apiPackage.init", "InitApiContext")
     val classLogger = ClassName("$apiPackage.log", "Logger")
+    val backendData = appBackendData.backendData
 
     fileBuilder.addType(
         TypeSpec.classBuilder("ApisFactoryImpl")
@@ -49,7 +50,16 @@ fun createApisFactoryImpl(backendData: BackendData): String {
                     .returns(classApis)
                     .addCode(CodeBlock.builder().apply {
                         addStatement("val data = %T()", classMutableData)
-                        addStatement("val apis = %T(env, data, logger)", classApis)
+                        addStatement(
+                            buildString {
+                                append("val apis = %T(env, data, logger")
+                                appBackendData.apiInterceptorMethod?.let { requestInterceptorMethod ->
+                                    append(", apiInterceptor = { ctx -> ${requestInterceptorMethod.fqn}(ctx) }")
+                                }
+                                append(")")
+                            },
+                            classApis
+                        )
                         backendData.apiMethods.sortedBy { entry -> entry.route }.forEach { entry ->
                             addStatement("apis.register(%S) { ctx -> ${entry.fqn}(ctx) }", entry.route)
                         }

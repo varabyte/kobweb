@@ -11,10 +11,17 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class BackendData(
-    val initMethods: List<InitApiEntry>,
-    val apiMethods: List<ApiEntry>,
-    val apiStreamMethods: List<ApiStreamEntry>
+    val initMethods: List<InitApiEntry> = emptyList(),
+    val apiMethods: List<ApiEntry> = emptyList(),
+    val apiStreamMethods: List<ApiStreamEntry> = emptyList(),
 )
+
+@Serializable
+class AppBackendData(
+    val apiInterceptorMethod: ApiInterceptorEntry? = null,
+    val backendData: BackendData = BackendData(),
+)
+
 
 /**
  * Merge multiple [BackendData] objects together.
@@ -44,6 +51,9 @@ private fun Iterable<ApiEntry>.assertValidApis(throwError: (String) -> Unit) {
 
 @Serializable
 class InitApiEntry(val fqn: String)
+
+@Serializable
+class ApiInterceptorEntry(val fqn: String)
 
 @Serializable
 class ApiStreamEntry(val fqn: String, val route: String)

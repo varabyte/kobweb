@@ -37,26 +37,15 @@ import com.varabyte.kobweb.api.ApiContext
  *
  * @see Response
  */
-class Request(
-    val connection: Connection,
-    val method: HttpMethod,
-    val params: Map<String, String>,
-    val queryParams: Map<String, String>,
-    val headers: Map<String, List<String>>,
-    val cookies: Map<String, String>,
-    val body: ByteArray?,
-    val contentType: String?,
-) {
-    /** Convenience constructor if you don't care about dynamic parameters. */
-    constructor(
-        connection: Connection,
-        method: HttpMethod,
-        params: Map<String, String>,
-        headers: Map<String, List<String>>,
-        cookies: Map<String, String>,
-        body: ByteArray?,
-        contentType: String?,
-    ) : this(connection, method, params, params, headers, cookies, body, contentType)
+interface Request {
+    val connection: Connection
+    val method: HttpMethod
+    val params: Map<String, String>
+    val queryParams: Map<String, String>
+    val headers: Map<String, List<String>>
+    val cookies: Map<String, String>
+    val body: ByteArray?
+    val contentType: String?
 
     /**
      * Top-level container class for views about a connection for some request.
@@ -103,6 +92,36 @@ class Request(
             val serverPort: Int,
         )
     }
+}
+
+class MutableRequest(
+    override val connection: Request.Connection,
+    override var method: HttpMethod,
+    params: Map<String, String>,
+    queryParams: Map<String, String>,
+    headers: Map<String, List<String>>,
+    cookies: Map<String, String>,
+    override var body: ByteArray?,
+    override var contentType: String?,
+) : Request {
+    constructor(request: Request) : this(
+        request.connection,
+        request.method,
+        request.params,
+        request.queryParams,
+        request.headers,
+        request.cookies,
+        request.body,
+        request.contentType,
+    )
+
+    override val params: MutableMap<String, String> = params.toMutableMap()
+    override val queryParams: MutableMap<String, String> = queryParams.toMutableMap()
+    override val headers: MutableMap<String, MutableList<String>> = headers
+        .mapValues { entry -> entry.value.toMutableList() }
+        .toMutableMap()
+
+    override val cookies: MutableMap<String, String> = cookies.toMutableMap()
 }
 
 /**

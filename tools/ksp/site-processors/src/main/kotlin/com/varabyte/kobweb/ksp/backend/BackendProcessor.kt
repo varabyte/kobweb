@@ -14,12 +14,14 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.varabyte.kobweb.ksp.common.API_FQN
+import com.varabyte.kobweb.ksp.common.API_INTERCEPTOR_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_FQN
 import com.varabyte.kobweb.ksp.common.API_STREAM_SIMPLE_NAME
 import com.varabyte.kobweb.ksp.common.INIT_API_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_API_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.common.processRoute
+import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.resolveQualifiedName
 import com.varabyte.kobweb.ksp.symbol.suppresses
@@ -28,10 +30,12 @@ import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.InitApiEntry
 import com.varabyte.kobweb.project.backend.assertValid
+import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class BackendProcessor(
+    private val isLibrary: Boolean,
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
@@ -50,13 +54,22 @@ class BackendProcessor(
     // We track all files we depend on so that ksp can perform smart recompilation
     // Even though our output is aggregating so generally requires full reprocessing, this at minimum means processing
     // will be skipped if the only change is deleted file(s) that we do not depend on.
-    private val fileDependencies = mutableListOf<KSFile>()
+    private val fileDependencies = mutableSetOf<KSFile>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         initMethods += resolver.getSymbolsWithAnnotation(INIT_API_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
             InitApiEntry(name)
+        }
+
+        if (isLibrary) {
+            resolver.getSymbolsWithAnnotation(API_INTERCEPTOR_FQN).toList().forEach { apiInterceptorMethod ->
+                logger.error(
+                    "@ApiInterceptor functions cannot be defined in library projects.",
+                    apiInterceptorMethod
+                )
+            }
         }
 
         val newFiles = resolver.getNewFiles()
@@ -118,7 +131,16 @@ class BackendProcessor(
         }
     }
 
-    override fun finish() {
+    /**
+     * Get the finalized metadata acquired over all rounds of processing.
+     *
+     * This function should only be called from [SymbolProcessor.finish] as it relies on all rounds of processing being
+     * complete.
+     *
+     * @return A [Result] containing the finalized [FrontendData] and the file dependencies that should be
+     * passed in when using KSP's [CodeGenerator] to store the data.
+     */
+    fun getProcessorResult(): Result {
         // api declarations must be processed at the end, as they rely on package mappings,
         // which may be populated over several rounds
         val apiMethods = apiMethodsDeclarations.mapNotNull { annotatedFun ->
@@ -145,15 +167,27 @@ class BackendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
+        return Result(backendData, fileDependencies)
+    }
+
+
+    override fun finish() {
         val (path, extension) = genFile.split('.')
+        val result = getProcessorResult()
         codeGenerator.createNewFileByPath(
             Dependencies(aggregating = true, *fileDependencies.toTypedArray()),
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString(backendData))
+            writer.write(Json.encodeToString(result.data))
         }
     }
+
+    /**
+     * Represents the result of [FrontendProcessor]'s processing, consisting of the generated [FrontendData] and the
+     * files that contained relevant declarations.
+     */
+    data class Result(val data: BackendData, val fileDependencies: Set<KSFile>)
 }
 
 private fun processApiFun(
