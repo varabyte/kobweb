@@ -550,14 +550,14 @@ class FrontendProcessor(
             it.assertValid(throwError = { msg -> logger.error(msg) })
         }
 
-        return Result(frontendData, fileDependencies.toList())
+        return Result(frontendData, fileDependencies)
     }
 
     /**
      * Represents the result of [FrontendProcessor]'s processing, consisting of the generated [FrontendData] and the
      * files that contained relevant declarations.
      */
-    data class Result(val data: FrontendData, val fileDependencies: List<KSFile>)
+    data class Result(val data: FrontendData, val fileDependencies: Set<KSFile>)
 }
 
 /**
