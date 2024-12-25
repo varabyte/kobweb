@@ -366,48 +366,44 @@ class Router {
             // Next, we check a common edge case where the site has registered "slug" and the user typed "slug/"
             // OR vice versa ("slug/" and user typed "slug"). Let's help the user find the right place.
 
-            // Note: We don't touch the path if it has queries or fragments. Because in that case, if the original route
-            // isn't found, we don't want to waste time adding a slash to the end of it (since slashes shouldn't ever
-            // come after queries / fragments).
-            if (pathQueryAndFragment.all { it != '#' && it != '?' }) {
-                // Unlikely but if user never defines a root page, `isRegistered("/")` will return false. We don't want
-                // to add or remove slashes in that case!
-                if (pathQueryAndFragment != "/") {
-                    val originalRoute = pathQueryAndFragment
-                    if (!routeTree.isRegistered(originalRoute)) {
-                        if (originalRoute.endsWith('/')) {
-                            val withoutSlash = originalRoute.removeSuffix("/")
-                            if (routeTree.isRegistered(withoutSlash)) {
-                                pathQueryAndFragment = withoutSlash
-                            }
-                        } else {
-                            val withSlash = "$originalRoute/"
-                            if (routeTree.isRegistered(withSlash)) {
-                                pathQueryAndFragment = withSlash
-                            }
+            val (pathPart, queryAndFragmentPart) = pathQueryAndFragment.partitionPath()
+
+            // Unlikely but if user never defines a root page, `isRegistered("/")` will return false. We don't want
+            // to add or remove slashes in that case!
+            if (pathPart != "/") {
+                if (!routeTree.isRegistered(pathPart)) {
+                    if (pathPart.endsWith('/')) {
+                        val withoutSlash = pathPart.removeSuffix("/")
+                        if (routeTree.isRegistered(withoutSlash)) {
+                            pathQueryAndFragment = withoutSlash + queryAndFragmentPart
+                        }
+                    } else {
+                        val withSlash = "$pathPart/"
+                        if (routeTree.isRegistered(withSlash)) {
+                            pathQueryAndFragment = withSlash + queryAndFragmentPart
                         }
                     }
+                }
 
-                    // If the next check passes, we can't find the path locally, but it's possible that it refers to a
-                    // file that lives on the server e.g. "documents/external.md". So we ask the server if it's there.
-                    // If so, we treat this navigation as "handled" and kick off a request to the server to download
-                    // the file.
-                    if (!routeTree.isRegistered(pathQueryAndFragment)) {
-                        val xhr = XMLHttpRequest()
-                        var fileExistsOnServer = false
-                        xhr.open("HEAD", pathQueryAndFragment, async = false)
-                        xhr.onload = {
-                            fileExistsOnServer = xhr.status == 200.toShort()
-                            Unit
-                        }
-                        xhr.onerror = {}
-                        xhr.onabort = {}
-                        xhr.send(null)
+                // If the next check passes, we can't find the path locally, but it's possible that it refers to a
+                // file that lives on the server e.g. "documents/external.md". So we ask the server if it's there.
+                // If so, we treat this navigation as "handled" and kick off a request to the server to download
+                // the file.
+                if (!routeTree.isRegistered(pathQueryAndFragment)) {
+                    val xhr = XMLHttpRequest()
+                    var fileExistsOnServer = false
+                    xhr.open("HEAD", pathQueryAndFragment, async = false)
+                    xhr.onload = {
+                        fileExistsOnServer = xhr.status == 200.toShort()
+                        Unit
+                    }
+                    xhr.onerror = {}
+                    xhr.onabort = {}
+                    xhr.send(null)
 
-                        if (fileExistsOnServer) {
-                            window.open(pathQueryAndFragment)
-                            return true
-                        }
+                    if (fileExistsOnServer) {
+                        window.open(pathQueryAndFragment)
+                        return true
                     }
                 }
             }
