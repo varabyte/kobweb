@@ -23,6 +23,35 @@ import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
+// Must only ever call once or else we get a thrown Error
+private object UrlStreamHandlerFactoryInitializer {
+    private var initialized = false
+
+    fun initialize() {
+        if (initialized) return
+        try {
+            // Code inspired by org.jetbrains.kotlin.codegen.GeneratedClassLoader and .BytesUrlUtils
+            // See also: toInMemoryUrl
+            URL.setURLStreamHandlerFactory { protocol ->
+                if (protocol == "bytes") {
+                    object : URLStreamHandler() {
+                        override fun openConnection(url: URL): URLConnection {
+                            return object : URLConnection(url) {
+                                override fun connect() {}
+                                override fun getInputStream(): InputStream {
+                                    return ByteArrayInputStream(Base64.getDecoder().decode(url.path))
+                                }
+                            }
+                        }
+                    }
+                } else null
+            }
+        } finally {
+            initialized = true
+        }
+    }
+}
+
 /**
  * Wrapper around a Kobweb API jar, which is expected (in dev mode at least) to occasionally be reloaded on the fly.
  *
@@ -83,22 +112,7 @@ class ApiJarFile(
         }
 
         init {
-            // Code inspired by org.jetbrains.kotlin.codegen.GeneratedClassLoader and .BytesUrlUtils
-            // See also: toInMemoryUrl
-            URL.setURLStreamHandlerFactory { protocol ->
-                if (protocol == "bytes") {
-                    object : URLStreamHandler() {
-                        override fun openConnection(url: URL): URLConnection {
-                            return object : URLConnection(url) {
-                                override fun connect() {}
-                                override fun getInputStream(): InputStream {
-                                    return ByteArrayInputStream(Base64.getDecoder().decode(url.path))
-                                }
-                            }
-                        }
-                    }
-                } else null
-            }
+            UrlStreamHandlerFactoryInitializer.initialize()
         }
 
         // Code inspired by org.jetbrains.kotlin.codegen.GeneratedClassLoader and .BytesUrlUtils
