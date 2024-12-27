@@ -208,7 +208,6 @@ class KobwebApplicationPlugin @Inject constructor(
             }
         }
 
-        val kobwebCacheAppFrontendDataTask = project.tasks.register<KobwebCacheAppFrontendDataTask>("kobwebCacheAppFrontendData")
         val kobwebExportTask = project.tasks
             .register<KobwebExportTask>(
                 "kobwebExport",
@@ -280,7 +279,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 KobwebGenSiteEntryConfInputs(kobwebConf),
             )
 
-            kobwebCacheAppFrontendDataTask.configure {
+            val kobwebCacheAppFrontendDataTask = project.tasks.register<KobwebCacheAppFrontendDataTask>("kobwebCacheAppFrontendData") {
                 appFrontendMetadataFile.set(project.kspFrontendFile(jsTarget))
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 appDataFile.set(this.kobwebCacheFile("appData.json"))
