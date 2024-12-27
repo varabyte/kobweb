@@ -71,7 +71,7 @@ private fun Iterable<PageEntry>.assertValidPages(throwError: (String) -> Unit) {
 class AppEntry(val fqn: String)
 
 @Serializable
-class AppData(val appEntry: AppEntry?, val frontendData: FrontendData)
+class AppFrontendData(val appEntry: AppEntry?, val frontendData: FrontendData)
 
 @Serializable
 class InitSilkEntry(

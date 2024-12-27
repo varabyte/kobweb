@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.gradle.application.tasks
 
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
-import com.varabyte.kobweb.project.frontend.AppData
+import com.varabyte.kobweb.project.frontend.AppFrontendData
 import kotlinx.serialization.json.Json
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
@@ -13,7 +13,7 @@ abstract class KobwebListRoutesTask : KobwebTask("Enumerate all routes for your 
 
     @TaskAction
     fun execute() {
-        val pageEntries = Json.decodeFromString<AppData>(appDataFile.asFile.get().readText()).frontendData.pages
+        val pageEntries = Json.decodeFromString<AppFrontendData>(appDataFile.asFile.get().readText()).frontendData.pages
         if (pageEntries.isNotEmpty()) {
             println("Your site defines the following routes:")
             pageEntries.map { it.route }.sorted().forEach { route ->

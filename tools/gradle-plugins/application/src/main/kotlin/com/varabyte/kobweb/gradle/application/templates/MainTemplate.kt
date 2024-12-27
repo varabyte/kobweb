@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.withIndent
 import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.project.conf.Server
-import com.varabyte.kobweb.project.frontend.AppData
+import com.varabyte.kobweb.project.frontend.AppFrontendData
 
 private const val KOBWEB_GROUP = "com.varabyte.kobweb"
 
@@ -19,7 +19,7 @@ enum class SilkSupport {
 }
 
 fun createMainFunction(
-    appData: AppData,
+    appFrontendData: AppFrontendData,
     silkSupport: SilkSupport,
     appGlobals: Map<String, String>,
     cleanUrls: Boolean,
@@ -30,10 +30,10 @@ fun createMainFunction(
     val usingSilkFoundation = silkSupport != SilkSupport.NONE
     val usingSilkWidgets = silkSupport == SilkSupport.FULL
 
-    val appFqn = appData.appEntry?.fqn
+    val appFqn = appFrontendData.appEntry?.fqn
         ?: (KOBWEB_GROUP + if (usingSilkWidgets) ".silk.SilkApp" else ".core.KobwebApp")
 
-    val frontendData = appData.frontendData
+    val frontendData = appFrontendData.frontendData
     val fileBuilder = FileSpec.builder("", "main").indent(" ".repeat(4))
 
     buildSet {

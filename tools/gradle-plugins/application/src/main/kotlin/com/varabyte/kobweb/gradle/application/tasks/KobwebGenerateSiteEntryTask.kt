@@ -8,7 +8,7 @@ import com.varabyte.kobweb.gradle.application.templates.createMainFunction
 import com.varabyte.kobweb.gradle.core.util.hasDependencyNamed
 import com.varabyte.kobweb.project.conf.KobwebConf
 import com.varabyte.kobweb.project.conf.Server
-import com.varabyte.kobweb.project.frontend.AppData
+import com.varabyte.kobweb.project.frontend.AppFrontendData
 import kotlinx.serialization.json.Json
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.file.RegularFileProperty
@@ -63,12 +63,12 @@ abstract class KobwebGenerateSiteEntryTask @Inject constructor(
 
     @TaskAction
     fun execute() {
-        val appData = Json.decodeFromString<AppData>(appDataFile.asFile.get().readText())
+        val appFrontendData = Json.decodeFromString<AppFrontendData>(appDataFile.asFile.get().readText())
         val mainFile = getGenMainFile().get().asFile.resolve("main.kt")
 
         mainFile.writeText(
             createMainFunction(
-                appData,
+                appFrontendData,
                 silkSupport.get(),
                 globals.get(),
                 cleanUrls.get(),

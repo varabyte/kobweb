@@ -10,12 +10,12 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.APP_FQN
-import com.varabyte.kobweb.project.frontend.AppData
+import com.varabyte.kobweb.project.frontend.AppFrontendData
 import com.varabyte.kobweb.project.frontend.AppEntry
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class AppProcessor(
+class AppFrontendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
@@ -54,7 +54,7 @@ class AppProcessor(
     override fun finish() {
         val frontendResult = frontendProcessor.getProcessorResult()
         fileDependencies.addAll(frontendResult.fileDependencies)
-        val appData = AppData(appFqn?.let { AppEntry(it) }, frontendResult.data)
+        val appFrontendData = AppFrontendData(appFqn?.let { AppEntry(it) }, frontendResult.data)
 
         val (path, extension) = genFile.split('.')
         codeGenerator.createNewFileByPath(
@@ -62,7 +62,7 @@ class AppProcessor(
             path = path,
             extensionName = extension,
         ).writer().use { writer ->
-            writer.write(Json.encodeToString(appData))
+            writer.write(Json.encodeToString(appFrontendData))
         }
     }
 }

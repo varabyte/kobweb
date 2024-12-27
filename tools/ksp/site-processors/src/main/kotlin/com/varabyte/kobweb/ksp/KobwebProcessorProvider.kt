@@ -11,7 +11,7 @@ import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.backendFile
 import com.varabyte.kobweb.frontendFile
 import com.varabyte.kobweb.ksp.backend.BackendProcessor
-import com.varabyte.kobweb.ksp.frontend.AppProcessor
+import com.varabyte.kobweb.ksp.frontend.AppFrontendProcessor
 import com.varabyte.kobweb.ksp.frontend.FrontendProcessor
 
 class KobwebProcessorProvider : SymbolProcessorProvider {
@@ -28,7 +28,7 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
                 val defaultCssPrefix = environment.options[KSP_DEFAULT_CSS_PREFIX_KEY]
                 when (processorMode) {
                     ProcessorMode.APP -> {
-                        AppProcessor(
+                        AppFrontendProcessor(
                             codeGenerator = environment.codeGenerator,
                             logger = environment.logger,
                             genFile = genFile,
