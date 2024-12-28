@@ -39,6 +39,7 @@ class KobwebProcessorProvider : SymbolProcessorProvider {
 
                     ProcessorMode.LIBRARY -> {
                         FrontendProcessor(
+                            isLibrary = true,
                             codeGenerator = environment.codeGenerator,
                             logger = environment.logger,
                             genFile = genFile,

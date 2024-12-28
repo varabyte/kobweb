@@ -31,8 +31,11 @@ import org.jetbrains.compose.web.css.*
  * }
  * ```
  *
- * Finally, there must either be **no methods** or **just a single method** marked with this annotation. If Kobweb
- * encounters more than one `@App` annotation, it will log an error and discard duplicates arbitrarily.
+ * There must either be **no methods** or **just a single method** marked with this annotation. If Kobweb encounters
+ * more than one `@App` annotation, it will log an error and discard duplicates arbitrarily.
+ *
+ * Finally, it is an error to tag a method with `@App` inside a Kobweb library module. Users can only use it to tag a
+ * method in the application module.
  */
 @Target(AnnotationTarget.FUNCTION)
 annotation class App

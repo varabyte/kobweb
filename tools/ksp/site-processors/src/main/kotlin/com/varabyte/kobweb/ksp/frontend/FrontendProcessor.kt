@@ -21,6 +21,7 @@ import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.symbol.Variance
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
 import com.varabyte.kobweb.common.text.splitCamelCase
+import com.varabyte.kobweb.ksp.common.APP_FQN
 import com.varabyte.kobweb.ksp.common.CSS_KIND_COMPONENT_FQN
 import com.varabyte.kobweb.ksp.common.CSS_KIND_RESTRICTED_FQN
 import com.varabyte.kobweb.ksp.common.CSS_LAYER_FQN
@@ -48,6 +49,7 @@ import kotlinx.serialization.json.Json
 
 @OptIn(KspExperimental::class)
 class FrontendProcessor(
+    private val isLibrary: Boolean,
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
@@ -80,6 +82,12 @@ class FrontendProcessor(
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
             InitSilkEntry(name)
+        }
+
+        if (isLibrary) {
+            resolver.getSymbolsWithAnnotation(APP_FQN).toList().forEach { appMethod ->
+                logger.error("@App functions cannot be defined in library projects.", appMethod)
+            }
         }
 
         // only process files that are new to this round, since prior declarations are unchanged

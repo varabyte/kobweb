@@ -27,6 +27,7 @@ class AppFrontendProcessor(
 
     // use single processor so that results are stored between round during multi-round processing
     private val frontendProcessor = FrontendProcessor(
+        isLibrary = false,
         codeGenerator = codeGenerator,
         logger = logger,
         genFile = "",
