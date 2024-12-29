@@ -58,8 +58,9 @@ fun SilkCalloutBlockquoteHandler(
 ): NodeScope.(BlockQuote) -> String {
     return { blockQuote ->
         val silkCallout = blockQuote.firstChild.firstChild?.let { firstChild ->
-            firstChild as Text
-            val regex = """\[!([^ ]+)( "(.*)")?]""".toRegex()
+            @Suppress("NAME_SHADOWING")
+            val firstChild = firstChild as? Text ?: return@let null
+            val regex = """\[!([^ ]+)( "(.*)")?]""".toRegex() // [!TYPE "LABEL"]
             val typeMatch = regex.find(firstChild.literal) ?: return@let null
             firstChild.literal = firstChild.literal.substringAfter(typeMatch.value)
 
