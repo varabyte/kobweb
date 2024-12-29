@@ -11,6 +11,7 @@ import com.varabyte.kobwebx.gradle.markdown.children
 import com.varabyte.kobwebx.gradle.markdown.util.escapeDollars
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.escapeTripleQuotes
+import com.varabyte.kobwebx.gradle.markdown.util.nestedLiteral
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
@@ -63,20 +64,6 @@ class NodeScope(val reporter: Reporter, val data: TypedMap, private val indentCo
      * The indent applied here will be consistent with the indent used by the Markdown -> Kotlin renderer.
      */
     fun indent(indentCount: Int) = "    ".repeat(indentCountBase + indentCount)
-}
-
-/**
- * Convert a [Node] to any text it contains.
- *
- * This is useful if you are pretty sure that a node contains some text but it might be deep down in its children. For
- * example, if a node represents a link, then the text value is contained as a child node.
- */
-private fun Node.toText(): String {
-    return when (this) {
-        is Text -> this.literal
-        is Code -> this.literal
-        else -> this.children().joinToString { it.toText() }
-    }
 }
 
 /**
@@ -289,7 +276,7 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
             buildString {
                 append("$JB_DOM.H${heading.level}")
                 if (generateHeaderIds.get()) {
-                    val text = heading.toText()
+                    val text = heading.nestedLiteral
                     val headingIds = data.computeIfAbsent(DataKeys.HeadingIds) { mutableMapOf() }
                     val id = run {
                         val baseId = idGenerator.get().invoke(text)
