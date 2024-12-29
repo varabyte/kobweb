@@ -10,7 +10,9 @@ This site is generated from Markdown.
 
 Create rich, dynamic web apps with ease, leveraging [Kotlin](https://kotlinlang.org/) and [Compose HTML](https://github.com/JetBrains/compose-multiplatform#compose-html).
 
-Markdown also supports
+Markdown of course supports **bold**, _italic_, and _**bold italic**_ text.
+
+It also supports
 
 ```
 Multi-line
