@@ -654,6 +654,63 @@ fun PostPage() {
 > conflict, then the dynamic route parameters will take precedence. (You can still access the query parameter value via
 > `ctx.route.queryParams` in this case if necessary.)
 
+#### Catch-all dynamic routes
+
+As seen above, dynamic routes so far capture a single part of the entire route, e.g. `"/users/{user}/profile"` capturing
+`"bitspittle"` in the URL `"/users/bitspittle/profile"`.
+
+Kobweb also supports catch-all dynamic routes, which capture the remainder of the URL, at which point the page can parse
+it and handle it as it sees fit.
+
+To create a catch-all route, prepend your dynamic route name with an ellipsis.
+
+For example, the catch-all route `"/a/b/c/{...rest}"` would capture `"x/y/z"` in the URL `"/a/b/c/x/y/z"`.
+
+In practice, it looks like this:
+
+```kotlin
+// pages/com/mysite/store/products/ProductDetails.kt
+
+@Page("{...product-details}")
+@Composable
+fun ProductDetailsPage() {
+    val ctx = rememberPageContext()
+    val productDetails = remember(ctx.route.path) { ctx.route.params.getValue("product-details").split("/") }
+    /* ... */
+}
+```
+
+It's not expected that many sites will ever use a catch-all route, but in the above case, you could use the captured
+value as a way to encode fluid details of a product, perhaps with sub-routes contextually depending on the root
+category. For example, the above page could handle `/store/products/home-and-garden/hoses/19528` (depth = 3),
+`/store/products/electronics/phones/google/pixel/4a` (depth = 5), and whatever other scheme each department demands.
+
+Of course, it is better to provide a more structured solution if you can (e.g. declaring a page route like
+`/store/products/{category}/{subcategory}/{product}`), but reality can be messy sometimes.
+
+> [!CAUTION]
+> Catch-all route parts MUST terminate the route. The following is not valid and will result in an exception being
+> thrown: `"/a/b/c/{...middle}/x/y/z"`.
+
+##### Optional catch-all routes
+
+Note that `"a/b/c/{...rest}"` will NOT match `"/a/b/c/"`. If you want to additionally support the empty case, you can
+add a question mark to the end of the name, e.g. `"/a/b/c/{...rest?}"`.
+
+Using this feature, you could even discard Kobweb's routing logic entirely and handle everything yourself:
+
+```kotlin
+// com/mysite/pages/Index.kt
+
+@Page("{...path?}")
+@Composable
+fun CatchAllPage() {
+    val ctx = rememberPageContext()
+    val url = ctx.route.params.getValue("path")
+    /* ... */
+}
+```
+
 ## Public resources
 
 If you have a resource that you'd like to serve from your site, you handle this by placing it in your site's

@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.navigation
 
+import com.varabyte.truthish.assertAll
 import com.varabyte.truthish.assertThat
+import com.varabyte.truthish.assertThrows
 import kotlin.test.Test
 
 class RouteTreeTest {
@@ -56,14 +58,97 @@ class RouteTreeTest {
 
     @Test
     fun dynamicRoutesWork() {
-        val routeTree = RouteTree<DummyData>()
         val data = DummyData()
-        routeTree.register("/users/{user}/posts/{post}", data)
-        routeTree.resolve("/users/123/posts/11")!!.captureDynamicValues().let { dynamicParams ->
-            assertThat(dynamicParams).containsExactly(
-                "user" to "123",
-                "post" to "11"
-            )
+        run {
+            val routeTree = RouteTree<DummyData>()
+            routeTree.register("/users/{user}/posts/{post}", data)
+            routeTree.resolve("/users/123/posts/11")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly(
+                    "user" to "123",
+                    "post" to "11"
+                )
+            }
+        }
+
+        run {
+            val routeTree = RouteTree<DummyData>()
+            routeTree.register("/games/{...slug}", data)
+            routeTree.resolve("/games/frogger")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly("slug" to "frogger")
+            }
+            routeTree.resolve("/games/space-invaders/difficulty/easy")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly("slug" to "space-invaders/difficulty/easy")
+            }
+
+            assertThat(routeTree.resolve("/games/")).isNull()
+        }
+
+        run {
+            val routeTree = RouteTree<DummyData>()
+            routeTree.register("/games/{...slug?}", data)
+            routeTree.resolve("/games/frogger")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly("slug" to "frogger")
+            }
+            routeTree.resolve("/games/space-invaders/difficulty/easy")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly("slug" to "space-invaders/difficulty/easy")
+            }
+
+            routeTree.resolve("/games/")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly("slug" to "")
+            }
+
+            assertThat(routeTree.resolve("/games")).isNull()
+        }
+
+        run {
+            val routeTree = RouteTree<DummyData>()
+            routeTree.register("/{...slug?}", data)
+            routeTree.resolve("/")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly("slug" to "")
+            }
+            routeTree.resolve("/a/b/c")!!.captureDynamicValues().let { dynamicParams ->
+                assertThat(dynamicParams).containsExactly("slug" to "a/b/c")
+            }
+        }
+    }
+
+    @Test
+    fun catchAllDynamicRoutesMustBeTheLastPartOfTheRoute() {
+        val data = DummyData()
+        assertThrows<IllegalStateException> {
+            val routeTree = RouteTree<DummyData>()
+            routeTree.register("/a/b/{...slug}/etc", data)
+        }.let { ex ->
+            assertAll {
+                that(ex.message!!).contains("{...slug}")
+                that(ex.message!!).contains("etc")
+            }
+        }
+    }
+
+    @Test
+    fun dynamicRoutesCannotHaveSiblings() {
+        val data = DummyData()
+        assertThrows<IllegalStateException> {
+            val routeTree = RouteTree<DummyData>()
+            routeTree.register("/a/b/c", data)
+            routeTree.register("/a/{d}", data)
+        }.let { ex ->
+            assertAll {
+                that(ex.message!!).contains("b")
+                that(ex.message!!).contains("{d}")
+            }
+        }
+
+        assertThrows<IllegalStateException> {
+            val routeTree = RouteTree<DummyData>()
+            routeTree.register("/a/{d}", data)
+            routeTree.register("/a/b/c", data)
+        }.let { ex ->
+            assertAll {
+                that(ex.message!!).contains("b")
+                that(ex.message!!).contains("{d}")
+            }
         }
     }
 

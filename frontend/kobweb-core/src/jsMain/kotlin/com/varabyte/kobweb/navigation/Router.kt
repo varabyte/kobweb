@@ -119,13 +119,7 @@ class Router {
             .filter { nodeList -> nodeList.last().data != null }
             .map { nodeList ->
             RouteEntry(
-                nodeList.joinToString("/") { node ->
-                    if (node is RouteTree.DynamicNode) {
-                        "{${node.name}}"
-                    } else {
-                        node.name
-                    }
-                },
+                nodeList.joinToString("/") { node -> node.sourceRoutePart },
                 nodeList.any { it is RouteTree.DynamicNode }
             )
         }
