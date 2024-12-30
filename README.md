@@ -3213,6 +3213,9 @@ suspend fun redirect(ctx: ApiContext) {
     if (ctx.req.method != HttpMethod.GET) return
     ctx.res.headers["Location"] = "..."
     ctx.res.status = 302
+  
+  // Note: A convenience method is provided for this:
+  // `ctx.res.setAsRedirect("...", 302)
 }
 ```
 
