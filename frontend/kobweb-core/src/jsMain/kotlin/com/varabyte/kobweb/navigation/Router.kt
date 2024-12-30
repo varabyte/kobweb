@@ -114,7 +114,10 @@ class Router {
      * ```
      */
     val routes: Sequence<RouteEntry>
-        get() = routeTree.nodes.map { nodeList ->
+        get() = routeTree.nodes
+            // Make sure we discard partial routes -- only the last node of actual routes have data attached to them
+            .filter { nodeList -> nodeList.last().data != null }
+            .map { nodeList ->
             RouteEntry(
                 nodeList.joinToString("/") { node ->
                     if (node is RouteTree.DynamicNode) {
