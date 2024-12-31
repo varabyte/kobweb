@@ -117,7 +117,7 @@ class KobwebPublishPlugin : Plugin<Project> {
             // Configure after evaluating to allow the user to set extension values first
             configurePublishing(config)
 
-            // AbstractPublishToMaven configured both maven local and remote maven publish tasks
+            // AbstractPublishToMaven configures both maven local and remote maven publish tasks
             tasks.withType<AbstractPublishToMaven>().configureEach {
                 // Declare predicate outside of `onlyIf` to avoid configuration cache issues
                 val predicate = project.provider { config.filter.get().invoke(publication) }
