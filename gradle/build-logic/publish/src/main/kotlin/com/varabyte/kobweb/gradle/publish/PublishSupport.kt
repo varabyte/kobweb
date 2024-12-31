@@ -7,6 +7,7 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.http.BasicAuthentication
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
@@ -18,21 +19,56 @@ internal fun Project.shouldPublishToGCloud(): Boolean {
         && findProperty("gcloud.artifact.registry.secret") != null
 }
 
+internal fun Project.shouldPublishToMavenCentral(): Boolean {
+    return (findProperty("kobweb.maven.publish") as? String).toBoolean()
+        && findProperty("ossrhToken") != null && findProperty("ossrhTokenPassword") != null
+}
+
 internal fun MavenArtifactRepository.gcloudAuth(project: Project) {
-    url = project.uri("https://us-central1-maven.pkg.dev/varabyte-repos/public")
-    credentials {
-        username = "_json_key_base64"
-        password = project.findProperty("gcloud.artifact.registry.secret") as String
+    with(project) {
+        url = uri("https://us-central1-maven.pkg.dev/varabyte-repos/public")
+        credentials {
+            username = "_json_key_base64"
+            password = findProperty("gcloud.artifact.registry.secret") as String
+        }
+        authentication {
+            create("basic", BasicAuthentication::class.java)
+        }
     }
-    authentication {
-        create("basic", BasicAuthentication::class.java)
+}
+
+fun MavenArtifactRepository.sonatypeAuth(project: Project) {
+    name = "SonatypeMaven"
+    with(project) {
+        url = if (!version.toString().endsWith("SNAPSHOT"))
+            uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+        else uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+
+        credentials {
+            username = findProperty("ossrhToken") as String
+            password = findProperty("ossrhTokenPassword") as String
+        }
+        authentication {
+            create<BasicAuthentication>("basic")
+        }
     }
 }
 
 internal fun PublishingExtension.prepareRepositories(project: Project) {
-    if (project.shouldSign() && project.shouldPublishToGCloud()) {
+    if (project.shouldPublishToGCloud()) {
         repositories {
-            maven { gcloudAuth(project) }
+            maven {
+                name = "GCloudMaven"
+                gcloudAuth(project)
+            }
+        }
+    }
+    if (project.shouldPublishToMavenCentral()) {
+        repositories {
+            maven {
+                name = "SonatypeMaven"
+                sonatypeAuth(project)
+            }
         }
     }
 }

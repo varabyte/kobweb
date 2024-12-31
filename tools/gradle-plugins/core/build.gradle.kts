@@ -2,6 +2,7 @@ import java.util.*
 
 plugins {
     `kotlin-dsl`
+    id("kobweb-gradle-portal")
     id("com.varabyte.kobweb.internal.publish")
     alias(libs.plugins.kotlinx.serialization)
 }
@@ -23,7 +24,7 @@ dependencies {
     api(projects.tools.processorCommon)
 }
 
-val DESCRIPTION = "A Gradle plugin that provides common support for the Library and Application plugins."
+val DESCRIPTION = "Provides common support for Kobweb library and application plugins."
 gradlePlugin {
     plugins {
         create("kobwebLibrary") {

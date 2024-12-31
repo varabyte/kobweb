@@ -1,5 +1,6 @@
 plugins {
     `kotlin-dsl`
+    id("kobweb-gradle-portal")
     id("com.varabyte.kobweb.internal.publish")
     alias(libs.plugins.kotlinx.serialization)
 }
@@ -20,7 +21,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 }
 
-val DESCRIPTION = "A Gradle plugin that helps wrap vanilla web workers with type-safe APIs"
+val DESCRIPTION = "Wraps vanilla web workers with type-safe APIs that can be consumed by a Kobweb application."
 gradlePlugin {
     plugins {
         create("kobwebWorker") {

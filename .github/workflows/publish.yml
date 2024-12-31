@@ -2,6 +2,19 @@ name: Publish Kobweb artifacts
 
 on:
   workflow_dispatch:
+    inputs:
+      repo-gcloud:
+        type: boolean
+        description: "Repository: GCloud"
+        default: true
+      repo-sonatype:
+        type: boolean
+        description: "Repository: Sonatype"
+        default: true
+      repo-gradle-portal:
+        type: boolean
+        description: "Repository: Gradle Plugin Portal (release only)"
+        default: false
 
 jobs:
   publish:
@@ -35,5 +48,14 @@ jobs:
           echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
 
-      - name: Publish Kobweb artifacts
-        run: ./gradlew publish
+      - name: Publish Kobweb artifacts (GCloud)
+        if: inputs.repo-gcloud
+        run: ./gradlew publishAllPublicationsToGCloudMavenRepository --no-daemon
+
+      - name: Publish Kobweb artifacts (Sonatype)
+        if: inputs.repo-sonatype
+        run: ./gradlew publishAllPublicationsToSonatypeMavenRepository --no-daemon
+
+      - name: Publish Kobweb artifacts (Gradle Plugin Portal)
+        if: inputs.repo-gradle-portal
+        run: ./gradlew publishPlugins --no-daemon

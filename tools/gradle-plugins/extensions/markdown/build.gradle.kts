@@ -1,5 +1,6 @@
 plugins {
     `kotlin-dsl`
+    id("kobweb-gradle-portal")
     id("com.varabyte.kobweb.internal.publish")
 }
 
@@ -20,7 +21,7 @@ dependencies {
     compileOnly(projects.tools.gradlePlugins.core)
 }
 
-val DESCRIPTION = "A Gradle plugin that adds markdown support to a Kobweb project"
+val DESCRIPTION = "Adds markdown support to a Kobweb project."
 gradlePlugin {
     plugins {
         create("kobwebxMarkdown") {
