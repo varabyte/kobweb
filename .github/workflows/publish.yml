@@ -50,12 +50,12 @@ jobs:
 
       - name: Publish Kobweb artifacts (GCloud)
         if: inputs.repo-gcloud
-        run: ./gradlew publishAllPublicationsToGCloudMavenRepository --no-daemon
+        run: ./gradlew publishAllPublicationsToGCloudMavenRepository
 
       - name: Publish Kobweb artifacts (Sonatype)
         if: inputs.repo-sonatype
-        run: ./gradlew publishAllPublicationsToSonatypeMavenRepository --no-daemon
+        run: ./gradlew publishAllPublicationsToSonatypeMavenRepository
 
       - name: Publish Kobweb artifacts (Gradle Plugin Portal)
         if: inputs.repo-gradle-portal
-        run: ./gradlew publishPlugins --no-daemon
+        run: ./gradlew publishPlugins
