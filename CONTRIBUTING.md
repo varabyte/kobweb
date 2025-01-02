@@ -39,12 +39,18 @@ These rules are NOT dogma. I am always open to exceptions, but be ready to expla
 
 ## Kobweb Development
 
-### Latest Branch
+### Dev Branch
 
 Kobweb development does *NOT* happen on `main`. You should consider the `main` branch as effectively read-only.
 
-Instead, work is done on the latest version branch. For example, if the current version of Kobweb is "1.2.3", then look
-for an active branch named "1.2.4" *or* "1.3.0".
+Instead, almost all work is done on the `dev` branch.
+
+Occasionally, we may cut off a version branch for a limited time as we prepare for a release. The chance you will
+even have to be aware of this is extremely slim. Unless you are helping us prepare for that release, you should
+just continue working against the `dev` branch.
+
+Any PRs made against the main branch will be (politely!) informed about this section in the CONTRIBUTING doc and
+asked to be rebased against `dev`.
 
 ### Kobweb Playground
 
@@ -66,7 +72,7 @@ probably be fairly rare, but I'm open to it if you think they will be useful for
 
 #### Development Server
 
-If you want to get a breakpoint in a Kobweb server, then instead of using `kobweb run` in the playground folder,
+If you want to set a breakpoint in a Kobweb server, then instead of using `kobweb run` in the playground folder,
 run the "Playground Server" run configuration provided in the Playground project instead.
 
 You'll lose the convenient live reloading experience with this approach, but it can be very useful when you're focusing
@@ -90,13 +96,14 @@ Finally, (and optionally), I like to restrict my maven local declaration to just
 
 ```kotlin
 mavenLocal {
-    content {
-        includeGroupAndSubgroups("com.varabyte.kobweb")
-        includeGroupAndSubgroups("com.varabyte.kobwebx")
-    }
+    content { includeGroupByRegex("com\\.varabyte\\.kobweb.*") }
 }
 ```
 
 ## Thanks!!
 
 Thank you, again, for choosing to help out on Kobweb.
+
+If you have any questions, please see the README
+[Connecting with us](https://github.com/varabyte/kobweb?tab=readme-ov-file#connecting-with-us)
+section for options on how to get in touch with someone.
