@@ -27,7 +27,7 @@ dependencies {
 val DESCRIPTION = "Provides common support for Kobweb library and application plugins."
 gradlePlugin {
     plugins {
-        create("kobwebLibrary") {
+        create("kobwebCore") {
             id = "com.varabyte.kobweb.core"
             displayName = "Kobweb Core Plugin"
             description = DESCRIPTION
