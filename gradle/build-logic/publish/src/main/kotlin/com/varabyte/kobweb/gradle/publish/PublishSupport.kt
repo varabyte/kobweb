@@ -8,11 +8,13 @@ import org.gradle.api.component.SoftwareComponentContainer
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.authentication.http.BasicAuthentication
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
+import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
@@ -124,19 +126,17 @@ internal fun PublishingExtension.addVarabyteArtifact(
         }
     }
 
-    // The Kotlin multiplatform plugin doesn't automatically add javadoc jars, so we use dokka to generate them
-    // ourselves. We skip this for java projects, as this is already accomplished above via the withJavadocJar() call.
-    val javadocJar = project.tasks.dokkaHtmlJar.takeIf { project.isKotlinMultiplatform }
     publications.withType<MavenPublication>().configureEach {
-        // For now, only generate a javadoc for the JVM target. It's the only artifact type enforced by maven central,
-        // and if I target multiple targets, I'm getting errors like
-        // ```
-        // Task ':publishJsPublicationToMavenLocal' uses this output of task ':signJvmPublication' without declaring an
-        // explicit or implicit dependency. This can lead to incorrect results being produced, depending on what order
-        // the tasks are executed.
-        // ```
-        // Maybe figure something out later?
-        javadocJar?.takeIf { name == "jvm" }?.let { artifact(it) }
+        project.tasks.dokkaHtmlJar
+            // For now, only generate a javadoc for the JVM target. It's the only artifact type enforced by maven
+            // central, and if I allow all targets, it adds ~20MB of extra files across all modules. We can easily
+            // remove this line later if it becomes obvious there's value in supporting javadocs for all targets.
+            .takeIf { this.name == "jvm" }
+            // The Kotlin multiplatform plugin doesn't automatically add javadoc jars, so we use dokka to generate them
+            // ourselves. We skip this for java projects, as this is already accomplished above via the withJavadocJar()
+            // call.
+            .takeIf { project.isKotlinMultiplatform }
+            ?.let { javadocJar -> artifact(javadocJar) }
 
         if (artifactId != null) {
             this.artifactId = artifactId.invoke(this.name)
@@ -210,6 +210,12 @@ internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
     }
 
     if (shouldSign()) {
+        // Workaround for https://youtrack.jetbrains.com/issue/KT-61858
+        val signingTasks = tasks.withType<Sign>()
+        tasks.withType<AbstractPublishToMaven>().configureEach {
+            mustRunAfter(signingTasks)
+        }
+
         signing {
             val secretKeyRingExists = (findProperty("signing.secretKeyRingFile") as? String)
                 ?.let { File(it).exists() }
