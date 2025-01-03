@@ -16,10 +16,32 @@ import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.utils.named
 import javax.inject.Inject
 
-// In some cases, we aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
-// libraries, but they need to be defined in a multiplatform module because it does extra Compose-related
-// processing on the artifacts as a side effect. For simplicity in our maven repo, though, we only send
-// the JS bits.
+/**
+ * A filter that prevents artifacts for the "common" part of multiplatform output from getting published.
+ *
+ * In some cases, we aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
+ * libraries, but they need to be defined in a multiplatform module because that's a Kotlin/JS requirement. For
+ * simplicity, though, we only send the JS bits - there is no need to export the additional "common" bits.
+ *
+ * (This of this like when you export a JVM-only module. You only product the JVM artifacts. That's what we're doing
+ * here, but for JS.)
+ *
+ * Callers who use this are also expected to set the artifact ID directly, so there isn't an unnecessary "-js" suffix
+ * added to the artifact filename.
+ * ```
+ * // With filter:
+ * kobwebPublication {
+ *    artifactId.set("example-artifact")
+ *    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
+ * }
+ *
+ * // Without filter:
+ * kobwebPublication {
+ *   // Generates "example-artifact", "example-artifact-js", and "example-artifact-jvm"
+ *   artifactId.setForMultiplatform("example-artifact")
+ * }
+ * ```
+ */
 val FILTER_OUT_MULTIPLATFORM_PUBLICATIONS: (Publication) -> Boolean = { it.name != "kotlinMultiplatform" }
 
 abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactory) {
