@@ -3,7 +3,7 @@
 <br>
 [![kotlin: 2.1.0](https://img.shields.io/badge/kotlin-2.1.0-blue?logo=kotlin)](COMPATIBILITY.md)
 [![compose: 1.7.3](https://img.shields.io/badge/compose-1.7.3-blue?logo=jetpackcompose)](COMPATIBILITY.md)
-[![ktor: 3.0.0](https://img.shields.io/badge/ktor-3.0.0-blue)](https://ktor.io/)
+[![ktor: 3.0.3](https://img.shields.io/badge/ktor-3.0.3-blue)](https://ktor.io/)
 <br>
 [![Varabyte Discord](https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/5NZ2GKV5Cs)
 [![Kotlin Slack](https://img.shields.io/badge/%23Kobweb-4A154B?logo=slack&logoColor=white)](https://kotlinlang.slack.com/archives/C04RTD72RQ8)
