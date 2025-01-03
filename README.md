@@ -4384,7 +4384,7 @@ interface SomeKind : ComponentKind
 val SomeStyle = CssStyle<SomeKind> { /* ... */ } // "component-styles"
 val SomeVariant = SomeStyle.addVariant { /* ... */ } // "component-variants"
 class ButtonSize(/*...*/) : CssStyle.Base(/*...*/) // "restricted-styles"
-val GeneralStyle = CssSTyle { /* ... */ } // "general-styles"
+val GeneralStyle = CssStyle { /* ... */ } // "general-styles"
 ```
 
 We chose this order to ensure that CSS styles are layered in ways that match intuition; for example, a style's variant
