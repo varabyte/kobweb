@@ -26,7 +26,8 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Markdown")
     artifactId.set("kobwebx-markdown")
-    description.set("Classes useful for projects using the Kobweb markdown plugin")
+    description.set("Classes useful for projects using the Kobweb markdown plugin.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

@@ -16,7 +16,8 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Worker Interface")
     artifactId.set("kobweb-worker-interface")
-    description.set("Common interface for worker implementations")
+    description.set("Common interface for worker implementations.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

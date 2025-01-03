@@ -24,6 +24,11 @@ abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactor
     }
 
     /**
+     * A human-readable display name for this artifact.
+     */
+    abstract val artifactName: Property<String>
+
+    /**
      * Provide an artifact ID given the name of the publication.
      *
      * The string passed in will be the name of the current publication target, e.g. "js", "jvm", "kotlinMultiplatform"

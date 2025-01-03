@@ -14,6 +14,7 @@ dependencies {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Processor Common")
     artifactId.set("kobweb-processor-common")
     description.set("Common code shared between KSP and Gradle code responsible for processing a Kobweb project")
 }

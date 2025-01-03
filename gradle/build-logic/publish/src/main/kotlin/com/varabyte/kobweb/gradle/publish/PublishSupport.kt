@@ -74,12 +74,17 @@ internal fun PublishingExtension.prepareRepositories(project: Project) {
 }
 
 /**
+ * @param artifactName A display name for the artifact. Should almost always be set, but can be null if somewhere else
+ *   ends up being responsible for setting the maven publication's name (e.g. like the `gradlePlugin` block). If a name
+ *   ultimately never gets registered, publishing artifacts locally will work but maven central will reject it.
+ *
  * @param artifactId Can be null if we want to let the system use the default value for this project.
  *   This is particularly useful for publishing Gradle plugins, which does some of its own magic that we don't want
  *   to fight with.
  */
 internal fun PublishingExtension.addVarabyteArtifact(
     project: Project,
+    artifactName: String?,
     artifactId: ((String) -> String)?,
     relocationDetails: KobwebPublicationConfig.RelocationDetails,
     description: String?,
@@ -98,12 +103,6 @@ internal fun PublishingExtension.addVarabyteArtifact(
         if (publications.none { it is MavenPublication }) {
             check(javaComponent != null) // This seems to always be true so far
             publications.register("maven", MavenPublication::class.java) {
-                groupId = project.group.toString()
-                if (artifactId != null) {
-                    this.artifactId = artifactId.invoke(this.name)
-                }
-                version = project.version.toString()
-
                 from(javaComponent)
             }
         }
@@ -126,11 +125,33 @@ internal fun PublishingExtension.addVarabyteArtifact(
             this.artifactId = artifactId.invoke(this.name)
         }
         pom {
+            val githubPath = "https://github.com/varabyte/kobweb"
+            url.set(githubPath)
+            if (artifactName != null) this.name.set(artifactName)
             description?.let { this.description.set(it) }
             site?.let { this.url.set(it) }
+            scm {
+                url.set(githubPath)
+                val connectionPath = "scm:git:${githubPath}.git"
+                connection.set(connectionPath)
+                developerConnection.set(connectionPath)
+            }
+            developers {
+                developer {
+                    id.set("bitspittle")
+                    name.set("David Herman")
+                    email.set("bitspittle@gmail.com")
+                    url.set("https://github.com/bitspittle")
+                }
+                developer {
+                    id.set("dennistsar")
+                    name.set("Dennis Tsar")
+                    url.set("https://github.com/dennistsar")
+                }
+            }
             licenses {
                 license {
-                    name.set("The Apache License, Version 2.0")
+                    name.set("Apache-2.0")
                     url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
                 }
             }
@@ -139,7 +160,7 @@ internal fun PublishingExtension.addVarabyteArtifact(
 }
 
 private val Project.java: JavaPluginExtension?
-    get() = extensions.getByName("java") as? JavaPluginExtension
+    get() = extensions.findByName("java") as? JavaPluginExtension
 
 private val Project.publishing: PublishingExtension
     get() = extensions.getByName("publishing") as PublishingExtension
@@ -157,6 +178,7 @@ internal fun Project.configurePublishing(config: KobwebPublicationConfig) {
         prepareRepositories(project)
         addVarabyteArtifact(
             project,
+            config.artifactName.orNull,
             config.artifactId.orNull,
             config.relocationDetails,
             config.description.orNull,

@@ -27,22 +27,20 @@ dependencies {
     implementation(projects.common.kobwebCommon)
 }
 
-val DESCRIPTION = "Generates boilerplate for a Kobweb application."
 gradlePlugin {
     plugins {
         create("kobwebApplication") {
             id = "com.varabyte.kobweb.application"
             displayName = "Kobweb Application Plugin"
-            description = DESCRIPTION
+            description = "Generates boilerplate for a Kobweb application."
             implementationClass = "com.varabyte.kobweb.gradle.application.KobwebApplicationPlugin"
+
+            kobwebPublication {
+                artifactName.set(this@create.displayName)
+                description.set(this@create.description)
+            }
         }
     }
-}
-
-kobwebPublication {
-    // Leave artifactId blank. It will be set to the name of this module, and then the gradlePlugin step does some
-    // additional tweaking that we don't want to interfere with.
-    description.set(DESCRIPTION)
 }
 
 val serverJar by configurations.registering {

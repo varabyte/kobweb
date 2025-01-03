@@ -32,7 +32,8 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Silk Foundation")
     artifactId.set("silk-foundation")
-    description.set("The foundational layer of Silk that provides general purpose styling functionality like component styles, keyframes, and .")
+    description.set("The foundational layer of Silk that provides general purpose styling via CSS style blocks and functionality like CSS breakpoints, keyframes, animations, light/dark color modes, and theming support.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

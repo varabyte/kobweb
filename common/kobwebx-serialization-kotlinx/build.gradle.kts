@@ -33,6 +33,7 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Serialization Utilities for Kotlinx")
     artifactId.setForMultiplatform("kobwebx-serialization-kotlinx")
     description.set("Generally useful Kotlinx Serialization extensions for various Kobweb APIs.")
 }

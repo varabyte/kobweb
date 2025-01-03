@@ -33,7 +33,8 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Core")
     artifactId.set("kobweb-core")
-    description.set("An opinionated framework making it easy to build web apps, leveraging Kotlin and Compose")
+    description.set("Core classes and annotations in the Kobweb framework for defining pages and handling routing on the frontend.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

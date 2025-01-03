@@ -27,6 +27,7 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Browser Extensions")
     artifactId.set("browser-ext")
     description.set("Generally useful Kotlin/JS extensions for the browser (not Node) APIs that could potentially move upstream someday.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)

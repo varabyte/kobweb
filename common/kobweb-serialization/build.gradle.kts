@@ -17,6 +17,7 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Serialization")
     artifactId.setForMultiplatform("kobweb-serialization")
     description.set("A collection of utility classes related to serialization.")
 }

@@ -8,16 +8,12 @@ plugins {
 group = "com.varabyte.kobweb"
 version = libs.versions.kobweb.libs.get()
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 dependencies {
     implementation(projects.common.clientServerInternal)
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb API")
     artifactId.set("kobweb-api")
-    description.set("Classes related to extending API routes handled by a Kobweb server")
+    description.set("Core classes and annotations in the Kobweb framework for defining API routes and API streams on the backend.")
 }

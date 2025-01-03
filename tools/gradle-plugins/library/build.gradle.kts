@@ -25,20 +25,18 @@ dependencies {
     implementation(projects.common.kobwebCommon)
 }
 
-val DESCRIPTION = "Generates metadata for a Kobweb library that can then be consumed by a Kobweb application."
 gradlePlugin {
     plugins {
         create("kobwebLibrary") {
             id = "com.varabyte.kobweb.library"
             displayName = "Kobweb Library Plugin"
-            description = DESCRIPTION
+            description = "Generates metadata for a Kobweb library that can then be consumed by a Kobweb application."
             implementationClass = "com.varabyte.kobweb.gradle.library.KobwebLibraryPlugin"
+
+            kobwebPublication {
+                artifactName.set(this@create.displayName)
+                description.set(this@create.description)
+            }
         }
     }
-}
-
-kobwebPublication {
-    // Leave artifactId blank. It will be set to the name of this module, and then the gradlePlugin step does some
-    // additional tweaking that we don't want to interfere with.
-    description.set(DESCRIPTION)
 }

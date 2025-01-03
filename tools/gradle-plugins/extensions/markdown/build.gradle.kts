@@ -21,20 +21,18 @@ dependencies {
     compileOnly(projects.tools.gradlePlugins.core)
 }
 
-val DESCRIPTION = "Adds markdown support to a Kobweb project."
 gradlePlugin {
     plugins {
         create("kobwebxMarkdown") {
             id = "com.varabyte.kobwebx.markdown"
             displayName = "Kobwebx Markdown Plugin"
-            description = DESCRIPTION
+            description = "Adds markdown support to a Kobweb project."
             implementationClass = "com.varabyte.kobwebx.gradle.markdown.KobwebxMarkdownPlugin"
+
+            kobwebPublication {
+                artifactName.set(this@create.displayName)
+                description.set(this@create.description)
+            }
         }
     }
-}
-
-kobwebPublication {
-    // Leave artifactId blank. It will be set to the name of this module, and then the gradlePlugin step does some
-    // additional tweaking that we don't want to interfere with.
-    description.set(DESCRIPTION)
 }

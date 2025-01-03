@@ -23,7 +23,8 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Worker")
     artifactId.set("kobweb-worker")
-    description.set("Utility classes for creating a type-safe web worker in Kobweb")
+    description.set("Utility classes for creating a type-safe web worker in Kobweb.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

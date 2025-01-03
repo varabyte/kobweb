@@ -15,6 +15,7 @@ dependencies {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb KSP Extensions")
     artifactId.set("kobweb-ksp-ext")
     description.set("Useful KSP utility methods that are shared across projects.")
 }

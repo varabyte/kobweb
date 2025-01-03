@@ -24,22 +24,20 @@ dependencies {
     api(projects.tools.processorCommon)
 }
 
-val DESCRIPTION = "Provides common support for Kobweb library and application plugins."
 gradlePlugin {
     plugins {
         create("kobwebCore") {
             id = "com.varabyte.kobweb.core"
             displayName = "Kobweb Core Plugin"
-            description = DESCRIPTION
+            description = "Provides common support for Kobweb library and application plugins."
             implementationClass = "com.varabyte.kobweb.gradle.core.KobwebCorePlugin"
+
+            kobwebPublication {
+                artifactName.set(this@create.displayName)
+                description.set(this@create.description)
+            }
         }
     }
-}
-
-kobwebPublication {
-    // Leave artifactId blank. It will be set to the name of this module, and then the gradlePlugin step does some
-    // additional tweaking that we don't want to interfere with.
-    description.set(DESCRIPTION)
 }
 
 // Make the version available to the plugin code, so that it can be used to determine the version of the ksp processor

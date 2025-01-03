@@ -16,12 +16,8 @@ dependencies {
     compileOnlyApi(libs.bundles.ktor)
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 kobwebPublication {
+    artifactName.set("Kobweb Server Plugin")
     artifactId.set("kobweb-server-plugin")
-    description.set("A plugin API that users can implement to run custom code on a Kobweb server")
+    description.set("A plugin API that users can implement to run custom code on a Kobweb server.")
 }

@@ -21,6 +21,7 @@ dependencies {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Common")
     artifactId.set("kobweb-common")
     description.set("A collection of utility classes for interacting with a Kobweb project needed by both frontend and backend codebases.")
 }

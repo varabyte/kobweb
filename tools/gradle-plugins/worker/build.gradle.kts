@@ -21,22 +21,20 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 }
 
-val DESCRIPTION = "Wraps vanilla web workers with type-safe APIs that can be consumed by a Kobweb application."
 gradlePlugin {
     plugins {
         create("kobwebWorker") {
             id = "com.varabyte.kobweb.worker"
             displayName = "Kobweb Worker Plugin"
-            description = DESCRIPTION
+            description = "Wraps vanilla web workers with type-safe APIs that can be consumed by a Kobweb application."
             implementationClass = "com.varabyte.kobweb.gradle.worker.KobwebWorkerPlugin"
+
+            kobwebPublication {
+                artifactName.set(this@create.displayName)
+                description.set(this@create.description)
+            }
         }
     }
-}
-
-kobwebPublication {
-    // Leave artifactId blank. It will be set to the name of this module, and then the gradlePlugin step does some
-    // additional tweaking that we don't want to interfere with.
-    description.set(DESCRIPTION)
 }
 
 //tasks.register<Copy>("copyServerJar") {

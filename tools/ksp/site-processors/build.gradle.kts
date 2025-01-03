@@ -17,6 +17,7 @@ dependencies {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb KSP Site Processors")
     artifactId.set("kobweb-ksp-site-processors")
     description.set("KSP processors for Kobweb library and app modules, generating both frontend and backend metadata.")
 }

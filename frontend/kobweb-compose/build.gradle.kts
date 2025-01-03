@@ -31,7 +31,8 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Compose")
     artifactId.set("kobweb-compose")
-    description.set("Additions to Web Compose that attempt to mimic Jetpack Compose as much as possible")
+    description.set("Additions to Compose HTML that attempt to mimic Jetpack Compose as much as possible (e.g. Box, Row, Column).")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

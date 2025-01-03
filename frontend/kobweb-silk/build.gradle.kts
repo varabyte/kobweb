@@ -29,6 +29,7 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Silk")
     artifactId.set("kobweb-silk")
     description.set("An artifact that includes all relevant Silk dependencies and glues them together.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)

@@ -27,7 +27,8 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Silk Widgets")
     artifactId.set("silk-widgets-kobweb")
-    description.set("Silk UI components tightly integrated with Kobweb functionality -- they cannot be used without Kobweb")
+    description.set("Silk UI components tightly integrated with Kobweb functionality -- they cannot be used without Kobweb.")
     filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

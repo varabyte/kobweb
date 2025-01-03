@@ -27,6 +27,7 @@ kotlin {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb Client Server Internal")
     artifactId.setForMultiplatform("kobweb-client-server-internal")
-    description.set("Miscellaneous multiplatform common classes and utilities shared between Kobweb core and server codebases")
+    description.set("Miscellaneous multiplatform classes and utilities shared between Kobweb core and server codebases. This is published for compilation purposes but users are not expected to depend on this artifact directly themselves.")
 }

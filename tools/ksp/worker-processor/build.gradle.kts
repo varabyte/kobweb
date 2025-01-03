@@ -15,6 +15,7 @@ dependencies {
 }
 
 kobwebPublication {
+    artifactName.set("Kobweb KSP Worker Processor")
     artifactId.set("kobweb-ksp-worker-processor")
     description.set("KSP processor that generates boilerplate code for Kobweb worker modules.")
 }
