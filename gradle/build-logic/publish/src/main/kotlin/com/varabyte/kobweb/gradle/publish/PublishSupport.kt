@@ -3,14 +3,18 @@ package com.varabyte.kobweb.gradle.publish
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.component.SoftwareComponent
+import org.gradle.api.component.SoftwareComponentContainer
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.http.BasicAuthentication
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 
 internal fun Project.shouldSign() = (findProperty("kobweb.sign") as? String).toBoolean()
@@ -91,7 +95,7 @@ internal fun PublishingExtension.addVarabyteArtifact(
     site: String?,
 ) {
     if (!relocationDetails.artifactId.isPresent) {
-        val javaComponent = project.components.findByName("java")
+        val javaComponent = project.components.java
         if (javaComponent != null) {
             project.java?.let {
                 it.withJavadocJar()
@@ -120,7 +124,20 @@ internal fun PublishingExtension.addVarabyteArtifact(
         }
     }
 
+    // The Kotlin multiplatform plugin doesn't automatically add javadoc jars, so we use dokka to generate them
+    // ourselves. We skip this for java projects, as this is already accomplished above via the withJavadocJar() call.
+    val javadocJar = project.tasks.dokkaHtmlJar.takeIf { project.isKotlinMultiplatform }
     publications.withType<MavenPublication>().configureEach {
+        // For now, only generate a javadoc for the JVM target. It's the only artifact type enforced by maven central,
+        // and if I target multiple targets, I'm getting errors like
+        // ```
+        // Task ':publishJsPublicationToMavenLocal' uses this output of task ':signJvmPublication' without declaring an
+        // explicit or implicit dependency. This can lead to incorrect results being produced, depending on what order
+        // the tasks are executed.
+        // ```
+        // Maybe figure something out later?
+        javadocJar?.takeIf { name == "jvm" }?.let { artifact(it) }
+
         if (artifactId != null) {
             this.artifactId = artifactId.invoke(this.name)
         }
@@ -161,6 +178,12 @@ internal fun PublishingExtension.addVarabyteArtifact(
 
 private val Project.java: JavaPluginExtension?
     get() = extensions.findByName("java") as? JavaPluginExtension
+
+private val Project.isKotlinMultiplatform: Boolean
+    get() = extensions.findByType<KotlinMultiplatformExtension>() != null
+
+private val SoftwareComponentContainer.java: SoftwareComponent?
+    get() = findByName("java")
 
 private val Project.publishing: PublishingExtension
     get() = extensions.getByName("publishing") as PublishingExtension

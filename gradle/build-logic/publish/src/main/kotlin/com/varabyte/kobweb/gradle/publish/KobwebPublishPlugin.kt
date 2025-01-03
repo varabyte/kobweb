@@ -3,11 +3,17 @@ package com.varabyte.kobweb.gradle.publish
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.Property
 import org.gradle.api.publish.Publication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
+import org.gradle.api.tasks.TaskContainer
+import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
+import org.jetbrains.kotlin.gradle.utils.named
 import javax.inject.Inject
 
 // In some cases, we aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
@@ -101,6 +107,11 @@ fun Property<(String) -> String>.setForMultiplatform(value: String) {
     this.set { value + if (it == "kotlinMultiplatform") "" else "-$it" }
 }
 
+private const val DOKKA_HTML_JAR_TASK_NAME = "dokkaHtmlJar"
+
+val TaskContainer.dokkaHtmlJar: Provider<Jar>
+    get() = named<Jar>(DOKKA_HTML_JAR_TASK_NAME)
+
 /**
  * An internal plugin that helps configure and publish Varabyte artifacts to our maven repository.
  *
@@ -115,6 +126,14 @@ class KobwebPublishPlugin : Plugin<Project> {
         project.pluginManager.apply {
             apply("org.gradle.maven-publish")
             apply("org.gradle.signing")
+            apply("org.jetbrains.dokka")
+        }
+
+        val dokkaHtmlTask = project.tasks.named<DokkaGenerateTask>("dokkaGeneratePublicationHtml")
+        project.tasks.register<Jar>(DOKKA_HTML_JAR_TASK_NAME) {
+            dependsOn(dokkaHtmlTask)
+            from(dokkaHtmlTask.flatMap { it.outputDirectory })
+            archiveClassifier.set("javadoc")
         }
 
         val config = project.extensions.create<KobwebPublicationConfig>("kobwebPublication", project.objects)
