@@ -54,6 +54,8 @@ class AppBackendProcessor(
             }
         }
 
+        backendProcessor.process(resolver)
+
         return emptyList()
     }
 
