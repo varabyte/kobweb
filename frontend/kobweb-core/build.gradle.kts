@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -33,6 +31,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Core")
-    artifactId.setForMultiplatform("kobweb-core")
+    artifactId.set("kobweb-core")
     description.set("Core classes and annotations in the Kobweb framework for defining pages and handling routing on the frontend.")
 }

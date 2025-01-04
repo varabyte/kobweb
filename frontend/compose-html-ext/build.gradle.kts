@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -31,6 +29,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Compose HTML Extensions")
-    artifactId.setForMultiplatform("compose-html-ext")
+    artifactId.set("compose-html-ext")
     description.set("Generally useful Compose extensions that could potentially move upstream someday; until then, needed now for Kobweb.")
 }

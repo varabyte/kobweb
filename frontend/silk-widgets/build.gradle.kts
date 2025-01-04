@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -28,6 +26,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Silk Widgets")
-    artifactId.setForMultiplatform("silk-widgets")
+    artifactId.set("silk-widgets")
     description.set("A subset of Silk UI components that don't depend on Kobweb at all, extracted into their own library in case projects want to use it without Kobweb.")
 }

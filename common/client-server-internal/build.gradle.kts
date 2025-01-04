@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
@@ -28,6 +26,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Client Server Internal")
-    artifactId.setForMultiplatform("kobweb-client-server-internal")
+    artifactId.set("kobweb-client-server-internal")
     description.set("Miscellaneous multiplatform classes and utilities shared between Kobweb core and server codebases. This is published for compilation purposes but users are not expected to depend on this artifact directly themselves.")
 }

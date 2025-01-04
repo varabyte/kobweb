@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("com.varabyte.kobweb.internal.publish")
@@ -27,6 +25,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Browser Extensions")
-    artifactId.setForMultiplatform("browser-ext")
+    artifactId.set("browser-ext")
     description.set("Generally useful Kotlin/JS extensions for the browser (not Node) APIs that could potentially move upstream someday.")
 }

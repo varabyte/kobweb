@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -26,6 +24,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Markdown")
-    artifactId.setForMultiplatform("kobwebx-markdown")
+    artifactId.set("kobwebx-markdown")
     description.set("Classes useful for projects using the Kobweb markdown plugin.")
 }

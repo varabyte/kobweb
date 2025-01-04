@@ -91,7 +91,7 @@ internal fun PublishingExtension.prepareRepositories(project: Project) {
 internal fun PublishingExtension.addVarabyteArtifact(
     project: Project,
     artifactName: String?,
-    artifactId: ((String) -> String)?,
+    artifactId: String?,
     relocationDetails: KobwebPublicationConfig.RelocationDetails,
     description: String?,
     site: String?,
@@ -139,7 +139,13 @@ internal fun PublishingExtension.addVarabyteArtifact(
             ?.let { javadocJar -> artifact(javadocJar) }
 
         if (artifactId != null) {
-            this.artifactId = artifactId.invoke(this.name)
+            val platformName = this.name
+            this.artifactId = buildString {
+                append(artifactId)
+                when (platformName) {
+                    "js", "jvm" -> append("-$platformName")
+                }
+            }
         }
         pom {
             val githubPath = "https://github.com/varabyte/kobweb"

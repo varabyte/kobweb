@@ -28,15 +28,9 @@ abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactor
     /**
      * Provide an artifact ID given the name of the publication.
      *
-     * The string passed in will be the name of the current publication target, e.g. "js", "jvm", "kotlinMultiplatform"
-     *
-     * The name can be useful for disambiguation in case a single project generates multiple publications (such as
-     * multiplatform, js, and jvm artifacts).
-     *
-     * An extension method [set] is provided for the very common case where the user knows that they'll only be
-     * producing a single publication and don't care about disambiguating the final name.
+     * For multiplatform artifacts, this name will be automatically suffixed with the target name, e.g. "-js", "-jvm".
      */
-    abstract val artifactId: Property<(String) -> String>
+    abstract val artifactId: Property<String>
 
     /**
      * A human-readable description for this artifact.
@@ -68,25 +62,6 @@ abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactor
     init {
         site.convention("https://github.com/varabyte/kobweb")
     }
-}
-
-/**
- * Convenience setter for the common case where we aren't worried about disambiguation.
- *
- * This is useful when we know there's only one artifact that will get produced for this configuration (e.g. using the
- * jvm Gradle plugin and not the Kotlin Multiplatform plugin).
- */
-fun Property<(String) -> String>.set(value: String) {
-    this.set { value }
-}
-
-/**
- * Convenience setter for handling all artifact targets for a multiplatform module.
- *
- * A multiplatform target often generates N + 1 artifacts given N targets (e.g. js, jvm, and multiplatform metadata).
- */
-fun Property<(String) -> String>.setForMultiplatform(value: String) {
-    this.set { value + if (it == "kotlinMultiplatform") "" else "-$it" }
 }
 
 private const val DOKKA_HTML_JAR_TASK_NAME = "dokkaHtmlJar"

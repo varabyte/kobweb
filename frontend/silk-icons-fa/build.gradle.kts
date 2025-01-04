@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -200,6 +198,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Silk Icons (Font Awesome)")
-    artifactId.setForMultiplatform("silk-icons-fa")
+    artifactId.set("silk-icons-fa")
     description.set("A collection of composables that directly wrap Font Awesome icons.")
 }

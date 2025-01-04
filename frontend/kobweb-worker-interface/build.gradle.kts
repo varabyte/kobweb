@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("com.varabyte.kobweb.internal.publish")
@@ -16,6 +14,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Worker Interface")
-    artifactId.setForMultiplatform("kobweb-worker-interface")
+    artifactId.set("kobweb-worker-interface")
     description.set("Common interface for worker implementations.")
 }

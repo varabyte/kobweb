@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.set
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlinx.serialization)

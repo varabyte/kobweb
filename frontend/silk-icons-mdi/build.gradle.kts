@@ -1,5 +1,3 @@
-import com.varabyte.kobweb.gradle.publish.setForMultiplatform
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("kobweb-compose")
@@ -185,6 +183,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Silk Icons (Material Design Icons)")
-    artifactId.setForMultiplatform("silk-icons-mdi")
+    artifactId.set("silk-icons-mdi")
     description.set("A collection of composables that directly wrap Material Design Icons.")
 }
