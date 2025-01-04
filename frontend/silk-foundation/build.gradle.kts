@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -33,7 +32,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Silk Foundation")
-    artifactId.set("silk-foundation")
+    artifactId.setForMultiplatform("silk-foundation")
     description.set("The foundational layer of Silk that provides general purpose styling via CSS style blocks and functionality like CSS breakpoints, keyframes, animations, light/dark color modes, and theming support.")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

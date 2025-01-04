@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -34,7 +33,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Core")
-    artifactId.set("kobweb-core")
+    artifactId.setForMultiplatform("kobweb-core")
     description.set("Core classes and annotations in the Kobweb framework for defining pages and handling routing on the frontend.")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

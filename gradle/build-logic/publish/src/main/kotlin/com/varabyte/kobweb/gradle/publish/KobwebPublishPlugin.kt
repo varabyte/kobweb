@@ -3,46 +3,15 @@ package com.varabyte.kobweb.gradle.publish
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
 import org.gradle.api.provider.Property
-import org.gradle.api.publish.Publication
-import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 import org.jetbrains.kotlin.gradle.utils.named
 import javax.inject.Inject
-
-/**
- * A filter that prevents artifacts for the "common" part of multiplatform output from getting published.
- *
- * In some cases, we aren't REALLY publishing multiplatform libraries with Kobweb. Instead, we're publishing JS
- * libraries, but they need to be defined in a multiplatform module because that's a Kotlin/JS requirement. For
- * simplicity, though, we only send the JS bits - there is no need to export the additional "common" bits.
- *
- * (This of this like when you export a JVM-only module. You only product the JVM artifacts. That's what we're doing
- * here, but for JS.)
- *
- * Callers who use this are also expected to set the artifact ID directly, so there isn't an unnecessary "-js" suffix
- * added to the artifact filename.
- * ```
- * // With filter:
- * kobwebPublication {
- *    artifactId.set("example-artifact")
- *    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
- * }
- *
- * // Without filter:
- * kobwebPublication {
- *   // Generates "example-artifact", "example-artifact-js", and "example-artifact-jvm"
- *   artifactId.setForMultiplatform("example-artifact")
- * }
- * ```
- */
-val FILTER_OUT_MULTIPLATFORM_PUBLICATIONS: (Publication) -> Boolean = { it.name != "kotlinMultiplatform" }
 
 abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactory) {
     abstract class RelocationDetails {
@@ -82,13 +51,6 @@ abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactor
     abstract val site: Property<String>
 
     /**
-     * Whether this artifact should be published or not.
-     *
-     * The callback should return true to get published or false to get filtered out.
-     */
-    abstract val filter: Property<(Publication) -> Boolean>
-
-    /**
      * Set to non-null if this publication represents a relocation to another artifact.
      *
      * Relocations are useful if an artifact coordinate has changed, but you don't want projects using the old
@@ -105,16 +67,14 @@ abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactor
 
     init {
         site.convention("https://github.com/varabyte/kobweb")
-        filter.convention { true }
     }
 }
 
 /**
  * Convenience setter for the common case where we aren't worried about disambiguation.
  *
- * This can be either because we know there's only one artifact that will get produced for this configuration, OR
- * because we plan on using [KobwebPublicationConfig.filter] to remove other artifacts so we're not worried about a name
- * collision.
+ * This is useful when we know there's only one artifact that will get produced for this configuration (e.g. using the
+ * jvm Gradle plugin and not the Kotlin Multiplatform plugin).
  */
 fun Property<(String) -> String>.set(value: String) {
     this.set { value }
@@ -162,13 +122,6 @@ class KobwebPublishPlugin : Plugin<Project> {
         project.afterEvaluate {
             // Configure after evaluating to allow the user to set extension values first
             configurePublishing(config)
-
-            // AbstractPublishToMaven configures both maven local and remote maven publish tasks
-            tasks.withType<AbstractPublishToMaven>().configureEach {
-                // Declare predicate outside of `onlyIf` to avoid configuration cache issues
-                val predicate = project.provider { config.filter.get().invoke(publication) }
-                onlyIf { predicate.get() }
-            }
         }
     }
 }

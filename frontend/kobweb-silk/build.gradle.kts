@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -30,7 +29,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Silk")
-    artifactId.set("kobweb-silk")
+    artifactId.setForMultiplatform("kobweb-silk")
     description.set("An artifact that includes all relevant Silk dependencies and glues them together.")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

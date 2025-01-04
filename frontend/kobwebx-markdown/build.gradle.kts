@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -27,7 +26,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Markdown")
-    artifactId.set("kobwebx-markdown")
+    artifactId.setForMultiplatform("kobwebx-markdown")
     description.set("Classes useful for projects using the Kobweb markdown plugin.")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

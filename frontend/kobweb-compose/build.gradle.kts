@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -32,7 +31,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Compose")
-    artifactId.set("kobweb-compose")
+    artifactId.setForMultiplatform("kobweb-compose")
     description.set("Additions to Compose HTML that attempt to mimic Jetpack Compose as much as possible (e.g. Box, Row, Column).")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -28,7 +27,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Browser Extensions")
-    artifactId.set("browser-ext")
+    artifactId.setForMultiplatform("browser-ext")
     description.set("Generally useful Kotlin/JS extensions for the browser (not Node) APIs that could potentially move upstream someday.")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }

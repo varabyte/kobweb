@@ -1,5 +1,4 @@
-import com.varabyte.kobweb.gradle.publish.FILTER_OUT_MULTIPLATFORM_PUBLICATIONS
-import com.varabyte.kobweb.gradle.publish.set
+import com.varabyte.kobweb.gradle.publish.setForMultiplatform
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -186,7 +185,6 @@ kotlin {
 
 kobwebPublication {
     artifactName.set("Kobweb Silk Icons (Material Design Icons)")
-    artifactId.set("silk-icons-mdi")
+    artifactId.setForMultiplatform("silk-icons-mdi")
     description.set("A collection of composables that directly wrap Material Design Icons.")
-    filter.set(FILTER_OUT_MULTIPLATFORM_PUBLICATIONS)
 }
