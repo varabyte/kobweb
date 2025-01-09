@@ -36,17 +36,3 @@ gradlePlugin {
         }
     }
 }
-
-//tasks.register<Copy>("copyServerJar") {
-//    dependsOn(":backend:server:shadowJar")
-//
-//    val serverJarName = "server-${libs.versions.kobweb.get()}-all.jar"
-//    val serverJarFile = projects.backend.server.dependencyProject.layout.buildDirectory.file("libs/$serverJarName")
-//
-//    from(serverJarFile)
-//    into(file("$projectDir/build/resources/main"))
-//    rename(serverJarName, "server.jar")
-//}
-//tasks.named("processResources") {
-//    dependsOn("copyServerJar")
-//}
