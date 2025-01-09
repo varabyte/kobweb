@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.varabyte.kobwebx.gradle"
-version = libs.versions.kobweb.libs.get()
+version = libs.versions.kobweb.get()
 
 dependencies {
     // Get access to Kotlin multiplatform source sets

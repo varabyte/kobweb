@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.server"
-version = libs.versions.kobweb.libs.get()
+version = libs.versions.kobweb.get()
 
 dependencies {
     implementation(libs.bundles.ktor)

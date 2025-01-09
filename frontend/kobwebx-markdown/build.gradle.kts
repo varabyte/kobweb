@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.varabyte.kobwebx"
-version = libs.versions.kobweb.libs.get()
+version = libs.versions.kobweb.get()
 
 kotlin {
     js {

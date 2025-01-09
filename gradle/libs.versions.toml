@@ -1,4 +1,6 @@
 [versions]
+kobweb = "0.20.1-SNAPSHOT"
+#------------------------
 commonmark = "0.21.0"
 compose = "1.7.3"
 dokka = "2.0.0"
@@ -6,7 +8,6 @@ gradle-publish = "1.3.0"
 janino = "3.1.12"
 jsoup = "1.16.2"
 kaml = "0.60.0"
-kobweb-libs = "0.20.1-SNAPSHOT"
 kotlin = "2.1.0"
 kotlinpoet = "1.14.2"
 kotlinx-coroutines = "1.8.1"

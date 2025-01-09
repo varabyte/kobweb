@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.gradle"
-version = libs.versions.kobweb.libs.get()
+version = libs.versions.kobweb.get()
 
 dependencies {
     // Get access to Kotlin multiplatform source sets
@@ -59,7 +59,7 @@ dependencies {
 val copyServerJar by tasks.registering(Sync::class) {
     from(serverJar)
     into(layout.buildDirectory.dir("generated/kobweb/server"))
-    rename("server-${libs.versions.kobweb.libs.get()}-all.jar", "server.jar")
+    rename("server-${libs.versions.kobweb.get()}-all.jar", "server.jar")
 }
 
 kotlin.sourceSets.main {

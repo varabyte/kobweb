@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.varabyte.kobweb.gradle"
-version = libs.versions.kobweb.libs.get()
+version = libs.versions.kobweb.get()
 
 dependencies {
     // Get access to Kotlin multiplatform source sets
@@ -40,7 +40,7 @@ gradlePlugin {
 //tasks.register<Copy>("copyServerJar") {
 //    dependsOn(":backend:server:shadowJar")
 //
-//    val serverJarName = "server-${libs.versions.kobweb.libs.get()}-all.jar"
+//    val serverJarName = "server-${libs.versions.kobweb.get()}-all.jar"
 //    val serverJarFile = projects.backend.server.dependencyProject.layout.buildDirectory.file("libs/$serverJarName")
 //
 //    from(serverJarFile)
