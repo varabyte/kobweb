@@ -88,17 +88,24 @@ repository:
 $ ./gradlew publishToMavenLocal
 ```
 
-Then, in the project you want to test it out in, search for all occurrences of the line
-`maven("https://us-central1-maven.pkg.dev/varabyte-repos/public")` and declare a `mavenLocal` declaration right above it
-(to make sure the local publication will be found first).
-
-Finally, (and optionally), I like to restrict my maven local declaration to just Kobweb stuff:
+Then, in the project you want to test it out in, go to your project's `settings.gradle.kts` file, add the following
+code:
 
 ```kotlin
-mavenLocal {
-    content { includeGroupByRegex("com\\.varabyte\\.kobweb.*") }
+gradle.settingsEvaluated {
+    fun RepositoryHandler.kobwebLocal() {
+        mavenLocal {
+            content { includeGroupByRegex("com\\.varabyte\\.kobweb.*") }
+        }
+    }
+
+    pluginManagement.repositories { kobwebLocal() }
+    dependencyResolutionManagement.repositories { kobwebLocal() }
 }
 ```
+
+and then update the Kobweb version in your `gradle/libs.version.toml` file, matching it to the version for this
+project's `gradle/libs.versions.toml` file.
 
 ## Thanks!!
 
