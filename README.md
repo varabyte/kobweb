@@ -4729,35 +4729,9 @@ which the following steps help you work around:
    cp -r app/site /path/to/your/project
    # delete app
    ```
-4. In your own project's root `settings.gradle.kts` file, include the new module *and* add our custom artifact
-   repository link so your project can find the Kobweb Gradle plugins.
-   ```kotlin
-   // settings.gradle.kts
-   pluginManagement {
-     repositories {
-       // ... other repositories you already declared ...
-       maven("https://us-central1-maven.pkg.dev/varabyte-repos/public")
-     }
-   }
-   // ... other includes you already declared
-   include(":site")
-   ```
-5. In your project's root `build.gradle.kts` file, add our custom artifact repository there as well (so your project can
-   find Kobweb libraries)
-   ```kotlin
-   // build.gradle.kts
-   subprojects {
-     repositories {
-       // ... other repositories you already declared ...
-       maven("https://us-central1-maven.pkg.dev/varabyte-repos/public")
-     }
-   }
-
-   // If you prefer, you can just declare this directly inside the
-   // repositories block in site's `build.gradle.kts` file, but I
-   // like declaring my maven repositories globally.
-   ```
-6. Kobweb uses version catalogs for its dependencies. Add or update your version catalog under
+4. Ensure your Gradle project is configured to include Maven Central and Gradle Plugin Portal repositories, as
+   described in [Gradle Configuration▲](#gradle-configuration).
+5. Kobweb uses version catalogs for its dependencies. Add or update your version catalog under
    `gradle/libs.versions.toml`
    ```toml
    [versions]
@@ -5656,7 +5630,6 @@ plugins {
 repositories {
   mavenCentral()
   google()
-  maven("https://us-central1-maven.pkg.dev/varabyte-repos/public") // IMPORTANT!!!
 }
 
 kotlin {
