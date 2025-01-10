@@ -1,5 +1,5 @@
 [versions]
-kobweb = "0.20.2"
+kobweb = "0.20.3-SNAPSHOT"
 #------------------------
 commonmark = "0.21.0"
 compose = "1.7.3"
