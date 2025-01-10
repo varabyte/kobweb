@@ -218,6 +218,8 @@ class Router {
      * Split a URL into its path part and the rest of the URL.
      *
      * For example, `/path?query#fragment` would return `/path` and `?query#fragment`.
+     *
+     * If there are neither query parameters nor a fragment, the second part will be an empty string.
      */
     private fun String.partitionPath(): Pair<String, String> {
         val pathPart = this.substringBefore('?').substringBefore('#')
