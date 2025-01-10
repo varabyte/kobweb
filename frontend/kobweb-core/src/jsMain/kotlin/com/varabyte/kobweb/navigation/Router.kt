@@ -386,7 +386,7 @@ class Router {
                 // file that lives on the server e.g. "documents/external.md". So we ask the server if it's there.
                 // If so, we treat this navigation as "handled" and kick off a request to the server to download
                 // the file.
-                if (!routeTree.isRegistered(pathQueryAndFragment)) {
+                if (!routeTree.isRegistered(pathPart)) {
                     val xhr = XMLHttpRequest()
                     var fileExistsOnServer = false
                     xhr.open("HEAD", pathQueryAndFragment, async = false)
