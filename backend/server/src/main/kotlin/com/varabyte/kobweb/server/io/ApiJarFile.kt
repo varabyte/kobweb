@@ -130,7 +130,7 @@ class ApiJarFile(
                 }
         }
 
-        override fun findResource(name: String): URL {
+        override fun findResource(name: String): URL? {
             return findFileInZipByPath(name)
                 ?.toInMemoryUrl()
                 ?: super.findResource(name)
