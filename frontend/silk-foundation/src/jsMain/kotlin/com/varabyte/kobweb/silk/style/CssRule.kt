@@ -1,8 +1,7 @@
 package com.varabyte.kobweb.silk.style
 
 import com.varabyte.kobweb.compose.ui.Modifier
-import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
-import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
+import com.varabyte.kobweb.silk.style.breakpoint.BreakpointQueryProvider
 import org.jetbrains.compose.web.css.*
 
 /**
@@ -154,11 +153,11 @@ sealed class CssRule(val target: StyleScope) {
 }
 
 // Breakpoint extensions to allow adding styles to normal breakpoint values, e.g. "Breakpoint.MD + hover"
-operator fun Breakpoint.plus(other: CssRule.OfPseudoClass) =
-    CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
+operator fun BreakpointQueryProvider.plus(other: CssRule.OfPseudoClass) =
+    CssRule.OfMedia(other.target, this.toCSSMediaQuery()) + other
 
-operator fun Breakpoint.plus(other: CssRule.OfPseudoElement) =
-    CssRule.OfMedia(other.target, this.toMinWidthQuery()) + other
+operator fun BreakpointQueryProvider.plus(other: CssRule.OfPseudoElement) =
+    CssRule.OfMedia(other.target, this.toCSSMediaQuery()) + other
 
 /**
  * A way you can define multiple rules which all result in the same style.
