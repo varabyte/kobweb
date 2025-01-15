@@ -794,6 +794,14 @@ fun CatchAllPage() {
 }
 ```
 
+#### Static and dynamic siblings
+
+If you have a site that registers both static and dynamic segments at the same level, then a static match will always
+take precedence.
+
+For example, if you register routes `/a` and `/{else}`, then visiting `/a` will trigger the `/a` handler, while visiting
+anything else, such as `/b`, will trigger the `/{else}` handler.
+
 ## Public resources
 
 If you have a resource that you'd like to serve from your site, you handle this by placing it in your site's

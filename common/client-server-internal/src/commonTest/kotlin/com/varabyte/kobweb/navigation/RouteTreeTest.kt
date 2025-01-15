@@ -113,6 +113,196 @@ class RouteTreeTest {
     }
 
     @Test
+    fun canRegisterNestedRoutesBeforeNonNested() {
+        val routeTree = RouteTree<DummyData>()
+
+        val dataA = DummyData()
+        val dataABC = DummyData()
+
+        routeTree.register("/a/b/c", dataABC)
+        routeTree.register("/a", dataA)
+
+        assertThat(routeTree.resolveRouteData("/a")).isSameAs(dataA)
+        assertThat(routeTree.resolveRouteData("/a/b/c")).isSameAs(dataABC)
+    }
+
+    @Test
+    fun canRepeatDynamicRouteIfNameIsSame() {
+        val routeTree = RouteTree<DummyData>()
+
+        val dataRoot = DummyData()
+        val dataA = DummyData()
+        val dataB = DummyData()
+
+        routeTree.register("/{dynamic}", dataRoot)
+        routeTree.register("/{dynamic}/a", dataA)
+        routeTree.register("/{dynamic}/b", dataB)
+
+        assertThat(routeTree.resolveRouteData("/root")).isSameAs(dataRoot)
+        assertThat(routeTree.resolveRouteData("/root/a")).isSameAs(dataA)
+        assertThat(routeTree.resolveRouteData("/root/b")).isSameAs(dataB)
+        assertThat(routeTree.resolve("/root/c")).isNull()
+
+        routeTree.resolve("/root")!!.captureDynamicValues().let { values ->
+            assertThat(values).containsExactly("dynamic" to "root")
+        }
+        routeTree.resolve("/root/a")!!.captureDynamicValues().let { values ->
+            assertThat(values).containsExactly("dynamic" to "root")
+        }
+        routeTree.resolve("/root/b")!!.captureDynamicValues().let { values ->
+            assertThat(values).containsExactly("dynamic" to "root")
+        }
+    }
+
+    @Test
+    fun dynamicRoutesAndStaticRoutesCanExistSideBySideAndStaticRoutesTakePrecedence() {
+        run {
+            val routeTree = RouteTree<DummyData>()
+
+            val dataA = DummyData()
+            val dataB = DummyData()
+            val dataC = DummyData()
+            val dataABC = DummyData()
+            val dataElse = DummyData()
+
+            routeTree.register("/a", dataA)
+            routeTree.register("/b", dataB)
+            routeTree.register("/c", dataC)
+            routeTree.register("/a/b/c", dataABC)
+            routeTree.register("/{else}", dataElse)
+            routeTree.register("/{else}/b/c", dataElse)
+            routeTree.register("/a/{else}/c", dataElse)
+            routeTree.register("/a/b/{else}", dataElse)
+
+
+            assertThat(routeTree.resolveRouteData("/a")).isSameAs(dataA)
+            assertThat(routeTree.resolveRouteData("/b")).isSameAs(dataB)
+            assertThat(routeTree.resolveRouteData("/c")).isSameAs(dataC)
+            assertThat(routeTree.resolveRouteData("/x")).isSameAs(dataElse)
+            assertThat(routeTree.resolveRouteData("/a/b/c")).isSameAs(dataABC)
+            assertThat(routeTree.resolveRouteData("/o/b/c")).isSameAs(dataElse)
+            assertThat(routeTree.resolveRouteData("/a/o/c")).isSameAs(dataElse)
+            assertThat(routeTree.resolveRouteData("/a/b/o")).isSameAs(dataElse)
+        }
+
+        run {
+            val routeTree = RouteTree<DummyData>()
+
+            val dataX = DummyData()
+            val dataXYZ = DummyData()
+            val dataElse = DummyData()
+
+            routeTree.register("/{else}", dataElse)
+            routeTree.register("/{else}/y/z", dataElse)
+            routeTree.register("/x/{else}/z", dataElse)
+            routeTree.register("/x/y/{else}", dataElse)
+
+            // static nodes registered after dynamic nodes still take precedence
+            routeTree.register("/x", dataX)
+            routeTree.register("/x/y/z", dataXYZ)
+
+            assertThat(routeTree.resolveRouteData("/x")).isSameAs(dataX)
+            assertThat(routeTree.resolveRouteData("/z")).isSameAs(dataElse)
+            assertThat(routeTree.resolveRouteData("/a/y/z")).isSameAs(dataElse)
+            assertThat(routeTree.resolveRouteData("/x/a/z")).isSameAs(dataElse)
+            assertThat(routeTree.resolveRouteData("/x/y/a")).isSameAs(dataElse)
+            assertThat(routeTree.resolveRouteData("/x/y/z")).isSameAs(dataXYZ)
+        }
+
+        run {
+            val routeTree = RouteTree<DummyData>()
+
+            val dataAB = DummyData()
+            val dataAElse = DummyData()
+            val dataElseB = DummyData()
+            val dataElse = DummyData()
+
+            routeTree.register("/{a}/b", dataElseB)
+            routeTree.register("/a/{b}", dataAElse)
+            routeTree.register("/{a}/{b}", dataElse)
+            assertThat(routeTree.resolveRouteData("/a/y")).isSameAs(dataAElse)
+            assertThat(routeTree.resolveRouteData("/x/b")).isSameAs(dataElseB)
+            assertThat(routeTree.resolveRouteData("/x/y")).isSameAs(dataElse)
+
+            // Both registered routes match the following URL, but the one with the earlier static route takes
+            // precedence.
+            assertThat(routeTree.resolveRouteData("/a/b")).isSameAs(dataAElse)
+
+            routeTree.register("/a/b", dataAB)
+            assertThat(routeTree.resolveRouteData("/a/b")).isSameAs(dataAB)
+        }
+    }
+
+    @Test
+    fun staticRoutesDoNotPreventDynamicRoutesFromMatching() {
+        val routeTree = RouteTree<DummyData>()
+
+        val dataXY = DummyData()
+        val dataElse = DummyData()
+
+        routeTree.register("/x/y", dataXY)
+        routeTree.register("/{else}", dataElse)
+
+        assertThat(routeTree.resolveRouteData("/x")).isSameAs(dataElse)
+        assertThat(routeTree.resolveRouteData("/x/y")).isSameAs(dataXY)
+    }
+
+    @Test
+    fun onlyOneDynamicRouteNameAllowedPerLevel() {
+        val routeTree = RouteTree<DummyData>()
+
+        val data = DummyData()
+
+        // Same name is OK
+        routeTree.register("/{a}", data)
+        routeTree.register("/{a}/x", data)
+        routeTree.register("/{a}/y", data)
+        routeTree.register("/a/{b}", data)
+        routeTree.register("/a/{b}/x", data)
+        routeTree.register("/a/{b}/y", data)
+
+        // {j} conflicts with {a}
+        assertThrows<IllegalStateException> {
+            routeTree.register("/{j}", data)
+        }.let { ex ->
+            assertAll {
+                that(ex.message!!).contains("{j}")
+                that(ex.message!!).contains("{a}")
+            }
+        }
+
+        // {j} conflicts with {a}
+        assertThrows<IllegalStateException> {
+            routeTree.register("/{j}/k", data)
+        }.let { ex ->
+            assertAll {
+                that(ex.message!!).contains("{j}")
+                that(ex.message!!).contains("{a}")
+            }
+        }
+
+        // {j} conflicts with {b}
+        assertThrows<IllegalStateException> {
+            routeTree.register("/a/{j}", data)
+        }.let { ex ->
+            assertAll {
+                that(ex.message!!).contains("{j}")
+                that(ex.message!!).contains("{b}")
+            }
+        }
+
+        // {j} conflicts with {b}
+        assertThrows<IllegalStateException> {
+            routeTree.register("/a/{j}/k", data)
+        }.let { ex ->
+            assertAll {
+                that(ex.message!!).contains("{j}")
+                that(ex.message!!).contains("{b}")
+            }
+        }
+    }
+
+    @Test
     fun catchAllDynamicRoutesMustBeTheLastPartOfTheRoute() {
         val data = DummyData()
         assertThrows<IllegalStateException> {
@@ -127,28 +317,29 @@ class RouteTreeTest {
     }
 
     @Test
-    fun dynamicRoutesCannotHaveSiblings() {
+    fun dynamicRoutesCannotHaveDynamicSiblings() {
         val data = DummyData()
         assertThrows<IllegalStateException> {
             val routeTree = RouteTree<DummyData>()
-            routeTree.register("/a/b/c", data)
+            routeTree.register("/a/{x}/c", data)
             routeTree.register("/a/{d}", data)
         }.let { ex ->
             assertAll {
-                that(ex.message!!).contains("b")
+                that(ex.message!!).contains("{x}")
                 that(ex.message!!).contains("{d}")
             }
         }
+    }
 
+    @Test
+    fun catchAllRoutesCannotHaveNonCatchAllSiblingsEvenWithTheSameName() {
+        val data = DummyData()
         assertThrows<IllegalStateException> {
             val routeTree = RouteTree<DummyData>()
-            routeTree.register("/a/{d}", data)
-            routeTree.register("/a/b/c", data)
+            routeTree.register("/a/{else}", data)
+            routeTree.register("/a/{...else}", data)
         }.let { ex ->
-            assertAll {
-                that(ex.message!!).contains("b")
-                that(ex.message!!).contains("{d}")
-            }
+            assertThat(ex.message!!).contains("else")
         }
     }
 
