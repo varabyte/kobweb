@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.dom.GenericTag
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.silk.theme.breakpoint.toMinWidthQuery
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSRule
@@ -47,15 +46,16 @@ internal fun SilkBreakpointDisplayStyles() {
     GenericTag("style") {
         DisposableEffect(Unit) {
             val cssStylesheet = scopeElement.unsafeCast<HTMLStyleElement>().sheet as? CSSStyleSheet
+            // `display-if-at-least-zero` and `display-until-zero` are unnecessary, but provided for completeness
             Breakpoint.entries.forEach { breakpoint ->
-                // `display-if-at-least-zero` and `display-until-zero` are unnecessary, but provided for completeness
-                val minWidthQuery = CSSMediaRuleDeclaration(breakpoint.toMinWidthQuery(), emptyList()).header
-                val invertMinWidthQuery =
-                    CSSMediaRuleDeclaration(breakpoint.toMinWidthQuery().invert(), emptyList()).header
+                // toCSSMediaQuery() includes the breakpoint itself and above. Invert should be everything lower.
+                val breakpointQuery = CSSMediaRuleDeclaration(breakpoint.toCSSMediaQuery(), emptyList()).header
+                val invertBreakpointQuery =
+                    CSSMediaRuleDeclaration(breakpoint.toCSSMediaQuery().invert(), emptyList()).header
                 cssStylesheet
-                    ?.addRule("$invertMinWidthQuery { .silk-display-if-at-least-${breakpoint.name.lowercase()} { display: none !important; } }")
+                    ?.addRule("$invertBreakpointQuery { .silk-display-if-at-least-${breakpoint.name.lowercase()} { display: none !important; } }")
                 cssStylesheet
-                    ?.addRule("$minWidthQuery { .silk-display-until-${breakpoint.name.lowercase()} { display: none !important; } }")
+                    ?.addRule("$breakpointQuery { .silk-display-until-${breakpoint.name.lowercase()} { display: none !important; } }")
             }
             onDispose {
                 cssStylesheet?.clearCSSRules()
