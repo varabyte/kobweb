@@ -46,8 +46,9 @@ abstract class StyleScope {
         _cssModifiers.add(CssModifier(createModifier(), mediaQuery))
     }
 
-    // Note: This probably would have been an extension method except Kotlin doesn't support multiple receivers yet
-    // (here, we'd need to access both "BreakpointQueryProvider" and "StyleScope")
+    // Note: These probably would have been an extension methods except Kotlin doesn't support multiple receivers yet
+    // (here, we'd need to access both "BreakpointQueryProvider/CssRule" and "StyleScope")
+
     /**
      * Declare a style that applies within the provided breakpoint(s).
      *
@@ -69,6 +70,10 @@ abstract class StyleScope {
      */
     operator fun BreakpointQueryProvider.invoke(createModifier: () -> Modifier) {
         cssRule(toCSSMediaQuery(), createModifier)
+    }
+
+    operator fun CssRule.invoke(createModifier: () -> Modifier) {
+        cssRule(this@StyleScope, createModifier)
     }
 }
 
