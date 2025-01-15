@@ -45,6 +45,7 @@ enum class Breakpoint : BreakpointQueryProvider {
     LG,
     XL;
 
+    /** Returns a `min-width` media query that applies at this breakpoint and above. */
     override fun toCSSMediaQuery(): CSSMediaQuery = CSSMediaQuery.MediaFeature("min-width", this.toWidth())
 
     class Range internal constructor(
