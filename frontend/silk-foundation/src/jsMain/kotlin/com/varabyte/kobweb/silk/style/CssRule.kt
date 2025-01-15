@@ -79,7 +79,7 @@ sealed class CssRule {
      *
      * For example, passing in "aria-disabled" would result in: `[aria-disabled]`
      */
-    class OfAttributeSelector(val attributeSelector: String) : NonMediaCssRule() {
+    class OfAttributeSelector(internal val attributeSelector: String) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(listOf(this), emptyList(), null)
 
         operator fun plus(other: OfAttributeSelector) =
@@ -98,7 +98,7 @@ sealed class CssRule {
      *
      * For example, passing in "hover" would result in: `:hover`
      */
-    class OfPseudoClass(val pseudoClass: String) : NonMediaCssRule() {
+    class OfPseudoClass(internal val pseudoClass: String) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(emptyList(), listOf(this), null)
 
         operator fun plus(other: OfPseudoClass) =
@@ -113,7 +113,7 @@ sealed class CssRule {
      *
      * For example, passing in "after" would result in: `::after`
      */
-    class OfPseudoElement(val pseudoElement: String) : NonMediaCssRule() {
+    class OfPseudoElement(internal val pseudoElement: String) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(emptyList(), emptyList(), this)
     }
 
@@ -123,8 +123,8 @@ sealed class CssRule {
      */
     class CompositeOpen(
         override val mediaQuery: CSSMediaQuery?,
-        val attributeSelectors: List<OfAttributeSelector>,
-        val pseudoClasses: List<OfPseudoClass>
+        private val attributeSelectors: List<OfAttributeSelector>,
+        private val pseudoClasses: List<OfPseudoClass>
     ) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(attributeSelectors, pseudoClasses, null)
 
@@ -144,9 +144,9 @@ sealed class CssRule {
      */
     class CompositeClosed(
         override val mediaQuery: CSSMediaQuery?,
-        val attributeSelectors: List<OfAttributeSelector>,
-        val pseudoClasses: List<OfPseudoClass>,
-        val pseudoElement: OfPseudoElement
+        private val attributeSelectors: List<OfAttributeSelector>,
+        private val pseudoClasses: List<OfPseudoClass>,
+        private val pseudoElement: OfPseudoElement
     ) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(attributeSelectors, pseudoClasses, pseudoElement)
     }
