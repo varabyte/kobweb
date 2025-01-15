@@ -5,10 +5,9 @@ import com.varabyte.kobweb.silk.style.breakpoint.BreakpointQueryProvider
 import org.jetbrains.compose.web.css.*
 
 /**
- * A class which can be used to set CSS rules on a target [StyleScope] instance using types to prevent
- * invalid combinations.
+ * A class which can be used to create type-safe CSS rules that can be applied to a [StyleScope] instance.
  *
- * A CSS rule can consist of an optional breakpoint, zero or more pseudo-classes, and an optional trailing
+ * A CSS rule can consist of an optional media query, zero or more pseudo-classes, and an optional trailing
  * pseudo-element.
  *
  * For example, this class enables:
@@ -24,18 +23,21 @@ import org.jetbrains.compose.web.css.*
  * It's not expected for an end user to use this class directly. It's provided for libraries that want to provide
  * additional extension properties to the [StyleScope] class (like `hover` and `after`)
  */
-sealed class CssRule(val target: StyleScope) {
+sealed class CssRule {
     companion object {
         /**
          * A CSS rule that represents a functional pseudo-class.
          *
          * For example, passing in "not" would result in: `:not(...)`
          */
-        fun OfFunctionalPseudoClass(target: StyleScope, pseudoClass: String, vararg params: NonMediaCssRule) =
-            OfPseudoClass(target, "$pseudoClass(${params.mapNotNull { it.toSelectorText() }.joinToString()})")
+        fun OfFunctionalPseudoClass(pseudoClass: String, vararg params: NonMediaCssRule) =
+            OfPseudoClass("$pseudoClass(${params.mapNotNull { it.toSelectorText() }.joinToString()})")
     }
 
-    operator fun invoke(createModifier: () -> Modifier) {
+    // Note: This is used by the `StyleScope` class to create css rules without leaking CssRule's implementation details.
+    // If/when kotlin supports context parameters, the logic can be entirely contained within this class, taking a
+    // `StyleScope` instance as a context parameter.
+    internal fun cssRule(target: StyleScope, createModifier: () -> Modifier) {
         target.cssRule(mediaQuery, toSelectorText(), createModifier)
     }
 
@@ -62,32 +64,32 @@ sealed class CssRule(val target: StyleScope) {
      *
      * For example, could result in: `@media (max-width: 1234px)`
      */
-    class OfMedia(target: StyleScope, override val mediaQuery: CSSMediaQuery) : CssRule(target) {
+    class OfMedia(override val mediaQuery: CSSMediaQuery) : CssRule() {
         operator fun plus(other: OfPseudoClass) =
-            CompositeOpen(target, mediaQuery, emptyList(), listOf(other))
+            CompositeOpen(mediaQuery, emptyList(), listOf(other))
 
         operator fun plus(other: OfPseudoElement) =
-            CompositeClosed(target, mediaQuery, emptyList(), emptyList(), other)
+            CompositeClosed(mediaQuery, emptyList(), emptyList(), other)
     }
 
-    sealed class NonMediaCssRule(target: StyleScope) : CssRule(target)
+    sealed class NonMediaCssRule() : CssRule()
 
     /**
      * A CSS rule that represents an attribute selector.
      *
      * For example, passing in "aria-disabled" would result in: `[aria-disabled]`
      */
-    class OfAttributeSelector(target: StyleScope, val attributeSelector: String) : NonMediaCssRule(target) {
+    class OfAttributeSelector(val attributeSelector: String) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(listOf(this), emptyList(), null)
 
         operator fun plus(other: OfAttributeSelector) =
-            CompositeOpen(target, null, listOf(this, other), emptyList())
+            CompositeOpen(null, listOf(this, other), emptyList())
 
         operator fun plus(other: OfPseudoClass) =
-            CompositeOpen(target, null, listOf(this), listOf(other))
+            CompositeOpen(null, listOf(this), listOf(other))
 
         operator fun plus(other: OfPseudoElement) =
-            CompositeClosed(target, null, listOf(this), emptyList(), other)
+            CompositeClosed(null, listOf(this), emptyList(), other)
 
     }
 
@@ -96,14 +98,14 @@ sealed class CssRule(val target: StyleScope) {
      *
      * For example, passing in "hover" would result in: `:hover`
      */
-    class OfPseudoClass(target: StyleScope, val pseudoClass: String) : NonMediaCssRule(target) {
+    class OfPseudoClass(val pseudoClass: String) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(emptyList(), listOf(this), null)
 
         operator fun plus(other: OfPseudoClass) =
-            CompositeOpen(target, null, emptyList(), listOf(this, other))
+            CompositeOpen(null, emptyList(), listOf(this, other))
 
         operator fun plus(other: OfPseudoElement) =
-            CompositeClosed(target, null, emptyList(), listOf(this), other)
+            CompositeClosed(null, emptyList(), listOf(this), other)
     }
 
     /**
@@ -111,7 +113,7 @@ sealed class CssRule(val target: StyleScope) {
      *
      * For example, passing in "after" would result in: `::after`
      */
-    class OfPseudoElement(target: StyleScope, val pseudoElement: String) : NonMediaCssRule(target) {
+    class OfPseudoElement(val pseudoElement: String) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(emptyList(), emptyList(), this)
     }
 
@@ -120,21 +122,20 @@ sealed class CssRule(val target: StyleScope) {
      * pseudo-element.
      */
     class CompositeOpen(
-        target: StyleScope,
         override val mediaQuery: CSSMediaQuery?,
         val attributeSelectors: List<OfAttributeSelector>,
         val pseudoClasses: List<OfPseudoClass>
-    ) : NonMediaCssRule(target) {
+    ) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(attributeSelectors, pseudoClasses, null)
 
         operator fun plus(other: OfPseudoClass) =
-            CompositeOpen(target, null, attributeSelectors, pseudoClasses + other)
+            CompositeOpen(null, attributeSelectors, pseudoClasses + other)
 
         operator fun plus(other: OfAttributeSelector) =
-            CompositeOpen(target, null, attributeSelectors + other, pseudoClasses)
+            CompositeOpen(null, attributeSelectors + other, pseudoClasses)
 
         operator fun plus(other: OfPseudoElement) =
-            CompositeClosed(target, null, attributeSelectors, pseudoClasses, other)
+            CompositeClosed(null, attributeSelectors, pseudoClasses, other)
     }
 
     /**
@@ -142,28 +143,27 @@ sealed class CssRule(val target: StyleScope) {
      * be invoked at this point.
      */
     class CompositeClosed(
-        target: StyleScope,
         override val mediaQuery: CSSMediaQuery?,
         val attributeSelectors: List<OfAttributeSelector>,
         val pseudoClasses: List<OfPseudoClass>,
         val pseudoElement: OfPseudoElement
-    ) : NonMediaCssRule(target) {
+    ) : NonMediaCssRule() {
         override fun toSelectorText() = buildSelectorText(attributeSelectors, pseudoClasses, pseudoElement)
     }
 }
 
 // Breakpoint extensions to allow adding styles to normal breakpoint values, e.g. "Breakpoint.MD + hover"
 operator fun BreakpointQueryProvider.plus(other: CssRule.OfPseudoClass) =
-    CssRule.OfMedia(other.target, this.toCSSMediaQuery()) + other
+    CssRule.OfMedia(this.toCSSMediaQuery()) + other
 
 operator fun BreakpointQueryProvider.plus(other: CssRule.OfPseudoElement) =
-    CssRule.OfMedia(other.target, this.toCSSMediaQuery()) + other
+    CssRule.OfMedia(this.toCSSMediaQuery()) + other
 
 /**
  * A way you can define multiple rules which all result in the same style.
  */
 // TODO: Simplify this using selector lists instead?
 //  See also: https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#selector_lists
-fun cssRules(vararg rules: CssRule, createModifier: () -> Modifier) {
+fun StyleScope.cssRules(vararg rules: CssRule, createModifier: () -> Modifier) {
     rules.forEach { rule -> rule.invoke(createModifier) }
 }
