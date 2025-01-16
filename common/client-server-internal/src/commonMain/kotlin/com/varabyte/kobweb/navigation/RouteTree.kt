@@ -30,7 +30,7 @@ private fun String.isDynamicSegment() = this.startsWith('{') && this.endsWith('}
 /**
  * A tree data structure that represents a parsed route, such as `/example/path` or `/{dynamic}/path`
  */
-class RouteTree<T> {
+class RouteTree<T : Any> {
     sealed class Node<T>(val parent: Node<T>? = null, val sourceRouteSegment: String) {
         internal var _data: T? = null
         val data: T? get() = _data
