@@ -132,9 +132,8 @@ class RouteTree<T : Any> {
             fun createResolvedEntry() = listOf(ResolvedEntry(this, consumedPart))
             if (remainingSegments.isEmpty()) return createResolvedEntry()
 
-            return children.asSequence()
-                .mapNotNull { it.resolve(remainingSegments) }
-                .firstOrNull()
+            return children
+                .firstNotNullOfOrNull { it.resolve(remainingSegments) }
                 ?.let { createResolvedEntry() + it }
         }
 
