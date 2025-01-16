@@ -7,14 +7,14 @@ import com.varabyte.kobweb.ksp.symbol.nameWithoutExtension
 
 object RouteUtils {
     /**
-     * Perform a default transformation of any package part to a final route part.
+     * Perform a default transformation of any package segment to a final route segment.
      *
      * Note that this should only be used when a specific package mapping wasn't provided by the user (which is expected
      * in a vast majority of cases).
      *
      * @param packagePart A package part, e.g. "b" in "a.b.c"
      */
-    fun packagePartToRoutePart(packagePart: String): String {
+    fun packageSegmentToRouteSegment(packagePart: String): String {
         require('.' !in packagePart) { "Invalid package part: $packagePart" }
         return packagePart
             .camelCaseToKebabCase()
@@ -76,13 +76,13 @@ object RouteUtils {
         //   site/pages/blogs/2021/12/tutorials
         @Suppress("NAME_SHADOWING") // Make pkg writable
         var pkg = pkg
-        val transformedParts = mutableListOf<String>()
+        val transformedSegments = mutableListOf<String>()
         while (pkg.isNotEmpty() && pkg != packageRoot) {
-            val transformedPart = packageMappings[pkg] ?: packagePartToRoutePart(pkg.substringAfterLast('.'))
-            transformedParts.add(0, transformedPart)
+            val transformedSegment = packageMappings[pkg] ?: packageSegmentToRouteSegment(pkg.substringAfterLast('.'))
+            transformedSegments.add(0, transformedSegment)
             pkg = (pkg.takeIf { it.contains('.') } ?: "").substringBeforeLast('.')
         }
-        return (transformedParts.joinToString("/") + "/").prefixIfNot("/")
+        return (transformedSegments.joinToString("/") + "/").prefixIfNot("/")
     }
 }
 

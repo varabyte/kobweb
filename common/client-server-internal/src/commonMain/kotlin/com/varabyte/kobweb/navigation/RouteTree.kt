@@ -16,22 +16,22 @@ fun List<ResolvedEntry<*>>.captureDynamicValues(): Map<String, String> {
     return buildMap {
         entries.forEach { entry ->
             if (entry.node is RouteTree.DynamicNode) {
-                put(entry.node.name, entry.capturedRoutePart)
+                put(entry.node.name, entry.capturedRouteSegment)
             }
         }
     }
 }
 
-fun List<ResolvedEntry<*>>.toRouteString() = joinToString("/") { it.capturedRoutePart }
+fun List<ResolvedEntry<*>>.toRouteString() = joinToString("/") { it.capturedRouteSegment }
 
 // e.g. "{dynamic}"
-private fun String.isDynamicPart() = this.startsWith('{') && this.endsWith('}')
+private fun String.isDynamicSegment() = this.startsWith('{') && this.endsWith('}')
 
 /**
  * A tree data structure that represents a parsed route, such as `/example/path` or `/{dynamic}/path`
  */
 class RouteTree<T> {
-    sealed class Node<T>(val parent: Node<T>? = null, val sourceRoutePart: String) {
+    sealed class Node<T>(val parent: Node<T>? = null, val sourceRouteSegment: String) {
         internal var _data: T? = null
         val data: T? get() = _data
 
@@ -45,10 +45,10 @@ class RouteTree<T> {
         /**
          * The raw name for this node.
          *
-         * For most nodes, it will just match the route part from which it is associated with, but for dynamic routes,
-         * this will be the value undecorated from things like curly braces.
+         * For most nodes, it will just match the route segment which it is associated with, but for dynamic routes,
+         * this will be the value with dynamic decorations (i.e. curly braces) removed.
          */
-        open val name: String = sourceRoutePart
+        open val name: String = sourceRouteSegment
 
         protected open val isRouteTerminator: Boolean = false
 
@@ -62,7 +62,7 @@ class RouteTree<T> {
         }
 
         /**
-         * Given a list of route parts, return a [AcceptResult] indicating if this node would accept them or not.
+         * Given a list of route segments, return a [AcceptResult] indicating if this node would accept them or not.
          *
          * For a concrete example, the incoming route "/a/b/c" would get converted to ["", "a", "b", "c"]. The root node
          * should always accept the first empty string, leaving remaining children nodes to check ["a", "b", "c"].
@@ -73,38 +73,38 @@ class RouteTree<T> {
          * - a dynamic node "{dynamic}" would accept the first "a" and return [AcceptResult.SINGLE].
          * - a dynamic node "{...dynamic}" would accept everything and return [AcceptResult.ALL].
          *
-         * Note that this will always be called during route resolution time (meaning all route parts are values typed
-         * in by a user in a browser URL bar).
+         * Note that this will always be called during route resolution time (meaning all route segments are values
+         * typed in by a user in a browser URL bar).
          *
-         * IMPORTANT: [routeParts] will always contain at least one element (so there is no need to waste time
+         * IMPORTANT: [routeSegments] will always contain at least one element (so there is no need to waste time
          * checking if it is empty).
          */
-        abstract fun accepts(routeParts: List<String>): AcceptResult
+        abstract fun accepts(routeSegments: List<String>): AcceptResult
 
         /**
-         * Check if this node matches the given route part.
+         * Check if this node matches the given route segment.
          *
          * This method can be called either during the registration phase or at route resolution time. If the former,
-         * it might contain a dynamic route part like "{dynamic}". If the latter, it will contain the actual value.
+         * it might contain a dynamic route segment like "{dynamic}". If the latter, it will contain the actual value.
          */
-        abstract fun matches(routePart: String): Boolean
+        abstract fun matches(routeSegment: String): Boolean
 
-        fun findChild(routePart: String): Node<T>? {
-            return children.firstOrNull { it.matches(routePart) }
+        fun findChild(routeSegment: String): Node<T>? {
+            return children.firstOrNull { it.matches(routeSegment) }
         }
 
         // Callers should ensure they only call this if `findChild` would have returned null
-        fun createChild(routePart: String): Node<T> {
-            check(findChild(routePart) == null) { "Node.createChild called unexpectedly. Please report this issue." }
+        fun createChild(routeSegment: String): Node<T> {
+            check(findChild(routeSegment) == null) { "Node.createChild called unexpectedly. Please report this issue." }
 
             check(!isRouteTerminator) {
-                error("User attempted to register an invalid route. \"$sourceRoutePart\" must be the last part of the route, but it was followed by \"$routePart\".")
+                error("User attempted to register an invalid route. \"$sourceRouteSegment\" must be the last segment of the route, but it was followed by \"$routeSegment\".")
             }
 
-            return if (routePart.isDynamicPart()) {
-                DynamicNode(this, routePart).also { _dynamicChild = it  }
+            return if (routeSegment.isDynamicSegment()) {
+                DynamicNode(this, routeSegment).also { _dynamicChild = it  }
             } else {
-                StaticNode(this, routePart).also { _staticChildren.add(it) }
+                StaticNode(this, routeSegment).also { _staticChildren.add(it) }
             }
         }
 
@@ -115,25 +115,25 @@ class RouteTree<T> {
          * if "/a" and "/{else}" were registered, then "/a" would match the static "/a" route and "/b" would match the
          * dynamic "/{else}" route. Meanwhile, "/a/b" would not match any route and return null.
          */
-        fun resolve(routeParts: List<String>): List<ResolvedEntry<T>>? {
-            val consumeResult = accepts(routeParts)
-            val (consumedPart, remainingParts) = when (consumeResult) {
+        fun resolve(routeSegments: List<String>): List<ResolvedEntry<T>>? {
+            val consumeResult = accepts(routeSegments)
+            val (consumedPart, remainingSegments) = when (consumeResult) {
                 AcceptResult.NONE -> return null
-                AcceptResult.SINGLE -> routeParts.first() to routeParts.drop(1)
-                AcceptResult.ALL -> routeParts.joinToString("/") to emptyList()
+                AcceptResult.SINGLE -> routeSegments.first() to routeSegments.drop(1)
+                AcceptResult.ALL -> routeSegments.joinToString("/") to emptyList()
             }
 
-            // If here, this means we have only consumed part of a route, e.g. the site registered "/a/b/c" but the
+            // If here, this means we have only consumed segment of a route, e.g. the site registered "/a/b/c" but the
             // user only visited "/a/b". In this case, we should return null (which will ultimately show a 404 to
             // the user).
-            if (remainingParts.isEmpty() && data == null) return null
+            if (remainingSegments.isEmpty() && data == null) return null
 
             // Helper function to avoid allocating a list if we can
             fun createResolvedEntry() = listOf(ResolvedEntry(this, consumedPart))
-            if (remainingParts.isEmpty()) return createResolvedEntry()
+            if (remainingSegments.isEmpty()) return createResolvedEntry()
 
             return children.asSequence()
-                .mapNotNull { it.resolve(remainingParts) }
+                .mapNotNull { it.resolve(remainingSegments) }
                 .firstOrNull()
                 ?.let { createResolvedEntry() + it }
         }
@@ -159,39 +159,39 @@ class RouteTree<T> {
             }
     }
 
-    class RootNode<T> : Node<T>(parent = null, sourceRoutePart = "") {
-        override fun matches(routePart: String): Boolean = routePart.isEmpty()
+    class RootNode<T> : Node<T>(parent = null, sourceRouteSegment = "") {
+        override fun matches(routeSegment: String): Boolean = routeSegment.isEmpty()
 
-        override fun accepts(routeParts: List<String>): AcceptResult {
-            check(routeParts.first() == "")
+        override fun accepts(routeSegments: List<String>): AcceptResult {
+            check(routeSegments.first() == "")
             return AcceptResult.SINGLE
         }
     }
 
-    sealed class ChildNode<T>(parent: Node<T>, sourceRoutePart: String) : Node<T>(parent, sourceRoutePart)
+    sealed class ChildNode<T>(parent: Node<T>, sourceRouteSegment: String) : Node<T>(parent, sourceRouteSegment)
 
-    /** A node representing a normal part of the route, such as "example" in "/example/path" */
-    class StaticNode<T>(parent: Node<T>, sourceRoutePart: String) : ChildNode<T>(parent, sourceRoutePart) {
-        override fun matches(routePart: String): Boolean = routePart == sourceRoutePart
+    /** A node representing a normal, static route segment, such as "example" in "/example/path" */
+    class StaticNode<T>(parent: Node<T>, sourceRouteSegment: String) : ChildNode<T>(parent, sourceRouteSegment) {
+        override fun matches(routeSegment: String): Boolean = routeSegment == sourceRouteSegment
 
-        override fun accepts(routeParts: List<String>): AcceptResult {
-            if (matches(routeParts.first())) return AcceptResult.SINGLE
+        override fun accepts(routeSegments: List<String>): AcceptResult {
+            if (matches(routeSegments.first())) return AcceptResult.SINGLE
             return AcceptResult.NONE
         }
     }
 
-    /** A node representing a dynamic part of the route, such as "{dynamic}" in "/{dynamic}/path" */
-    class DynamicNode<T>(parent: Node<T>, sourceRoutePart: String) : ChildNode<T>(parent, sourceRoutePart) {
+    /** A node representing a dynamic route segment, such as "{dynamic}" in "/{dynamic}/path" */
+    class DynamicNode<T>(parent: Node<T>, sourceRouteSegment: String) : ChildNode<T>(parent, sourceRouteSegment) {
 
         /**
          * Result of parsing text like "{name}", "{...name}", or "{...name?}".
          */
         private data class Info(val name: String, val match: Match) {
             companion object {
-                fun tryCreateFrom(routePart: String): Info? {
-                    if (!routePart.isDynamicPart()) return null
+                fun tryCreateFrom(routeSegment: String): Info? {
+                    if (!routeSegment.isDynamicSegment()) return null
 
-                    var name = routePart
+                    var name = routeSegment
                     name = name.removeSurrounding("{", "}")
                     val match = if (name.startsWith("...")) {
                         name = name.removePrefix("...")
@@ -212,7 +212,7 @@ class RouteTree<T> {
 
         private enum class Match {
             /**
-             * This node matches a single part of the route.
+             * This node matches a single segment of the route.
              *
              * For example: "/users/{user}/posts/{post}"
              *
@@ -226,41 +226,41 @@ class RouteTree<T> {
              * For example: "/games/{...game-details}"
              *
              * This would match a URL like "/games/frogger", "/games/space-invaders/easy", etc. This would NOT match
-             * "/games" by itself, as the node expects at least one more part of the route.
+             * "/games" by itself, as the node expects at least one more segments of the route.
              */
             REST,
 
             /**
-             * Like [REST] but also match if there are no more parts of the route.
+             * Like [REST] but also match if there are no more segments of the route.
              */
             REST_OPTIONAL,
         }
 
-        private val info = Info.tryCreateFrom(sourceRoutePart) ?: error("Expected a dynamic route part here, but got \"$sourceRoutePart\"")
+        private val info = Info.tryCreateFrom(sourceRouteSegment) ?: error("Expected a dynamic route segment here, but got \"$sourceRouteSegment\"")
         override val name = info.name
 
-        // REST match types consume the rest of the route so therefore can't have any following route parts
+        // REST match types consume the rest of the route so therefore can't have any following route segments
         override val isRouteTerminator = info.match != Match.SINGLE
 
-        override fun matches(routePart: String): Boolean {
-            Info.tryCreateFrom(routePart)?.let { info ->
+        override fun matches(routeSegment: String): Boolean {
+            Info.tryCreateFrom(routeSegment)?.let { info ->
                 // Hack: It's kind of weird to throw an error as a side effect of a check, but it's convenient for now,
                 // and this method is only used internally. We can revisit if this becomes a problem later.
                 // During the registration phase, we should reject attempts to register more multiple dynamic nodes with
                 // different names. In other words, "/{a}/x" and "/{a}/y" is OK, but "/{a}/x" and "/{b}/y" is not.
                 // Neither is "/{a}" and "/{...a}".
                 if (this.info != info) {
-                    error("User is attempting to register a dynamic route that conflicts with another dynamic route already set up. \"$routePart\" is being registered but \"${sourceRoutePart}\" already exists.")
+                    error("User is attempting to register a dynamic route that conflicts with another dynamic route already set up. \"$routeSegment\" is being registered but \"${sourceRouteSegment}\" already exists.")
                 }
                 return true
             }
             return false
         }
 
-        override fun accepts(routeParts: List<String>): AcceptResult {
+        override fun accepts(routeSegments: List<String>): AcceptResult {
             return when (info.match) {
                 Match.SINGLE -> AcceptResult.SINGLE
-                Match.REST -> if (routeParts.first() != "") AcceptResult.ALL else AcceptResult.NONE
+                Match.REST -> if (routeSegments.first() != "") AcceptResult.ALL else AcceptResult.NONE
                 Match.REST_OPTIONAL -> AcceptResult.ALL
             }
         }
@@ -271,11 +271,11 @@ class RouteTree<T> {
      *
      * For example, if the route "/a/b/c" is resolved, then there would be three resolved entries.
      *
-     * In most cases, the node name and its captured route part will be the same. However, this is not true for dynamic
-     * routes, where a route registered as "/users/{user}" when visiting "/users/bitspittle" would have a resolved entry
-     * with a node name of "user" and a captured route part of "bitspittle".
+     * In most cases, the node name and its captured route segment will be the same. However, this is not true for
+     * dynamic routes, where a route registered as "/users/{user}" when visiting "/users/bitspittle" would have a
+     * resolved entry with a node name of "user" and a captured route segment of "bitspittle".
      */
-    class ResolvedEntry<T>(val node: Node<T>, val capturedRoutePart: String)
+    class ResolvedEntry<T>(val node: Node<T>, val capturedRouteSegment: String)
 
     private val root = RootNode<T>()
 
@@ -294,13 +294,13 @@ class RouteTree<T> {
     }
 
     /**
-     * Parse a route and associate its split up parts with [Node] instances.
+     * Parse a route and associate its split up segments with [Node] instances.
      *
-     * This is particularly useful for handling dynamic route parts (e.g. the "b" in a route registered like
+     * This is particularly useful for handling dynamic route segments (e.g. the "b" in a route registered like
      * "/a/{b}/c"). The returned node will contain the captured name.
      *
-     * Partial routes will not get resolved! That is, "a/b" will not get resolved if there is no page associated with
-     * it, even if "a/b/c" is registered.
+     * Partial routes will not get resolved! That is, "/a/b" will not get resolved if there is no page associated with
+     * it, even if "/a/b/c" is registered.
      *
      * @param allowRedirects Set to true to allow redirects, registered by [registerRedirect], to be followed.
      *   Otherwise, the [route] passed in must be an exact match to a registered route.
@@ -339,13 +339,13 @@ class RouteTree<T> {
      * Register [route] with this tree, or return false if it was already added.
      */
     fun register(route: String, data: T): Boolean {
-        val routeParts = route.split('/').toMutableList()
+        val routeSegments = route.split('/').toMutableList()
         var currNode: Node<T> = root
-        require(root.matches(routeParts.removeFirst())) // Will be true if incoming route starts with '/'
+        require(root.matches(routeSegments.removeFirst())) // Will be true if incoming route starts with '/'
 
-        while (routeParts.isNotEmpty()) {
-            val nextRoutePart = routeParts.removeFirst()
-            currNode = currNode.findChild(nextRoutePart) ?: currNode.createChild(nextRoutePart)
+        while (routeSegments.isNotEmpty()) {
+            val nextRouteSegment = routeSegments.removeFirst()
+            currNode = currNode.findChild(nextRouteSegment) ?: currNode.createChild(nextRouteSegment)
         }
 
         if (currNode.data != null) return false

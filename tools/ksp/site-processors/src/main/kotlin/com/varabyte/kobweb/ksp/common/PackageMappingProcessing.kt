@@ -22,7 +22,7 @@ fun getPackageMappings(
                 // {} is a special value which means infer from the current package,
                 // e.g. "{}" under a.b.pkg resolves to "{pkg}"
                 if (value != "{}") value.toString() else "{${
-                    RouteUtils.packagePartToRoutePart(currPackage.substringAfterLast('.'))
+                    RouteUtils.packageSegmentToRouteSegment(currPackage.substringAfterLast('.'))
                 }}"
             }
             currPackage to override

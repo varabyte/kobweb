@@ -119,7 +119,7 @@ class Router {
             .filter { nodeList -> nodeList.last().data != null }
             .map { nodeList ->
             RouteEntry(
-                nodeList.joinToString("/") { node -> node.sourceRoutePart },
+                nodeList.joinToString("/") { node -> node.sourceRouteSegment },
                 nodeList.any { it is RouteTree.DynamicNode }
             )
         }
@@ -324,8 +324,8 @@ class Router {
      * Attempt to navigate **internally** within this site, or return false if that's not possible (i.e. because the
      * path is external).
      *
-     * By internally, I mean this method expects a route part of a path only -- no https:// origin in other words. "/",
-     * "/about", "/help/contact", and "user/123" are examples.
+     * By internally, I mean this method expects a route path only -- no https:// origin in other words. "/",
+     * "/about", "/help/contact", and "user/123" are valid examples.
      *
      * You will generally call this method like so:
      *

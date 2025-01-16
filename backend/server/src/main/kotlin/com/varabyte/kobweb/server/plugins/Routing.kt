@@ -381,10 +381,10 @@ private suspend fun RoutingContext.serveIndexFile(index: Path) {
  * Common handler used by [configureCatchAllRouting] since we have multiple route patterns which need the same handling
  */
 private suspend fun RoutingContext.handleCatchAllRouting(
-    pathParts: List<String>,
+    pathSegments: List<String>,
     vararg handlers: suspend RoutingContext.(String) -> Boolean,
 ) {
-    val pathString = pathParts.joinToString("/")
+    val pathString = pathSegments.joinToString("/")
 
     for (handler in handlers) {
         if (handler(pathString)) break
@@ -414,8 +414,8 @@ private suspend fun RoutingContext.handleRedirect(
 private fun Routing.configureRedirects(basePath: String, redirects: List<PatternMapper>) {
     if (redirects.isEmpty()) return
     get("$basePath/{$KOBWEB_PARAMS...}") {
-        val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
-        handleRedirect(basePath, pathParts.joinToString("/"), redirects)
+        val pathSegments = call.parameters.getAll(KOBWEB_PARAMS)!!
+        handleRedirect(basePath, pathSegments.joinToString("/"), redirects)
     }
 }
 
@@ -439,9 +439,9 @@ private fun Routing.configureCatchAllRouting(
     val patternMappers = conf.server.redirects.toPatternMappers()
 
     get("$basePath/{$KOBWEB_PARAMS...}") {
-        val pathParts = call.parameters.getAll(KOBWEB_PARAMS)!!
+        val pathSegments = call.parameters.getAll(KOBWEB_PARAMS)!!
         handleCatchAllRouting(
-            pathParts,
+            pathSegments,
             { path -> serveScriptFiles(path, script, scriptMap) },
             { path -> handleRedirect(basePath, path, patternMappers) },
             { path ->
@@ -457,9 +457,7 @@ private fun Routing.configureCatchAllRouting(
                 serveIndexFile(index).also {
                     application.log.debug(
                         "Served fallback index.html file in response to \"/${
-                            pathParts.joinToString(
-                                "/"
-                            )
+                            pathSegments.joinToString("/")
                         }\""
                     )
                 }; true

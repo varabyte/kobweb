@@ -36,7 +36,7 @@ fun processPagesFun(
                 file = file,
                 routeOverride = routeOverride,
                 packageMappings = packageMappings,
-                supportDynamicRoute = true,
+                supportEmptyDynamicSegments = true,
             ).let { if (it.endsWith("/index")) it.removeSuffix("index") else it }
 
             return PageEntry(annotatedFun.qualifiedName!!.asString(), route)

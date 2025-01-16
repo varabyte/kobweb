@@ -157,7 +157,7 @@ class BackendProcessor(
                 file = property.containingFile!!,
                 routeOverride = routeOverride,
                 packageMappings = packageMappings,
-                supportDynamicRoute = false,
+                supportEmptyDynamicSegments = false,
             )
 
             ApiStreamEntry(property.qualifiedName!!.asString(), resolvedRoute)
@@ -208,7 +208,7 @@ private fun processApiFun(
             file = file,
             routeOverride = routeOverride,
             packageMappings = packageMappings,
-            supportDynamicRoute = false,
+            supportEmptyDynamicSegments = false,
         )
         ApiEntry(annotatedFun.qualifiedName!!.asString(), resolvedRoute)
     } else {

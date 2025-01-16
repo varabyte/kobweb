@@ -578,19 +578,19 @@ Some examples can clarify these rules (and how they behave when combined). Assum
 
 While the slug is derived from the filename, earlier parts of the route are derived from the file's package.
 
-A package will be converted into a route part by removing any leading or trailing underscores (as these are often used
-to work around limitations into what values and keywords are allowed in a package name, e.g. `site.pages.blog._2022` and
-`site.events.fun_`) and converting camelCase packages into hyphenated words (so `site.pages.team.ourValues` generates
-the route `/team/our-values/`).
+A package will be converted into a route segment by removing any leading or trailing underscores (as these are often
+used to work around limitations into what values and keywords are allowed in a package name,
+e.g. `site.pages.blog._2022` and `site.events.fun_`) and converting camelCase packages into hyphenated words
+(so `site.pages.team.ourValues` generates the route `/team/our-values/`).
 
 #### PackageMapping
 
-If you'd like to override the route part generated for a package, you can use the `PackageMapping` annotation.
+If you'd like to override the route segment generated for a package, you can use the `PackageMapping` annotation.
 
 For example, let's say your team prefers not to use camelCase packages for aesthetic reasons. Or perhaps you
-intentionally want to add a leading underscore into your site's route part for some emphasis (since earlier we mentioned
-that leading underscores get removed automatically), such as in the route `/team/_internal/contact-numbers`. You can
-use package mappings for this.
+intentionally want to add a leading underscore into your site's route segment for some emphasis (since earlier we
+mentioned that leading underscores get removed automatically), such as in the route `/team/_internal/contact-numbers`.
+You can use package mappings for this.
 
 You apply the package mapping annotation to the current file. Using it looks like this:
 
@@ -665,8 +665,8 @@ want to register the path `users/{user}/posts/{post}` which would be visited if 
 How do we set it up? Thankfully, it's fairly easy.
 
 But first, notice that in the example dynamic route `users/{user}/posts/{post}` there are actually two different dynamic
-parts, one in the middle and one at the tail end. These can be handled by the `PackageMapping` and `Page` annotations,
-respectively.
+segments, one in the middle and one at the tail end. These can be handled by the `PackageMapping` and `Page`
+annotations, respectively.
 
 #### PackageMapping
 
@@ -700,7 +700,7 @@ fun PostPage() {
 
 An empty `"{}"` tells Kobweb to use the name of the current file.
 
-Remember that the `Page` annotation allows you to rewrite the entire route. That value also accepts dynamic parts, so
+Remember that the `Page` annotation allows you to rewrite the entire route. That value also accepts dynamic segments, so
 you could even do something like:
 
 ```kotlin
@@ -772,7 +772,7 @@ Of course, it is better to provide a more structured solution if you can (e.g. d
 `/store/products/{category}/{subcategory}/{product}`), but reality can be messy sometimes.
 
 > [!CAUTION]
-> Catch-all route parts MUST terminate the route. The following is not valid and will result in an exception being
+> Catch-all route segments MUST terminate the route. The following is not valid and will result in an exception being
 > thrown: `"/a/b/c/{...middle}/x/y/z"`.
 
 ##### Optional catch-all routes

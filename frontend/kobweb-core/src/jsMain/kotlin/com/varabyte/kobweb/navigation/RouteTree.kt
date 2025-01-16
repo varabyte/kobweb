@@ -38,7 +38,7 @@ internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageContent
     val dynamicParams = mutableMapOf<String, String>()
     resolved.forEach { resolvedEntry ->
         if (resolvedEntry.node is RouteTree.DynamicNode) {
-            dynamicParams[resolvedEntry.node.name] = resolvedEntry.capturedRoutePart
+            dynamicParams[resolvedEntry.node.name] = resolvedEntry.capturedRouteSegment
         }
     }
 

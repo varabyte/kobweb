@@ -23,7 +23,7 @@ import com.varabyte.kobweb.ksp.util.toSlug
  * @param routeOverride If specified, this will influence the final route. Depending on whether it starts with and/or
  *   ends with a slash, it will either replace the entire route or affect parts of it.
  * @param packageMappings A map of package to route mappings. See [RouteUtils.convertPackageToRoute] for more information.
- * @param supportDynamicRoute Whether or not to support the special "{}" route part. This is allowed on the frontend
+ * @param supportEmptyDynamicSegments Whether to support the special "{}" route segment. This is allowed on the frontend
  *   (where it captures values from the user's URL) but not on the backend.
  */
 fun processRoute(
@@ -32,7 +32,7 @@ fun processRoute(
     file: KSFile,
     routeOverride: String?,
     packageMappings: Map<String, String>,
-    supportDynamicRoute: Boolean,
+    supportEmptyDynamicSegments: Boolean,
 ): String {
     val slugFromFile = file.toSlug()
     val routeWithoutSlug = if (routeOverride != null && routeOverride.startsWith("/")) {
@@ -55,7 +55,7 @@ fun processRoute(
         routeOverride.substringAfterLast("/").let { value ->
             // {} is a special value which means infer from the current file,
             // e.g. `Slug.kt` -> `"{slug}"`
-            if (!supportDynamicRoute || value != "{}") value else "{${slugFromFile}}"
+            if (!supportEmptyDynamicSegments || value != "{}") value else "{${slugFromFile}}"
         }
     } else {
         slugFromFile
