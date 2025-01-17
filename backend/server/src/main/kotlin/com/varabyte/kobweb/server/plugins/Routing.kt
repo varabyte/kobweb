@@ -685,7 +685,7 @@ private fun Application.configureStaticProdRouting(conf: KobwebConf) {
             siteRootFile.walkBottomUp().filter { it.isFile }.forEach { file ->
                 val relativeFile = file.relativeTo(siteRootFile)
                 val name = relativeFile.name.removeSuffix(".html")
-                val parent = relativeFile.parent?.let { "$it/" } ?: ""
+                val parent = relativeFile.parentFile?.let { "${it.invariantSeparatorsPath}/" } ?: ""
 
                 val path = if (name != "index") "$basePath/$parent$name" else "$basePath/$parent"
                 get(path) { call.respondFile(file) }
