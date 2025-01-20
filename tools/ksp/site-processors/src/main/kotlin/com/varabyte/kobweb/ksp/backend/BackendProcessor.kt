@@ -30,6 +30,7 @@ import com.varabyte.kobweb.project.backend.ApiStreamEntry
 import com.varabyte.kobweb.project.backend.BackendData
 import com.varabyte.kobweb.project.backend.InitApiEntry
 import com.varabyte.kobweb.project.backend.assertValid
+import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.FrontendData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -39,9 +40,12 @@ class BackendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    private val qualifiedApiPackage: String,
+    projectGroup: String,
+    apiPackage: String,
 ) : SymbolProcessor {
     private val apiVisitor = ApiVisitor()
+
+    private val qualifiedApiPackage = PackageUtils.resolvePackageShortcut(projectGroup, apiPackage)
 
     private val initMethods = mutableListOf<InitApiEntry>()
 

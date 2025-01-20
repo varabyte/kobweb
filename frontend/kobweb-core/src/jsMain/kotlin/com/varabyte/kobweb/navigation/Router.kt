@@ -104,6 +104,9 @@ class Router {
         val isDynamic: Boolean, // Whether the path is dynamic or not, in case users want to filter them out
     )
 
+    private val layouts = mutableMapOf<String, LayoutMethod>()
+    private val layoutIdForPage = mutableMapOf<PageMethod, String>()
+    private val layoutIdForLayout = mutableMapOf<LayoutMethod, String>()
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree<PageMethod>()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
@@ -158,6 +161,7 @@ class Router {
             val data = routeTree.createPageData(route, errorPageMethod)
             activePageMethod = data.pageMethod
             this.route = data.routeInfo
+            this.data.clear()
             true
         } else {
             false
@@ -186,12 +190,25 @@ class Router {
             PageContextLocal provides PageContext.instance
         ) {
             pageWrapper {
+                var layoutMethod: LayoutMethod? = layoutIdForPage[pageMethod]?.let { layouts[it] }
+                val layouts: List<LayoutMethod> =
+                    buildList {
+                        while (layoutMethod != null) {
+                            add(0, layoutMethod)
+                            layoutMethod = layoutIdForLayout[layoutMethod]?.let { layouts[it] }
+                        }
+                    }
+
                 // If a user navigates between two different dynamic routes, e.g. "/users/a" and "/users/b" for route
                 // "/users/{user}", we want to treat this as a recomposition, since from the user's point of view, they
                 // are different URLs. Query params changing should NOT cause a recomposition though!
-                key(PageContext.instance.route.path) {
-                    pageMethod.invoke(PageContext.instance)
+                val keyedPageMethod: PageMethod = { ctx ->
+                    key(PageContext.instance.route.path) { pageMethod(ctx) }
                 }
+
+                layouts.foldRight(keyedPageMethod) { layout, accum ->
+                    { ctx -> layout(ctx, accum) }
+                }.invoke(PageContext.instance)
             }
         }
     }
@@ -235,6 +252,11 @@ class Router {
         return pathPart to this.removePrefix(pathPart)
     }
 
+    fun registerLayout(layoutId: String, parentLayoutId: String? = null, layoutMethod: LayoutMethod) {
+        layouts[layoutId] = layoutMethod
+        parentLayoutId?.let { layoutIdForLayout[layoutMethod] = it }
+    }
+
     /**
      * Register a route, mapping it to some target composable method that will get called when that path is requested by
      * the browser.
@@ -255,11 +277,13 @@ class Router {
      * `user = 123456` and `post = 321` passed down in the `PageContext`.
      */
     @Suppress("unused") // Called by generated code
-    fun register(route: String, pageMethod: PageMethod) {
+    fun register(route: String, layoutId: String? = null, pageMethod: PageMethod) {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(
             routeTree.register(BasePath.prependTo(route), pageMethod)
         ) { "Registration failure. Path is already registered: $route" }
+
+        layoutId?.let { layoutIdForPage[pageMethod] = it }
     }
 
     @Suppress("unused") // Called by generated code

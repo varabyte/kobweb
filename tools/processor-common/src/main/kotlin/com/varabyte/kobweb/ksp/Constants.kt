@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.ksp
 
+const val KSP_PROJECT_GROUP_KEY = "kobweb.projectGroup"
 const val KSP_PAGES_PACKAGE_KEY = "kobweb.pagesPackage"
 const val KSP_API_PACKAGE_KEY = "kobweb.apiPackage"
 const val KSP_PROCESSOR_MODE_KEY = "kobweb.mode"

@@ -14,7 +14,7 @@ import com.varabyte.kobweb.ksp.KSP_API_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.KSP_DEFAULT_CSS_PREFIX_KEY
 import com.varabyte.kobweb.ksp.KSP_PAGES_PACKAGE_KEY
 import com.varabyte.kobweb.ksp.KSP_PROCESSOR_MODE_KEY
-import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobweb.ksp.KSP_PROJECT_GROUP_KEY
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.provider.Property
@@ -25,7 +25,10 @@ import org.gradle.language.jvm.tasks.ProcessResources
 
 fun Project.applyKspPlugin() = pluginManager.apply(KspGradleSubplugin::class.java)
 
-fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE_KEY to mode.name)
+fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(
+    KSP_PROCESSOR_MODE_KEY to mode.name,
+    KSP_PROJECT_GROUP_KEY to group.toString(),
+)
 
 /**
  * Add & configure the Kobweb KSP processor for JS sources.
@@ -38,10 +41,7 @@ fun Project.setupKspJs(target: JsTarget, defaultCssPrefix: Property<String>? = n
 
     configureKspTask(target) {
         addKspArguments(
-            KSP_PAGES_PACKAGE_KEY to PackageUtils.resolvePackageShortcut(
-                this@setupKspJs.group.toString(),
-                kobwebBlock.pagesPackage.get()
-            )
+            KSP_PAGES_PACKAGE_KEY to kobwebBlock.pagesPackage.get()
         )
         defaultCssPrefix?.orNull?.let {
             addKspArguments(KSP_DEFAULT_CSS_PREFIX_KEY to it)
@@ -61,9 +61,7 @@ fun Project.setupKspJvm(target: JvmTarget) {
     addKspDependency(target)
 
     configureKspTask(target) {
-        val apiPackage =
-            PackageUtils.resolvePackageShortcut(this@setupKspJvm.group.toString(), kobwebBlock.apiPackage.get())
-        addKspArguments(KSP_API_PACKAGE_KEY to apiPackage)
+        addKspArguments(KSP_API_PACKAGE_KEY to this@setupKspJvm.kobwebBlock.apiPackage.get())
     }
 }
 

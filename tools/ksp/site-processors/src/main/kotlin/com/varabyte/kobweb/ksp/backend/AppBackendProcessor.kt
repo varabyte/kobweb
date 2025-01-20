@@ -19,7 +19,8 @@ class AppBackendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    qualifiedApiPackage: String,
+    projectGroup: String,
+    apiPackage: String,
 ) : SymbolProcessor {
     private val fileDependencies = mutableSetOf<KSFile>()
 
@@ -31,7 +32,8 @@ class AppBackendProcessor(
         codeGenerator = codeGenerator,
         logger = logger,
         genFile = "",
-        qualifiedApiPackage = qualifiedApiPackage,
+        projectGroup = projectGroup,
+        apiPackage = apiPackage,
     )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {

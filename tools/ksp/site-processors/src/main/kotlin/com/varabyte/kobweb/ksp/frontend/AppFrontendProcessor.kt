@@ -19,7 +19,8 @@ class AppFrontendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    qualifiedPagesPackage: String,
+    projectGroup: String,
+    pagesPackage: String,
     defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
     private val fileDependencies = mutableListOf<KSFile>()
@@ -31,7 +32,8 @@ class AppFrontendProcessor(
         codeGenerator = codeGenerator,
         logger = logger,
         genFile = "",
-        qualifiedPagesPackage = qualifiedPagesPackage,
+        projectGroup = projectGroup,
+        pagesPackage = pagesPackage,
         defaultCssPrefix = defaultCssPrefix,
     )
 

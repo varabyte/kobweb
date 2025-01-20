@@ -13,6 +13,7 @@ import com.varabyte.kobweb.project.frontend.PageEntry
  */
 fun processPagesFun(
     annotatedFun: KSFunctionDeclaration,
+    layoutFun: KSFunctionDeclaration?,
     qualifiedPagesPackage: String,
     packageMappings: Map<String, String>,
     logger: KSPLogger,
@@ -53,7 +54,8 @@ fun processPagesFun(
             return PageEntry(
                 annotatedFun.qualifiedName!!.asString(),
                 route,
-                acceptsContext = annotatedFun.parameters.size == 1
+                acceptsContext = annotatedFun.parameters.size == 1,
+                layoutFqn = layoutFun?.qualifiedName?.asString()
             )
         } else {
             logger.warn(

@@ -27,6 +27,8 @@ class PageContext internal constructor(val router: Router) {
             routeState.value = value
         }
 
+    val data: MutableMap<String, Any?> = mutableStateMapOf()
+
     class RouteInfo internal constructor(
         private val route: Route,
         /**

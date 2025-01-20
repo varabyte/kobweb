@@ -26,6 +26,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class FrontendData(
+    val layouts: List<LayoutEntry> = mutableListOf(),
     val pages: List<PageEntry> = mutableListOf(),
     val kobwebInits: List<InitKobwebEntry> = mutableListOf(),
     val silkInits: List<InitSilkEntry> = mutableListOf(),
@@ -41,6 +42,7 @@ class FrontendData(
  */
 fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
     return FrontendData(
+        this.flatMap { it.layouts },
         this.flatMap { it.pages },
         this.flatMap { it.kobwebInits },
         this.flatMap { it.silkInits },
@@ -94,7 +96,18 @@ class InitKobwebEntry(val fqn: String, val acceptsContext: Boolean)
 class KeyframesEntry(val fqcn: String, val name: String, val import: String? = null)
 
 /**
- * Information about a method in the user's code targeted by an `@Page` annotation.
+ * Information about a method in the user's code targeted by a `@Layout` annotation.
+ *
+ * @property fqn The fully qualified name of the method
+ * @property acceptsContext If true, the method accepts a single `PageContext` argument; otherwise, no arguments.
+ * @property parentLayoutFqn The fully qualified name of a layout that parents this one, if present (indicated this is
+ *   a nested layout).
+ */
+@Serializable
+class LayoutEntry(val fqn: String, val acceptsContext: Boolean, val parentLayoutFqn: String? = null)
+
+/**
+ * Information about a method in the user's code targeted by a `@Page` annotation.
  *
  * @param fqn The fully qualified name of the method
  * @param route The associated route that should be generated for this page method, e.g. "/example/path". The final
@@ -102,9 +115,10 @@ class KeyframesEntry(val fqcn: String, val name: String, val import: String? = n
  *   as well.
  * @param acceptsContext If true, the method accepts a single `PageContext` argument; otherwise, no arguments. Defaults
  *   to false for compatibility with libraries using a version of Kobweb before this feature was introduced.
+ * @param layoutFqn The fully qualified name of the parent layout method for this page.
  */
 @Serializable
-class PageEntry(val fqn: String, val route: String, val acceptsContext: Boolean = false)
+class PageEntry(val fqn: String, val route: String, val acceptsContext: Boolean = false, val layoutFqn: String? = null)
 
 /**
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)

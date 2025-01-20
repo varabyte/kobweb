@@ -32,17 +32,21 @@ import com.varabyte.kobweb.ksp.common.CSS_STYLE_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
+import com.varabyte.kobweb.ksp.common.LAYOUT_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
+import com.varabyte.kobweb.ksp.common.PAGE_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
+import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.InitKobwebEntry
 import com.varabyte.kobweb.project.frontend.InitSilkEntry
 import com.varabyte.kobweb.project.frontend.KeyframesEntry
+import com.varabyte.kobweb.project.frontend.LayoutEntry
 import com.varabyte.kobweb.project.frontend.assertValid
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -53,11 +57,15 @@ class FrontendProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val genFile: String,
-    private val qualifiedPagesPackage: String,
+    private val projectGroup: String,
+    pagesPackage: String,
     private val defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
     private val pageDeclarations = mutableListOf<KSFunctionDeclaration>()
 
+    private val qualifiedPagesPackage = PackageUtils.resolvePackageShortcut(projectGroup, pagesPackage)
+
+    private val layoutsFor = mutableMapOf<KSFunctionDeclaration, KSFunctionDeclaration>()
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
@@ -72,6 +80,31 @@ class FrontendProcessor(
     private val fileDependencies = mutableSetOf<KSFile>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+
+        val pageContextName = resolver.getKSNameFromString(PAGE_CONTEXT_FQN)
+        // Layout annotated methods are not (necessarily) layout methods themselves; but they point at layout methods.
+        resolver.getSymbolsWithAnnotation(LAYOUT_FQN).forEach { annotatedFun ->
+            fileDependencies.add(annotatedFun.containingFile!!)
+
+            val layoutMethodName =
+                annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value.toString()
+                    .let { layoutFqn ->
+                        PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)
+                    }
+                    .let { resolver.getKSNameFromString(it) }
+
+            resolver.getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
+                .singleOrNull {
+                    // A valid layout method takes an optional first parameter of type `PageContext` and a final
+                    // parameter of type `@Composable () -> Unit`
+                    ((it.parameters.size == 2 && it.parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
+                        || it.parameters.size == 1)
+                        && it.parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
+                }?.let { layoutMethod ->
+                    layoutsFor[annotatedFun as KSFunctionDeclaration] = layoutMethod
+                }
+        }
+
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
             val name = (annotatedFun as KSFunctionDeclaration).qualifiedName!!.asString()
@@ -526,10 +559,22 @@ class FrontendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
+        val layouts = run {
+            val layoutMethods = layoutsFor.values.toSet()
+            layoutMethods.map { layout ->
+                LayoutEntry(
+                    layout.qualifiedName!!.asString(),
+                    layout.parameters.size == 2,
+                    layoutsFor[layout]?.qualifiedName?.asString()
+                )
+            }
+        }
+
         // pages are processed here as they rely on packageMappings, which may be populated over several rounds
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
                 annotatedFun = annotatedFun,
+                layoutFun = layoutsFor[annotatedFun],
                 qualifiedPagesPackage = qualifiedPagesPackage,
                 packageMappings = packageMappings,
                 logger = logger,
@@ -548,6 +593,7 @@ class FrontendProcessor(
         }
 
         val frontendData = FrontendData(
+            layouts,
             pages,
             kobwebInits,
             silkInits,

@@ -176,10 +176,32 @@ fun createMainFunction(
                 addStatement("val router = Router()")
                 addStatement("$KOBWEB_GROUP.core.init.initKobweb(router) { ctx ->")
                 withIndent {
+                    frontendData.layouts.sortedBy { it.fqn }.forEach { entry ->
+                        addStatement(
+                            buildString {
+                                append("ctx.router.registerLayout(\"${entry.fqn}\"")
+                                if (entry.parentLayoutFqn != null) {
+                                    append(", parentLayoutId = \"${entry.parentLayoutFqn}\"")
+                                }
+                                append(") { pageCtx, pageMethod -> ")
+                                append("${entry.fqn}(")
+                                if (entry.acceptsContext) {
+                                    append("pageCtx")
+                                }
+                                append(") { pageMethod(pageCtx) } }")
+                            }
+                        )
+
+                    }
                     frontendData.pages.sortedBy { it.route }.forEach { entry ->
                         addStatement(
                             buildString {
-                                append("ctx.router.register(\"${entry.route}\") { ")
+                                append("ctx.router.register(\"${entry.route}\"")
+                                if (entry.layoutFqn != null) {
+                                    append(", layoutId = \"${entry.layoutFqn}\"")
+                                }
+                                append(") { ")
+
                                 if (entry.acceptsContext) {
                                     append("pageCtx -> ")
                                 }
