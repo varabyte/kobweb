@@ -8,8 +8,11 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
+import org.w3c.dom.INSTANT
 import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
+import org.w3c.dom.ScrollBehavior
+import org.w3c.dom.ScrollToOptions
 import org.w3c.dom.url.URL
 import org.w3c.xhr.XMLHttpRequest
 
@@ -435,7 +438,7 @@ class Router {
                     }
 
                     if (onNewPage) {
-                        document.documentElement?.scrollTop = 0.0
+                        window.scroll(ScrollToOptions(0.0, 0.0, ScrollBehavior.INSTANT))
                     }
                 }
 
