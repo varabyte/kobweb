@@ -401,7 +401,7 @@ class Router {
                     xhr.send(null)
 
                     if (fileExistsOnServer) {
-                        window.open(pathQueryAndFragment)
+                        window.open(pathQueryAndFragment, OpenLinkStrategy.IN_PLACE)
                         return true
                     }
                 }
