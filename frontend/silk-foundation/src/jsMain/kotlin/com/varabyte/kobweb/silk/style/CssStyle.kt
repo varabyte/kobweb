@@ -123,7 +123,6 @@ internal value class ClassSelectors(private val value: List<String>) {
  *
  * You can use [CssName] and [CssPrefix] annotations to customize the name of the CSS class generated for a style.
  */
-@Immutable // TODO: Remove when CMP-5680 is fixed
 abstract class CssStyle<K : CssKind> internal constructor(
     internal val init: CssStyleScope.() -> Unit,
     internal val extraModifier: @Composable () -> Modifier = { Modifier },
