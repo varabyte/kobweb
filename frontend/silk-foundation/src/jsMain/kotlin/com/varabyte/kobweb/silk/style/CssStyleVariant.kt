@@ -3,7 +3,6 @@ package com.varabyte.kobweb.silk.style
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
 
-@Immutable // TODO: Remove when CMP-5680 is fixed
 abstract class CssStyleVariant<K : ComponentKind> {
     infix fun then(next: CssStyleVariant<K>): CssStyleVariant<K> {
         return CompositeCssStyleVariant(this, next)
