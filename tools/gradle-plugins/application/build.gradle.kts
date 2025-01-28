@@ -49,7 +49,7 @@ val serverJar by configurations.registering {
 }
 dependencies {
     @Suppress("UnstableApiUsage")
-    serverJar(project(projects.backend.server.dependencyProject.path, configuration = "shadow"))
+    serverJar(project(projects.backend.server.path, configuration = "shadow"))
 }
 
 /**
