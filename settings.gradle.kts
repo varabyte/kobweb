@@ -9,10 +9,11 @@ rootProject.name = "kobweb"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+include(":common:client-server-internal")
+include(":common:framework-annotations")
 include(":common:kobweb-common")
 include(":common:kobweb-serialization")
 include(":common:kobwebx-serialization-kotlinx")
-include(":common:client-server-internal")
 include(":frontend:kobweb-core")
 include(":frontend:kobweb-compose")
 include(":frontend:kobweb-silk")

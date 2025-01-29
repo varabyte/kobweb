@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.dom
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.framework.annotations.DelicateApi
 import org.w3c.dom.Comment
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
@@ -57,9 +58,11 @@ private fun walk(nodes: NodeList) {
  * }
  * ```
  *
- * **IMPORTANT**: This method does *not* sanitize input and should only be called with HTML that you control!!
+ * **Important:** This method does *not* sanitize input. **Do not** use it with untrusted HTML, as it may introduce
+ * security vulnerabilities, such as XSS (Cross-Site Scripting).
  */
 @Composable
+@DelicateApi("This method does *not* sanitize input and must only be called with HTML that you fully control. Using untrusted input may lead to security vulnerabilities.")
 fun RawHtml(htmlString: String) {
     val parser = DOMParser()
     val doc = parser.parseFromString(htmlString, "text/html")

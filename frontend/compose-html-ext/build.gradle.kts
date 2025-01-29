@@ -14,6 +14,7 @@ kotlin {
 
     sourceSets {
         jsMain.dependencies {
+            api(projects.common.frameworkAnnotations) // api or else opt-in message won't be shown
             implementation(libs.compose.runtime)
             implementation(libs.compose.html.core)
             api(libs.kotlinx.coroutines)
