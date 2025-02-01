@@ -1,7 +1,7 @@
 package com.varabyte.kobweb.compose.dom
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.framework.annotations.DelicateApi
+import com.varabyte.kobweb.framework.annotations.UnsafeApi
 import org.w3c.dom.Comment
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
@@ -47,7 +47,7 @@ private fun walk(nodes: NodeList) {
  *
  * This is a convenience method for generating compose nodes for raw HTML.
  *
- * For example, `"<div>Hello <i>World</i></div>"` will generate:
+ * For example, `RawHtml("<div>Hello <i>World</i></div>")` is equivalent to:
  *
  * ```
  * GenericTag("div") {
@@ -60,9 +60,25 @@ private fun walk(nodes: NodeList) {
  *
  * **Important:** This method does *not* sanitize input. **Do not** use it with untrusted HTML, as it may introduce
  * security vulnerabilities, such as XSS (Cross-Site Scripting).
+ *
+ * As this method is unsafe, you are expected to opt-in to using it. Additionally, you are heavily encouraged to leave a
+ * comment for why your use of this method is OK:
+ *
+ * ```
+ * @OptIn(UnsafeApi::class) // Safe here since we control the text
+ * RawHtml("<div>Hello <i>World</i></div>")
+ *
+ * @OptIn(UnsafeApi::class) // This input comes from our server and was already sanitized there
+ * RawHtml(input)
+ * ```
+ *
+ * This method delegates to [`DOMParser.parseFromString(...)`](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString)
+ * passing in `"text/html"` as the mime type, so you can read about that method for more details. One quirk is that
+ * `<script>` tags, if present, will be disabled, which is done for security purposes. The parser attempts to handle
+ * invalid HTML instead of throwing exceptions, as well, meaning any errors will be handled silently.
  */
 @Composable
-@DelicateApi("This method does *not* sanitize input and must only be called with HTML that you fully control. Using untrusted input may lead to security vulnerabilities.")
+@UnsafeApi("This method does *not* sanitize input and must only be called with HTML that you fully control. Using untrusted input may lead to security vulnerabilities.")
 fun RawHtml(htmlString: String) {
     val parser = DOMParser()
     val doc = parser.parseFromString(htmlString, "text/html")
