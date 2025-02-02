@@ -17,7 +17,7 @@ import com.varabyte.kobweb.api.log.Logger
  *
  * @property env The current server environment, in case you need to branch logic in development vs production
  *   environments.
- * @property path The path of the API endpoint being requested.
+ * @property path The path of the API endpoint being requested, including a leading slash.
  * @property req Request information sent from the client. This instance of the request is mutable, meaning some fields
  *   (headers, cookies, body, and content-type) can still be changed.
  * @property data Readonly data store potentially populated by methods annotated with [InitApi].
