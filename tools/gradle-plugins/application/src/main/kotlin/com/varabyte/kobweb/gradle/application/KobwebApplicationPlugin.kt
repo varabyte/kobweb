@@ -225,7 +225,9 @@ class KobwebApplicationPlugin @Inject constructor(
         val taskListenerService = project.gradle.sharedServices
             .registerIfAbsent("kobweb-task-listener", KobwebTaskListener::class.java) {
                 parameters.kobwebStartTaskName = kobwebStartTask.name
-                parameters.isKobwebStartBuild = kobwebStartTask.name in project.gradle.startParameter.taskNames
+                // Tasks may include a project prefix (e.g. `site:kobwebStart`), so we compare just the base task name
+                parameters.isKobwebStartBuild = project.gradle.startParameter.taskNames
+                    .any { it.substringAfterLast(':') == kobwebStartTask.name }
                 parameters.kobwebFolderFile = kobwebFolder.path.toFile()
             }
         buildEventsListenerRegistry.onTaskCompletion(taskListenerService)
