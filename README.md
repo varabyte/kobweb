@@ -5790,3 +5790,25 @@ plenty of work to do to get to a 1.0 launch! We are hungry for the community's f
 * Ask us for guidance, especially as there are no tutorials yet (your questions can help us know what to write first!)
 
 Thank you for your support and interest in Kobweb!
+
+# Supporting the project
+
+You should feel no obligation to pay anything to use my software -- it is liberally licensed quite intentionally and
+given to the community without any strings attached.
+
+However, if you like what I am doing and would like to support my efforts financially, I would gratefully accept a
+donation at [ko-fi.com/bitspittle](https://ko-fi.com/bitspittle). Money will go towards development fees and rewarding
+contributors.
+
+Alternately, there are countless non-financial ways to support this project as well, such as:
+
+* Just use Kobweb yourself and spread the word!
+* Consider tagging your website with a "Made with [Kobweb](https://github.com/varabyte/kobweb)" blurb in the footer.
+* Write articles about Kobweb / share your experience using it.
+* Send us feedback, be it appreciative or critical. Please don't be shy about letting us know if there are things you
+  feel are missing -- if you have ideas that you think can make Kobweb better, please share them.
+* Join our community on Discord and/or Slack and answer questions.
+* Pick up a bug or feature to work on.
+
+Ultimately, I want Kobweb to be known for having a kind, patient, and welcoming community. As long as you are helping
+us accomplish that, then please consider yourself already supporting our efforts.
