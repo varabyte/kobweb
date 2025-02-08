@@ -5770,22 +5770,6 @@ I'm pleased to mention that Kobweb has received feedback from some satisfied use
 * "Finally got paid -- all thanks to kobweb 🎉💥"
 * "I didn't wanna learn any JS framework so when I first learned about kobweb it felt like a no-brainer; having built 2 Android apps with compose already and a backend with ktor. One could argue Android developers are the best target audience since the additional knowledge needed to move an app to the web with Kobweb is minimal. I love it! 🤩"
 
-## BrowserStack
-
-Kobweb uses [BrowserStack](https://www.browserstack.com/) when we need to test its APIs on older browsers.
-
-We appreciate their support for the open source community.
-
-<!--
-NOTE: For open source support, BrowserStack requires the following line in the README:
-
-This project is tested with BrowserStack.
-
-But this is technically not quite accurate, as Kobweb itself is just the framework that generates projects
-that get tested with BrowserStack. Hopefully the blurb we wrote above is both more accurate and more useful
-to the BrowserStack team.
--->
-
 # Connecting with us
 
 * [Join my Discord!](https://discord.gg/5NZ2GKV5Cs)
