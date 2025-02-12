@@ -296,10 +296,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 dependencies.set(project.getTransitiveJsDependencyResults())
             }
 
-            val jsRunTasks = listOf(
-                jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun,
-                jsTarget.browserRun, jsTarget.run,
-            )
+            val jsRunTasks = listOf(jsTarget.browserDevelopmentRun, jsTarget.browserProductionRun)
             // Users should be using Kobweb tasks instead of the standard multiplatform tasks, but they
             // probably don't know that. We do our best to work even in those cases, but warn the user to prefer
             // the Kobweb commands instead.
