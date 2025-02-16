@@ -16,6 +16,7 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.display.Callout
 import com.varabyte.kobweb.silk.components.display.CalloutType
@@ -81,6 +82,7 @@ import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
 import com.varabyte.kobweb.silk.components.icons.mdi.MdiSearch
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
+import com.varabyte.kobweb.silk.components.navigation.Link
 import com.varabyte.kobweb.silk.components.overlay.KeepPopupOpenStrategy
 import com.varabyte.kobweb.silk.components.overlay.Popover
 import com.varabyte.kobweb.silk.components.overlay.PopupPlacement
@@ -538,6 +540,19 @@ fun WidgetsPage() {
                             "tooltip",
                             placement = PopupPlacement.Right,
                             keepOpenStrategy = manualStrat
+                        )
+                    }
+
+                    Column(Modifier.gap(1.cssRem)) { // Should close after switching back to the tab
+                        Link(
+                            "https://example.com",
+                            "Click to open a new tab",
+                            openExternalLinksStrategy = OpenLinkStrategy.IN_NEW_TAB
+                        )
+                        Tooltip(
+                            ElementTarget.PreviousSibling,
+                            "This tooltip should not remain open after coming back to this page",
+                            placement = PopupPlacement.Right
                         )
                     }
 

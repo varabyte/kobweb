@@ -82,7 +82,14 @@ fun OpenClosePopupStrategy.Companion.onFocus() = object : OpenClosePopupStrategy
     override fun init(targetElement: HTMLElement) {
         manager = EventListenerManager(targetElement).apply {
             addEventListener("focusin") { emitRequest(OpenClose.OPEN) }
-            addEventListener("focusout") { emitRequest(OpenClose.CLOSE) }
+            addEventListener("focusout") {
+                // The `focusout` event can be triggered by the browser tab/window losing focus, which we do not want to
+                // treat as a close event. If you don't check for this and click on an element (with a popup) that opens
+                // a new tab, you'll see the popup open when you switch back to the page.
+                if (document.hasFocus()) {
+                    emitRequest(OpenClose.CLOSE)
+                }
+            }
             if (targetElement.contains(document.activeElement)) emitRequest(OpenClose.OPEN)
         }
     }
