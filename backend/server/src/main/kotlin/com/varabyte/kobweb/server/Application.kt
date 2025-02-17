@@ -121,7 +121,7 @@ suspend fun main() {
     val engine = embeddedServer(Netty, port) {
         configureRouting(env, siteLayout, conf, globals, events)
         configureSerialization()
-        configureHTTP(conf)
+        configureHTTP(env, conf)
 
         val loader = ServiceLoader.load(KobwebServerPlugin::class.java, pluginClassloader)
         loader.forEach { kobwebServerPlugin -> kobwebServerPlugin.configure(this) }

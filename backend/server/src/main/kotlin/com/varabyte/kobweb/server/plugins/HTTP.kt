@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.server.plugins
 
 import com.varabyte.kobweb.project.conf.KobwebConf
+import com.varabyte.kobweb.server.api.ServerEnvironment
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -10,7 +11,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.forwardedheaders.*
 
-fun Application.configureHTTP(conf: KobwebConf) {
+fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
     install(DefaultHeaders) {
         header("X-Engine", "Ktor")
 
@@ -69,11 +70,13 @@ fun Application.configureHTTP(conf: KobwebConf) {
         }
     }
 
-    install(CachingHeaders) {
-        options { _, outgoingContent ->
-            when (outgoingContent.contentType?.withoutParameters()) {
-                ContentType.Text.CSS -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
-                else -> null
+    if (env == ServerEnvironment.PROD) {
+        install(CachingHeaders) {
+            options { _, outgoingContent ->
+                when (outgoingContent.contentType?.withoutParameters()) {
+                    ContentType.Text.CSS -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
+                    else -> null
+                }
             }
         }
     }
