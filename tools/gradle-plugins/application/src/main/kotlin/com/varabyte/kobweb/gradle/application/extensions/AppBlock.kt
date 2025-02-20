@@ -357,6 +357,11 @@ abstract class AppBlock @Inject constructor(
         abstract val forceCopyingForRedirects: Property<Boolean>
 
         /**
+         * If true, hide the warning shown the projects that don't define a root route.
+         */
+        abstract val suppressNoRootWarning: Property<Boolean>
+
+        /**
          * Enable traces for your export.
          *
          * Traces are a feature provided by Playwright (the engine we use to download a browser and take export
@@ -388,6 +393,7 @@ abstract class AppBlock @Inject constructor(
             browser.convention(Browser.Chromium)
             includeSourceMap.convention(true)
             forceCopyingForRedirects.convention(false)
+            suppressNoRootWarning.convention(false)
         }
     }
 

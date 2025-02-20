@@ -176,10 +176,8 @@ abstract class KobwebExportTask @Inject constructor(
                 data.pages.toList().let { entries ->
                     if (entries.isEmpty()) {
                         throw GradleException("No pages were defined. You must tag at least one page with the `@Page` annotation!")
-                    } else if (entries.none { it.route == "/" }) {
-                        throw GradleException(
-                            "No root route was defined for your site. This means if people visit your website URL, they'll get a 404 error. Create a `@Page` in a root `pages/Index.kt` file to make this warning go away."
-                        )
+                    } else if (!exportBlock.suppressNoRootWarning.get() && entries.none { it.route == "/" }) {
+                        logger.warn("w: No root route was defined for your site. This means if people visit your website URL, they'll get a 404 error. Create a `@Page` in a root `pages/Index.kt` file OR add `kobweb.app.export.suppressNoRootWarning.set(true)` to your build script to make this warning go away.")
                     }
                 }
             }
