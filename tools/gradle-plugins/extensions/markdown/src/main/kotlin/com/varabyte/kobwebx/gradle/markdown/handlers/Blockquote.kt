@@ -43,13 +43,15 @@ val SilkCalloutTypes = mapOf(
  * overridden by users on a case-by-case basis by specifying the label inside the callout syntax. For
  * example: `[!NOTE "My Custom Label"]`.
  *
- * But you can change the default label globally, specifying it in the [labels] parameter. For example, if you want
+ * But you can also change the default label globally, specifying it in the [labels] parameter. For example, if you want
  * to set the "QUOTE" type to have an empty label by default (which looks clean), you can set the [labels]
  * parameter to `mapOf("QUOTE" to "")`. NOTE: If you specify a key in [labels] that isn't also registered in
  * [types], it will essentially be ignored.
  *
  * Finally, you can specify an alternate callout variant to use (perhaps `OutlinedCalloutVariant` or something from
- * your own project) by setting the [variant] parameter.
+ * your own project) by setting the [variant] parameter. You can specify an override for the variant in markdown by
+ * wrapping it in curly braces, like
+ * so: `[!NOTE {variant = com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant}]`.
  */
 fun SilkCalloutBlockquoteHandler(
     types: Map<String, String> = SilkCalloutTypes,
@@ -60,19 +62,36 @@ fun SilkCalloutBlockquoteHandler(
         val silkCallout = blockQuote.firstChild.firstChild?.let { firstChild ->
             @Suppress("NAME_SHADOWING")
             val firstChild = firstChild as? Text ?: return@let null
-            val regex = """\[!([^ ]+)( "(.*)")?]""".toRegex() // [!TYPE "LABEL"]
+            val regex = """\[!([^ ]+)( "(.*)")?( \{(.*)})?]""".toRegex() // [!TYPE "LABEL" {VARIANT}]
             val typeMatch = regex.find(firstChild.literal) ?: return@let null
             firstChild.literal = firstChild.literal.substringAfter(typeMatch.value)
 
             val typeId = typeMatch.groupValues[1]
             val isLabelSet = typeMatch.groupValues[2].isNotBlank()
             val label = typeMatch.groupValues[3].takeIf { isLabelSet } ?: labels[typeId]
-
+            val areParametersSet = typeMatch.groupValues[4].isNotBlank()
+            val parameters: Map<String, String> = typeMatch.groupValues[5]
+                .takeIf { areParametersSet }
+                ?.let { parameters ->
+                    try {
+                        val keyValuePairs = parameters.split(",").map { it.trim() }
+                        keyValuePairs.associate {
+                            val (key, value) = it.split("=", limit = 2)
+                            key.trim() to value.trim()
+                        }
+                    } catch (_: Exception) {
+                        // Swallow malformed input! No great way to inform users this happened -- but maybe we can add
+                        // syntax highlighting to our Kobweb IntelliJ plugin someday.
+                        // See https://github.com/varabyte/kobweb-intellij-plugin/issues/65
+                        emptyMap()
+                    }
+                }
+                ?: emptyMap()
+            @Suppress("NAME_SHADOWING")
+            val variant = parameters["variant"] ?: variant ?: "$SILK.display.CalloutDefaults.Variant"
             val calloutTypeFqn = types[typeId]?.let {
                 PackageUtils.resolvePackageShortcut(data.getValue(MarkdownHandlers.DataKeys.ProjectGroup), it)
             }
-
-            @Suppress("NAME_SHADOWING") val variant = variant ?: "$SILK.display.CalloutDefaults.Variant"
 
             if (calloutTypeFqn != null) {
                 """$SILK.display.Callout(type = $calloutTypeFqn, label = ${label?.let { "\"$it\"" }}, variant = $variant)"""

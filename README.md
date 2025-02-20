@@ -2315,14 +2315,14 @@ and a filled variant:
 
 ![Markdown filled callout](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callout-filled.png)
 
-You can also combine any of the standard variants with an additional matching link variant (e.g.
-`LeftBorderedCalloutVariant.then(MatchingLinkCalloutVariant))`) to make it so that any hyperlinks inside the callout
-will match the color of the callout itself:
+When specifying a callout variant in code, you can combine any of the standard variants with an additional matching link
+variant (e.g. `LeftBorderedCalloutVariant.then(MatchingLinkCalloutVariant))`) to make it so that any hyperlinks inside
+the callout will match the color of the callout itself:
 
 ![Markdown matching link callouts](https://github.com/varabyte/media/raw/main/kobweb/images/widgets/callouts-matching-link.png)
 
 If you prefer any of these styles over the default, you can set the `variant` parameter in the
-`SilkCalloutBlockquoteHandler`, for example here we set it to the outlined variant:
+`SilkCalloutBlockquoteHandler`. For example, here we set it to the outlined variant:
 
 ```kotlin
 kobweb {
@@ -2334,7 +2334,14 @@ kobweb {
 }
 ```
 
-Of course, you can also define your own variant in your own codebase and pass that in here as well.
+You can also specify the variant from within the markdown syntax, passing it in as a parameter there using a curly brace
+syntax:
+
+```markdown
+> [!NOTE {variant = com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant}]
+```
+
+Of course, you can also define your own callout variant in your own codebase and pass that in as well.
 
 #### Custom callouts
 
