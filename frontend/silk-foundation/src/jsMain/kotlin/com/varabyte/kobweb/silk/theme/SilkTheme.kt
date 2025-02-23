@@ -517,9 +517,15 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
  * dereference this (i.e. `!!`) on any style that has been declared as a
  * property (e.g. `val MyStyle = CssStyle { ... }`).
  */
-val CssStyle<*>.name
-    get() = SilkTheme.nameFor(this)
-        ?: error("Name requested for invalid CssStyle. This should only be called on top-level public styles or styles that got manually registered")
+val CssStyle<*>.name: String
+    get() {
+        if (_SilkTheme == null) {
+            error("Attempting to get the name for a CssStyle instance before Silk is initialized.")
+        }
+
+        return _SilkTheme!!.nameFor(this)
+            ?: error("Name requested for invalid CssStyle. This should only be called on top-level public styles or styles that got manually registered")
+    }
 
 /**
  * Return the class name associated with the given [CssStyleVariant].
@@ -528,11 +534,17 @@ val CssStyle<*>.name
  * dereference this (i.e. `!!`) on any variant that has been declared as a
  * property (e.g. `val MyVariant = SomeStyle.addVariant { ... }`).
  */
-val CssStyleVariant<*>.name
-    get() = (this as? SimpleCssStyleVariant<*>)?.let { simpleVariant ->
-        SilkTheme.nameFor(simpleVariant.cssStyle)
+val CssStyleVariant<*>.name: String
+    get() {
+        if (_SilkTheme == null) {
+            error("Attempting to get the name for a CssStyleVariant instance before Silk is initialized.")
+        }
+
+        return (this as? SimpleCssStyleVariant<*>)?.let { simpleVariant ->
+            _SilkTheme!!.nameFor(simpleVariant.cssStyle)
+        }
+            ?: error("Name requested for invalid CssStyleVariant. Did you call this on a composite variant (e.g. `FirstVariant.then(SecondVariant)`?)")
     }
-        ?: error("Name requested for invalid CssStyleVariant. Did you call this on a composite variant (e.g. `FirstVariant.then(SecondVariant)`?)")
 
 /**
  * Return the class name associated with the given [Keyframes].
@@ -541,9 +553,14 @@ val CssStyleVariant<*>.name
  * dereference this (i.e. `!!`) on any keyframes that has been declared as a
  * property (e.g. `val MyKeyframes = Keyframes { ... }`).
  */
-val Keyframes.name
-    get() = SilkTheme.nameFor(this)
-        ?: error("Name requested for invalid Keyframes. This should only be called on top-level public keyframes or keyframes that got manually registered")
+val Keyframes.name: String
+    get() {
+        if (_SilkTheme == null) {
+            error("Attempting to get the name for a Keyframes instance before Silk is initialized. If you are trying to create an animation as part of a top-level Modifier declaration, consider putting it inside a `lazy` block, or move it into a `CssStyle`.")
+        }
+        return _SilkTheme!!.nameFor(this)
+            ?: error("Name requested for invalid Keyframes. This should only be called on top-level public keyframes or keyframes that got manually registered")
+    }
 
 internal var _SilkTheme: ImmutableSilkTheme? = null
 val SilkTheme: ImmutableSilkTheme
