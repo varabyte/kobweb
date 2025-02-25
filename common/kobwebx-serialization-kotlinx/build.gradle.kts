@@ -27,6 +27,10 @@ kotlin {
             implementation(kotlin("test-js"))
             implementation(libs.truthish)
         }
+
+        jvmMain.dependencies {
+            implementation(projects.backend.kobwebApi)
+        }
     }
 }
 
