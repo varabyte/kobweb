@@ -477,8 +477,11 @@ class Router {
     /**
      * Like [tryRoutingTo] but handle the external navigation as well.
      *
-     * In other words, it can handle paths like `/example/route`, which would be considered an internal route, or
-     * `https://example.com/some/route`, which would be considered external.
+     * In other words, it can handle paths like `/example/route`, which would be considered an internal route, and also
+     * `https://example.com/some/route`, referencing some outside domain, which would be considered external.
+     *
+     * Internal routes open instantly without needing to fetch any additional information from the server, while
+     * external paths make a server request.
      *
      * You will generally call this method like so:
      *
@@ -488,11 +491,24 @@ class Router {
      *   ctx.router.navigateTo(...)
      * ```
      *
-     * Note that this method will automatically prepend this site's [BasePath] if it is configured and if
-     * [pathQueryAndFragment] is an absolute route.
+     * Note that if [pathQueryAndFragment] is a domain-less, absolute route (that is, it starts with a slash), then this
+     * method will automatically prepend this site's [BasePath] if it is configured.
+     *
+     * Finally, if you pass in a path that starts with the current site's domain, then this method will treat it as an
+     * external navigation *except* it will use [openInternalLinksStrategy] instead of [openExternalLinksStrategy] when
+     * opening the link. This will also skip adding the [BasePath] prefix, because it is assumed you are grounding your
+     * link to your own domain on purpose at that point.
+     *
+     * It may seem like an odd choice to allow an external navigation to your own site, but this enables a use-case
+     * where you might split your Kobweb site across multiple servers, e.g. one for the main site and another for
+     * subfolders, and then you can use external navigations against your own domain to jump between them.
      *
      * @param updateHistoryMode This parameter is only used for internal site routing. See [tryRoutingTo] for more
      *   information.
+     * @param openInternalLinksStrategy The tab opening strategy to use when [pathQueryAndFragment] is a link that
+     *   would result in the user staying inside the same domain.
+     * @param openExternalLinksStrategy The tab opening strategy to use when [pathQueryAndFragment] is a link that
+     *   would result in the user leaving the current domain.
      */
     fun navigateTo(
         pathQueryAndFragment: String,
@@ -501,12 +517,18 @@ class Router {
         openExternalLinksStrategy: OpenLinkStrategy = OpenLinkStrategy.IN_NEW_TAB,
     ) {
         if (!tryRoutingTo(
-                pathQueryAndFragment.removePrefix(window.origin),
+                pathQueryAndFragment,
                 updateHistoryMode,
                 openInternalLinksStrategy,
             )
         ) {
-            window.open(pathQueryAndFragment, openExternalLinksStrategy)
+            window.open(pathQueryAndFragment,
+                if (pathQueryAndFragment.startsWith(window.origin)) {
+                    openInternalLinksStrategy
+                } else {
+                    openExternalLinksStrategy
+                }
+            )
         }
     }
 }
