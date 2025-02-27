@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.icons
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.svg.SVGFillType
 import com.varabyte.kobweb.compose.dom.svg.SVGStrokeType
 import com.varabyte.kobweb.compose.dom.svg.SVGSvgAttrsScope
@@ -54,6 +55,8 @@ fun createIcon(
                 }
             }
         }
+        // Prevents clipping when the SVG has a fractional pixel size
+        style { overflow(Overflow.Visible) }
         attrs?.invoke(this)
     }, content)
 }
