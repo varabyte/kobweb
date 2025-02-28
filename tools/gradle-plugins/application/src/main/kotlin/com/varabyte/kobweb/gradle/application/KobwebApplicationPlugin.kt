@@ -293,6 +293,7 @@ class KobwebApplicationPlugin @Inject constructor(
             }
 
             kobwebGenSiteIndexTask.configure {
+                publicPath.set(kobwebBlock.publicPath)
                 compileClasspath.from(project.configurations.named(jsTarget.compileClasspath))
                 dependencies.set(project.getTransitiveJsDependencyResults())
             }
@@ -323,6 +324,7 @@ class KobwebApplicationPlugin @Inject constructor(
                 kotlin.srcDir(kobwebGenSiteEntryTask)
                 resources.srcDir(kobwebCopySupplementalResourcesTask)
                 resources.srcDir(kobwebCopyWorkerJsOutputTask)
+                resources.srcDir(kobwebGenSiteIndexTask.flatMap { it.getGenResDir() })
             }
 
             // When exporting, both dev + production webpack actions are triggered - dev for the temporary server
