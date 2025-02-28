@@ -14,7 +14,7 @@ for more details on why.
 >
 > ```kotlin
 > fun main() {
->     renderComposable(rootElementId = "root") {
+>     renderComposable(rootElementId = "_kobweb-root") {
 >         StyleSheet(KobwebComposeStyleSheet) // REQUIRED
 >         ...
 >     }

@@ -94,7 +94,7 @@ fun createIndexFile(
 
                 body {
                     div {
-                        id = "root"
+                        id = "_kobweb-root"
                         // Fill max size just in case user sets html / body size
                         style = "width: 100%; height: 100%;"
                     }

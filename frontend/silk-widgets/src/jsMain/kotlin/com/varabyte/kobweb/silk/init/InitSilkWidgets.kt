@@ -401,7 +401,7 @@ fun SilkWidgetVariables(elementId: String) {
     ReplaceWith("SilkWidgetVariables(rootElementId)")
 )
 @Composable
-fun Document.setSilkWidgetVariables(rootElementId: String = "root") {
+fun Document.setSilkWidgetVariables(rootElementId: String = "_kobweb-root") {
     SilkWidgetVariables { this.getElementById(rootElementId) as HTMLElement }
 }
 

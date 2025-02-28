@@ -248,13 +248,13 @@ fun createMainFunction(
             addComment("versions. Think of this as poor man's hydration :)")
             addComment("See also: https://en.wikipedia.org/wiki/Hydration_(web_development)")
             addCode(CodeBlock.Builder().apply {
-                addStatement("val root = document.getElementById(\"root\")!!")
+                addStatement("val root = document.getElementById(\"_kobweb-root\")!!")
                 addStatement("while (root.firstChild != null) { root.removeChild(root.firstChild!!) }")
                 addStatement("")
             }.build())
 
             addCode(CodeBlock.Builder().apply {
-                addStatement("renderComposable(rootElementId = \"root\") {")
+                addStatement("renderComposable(rootElementId = \"_kobweb-root\") {")
                 withIndent {
                     addStatement("$appFqn {")
                     withIndent {

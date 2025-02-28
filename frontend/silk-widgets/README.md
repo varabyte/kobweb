@@ -10,7 +10,7 @@ plugin does for you. To do that, you must call `SilkFoundationStyles`, `SilkWidg
 
 ```kotlin
 fun main() {
-    renderComposable(rootElementId = "root") {
+    renderComposable(rootElementId = "_kobweb-root") {
         KobwebComposeStyles() // OPTIONAL but recommended for `Box`, `Row`, `Column`, etc. support
         SilkFoundationStyles() // REQUIRED
         SilkWidgetVariables() // REQUIRED
