@@ -69,9 +69,16 @@ import com.varabyte.kobweb.silk.components.icons.SunIcon
 import com.varabyte.kobweb.silk.components.icons.WarningIcon
 import com.varabyte.kobweb.silk.components.icons.fa.FaBolt
 import com.varabyte.kobweb.silk.components.icons.fa.FaCheck
+import com.varabyte.kobweb.silk.components.icons.fa.FaCloud
 import com.varabyte.kobweb.silk.components.icons.fa.FaDollarSign
+import com.varabyte.kobweb.silk.components.icons.fa.FaGithub
+import com.varabyte.kobweb.silk.components.icons.fa.FaHouse
+import com.varabyte.kobweb.silk.components.icons.fa.FaStar
 import com.varabyte.kobweb.silk.components.icons.fa.FaUser
-import com.varabyte.kobweb.silk.components.icons.fa.IconStyle
+import com.varabyte.kobweb.silk.components.icons.mdi.MdiClose
+import com.varabyte.kobweb.silk.components.icons.mdi.MdiHome
+import com.varabyte.kobweb.silk.components.icons.mdi.MdiMenu
+import com.varabyte.kobweb.silk.components.icons.mdi.MdiSearch
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
 import com.varabyte.kobweb.silk.components.overlay.KeepPopupOpenStrategy
@@ -95,6 +102,8 @@ import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Text
 import playground.components.layouts.PageLayout
 import playground.components.widgets.GoHomeLink
+import com.varabyte.kobweb.silk.components.icons.fa.IconStyle as FaIconStyle
+import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle as MdiIconStyle
 
 val WidgetSectionStyle = CssStyle.base {
     Modifier
@@ -245,43 +254,85 @@ fun WidgetsPage() {
             }
 
             WidgetSection("Icons") {
-                val icons = mapOf<String, @Composable () -> Unit>(
-                    "Arrow Back" to { ArrowBackIcon() },
-                    "Arrow Down" to { ArrowDownIcon() },
-                    "Arrow Forward" to { ArrowForwardIcon() },
-                    "Arrow Up" to { ArrowUpIcon() },
-                    "Attachment" to { AttachmentIcon() },
-                    "Check" to { CheckIcon() },
-                    "Chevron Down" to { ChevronDownIcon() },
-                    "Chevron Left" to { ChevronLeftIcon() },
-                    "Chevron Right" to { ChevronRightIcon() },
-                    "Chevron Up" to { ChevronUpIcon() },
-                    "Circle" to { CircleIcon() },
-                    "Close" to { CloseIcon() },
-                    "Download" to { DownloadIcon() },
-                    "Exclaim" to { ExclaimIcon() },
-                    "Hamburger" to { HamburgerIcon() },
-                    "Indeterminate" to { IndeterminateIcon() },
-                    "Info" to { InfoIcon() },
-                    "Lightbulb" to { LightbulbIcon() },
-                    "Minus" to { MinusIcon() },
-                    "Moon" to { MoonIcon() },
-                    "Plus" to { PlusIcon() },
-                    "Question" to { QuestionIcon() },
-                    "Quote" to { QuoteIcon() },
-                    "Square" to { SquareIcon() },
-                    "Stop" to { StopIcon() },
-                    "Sun" to { SunIcon() },
-                    "Warning" to { WarningIcon() },
-                )
+                Column(Modifier.fillMaxWidth().gap(1.cssRem).padding(top = 0.5.cssRem)) {
+                    WidgetSection("SVG") {
+                        val icons = mapOf<String, @Composable () -> Unit>(
+                            "Arrow Back" to { ArrowBackIcon() },
+                            "Arrow Down" to { ArrowDownIcon() },
+                            "Arrow Forward" to { ArrowForwardIcon() },
+                            "Arrow Up" to { ArrowUpIcon() },
+                            "Attachment" to { AttachmentIcon() },
+                            "Check" to { CheckIcon() },
+                            "Chevron Down" to { ChevronDownIcon() },
+                            "Chevron Left" to { ChevronLeftIcon() },
+                            "Chevron Right" to { ChevronRightIcon() },
+                            "Chevron Up" to { ChevronUpIcon() },
+                            "Circle" to { CircleIcon() },
+                            "Close" to { CloseIcon() },
+                            "Download" to { DownloadIcon() },
+                            "Exclaim" to { ExclaimIcon() },
+                            "Hamburger" to { HamburgerIcon() },
+                            "Indeterminate" to { IndeterminateIcon() },
+                            "Info" to { InfoIcon() },
+                            "Lightbulb" to { LightbulbIcon() },
+                            "Minus" to { MinusIcon() },
+                            "Moon" to { MoonIcon() },
+                            "Plus" to { PlusIcon() },
+                            "Question" to { QuestionIcon() },
+                            "Quote" to { QuoteIcon() },
+                            "Square" to { SquareIcon() },
+                            "Stop" to { StopIcon() },
+                            "Sun" to { SunIcon() },
+                            "Warning" to { WarningIcon() },
+                        )
 
-                Row(
-                    Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    icons.forEach { (iconName, iconMethod) ->
-                        Box(IconContainerStyle.toModifier()) { iconMethod() }
-                        Tooltip(ElementTarget.PreviousSibling, iconName)
+                        Row(
+                            Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            icons.forEach { (iconName, iconMethod) ->
+                                Box(IconContainerStyle.toModifier()) { iconMethod() }
+                                Tooltip(ElementTarget.PreviousSibling, iconName)
+                            }
+                        }
+                    }
+
+                    WidgetSection("Web - Font Awesome") {
+                        val faIcons = mapOf<String, @Composable () -> Unit>(
+                            "Home" to { FaHouse() },
+                            "Cloud" to { FaCloud() },
+                            "Star" to { FaStar(style = FaIconStyle.FILLED) },
+                            "GitHub" to { FaGithub() }
+                        )
+
+                        Row(
+                            Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            faIcons.forEach { (iconName, iconMethod) ->
+                                Box(IconContainerStyle.toModifier()) { iconMethod() }
+                                Tooltip(ElementTarget.PreviousSibling, iconName)
+                            }
+                        }
+                    }
+
+                    WidgetSection("Web - Google Material Design") {
+                        val mdiIcons = mapOf<String, @Composable () -> Unit>(
+                            "Search" to { MdiSearch() },
+                            "Home" to { MdiHome(style = MdiIconStyle.OUTLINED) },
+                            "Menu" to { MdiMenu() },
+                            "Close" to { MdiClose() },
+                        )
+
+                        Row(
+                            Modifier.gap(0.5.cssRem).flexWrap(FlexWrap.Wrap),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            mdiIcons.forEach { (iconName, iconMethod) ->
+                                Box(IconContainerStyle.toModifier()) { iconMethod() }
+                                Tooltip(ElementTarget.PreviousSibling, iconName)
+                            }
+                        }
                     }
                 }
             }
@@ -370,7 +421,7 @@ fun WidgetsPage() {
                         Column(Modifier.gap(0.5.cssRem)) {
                             var username by remember { mutableStateOf("") }
                             InputGroup {
-                                LeftInset { FaUser(style = IconStyle.FILLED) }
+                                LeftInset { FaUser(style = FaIconStyle.FILLED) }
                                 TextInput(
                                     username,
                                     placeholder = "username",

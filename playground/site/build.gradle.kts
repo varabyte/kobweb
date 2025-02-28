@@ -13,6 +13,13 @@ group = "playground"
 version = "1.0-SNAPSHOT"
 
 kobweb {
+    app {
+        index {
+            interceptUrls {
+                enableSelfHosting()
+            }
+        }
+    }
     markdown {
         imports.add(".components.widgets.*")
         process.set { markdownEntries ->
@@ -39,6 +46,7 @@ kotlin {
             implementation("com.varabyte.kobweb:kobweb-core")
             implementation("com.varabyte.kobweb:kobweb-silk")
             implementation("com.varabyte.kobwebx:silk-icons-fa")
+            implementation("com.varabyte.kobwebx:silk-icons-mdi")
             implementation("com.varabyte.kobwebx:kobwebx-markdown")
             implementation("com.varabyte.kobwebx:kobwebx-serialization-kotlinx")
             implementation(project(":sitelib"))
