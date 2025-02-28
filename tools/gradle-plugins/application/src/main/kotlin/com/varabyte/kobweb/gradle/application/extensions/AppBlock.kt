@@ -126,6 +126,9 @@ abstract class AppBlock @Inject constructor(
         /**
          * A list of dependencies that should be excluded from generating html elements in the `index.html` file.
          *
+         * In general, if a library is adding elements to your head block, it is *probably* for a good reason, but it is
+         * worth auditing what they are doing at least.
+         *
          * Each entry in this list is a String prefix, which is checked to see if an actual dependency name begins with
          * this value.
          *
@@ -133,9 +136,8 @@ abstract class AppBlock @Inject constructor(
          * "some-library-js-1.0.klib" itself, or "some-library-js-1.0", or "some-library-js", or even just
          * "some-library".
          *
-         * If a project ever includes a Kobweb library that declares a collection of head elements, this will be
-         * reported with a message that shows what they are and includes instructions on using this method. An example
-         * message looks like this:
+         * When Kobweb detects that a dependency is trying to add head elements, this will be reported with a message
+         * that shows what they are and includes instructions on using this method. An example message looks like this:
          *
          * ```
          * Dependency "kotlin-bootstrap-js-1.0.klib" will add the following <head> elements to your site's index.html:
@@ -145,10 +147,16 @@ abstract class AppBlock @Inject constructor(
          * Add `kobweb { app { index { excludeHtmlForDependencies.add("kotlin-bootstrap") } } }` to your build.gradle.kts file to opt-out.
          * ```
          *
-         * You can do a full opt-out by calling [excludeAllHtmlFromDependencies].
+         * In general, if you see a library doing something suspicious, you probably shouldn't use it at all. However,
+         * if the library is doing something like adding a reasonable CDN path, but you are concerned about that for
+         * some personal reason, e.g. for GDPR, you can then use this property to exclude the dependency and add the
+         * relevant files yourself, e.g. hosting files locally on your own server instead of using the CDN link.
          *
-         * If you intentionally don't want to exclude a library and don't want the warning to show up,
-         * use [suppressHtmlWarningsForDependencies] instead.
+         * You can do a full opt-out from all dependencies by calling [excludeAllHtmlFromDependencies] (but understand
+         * this could break functionality provided by some libraries).
+         *
+         * If you trust the library and don't want the warning to show up, use [suppressHtmlWarningsForDependencies]
+         * instead.
          */
         @get:Input
         abstract val excludeHtmlForDependencies: ListProperty<String>
