@@ -161,9 +161,15 @@ val CalloutStyle = CssStyle<CalloutKind> {
     }
 }
 
-// Markdown generates blockquote content wrapped in a <p> tag, which adds weird spacing that we don't want.
-private fun CssStyleScope.markdownParagraphHack() {
-    cssRule(" >.callout-body>p:last-child") {
+// If the callout content is wrapped in a <p> tag (which is the default behavior for Markdown content), we do not want
+// paragraph spacing to interfere with the callout layout.
+// An alternative would be to embrace the <p> spacing in our design, but this would lead to poor results for sites which
+// explicitly remove margin from their <p> tags as part of a CSS reset.
+private fun CssStyleScope.removeEdgeParagraphSpacing() {
+    cssRule(" > .callout-body > p:first-child") {
+        Modifier.marginBlock { start(0.px) }
+    }
+    cssRule(" > .callout-body > p:last-child") {
         Modifier.marginBlock { end(0.px) }
     }
 }
@@ -182,7 +188,7 @@ val LeftBorderedCalloutVariant = CalloutStyle.addVariant {
             .margin { bottom(1.cssRem) }
     }
 
-    markdownParagraphHack()
+    removeEdgeParagraphSpacing()
 }
 
 // Style from https://just-the-docs.com/docs/ui-components/callouts/
@@ -202,10 +208,10 @@ val LeftBorderedFilledCalloutVariant = CalloutStyle.addVariant {
     cssRule(" >.callout-title") {
         Modifier
             .color(CalloutVars.Color.value())
-            .margin { bottom(0.5.cssRem) }
+            .margin { bottom(0.75.cssRem) }
     }
 
-    markdownParagraphHack()
+    removeEdgeParagraphSpacing()
 }
 
 
@@ -231,7 +237,7 @@ val OutlinedCalloutVariant = CalloutStyle.addVariant {
         Modifier.padding(0.5.cssRem, 0.75.cssRem)
     }
 
-    markdownParagraphHack()
+    removeEdgeParagraphSpacing()
 }
 
 /**
