@@ -10,8 +10,11 @@ import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.forwardedheaders.*
+import kotlin.math.log
 
 fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
+    val logger = log
+
     install(DefaultHeaders) {
         header("X-Engine", "Ktor")
 
@@ -48,7 +51,17 @@ fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
         allowCredentials = true
         allowNonSimpleContentTypes = true // Kobweb uses octet-streams
 
-        conf.server.cors.hosts.forEach { host -> allowHost(host.name, host.schemes, host.subdomains) }
+        conf.server.cors.hosts.let { corsHosts ->
+            corsHosts.forEach { host -> allowHost(host.name, host.schemes, host.subdomains) }
+
+            if (corsHosts.isNotEmpty()) {
+                logger.info("CORS: Registered host(s): ${corsHosts.joinToString(", ") { it.name }}")
+            } else {
+                logger.info("CORS: No hosts registered.")
+            }
+        }
+
+
     }
 
     install(Compression) {
