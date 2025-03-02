@@ -13,7 +13,6 @@ import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
-import com.varabyte.kobweb.silk.components.icons.CloseIcon
 import com.varabyte.kobweb.silk.components.icons.ExclaimIcon
 import com.varabyte.kobweb.silk.components.icons.InfoIcon
 import com.varabyte.kobweb.silk.components.icons.LightbulbIcon
@@ -42,6 +41,7 @@ object CalloutVars {
     val BackgroundColor by StyleVariable<CSSColorValue>(prefix = "silk")
     val TitleFontSize by StyleVariable<CSSLengthNumericValue>(prefix = "silk")
     val TitleGap by StyleVariable<CSSLengthNumericValue>(prefix = "silk", defaultFallback = 0.5.cssRem)
+    val TitleLineHeight by StyleVariable<Number>(prefix = "silk", defaultFallback = 1)
 }
 
 class CalloutType(
@@ -157,6 +157,7 @@ val CalloutStyle = CssStyle<CalloutKind> {
             .fontWeight(FontWeight.Medium)
             .fontSize(CalloutVars.TitleFontSize.value())
             .gap(CalloutVars.TitleGap.value())
+            .lineHeight(CalloutVars.TitleLineHeight.value())
     }
 }
 
@@ -201,7 +202,7 @@ val LeftBorderedFilledCalloutVariant = CalloutStyle.addVariant {
     cssRule(" >.callout-title") {
         Modifier
             .color(CalloutVars.Color.value())
-            .margin { bottom(0.25.cssRem) }
+            .margin { bottom(0.5.cssRem) }
     }
 
     markdownParagraphHack()
@@ -219,7 +220,7 @@ val OutlinedCalloutVariant = CalloutStyle.addVariant {
     cssRule(" >.callout-title") {
         Modifier
             .backgroundColor(CalloutVars.BackgroundColor.value())
-            .padding(0.5.cssRem, 0.75.cssRem)
+            .padding(0.75.cssRem, 0.75.cssRem)
     }
 
     cssRule(" .callout-icon") {
