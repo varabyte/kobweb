@@ -11,6 +11,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.forwardedheaders.*
 import kotlin.math.log
+import kotlin.time.Duration.Companion.days
 
 fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
     val logger = log
@@ -87,7 +88,7 @@ fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
         install(CachingHeaders) {
             options { _, outgoingContent ->
                 when (outgoingContent.contentType?.withoutParameters()) {
-                    ContentType.Text.CSS -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
+                    ContentType.Text.CSS -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 1.days.inWholeSeconds.toInt()))
                     else -> null
                 }
             }
