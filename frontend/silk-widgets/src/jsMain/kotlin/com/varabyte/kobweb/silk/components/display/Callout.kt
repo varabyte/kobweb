@@ -240,6 +240,25 @@ val OutlinedCalloutVariant = CalloutStyle.addVariant {
     removeEdgeParagraphSpacing()
 }
 
+// Inspired by https://imfing.github.io/hextra/docs/guide/markdown/#alerts
+val OutlinedFilledCalloutVariant = CalloutStyle.addVariant {
+    base {
+        Modifier
+            .border(1.px, LineStyle.Solid, CalloutVars.Color.value())
+            .backgroundColor(CalloutVars.BackgroundColor.value())
+            .borderRadius(4.px)
+            .padding(0.75.cssRem)
+    }
+
+    cssRule(" >.callout-title") {
+        Modifier
+            .color(CalloutVars.Color.value())
+            .margin { bottom(0.75.cssRem) }
+    }
+
+    removeEdgeParagraphSpacing()
+}
+
 /**
  * A variant which makes it so any links inside the callout match the callout's color.
  *

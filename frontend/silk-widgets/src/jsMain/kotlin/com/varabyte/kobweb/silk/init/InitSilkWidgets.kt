@@ -17,6 +17,7 @@ import com.varabyte.kobweb.silk.components.display.LeftBorderedCalloutVariant
 import com.varabyte.kobweb.silk.components.display.LeftBorderedFilledCalloutVariant
 import com.varabyte.kobweb.silk.components.display.MatchingLinkCalloutVariant
 import com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant
+import com.varabyte.kobweb.silk.components.display.OutlinedFilledCalloutVariant
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.ButtonStyle
 import com.varabyte.kobweb.silk.components.forms.ButtonVars
@@ -256,6 +257,7 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerVariant("-left-bordered", LeftBorderedCalloutVariant)
     mutableTheme.registerVariant("-left-bordered-filled", LeftBorderedFilledCalloutVariant)
     mutableTheme.registerVariant("-outlined", OutlinedCalloutVariant)
+    mutableTheme.registerVariant("-outlined-filled", OutlinedFilledCalloutVariant)
     mutableTheme.registerVariant("-matching-link", MatchingLinkCalloutVariant)
     mutableTheme.registerStyle("silk-checkbox", CheckboxStyle)
     mutableTheme.registerVariant("-checkbox", CheckboxInputVariant)
