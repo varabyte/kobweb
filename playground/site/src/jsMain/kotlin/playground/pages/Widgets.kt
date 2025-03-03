@@ -21,6 +21,7 @@ import com.varabyte.kobweb.silk.components.display.Callout
 import com.varabyte.kobweb.silk.components.display.CalloutType
 import com.varabyte.kobweb.silk.components.display.LeftBorderedFilledCalloutVariant
 import com.varabyte.kobweb.silk.components.display.OutlinedCalloutVariant
+import com.varabyte.kobweb.silk.components.display.OutlinedFilledCalloutVariant
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.ButtonSize
 import com.varabyte.kobweb.silk.components.forms.Checkbox
@@ -55,10 +56,10 @@ import com.varabyte.kobweb.silk.components.icons.DownloadIcon
 import com.varabyte.kobweb.silk.components.icons.ExclaimIcon
 import com.varabyte.kobweb.silk.components.icons.HamburgerIcon
 import com.varabyte.kobweb.silk.components.icons.IndeterminateIcon
-import com.varabyte.kobweb.silk.components.icons.MinusIcon
-import com.varabyte.kobweb.silk.components.icons.MoonIcon
 import com.varabyte.kobweb.silk.components.icons.InfoIcon
 import com.varabyte.kobweb.silk.components.icons.LightbulbIcon
+import com.varabyte.kobweb.silk.components.icons.MinusIcon
+import com.varabyte.kobweb.silk.components.icons.MoonIcon
 import com.varabyte.kobweb.silk.components.icons.PlusIcon
 import com.varabyte.kobweb.silk.components.icons.QuestionIcon
 import com.varabyte.kobweb.silk.components.icons.QuoteIcon
@@ -166,9 +167,10 @@ fun WidgetsPage() {
                         CalloutType.IMPORTANT,
                         CalloutType.WARNING,
                     ).forEach { type ->
-                        Callout(type,  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
-                        Callout(type,  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = OutlinedCalloutVariant)
-                        Callout(type,  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = LeftBorderedFilledCalloutVariant)
+                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = LeftBorderedFilledCalloutVariant)
+                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = OutlinedFilledCalloutVariant)
+                        Callout(type, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", variant = OutlinedCalloutVariant)
                     }
                 }
             }
