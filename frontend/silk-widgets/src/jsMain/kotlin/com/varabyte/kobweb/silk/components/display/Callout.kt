@@ -174,7 +174,7 @@ private fun CssStyleScope.removeEdgeParagraphSpacing() {
     }
 }
 
-// Style from https://github.com/orgs/community/discussions/16925
+// Inspired by https://github.com/orgs/community/discussions/16925
 val LeftBorderedCalloutVariant = CalloutStyle.addVariant {
     base {
         Modifier
@@ -191,14 +191,14 @@ val LeftBorderedCalloutVariant = CalloutStyle.addVariant {
     removeEdgeParagraphSpacing()
 }
 
-// Style from https://just-the-docs.com/docs/ui-components/callouts/
+// Inspired by https://just-the-docs.com/docs/ui-components/callouts/
 val LeftBorderedFilledCalloutVariant = CalloutStyle.addVariant {
     base {
         Modifier
             .borderLeft(0.25.em, LineStyle.Solid, CalloutVars.Color.value())
             .backgroundColor(CalloutVars.BackgroundColor.value())
             .borderRadius(4.px)
-            .padding(0.8.cssRem)
+            .padding(0.75.cssRem, 1.cssRem)
             .boxShadow(
                 BoxShadow.of(0.px, 1.px, 2.px, color = Colors.Black.copyf(alpha = 0.12f)),
                 BoxShadow.of(0.px, 3.px, 10.px, color = Colors.Black.copyf(alpha = 0.08f)),
@@ -215,7 +215,7 @@ val LeftBorderedFilledCalloutVariant = CalloutStyle.addVariant {
 }
 
 
-// Style from https://squidfunk.github.io/mkdocs-material/reference/admonitions/
+// Inspired by https://squidfunk.github.io/mkdocs-material/reference/admonitions/
 val OutlinedCalloutVariant = CalloutStyle.addVariant {
     base {
         Modifier
@@ -234,7 +234,7 @@ val OutlinedCalloutVariant = CalloutStyle.addVariant {
     }
 
     cssRule(" >.callout-body") {
-        Modifier.padding(0.5.cssRem, 0.75.cssRem)
+        Modifier.padding(0.75.cssRem, 0.75.cssRem)
     }
 
     removeEdgeParagraphSpacing()
