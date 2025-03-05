@@ -13,41 +13,15 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
 import java.nio.file.Path
 import java.security.MessageDigest
-
-private fun Project.getRoots(
-    platform: TargetPlatform<*>,
-    sourceSetToDirSet: (KotlinSourceSet) -> SourceDirectorySet
-): Sequence<File> {
-    return project.kotlin.sourceSets.asSequence()
-        .filter { sourceSet -> sourceSet.name == platform.mainSourceSet }
-        .flatMap { sourceSet -> sourceSetToDirSet(sourceSet).srcDirs }
-}
 
 fun Project.getResourceSources(target: TargetPlatform<*>): Provider<SourceDirectorySet> =
     project.kotlin.sourceSets.named(target.mainSourceSet).map { it.resources }
 
 class RootAndFile(val root: File, val file: File) {
     val relativeFile get() = file.relativeTo(root)
-}
-
-private fun Project.getFilesWithRoots(
-    platform: TargetPlatform<*>,
-    sourceSetToDirSet: (KotlinSourceSet) -> SourceDirectorySet
-): Sequence<RootAndFile> {
-    return project.getRoots(platform, sourceSetToDirSet)
-        .flatMap { root ->
-            root.walkBottomUp()
-                .filter { it.isFile && it.startsWith(root) }
-                .map { file -> RootAndFile(root, file) }
-        }
-}
-
-fun Project.getSourceFilesWithRoots(platform: TargetPlatform<*>): Sequence<RootAndFile> {
-    return project.getFilesWithRoots(platform) { sourceSet -> sourceSet.kotlin }
 }
 
 private fun Project.getDependencyResultsFromConfiguration(configurationName: String): List<ResolvedDependencyResult> {
