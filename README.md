@@ -4601,31 +4601,6 @@ fun initSilk(ctx: InitSilkContext) {
 
 You've just tamed some wild CSS styles, congratulations!
 
-## Removing the legacy route strategy
-
-Kobweb used to support a feature called legacy routes (you
-can [read more about the feature here](https://github.com/varabyte/kobweb/tree/v0.18.2#legacy-routes) using an earlier
-version of the Kobweb README). This was an emergency feature added to give users time to respond to us fixing a
-long-standing mistake with our initial route naming algorithm without breaking their existing sites.
-
-As of v0.18.3, we believe enough time has passed, and legacy route support has finally been removed. As a result, users
-who never migrated away from the feature might be seeing an error pointing them to this section.
-
-If that is you, please follow these steps:
-
-1. In your site directory, run `../gradlew kobwebListRoutes` and look for any routes that have hyphens in them.
-2. Search through your codebase to see if there are any versions of those links but with hyphens removed. If so,
-   update them.
-3. Consider updating the `redirects` section of the `conf.yaml` file to explicitly redirect from the old route to the
-   new one. See the [Redirects▲](#redirects) section for more information.
-4. If you are using a third-party hosting provider for serving your site, check their documentation to learn how to
-   notify them of these redirects.
-5. Delete the `legacyRouteRedirectStrategy = ...` line from the `kobweb.app` block in your build script.
-
-> [!TIP]
-> This [target commit](https://github.com/bitspittle/bitspittle.dev/commit/08b508ffcbb8503d1b3a7242213c8183aa9f15f3)
-> demonstrates how I upgraded my blog site (which uses Firebase) to move away from Kobweb legacy route redirecting.
-
 ## Generating site code at compile time
 
 Occasionally, you might find yourself wanting code for your site that is better generated programmatically than written

@@ -47,14 +47,6 @@ private val LocalDeferred = staticCompositionLocalOf<DeferredComposablesState> {
     error("Attempting to defer rendering without calling `DeferringHost`, a required pre-requisite.")
 }
 
-@Deprecated("Renamed to `Deferred` to be consistent with official Compose naming conventions.",
-    ReplaceWith("Deferred(content)")
-)
-@Composable
-fun deferRender(content: @Composable () -> Unit) {
-    Deferred(content)
-}
-
 /**
  * Defer the target [content] from rendering until the main content is finished.
  *
@@ -70,14 +62,6 @@ fun Deferred(content: @Composable () -> Unit) {
     val deferredEntry = remember(state) { state.append() }
     deferredEntry.content = content
     DisposableEffect(deferredEntry) { onDispose { deferredEntry.dismiss() } }
-}
-
-@Deprecated("Renamed to `DeferringHost` to be consistent with official Compose naming conventions.",
-    ReplaceWith("DeferringHost(content)")
-)
-@Composable
-fun renderWithDeferred(content: @Composable () -> Unit) {
-    DeferringHost(content)
 }
 
 /**
