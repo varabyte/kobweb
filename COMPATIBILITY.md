@@ -32,4 +32,5 @@ This page lists the versions of Compose and Kotlin that each version of Kobweb i
 You should consider keeping these versions in sync in your own projects if possible to avoid unexpected
 issues around diverging APIs.
 
-[^k2]: See [migration docs](docs/k2-migration.md) if upgrading to Kobweb 0.19.x from an older project.
+[^k2]: See [migration docs](https://github.com/varabyte/kobweb/blob/v0.19.0/docs/k2-migration.md) if upgrading to Kobweb
+0.19.x from an older project.

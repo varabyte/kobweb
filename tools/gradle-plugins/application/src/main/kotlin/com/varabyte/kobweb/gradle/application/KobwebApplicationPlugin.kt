@@ -38,7 +38,6 @@ import com.varabyte.kobweb.gradle.core.ksp.kspExcludedSources
 import com.varabyte.kobweb.gradle.core.ksp.setKspMode
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJs
 import com.varabyte.kobweb.gradle.core.ksp.setupKspJvm
-import com.varabyte.kobweb.gradle.core.registerKobwebMigrationTasks
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.gradle.core.util.configureHackWorkaroundSinceWebpackTaskIsBrokenInContinuousMode
 import com.varabyte.kobweb.gradle.core.util.getBuildScripts
@@ -402,8 +401,6 @@ class KobwebApplicationPlugin @Inject constructor(
 
             dependsOn(project.tasks.withType<KobwebGenerateTask>())
         }
-
-        project.registerKobwebMigrationTasks()
     }
 }
 

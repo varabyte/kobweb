@@ -5,8 +5,6 @@ import com.varabyte.kobweb.gradle.core.extensions.YarnLockChangedStrategy
 import com.varabyte.kobweb.gradle.core.extensions.createYarnBlock
 import com.varabyte.kobweb.gradle.core.extensions.yarn
 import com.varabyte.kobweb.gradle.core.tasks.KobwebGenerateModuleMetadataTask
-import com.varabyte.kobweb.gradle.core.tasks.migration.KobwebMigrateToCssStyleTask
-import com.varabyte.kobweb.gradle.core.tasks.migration.KobwebMigrateToK2Task
 import com.varabyte.kobweb.gradle.core.util.KOBWEB_CONFIGURE_COMPOSE_COMPILER
 import com.varabyte.kobweb.gradle.core.util.configureComposeCompiler
 import org.gradle.api.GradleException
@@ -52,17 +50,6 @@ class KobwebCorePlugin : Plugin<Project> {
 
         if (project.providers.gradleProperty(KOBWEB_CONFIGURE_COMPOSE_COMPILER).getOrElse("true").toBoolean()) {
             project.configureComposeCompiler()
-        }
-    }
-}
-
-// We don't simply do this ourselves in the core plugin apply method because they don't apply to the worker plugin.
-// TODO: We should consider creating a new module which is just for "application" and "library" plugins.
-fun Project.registerKobwebMigrationTasks() {
-    tasks.register("kobwebMigrateToCssStyle", KobwebMigrateToCssStyleTask::class.java)
-    if ("kobwebMigrateToK2" !in rootProject.tasks.names) {
-        rootProject.tasks.register("kobwebMigrateToK2", KobwebMigrateToK2Task::class.java) {
-            notCompatibleWithConfigurationCache("not worth it")
         }
     }
 }
