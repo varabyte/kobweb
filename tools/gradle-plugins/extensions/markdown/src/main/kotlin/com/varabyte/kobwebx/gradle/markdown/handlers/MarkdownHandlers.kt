@@ -97,11 +97,6 @@ abstract class MarkdownHandlers @Inject constructor(project: Project) {
         val ProjectGroup = Key.create<String>("md.project.group")
     }
 
-    companion object {
-        @Deprecated("Use `MarkdownHandlers.DataKeys.HeadingIds` instead.")
-        val HeadingIdsKey = DataKeys.HeadingIds
-    }
-
     /**
      * Use Silk components instead of Compose HTML components when relevant.
      *

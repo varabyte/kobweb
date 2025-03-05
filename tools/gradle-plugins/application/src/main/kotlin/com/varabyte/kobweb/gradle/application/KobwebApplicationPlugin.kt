@@ -2,7 +2,6 @@ package com.varabyte.kobweb.gradle.application
 
 import com.varabyte.kobweb.ProcessorMode
 import com.varabyte.kobweb.gradle.application.buildservices.KobwebTaskListener
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.app
 import com.varabyte.kobweb.gradle.application.extensions.createAppBlock
 import com.varabyte.kobweb.gradle.application.extensions.export
@@ -405,24 +404,6 @@ class KobwebApplicationPlugin @Inject constructor(
         }
 
         project.registerKobwebMigrationTasks()
-
-        project.afterEvaluate {
-            @Suppress("DEPRECATION")
-            val legacyOverride = kobwebBlock.app.legacyRouteRedirectStrategy.orNull
-            if (legacyOverride != null) {
-                project.logger.warn(
-                    buildString {
-                        val legacyRoutesWereEnabled = legacyOverride != AppBlock.LegacyRouteRedirectStrategy.DISALLOW
-                        append(if (legacyRoutesWereEnabled) 'e' else 'w')
-                        append(": The `legacyRouteRedirectStrategy` property is no longer functional. Please remove it at your earliest convenience.")
-
-                        if (legacyOverride != AppBlock.LegacyRouteRedirectStrategy.DISALLOW) {
-                            append(" As this was previously set to a value ($legacyOverride) that allowed automatically redirecting routes, please note that your site's behavior might have been affected by this change. Please review https://github.com/varabyte/kobweb#removing-the-legacy-route-strategy at your earliest convenience.")
-                        }
-                    }
-                )
-            }
-        }
     }
 }
 

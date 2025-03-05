@@ -412,14 +412,6 @@ fun SilkWidgetVariables(element: HTMLElement) {
     element.setSilkWidgetVariables(ColorMode.current)
 }
 
-@Deprecated("Use `SilkWidgetVariables` instead, as it is more Compose-idiomatic.",
-    ReplaceWith("SilkWidgetVariables(this)"),
-)
-@Composable
-fun HTMLElement.setSilkWidgetVariables() {
-    SilkWidgetVariables(this)
-}
-
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
     SilkColorsStyle.name.let { silkColorsStyleName ->
         removeClass(silkColorsStyleName.suffixedWith(colorMode.opposite))

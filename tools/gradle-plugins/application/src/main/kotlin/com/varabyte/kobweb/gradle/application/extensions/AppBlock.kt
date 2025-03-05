@@ -5,15 +5,11 @@ package com.varabyte.kobweb.gradle.application.extensions
 import com.varabyte.kobweb.common.navigation.BasePath
 import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.gradle.application.Browser
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock.IndexBlock.InterceptUrlsBlock.SelfHostingBlock
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.ALLOW
-import com.varabyte.kobweb.gradle.application.extensions.AppBlock.LegacyRouteRedirectStrategy.WARN
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
 import com.varabyte.kobweb.project.KobwebFolder
 import com.varabyte.kobweb.project.conf.KobwebConf
 import kotlinx.html.HEAD
-import kotlinx.html.consumers.filter
 import kotlinx.html.link
 import kotlinx.html.meta
 import org.gradle.api.plugins.ExtensionAware
@@ -81,7 +77,7 @@ abstract class AppBlock @Inject constructor(
              * bandwidth for serving those files, which could add up. Fetching files from your site might also be
              * slower for some users as the CDN is more likely to have more servers across the globe.
              */
-            abstract class SelfHostingBlock @Inject constructor():  ExtensionAware {
+            abstract class SelfHostingBlock @Inject constructor() : ExtensionAware {
                 /**
                  * When `true`, opts-in to Kobweb attempting to automate self-hosting of external resources.
                  */
@@ -500,16 +496,6 @@ abstract class AppBlock @Inject constructor(
         internal abstract val traceConfig: Property<TraceConfig>
 
         /**
-         * Force the static export task to always copy files when supporting legacy route redirecting.
-         *
-         * Normally, the export task tries to use symbolic links if it can, as it is a more elegant, efficient solution.
-         *
-         * However, there may be static hosting providers that don't support symbolic links, so this option is provided
-         * to force copying instead.
-         */
-        abstract val forceCopyingForRedirects: Property<Boolean>
-
-        /**
          * If true, hide the warning shown the projects that don't define a root route.
          */
         abstract val suppressNoRootWarning: Property<Boolean>
@@ -545,7 +531,6 @@ abstract class AppBlock @Inject constructor(
         init {
             browser.convention(Browser.Chromium)
             includeSourceMap.convention(true)
-            forceCopyingForRedirects.convention(false)
             suppressNoRootWarning.convention(false)
         }
     }
@@ -583,41 +568,6 @@ abstract class AppBlock @Inject constructor(
      */
     @get:Input
     abstract val cssPrefix: Property<String>
-
-    /**
-     * The strategy for whether to allow flexibility around supporting legacy route formats.
-     *
-     * When Kobweb was first released, it used very simple strategies for generating routes from your Kotlin project:
-     * - filenames would be lowercased
-     * - packages were converted into routes as is
-     *
-     * This is fine for most sites, where filenames and packages are usually single words. But this was problematic for
-     * multi-word scenarios.
-     *
-     * For example, if you have a page called "StateOfArt.kt", this creates "stateofart"... where users would likely
-     * prefer "state-of-art" instead, both for clarity and to avoid its flatulence-adjacent misreading.
-     *
-     * Hyphens are pretty common in clean URLs, so Kobweb has changed to support them as the default behavior. However,
-     * this leaves users of old sites in a bit of a pickle. If they have built up links and SEO around the old link
-     * formats, forcing them to change overnight could be a bit of a problem.
-     *
-     * Therefore, for older sites, allowing the old formats to continue to work is probably a safe idea, during which
-     * time you may want to audit your links. Newer sites are encouraged to disallow these legacy redirects, since they
-     * don't have to worry about potentially stale links in this case.
-     *
-     * If this property isn't set explicitly, it will default to [WARN] in development and [ALLOW] in production.
-     */
-    enum class LegacyRouteRedirectStrategy {
-        ALLOW,
-        WARN,
-        DISALLOW,
-    }
-
-    /**
-     * @see LegacyRouteRedirectStrategy
-     */
-    @Deprecated("This property is no longer used and should be removed.")
-    abstract val legacyRouteRedirectStrategy: Property<LegacyRouteRedirectStrategy>
 
     init {
         globals.set(mapOf("title" to conf.site.title))
