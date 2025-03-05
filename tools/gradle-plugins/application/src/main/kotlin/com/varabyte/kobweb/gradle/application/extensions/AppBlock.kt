@@ -80,15 +80,21 @@ abstract class AppBlock @Inject constructor(
             abstract class SelfHostingBlock @Inject constructor() : ExtensionAware {
                 /**
                  * When `true`, opts-in to Kobweb attempting to automate self-hosting of external resources.
+                 *
+                 * Defaults to `false`.
+                 *
+                 * Users should call [InterceptUrlsBlock.enableSelfHosting] instead.
                  */
                 @get:Input
-                abstract val enabled: Property<Boolean>
+                internal abstract val enabled: Property<Boolean>
 
                 /**
                  * A list of URLs which, if encountered, should be ignored by the self-hosting conversion logic.
+                 *
+                 * Users should call [InterceptUrlsBlock.enableSelfHosting] instead.
                  */
                 @get:Input
-                abstract val excludes: ListProperty<String>
+                internal abstract val excludes: ListProperty<String>
 
                 init {
                     enabled.convention(false)
@@ -110,7 +116,7 @@ abstract class AppBlock @Inject constructor(
              * Users should call [replace] instead.
              */
             @get:Input
-            abstract val replacements: MapProperty<String, String>
+            internal abstract val replacements: MapProperty<String, String>
 
             /**
              * Keep track of URLs that should be removed if encountered in a <head> block.
@@ -118,7 +124,7 @@ abstract class AppBlock @Inject constructor(
              * Users should call [reject] instead.
              */
             @get:Input
-            abstract val rejects: SetProperty<String>
+            internal abstract val rejects: SetProperty<String>
 
             /**
              * Register a URL which, if referenced in a <head> block element, should be replaced with the given value.
