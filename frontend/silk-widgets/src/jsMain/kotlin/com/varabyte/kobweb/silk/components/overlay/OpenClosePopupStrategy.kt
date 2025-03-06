@@ -8,10 +8,13 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.pointerevents.PointerEvent
+import kotlin.math.absoluteValue
 
 enum class OpenClose {
     OPEN,
@@ -46,30 +49,54 @@ abstract class OpenClosePopupStrategy {
     open fun reset() = Unit
 
     protected fun emitRequest(request: OpenClose) {
-        _requestFlow.tryEmit(request)
+        _requestFlow.tryEmit(request).also {
+            println("\tEmit request: $request -> $it")
+        }
     }
 }
 
 /** A readable convenience property that queries the underlying state flow. */
 val OpenClosePopupStrategy.isOpen: Boolean get() = requestFlow.value == OpenClose.OPEN
 
+private val PointerEvent.isTouch get() = pointerType == "touch"
+
 /**
  * A strategy that opens the popup when the cursor enters some target element and closes it when the cursor leaves.
  */
 fun OpenClosePopupStrategy.Companion.onHover() = object : OpenClosePopupStrategy() {
-    private var manager: EventListenerManager? = null
+    private var targetManager: EventListenerManager? = null
+
+    private var ignoreHoverForTarget: HTMLElement? = null
 
     override fun init(targetElement: HTMLElement) {
-        manager = EventListenerManager(targetElement).apply {
-            addEventListener("mouseenter") { emitRequest(OpenClose.OPEN) }
-            addEventListener("mouseleave") { emitRequest(OpenClose.CLOSE) }
-            if (targetElement.matches(":hover")) emitRequest(OpenClose.OPEN)
+        targetManager = EventListenerManager(targetElement).apply {
+            addEventListener("pointerenter") { event ->
+                println("pointerenter - ${!(event as PointerEvent).isTouch}")
+                if (!(event as PointerEvent).isTouch) emitRequest(OpenClose.OPEN)
+            }
+            addEventListener("pointerleave") { event ->
+                println("pointerleave - ${!(event as PointerEvent).isTouch}")
+                if (!(event as PointerEvent).isTouch) emitRequest(OpenClose.CLOSE)
+            }
+            addEventListener("pointerdown") { event ->
+                println("pointerdown - ${(event as PointerEvent).isTouch}")
+                if ((event as PointerEvent).isTouch) {
+                    emitRequest(OpenClose.CLOSE)
+                    ignoreHoverForTarget = targetElement
+                }
+            }
+
+            if (ignoreHoverForTarget != targetElement && targetElement.matches(":hover")) {
+                println(":hover")
+                emitRequest(OpenClose.OPEN)
+            }
+            ignoreHoverForTarget = null
         }
     }
 
     override fun reset() {
-        manager!!.clearAllListeners()
-        manager = null
+        targetManager!!.clearAllListeners()
+        targetManager = null
     }
 }
 
@@ -97,6 +124,46 @@ fun OpenClosePopupStrategy.Companion.onFocus() = object : OpenClosePopupStrategy
     override fun reset() {
         manager!!.clearAllListeners()
         manager = null
+    }
+}
+
+/**
+ * A strategy that opens the popup when an element gains focus (by keyboard) and closes it when it loses focus.
+ */
+fun OpenClosePopupStrategy.Companion.onKeyboardFocus() = object : OpenClosePopupStrategy() {
+    private val windowManager = EventListenerManager(window)
+    private var targetManager: EventListenerManager? = null
+
+    override fun init(targetElement: HTMLElement) {
+        var isKeyboardInteraction = false
+
+        windowManager.apply {
+            addEventListener("keydown", {
+                isKeyboardInteraction = true
+            })
+
+            addEventListener("pointerdown", {
+                isKeyboardInteraction = false
+            })
+        }
+
+        targetManager = EventListenerManager(targetElement).apply {
+            addEventListener("focusin") {
+                println("focusin - $isKeyboardInteraction")
+                if (isKeyboardInteraction) emitRequest(OpenClose.OPEN)
+            }
+            addEventListener("focusout") {
+                println("focusout")
+                emitRequest(OpenClose.CLOSE)
+                isKeyboardInteraction = false
+            }
+        }
+    }
+
+    override fun reset() {
+        windowManager.clearAllListeners()
+        targetManager!!.clearAllListeners()
+        targetManager = null
     }
 }
 
@@ -165,7 +232,11 @@ fun OpenClosePopupStrategy.Companion.combine(vararg strategies: OpenClosePopupSt
             strategies
                 .map { it.requestFlow }
                 .merge()
-                .onEach { emitRequest(it) }
+                .distinctUntilChanged()
+                .onEach {
+                    println("combine")
+                    emitRequest(it)
+                }
                 .launchIn(CoroutineScope(window.asCoroutineDispatcher()))
         }
 

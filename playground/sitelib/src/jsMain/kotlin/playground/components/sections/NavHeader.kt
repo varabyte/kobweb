@@ -8,7 +8,9 @@ import com.varabyte.kobweb.compose.foundation.layout.Spacer
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.forms.Button
+import com.varabyte.kobweb.silk.components.icons.fa.FaGithub
 import com.varabyte.kobweb.silk.components.icons.fa.FaMoon
 import com.varabyte.kobweb.silk.components.icons.fa.FaSun
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -78,16 +80,24 @@ fun NavHeader() {
             NavLink("/markdown", "MARKDOWN")
             Spacer()
 
+            val ctx = rememberPageContext()
             Button(
-                onClick = { colorMode = colorMode.opposite },
+                onClick = { ctx.router.navigateTo("https://github.com/varabyte/kobweb") },
                 NavItemStyle.toModifier(NavButtonVariant),
             ) {
-                when (colorMode) {
-                    ColorMode.LIGHT -> FaMoon()
-                    ColorMode.DARK -> FaSun()
-                }
+                FaGithub()
             }
-            Tooltip(ElementTarget.PreviousSibling, "Toggle color mode", placement = PopupPlacement.BottomRight)
+            Tooltip(ElementTarget.PreviousSibling, "Open Kobweb source", placement = PopupPlacement.BottomRight)
+//            Button(
+//                onClick = { colorMode = colorMode.opposite },
+//                NavItemStyle.toModifier(NavButtonVariant),
+//            ) {
+//                when (colorMode) {
+//                    ColorMode.LIGHT -> FaMoon()
+//                    ColorMode.DARK -> FaSun()
+//                }
+//            }
+//            Tooltip(ElementTarget.PreviousSibling, "Toggle color mode", placement = PopupPlacement.BottomRight)
         }
     }
 }

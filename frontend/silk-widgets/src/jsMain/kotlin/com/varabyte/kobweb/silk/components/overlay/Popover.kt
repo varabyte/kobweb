@@ -203,6 +203,7 @@ private class PopoverStateController(
         }.launchIn(scope)
 
         openCloseStrategy.requestFlow.onEach { request ->
+            println("!! Received request: $request")
             when (request) {
                 OpenClose.OPEN -> requestShowPopup()
                 OpenClose.CLOSE -> requestHidePopup()
@@ -314,7 +315,7 @@ fun AdvancedPopover(
 ) {
     @Suppress("NAME_SHADOWING")
     val openCloseStrategy = remember(openCloseStrategy) {
-        openCloseStrategy ?: (OpenClosePopupStrategy.onHover() + OpenClosePopupStrategy.onFocus())
+        openCloseStrategy ?: (OpenClosePopupStrategy.onHover() + OpenClosePopupStrategy.onKeyboardFocus())
     }
 
     val showHideSettings =
