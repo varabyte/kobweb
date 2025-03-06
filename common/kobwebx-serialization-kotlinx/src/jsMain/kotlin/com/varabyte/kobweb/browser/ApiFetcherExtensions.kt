@@ -21,10 +21,10 @@ suspend inline fun <reified R> ApiFetcher.get(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return Json.decodeFromString(
-        responseSerializer,
+        responseDeserializer,
         get(apiPath, headers, redirect, abortController).decodeToString()
     )
 }
@@ -40,11 +40,11 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryGet(apiPath, headers, redirect, abortController)
         ?.decodeToString()
-        ?.let { Json.decodeFromString(responseSerializer, it) }
+        ?.let { Json.decodeFromString(responseDeserializer, it) }
 }
 
 /**
@@ -64,7 +64,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.post(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return post(
         apiPath,
@@ -72,7 +72,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.post(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -88,10 +88,10 @@ suspend inline fun <reified R> ApiFetcher.post(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return Json.decodeFromString(
-        responseSerializer,
+        responseDeserializer,
         post(apiPath, headers, body, redirect, abortController).decodeToString()
     )
 }
@@ -112,7 +112,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPost(
         apiPath,
@@ -120,7 +120,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -136,7 +136,7 @@ suspend inline fun <reified R> ApiFetcher.tryPost(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPost(
         apiPath,
@@ -145,7 +145,7 @@ suspend inline fun <reified R> ApiFetcher.tryPost(
         redirect,
         abortController,
     )
-        ?.let { Json.decodeFromString(responseSerializer, it.decodeToString()) }
+        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
 }
 
 /**
@@ -165,7 +165,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.put(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return put(
         apiPath,
@@ -173,7 +173,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.put(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer,
+        responseDeserializer,
     )
 }
 
@@ -189,10 +189,10 @@ suspend inline fun <reified R> ApiFetcher.put(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return Json.decodeFromString(
-        responseSerializer,
+        responseDeserializer,
         put(
             apiPath,
             headers,
@@ -219,7 +219,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPut(
         apiPath,
@@ -227,7 +227,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -243,7 +243,7 @@ suspend inline fun <reified R> ApiFetcher.tryPut(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPut(
         apiPath,
@@ -252,7 +252,7 @@ suspend inline fun <reified R> ApiFetcher.tryPut(
         redirect,
         abortController,
     )
-        ?.let { Json.decodeFromString(responseSerializer, it.decodeToString()) }
+        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
 }
 
 /**
@@ -272,7 +272,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.patch(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return patch(
         apiPath,
@@ -280,7 +280,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.patch(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer,
+        responseDeserializer,
     )
 }
 
@@ -296,10 +296,10 @@ suspend inline fun <reified R> ApiFetcher.patch(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return Json.decodeFromString(
-        responseSerializer,
+        responseDeserializer,
         patch(
             apiPath,
             headers,
@@ -326,7 +326,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPatch(
         apiPath,
@@ -334,7 +334,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer,
+        responseDeserializer,
     )
 }
 
@@ -350,7 +350,7 @@ suspend inline fun <reified R> ApiFetcher.tryPatch(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPatch(
         apiPath,
@@ -359,7 +359,7 @@ suspend inline fun <reified R> ApiFetcher.tryPatch(
         redirect,
         abortController,
     )
-        ?.let { Json.decodeFromString(responseSerializer, it.decodeToString()) }
+        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
 }
 
 /**
@@ -374,10 +374,10 @@ suspend inline fun <reified R> ApiFetcher.delete(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return Json.decodeFromString(
-        responseSerializer,
+        responseDeserializer,
         delete(apiPath, headers, redirect, abortController).decodeToString()
     )
 }
@@ -393,10 +393,10 @@ suspend inline fun <reified R> ApiFetcher.tryDelete(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryDelete(apiPath, headers, redirect, abortController)
-        ?.let { Json.decodeFromString(responseSerializer, it.decodeToString()) }
+        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
 }
 
 
@@ -412,9 +412,9 @@ suspend inline fun <reified R> ApiFetcher.head(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
-    return Json.decodeFromString(responseSerializer, head(apiPath, headers, redirect, abortController).decodeToString())
+    return Json.decodeFromString(responseDeserializer, head(apiPath, headers, redirect, abortController).decodeToString())
 }
 
 /**
@@ -428,10 +428,10 @@ suspend inline fun <reified R> ApiFetcher.tryHead(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryHead(apiPath, headers, redirect, abortController)
-        ?.let { Json.decodeFromString(responseSerializer, it.decodeToString()) }
+        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
 }
 
 /**
@@ -446,10 +446,10 @@ suspend inline fun <reified R> ApiFetcher.options(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return Json.decodeFromString(
-        responseSerializer,
+        responseDeserializer,
         options(apiPath, headers, redirect, abortController).decodeToString()
     )
 }
@@ -465,8 +465,8 @@ suspend inline fun <reified R> ApiFetcher.tryOptions(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryOptions(apiPath, headers, redirect, abortController)
-        ?.let { Json.decodeFromString(responseSerializer, it.decodeToString()) }
+        ?.let { Json.decodeFromString(responseDeserializer, it.decodeToString()) }
 }
