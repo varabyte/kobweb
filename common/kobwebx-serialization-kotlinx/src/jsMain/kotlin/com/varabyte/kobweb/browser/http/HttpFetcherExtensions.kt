@@ -18,10 +18,10 @@ suspend inline fun <reified R> HttpFetcher.get(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     val response = get(resource, headers, redirect, abortController)
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -34,10 +34,10 @@ suspend inline fun <reified R> HttpFetcher.tryGet(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     val response = tryGet(resource, headers, redirect, abortController) ?: return null
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -56,7 +56,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.post(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return post(
         resource,
@@ -64,7 +64,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.post(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -80,7 +80,7 @@ suspend inline fun <reified R> HttpFetcher.post(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     val response = post(
         resource,
@@ -89,7 +89,7 @@ suspend inline fun <reified R> HttpFetcher.post(
         redirect,
         abortController
     )
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -108,7 +108,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPost(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPost(
         resource,
@@ -116,7 +116,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPost(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -132,7 +132,7 @@ suspend inline fun <reified R> HttpFetcher.tryPost(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     val response = tryPost(
         resource,
@@ -141,7 +141,7 @@ suspend inline fun <reified R> HttpFetcher.tryPost(
         redirect,
         abortController
     ) ?: return null
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -160,7 +160,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.put(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return put(
         resource,
@@ -168,7 +168,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.put(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer,
+        responseDeserializer,
     )
 }
 
@@ -184,7 +184,7 @@ suspend inline fun <reified R> HttpFetcher.put(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     val response = put(
         resource,
@@ -193,7 +193,7 @@ suspend inline fun <reified R> HttpFetcher.put(
         redirect,
         abortController
     )
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -212,7 +212,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPut(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPut(
         resource,
@@ -220,7 +220,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPut(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -236,7 +236,7 @@ suspend inline fun <reified R> HttpFetcher.tryPut(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     val response = tryPut(
         resource,
@@ -245,7 +245,7 @@ suspend inline fun <reified R> HttpFetcher.tryPut(
         redirect,
         abortController
     ) ?: return null
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -264,7 +264,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.patch(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     return patch(
         resource,
@@ -272,7 +272,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.patch(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -288,7 +288,7 @@ suspend inline fun <reified R> HttpFetcher.patch(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     val response = patch(
         resource,
@@ -297,7 +297,7 @@ suspend inline fun <reified R> HttpFetcher.patch(
         redirect,
         abortController
     )
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -316,7 +316,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPatch(
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     bodySerializer: SerializationStrategy<B> = serializer(),
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     return tryPatch(
         resource,
@@ -324,7 +324,7 @@ suspend inline fun <reified B, reified R> HttpFetcher.tryPatch(
         body?.let { Json.encodeToString(bodySerializer, it).encodeToByteArray() },
         redirect,
         abortController,
-        responseSerializer
+        responseDeserializer
     )
 }
 
@@ -340,7 +340,7 @@ suspend inline fun <reified R> HttpFetcher.tryPatch(
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     val response = tryPatch(
         resource,
@@ -349,7 +349,7 @@ suspend inline fun <reified R> HttpFetcher.tryPatch(
         redirect,
         abortController
     ) ?: return null
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -362,10 +362,10 @@ suspend inline fun <reified R> HttpFetcher.delete(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     val response = delete(resource, headers, redirect, abortController)
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -378,10 +378,10 @@ suspend inline fun <reified R> HttpFetcher.tryDelete(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     val response = tryDelete(resource, headers, redirect, abortController) ?: return null
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -394,10 +394,10 @@ suspend inline fun <reified R> HttpFetcher.head(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     val response = head(resource, headers, redirect, abortController)
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -410,10 +410,10 @@ suspend inline fun <reified R> HttpFetcher.tryHead(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     val response = tryHead(resource, headers, redirect, abortController) ?: return null
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -426,10 +426,10 @@ suspend inline fun <reified R> HttpFetcher.options(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R {
     val response = options(resource, headers, redirect, abortController)
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }
 
 /**
@@ -442,8 +442,8 @@ suspend inline fun <reified R> HttpFetcher.tryOptions(
     headers: Map<String, Any>? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
-    responseSerializer: DeserializationStrategy<R> = serializer()
+    responseDeserializer: DeserializationStrategy<R> = serializer()
 ): R? {
     val response = tryOptions(resource, headers, redirect, abortController) ?: return null
-    return Json.decodeFromString(responseSerializer, response.decodeToString())
+    return Json.decodeFromString(responseDeserializer, response.decodeToString())
 }

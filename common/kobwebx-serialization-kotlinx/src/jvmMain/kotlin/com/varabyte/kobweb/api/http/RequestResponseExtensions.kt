@@ -15,9 +15,9 @@ import kotlinx.serialization.serializer
  * See also the ApiFetcher extension methods provided by this library for examples of how to send requests with a
  * serialized body, e.g. `window.api.post<ExampleRequest, ExampleResponse>(body = ...)`.
  */
-inline fun <reified T> Request.readBody(bodySerializer: DeserializationStrategy<T> = serializer()): T? {
+inline fun <reified T> Request.readBody(bodyDeserializer: DeserializationStrategy<T> = serializer()): T? {
     return readBodyText()?.let { bodyText ->
-        Json.decodeFromString(bodySerializer, bodyText)
+        Json.decodeFromString(bodyDeserializer, bodyText)
     }
 }
 
