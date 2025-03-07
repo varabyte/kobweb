@@ -299,9 +299,6 @@ abstract class AppBlock @Inject constructor(
          *
          * You can do a full opt-out from all dependencies by calling [excludeAllHtmlFromDependencies] (but understand
          * this could break functionality provided by some libraries).
-         *
-         * If you trust the library and don't want the warning to show up, use [suppressHtmlWarningsForDependencies]
-         * instead.
          */
         @get:Input
         abstract val excludeHtmlForDependencies: ListProperty<String>
@@ -312,6 +309,7 @@ abstract class AppBlock @Inject constructor(
          * @see excludeHtmlForDependencies
          */
         @get:Input
+        @Deprecated("We refactored how we show users excluded HTML dependencies and suppression is no longer possible. As a result, this property is no longer used.")
         abstract val suppressHtmlWarningsForDependencies: ListProperty<String>
 
         init {

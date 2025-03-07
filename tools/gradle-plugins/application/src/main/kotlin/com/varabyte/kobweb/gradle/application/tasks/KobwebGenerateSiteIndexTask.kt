@@ -170,10 +170,16 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         return "/$selfHostPrefix/$urlAsPath"
     }
 
-    private fun List<String>.applyUrlInterceptors(): List<String> {
+    private class ApplyUrlInterceptorsResult(
+        val elements: List<String>,
+        val changedUrls: Map<String, String?> = emptyMap()
+    )
+
+    private fun List<String>.applyUrlInterceptors(): ApplyUrlInterceptorsResult {
+        // Early abort if we're sure we don't need to do any work (99.9% of users, probably!)
         if (interceptUrls.rejects.get().isEmpty() && interceptUrls.replacements.get().isEmpty()
             && !selfHosting.enabled.get()
-        ) return this // Early abort if we're sure we don't need to do any work (99.9% of users, probably!)
+        ) return ApplyUrlInterceptorsResult(this)
 
         val elements = this.flatMap { html ->
             Jsoup.parse(html).apply {
@@ -244,15 +250,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             element
         }
 
-        if (changedUrls.isNotEmpty()) {
-            logger.lifecycle("Intercepted the following <head> element URLs:")
-            changedUrls.forEach {
-                logger.lifecycle("  * ${it.key} -> ${it.value ?: "(removed)"}")
-            }
-            logger.lifecycle("(This was configured by your `kobweb.app.index.interceptUrls` block)")
-        }
-
-
         val commonErrorMessage = "but it was not detected in your <head> elements. This could indicate a stale configuration that should be removed or updated to a new URL."
         interceptUrls.rejects.get().forEach { reject ->
             if (!changedUrls.containsKey(reject)) {
@@ -272,7 +269,10 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             }
         }
 
-        return filteredElements.map { it.toString() }
+        return ApplyUrlInterceptorsResult(
+            filteredElements.map { it.toString() },
+            changedUrls
+        )
     }
 
     @TaskAction
@@ -301,6 +301,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             })
         }
 
+        val headElementsFromDependencies = mutableMapOf<File, List<String>>()
         compileClasspath.forEach { file ->
             var libraryMetadata: LibraryMetadata? = null
 
@@ -312,33 +313,20 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 if (headElementsStr.isBlank()) {
                     return@forEach
                 }
+
                 // There doesn't seem to be a better way to pretty print the <head> contents using kotlinx.html
-                val headPrettyPrint = document {
+                val headElementsList = document {
                     append.head { unsafe { raw(headElementsStr) } }
-                }.serialize().lines().drop(3).dropLast(2).joinToString("\n").trimIndent()
+                }.serialize().lines().drop(3).dropLast(2).map { it.trim() }
 
                 val optedOut = indexBlock.excludeHtmlForDependencies.get().any { file.name.startsWith(it) }
                 if (!optedOut) {
-                    if (indexBlock.suppressHtmlWarningsForDependencies.get()
-                            .none { file.name.startsWith(it) }
-                    ) {
-                        val dep = file.nameWithoutExtension.substringBeforeLast("-js-")
-                        logger.warn(buildString {
-                            appendLine()
-                            appendLine("Dependency artifact \"${file.name}\" will add the following <head> elements to your site's index.html:")
-                            appendLine(headPrettyPrint)
-                            appendLine("You likely want to let them do this, as it is probably necessary for the library's functionality, but you should still audit what they're doing.")
-                            append(
-                                "Add `kobweb { app { index { excludeHtmlForDependencies.add(\"$dep\") } } }` to your build.gradle.kts file to reject these elements (or `suppressHtmlWarningsForDependencies.add(\"$dep\")` to hide this message)."
-                            )
-                        })
-                    }
+                    headElementsFromDependencies[file] = headElementsList
                     headElements.add(headElementsStr)
                 } else {
-                    logger.warn(buildString {
-                        appendLine()
-                        appendLine("Dependency artifact \"${file.name}\" was prevented from adding the following <head> elements to your site's index.html:")
-                        append(headPrettyPrint)
+                    logger.info(buildString {
+                        appendLine("Dependency artifact \"${file.name}\" was prevented (via `app.kobweb.index.excludeHtmlForDependencies`) from adding the following <head> elements to your site's index.html:")
+                        headElementsList.forEach { appendLine("* \"$it\"") }
                     })
                 }
             }
@@ -349,10 +337,26 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             createIndexFile(
                 confInputs.title,
                 indexBlock.lang.get(),
-                headElements.applyUrlInterceptors().also { elements ->
+                headElements.applyUrlInterceptors().also { result ->
                     logger.lifecycle("Final <head> elements:")
-                    elements.forEach { logger.lifecycle("  ${it.replace("\n", "")}") }
-                },
+                    logger.lifecycle("```")
+                    result.elements.forEach { logger.lifecycle("  ${it.replace("\n", "")}") }
+                    logger.lifecycle("```")
+
+                    headElementsFromDependencies.forEach { (artifact, elements) ->
+                        val dep = artifact.nameWithoutExtension.substringBeforeLast("-js-")
+                        logger.lifecycle("* Requested by \"${artifact.name}:\"")
+                        elements.forEach { element -> logger.lifecycle("  $element") }
+                        logger.lifecycle("  ! Call `kobweb.app.index.excludeHtmlForDependencies.add(\"$dep\")` in your build.gradle.kts file to reject these elements.")
+                    }
+                    result.changedUrls.forEach { (from, to) ->
+                        logger.lifecycle("* URL intercepted: \"$from\" -> ${to?.let { "\"$it\"" } ?: "(removed)"}")
+                    }
+
+                    if (result.changedUrls.isEmpty()) {
+                        logger.lifecycle("NOTE: You can configure external <head> links using the `kobweb.app.index.interceptUrls` block.")
+                    }
+                }.elements,
                 // Our script will always exist at the root folder, so be sure to ground it,
                 // e.g. "example.js" -> "/example.js", so the root will be searched even if we're visiting a page in
                 // a subdirectory.
