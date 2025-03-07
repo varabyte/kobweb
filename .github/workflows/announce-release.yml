@@ -1,0 +1,23 @@
+name: Announce the Kobweb release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  bluesky:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cbrgm/bluesky-github-action@v1
+        with:
+          handle: ${{ secrets.VARABYTE_BLUESKY_HANDLE }}
+          password: ${{ secrets.VARABYTE_BLUESKY_PASSWORD }}
+          text: |
+            🕸️ Latest Kobweb ${{ github.event.release.tag_name }} released!
+
+            Check out the release notes here:
+            https://github.com/varabyte/kobweb/releases/tag/${{ github.event.release.tag_name }}
+
+            🤖 (Automated post via GitHub Actions)
+
+            #Kobweb #Kotlin #WebDev
