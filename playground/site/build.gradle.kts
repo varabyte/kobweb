@@ -29,6 +29,8 @@ kobweb {
                     appendLine("* [${entry.filePath}](${entry.route})")
                 }
             })
+
+            generateResource("hello.txt", "Hi there")
         }
         handlers.blockquote.set(SilkCalloutBlockquoteHandler(labels = mapOf("QUOTE" to "")))
     }

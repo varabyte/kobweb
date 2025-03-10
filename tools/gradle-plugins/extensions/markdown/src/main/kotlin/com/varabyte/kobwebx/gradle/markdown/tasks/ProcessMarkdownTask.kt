@@ -9,6 +9,8 @@ import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
@@ -36,6 +38,10 @@ private class MarkdownVisitor : AbstractVisitor() {
     }
 }
 
+// A misc name so this task gets its own unique generated directory root
+// This will already be under a grouped subfolder called `markdown`.
+private const val GEN_ROOT_NAME = "process"
+
 abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
     MarkdownTask(
         markdownBlock,
@@ -48,16 +54,23 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     @Optional
     val markdownProcess = markdownBlock.process
 
-    @OutputDirectory
-    fun getGenSrcDir() = markdownBlock.getGenJsSrcRoot("process")
+    @get:Input
+    abstract val publicPath: Property<String>
 
     @OutputDirectory
-    fun getGenResDir() = markdownBlock.getGenJsResRoot("process")
+    fun getGenSrcDir() = markdownBlock.getGenJsSrcRoot(GEN_ROOT_NAME)
+
+    @OutputDirectory
+    fun getGenMiscResDir() = markdownBlock.getGenJsResRoot("$GEN_ROOT_NAME/misc").map { it.dir(publicPath).get() }
+
+    @OutputDirectory
+    fun getGenMarkdownResDir() = markdownBlock.getGenJsResRoot("$GEN_ROOT_NAME/markdown").map { it.dir(markdownPath).get() }
 
     @TaskAction
     fun execute() {
         getGenSrcDir().get().asFile.clearDirectory()
-        getGenResDir().get().asFile.clearDirectory()
+        getGenMiscResDir().get().asFile.clearDirectory()
+        getGenMarkdownResDir().get().asFile.clearDirectory()
         val process = markdownProcess.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
@@ -86,18 +99,24 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         val processScope = MarkdownBlock.ProcessScope()
         processScope.process(markdownEntries)
 
-        val genResRoot = getGenResDir().get().asFile.resolve(markdownPath.get())
-        processScope.markdownOutput.forEach { processNode ->
-            File(genResRoot, processNode.filePath).let { outputFile ->
-                outputFile.parentFile.mkdirs()
-                outputFile.writeText(processNode.content)
+        val genResRoot = getGenMiscResDir().get().asFile
+        val genSrcRoot = getGenSrcDir().get().asFile
+        val genMarkdownResRoot = getGenMarkdownResDir().get().asFile
+
+        fun MarkdownBlock.ProcessScope.OutputFile.generateInto(root: File) {
+            File(root, filePath).apply {
+                parentFile.mkdirs()
+                writeText(content)
             }
         }
-        processScope.kotlinOutput.forEach { processNode ->
-            File(getGenSrcDir().get().asFile, processNode.filePath).let { outputFile ->
-                outputFile.parentFile.mkdirs()
-                outputFile.writeText(processNode.content)
-            }
+        processScope.markdownOutputs.forEach { outputFile ->
+            outputFile.generateInto(genMarkdownResRoot)
+        }
+        processScope.kotlinOutputs.forEach { outputFile ->
+            outputFile.generateInto(genSrcRoot)
+        }
+        processScope.resourceOutputs.forEach { outputFile ->
+            outputFile.generateInto(genResRoot)
         }
     }
 }

@@ -6,6 +6,7 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileTree
 import org.gradle.api.file.RelativePath
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input

@@ -34,6 +34,10 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         val processTask = project.tasks
             .register<ProcessMarkdownTask>("kobwebxMarkdownProcess", markdownBlock)
 
+        processTask.configure {
+            publicPath.set(kobwebBlock.publicPath)
+        }
+
         val convertTask = project.tasks
             .register<ConvertMarkdownTask>("kobwebxMarkdownConvert", markdownBlock)
 
@@ -46,13 +50,15 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 projectGroup.set(project.group)
                 markdownResources.from(markdownBlock.markdownPath.map { markdownPath ->
                     project.getResourceSources(jsTarget).map { srcDirSet ->
-                        srcDirSet.matching { include("$markdownPath/**/*.md") }
+                        srcDirSet.asFileTree.matching {
+                            include("$markdownPath/**/*.md")
+                        }
                     }
                 })
             }
 
             convertTask.configure {
-                generatedMarkdownDir.set(processTask.map { it.getGenResDir().get() })
+                generatedMarkdownDir.set(processTask.map { it.getGenMarkdownResDir().get() })
                 dependsOnMarkdownArtifact.set(
                     project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
                 )
@@ -68,6 +74,14 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 kotlin.srcDir(convertTask)
                 kotlin.srcDir(processTask.map { it.getGenSrcDir() })
+
+//                resources.srcDir(processTask.map { it.getGenMiscResDir() })
+            }
+
+            project.afterEvaluate {
+                project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
+                    resources.srcDir(processTask.map { it.getGenMiscResDir() })
+                }
             }
         }
     }
