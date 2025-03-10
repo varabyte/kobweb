@@ -66,7 +66,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun delete(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray = window.fetch(HttpMethod.DELETE, resource, headers, body = null, redirect, abortController)
@@ -78,7 +78,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun tryDelete(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? = window.tryFetch(HttpMethod.DELETE, resource, headers, body = null, redirect, logOnError, abortController)
@@ -90,7 +90,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun get(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray = window.fetch(HttpMethod.GET, resource, headers, body = null, redirect, abortController)
@@ -102,7 +102,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun tryGet(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? = window.tryFetch(HttpMethod.GET, resource, headers, body = null, redirect, logOnError, abortController)
@@ -114,7 +114,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun head(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray = window.fetch(HttpMethod.HEAD, resource, headers, body = null, redirect, abortController)
@@ -126,7 +126,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun tryHead(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? = window.tryFetch(HttpMethod.HEAD, resource, headers, body = null, redirect, logOnError, abortController)
@@ -138,7 +138,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun options(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray = window.fetch(HttpMethod.OPTIONS, resource, headers, body = null, redirect, abortController)
@@ -150,7 +150,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun tryOptions(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
     ): ByteArray? = window.tryFetch(HttpMethod.OPTIONS, resource, headers, body = null, redirect, logOnError, abortController)
@@ -162,7 +162,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun patch(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
@@ -175,7 +175,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun tryPatch(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
@@ -188,7 +188,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun post(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
@@ -201,7 +201,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun tryPost(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
@@ -214,7 +214,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun put(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null
@@ -227,7 +227,7 @@ class HttpFetcher(private val window: Window) {
      */
     suspend fun tryPut(
         resource: String,
-        headers: Map<String, Any>? = null,
+        headers: Map<String, Any>? = FetchDefaults.Headers,
         body: ByteArray? = null,
         redirect: RequestRedirect? = FetchDefaults.Redirect,
         abortController: AbortController? = null

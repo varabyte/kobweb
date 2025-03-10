@@ -18,7 +18,7 @@ import org.w3c.fetch.RequestRedirect
  */
 suspend inline fun <reified R> ApiFetcher.get(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
@@ -37,7 +37,7 @@ suspend inline fun <reified R> ApiFetcher.get(
  */
 suspend inline fun <reified R> ApiFetcher.tryGet(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
@@ -59,7 +59,7 @@ suspend inline fun <reified R> ApiFetcher.tryGet(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.post(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -84,7 +84,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.post(
  */
 suspend inline fun <reified R> ApiFetcher.post(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -107,7 +107,7 @@ suspend inline fun <reified R> ApiFetcher.post(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -132,7 +132,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPost(
  */
 suspend inline fun <reified R> ApiFetcher.tryPost(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -160,7 +160,7 @@ suspend inline fun <reified R> ApiFetcher.tryPost(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.put(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -185,7 +185,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.put(
  */
 suspend inline fun <reified R> ApiFetcher.put(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -214,7 +214,7 @@ suspend inline fun <reified R> ApiFetcher.put(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -239,7 +239,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPut(
  */
 suspend inline fun <reified R> ApiFetcher.tryPut(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -267,7 +267,7 @@ suspend inline fun <reified R> ApiFetcher.tryPut(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.patch(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -292,7 +292,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.patch(
  */
 suspend inline fun <reified R> ApiFetcher.patch(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -321,7 +321,7 @@ suspend inline fun <reified R> ApiFetcher.patch(
  */
 suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: B? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -346,7 +346,7 @@ suspend inline fun <reified B, reified R> ApiFetcher.tryPatch(
  */
 suspend inline fun <reified R> ApiFetcher.tryPatch(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
@@ -371,7 +371,7 @@ suspend inline fun <reified R> ApiFetcher.tryPatch(
  */
 suspend inline fun <reified R> ApiFetcher.delete(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
@@ -390,7 +390,7 @@ suspend inline fun <reified R> ApiFetcher.delete(
  */
 suspend inline fun <reified R> ApiFetcher.tryDelete(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
@@ -409,7 +409,7 @@ suspend inline fun <reified R> ApiFetcher.tryDelete(
  */
 suspend inline fun <reified R> ApiFetcher.head(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
@@ -425,7 +425,7 @@ suspend inline fun <reified R> ApiFetcher.head(
  */
 suspend inline fun <reified R> ApiFetcher.tryHead(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
@@ -443,7 +443,7 @@ suspend inline fun <reified R> ApiFetcher.tryHead(
  */
 suspend inline fun <reified R> ApiFetcher.options(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
@@ -462,7 +462,7 @@ suspend inline fun <reified R> ApiFetcher.options(
  */
 suspend inline fun <reified R> ApiFetcher.tryOptions(
     apiPath: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null,
     responseDeserializer: DeserializationStrategy<R> = serializer()
