@@ -27,7 +27,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
-          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
+          build-scan-terms-of-use-agree: "yes"
+          cache-read-only: false
 
       - name: Generate Dokka multi-module documentation
         run: ./gradlew :docs:dokkaGenerate
