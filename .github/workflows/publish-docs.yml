@@ -30,7 +30,7 @@ jobs:
           cache: gradle
 
       - name: Generate Dokka multi-module documentation
-        run: ./gradlew :docs:dokkaGenerate --no-daemon
+        run: ./gradlew :docs:dokkaGenerate
 
       - name: Upload output artifact
         uses: actions/upload-pages-artifact@v3
