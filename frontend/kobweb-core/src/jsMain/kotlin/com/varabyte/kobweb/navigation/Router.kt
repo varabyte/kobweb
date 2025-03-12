@@ -13,6 +13,7 @@ import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.ScrollBehavior
 import org.w3c.dom.ScrollToOptions
+import org.w3c.dom.asList
 import org.w3c.dom.url.URL
 import org.w3c.xhr.XMLHttpRequest
 
@@ -456,7 +457,8 @@ class Router {
                         // exist yet.
                         MutationObserver { mutations, observer ->
                             mutations.forEach { mutation ->
-                                if (mutation.type == "childList") {
+                                // Only scroll if elements were added, removals do not signal that the page is rendered.
+                                if (mutation.type == "childList" && mutation.addedNodes.asList().isNotEmpty()) {
                                     scrollElementIntoView()
                                     observer.disconnect()
                                 }
