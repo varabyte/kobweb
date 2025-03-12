@@ -61,4 +61,5 @@ jobs:
         run: ./gradlew publishPlugins
 
       - name: Publish Dokka API documentation
+        if: inputs.repo-sonatype
         uses: ./.github/workflows/publish-docs.yml
