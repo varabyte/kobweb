@@ -6,7 +6,7 @@ import com.varabyte.kobweb.core.rememberPageContext
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-@Page("{...product-details}")
+@Page("{...}")
 fun ProductDetails() {
     val ctx = rememberPageContext()
     Text("(Pretend we're showing product details for: ${ctx.route.params.getValue("product-details")})")

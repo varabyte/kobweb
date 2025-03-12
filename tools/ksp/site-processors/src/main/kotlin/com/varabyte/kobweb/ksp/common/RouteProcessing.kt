@@ -53,9 +53,10 @@ fun processRoute(
 
     val slug = if (routeOverride != null && routeOverride.last() != '/') {
         routeOverride.substringAfterLast("/").let { value ->
-            // {} is a special value which means infer from the current file,
-            // e.g. `Slug.kt` -> `"{slug}"`
-            if (!supportEmptyDynamicSegments || value != "{}") value else "{${slugFromFile}}"
+            val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value)
+            if (supportEmptyDynamicSegments && dynamicRouteSegment != null && dynamicRouteSegment.isInferred) {
+                dynamicRouteSegment.withReplacedName(slugFromFile).rawValue
+            } else value
         }
     } else {
         slugFromFile

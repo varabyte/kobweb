@@ -3,10 +3,14 @@ package com.varabyte.kobweb.ksp.frontend
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
+import com.varabyte.kobweb.ksp.common.DynamicRouteSegment
 import com.varabyte.kobweb.ksp.common.processRoute
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.project.frontend.PageEntry
 
+/**
+ * Process a function marked with the `@Page` annotation
+ */
 fun processPagesFun(
     annotatedFun: KSFunctionDeclaration,
     qualifiedPagesPackage: String,
@@ -27,9 +31,16 @@ fun processPagesFun(
 
     if (routeOverride?.startsWith("/") == true || currPackage.startsWith(qualifiedPagesPackage)) {
         // To maintain the general association between the file name and the slug, we reject route overrides which use
-        // the "{}" inferred dynamic route syntax in any part except for the last.
-        // e.g. "/dynamic/{example}/route/{}" is OK but "/dynamic/{}/route/{example}" is not
-        if (routeOverride == null || "{}" !in routeOverride.substringBeforeLast("/", missingDelimiterValue = "")) {
+        // the "{}" inferred dynamic segment syntax in any part except for the last.
+        // e.g. "/dynamic/{example}/route/{}" is OK but "/dynamic/{}/route/{example}" is not.
+        // (Also, catch all dynamic segments are not allowed in any part except for the last as well)
+        if (routeOverride == null ||
+            routeOverride.substringBeforeLast("/", missingDelimiterValue = "").split("/")
+                .none { segment ->
+                    val dynamicSegment = DynamicRouteSegment.tryCreate(segment)
+                    dynamicSegment != null && (dynamicSegment.isInferred || dynamicSegment.isCatchAll)
+                }
+        ) {
             val route = processRoute(
                 packageRoot = qualifiedPagesPackage,
                 pkg = currPackage,
