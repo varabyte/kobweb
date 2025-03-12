@@ -14,6 +14,6 @@ assignees: ''
 
 - [ ] README
 - [ ] Code comments
-- [ ] Website docs (https://kobweb.varabyte.com)
+- [ ] Website docs (https://kobweb.varabyte.com/docs)
 
 (Mark any with an `x`)
