@@ -1,0 +1,42 @@
+name: Publish Dokka API documentation
+
+on:
+  - workflow_call
+  - workflow_dispatch
+
+jobs:
+  publish-docs:
+    name: Publish docs
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: gradle
+
+      - name: Generate Dokka multi-module documentation
+        run: ./gradlew :docs:dokkaGenerate --no-daemon
+
+      - name: Upload output artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build/dokka/html/
+
+      - name: Deploy to GH Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
