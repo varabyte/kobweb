@@ -19,25 +19,29 @@ and [Chakra UI](https://chakra-ui.com).
 @Page
 @Composable
 fun HomePage() {
-  Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-    Row(Modifier.align(Alignment.End)) {
-      var colorMode by ColorMode.currentState
-      Button(
-        onClick = { colorMode = colorMode.opposite },
-        Modifier.borderRadius(50.percent).padding(0.px)
-      ) {
-        // Includes support for Font Awesome icons
-        if (colorMode.isLight) FaSun() else FaMoon()
-      }
+  Column(
+    Modifier.fillMaxWidth().whiteSpace(WhiteSpace.PreWrap).textAlign(TextAlign.Center),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    var colorMode by ColorMode.currentState
+    Button(
+      onClick = { colorMode = colorMode.opposite },
+      Modifier.borderRadius(50.percent).padding(0.px).align(Alignment.End)
+    ) {
+      // Includes support for Font Awesome icons
+      if (colorMode.isLight) FaMoon() else FaSun()
     }
     H1 {
       Text("Welcome to Kobweb!")
     }
-    Row(Modifier.flexWrap(FlexWrap.Wrap)) {
-      SpanText("Create rich, dynamic web apps with ease, leveraging ")
+    Span {
+      Text("Create rich, dynamic web apps with ease, leveraging ")
       Link("https://kotlinlang.org/", "Kotlin")
-      SpanText(" and ")
-      Link("https://github.com/JetBrains/compose-multiplatform#compose-html/", "Compose HTML")
+      Text(" and ")
+      Link(
+        "https://github.com/JetBrains/compose-multiplatform/#compose-html",
+        "Compose HTML"
+      )
     }
   }
 }
