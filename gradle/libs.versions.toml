@@ -83,7 +83,7 @@ logback = [
 ]
 
 [plugins]
-gradle-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-publish"}
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
