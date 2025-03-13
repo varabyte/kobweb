@@ -37,12 +37,12 @@ jobs:
           cache-read-only: false
 
       - name: Generate Dokka multi-module documentation
-        run: ./gradlew :docs:dokkaGenerate
+        run: ./gradlew :tools:aggregate-docs:dokkaGenerate
 
       - name: Upload output artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/build/dokka/html/
+          path: tools/aggregate-docs/build/dokka/html/
 
       - name: Deploy to GH Pages
         id: deployment
