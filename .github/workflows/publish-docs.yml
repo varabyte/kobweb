@@ -1,8 +1,9 @@
 name: Publish Dokka API documentation
 
 on:
-  - workflow_call
-  - workflow_dispatch
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   publish-docs:
