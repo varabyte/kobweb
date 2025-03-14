@@ -5,6 +5,13 @@
 [![compose: 1.7.3](https://img.shields.io/badge/compose-1.7.3-blue?logo=jetpackcompose)](COMPATIBILITY.md)
 [![ktor: 3.1.0](https://img.shields.io/badge/ktor-3.1.0-blue)](https://ktor.io/)
 <br>
+<a href="https://kobweb.varabyte.com/docs">
+![User Guide docs](https://img.shields.io/badge/User_Guide-royalblue?logo=readthedocs)
+</a>
+<a href="https://varabyte.github.io/kobweb/">
+![API Reference docs](https://img.shields.io/badge/API_Reference-grey?logo=readthedocs)
+</a>
+<br>
 [![Varabyte Discord](https://img.shields.io/discord/886036660767305799.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/5NZ2GKV5Cs)
 [![Kotlin Slack](https://img.shields.io/badge/%23Kobweb-4A154B?logo=slack&logoColor=white)](https://kotlinlang.slack.com/archives/C04RTD72RQ8)
 [![Bluesky](https://img.shields.io/badge/Bluesky-0285FF?logo=bluesky&logoColor=fff)](https://bsky.app/profile/bitspittle.bsky.social)
