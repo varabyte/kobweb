@@ -109,7 +109,16 @@ fun ColorMode.saveToLocalStorage(key: String = DEFAULT_COLOR_MODE_STORAGE_KEY_NA
 //
 // By using underscores instead, if we have dark and light mode variants of the parent style and its "dark" variant, we
 // would have "style_dark", "style_light", "style-dark_dark", and "style-dark_light"
-fun String.suffixedWith(colorMode: ColorMode) = "${this}_${colorMode.name.lowercase()}"
+//
+// Finally, note that this method can be used to REPLACE the suffix of a colored style, e.g. `style_light` when suffixed
+// with `ColorMode.Dark` will be converted to `style_dark`.
+fun String.suffixedWith(colorMode: ColorMode) = "${this.substringBeforeLast('_')}_${colorMode.name.lowercase()}"
+
+fun String.withColorModeSuffixRemoved() = ColorMode.entries.fold(this) { str, colorMode ->
+    str.removeSuffix("_${colorMode.name.lowercase()}")
+}
+
+fun String.isSuffixedWith(colorMode: ColorMode) = this.endsWith("_${colorMode.name.lowercase()}")
 
 /**
  * Lighten or darken the color, as appropriate, based on the specified color mode.

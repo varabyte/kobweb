@@ -430,6 +430,7 @@ class ImmutableSilkTheme(private val mutableSilkTheme: MutableSilkTheme) {
     private val _cssStyles = mutableMapOf<CssStyle<*>, ImmutableCssStyle>()
     internal val cssStyles: Map<CssStyle<*>, ImmutableCssStyle> = _cssStyles
 
+    fun hasStyle(name: String): Boolean = mutableSilkTheme.cssStyles[name] != null
     fun nameFor(style: CssStyle<*>): String? = mutableSilkTheme.cssStyleNames[style]
     fun nameFor(keyframes: Keyframes): String? = mutableSilkTheme.cssKeyframesNames[keyframes]
 

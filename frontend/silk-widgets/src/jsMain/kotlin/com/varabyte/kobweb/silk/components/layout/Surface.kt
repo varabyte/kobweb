@@ -16,8 +16,13 @@ import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
+import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.isSuffixedWith
+import com.varabyte.kobweb.silk.theme.colors.suffixedWith
+import com.varabyte.kobweb.silk.theme.colors.withColorModeSuffixRemoved
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.asList
 
 object SurfaceVars {
     val BackgroundColor by StyleVariable(prefix = "silk", defaultFallback = BackgroundColorVar.value())
@@ -55,25 +60,61 @@ fun Surface(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
-    var surfaceElement by remember { mutableStateOf<HTMLElement?>(null)}
-    Box(
-        SurfaceStyle.toModifier(variant).then(modifier),
-        contentAlignment = contentAlignment,
-        ref = refScope {
-            add(ref)
-            ref { surfaceElement = it }
-        },
-    ) {
-        if (colorModeOverride != null) {
+    val surfaceModifier = SurfaceStyle.toModifier(variant).then(modifier)
+
+    if (colorModeOverride == null) {
+        Box(
+            surfaceModifier,
+            contentAlignment = contentAlignment,
+            ref = ref,
+        ) {
+            content()
+        }
+    } else {
+        var surfaceElement by remember { mutableStateOf<HTMLElement?>(null)}
+        Box(
+            surfaceModifier,
+            contentAlignment = contentAlignment,
+            ref = refScope {
+                add(ref)
+                ref { surfaceElement = it }
+            },
+        ) {
             surfaceElement?.let { surfaceElement ->
+                // Minor hack - the passed in modifier may have color styles applied to it which came from a different
+                // color mode than the one we want to use starting from this surface and below. For example:
+                // ```
+                // TestStyle = CssStyle.base {
+                //     Modifier.backgroundColor(if (colorMode.isDark) Colors.DarkRed else Colors.Pink)
+                // }
+                // Surface(TestStyle.toModifier(), colorModeOverride = ColorMode.LIGHT) { ... }
+                // ```
+                // In the above case, the generated `TestStyle.toModifier` will be created using the color mode from
+                // one layer above the surface. We handle that case here by replacing all class names associated with
+                // the wrong target color mode by modifying the surface's classnames directly.
+                //
+                // Children of the surface don't need to do this because their parent colormode scope will be set
+                // correctly.
+                val parentColorMode = ColorMode.current
+                LaunchedEffect(parentColorMode, colorModeOverride) {
+                    surfaceElement.classList.asList().forEach { className ->
+                        // To be extra safe, we only replace class names that we can confirm came from Silk (and not,
+                        // say, a third party JS library that happens to use a name like "bright_light" or something.)
+                        if (
+                            className.isSuffixedWith(colorModeOverride.opposite) &&
+                            SilkTheme.hasStyle(className.withColorModeSuffixRemoved())
+                        ) {
+                            surfaceElement.classList.replace(className, className.suffixedWith(colorModeOverride))
+                        }
+                    }
+                }
+
                 CompositionLocalProvider(colorModeOverride.provide()) {
                     val currColorMode = ColorMode.current // Can recompose if child changes ColorMode.currentState
                     LaunchedEffect(currColorMode) { surfaceElement.setSilkWidgetVariables(currColorMode) }
                     content()
                 }
             }
-        } else {
-            content()
         }
     }
 }
