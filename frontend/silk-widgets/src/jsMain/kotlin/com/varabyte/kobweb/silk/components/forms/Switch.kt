@@ -217,6 +217,8 @@ fun Switch(
             onValueChange = { onCheckedChange(!checked) },
             variant = SwitchInputVariant,
             enabled = enabled,
+            modifier = Modifier
+                .ariaLabel("switch"),
         )
         Box(
             SwitchTrackStyle.toModifier()
