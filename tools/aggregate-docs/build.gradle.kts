@@ -10,6 +10,10 @@ dokka {
 }
 
 dependencies {
+    // (*) indicates dependencies we explicitly excluded as their API is meant to be internal only; no need to make the
+    // docs more complicated by including them.
+
+    // dokka(projects.common.clientServerInternal) (*)
     dokka(projects.common.frameworkAnnotations)
     dokka(projects.common.kobwebCommon)
     dokka(projects.common.kobwebSerialization)
@@ -29,9 +33,14 @@ dependencies {
     dokka(projects.frontend.browserExt)
     dokka(projects.backend.kobwebApi)
     dokka(projects.backend.serverPlugin)
+    // dokka(projects.backend.server) (*)
     dokka(projects.tools.gradlePlugins.core)
     dokka(projects.tools.gradlePlugins.library)
     dokka(projects.tools.gradlePlugins.application)
     dokka(projects.tools.gradlePlugins.worker)
     dokka(projects.tools.gradlePlugins.extensions.markdown)
+    // dokka(projects.tools.ksp.siteProcessors) (*)
+    // dokka(projects.tools.ksp.workerProcessor) (*)
+    // dokka(projects.tools.ksp.kspExt) (*)
+    // dokka(projects.tools.processorCommon) (*)
 }
