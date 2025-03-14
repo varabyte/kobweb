@@ -8,9 +8,9 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
-import org.jetbrains.kotlin.gradle.utils.named
 import javax.inject.Inject
 
 abstract class KobwebPublicationConfig @Inject constructor(objects: ObjectFactory) {
@@ -92,6 +92,8 @@ class KobwebPublishPlugin : Plugin<Project> {
             from(dokkaHtmlTask.flatMap { it.outputDirectory })
             archiveClassifier.set("javadoc")
         }
+
+        project.configureDokka()
 
         val config = project.extensions.create<KobwebPublicationConfig>("kobwebPublication", project.objects)
         project.afterEvaluate {
