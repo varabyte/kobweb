@@ -100,25 +100,46 @@ fun ColorMode.saveToLocalStorage(key: String = DEFAULT_COLOR_MODE_STORAGE_KEY_NA
     window.localStorage.setItem(colorModeKey, this)
 }
 
+private fun ColorMode.toSuffix() = "_${name.lowercase()}"
 
-// Note: We use an underscore here as a separator instead of a hyphen, since we otherwise use hyphens when generating
-// names, so this makes the separator stand out as something more orthogonal to the base name.
-//
-// It also avoids ambiguity if you call some style's variant "dark", as in `ComponentStyle.addVariant("dark")`, since
-// that would generate a full style name of "style-dark".
-//
-// By using underscores instead, if we have dark and light mode variants of the parent style and its "dark" variant, we
-// would have "style_dark", "style_light", "style-dark_dark", and "style-dark_light"
-//
-// Finally, note that this method can be used to REPLACE the suffix of a colored style, e.g. `style_light` when suffixed
-// with `ColorMode.Dark` will be converted to `style_dark`.
-fun String.suffixedWith(colorMode: ColorMode) = "${this.substringBeforeLast('_')}_${colorMode.name.lowercase()}"
+/**
+ * For a String that represents a CSS class name, append the appropriate color mode suffix to it.
+ *
+ * For example, `"my-class".suffixedWith(ColorMode.DARK)` will return `"my-class_dark"`.
+ *
+ * Note: We use an underscore here as a separator instead of a hyphen, as Silk otherwise uses hyphens when generating
+ * class names, so this makes the separator stand out as something more orthogonal to the base name.
+ *
+ * This also avoids ambiguity if you create a variant called "dark", as in `MenuStyle.addVariant("dark")`, since that
+ * would generate a full style name of "menu-dark". In this case, when applying color mode suffixes to this, we will
+ * end up with "menu-dark_dark" and "menu-dark_light".
+ */
+fun String.suffixedWith(colorMode: ColorMode) = "${this.withColorModeSuffixRemoved()}${colorMode.toSuffix()}"
 
-fun String.withColorModeSuffixRemoved() = ColorMode.entries.fold(this) { str, colorMode ->
-    str.removeSuffix("_${colorMode.name.lowercase()}")
-}
+/**
+ * Assuming this string represents a CSS class name, return the color mode suffix (if any) associated with it.
+ *
+ * For example, `"my-style_dark" will return `ColorMode.DARK`, while `"my-style"` will return `null`.
+ */
+val String.colorModeSuffix: ColorMode?
+    get() {
+        val self = this
+        return ColorMode.entries.firstOrNull { colorMode -> self.isSuffixedWith(colorMode) }
+    }
 
-fun String.isSuffixedWith(colorMode: ColorMode) = this.endsWith("_${colorMode.name.lowercase()}")
+/**
+ * Assuming this string represents a CSS class name, test whether it has the specified color mode suffix.
+ */
+fun String.isSuffixedWith(colorMode: ColorMode) = this.endsWith(colorMode.toSuffix())
+
+/**
+ * Assuming this string represents a CSS class name, remove its color mode suffix if it has one.
+ *
+ * This will return the style base without the color suffix if it has one, or it will return the original string
+ * otherwise.
+ */
+fun String.withColorModeSuffixRemoved() =
+    this.colorModeSuffix?.let { colorMode -> this.removeSuffix(colorMode.toSuffix()) } ?: this
 
 /**
  * Lighten or darken the color, as appropriate, based on the specified color mode.
