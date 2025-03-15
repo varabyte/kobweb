@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.components.layout
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.dom.css.CssIdent
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.dom.refScope
@@ -98,13 +99,14 @@ fun Surface(
                 val parentColorMode = ColorMode.current
                 LaunchedEffect(parentColorMode, colorModeOverride) {
                     surfaceElement.classList.asList().forEach { className ->
+                        val ident = CssIdent(className)
                         // To be extra safe, we only replace class names that we can confirm came from Silk (and not,
                         // say, a third party JS library that happens to use a name like "bright_light" or something.)
                         if (
-                            className.isSuffixedWith(colorModeOverride.opposite) &&
-                            SilkTheme.hasStyle(className.withColorModeSuffixRemoved())
+                            ident.isSuffixedWith(colorModeOverride.opposite) &&
+                            SilkTheme.hasStyle(ident.withColorModeSuffixRemoved().asStr)
                         ) {
-                            surfaceElement.classList.replace(className, className.suffixedWith(colorModeOverride))
+                            surfaceElement.classList.replace(className, ident.suffixedWith(colorModeOverride).asStr)
                         }
                     }
                 }

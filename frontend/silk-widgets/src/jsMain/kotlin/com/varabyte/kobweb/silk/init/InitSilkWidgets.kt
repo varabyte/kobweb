@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.init
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.dom.css.CssIdent
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -405,7 +406,8 @@ fun SilkWidgetVariables(element: HTMLElement) {
 
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
     SilkColorsStyle.name.let { silkColorsStyleName ->
-        removeClass(silkColorsStyleName.suffixedWith(colorMode.opposite))
-        addClass(silkColorsStyleName.suffixedWith(colorMode))
+        val ident = CssIdent(silkColorsStyleName)
+        removeClass(ident.suffixedWith(colorMode.opposite).asStr)
+        addClass(ident.suffixedWith(colorMode).asStr)
     }
 }

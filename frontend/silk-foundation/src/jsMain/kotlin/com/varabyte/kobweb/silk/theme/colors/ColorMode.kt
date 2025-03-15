@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.theme.colors
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.dom.css.CssIdent
 import com.varabyte.kobweb.browser.storage.createStorageKey
 import com.varabyte.kobweb.browser.storage.getItem
 import com.varabyte.kobweb.browser.storage.setItem
@@ -107,7 +108,7 @@ private fun ColorMode.toSuffix() = "_${name.lowercase()}"
  *
  * For example, `"my-style_dark"` will return `ColorMode.DARK`, while `"my-style"` will return `null`.
  */
-private val String.colorModeSuffix: ColorMode?
+private val CssIdent.colorModeSuffix: ColorMode?
     get() {
         val self = this
         return ColorMode.entries.firstOrNull { colorMode -> self.isSuffixedWith(colorMode) }
@@ -125,12 +126,12 @@ private val String.colorModeSuffix: ColorMode?
  * would generate a full style name of "menu-dark". In this case, when applying color mode suffixes to this, we will
  * end up with "menu-dark_dark" and "menu-dark_light".
  */
-fun String.suffixedWith(colorMode: ColorMode) = "${this.withColorModeSuffixRemoved()}${colorMode.toSuffix()}"
+fun CssIdent.suffixedWith(colorMode: ColorMode) = this.withColorModeSuffixRemoved().renamed { "${this}${colorMode.toSuffix()}" }
 
 /**
  * Assuming this string represents a CSS class name, test whether it has the specified color mode suffix.
  */
-fun String.isSuffixedWith(colorMode: ColorMode) = this.endsWith(colorMode.toSuffix())
+fun CssIdent.isSuffixedWith(colorMode: ColorMode) = this.endsWith(colorMode.toSuffix())
 
 /**
  * Assuming this string represents a CSS class name, remove its color mode suffix if it has one.
@@ -138,8 +139,11 @@ fun String.isSuffixedWith(colorMode: ColorMode) = this.endsWith(colorMode.toSuff
  * This will return the style base without the color suffix if it has one, or it will return the original string
  * otherwise.
  */
-fun String.withColorModeSuffixRemoved() =
-    this.colorModeSuffix?.let { colorMode -> this.removeSuffix(colorMode.toSuffix()) } ?: this
+fun CssIdent.withColorModeSuffixRemoved() =
+    this
+        .colorModeSuffix
+        ?.let { colorMode -> this.renamed { removeSuffix(colorMode.toSuffix()) } }
+        ?: this
 
 /**
  * Lighten or darken the color, as appropriate, based on the specified color mode.

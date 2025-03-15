@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.silk.style
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.browser.dom.css.CssIdent
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -197,6 +198,13 @@ abstract class CssStyle<K : CssKind> internal constructor(
         group: StyleGroup,
         handler: (String, ComparableStyleScope) -> Unit
     ) {
+        fun String.suffixedWith(colorMode: ColorMode): String {
+            // "this" should always be a simple class selector, e.g. ".some-style", but use `tryCreate` to be careful
+            return CssIdent.tryCreate(this.removePrefix("."))
+                ?.suffixedWith(colorMode)
+                ?.asStr?.let { ".$it" }
+                ?: this
+        }
         when (group) {
             is StyleGroup.Light -> handler(selectorBaseName.suffixedWith(ColorMode.LIGHT), group.styles)
             is StyleGroup.Dark -> handler(selectorBaseName.suffixedWith(ColorMode.DARK), group.styles)
@@ -402,7 +410,7 @@ internal class ImmutableCssStyle(
 
     @Composable
     fun toModifier(): Modifier {
-        val currentClassNames = classNames.filterNot { it.isSuffixedWith(ColorMode.current.opposite) }
+        val currentClassNames = classNames.filterNot { CssIdent(it).isSuffixedWith(ColorMode.current.opposite) }
         return (if (currentClassNames.isNotEmpty()) Modifier.classNames(*currentClassNames.toTypedArray()) else Modifier)
             .then(extraModifier())
     }
