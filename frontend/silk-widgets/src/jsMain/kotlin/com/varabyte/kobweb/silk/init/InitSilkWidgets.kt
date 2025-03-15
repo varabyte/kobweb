@@ -68,6 +68,7 @@ import com.varabyte.kobweb.silk.components.overlay.TooltipVars
 import com.varabyte.kobweb.silk.components.overlay.TopLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopTooltipArrowVariant
+import com.varabyte.kobweb.silk.style.CssIdent
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.common.DisabledStyle
@@ -414,7 +415,8 @@ fun SilkWidgetVariables(element: HTMLElement) {
 
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
     SilkColorsStyle.name.let { silkColorsStyleName ->
-        removeClass(silkColorsStyleName.suffixedWith(colorMode.opposite))
-        addClass(silkColorsStyleName.suffixedWith(colorMode))
+        val ident = CssIdent(silkColorsStyleName)
+        removeClass(ident.suffixedWith(colorMode.opposite).asStr)
+        addClass(ident.suffixedWith(colorMode).asStr)
     }
 }

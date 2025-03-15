@@ -13,6 +13,7 @@ import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
+import com.varabyte.kobweb.silk.style.CssIdent
 import com.varabyte.kobweb.silk.style.toModifier
 import com.varabyte.kobweb.silk.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
@@ -98,13 +99,14 @@ fun Surface(
                 val parentColorMode = ColorMode.current
                 LaunchedEffect(parentColorMode, colorModeOverride) {
                     surfaceElement.classList.asList().forEach { className ->
+                        val ident = CssIdent(className)
                         // To be extra safe, we only replace class names that we can confirm came from Silk (and not,
                         // say, a third party JS library that happens to use a name like "bright_light" or something.)
                         if (
-                            className.isSuffixedWith(colorModeOverride.opposite) &&
-                            SilkTheme.hasStyle(className.withColorModeSuffixRemoved())
+                            ident.isSuffixedWith(colorModeOverride.opposite) &&
+                            SilkTheme.hasStyle(ident.withColorModeSuffixRemoved().asStr)
                         ) {
-                            surfaceElement.classList.replace(className, className.suffixedWith(colorModeOverride))
+                            surfaceElement.classList.replace(className, ident.suffixedWith(colorModeOverride).asStr)
                         }
                     }
                 }

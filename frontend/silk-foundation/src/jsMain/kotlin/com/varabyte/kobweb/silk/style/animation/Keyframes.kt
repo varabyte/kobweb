@@ -5,13 +5,13 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toStyles
+import com.varabyte.kobweb.silk.style.CssIdent
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleScopeBase
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import com.varabyte.kobweb.silk.theme.name
 import org.jetbrains.compose.web.css.*
-import kotlin.reflect.KProperty
 
 class KeyframesBuilder internal constructor(override val colorMode: ColorMode) : CssStyleScopeBase {
     private val keyframeStyles = mutableMapOf<CSSKeyframe, Modifier>()
@@ -195,7 +195,7 @@ fun Keyframes.toAnimation(
         null
     }
 
-    val nameWithColorMode = if (colorMode != null) name.suffixedWith(colorMode) else name
+    val nameWithColorMode = if (colorMode != null) CssIdent(name).suffixedWith(colorMode).asStr else name
     return Animation.of(
         nameWithColorMode,
         duration,
