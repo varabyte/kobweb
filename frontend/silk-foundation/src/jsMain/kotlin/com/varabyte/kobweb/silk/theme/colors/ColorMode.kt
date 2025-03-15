@@ -103,6 +103,17 @@ fun ColorMode.saveToLocalStorage(key: String = DEFAULT_COLOR_MODE_STORAGE_KEY_NA
 private fun ColorMode.toSuffix() = "_${name.lowercase()}"
 
 /**
+ * Assuming this string represents a CSS class name, return the color mode suffix (if any) associated with it.
+ *
+ * For example, `"my-style_dark"` will return `ColorMode.DARK`, while `"my-style"` will return `null`.
+ */
+private val String.colorModeSuffix: ColorMode?
+    get() {
+        val self = this
+        return ColorMode.entries.firstOrNull { colorMode -> self.isSuffixedWith(colorMode) }
+    }
+
+/**
  * For a String that represents a CSS class name, append the appropriate color mode suffix to it.
  *
  * For example, `"my-class".suffixedWith(ColorMode.DARK)` will return `"my-class_dark"`.
@@ -115,17 +126,6 @@ private fun ColorMode.toSuffix() = "_${name.lowercase()}"
  * end up with "menu-dark_dark" and "menu-dark_light".
  */
 fun String.suffixedWith(colorMode: ColorMode) = "${this.withColorModeSuffixRemoved()}${colorMode.toSuffix()}"
-
-/**
- * Assuming this string represents a CSS class name, return the color mode suffix (if any) associated with it.
- *
- * For example, `"my-style_dark" will return `ColorMode.DARK`, while `"my-style"` will return `null`.
- */
-val String.colorModeSuffix: ColorMode?
-    get() {
-        val self = this
-        return ColorMode.entries.firstOrNull { colorMode -> self.isSuffixedWith(colorMode) }
-    }
 
 /**
  * Assuming this string represents a CSS class name, test whether it has the specified color mode suffix.
