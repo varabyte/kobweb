@@ -8,6 +8,9 @@ import com.varabyte.kobweb.browser.storage.setItem
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.silk.init.SilkConfig
+import com.varabyte.kobweb.silk.style.ColorModeStrategy
+import com.varabyte.kobweb.silk.theme.colors.ColorMode.Companion.current
+import com.varabyte.kobweb.silk.theme.colors.ColorMode.Companion.currentState
 import kotlinx.browser.window
 import kotlin.math.absoluteValue
 
@@ -86,6 +89,20 @@ val ColorMode.Companion.systemPreference: ColorMode get() {
         else -> ColorMode.LIGHT
     }
 }
+
+/**
+ * A CSS class representing the given color mode.
+ *
+ * When using [ColorModeStrategy.SCOPE] mode (the default), this class must be set on an element so that it and its
+ * descendants use styles for the current color mode.
+ *
+ * Setting this class on a child element will override the color mode for styles on that element and its descendants.
+ */
+val ColorMode.cssClass
+    get() = when (this) {
+        ColorMode.LIGHT -> "silk-light"
+        ColorMode.DARK -> "silk-dark"
+    }
 
 private const val DEFAULT_COLOR_MODE_STORAGE_KEY_NAME = "silk-color-mode"
 
