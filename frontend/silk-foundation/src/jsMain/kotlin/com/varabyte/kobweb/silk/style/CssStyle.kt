@@ -217,30 +217,34 @@ abstract class CssStyle<K : CssKind> internal constructor(
         }
     }
 
-    private fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.withColorModeScope(
-        selectorBaseName: String,
+    /**
+     * Shared logic for adding a style into the appropriate stylesheet(s) based on its color mode awareness.
+     *
+     * The receiver of the [handler] callback should be used to register the provided style with the given selector and
+     * any other scopes, such as layers or media queries, if applicable.
+     */
+    private fun withColorModeScope(
+        selector: String,
         group: StyleGroup,
-        cssRuleKey: CssModifier.Key? = null,
+        baseStyleSheet: StyleSheet,
+        lightStyleSheet: StyleSheet,
+        darkStyleSheet: StyleSheet,
         handler: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.(String, ComparableStyleScope) -> Unit
     ) {
         // TODO: Consider using `&` instead of `:scope`, which base on caniuse has strictly wider browser support than
         //  `@scope`, except *maybe* Chrome 118-119
-        val suffix = cssRuleKey?.suffix.orEmpty()
-        val inScopeSelector = ":scope$selectorBaseName$suffix, $selectorBaseName$suffix"
-        val lightSelector = ".${ColorMode.LIGHT.cssClass}"
-        val darkSelector = ".${ColorMode.DARK.cssClass}"
-
+        // A selector like ".abc" inside an `@scope` rule applies to all descendants of the scope with the "abc" class,
+        // but not the scope itself. So, we also add a selector of the form ":scope.abc" to target the scope element.
+        // Note: We know that `selector` begins with a "." as long as `group` is not `ColorAgnostic` (since only
+        // `CssStyle`s can be color mode aware), so we can safely perform the string concatenation here.
+        val inScopeSelector = ":scope$selector, $selector"
         when (group) {
-            is StyleGroup.Light -> scope(lightSelector, darkSelector) { handler(inScopeSelector, group.styles) }
-            is StyleGroup.Dark -> scope(darkSelector, lightSelector) { handler(inScopeSelector, group.styles) }
-            is StyleGroup.ColorAgnostic -> handler("$selectorBaseName$suffix", group.styles)
+            is StyleGroup.Light -> lightStyleSheet.handler(inScopeSelector, group.styles)
+            is StyleGroup.Dark -> darkStyleSheet.handler(inScopeSelector, group.styles)
+            is StyleGroup.ColorAgnostic -> baseStyleSheet.handler(selector, group.styles)
             is StyleGroup.ColorAware -> {
-                scope(lightSelector, darkSelector) {
-                    handler(inScopeSelector, group.lightStyles)
-                }
-                scope(darkSelector, lightSelector) {
-                    handler(inScopeSelector, group.darkStyles)
-                }
+                lightStyleSheet.handler(inScopeSelector, group.lightStyles)
+                darkStyleSheet.handler(inScopeSelector, group.darkStyles)
             }
         }
     }
@@ -338,10 +342,20 @@ abstract class CssStyle<K : CssKind> internal constructor(
         val darkModifiers = CssStyleScope(ColorMode.DARK).mergeCssModifiers(init)
             .assertNoAttributeModifiers(selector, layer)
 
+        // Use StyleSheets as rule builders for all styles belonging to a common `@scope` color mode block
+        val lightStyleSheet = StyleSheet()
+        val darkStylesSheet = StyleSheet()
+
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
                 if (CSSScopeSupport) {
-                    styleSheet.withColorModeScope(selector, group) { selector, styles ->
+                    withColorModeScope(
+                        selector = selector,
+                        group = group,
+                        baseStyleSheet = styleSheet,
+                        lightStyleSheet = lightStyleSheet,
+                        darkStyleSheet = darkStylesSheet,
+                    ) { selector, styles ->
                         if (styles.isNotEmpty()) {
                             layerOrInPlace(layer) {
                                 addStyles(selector, styles)
@@ -365,8 +379,13 @@ abstract class CssStyle<K : CssKind> internal constructor(
             val group = StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)
                 ?: continue
             if (CSSScopeSupport) {
-                // TODO: considering reusing "@scope" blocks instead of recreating every time
-                styleSheet.withColorModeScope(selector, group, cssRuleKey) { selector, styles ->
+                withColorModeScope(
+                    selector = "$selector${cssRuleKey.suffix.orEmpty()}",
+                    group = group,
+                    baseStyleSheet = styleSheet,
+                    lightStyleSheet = lightStyleSheet,
+                    darkStyleSheet = darkStylesSheet,
+                ) { selector, styles ->
                     if (styles.isNotEmpty()) {
                         mediaOrInPlace(cssRuleKey.mediaQuery) {
                             layerOrInPlace(layer) {
@@ -390,6 +409,30 @@ abstract class CssStyle<K : CssKind> internal constructor(
                 }
             }
         }
+
+        if (CSSScopeSupport) {
+            styleSheet.apply {
+                if (lightStyleSheet.cssRules.isNotEmpty()) {
+                    add(
+                        CSSScopeRuleDeclaration(
+                            start = ".${ColorMode.LIGHT.cssClass}",
+                            end = ".${ColorMode.DARK.cssClass}",
+                            rules = lightStyleSheet.cssRules
+                        )
+                    )
+                }
+                if (darkStylesSheet.cssRules.isNotEmpty()) {
+                    add(
+                        CSSScopeRuleDeclaration(
+                            start = ".${ColorMode.DARK.cssClass}",
+                            end = ".${ColorMode.LIGHT.cssClass}",
+                            rules = darkStylesSheet.cssRules
+                        )
+                    )
+                }
+            }
+        }
+
         return ClassSelectors(classNames)
     }
 
