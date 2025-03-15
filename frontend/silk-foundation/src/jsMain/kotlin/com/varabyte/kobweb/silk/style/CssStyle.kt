@@ -12,6 +12,7 @@ import com.varabyte.kobweb.silk.style.animation.toAnimation
 import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.cssClass
 import com.varabyte.kobweb.silk.theme.colors.isSuffixedWith
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.attributes.AttrsScope
@@ -216,6 +217,34 @@ abstract class CssStyle<K : CssKind> internal constructor(
         }
     }
 
+    private fun GenericStyleSheetBuilder<CSSStyleRuleBuilder>.withColorModeScope(
+        selectorBaseName: String,
+        group: StyleGroup,
+        cssRuleKey: CssModifier.Key? = null,
+        handler: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.(String, ComparableStyleScope) -> Unit
+    ) {
+        // TODO: Consider using `&` instead of `:scope`, which base on caniuse has strictly wider browser support than
+        //  `@scope`, except *maybe* Chrome 118-119
+        val suffix = cssRuleKey?.suffix.orEmpty()
+        val inScopeSelector = ":scope$selectorBaseName$suffix, $selectorBaseName$suffix"
+        val lightSelector = ".${ColorMode.LIGHT.cssClass}"
+        val darkSelector = ".${ColorMode.DARK.cssClass}"
+
+        when (group) {
+            is StyleGroup.Light -> scope(lightSelector, darkSelector) { handler(inScopeSelector, group.styles) }
+            is StyleGroup.Dark -> scope(darkSelector, lightSelector) { handler(inScopeSelector, group.styles) }
+            is StyleGroup.ColorAgnostic -> handler("$selectorBaseName$suffix", group.styles)
+            is StyleGroup.ColorAware -> {
+                scope(lightSelector, darkSelector) {
+                    handler(inScopeSelector, group.lightStyles)
+                }
+                scope(darkSelector, lightSelector) {
+                    handler(inScopeSelector, group.darkStyles)
+                }
+            }
+        }
+    }
+
     // Collect all CSS selectors (e.g. all base, hover, breakpoints, etc. modifiers) and, if we ever find multiple
     // definitions for the same selector, just combine them together. One way this is useful is you can use
     // `MutableSilkTheme.modifyStyle` to layer additional styles on top of a base style. In almost all
@@ -311,11 +340,21 @@ abstract class CssStyle<K : CssKind> internal constructor(
 
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
-                withFinalSelectorName(selector, group) { name, styles ->
-                    if (styles.isNotEmpty()) {
-                        classNames.add(name)
-                        styleSheet.layerOrInPlace(layer) {
-                            addStyles(name, styles)
+                if (CSSScopeSupport) {
+                    styleSheet.withColorModeScope(selector, group) { selector, styles ->
+                        if (styles.isNotEmpty()) {
+                            layerOrInPlace(layer) {
+                                addStyles(selector, styles)
+                            }
+                        }
+                    }
+                } else {
+                    withFinalSelectorName(selector, group) { name, styles ->
+                        if (styles.isNotEmpty()) {
+                            classNames.add(name)
+                            styleSheet.layerOrInPlace(layer) {
+                                addStyles(name, styles)
+                            }
                         }
                     }
                 }
@@ -325,14 +364,27 @@ abstract class CssStyle<K : CssKind> internal constructor(
         for (cssRuleKey in allCssRuleKeys) {
             val group = StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)
                 ?: continue
-            withFinalSelectorName(selector, group) { name, styles ->
-                if (styles.isNotEmpty()) {
-                    classNames.add(name)
+            if (CSSScopeSupport) {
+                // TODO: considering reusing "@scope" blocks instead of recreating every time
+                styleSheet.withColorModeScope(selector, group, cssRuleKey) { selector, styles ->
+                    if (styles.isNotEmpty()) {
+                        mediaOrInPlace(cssRuleKey.mediaQuery) {
+                            layerOrInPlace(layer) {
+                                addStyles(selector, styles)
+                            }
+                        }
+                    }
+                }
+            } else {
+                withFinalSelectorName(selector, group) { name, styles ->
+                    if (styles.isNotEmpty()) {
+                        classNames.add(name)
 
-                    val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
-                    styleSheet.mediaOrInPlace(cssRuleKey.mediaQuery) {
-                        layerOrInPlace(layer) {
-                            addStyles(cssRule, styles)
+                        val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
+                        styleSheet.mediaOrInPlace(cssRuleKey.mediaQuery) {
+                            layerOrInPlace(layer) {
+                                addStyles(cssRule, styles)
+                            }
                         }
                     }
                 }

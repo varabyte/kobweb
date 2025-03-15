@@ -80,6 +80,7 @@ import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.color.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorPalettes
+import com.varabyte.kobweb.silk.theme.colors.cssClass
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
 import com.varabyte.kobweb.silk.theme.colors.palette.button
@@ -406,8 +407,17 @@ fun SilkWidgetVariables(element: HTMLElement) {
 
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
     SilkColorsStyle.name.let { silkColorsStyleName ->
+        // Apply the appropriate color mode class unconditionally
+        // It will by default be a no-op in SUFFIX mode, but users may rely on it for custom color mode-based styling
+        removeClass(colorMode.opposite.cssClass)
+        addClass(colorMode.cssClass)
+
         val ident = CssIdent(silkColorsStyleName)
-        removeClass(ident.suffixedWith(colorMode.opposite).asStr)
-        addClass(ident.suffixedWith(colorMode).asStr)
+        if (CSSScopeSupport) {
+            addClass(silkColorsStyleName)
+        } else {
+            removeClass(ident.suffixedWith(colorMode.opposite).asStr)
+            addClass(ident.suffixedWith(colorMode).asStr)
+        }
     }
 }
