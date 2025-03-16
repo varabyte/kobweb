@@ -98,7 +98,6 @@ import com.varabyte.kobweb.silk.theme.name
 import kotlinx.browser.document
 import kotlinx.dom.addClass
 import kotlinx.dom.removeClass
-import org.w3c.dom.Document
 import org.w3c.dom.HTMLElement
 
 fun initSilkWidgets(ctx: InitSilkContext) {
@@ -397,14 +396,6 @@ fun SilkWidgetVariables() {
 @Composable
 fun SilkWidgetVariables(elementId: String) {
     SilkWidgetVariables { document.getElementById(elementId) as HTMLElement }
-}
-
-@Deprecated("Use `SilkWidgetVariables` instead, as it is more Compose-idiomatic.",
-    ReplaceWith("SilkWidgetVariables(rootElementId)")
-)
-@Composable
-fun Document.setSilkWidgetVariables(rootElementId: String = "_kobweb-root") {
-    SilkWidgetVariables { this.getElementById(rootElementId) as HTMLElement }
 }
 
 @Composable
