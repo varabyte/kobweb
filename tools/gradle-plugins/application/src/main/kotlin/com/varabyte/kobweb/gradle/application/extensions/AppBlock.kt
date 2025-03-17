@@ -19,6 +19,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
@@ -212,22 +213,34 @@ abstract class AppBlock @Inject constructor(
         }
 
         /**
-         * The default description to set in the meta tag.
+         * The default description for the site.
          *
-         * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), this value
-         * will not be used.
+         * This is a convenience property which, if set, causes a `<meta name="description" content="$description">`
+         * element to be added to the site's `<head>` block.
+         *
+         * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), any value
+         * set here will be ignored.
          */
         @get:Input
+        @get:Optional
         abstract val description: Property<String>
 
         /**
-         * The path to use for the favicon in the link tag.
+         * The path to use for the favicon for the site.
          *
-         * For example, "/favicon.ico" (which is the default value) will refer to the icon file located at
+         * This is a convenience property which, if set, causes a `<link rel="icon" href="$faviconPath">` element to be
+         * added to the site's `<head>` block.
+         *
+         * This value defaults to "/favicon.ico". If you don't want Kobweb to create the link element for you, you can
+         * set this value to "".
+         *
+         * The path of the favicon is relative to the public folder in your resources directory. For example,
+         * "/favicon.ico" (which is the default value) will refer to the icon file located at
          * "jsMain/resources/public/favicon.ico".
          *
          * You are expected to begin your path with a '/' to explicitly indicate that the path will always be rooted
-         * regardless of which URL on your site you visit. If you do not, a leading slash will be added for you.
+         * at the top of your site even if you are visited a nested subpage. If you do not add a leading slash yourself,
+         * one will be added for you.
          *
          * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), this value
          * will not be used.
@@ -241,6 +254,7 @@ abstract class AppBlock @Inject constructor(
          * Defaults to "en". You can set this to another language or even "" if you want to clear it.
          */
         @get:Input
+        @get:Optional
         abstract val lang: Property<String>
 
         /**
@@ -315,18 +329,21 @@ abstract class AppBlock @Inject constructor(
         init {
             extensions.create<InterceptUrlsBlock>("interceptUrls")
 
-            description.convention("Powered by Kobweb")
             faviconPath.convention("/favicon.ico")
             lang.convention("en")
 
             head.set(listOf {
-                meta {
-                    name = "description"
-                    content = description.get()
+                description.orNull?.takeIf { it.isNotBlank() }?.let { description ->
+                    meta {
+                        name = "description"
+                        content = description
+                    }
                 }
-                link {
-                    rel = "icon"
-                    href = basePath.prependTo(faviconPath.get().prefixIfNot("/"))
+                faviconPath.get().takeIf { it.isNotBlank() }?.let { faviconPath ->
+                    link {
+                        rel = "icon"
+                        href = basePath.prependTo(faviconPath.prefixIfNot("/"))
+                    }
                 }
 
                 // Viewport content chosen for a good mobile experience.
