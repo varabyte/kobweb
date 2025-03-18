@@ -40,13 +40,13 @@ var additionalSilkInitialization: (InitSilkContext) -> Unit = {}
 
 // For iterating over stylesheets that we have created / populated locally
 // This excludes stylesheets imported from external locations (i.e. from inside a <head> block)
-private val Document.localStyleSheets: List<CSSStyleSheet> get() {
-    return document.styleSheets.asList()
-        .filterIsInstance<CSSStyleSheet>()
-        // Trying to peek at external stylesheets causes a security exception so step over them
-        .filter { it.href == null }
-
-}
+private val Document.localStyleSheets: List<CSSStyleSheet>
+    get() {
+        return this.styleSheets.asList()
+            .filterIsInstance<CSSStyleSheet>()
+            // Trying to peek at external stylesheets causes a security exception so step over them
+            .filter { it.href == null }
+    }
 
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
@@ -98,13 +98,9 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
             }
         }
 
-        document.styleSheets.asList()
-            .filterIsInstance<CSSStyleSheet>()
-            // Trying to peek at external stylesheets causes a security exception so step over them
-            .filter { it.href == null }
-            .forEach { styleSheet ->
-                val cssLayers = SilkStylesheetInstance.cssLayers.build()
-                styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
-            }
+        document.localStyleSheets.forEach { styleSheet ->
+            val cssLayers = SilkStylesheetInstance.cssLayers.build()
+            styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
+        }
     }
 }
