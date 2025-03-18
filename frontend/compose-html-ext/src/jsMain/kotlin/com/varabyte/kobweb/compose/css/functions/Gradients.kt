@@ -182,8 +182,6 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
     internal class Default internal constructor(position: CSSPosition?, vararg entries: LengthColorStopsBuilderEntry) :
         RadialGradient(buildString {
             if (position != null) {
-                if (this.isNotEmpty()) append(' ')
-
                 append("at $position")
             }
             if (this.isNotEmpty()) {
