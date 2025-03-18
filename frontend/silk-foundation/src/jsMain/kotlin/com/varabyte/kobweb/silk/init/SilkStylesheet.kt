@@ -163,10 +163,9 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         this.invoke(simpleStyleScope)
 
         simpleStyleScope.cssModifiers.forEach { cssModifier ->
-            cssModifier.assertNoAttributes(
-                selectorName,
-                extraContext = "Please search your `@InitSilk` code for a line like `ctx.stylesheet.registerStyle(\"$selectorName\")` and remove the offending attribute(s)."
-            )
+            cssModifier.assertNoAttributes(selectorName) {
+                "Please search your `@InitSilk` code for a line like `ctx.stylesheet.registerStyle(\"$selectorName\")` and remove the offending attribute(s)."
+            }
         }
     }
 

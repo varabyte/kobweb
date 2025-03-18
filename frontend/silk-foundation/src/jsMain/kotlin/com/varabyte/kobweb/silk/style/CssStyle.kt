@@ -233,9 +233,8 @@ abstract class CssStyle<K : CssKind> internal constructor(
         layer: String?
     ): Map<CssModifier.Key, CssModifier> {
         return this.onEach { (_, cssModifier) ->
-            cssModifier.assertNoAttributes(
-                selectorName,
-                extraContext = buildString {
+            cssModifier.assertNoAttributes(selectorName) {
+                buildString {
                     val styleDeclaration = when {
                         layer == SilkLayer.COMPONENT_VARIANTS.layerName -> "val SomeExampleVariant = ExampleStyle.addVariant"
                         layer == SilkLayer.COMPONENT_STYLES.layerName -> "val ExampleStyle = CssStyle<ExampleKind>"
@@ -264,7 +263,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
                         """.trimMargin()
                     )
                 }
-            )
+            }
         }
     }
 
