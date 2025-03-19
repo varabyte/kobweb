@@ -13,10 +13,12 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.silk.init.SilkColorsStyle
 import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
+import com.varabyte.kobweb.silk.style.ColorModeStrategy
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.toModifier
+import com.varabyte.kobweb.silk.style.useScope
 import com.varabyte.kobweb.silk.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -66,7 +68,7 @@ fun Surface(
 ) {
     val surfaceModifier = SurfaceStyle.toModifier(variant).then(modifier)
 
-    if (colorModeOverride == null || CSSScopeSupport) {
+    if (colorModeOverride == null || ColorModeStrategy.current.useScope) {
         Box(
             surfaceModifier.thenIf(colorModeOverride != null) {
                 SilkColorsStyle.toModifier()

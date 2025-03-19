@@ -69,10 +69,13 @@ import com.varabyte.kobweb.silk.components.overlay.TooltipVars
 import com.varabyte.kobweb.silk.components.overlay.TopLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopTooltipArrowVariant
+import com.varabyte.kobweb.silk.style.ColorModeStrategy
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.style.common.SmoothColorStyle
+import com.varabyte.kobweb.silk.style.useScope
+import com.varabyte.kobweb.silk.style.useSuffix
 import com.varabyte.kobweb.silk.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
@@ -413,9 +416,15 @@ fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
         addClass(colorMode.cssClass)
 
         val ident = CssIdent(silkColorsStyleName)
-        if (CSSScopeSupport) {
+        if (ColorModeStrategy.current.useScope) {
             addClass(silkColorsStyleName)
-        } else {
+            // The color mode suffixed classes may have been added during export, but aren't needed in this mode
+            if (ColorModeStrategy.current == ColorModeStrategy.SCOPE) {
+                removeClass(ident.suffixedWith(colorMode).asStr)
+                removeClass(ident.suffixedWith(colorMode.opposite).asStr)
+            }
+        }
+        if (ColorModeStrategy.current.useSuffix) {
             removeClass(ident.suffixedWith(colorMode.opposite).asStr)
             addClass(ident.suffixedWith(colorMode).asStr)
         }
