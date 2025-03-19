@@ -19,6 +19,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
@@ -63,43 +64,11 @@ abstract class AppBlock @Inject constructor(
          * more information about that.
          */
         abstract class InterceptUrlsBlock @Inject constructor() : ExtensionAware {
-            /**
-             * Configuration for converting external resources into self-hosted files.
-             *
-             * The internet is full of CDNs and other external resources that can be useful to include in your site.
-             * Though convenient, there are complex realities that come with using them, including GDPR compliance and
-             * concerns about availability.
-             *
-             * Kobweb provides a way to automatically try to convert these resources to self-hosted paths, so by
-             * request self-host conversions, the framework will attempt to download links that are found in your <head>
-             * block and replace them with links to those local copies.
-             *
-             * Using self-hosting can seem like a straight-up win, but note that you will be paying for the extra
-             * bandwidth for serving those files, which could add up. Fetching files from your site might also be
-             * slower for some users as the CDN is more likely to have more servers across the globe.
-             */
-            abstract class SelfHostingBlock @Inject constructor() : ExtensionAware {
-                /**
-                 * When `true`, opts-in to Kobweb attempting to automate self-hosting of external resources.
-                 *
-                 * Defaults to `false`.
-                 *
-                 * Users should call [InterceptUrlsBlock.enableSelfHosting] instead.
-                 */
-                @get:Input
-                internal abstract val enabled: Property<Boolean>
-
-                /**
-                 * A list of URLs which, if encountered, should be ignored by the self-hosting conversion logic.
-                 *
-                 * Users should call [InterceptUrlsBlock.enableSelfHosting] instead.
-                 */
-                @get:Input
-                internal abstract val excludes: ListProperty<String>
-
-                init {
-                    enabled.convention(false)
-                }
+            internal class SelfHostingConfig(
+                @get:Input val enabled: Boolean,
+                @get:Input val excludes: List<String>,
+            ) {
+                constructor() : this(false, emptyList())
             }
 
             /**
@@ -126,6 +95,9 @@ abstract class AppBlock @Inject constructor(
              */
             @get:Input
             internal abstract val rejects: SetProperty<String>
+
+            @get:Nested
+            internal abstract val selfHosting: Property<SelfHostingConfig>
 
             /**
              * Register a URL which, if referenced in a <head> block element, should be replaced with the given value.
@@ -160,19 +132,29 @@ abstract class AppBlock @Inject constructor(
             }
 
             /**
-             * A convenience method for enabling self-hosting of external resources.
+             * Enable a processing step at build that time converts external resources into self-hosted files.
              *
-             * See the docs on [SelfHostingBlock] for more information.
+             * The internet is full of CDNs and other external resources that can be useful to include in your site.
+             * Though convenient, there are complex realities that come with using them, including GDPR compliance and
+             * concerns about availability.
+             *
+             * Kobweb provides a way to automatically try to convert these resources to self-hosted paths, so by
+             * request self-host conversions, the framework will attempt to download links that are found in your <head>
+             * block and replace them with links to those local copies.
+             *
+             * Using self-hosting can seem like a straight-up win, but note that you will be paying for the extra
+             * bandwidth for serving those files, which could add up. Fetching files from your site might also be
+             * slower for some users as the CDN is more likely to have more servers across the globe.
+             *
+             * @param excludes A list of URLs which, if encountered, should be ignored by the self-hosting conversion
+             *   logic.
              */
             fun enableSelfHosting(excludes: Set<String> = emptySet()) {
-                val selfHosting = extensions.getByType<SelfHostingBlock>()
-                selfHosting.enabled.set(true)
-                selfHosting.excludes.addAll(excludes)
+                selfHosting.set(SelfHostingConfig(true, excludes.toList()))
             }
 
             init {
-                extensions.create<SelfHostingBlock>("selfHosting")
-
+                selfHosting.convention(SelfHostingConfig())
                 linkRels.convention(
                     setOf(
                         "stylesheet",
@@ -180,7 +162,6 @@ abstract class AppBlock @Inject constructor(
                         "preload",
                         "prefetch",
                     )
-
                 )
             }
         }
@@ -606,9 +587,6 @@ val AppBlock.index: AppBlock.IndexBlock
 
 val AppBlock.IndexBlock.interceptUrls: AppBlock.IndexBlock.InterceptUrlsBlock
     get() = extensions.getByType<AppBlock.IndexBlock.InterceptUrlsBlock>()
-
-val AppBlock.IndexBlock.InterceptUrlsBlock.selfHosting: AppBlock.IndexBlock.InterceptUrlsBlock.SelfHostingBlock
-    get() = extensions.getByType<AppBlock.IndexBlock.InterceptUrlsBlock.SelfHostingBlock>()
 
 val AppBlock.export: AppBlock.ExportBlock
     get() = extensions.getByType<AppBlock.ExportBlock>()

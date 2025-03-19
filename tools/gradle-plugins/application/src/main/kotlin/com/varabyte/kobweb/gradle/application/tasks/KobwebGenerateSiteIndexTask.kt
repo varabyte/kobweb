@@ -5,7 +5,6 @@ import com.varabyte.kobweb.gradle.application.BuildTarget
 import com.varabyte.kobweb.gradle.application.extensions.AppBlock
 import com.varabyte.kobweb.gradle.application.extensions.index
 import com.varabyte.kobweb.gradle.application.extensions.interceptUrls
-import com.varabyte.kobweb.gradle.application.extensions.selfHosting
 import com.varabyte.kobweb.gradle.application.templates.createIndexFile
 import com.varabyte.kobweb.gradle.core.metadata.LibraryMetadata
 import com.varabyte.kobweb.gradle.core.util.HtmlUtil
@@ -65,9 +64,6 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
     @get:Nested
     val interceptUrls = appBlock.index.interceptUrls
-
-    @get:Nested
-    val selfHosting = appBlock.index.interceptUrls.selfHosting
 
     @get:Input
     abstract val publicPath: Property<String>
@@ -176,10 +172,14 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
     )
 
     private fun List<String>.applyUrlInterceptors(): ApplyUrlInterceptorsResult {
+        val rejects = interceptUrls.rejects.get()
+        val replacements = interceptUrls.replacements.get()
+        val selfHosting = interceptUrls.selfHosting.get()
+
         // Early abort if we're sure we don't need to do any work (99.9% of users, probably!)
-        if (interceptUrls.rejects.get().isEmpty() && interceptUrls.replacements.get().isEmpty()
-            && !selfHosting.enabled.get()
-        ) return ApplyUrlInterceptorsResult(this)
+        if (rejects.isEmpty() && replacements.isEmpty() && !selfHosting.enabled) {
+            return ApplyUrlInterceptorsResult(this)
+        }
 
         val elements = this.flatMap { html ->
             Jsoup.parse(html).apply {
@@ -193,15 +193,18 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         // returns the element itself or null as a signal to indicate that the element should be removed from the final
         // head block as its link was rejected.
         fun Element.replaceUrl(url: String, action: Element.(String) -> Unit): Element? {
-            if (interceptUrls.rejects.get().contains(url)) {
+            if (rejects.contains(url)) {
                 changedUrls[url] = null
                 return null
             }
 
             var finalUrl: String? = null
-            interceptUrls.replacements.get()[url]?.let { finalUrl = it }
+            replacements[url]?.let { finalUrl = it }
 
-            if (finalUrl == null && selfHosting.enabled.get() && !selfHosting.excludes.get().contains(url) && interceptUrls.replacements.get().values.none { it == url }) {
+            if (finalUrl == null &&
+                selfHosting.enabled && !selfHosting.excludes.contains(url) &&
+                replacements.values.none { it == url }
+            ) {
                 finalUrl = makeLocalCopyOfUrl(url)
             }
 
@@ -251,19 +254,19 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         }
 
         val commonErrorMessage = "but it was not detected in your <head> elements. This could indicate a stale configuration that should be removed or updated to a new URL."
-        interceptUrls.rejects.get().forEach { reject ->
+        rejects.forEach { reject ->
             if (!changedUrls.containsKey(reject)) {
                 logger.warn("w: Your project is configured to intercept and reject URL \"$reject\", $commonErrorMessage")
             }
         }
 
-        interceptUrls.replacements.get().keys.forEach { toReplace ->
+        replacements.keys.forEach { toReplace ->
             if (!changedUrls.containsKey(toReplace)) {
                 logger.warn("w: Your project is configured to intercept and replace URL \"$toReplace\", $commonErrorMessage")
             }
         }
 
-        selfHosting.excludes.get().forEach { exclude ->
+        selfHosting.excludes.forEach { exclude ->
             if (!changedUrls.containsKey(exclude)) {
                 logger.warn("w: Your self-hosting configuration excludes URL \"$exclude\", $commonErrorMessage")
             }
