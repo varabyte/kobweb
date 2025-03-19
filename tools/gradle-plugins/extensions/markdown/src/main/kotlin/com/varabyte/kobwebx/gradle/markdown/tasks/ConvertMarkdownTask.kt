@@ -9,14 +9,9 @@ import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import org.commonmark.node.Node
 import org.commonmark.parser.Parser
 import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -31,8 +26,6 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         markdownBlock,
         "Convert markdown files found in the project's resources path to source code in the final project"
     ) {
-    @get:Inject
-    abstract val objectFactory: ObjectFactory
 
     @Nested
     val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
@@ -49,12 +42,6 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     @get:Input
     abstract val dependsOnMarkdownArtifact: Property<Boolean>
 
-    @get:InputDirectory
-    abstract val generatedMarkdownDir: DirectoryProperty
-
-    @get:InputFiles
-    abstract val markdownRoots: ListProperty<File>
-
     @OutputDirectory
     fun getGenDir(): Provider<Directory> {
         return markdownBlock.getGenJsSrcRoot("convert").flatMap { rootDir ->
@@ -70,11 +57,9 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         getGenDir().get().asFile.clearDirectory()
         val cache = NodeCache(
             parser = markdownFeatures.createParser(),
-            roots = markdownRoots.get() + generatedMarkdownDir.asFileTree
+            roots = markdownDirs.get()
         )
-        val markdownFiles = markdownResources.asFileTree + objectFactory.fileTree().setDir(generatedMarkdownDir)
-
-        markdownFiles.visit {
+        markdownResources.asFileTree.visit {
             if (isDirectory) return@visit
 
             val mdFile = file
@@ -121,7 +106,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
      * @param roots A collection of root folders under which Markdown files should be considered for processing. Any
      *   markdown files referenced outside of these roots should be ignored for caching purposes.
      */
-    private class NodeCache(private val parser: Parser, private val roots: List<File>) {
+    private class NodeCache(private val parser: Parser, private val roots: List<Directory>) {
         private val existingNodes = mutableMapOf<String, Node>()
 
         /**
@@ -131,7 +116,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
          * the file fails to parse, this method will throw an exception.
          */
         operator fun get(file: File): Node = file.canonicalFile.let { canonicalFile ->
-            require(roots.any { canonicalFile.startsWith(it) }) {
+            require(roots.any { canonicalFile.startsWith(it.asFile) }) {
                 "File $canonicalFile is not under any of the specified Markdown roots: $roots"
             }
             existingNodes.computeIfAbsent(canonicalFile.invariantSeparatorsPath) {
@@ -153,10 +138,10 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
          */
         fun getRelative(relPath: String): Node? = try {
             roots.asSequence()
-                .map { it to it.resolve(relPath).canonicalFile }
+                .map { it to it.file(relPath).asFile.canonicalFile }
                 // Make sure we don't access anything outside our markdown roots
                 .firstOrNull { (root, canonicalFile) ->
-                    canonicalFile.exists() && canonicalFile.isFile && canonicalFile.startsWith(root)
+                    canonicalFile.exists() && canonicalFile.isFile && canonicalFile.startsWith(root.asFile)
                 }?.second?.let(::get)
         } catch (ignored: IOException) {
             null

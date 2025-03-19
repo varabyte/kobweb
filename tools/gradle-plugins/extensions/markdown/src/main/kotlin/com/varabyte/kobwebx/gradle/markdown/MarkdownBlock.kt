@@ -3,17 +3,77 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.gradle.core.extensions.KobwebBlock
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.TaskProvider
 
 abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGeneratingBlock {
+
     /**
-     * The path to all markdown resources to process.
+     * The path under which all markdown resources will live.
      *
-     * This path should live in the root of the project's `resources` folder, e.g. `src/jsMain/resources`
+     * Defaults to "markdown"
+     *
+     * This value will be checked when looking through resource directories for markdown files to convert to code.
+     * For example, this will find files nested under `src/jsMain/resources/markdown`
+     *
+     * CAUTION: This should not be confused with [defaultRoot], which is the root composable used to wrap all markdown
+     * content.
      */
     abstract val markdownPath: Property<String>
+
+    @get:InputFiles()
+    internal abstract val additionalDirectories: ConfigurableFileCollection
+
+    /**
+     * Adds a resource directory under which to search for additional markdown files.
+     *
+     * All markdown files, when processed, will be converted into Kotlin code annotated as a `@Page`.
+     */
+    fun addDir(dir: Directory) {
+        additionalDirectories.from(dir)
+    }
+
+    fun addDir(dirProvider: Provider<Directory>) {
+        additionalDirectories.from(dirProvider)
+    }
+
+    /**
+     * Hooks up a task's output files as directories under which to search for additional markdown files.
+     *
+     * For example:
+     *
+     * ```
+     * val generateMarkdownTask = tasks.register("generateMarkdown") {
+     *     // $name here to create a unique output directory just for this task
+     *     val genOutputDir = layout.buildDirectory.dir("generated/$name/src/jsMain/resources/markdown")
+     *
+     *     outputs.dir(genOutputDir)
+     *
+     *     doLast {
+     *         genOutputDir.get().file("test.md").asFile.apply {
+     *             parentFile.mkdirs()
+     *             writeText("""
+     *                 # TEST
+     *             """.trimIndent()
+     *             )
+     *
+     *             println("Generated $absolutePath")
+     *         }
+     *     }
+     * }
+     *
+     * kobweb.markdown.addDir(generateMarkdownTask)
+     * ```
+     */
+    fun addDir(taskProvider: TaskProvider<*>) {
+        additionalDirectories.from(taskProvider)
+    }
 
     /**
      * The root composable to use as a fallback if no other root is provided.
@@ -27,6 +87,7 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      * they may not need to specify a root at all here (since that could just add an unnecessary extra layer to the DOM
      * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
      */
+    @get:Input()
     abstract val defaultRoot: Property<String>
 
     /**
@@ -45,6 +106,7 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      * ```
      * will add `import com.mysite.components.widgets.*` to the top of every generated markdown file.
      */
+    @get:Input
     abstract val imports: ListProperty<String>
 
     /**
@@ -60,6 +122,7 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
      *
      * @see MarkdownEntry
      */
+    @get:Input
     abstract val process: Property<ProcessScope.(List<MarkdownEntry>) -> Unit>
 
     class ProcessScope {

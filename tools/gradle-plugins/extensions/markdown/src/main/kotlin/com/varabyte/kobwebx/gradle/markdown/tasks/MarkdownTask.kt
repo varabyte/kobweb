@@ -5,8 +5,11 @@ import com.varabyte.kobweb.common.lang.toPackageName
 import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
-import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RelativePath
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -21,6 +24,9 @@ abstract class MarkdownTask @Inject constructor(
     @get:Internal protected val markdownBlock: MarkdownBlock,
     desc: String
 ) : KobwebTask(desc) {
+    @get:Inject
+    abstract val objectFactory: ObjectFactory
+
     @get:Input
     abstract val pagesPackage: Property<String>
 
@@ -28,12 +34,27 @@ abstract class MarkdownTask @Inject constructor(
     abstract val projectGroup: Property<Any>
 
     @get:InputFiles
-    abstract val markdownResources: ConfigurableFileCollection
+    abstract val markdownDirs: ListProperty<Directory>
 
     @get:Input
     val markdownPath = markdownBlock.markdownPath
 
-    private val rootPath get() = Path(markdownPath.get())
+    /**
+     * Return a listing of all markdown files under all [markdownDirs].
+     *
+     * This is returned as a [FileCollection] so files can be visited and their relative path easily extracted.
+     *
+     * IMPORTANT: This method should only be called inside a task's `execute()` method.
+     */
+    @get:Internal
+    protected val markdownResources get(): FileCollection {
+        return objectFactory.fileCollection().from(
+            markdownDirs.map { dirs ->
+                dirs.map {
+                    it.asFileTree.matching { include("**/*.md") }
+                }
+            })
+    }
 
     protected fun funNameFor(mdFile: File): String {
         // The suggested replacement for "capitalize" is awful
@@ -42,7 +63,7 @@ abstract class MarkdownTask @Inject constructor(
     }
 
     protected fun RelativePath.toPath(): Path {
-        return rootPath.relativize(Path(this.pathString))
+        return Path(this.pathString)
     }
 
     /** Recursively delete the contents of this directory without deleting the directory itself. */
