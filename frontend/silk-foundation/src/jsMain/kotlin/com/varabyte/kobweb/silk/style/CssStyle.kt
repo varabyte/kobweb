@@ -348,7 +348,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
 
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
-                if (CSSScopeSupport) {
+                if (ColorModeStrategy.current.useScope) {
                     withColorModeScope(
                         selector = selector,
                         group = group,
@@ -362,7 +362,8 @@ abstract class CssStyle<K : CssKind> internal constructor(
                             }
                         }
                     }
-                } else {
+                }
+                if (ColorModeStrategy.current.useSuffix) {
                     withFinalSelectorName(selector, group) { name, styles ->
                         if (styles.isNotEmpty()) {
                             classNames.add(name)
@@ -378,7 +379,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
         for (cssRuleKey in allCssRuleKeys) {
             val group = StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)
                 ?: continue
-            if (CSSScopeSupport) {
+            if (ColorModeStrategy.current.useScope) {
                 withColorModeScope(
                     selector = "$selector${cssRuleKey.suffix.orEmpty()}",
                     group = group,
@@ -394,7 +395,8 @@ abstract class CssStyle<K : CssKind> internal constructor(
                         }
                     }
                 }
-            } else {
+            }
+            if (ColorModeStrategy.current.useSuffix) {
                 withFinalSelectorName(selector, group) { name, styles ->
                     if (styles.isNotEmpty()) {
                         classNames.add(name)
@@ -410,7 +412,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
             }
         }
 
-        if (CSSScopeSupport) {
+        if (ColorModeStrategy.current.useScope) {
             styleSheet.apply {
                 if (lightStyleSheet.cssRules.isNotEmpty()) {
                     add(
@@ -504,6 +506,7 @@ internal class ImmutableCssStyle(
 
     @Composable
     fun toModifier(): Modifier {
+        // Note: We do not check `ColorModeStrategy.current` because `classNames` already accounts for the strategy being used
         val currentClassNames = classNames.filterNot { CssIdent(it).isSuffixedWith(ColorMode.current.opposite) }
         return (if (currentClassNames.isNotEmpty()) Modifier.classNames(*currentClassNames.toTypedArray()) else Modifier)
             .then(extraModifier())
