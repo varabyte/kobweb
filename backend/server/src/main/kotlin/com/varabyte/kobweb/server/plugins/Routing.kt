@@ -83,9 +83,6 @@ fun Application.configureRouting(
     globals: ServerGlobals,
     events: EventDispatcher
 ) {
-    // "example/" should resolve to "example/index.html" if present, but default ktor behavior rejects trailing slashes.
-    this.install(IgnoreTrailingSlash)
-
     val logger = object : Logger {
         override fun trace(message: String) = log.trace(message)
         override fun debug(message: String) = log.debug(message)
