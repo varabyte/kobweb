@@ -186,7 +186,12 @@ class Router {
             PageContextLocal provides PageContext.instance
         ) {
             pageWrapper {
-                pageMethod.invoke()
+                // If a user navigates between two different dynamic routes, e.g. "/users/a" and "/users/b" for route
+                // "/users/{user}", we want to treat this as a recomposition, since from the user's point of view, they
+                // are different URLs. Query params changing should NOT cause a recomposition though!
+                key(PageContext.instance.route.path) {
+                    pageMethod.invoke()
+                }
             }
         }
     }

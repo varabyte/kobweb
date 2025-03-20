@@ -47,6 +47,8 @@ class PageContext internal constructor(val router: Router) {
         /**
          * The current route path.
          *
+         * In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", the path is "/a/b/c/slug"
+         *
          * This property is equivalent to `window.location.pathname` but provided here as a convenience property.
          */
         val path: String = route.path
