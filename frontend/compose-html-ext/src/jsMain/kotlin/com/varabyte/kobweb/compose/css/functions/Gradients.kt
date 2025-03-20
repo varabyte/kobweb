@@ -44,6 +44,12 @@ internal typealias LengthColorStopsBuilderEntry = Gradient.ColorStopsBuilder.Ent
 typealias AngleColorStopsBuilder = Gradient.ColorStopsBuilder<CSSAngleNumericValue>
 internal typealias AngleColorStopsBuilderEntry = Gradient.ColorStopsBuilder.Entry<CSSAngleNumericValue>
 
+// All repeating gradients take the same arguments as the non-repeating versions; they just use a different name and
+// interpret the arguments differently.
+class RepeatingGradient<G: Gradient> internal constructor(private val wrapped: G) : Gradient by wrapped {
+    override fun toString() = "repeating-$wrapped"
+}
+
 // region linear gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/linear-gradient
 
 sealed class LinearGradient(private val gradientStr: String) : Gradient {
@@ -171,6 +177,29 @@ fun linearGradient(dir: LinearGradient.Direction, from: CSSColorValue, to: CSSCo
 fun linearGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue) =
     linearGradient(from, to, angle)
 
+fun repeatingLinearGradient(
+    dir: LinearGradient.Direction,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<LinearGradient> {
+    return RepeatingGradient(linearGradient(dir, interpolation, init))
+}
+
+fun repeatingLinearGradient(
+    angle: CSSAngleNumericValue,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<LinearGradient> {
+    return RepeatingGradient(linearGradient(angle, interpolation, init))
+}
+
+fun repeatingLinearGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<LinearGradient> {
+    return RepeatingGradient(linearGradient(interpolation, init))
+}
+
 // endregion
 
 // region radial gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/radial-gradient
@@ -295,6 +324,30 @@ fun radialGradient(
 fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
     radialGradient(from, to, shape, position)
 
+fun repeatingRadialGradient(
+    shape: RadialGradient.Shape?,
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<RadialGradient> {
+    return RepeatingGradient(radialGradient(shape, position, interpolation, init))
+}
+
+fun repeatingRadialGradient(
+    position: CSSPosition?,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<RadialGradient> {
+    return RepeatingGradient(radialGradient(position, interpolation, init))
+}
+
+fun repeatingRadialGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<RadialGradient> {
+    return RepeatingGradient(radialGradient(interpolation, init))
+}
+
 // endregion
 
 // region conic gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/conic-gradient
@@ -365,5 +418,29 @@ fun conicGradient(
 )
 fun conicGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
     conicGradient(from, to, angle, position)
+
+fun repeatingConicGradient(
+    angle: CSSAngleNumericValue?,
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): RepeatingGradient<ConicGradient> {
+    return RepeatingGradient(conicGradient(angle, position, interpolation, init))
+}
+
+fun repeatingConicGradient(
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): RepeatingGradient<ConicGradient> {
+    return RepeatingGradient(conicGradient(position, interpolation, init))
+}
+
+fun repeatingConicGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): RepeatingGradient<ConicGradient> {
+    return RepeatingGradient(conicGradient(interpolation, init))
+}
 
 // endregion
