@@ -346,6 +346,12 @@ abstract class CssStyle<K : CssKind> internal constructor(
         val lightStyleSheet = StyleSheet()
         val darkStylesSheet = StyleSheet()
 
+        fun registerSuffixedStyle(group: StyleGroup) = when (ColorModeStrategy.current) {
+            ColorModeStrategy.SCOPE -> false
+            ColorModeStrategy.SUFFIX -> true
+            ColorModeStrategy.BOTH -> group !is StyleGroup.ColorAgnostic // SCOPE mode registers these without `@scope` anyway
+        }
+
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
                 if (ColorModeStrategy.current.useScope) {
@@ -363,7 +369,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
                         }
                     }
                 }
-                if (ColorModeStrategy.current.useSuffix) {
+                if (registerSuffixedStyle(group)) {
                     withFinalSelectorName(selector, group) { name, styles ->
                         if (styles.isNotEmpty()) {
                             classNames.add(name)
@@ -396,7 +402,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
                     }
                 }
             }
-            if (ColorModeStrategy.current.useSuffix) {
+            if (registerSuffixedStyle(group)) {
                 withFinalSelectorName(selector, group) { name, styles ->
                     if (styles.isNotEmpty()) {
                         classNames.add(name)
