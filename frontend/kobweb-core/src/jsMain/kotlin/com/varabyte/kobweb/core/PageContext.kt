@@ -27,7 +27,27 @@ class PageContext internal constructor(val router: Router) {
             routeState.value = value
         }
 
-    class RouteInfo internal constructor(private val route: Route, private val dynamicParams: Map<String, String>) {
+    class RouteInfo internal constructor(
+        private val route: Route,
+        /**
+         * Params extracted either from the URL's dynamic route
+         *
+         * For example:
+         *
+         * ```
+         * /users/123/posts/11
+         *
+         * # for a URL registered as "/users/{user}/posts/{post}"
+         * ```
+         *
+         * will generate a mapping of "user" to 123 and "post" to 11.
+         *
+         * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
+         * where perhaps you want to explicitly exclude query params from the list of results. For example, checking if
+         * this value is not empty is a quick way to determine if the current route is, indeed, a dynamic one.
+         */
+        val dynamicParams: Map<String, String>
+    ) {
         /**
          * The origin of the current page.
          *
