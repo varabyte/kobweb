@@ -46,7 +46,7 @@ internal typealias AngleColorStopsBuilderEntry = Gradient.ColorStopsBuilder.Entr
 
 // All repeating gradients take the same arguments as the non-repeating versions; they just use a different name and
 // interpret the arguments differently.
-class RepeatingGradient<G: Gradient> internal constructor(private val wrapped: G) : Gradient by wrapped {
+class RepeatingGradient<G : Gradient> internal constructor(private val wrapped: G) : Gradient by wrapped {
     override fun toString() = "repeating-$wrapped"
 }
 
@@ -361,7 +361,7 @@ class ConicGradient private constructor(private val gradientStr: String) : Gradi
         interpolation: ColorInterpolationMethod?,
         vararg entries: AngleColorStopsBuilderEntry
     ) : this(buildString {
-        append(listOfNotNull(angle, position?.let { "at $it" }, interpolation).joinToString(" "))
+        append(listOfNotNull(angle?.let { "from $it" }, position?.let { "at $it" }, interpolation).joinToString(" "))
         if (this.isNotEmpty()) {
             append(", ")
         }
