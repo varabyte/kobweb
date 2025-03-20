@@ -158,14 +158,14 @@ fun linearGradient(
 }
 
 @Deprecated(
-    "The arguments have been reordered to accept the colors first, as this allows passing all of the optional arguments as well.",
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
     ReplaceWith("linearGradient(from, to, dir)")
 )
 fun linearGradient(dir: LinearGradient.Direction, from: CSSColorValue, to: CSSColorValue) =
     linearGradient(from, to, dir)
 
 @Deprecated(
-    "The arguments have been reordered to accept the colors first, as this allows passing all of the optional arguments as well.",
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
     ReplaceWith("linearGradient(from, to, angle)")
 )
 fun linearGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue) =
@@ -289,7 +289,7 @@ fun radialGradient(
 }
 
 @Deprecated(
-    "The arguments have been reordered to accept the colors first, as this allows passing all of the optional arguments as well.",
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
     ReplaceWith("radialGradient(from, to, shape, position)")
 )
 fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
@@ -360,7 +360,7 @@ fun conicGradient(
 }
 
 @Deprecated(
-    "The arguments have been reordered to accept the colors first, as this allows passing all of the optional arguments as well.",
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
     ReplaceWith("conicGradient(from, to, angle, position)")
 )
 fun conicGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
