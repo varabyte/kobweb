@@ -191,10 +191,10 @@ abstract class CssStyle<K : CssKind> internal constructor(
     }
 
     /**
-     * Shared logic for using an initial selector name and triggering a callback with the final selector name and
-     * CSS styles to be associated with it.
+     * Shared logic for using an initial selector name and triggering a callback with the color mode suffix-based
+     * selector name and CSS styles to be associated with it.
      */
-    private fun withFinalSelectorName(
+    private fun withSuffixedSelectorName(
         selectorBaseName: String,
         group: StyleGroup,
         handler: (String, ComparableStyleScope) -> Unit
@@ -370,10 +370,10 @@ abstract class CssStyle<K : CssKind> internal constructor(
                     }
                 }
                 if (registerSuffixedStyle(group)) {
-                    withFinalSelectorName(selector, group) { name, styles ->
+                    withSuffixedSelectorName(selector, group) { name, styles ->
                         if (styles.isNotEmpty()) {
                             classNames.add(name)
-                            styleSheet.layerOrInPlace(layer) {
+                            styleSheet.layerOrInPlace(ColorModeStrategy.current.suffixedStyleLayer(layer)) {
                                 addStyles(name, styles)
                             }
                         }
@@ -403,13 +403,13 @@ abstract class CssStyle<K : CssKind> internal constructor(
                 }
             }
             if (registerSuffixedStyle(group)) {
-                withFinalSelectorName(selector, group) { name, styles ->
+                withSuffixedSelectorName(selector, group) { name, styles ->
                     if (styles.isNotEmpty()) {
                         classNames.add(name)
 
                         val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
                         styleSheet.mediaOrInPlace(cssRuleKey.mediaQuery) {
-                            layerOrInPlace(layer) {
+                            layerOrInPlace(ColorModeStrategy.current.suffixedStyleLayer(layer)) {
                                 addStyles(cssRule, styles)
                             }
                         }

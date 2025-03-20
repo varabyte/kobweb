@@ -79,3 +79,27 @@ val ColorModeStrategy.useScope get() = this != SUFFIX
  * Note that [useScope] and [useSuffix] are NOT mutually exclusive.
  */
 val ColorModeStrategy.useSuffix get() = this != SCOPE
+
+/**
+ * Returns a list of CSS layers that will be used by the site, based on the given strategy.
+ *
+ * If the strategy is [SCOPE] or [SUFFIX], the original layers are returned.
+ * When the strategy is [BOTH], each original layer is preceded by a corresponding "compatibility" layer. These
+ * compatibility layers contain suffixed styles that also exist as `@scope`-based styles, meaning all styles in these
+ * layers can be ignored if the browser supports `@scope`.
+ */
+internal fun ColorModeStrategy.getLayersWithCompat(layers: Set<String>): List<String> = when (this) {
+    SCOPE, SUFFIX -> layers.toList()
+    BOTH -> layers.flatMap { listOfNotNull(suffixedStyleLayer(it), it) }
+}
+
+/**
+ * Returns the CSS layer that should be used for suffix-based styles.
+ *
+ * For [SCOPE] and [SUFFIX] mode, this is simply the original layer name, but in [BOTH] mode, these styles should be
+ * registered into a separate layer.
+ */
+internal fun ColorModeStrategy.suffixedStyleLayer(layer: String?) = when (this) {
+    SCOPE, SUFFIX -> layer
+    BOTH -> layer?.let { "$it-compat" }
+}

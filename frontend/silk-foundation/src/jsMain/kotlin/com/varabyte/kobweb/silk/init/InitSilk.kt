@@ -2,8 +2,11 @@ package com.varabyte.kobweb.silk.init
 
 import com.varabyte.kobweb.browser.dom.css.CSSLayerBlockRule
 import com.varabyte.kobweb.browser.util.invokeLater
+import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
+import com.varabyte.kobweb.silk.style.ColorModeStrategy
+import com.varabyte.kobweb.silk.style.getLayersWithCompat
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -66,17 +69,44 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
     SilkTheme.registerStylesInto(SilkStyleSheet)
 
+    val (finalCssLayers, compatCssLayers) = run {
+        val registeredCssLayers = SilkStylesheetInstance.cssLayers.build().toSet()
+        val finalCssLayers = ColorModeStrategy.current.getLayersWithCompat(registeredCssLayers)
+        finalCssLayers to finalCssLayers.minus(registeredCssLayers)
+    }
+
+    // When in `ColorModeStrategy.BOTH` mode, we generate all suffixed styles into their own layers
+    // and then use an `@scope` rule + `revert-layer` to disable those layers.
+    // This ensures that these suffixed styles do not get applied when `@scope` is supported (and do get applied if it isn't)
+    // While this would normally not matter since the styles are the same in both modes, `SCOPE` mode allows users to
+    // change the color mode by toggling a class on the root element, which would not work if the suffixed styles of the
+    // original color mode are still being applied.
+    run {
+        if (compatCssLayers.isEmpty()) return@run
+        // compat layers are only generated in `BOTH` mode
+        check(ColorModeStrategy.current == ColorModeStrategy.BOTH)
+
+        SilkStyleSheet.scope("*", null) {
+            compatCssLayers.forEach { layer ->
+                layer(layer) {
+                    ":scope" style {
+                        property("all", "revert-layer")
+                    }
+                }
+            }
+        }
+    }
+
     window.invokeLater { // invokeLater gives the engine time to register Silk styles into the stylesheet objects first
         run {
             // Warn if we detect layers that the user referenced without registering
-            val registeredCssLayers = SilkStylesheetInstance.cssLayers.build().toSet()
             val referencedCssLayers = document.localStyleSheets.asSequence()
                 .flatMap { it.cssRules.asList().asSequence() }
                 .filterIsInstance<CSSLayerBlockRule>()
                 .map { it.name }
                 .toSet()
 
-            val unregisteredLayers = referencedCssLayers.subtract(registeredCssLayers)
+            val unregisteredLayers = referencedCssLayers.subtract(finalCssLayers)
 
             if (unregisteredLayers.isNotEmpty()) {
                 console.warn(
@@ -99,8 +129,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
         }
 
         document.localStyleSheets.forEach { styleSheet ->
-            val cssLayers = SilkStylesheetInstance.cssLayers.build()
-            styleSheet.insertRule("@layer ${cssLayers.joinToString()};", 0)
+            styleSheet.insertRule("@layer ${finalCssLayers.joinToString()};", 0)
         }
     }
 }
