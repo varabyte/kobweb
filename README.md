@@ -746,7 +746,8 @@ limitations:
 It would also prevent a developer from making use of the rich ecosystem of Javascript libraries out there.
 
 Finally, Kobweb is more than just Kotlin-ifying HTML / CSS. It also provides rich integration with powerful web
-technologies like [web workers▲](#worker) and [websockets▲](#api-stream).
+technologies like [web workers](https://kobweb.varabyte.com/docs/concepts/foundation/workers)
+and [websockets](https://kobweb.varabyte.com/docs/concepts/server/fullstack#api-streams).
 
 For now, I am making a bet that there will always be value in embracing the web, providing a framework that sticks to
 HTML / CSS but offers a growing suite of UI widgets, layouts, and other features that make it a more comfortable
@@ -811,7 +812,8 @@ So, should you use Kobweb at this point? If you are...
     with us at our Discord if you try it and have questions or run into missing features.
 * someone who already has an existing project in progress and wants to integrate Kobweb into it:
   * **Maybe not?** Depending on how much work you've done, it may not be a trivial refactor. You can review
-    [this earlier section▲](#adding-kobweb-to-an-existing-project) if you want to try anyway.
+    [this guide on adding Kobweb to an existing project](https://kobweb.varabyte.com/docs/guides/existing-project) if
+    you want to try anyway.
 * a company:
   * **Probably not?** I'm assuming most companies are so risk-averse they would not even use Compose HTML, which Kobweb
     is built on top of. If you *were* considering Compose HTML, however, Kobweb is worth a look.
