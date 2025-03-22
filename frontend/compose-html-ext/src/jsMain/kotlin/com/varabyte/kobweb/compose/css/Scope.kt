@@ -2,9 +2,6 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
-// TODO: consider inlining and removing this property
-val CSSScopeSupport: Boolean = js("typeof CSSScopeRule != 'undefined'")
-
 // Dev note: This class was tweaked from the one for @media
 // See also: org.jetbrains.compose.web.css.CSSMediaRuleDeclaration
 @Suppress("EqualsOrHashCode")

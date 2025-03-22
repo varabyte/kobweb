@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.silk.style
 
-import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.silk.style.ColorModeStrategy.BOTH
 import com.varabyte.kobweb.silk.style.ColorModeStrategy.Companion.current
 import com.varabyte.kobweb.silk.style.ColorModeStrategy.SCOPE
@@ -10,6 +9,12 @@ import com.varabyte.kobweb.silk.theme.colors.cssClass
 import kotlinx.browser.window
 import org.w3c.dom.url.URLSearchParams
 
+/**
+ * Whether the current browser supports the CSS `@scope` at-rule.
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scope">@scope</a>
+ */
+private val CSSScopeSupport: Boolean = js("typeof CSSScopeRule != 'undefined'")
 
 /**
  * An enum indicating how Silk will register color mode aware styles.
