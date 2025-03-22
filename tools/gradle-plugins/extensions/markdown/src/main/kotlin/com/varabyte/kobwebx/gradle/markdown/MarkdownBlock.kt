@@ -137,10 +137,12 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
             }
         }
 
-        private val _markdownOutput = mutableListOf<OutputFile>()
-        internal val markdownOutput: List<OutputFile> = _markdownOutput
-        private val _kotlinOutput = mutableListOf<OutputFile>()
-        internal val kotlinOutput: List<OutputFile> = _kotlinOutput
+        private val _markdownOutputs = mutableListOf<OutputFile>()
+        internal val markdownOutputs: List<OutputFile> = _markdownOutputs
+        private val _kotlinOutputs = mutableListOf<OutputFile>()
+        internal val kotlinOutputs: List<OutputFile> = _kotlinOutputs
+        private val _resourceOutputs = mutableListOf<OutputFile>()
+        internal val resourceOutputs: List<OutputFile> = _resourceOutputs
 
         /**
          * Generate Kotlin source in the final project.
@@ -150,7 +152,7 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
          */
         fun generateKotlin(filePath: String, content: String) {
             require(filePath.endsWith(".kt")) { "Expected a path that ends with .kt, got \"$filePath\"" }
-            _kotlinOutput.add(OutputFile(filePath, content))
+            _kotlinOutputs.add(OutputFile(filePath, content))
         }
 
         /**
@@ -163,7 +165,17 @@ abstract class MarkdownBlock(baseGenDir: Provider<String>) : KobwebBlock.FileGen
          */
         fun generateMarkdown(filePath: String, content: String) {
             require(filePath.endsWith(".md")) { "Expected a path that ends with .md, got \"$filePath\"" }
-            _markdownOutput.add(OutputFile(filePath, content))
+            _markdownOutputs.add(OutputFile(filePath, content))
+        }
+
+        /**
+         * Generate a general resource for this site.
+         *
+         * NOTE: If you are trying to specifically create a new markdown file (e.g. like a listing page), you should
+         * prefer calling [generateMarkdown] directly instead.
+         */
+        fun generateResource(filePath: String, content: String) {
+            _resourceOutputs.add(OutputFile(filePath, content))
         }
     }
 
