@@ -231,13 +231,18 @@ abstract class CssStyle<K : CssKind> internal constructor(
         darkStyleSheet: StyleSheet,
         handler: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.(String, ComparableStyleScope) -> Unit
     ) {
-        // TODO: Consider using `&` instead of `:scope`, which base on caniuse has strictly wider browser support than
-        //  `@scope`, except *maybe* Chrome 118-119
-        // A selector like ".abc" inside an `@scope` rule applies to all descendants of the scope with the "abc" class,
-        // but not the scope itself. So, we also add a selector of the form ":scope.abc" to target the scope element.
-        // Note: We know that `selector` begins with a "." as long as `group` is not `ColorAgnostic` (since only
-        // `CssStyle`s can be color mode aware), so we can safely perform the string concatenation here.
-        val inScopeSelector = ":scope$selector, $selector"
+        // A selector like ".abc" inside an `@scope` rule is implicitly treated as ":scope .abc", which means that it
+        // will match descendants of the scope with the "abc" class, but not the scope itself.
+        // Thus, we add a selector of the form ":where(&).abc" to target the scope element if it has the "abc" class.
+        // Notes:
+        // - `&` here is equivalent to `:scope`, but is used because it has fewer characters. It's feature of CSS
+        // nesting, which has strictly wider browser support than `@scope`, according to caniuse.com.
+        // - `:where()` is used to ensure both selectors have the same specificity, since it itself has 0 specificity.
+        // Otherwise, the same style applied to one element with the "silk-light" class and one without could end up
+        // applying differently due to specificity.
+        // - We know `selector` begins with a "." as long as `group` is not `ColorAgnostic` (since only `CssStyle`s can
+        // be color mode aware), so we can safely perform the string concatenation here.
+        val inScopeSelector = ":where(&)$selector, $selector"
         when (group) {
             is StyleGroup.Light -> lightStyleSheet.handler(inScopeSelector, group.styles)
             is StyleGroup.Dark -> darkStyleSheet.handler(inScopeSelector, group.styles)
