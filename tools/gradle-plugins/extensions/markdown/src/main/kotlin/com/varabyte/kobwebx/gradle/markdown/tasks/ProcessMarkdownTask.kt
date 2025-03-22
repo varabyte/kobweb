@@ -87,18 +87,20 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         val processScope = MarkdownBlock.ProcessScope()
         processScope.process(markdownEntries)
 
-        val genResRoot = getGenResDir().get().asFile.resolve(markdownPath.get())
-        processScope.markdownOutput.forEach { processNode ->
-            File(genResRoot, processNode.filePath).let { outputFile ->
-                outputFile.parentFile.mkdirs()
-                outputFile.writeText(processNode.content)
+        fun MarkdownBlock.ProcessScope.OutputFile.generateInto(root: File) {
+            File(root, filePath).apply {
+                parentFile.mkdirs()
+                writeText(content)
             }
         }
-        processScope.kotlinOutput.forEach { processNode ->
-            File(getGenSrcDir().get().asFile, processNode.filePath).let { outputFile ->
-                outputFile.parentFile.mkdirs()
-                outputFile.writeText(processNode.content)
-            }
+        processScope.markdownOutputs.forEach { outputFile ->
+            outputFile.generateInto(getGenResDir().get().asFile.resolve(markdownPath.get()))
+        }
+        processScope.kotlinOutputs.forEach { outputFile ->
+            outputFile.generateInto(getGenResDir().get().asFile)
+        }
+        processScope.resourceOutputs.forEach { outputFile ->
+            outputFile.generateInto(getGenResDir().get().asFile)
         }
     }
 }
