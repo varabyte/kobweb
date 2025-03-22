@@ -12,6 +12,7 @@ import com.varabyte.kobweb.silk.style.animation.toAnimation
 import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.cssClass
 import com.varabyte.kobweb.silk.theme.colors.isSuffixedWith
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import org.jetbrains.compose.web.attributes.AttrsScope
@@ -190,10 +191,10 @@ abstract class CssStyle<K : CssKind> internal constructor(
     }
 
     /**
-     * Shared logic for using an initial selector name and triggering a callback with the final selector name and
-     * CSS styles to be associated with it.
+     * Shared logic for using an initial selector name and triggering a callback with the color mode suffix-based
+     * selector name and CSS styles to be associated with it.
      */
-    private fun withFinalSelectorName(
+    private fun withSuffixedSelectorName(
         selectorBaseName: String,
         group: StyleGroup,
         handler: (String, ComparableStyleScope) -> Unit
@@ -212,6 +213,43 @@ abstract class CssStyle<K : CssKind> internal constructor(
             is StyleGroup.ColorAware -> {
                 handler(selectorBaseName.suffixedWith(ColorMode.LIGHT), group.lightStyles)
                 handler(selectorBaseName.suffixedWith(ColorMode.DARK), group.darkStyles)
+            }
+        }
+    }
+
+    /**
+     * Shared logic for adding a style into the appropriate stylesheet(s) based on its color mode awareness.
+     *
+     * The receiver of the [handler] callback should be used to register the provided style with the given selector and
+     * any other scopes, such as layers or media queries, if applicable.
+     */
+    private fun withColorModeScope(
+        selector: String,
+        group: StyleGroup,
+        baseStyleSheet: StyleSheet,
+        lightStyleSheet: StyleSheet,
+        darkStyleSheet: StyleSheet,
+        handler: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.(String, ComparableStyleScope) -> Unit
+    ) {
+        // A selector like ".abc" inside an `@scope` rule is implicitly treated as ":scope .abc", which means that it
+        // will match descendants of the scope with the "abc" class, but not the scope itself.
+        // Thus, we add a selector of the form ":where(&).abc" to target the scope element if it has the "abc" class.
+        // Notes:
+        // - `&` here is equivalent to `:scope`, but is used because it has fewer characters. It's feature of CSS
+        // nesting, which has strictly wider browser support than `@scope`, according to caniuse.com.
+        // - `:where()` is used to ensure both selectors have the same specificity, since it itself has 0 specificity.
+        // Otherwise, the same style applied to one element with the "silk-light" class and one without could end up
+        // applying differently due to specificity.
+        // - We know `selector` begins with a "." as long as `group` is not `ColorAgnostic` (since only `CssStyle`s can
+        // be color mode aware), so we can safely perform the string concatenation here.
+        val inScopeSelector = ":where(&)$selector, $selector"
+        when (group) {
+            is StyleGroup.Light -> lightStyleSheet.handler(inScopeSelector, group.styles)
+            is StyleGroup.Dark -> darkStyleSheet.handler(inScopeSelector, group.styles)
+            is StyleGroup.ColorAgnostic -> baseStyleSheet.handler(selector, group.styles)
+            is StyleGroup.ColorAware -> {
+                lightStyleSheet.handler(inScopeSelector, group.lightStyles)
+                darkStyleSheet.handler(inScopeSelector, group.darkStyles)
             }
         }
     }
@@ -309,13 +347,40 @@ abstract class CssStyle<K : CssKind> internal constructor(
         val darkModifiers = CssStyleScope(ColorMode.DARK).mergeCssModifiers(init)
             .assertNoAttributeModifiers(selector, layer)
 
+        // Use StyleSheets as rule builders for all styles belonging to a common `@scope` color mode block
+        val lightStyleSheet = StyleSheet()
+        val darkStylesSheet = StyleSheet()
+
+        fun registerSuffixedStyle(group: StyleGroup) = when (ColorModeStrategy.current) {
+            ColorModeStrategy.SCOPE -> false
+            ColorModeStrategy.SUFFIX -> true
+            ColorModeStrategy.BOTH -> group !is StyleGroup.ColorAgnostic // SCOPE mode registers these without `@scope` anyway
+        }
+
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
-                withFinalSelectorName(selector, group) { name, styles ->
-                    if (styles.isNotEmpty()) {
-                        classNames.add(name)
-                        styleSheet.layerOrInPlace(layer) {
-                            addStyles(name, styles)
+                if (ColorModeStrategy.current.useScope) {
+                    withColorModeScope(
+                        selector = selector,
+                        group = group,
+                        baseStyleSheet = styleSheet,
+                        lightStyleSheet = lightStyleSheet,
+                        darkStyleSheet = darkStylesSheet,
+                    ) { selector, styles ->
+                        if (styles.isNotEmpty()) {
+                            layerOrInPlace(layer) {
+                                addStyles(selector, styles)
+                            }
+                        }
+                    }
+                }
+                if (registerSuffixedStyle(group)) {
+                    withSuffixedSelectorName(selector, group) { name, styles ->
+                        if (styles.isNotEmpty()) {
+                            classNames.add(name)
+                            styleSheet.layerOrInPlace(ColorModeStrategy.current.suffixedStyleLayer(layer)) {
+                                addStyles(name, styles)
+                            }
                         }
                     }
                 }
@@ -325,19 +390,62 @@ abstract class CssStyle<K : CssKind> internal constructor(
         for (cssRuleKey in allCssRuleKeys) {
             val group = StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)
                 ?: continue
-            withFinalSelectorName(selector, group) { name, styles ->
-                if (styles.isNotEmpty()) {
-                    classNames.add(name)
+            if (ColorModeStrategy.current.useScope) {
+                withColorModeScope(
+                    selector = "$selector${cssRuleKey.suffix.orEmpty()}",
+                    group = group,
+                    baseStyleSheet = styleSheet,
+                    lightStyleSheet = lightStyleSheet,
+                    darkStyleSheet = darkStylesSheet,
+                ) { selector, styles ->
+                    if (styles.isNotEmpty()) {
+                        mediaOrInPlace(cssRuleKey.mediaQuery) {
+                            layerOrInPlace(layer) {
+                                addStyles(selector, styles)
+                            }
+                        }
+                    }
+                }
+            }
+            if (registerSuffixedStyle(group)) {
+                withSuffixedSelectorName(selector, group) { name, styles ->
+                    if (styles.isNotEmpty()) {
+                        classNames.add(name)
 
-                    val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
-                    styleSheet.mediaOrInPlace(cssRuleKey.mediaQuery) {
-                        layerOrInPlace(layer) {
-                            addStyles(cssRule, styles)
+                        val cssRule = "$name${cssRuleKey.suffix.orEmpty()}"
+                        styleSheet.mediaOrInPlace(cssRuleKey.mediaQuery) {
+                            layerOrInPlace(ColorModeStrategy.current.suffixedStyleLayer(layer)) {
+                                addStyles(cssRule, styles)
+                            }
                         }
                     }
                 }
             }
         }
+
+        if (ColorModeStrategy.current.useScope) {
+            styleSheet.apply {
+                if (lightStyleSheet.cssRules.isNotEmpty()) {
+                    add(
+                        CSSScopeRuleDeclaration(
+                            start = ".${ColorMode.LIGHT.cssClass}",
+                            end = ".${ColorMode.DARK.cssClass}",
+                            rules = lightStyleSheet.cssRules
+                        )
+                    )
+                }
+                if (darkStylesSheet.cssRules.isNotEmpty()) {
+                    add(
+                        CSSScopeRuleDeclaration(
+                            start = ".${ColorMode.DARK.cssClass}",
+                            end = ".${ColorMode.LIGHT.cssClass}",
+                            rules = darkStylesSheet.cssRules
+                        )
+                    )
+                }
+            }
+        }
+
         return ClassSelectors(classNames)
     }
 
@@ -409,6 +517,7 @@ internal class ImmutableCssStyle(
 
     @Composable
     fun toModifier(): Modifier {
+        // Note: We do not check `ColorModeStrategy.current` because `classNames` already accounts for the strategy being used
         val currentClassNames = classNames.filterNot { CssIdent(it).isSuffixedWith(ColorMode.current.opposite) }
         return (if (currentClassNames.isNotEmpty()) Modifier.classNames(*currentClassNames.toTypedArray()) else Modifier)
             .then(extraModifier())

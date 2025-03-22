@@ -10,15 +10,20 @@ import com.varabyte.kobweb.compose.foundation.layout.BoxScope
 import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.compose.ui.thenIf
+import com.varabyte.kobweb.silk.init.SilkColorsStyle
 import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
+import com.varabyte.kobweb.silk.style.ColorModeStrategy
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.CssStyleVariant
 import com.varabyte.kobweb.silk.style.toModifier
+import com.varabyte.kobweb.silk.style.useScope
 import com.varabyte.kobweb.silk.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
 import com.varabyte.kobweb.silk.theme.SilkTheme
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.cssClass
 import com.varabyte.kobweb.silk.theme.colors.isSuffixedWith
 import com.varabyte.kobweb.silk.theme.colors.suffixedWith
 import com.varabyte.kobweb.silk.theme.colors.withColorModeSuffixRemoved
@@ -63,16 +68,25 @@ fun Surface(
 ) {
     val surfaceModifier = SurfaceStyle.toModifier(variant).then(modifier)
 
-    if (colorModeOverride == null) {
+    if (colorModeOverride == null || ColorModeStrategy.current.useScope) {
         Box(
-            surfaceModifier,
+            surfaceModifier.thenIf(colorModeOverride != null) {
+                SilkColorsStyle.toModifier()
+                    .classNames(colorModeOverride!!.cssClass)
+            },
             contentAlignment = contentAlignment,
             ref = ref,
         ) {
-            content()
+            if (colorModeOverride != null) {
+                CompositionLocalProvider(colorModeOverride.provide()) {
+                    content()
+                }
+            } else {
+                content()
+            }
         }
     } else {
-        var surfaceElement by remember { mutableStateOf<HTMLElement?>(null)}
+        var surfaceElement by remember { mutableStateOf<HTMLElement?>(null) }
         Box(
             surfaceModifier,
             contentAlignment = contentAlignment,
