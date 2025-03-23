@@ -711,7 +711,9 @@ kotlin {
 ```
 
 > [!NOTE]
-> The `compose-html-ext` dependency automatically exposes the `browser-ext` dependency.
+> The `compose-html-ext` dependency automatically provides the `browser-ext` dependency.
+>
+> And of course, if you use Kobweb, it provides both.
 
 <!-- Some sites link to this section before I changed its name, so adding a span here so they can still find it. -->
 ### <span id="what-about-multiplatform-widgets"><span id="what-about-compose-for-web-canvas">What about Compose Multiplatform for Web?</span></span>
