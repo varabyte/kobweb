@@ -45,8 +45,8 @@ class CSSScopeRuleDeclaration(
  * ```
  */
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.scope(
-    start: String?,
-    end: String?,
+    start: String? = null,
+    end: String? = null,
     rulesBuild: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.() -> Unit
 ) {
     val rules = StyleSheet().apply(rulesBuild).cssRules

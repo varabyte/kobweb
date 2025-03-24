@@ -86,7 +86,7 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
         // compat layers are only generated in `BOTH` mode
         check(ColorModeStrategy.current == ColorModeStrategy.BOTH)
 
-        SilkStyleSheet.scope("*", null) {
+        SilkStyleSheet.scope("*") {
             compatCssLayers.forEach { layer ->
                 layer(layer) {
                     ":scope" style {
