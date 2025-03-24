@@ -1,5 +1,8 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
+import com.varabyte.kobweb.common.lang.dirToPackage
+import com.varabyte.kobweb.common.lang.packageConcat
+import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
@@ -19,7 +22,9 @@ import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.relativeTo
 
 abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
     MarkdownTask(
@@ -44,12 +49,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
 
     @OutputDirectory
     fun getGenDir(): Provider<Directory> {
-        return markdownBlock.getGenJsSrcRoot("convert").flatMap { rootDir ->
-            val subDir = projectGroup.zip(pagesPackage) { group, pagesPackage ->
-                PackageUtils.resolvePackageShortcut(group.toString(), pagesPackage).replace(".", "/")
-            }
-            rootDir.dir(subDir)
-        }
+        return markdownBlock.getGenJsSrcRoot("convert")
     }
 
     @TaskAction
@@ -57,33 +57,46 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         getGenDir().get().asFile.clearDirectory()
         val cache = NodeCache(
             parser = markdownFeatures.createParser(),
-            roots = markdownDirs.files
+            roots = markdownFolders.get().flatMap { it.files.files }.toSet()
         )
-        markdownResources.asFileTree.visit {
+        markdownFiles.visit {
             if (isDirectory) return@visit
 
+            val pkgBase = markdownFolders.findTargetPackage(rootDir) ?: run {
+                logger.warn("Please report we could not find a target source root for markdown folder \"$rootDir\". Skipping converting \"$path\".")
+                return@visit
+            }
+
             val mdFile = file
-            val packageParts = packagePartsFor(relativePath)
             val ktFileName = mdFile.nameWithoutExtension.replaceFirstChar { it.uppercase() }
             val mdPathRel = relativePath.toPath()
-            val mdPathRelStr = mdPathRel.invariantSeparatorsPathString
+            val mdPathParentRel = mdPathRel.parent ?: Path("")
+            val outputRootPath =
+                Path(PackageUtils.packageToPath(pkgBase), mdPathParentRel.invariantSeparatorsPathString)
+            val outputRootPathStr = outputRootPath.invariantSeparatorsPathString
 
             File(
-                getGenDir().get().asFile,
-                mdPathRel.resolveSibling("$ktFileName.kt").invariantSeparatorsPathString
+                getGenDir().get().asFile.resolve(outputRootPathStr),
+                "$ktFileName.kt"
             ).let { outputFile ->
                 outputFile.parentFile.mkdirs()
-                val mdPackage = absolutePackageFor(packageParts)
-                val funName = funNameFor(mdFile)
+                val funName = mdFile.capitalizedNameWithoutExtension +
+                    "Page".takeIf { outputRootPath.toRelativePagePath() != null }.orEmpty()
+
                 val ktRenderer = KotlinRenderer(
+                    projectGroup.get().toString(),
                     cache::getRelative,
+                    pagesPackage.get(),
+                    rootDir.toPath(),
+                    mdPathRel,
+                    pkgBase.packageConcat(mdPathParentRel.dirToPackage()),
+                    if (outputRootPath.startsWith(pagesPath)) {
+                        outputRootPath.relativeTo(pagesPath).invariantSeparatorsPathString.ensureSurrounded("/")
+                    } else null,
                     markdownDefaultRoot.get().takeUnless { it.isBlank() },
                     markdownImports.get(),
-                    mdPathRelStr,
                     markdownHandlers,
-                    mdPackage,
                     funName,
-                    projectGroup.get().toString(),
                     dependsOnMarkdownArtifact.get(),
                     LoggingReporter(logger),
                 )

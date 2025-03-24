@@ -2,8 +2,8 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
-import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.common.text.isSurrounded
+import com.varabyte.kobweb.common.text.suffixIfNot
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
@@ -47,8 +47,9 @@ import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.commonmark.renderer.Renderer
 import org.gradle.api.provider.Provider
+import java.nio.file.Path
 import java.util.*
-import kotlin.io.path.Path
+import kotlin.io.path.invariantSeparatorsPathString
 
 fun String.yamlStringToKotlinString(): String {
     return if (this.isSurrounded("\"")) {
@@ -63,34 +64,66 @@ fun String.yamlStringToKotlinString(): String {
 /**
  * A markdown renderer that generates a Kobweb source file given an input markdown file.
  *
+ * @property projectGroup The group of the project, which is used to resolve package shortcuts, e.g. "com.mysite"
  * @property markdownNodeGetter A function that can be used to retrieve the AST for a given markdown file. This allows
  *   avoiding needing to do redundant parsing.
+ * @property pagesPackage The package for this project that is the root of all pages, e.g. "com.mysites.pages" or the
+ *   shortcut variant, ".pages"
+ * @property sourceFilePath The path of the source markdown file, relative to the markdown root it lives within. For
+ *   example, "a/b/c/Test.md" (which might live under "src/jsMain/resources/markdown").
+ * @property targetPackage The target package to use for the Kotlin file generated from the markdown file. This should
+ *   be an absolute package.
  * @property defaultRoot The default root layout to use if not specified in the markdown file. If null, and no root is
  *   specified by the markdown file, then no outer root node will be added to the page.
  * @property imports A list of additional imports to include at the top of the generated file.
- * @property filePath The path to the markdown file being processed (relative from its `markdown` folder root).
  * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
  * @property pkg The package that the generated file should be placed in.
  * @property funName The name of the page function that will be generated.
- * @property projectGroup The group of the project, which is used to resolve package shortcuts
  * @property reporter A reporter that can be used to log warnings and errors.
  */
 class KotlinRenderer(
+    private val projectGroup: String,
     private val markdownNodeGetter: (path: String) -> Node?,
+    private val pagesPackage: String,
+    private val markdownSourceRoot: Path,
+    private val sourceFilePath: Path,
+    private val targetPackage: String,
+    private val absoluteRoute: String?,
     private val defaultRoot: String?,
     private val imports: List<String>,
-    private val filePath: String,
     private val handlers: MarkdownHandlers,
-    private val pkg: String,
     private val funName: String,
-    private val projectGroup: String,
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact: Boolean,
     private val reporter: Reporter,
 ) : Renderer {
+    init {
+        require(absoluteRoute == null || absoluteRoute.startsWith('/')) {
+            "Got an absolute route that doesn't start with '/': $absoluteRoute"
+        }
+
+        if (isPage()) {
+            require(absoluteRoute != null) {
+                "Got a request to create a page without specifying an absolute route: $sourceFilePath (package: $targetPackage)"
+            }
+        } else {
+            require(absoluteRoute == null) {
+                "Got an absolute route for a non-page: $sourceFilePath (route: $absoluteRoute)"
+            }
+        }
+
+        require(!targetPackage.startsWith('.')) {
+            "The target package must be an absolute package, but got: $targetPackage (file: $sourceFilePath)"
+        }
+    }
+
     private var indentCount = 0
     private val indent get() = NodeScope(reporter, TypedMap()).indent(indentCount)
 
+    private fun isPage(): Boolean {
+        val resolvedPagesPackage = PackageUtils.resolvePackageShortcut(projectGroup, pagesPackage)
+        return targetPackage == resolvedPagesPackage || targetPackage.startsWith("$resolvedPagesPackage.")
+    }
 
     // Flexible data which can be used by Node handlers however they need
     private val data = TypedMap().apply {
@@ -108,7 +141,7 @@ class KotlinRenderer(
 
         output.append(
             buildString {
-                appendLine("package $pkg")
+                appendLine("package $targetPackage")
                 appendLine()
                 appendLine("import androidx.compose.runtime.*")
                 appendLine("import com.varabyte.kobweb.core.*")
@@ -121,12 +154,14 @@ class KotlinRenderer(
 
                 appendLine()
 
-                append("@Page(\"")
-                val routeFromFilePath = filePath.split("/").dropLast(1).joinToString("/").ensureSurrounded("/")
-                append(frontMatterData?.routeOverride?.let {
-                    if (it.startsWith("/")) it else routeFromFilePath + it
-                } ?: routeFromFilePath)
-                appendLine("\")")
+                if (isPage()) {
+                    val absoluteRoute = absoluteRoute!! // Guaranteed non-null if `isPage()` is true
+                    append("@Page(\"")
+                    append(frontMatterData?.routeOverride?.let {
+                        if (it.startsWith("/")) it else absoluteRoute.suffixIfNot("/") + it
+                    } ?: absoluteRoute)
+                    appendLine("\")")
+                }
 
                 appendLine("@Composable")
                 appendLine("fun $funName() {")
@@ -214,7 +249,7 @@ class KotlinRenderer(
 
         init {
             var contextCreated = false
-            if (dependsOnMarkdownArtifact) {
+            if (isPage() && dependsOnMarkdownArtifact) {
                 val userData = frontMatterData
                     ?.filterUserData()
                     ?.mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
@@ -222,7 +257,9 @@ class KotlinRenderer(
 
                 val mdCtx = buildString {
                     append("MarkdownContext(")
-                    append("\"$filePath\"")
+                    append("\"${markdownSourceRoot.invariantSeparatorsPathString}\"")
+                    append(", ")
+                    append("\"${sourceFilePath.invariantSeparatorsPathString}\"")
                     append(", ")
                     append(userData.serialize())
                     append(")")
@@ -348,7 +385,7 @@ class KotlinRenderer(
             // (e.g. "[link](http://path/to/example.md)"), since in that case, the user is explicitly linking to an
             // external resource.
             if (link.destination.endsWith(".md") && !link.destination.contains("://")) {
-                val destinationPath = Path(filePath).resolveSibling(link.destination).normalize().toString()
+                val destinationPath = sourceFilePath.resolveSibling(link.destination).normalize().toString()
                 val destinationNode = markdownNodeGetter(destinationPath.removePrefix("/"))
                 if (destinationNode != null) {
                     // Retrieve the destination's route override, if present

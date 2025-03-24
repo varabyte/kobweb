@@ -13,7 +13,6 @@ import com.varabyte.kobwebx.gradle.markdown.tasks.ProcessMarkdownTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.FileCollection
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -25,7 +24,15 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         val kobwebBlock = project.extensions.findByName("kobweb") as? KobwebBlock
             ?: throw GradleException("The Gradle markdown plugin should only be applied AFTER com.varabyte.kobweb.application OR com.varabyte.kobweb.library plugins.")
 
-        val markdownBlock = kobwebBlock.extensions.create<MarkdownBlock>("markdown", kobwebBlock.baseGenDir)
+
+        val markdownBlock =
+            kobwebBlock.extensions.create<MarkdownBlock>(
+                "markdown",
+                project.providers,
+                project.objects,
+                kobwebBlock.baseGenDir,
+                kobwebBlock.pagesPackage
+            )
         markdownBlock.extensions.apply {
             create<MarkdownHandlers>("handlers", project)
             create<MarkdownFeatures>("features")
@@ -40,19 +47,16 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
         project.buildTargets.withType<KotlinJsIrTarget>().configureEach {
             val jsTarget = JsTarget(this)
 
-            fun provideAllMarkdownDirs(): FileCollection {
-                val projectResources = project.layout.projectDirectory.dir("src/${jsTarget.mainSourceSet}/resources/${markdownBlock.markdownPath.get()}")
-
-                return project.files()
-                    .from(projectResources)
-                    .from(markdownBlock.additionalDirectories)
-            }
+            markdownBlock.addSource(markdownBlock.markdownPath.map { markdownPath ->
+                project.layout.projectDirectory.dir("src/${jsTarget.mainSourceSet}/resources/$markdownPath")
+            })
 
             // Configures both ProcessMarkdownTask & ConvertMarkdownTask
             project.tasks.withType<MarkdownTask>().configureEach {
                 pagesPackage.set(kobwebBlock.pagesPackage)
                 projectGroup.set(project.group)
-                markdownDirs.from(provideAllMarkdownDirs())
+                markdownFolders.set(markdownBlock.folders)
+                pagesPackage.set(kobwebBlock.pagesPackage)
             }
 
             convertTask.configure {
@@ -60,17 +64,17 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                     project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
                 )
 
-                markdownDirs.from(
-                    project.files()
-                        .from(provideAllMarkdownDirs())
-                        .from(processTask.map { task ->
-                            task.getGenResDir().map { it.dir(markdownBlock.markdownPath.get()) }
+                markdownFolders.add(
+                    markdownBlock.createMarkdownFolder().apply {
+                        files.from(processTask.map { task ->
+                            task.getGenResDir().flatMap { it.dir(markdownBlock.markdownPath) }
                         })
+                    }
                 )
             }
 
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
-                kotlin.srcDir(convertTask)
+                kotlin.srcDir(convertTask.map { it.getGenDir()})
                 kotlin.srcDir(processTask.map { it.getGenSrcDir() })
                 resources.srcDir(processTask.map { it.getGenResDir() })
             }

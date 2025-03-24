@@ -1,5 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
+import com.varabyte.kobweb.common.lang.fileToPackage
+import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
@@ -16,6 +18,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import javax.inject.Inject
+import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
 
 private class MarkdownVisitor : AbstractVisitor() {
@@ -61,27 +64,33 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         val process = markdownProcess.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
-
-            markdownResources.asFileTree.visit {
+            markdownFiles.visit {
                 if (isDirectory) return@visit
+                val pkgBase = markdownFolders.findTargetPackage(rootDir) ?: run {
+                    logger.warn("Please report we could not find a target source root for markdown folder \"$rootDir\". Skipping processing \"$path\".")
+                    return@visit
+                }
 
-                val mdFile = file
-                val visitor = MarkdownVisitor()
+                val srcPath = Path(PackageUtils.packageToPath(pkgBase), relativePath.toString())
+                srcPath.toRelativePagePath()?.let { relativePagePath ->
+                    val mdFile = file
+                    val visitor = MarkdownVisitor()
 
-                parser
-                    .parse(mdFile.readText())
-                    .accept(visitor)
-                add(
-                    MarkdownEntry(
-                        filePath = relativePath.toPath().invariantSeparatorsPathString,
-                        frontMatter = visitor.frontMatter,
-                        route = RouteUtils.getRoute(
-                            relativePath.toPath().toFile(),
-                            visitor.frontMatter,
-                        ),
-                        "${absolutePackageFor(relativePath)}.${funNameFor(mdFile)}"
+                    parser
+                        .parse(mdFile.readText())
+                        .accept(visitor)
+                    add(
+                        MarkdownEntry(
+                            filePath = relativePagePath.invariantSeparatorsPathString,
+                            frontMatter = visitor.frontMatter,
+                            route = RouteUtils.getRoute(
+                                relativePagePath.toFile(),
+                                visitor.frontMatter,
+                            ),
+                            "${srcPath.fileToPackage()}.${mdFile.capitalizedNameWithoutExtension}Page"
+                        )
                     )
-                )
+                }
             }
         }
         val processScope = MarkdownBlock.ProcessScope()

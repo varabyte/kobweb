@@ -16,4 +16,9 @@ object PackageUtils {
             else -> pkg
         }
     }
+
+    /**
+     * Given a package (e.g. "a.b.c"), return its path (e.g. "a/b/c")
+     */
+    fun packageToPath(pkg: String) = pkg.replace('.', '/')
 }
