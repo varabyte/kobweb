@@ -11,8 +11,6 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
-import com.varabyte.kobweb.silk.init.SilkColorsStyle
-import com.varabyte.kobweb.silk.init.setSilkWidgetVariables
 import com.varabyte.kobweb.silk.style.ColorModeStrategy
 import com.varabyte.kobweb.silk.style.ComponentKind
 import com.varabyte.kobweb.silk.style.CssStyle
@@ -66,14 +64,15 @@ fun Surface(
     ref: ElementRefScope<HTMLElement>? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val surfaceModifier = SurfaceStyle.toModifier(variant).then(modifier)
+    val surfaceModifier = SurfaceStyle.toModifier(variant)
+        .then(modifier)
+        .thenIf(colorModeOverride != null) {
+            Modifier.classNames(colorModeOverride!!.cssClass)
+        }
 
     if (colorModeOverride == null || ColorModeStrategy.current.useScope) {
         Box(
-            surfaceModifier.thenIf(colorModeOverride != null) {
-                SilkColorsStyle.toModifier()
-                    .classNames(colorModeOverride!!.cssClass)
-            },
+            surfaceModifier,
             contentAlignment = contentAlignment,
             ref = ref,
         ) {
@@ -126,8 +125,6 @@ fun Surface(
                 }
 
                 CompositionLocalProvider(colorModeOverride.provide()) {
-                    val currColorMode = ColorMode.current // Can recompose if child changes ColorMode.currentState
-                    LaunchedEffect(currColorMode) { surfaceElement.setSilkWidgetVariables(currColorMode) }
                     content()
                 }
             }

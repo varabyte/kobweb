@@ -5,7 +5,7 @@ just the widgets -- for example, maybe they have their own existing Compose HTML
 ported to Kobweb, but they still want to use our fancy color mode support or widgets like SimpleGrid.
 
 When using this widget library on its own, you must initialize it yourself, since that's normally something the Kobweb
-plugin does for you. To do that, you must call `SilkFoundationStyles`, `SilkWidgetVariables`, and
+plugin does for you. To do that, you must call `SilkFoundationStyles`, `ColorModeAware`, and
 `DeferringHost` inside the `renderComposable` block:
 
 ```kotlin
@@ -13,7 +13,7 @@ fun main() {
     renderComposable(rootElementId = "_kobweb-root") {
         KobwebComposeStyles() // OPTIONAL but recommended for `Box`, `Row`, `Column`, etc. support
         SilkFoundationStyles() // REQUIRED
-        SilkWidgetVariables() // REQUIRED
+        ColorModeAware() // REQUIRED
         DeferringHost { // REQUIRED (if you plan to use `Deferred` or widgets that use it like tooltips)
             /* ... your content here ... */ 
         }
