@@ -154,14 +154,14 @@ abstract class MarkdownBlock(
     /**
      * The root composable to use as a fallback if no other root is provided.
      *
-     * All markdown files, when converted to code, should have some root composable called first, wrapping all content.
-     * This root is often done set a YAML block, but we should handle the case where one is not specified (either
-     * because the YAML block doesn't include it or when there's no YAML block at all). This is because Kobweb's default
-     * layouts use a Box as the root, which just stacks elements on top of each other.
+     * All markdown files, when converted to code, should have some root composable it lives within, wrapping all
+     * content. It should be an element that has a natural vertical flow to it, such as Compose HTML's `Div` element
+     * (the default value) or Kobweb's `Column` composable.
      *
-     * Note that a user might have overridden the Kobweb default root layout via the `@App` annotation, in which case,
-     * they may not need to specify a root at all here (since that could just add an unnecessary extra layer to the DOM
-     * tree). To indicate this (expectedly rare) case, this value may be set to the empty string to disable it.
+     * This root may be overridden if a `root` value is set inside the markdown's front-matter block.
+     *
+     * If a site doesn't want any special root element to wrap all markdown source files, then this value can be set to
+     * the empty string to disable it.
      */
     abstract val defaultRoot: Property<String>
 
@@ -264,7 +264,7 @@ abstract class MarkdownBlock(
         markdownPath.convention("markdown")
 
         defaultPackage.convention(pagesPackage)
-        defaultRoot.convention("com.varabyte.kobweb.compose.foundation.layout.Column")
+        defaultRoot.convention("org.jetbrains.compose.web.dom.Div")
         imports.set(emptyList())
         genDir.convention(baseGenDir.map { "$it/markdown" })
     }
