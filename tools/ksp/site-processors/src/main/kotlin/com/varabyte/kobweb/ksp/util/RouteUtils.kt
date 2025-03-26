@@ -31,7 +31,7 @@ object RouteUtils {
      *
      * The final route will begin with a slash and end with a slash.
      *
-     * We also perform some additional processing on any remaining package parts that don't have mappings:
+     * We also perform some additional processing on any remaining package segments that don't have mappings:
      * - convert camelCase to kebab-case
      * - remove leading underscores (because these are usually used as a workaround for numbers, e.g. _123)
      * - remove trailing underscores (because these are usually used as a workaround for reserved words, e.g. `fun_`)
@@ -88,7 +88,7 @@ object RouteUtils {
 
 // e.g. `___forced__--example_--_` -> `forced-example`
 private fun String.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators() =
-    replace(Regex("_+"), "-").replace(Regex("-+"), "-").removeSurrounding("-")
+    trim('_').replace(Regex("_+"), "-").replace(Regex("-+"), "-")
 
 /**
  * Given some file (which likely represents an annotation's containing file), return the slug for the file.
