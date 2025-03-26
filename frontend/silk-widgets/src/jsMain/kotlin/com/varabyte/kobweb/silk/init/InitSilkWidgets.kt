@@ -1,12 +1,12 @@
 package com.varabyte.kobweb.silk.init
 
 import androidx.compose.runtime.*
-import com.varabyte.kobweb.browser.dom.css.CssIdent
 import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.ColorModeAware
 import com.varabyte.kobweb.silk.components.disclosure.TabVars
 import com.varabyte.kobweb.silk.components.disclosure.TabsPanelStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsStyle
@@ -69,13 +69,11 @@ import com.varabyte.kobweb.silk.components.overlay.TooltipVars
 import com.varabyte.kobweb.silk.components.overlay.TopLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopTooltipArrowVariant
-import com.varabyte.kobweb.silk.style.ColorModeStrategy
+import com.varabyte.kobweb.silk.setStyleFor
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.common.DisabledStyle
 import com.varabyte.kobweb.silk.style.common.SmoothColorStyle
-import com.varabyte.kobweb.silk.style.useScope
-import com.varabyte.kobweb.silk.style.useSuffix
 import com.varabyte.kobweb.silk.style.vars.color.BackgroundColorVar
 import com.varabyte.kobweb.silk.style.vars.color.BorderColorVar
 import com.varabyte.kobweb.silk.style.vars.color.ColorVar
@@ -98,11 +96,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.switch
 import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.tooltip
-import com.varabyte.kobweb.silk.theme.colors.suffixedWith
-import com.varabyte.kobweb.silk.theme.name
 import kotlinx.browser.document
-import kotlinx.dom.addClass
-import kotlinx.dom.removeClass
 import org.w3c.dom.HTMLElement
 
 fun initSilkWidgets(ctx: InitSilkContext) {
@@ -241,7 +235,13 @@ fun initSilkWidgets(ctx: InitSilkContext) {
         }
     }
 
-    mutableTheme.registerStyle("silk-colors", SilkColorsStyle)
+    // Register CSS variables directly on the `silk-light/dark` element
+    // Note: This only works because the same set of properties/variables are set in both light and dark mode
+    ColorMode.entries.forEach { colorMode ->
+        ctx.stylesheet.registerStyleBase(".${colorMode.cssClass}") {
+            silkColorsModifier(colorMode)
+        }
+    }
 
     // Register InputStyle early as it's wrapped by other components
     mutableTheme.registerStyle("silk-input", InputStyle)
@@ -332,9 +332,14 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerStyle("silk-callout-type_warning", CalloutType.WARNING)
 }
 
+@Deprecated("`SilkColorsStyle` is no longer used as part of a rework of Silk's color mode support. Silk variables and color mode-based styling should now be managed using `ColorMode.cssClass`.")
 val SilkColorsStyle = CssStyle.base {
+    silkColorsModifier(colorMode)
+}
+
+private fun silkColorsModifier(colorMode: ColorMode): Modifier {
     val palette = colorMode.toPalette()
-    Modifier
+    return Modifier
         .colorScheme(if (colorMode.isLight) ColorScheme.Light else ColorScheme.Dark)
 
         // region General color vars
@@ -381,52 +386,50 @@ val SilkColorsStyle = CssStyle.base {
  * @param provideElement An element which must live at a point in the DOM tree above any Silk widgets. This method
  *   will be called inside a `remember` block, meaning it will only be triggered once per composition.
  */
+@Deprecated("Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.")
 @Composable
 fun SilkWidgetVariables(provideElement: () -> HTMLElement) {
     val rootElement = remember { provideElement() }
-    SilkWidgetVariables(rootElement)
+    ColorModeAware(rootElement)
 }
 
 /**
  * Set all Silk variables on the DOM root.
  */
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.",
+    ReplaceWith("ColorModeAware()")
+)
 @Composable
 fun SilkWidgetVariables() {
-    SilkWidgetVariables { document.documentElement as HTMLElement }
+    ColorModeAware(document.documentElement as HTMLElement)
 }
 
 /**
  * Set all Silk variables on an element with the target ID name.
  */
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.",
+    ReplaceWith("ColorModeAware(elementId)")
+)
 @Composable
 fun SilkWidgetVariables(elementId: String) {
-    SilkWidgetVariables { document.getElementById(elementId) as HTMLElement }
+    ColorModeAware(elementId)
 }
 
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.",
+    ReplaceWith("ColorModeAware(element)")
+)
 @Composable
 fun SilkWidgetVariables(element: HTMLElement) {
-    element.setSilkWidgetVariables(ColorMode.current)
+    element.setStyleFor(ColorMode.current)
 }
 
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `HTMLElement.setStyleFor` to set this class instead.",
+    ReplaceWith("this.setStyleFor(colorMode)", "com.varabyte.kobweb.silk.setStyleFor")
+)
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
-    SilkColorsStyle.name.let { silkColorsStyleName ->
-        // Apply the appropriate color mode class unconditionally
-        // It will by default be a no-op in SUFFIX mode, but users may rely on it for custom color mode-based styling
-        removeClass(colorMode.opposite.cssClass)
-        addClass(colorMode.cssClass)
-
-        val ident = CssIdent(silkColorsStyleName)
-        if (ColorModeStrategy.current.useScope) {
-            addClass(silkColorsStyleName)
-            // The color mode suffixed classes may have been added during export, but aren't needed in this mode
-            if (ColorModeStrategy.current == ColorModeStrategy.SCOPE) {
-                removeClass(ident.suffixedWith(colorMode).asStr)
-                removeClass(ident.suffixedWith(colorMode.opposite).asStr)
-            }
-        }
-        if (ColorModeStrategy.current.useSuffix) {
-            removeClass(ident.suffixedWith(colorMode.opposite).asStr)
-            addClass(ident.suffixedWith(colorMode).asStr)
-        }
-    }
+    this.setStyleFor(colorMode)
 }
