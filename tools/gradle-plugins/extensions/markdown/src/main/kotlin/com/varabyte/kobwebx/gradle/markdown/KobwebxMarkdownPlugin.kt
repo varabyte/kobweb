@@ -68,7 +68,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
                 markdownFolders.add(
                     markdownBlock.createMarkdownFolder().apply {
-                        files.from(processTask.map { task ->
+                        roots.from(processTask.map { task ->
                             task.getGenResDir().flatMap { it.dir(markdownBlock.markdownPath) }
                         })
                     }

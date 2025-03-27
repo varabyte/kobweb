@@ -66,63 +66,70 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         getGenDir().get().asFile.clearDirectory()
         val nodeCache = NodeCache(
             parser = markdownFeatures.createParser(),
-            roots = markdownFolders.get().flatMap { it.files.files }.toSet()
+            roots = markdownFolders.get().flatMap { it.roots.files }.toSet()
         )
 
-        markdownFiles.visit {
-            if (isDirectory) return@visit
+        markdownFolders.get().forEach { markdownFolder ->
+            markdownFolder.files.asFileTree.visit {
+                if (isDirectory) return@visit
 
-            val pkgBase = markdownFolders.findTargetPackage(rootDir) ?: run {
-                logger.warn("Please report we could not find a target source root for markdown folder \"$rootDir\". Skipping converting \"$path\".")
-                return@visit
+                val pkgBase = markdownFolder.resolvedTargetPackage
+
+                val sourcePath = relativePath.toPath()
+                val absolutePackage = pkgBase.packageConcat(sourcePath.packageFromFile())
+                val outputRootPath = Path(PackageUtils.packageToPath(absolutePackage))
+
+                nodeCache.metadata[nodeCache[file]] = NodeCache.Metadata.Entry(
+                    projectRoot.get(),
+                    rootDir.relativeTo(projectLayout.projectDirectory.asFile).toPath(),
+                    relativePath.toPath(),
+                    outputRootPath,
+                    absolutePackage,
+                    // Route should only be set for pages
+                    if (outputRootPath.startsWith(pagesPath)) {
+                        outputRootPath.relativeTo(pagesPath).invariantSeparatorsPathString.ensureSurrounded("/") +
+                            RouteUtils.getSlug(sourcePath.toFile())
+                    } else null,
+                )
             }
-
-            val sourcePath = relativePath.toPath()
-            val absolutePackage = pkgBase.packageConcat(sourcePath.packageFromFile())
-            val outputRootPath = Path(PackageUtils.packageToPath(absolutePackage))
-
-            nodeCache.metadata[nodeCache[file]] = NodeCache.Metadata.Entry(
-                projectRoot.get(),
-                rootDir.relativeTo(projectLayout.projectDirectory.asFile).toPath(),
-                relativePath.toPath(),
-                outputRootPath,
-                absolutePackage,
-                // Route should only be set for pages
-                if (outputRootPath.startsWith(pagesPath)) {
-                    outputRootPath.relativeTo(pagesPath).invariantSeparatorsPathString.ensureSurrounded("/") +
-                        RouteUtils.getSlug(sourcePath.toFile())
-                } else null,
-            )
         }
 
-        markdownFiles.visit {
-            if (isDirectory) return@visit
-            val node = try { nodeCache[file] } catch (_: IllegalArgumentException) { null } ?: return@visit
-            val metadata = nodeCache.metadata.getValue(node)
+        markdownFolders.get().forEach { markdownFolder ->
+            markdownFolder.files.asFileTree.visit {
+                if (isDirectory) return@visit
 
-            val sourcePath = relativePath.toPath()
+                val node = try {
+                    nodeCache[file]
+                } catch (_: IllegalArgumentException) {
+                    null
+                } ?: return@visit
+                val metadata = nodeCache.metadata.getValue(node)
 
-            val outputFileName = sourcePath.nameWithoutExtension.replaceFirstChar { it.uppercase() }
-            val outputRootPathStr = nodeCache.metadata.getValue(node).outputRootPath.invariantSeparatorsPathString
+                val sourcePath = relativePath.toPath()
 
-            File(
-                getGenDir().get().asFile.resolve(outputRootPathStr),
-                "$outputFileName.kt"
-            ).let { outputFile ->
-                outputFile.parentFile.mkdirs()
+                val outputFileName = sourcePath.nameWithoutExtension.replaceFirstChar { it.uppercase() }
+                val outputRootPathStr =
+                    nodeCache.metadata.getValue(node).outputRootPath.invariantSeparatorsPathString
 
-                val ktRenderer = KotlinRenderer(
-                    projectGroup.get().toString(),
-                    nodeCache,
-                    markdownDefaultRoot.get().takeUnless { it.isBlank() },
-                    markdownImports.get(),
-                    markdownHandlers,
-                    funName = sourcePath.capitalizedNameWithoutExtension +
-                        "Page".takeIf { metadata.routeWithSlug != null }.orEmpty(),
-                    dependsOnMarkdownArtifact.get(),
-                    LoggingReporter(logger),
-                )
-                outputFile.writeText(ktRenderer.render(nodeCache[file]))
+                File(
+                    getGenDir().get().asFile.resolve(outputRootPathStr),
+                    "$outputFileName.kt"
+                ).let { outputFile ->
+                    outputFile.parentFile.mkdirs()
+
+                    val ktRenderer = KotlinRenderer(
+                        projectGroup.get().toString(),
+                        nodeCache,
+                        markdownDefaultRoot.get().takeUnless { it.isBlank() },
+                        markdownImports.get(),
+                        markdownHandlers,
+                        funName = sourcePath.capitalizedNameWithoutExtension +
+                            "Page".takeIf { metadata.routeWithSlug != null }.orEmpty(),
+                        dependsOnMarkdownArtifact.get(),
+                        LoggingReporter(logger),
+                    )
+                    outputFile.writeText(ktRenderer.render(nodeCache[file]))
+                }
             }
         }
     }

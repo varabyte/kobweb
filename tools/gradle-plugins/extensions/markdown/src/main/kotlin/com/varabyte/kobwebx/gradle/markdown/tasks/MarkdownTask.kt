@@ -7,14 +7,11 @@ import com.varabyte.kobweb.gradle.core.tasks.KobwebTask
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFolder
-import org.gradle.api.file.FileTree
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import java.io.File
@@ -28,34 +25,14 @@ abstract class MarkdownTask @Inject constructor(
     @get:Internal protected val markdownBlock: MarkdownBlock,
     desc: String
 ) : KobwebTask(desc) {
-    @get:Inject
-    abstract val objectFactory: ObjectFactory
-
     @get:Input
     abstract val pagesPackage: Property<String>
 
     @get:Input
     abstract val projectGroup: Property<Any>
 
-    /**
-     * A list of all directories containing markdown files to process.
-     *
-     * See also: [markdownFiles]
-     */
     @get:Nested
     abstract val markdownFolders: ListProperty<MarkdownFolder>
-
-    /**
-     * A list of all markdown files to process.
-     */
-    @get:InputFiles
-    protected val markdownFiles get(): FileTree {
-        val files = objectFactory.fileCollection()
-        markdownFolders.get().forEach { markdownFolder ->
-            files.from(markdownFolder.files)
-        }
-        return files.asFileTree.matching { include("**/*.md") }
-    }
 
     // Should only be called during the `execute` phase
     @get:Internal
@@ -67,27 +44,15 @@ abstract class MarkdownTask @Inject constructor(
     val markdownPath = markdownBlock.markdownPath
 
     /**
-     * Given a base dir that owns markdown files, return the target path any generated source should be written into.
-     *
-     * A null return value indicates that no path target was found, which shouldn't happen if we hooked everything up
-     * correctly.
-     *
-     * Otherwise, this value will end with a trailing slash unless empty, as then you can just prepend it in front of a
-     * relative to get the final output path.
-     *
-     * NOTE: This method is only expected to be called inside an execute method.
+     * [MarkdownFolder.targetPackage] but resolved against [projectGroup] to ensure it is an absolute package.
      */
-    protected fun ListProperty<MarkdownFolder>.findTargetPackage(dir: File): String? {
-        return get().asSequence()
-                .filter { dir in it.files }
-                .map {
-                    PackageUtils.resolvePackageShortcut(
-                        projectGroup.get().toString(),
-                        it.targetPackage.get()
-                    )
-                }
-                .firstOrNull()
-    }
+    protected val MarkdownFolder.resolvedTargetPackage: String
+        get() {
+            return PackageUtils.resolvePackageShortcut(
+                projectGroup.get().toString(),
+                targetPackage.get()
+            )
+        }
 
     protected fun Path.toRelativePagePath(): Path? {
         val pagesPath = Path(pagesPath.invariantSeparatorsPathString.suffixIfNot("/"))

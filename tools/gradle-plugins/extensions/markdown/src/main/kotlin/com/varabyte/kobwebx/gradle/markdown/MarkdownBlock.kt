@@ -12,6 +12,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.newInstance
 
@@ -21,11 +22,14 @@ import org.gradle.kotlin.dsl.newInstance
  * This should be instantiated by [MarkdownBlock.createMarkdownFolder] to ensure defaults are set up correctly.
  */
 abstract class MarkdownFolder {
+    @get:Internal
+    abstract val roots: ConfigurableFileCollection
+
     /**
      * A collection of one (or more) directories that should contain markdown files.
      */
     @get:InputFiles
-    internal abstract val files: ConfigurableFileCollection
+    val files = roots.asFileTree.matching { include("**/*.md") }
 
     /**
      * The target package under which we should generate markdown files under.
@@ -33,7 +37,7 @@ abstract class MarkdownFolder {
      * This will default to [MarkdownBlock.defaultPackage] but can be overridden if desired.
      */
     @get:Input
-    internal abstract val targetPackage: Property<String>
+    abstract val targetPackage: Property<String>
 }
 
 abstract class MarkdownBlock(
@@ -90,7 +94,7 @@ abstract class MarkdownBlock(
     @Suppress("FunctionName")
     private fun _addSource(dir: Any, targetPackage: Provider<String>) {
         val folder = objects.newInstance<MarkdownFolder>()
-        folder.files.from(dir)
+        folder.roots.from(dir)
         folder.targetPackage.set(targetPackage.orElse(defaultPackage))
 
         folders.add(folder)

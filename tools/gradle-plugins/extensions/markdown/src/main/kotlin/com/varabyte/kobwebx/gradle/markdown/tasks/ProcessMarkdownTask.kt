@@ -64,32 +64,31 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         val process = markdownProcess.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
-            markdownFiles.visit {
-                if (isDirectory) return@visit
-                val pkgBase = markdownFolders.findTargetPackage(rootDir) ?: run {
-                    logger.warn("Please report we could not find a target source root for markdown folder \"$rootDir\". Skipping processing \"$path\".")
-                    return@visit
-                }
+            markdownFolders.get().forEach { markdownFolder ->
+                markdownFolder.files.asFileTree.visit {
+                    if (isDirectory) return@visit
 
-                val srcPath = Path(PackageUtils.packageToPath(pkgBase), relativePath.toString())
-                srcPath.toRelativePagePath()?.let { relativePagePath ->
-                    val mdFile = file
-                    val visitor = MarkdownVisitor()
+                    val pkgBase = markdownFolder.resolvedTargetPackage
+                    val srcPath = Path(PackageUtils.packageToPath(pkgBase), relativePath.toString())
+                    srcPath.toRelativePagePath()?.let { relativePagePath ->
+                        val mdFile = file
+                        val visitor = MarkdownVisitor()
 
-                    parser
-                        .parse(mdFile.readText())
-                        .accept(visitor)
-                    add(
-                        MarkdownEntry(
-                            filePath = relativePagePath.invariantSeparatorsPathString,
-                            frontMatter = visitor.frontMatter,
-                            route = RouteUtils.getRoute(
-                                relativePagePath.toFile(),
-                                visitor.frontMatter,
-                            ),
-                            "${srcPath.packageFromFile()}.${mdFile.capitalizedNameWithoutExtension}Page"
+                        parser
+                            .parse(mdFile.readText())
+                            .accept(visitor)
+                        add(
+                            MarkdownEntry(
+                                filePath = relativePagePath.invariantSeparatorsPathString,
+                                frontMatter = visitor.frontMatter,
+                                route = RouteUtils.getRoute(
+                                    relativePagePath.toFile(),
+                                    visitor.frontMatter,
+                                ),
+                                "${srcPath.packageFromFile()}.${mdFile.capitalizedNameWithoutExtension}Page"
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
