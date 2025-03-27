@@ -17,12 +17,6 @@ class DynamicRouteSegment(val rawValue: String) {
     val isCatchAll get() = content.startsWith("...")
     val isOptional get() = content.endsWith("?")
 
-    init {
-        if(isOptional && !isCatchAll) {
-            error("Optional dynamic segments must also be catch-all (i.e. a \"?\" suffix requires a \"...\" prefix). Got: \"$rawValue\"")
-        }
-    }
-
     val name = content.removePrefix("...").removeSuffix("?")
 
     val isInferred get() = name.isEmpty()

@@ -201,7 +201,12 @@ class RouteTree<T : Any> {
                             Match.REST
                         }
                     } else {
-                        Match.SINGLE
+                        if (name.endsWith("?")) {
+                            name = name.removeSuffix("?")
+                            Match.SINGLE_OPTIONAL
+                        } else {
+                            Match.SINGLE
+                        }
                     }
 
                     return Info(name, match)
@@ -215,9 +220,20 @@ class RouteTree<T : Any> {
              *
              * For example: "/users/{user}/posts/{post}"
              *
-             * This would match a URL like "/users/bitspittle/posts/123"
+             * This would match "bitspittle" and "123" URL like "/users/bitspittle/posts/123"
+             *
+             * This would fail to match "/users/bitspittle/posts/" as this does not capture empty segments.
              */
             SINGLE,
+
+            /**
+             * This node matches a single segment of the route which can also accept the empty string.
+             *
+             * For example: "/users/{user?}"
+             *
+             * This would match "bitspittle" in "/users/bitspittle" and "" in "/users/".
+             */
+            SINGLE_OPTIONAL,
 
             /**
              * This node consumes the rest of the route.
@@ -258,7 +274,8 @@ class RouteTree<T : Any> {
 
         override fun accepts(routeSegments: List<String>): AcceptResult {
             return when (info.match) {
-                Match.SINGLE -> AcceptResult.SINGLE
+                Match.SINGLE -> if (routeSegments.first() != "") AcceptResult.SINGLE else AcceptResult.NONE
+                Match.SINGLE_OPTIONAL -> AcceptResult.SINGLE
                 Match.REST -> if (routeSegments.first() != "") AcceptResult.ALL else AcceptResult.NONE
                 Match.REST_OPTIONAL -> AcceptResult.ALL
             }
