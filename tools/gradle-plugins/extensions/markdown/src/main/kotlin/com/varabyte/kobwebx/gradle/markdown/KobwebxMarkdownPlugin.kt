@@ -60,6 +60,8 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             }
 
             convertTask.configure {
+                projectRoot.set(project.layout.projectDirectory.asFile.relativeTo(project.rootDir).invariantSeparatorsPath)
+
                 dependsOnMarkdownArtifact.set(
                     project.getJsDependencyResults().hasDependencyNamed("com.varabyte.kobwebx:kobwebx-markdown")
                 )

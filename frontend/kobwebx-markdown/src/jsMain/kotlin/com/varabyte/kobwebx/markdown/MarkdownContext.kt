@@ -38,27 +38,28 @@ import com.varabyte.kobweb.core.PageContext
  * }
  * ```
  *
- * @param markdownRoot Which source markdown directory contains the markdown used to generate this page,
- *   e.g. `/jsMain/resources/markdown`.
+ * @param markdownRoot Which source markdown directory contains the markdown used to generate this page, relative to
+ *   the project it lives in, e.g. `src/jsMain/resources/markdown`.
  * @param path The path of the markdown file, including its extension, relative to [markdownRoot],
  *   e.g. `a/b/c/Hello.md`.
  * @param frontMatter Exposes data set in a markdown file's front matter block. (Front matter is the YAML block
  *   optionally declared at the top of a markdown file, which is delimited by `---` lines.)
  */
 class MarkdownContext(
+    val projectRoot: String,
     val markdownRoot: String,
     val path: String,
     val frontMatter: Map<String, List<String>>,
 ) {
     /**
-     * The full path of the markdown file, including its extension, relative to its owning project root.
+     * The full path of the markdown file, including its extension, relative to its owning codebase.
      *
-     * For example, `jsMain/resources/markdown/a/b/c/Hello.md`.
+     * For example, `site/src/jsMain/resources/markdown/a/b/c/Hello.md`.
      *
      * This could be a convenient property to use if you wanted to add a link to, say, your GitHub repository for the
      * source of this page.
      */
-    val projectPath: String get() = "${markdownRoot.removeSuffix("/")}/$path"
+    val fullPath: String get() = listOf(projectRoot, markdownRoot, path).joinToString("/")
 }
 
 // Extend `rememberPageContext()` with markdown specific values

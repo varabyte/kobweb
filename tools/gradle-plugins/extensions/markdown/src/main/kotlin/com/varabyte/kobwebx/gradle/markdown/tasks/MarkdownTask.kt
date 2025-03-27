@@ -114,6 +114,10 @@ abstract class MarkdownTask @Inject constructor(
         return nameWithoutExtension.capitalize()
     }
 
+    protected val Path.capitalizedNameWithoutExtension get(): String {
+        return toFile().capitalizedNameWithoutExtension
+    }
+
     protected fun RelativePath.toPath(): Path {
         return Path(this.pathString)
     }

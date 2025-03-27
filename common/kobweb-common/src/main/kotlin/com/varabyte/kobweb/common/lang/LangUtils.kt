@@ -84,7 +84,7 @@ fun String.packageConcat(otherPackage: String): String {
  * Path segments that cannot be directly represented by Kotlin package constraints will be transformed via
  * [toPackageName].
  */
-fun Path.dirToPackage(): String {
+fun Path.packageFromDir(): String {
     return invariantSeparatorsPathString
         .split('/')
         .joinToString(".") { it.toPackageName() }
@@ -95,6 +95,6 @@ fun Path.dirToPackage(): String {
  *
  * This should be a path to a file, as the filename will be excluded from the final package.
  *
- * @see [dirToPackage]
+ * @see [packageFromDir]
  */
-fun Path.fileToPackage(): String = this.parent.dirToPackage()
+fun Path.packageFromFile(): String = this.parent?.packageFromDir().orEmpty()

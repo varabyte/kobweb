@@ -55,6 +55,7 @@ val generateTestMarkdownTask = tasks.register("generateTestMarkdown") {
 }
 
 kobweb.markdown.addSource(generateTestMarkdownTask)
+kobweb.markdown.addSource(project.layout.projectDirectory.dir("src/jsMain/resources/markdown-src"), ".")
 
 kotlin {
     configAsKobwebApplication(includeServer = true)

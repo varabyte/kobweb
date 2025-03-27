@@ -30,6 +30,8 @@ internal object RouteUtils {
         ?.replaceUnderscoresAndMultipleHyphensWithSingleHyphenSeparators()
         .orEmpty()
 
+    fun getSlug(file: File) = file.toSlug()
+
     /**
      * Return the final route that will be generated for this markdown file.
      *

@@ -1,6 +1,6 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
-import com.varabyte.kobweb.common.lang.fileToPackage
+import com.varabyte.kobweb.common.lang.packageFromFile
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
@@ -87,7 +87,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                                 relativePagePath.toFile(),
                                 visitor.frontMatter,
                             ),
-                            "${srcPath.fileToPackage()}.${mdFile.capitalizedNameWithoutExtension}Page"
+                            "${srcPath.packageFromFile()}.${mdFile.capitalizedNameWithoutExtension}Page"
                         )
                     )
                 }
