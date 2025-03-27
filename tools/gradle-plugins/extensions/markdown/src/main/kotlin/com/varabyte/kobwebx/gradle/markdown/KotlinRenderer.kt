@@ -130,7 +130,7 @@ class KotlinRenderer internal constructor(
                 }
 
                 appendLine("@Composable")
-                appendLine("fun $funName() {")
+                appendLine("fun ${frontMatterData?.funName ?: funName}() {")
             }
         )
 
@@ -178,6 +178,7 @@ class KotlinRenderer internal constructor(
 
     private class FrontMatterData(val raw: Map<String, List<String>>) {
         val root: String? get() = raw["root"]?.singleOrNull()
+        val funName: String? get() = raw["funName"]?.singleOrNull()
         val imports: List<String>? get() = raw["imports"]
         val routeOverride: String? get() = raw["routeOverride"]?.singleOrNull()
 
@@ -185,6 +186,7 @@ class KotlinRenderer internal constructor(
         fun filterUserData(): Map<String, List<String>> {
             return raw.filterKeys {
                 it != "root" &&
+                    it != "funName" &&
                     it != "imports" &&
                     it != "routeOverride"
             }
