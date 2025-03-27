@@ -309,8 +309,8 @@ abstract class CssStyle<K : CssKind> internal constructor(
      * Adds styles into the given stylesheet for the specified selector.
      *
      * @return The CSS class selectors that were added to the stylesheet, always including the base class, and
-     *  potentially additional classes if the style is color mode aware. This lets us avoid applying unnecessary
-     *  classnames, making it easier to debug CSS issues in the browser.
+     *  potentially additional classes if the style is color mode aware and [ColorModeStrategy.useSuffix] is true.
+     *  This lets us avoid applying unnecessary classnames, making it easier to debug CSS issues in the browser.
      */
     internal fun addStylesInto(selector: String, styleSheet: StyleSheet, layer: String?): ClassSelectors {
         // Wrap with a @media block if a query is specified, or in place otherwise
