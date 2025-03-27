@@ -12,6 +12,7 @@ import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
@@ -51,6 +52,9 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     @Nested
     @Optional
     val markdownProcess = markdownBlock.process
+
+    @get:Input
+    val markdownPath = markdownBlock.markdownPath
 
     @OutputDirectory
     fun getGenSrcDir() = markdownBlock.getGenJsSrcRoot("process")

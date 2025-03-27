@@ -40,9 +40,6 @@ abstract class MarkdownTask @Inject constructor(
         return Path(PackageUtils.packageToPath(projectGroup.get().toString().packageConcat(pagesPackage.get())))
     }
 
-    @get:Input
-    val markdownPath = markdownBlock.markdownPath
-
     /**
      * [MarkdownFolder.targetPackage] but resolved against [projectGroup] to ensure it is an absolute package.
      */
