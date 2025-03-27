@@ -104,7 +104,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
             outputFile.generateInto(getGenResDir().get().asFile.resolve(markdownPath.get()))
         }
         processScope.kotlinOutputs.forEach { outputFile ->
-            outputFile.generateInto(getGenResDir().get().asFile)
+            outputFile.generateInto(getGenSrcDir().get().asFile)
         }
         processScope.resourceOutputs.forEach { outputFile ->
             outputFile.generateInto(getGenResDir().get().asFile)
