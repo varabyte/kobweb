@@ -86,7 +86,10 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                     absolutePackage,
                     // Route should only be set for pages
                     if (outputRootPath.startsWith(pagesPath)) {
-                        outputRootPath.relativeTo(pagesPath).invariantSeparatorsPathString.ensureSurrounded("/") +
+                        Path(PackageUtils.packageToPath(pkgBase)).resolve(sourcePath.parent ?: Path(""))
+                            .relativeTo(pagesPath)
+                            .invariantSeparatorsPathString
+                            .ensureSurrounded("/") +
                             RouteUtils.getSlug(sourcePath.toFile())
                     } else null,
                 )
