@@ -11,6 +11,7 @@ import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
+import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -70,9 +71,7 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         )
 
         markdownFolders.get().forEach { markdownFolder ->
-            markdownFolder.files.asFileTree.visit {
-                if (isDirectory) return@visit
-
+            markdownFolder.files.visitFiles {
                 val pkgBase = markdownFolder.resolvedTargetPackage
 
                 val sourcePath = relativePath.toPath()
@@ -95,14 +94,12 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         }
 
         markdownFolders.get().forEach { markdownFolder ->
-            markdownFolder.files.asFileTree.visit {
-                if (isDirectory) return@visit
-
+            markdownFolder.files.visitFiles {
                 val node = try {
                     nodeCache[file]
                 } catch (_: IllegalArgumentException) {
                     null
-                } ?: return@visit
+                } ?: return@visitFiles
                 val metadata = nodeCache.metadata.getValue(node)
 
                 val sourcePath = relativePath.toPath()

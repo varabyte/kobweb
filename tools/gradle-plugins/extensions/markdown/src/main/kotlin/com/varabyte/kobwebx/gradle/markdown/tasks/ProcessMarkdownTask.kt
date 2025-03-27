@@ -6,6 +6,7 @@ import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
+import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
 import com.varabyte.kobwebx.gradle.markdown.yamlStringToKotlinString
 import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
@@ -65,9 +66,7 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
             markdownFolders.get().forEach { markdownFolder ->
-                markdownFolder.files.asFileTree.visit {
-                    if (isDirectory) return@visit
-
+                markdownFolder.files.visitFiles {
                     val pkgBase = markdownFolder.resolvedTargetPackage
                     val srcPath = Path(PackageUtils.packageToPath(pkgBase), relativePath.toString())
                     srcPath.toRelativePagePath()?.let { relativePagePath ->
