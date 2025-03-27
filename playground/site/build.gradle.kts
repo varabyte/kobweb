@@ -25,7 +25,7 @@ kobweb {
         process.set { markdownEntries ->
             generateMarkdown("markdown/listing.md", buildString {
                 appendLine("# Listing Index")
-                markdownEntries.forEach { entry ->
+                markdownEntries.sortedBy { it.route }.forEach { entry ->
                     appendLine("* [${entry.filePath}](${entry.route})")
                 }
             })
