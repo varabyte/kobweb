@@ -229,10 +229,6 @@ class KotlinRenderer internal constructor(
 
                 val mdCtx = buildString {
                     append("MarkdownContext(")
-                    append("\"${metadataEntry.projectRoot}\"")
-                    append(", ")
-                    append("\"${metadataEntry.markdownSourceRoot.invariantSeparatorsPathString}\"")
-                    append(", ")
                     append("\"${metadataEntry.sourceFilePath.invariantSeparatorsPathString}\"")
                     append(", ")
                     append(userData.serialize())
