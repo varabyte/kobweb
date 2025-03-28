@@ -7,7 +7,7 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
-class BackgroundAttachment private constructor(private val value: String) : StylePropertyValue {
+class BackgroundAttachment private constructor(private val value: String) : StylePropertyValue, CssStyleProperty<Animation>(value) {
     override fun toString() = value
 
     companion object {
@@ -15,12 +15,6 @@ class BackgroundAttachment private constructor(private val value: String) : Styl
         val Scroll get() = BackgroundAttachment("scroll")
         val Fixed get() = BackgroundAttachment("fixed")
         val Local get() = BackgroundAttachment("local")
-
-        // Global values
-        val Inherit get() = BackgroundAttachment("inherit")
-        val Initial get() = BackgroundAttachment("initial")
-        val Revert get() = BackgroundAttachment("revert")
-        val Unset get() = BackgroundAttachment("unset")
     }
 }
 
