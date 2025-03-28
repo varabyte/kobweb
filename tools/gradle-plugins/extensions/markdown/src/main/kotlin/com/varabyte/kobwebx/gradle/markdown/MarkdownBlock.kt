@@ -223,8 +223,8 @@ abstract class MarkdownBlock(
         internal val markdownOutputs: List<OutputFile> = _markdownOutputs
         private val _kotlinOutputs = mutableListOf<OutputFile>()
         internal val kotlinOutputs: List<OutputFile> = _kotlinOutputs
-        private val _resourceOutputs = mutableListOf<OutputFile>()
-        internal val resourceOutputs: List<OutputFile> = _resourceOutputs
+        private val _publicResourceOutputs = mutableListOf<OutputFile>()
+        internal val publicResourceOutputs: List<OutputFile> = _publicResourceOutputs
 
         /**
          * Generate Kotlin source in the final project.
@@ -251,13 +251,10 @@ abstract class MarkdownBlock(
         }
 
         /**
-         * Generate a general resource for this site.
-         *
-         * NOTE: If you are trying to specifically create a new markdown file (e.g. like a listing page), you should
-         * prefer calling [generateMarkdown] directly instead.
+         * Generate a general resource and put it in a location that will ultimately get served by the site.
          */
-        fun generateResource(filePath: String, content: String) {
-            _resourceOutputs.add(OutputFile(filePath, content))
+        fun generatePublicResource(filePath: String, content: String) {
+            _publicResourceOutputs.add(OutputFile(filePath, content))
         }
     }
 

@@ -59,6 +59,10 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
                 pagesPackage.set(kobwebBlock.pagesPackage)
             }
 
+            processTask.configure {
+                publicPath.set(kobwebBlock.publicPath)
+            }
+
             convertTask.configure {
                 projectRoot.set(project.layout.projectDirectory.asFile.relativeTo(project.rootDir).invariantSeparatorsPath)
 
@@ -68,9 +72,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
 
                 markdownFolders.add(
                     markdownBlock.createMarkdownFolder().apply {
-                        roots.from(processTask.map { task ->
-                            task.getGenResDir().flatMap { it.dir(task.markdownPath) }
-                        })
+                        roots.from(processTask.map { task -> task.getGenResMarkdownDir() })
                     }
                 )
             }
@@ -78,7 +80,7 @@ class KobwebxMarkdownPlugin : Plugin<Project> {
             project.kotlin.sourceSets.named(jsTarget.mainSourceSet) {
                 kotlin.srcDir(convertTask.map { it.getGenDir()})
                 kotlin.srcDir(processTask.map { it.getGenSrcDir() })
-                resources.srcDir(processTask.map { it.getGenResDir() })
+                resources.srcDir(processTask.map { it.getGenResPublicDir() })
             }
         }
     }

@@ -12,6 +12,7 @@ import org.commonmark.ext.front.matter.YamlFrontMatterBlock
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
@@ -54,18 +55,24 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     val markdownProcess = markdownBlock.process
 
     @get:Input
-    val markdownPath = markdownBlock.markdownPath
+    abstract val publicPath: Property<String>
 
     @OutputDirectory
     fun getGenSrcDir() = markdownBlock.getGenJsSrcRoot("process")
 
+    private fun getGenResDirRoot() = markdownBlock.getGenJsResRoot("process")
+
     @OutputDirectory
-    fun getGenResDir() = markdownBlock.getGenJsResRoot("process")
+    fun getGenResPublicDir() = getGenResDirRoot().map { it.dir("public") }
+
+    @OutputDirectory
+    fun getGenResMarkdownDir() = getGenResDirRoot().map { it.dir("markdown") }
 
     @TaskAction
     fun execute() {
         getGenSrcDir().get().asFile.clearDirectory()
-        getGenResDir().get().asFile.clearDirectory()
+        getGenResPublicDir().get().asFile.clearDirectory()
+        getGenResMarkdownDir().get().asFile.clearDirectory()
         val process = markdownProcess.orNull ?: return
         val parser = markdownFeatures.createParser()
         val markdownEntries = buildList {
@@ -105,13 +112,13 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
             }
         }
         processScope.markdownOutputs.forEach { outputFile ->
-            outputFile.generateInto(getGenResDir().get().asFile.resolve(markdownPath.get()))
+            outputFile.generateInto(getGenResMarkdownDir().get().asFile)
         }
         processScope.kotlinOutputs.forEach { outputFile ->
             outputFile.generateInto(getGenSrcDir().get().asFile)
         }
-        processScope.resourceOutputs.forEach { outputFile ->
-            outputFile.generateInto(getGenResDir().get().asFile)
+        processScope.publicResourceOutputs.forEach { outputFile ->
+            outputFile.generateInto(getGenResPublicDir().get().asFile.resolve(publicPath.get()))
         }
     }
 }
