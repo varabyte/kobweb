@@ -12,7 +12,7 @@ value class AnimationIterationCount private constructor(private val count: Numbe
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
-sealed class Animation private constructor(private val value: String) : StylePropertyValue {
+sealed class Animation private constructor(private val value: String) : StylePropertyValue, CssStyleProperty<Animation>(value) {
     override fun toString(): String = value
 
     private class Keyword(value: String) : Animation(value)
@@ -64,12 +64,6 @@ sealed class Animation private constructor(private val value: String) : StylePro
 
         // Keyword
         val None: Animation get() = Keyword("none")
-
-        // Global Keywords
-        val Inherit: Animation get() = Keyword("inherit")
-        val Initial: Animation get() = Keyword("initial")
-        val Revert: Animation get() = Keyword("revert")
-        val Unset: Animation get() = Keyword("unset")
     }
 }
 
