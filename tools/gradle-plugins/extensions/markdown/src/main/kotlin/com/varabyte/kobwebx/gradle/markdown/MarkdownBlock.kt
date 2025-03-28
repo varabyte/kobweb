@@ -60,9 +60,6 @@ abstract class MarkdownBlock(
      *
      * This value will be checked when looking through resource directories for markdown files to convert to code.
      * For example, this will find files nested under `src/jsMain/resources/markdown`
-     *
-     * CAUTION: This should not be confused with [defaultRoot], which is the root composable used to wrap all markdown
-     * content.
      */
     abstract val markdownPath: Property<String>
 
