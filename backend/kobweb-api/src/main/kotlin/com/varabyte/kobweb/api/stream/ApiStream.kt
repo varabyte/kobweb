@@ -30,29 +30,42 @@ import com.varabyte.kobweb.api.log.Logger
  *    appropriate stream handlers.
  */
 abstract class ApiStream {
+    interface LimitedStreamContext {
+        val stream: LimitedStream
+        val clientId: StreamClientId
+        val env: Environment
+        val data: Data
+        val logger: Logger
+    }
+
+    interface StreamContext : LimitedStreamContext {
+        override val stream: Stream
+    }
+
     class ClientConnectedContext(
-        val stream: Stream,
-        val clientId: StreamClientId,
-        val env: Environment,
-        val data: Data,
-        val logger: Logger
-    )
+        override val stream: Stream,
+        override val clientId: StreamClientId,
+        override val env: Environment,
+        override val data: Data,
+        override val logger: Logger
+    ) : StreamContext
+
     class TextReceivedContext(
-        val stream: Stream,
-        val clientId: StreamClientId,
+        override val stream: Stream,
+        override val clientId: StreamClientId,
         val text: String,
-        val env: Environment,
-        val data: Data,
-        val logger: Logger
-    )
+        override val env: Environment,
+        override val data: Data,
+        override val logger: Logger
+    ) : StreamContext
 
     class ClientDisconnectedContext(
-        val stream: LimitedStream,
-        val clientId: StreamClientId,
-        val env: Environment,
-        val data: Data,
-        val logger: Logger
-    )
+        override val stream: LimitedStream,
+        override val clientId: StreamClientId,
+        override val env: Environment,
+        override val data: Data,
+        override val logger: Logger
+    ) : LimitedStreamContext
 
     open suspend fun onClientConnected(ctx: ClientConnectedContext) = Unit
     abstract suspend fun onTextReceived(ctx: TextReceivedContext)
