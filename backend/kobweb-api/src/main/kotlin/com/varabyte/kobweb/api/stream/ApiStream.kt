@@ -47,7 +47,7 @@ abstract class ApiStream {
     )
 
     class ClientDisconnectedContext(
-        val stream: DisconnectedStream,
+        val stream: LimitedStream,
         val clientId: StreamClientId,
         val env: Environment,
         val data: Data,

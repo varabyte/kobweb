@@ -3,7 +3,7 @@ package com.varabyte.kobweb.api.stream
 import java.util.concurrent.atomic.AtomicInteger
 
 // Some functionality is still available even after a stream has been disconnected
-interface DisconnectedStream {
+interface LimitedStream {
     /**
      * Send a text message to all clients connected on this stream.
      *
@@ -13,7 +13,7 @@ interface DisconnectedStream {
     suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean = { true })
 }
 
-interface Stream : DisconnectedStream {
+interface Stream : LimitedStream {
     /**
      * Reply with a text message back to the client.
      *
@@ -32,9 +32,28 @@ interface Stream : DisconnectedStream {
 /**
  * Convenience method to send a message to all clients with matching IDs.
  */
-suspend fun DisconnectedStream.sendTo(text: String, clientIds: Iterable<StreamClientId>) {
+suspend fun LimitedStream.sendTo(text: String, clientIds: Iterable<StreamClientId>) {
     val idSet = clientIds.toSet()
     broadcast(text) { it in idSet }
+}
+
+suspend fun LimitedStream.sendTo(text: String, clientId: StreamClientId) {
+    sendTo(text, listOf(clientId))
+}
+
+/**
+ * Convenience method to send a message to all clients that don't match any of the passed in IDs.
+ */
+suspend fun LimitedStream.broadcastExcluding(text: String, clientIds: Iterable<StreamClientId>) {
+    val idSet = clientIds.toSet()
+    broadcast(text) { it !in idSet }
+}
+
+/**
+ * Convenience method to send a message to all clients that don't match any of the passed in IDs.
+ */
+suspend fun LimitedStream.broadcastExcluding(text: String, clientId: StreamClientId) {
+    broadcastExcluding(text, listOf(clientId))
 }
 
 /**
@@ -71,5 +90,5 @@ value class StreamClientId private constructor(val id: Short) {
 sealed class StreamEvent(val clientId: StreamClientId) {
     class ClientConnected(val stream: Stream, clientId: StreamClientId) : StreamEvent(clientId)
     class Text(val stream: Stream, clientId: StreamClientId, val text: String) : StreamEvent(clientId)
-    class ClientDisconnected(val stream: DisconnectedStream, clientId: StreamClientId) : StreamEvent(clientId)
+    class ClientDisconnected(val stream: LimitedStream, clientId: StreamClientId) : StreamEvent(clientId)
 }
