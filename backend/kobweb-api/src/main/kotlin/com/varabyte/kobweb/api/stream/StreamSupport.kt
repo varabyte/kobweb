@@ -4,13 +4,15 @@ import java.util.concurrent.atomic.AtomicInteger
 
 // Some functionality is still available even after a stream has been disconnected
 interface LimitedStream {
+    val id: StreamId
+
     /**
      * Send a text message to all clients connected on this stream.
      *
      * @param filter An optional filter which, if specified, limits the set of clients who will receive the message.
      *   The filter should return true to indicate that the client with the target ID should receive the message.
      */
-    suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean = { true })
+    suspend fun broadcast(text: String, filter: (StreamId) -> Boolean = { true })
 }
 
 interface Stream : LimitedStream {
@@ -32,49 +34,68 @@ interface Stream : LimitedStream {
 /**
  * Convenience method to send a message to all clients with matching IDs.
  */
-suspend fun LimitedStream.sendTo(text: String, clientIds: Iterable<StreamClientId>) {
-    val idSet = clientIds.toSet()
+suspend fun LimitedStream.sendTo(text: String, streamIds: Iterable<StreamId>) {
+    val idSet = streamIds.toSet()
     broadcast(text) { it in idSet }
 }
 
-suspend fun LimitedStream.sendTo(text: String, clientId: StreamClientId) {
-    sendTo(text, listOf(clientId))
+suspend fun LimitedStream.sendTo(text: String, streamId: StreamId) {
+    sendTo(text, listOf(streamId))
 }
 
 /**
  * Convenience method to send a message to all clients that don't match any of the passed in IDs.
  */
-suspend fun LimitedStream.broadcastExcluding(text: String, clientIds: Iterable<StreamClientId>) {
-    val idSet = clientIds.toSet()
+suspend fun LimitedStream.broadcastExcluding(text: String, streamIds: Iterable<StreamId>) {
+    val idSet = streamIds.toSet()
     broadcast(text) { it !in idSet }
 }
 
 /**
  * Convenience method to send a message to all clients that don't match any of the passed in IDs.
  */
-suspend fun LimitedStream.broadcastExcluding(text: String, clientId: StreamClientId) {
-    broadcastExcluding(text, listOf(clientId))
+suspend fun LimitedStream.broadcastExcluding(text: String, streamId: StreamId) {
+    broadcastExcluding(text, listOf(streamId))
 }
 
 /**
- * Represents the ID of the user who is connected to this stream.
+ * Represents a unique ID for a stream.
  *
- * For clarity, note that you might have multiple active streams flowing at the same time. This class does NOT represent
- * them! Instead, it represents the user sending data to the stream. A single user might be concurrently sending data
- * across multiple streams (and will have the same ID in each case), and also multiple different users might be sending
- * data to the same stream.
+ * This is commonly used when indicating which other streams should receive (or NOT receive) a broadcast message:
+ * ```
+ * // Exclude from self:
+ * ctx.stream.broadcastExcluding("Hello, everyone else!", ctx.stream.id)
+ * ```
+ *
+ * As this class is simple, immutable data, it is totally safe to store a copy of it after receiving some event, e.g.
+ * if you receive a `ClientConnected` event, without worrying about major memory leaks. Just be sure to remove it when
+ * you receive a `ClientDisconnected` event that contains that stream ID.
+ *
+ * In most cases, a user will only ever create a single client stream per API stream endpoint they want to connect to.
+ * However, a user could technically create multiple streams that attach to the same endpoint, and each one will get its
+ * own unique stream ID.
+ *
+ * NOTE: A stream's ID is a combination of its [clientId] and its [localStreamId], which are both exposed as well.
+ *
+ * @property clientId A value which uniquely identifies the client that connected this stream. In most cases, users will
+ *   only create one stream per endpoint, but in the case a user does create multiple streams, the client ID will be the
+ *   same across all of them.
+ *
+ * @property localStreamId A value which uniquely identifies a stream **for a client** (but not globally across all
+ *    clients). In other words, multiple different `StreamId` instances may share the same `localStreamId` but they will
+ *    represent different streams if associated with different `clientId` values.
  */
-@JvmInline
-value class StreamClientId private constructor(val id: Short) {
-    companion object {
-        private val nextId = AtomicInteger(0)
-
-        // A machine only can allow up to 65K concurrent connections, so even in that extreme case, using a short and
-        // wrapping around is fine to guarantee uniqueness.
-        fun next() = StreamClientId((nextId.getAndIncrement() % Short.MAX_VALUE).toShort())
+class StreamId(val clientId: Short, val localStreamId: Short) {
+    /**
+     * A value uniquely identifying this stream globally across all connected clients and all of their streams.
+     */
+    val value = (clientId.toInt() shl 16).or(localStreamId.toInt())
+    override fun equals(other: Any?): Boolean {
+        if (other !is StreamId) return false
+        return this.value == other.value
     }
-
-    override fun toString() = id.toString()
+    override fun hashCode() = value.hashCode()
+    override fun toString() = value.toString()
 }
 
 /**
@@ -83,12 +104,14 @@ value class StreamClientId private constructor(val id: Short) {
  * A stream is a collection of many events, most which usually are text events sent from the client.
  *
  * Each event contains additional properties allowing the handler to respond to it.
- *
- * @property clientId The ID of the streamer (that is, user) associated with this stream. This is NOT an ID of the
- *   stream itself, in other words.
  */
-sealed class StreamEvent(val clientId: StreamClientId) {
-    class ClientConnected(val stream: Stream, clientId: StreamClientId) : StreamEvent(clientId)
-    class Text(val stream: Stream, clientId: StreamClientId, val text: String) : StreamEvent(clientId)
-    class ClientDisconnected(val stream: LimitedStream, clientId: StreamClientId) : StreamEvent(clientId)
+sealed class StreamEvent(val streamId: StreamId) {
+    @Deprecated("This property has been renamed to `streamId` as we can now distinguish between multiple streams from the same client.",
+        ReplaceWith("streamId")
+    )
+    val clientId get() = streamId
+
+    class ClientConnected(val stream: Stream, streamId: StreamId) : StreamEvent(streamId)
+    class Text(val stream: Stream, streamId: StreamId, val text: String) : StreamEvent(streamId)
+    class ClientDisconnected(val stream: LimitedStream, streamId: StreamId) : StreamEvent(streamId)
 }

@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.streams.StreamMessage.Payload
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.WebSocket
@@ -119,6 +118,8 @@ class ApiStream(override val route: String) : ImmutableApiStream {
         private var _channel: WebSocketChannel? = null
         private var activeStreamCount = 0
 
+        private var nextStreamId: Int = 0
+
         private fun connectChannel(): WebSocketChannel {
             if (activeStreamCount == 0) {
                 _channel = WebSocketChannel()
@@ -135,8 +136,12 @@ class ApiStream(override val route: String) : ImmutableApiStream {
                 _channel = null
             }
         }
+
+        private fun nextId(): Short = nextStreamId.toShort()
+            .also { nextStreamId = (nextStreamId + 1) % Short.MAX_VALUE }
     }
 
+    private val id = nextId()
     private var channel: WebSocketChannel? = null
     private val isClosed = CompletableDeferred<Unit>()
 
@@ -152,12 +157,12 @@ class ApiStream(override val route: String) : ImmutableApiStream {
         val listener = object : WebSocketChannel.Listener {
             override fun onOpen() {
                 this@ApiStream.channel = channel
-                channel.send(StreamMessage.clientConnect(route))
+                channel.send(StreamMessage.clientConnect(id, route))
                 streamListener.onConnected(ApiStreamListener.ConnectedContext(this@ApiStream))
                 // Should be rare, but user can technically call `disconnect` in the `onConnected` handler
                 if (isConnected) {
                     enqueuedMessages.forEach { message ->
-                        channel.send(StreamMessage.text(route, message))
+                        channel.send(StreamMessage.text(id, message))
                     }
                 }
                 enqueuedMessages.clear()
@@ -168,9 +173,10 @@ class ApiStream(override val route: String) : ImmutableApiStream {
             }
 
             override fun onMessage(message: StreamMessage<Payload.Server>) {
-                // We have one websocket that can traffic multiple streams. If we're connected for multiple streams,
-                // we'll get messages for all of them. Only respond to the client stream we are associated with.
-                if (message.route != route) return
+                // Every Kobweb server only has one websocket that traffics multiple streams. If we've connected
+                // multiple streams from this client, all ApiStream instances will receive all of them. Only respond to
+                // the ones that target this stream specifically.
+                if (message.localStreamId != id) return
 
                 when (val payload = message.payload) {
                     is Payload.Text -> streamListener.onTextReceived(
@@ -182,7 +188,7 @@ class ApiStream(override val route: String) : ImmutableApiStream {
 
                     is Payload.Server.Error -> {
                         console.error(buildString {
-                            append("API stream endpoint (\"${message.route}\") threw an exception")
+                            append("API stream endpoint (\"$route\") threw an exception")
                             if (payload.callstack != null) {
                                 append(":\n${payload.callstack}")
                             }
@@ -199,7 +205,7 @@ class ApiStream(override val route: String) : ImmutableApiStream {
             // Might end up here without `isClosed` getting set explicitly if the user cancelled the coroutine, e.g. by
             // navigating away from the page.
             isClosed.complete(Unit)
-            channel.send(StreamMessage.clientDisconnect(route))
+            channel.send(StreamMessage.clientDisconnect(id))
             channel.removeListener(listener)
             disconnectChannel()
             streamListener.onDisconnected(ApiStreamListener.DisconnectedContext(this))
@@ -249,7 +255,7 @@ class ApiStream(override val route: String) : ImmutableApiStream {
                 IfSentBeforeConnectedStrategy.SKIP -> {}
             }
         } else {
-            channel.send(StreamMessage.text(route, text))
+            channel.send(StreamMessage.text(id, text))
         }
     }
 

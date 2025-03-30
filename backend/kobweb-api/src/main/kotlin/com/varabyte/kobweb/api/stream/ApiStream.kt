@@ -32,10 +32,14 @@ import com.varabyte.kobweb.api.log.Logger
 abstract class ApiStream {
     interface LimitedStreamContext {
         val stream: LimitedStream
-        val clientId: StreamClientId
         val env: Environment
         val data: Data
         val logger: Logger
+
+        @Deprecated("Moving forward you should use `stream.id` instead as we can now distinguish between multiple streams from the same client.",
+            ReplaceWith("stream.id"),
+        )
+        val clientId: StreamId get() = stream.id
     }
 
     interface StreamContext : LimitedStreamContext {
@@ -44,7 +48,6 @@ abstract class ApiStream {
 
     class ClientConnectedContext(
         override val stream: Stream,
-        override val clientId: StreamClientId,
         override val env: Environment,
         override val data: Data,
         override val logger: Logger
@@ -52,7 +55,6 @@ abstract class ApiStream {
 
     class TextReceivedContext(
         override val stream: Stream,
-        override val clientId: StreamClientId,
         val text: String,
         override val env: Environment,
         override val data: Data,
@@ -61,7 +63,6 @@ abstract class ApiStream {
 
     class ClientDisconnectedContext(
         override val stream: LimitedStream,
-        override val clientId: StreamClientId,
         override val env: Environment,
         override val data: Data,
         override val logger: Logger
