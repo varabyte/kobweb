@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.api.stream
 
-import java.util.concurrent.atomic.AtomicInteger
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 // Some functionality is still available even after a stream has been disconnected
 interface LimitedStream {
@@ -75,7 +76,8 @@ suspend fun LimitedStream.broadcastExcluding(text: String, streamId: StreamId) {
  * However, a user could technically create multiple streams that attach to the same endpoint, and each one will get its
  * own unique stream ID.
  *
- * NOTE: A stream's ID is a combination of its [clientId] and its [localStreamId], which are both exposed as well.
+ * NOTE: A stream's ID is a hashed combination of its [clientId] and its [localStreamId], which are both exposed as
+ * well.
  *
  * @property clientId A value which uniquely identifies the client that connected this stream. In most cases, users will
  *   only create one stream per endpoint, but in the case a user does create multiple streams, the client ID will be the
@@ -86,16 +88,52 @@ suspend fun LimitedStream.broadcastExcluding(text: String, streamId: StreamId) {
  *    represent different streams if associated with different `clientId` values.
  */
 class StreamId(val clientId: Short, val localStreamId: Short) {
+    companion object {
+        // Define some random constants for mixing.
+        private val C1 = 0xdeadbeef.toInt()
+        private val C2 = 0xabcdef01.toInt()
+        // Odd values used for multiplication, taken from murmurhash3
+        // See also: https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
+        private val M1 = 0xcc9e2d51.toInt()
+        private val M2 = 0x1b873593.toInt()
+        // Random additive constants
+        private val A1 = Random.nextInt()
+        private val A2 = 0xe6546b64.toInt() // taken from murmurhash3
+        // Rotation amounts, taken from murmurhash3
+        private val R1 = 15
+        private val R2 = 13
+
+        // Obfuscate the incoming value, not because we care that much from a security standpoint, but to emphasize to
+        // users that the ID is not meant to be human-readable or predictable.
+        // The approach we use here should be fairly fast, results in splitting neighboring input numbers up, and
+        // most important no two input numbers should produce the same output number.
+        private fun Int.obfuscate(): Int {
+            var x = this
+
+            x += A1
+            x = x xor C1
+            x *= M1
+            x = x.rotateLeft(R1)
+
+            x += A2
+            x = x xor C2
+            x *= M2
+            x = x.rotateLeft(R2)
+
+            return x
+        }
+    }
+
     /**
      * A value uniquely identifying this stream globally across all connected clients and all of their streams.
      */
-    val value = (clientId.toInt() shl 16).or(localStreamId.toInt())
+    val value = ((clientId.toInt() shl 16).or(localStreamId.toInt())).obfuscate()
     override fun equals(other: Any?): Boolean {
         if (other !is StreamId) return false
         return this.value == other.value
     }
     override fun hashCode() = value.hashCode()
-    override fun toString() = value.toString()
+    override fun toString() = String.format("%08X", value) // Convert ID to hex format, looks more ID like
 }
 
 /**
