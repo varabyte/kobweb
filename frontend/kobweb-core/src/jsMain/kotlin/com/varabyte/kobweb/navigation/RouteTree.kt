@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.PageContext
 
 internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageContent: @Composable (errorCode: Int) -> Unit): PageData {
-    val errorPageMethod = @Composable { errorPageContent(404) }
+    val errorPageMethod: @Composable (PageContext) -> Unit = { errorPageContent(404) }
     val self = this
     val resolved = self.resolve(route.path, allowRedirects = true)
         ?: route.path

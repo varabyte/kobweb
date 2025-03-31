@@ -50,7 +50,11 @@ fun processPagesFun(
                 supportEmptyDynamicSegments = true,
             ).let { if (it.endsWith("/index")) it.removeSuffix("index") else it }
 
-            return PageEntry(annotatedFun.qualifiedName!!.asString(), route)
+            return PageEntry(
+                annotatedFun.qualifiedName!!.asString(),
+                route,
+                acceptsContext = annotatedFun.parameters.size == 1
+            )
         } else {
             logger.warn(
                 "Skipped over `@$pageSimpleName fun ${funName}`. Route override is invalid.",
