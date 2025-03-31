@@ -672,7 +672,9 @@ fun CssStyle<GeneralKind>.extendedByBase(
 
 @Suppress("FunctionName") // Inline so it can be called from @Composable methods
 @Composable
-private fun CssStyle<*>._toModifier(): Modifier = SilkTheme.cssStyles.getValue(this).toModifier()
+private fun CssStyle<*>._toModifier(): Modifier = SilkTheme.cssStyles[this]?.toModifier()
+    ?: error("Failed to convert a CssStyle to a modifier. Double check that the style was declared at the top-level of your file or registered manually via an `@InitSilk` method.")
+
 
 @Composable
 fun CssStyle<GeneralKind>.toModifier(): Modifier = _toModifier()

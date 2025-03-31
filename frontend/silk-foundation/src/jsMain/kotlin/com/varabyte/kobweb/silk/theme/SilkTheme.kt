@@ -525,7 +525,7 @@ val CssStyle<*>.name: String
         }
 
         return _SilkTheme!!.nameFor(this)
-            ?: error("Name requested for invalid CssStyle. This should only be called on top-level public styles or styles that got manually registered")
+            ?: error("Name requested for invalid CssStyle. This should only be called on top-level public styles or styles that got manually registered via `@InitSilk` methods.")
     }
 
 /**
@@ -560,7 +560,7 @@ val Keyframes.name: String
             error("Attempting to get the name for a Keyframes instance before Silk is initialized. If you are trying to create an animation as part of a top-level Modifier declaration, consider putting it inside a `lazy` block, or move it into a `CssStyle`.")
         }
         return _SilkTheme!!.nameFor(this)
-            ?: error("Name requested for invalid Keyframes. This should only be called on top-level public keyframes or keyframes that got manually registered")
+            ?: error("Name requested for invalid Keyframes. This should only be called on top-level public keyframes or keyframes that got manually registered via `@InitSIlk` methods.")
     }
 
 internal var _SilkTheme: ImmutableSilkTheme? = null
