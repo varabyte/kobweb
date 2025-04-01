@@ -143,13 +143,8 @@ class StreamId(val clientId: Short, val localStreamId: Short) {
  *
  * Each event contains additional properties allowing the handler to respond to it.
  */
-sealed class StreamEvent(val streamId: StreamId) {
-    @Deprecated("This property has been renamed to `streamId` as we can now distinguish between multiple streams from the same client.",
-        ReplaceWith("streamId")
-    )
-    val clientId get() = streamId
-
-    class ClientConnected(val stream: Stream, streamId: StreamId) : StreamEvent(streamId)
-    class Text(val stream: Stream, streamId: StreamId, val text: String) : StreamEvent(streamId)
-    class ClientDisconnected(val stream: LimitedStream, streamId: StreamId) : StreamEvent(streamId)
+sealed interface StreamEvent {
+    class ClientConnected(val stream: Stream) : StreamEvent
+    class Text(val stream: Stream, val text: String) : StreamEvent
+    class ClientDisconnected(val stream: LimitedStream) : StreamEvent
 }

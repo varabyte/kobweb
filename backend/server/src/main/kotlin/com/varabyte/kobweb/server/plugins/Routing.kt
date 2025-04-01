@@ -237,7 +237,7 @@ private class StreamImpl(
     override suspend fun disconnect() {
         val sessionData = sessions.getValue(session)
         val route = sessionData.streamEntries.remove(id)!!.route
-        apiJar.apis.handle(route, StreamEvent.ClientDisconnected(this, id))
+        apiJar.apis.handle(route, StreamEvent.ClientDisconnected(this))
         if (sessionData.streamEntries.isEmpty()) {
             session.close()
         }
@@ -288,7 +288,7 @@ private fun Routing.setupStreaming(
                                 }
                                 apiJar.apis.handle(
                                     payload.route,
-                                    StreamEvent.ClientConnected(streamImpl, streamId)
+                                    StreamEvent.ClientConnected(streamImpl)
                                 )
                             }
 
@@ -297,7 +297,7 @@ private fun Routing.setupStreaming(
                                 val route = sessions.getValue(session).streamEntries.getValue(streamId).route
                                 apiJar.apis.handle(
                                     route,
-                                    StreamEvent.Text(streamImpl, StreamId(clientId, incomingMessage.localStreamId), payload.text)
+                                    StreamEvent.Text(streamImpl, payload.text)
                                 )
                             }
                         }
@@ -343,7 +343,7 @@ private fun Routing.setupStreaming(
             sessions.remove(session)?.let { sessionData ->
                 sessionData.streamEntries.forEach { (streamId, streamData) ->
                     val streamImpl = StreamImpl(sessions, session, apiJar, streamId)
-                    apiJar.apis.handle(streamData.route, StreamEvent.ClientDisconnected(streamImpl, streamImpl.id))
+                    apiJar.apis.handle(streamData.route, StreamEvent.ClientDisconnected(streamImpl))
                 }
             }
         }
