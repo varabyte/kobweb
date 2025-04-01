@@ -60,8 +60,8 @@ abstract class AppBlock @Inject constructor(
          * - `<script src="...">`
          * - `@import url("...")`
          *
-         * NOTE: Self-hosting is the most likely reason you'll want to intercept URLs, so see [SelfHostingBlock] for
-         * more information about that.
+         * NOTE: Self-hosting is the most likely reason you'll want to intercept URLs, so see [selfHosting] for
+         * more information about how to do that.
          */
         abstract class InterceptUrlsBlock @Inject constructor() : ExtensionAware {
             internal class SelfHostingConfig(
