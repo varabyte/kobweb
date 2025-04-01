@@ -95,7 +95,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
 
     private fun getGenPublicRoot() = getGenResDir().get().asFile.resolve(publicPath.get())
 
-    private fun makeLocalCopyOfUrl(url: String): String {
+    private fun makeLocalCopyOfUrl(url: String, basePath: BasePath): String {
         fun File.resolveWithMkdirs(name: String): File {
             return resolve(name).also { it.parentFile.mkdirs() }
         }
@@ -145,7 +145,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                                 // Bad:  `/url/base` + './nested/value` -> "/url/base/./nested/value`
                                 urlBase + "/" + urlValue.removePrefix("./") + if (paramsIndex >= 0) url.substring(paramsIndex) else ""
                             }
-                        }?.let { makeLocalCopyOfUrl(it) }
+                        }?.let { makeLocalCopyOfUrl(it, basePath) }
 
                         if (finalUrl != null) {
                             indexOf(urlValue, fromIndex).takeIf { it >= 0 }?.let { i ->
@@ -163,7 +163,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             })
         }
 
-        return "/$selfHostPrefix/$urlAsPath"
+        return basePath.prependTo("/$selfHostPrefix/$urlAsPath")
     }
 
     private class ApplyUrlInterceptorsResult(
@@ -171,7 +171,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
         val changedUrls: Map<String, String?> = emptyMap()
     )
 
-    private fun List<String>.applyUrlInterceptors(): ApplyUrlInterceptorsResult {
+    private fun List<String>.applyUrlInterceptors(basePath: BasePath): ApplyUrlInterceptorsResult {
         val rejects = interceptUrls.rejects.get()
         val replacements = interceptUrls.replacements.get()
         val selfHosting = interceptUrls.selfHosting.get()
@@ -205,7 +205,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
                 selfHosting.enabled && !selfHosting.excludes.contains(url) &&
                 replacements.values.none { it == url }
             ) {
-                finalUrl = makeLocalCopyOfUrl(url)
+                finalUrl = makeLocalCopyOfUrl(url, basePath)
             }
 
             @Suppress("NAME_SHADOWING")
@@ -340,7 +340,7 @@ abstract class KobwebGenerateSiteIndexTask @Inject constructor(
             createIndexFile(
                 confInputs.title,
                 indexBlock.lang.get(),
-                headElements.applyUrlInterceptors().also { result ->
+                headElements.applyUrlInterceptors(basePath).also { result ->
                     logger.lifecycle("Final <head> elements:")
                     logger.lifecycle("```")
                     result.elements.forEach { logger.lifecycle("  ${it.replace("\n", "")}") }
