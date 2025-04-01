@@ -49,7 +49,7 @@ interface BasePath {
 
 /** Conditionally prepend the base path only if the passed in condition is true. */
 fun BasePath.Companion.prependIf(condition: Boolean, path: String): String {
-    return if (condition) prepend(path) else path
+    return if (condition) prependTo(path) else path
 }
 
 /** Remove the base path from some target *absolute* path (relative paths will be returned as is). */
