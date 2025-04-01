@@ -258,7 +258,7 @@ class Router {
     fun register(route: String, pageMethod: PageMethod) {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(
-            routeTree.register(BasePath.prepend(route), pageMethod)
+            routeTree.register(BasePath.prependTo(route), pageMethod)
         ) { "Registration failure. Path is already registered: $route" }
     }
 
@@ -367,7 +367,7 @@ class Router {
         if (pathQueryAndFragment.contains("://")) return false
 
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        var pathQueryAndFragment = BasePath.prepend(pathQueryAndFragment)
+        var pathQueryAndFragment = BasePath.prependTo(pathQueryAndFragment)
         if (Route.isRoute(pathQueryAndFragment)) {
             pathQueryAndFragment = pathQueryAndFragment.normalize()
 

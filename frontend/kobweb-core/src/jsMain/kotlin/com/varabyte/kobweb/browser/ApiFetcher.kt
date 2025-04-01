@@ -28,7 +28,7 @@ class ApiFetcher(private val window: Window) {
     var logOnError: Boolean by window.http::logOnError
 
     private fun toResource(apiPath: String): String {
-        return BasePath.prepend("/api/${apiPath.trimStart('/')}")
+        return BasePath.prependTo("/api/${apiPath.trimStart('/')}")
     }
 
     /**
