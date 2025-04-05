@@ -4,6 +4,7 @@ import com.varabyte.kobweb.silk.style.ColorModeStrategy.BOTH
 import com.varabyte.kobweb.silk.style.ColorModeStrategy.Companion.current
 import com.varabyte.kobweb.silk.style.ColorModeStrategy.SCOPE
 import com.varabyte.kobweb.silk.style.ColorModeStrategy.SUFFIX
+import com.varabyte.kobweb.silk.style.layer.SilkLayer
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.cssClass
 import kotlinx.browser.window
@@ -93,9 +94,17 @@ val ColorModeStrategy.useSuffix get() = this != SCOPE
  * compatibility layers contain suffixed styles that also exist as `@scope`-based styles, meaning all styles in these
  * layers can be ignored if the browser supports `@scope`.
  */
-internal fun ColorModeStrategy.getLayersWithCompat(layers: Set<String>): List<String> = when (this) {
-    SCOPE, SUFFIX -> layers.toList()
-    BOTH -> layers.flatMap { listOfNotNull(suffixedStyleLayer(it), it) }
+internal fun ColorModeStrategy.getExpandedLayers(layers: Set<String>): List<String> {
+    val (baseLayers, styleLayers) = layers.partition { layerName ->
+        val layerIndex = SilkLayer.entries.single { it.layerName == layerName }.ordinal
+        layerIndex < SilkLayer.COMPONENT_STYLES.ordinal
+    }
+
+    return baseLayers + when (this) {
+        SUFFIX -> styleLayers.toList()
+        SCOPE -> styleLayers.mapNotNull { suffixedBaseLayer(it) }.toList() + styleLayers
+        BOTH -> styleLayers.flatMap { listOfNotNull(suffixedCompatLayer(it), it) }.toList()
+    }
 }
 
 /**
@@ -104,7 +113,12 @@ internal fun ColorModeStrategy.getLayersWithCompat(layers: Set<String>): List<St
  * For [SCOPE] and [SUFFIX] mode, this is simply the original layer name, but in [BOTH] mode, these styles should be
  * registered into a separate layer.
  */
-internal fun ColorModeStrategy.suffixedStyleLayer(layer: String?) = when (this) {
+internal fun ColorModeStrategy.suffixedCompatLayer(layer: String?) = when (this) {
     SCOPE, SUFFIX -> layer
     BOTH -> layer?.let { "$it-compat" }
+}
+
+internal fun ColorModeStrategy.suffixedBaseLayer(layer: String?) = when (this) {
+    SUFFIX -> layer
+    BOTH, SCOPE -> layer?.let { "$it-base" }
 }

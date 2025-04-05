@@ -6,7 +6,7 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.silk.SilkStyleSheet
 import com.varabyte.kobweb.silk.components.text.SpanTextStyle
 import com.varabyte.kobweb.silk.style.ColorModeStrategy
-import com.varabyte.kobweb.silk.style.getLayersWithCompat
+import com.varabyte.kobweb.silk.style.getExpandedLayers
 import com.varabyte.kobweb.silk.theme.ImmutableSilkTheme
 import com.varabyte.kobweb.silk.theme.MutableSilkTheme
 import com.varabyte.kobweb.silk.theme.SilkTheme
@@ -69,9 +69,9 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     SilkStylesheetInstance.registerStylesAndKeyframesInto(SilkStyleSheet)
     SilkTheme.registerStylesInto(SilkStyleSheet)
 
-    val (finalCssLayers, compatCssLayers) = run {
+    val (finalCssLayers, expandedCssLayers) = run {
         val registeredCssLayers = SilkStylesheetInstance.cssLayers.build().toSet()
-        val finalCssLayers = ColorModeStrategy.current.getLayersWithCompat(registeredCssLayers)
+        val finalCssLayers = ColorModeStrategy.current.getExpandedLayers(registeredCssLayers)
         finalCssLayers to finalCssLayers.minus(registeredCssLayers)
     }
 
@@ -82,12 +82,13 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
     // change the color mode by toggling a class on the root element, which would not work if the suffixed styles of the
     // original color mode are still being applied.
     run {
-        if (compatCssLayers.isEmpty()) return@run
-        // compat layers are only generated in `BOTH` mode
-        check(ColorModeStrategy.current == ColorModeStrategy.BOTH)
+        if (ColorModeStrategy.current != ColorModeStrategy.BOTH) return@run
+        if (expandedCssLayers.isEmpty()) return@run
+        // compat layers are added by `BOTH` mode
+        check(expandedCssLayers.isNotEmpty())
 
         SilkStyleSheet.scope("*") {
-            compatCssLayers.forEach { layer ->
+            expandedCssLayers.forEach { layer ->
                 layer(layer) {
                     ":scope" style {
                         property("all", "revert-layer")
