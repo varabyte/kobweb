@@ -19,7 +19,9 @@ import org.w3c.dom.HTMLElement
 fun ColorModeAware(element: HTMLElement = document.documentElement.unsafeCast<HTMLElement>()) {
     val colorMode = ColorMode.current
     DisposableEffect(colorMode) {
-        element.addClass(colorMode.cssClass)
+        // Use this and not `addClass` because after an export, the opposite color mode might be set on some
+        // elements (if that was the color mode at export time)
+        element.setStyleFor(colorMode)
         onDispose {
             element.removeClass(colorMode.cssClass)
         }
