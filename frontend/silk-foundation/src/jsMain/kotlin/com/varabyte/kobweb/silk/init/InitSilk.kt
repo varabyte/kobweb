@@ -15,6 +15,8 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.Document
 import org.w3c.dom.asList
+import org.w3c.dom.css.CSSGroupingRule
+import org.w3c.dom.css.CSSRule
 import org.w3c.dom.css.CSSStyleSheet
 
 /**
@@ -50,6 +52,116 @@ private val Document.localStyleSheets: List<CSSStyleSheet>
             // Trying to peek at external stylesheets causes a security exception so step over them
             .filter { it.href == null }
     }
+
+// NOTE: CSSScopeRule is not available on all browsers yet which is why we aren't exposing it yet; but we can move this
+// to `browser-ext` upon request or when it is baseline available.
+private sealed external class CSSScopeRule : CSSGroupingRule {
+    val start: String?
+    val end: String?
+}
+
+// CSSStyleSheet and CSSGroupingRule do not expose a common interface for their rules, so we work around that
+private interface CssRulesContainer {
+    val rules: List<CSSRule>
+
+    fun insertRule(rule: String, index: Int): Int
+    fun deleteRule(index: Int)
+
+    class StyleSheet(val styleSheet: CSSStyleSheet) : CssRulesContainer {
+        override val rules: List<CSSRule> = styleSheet.cssRules.asList()
+        override fun insertRule(rule: String, index: Int) = styleSheet.insertRule(rule, index)
+        override fun deleteRule(index: Int) = styleSheet.deleteRule(index)
+    }
+
+    class Group(val group: CSSGroupingRule) : CssRulesContainer {
+        override val rules: List<CSSRule> = group.cssRules.asList()
+        override fun insertRule(rule: String, index: Int) = group.insertRule(rule, index)
+        override fun deleteRule(index: Int) = group.deleteRule(index)
+    }
+}
+
+// Because we generate CSS features programmatically, we can generate extra verbose output quite easily, such as
+// multiple instances of the same kind of CSS blocks repeated over and over again. Although the site works fine with
+// this, we can end up generating significantly larger CSS files than necessary, so this optimization helps slim things
+// down.
+private inline fun <reified R : CSSGroupingRule> CssRulesContainer.mergeAdjacentGroupingRulesRecursively(
+    noinline shouldMerge: (R, R) -> Boolean,
+    noinline provideCssHeader: (R) -> String,
+) {
+    // Extract non-inline method for recursion purposes; general recursion methods + inline don't mix
+    fun recurse(container: CssRulesContainer) {
+        var baseRuleIndex = 0
+        while (baseRuleIndex < container.rules.lastIndex) {
+            val baseRule = container.rules[baseRuleIndex++]
+            when (baseRule) {
+                is R -> {
+                    var mergedRules: MutableList<CSSRule>? = null
+                    var nextRuleIndex = baseRuleIndex
+                    while (nextRuleIndex < container.rules.size) {
+                        val maybeMergeRule = container.rules[nextRuleIndex]
+                        if (maybeMergeRule !is R) break
+
+                        if (shouldMerge(baseRule, maybeMergeRule)) {
+                            if (mergedRules == null) {
+                                mergedRules = baseRule.cssRules.asList().toMutableList()
+                            }
+                            mergedRules.addAll(maybeMergeRule.cssRules.asList())
+                            container.deleteRule(nextRuleIndex)
+                        } else {
+                            break
+                        }
+                    }
+
+                    if (mergedRules != null) {
+                        val mergedCssText = buildString {
+                            append(provideCssHeader(baseRule))
+                            if (this[this.lastIndex] != ' ') append(' ')
+                            append("{ ")
+                            mergedRules.forEach { append(it.cssText) }
+                            append(" }")
+                        }
+                        container.deleteRule(baseRuleIndex - 1)
+                        container.insertRule(mergedCssText, baseRuleIndex - 1)
+                    }
+                }
+                is CSSGroupingRule -> {
+                    recurse(CssRulesContainer.Group(baseRule))
+                }
+                else -> continue
+            }
+        }
+    }
+
+    recurse(this)
+}
+
+private fun CssRulesContainer.mergeAdjacentScopeBlocksRecursively() {
+    this.mergeAdjacentGroupingRulesRecursively<CSSScopeRule>(
+        shouldMerge = { base, next -> base.start == next.start && base.end == next.end },
+        provideCssHeader = { baseRule->
+            buildString {
+                append("@scope ")
+                if (baseRule.start != null) {
+                    append("(${baseRule.start}) ")
+                }
+                if (baseRule.end != null) {
+                    append("to (${baseRule.end}) ")
+                }
+            }
+        }
+    )
+}
+
+private fun CssRulesContainer.mergeAdjacentLayerBlocksRecursively() {
+    this.mergeAdjacentGroupingRulesRecursively<CSSLayerBlockRule>(
+        shouldMerge = { base, next -> base.name == next.name },
+        provideCssHeader = { baseRule->
+            buildString {
+                append("@layer ${baseRule.name}")
+            }
+        }
+    )
+}
 
 
 fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
@@ -130,6 +242,15 @@ fun initSilk(additionalInit: (InitSilkContext) -> Unit = {}) {
 
         document.localStyleSheets.forEach { styleSheet ->
             styleSheet.insertRule("@layer ${finalCssLayers.joinToString()};", 0)
+        }
+
+        document.localStyleSheets.forEach { styleSheet ->
+            CssRulesContainer.StyleSheet(styleSheet).apply {
+                // Important: Merge scope blocks first because otherwise all layers are single children under parent
+                // blocks and therefore won't ever merge.
+                mergeAdjacentScopeBlocksRecursively()
+                mergeAdjacentLayerBlocksRecursively()
+            }
         }
     }
 }
