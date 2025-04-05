@@ -223,14 +223,15 @@ abstract class CssStyle<K : CssKind> internal constructor(
      * The receiver of the [handler] callback should be used to register the provided style with the given selector and
      * any other scopes, such as layers or media queries, if applicable.
      */
-    private fun withColorModeScope(
+    private fun StyleSheet.withColorModeScope(
         selector: String,
         group: StyleGroup,
-        baseStyleSheet: StyleSheet,
-        lightStyleSheet: StyleSheet,
-        darkStyleSheet: StyleSheet,
         handler: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.(String, ComparableStyleScope) -> Unit
     ) {
+        fun scope(colorMode: ColorMode, rulesBuild: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.() -> Unit) {
+            scope(".${colorMode.cssClass}", ".${colorMode.opposite.cssClass}", rulesBuild)
+        }
+
         // A selector like ".abc" inside an `@scope` rule is implicitly treated as ":scope .abc", which means that it
         // will match descendants of the scope with the "abc" class, but not the scope itself.
         // Thus, we add a selector of the form ":where(&).abc" to target the scope element if it has the "abc" class.
@@ -244,12 +245,28 @@ abstract class CssStyle<K : CssKind> internal constructor(
         // be color mode aware), so we can safely perform the string concatenation here.
         val inScopeSelector = ":where(&)$selector, $selector"
         when (group) {
-            is StyleGroup.Light -> lightStyleSheet.handler(inScopeSelector, group.styles)
-            is StyleGroup.Dark -> darkStyleSheet.handler(inScopeSelector, group.styles)
-            is StyleGroup.ColorAgnostic -> baseStyleSheet.handler(selector, group.styles)
+            is StyleGroup.Light -> scope(ColorMode.LIGHT) { handler(inScopeSelector, group.styles) }
+            is StyleGroup.Dark -> scope(ColorMode.DARK) { handler(inScopeSelector, group.styles) }
+            is StyleGroup.ColorAgnostic -> {
+                // Styles in a `@scope` block take precedence over styles not in a `@scope` block, so even agnostic
+                // styles need to be added to a `@scope` that always applies
+                // NOTE: this check avoids using `@scope` for `SilkStylesheet.registerStyle()` styles (e.g. styles you
+                // might register against an "html" or "body" element), but relies on an implementation detail (though
+                // one which we entirely control).
+                if (this@CssStyle !is SimpleCssStyle) {
+                    // We need to ensure that this block has equal precedence to the color mode specific blocks,
+                    // so we scope them to both color mode classes.
+                    scope(ColorMode.entries.joinToString(", ") { ".${it.cssClass}" }) {
+                        handler(inScopeSelector, group.styles)
+                    }
+                } else {
+                    handler(selector, group.styles)
+                }
+            }
+
             is StyleGroup.ColorAware -> {
-                lightStyleSheet.handler(inScopeSelector, group.lightStyles)
-                darkStyleSheet.handler(inScopeSelector, group.darkStyles)
+                scope(ColorMode.LIGHT) { handler(inScopeSelector, group.lightStyles) }
+                scope(ColorMode.DARK) { handler(inScopeSelector, group.darkStyles) }
             }
         }
     }
@@ -360,13 +377,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
         StyleGroup.from(lightModifiers[CssModifier.BaseKey]?.modifier, darkModifiers[CssModifier.BaseKey]?.modifier)
             ?.let { group ->
                 if (ColorModeStrategy.current.useScope) {
-                    withColorModeScope(
-                        selector = selector,
-                        group = group,
-                        baseStyleSheet = styleSheet,
-                        lightStyleSheet = lightStyleSheet,
-                        darkStyleSheet = darkStylesSheet,
-                    ) { selector, styles ->
+                    styleSheet.withColorModeScope(selector, group) { selector, styles ->
                         if (styles.isNotEmpty()) {
                             layerOrInPlace(layer) {
                                 addStyles(selector, styles)
@@ -391,13 +402,7 @@ abstract class CssStyle<K : CssKind> internal constructor(
             val group = StyleGroup.from(lightModifiers[cssRuleKey]?.modifier, darkModifiers[cssRuleKey]?.modifier)
                 ?: continue
             if (ColorModeStrategy.current.useScope) {
-                withColorModeScope(
-                    selector = "$selector${cssRuleKey.suffix.orEmpty()}",
-                    group = group,
-                    baseStyleSheet = styleSheet,
-                    lightStyleSheet = lightStyleSheet,
-                    darkStyleSheet = darkStylesSheet,
-                ) { selector, styles ->
+                styleSheet.withColorModeScope("$selector${cssRuleKey.suffix.orEmpty()}", group) { selector, styles ->
                     if (styles.isNotEmpty()) {
                         mediaOrInPlace(cssRuleKey.mediaQuery) {
                             layerOrInPlace(layer) {
