@@ -39,7 +39,7 @@ fun KotlinMultiplatformExtension.configAsKobwebWorker(
 
         val name = project.kobwebBlock.worker.name.get().removeSuffix(".js")
         binaries.executable()
-        this.moduleName = name
+        outputModuleName.set(name)
         browser {
             commonWebpackConfig {
                 outputFileName = name.suffixIfNot(".js")

@@ -18,12 +18,18 @@ fun getPackageMappings(
     return file.getAnnotationsByName(packageMappingFqn).mapNotNull { packageMappingAnnotation ->
         val currPackage = file.packageName.asString()
         if (currPackage.startsWith(qualifiedPackage)) {
-            val override = packageMappingAnnotation.arguments.first().value!!.let { value ->
-                // {} is a special value which means infer from the current package,
-                // e.g. "{}" under a.b.pkg resolves to "{pkg}"
-                if (value != "{}") value.toString() else "{${
-                    RouteUtils.packageSegmentToRouteSegment(currPackage.substringAfterLast('.'))
-                }}"
+            val override = packageMappingAnnotation.arguments.first().value!!.let {
+                val value = it.toString()
+                val dynamicRouteSegment = DynamicRouteSegment.tryCreate(value)
+                if (dynamicRouteSegment != null && dynamicRouteSegment.isInferred) {
+                    if (dynamicRouteSegment.isCatchAll) {
+                        error("Package mappings cannot be set to a catch-all dynamic route. In \"$currPackage\", got: \"$value\"")
+                    }
+                    // e.g. "{}" under a.b.pkg resolves to "{pkg}"
+                    dynamicRouteSegment.withReplacedName(
+                        RouteUtils.packageSegmentToRouteSegment(currPackage.substringAfterLast('.'))
+                    ).rawValue
+                } else value
             }
             currPackage to override
         } else {

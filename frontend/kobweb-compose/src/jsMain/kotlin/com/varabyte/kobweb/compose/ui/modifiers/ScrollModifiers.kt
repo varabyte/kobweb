@@ -150,3 +150,7 @@ fun Modifier.scrollMarginBlock(both: CSSLengthNumericValue) = styleModifier {
 fun Modifier.scrollMarginBlock(start: CSSLengthNumericValue = 0.px, end: CSSLengthNumericValue = 0.px) = styleModifier {
     scrollMarginBlock(start, end)
 }
+
+fun Modifier.scrollbarWidth(scrollbarWidth: ScrollbarWidth) = styleModifier {
+    scrollbarWidth(scrollbarWidth)
+}

@@ -4,5 +4,5 @@ root: .components.layouts.PageLayout("DOCUMENTS")
 
 Links to some documents:
 
-* [../KotlinLanguage.md](../KotlinLanguage.md)
+* [../jetbrains/KotlinLanguage.md](../jetbrains/KotlinLanguage.md)
 * [Bananas.md](Bananas.md)

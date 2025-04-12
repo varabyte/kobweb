@@ -19,6 +19,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
@@ -58,47 +60,15 @@ abstract class AppBlock @Inject constructor(
          * - `<script src="...">`
          * - `@import url("...")`
          *
-         * NOTE: Self-hosting is the most likely reason you'll want to intercept URLs, so see [SelfHostingBlock] for
-         * more information about that.
+         * NOTE: Self-hosting is the most likely reason you'll want to intercept URLs, so see [selfHosting] for
+         * more information about how to do that.
          */
         abstract class InterceptUrlsBlock @Inject constructor() : ExtensionAware {
-            /**
-             * Configuration for converting external resources into self-hosted files.
-             *
-             * The internet is full of CDNs and other external resources that can be useful to include in your site.
-             * Though convenient, there are complex realities that come with using them, including GDPR compliance and
-             * concerns about availability.
-             *
-             * Kobweb provides a way to automatically try to convert these resources to self-hosted paths, so by
-             * request self-host conversions, the framework will attempt to download links that are found in your <head>
-             * block and replace them with links to those local copies.
-             *
-             * Using self-hosting can seem like a straight-up win, but note that you will be paying for the extra
-             * bandwidth for serving those files, which could add up. Fetching files from your site might also be
-             * slower for some users as the CDN is more likely to have more servers across the globe.
-             */
-            abstract class SelfHostingBlock @Inject constructor() : ExtensionAware {
-                /**
-                 * When `true`, opts-in to Kobweb attempting to automate self-hosting of external resources.
-                 *
-                 * Defaults to `false`.
-                 *
-                 * Users should call [InterceptUrlsBlock.enableSelfHosting] instead.
-                 */
-                @get:Input
-                internal abstract val enabled: Property<Boolean>
-
-                /**
-                 * A list of URLs which, if encountered, should be ignored by the self-hosting conversion logic.
-                 *
-                 * Users should call [InterceptUrlsBlock.enableSelfHosting] instead.
-                 */
-                @get:Input
-                internal abstract val excludes: ListProperty<String>
-
-                init {
-                    enabled.convention(false)
-                }
+            internal class SelfHostingConfig(
+                @get:Input val enabled: Boolean,
+                @get:Input val excludes: List<String>,
+            ) {
+                constructor() : this(false, emptyList())
             }
 
             /**
@@ -125,6 +95,9 @@ abstract class AppBlock @Inject constructor(
              */
             @get:Input
             internal abstract val rejects: SetProperty<String>
+
+            @get:Nested
+            internal abstract val selfHosting: Property<SelfHostingConfig>
 
             /**
              * Register a URL which, if referenced in a <head> block element, should be replaced with the given value.
@@ -159,19 +132,29 @@ abstract class AppBlock @Inject constructor(
             }
 
             /**
-             * A convenience method for enabling self-hosting of external resources.
+             * Enable a processing step at build that time converts external resources into self-hosted files.
              *
-             * See the docs on [SelfHostingBlock] for more information.
+             * The internet is full of CDNs and other external resources that can be useful to include in your site.
+             * Though convenient, there are complex realities that come with using them, including GDPR compliance and
+             * concerns about availability.
+             *
+             * Kobweb provides a way to automatically try to convert these resources to self-hosted paths, so by
+             * request self-host conversions, the framework will attempt to download links that are found in your <head>
+             * block and replace them with links to those local copies.
+             *
+             * Using self-hosting can seem like a straight-up win, but note that you will be paying for the extra
+             * bandwidth for serving those files, which could add up. Fetching files from your site might also be
+             * slower for some users as the CDN is more likely to have more servers across the globe.
+             *
+             * @param excludes A list of URLs which, if encountered, should be ignored by the self-hosting conversion
+             *   logic.
              */
             fun enableSelfHosting(excludes: Set<String> = emptySet()) {
-                val selfHosting = extensions.getByType<SelfHostingBlock>()
-                selfHosting.enabled.set(true)
-                selfHosting.excludes.addAll(excludes)
+                selfHosting.set(SelfHostingConfig(true, excludes.toList()))
             }
 
             init {
-                extensions.create<SelfHostingBlock>("selfHosting")
-
+                selfHosting.convention(SelfHostingConfig())
                 linkRels.convention(
                     setOf(
                         "stylesheet",
@@ -179,7 +162,6 @@ abstract class AppBlock @Inject constructor(
                         "preload",
                         "prefetch",
                     )
-
                 )
             }
         }
@@ -212,22 +194,34 @@ abstract class AppBlock @Inject constructor(
         }
 
         /**
-         * The default description to set in the meta tag.
+         * The default description for the site.
          *
-         * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), this value
-         * will not be used.
+         * This is a convenience property which, if set, causes a `<meta name="description" content="$description">`
+         * element to be added to the site's `<head>` block.
+         *
+         * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), any value
+         * set here will be ignored.
          */
         @get:Input
+        @get:Optional
         abstract val description: Property<String>
 
         /**
-         * The path to use for the favicon in the link tag.
+         * The path to use for the favicon for the site.
          *
-         * For example, "/favicon.ico" (which is the default value) will refer to the icon file located at
+         * This is a convenience property which, if set, causes a `<link rel="icon" href="$faviconPath">` element to be
+         * added to the site's `<head>` block.
+         *
+         * This value defaults to "/favicon.ico". If you don't want Kobweb to create the link element for you, you can
+         * set this value to "".
+         *
+         * The path of the favicon is relative to the public folder in your resources directory. For example,
+         * "/favicon.ico" (which is the default value) will refer to the icon file located at
          * "jsMain/resources/public/favicon.ico".
          *
          * You are expected to begin your path with a '/' to explicitly indicate that the path will always be rooted
-         * regardless of which URL on your site you visit. If you do not, a leading slash will be added for you.
+         * at the top of your site even if you are visited a nested subpage. If you do not add a leading slash yourself,
+         * one will be added for you.
          *
          * Note that if you completely replace the head block (e.g. `head.set(...)` in your build script), this value
          * will not be used.
@@ -241,6 +235,7 @@ abstract class AppBlock @Inject constructor(
          * Defaults to "en". You can set this to another language or even "" if you want to clear it.
          */
         @get:Input
+        @get:Optional
         abstract val lang: Property<String>
 
         /**
@@ -299,9 +294,6 @@ abstract class AppBlock @Inject constructor(
          *
          * You can do a full opt-out from all dependencies by calling [excludeAllHtmlFromDependencies] (but understand
          * this could break functionality provided by some libraries).
-         *
-         * If you trust the library and don't want the warning to show up, use [suppressHtmlWarningsForDependencies]
-         * instead.
          */
         @get:Input
         abstract val excludeHtmlForDependencies: ListProperty<String>
@@ -312,23 +304,27 @@ abstract class AppBlock @Inject constructor(
          * @see excludeHtmlForDependencies
          */
         @get:Input
+        @Deprecated("We refactored how we show users excluded HTML dependencies and suppression is no longer possible. As a result, this property is no longer used.")
         abstract val suppressHtmlWarningsForDependencies: ListProperty<String>
 
         init {
             extensions.create<InterceptUrlsBlock>("interceptUrls")
 
-            description.convention("Powered by Kobweb")
             faviconPath.convention("/favicon.ico")
             lang.convention("en")
 
             head.set(listOf {
-                meta {
-                    name = "description"
-                    content = description.get()
+                description.orNull?.takeIf { it.isNotBlank() }?.let { description ->
+                    meta {
+                        name = "description"
+                        content = description
+                    }
                 }
-                link {
-                    rel = "icon"
-                    href = basePath.prependTo(faviconPath.get().prefixIfNot("/"))
+                faviconPath.get().takeIf { it.isNotBlank() }?.let { faviconPath ->
+                    link {
+                        rel = "icon"
+                        href = basePath.prependTo(faviconPath.prefixIfNot("/"))
+                    }
                 }
 
                 // Viewport content chosen for a good mobile experience.
@@ -591,9 +587,6 @@ val AppBlock.index: AppBlock.IndexBlock
 
 val AppBlock.IndexBlock.interceptUrls: AppBlock.IndexBlock.InterceptUrlsBlock
     get() = extensions.getByType<AppBlock.IndexBlock.InterceptUrlsBlock>()
-
-val AppBlock.IndexBlock.InterceptUrlsBlock.selfHosting: AppBlock.IndexBlock.InterceptUrlsBlock.SelfHostingBlock
-    get() = extensions.getByType<AppBlock.IndexBlock.InterceptUrlsBlock.SelfHostingBlock>()
 
 val AppBlock.export: AppBlock.ExportBlock
     get() = extensions.getByType<AppBlock.ExportBlock>()

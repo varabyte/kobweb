@@ -55,7 +55,7 @@ fun Image(
             registerRefScope(ref) { it.nextSibling as HTMLImageElement }
         }
     }
-    Img(BasePath.prepend(src), alt, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs {
+    Img(BasePath.prependTo(src), alt, attrs = ImageStyle.toModifier(variant).then(modifier).toAttrs {
         if (width != null) attr("width", width.toString())
         if (height != null) attr("height", height.toString())
     })

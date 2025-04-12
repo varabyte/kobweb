@@ -333,3 +333,29 @@ fun StyleScope.scrollMarginBlockEnd(value: CSSLengthNumericValue) {
 }
 
 // endregion
+
+// region ScrollbarWidth
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-width
+class ScrollbarWidth private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword
+        val Auto get() = ScrollbarWidth("auto")
+        val Thin get() = ScrollbarWidth("thin")
+        val None get() = ScrollbarWidth("none")
+
+        // Global
+        val Inherit get() = ScrollbarWidth("inherit")
+        val Initial get() = ScrollbarWidth("initial")
+        val Revert get() = ScrollbarWidth("revert")
+        val Unset get() = ScrollbarWidth("unset")
+    }
+}
+
+fun StyleScope.scrollbarWidth(scrollbarWidth: ScrollbarWidth) {
+    property("scrollbar-width", scrollbarWidth)
+}
+
+// endregion

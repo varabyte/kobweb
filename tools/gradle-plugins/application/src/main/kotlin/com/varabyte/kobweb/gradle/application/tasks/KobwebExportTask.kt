@@ -74,7 +74,7 @@ abstract class KobwebExportTask @Inject constructor(
                 }\" crashed mid-export. You should investigate this by using `kobweb run` and visiting that route."
             )
         }
-        navigate("${url}?_kobwebIsExporting=true")
+        navigate("${url}?_kobwebIsExporting=true&_kobwebColorModeStrategy=BOTH")
 
         // First, we bake dynamic styles into static ones. Let me explain :)
         // Compose HTML creates empty style nodes and then adds styles to them programmatically, meaning the page

@@ -79,7 +79,6 @@ class Apis(
                     streamHandler.onClientConnected(
                         ApiStream.ClientConnectedContext(
                             event.stream,
-                            event.clientId,
                             env,
                             data,
                             logger
@@ -91,7 +90,6 @@ class Apis(
                     streamHandler.onTextReceived(
                         ApiStream.TextReceivedContext(
                             event.stream,
-                            event.clientId,
                             event.text,
                             env,
                             data,
@@ -104,7 +102,6 @@ class Apis(
                     streamHandler.onClientDisconnected(
                         ApiStream.ClientDisconnectedContext(
                             event.stream,
-                            event.clientId,
                             env,
                             data,
                             logger

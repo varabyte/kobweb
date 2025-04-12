@@ -27,7 +27,27 @@ class PageContext internal constructor(val router: Router) {
             routeState.value = value
         }
 
-    class RouteInfo internal constructor(private val route: Route, private val dynamicParams: Map<String, String>) {
+    class RouteInfo internal constructor(
+        private val route: Route,
+        /**
+         * Params extracted either from the URL's dynamic route
+         *
+         * For example:
+         *
+         * ```
+         * /users/123/posts/11
+         *
+         * # for a URL registered as "/users/{user}/posts/{post}"
+         * ```
+         *
+         * will generate a mapping of "user" to 123 and "post" to 11.
+         *
+         * Note that you are generally encouraged to use [params] instead. However, this property is provided for cases
+         * where perhaps you want to explicitly exclude query params from the list of results. For example, checking if
+         * this value is not empty is a quick way to determine if the current route is, indeed, a dynamic one.
+         */
+        val dynamicParams: Map<String, String>
+    ) {
         /**
          * The origin of the current page.
          *
@@ -46,6 +66,8 @@ class PageContext internal constructor(val router: Router) {
 
         /**
          * The current route path.
+         *
+         * In the URL: "https://example.com/a/b/c/slug?x=1&y=2#id", the path is "/a/b/c/slug"
          *
          * This property is equivalent to `window.location.pathname` but provided here as a convenience property.
          */
@@ -145,9 +167,10 @@ class PageContext internal constructor(val router: Router) {
  * A property which indicates if this current page is being rendered as part of a Kobweb export.
  *
  * While it should be rare that you'll need to use it, it can be useful to check if you want to avoid doing some
- * side-effect that shouldn't happen at export time, like sending page visit analytics to a server for example.
+ * side effect that shouldn't happen at export time, like sending page visit analytics to a server for example.
  */
-val PageContext.isExporting: Boolean get() = route.params.containsKey("_kobwebIsExporting")
+@Deprecated("Use `AppGlobals.isExporting` instead, as that is more universal.")
+val PageContext.isExporting: Boolean get() = AppGlobals.isExporting
 
 // Note: PageContext is technically a global, but we wrap it in a `PageContextLocal` as a way to ensure it is only
 // accessible when under a `@Page` composable.

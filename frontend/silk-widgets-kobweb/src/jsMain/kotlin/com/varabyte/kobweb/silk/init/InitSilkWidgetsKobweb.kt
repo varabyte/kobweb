@@ -12,9 +12,10 @@ import com.varabyte.kobweb.silk.components.navigation.LinkStyle
 import com.varabyte.kobweb.silk.components.navigation.LinkVars
 import com.varabyte.kobweb.silk.components.navigation.UncoloredLinkVariant
 import com.varabyte.kobweb.silk.components.navigation.UndecoratedLinkVariant
+import com.varabyte.kobweb.silk.theme.colors.ColorMode
+import com.varabyte.kobweb.silk.theme.colors.cssClass
 import com.varabyte.kobweb.silk.theme.colors.palette.link
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
-import com.varabyte.kobweb.silk.theme.modifyStyleBase
 
 // Note: This expects to be called after `initSilkWidgets` is called first.
 fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
@@ -35,11 +36,15 @@ fun initSilkWidgetsKobweb(ctx: InitSilkContext) {
         }
     }
 
-    mutableTheme.modifyStyleBase(SilkColorsStyle) {
-        val palette = colorMode.toPalette()
-        Modifier
-            .setVariable(LinkVars.DefaultColor, palette.link.default)
-            .setVariable(LinkVars.VisitedColor, palette.link.visited)
+    // Register CSS variables directly on the `silk-light/dark` element
+    // Note: This only works because the same set of properties/variables are set in both light and dark mode
+    ColorMode.entries.forEach { colorMode ->
+        ctx.stylesheet.registerStyleBase(".${colorMode.cssClass}") {
+            val palette = colorMode.toPalette()
+            Modifier
+                .setVariable(LinkVars.DefaultColor, palette.link.default)
+                .setVariable(LinkVars.VisitedColor, palette.link.visited)
+        }
     }
 
     // TODO: Automate the creation of this list (with a Gradle task?)

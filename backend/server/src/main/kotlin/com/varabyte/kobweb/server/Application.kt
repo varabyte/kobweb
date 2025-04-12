@@ -119,6 +119,8 @@ suspend fun main() {
     val siteLayout = SiteLayout.get()
     val events = EventDispatcher()
     val engine = embeddedServer(Netty, port) {
+        log.info("Initializing server engine for Kobweb project \"${conf.site.title}\"")
+
         configureRouting(env, siteLayout, conf, globals, events)
         configureSerialization()
         configureHTTP(env, conf)

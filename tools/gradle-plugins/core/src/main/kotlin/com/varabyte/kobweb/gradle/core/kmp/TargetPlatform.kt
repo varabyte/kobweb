@@ -30,8 +30,6 @@ class JsTarget(kotlinTarget: KotlinJsIrTarget) : TargetPlatform<KotlinJsIrTarget
 
     val browserDevelopmentRun get() = "${name}BrowserDevelopmentRun"
     val browserProductionRun get() = "${name}BrowserProductionRun"
-    val browserRun get() = "${name}BrowserRun"
-    val run get() = "${name}Run"
 
     val browserDevelopmentWebpack get() = "${name}BrowserDevelopmentWebpack"
     val browserProductionWebpack get() = "${name}BrowserProductionWebpack"

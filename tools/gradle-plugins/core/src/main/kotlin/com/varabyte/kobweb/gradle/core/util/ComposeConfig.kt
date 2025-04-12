@@ -40,6 +40,9 @@ fun Project.configureComposeCompiler() {
             // Trace markers are "pure overhead" for the JS target & needlessly increase the bundle size, but
             // must be explicitly disabled until https://youtrack.jetbrains.com/issue/KT-69900 is resolved.
             composeCompilerExt.includeTraceMarkers.set(false)
+            // As per its KDoc, source information is meant to be removed in production builds, but is explicitly
+            // disabled since Webpack does not remove it.
+            composeCompilerExt.includeSourceInformation.set(false)
             // Unlike standard multiplatform applications, Kobweb projects only use compose on the JS frontend,
             // so we disable the compiler plugin for other targets.
             composeCompilerExt.targetKotlinPlatforms.set(setOf(KotlinPlatformType.js))
