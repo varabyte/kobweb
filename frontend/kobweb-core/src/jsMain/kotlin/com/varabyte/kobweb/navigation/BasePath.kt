@@ -32,7 +32,10 @@ interface BasePath {
      * By only working on absolute routes, we'll never accidentally prepend a base path onto a sub-route where any
      * middle parts are missing.
      */
-    fun prepend(path: String): String
+    fun prependTo(path: String): String
+
+    @Deprecated("Use `prependTo` instead, as this is consistent with the build script version and also is clearer.", ReplaceWith("prependTo(path)"))
+    fun prepend(path: String) = prependTo(path)
 
     companion object : BasePath {
         fun set(value: String) {
@@ -40,13 +43,13 @@ interface BasePath {
         }
 
         override val value get() = BasePathImpl.instance.value
-        override fun prepend(path: String): String = BasePathImpl.instance.prepend(path)
+        override fun prependTo(path: String): String = BasePathImpl.instance.prependTo(path)
     }
 }
 
 /** Conditionally prepend the base path only if the passed in condition is true. */
 fun BasePath.Companion.prependIf(condition: Boolean, path: String): String {
-    return if (condition) prepend(path) else path
+    return if (condition) prependTo(path) else path
 }
 
 /** Remove the base path from some target *absolute* path (relative paths will be returned as is). */
@@ -77,7 +80,7 @@ internal class BasePathImpl(value: String) : BasePath {
         ?.let { if (it.endsWith('/')) it else "$it/" }
         ?: ""
 
-    override fun prepend(path: String): String {
+    override fun prependTo(path: String): String {
         if (value.isBlank()) return path
         if (!path.startsWith("/")) return path
 

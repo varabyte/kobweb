@@ -17,7 +17,7 @@ fun KotlinJsTargetDsl.kobwebApplicationBrowser(kobwebName: String? = null) {
     @Suppress("NAME_SHADOWING")
     val kobwebName = kobwebName ?: project.suggestKobwebProjectName()
 
-    this.moduleName = kobwebName
+    this.outputModuleName.set(kobwebName)
     browser {
         commonWebpackConfig {
             outputFileName = kobwebName.suffixIfNot(".js")

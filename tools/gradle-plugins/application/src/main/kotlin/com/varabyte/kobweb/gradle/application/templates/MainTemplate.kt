@@ -177,7 +177,19 @@ fun createMainFunction(
                 addStatement("$KOBWEB_GROUP.core.init.initKobweb(router) { ctx ->")
                 withIndent {
                     frontendData.pages.sortedBy { it.route }.forEach { entry ->
-                        addStatement("""ctx.router.register("${entry.route}") { ${entry.fqn}() }""")
+                        addStatement(
+                            buildString {
+                                append("ctx.router.register(\"${entry.route}\") { ")
+                                if (entry.acceptsContext) {
+                                    append("pageCtx -> ")
+                                }
+                                append("${entry.fqn}(")
+                                if (entry.acceptsContext) {
+                                    append("pageCtx")
+                                }
+                                append(") }")
+                            }
+                        )
                     }
                     redirects.sortedBy { it.to }.forEach { entry ->
                         addStatement("""ctx.router.registerRedirect("${entry.from}", "${entry.to}")""")

@@ -1,38 +1,46 @@
 package com.varabyte.kobwebx.gradle.markdown.tasks
 
+import com.varabyte.kobweb.common.lang.packageConcat
+import com.varabyte.kobweb.common.lang.packageFromFile
+import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.gradle.core.util.LoggingReporter
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobwebx.gradle.markdown.KotlinRenderer
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
-import org.commonmark.node.Node
-import org.commonmark.parser.Parser
+import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
+import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
+import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
 import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
+import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.relativeTo
 
 abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBlock) :
     MarkdownTask(
         markdownBlock,
         "Convert markdown files found in the project's resources path to source code in the final project"
     ) {
-    @get:Inject
-    abstract val objectFactory: ObjectFactory
+
+    /**
+     * The path from the codebase root to this project, which is information we pass down into the generated code.
+     *
+     * For example, if the path to your Kobweb project is `"myproject/web/site", then this value will be set to
+     * "web/site".
+     */
+    @get:Input
+    abstract val projectRoot: Property<String>
 
     @Nested
     val markdownHandlers = markdownBlock.extensions.getByType<MarkdownHandlers>()
@@ -49,117 +57,80 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     @get:Input
     abstract val dependsOnMarkdownArtifact: Property<Boolean>
 
-    @get:InputDirectory
-    abstract val generatedMarkdownDir: DirectoryProperty
-
-    @get:InputFiles
-    abstract val markdownRoots: ListProperty<File>
-
     @OutputDirectory
     fun getGenDir(): Provider<Directory> {
-        return markdownBlock.getGenJsSrcRoot("convert").flatMap { rootDir ->
-            val subDir = projectGroup.zip(pagesPackage) { group, pagesPackage ->
-                PackageUtils.resolvePackageShortcut(group.toString(), pagesPackage).replace(".", "/")
-            }
-            rootDir.dir(subDir)
-        }
+        return markdownBlock.getGenJsSrcRoot("convert")
     }
 
     @TaskAction
     fun execute() {
         getGenDir().get().asFile.clearDirectory()
-        val cache = NodeCache(
+        val nodeCache = NodeCache(
             parser = markdownFeatures.createParser(),
-            roots = markdownRoots.get() + generatedMarkdownDir.asFileTree
+            roots = markdownFolders.get().flatMap { it.roots.files }.toSet()
         )
-        val markdownFiles = markdownResources.asFileTree + objectFactory.fileTree().setDir(generatedMarkdownDir)
 
-        markdownFiles.visit {
-            if (isDirectory) return@visit
+        markdownFolders.get().forEach { markdownFolder ->
+            markdownFolder.files.visitFiles {
+                val pkgBase = markdownFolder.resolvedTargetPackage
 
-            val mdFile = file
-            val packageParts = packagePartsFor(relativePath)
-            val ktFileName = mdFile.nameWithoutExtension.replaceFirstChar { it.uppercase() }
-            val mdPathRel = relativePath.toPath()
-            val mdPathRelStr = mdPathRel.invariantSeparatorsPathString
+                val sourcePath = relativePath.toPath()
+                val absolutePackage = pkgBase.packageConcat(sourcePath.packageFromFile())
+                val outputRootPath = Path(PackageUtils.packageToPath(absolutePackage))
 
-            File(
-                getGenDir().get().asFile,
-                mdPathRel.resolveSibling("$ktFileName.kt").invariantSeparatorsPathString
-            ).let { outputFile ->
-                outputFile.parentFile.mkdirs()
-                val mdPackage = absolutePackageFor(packageParts)
-                val funName = funNameFor(mdFile)
-                val ktRenderer = KotlinRenderer(
-                    cache::getRelative,
-                    markdownDefaultRoot.get().takeUnless { it.isBlank() },
-                    markdownImports.get(),
-                    mdPathRelStr,
-                    markdownHandlers,
-                    mdPackage,
-                    funName,
-                    projectGroup.get().toString(),
-                    dependsOnMarkdownArtifact.get(),
-                    LoggingReporter(logger),
+                nodeCache.metadata[nodeCache[file]] = NodeCache.Metadata.Entry(
+                    projectRoot.get(),
+                    rootDir.relativeTo(projectLayout.projectDirectory.asFile).toPath(),
+                    relativePath.toPath(),
+                    outputRootPath,
+                    absolutePackage,
+                    // Route should only be set for pages
+                    if (outputRootPath.startsWith(pagesPath)) {
+                        Path(PackageUtils.packageToPath(pkgBase)).resolve(sourcePath.parent ?: Path(""))
+                            .relativeTo(pagesPath)
+                            .invariantSeparatorsPathString
+                            .ensureSurrounded("/") +
+                            RouteUtils.getSlug(sourcePath.toFile())
+                    } else null,
                 )
-                outputFile.writeText(ktRenderer.render(cache[mdFile]))
-            }
-        }
-    }
-
-    /**
-     * Class which maintains a cache of parsed markdown content associated with their source files.
-     *
-     * This cache is useful because Markdown files can reference other Markdown files, meaning as we process a
-     * collection of them, we might end up referencing the same file multiple times.
-     *
-     * Note that this cache should not be created with too long a lifetime, because users may edit Markdown files and
-     * those changes should be picked up. It is intended to be used only for a single processing run across a collection
-     * of markdown files and then discarded.
-     *
-     * @param parser The parser to use to parse markdown files.
-     * @param roots A collection of root folders under which Markdown files should be considered for processing. Any
-     *   markdown files referenced outside of these roots should be ignored for caching purposes.
-     */
-    private class NodeCache(private val parser: Parser, private val roots: List<File>) {
-        private val existingNodes = mutableMapOf<String, Node>()
-
-        /**
-         * Returns a parsed Markdown [Node] for the target file (which is expected to be a valid markdown file).
-         *
-         * Once queried, the node will be cached so that subsequent calls to this method will not re-read the file. If
-         * the file fails to parse, this method will throw an exception.
-         */
-        operator fun get(file: File): Node = file.canonicalFile.let { canonicalFile ->
-            require(roots.any { canonicalFile.startsWith(it) }) {
-                "File $canonicalFile is not under any of the specified Markdown roots: $roots"
-            }
-            existingNodes.computeIfAbsent(canonicalFile.invariantSeparatorsPath) {
-                parser.parse(canonicalFile.readText())
             }
         }
 
-        /**
-         * Returns a parsed Markdown node given a relative path which will be resolved against all markdown roots.
-         *
-         * For example, "test/example.md" will return parsed markdown information if found in
-         * `src/jsMain/resources/markdown/test/example.md`.
-         *
-         * This will return null if:
-         * * no file is found matching the passed in path.
-         * * the file at the specified location fails to parse.
-         * * the relative file path escapes the current root, e.g. `../public/files/license.md`, as this could be a
-         *   useful way to link to a raw markdown file that should be served as is and not converted into an html page.
-         */
-        fun getRelative(relPath: String): Node? = try {
-            roots.asSequence()
-                .map { it to it.resolve(relPath).canonicalFile }
-                // Make sure we don't access anything outside our markdown roots
-                .firstOrNull { (root, canonicalFile) ->
-                    canonicalFile.exists() && canonicalFile.isFile && canonicalFile.startsWith(root)
-                }?.second?.let(::get)
-        } catch (ignored: IOException) {
-            null
+        markdownFolders.get().forEach { markdownFolder ->
+            markdownFolder.files.visitFiles {
+                val node = try {
+                    nodeCache[file]
+                } catch (_: IllegalArgumentException) {
+                    null
+                } ?: return@visitFiles
+                val metadata = nodeCache.metadata.getValue(node)
+
+                val sourcePath = relativePath.toPath()
+
+                val outputFileName = sourcePath.nameWithoutExtension.replaceFirstChar { it.uppercase() }
+                val outputRootPathStr =
+                    nodeCache.metadata.getValue(node).outputRootPath.invariantSeparatorsPathString
+
+                File(
+                    getGenDir().get().asFile.resolve(outputRootPathStr),
+                    "$outputFileName.kt"
+                ).let { outputFile ->
+                    outputFile.parentFile.mkdirs()
+
+                    val ktRenderer = KotlinRenderer(
+                        projectGroup.get().toString(),
+                        nodeCache,
+                        markdownDefaultRoot.get().takeUnless { it.isBlank() },
+                        markdownImports.get(),
+                        markdownHandlers,
+                        funName = sourcePath.capitalizedNameWithoutExtension +
+                            "Page".takeIf { metadata.routeWithSlug != null }.orEmpty(),
+                        dependsOnMarkdownArtifact.get(),
+                        LoggingReporter(logger),
+                    )
+                    outputFile.writeText(ktRenderer.render(nodeCache[file]))
+                }
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.graphics.lightened
 import com.varabyte.kobweb.compose.ui.modifiers.*
+import com.varabyte.kobweb.silk.ColorModeAware
 import com.varabyte.kobweb.silk.components.disclosure.TabVars
 import com.varabyte.kobweb.silk.components.disclosure.TabsPanelStyle
 import com.varabyte.kobweb.silk.components.disclosure.TabsStyle
@@ -68,6 +69,7 @@ import com.varabyte.kobweb.silk.components.overlay.TooltipVars
 import com.varabyte.kobweb.silk.components.overlay.TopLeftTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopRightTooltipArrowVariant
 import com.varabyte.kobweb.silk.components.overlay.TopTooltipArrowVariant
+import com.varabyte.kobweb.silk.setStyleFor
 import com.varabyte.kobweb.silk.style.CssStyle
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.common.DisabledStyle
@@ -79,6 +81,7 @@ import com.varabyte.kobweb.silk.style.vars.color.FocusOutlineColorVar
 import com.varabyte.kobweb.silk.style.vars.color.PlaceholderColorVar
 import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorPalettes
+import com.varabyte.kobweb.silk.theme.colors.cssClass
 import com.varabyte.kobweb.silk.theme.colors.palette.background
 import com.varabyte.kobweb.silk.theme.colors.palette.border
 import com.varabyte.kobweb.silk.theme.colors.palette.button
@@ -93,12 +96,7 @@ import com.varabyte.kobweb.silk.theme.colors.palette.switch
 import com.varabyte.kobweb.silk.theme.colors.palette.tab
 import com.varabyte.kobweb.silk.theme.colors.palette.toPalette
 import com.varabyte.kobweb.silk.theme.colors.palette.tooltip
-import com.varabyte.kobweb.silk.theme.colors.suffixedWith
-import com.varabyte.kobweb.silk.theme.name
 import kotlinx.browser.document
-import kotlinx.dom.addClass
-import kotlinx.dom.removeClass
-import org.w3c.dom.Document
 import org.w3c.dom.HTMLElement
 
 fun initSilkWidgets(ctx: InitSilkContext) {
@@ -237,7 +235,13 @@ fun initSilkWidgets(ctx: InitSilkContext) {
         }
     }
 
-    mutableTheme.registerStyle("silk-colors", SilkColorsStyle)
+    // Register CSS variables directly on the `silk-light/dark` element
+    // Note: This only works because the same set of properties/variables are set in both light and dark mode
+    ColorMode.entries.forEach { colorMode ->
+        ctx.stylesheet.registerStyleBase(".${colorMode.cssClass}") {
+            silkColorsModifier(colorMode)
+        }
+    }
 
     // Register InputStyle early as it's wrapped by other components
     mutableTheme.registerStyle("silk-input", InputStyle)
@@ -328,9 +332,14 @@ fun initSilkWidgets(ctx: InitSilkContext) {
     mutableTheme.registerStyle("silk-callout-type_warning", CalloutType.WARNING)
 }
 
+@Deprecated("`SilkColorsStyle` is no longer used as part of a rework of Silk's color mode support. Silk variables and color mode-based styling should now be managed using `ColorMode.cssClass`.")
 val SilkColorsStyle = CssStyle.base {
+    silkColorsModifier(colorMode)
+}
+
+private fun silkColorsModifier(colorMode: ColorMode): Modifier {
     val palette = colorMode.toPalette()
-    Modifier
+    return Modifier
         .colorScheme(if (colorMode.isLight) ColorScheme.Light else ColorScheme.Dark)
 
         // region General color vars
@@ -377,44 +386,50 @@ val SilkColorsStyle = CssStyle.base {
  * @param provideElement An element which must live at a point in the DOM tree above any Silk widgets. This method
  *   will be called inside a `remember` block, meaning it will only be triggered once per composition.
  */
+@Deprecated("Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.")
 @Composable
 fun SilkWidgetVariables(provideElement: () -> HTMLElement) {
     val rootElement = remember { provideElement() }
-    SilkWidgetVariables(rootElement)
+    ColorModeAware(rootElement)
 }
 
 /**
  * Set all Silk variables on the DOM root.
  */
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.",
+    ReplaceWith("ColorModeAware()")
+)
 @Composable
 fun SilkWidgetVariables() {
-    SilkWidgetVariables { document.documentElement as HTMLElement }
+    ColorModeAware(document.documentElement as HTMLElement)
 }
 
 /**
  * Set all Silk variables on an element with the target ID name.
  */
-@Composable
-fun SilkWidgetVariables(elementId: String) {
-    SilkWidgetVariables { document.getElementById(elementId) as HTMLElement }
-}
-
-@Deprecated("Use `SilkWidgetVariables` instead, as it is more Compose-idiomatic.",
-    ReplaceWith("SilkWidgetVariables(rootElementId)")
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.",
+    ReplaceWith("ColorModeAware(elementId)")
 )
 @Composable
-fun Document.setSilkWidgetVariables(rootElementId: String = "_kobweb-root") {
-    SilkWidgetVariables { this.getElementById(rootElementId) as HTMLElement }
+fun SilkWidgetVariables(elementId: String) {
+    ColorModeAware(elementId)
 }
 
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `ColorModeAware` to set this class instead.",
+    ReplaceWith("ColorModeAware(element)")
+)
 @Composable
 fun SilkWidgetVariables(element: HTMLElement) {
-    element.setSilkWidgetVariables(ColorMode.current)
+    element.setStyleFor(ColorMode.current)
 }
 
+@Deprecated(
+    "Silk styling has been streamlined to operate based on a single color mode class, which automatically provides widget variables. Use `HTMLElement.setStyleFor` to set this class instead.",
+    ReplaceWith("this.setStyleFor(colorMode)", "com.varabyte.kobweb.silk.setStyleFor")
+)
 fun HTMLElement.setSilkWidgetVariables(colorMode: ColorMode) {
-    SilkColorsStyle.name.let { silkColorsStyleName ->
-        removeClass(silkColorsStyleName.suffixedWith(colorMode.opposite))
-        addClass(silkColorsStyleName.suffixedWith(colorMode))
-    }
+    this.setStyleFor(colorMode)
 }

@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk.init
 
+import com.varabyte.kobweb.browser.dom.css.CssIdent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.silk.style.SimpleCssStyle
 import com.varabyte.kobweb.silk.style.StyleScope
@@ -162,10 +163,9 @@ internal object SilkStylesheetInstance : SilkStylesheet {
         this.invoke(simpleStyleScope)
 
         simpleStyleScope.cssModifiers.forEach { cssModifier ->
-            cssModifier.assertNoAttributes(
-                selectorName,
-                extraContext = "Please search your `@InitSilk` code for a line like `ctx.stylesheet.registerStyle(\"$selectorName\")` and remove the offending attribute(s)."
-            )
+            cssModifier.assertNoAttributes(selectorName) {
+                "Please search your `@InitSilk` code for a line like `ctx.stylesheet.registerStyle(\"$selectorName\")` and remove the offending attribute(s)."
+            }
         }
     }
 
@@ -211,8 +211,9 @@ internal object SilkStylesheetInstance : SilkStylesheet {
             if (lightBuilder == darkBuilder) {
                 lightBuilder.addKeyframesIntoStylesheet(siteStyleSheet, name)
             } else {
-                lightBuilder.addKeyframesIntoStylesheet(siteStyleSheet, name.suffixedWith(ColorMode.LIGHT))
-                darkBuilder.addKeyframesIntoStylesheet(siteStyleSheet, name.suffixedWith(ColorMode.DARK))
+                val ident = CssIdent(name)
+                lightBuilder.addKeyframesIntoStylesheet(siteStyleSheet, ident.suffixedWith(ColorMode.LIGHT).asStr)
+                darkBuilder.addKeyframesIntoStylesheet(siteStyleSheet, ident.suffixedWith(ColorMode.DARK).asStr)
             }
         }
     }

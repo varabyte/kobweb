@@ -100,9 +100,11 @@ class KeyframesEntry(val fqcn: String, val name: String, val import: String? = n
  * @param route The associated route that should be generated for this page method, e.g. "/example/path". The final
  *   value is usually decided by the current file name but could be influenced by arguments in the `@Page` annotation
  *   as well.
+ * @param acceptsContext If true, the method accepts a single `PageContext` argument; otherwise, no arguments. Defaults
+ *   to false for compatibility with libraries using a version of Kobweb before this feature was introduced.
  */
 @Serializable
-class PageEntry(val fqn: String, val route: String)
+class PageEntry(val fqn: String, val route: String, val acceptsContext: Boolean = false)
 
 /**
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)

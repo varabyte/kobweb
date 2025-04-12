@@ -2,7 +2,6 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
-import com.varabyte.kobweb.common.text.ensureSurrounded
 import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.project.common.PackageUtils
@@ -11,6 +10,7 @@ import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlockVisitor
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.handlers.NodeScope
+import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeTicks
@@ -47,8 +47,9 @@ import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.commonmark.renderer.Renderer
 import org.gradle.api.provider.Provider
+import java.nio.file.Path
 import java.util.*
-import kotlin.io.path.Path
+import kotlin.io.path.invariantSeparatorsPathString
 
 fun String.yamlStringToKotlinString(): String {
     return if (this.isSurrounded("\"")) {
@@ -63,34 +64,31 @@ fun String.yamlStringToKotlinString(): String {
 /**
  * A markdown renderer that generates a Kobweb source file given an input markdown file.
  *
- * @property markdownNodeGetter A function that can be used to retrieve the AST for a given markdown file. This allows
- *   avoiding needing to do redundant parsing.
+ * @property projectGroup The group of the project, which is used to resolve package shortcuts, e.g. "com.mysite"
+ * @property nodeCache Cache which allows us to look up nodes by their relative path.
+ * @property nodeMetadata Additional information about each node, including our own. This can be used to look up
+ *   relevant file information about ourselves or other nodes fetched through the [nodeCache].
  * @property defaultRoot The default root layout to use if not specified in the markdown file. If null, and no root is
  *   specified by the markdown file, then no outer root node will be added to the page.
  * @property imports A list of additional imports to include at the top of the generated file.
- * @property filePath The path to the markdown file being processed (relative from its `markdown` folder root).
  * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
  * @property pkg The package that the generated file should be placed in.
  * @property funName The name of the page function that will be generated.
- * @property projectGroup The group of the project, which is used to resolve package shortcuts
  * @property reporter A reporter that can be used to log warnings and errors.
  */
-class KotlinRenderer(
-    private val markdownNodeGetter: (path: String) -> Node?,
+class KotlinRenderer internal constructor(
+    private val projectGroup: String,
+    private val nodeCache: NodeCache,
     private val defaultRoot: String?,
     private val imports: List<String>,
-    private val filePath: String,
     private val handlers: MarkdownHandlers,
-    private val pkg: String,
     private val funName: String,
-    private val projectGroup: String,
     // If true, we have access to the `MarkdownContext` class and CompositionLocal
     private val dependsOnMarkdownArtifact: Boolean,
     private val reporter: Reporter,
 ) : Renderer {
     private var indentCount = 0
     private val indent get() = NodeScope(reporter, TypedMap()).indent(indentCount)
-
 
     // Flexible data which can be used by Node handlers however they need
     private val data = TypedMap().apply {
@@ -106,9 +104,11 @@ class KotlinRenderer(
             this.data
         }
 
+        val metadataEntry = nodeCache.metadata.getValue(node)
+
         output.append(
             buildString {
-                appendLine("package $pkg")
+                appendLine("package ${metadataEntry.`package`}")
                 appendLine()
                 appendLine("import androidx.compose.runtime.*")
                 appendLine("import com.varabyte.kobweb.core.*")
@@ -121,20 +121,21 @@ class KotlinRenderer(
 
                 appendLine()
 
-                append("@Page(\"")
-                val routeFromFilePath = filePath.split("/").dropLast(1).joinToString("/").ensureSurrounded("/")
-                append(frontMatterData?.routeOverride?.let {
-                    if (it.startsWith("/")) it else routeFromFilePath + it
-                } ?: routeFromFilePath)
-                appendLine("\")")
+                metadataEntry.routeWithSlug?.let { routeWithSlug ->
+                    append("@Page(\"")
+                    append(frontMatterData?.routeOverride?.let {
+                        if (it.startsWith("/")) it else metadataEntry.routeWithoutSlug + it
+                    } ?: routeWithSlug)
+                    appendLine("\")")
+                }
 
                 appendLine("@Composable")
-                appendLine("fun $funName() {")
+                appendLine("fun ${frontMatterData?.funName ?: funName}() {")
             }
         )
 
         indentCount++
-        RenderVisitor(output, frontMatterData).visitAndFinish(node)
+        RenderVisitor(output, metadataEntry, frontMatterData).visitAndFinish(node)
         indentCount--
 
         assert(indentCount == 0)
@@ -177,6 +178,7 @@ class KotlinRenderer(
 
     private class FrontMatterData(val raw: Map<String, List<String>>) {
         val root: String? get() = raw["root"]?.singleOrNull()
+        val funName: String? get() = raw["funName"]?.singleOrNull()
         val imports: List<String>? get() = raw["imports"]
         val routeOverride: String? get() = raw["routeOverride"]?.singleOrNull()
 
@@ -184,6 +186,7 @@ class KotlinRenderer(
         fun filterUserData(): Map<String, List<String>> {
             return raw.filterKeys {
                 it != "root" &&
+                    it != "funName" &&
                     it != "imports" &&
                     it != "routeOverride"
             }
@@ -205,7 +208,11 @@ class KotlinRenderer(
         }
     }
 
-    private inner class RenderVisitor(private val output: Appendable, frontMatterData: FrontMatterData?) :
+    private inner class RenderVisitor(
+        private val output: Appendable,
+        private val metadataEntry: NodeCache.Metadata.Entry,
+        frontMatterData: FrontMatterData?
+    ) :
         AbstractVisitor() {
         private val onFinish = Stack<() -> Unit>()
         fun finish() {
@@ -214,7 +221,7 @@ class KotlinRenderer(
 
         init {
             var contextCreated = false
-            if (dependsOnMarkdownArtifact) {
+            if (metadataEntry.routeWithSlug != null && dependsOnMarkdownArtifact) {
                 val userData = frontMatterData
                     ?.filterUserData()
                     ?.mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
@@ -222,7 +229,7 @@ class KotlinRenderer(
 
                 val mdCtx = buildString {
                     append("MarkdownContext(")
-                    append("\"$filePath\"")
+                    append("\"${metadataEntry.sourceFilePath.invariantSeparatorsPathString}\"")
                     append(", ")
                     append(userData.serialize())
                     append(")")
@@ -348,15 +355,19 @@ class KotlinRenderer(
             // (e.g. "[link](http://path/to/example.md)"), since in that case, the user is explicitly linking to an
             // external resource.
             if (link.destination.endsWith(".md") && !link.destination.contains("://")) {
-                val destinationPath = Path(filePath).resolveSibling(link.destination).normalize().toString()
-                val destinationNode = markdownNodeGetter(destinationPath.removePrefix("/"))
+                val destinationPath = metadataEntry.sourceFilePath.resolveSibling(link.destination).normalize().toString()
+                val destinationNode = nodeCache.getRelative(destinationPath.removePrefix("/"))
                 if (destinationNode != null) {
                     // Retrieve the destination's route override, if present
                     val frontMatterData = with(FrontMatterVisitor()) {
                         destinationNode.accept(this)
                         this.data
                     }
-                    val route = Route(frontMatterData?.routeOverride ?: "")
+
+                    val route = Route(
+                        frontMatterData?.routeOverride
+                        ?: nodeCache.metadata.getValue(destinationNode).routeWithSlug!! // Guaranteed set for a page
+                    )
                     if (route.isDynamic) {
                         error("Markdown file link '${link.destination}' links to file with dynamic route override. This is not supported!")
                     }

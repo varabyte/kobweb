@@ -13,6 +13,7 @@ import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.ScrollBehavior
 import org.w3c.dom.ScrollToOptions
+import org.w3c.dom.asList
 import org.w3c.dom.url.URL
 import org.w3c.xhr.XMLHttpRequest
 
@@ -185,7 +186,12 @@ class Router {
             PageContextLocal provides PageContext.instance
         ) {
             pageWrapper {
-                pageMethod.invoke()
+                // If a user navigates between two different dynamic routes, e.g. "/users/a" and "/users/b" for route
+                // "/users/{user}", we want to treat this as a recomposition, since from the user's point of view, they
+                // are different URLs. Query params changing should NOT cause a recomposition though!
+                key(PageContext.instance.route.path) {
+                    pageMethod.invoke(PageContext.instance)
+                }
             }
         }
     }
@@ -252,7 +258,7 @@ class Router {
     fun register(route: String, pageMethod: PageMethod) {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(
-            routeTree.register(BasePath.prepend(route), pageMethod)
+            routeTree.register(BasePath.prependTo(route), pageMethod)
         ) { "Registration failure. Path is already registered: $route" }
     }
 
@@ -361,7 +367,7 @@ class Router {
         if (pathQueryAndFragment.contains("://")) return false
 
         @Suppress("NAME_SHADOWING") // Intentionally transformed
-        var pathQueryAndFragment = BasePath.prepend(pathQueryAndFragment)
+        var pathQueryAndFragment = BasePath.prependTo(pathQueryAndFragment)
         if (Route.isRoute(pathQueryAndFragment)) {
             pathQueryAndFragment = pathQueryAndFragment.normalize()
 
@@ -456,7 +462,8 @@ class Router {
                         // exist yet.
                         MutationObserver { mutations, observer ->
                             mutations.forEach { mutation ->
-                                if (mutation.type == "childList") {
+                                // Only scroll if elements were added, removals do not signal that the page is rendered.
+                                if (mutation.type == "childList" && mutation.addedNodes.asList().isNotEmpty()) {
                                     scrollElementIntoView()
                                     observer.disconnect()
                                 }

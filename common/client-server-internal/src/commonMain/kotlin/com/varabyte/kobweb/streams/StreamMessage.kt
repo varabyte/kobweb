@@ -4,10 +4,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * A message sent from the client to the server, to deliver a payload to a target API stream.
+ * A message sent between the client and the server (could be in either direction), including some payload.
+ *
+ * @property localStreamId An ID that uniquely identifies the stream **to a client**. NOTE: This value is NOT the same
+ *   as the ID used for the stream as the server manages it, since it has to distinguish between multiple clients that
+ *   may use the same `localStreamId` value.
  */
 @Serializable
-class StreamMessage<out P : StreamMessage.Payload>(val route: String, val payload: P) {
+class StreamMessage<out P : StreamMessage.Payload>(val localStreamId: Short, val payload: P) {
     @Serializable
     sealed interface Payload {
         /**
@@ -15,9 +19,15 @@ class StreamMessage<out P : StreamMessage.Payload>(val route: String, val payloa
          */
         @Serializable
         sealed interface Client : Payload {
+            /**
+             * @property route The name of the API endpoint being connected to. A stream has to advertise this because
+             *   the server uses a single websocket endpoint to handle all streams, so it relies on the client for
+             *   informing it which endpoint it is trying to connect to. After getting connected, the server will
+             *   associate this information with the stream moving forward.
+             */
             @Serializable
             @SerialName("StreamPayloadClientConnect")
-            object Connect : Client
+            class Connect(val route: String) : Client
 
             @Serializable
             @SerialName("StreamPayloadClientDisconnect")
@@ -48,10 +58,19 @@ class StreamMessage<out P : StreamMessage.Payload>(val route: String, val payloa
     }
 
     companion object {
-        fun clientConnect(route: String) = StreamMessage<Payload.Client>(route, Payload.Client.Connect)
-        fun clientDisconnect(route: String) = StreamMessage<Payload.Client>(route, Payload.Client.Disconnect)
-        fun text(route: String, text: String) = StreamMessage<Payload.Bidirectional>(route, Payload.Text(text))
-        fun serverError(route: String, callstack: String?) =
-            StreamMessage<Payload.Server>(route, Payload.Server.Error(callstack))
+        fun clientConnect(streamId: Short, route: String) = StreamMessage<Payload.Client>(
+            streamId,
+            Payload.Client.Connect(route),
+        )
+        fun clientDisconnect(streamId: Short) = StreamMessage<Payload.Client>(
+            streamId,
+            Payload.Client.Disconnect
+        )
+        fun text(streamId: Short, text: String) = StreamMessage<Payload.Bidirectional>(
+            streamId,
+            Payload.Text(text)
+        )
+        fun serverError(streamId: Short, callstack: String?) =
+            StreamMessage<Payload.Server>(streamId, Payload.Server.Error(callstack))
     }
 }

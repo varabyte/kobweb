@@ -9,8 +9,8 @@ import com.varabyte.kobweb.api.http.Request
 import com.varabyte.kobweb.api.log.Logger
 import com.varabyte.kobweb.api.stream.ApiStream
 import com.varabyte.kobweb.api.stream.Stream
-import com.varabyte.kobweb.api.stream.StreamClientId
 import com.varabyte.kobweb.api.stream.StreamEvent
+import com.varabyte.kobweb.api.stream.StreamId
 import com.varabyte.kobweb.common.error.KobwebException
 import com.varabyte.kobweb.common.text.prefixIfNot
 import com.varabyte.kobweb.project.conf.KobwebConf
@@ -42,6 +42,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.nio.file.Path
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.name
@@ -83,9 +84,6 @@ fun Application.configureRouting(
     globals: ServerGlobals,
     events: EventDispatcher
 ) {
-    // "example/" should resolve to "example/index.html" if present, but default ktor behavior rejects trailing slashes.
-    this.install(IgnoreTrailingSlash)
-
     val logger = object : Logger {
         override fun trace(message: String) = log.trace(message)
         override fun debug(message: String) = log.debug(message)
@@ -202,32 +200,34 @@ private suspend fun RoutingContext.handleApiCall(
     }
 }
 
-private class WebSocketSessionStreamData(val clientId: StreamClientId) {
-    val streams = mutableSetOf<String>()
+private class WebSocketSessionData {
+    class StreamData(val route: String)
+    val streamEntries = mutableMapOf<StreamId, StreamData>()
 }
 
 private class StreamImpl(
-    val sessions: Map<WebSocketSession, WebSocketSessionStreamData>,
+    val sessions: Map<WebSocketSession, WebSocketSessionData>,
     val session: WebSocketSession,
     val apiJar: ApiJarFile,
-    val route: String,
-    val id: StreamClientId
+    override val id: StreamId,
 ) : Stream {
     private suspend fun WebSocketSession.sendMessage(message: StreamMessage<Payload.Server>) {
         send(Json.encodeToString(message))
     }
 
     override suspend fun send(text: String) {
-        session.sendMessage(StreamMessage.text(route, text))
+        session.sendMessage(StreamMessage.text(id.localStreamId, text))
     }
 
-    override suspend fun broadcast(text: String, filter: (StreamClientId) -> Boolean) {
-        val message = StreamMessage.text(route, text)
+    override suspend fun broadcast(text: String, filter: (StreamId) -> Boolean) {
         sessions.entries.forEach { (currSession, currStreamData) ->
-            // A user might have connected for a different stream channel, so don't waste
-            // bandwidth sending them a message they don't care about.
-            if (currStreamData.streams.contains(route)) {
-                if (filter(currStreamData.clientId)) {
+            val route = sessions.getValue(session).streamEntries.getValue(id).route
+            // Users probably think that each ApiStream is a totally separate websocket, but in reality, we use one
+            // websocket for all of them (helps us with live reloading and minimizes connection resources). However, it
+            // means that here we must skip streams that are attached to a different route endpoint.
+            currStreamData.streamEntries.forEach { (streamId, streamData) ->
+                if (route == streamData.route && filter(streamId)) {
+                    val message = StreamMessage.text(streamId.localStreamId, text)
                     currSession.sendMessage(message)
                 }
             }
@@ -235,15 +235,22 @@ private class StreamImpl(
     }
 
     override suspend fun disconnect() {
-        apiJar.apis.handle(route, StreamEvent.ClientDisconnected(this, id))
-        val streams = sessions[session]!!.streams
-        streams.remove(route)
-        if (streams.isEmpty()) {
+        val sessionData = sessions.getValue(session)
+        val route = sessionData.streamEntries.remove(id)!!.route
+        apiJar.apis.handle(route, StreamEvent.ClientDisconnected(this))
+        if (sessionData.streamEntries.isEmpty()) {
             session.close()
         }
     }
 }
 
+/**
+ * A thread-safe class which you can use to generate a unique Short ID that wraps after reaching [Short.MAX_VALUE].
+ */
+private class ShortIdGenerator {
+    private val nextId = AtomicInteger(0)
+    fun next() = (nextId.getAndIncrement() % Short.MAX_VALUE).toShort()
+}
 
 private fun Routing.setupStreaming(
     env: ServerEnvironment,
@@ -259,40 +266,48 @@ private fun Routing.setupStreaming(
         timeout = conf.server.streaming.timeout
     }
 
-    val sessions = Collections.synchronizedMap(mutableMapOf<WebSocketSession, WebSocketSessionStreamData>())
+    val clientIdGenerator = ShortIdGenerator()
+    val sessions = Collections.synchronizedMap(mutableMapOf<WebSocketSession, WebSocketSessionData>())
     webSocket("/api/kobweb-streams") {
-        val id = StreamClientId.next()
+        // This callback is triggered once per connecting client (no matter how many streams they create)
+        val clientId = clientIdGenerator.next()
         val session = this
-        val streamData = WebSocketSessionStreamData(id)
-        sessions[session] = streamData
+        sessions[session] = WebSocketSessionData()
         try {
             for (frame in incoming) {
                 if (frame is Frame.Text) {
                     val incomingMessage = Json.decodeFromString<StreamMessage<Payload.Client>>(frame.readText())
-                    val streamImpl = StreamImpl(sessions, session, apiJar, incomingMessage.route, id)
+                    val streamId = StreamId(clientId, incomingMessage.localStreamId)
+                    val streamImpl = StreamImpl(sessions, session, apiJar, streamId)
 
                     try {
                         when (val payload = incomingMessage.payload) {
-                            Payload.Client.Connect -> {
-                                sessions[session]!!.streams.add(incomingMessage.route)
+                            is Payload.Client.Connect -> {
+                                sessions.getValue(session).apply {
+                                    streamEntries[streamId] = WebSocketSessionData.StreamData(payload.route)
+                                }
                                 apiJar.apis.handle(
-                                    incomingMessage.route,
-                                    StreamEvent.ClientConnected(streamImpl, id)
+                                    payload.route,
+                                    StreamEvent.ClientConnected(streamImpl)
                                 )
                             }
 
                             Payload.Client.Disconnect -> streamImpl.disconnect()
                             is Payload.Text -> {
+                                val route = sessions.getValue(session).streamEntries.getValue(streamId).route
                                 apiJar.apis.handle(
-                                    incomingMessage.route,
-                                    StreamEvent.Text(streamImpl, id, payload.text)
+                                    route,
+                                    StreamEvent.Text(streamImpl, payload.text)
                                 )
                             }
                         }
                     } catch (t: Throwable) {
+                        // Note: Route should always be set unless somehow we crash on the Connect event, which
+                        // shouldn't happen.
+                        val route = sessions.getValue(session).streamEntries[streamId]?.route ?: "?"
                         logger.error(
                             """
-                            |API stream ("${incomingMessage.route}", clientId=${id}) crashed
+                            |API stream ("$route", clientId=${clientId}) crashed
                             |payload: "${Json.encodeToString(incomingMessage.payload)}"
                             |${t.stackTraceToString()}
                             """.trimMargin()
@@ -308,19 +323,28 @@ private fun Routing.setupStreaming(
                                 })
                             } else null
 
-                        session.send(Json.encodeToString(StreamMessage.serverError(incomingMessage.route, callstack)))
+                        session.send(
+                            Json.encodeToString(
+                                StreamMessage.serverError(
+                                    incomingMessage.localStreamId,
+                                    callstack
+                                )
+                            )
+                        )
                         streamImpl.disconnect()
                     }
                 }
             }
         } catch (e: ClosedReceiveChannelException) {
-            logger.trace("WebSocket connection (with clientId = $id) closed: ${closeReason.await()}\n$e")
+            logger.trace("WebSocket connection (with clientId = $clientId) closed: ${closeReason.await()}\n$e")
         } catch (e: Throwable) {
-            logger.error("WebSocket connection (with clientId = $id) closed with an exception: ${closeReason.await()}\n$e")
+            logger.error("WebSocket connection (with clientId = $clientId) closed with an exception: ${closeReason.await()}\n$e")
         } finally {
-            sessions.remove(session)?.streams?.forEach { route ->
-                val streamImpl = StreamImpl(sessions, session, apiJar, route, id)
-                apiJar.apis.handle(route, StreamEvent.ClientDisconnected(streamImpl, id))
+            sessions.remove(session)?.let { sessionData ->
+                sessionData.streamEntries.forEach { (streamId, streamData) ->
+                    val streamImpl = StreamImpl(sessions, session, apiJar, streamId)
+                    apiJar.apis.handle(streamData.route, StreamEvent.ClientDisconnected(streamImpl))
+                }
             }
         }
     }

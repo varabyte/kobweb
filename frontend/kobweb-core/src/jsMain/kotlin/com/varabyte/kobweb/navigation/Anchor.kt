@@ -38,7 +38,7 @@ fun Anchor(
 ) {
     val ctx = rememberPageContext()
     A(
-        BasePath.prepend(href), // match `navigateTo` which internally prepends as well
+        BasePath.prependTo(href), // match `navigateTo` which internally prepends as well
         attrs = {
             if (attrs != null) {
                 attrs()

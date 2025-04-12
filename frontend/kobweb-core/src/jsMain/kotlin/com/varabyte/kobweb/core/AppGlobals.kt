@@ -1,5 +1,8 @@
 package com.varabyte.kobweb.core
 
+import kotlinx.browser.window
+import org.w3c.dom.url.URLSearchParams
+
 /**
  * A list of globals for this app.
  *
@@ -57,3 +60,11 @@ object AppGlobals {
 }
 
 val AppGlobals.title get() = AppGlobals.getValue("title")
+
+/**
+ * A property which indicates if we are currently running this site as part of a Kobweb export.
+ *
+ * While it should be rare that you'll need to use it, it can be useful to check if you want to avoid doing some
+ * side effect that shouldn't happen at export time, like sending page visit analytics to a server for example.
+ */
+val AppGlobals.isExporting get() = URLSearchParams(window.location.search).has("_kobwebIsExporting")

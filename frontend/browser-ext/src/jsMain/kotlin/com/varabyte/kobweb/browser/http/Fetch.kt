@@ -79,6 +79,7 @@ class ResponseException(val response: Response, val bodyBytes: ByteArray?) : Exc
  * Default values for [fetch] (or methods that delegate to fetch).
  */
 object FetchDefaults {
+    var Headers: Map<String, Any>? = null
     var Redirect: RequestRedirect? = null
 }
 
@@ -91,7 +92,7 @@ object FetchDefaults {
 suspend fun Window.fetch(
     method: HttpMethod,
     resource: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     abortController: AbortController? = null
@@ -140,7 +141,7 @@ suspend fun Window.fetch(
 suspend fun Window.tryFetch(
     method: HttpMethod,
     resource: String,
-    headers: Map<String, Any>? = null,
+    headers: Map<String, Any>? = FetchDefaults.Headers,
     body: ByteArray? = null,
     redirect: RequestRedirect? = FetchDefaults.Redirect,
     logOnError: Boolean = false,

@@ -25,7 +25,7 @@ kobweb {
         process.set { markdownEntries ->
             generateMarkdown("markdown/listing.md", buildString {
                 appendLine("# Listing Index")
-                markdownEntries.forEach { entry ->
+                markdownEntries.sortedBy { it.route }.forEach { entry ->
                     appendLine("* [${entry.filePath}](${entry.route})")
                 }
             })
@@ -34,6 +34,28 @@ kobweb {
     }
     kspProcessorDependency.set("com.varabyte.kobweb:site-processors")
 }
+
+val generateTestMarkdownTask = tasks.register("generateTestMarkdown") {
+    // $name here to create a unique output directory just for this task
+    val genOutputDir = layout.buildDirectory.dir("generated/$name/src/jsMain/resources/markdown")
+
+    outputs.dir(genOutputDir)
+
+    doLast {
+        genOutputDir.get().file("markdown/GenerateTest.md").asFile.apply {
+            parentFile.mkdirs()
+            writeText("""
+                # HELLO WORLD
+            """.trimIndent()
+            )
+
+            println("Generated $absolutePath")
+        }
+    }
+}
+
+kobweb.markdown.addSource(generateTestMarkdownTask)
+kobweb.markdown.addSource(project.layout.projectDirectory.dir("src/jsMain/resources/markdown-src"), ".")
 
 kotlin {
     configAsKobwebApplication(includeServer = true)

@@ -44,6 +44,12 @@ internal typealias LengthColorStopsBuilderEntry = Gradient.ColorStopsBuilder.Ent
 typealias AngleColorStopsBuilder = Gradient.ColorStopsBuilder<CSSAngleNumericValue>
 internal typealias AngleColorStopsBuilderEntry = Gradient.ColorStopsBuilder.Entry<CSSAngleNumericValue>
 
+// All repeating gradients take the same arguments as the non-repeating versions; they just use a different name and
+// interpret the arguments differently.
+class RepeatingGradient<G : Gradient> internal constructor(private val wrapped: G) : Gradient by wrapped {
+    override fun toString() = "repeating-$wrapped"
+}
+
 // region linear gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/linear-gradient
 
 sealed class LinearGradient(private val gradientStr: String) : Gradient {
@@ -71,59 +77,134 @@ sealed class LinearGradient(private val gradientStr: String) : Gradient {
 
     override fun toString() = "linear-gradient($gradientStr)"
 
-    internal class Default internal constructor(vararg entries: LengthColorStopsBuilderEntry) :
-        LinearGradient(entries.joinToString())
-
-    internal class ByDirection internal constructor(dir: Direction, vararg entries: LengthColorStopsBuilderEntry) :
-        LinearGradient("$dir, ${entries.joinToString()}")
-
-    internal class ByAngle internal constructor(
-        angle: CSSAngleNumericValue,
+    internal sealed class Base<T>(
+        dir: T?,
+        interpolation: ColorInterpolationMethod?,
         vararg entries: LengthColorStopsBuilderEntry
-    ) :
-        LinearGradient("$angle, ${entries.joinToString()}")
+    ) : LinearGradient(buildString {
+        append(listOfNotNull(dir, interpolation).joinToString(" "))
+        if (this.isNotEmpty()) {
+            append(", ")
+        }
+        append(entries.joinToString())
+    })
+
+    internal class ByDirection(
+        dir: Direction?,
+        interpolation: ColorInterpolationMethod?,
+        vararg entries: LengthColorStopsBuilderEntry
+    ) : Base<Direction>(dir, interpolation, *entries)
+
+    internal class ByAngle(
+        angle: CSSAngleNumericValue?,
+        interpolation: ColorInterpolationMethod?,
+        vararg entries: LengthColorStopsBuilderEntry
+    ) : Base<CSSAngleNumericValue>(angle, interpolation, *entries)
 }
 
-fun linearGradient(dir: LinearGradient.Direction, init: LengthColorStopsBuilder.() -> Unit): LinearGradient {
+fun linearGradient(
+    dir: LinearGradient.Direction,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): LinearGradient {
     return LengthColorStopsBuilder().apply(init).let {
-        LinearGradient.ByDirection(dir, *it.verifiedEntries())
+        LinearGradient.ByDirection(dir, interpolation, *it.verifiedEntries())
     }
 }
 
-fun linearGradient(angle: CSSAngleNumericValue, init: LengthColorStopsBuilder.() -> Unit): LinearGradient {
+fun linearGradient(
+    angle: CSSAngleNumericValue,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): LinearGradient {
     return LengthColorStopsBuilder().apply(init).let {
-        LinearGradient.ByAngle(angle, *it.verifiedEntries())
+        LinearGradient.ByAngle(angle, interpolation, *it.verifiedEntries())
     }
 }
 
-fun linearGradient(init: LengthColorStopsBuilder.() -> Unit): LinearGradient {
+fun linearGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): LinearGradient {
     return LengthColorStopsBuilder().apply(init).let {
-        LinearGradient.Default(*it.verifiedEntries())
+        LinearGradient.ByDirection(null, interpolation, *it.verifiedEntries())
     }
 }
 
-// Using the builder is flexible, but provide some useful defaults for common cases
+// Using the builder is flexible, but provide overloads for the common 2-color case
 
-fun linearGradient(dir: LinearGradient.Direction, from: CSSColorValue, to: CSSColorValue) = linearGradient(dir) {
+fun linearGradient(
+    from: CSSColorValue,
+    to: CSSColorValue,
+    dir: LinearGradient.Direction,
+    interpolation: ColorInterpolationMethod? = null,
+) = linearGradient(dir, interpolation) {
     add(from)
     add(to)
 }
 
-fun linearGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue) = linearGradient(angle) {
+fun linearGradient(
+    from: CSSColorValue,
+    to: CSSColorValue,
+    angle: CSSAngleNumericValue,
+    interpolation: ColorInterpolationMethod? = null,
+) = linearGradient(angle, interpolation) {
     add(from)
     add(to)
 }
 
-fun linearGradient(from: CSSColorValue, to: CSSColorValue) = linearGradient {
+// This overload is provided to avoid ambiguity issues between the previous two
+fun linearGradient(
+    from: CSSColorValue,
+    to: CSSColorValue,
+    interpolation: ColorInterpolationMethod? = null,
+) = linearGradient(interpolation) {
     add(from)
     add(to)
+}
+
+@Deprecated(
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
+    ReplaceWith("linearGradient(from, to, dir)")
+)
+fun linearGradient(dir: LinearGradient.Direction, from: CSSColorValue, to: CSSColorValue) =
+    linearGradient(from, to, dir)
+
+@Deprecated(
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
+    ReplaceWith("linearGradient(from, to, angle)")
+)
+fun linearGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue) =
+    linearGradient(from, to, angle)
+
+fun repeatingLinearGradient(
+    dir: LinearGradient.Direction,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<LinearGradient> {
+    return RepeatingGradient(linearGradient(dir, interpolation, init))
+}
+
+fun repeatingLinearGradient(
+    angle: CSSAngleNumericValue,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<LinearGradient> {
+    return RepeatingGradient(linearGradient(angle, interpolation, init))
+}
+
+fun repeatingLinearGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<LinearGradient> {
+    return RepeatingGradient(linearGradient(interpolation, init))
 }
 
 // endregion
 
 // region radial gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/radial-gradient
 
-sealed class RadialGradient(private val gradientStr: String) : Gradient {
+class RadialGradient private constructor(private val gradientStr: String) : Gradient {
     sealed class Shape(private val value: String) {
         override fun toString() = value
 
@@ -179,123 +260,187 @@ sealed class RadialGradient(private val gradientStr: String) : Gradient {
 
     override fun toString() = "radial-gradient($gradientStr)"
 
-    internal class Default internal constructor(position: CSSPosition?, vararg entries: LengthColorStopsBuilderEntry) :
-        RadialGradient(buildString {
-            if (position != null) {
-                if (this.isNotEmpty()) append(' ')
-
-                append("at $position")
-            }
-            if (this.isNotEmpty()) {
-                append(", ")
-            }
-            append(entries.joinToString())
-        })
-
-    internal class ByShape internal constructor(
-        shape: Shape,
+    internal constructor(
+        shape: Shape?,
         position: CSSPosition?,
+        interpolation: ColorInterpolationMethod?,
         vararg entries: LengthColorStopsBuilderEntry
-    ) :
-        RadialGradient(buildString {
-            append(shape.toString())
-            if (position != null) {
-                append(" at $position")
-            }
+    ) : this(buildString {
+        append(listOfNotNull(shape, position?.let { "at $it" }, interpolation).joinToString(" "))
+        if (this.isNotEmpty()) {
             append(", ")
-            append(entries.joinToString())
-        })
+        }
+        append(entries.joinToString())
+    })
 }
 
 fun radialGradient(
-    shape: RadialGradient.Shape,
+    shape: RadialGradient.Shape?,
     position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
     init: LengthColorStopsBuilder.() -> Unit
 ): RadialGradient {
     return LengthColorStopsBuilder().apply(init).let {
-        RadialGradient.ByShape(shape, position, *it.verifiedEntries())
+        RadialGradient(shape, position, interpolation, *it.verifiedEntries())
     }
 }
 
-fun radialGradient(position: CSSPosition? = null, init: LengthColorStopsBuilder.() -> Unit): RadialGradient {
+fun radialGradient(
+    position: CSSPosition?,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RadialGradient {
     return LengthColorStopsBuilder().apply(init).let {
-        RadialGradient.Default(position, *it.verifiedEntries())
+        RadialGradient(null, position, interpolation, *it.verifiedEntries())
     }
 }
 
-// Using the builder is flexible, but provide some useful defaults for common cases
-
-fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
-    radialGradient(shape, position) {
-        add(from)
-        add(to)
+fun radialGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RadialGradient {
+    return LengthColorStopsBuilder().apply(init).let {
+        RadialGradient(null, null, interpolation, *it.verifiedEntries())
     }
+}
 
-fun radialGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = radialGradient(position) {
+// Using the builder is flexible, but provide an overload for the common 2-color case
+
+fun radialGradient(
+    from: CSSColorValue,
+    to: CSSColorValue,
+    shape: RadialGradient.Shape? = null,
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+) = radialGradient(shape, position, interpolation) {
     add(from)
     add(to)
+}
+
+@Deprecated(
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
+    ReplaceWith("radialGradient(from, to, shape, position)")
+)
+fun radialGradient(shape: RadialGradient.Shape, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
+    radialGradient(from, to, shape, position)
+
+fun repeatingRadialGradient(
+    shape: RadialGradient.Shape?,
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<RadialGradient> {
+    return RepeatingGradient(radialGradient(shape, position, interpolation, init))
+}
+
+fun repeatingRadialGradient(
+    position: CSSPosition?,
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<RadialGradient> {
+    return RepeatingGradient(radialGradient(position, interpolation, init))
+}
+
+fun repeatingRadialGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: LengthColorStopsBuilder.() -> Unit
+): RepeatingGradient<RadialGradient> {
+    return RepeatingGradient(radialGradient(interpolation, init))
 }
 
 // endregion
 
 // region conic gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/conic-gradient
 
-sealed class ConicGradient(private val gradientStr: String) : Gradient {
+class ConicGradient private constructor(private val gradientStr: String) : Gradient {
     override fun toString() = "conic-gradient($gradientStr)"
 
-    internal class Default internal constructor(position: CSSPosition?, vararg entries: AngleColorStopsBuilderEntry) :
-        ConicGradient(buildString {
-            if (position != null) {
-                append("at $position")
-            }
-            if (this.isNotEmpty()) {
-                append(", ")
-            }
-            append(entries.joinToString())
-        })
-
-    internal class ByAngle internal constructor(
-        angle: CSSAngleNumericValue,
+    internal constructor(
+        angle: CSSAngleNumericValue?,
         position: CSSPosition?,
+        interpolation: ColorInterpolationMethod?,
         vararg entries: AngleColorStopsBuilderEntry
-    ) :
-        ConicGradient(buildString {
-            append("from $angle")
-            if (position != null) {
-                append(" at $position")
-            }
+    ) : this(buildString {
+        append(listOfNotNull(angle?.let { "from $it" }, position?.let { "at $it" }, interpolation).joinToString(" "))
+        if (this.isNotEmpty()) {
             append(", ")
-            append(entries.joinToString())
-        })
+        }
+        append(entries.joinToString())
+    })
 }
 
 fun conicGradient(
-    angle: CSSAngleNumericValue,
+    angle: CSSAngleNumericValue?,
     position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
     init: AngleColorStopsBuilder.() -> Unit
 ): ConicGradient {
     return AngleColorStopsBuilder().apply(init).let {
-        ConicGradient.ByAngle(angle, position, *it.verifiedEntries())
+        ConicGradient(angle, position, interpolation, *it.verifiedEntries())
     }
 }
 
-fun conicGradient(position: CSSPosition? = null, init: AngleColorStopsBuilder.() -> Unit): ConicGradient {
+fun conicGradient(
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): ConicGradient {
     return AngleColorStopsBuilder().apply(init).let {
-        ConicGradient.Default(position, *it.verifiedEntries())
+        ConicGradient(null, position, interpolation, *it.verifiedEntries())
     }
 }
 
-// Using the builder is flexible, but provide some useful defaults for common cases
-
-fun conicGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
-    conicGradient(angle, position) {
-        add(from)
-        add(to)
+fun conicGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): ConicGradient {
+    return AngleColorStopsBuilder().apply(init).let {
+        ConicGradient(null, null, interpolation, *it.verifiedEntries())
     }
+}
 
-fun conicGradient(from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) = conicGradient(position) {
+// Using the builder is flexible, but provide an overload for the common 2-color case
+
+fun conicGradient(
+    from: CSSColorValue,
+    to: CSSColorValue,
+    angle: CSSAngleNumericValue? = null,
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+) = conicGradient(angle, position, interpolation) {
     add(from)
     add(to)
+}
+
+@Deprecated(
+    "The arguments have been reordered to accept the colors first, as this order is more suited to adding additional optional arguments across the different method variants in a consistent way.",
+    ReplaceWith("conicGradient(from, to, angle, position)")
+)
+fun conicGradient(angle: CSSAngleNumericValue, from: CSSColorValue, to: CSSColorValue, position: CSSPosition? = null) =
+    conicGradient(from, to, angle, position)
+
+fun repeatingConicGradient(
+    angle: CSSAngleNumericValue?,
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): RepeatingGradient<ConicGradient> {
+    return RepeatingGradient(conicGradient(angle, position, interpolation, init))
+}
+
+fun repeatingConicGradient(
+    position: CSSPosition? = null,
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): RepeatingGradient<ConicGradient> {
+    return RepeatingGradient(conicGradient(position, interpolation, init))
+}
+
+fun repeatingConicGradient(
+    interpolation: ColorInterpolationMethod? = null,
+    init: AngleColorStopsBuilder.() -> Unit
+): RepeatingGradient<ConicGradient> {
+    return RepeatingGradient(conicGradient(interpolation, init))
 }
 
 // endregion

@@ -79,9 +79,6 @@ fun Application.configureHTTP(env: ServerEnvironment, conf: KobwebConf) {
         gzip {
             priority = 1.0
         }
-        deflate {
-            priority = 10.0
-        }
     }
 
     if (env == ServerEnvironment.PROD) {

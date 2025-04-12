@@ -17,6 +17,8 @@ import java.io.File
 value class Route(private val routeStr: String) {
     val isDynamic get() = routeStr.split("/").any { it.isSurrounded("{", "}") }
 
+    override fun toString() = routeStr
+
     /**
      * Resolve a route with a reference path to some file to generate an absolute path.
      *

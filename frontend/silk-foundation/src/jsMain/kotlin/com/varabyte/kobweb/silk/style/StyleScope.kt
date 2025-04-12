@@ -170,7 +170,7 @@ internal class CssModifier(
     val key get() = Key(mediaQuery?.toString(), suffix)
 }
 
-internal fun CssModifier.assertNoAttributes(selectorName: String, extraContext: String) {
+internal fun CssModifier.assertNoAttributes(selectorName: String, lazyExtraContext: () -> String) {
     val attrsScope = ComparableAttrsScope<Element>()
     this.modifier.toAttrs<AttrsScope<Element>>().invoke(attrsScope)
 
@@ -188,6 +188,6 @@ internal fun CssModifier.assertNoAttributes(selectorName: String, extraContext: 
         appendLine("\"")
         appendLine("\tAttribute(s): ${attrsScope.attributes.keys.joinToString(", ") { "\"$it\"" }}")
         appendLine()
-        appendLine(extraContext)
+        appendLine(lazyExtraContext())
     })
 }

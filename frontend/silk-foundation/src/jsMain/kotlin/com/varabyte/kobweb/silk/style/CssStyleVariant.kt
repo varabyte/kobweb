@@ -77,7 +77,6 @@ fun <K : ComponentKind> CssStyleVariant<K>.thenUnless(
  *
  * Returns `null` if the collection is empty or entirely `null`.
  */
-@Composable
 fun <K : ComponentKind> Iterable<CssStyleVariant<K>?>.combine(): CssStyleVariant<K>? {
     return reduceOrNull { acc, variant ->
         if (acc != null && variant != null) acc.then(variant) else acc ?: variant
