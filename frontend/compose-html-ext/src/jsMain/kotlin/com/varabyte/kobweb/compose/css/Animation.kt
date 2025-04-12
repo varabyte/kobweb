@@ -1,5 +1,7 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.GlobalStylePropertyValues
+import com.varabyte.kobweb.compose.css.global.globalStyleValues
 import org.jetbrains.compose.web.css.*
 
 value class AnimationIterationCount private constructor(private val count: Number?) : StylePropertyValue {
@@ -12,7 +14,7 @@ value class AnimationIterationCount private constructor(private val count: Numbe
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
-sealed class Animation private constructor(private val value: String) : StylePropertyValue, CssStyleProperty<Animation>(value) {
+sealed class Animation private constructor(private val value: String) : StylePropertyValue {
     override fun toString(): String = value
 
     private class Keyword(value: String) : Animation(value)
@@ -49,7 +51,7 @@ sealed class Animation private constructor(private val value: String) : StylePro
         }.joinToString(" ")
     )
 
-    companion object {
+    companion object : GlobalStylePropertyValues<Animation> by globalStyleValues(::Animation) {
         fun of(
             name: String,
             duration: CSSTimeNumericValue? = null,
