@@ -21,7 +21,7 @@ import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 class BackgroundAttachment private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : GlobalStylePropertyValues<BackgroundAttachment> by globalStyleValues(::BackgroundAttachment) {
         // Keywords
         val Scroll get() = BackgroundAttachment("scroll")
         val Fixed get() = BackgroundAttachment("fixed")
