@@ -43,9 +43,9 @@ fun HomePage() {
     }
     Span {
       Text("Create rich, dynamic web apps with ease, leveraging ")
-      Link("https://kotlinlang.org/", "Kotlin")
+      Anchor("https://kotlinlang.org/", "Kotlin")
       Text(" and ")
-      Link(
+      Anchor(
         "https://github.com/JetBrains/compose-multiplatform/#compose-html",
         "Compose HTML"
       )
