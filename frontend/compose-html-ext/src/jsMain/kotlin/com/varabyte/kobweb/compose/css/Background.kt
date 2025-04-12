@@ -44,7 +44,7 @@ fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
 class BackgroundClip private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object : GlobalStyleValues<BackgroundClip> by globalStyleValues(::BackgroundClip) {
+    companion object : GlobalStylePropertyValues<BackgroundClip> by globalStyleValues(::BackgroundClip) {
         // Keywords
         val BorderBox get() = BackgroundClip("border-box")
         val PaddingBox get() = BackgroundClip("padding-box")
@@ -61,7 +61,7 @@ fun StyleScope.backgroundClip(backgroundClip: BackgroundClip) {
 class BackgroundColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object : GlobalStyleValues<BackgroundColor> by globalStyleValues(::BackgroundColor) {
+    companion object : GlobalStylePropertyValues<BackgroundColor> by globalStyleValues(::BackgroundColor) {
         // Keywords
         val CurrentColor get() = BackgroundColor("currentcolor")
         val Transparent get() = BackgroundColor("transparent")
@@ -221,7 +221,7 @@ sealed class Background private constructor(private val value: String) : StylePr
         }.joinToString(" ")
     )
 
-    companion object : GlobalStyleValues<Background> by globalStyleValues(::Background){
+    companion object : GlobalStylePropertyValues<Background> by globalStyleValues(::Background){
         // Keyword
         val None: Background get() = Keyword("none")
 
