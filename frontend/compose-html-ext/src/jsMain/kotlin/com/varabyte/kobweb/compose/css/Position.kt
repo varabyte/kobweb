@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // region horizontal and vertical positions
@@ -8,13 +9,7 @@ import org.jetbrains.compose.web.css.*
 class Bottom private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-        // Global
-        val Inherit get() = Bottom("inherit")
-        val Initial get() = Bottom("initial")
-        val Revert get() = Bottom("revert")
-        val Unset get() = Bottom("unset")
-    }
+    companion object: CssGlobalValues<Bottom>
 }
 
 fun StyleScope.bottom(bottom: Bottom) {
@@ -25,13 +20,7 @@ fun StyleScope.bottom(bottom: Bottom) {
 class Top private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-        // Global
-        val Inherit get() = Top("inherit")
-        val Initial get() = Top("initial")
-        val Revert get() = Top("revert")
-        val Unset get() = Top("unset")
-    }
+    companion object: CssGlobalValues<Top>
 }
 
 fun StyleScope.top(top: Top) {
@@ -42,13 +31,7 @@ fun StyleScope.top(top: Top) {
 class Left private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-        // Global
-        val Inherit get() = Left("inherit")
-        val Initial get() = Left("initial")
-        val Revert get() = Left("revert")
-        val Unset get() = Left("unset")
-    }
+    companion object: CssGlobalValues<Left>
 }
 
 fun StyleScope.left(left: Left) {
@@ -59,13 +42,7 @@ fun StyleScope.left(left: Left) {
 class Right private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-        // Global
-        val Inherit get() = Right("inherit")
-        val Initial get() = Right("initial")
-        val Revert get() = Right("revert")
-        val Unset get() = Right("unset")
-    }
+    companion object: CssGlobalValues<Right>
 }
 
 fun StyleScope.right(right: Right) {
@@ -85,19 +62,13 @@ fun StyleScope.right(right: Right) {
 class CSSFloat private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<CSSFloat> {
         // Keyword
         val Left get() = CSSFloat("left")
         val Right get() = CSSFloat("right")
         val None get() = CSSFloat("none")
         val InlineStart get() = CSSFloat("inline-start")
         val InlineEnd get() = CSSFloat("inline-end")
-
-        // Global
-        val Inherit get() = CSSFloat("inherit")
-        val Initial get() = CSSFloat("initial")
-        val Revert get() = CSSFloat("revert")
-        val Unset get() = CSSFloat("unset")
     }
 }
 

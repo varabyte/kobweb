@@ -1,21 +1,16 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/box-decoration-break
 class BoxDecorationBreak private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<BoxDecorationBreak> {
         // Keyword
         val Slice get() = BoxDecorationBreak("slice")
         val Clone get() = BoxDecorationBreak("clone")
-
-        // Global
-        val Inherit get() = BoxDecorationBreak("inherit")
-        val Initial get() = BoxDecorationBreak("initial")
-        val Revert get() = BoxDecorationBreak("revert")
-        val Unset get() = BoxDecorationBreak("unset")
     }
 }
 
@@ -27,16 +22,10 @@ fun StyleScope.boxDecorationBreak(boxDecorationBreak: BoxDecorationBreak) {
 class BoxSizing private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<BoxSizing> {
         // Keyword
         val BorderBox get() = BoxSizing("border-box")
         val ContentBox get() = BoxSizing("content-box")
-
-        // Global
-        val Inherit get() = BoxSizing("inherit")
-        val Initial get() = BoxSizing("initial")
-        val Revert get() = BoxSizing("revert")
-        val Unset get() = BoxSizing("unset")
     }
 }
 
@@ -211,15 +200,9 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
         },
     )
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         // Keyword
         val None: BoxShadow get() = Keyword("none")
-
-        // Global Keywords
-        val Inherit: BoxShadow get() = Keyword("inherit")
-        val Initial: BoxShadow get() = Keyword("initial")
-        val Revert: BoxShadow get() = Keyword("revert")
-        val Unset: BoxShadow get() = Keyword("unset")
 
         // Custom
         /**

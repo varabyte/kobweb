@@ -1,20 +1,15 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
 class AspectRatio private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<AspectRatio> {
         // Keywords
         val Auto get() = AspectRatio("auto")
-
-        // Global values
-        val Inherit get() = AspectRatio("inherit")
-        val Initial get() = AspectRatio("initial")
-        val Revert get() = AspectRatio("revert")
-        val Unset get() = AspectRatio("unset")
     }
 }
 
@@ -34,7 +29,7 @@ fun StyleScope.aspectRatio(aspectRatio: AspectRatio) {
 class Clear private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<Clear> {
         // Keyword values
         val None get() = Clear("none")
         val Left get() = Clear("left")
@@ -42,12 +37,6 @@ class Clear private constructor(private val value: String) : StylePropertyValue 
         val Both get() = Clear("both")
         val InlineStart get() = Clear("inline-start")
         val InlineEnd get() = Clear("inline-end")
-
-        // Global values
-        val Inherit get() = Clear("inherit")
-        val Initial get() = Clear("initial")
-        val Revert get() = Clear("revert")
-        val Unset get() = Clear("unset")
     }
 }
 
@@ -59,15 +48,9 @@ fun StyleScope.clear(clear: Clear) {
 class LineHeight private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<LineHeight> {
         // Keywords
         val Normal get() = LineHeight("normal")
-
-        // Global values
-        val Inherit get() = LineHeight("inherit")
-        val Initial get() = LineHeight("initial")
-        val Revert get() = LineHeight("revert")
-        val Unset get() = LineHeight("unset")
     }
 }
 
@@ -172,7 +155,7 @@ fun StyleScope.paddingBlockEnd(value: CSSLengthOrPercentageNumericValue) {
 class Resize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<Resize> {
         // Keyword
         val None get() = Resize("none")
         val Both get() = Resize("both")
@@ -180,12 +163,6 @@ class Resize private constructor(private val value: String) : StylePropertyValue
         val Vertical get() = Resize("vertical")
         val Block get() = Resize("block")
         val Inline get() = Resize("inline")
-
-        // Global
-        val Inherit get() = Resize("inherit")
-        val Initial get() = Resize("initial")
-        val Revert get() = Resize("revert")
-        val Unset get() = Resize("unset")
     }
 }
 
@@ -197,7 +174,7 @@ fun StyleScope.resize(resize: Resize) {
 class VerticalAlign private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<VerticalAlign> {
         // Keyword
         val Baseline get() = VerticalAlign("baseline")
         val Sub get() = VerticalAlign("sub")
@@ -207,12 +184,6 @@ class VerticalAlign private constructor(private val value: String) : StyleProper
         val Middle get() = VerticalAlign("middle")
         val Top get() = VerticalAlign("top")
         val Bottom get() = VerticalAlign("bottom")
-
-        // Global
-        val Inherit get() = VerticalAlign("inherit")
-        val Initial get() = VerticalAlign("initial")
-        val Revert get() = VerticalAlign("revert")
-        val Unset get() = VerticalAlign("unset")
     }
 }
 

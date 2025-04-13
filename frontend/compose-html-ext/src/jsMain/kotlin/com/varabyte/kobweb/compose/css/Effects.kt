@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSFilter
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
@@ -8,15 +9,9 @@ import org.jetbrains.compose.web.css.*
 class Filter private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<Filter> {
         // Keyword
         val None get() = Filter("none")
-
-        // Global
-        val Inherit get() = Filter("inherit")
-        val Initial get() = Filter("initial")
-        val Revert get() = Filter("revert")
-        val Unset get() = Filter("unset")
     }
 }
 

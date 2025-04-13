@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
@@ -8,16 +9,10 @@ import org.jetbrains.compose.web.css.*
 class TransitionBehavior private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<TransitionBehavior> {
         // Keywords
         val AllowDiscrete get() = TransitionBehavior("allow-discrete")
         val Normal get() = TransitionBehavior("normal")
-
-        // Global values
-        val Inherit get() = TransitionBehavior("inherit")
-        val Initial get() = TransitionBehavior("initial")
-        val Revert get() = TransitionBehavior("revert")
-        val Unset get() = TransitionBehavior("unset")
     }
 }
 
@@ -36,7 +31,7 @@ sealed class TransitionProperty private constructor(private val value: String) :
     private class Keyword(value: String) : TransitionProperty(value)
     class Name internal constructor(value: String) : TransitionProperty(value)
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         // Custom
         fun of(customValue: String): Name {
             require(customValue.isNotEmpty() && customValue.none { it.isWhitespace() }) {
@@ -48,12 +43,6 @@ sealed class TransitionProperty private constructor(private val value: String) :
         // Keywords
         val None: TransitionProperty get() = Keyword("none")
         val All get() = Name("all") // Essentially a special property name
-
-        // Global values
-        val Inherit: TransitionProperty get() = Keyword("inherit")
-        val Initial: TransitionProperty get() = Keyword("initial")
-        val Revert: TransitionProperty get() = Keyword("revert")
-        val Unset: TransitionProperty get() = Keyword("unset")
     }
 }
 
@@ -72,13 +61,7 @@ fun StyleScope.transitionProperty(vararg properties: String) {
 class TransitionDuration private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-        // Global values
-        val Inherit get() = TransitionDuration("inherit")
-        val Initial get() = TransitionDuration("initial")
-        val Revert get() = TransitionDuration("revert")
-        val Unset get() = TransitionDuration("unset")
-    }
+    companion object: CssGlobalValues<TransitionDuration>
 }
 
 fun StyleScope.transitionDuration(duration: TransitionDuration) {
@@ -96,13 +79,7 @@ fun StyleScope.transitionDuration(vararg durations: CSSTimeNumericValue) {
 class TransitionDelay private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-        // Global values
-        val Inherit get() = TransitionDelay("inherit")
-        val Initial get() = TransitionDelay("initial")
-        val Revert get() = TransitionDelay("revert")
-        val Unset get() = TransitionDelay("unset")
-    }
+    companion object: CssGlobalValues<TransitionDelay>
 }
 
 fun StyleScope.transitionDelay(delay: TransitionDelay) {
@@ -152,15 +129,9 @@ sealed class Transition private constructor(private val value: String) : StylePr
         }.joinToString(" ")
     )
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         // Keyword
         val None: Transition get() = Keyword("none")
-
-        // Global Keywords
-        val Inherit: Transition get() = Keyword("inherit")
-        val Initial: Transition get() = Keyword("initial")
-        val Revert: Transition get() = Keyword("revert")
-        val Unset: Transition get() = Keyword("unset")
 
         fun of(
             property: TransitionProperty.Name,

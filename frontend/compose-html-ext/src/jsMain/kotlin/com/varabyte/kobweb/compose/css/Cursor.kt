@@ -1,12 +1,13 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 class Cursor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<Cursor> {
         // General
         val Auto get() = Cursor("auto")
         val Default get() = Cursor("default")
@@ -54,12 +55,6 @@ class Cursor private constructor(private val value: String) : StylePropertyValue
         // Zoom
         val ZoomIn get() = Cursor("zoom-in")
         val ZoomOut get() = Cursor("zoom-out")
-
-        // Global
-        val Inherit get() = Cursor("inherit")
-        val Initial get() = Cursor("initial")
-        val Revert get() = Cursor("revert")
-        val Unset get() = Cursor("unset")
     }
 }
 
