@@ -23,7 +23,6 @@ truthish = "1.0.2"
 [libraries]
 commonmark-core = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
 commonmark-autolink = { module = "org.commonmark:commonmark-ext-autolink", version.ref = "commonmark" }
-commonmark-frontmatter = { module = "org.commonmark:commonmark-ext-yaml-front-matter", version.ref = "commonmark" }
 commonmark-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark" }
 commonmark-tasklist = { module = "org.commonmark:commonmark-ext-task-list-items", version.ref = "commonmark" }
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose" }
@@ -61,7 +60,7 @@ playwright = { module = "com.microsoft.playwright:playwright", version.ref = "pl
 truthish = { module = "com.varabyte.truthish:truthish", version.ref = "truthish" }
 
 [bundles]
-commonmark = ["commonmark-core", "commonmark-autolink", "commonmark-frontmatter", "commonmark-tables", "commonmark-tasklist"]
+commonmark = ["commonmark-core", "commonmark-autolink", "commonmark-tables", "commonmark-tasklist"]
 ktor = [
     "ktor-serialization-json",
     "ktor-server-auth",

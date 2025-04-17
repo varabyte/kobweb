@@ -2,14 +2,13 @@ package com.varabyte.kobwebx.gradle.markdown.tasks
 
 import com.varabyte.kobweb.common.lang.packageFromFile
 import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 import com.varabyte.kobwebx.gradle.markdown.MarkdownBlock
 import com.varabyte.kobwebx.gradle.markdown.MarkdownEntry
 import com.varabyte.kobwebx.gradle.markdown.MarkdownFeatures
+import com.varabyte.kobwebx.gradle.markdown.frontmatter.FrontMatterBlock
 import com.varabyte.kobwebx.gradle.markdown.util.RouteUtils
 import com.varabyte.kobwebx.gradle.markdown.util.visitFiles
-import com.varabyte.kobwebx.gradle.markdown.yamlStringToKotlinString
-import org.commonmark.ext.front.matter.YamlFrontMatterBlock
-import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.CustomBlock
 import org.gradle.api.provider.Property
@@ -25,19 +24,10 @@ import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
 
 private class MarkdownVisitor : AbstractVisitor() {
-    private val _frontMatter = mutableMapOf<String, List<String>>()
-    val frontMatter: Map<String, List<String>> = _frontMatter
-
+    var frontMatterElement: FrontMatterElement? = null
     override fun visit(customBlock: CustomBlock) {
-        if (customBlock is YamlFrontMatterBlock) {
-            val yamlVisitor = YamlFrontMatterVisitor()
-            customBlock.accept(yamlVisitor)
-            _frontMatter.putAll(
-                yamlVisitor.data
-                    .mapValues { (_, values) ->
-                        values.map { it.yamlStringToKotlinString() }
-                    }
-            )
+        if (customBlock is FrontMatterBlock) {
+            frontMatterElement = customBlock.frontMatterNode.element
         }
     }
 }
@@ -87,17 +77,19 @@ abstract class ProcessMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                         parser
                             .parse(mdFile.readText())
                             .accept(visitor)
-                        add(
-                            MarkdownEntry(
-                                filePath = relativePagePath.invariantSeparatorsPathString,
-                                frontMatter = visitor.frontMatter,
-                                route = RouteUtils.getRoute(
-                                    relativePagePath.toFile(),
-                                    visitor.frontMatter,
-                                ),
-                                "${srcPath.packageFromFile()}.${mdFile.capitalizedNameWithoutExtension}Page"
+                        visitor.frontMatterElement?.let { frontMatter ->
+                            add(
+                                MarkdownEntry(
+                                    filePath = relativePagePath.invariantSeparatorsPathString,
+                                    frontMatter = frontMatter,
+                                    route = RouteUtils.getRoute(
+                                        relativePagePath.toFile(),
+                                        frontMatter,
+                                    ),
+                                    "${srcPath.packageFromFile()}.${mdFile.capitalizedNameWithoutExtension}Page"
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }

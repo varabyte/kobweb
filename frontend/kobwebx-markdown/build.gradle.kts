@@ -17,6 +17,7 @@ kotlin {
             implementation(libs.compose.runtime)
             implementation(libs.compose.html.core)
 
+            api(projects.common.kobwebxFrontmatter)
             implementation(projects.frontend.kobwebCore)
         }
     }

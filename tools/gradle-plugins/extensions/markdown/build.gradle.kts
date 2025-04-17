@@ -13,8 +13,13 @@ dependencies {
 
     implementation(libs.bundles.commonmark)
     implementation(libs.jsoup)
+    implementation(libs.kaml)
 
     implementation(projects.common.kobwebCommon)
+    // Get the JVM part of this KMP dependency, or else its classes don't end up in the plugin JAR
+    implementation(projects.common.kobwebxFrontmatter) {
+        targetConfiguration ="jvmRuntimeElements"
+    }
 
     // Compile only - the plugin itself should exist at runtime, provided by either the
     // Library or Application plugin.

@@ -153,16 +153,26 @@ abstract class MarkdownBlock(
     }
 
     /**
+     * The layout fqn to use as a fallback if no layout is provided.
+     *
+     * See the `@Layout` annotation for more information.
+     *
+     * This value will be overridden if a `layout` value is set inside the markdown's front-matter block.
+     *
+     * If left unset, no layout
+     */
+    abstract val defaultLayout: Property<String>
+
+    /**
      * The root composable to use as a fallback if no other root is provided.
      *
      * All markdown files, when converted to code, should have some root composable it lives within, wrapping all
      * content. It should be an element that has a natural vertical flow to it, such as Compose HTML's `Div` element
      * (the default value) or Kobweb's `Column` composable.
      *
-     * This root may be overridden if a `root` value is set inside the markdown's front-matter block.
+     * This root will be overridden if a `root` value is set inside the markdown's front-matter block.
      *
-     * If a site doesn't want any special root element to wrap all markdown source files, then this value can be set to
-     * the empty string to disable it.
+     * You can set this to the empty string if you want to disable it.
      */
     abstract val defaultRoot: Property<String>
 

@@ -1,5 +1,7 @@
 ---
-root: .components.layouts.PageLayout("KOTLIN")
+layout: .components.layouts.PageLayout
+data:
+  title: "KOTLIN"
 routeOverride: languages/kotlin
 ---
 

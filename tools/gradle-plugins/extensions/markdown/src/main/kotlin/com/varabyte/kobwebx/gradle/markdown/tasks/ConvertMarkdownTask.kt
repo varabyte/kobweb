@@ -17,6 +17,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
@@ -48,6 +49,11 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
     @Nested
     val markdownFeatures = markdownBlock.extensions.getByType<MarkdownFeatures>()
 
+    @Optional
+    @Input
+    val markdownDefaultLayout = markdownBlock.defaultLayout
+
+    @Optional
     @Input
     val markdownDefaultRoot = markdownBlock.defaultRoot
 
@@ -120,7 +126,8 @@ abstract class ConvertMarkdownTask @Inject constructor(markdownBlock: MarkdownBl
                     val ktRenderer = KotlinRenderer(
                         projectGroup.get().toString(),
                         nodeCache,
-                        markdownDefaultRoot.get().takeUnless { it.isBlank() },
+                        markdownDefaultLayout.orNull,
+                        markdownDefaultRoot.orNull,
                         markdownImports.get(),
                         markdownHandlers,
                         funName = sourcePath.capitalizedNameWithoutExtension +

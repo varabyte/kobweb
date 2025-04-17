@@ -1,6 +1,7 @@
 package com.varabyte.kobwebx.gradle.markdown.util
 
 import com.varabyte.kobweb.common.text.camelCaseToKebabCase
+import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 import java.io.File
 
 internal const val FRONTMATTER_KEY_ROUTE_OVERRIDE = "routeOverride"
@@ -37,9 +38,9 @@ internal object RouteUtils {
      *
      * This final route may be partially or entirely affected by a route override set in the front matter.
      */
-    fun getRoute(file: File, frontMatterData: Map<String, List<String>>): String {
+    fun getRoute(file: File, frontMatter: FrontMatterElement): String {
         val defaultSlug = file.toSlug()
-        val routeOverride = frontMatterData[FRONTMATTER_KEY_ROUTE_OVERRIDE]?.singleOrNull()
+        val routeOverride = frontMatter[FRONTMATTER_KEY_ROUTE_OVERRIDE]?.singleOrNull()
             ?.let { route -> if (route.endsWith('/')) "$route$defaultSlug" else route }
             // Front-matter instructs users to use "index" to indicate an index page, but we don't want to actually show
             // that to the user if we encounter that.

@@ -1,5 +1,7 @@
 ---
-root: .components.layouts.PageLayout("BANANAS")
+layout: .components.layouts.PageLayout
+data:
+  title: "BANANAS"
 routeOverride: /fruits/
 ---
 

@@ -1,10 +1,8 @@
 ---
-root: .components.layouts.PageLayout("MARKDOWN")
-imports:
-  - .components.widgets.*
+layout: .components.layouts.PageLayout
+data:
+  title: "MARKDOWN"
 ---
-
-## Markdown Example
 
 This site is generated from Markdown.
 

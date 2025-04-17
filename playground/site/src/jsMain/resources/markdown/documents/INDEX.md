@@ -1,5 +1,7 @@
 ---
-root: .components.layouts.PageLayout("DOCUMENTS")
+layout: .components.layouts.PageLayout
+data:
+  title: "DOCUMENTS"
 ---
 
 Links to some documents:

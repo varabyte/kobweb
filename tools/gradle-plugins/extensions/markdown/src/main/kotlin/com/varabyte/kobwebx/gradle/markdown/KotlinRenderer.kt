@@ -2,20 +2,18 @@ package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobweb.common.collect.TypedMap
 import com.varabyte.kobweb.common.navigation.Route
-import com.varabyte.kobweb.common.text.isSurrounded
 import com.varabyte.kobweb.gradle.core.util.Reporter
 import com.varabyte.kobweb.project.common.PackageUtils
+import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCall
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlock
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallBlockVisitor
+import com.varabyte.kobwebx.gradle.markdown.frontmatter.FrontMatterBlock
 import com.varabyte.kobwebx.gradle.markdown.handlers.MarkdownHandlers
 import com.varabyte.kobwebx.gradle.markdown.handlers.NodeScope
 import com.varabyte.kobwebx.gradle.markdown.util.NodeCache
 import com.varabyte.kobwebx.gradle.markdown.util.escapeQuotes
 import com.varabyte.kobwebx.gradle.markdown.util.unescapeQuotes
-import com.varabyte.kobwebx.gradle.markdown.util.unescapeTicks
-import org.commonmark.ext.front.matter.YamlFrontMatterBlock
-import org.commonmark.ext.front.matter.YamlFrontMatterVisitor
 import org.commonmark.ext.gfm.tables.TableBlock
 import org.commonmark.ext.gfm.tables.TableBody
 import org.commonmark.ext.gfm.tables.TableCell
@@ -47,38 +45,25 @@ import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.commonmark.renderer.Renderer
 import org.gradle.api.provider.Provider
-import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.invariantSeparatorsPathString
-
-fun String.yamlStringToKotlinString(): String {
-    return if (this.isSurrounded("\"")) {
-        this.removeSurrounding("\"").unescapeQuotes()
-    } else if (this.isSurrounded("'")) {
-        this.removeSurrounding("'").unescapeTicks()
-    } else {
-        this
-    }
-}
 
 /**
  * A markdown renderer that generates a Kobweb source file given an input markdown file.
  *
  * @property projectGroup The group of the project, which is used to resolve package shortcuts, e.g. "com.mysite"
  * @property nodeCache Cache which allows us to look up nodes by their relative path.
- * @property nodeMetadata Additional information about each node, including our own. This can be used to look up
- *   relevant file information about ourselves or other nodes fetched through the [nodeCache].
  * @property defaultRoot The default root layout to use if not specified in the markdown file. If null, and no root is
  *   specified by the markdown file, then no outer root node will be added to the page.
  * @property imports A list of additional imports to include at the top of the generated file.
  * @property handlers A set of handlers that can be used to customize how different markdown nodes are rendered.
- * @property pkg The package that the generated file should be placed in.
  * @property funName The name of the page function that will be generated.
  * @property reporter A reporter that can be used to log warnings and errors.
  */
 class KotlinRenderer internal constructor(
     private val projectGroup: String,
     private val nodeCache: NodeCache,
+    private val defaultLayout: String?,
     private val defaultRoot: String?,
     private val imports: List<String>,
     private val handlers: MarkdownHandlers,
@@ -112,7 +97,9 @@ class KotlinRenderer internal constructor(
                 appendLine()
                 appendLine("import androidx.compose.runtime.*")
                 appendLine("import com.varabyte.kobweb.core.*")
+                appendLine("import com.varabyte.kobweb.core.layout.*")
                 if (dependsOnMarkdownArtifact) {
+                    appendLine("import com.varabyte.kobwebx.frontmatter.*")
                     appendLine("import com.varabyte.kobwebx.markdown.*")
                 }
                 (imports + frontMatterData?.imports.orEmpty()).forEach { importPath ->
@@ -127,14 +114,27 @@ class KotlinRenderer internal constructor(
                         if (it.startsWith("/")) it else metadataEntry.routeWithoutSlug + it
                     } ?: routeWithSlug)
                     appendLine("\")")
+
+                    (frontMatterData?.layout ?: defaultLayout)?.takeIf { it.isNotBlank() }?.let { layout ->
+                        appendLine("@Layout(\"$layout\")")
+                    }
                 }
 
                 appendLine("@Composable")
-                appendLine("fun ${frontMatterData?.funName ?: funName}() {")
+                appendLine("fun ${frontMatterData?.funName ?: funName}(ctx: PageContext) {")
             }
         )
 
         indentCount++
+        frontMatterData?.data?.let { data ->
+            output.appendLine("${indent}LaunchedEffect(Unit) {")
+            indentCount++
+            data.forEach { (key, value) ->
+                output.appendLine("${indent}ctx.data[\"$key\"] = \"${value.escapeQuotes()}\"")
+            }
+            indentCount--
+            output.appendLine("$indent}")
+        }
         RenderVisitor(output, metadataEntry, frontMatterData).visitAndFinish(node)
         indentCount--
 
@@ -176,20 +176,24 @@ class KotlinRenderer internal constructor(
         }
     }
 
-    private class FrontMatterData(val raw: Map<String, List<String>>) {
-        val root: String? get() = raw["root"]?.singleOrNull()
-        val funName: String? get() = raw["funName"]?.singleOrNull()
-        val imports: List<String>? get() = raw["imports"]
-        val routeOverride: String? get() = raw["routeOverride"]?.singleOrNull()
+    private class FrontMatterData(val raw: FrontMatterElement.ValueMap) {
+        val root: String? get() = raw.map["root"]?.scalarOrNull()
+        val layout: String? get() = raw.map["layout"]?.scalarOrNull()
+        val data: Map<String, String> get() = raw.map["data"]?.scalarMap() ?: emptyMap()
+        val funName: String? get() = raw.map["funName"]?.scalarOrNull()
+        val imports: List<String>? get() = raw.map["imports"]?.scalarList() ?: emptyList()
+        val routeOverride: String? get() = raw.map["routeOverride"]?.scalarOrNull()
 
         // Hide front matter data from the user that is meant to be consumed by the renderer
-        fun filterUserData(): Map<String, List<String>> {
-            return raw.filterKeys {
+        fun filterUserData(): FrontMatterElement.ValueMap {
+            return FrontMatterElement.ValueMap(raw.map.filterKeys {
                 it != "root" &&
+                    it != "layout" &&
+                    it != "data" &&
                     it != "funName" &&
                     it != "imports" &&
                     it != "routeOverride"
-            }
+            })
         }
     }
 
@@ -199,11 +203,8 @@ class KotlinRenderer internal constructor(
             private set
 
         override fun visit(customBlock: CustomBlock) {
-            if (customBlock is YamlFrontMatterBlock) {
-                val yamlVisitor = YamlFrontMatterVisitor()
-                customBlock.accept(yamlVisitor)
-
-                data = FrontMatterData(yamlVisitor.data)
+            if (customBlock is FrontMatterBlock) {
+                data = FrontMatterData(customBlock.frontMatterNode.element)
             }
         }
     }
@@ -222,16 +223,47 @@ class KotlinRenderer internal constructor(
         init {
             var contextCreated = false
             if (metadataEntry.routeWithSlug != null && dependsOnMarkdownArtifact) {
-                val userData = frontMatterData
-                    ?.filterUserData()
-                    ?.mapValues { (_, values) -> values.map { it.yamlStringToKotlinString() } }
-                    ?: emptyMap()
+                val fmUserDataStr = frontMatterData?.filterUserData()
+                    ?.takeIf { it.map.isNotEmpty() }
+                    ?.let { fmUserData ->
+                        fun StringBuilder.appendElement(key: String, element: FrontMatterElement) {
+                            when (element) {
+                                is FrontMatterElement.Scalar -> {
+                                    append("addScalar(\"$key\", \"${element.scalar.unescapeQuotes()}\"); ")
+                                }
+
+                                is FrontMatterElement.ValueList -> {
+                                    append("addList(\"$key\") { ")
+                                    element.list.mapNotNull { it.scalarOrNull() }.forEach { scalar ->
+                                        append("addScalar(\"${scalar.unescapeQuotes()}\"); ")
+                                    }
+                                    append("}; ")
+                                }
+
+                                is FrontMatterElement.ValueMap -> {
+                                    append("addMap(\"$key\") { ")
+                                    element.map.forEach { (key, value) ->
+                                        appendElement(key, value)
+                                    }
+                                    append("}; ")
+                                }
+                            }
+                        }
+
+                        buildString {
+                            append("FrontMatterElement.Builder { ")
+                            fmUserData.map.forEach { (key, value) ->
+                                appendElement(key, value)
+                            }
+                            append("}")
+                        }
+                    } ?: "FrontMatterElement.EmptyMap"
 
                 val mdCtx = buildString {
                     append("MarkdownContext(")
                     append("\"${metadataEntry.sourceFilePath.invariantSeparatorsPathString}\"")
                     append(", ")
-                    append(userData.serialize())
+                    append(fmUserDataStr)
                     append(")")
                 }
                 output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
@@ -239,9 +271,15 @@ class KotlinRenderer internal constructor(
                 contextCreated = true
             }
 
-            // If "root" is set in the YAML block, that represents a top level composable which should wrap
+            // If "root" is set in the YAML block, that represents a top-level composable which should wrap
             // everything else.
-            val root = frontMatterData?.root ?: defaultRoot
+            val root = (frontMatterData?.root ?: defaultRoot)?.takeUnless {
+                // A user is expected either to specify a layout (the new way) or a root (the old way), but not both.
+                // Even if you can conceive of a case where you might want to specify both, it can end up with subtle
+                // issues if we allow it. For example, the default layout is a Div that suddenly gets jammed inside
+                // your page. If you really, *really* need a custom root for this page, then create a new layout.
+                (frontMatterData?.layout ?: defaultLayout) != null
+            }?.takeUnless { it.isBlank() }
             if (root != null) {
                 visit(KobwebCall(root, appendBrace = true))
                 ++indentCount
@@ -453,26 +491,6 @@ class KotlinRenderer internal constructor(
             }
         }
 
-        private fun List<String>.serialize(): String {
-            return buildString {
-                append("listOf(")
-                append(joinToString { "\"${it.escapeQuotes()}\"" })
-                append(")")
-            }
-        }
-
-        private fun Map.Entry<String, List<String>>.serialize(): String {
-            return "\"$key\" to ${value.serialize()}"
-        }
-
-        private fun Map<String, List<String>>.serialize(): String {
-            return buildString {
-                append("mapOf(")
-                append(entries.joinToString { it.serialize() })
-                append(")")
-            }
-        }
-
         override fun visit(customBlock: CustomBlock) {
             when (customBlock) {
                 is KobwebCallBlock -> {
@@ -489,7 +507,7 @@ class KotlinRenderer internal constructor(
                     }
                 }
 
-                is YamlFrontMatterBlock -> {
+                is FrontMatterBlock -> {
                     // No-op. We don't need to do anything here because we already handled parsing front matter earlier.
                 }
 

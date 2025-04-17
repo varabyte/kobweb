@@ -2,6 +2,7 @@ package com.varabyte.kobwebx.markdown
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 
 /**
  * Various context that will be set if this page was generated from Markdown.
@@ -38,14 +39,14 @@ import com.varabyte.kobweb.core.PageContext
  * }
  * ```
  *
- * @param path The path of the markdown file, including its extension, relative to the markdown root it was found in,
+ * @property path The path of the markdown file, including its extension, relative to the markdown root it was found in,
  *   e.g. `a/b/c/Hello.md`.
- * @param frontMatter Exposes data set in a markdown file's front matter block. (Front matter is the YAML block
+ * @property frontMatter Exposes data set in a markdown file's front matter block. (Front matter is the YAML block
  *   optionally declared at the top of a markdown file, which is delimited by `---` lines.)
  */
 class MarkdownContext(
     val path: String,
-    val frontMatter: Map<String, List<String>>,
+    val frontMatter: FrontMatterElement.ValueMap,
 )
 
 // Extend `rememberPageContext()` with markdown specific values

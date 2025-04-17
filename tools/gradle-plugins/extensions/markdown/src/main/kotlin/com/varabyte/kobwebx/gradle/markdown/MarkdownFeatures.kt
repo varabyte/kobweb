@@ -3,9 +3,9 @@
 package com.varabyte.kobwebx.gradle.markdown
 
 import com.varabyte.kobwebx.gradle.markdown.ext.kobwebcall.KobwebCallExtension
+import com.varabyte.kobwebx.gradle.markdown.frontmatter.FrontMatterExtension
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
-import org.commonmark.ext.front.matter.YamlFrontMatterExtension
 import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.parser.IncludeSourceSpans
@@ -118,7 +118,7 @@ abstract class MarkdownFeatures {
             extensions.add(AutolinkExtension.create())
         }
         if (frontMatter.get()) {
-            extensions.add(YamlFrontMatterExtension.create())
+            extensions.add(FrontMatterExtension.create())
         }
         if (kobwebCall.get()) {
             extensions.add(KobwebCallExtension.create(kobwebCallDelimiters.get()) { createParser() })

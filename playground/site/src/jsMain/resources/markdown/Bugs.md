@@ -1,7 +1,7 @@
 ---
-root: .components.layouts.PageLayout("BUGS")
-imports:
-  - .components.widgets.*
+layout: .components.layouts.PageLayout
+data:
+  title: "BUGS"
 ---
 
 <!-- This file contains examples reported by users where markdown broke. -->
