@@ -47,7 +47,7 @@ You can use blockquotes:
 You can link to other Markdown documents with their route overrides resolved correctly (except for dynamic overrides):
 
 [documents/INDEX.md](documents/INDEX.md)<br>
-[KotlinLanguage.md](KotlinLanguage.md) (`routeOverride: languages/kotlin`)<br>
+[KotlinLanguage.md](jetbrains/KotlinLanguage.md) (`routeOverride: languages/kotlin`)<br>
 [documents/Bananas.md](documents/Bananas.md) (`routeOverride: /fruits/`)<br>
 [files/external.md](/files/external.md) (Linking to a Markdown file outside of the processed markdown files)<br>
 
