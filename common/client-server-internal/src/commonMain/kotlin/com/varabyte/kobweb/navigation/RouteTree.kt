@@ -339,7 +339,6 @@ class RouteTree<T : Any> {
         require(root.children.isNotEmpty()) { "No routes were ever registered. This is unexpected and probably means no `@Page` was defined (or pages were defined in the wrong place where Kobweb couldn't discover them)." }
         require(route.startsWith('/')) { "When checking a route, it must begin with a slash. Got: \"$route\"" }
 
-        // Only show legacy warning when trying to actually navigate to the route (in `createPageData`).
         val resolvedNodes = resolveAllowingRedirects(route) ?: return null
         return resolvedNodes.toRouteString()
     }
