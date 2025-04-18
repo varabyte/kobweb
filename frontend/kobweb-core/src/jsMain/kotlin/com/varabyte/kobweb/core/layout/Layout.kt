@@ -87,7 +87,7 @@ import androidx.compose.runtime.*
  * }
  * ```
  *
- * Finally, note that a layout can delegate to another layout, like so:
+ * Note that a layout can delegate to another layout, like so:
  * ```
  * @Composable()
  * fun PageLayout(content: @Composable () -> Unit) { /* ... */ }
@@ -119,10 +119,34 @@ import androidx.compose.runtime.*
  * }
  * ```
  *
+ * And finally, note that the `@Layout` annotation can be applied to a file as well, which, as long as it is nested
+ * under the root page package, can let users specify a default layout for all pages under that package. For example,
+ * you can set up default layouts for all pages in your site like so:
+ *
+ * ```
+ * // pages/Layout.kt
+ * @file:Layout(".components.layouts.PageLayout")
+ *
+ * package pages
+ *
+ * import com.varabyte.kobweb.core.layout.Layout
+ *
+ * // pages/blog/Layout.kt
+ * @file:Layout(".components.layouts.BlogLayout")
+ *
+ * package pages
+ *
+ * import com.varabyte.kobweb.core.layout.Layout
+ * ```
+ *
+ * If a `@Layout` is annotated on a page directly, it will always take precedence. Otherwise, the most specific
+ * `@Layout` will be used. For example, if a page is in the `pages.blog` package, it will use the `BlogLayout` above,
+ * not the `PageLayout`.
+ *
  * Ultimately, users are heavily encouraged to use `@Layout` for their pages (as opposed to manually calling a layout
  * composable method directly inside their page), as remembering layout state across pages is very useful. For example,
  * your layout can contain a sidebar with collapsable sections. When you reference this layout via the `@Layout`
  * annotation, it will remember which sections are collapsed even as you navigate across pages.
  */
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.FILE)
 annotation class Layout(@Suppress("unused") val fqn: String)
