@@ -7,8 +7,8 @@ import com.varabyte.kobweb.compose.dom.ElementRefScope
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
-import com.varabyte.kobweb.compose.ui.styleModifier
 import com.varabyte.kobweb.silk.components.text.SpanText
 import com.varabyte.kobweb.silk.defer.DeferringHost
 import com.varabyte.kobweb.silk.style.ComponentKind
@@ -21,20 +21,20 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Br
 import org.w3c.dom.HTMLElement
 
-private fun Modifier.triangleUp(color: CSSColorValue) = styleModifier {
-    property("border-color", "$color transparent transparent transparent")
+private fun Modifier.triangleUp(color: CSSColorValue) = border {
+    color(color, Colors.Transparent, Colors.Transparent, Colors.Transparent)
 }
 
-private fun Modifier.triangleLeft(color: CSSColorValue) = styleModifier {
-    property("border-color", "transparent $color transparent transparent")
+private fun Modifier.triangleLeft(color: CSSColorValue) = border {
+    color(Colors.Transparent, color, Colors.Transparent, Colors.Transparent)
 }
 
-private fun Modifier.triangleDown(color: CSSColorValue) = styleModifier {
-    property("border-color", "transparent transparent $color transparent")
+private fun Modifier.triangleDown(color: CSSColorValue) = border {
+    color(Colors.Transparent, Colors.Transparent, color, Colors.Transparent)
 }
 
-private fun Modifier.triangleRight(color: CSSColorValue) = styleModifier {
-    property("border-color", "transparent transparent transparent $color")
+private fun Modifier.triangleRight(color: CSSColorValue) = border {
+    color(Colors.Transparent, Colors.Transparent, Colors.Transparent, color)
 }
 
 private val TRIANGLE_WIDTH = 5.px
