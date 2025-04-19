@@ -153,26 +153,21 @@ abstract class MarkdownBlock(
     }
 
     /**
-     * The layout fqn to use as a fallback if no layout is provided.
+     * A layout fqn to use as a fallback if no layout is specified.
      *
      * See the `@Layout` annotation for more information.
      *
      * This value will be overridden if a `layout` value is set inside the markdown's front-matter block.
-     *
-     * If left unset, no layout
      */
     abstract val defaultLayout: Property<String>
 
     /**
-     * The root composable to use as a fallback if no other root is provided.
+     * A root composable to use as a fallback if no root is explicitly specified.
      *
-     * All markdown files, when converted to code, should have some root composable it lives within, wrapping all
-     * content. It should be an element that has a natural vertical flow to it, such as Compose HTML's `Div` element
-     * (the default value) or Kobweb's `Column` composable.
+     * Even if set, this value will be overridden if a `root` value is set inside the markdown's front-matter block.
      *
-     * This root will be overridden if a `root` value is set inside the markdown's front-matter block.
-     *
-     * You can set this to the empty string if you want to disable it.
+     * IMPORTANT: This approach was commonly used to call a layout method directly as the first call inside the page,
+     * but we are migrating away from that concept to recommend using `@Layout`s instead. See [defaultLayout].
      */
     abstract val defaultRoot: Property<String>
 
@@ -272,7 +267,6 @@ abstract class MarkdownBlock(
         markdownPath.convention("markdown")
 
         defaultPackage.convention(pagesPackage)
-        defaultRoot.convention("org.jetbrains.compose.web.dom.Div")
         imports.set(emptyList())
         genDir.convention(baseGenDir.map { "$it/markdown" })
     }

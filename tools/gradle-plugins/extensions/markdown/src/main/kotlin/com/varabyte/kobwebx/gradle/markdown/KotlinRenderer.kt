@@ -275,9 +275,8 @@ class KotlinRenderer internal constructor(
             // everything else.
             val root = (frontMatterData?.root ?: defaultRoot)?.takeUnless {
                 // A user is expected either to specify a layout (the new way) or a root (the old way), but not both.
-                // Even if you can conceive of a case where you might want to specify both, it can end up with subtle
-                // issues if we allow it. For example, the default layout is a Div that suddenly gets jammed inside
-                // your page. If you really, *really* need a custom root for this page, then create a new layout.
+                // Even if you can conceive of a case where you might want to specify both, it would probably be cleaner
+                // if you updated the layout instead.
                 (frontMatterData?.layout ?: defaultLayout) != null
             }?.takeUnless { it.isBlank() }
             if (root != null) {
