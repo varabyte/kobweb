@@ -25,10 +25,7 @@ import org.gradle.language.jvm.tasks.ProcessResources
 
 fun Project.applyKspPlugin() = pluginManager.apply(KspGradleSubplugin::class.java)
 
-fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(
-    KSP_PROCESSOR_MODE_KEY to mode.name,
-    KSP_PROJECT_GROUP_KEY to group.toString(),
-)
+fun Project.setKspMode(mode: ProcessorMode) = addKspArguments(KSP_PROCESSOR_MODE_KEY to mode.name)
 
 /**
  * Add & configure the Kobweb KSP processor for JS sources.
@@ -41,6 +38,7 @@ fun Project.setupKspJs(target: JsTarget, defaultCssPrefix: Property<String>? = n
 
     configureKspTask(target) {
         addKspArguments(
+            KSP_PROJECT_GROUP_KEY to this@setupKspJs.group.toString(),
             KSP_PAGES_PACKAGE_KEY to kobwebBlock.pagesPackage.get()
         )
         defaultCssPrefix?.orNull?.let {
@@ -61,7 +59,10 @@ fun Project.setupKspJvm(target: JvmTarget) {
     addKspDependency(target)
 
     configureKspTask(target) {
-        addKspArguments(KSP_API_PACKAGE_KEY to this@setupKspJvm.kobwebBlock.apiPackage.get())
+        addKspArguments(
+            KSP_PROJECT_GROUP_KEY to this@setupKspJvm.group.toString(),
+            KSP_API_PACKAGE_KEY to this@setupKspJvm.kobwebBlock.apiPackage.get()
+        )
     }
 }
 

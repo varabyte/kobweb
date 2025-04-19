@@ -28,20 +28,20 @@ import com.varabyte.kobweb.project.common.PackageUtils
 fun getDefaultLayout(
     file: KSFile,
     projectGroup: String,
-    qualifiedPackage: String,
+    qualifiedPagesPackage: String,
     layoutAnnotationFqn: String,
     logger: KSPLogger,
 ): Pair<String, String>? {
     return file.getAnnotationsByName(layoutAnnotationFqn).singleOrNull()?.let { layoutAnnotation ->
         val currPackage = file.packageName.asString()
-        if (currPackage.startsWith(qualifiedPackage)) {
+        if (currPackage.startsWith(qualifiedPagesPackage)) {
             val layoutMethodFqn =
                 PackageUtils.resolvePackageShortcut(projectGroup, layoutAnnotation.arguments.first().value!!.toString())
 
             currPackage to layoutMethodFqn
         } else {
             logger.warn(
-                "Skipped over `@file:${layoutAnnotation.shortName.asString()}` annotation. It is defined under package `$currPackage` but must exist under `$qualifiedPackage`.",
+                "Skipped over `@file:${layoutAnnotation.shortName.asString()}` annotation. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
                 layoutAnnotation
             )
             null
