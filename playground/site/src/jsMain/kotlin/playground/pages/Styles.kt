@@ -11,6 +11,7 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
+import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
 import com.varabyte.kobweb.silk.components.text.SpanText
@@ -22,18 +23,19 @@ import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.extendedBy
 import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
-import playground.components.layouts.PageLayout
+import playground.utilities.setTitle
 
 // This page tests all the different variations of declaring, prefixing, and naming styles
 
 @Composable
 private fun ClassNamesBox(modifier: Modifier) {
     val classNames = remember { mutableStateListOf<String>() }
-    Box(Modifier.padding(1.cssRem).border(width = 1.px, LineStyle.Solid, Colors.Black).borderRadius(5.px)
-        .then(modifier), contentAlignment = Alignment.TopStart, ref = ref { element ->
-        classNames.clear()
-        classNames.addAll(element.className.split(" ").filter { !it.startsWith("kobweb") })
-    }) {
+    Box(
+        Modifier.padding(1.cssRem).border(width = 1.px, LineStyle.Solid, Colors.Black).borderRadius(5.px)
+            .then(modifier), contentAlignment = Alignment.TopStart, ref = ref { element ->
+            classNames.clear()
+            classNames.addAll(element.className.split(" ").filter { !it.startsWith("kobweb") })
+        }) {
         Column(horizontalAlignment = Alignment.Start) {
             classNames.forEach { SpanText(it) }
         }
@@ -127,46 +129,47 @@ class NamedClassContainer {
 
 @Page
 @Composable
-fun StylesPage() {
-    PageLayout("Styles") {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-            val styleModifiers = listOf(
-                BasicStyle.toModifier(),
-                ExtendingStyle.toModifier(),
-                ExtraExtendingStyle.toModifier(),
+fun StylesPage(ctx: PageContext) {
+    LaunchedEffect(Unit) { ctx.setTitle("Http Serialization Test") }
 
-                WidgetStyle.toModifier(),
-                WidgetStyle.toModifier(ExampleWidgetVariant),
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val styleModifiers = listOf(
+            BasicStyle.toModifier(),
+            ExtendingStyle.toModifier(),
+            ExtraExtendingStyle.toModifier(),
 
-                RestrictedStyle.SM.toModifier(),
-                RestrictedStyle.LG.toModifier(),
+            WidgetStyle.toModifier(),
+            WidgetStyle.toModifier(ExampleWidgetVariant),
 
-                ObjectContainer.BasicStyle.toModifier(),
-                ObjectContainer.ExtendingStyle.toModifier(),
-                ObjectContainer.WidgetStyle.toModifier(ObjectContainer.ExampleWidgetVariant),
-                ObjectContainer.ExtensionStyle.toModifier(),
+            RestrictedStyle.SM.toModifier(),
+            RestrictedStyle.LG.toModifier(),
 
-                ClassContainer.BasicStyle.toModifier(),
-                ClassContainer.ExtendingStyle.toModifier(),
-                ClassContainer.WidgetStyle.toModifier(ClassContainer.ExampleWidgetVariant),
-                ClassContainer.ExtensionStyle.toModifier(),
+            ObjectContainer.BasicStyle.toModifier(),
+            ObjectContainer.ExtendingStyle.toModifier(),
+            ObjectContainer.WidgetStyle.toModifier(ObjectContainer.ExampleWidgetVariant),
+            ObjectContainer.ExtensionStyle.toModifier(),
 
-                NamedBasicStyle.toModifier(),
-                NamedExtendingStyle.toModifier(),
-                NamedWidgetStyle.toModifier(NamedExampleWidgetVariant),
+            ClassContainer.BasicStyle.toModifier(),
+            ClassContainer.ExtendingStyle.toModifier(),
+            ClassContainer.WidgetStyle.toModifier(ClassContainer.ExampleWidgetVariant),
+            ClassContainer.ExtensionStyle.toModifier(),
 
-                NamedObjectContainer.BasicStyle.toModifier(),
-                NamedObjectContainer.NameOverriddenStyle.toModifier(),
+            NamedBasicStyle.toModifier(),
+            NamedExtendingStyle.toModifier(),
+            NamedWidgetStyle.toModifier(NamedExampleWidgetVariant),
 
-                NamedClassContainer.BasicStyle.toModifier(),
-                NamedClassContainer.NameOverriddenStyle.toModifier(),
-            )
+            NamedObjectContainer.BasicStyle.toModifier(),
+            NamedObjectContainer.NameOverriddenStyle.toModifier(),
 
-            SimpleGrid(numColumns(3), Modifier.gap(1.cssRem)) {
-                styleModifiers.forEach { modifier ->
-                    ClassNamesBox(modifier)
-                }
+            NamedClassContainer.BasicStyle.toModifier(),
+            NamedClassContainer.NameOverriddenStyle.toModifier(),
+        )
+
+        SimpleGrid(numColumns(3), Modifier.gap(1.cssRem)) {
+            styleModifiers.forEach { modifier ->
+                ClassNamesBox(modifier)
             }
         }
     }
 }
+

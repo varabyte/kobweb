@@ -3,7 +3,6 @@ package playground.pages
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
-import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.silk.components.forms.Input
 import com.varabyte.kobweb.worker.rememberWorker
 import org.jetbrains.compose.web.attributes.InputType
@@ -15,7 +14,6 @@ import playground.worker.SumWorker
 
 @Page
 @Composable
-@Layout(".components.layouts.PageLayout")
 fun WorkerPage(ctx: PageContext) {
     LaunchedEffect(Unit) { ctx.setTitle("WORKER") }
 

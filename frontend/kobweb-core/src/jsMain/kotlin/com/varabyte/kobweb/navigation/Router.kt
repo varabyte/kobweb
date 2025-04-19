@@ -107,6 +107,7 @@ class Router {
     private val layouts = mutableMapOf<String, LayoutMethod>()
     private val layoutIdForPage = mutableMapOf<PageMethod, String>()
     private val layoutIdForLayout = mutableMapOf<LayoutMethod, String>()
+    private val layoutIdForRoute = mutableMapOf<String, String>()
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree<PageMethod>()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
@@ -191,6 +192,23 @@ class Router {
         ) {
             pageWrapper {
                 var layoutMethod: LayoutMethod? = layoutIdForPage[pageMethod]?.let { layouts[it] }
+                    ?: run {
+                        println("I AM HERE FOR ${PageContext.instance.route.path}")
+                        layoutIdForRoute.entries.asSequence().mapNotNull { (route, layoutId) ->
+                            println("\tChecking $route against ${PageContext.instance.route.path}...")
+
+                            if (PageContext.instance.route.path.startsWith(route)) {
+                                println("\t\tTrue! ${layouts[layoutId]}")
+                                layouts[layoutId]
+                                    ?.also {
+                                        println("\t\tFound layout $layoutId for $route")
+                                    }
+                            } else {
+                                null
+                            }
+                        }.firstOrNull()
+                    }
+
                 val layouts: List<LayoutMethod> =
                     buildList {
                         while (layoutMethod != null) {
@@ -284,6 +302,21 @@ class Router {
         ) { "Registration failure. Path is already registered: $route" }
 
         layoutId?.let { layoutIdForPage[pageMethod] = it }
+    }
+
+    /**
+     * Register the default layout for a route that any pages under that route will use as a fallback.
+     */
+    fun registerDefaultLayout(route: String, layoutId: String) {
+        layoutIdForRoute[route] = layoutId
+
+        // Keep keys sorted by longest routes (i.e. most specific matches) first.
+        val layoutIdForRouteSorted = layoutIdForRoute
+            .toList()
+            .sortedWith(compareBy({ -it.first.length }, { it.first }))
+
+        layoutIdForRoute.clear()
+        layoutIdForRoute.putAll(layoutIdForRouteSorted)
     }
 
     @Suppress("unused") // Called by generated code

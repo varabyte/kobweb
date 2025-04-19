@@ -139,7 +139,7 @@ import androidx.compose.runtime.*
  * import com.varabyte.kobweb.core.layout.Layout
  * ```
  *
- * If a `@Layout` is annotated on a page directly, it will always take precedence. Otherwise, the most specific
+ * If a `@Layout` is annotated on a page directly, that will always take precedence. Otherwise, the most specific
  * `@Layout` will be used. For example, if a page is in the `pages.blog` package, it will use the `BlogLayout` above,
  * not the `PageLayout`.
  *

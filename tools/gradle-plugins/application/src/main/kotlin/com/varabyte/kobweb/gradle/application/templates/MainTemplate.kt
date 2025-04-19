@@ -191,8 +191,11 @@ fun createMainFunction(
                                 append(") { pageMethod(pageCtx) } }")
                             }
                         )
-
                     }
+                    frontendData.defaultLayouts.sortedBy { it.fqn }.forEach { entry ->
+                        addStatement("ctx.router.registerDefaultLayout(\"${entry.route}\", \"${entry.fqn}\")")
+                    }
+
                     frontendData.pages.sortedBy { it.route }.forEach { entry ->
                         addStatement(
                             buildString {

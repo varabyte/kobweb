@@ -36,12 +36,15 @@ import com.varabyte.kobweb.ksp.common.LAYOUT_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
+import com.varabyte.kobweb.ksp.common.getDefaultLayout
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
+import com.varabyte.kobweb.ksp.util.RouteUtils
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
+import com.varabyte.kobweb.project.frontend.DefaultLayoutEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.InitKobwebEntry
 import com.varabyte.kobweb.project.frontend.InitSilkEntry
@@ -66,6 +69,8 @@ class FrontendProcessor(
     private val qualifiedPagesPackage = PackageUtils.resolvePackageShortcut(projectGroup, pagesPackage)
 
     private val layoutsFor = mutableMapOf<KSFunctionDeclaration, KSFunctionDeclaration>()
+    // fqPkg to layout fqn, e.g. "pages.blog" to "com.example.components.layouts.BlogLayout"
+    private val defaultLayouts = mutableMapOf<String, String>()
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
@@ -83,27 +88,30 @@ class FrontendProcessor(
 
         val pageContextName = resolver.getKSNameFromString(PAGE_CONTEXT_FQN)
         // Layout annotated methods are not (necessarily) layout methods themselves; but they point at layout methods.
-        resolver.getSymbolsWithAnnotation(LAYOUT_FQN).forEach { annotatedFun ->
-            fileDependencies.add(annotatedFun.containingFile!!)
+        resolver.getSymbolsWithAnnotation(LAYOUT_FQN)
+            // Ignore layout annotations attached to files
+            .filter { annotated -> annotated is KSFunctionDeclaration }
+            .forEach { annotatedFun ->
+                fileDependencies.add(annotatedFun.containingFile!!)
 
-            val layoutMethodName =
-                annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value.toString()
-                    .let { layoutFqn ->
-                        PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)
+                val layoutMethodName =
+                    annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value.toString()
+                        .let { layoutFqn ->
+                            PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)
+                        }
+                        .let { resolver.getKSNameFromString(it) }
+
+                resolver.getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
+                    .singleOrNull {
+                        // A valid layout method takes an optional first parameter of type `PageContext` and a final
+                        // parameter of type `@Composable () -> Unit`
+                        ((it.parameters.size == 2 && it.parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
+                            || it.parameters.size == 1)
+                            && it.parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
+                    }?.let { layoutMethod ->
+                        layoutsFor[annotatedFun as KSFunctionDeclaration] = layoutMethod
                     }
-                    .let { resolver.getKSNameFromString(it) }
-
-            resolver.getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
-                .singleOrNull {
-                    // A valid layout method takes an optional first parameter of type `PageContext` and a final
-                    // parameter of type `@Composable () -> Unit`
-                    ((it.parameters.size == 2 && it.parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
-                        || it.parameters.size == 1)
-                        && it.parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
-                }?.let { layoutMethod ->
-                    layoutsFor[annotatedFun as KSFunctionDeclaration] = layoutMethod
-                }
-        }
+            }
 
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
@@ -135,6 +143,17 @@ class FrontendProcessor(
         }
         resolver.getNewFiles().forEach { file ->
             silkVisitor?.let { file.accept(it, Unit) }
+
+            getDefaultLayout(
+                file,
+                projectGroup,
+                qualifiedPagesPackage,
+                LAYOUT_FQN,
+                logger
+            )?.let { defaultLayout ->
+                defaultLayouts += defaultLayout
+                fileDependencies.add(file)
+            }
 
             packageMappings += getPackageMappings(
                 file,
@@ -570,7 +589,14 @@ class FrontendProcessor(
             }
         }
 
-        // pages are processed here as they rely on packageMappings, which may be populated over several rounds
+        // default layouts and pages are processed here as they rely on packageMappings, which may be populated over several rounds
+        val defaultLayouts = defaultLayouts.map { (pkg, layoutFqn) ->
+            DefaultLayoutEntry(
+                layoutFqn,
+                RouteUtils.convertPackageToRoute(qualifiedPagesPackage, packageMappings, pkg)
+            )
+        }
+
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
                 annotatedFun = annotatedFun,
@@ -594,6 +620,7 @@ class FrontendProcessor(
 
         val frontendData = FrontendData(
             layouts,
+            defaultLayouts,
             pages,
             kobwebInits,
             silkInits,

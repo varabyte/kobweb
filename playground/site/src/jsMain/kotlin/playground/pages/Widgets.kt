@@ -17,7 +17,6 @@ import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
-import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.display.Callout
@@ -154,7 +153,6 @@ fun WidgetSection(title: String, content: @Composable BoxScope.() -> Unit) {
 
 @Page
 @Composable
-@Layout(".components.layouts.PageLayout")
 fun WidgetsPage(ctx: PageContext) {
     LaunchedEffect(Unit) { ctx.setTitle("WIDGETS") }
 

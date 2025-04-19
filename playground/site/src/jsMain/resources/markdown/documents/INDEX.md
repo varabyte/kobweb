@@ -1,5 +1,4 @@
 ---
-layout: .components.layouts.PageLayout
 data:
   title: "DOCUMENTS"
 ---
