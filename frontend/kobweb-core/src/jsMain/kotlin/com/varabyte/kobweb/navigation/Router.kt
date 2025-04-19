@@ -193,16 +193,9 @@ class Router {
             pageWrapper {
                 var layoutMethod: LayoutMethod? = layoutIdForPage[pageMethod]?.let { layouts[it] }
                     ?: run {
-                        println("I AM HERE FOR ${PageContext.instance.route.path}")
                         layoutIdForRoute.entries.asSequence().mapNotNull { (route, layoutId) ->
-                            println("\tChecking $route against ${PageContext.instance.route.path}...")
-
                             if (PageContext.instance.route.path.startsWith(route)) {
-                                println("\t\tTrue! ${layouts[layoutId]}")
                                 layouts[layoutId]
-                                    ?.also {
-                                        println("\t\tFound layout $layoutId for $route")
-                                    }
                             } else {
                                 null
                             }
