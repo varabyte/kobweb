@@ -269,6 +269,21 @@ class Router {
     }
 
     /**
+     * Register the default layout for a route that any pages under that route will use as a fallback.
+     */
+    fun registerDefaultLayout(route: String, layoutId: String) {
+        layoutIdForRoute[route] = layoutId
+
+        // Keep keys sorted by longest routes (i.e. most specific matches) first.
+        val layoutIdForRouteSorted = layoutIdForRoute
+            .toList()
+            .sortedWith(compareBy({ -it.first.length }, { it.first }))
+
+        layoutIdForRoute.clear()
+        layoutIdForRoute.putAll(layoutIdForRouteSorted)
+    }
+
+    /**
      * Register a route, mapping it to some target composable method that will get called when that path is requested by
      * the browser.
      *
@@ -295,21 +310,6 @@ class Router {
         ) { "Registration failure. Path is already registered: $route" }
 
         layoutId?.let { layoutIdForPage[pageMethod] = it }
-    }
-
-    /**
-     * Register the default layout for a route that any pages under that route will use as a fallback.
-     */
-    fun registerDefaultLayout(route: String, layoutId: String) {
-        layoutIdForRoute[route] = layoutId
-
-        // Keep keys sorted by longest routes (i.e. most specific matches) first.
-        val layoutIdForRouteSorted = layoutIdForRoute
-            .toList()
-            .sortedWith(compareBy({ -it.first.length }, { it.first }))
-
-        layoutIdForRoute.clear()
-        layoutIdForRoute.putAll(layoutIdForRouteSorted)
     }
 
     @Suppress("unused") // Called by generated code
