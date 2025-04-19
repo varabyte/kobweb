@@ -14,6 +14,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSName
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
@@ -68,9 +69,10 @@ class FrontendProcessor(
 
     private val qualifiedPagesPackage = PackageUtils.resolvePackageShortcut(projectGroup, pagesPackage)
 
+    private val layoutMethods = mutableSetOf<KSFunctionDeclaration>()
     private val layoutsFor = mutableMapOf<KSFunctionDeclaration, KSFunctionDeclaration>()
     // fqPkg to layout fqn, e.g. "pages.blog" to "com.example.components.layouts.BlogLayout"
-    private val defaultLayouts = mutableMapOf<String, String>()
+    private val defaultLayouts = mutableMapOf<String, KSFunctionDeclaration>()
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
@@ -84,9 +86,19 @@ class FrontendProcessor(
     // will be skipped if the only change is deleted file(s) that we do not depend on.
     private val fileDependencies = mutableSetOf<KSFile>()
 
+    private fun Resolver.findLayoutMethod(layoutMethodName: KSName): KSFunctionDeclaration? {
+        val pageContextName = getKSNameFromString(PAGE_CONTEXT_FQN)
+        return getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
+            .singleOrNull {
+                // A valid layout method takes an optional first parameter of type `PageContext` and a final
+                // parameter of type `@Composable () -> Unit`
+                ((it.parameters.size == 2 && it.parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
+                    || it.parameters.size == 1)
+                    && it.parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
+            }
+    }
     override fun process(resolver: Resolver): List<KSAnnotated> {
 
-        val pageContextName = resolver.getKSNameFromString(PAGE_CONTEXT_FQN)
         // Layout annotated methods are not (necessarily) layout methods themselves; but they point at layout methods.
         resolver.getSymbolsWithAnnotation(LAYOUT_FQN)
             // Ignore layout annotations attached to files
@@ -101,16 +113,10 @@ class FrontendProcessor(
                         }
                         .let { resolver.getKSNameFromString(it) }
 
-                resolver.getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
-                    .singleOrNull {
-                        // A valid layout method takes an optional first parameter of type `PageContext` and a final
-                        // parameter of type `@Composable () -> Unit`
-                        ((it.parameters.size == 2 && it.parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
-                            || it.parameters.size == 1)
-                            && it.parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
-                    }?.let { layoutMethod ->
-                        layoutsFor[annotatedFun as KSFunctionDeclaration] = layoutMethod
-                    }
+                resolver.findLayoutMethod(layoutMethodName)?.let { layoutMethod ->
+                    layoutsFor[annotatedFun as KSFunctionDeclaration] = layoutMethod
+                    layoutMethods.add(layoutMethod)
+                }
             }
 
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
@@ -150,9 +156,11 @@ class FrontendProcessor(
                 qualifiedPagesPackage,
                 LAYOUT_FQN,
                 logger
-            )?.let { defaultLayout ->
-                defaultLayouts += defaultLayout
-                fileDependencies.add(file)
+            )?.let { (pkg, layoutFqn) ->
+                resolver.findLayoutMethod(resolver.getKSNameFromString(layoutFqn))?.let { layoutMethod ->
+                    defaultLayouts[pkg] = layoutMethod
+                    fileDependencies.add(file)
+                }
             }
 
             packageMappings += getPackageMappings(
@@ -579,7 +587,7 @@ class FrontendProcessor(
      */
     fun getProcessorResult(): Result {
         val layouts = run {
-            val layoutMethods = layoutsFor.values.toSet()
+            val layoutMethods = layoutsFor.values.toSet() + defaultLayouts.values.toSet()
             layoutMethods.map { layout ->
                 LayoutEntry(
                     layout.qualifiedName!!.asString(),
@@ -590,9 +598,9 @@ class FrontendProcessor(
         }
 
         // default layouts and pages are processed here as they rely on packageMappings, which may be populated over several rounds
-        val defaultLayouts = defaultLayouts.map { (pkg, layoutFqn) ->
+        val defaultLayouts = defaultLayouts.map { (pkg, layout) ->
             DefaultLayoutEntry(
-                layoutFqn,
+                layout.qualifiedName!!.asString(),
                 RouteUtils.convertPackageToRoute(qualifiedPagesPackage, packageMappings, pkg)
             )
         }
