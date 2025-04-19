@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
 
@@ -7,17 +8,11 @@ import org.jetbrains.compose.web.css.*
 class Width private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<Width> {
         // Keyword
         val FitContent get() = Width("fit-content")
         val MaxContent get() = Width("max-content")
         val MinContent get() = Width("min-content")
-
-        // Global
-        val Inherit get() = Width("inherit")
-        val Initial get() = Width("initial")
-        val Revert get() = Width("revert")
-        val Unset get() = Width("unset")
     }
 }
 typealias MinWidth = Width
@@ -38,17 +33,11 @@ fun StyleScope.minWidth(minWidth: MinWidth) {
 class Height private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<Height> {
         // Keyword
         val FitContent get() = Height("fit-content")
         val MaxContent get() = Height("max-content")
         val MinContent get() = Height("min-content")
-
-        // Global
-        val Inherit get() = Height("inherit")
-        val Initial get() = Height("initial")
-        val Revert get() = Height("revert")
-        val Unset get() = Height("unset")
     }
 }
 typealias MinHeight = Height
@@ -69,18 +58,12 @@ fun StyleScope.minHeight(minHeight: MinHeight) {
 class MaxWidth private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<MaxWidth> {
         // Keyword
         val FitContent get() = MaxWidth("fit-content")
         val MaxContent get() = MaxWidth("max-content")
         val MinContent get() = MaxWidth("min-content")
         val None get() = MaxWidth("none")
-
-        // Global
-        val Inherit get() = MaxWidth("inherit")
-        val Initial get() = MaxWidth("initial")
-        val Revert get() = MaxWidth("revert")
-        val Unset get() = MaxWidth("unset")
     }
 }
 
@@ -92,18 +75,12 @@ fun StyleScope.maxWidth(maxWidth: MaxWidth) {
 class MaxHeight private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<MaxHeight> {
         // Keyword
         val FitContent get() = MaxHeight("fit-content")
         val MaxContent get() = MaxHeight("max-content")
         val MinContent get() = MaxHeight("min-content")
         val None get() = MaxHeight("none")
-
-        // Global
-        val Inherit get() = MaxHeight("inherit")
-        val Initial get() = MaxHeight("initial")
-        val Revert get() = MaxHeight("revert")
-        val Unset get() = MaxHeight("unset")
     }
 }
 

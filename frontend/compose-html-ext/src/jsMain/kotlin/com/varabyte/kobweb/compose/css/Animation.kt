@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 value class AnimationIterationCount private constructor(private val count: Number?) : StylePropertyValue {
@@ -49,7 +50,7 @@ sealed class Animation private constructor(private val value: String) : StylePro
         }.joinToString(" ")
     )
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         fun of(
             name: String,
             duration: CSSTimeNumericValue? = null,
@@ -64,12 +65,6 @@ sealed class Animation private constructor(private val value: String) : StylePro
 
         // Keyword
         val None: Animation get() = Keyword("none")
-
-        // Global Keywords
-        val Inherit: Animation get() = Keyword("inherit")
-        val Initial: Animation get() = Keyword("initial")
-        val Revert: Animation get() = Keyword("revert")
-        val Unset: Animation get() = Keyword("unset")
     }
 }
 

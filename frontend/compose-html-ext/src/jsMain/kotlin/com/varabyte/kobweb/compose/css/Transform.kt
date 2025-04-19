@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // region Rotate
@@ -81,19 +82,13 @@ fun StyleScope.scaleZ(s: CSSPercentageNumericValue) {
 class TransformBox private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<TransformBox> {
         // Keyword
         val BorderBox get() = TransformBox("border-box")
         val ContentBox get() = TransformBox("content-box")
         val FillBox get() = TransformBox("fill-box")
         val StrokeBox get() = TransformBox("stroke-box")
         val ViewBox get() = TransformBox("view-box")
-
-        // Global
-        val Inherit get() = TransformBox("inherit")
-        val Initial get() = TransformBox("initial")
-        val Revert get() = TransformBox("revert")
-        val Unset get() = TransformBox("unset")
     }
 }
 
@@ -107,7 +102,7 @@ sealed class TransformOrigin private constructor(private val value: String) : St
     private class Keyword(value: String) : TransformOrigin(value)
     private class Origin(value: String) : TransformOrigin(value)
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         // We cannot use CssPosition as transform-origin does not support offsets from edges, e.g. Edge.Right(10.px)
 
         // NOTE: the following 2 functions do not take a `zOffset` parameter as `of(Edge.Right, 5.px)` would then apply
@@ -146,12 +141,6 @@ sealed class TransformOrigin private constructor(private val value: String) : St
         val Left get() = of(Edge.Left)
         val TopLeft get() = of(Edge.Left, Edge.Top)
         val Center get() = of(Edge.CenterX, Edge.CenterY)
-
-        // Global values
-        val Inherit get(): TransformOrigin = Keyword("inherit")
-        val Initial get(): TransformOrigin = Keyword("initial")
-        val Revert get(): TransformOrigin = Keyword("revert")
-        val Unset get(): TransformOrigin = Keyword("unset")
     }
 }
 
@@ -162,16 +151,10 @@ fun StyleScope.transformOrigin(transformOrigin: TransformOrigin) {
 class TransformStyle private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<TransformStyle> {
         // Keyword
         val Flat get() = TransformStyle("flat")
         val Preserve3d get() = TransformStyle("preserve-3d")
-
-        // Global
-        val Inherit get() = TransformStyle("inherit")
-        val Initial get() = TransformStyle("initial")
-        val Revert get() = TransformStyle("revert")
-        val Unset get() = TransformStyle("unset")
     }
 }
 

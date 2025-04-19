@@ -2,6 +2,7 @@ package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
 import com.varabyte.kobweb.compose.css.functions.CSSImage
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 typealias ListStyleImage = CSSImage
@@ -9,7 +10,7 @@ typealias ListStyleImage = CSSImage
 class ListStyleType private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<ListStyleType> {
         fun of(text: String) = ListStyleType(text.wrapQuotesIfNecessary())
 
         // Pre-defined types supported across all browsers (https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type#browser_compatibility)
@@ -70,28 +71,16 @@ class ListStyleType private constructor(private val value: String) : StyleProper
 
         // Keyword
         val None get() = ListStyleType("none")
-
-        // Global values
-        val Inherit get() = ListStyleType("inherit")
-        val Initial get() = ListStyleType("initial")
-        val Revert get() = ListStyleType("revert")
-        val Unset get() = ListStyleType("unset")
     }
 }
 
 class ListStylePosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<ListStylePosition> {
         // Keywords
         val Inside get() = ListStylePosition("inside")
         val Outside get() = ListStylePosition("outside")
-
-        // Global values
-        val Inherit get() = ListStylePosition("inherit")
-        val Initial get() = ListStylePosition("initial")
-        val Revert get() = ListStylePosition("revert")
-        val Unset get() = ListStylePosition("unset")
     }
 }
 

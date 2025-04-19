@@ -2,6 +2,7 @@
 
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -62,7 +63,7 @@ sealed class AlignContent(private val value: String) : StylePropertyValue {
     private class OverflowAlignment(strategy: OverflowStrategy, position: AlignContentPosition) :
         AlignContent(strategy.toValue(position))
 
-    companion object {
+    companion object: CssGlobalValues<AlignContentKeyword> {
         // Basic
         val Normal: AlignContent get() = AlignContentKeyword("normal")
 
@@ -87,12 +88,6 @@ sealed class AlignContent(private val value: String) : StylePropertyValue {
         // Overflow
         fun Safe(position: AlignContentPosition): AlignContent = OverflowAlignment(OverflowStrategy.SAFE, position)
         fun Unsafe(position: AlignContentPosition): AlignContent = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: AlignContent get() = AlignContentKeyword("inherit")
-        val Initial: AlignContent get() = AlignContentKeyword("initial")
-        val Revert: AlignContent get() = AlignContentKeyword("revert")
-        val Unset: AlignContent get() = AlignContentKeyword("unset")
     }
 }
 
@@ -121,7 +116,7 @@ sealed class AlignItems private constructor(private val value: String) : StylePr
     private class OverflowAlignment(strategy: OverflowStrategy, position: AlignItemsPosition) :
         AlignItems(strategy.toValue(position))
 
-    companion object {
+    companion object: CssGlobalValues<AlignItemsKeyword> {
         // Basic
         val Normal: AlignItems get() = AlignItemsKeyword("normal")
         val Stretch: AlignItems get() = AlignItemsKeyword("stretch")
@@ -143,12 +138,6 @@ sealed class AlignItems private constructor(private val value: String) : StylePr
         // Overflow
         fun Safe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.SAFE, position)
         fun Unsafe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: AlignItems get() = AlignItemsKeyword("inherit")
-        val Initial: AlignItems get() = AlignItemsKeyword("initial")
-        val Revert: AlignItems get() = AlignItemsKeyword("revert")
-        val Unset: AlignItems get() = AlignItemsKeyword("unset")
     }
 }
 
@@ -177,7 +166,7 @@ sealed class AlignSelf private constructor(private val value: String) : StylePro
     private class OverflowAlignment(strategy: OverflowStrategy, position: AlignSelfPosition) :
         AlignSelf(strategy.toValue(position))
 
-    companion object {
+    companion object: CssGlobalValues<AlignSelfKeyword> {
         // Basic
         val Auto: AlignSelf get() = AlignSelfKeyword("auto")
         val Normal: AlignSelf get() = AlignSelfKeyword("normal")
@@ -200,12 +189,6 @@ sealed class AlignSelf private constructor(private val value: String) : StylePro
         // Overflow
         fun Safe(position: AlignSelfPosition): AlignSelf = OverflowAlignment(OverflowStrategy.SAFE, position)
         fun Unsafe(position: AlignSelfPosition): AlignSelf = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: AlignSelf get() = AlignSelfKeyword("inherit")
-        val Initial: AlignSelf get() = AlignSelfKeyword("initial")
-        val Revert: AlignSelf get() = AlignSelfKeyword("revert")
-        val Unset: AlignSelf get() = AlignSelfKeyword("unset")
     }
 }
 
@@ -234,7 +217,7 @@ sealed class JustifyContent private constructor(private val value: String) : Sty
     private class OverflowAlignment(strategy: OverflowStrategy, position: JustifyContentPosition) :
         JustifyContent(strategy.toValue(position))
 
-    companion object {
+    companion object: CssGlobalValues<JustifyContentKeyword> {
         // Basic
         val Normal: JustifyContent get() = JustifyContentKeyword("normal")
 
@@ -257,12 +240,6 @@ sealed class JustifyContent private constructor(private val value: String) : Sty
         fun Safe(position: JustifyContentPosition): JustifyContent = OverflowAlignment(OverflowStrategy.SAFE, position)
         fun Unsafe(position: JustifyContentPosition): JustifyContent =
             OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: JustifyContent get() = JustifyContentKeyword("inherit")
-        val Initial: JustifyContent get() = JustifyContentKeyword("initial")
-        val Revert: JustifyContent get() = JustifyContentKeyword("revert")
-        val Unset: JustifyContent get() = JustifyContentKeyword("unset")
     }
 }
 
@@ -291,7 +268,7 @@ sealed class JustifyItems private constructor(private val value: String) : Style
     private class OverflowAlignment(strategy: OverflowStrategy, position: JustifyItemsPosition) :
         JustifyItems(strategy.toValue(position))
 
-    companion object {
+    companion object: CssGlobalValues<JustifyItemsKeyword> {
         // Basic
         val Normal: JustifyItems get() = JustifyItemsKeyword("normal")
         val Stretch: JustifyItems get() = JustifyItemsKeyword("stretch")
@@ -315,12 +292,6 @@ sealed class JustifyItems private constructor(private val value: String) : Style
         // Overflow
         fun Safe(position: JustifyItemsPosition): JustifyItems = OverflowAlignment(OverflowStrategy.SAFE, position)
         fun Unsafe(position: JustifyItemsPosition): JustifyItems = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: JustifyItems get() = JustifyItemsKeyword("inherit")
-        val Initial: JustifyItems get() = JustifyItemsKeyword("initial")
-        val Revert: JustifyItems get() = JustifyItemsKeyword("revert")
-        val Unset: JustifyItems get() = JustifyItemsKeyword("unset")
     }
 }
 
@@ -349,7 +320,7 @@ sealed class JustifySelf private constructor(private val value: String) : StyleP
     private class OverflowAlignment(strategy: OverflowStrategy, position: JustifySelfPosition) :
         JustifySelf(strategy.toValue(position))
 
-    companion object {
+    companion object: CssGlobalValues<JustifySelfKeyword> {
         // Basic
         val Auto: JustifySelf get() = JustifySelfKeyword("auto")
         val Normal: JustifySelf get() = JustifySelfKeyword("normal")
@@ -374,12 +345,6 @@ sealed class JustifySelf private constructor(private val value: String) : StyleP
         // Overflow
         fun Safe(position: JustifySelfPosition): JustifySelf = OverflowAlignment(OverflowStrategy.SAFE, position)
         fun Unsafe(position: JustifySelfPosition): JustifySelf = OverflowAlignment(OverflowStrategy.UNSAFE, position)
-
-        // Global
-        val Inherit: JustifySelf get() = JustifySelfKeyword("inherit")
-        val Initial: JustifySelf get() = JustifySelfKeyword("initial")
-        val Revert: JustifySelf get() = JustifySelfKeyword("revert")
-        val Unset: JustifySelf get() = JustifySelfKeyword("unset")
     }
 }
 

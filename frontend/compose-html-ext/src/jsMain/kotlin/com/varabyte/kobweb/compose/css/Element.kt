@@ -3,24 +3,19 @@ package com.varabyte.kobweb.compose.css
 import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.Gradient
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/appearance
 class Appearance private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<Appearance> {
         // CSS Basic User Interface Module Level 4 values
         val None get() = Appearance("none")
         val Auto get() = Appearance("auto")
         val MenuListButton get() = Appearance("menulist-button")
         val TextField get() = Appearance("textfield")
-
-        // Global values
-        val Inherit get() = Appearance("inherit")
-        val Initial get() = Appearance("initial")
-        val Revert get() = Appearance("revert")
-        val Unset get() = Appearance("unset")
     }
 }
 
@@ -46,7 +41,7 @@ sealed class Content(private val value: String) : StylePropertyValue {
     private class Gradient(gradient: com.varabyte.kobweb.compose.css.functions.Gradient) :
         Unrestricted(gradient.toString())
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         fun of(url: CSSUrl): Unrestricted = Url(url)
         fun of(gradient: com.varabyte.kobweb.compose.css.functions.Gradient): Unrestricted = Gradient(gradient)
         fun of(text: String): Unrestricted = Text(text)
@@ -60,12 +55,6 @@ sealed class Content(private val value: String) : StylePropertyValue {
         val NoCloseQuote get(): Content = Keyword("no-close-quote")
         val NoOpenQuote get(): Content = Keyword("no-open-quote")
         val OpenQuote get(): Content = Keyword("open-quote")
-
-        // Global
-        val Inherit get(): Content = Keyword("inherit")
-        val Initial get(): Content = Keyword("initial")
-        val Revert get(): Content = Keyword("revert")
-        val Unset get(): Content = Keyword("unset")
     }
 }
 

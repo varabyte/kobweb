@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css.functions
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 sealed class CSSImage private constructor(private val value: String) : StylePropertyValue {
@@ -11,7 +12,7 @@ sealed class CSSImage private constructor(private val value: String) : StyleProp
         CSSImage(gradient.toString())
 
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         fun of(url: CSSUrl): CSSImage = Url(url)
 
         /**
@@ -21,12 +22,6 @@ sealed class CSSImage private constructor(private val value: String) : StyleProp
 
         // Keyword
         val None get(): CSSImage = Keyword("none")
-
-        // Global values
-        val Inherit get(): CSSImage = Keyword("inherit")
-        val Initial get(): CSSImage = Keyword("initial")
-        val Revert get(): CSSImage = Keyword("revert")
-        val Unset get(): CSSImage = Keyword("unset")
     }
 }
 

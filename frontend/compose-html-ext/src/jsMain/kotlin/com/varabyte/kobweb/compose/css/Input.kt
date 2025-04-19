@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // region Caret Color, see https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color
@@ -7,17 +8,11 @@ import org.jetbrains.compose.web.css.*
 class CaretColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<CaretColor> {
         // Keyword
         val Auto get() = CaretColor("auto")
         val Transparent get() = CaretColor("transparent")
         val CurrentColor get() = CaretColor("currentcolor")
-
-        // Global
-        val Inherit get() = CaretColor("inherit")
-        val Initial get() = CaretColor("initial")
-        val Revert get() = CaretColor("revert")
-        val Unset get() = CaretColor("unset")
     }
 }
 
@@ -48,7 +43,7 @@ sealed class TouchAction private constructor(private val value: String) : StyleP
     class PanVert(vert: PanVertical, withPinchZoom: Boolean = false) :
         TouchAction("$vert" + if (withPinchZoom) " pinch-zoom" else "")
 
-    companion object {
+    companion object: CssGlobalValues<Keyword> {
         // Keyword
         val Auto get(): TouchAction = Keyword("auto")
         val None get(): TouchAction = Keyword("none")
@@ -62,12 +57,6 @@ sealed class TouchAction private constructor(private val value: String) : StyleP
 //        val PanDown get(): TouchAction = PanVertical("pan-down")
 
         val Manipulation get(): TouchAction = Keyword("manipulation")
-
-        // Global
-        val Inherit get(): TouchAction = Keyword("inherit")
-        val Initial get(): TouchAction = Keyword("initial")
-        val Revert get(): TouchAction = Keyword("revert")
-        val Unset get(): TouchAction = Keyword("unset")
     }
 }
 

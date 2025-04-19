@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.global.CssGlobalValues
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline
@@ -41,15 +42,9 @@ fun StyleScope.outline(
 class OutlineColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<OutlineColor> {
         // Keyword
         val Invert get() = OutlineColor("invert")
-
-        // Global
-        val Inherit get() = OutlineColor("inherit")
-        val Initial get() = OutlineColor("initial")
-        val Revert get() = OutlineColor("revert")
-        val Unset get() = OutlineColor("unset")
     }
 }
 
@@ -75,17 +70,11 @@ fun StyleScope.outlineStyle(value: LineStyle) {
 class OutlineWidth private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object: CssGlobalValues<OutlineWidth> {
         // Keyword
         val Thin get() = OutlineWidth("thin")
         val Medium get() = OutlineWidth("medium")
         val Thick get() = OutlineWidth("thick")
-
-        // Global
-        val Inherit get() = OutlineWidth("inherit")
-        val Initial get() = OutlineWidth("initial")
-        val Revert get() = OutlineWidth("revert")
-        val Unset get() = OutlineWidth("unset")
     }
 }
 
