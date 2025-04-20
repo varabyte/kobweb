@@ -1,6 +1,5 @@
 ---
-data:
-  title: "BUGS"
+title: "BUGS"
 ---
 
 <!-- This file contains examples reported by users where markdown broke. -->

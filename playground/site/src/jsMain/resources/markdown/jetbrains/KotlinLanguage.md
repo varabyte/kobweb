@@ -1,6 +1,5 @@
 ---
-data:
-  title: "KOTLIN"
+title: "KOTLIN"
 routeOverride: languages/kotlin
 ---
 

@@ -31,9 +31,11 @@ import com.varabyte.kobweb.ksp.common.CSS_PREFIX_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_FQN
 import com.varabyte.kobweb.ksp.common.CSS_STYLE_VARIANT_FQN
 import com.varabyte.kobweb.ksp.common.INIT_KOBWEB_FQN
+import com.varabyte.kobweb.ksp.common.INIT_ROUTE_FQN
 import com.varabyte.kobweb.ksp.common.INIT_SILK_FQN
 import com.varabyte.kobweb.ksp.common.KEYFRAMES_FQN
 import com.varabyte.kobweb.ksp.common.LAYOUT_FQN
+import com.varabyte.kobweb.ksp.common.NO_LAYOUT_FQN
 import com.varabyte.kobweb.ksp.common.PACKAGE_MAPPING_PAGE_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_CONTEXT_FQN
 import com.varabyte.kobweb.ksp.common.PAGE_FQN
@@ -66,10 +68,12 @@ class FrontendProcessor(
     private val defaultCssPrefix: String? = null,
 ) : SymbolProcessor {
     private val pageDeclarations = mutableListOf<KSFunctionDeclaration>()
+    private val initRouteDeclarations = mutableListOf<KSFunctionDeclaration>()
 
     private val qualifiedPagesPackage = PackageUtils.resolvePackageShortcut(projectGroup, pagesPackage)
 
     private val layoutMethods = mutableSetOf<KSFunctionDeclaration>()
+    private val noLayoutsFor = mutableSetOf<KSFunctionDeclaration>()
     private val layoutsFor = mutableMapOf<KSFunctionDeclaration, KSFunctionDeclaration>()
     // fqPkg to layout fqn, e.g. "pages.blog" to "com.example.components.layouts.BlogLayout"
     private val defaultLayouts = mutableMapOf<String, KSFunctionDeclaration>()
@@ -86,38 +90,64 @@ class FrontendProcessor(
     // will be skipped if the only change is deleted file(s) that we do not depend on.
     private val fileDependencies = mutableSetOf<KSFile>()
 
+    private fun KSFunctionDeclaration.hasPageAnnotation(): Boolean {
+        return getAnnotationsByName(PAGE_FQN).toList().isNotEmpty()
+    }
+
+    private fun KSFunctionDeclaration.hasLayoutAnnotation(): Boolean {
+        return getAnnotationsByName(LAYOUT_FQN).toList().isNotEmpty()
+    }
+
+    private fun KSFunctionDeclaration.isLayoutMethod(resolver: Resolver): Boolean {
+        // `@Layout` defined on a `@Page` means the method is a page, not a layout
+        if (hasPageAnnotation()) return false
+
+        val pageContextName = resolver.getKSNameFromString(PAGE_CONTEXT_FQN)
+
+        // A valid layout method takes an optional first parameter of type `PageContext` and a final
+        // parameter of type `@Composable () -> Unit`
+        return (
+            ((parameters.size == 2 && parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
+                || parameters.size == 1)
+                && parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
+            )
+    }
+
     private fun Resolver.findLayoutMethod(layoutMethodName: KSName): KSFunctionDeclaration? {
-        val pageContextName = getKSNameFromString(PAGE_CONTEXT_FQN)
         return getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
-            .singleOrNull {
-                // A valid layout method takes an optional first parameter of type `PageContext` and a final
-                // parameter of type `@Composable () -> Unit`
-                ((it.parameters.size == 2 && it.parameters[0].type.resolve().declaration.qualifiedName == pageContextName)
-                    || it.parameters.size == 1)
-                    && it.parameters.last().type.resolve().declaration.qualifiedName!!.asString() == "kotlin.Function0"
-            }
+            .singleOrNull { it.isLayoutMethod(this) }
     }
     override fun process(resolver: Resolver): List<KSAnnotated> {
-
         // Layout annotated methods are not (necessarily) layout methods themselves; but they point at layout methods.
         resolver.getSymbolsWithAnnotation(LAYOUT_FQN)
             // Ignore layout annotations attached to files
-            .filter { annotated -> annotated is KSFunctionDeclaration }
+            .filterIsInstance<KSFunctionDeclaration>()
+            .filter { it.hasPageAnnotation() || it.isLayoutMethod(resolver) }
             .forEach { annotatedFun ->
                 fileDependencies.add(annotatedFun.containingFile!!)
 
-                val layoutMethodName =
-                    annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value.toString()
-                        .let { layoutFqn ->
-                            PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)
-                        }
-                        .let { resolver.getKSNameFromString(it) }
-
-                resolver.findLayoutMethod(layoutMethodName)?.let { layoutMethod ->
-                    layoutsFor[annotatedFun as KSFunctionDeclaration] = layoutMethod
-                    layoutMethods.add(layoutMethod)
+                if (!annotatedFun.hasPageAnnotation()) {
+                    layoutMethods += annotatedFun
                 }
+
+                annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value.toString()
+                    .let { layoutFqn ->
+                        if (layoutFqn.isBlank()) {
+                            noLayoutsFor.add(annotatedFun)
+                        } else {
+                            val resolvedFqn = PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)
+                            val layoutParent = resolver.getKSNameFromString(resolvedFqn)
+                            resolver.findLayoutMethod(layoutParent)?.let { layoutMethod ->
+                                layoutsFor[annotatedFun] = layoutMethod
+                            }
+                        }
+                    }
             }
+
+        resolver.getSymbolsWithAnnotation(NO_LAYOUT_FQN)
+            .filterIsInstance<KSFunctionDeclaration>()
+            .filter { it.hasPageAnnotation() } // Only pages support `@NoLayout`
+            .forEach { annotatedFun -> noLayoutsFor.add(annotatedFun) }
 
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
@@ -173,6 +203,7 @@ class FrontendProcessor(
         }
 
         pageDeclarations += resolver.getSymbolsWithAnnotation(PAGE_FQN).map { it as KSFunctionDeclaration }
+        initRouteDeclarations += resolver.getSymbolsWithAnnotation(INIT_ROUTE_FQN).map { it as KSFunctionDeclaration }
 
         return emptyList()
     }
@@ -586,13 +617,15 @@ class FrontendProcessor(
      * passed in when using KSP's [CodeGenerator] to store the data.
      */
     fun getProcessorResult(): Result {
+        // Use filePath instead of containingFile, because equality doesn't seem to work as expected for KSFile
+        val initRoutesMap = initRouteDeclarations.associateBy { it.containingFile!!.filePath }
         val layouts = run {
-            val layoutMethods = layoutsFor.values.toSet() + defaultLayouts.values.toSet()
             layoutMethods.map { layout ->
                 LayoutEntry(
                     layout.qualifiedName!!.asString(),
-                    layout.parameters.size == 2,
-                    layoutsFor[layout]?.qualifiedName?.asString()
+                    acceptsContext = layout.parameters.size == 2,
+                    parentLayoutFqn = layoutsFor[layout]?.qualifiedName?.asString(),
+                    initRouteFqn = initRoutesMap[layout.containingFile!!.filePath]?.qualifiedName?.asString()
                 )
             }
         }
@@ -608,7 +641,8 @@ class FrontendProcessor(
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
                 annotatedFun = annotatedFun,
-                layoutFun = layoutsFor[annotatedFun],
+                layoutFqn = if (noLayoutsFor.contains(annotatedFun)) NO_LAYOUT_FQN else layoutsFor[annotatedFun]?.qualifiedName?.asString(),
+                initRoutes = initRoutesMap,
                 qualifiedPagesPackage = qualifiedPagesPackage,
                 packageMappings = packageMappings,
                 logger = logger,

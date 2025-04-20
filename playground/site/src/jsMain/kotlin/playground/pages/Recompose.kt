@@ -12,13 +12,15 @@ import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.data.add
+import com.varabyte.kobweb.core.init.InitRoute
+import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.forms.TextInput
 import com.varabyte.kobweb.silk.components.text.SpanText
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
-import playground.utilities.setTitle
+import playground.components.layouts.PageLayoutData
 
 @Composable
 private inline fun RecomposeCount() {
@@ -32,14 +34,16 @@ private inline fun CodeText(text: String) {
     SpanText(text, Modifier.fontFamily("monospace"))
 }
 
+@InitRoute
+fun initRecomposePage(ctx: InitRouteContext) {
+    ctx.data.add(PageLayoutData("Recompose"))
+}
 
 // This page is for testing that we don't get unexpected unecessary recompositions which can happen if we screw up
 // composable parameters.
 @Page
 @Composable
-fun RecomposePage(ctx: PageContext) {
-    LaunchedEffect(Unit) { ctx.setTitle("Recompose") }
-
+fun RecomposePage() {
     var msg by remember { mutableStateOf("") }
     TextInput(
         msg,

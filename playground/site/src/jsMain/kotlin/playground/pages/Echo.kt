@@ -2,19 +2,24 @@ package playground.pages
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.data.add
+import com.varabyte.kobweb.core.init.InitRoute
+import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.forms.TextInput
 import com.varabyte.kobweb.streams.rememberApiStream
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Text
-import playground.utilities.setTitle
+import playground.components.layouts.PageLayoutData
+
+@InitRoute
+fun initEchoPage(ctx: InitRouteContext) {
+    ctx.data.add(PageLayoutData("Echo test"))
+}
 
 @Page
 @Composable
-fun EchoPage(ctx: PageContext) {
-    LaunchedEffect(Unit) { ctx.setTitle("Echo test") }
-
+fun EchoPage() {
     var lastEchoedText by remember { mutableStateOf("") }
     val stream = rememberApiStream("echo") { ctx ->
         lastEchoedText = ctx.text

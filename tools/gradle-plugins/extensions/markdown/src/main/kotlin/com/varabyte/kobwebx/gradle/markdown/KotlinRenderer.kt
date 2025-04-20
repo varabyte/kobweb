@@ -96,8 +96,12 @@ class KotlinRenderer internal constructor(
                 appendLine("package ${metadataEntry.`package`}")
                 appendLine()
                 appendLine("import androidx.compose.runtime.*")
-                appendLine("import com.varabyte.kobweb.core.*")
-                appendLine("import com.varabyte.kobweb.core.layout.*")
+                appendLine("import com.varabyte.kobweb.core.Page")
+                appendLine("import com.varabyte.kobweb.core.data.*")
+                appendLine("import com.varabyte.kobweb.core.layout.Layout")
+                appendLine("import com.varabyte.kobweb.core.layout.NoLayout")
+                appendLine("import com.varabyte.kobweb.core.init.InitRoute")
+                appendLine("import com.varabyte.kobweb.core.init.InitRouteContext")
                 if (dependsOnMarkdownArtifact) {
                     appendLine("import com.varabyte.kobwebx.frontmatter.*")
                     appendLine("import com.varabyte.kobwebx.markdown.*")
@@ -108,6 +112,58 @@ class KotlinRenderer internal constructor(
 
                 appendLine()
 
+                if (metadataEntry.routeWithSlug != null && dependsOnMarkdownArtifact) {
+                    appendLine("@InitRoute")
+                    appendLine("fun init${frontMatterData?.funName ?: funName}(ctx: InitRouteContext) {")
+                    ++indentCount
+
+                    fun StringBuilder.appendElement(key: String, element: FrontMatterElement) {
+                        when (element) {
+                            is FrontMatterElement.Scalar -> {
+                                append("addScalar(\"$key\", \"${element.scalar.unescapeQuotes()}\"); ")
+                            }
+
+                            is FrontMatterElement.ValueList -> {
+                                append("addList(\"$key\") { ")
+                                element.list.mapNotNull { it.scalarOrNull() }.forEach { scalar ->
+                                    append("addScalar(\"${scalar.unescapeQuotes()}\"); ")
+                                }
+                                append("}; ")
+                            }
+
+                            is FrontMatterElement.ValueMap -> {
+                                append("addMap(\"$key\") { ")
+                                element.map.forEach { (key, value) ->
+                                    appendElement(key, value)
+                                }
+                                append("}; ")
+                            }
+                        }
+                    }
+
+                    val fmElementStr = frontMatterData?.filterUserData()?.takeIf { it.map.isNotEmpty() }?.let { filteredUserData ->
+                        buildString {
+                            append("FrontMatterElement.Builder { ")
+                            filteredUserData.map.forEach { (key, value) ->
+                                appendElement(key, value)
+                            }
+                            append("}")
+                        }
+                    } ?: "FrontMatterElement.EmptyMap"
+
+                    val mdCtx = buildString {
+                        append("MarkdownContext(")
+                        append("\"${metadataEntry.sourceFilePath.invariantSeparatorsPathString}\"")
+                        append(", ")
+                        append(fmElementStr)
+                        append(")")
+                    }
+                    appendLine("${indent}ctx.data.add($mdCtx)")
+                    --indentCount
+                    appendLine("}")
+                    appendLine()
+                }
+
                 metadataEntry.routeWithSlug?.let { routeWithSlug ->
                     append("@Page(\"")
                     append(frontMatterData?.routeOverride?.let {
@@ -115,26 +171,21 @@ class KotlinRenderer internal constructor(
                     } ?: routeWithSlug)
                     appendLine("\")")
 
-                    (frontMatterData?.layout ?: defaultLayout)?.takeIf { it.isNotBlank() }?.let { layout ->
-                        appendLine("@Layout(\"$layout\")")
+                    (frontMatterData?.layout ?: defaultLayout)?.let { layout ->
+                        if (layout.isNotEmpty()) {
+                            appendLine("@Layout(\"$layout\")")
+                        } else {
+                            appendLine("@NoLayout")
+                        }
                     }
                 }
 
                 appendLine("@Composable")
-                appendLine("fun ${frontMatterData?.funName ?: funName}(ctx: PageContext) {")
+                appendLine("fun ${frontMatterData?.funName ?: funName}() {")
             }
         )
 
         indentCount++
-        frontMatterData?.data?.let { data ->
-            output.appendLine("${indent}LaunchedEffect(Unit) {")
-            indentCount++
-            data.forEach { (key, value) ->
-                output.appendLine("${indent}ctx.data[\"$key\"] = \"${value.escapeQuotes()}\"")
-            }
-            indentCount--
-            output.appendLine("$indent}")
-        }
         RenderVisitor(output, metadataEntry, frontMatterData).visitAndFinish(node)
         indentCount--
 
@@ -179,7 +230,6 @@ class KotlinRenderer internal constructor(
     private class FrontMatterData(val raw: FrontMatterElement.ValueMap) {
         val root: String? get() = raw.map["root"]?.scalarOrNull()
         val layout: String? get() = raw.map["layout"]?.scalarOrNull()
-        val data: Map<String, String> get() = raw.map["data"]?.scalarMap() ?: emptyMap()
         val funName: String? get() = raw.map["funName"]?.scalarOrNull()
         val imports: List<String>? get() = raw.map["imports"]?.scalarList() ?: emptyList()
         val routeOverride: String? get() = raw.map["routeOverride"]?.scalarOrNull()
@@ -189,7 +239,6 @@ class KotlinRenderer internal constructor(
             return FrontMatterElement.ValueMap(raw.map.filterKeys {
                 it != "root" &&
                     it != "layout" &&
-                    it != "data" &&
                     it != "funName" &&
                     it != "imports" &&
                     it != "routeOverride"
@@ -221,56 +270,6 @@ class KotlinRenderer internal constructor(
         }
 
         init {
-            var contextCreated = false
-            if (metadataEntry.routeWithSlug != null && dependsOnMarkdownArtifact) {
-                val fmUserDataStr = frontMatterData?.filterUserData()
-                    ?.takeIf { it.map.isNotEmpty() }
-                    ?.let { fmUserData ->
-                        fun StringBuilder.appendElement(key: String, element: FrontMatterElement) {
-                            when (element) {
-                                is FrontMatterElement.Scalar -> {
-                                    append("addScalar(\"$key\", \"${element.scalar.unescapeQuotes()}\"); ")
-                                }
-
-                                is FrontMatterElement.ValueList -> {
-                                    append("addList(\"$key\") { ")
-                                    element.list.mapNotNull { it.scalarOrNull() }.forEach { scalar ->
-                                        append("addScalar(\"${scalar.unescapeQuotes()}\"); ")
-                                    }
-                                    append("}; ")
-                                }
-
-                                is FrontMatterElement.ValueMap -> {
-                                    append("addMap(\"$key\") { ")
-                                    element.map.forEach { (key, value) ->
-                                        appendElement(key, value)
-                                    }
-                                    append("}; ")
-                                }
-                            }
-                        }
-
-                        buildString {
-                            append("FrontMatterElement.Builder { ")
-                            fmUserData.map.forEach { (key, value) ->
-                                appendElement(key, value)
-                            }
-                            append("}")
-                        }
-                    } ?: "FrontMatterElement.EmptyMap"
-
-                val mdCtx = buildString {
-                    append("MarkdownContext(")
-                    append("\"${metadataEntry.sourceFilePath.invariantSeparatorsPathString}\"")
-                    append(", ")
-                    append(fmUserDataStr)
-                    append(")")
-                }
-                output.appendLine("${indent}CompositionLocalProvider(LocalMarkdownContext provides $mdCtx) {")
-                ++indentCount
-                contextCreated = true
-            }
-
             // If "root" is set in the YAML block, that represents a top-level composable which should wrap
             // everything else.
             val root = (frontMatterData?.root ?: defaultRoot)?.takeUnless {
@@ -286,11 +285,6 @@ class KotlinRenderer internal constructor(
 
             onFinish += {
                 if (root != null) {
-                    --indentCount
-                    output.appendLine("$indent}")
-                }
-
-                if (contextCreated) {
                     --indentCount
                     output.appendLine("$indent}")
                 }

@@ -183,6 +183,9 @@ fun createMainFunction(
                                 if (entry.parentLayoutFqn != null) {
                                     append(", parentLayoutId = \"${entry.parentLayoutFqn}\"")
                                 }
+                                if (entry.initRouteFqn != null) {
+                                    append(", initRouteMethod = { ctx -> ${entry.initRouteFqn}(ctx) }")
+                                }
                                 append(") { pageCtx, pageMethod -> ")
                                 append("${entry.fqn}(")
                                 if (entry.acceptsContext) {
@@ -202,6 +205,9 @@ fun createMainFunction(
                                 append("ctx.router.register(\"${entry.route}\"")
                                 if (entry.layoutFqn != null) {
                                     append(", layoutId = \"${entry.layoutFqn}\"")
+                                }
+                                if (entry.initRouteFqn != null) {
+                                    append(", initRouteMethod = { ctx -> ${entry.initRouteFqn}(ctx) }")
                                 }
                                 append(") { ")
 

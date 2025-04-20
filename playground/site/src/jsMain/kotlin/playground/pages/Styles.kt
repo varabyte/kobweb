@@ -11,7 +11,9 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.data.add
+import com.varabyte.kobweb.core.init.InitRoute
+import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.layout.SimpleGrid
 import com.varabyte.kobweb.silk.components.layout.numColumns
 import com.varabyte.kobweb.silk.components.text.SpanText
@@ -23,7 +25,7 @@ import com.varabyte.kobweb.silk.style.addVariant
 import com.varabyte.kobweb.silk.style.extendedBy
 import com.varabyte.kobweb.silk.style.toModifier
 import org.jetbrains.compose.web.css.*
-import playground.utilities.setTitle
+import playground.components.layouts.PageLayoutData
 
 // This page tests all the different variations of declaring, prefixing, and naming styles
 
@@ -127,11 +129,14 @@ class NamedClassContainer {
     }
 }
 
+@InitRoute
+fun initStylesPage(ctx: InitRouteContext) {
+    ctx.data.add(PageLayoutData("Styles"))
+}
+
 @Page
 @Composable
-fun StylesPage(ctx: PageContext) {
-    LaunchedEffect(Unit) { ctx.setTitle("Http Serialization Test") }
-
+fun StylesPage() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         val styleModifiers = listOf(
             BasicStyle.toModifier(),

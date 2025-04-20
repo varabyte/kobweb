@@ -33,15 +33,21 @@ fun getDefaultLayout(
     logger: KSPLogger,
 ): Pair<String, String>? {
     return file.getAnnotationsByName(layoutAnnotationFqn).singleOrNull()?.let { layoutAnnotation ->
+        val layoutTarget = layoutAnnotation.arguments.first().value!!.toString().takeIf { it.isNotEmpty() }
         val currPackage = file.packageName.asString()
-        if (currPackage.startsWith(qualifiedPagesPackage)) {
-            val layoutMethodFqn =
-                PackageUtils.resolvePackageShortcut(projectGroup, layoutAnnotation.arguments.first().value!!.toString())
-
+        if (layoutTarget == null) {
+            logger.warn(
+                "Skipped over `@file:${layoutAnnotation.shortName.asString()}` as it doesn't specify a target.",
+                layoutAnnotation
+            )
+            null
+        }
+        else if (currPackage.startsWith(qualifiedPagesPackage)) {
+            val layoutMethodFqn = PackageUtils.resolvePackageShortcut(projectGroup, layoutTarget)
             currPackage to layoutMethodFqn
         } else {
             logger.warn(
-                "Skipped over `@file:${layoutAnnotation.shortName.asString()}` annotation. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
+                "Skipped over `@file:${layoutAnnotation.shortName.asString()}`. It is defined under package `$currPackage` but must exist under `$qualifiedPagesPackage`.",
                 layoutAnnotation
             )
             null

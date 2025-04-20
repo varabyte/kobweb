@@ -16,7 +16,9 @@ import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.thenIf
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.data.add
+import com.varabyte.kobweb.core.init.InitRoute
+import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.navigation.OpenLinkStrategy
 import com.varabyte.kobweb.silk.components.disclosure.Tabs
 import com.varabyte.kobweb.silk.components.display.Callout
@@ -103,8 +105,8 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Hr
 import org.jetbrains.compose.web.dom.Text
+import playground.components.layouts.PageLayoutData
 import playground.components.widgets.GoHomeLink
-import playground.utilities.setTitle
 import com.varabyte.kobweb.silk.components.icons.fa.IconStyle as FaIconStyle
 import com.varabyte.kobweb.silk.components.icons.mdi.IconStyle as MdiIconStyle
 
@@ -151,11 +153,14 @@ fun WidgetSection(title: String, content: @Composable BoxScope.() -> Unit) {
     }
 }
 
+@InitRoute
+fun initPostPage(ctx: InitRouteContext) {
+    ctx.data.add(PageLayoutData("WIDGETS"))
+}
+
 @Page
 @Composable
-fun WidgetsPage(ctx: PageContext) {
-    LaunchedEffect(Unit) { ctx.setTitle("WIDGETS") }
-
+fun WidgetsPage() {
     Column(
         Modifier.gap(2.cssRem).fillMaxWidth().padding(2.cssRem).maxWidth(800.px),
         horizontalAlignment = Alignment.CenterHorizontally

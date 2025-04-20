@@ -107,9 +107,16 @@ class DefaultLayoutEntry(val fqn: String, val route: String)
  * @property acceptsContext If true, the method accepts a single `PageContext` argument; otherwise, no arguments.
  * @property parentLayoutFqn The fully qualified name of a layout that parents this one, if present (indicated this is
  *   a nested layout).
+ * @property initRouteFqn The fully qualified name of a method associated with this layout that should be called before
+ *   the current page is composed.
  */
 @Serializable
-class LayoutEntry(val fqn: String, val acceptsContext: Boolean, val parentLayoutFqn: String? = null)
+class LayoutEntry(
+    val fqn: String,
+    val acceptsContext: Boolean,
+    val parentLayoutFqn: String? = null,
+    val initRouteFqn: String? = null,
+)
 
 /**
  * Information about a method in the user's code targeted by a `@Page` annotation.
@@ -121,9 +128,17 @@ class LayoutEntry(val fqn: String, val acceptsContext: Boolean, val parentLayout
  * @param acceptsContext If true, the method accepts a single `PageContext` argument; otherwise, no arguments. Defaults
  *   to false for compatibility with libraries using a version of Kobweb before this feature was introduced.
  * @param layoutFqn The fully qualified name of the parent layout method for this page.
+ * @property initRouteFqn The fully qualified name of a method associated with this layout that should be called before
+ *   the current page is composed.
  */
 @Serializable
-class PageEntry(val fqn: String, val route: String, val acceptsContext: Boolean = false, val layoutFqn: String? = null)
+class PageEntry(
+    val fqn: String,
+    val route: String,
+    val acceptsContext: Boolean = false,
+    val layoutFqn: String? = null,
+    val initRouteFqn: String? = null,
+)
 
 /**
  * Metadata for code like `val MyStyle = CssStyle { ... }` or `val SM = ButtonSize()` (or any `CssStyle` subclass)

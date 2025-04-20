@@ -13,7 +13,8 @@ import com.varabyte.kobweb.project.frontend.PageEntry
  */
 fun processPagesFun(
     annotatedFun: KSFunctionDeclaration,
-    layoutFun: KSFunctionDeclaration?,
+    layoutFqn: String?,
+    initRoutes: Map<String, KSFunctionDeclaration>,
     qualifiedPagesPackage: String,
     packageMappings: Map<String, String>,
     logger: KSPLogger,
@@ -55,7 +56,8 @@ fun processPagesFun(
                 annotatedFun.qualifiedName!!.asString(),
                 route,
                 acceptsContext = annotatedFun.parameters.size == 1,
-                layoutFqn = layoutFun?.qualifiedName?.asString()
+                layoutFqn = layoutFqn,
+                initRouteFqn = initRoutes[annotatedFun.containingFile!!.filePath]?.qualifiedName?.asString(),
             )
         } else {
             logger.warn(

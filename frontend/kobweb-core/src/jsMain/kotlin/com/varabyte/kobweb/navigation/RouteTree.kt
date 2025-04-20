@@ -1,10 +1,8 @@
 package com.varabyte.kobweb.navigation
 
-import androidx.compose.runtime.*
-import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.RouteInfo
 
-internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageContent: @Composable (errorCode: Int) -> Unit): PageData {
-    val errorPageMethod: @Composable (PageContext) -> Unit = { errorPageContent(404) }
+internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageMethod: PageMethod): PageData {
     val self = this
     val resolved = self.resolve(route.path, allowRedirects = true)
         ?: route.path
@@ -29,10 +27,7 @@ internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageContent
                             }
                         }
                 } else null
-            } ?: return PageData(
-                errorPageMethod,
-                PageContext.RouteInfo(route, emptyMap())
-            )
+            } ?: return PageData(errorPageMethod, RouteInfo(route, emptyMap()))
 
     val pageMethod: PageMethod = resolved.last().node.data ?: errorPageMethod
     val dynamicParams = mutableMapOf<String, String>()
@@ -45,7 +40,7 @@ internal fun RouteTree<PageMethod>.createPageData(route: Route, errorPageContent
     return PageData(
         pageMethod,
         // Update RouteInfo with the latest path, just in case a redirect happened
-        PageContext.RouteInfo(
+        RouteInfo(
             Route(resolved.toRouteString(), route.queryParams, route.fragment),
             dynamicParams
         )

@@ -1,11 +1,19 @@
 package com.varabyte.kobweb.navigation
 
 import androidx.compose.runtime.*
+import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.AlignItems
+import com.varabyte.kobweb.compose.css.JustifyContent
 import com.varabyte.kobweb.core.Page
 import com.varabyte.kobweb.core.PageContext
 import com.varabyte.kobweb.core.PageContextLocal
+import com.varabyte.kobweb.core.data.MutableData
+import com.varabyte.kobweb.core.init.InitRouteContext
+import com.varabyte.kobweb.core.layout.NO_LAYOUT_FQN
+import com.varabyte.kobweb.core.layout.NoLayout
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.INSTANT
@@ -19,9 +27,17 @@ import org.w3c.xhr.XMLHttpRequest
 
 @Page
 @Composable
-private fun DefaultErrorPage(errorCode: Int) {
-    Div {
-        Text("Error code: $errorCode")
+private fun DefaultErrorPage() {
+    Div(attrs = {
+        style {
+            width(100.percent)
+            height(100.vh)
+            display(DisplayStyle.Flex)
+            alignItems(AlignItems.Center)
+            justifyContent(JustifyContent.Center)
+        }
+    }) {
+        Text("Page Not Found")
     }
 }
 
@@ -104,10 +120,18 @@ class Router {
         val isDynamic: Boolean, // Whether the path is dynamic or not, in case users want to filter them out
     )
 
+    private var errorPageMethod: PageMethod = { ctx -> DefaultErrorPage() }
+
+    private val pageDataStore = MutableData()
     private val layouts = mutableMapOf<String, LayoutMethod>()
+        .apply { this[NO_LAYOUT_FQN] = { ctx, content -> NoLayout { content(ctx) } } }
     private val layoutIdForPage = mutableMapOf<PageMethod, String>()
+        // Error page shouldn't use a layout (users can override this behavior using `setErrorHandler` if they need to)
+        .apply { this[errorPageMethod] = NO_LAYOUT_FQN }
     private val layoutIdForLayout = mutableMapOf<LayoutMethod, String>()
     private val layoutIdForRoute = mutableMapOf<String, String>()
+    private val initRouteForPage = mutableMapOf<PageMethod, InitRouteMethod>()
+    private val initRouteForLayout = mutableMapOf<LayoutMethod, InitRouteMethod>()
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
     private val routeTree = RouteTree<PageMethod>()
     private val interceptors = mutableListOf<RouteInterceptorScope.() -> Unit>()
@@ -133,7 +157,7 @@ class Router {
         }
 
     init {
-        PageContext.init(this)
+        PageContext.init(this, pageDataStore)
         window.onpopstate = {
             PageContext.instance.updatePageContext(document.location!!.let { it.href.removePrefix(it.origin) })
         }
@@ -149,10 +173,11 @@ class Router {
         // Special case - sometimes the value passed in here is simply a fragment, which means the browser
         // should scroll to an element on the same page
         if (pathQueryAndFragment.startsWith("#")) {
-            routeState.value?.let { routeInfo ->
+            val routeInfo = routeState.value
+            if (routeInfo != null) {
                 routeState.value = routeInfo.copy(fragment = pathQueryAndFragment.removePrefix("#"))
                 return true
-            } ?: run {
+            } else {
                 return false
             }
         }
@@ -162,10 +187,43 @@ class Router {
             val data = routeTree.createPageData(route, errorPageMethod)
             activePageMethod = data.pageMethod
             this.route = data.routeInfo
-            this.data.clear()
+            
+            val initRouteMethods = mutableListOf<InitRouteMethod>()
+            initRouteForPage[activePageMethod]?.let { initRouteMethods.add(it) }
+            data.pageMethod.parentLayouts.forEach { layoutMethod ->
+                initRouteForLayout[layoutMethod]?.let { initRouteMethods.add(it) }
+            }
+
+            this@Router.pageDataStore.clear()
+            val ctx = InitRouteContext(data.routeInfo, this@Router.pageDataStore)
+            initRouteMethods.forEach { it.invoke(ctx) }
+
             true
         } else {
             false
+        }
+    }
+
+    /**
+     * The ancestor layouts for this page (if any), in order from closet to most distance ancestory.
+     */
+    val PageMethod.parentLayouts: List<LayoutMethod> get() {
+        var layoutMethod: LayoutMethod? = layoutIdForPage[this]?.let { layouts[it] }
+            ?: run {
+                layoutIdForRoute.entries.asSequence().mapNotNull { (route, layoutId) ->
+                    if (PageContext.instance.route.path.startsWith(route)) {
+                        layouts[layoutId]
+                    } else {
+                        null
+                    }
+                }.firstOrNull()
+            }
+
+        return buildList {
+            while (layoutMethod != null) {
+                add(0, layoutMethod)
+                layoutMethod = layoutIdForLayout[layoutMethod]?.let { layouts[it] }
+            }
         }
     }
 
@@ -191,25 +249,6 @@ class Router {
             PageContextLocal provides PageContext.instance
         ) {
             pageWrapper {
-                var layoutMethod: LayoutMethod? = layoutIdForPage[pageMethod]?.let { layouts[it] }
-                    ?: run {
-                        layoutIdForRoute.entries.asSequence().mapNotNull { (route, layoutId) ->
-                            if (PageContext.instance.route.path.startsWith(route)) {
-                                layouts[layoutId]
-                            } else {
-                                null
-                            }
-                        }.firstOrNull()
-                    }
-
-                val layouts: List<LayoutMethod> =
-                    buildList {
-                        while (layoutMethod != null) {
-                            add(0, layoutMethod)
-                            layoutMethod = layoutIdForLayout[layoutMethod]?.let { layouts[it] }
-                        }
-                    }
-
                 // If a user navigates between two different dynamic routes, e.g. "/users/a" and "/users/b" for route
                 // "/users/{user}", we want to treat this as a recomposition, since from the user's point of view, they
                 // are different URLs. Query params changing should NOT cause a recomposition though!
@@ -217,7 +256,7 @@ class Router {
                     key(PageContext.instance.route.path) { pageMethod(ctx) }
                 }
 
-                layouts.foldRight(keyedPageMethod) { layout, accum ->
+                pageMethod.parentLayouts.foldRight(keyedPageMethod) { layout, accum ->
                     { ctx -> layout(ctx, accum) }
                 }.invoke(PageContext.instance)
             }
@@ -263,9 +302,10 @@ class Router {
         return pathPart to this.removePrefix(pathPart)
     }
 
-    fun registerLayout(layoutId: String, parentLayoutId: String? = null, layoutMethod: LayoutMethod) {
+    fun registerLayout(layoutId: String, parentLayoutId: String? = null, initRouteMethod: InitRouteMethod? = null, layoutMethod: LayoutMethod) {
         layouts[layoutId] = layoutMethod
         parentLayoutId?.let { layoutIdForLayout[layoutMethod] = it }
+        initRouteMethod?.let { initRouteForLayout[layoutMethod] = it }
     }
 
     /**
@@ -303,13 +343,14 @@ class Router {
      * `user = 123456` and `post = 321` passed down in the `PageContext`.
      */
     @Suppress("unused") // Called by generated code
-    fun register(route: String, layoutId: String? = null, pageMethod: PageMethod) {
+    fun register(route: String, layoutId: String? = null, initRouteMethod: InitRouteMethod? = null, pageMethod: PageMethod) {
         require(Route.isRoute(route) && route.startsWith('/')) { "Registration only allowed for internal, rooted routes, e.g. /example/path. Got: $route" }
         require(
             routeTree.register(BasePath.prependTo(route), pageMethod)
         ) { "Registration failure. Path is already registered: $route" }
 
         layoutId?.let { layoutIdForPage[pageMethod] = it }
+        initRouteMethod?.let { initRouteForPage[pageMethod] = it }
     }
 
     @Suppress("unused") // Called by generated code
@@ -341,12 +382,20 @@ class Router {
      * }
      * ```
      */
-    fun setErrorHandler(errorPageMethod: ErrorPageMethod) {
-        this.errorPageMethod = errorPageMethod
+    fun setErrorPage(layoutId: String? = NO_LAYOUT_FQN, pageMethod: PageMethod) {
+        this.errorPageMethod = pageMethod
+        if (layoutId == null) {
+            layoutIdForPage.remove(errorPageMethod)
+        } else {
+            layoutIdForPage[errorPageMethod] = layoutId
+        }
     }
 
-    private var errorPageMethod: ErrorPageMethod = { errorCode ->
-        DefaultErrorPage(errorCode)
+    @Deprecated("Use `setErrorPage` instead. This old method required you take in a numeric value representing the error code, but it was always 404, so by moving towards a more standard format (that takes a `PageContext` as its main argument), we can simplify the codebase.")
+    fun setErrorHandler(layoutId: String? = "", @Suppress("DEPRECATION") errorPageMethod: ErrorPageMethod) {
+        setErrorPage(layoutId) { ctx ->
+            errorPageMethod(404)
+        }
     }
 
     /**

@@ -1,6 +1,5 @@
 ---
-data:
-  title: "MARKDOWN"
+title: "MARKDOWN"
 ---
 
 This site is generated from Markdown.

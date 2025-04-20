@@ -21,9 +21,17 @@ kobweb {
         }
     }
     markdown {
+        defaultLayout.set(".components.layouts.MarkdownLayout")
         imports.add(".components.widgets.*")
         process.set { markdownEntries ->
             generateMarkdown("markdown/listing.md", buildString {
+                // Disable the layout for this page; it looks weird when centered
+                appendLine("""
+                    ---
+                    layout:
+                    ---
+                """.trimIndent()
+                )
                 appendLine("# Listing Index")
                 markdownEntries.sortedBy { it.route }.forEach { entry ->
                     appendLine("* [${entry.filePath}](${entry.route})")

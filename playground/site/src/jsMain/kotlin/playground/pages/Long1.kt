@@ -5,7 +5,9 @@ import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.modifiers.*
 import com.varabyte.kobweb.compose.ui.toAttrs
 import com.varabyte.kobweb.core.Page
-import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.data.add
+import com.varabyte.kobweb.core.init.InitRoute
+import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.silk.components.forms.Button
 import com.varabyte.kobweb.silk.components.icons.fa.FaArrowUp
 import com.varabyte.kobweb.silk.components.navigation.Link
@@ -16,14 +18,17 @@ import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.SMOOTH
 import org.w3c.dom.ScrollBehavior
 import org.w3c.dom.ScrollToOptions
-import playground.utilities.setTitle
+import playground.components.layouts.PageLayoutData
+
+@InitRoute
+fun initLong1Page(ctx: InitRouteContext) {
+    ctx.data.add(PageLayoutData("Long 1!"))
+}
 
 // Useful for testing scrolling to fragments. See also Long2Page.
 @Page
 @Composable
-fun Long1Page(ctx: PageContext) {
-    LaunchedEffect(Unit) { ctx.setTitle("Long 1!") }
-
+fun Long1Page() {
     Link("#h50", "Go halfway down")
 
     for (i in 0..100) {

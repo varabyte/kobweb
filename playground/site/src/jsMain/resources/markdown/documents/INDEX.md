@@ -1,6 +1,5 @@
 ---
-data:
-  title: "DOCUMENTS"
+title: "DOCUMENTS"
 ---
 
 Links to some documents:

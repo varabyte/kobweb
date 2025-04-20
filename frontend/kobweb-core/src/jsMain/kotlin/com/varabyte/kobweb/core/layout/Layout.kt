@@ -149,4 +149,4 @@ import androidx.compose.runtime.*
  * annotation, it will remember which sections are collapsed even as you navigate across pages.
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.FILE)
-annotation class Layout(@Suppress("unused") val fqn: String)
+annotation class Layout(@Suppress("unused") val fqn: String = "")

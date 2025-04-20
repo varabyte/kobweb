@@ -1,7 +1,8 @@
 package com.varabyte.kobwebx.markdown
 
-import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.PageContext
+import com.varabyte.kobweb.core.data.get
+import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobwebx.frontmatter.FrontMatterElement
 
 /**
@@ -50,10 +51,8 @@ class MarkdownContext(
 )
 
 // Extend `rememberPageContext()` with markdown specific values
-@Suppress("UnusedReceiverParameter") // Useful for scoping access to the feature only to pages
 val PageContext.markdown: MarkdownContext?
-    @Composable
-    @ReadOnlyComposable
-    get() = LocalMarkdownContext.current
+    get() = data.get<MarkdownContext>()
 
-val LocalMarkdownContext = compositionLocalOf<MarkdownContext?> { null }
+val InitRouteContext.markdown: MarkdownContext?
+    get() = data.get<MarkdownContext>()
