@@ -3,15 +3,41 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/break-after
-sealed class BreakAfter private constructor(private val value: String) : StylePropertyValue {
+class BreakAfter private constructor(private val value: String) : StylePropertyValue {
 
     override fun toString() = value
 
-    private class KeyWord(value: String) : BreakAfter(value)
+    companion object {
 
-    companion object : BreakStyleBeforeAfterPropertyValues<KeyWord> by breakStyleBeforeAfterPropertyValues(::KeyWord),
-        BreakStyleGlobalValues<KeyWord> by globalStyleGlobalValues(::KeyWord),
-        BreakInsidePropertyValues<KeyWord> by breakInsidePropertyValues(::KeyWord)
+        /* Generic break values */
+        val Auto = BreakAfter("auto")
+        val Avoid = BreakAfter("avoid")
+        val Always = BreakAfter("always")
+        val All = BreakAfter("all")
+
+        /* Page break values */
+        val AvoidPage get() = BreakAfter("avoid-page")
+        val Page get() = BreakAfter("page")
+        val Left get() = BreakAfter("left")
+        val Right get() = BreakAfter("right")
+        val Recto get() = BreakAfter("recto")
+        val Verso get() = BreakAfter("verso")
+
+        /* Column break values */
+        val Column = BreakAfter("column")
+        val AvoidColumn = BreakAfter("avoid-column")
+
+        /* Region break values */
+        val Region = BreakAfter("region")
+        val AvoidRegion = BreakAfter("avoid-region")
+
+        /* Global values */
+        val Inherit = BreakAfter("inherit")
+        val Initial = BreakAfter("initial")
+        val Revert = BreakAfter("revert")
+        val RevertLayer = BreakAfter("revert-layer")
+        val Unset = BreakAfter("unset")
+    }
 }
 
 fun StyleScope.breakAfter(breakAfter: BreakAfter) {
@@ -19,15 +45,41 @@ fun StyleScope.breakAfter(breakAfter: BreakAfter) {
 }
 
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/break-before
-sealed class BreakBefore private constructor(private val value: String) : StylePropertyValue {
+class BreakBefore private constructor(private val value: String) : StylePropertyValue {
 
     override fun toString() = value
 
-    private class KeyWord(value: String) : BreakBefore(value)
+    companion object {
 
-    companion object : BreakStyleBeforeAfterPropertyValues<KeyWord> by breakStyleBeforeAfterPropertyValues(::KeyWord),
-        BreakStyleGlobalValues<KeyWord> by globalStyleGlobalValues(::KeyWord),
-        BreakInsidePropertyValues<KeyWord> by breakInsidePropertyValues(::KeyWord)
+        /* Generic break values */
+        val Auto get() = BreakBefore("auto")
+        val Avoid get() = BreakBefore("avoid")
+        val Always get() = BreakBefore("always")
+        val All get() = BreakBefore("all")
+
+        /* Page break values */
+        val AvoidPage get() = BreakBefore("avoid-page")
+        val Page get() = BreakBefore("page")
+        val Left get() = BreakBefore("left")
+        val Right get() = BreakBefore("right")
+        val Recto get() = BreakBefore("recto")
+        val Verso get() = BreakBefore("verso")
+
+        /* Column break values */
+        val Column = BreakBefore("column")
+        val AvoidColumn = BreakBefore("avoid-column")
+
+        /* Region break values */
+        val Region = BreakBefore("region")
+        val AvoidRegion = BreakBefore("avoid-region")
+
+        /* Global values */
+        val Inherit get() = BreakBefore("inherit")
+        val Initial get() = BreakBefore("initial")
+        val Revert get() = BreakBefore("revert")
+        val RevertLayer get() = BreakBefore("revert-layer")
+        val Unset get() = BreakBefore("unset")
+    }
 }
 
 fun StyleScope.breakBefore(breakBefore: BreakBefore) {
@@ -35,113 +87,28 @@ fun StyleScope.breakBefore(breakBefore: BreakBefore) {
 }
 
 //See https://developer.mozilla.org/en-US/docs/Web/CSS/break-inside
-sealed class BreakInside private constructor(private val value: String) : StylePropertyValue {
+class BreakInside private constructor(private val value: String) : StylePropertyValue {
 
     override fun toString() = value
 
-    private class KeyWord(value: String) : BreakInside(value)
+    companion object {
 
-    companion object : BreakInsidePropertyValues<KeyWord> by breakInsidePropertyValues(::KeyWord),
-        BreakStyleGlobalValues<KeyWord> by globalStyleGlobalValues(::KeyWord)
+        /* Keyword values */
+        val Auto get() = BreakInside("auto")
+        val Avoid get() = BreakInside("avoid")
+        val AvoidPage get() = BreakInside("avoid-page")
+        val AvoidColumn = BreakInside("avoid-column")
+        val AvoidRegion = BreakInside("avoid-region")
+
+        /* Global values */
+        val Inherit get() = BreakInside("inherit")
+        val Initial get() = BreakInside("initial")
+        val Revert get() = BreakInside("revert")
+        val RevertLayer get() = BreakInside("revert-layer")
+        val Unset get() = BreakInside("unset")
+    }
 }
 
 fun StyleScope.breakInside(breakInside: BreakInside) {
     property("break-inside", breakInside)
 }
-
-/**
- * This interface defines the values for properties: [BreakInside]
- */
-@Suppress("PropertyName")
-interface BreakInsidePropertyValues<T> {
-    /* Generic break values */
-    val Auto: T
-    val Avoid: T
-
-    /* Page break values */
-    val AvoidPage: T
-
-    /* Column break values */
-    val AvoidColumn: T
-
-    /* Region break values */
-    val AvoidRegion: T
-
-}
-
-fun <T> breakInsidePropertyValues(factory: (String) -> T): BreakInsidePropertyValues<T> =
-    object : BreakInsidePropertyValues<T> {
-        override val Auto = factory("auto")
-        override val Avoid = factory("avoid")
-        override val AvoidPage = factory("avoid-page")
-        override val AvoidColumn = factory("avoid-column")
-        override val AvoidRegion = factory("avoid-region")
-
-    }
-
-/**
- * This interface defines the global values shared across the three properties: [BreakAfter], [BreakBefore] and [BreakInside]
- */
-@Suppress("PropertyName")
-interface BreakStyleGlobalValues<T> {
-    /* Global values */
-    val Inherit: T
-    val Initial: T
-    val Revert: T
-    val RevertLayer: T
-    val Unset: T
-}
-
-fun <T> globalStyleGlobalValues(factory: (String) -> T): BreakStyleGlobalValues<T> =
-    object : BreakStyleGlobalValues<T> {
-        /* Global values */
-        override val Inherit = factory("inherit")
-        override val Initial = factory("initial")
-        override val Revert = factory("revert")
-        override val RevertLayer = factory("revert-layer")
-        override val Unset = factory("unset")
-    }
-
-/**
- * This interface defines the global values shared across the two properties: [BreakAfter], [BreakBefore]
- */
-@Suppress("PropertyName")
-interface BreakStyleBeforeAfterPropertyValues<T> {
-    /* Generic break values */
-    val Always: T
-    val All: T
-
-    /* Page break values */
-    val Page: T
-    val Left: T
-    val Right: T
-    val Recto: T
-    val Verso: T
-
-    /* Column break values */
-    val Column: T
-
-    /* Region break values */
-    val Region: T
-}
-
-fun <T> breakStyleBeforeAfterPropertyValues(factory: (String) -> T): BreakStyleBeforeAfterPropertyValues<T> =
-    object : BreakStyleBeforeAfterPropertyValues<T> {
-
-        /* Generic break values */
-        override val Always = factory("always")
-        override val All = factory("all")
-
-        /* Page break values */
-        override val Page = factory("page")
-        override val Left = factory("left")
-        override val Right = factory("right")
-        override val Recto = factory("recto")
-        override val Verso = factory("verso")
-
-        /* Column break values */
-        override val Column = factory("column")
-
-        /* Region break values */
-        override val Region = factory("region")
-    }
