@@ -156,7 +156,11 @@ class FrontendProcessor(
 
                 annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value?.toString().orEmpty()
                     .let { layoutFqn ->
-                        if (layoutFqn.isBlank()) {
+                        // Users should NOT put the NO_LAYOUT_FQN in their layout, but we catch it here anyway to avoid
+                        // showing them a potentially confusing error from the else branch. However, we should not
+                        // advertise they can do this, and we reserve the right to turn this into a warning / error
+                        // later.
+                        if (layoutFqn.isBlank() || layoutFqn == NO_LAYOUT_FQN) {
                             noLayoutsFor.add(annotatedFun)
                         } else {
                             val resolvedFqn = PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)

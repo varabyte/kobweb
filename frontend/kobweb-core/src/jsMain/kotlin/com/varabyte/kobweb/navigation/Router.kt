@@ -10,7 +10,6 @@ import com.varabyte.kobweb.core.PageContextLocal
 import com.varabyte.kobweb.core.data.MutableData
 import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.NO_LAYOUT_FQN
-import com.varabyte.kobweb.core.layout.NoLayout
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
@@ -124,7 +123,7 @@ class Router {
 
     private val pageDataStore = MutableData()
     private val layouts = mutableMapOf<String, LayoutMethod>()
-        .apply { this[NO_LAYOUT_FQN] = { ctx, content -> NoLayout { content(ctx) } } }
+        .apply { this[NO_LAYOUT_FQN] = { ctx, content -> content(ctx) } }
     private val layoutIdForPage = mutableMapOf<PageMethod, String>()
         // Error page shouldn't use a layout (users can override this behavior using `setErrorHandler` if they need to)
         .apply { this[errorPageMethod] = NO_LAYOUT_FQN }

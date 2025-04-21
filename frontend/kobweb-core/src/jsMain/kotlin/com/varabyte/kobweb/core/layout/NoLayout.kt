@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.core.layout
 
-import androidx.compose.runtime.*
 import com.varabyte.kobweb.core.Page
 
 /**
@@ -23,15 +22,8 @@ import com.varabyte.kobweb.core.Page
  *   // Undecorated page
  * }
  * ```
- *
- * You can technically also use `@Layout("com.varabyte.kobweb.core.layout.NoLayout")` (or `@Layout(NO_LAYOUT_FQN)`) for
- * this, but prefer using `@NoLayout`` instead for clarity and intention.
  */
 @Target(AnnotationTarget.FUNCTION)
 annotation class NoLayout()
 
 const val NO_LAYOUT_FQN = "com.varabyte.kobweb.core.layout.NoLayout"
-
-@Composable
-// @Layout <- No need to explicitly declare because this special layout is added manually inside Router
-fun NoLayout(content: @Composable () -> Unit) = content()
