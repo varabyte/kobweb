@@ -27,7 +27,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 class FrontendData(
     val layouts: List<LayoutEntry> = mutableListOf(),
-    val defaultLayouts: List<DefaultLayoutEntry> = mutableListOf(),
     val pages: List<PageEntry> = mutableListOf(),
     val kobwebInits: List<InitKobwebEntry> = mutableListOf(),
     val silkInits: List<InitSilkEntry> = mutableListOf(),
@@ -44,7 +43,6 @@ class FrontendData(
 fun Iterable<FrontendData>.merge(throwError: (String) -> Unit): FrontendData {
     return FrontendData(
         this.flatMap { it.layouts },
-        this.flatMap { it.defaultLayouts },
         this.flatMap { it.pages },
         this.flatMap { it.kobwebInits },
         this.flatMap { it.silkInits },

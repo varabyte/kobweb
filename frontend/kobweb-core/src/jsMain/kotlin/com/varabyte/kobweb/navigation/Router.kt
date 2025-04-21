@@ -128,7 +128,6 @@ class Router {
         // Error page shouldn't use a layout (users can override this behavior using `setErrorHandler` if they need to)
         .apply { this[errorPageMethod] = NO_LAYOUT_FQN }
     private val layoutIdForLayout = mutableMapOf<LayoutMethod, String>()
-    private val layoutIdForRoute = mutableMapOf<String, String>()
     private val initRouteForPage = mutableMapOf<PageMethod, InitRouteMethod>()
     private val initRouteForLayout = mutableMapOf<LayoutMethod, InitRouteMethod>()
     private var activePageMethod by mutableStateOf<PageMethod?>(null)
@@ -208,16 +207,6 @@ class Router {
      */
     val PageMethod.parentLayouts: List<LayoutMethod> get() {
         var layoutMethod: LayoutMethod? = layoutIdForPage[this]?.let { layouts[it] }
-            ?: run {
-                layoutIdForRoute.entries.asSequence().mapNotNull { (route, layoutId) ->
-                    if (PageContext.instance.route.path.startsWith(route)) {
-                        layouts[layoutId]
-                    } else {
-                        null
-                    }
-                }.firstOrNull()
-            }
-
         return buildList {
             while (layoutMethod != null) {
                 add(0, layoutMethod)
@@ -305,21 +294,6 @@ class Router {
         layouts[layoutId] = layoutMethod
         parentLayoutId?.let { layoutIdForLayout[layoutMethod] = it }
         initRouteMethod?.let { initRouteForLayout[layoutMethod] = it }
-    }
-
-    /**
-     * Register the default layout for a route that any pages under that route will use as a fallback.
-     */
-    fun registerDefaultLayout(route: String, layoutId: String) {
-        layoutIdForRoute[route] = layoutId
-
-        // Keep keys sorted by longest routes (i.e. most specific matches) first.
-        val layoutIdForRouteSorted = layoutIdForRoute
-            .toList()
-            .sortedWith(compareBy({ -it.first.length }, { it.first }))
-
-        layoutIdForRoute.clear()
-        layoutIdForRoute.putAll(layoutIdForRouteSorted)
     }
 
     /**

@@ -43,11 +43,9 @@ import com.varabyte.kobweb.ksp.common.getDefaultLayout
 import com.varabyte.kobweb.ksp.common.getPackageMappings
 import com.varabyte.kobweb.ksp.symbol.getAnnotationsByName
 import com.varabyte.kobweb.ksp.symbol.suppresses
-import com.varabyte.kobweb.ksp.util.RouteUtils
 import com.varabyte.kobweb.project.common.PackageUtils
 import com.varabyte.kobweb.project.frontend.CssStyleEntry
 import com.varabyte.kobweb.project.frontend.CssStyleVariantEntry
-import com.varabyte.kobweb.project.frontend.DefaultLayoutEntry
 import com.varabyte.kobweb.project.frontend.FrontendData
 import com.varabyte.kobweb.project.frontend.InitKobwebEntry
 import com.varabyte.kobweb.project.frontend.InitSilkEntry
@@ -76,7 +74,8 @@ class FrontendProcessor(
     private val noLayoutsFor = mutableSetOf<KSFunctionDeclaration>()
     private val layoutsFor = mutableMapOf<KSFunctionDeclaration, KSFunctionDeclaration>()
     // fqPkg to layout fqn, e.g. "pages.blog" to "com.example.components.layouts.BlogLayout"
-    private val defaultLayouts = mutableMapOf<String, KSFunctionDeclaration>()
+    // sorted by length (descending), so more specific packages will be checked before less specific ones
+    private val defaultLayouts = mutableMapOf<String, KSFunctionDeclaration>().toSortedMap(compareBy({ -it.length }, { it }))
     private val kobwebInits = mutableListOf<InitKobwebEntry>()
     private val silkInits = mutableListOf<InitSilkEntry>()
     private val cssStyles = mutableListOf<CssStyleEntry>()
@@ -680,18 +679,13 @@ class FrontendProcessor(
             }
         }
 
-        // default layouts and pages are processed here as they rely on packageMappings, which may be populated over several rounds
-        val defaultLayouts = defaultLayouts.map { (pkg, layout) ->
-            DefaultLayoutEntry(
-                layout.qualifiedName!!.asString(),
-                RouteUtils.convertPackageToRoute(qualifiedPagesPackage, packageMappings, pkg)
-            )
-        }
-
         val pages = pageDeclarations.mapNotNull { annotatedFun ->
             processPagesFun(
                 annotatedFun = annotatedFun,
-                layoutFqn = if (noLayoutsFor.contains(annotatedFun)) NO_LAYOUT_FQN else layoutsFor[annotatedFun]?.qualifiedName?.asString(),
+                layoutFqn = if (noLayoutsFor.contains(annotatedFun)) NO_LAYOUT_FQN else (layoutsFor[annotatedFun]?.qualifiedName?.asString()
+                    ?: defaultLayouts.asSequence().mapNotNull { (pkg, layoutMethod) ->
+                        layoutMethod.takeIf { annotatedFun.packageName.asString().startsWith(pkg) }
+                    }.firstOrNull()?.qualifiedName?.asString()),
                 initRoutes = initRoutesMap,
                 qualifiedPagesPackage = qualifiedPagesPackage,
                 packageMappings = packageMappings,
@@ -712,7 +706,6 @@ class FrontendProcessor(
 
         val frontendData = FrontendData(
             layouts,
-            defaultLayouts,
             pages,
             kobwebInits,
             silkInits,
