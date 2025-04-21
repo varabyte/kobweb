@@ -33,7 +33,7 @@ fun getDefaultLayout(
     logger: KSPLogger,
 ): Pair<String, String>? {
     return file.getAnnotationsByName(layoutAnnotationFqn).singleOrNull()?.let { layoutAnnotation ->
-        val layoutTarget = layoutAnnotation.arguments.first().value!!.toString().takeIf { it.isNotEmpty() }
+        val layoutTarget = layoutAnnotation.arguments.first().value?.toString().orEmpty().takeIf { it.isNotEmpty() }
         val currPackage = file.packageName.asString()
         if (layoutTarget == null) {
             logger.warn(

@@ -99,7 +99,8 @@ class FrontendProcessor(
     }
 
     private fun KSFunctionDeclaration.isLayoutMethod(resolver: Resolver): Boolean {
-        // `@Layout` defined on a `@Page` means the method is a page, not a layout
+        if (!hasLayoutAnnotation()) return false
+        // @Layout defined on a @Page means the method is a page, not a layout
         if (hasPageAnnotation()) return false
 
         val pageContextName = resolver.getKSNameFromString(PAGE_CONTEXT_FQN)
@@ -113,9 +114,28 @@ class FrontendProcessor(
             )
     }
 
-    private fun Resolver.findLayoutMethod(layoutMethodName: KSName): KSFunctionDeclaration? {
-        return getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
+    /**
+     * Assert that the target [layoutMethodName] is a valid layout method, or log an error (and return null) if not.
+     */
+    private fun Resolver.checkLayoutMethod(context: KSNode, layoutMethodName: KSName): KSFunctionDeclaration? {
+        val matchesByName = getFunctionDeclarationsByName(layoutMethodName, includeTopLevel = true)
+        return matchesByName
             .singleOrNull { it.isLayoutMethod(this) }
+            .also { layoutMethod ->
+                if (layoutMethod == null) {
+                    logger.error(buildString {
+                        append("@Layout(\"${layoutMethodName.asString()}\") does not reference a valid layout method.")
+
+                        if (matchesByName.all { !it.hasLayoutAnnotation() }) {
+                            append(" Did you forget to add the @Layout annotation on the target method?")
+                        } else if (matchesByName.any()) {
+                            append(" Please check that the @Layout method takes the expected arguments (optionally, a PageContext, and a composable lambda).")
+                        } else {
+                            append(" No methods with that name were found. Please check the spelling.")
+                        }
+                    }, context)
+                }
+            }
     }
     override fun process(resolver: Resolver): List<KSAnnotated> {
         // Layout annotated methods are not (necessarily) layout methods themselves; but they point at layout methods.
@@ -127,17 +147,21 @@ class FrontendProcessor(
                 fileDependencies.add(annotatedFun.containingFile!!)
 
                 if (!annotatedFun.hasPageAnnotation()) {
+                    if (annotatedFun.annotations.none { it.shortName.asString() == "Composable" }) {
+                        logger.warn("`fun ${annotatedFun.qualifiedName!!.asString()}` annotated with @Layout must also be @Composable.", annotatedFun)
+                    }
+
                     layoutMethods += annotatedFun
                 }
 
-                annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value.toString()
+                annotatedFun.getAnnotationsByName(LAYOUT_FQN).first().arguments.first().value?.toString().orEmpty()
                     .let { layoutFqn ->
                         if (layoutFqn.isBlank()) {
                             noLayoutsFor.add(annotatedFun)
                         } else {
                             val resolvedFqn = PackageUtils.resolvePackageShortcut(projectGroup, layoutFqn)
                             val layoutParent = resolver.getKSNameFromString(resolvedFqn)
-                            resolver.findLayoutMethod(layoutParent)?.let { layoutMethod ->
+                            resolver.checkLayoutMethod(annotatedFun, layoutParent)?.let { layoutMethod ->
                                 layoutsFor[annotatedFun] = layoutMethod
                             }
                         }
@@ -148,6 +172,12 @@ class FrontendProcessor(
             .filterIsInstance<KSFunctionDeclaration>()
             .filter { it.hasPageAnnotation() } // Only pages support `@NoLayout`
             .forEach { annotatedFun -> noLayoutsFor.add(annotatedFun) }
+
+        noLayoutsFor.forEach { pageMethod ->
+            if (layoutsFor.containsKey(pageMethod)) {
+                logger.error("`${pageMethod.qualifiedName!!.asString()}` is tagged with both conflicting @NoLayout and @Layout annotations. Please remove one of them.", pageMethod)
+            }
+        }
 
         kobwebInits += resolver.getSymbolsWithAnnotation(INIT_KOBWEB_FQN).map { annotatedFun ->
             fileDependencies.add(annotatedFun.containingFile!!)
@@ -187,7 +217,7 @@ class FrontendProcessor(
                 LAYOUT_FQN,
                 logger
             )?.let { (pkg, layoutFqn) ->
-                resolver.findLayoutMethod(resolver.getKSNameFromString(layoutFqn))?.let { layoutMethod ->
+                resolver.checkLayoutMethod(file, resolver.getKSNameFromString(layoutFqn))?.let { layoutMethod ->
                     defaultLayouts[pkg] = layoutMethod
                     fileDependencies.add(file)
                 }
@@ -204,6 +234,22 @@ class FrontendProcessor(
 
         pageDeclarations += resolver.getSymbolsWithAnnotation(PAGE_FQN).map { it as KSFunctionDeclaration }
         initRouteDeclarations += resolver.getSymbolsWithAnnotation(INIT_ROUTE_FQN).map { it as KSFunctionDeclaration }
+            .also { initRouteDeclarations ->
+                initRouteDeclarations.forEach { initRouteMethod ->
+                    val file = initRouteMethod.containingFile!!
+                    val foundPageOrLayout = file.declarations.any { decl ->
+                        decl is KSFunctionDeclaration && decl !== initRouteMethod && (decl.hasPageAnnotation() || decl.hasLayoutAnnotation())
+                    }
+
+                    if (!foundPageOrLayout) {
+                        logger.error(
+                            "@InitRoute method \"${initRouteMethod.qualifiedName!!.asString()}\" must be defined in the same file as a @Page or @Layout method.",
+                            initRouteMethod
+                        )
+                    }
+                }
+            }
+        
 
         return emptyList()
     }
