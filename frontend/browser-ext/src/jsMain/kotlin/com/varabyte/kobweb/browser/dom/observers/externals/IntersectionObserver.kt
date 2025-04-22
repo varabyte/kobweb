@@ -14,7 +14,7 @@ internal external class IntersectionObserverEntry {
 }
 
 internal external class IntersectionObserver(
-    callback: (Array<IntersectionObserverEntry>, ResizeObserver) -> Unit,
+    callback: (Array<IntersectionObserverEntry>, IntersectionObserver) -> Unit,
     options: Json?
 ) {
     val root: dynamic
