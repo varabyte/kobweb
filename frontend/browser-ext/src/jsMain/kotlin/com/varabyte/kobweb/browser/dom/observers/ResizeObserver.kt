@@ -63,6 +63,7 @@ class ResizeObserver(resized: (List<Entry>, ResizeObserver) -> Unit) {
     }
 
     fun observe(element: Element): Unit = _actualObserver.observe(element)
+    fun observe(element: Element, options: ObserveOptions): Unit = _actualObserver.observe(element, options.toJson())
     fun unobserve(element: Element): Unit = _actualObserver.unobserve(element)
     fun disconnect(): Unit = _actualObserver.disconnect()
 }
