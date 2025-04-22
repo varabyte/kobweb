@@ -20,7 +20,7 @@ class ResizeObserver(resized: (List<Entry>, ResizeObserver) -> Unit) {
         resized.invoke(actualEntries.map { Entry.from(it) }, this)
     }
 
-    class Size(
+    data class Size(
         val blockSize: Double,
         val inlineSize: Double,
     ) {
@@ -32,7 +32,7 @@ class ResizeObserver(resized: (List<Entry>, ResizeObserver) -> Unit) {
         }
     }
 
-    class Entry(
+    data class Entry(
         val target: Element,
         val borderBoxSize: List<Size>,
         val contentBoxSize: List<Size>,

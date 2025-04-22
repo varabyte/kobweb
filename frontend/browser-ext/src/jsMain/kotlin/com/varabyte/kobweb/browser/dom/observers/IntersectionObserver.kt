@@ -20,7 +20,7 @@ class IntersectionObserver(options: Options? = null, resized: (List<Entry>, Inte
         resized.invoke(actualEntries.map { Entry.from(it) }, this)
     }, options?.toJson())
 
-    class Options(
+    data class Options(
         val root: Element? = null,
         val rootMargin: String? = null,
         val thresholds: List<Double>? = null,
@@ -34,7 +34,7 @@ class IntersectionObserver(options: Options? = null, resized: (List<Entry>, Inte
         }
     }
 
-    class Entry(
+    data class Entry(
         val target: Element,
         val boundingClientRect: DOMRectReadOnly,
         val intersectionRatio: Double,
