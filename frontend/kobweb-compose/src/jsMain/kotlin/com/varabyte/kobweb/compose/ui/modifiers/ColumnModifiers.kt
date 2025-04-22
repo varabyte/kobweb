@@ -12,3 +12,6 @@ fun Modifier.columnFill(columnFill: ColumnFill) = styleModifier {
     columnFill(columnFill)
 }
 
+fun Modifier.columnSpan(columnSpan: ColumnSpan) = styleModifier {
+    columnSpan(columnSpan)
+}
