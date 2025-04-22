@@ -2,6 +2,7 @@ package com.varabyte.kobweb.silk.theme.breakpoint
 
 import androidx.compose.runtime.*
 import com.varabyte.kobweb.compose.ui.Modifier
+import com.varabyte.kobweb.framework.annotations.DelicateApi
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.breakpoint.displayBetween
 import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
@@ -55,6 +56,7 @@ import org.w3c.dom.events.EventListener
  * dynamically and is not a core part of the initial layout, like a popup or a modal.
  */
 @Composable
+@DelicateApi("Though convenient, using this method can result in a page that flashes when you first visit it, as a page may be laid out one way at export time and another for the user seeing your page on their device or machine. Instead, prefer using breakpoint declarations in CSS styles as much as possible. Review the header docs for this method for more information.")
 fun rememberBreakpoint() = produceState(window.breakpointFloor) {
     val resizeListener = EventListener { value = window.breakpointFloor }
 
