@@ -1,3 +1,6 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
@@ -10,7 +13,7 @@ annotation class GridDslMarker
  *
  * This allows a user to convert a CSS value like "1fr `[name]` repeat(3, 100px) 1fr" into a list of [GridEntry]s.
  */
-sealed class GridEntry(private val value: String) {
+sealed class GridEntry private constructor(private val value: String) {
     override fun toString() = value
 
     /**

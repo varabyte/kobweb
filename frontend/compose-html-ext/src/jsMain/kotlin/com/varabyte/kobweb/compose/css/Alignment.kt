@@ -1,4 +1,6 @@
-@file:Suppress("FunctionName") // Intentionally make some function names look like constructors
+// Sealed class private constructors are useful, actually!
+// Intentionally make some function names look like constructors
+@file:Suppress("RedundantVisibilityModifier", "FunctionName")
 
 package com.varabyte.kobweb.compose.css
 
@@ -52,7 +54,7 @@ private fun OverflowStrategy.toValue(position: StylePropertyValue) = "${name.low
  * version provides it.
  */
 // See https://developer.mozilla.org/en-US/docs/Web/CSS/align-content
-sealed class AlignContent(private val value: String) : StylePropertyValue {
+sealed class AlignContent private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class AlignContentKeyword(value: String) : AlignContent(value)

@@ -1,3 +1,6 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
