@@ -8,6 +8,10 @@ fun Modifier.columnCount(columnCount: ColumnCount) = styleModifier {
     columnCount(columnCount)
 }
 
+fun Modifier.columnCount(count: Int) = styleModifier {
+    columnCount(count)
+}
+
 fun Modifier.columnFill(columnFill: ColumnFill) = styleModifier {
     columnFill(columnFill)
 }
