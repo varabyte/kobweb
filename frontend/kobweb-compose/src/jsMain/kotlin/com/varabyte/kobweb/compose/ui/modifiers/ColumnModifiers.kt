@@ -9,7 +9,7 @@ fun Modifier.columnCount(columnCount: ColumnCount) = styleModifier {
 }
 
 fun Modifier.columnCount(count: Int) = styleModifier {
-    columnCount(count)
+    columnCount(ColumnCount.of(count))
 }
 
 fun Modifier.columnFill(columnFill: ColumnFill) = styleModifier {

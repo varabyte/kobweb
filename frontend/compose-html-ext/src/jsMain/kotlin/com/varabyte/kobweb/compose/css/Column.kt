@@ -27,10 +27,6 @@ fun StyleScope.columnCount(columnCount: ColumnCount) {
     property("column-count", columnCount)
 }
 
-fun StyleScope.columnCount(count: Int) {
-    property("column-count", count)
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-fill
 class ColumnFill private constructor(private val value: String) : StylePropertyValue {
 
