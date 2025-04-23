@@ -114,7 +114,7 @@ fun StyleScope.backgroundOrigin(backgroundOrigin: BackgroundOrigin) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-sealed class BackgroundPosition private constructor(private val value: String) : StylePropertyValue {
+sealed class BackgroundPosition(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class Keyword(value: String) : BackgroundPosition(value)
@@ -136,7 +136,7 @@ fun StyleScope.backgroundPosition(backgroundPosition: BackgroundPosition) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
-sealed class BackgroundRepeat private constructor(private val value: String) : StylePropertyValue {
+sealed class BackgroundRepeat(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class Keyword(value: String) : BackgroundRepeat(value)
@@ -173,7 +173,7 @@ fun StyleScope.backgroundRepeat(horizontal: BackgroundRepeat.RepeatStyle, vertic
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
-sealed class BackgroundSize private constructor(private val value: String) : StylePropertyValue {
+sealed class BackgroundSize(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     private class Keyword(value: String) : BackgroundSize(value)
@@ -208,7 +208,7 @@ fun StyleScope.backgroundSize(backgroundSize: BackgroundSize) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background
-sealed class Background private constructor(private val value: String) : StylePropertyValue {
+sealed class Background(private val value: String) : StylePropertyValue {
     override fun toString(): String = value
 
     private class Keyword(value: String) : Background(value)

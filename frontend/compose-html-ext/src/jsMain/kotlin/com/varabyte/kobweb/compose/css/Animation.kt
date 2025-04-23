@@ -43,7 +43,8 @@ sealed class Animation private constructor(private val value: String) : StylePro
             iterationCount?.let { add(it.toString()) }
             direction?.let { add(it.toString()) }
             fillMode?.let { add(it.toString()) }
-            playState?.let { add(it.toString()) }
+            // JB enum value for "paused" is uppercased (probably copy/paste error)
+            playState?.let { add(it.toString().lowercase()) }
 
             add(name)
         }.joinToString(" ")
