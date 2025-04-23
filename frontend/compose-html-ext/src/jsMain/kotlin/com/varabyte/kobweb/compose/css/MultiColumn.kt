@@ -17,7 +17,5 @@ fun StyleScope.columnRuleWidth(width: CSSLengthNumericValue) {
 fun StyleScope.columnRule(
     width: CSSLengthNumericValue? = null, style: LineStyle? = null, color: CSSColorValue? = null
 ) {
-    width?.let { columnRuleWidth(it) }
-    style?.let { columnRuleStyle(it) }
-    color?.let { columnRuleColor(it) }
+    property("column-rule", listOfNotNull(width, style, color).joinToString(" "))
 }
