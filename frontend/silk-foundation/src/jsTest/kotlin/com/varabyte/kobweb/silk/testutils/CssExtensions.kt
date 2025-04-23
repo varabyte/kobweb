@@ -40,24 +40,27 @@ data class TestCssRule(
 fun StyleSheet.flattenCssRules(): List<TestCssRule> {
     val ruleLayers = mutableMapOf<CSSStyleRuleDeclaration, String>()
     val ruleQueries = mutableMapOf<CSSStyleRuleDeclaration, CSSMediaQuery>()
-    cssRules.filterIsInstance<CSSLayerRuleDeclaration>().forEach { rule ->
-        rule.rules.filterIsInstance<CSSStyleRuleDeclaration>().forEach { nestedRule ->
-            ruleLayers[nestedRule] = rule.name
-        }
+
+    // Starting in v0.21.1, we started wrapping all styles in scopes for more modern color mode management. However,
+    // for tests, let's peel these out of the way to make it easier to get to the inner data we care about.
+    val unscoped = cssRules.flatMap { rule ->
+        if (rule is CSSScopeRuleDeclaration) rule.rules else listOf(rule)
     }
-    cssRules.filterIsInstance<CSSMediaRuleDeclaration>().forEach { rule ->
-        rule.rules.filterIsInstance<CSSStyleRuleDeclaration>().forEach { nestedRule ->
-            ruleQueries[nestedRule] = rule.query
+
+    unscoped.filterIsInstance<CSSLayerRuleDeclaration>().forEach { layerRule ->
+        layerRule.rules.filterIsInstance<CSSStyleRuleDeclaration>().forEach { nestedRule ->
+            ruleLayers[nestedRule] = layerRule.name
         }
     }
 
-    return cssRules.flatMap { rule ->
-        when (rule) {
-            is CSSGroupingRuleDeclaration -> rule.rules.filterIsInstance<CSSStyleRuleDeclaration>()
-            is CSSStyleRuleDeclaration -> listOf(rule)
-            else -> emptyList()
+    unscoped.filterIsInstance<CSSMediaRuleDeclaration>().forEach { mediaRule ->
+        mediaRule.rules.filterIsInstance<CSSStyleRuleDeclaration>().forEach { nestedRule ->
+            ruleQueries[nestedRule] = mediaRule.query
         }
-    }.map { styleRule ->
+    }
+
+    val styleRules = unscoped.filterIsInstance<CSSStyleRuleDeclaration>().toSet() + ruleLayers.keys + ruleQueries.keys
+    return styleRules.map { styleRule ->
         TestCssRule(
             styleRule.header,
             styleRule.selector,

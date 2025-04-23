@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.silk
 
+import com.varabyte.kobweb.compose.css.CSSScopeRuleDeclaration
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Colors
 import com.varabyte.kobweb.compose.ui.modifiers.*
@@ -30,6 +31,9 @@ import kotlin.test.Test
 class CssStyleTest {
     sealed interface TestKind : ComponentKind
 
+    // See CssStyle#withColorModeScope for more details about this style selector syntax
+    private fun inScopeSelector(className: String) = ":where(&).$className, .$className"
+
     @AfterTest
     fun tearDown() {
         _SilkTheme = null
@@ -49,7 +53,7 @@ class CssStyleTest {
         SilkTheme.registerStylesInto(stylesheet)
 
         assertThat(stylesheet.flattenCssRules().map { it.header })
-            .containsExactly(".${BaseStyle.name}", ".${Variant.name}")
+            .containsExactly(inScopeSelector(BaseStyle.name), inScopeSelector(Variant.name))
             .inOrder()
     }
 
@@ -69,7 +73,11 @@ class CssStyleTest {
         SilkTheme.registerStylesInto(stylesheet)
 
         assertThat(stylesheet.flattenCssRules().map { it.header })
-            .containsExactly(".${BaseStyle.name}", ".${SecondaryStyle.name}", ".${TertiaryStyle.name}")
+            .containsExactly(
+                inScopeSelector(BaseStyle.name),
+                inScopeSelector(SecondaryStyle.name),
+                inScopeSelector(TertiaryStyle.name)
+            )
             .inOrder()
     }
 
@@ -83,9 +91,10 @@ class CssStyleTest {
             registerStyle("base-style", BaseStyle, layer = "")
         }.let(::ImmutableSilkTheme)
         SilkTheme.registerStylesInto(stylesheet)
-        val styleRule = stylesheet.cssRules.first()
-        assertThat(styleRule).isInstanceOf<CSSStyleRuleDeclaration>()
-        assertThat(styleRule.header).isEqualTo(".base-style")
+        // All styles get wrapped in a parent scope automatically
+        val scopeRule = stylesheet.cssRules.first() as CSSScopeRuleDeclaration
+        val styleRule = scopeRule.rules.first() as CSSStyleRuleDeclaration
+        assertThat(styleRule.header).isEqualTo(inScopeSelector(BaseStyle.name))
     }
 
     @Test
