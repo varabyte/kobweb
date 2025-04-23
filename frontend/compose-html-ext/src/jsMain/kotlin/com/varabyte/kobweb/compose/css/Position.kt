@@ -104,3 +104,32 @@ class CSSFloat private constructor(private val value: String) : StylePropertyVal
 fun StyleScope.float(float: CSSFloat) {
     property("float", float)
 }
+
+//https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
+class RubyPosition private constructor(private val value: String) : StylePropertyValue {
+
+    override fun toString() = value
+
+    companion object {
+
+        /* Keyword values */
+        val Over get() = RubyPosition("over")
+        val Under get() = RubyPosition("under")
+        val Alternate get() = RubyPosition("alternate")
+        val AlternateOver get() = RubyPosition("alternate over")
+        val AlternateUnder get() = RubyPosition("alternate under")
+        val InterCharacter get() = RubyPosition("inter-character")
+
+
+        /* Global values */
+        val Inherit get() = RubyPosition("inherit")
+        val Initial get() = RubyPosition("initial")
+        val Revert get() = RubyPosition("revert")
+        val RevertLayer get() = RubyPosition("revert-layer")
+        val Unset get() = RubyPosition("unset")
+    }
+}
+
+fun StyleScope.rubyPosition(rubyPosition: RubyPosition) {
+    property("ruby-position", rubyPosition)
+}
