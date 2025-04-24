@@ -25,7 +25,7 @@ We will eventually convert these into full-blown header comments, but for now, a
 for developers who need to quickly jump to the link to understand the property's behavior and syntax.
 
 ---
-### Every CSS style property should have a corresponding class
+### Every **non-longhand** CSS style property should have a corresponding class
 
 #### Example
 
@@ -37,6 +37,27 @@ class StyleExample /*...*/
 Even if the property is 99% of the time a simple integer value (e.g. `column-count`), we still need to support users
 being able to pass in global values (e.g. `ColumnCount.Inherit`), so we will always need a class for every single
 property type.
+
+#### Exception
+
+Some CSS properties are called *shorthand* and some are called *longhand*. A shorthand property is one that is a
+grouped representation of several inner properties, aka longhand properties.
+
+For example, `margin-inline` is a shorthand property, while `margin-inline-start` and `margin-inline-end` are
+longhand properties.
+
+Many longhand properties are simple primitive values (such as `border-width`).
+
+There are hundreds of these longhand properties (`border` alone has about fifty of them), so we've decided not to add
+classes for these at this point. So far, users haven't needed them.
+
+If a longhand property is notably complex, like several of the `animation` longhand properties are, then you can of
+course introduce classes for those cases. But we do not plan to support most of them at this time.
+
+```kotlin
+❌
+class MarginInlineEnd /* ... */
+```
 
 ---
 ### Every class should have a private constructor
