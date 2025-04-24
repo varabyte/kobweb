@@ -794,6 +794,312 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyFontOpticalSizing() {
+        assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Auto) }).isEqualTo("font-optical-sizing: auto")
+        assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.None) }).isEqualTo("font-optical-sizing: none")
+
+        assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Inherit) }).isEqualTo("font-optical-sizing: inherit")
+        assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Initial) }).isEqualTo("font-optical-sizing: initial")
+        assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Revert) }).isEqualTo("font-optical-sizing: revert")
+        assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Unset) }).isEqualTo("font-optical-sizing: unset")
+    }
+
+    @Test
+    fun verifyFontStyle() {
+        assertThat(styleToText { fontStyle(FontStyle.Normal) }).isEqualTo("font-style: normal")
+        assertThat(styleToText { fontStyle(FontStyle.Italic) }).isEqualTo("font-style: italic")
+        assertThat(styleToText { fontStyle(FontStyle.Oblique) }).isEqualTo("font-style: oblique")
+        assertThat(styleToText { fontStyle(FontStyle.Oblique(45.deg)) }).isEqualTo("font-style: oblique 45deg")
+
+        assertThat(styleToText { fontStyle(FontStyle.Inherit) }).isEqualTo("font-style: inherit")
+        assertThat(styleToText { fontStyle(FontStyle.Initial) }).isEqualTo("font-style: initial")
+        assertThat(styleToText { fontStyle(FontStyle.Revert) }).isEqualTo("font-style: revert")
+        assertThat(styleToText { fontStyle(FontStyle.Unset) }).isEqualTo("font-style: unset")
+    }
+
+    @Test
+    fun verifyFontVariantAlternates() {
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Normal) }).isEqualTo("font-variant-alternates: normal")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.HistoricalForms) }).isEqualTo("font-variant-alternates: historical-forms")
+
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Stylistic("ident")) }).isEqualTo("font-variant-alternates: stylistic(ident)")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Styleset("ident")) }).isEqualTo("font-variant-alternates: styleset(ident)")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.CharacterVariant("ident")) }).isEqualTo("font-variant-alternates: character-variant(ident)")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Swash("ident")) }).isEqualTo("font-variant-alternates: swash(ident)")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Ornaments("ident")) }).isEqualTo("font-variant-alternates: ornaments(ident)")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Annotation("ident")) }).isEqualTo("font-variant-alternates: annotation(ident)")
+
+        assertThat(styleToText {
+            fontVariantAlternates(
+                FontVariantAlternates.of(
+                    FontVariantAlternates.Stylistic("ident1"),
+                    FontVariantAlternates.Swash("ident2")
+                )
+            )
+        }).isEqualTo("font-variant-alternates: stylistic(ident1) swash(ident2)")
+
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Inherit) }).isEqualTo("font-variant-alternates: inherit")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Initial) }).isEqualTo("font-variant-alternates: initial")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Revert) }).isEqualTo("font-variant-alternates: revert")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Unset) }).isEqualTo("font-variant-alternates: unset")
+    }
+
+    @Test
+    fun verifyFontVariantCaps() {
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.Normal) }).isEqualTo("font-variant-caps: normal")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.SmallCaps) }).isEqualTo("font-variant-caps: small-caps")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.AllSmallCaps) }).isEqualTo("font-variant-caps: all-small-caps")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.PetiteCaps) }).isEqualTo("font-variant-caps: petite-caps")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.AllPetiteCaps) }).isEqualTo("font-variant-caps: all-petite-caps")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.Unicase) }).isEqualTo("font-variant-caps: unicase")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.TitlingCaps) }).isEqualTo("font-variant-caps: titling-caps")
+
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.Inherit) }).isEqualTo("font-variant-caps: inherit")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.Initial) }).isEqualTo("font-variant-caps: initial")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.Revert) }).isEqualTo("font-variant-caps: revert")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.Unset) }).isEqualTo("font-variant-caps: unset")
+    }
+
+    @Test
+    fun verifyFontVariantEastAsian() {
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Normal) }).isEqualTo("font-variant-east-asian: normal")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Ruby) }).isEqualTo("font-variant-east-asian: ruby")
+
+        // East Asian variants
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Jis78) }).isEqualTo("font-variant-east-asian: jis78")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Jis83) }).isEqualTo("font-variant-east-asian: jis83")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Jis90) }).isEqualTo("font-variant-east-asian: jis90")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Jis04) }).isEqualTo("font-variant-east-asian: jis04")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Simplified) }).isEqualTo("font-variant-east-asian: simplified")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Traditional) }).isEqualTo("font-variant-east-asian: traditional")
+
+        // East Asian widths
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.FullWidth) }).isEqualTo("font-variant-east-asian: full-width")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.ProportionalWidth) }).isEqualTo("font-variant-east-asian: proportional-width")
+
+        assertThat(styleToText {
+            fontVariantEastAsian(FontVariantEastAsian.of(FontVariantEastAsian.Ruby, FontVariantEastAsian.Jis78))
+        }).isEqualTo("font-variant-east-asian: ruby jis78")
+
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Inherit) }).isEqualTo("font-variant-east-asian: inherit")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Initial) }).isEqualTo("font-variant-east-asian: initial")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Revert) }).isEqualTo("font-variant-east-asian: revert")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Unset) }).isEqualTo("font-variant-east-asian: unset")
+    }
+
+    @Test
+    fun verifyFontVariantEmoji() {
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Normal) }).isEqualTo("font-variant-emoji: normal")
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Text) }).isEqualTo("font-variant-emoji: text")
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Emoji) }).isEqualTo("font-variant-emoji: emoji")
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Unicode) }).isEqualTo("font-variant-emoji: unicode")
+
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Inherit) }).isEqualTo("font-variant-emoji: inherit")
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Initial) }).isEqualTo("font-variant-emoji: initial")
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Revert) }).isEqualTo("font-variant-emoji: revert")
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Unset) }).isEqualTo("font-variant-emoji: unset")
+    }
+
+    @Test
+    fun verifyFontVariantLigatures() {
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Normal) }).isEqualTo("font-variant-ligatures: normal")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.None) }).isEqualTo("font-variant-ligatures: none")
+
+        // Common ligature values
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.CommonLigatures) }).isEqualTo("font-variant-ligatures: common-ligatures")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.NoCommonLigatures) }).isEqualTo("font-variant-ligatures: no-common-ligatures")
+
+        // Discretionary ligature values  
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.DiscretionaryLigatures) }).isEqualTo("font-variant-ligatures: discretionary-ligatures")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.NoDiscretionaryLigatures) }).isEqualTo("font-variant-ligatures: no-discretionary-ligatures")
+
+        // Historical ligature values
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.HistoricalLigatures) }).isEqualTo("font-variant-ligatures: historical-ligatures")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.NoHistoricalLigatures) }).isEqualTo("font-variant-ligatures: no-historical-ligatures")
+
+        // Contextual ligature values
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Contextual) }).isEqualTo("font-variant-ligatures: contextual")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.NoContextual) }).isEqualTo("font-variant-ligatures: no-contextual")
+
+        assertThat(styleToText {
+            fontVariantLigatures(
+                FontVariantLigatures.of(
+                    FontVariantLigatures.CommonLigatures,
+                    FontVariantLigatures.HistoricalLigatures
+                )
+            )
+        }).isEqualTo("font-variant-ligatures: common-ligatures historical-ligatures")
+
+        assertThat(styleToText {
+            fontVariantLigatures(
+                FontVariantLigatures.of(
+                    common = true,
+                    discretionary = false,
+                    historical = true,
+                    contextual = false
+                )
+            )
+        }).isEqualTo("font-variant-ligatures: common-ligatures no-discretionary-ligatures historical-ligatures no-contextual")
+
+        // Global values
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Inherit) }).isEqualTo("font-variant-ligatures: inherit")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Initial) }).isEqualTo("font-variant-ligatures: initial")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Revert) }).isEqualTo("font-variant-ligatures: revert")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Unset) }).isEqualTo("font-variant-ligatures: unset")
+    }
+
+    @Test
+    fun verifyFontVariantNumeric() {
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Normal) }).isEqualTo("font-variant-numeric: normal")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Ordinal) }).isEqualTo("font-variant-numeric: ordinal")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.SlashedZero) }).isEqualTo("font-variant-numeric: slashed-zero")
+
+        // Numeric figure
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.LiningNums) }).isEqualTo("font-variant-numeric: lining-nums")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.OldstyleNums) }).isEqualTo("font-variant-numeric: oldstyle-nums")
+
+        // Numeric spacing
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.ProportionalNums) }).isEqualTo("font-variant-numeric: proportional-nums")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.TabularNums) }).isEqualTo("font-variant-numeric: tabular-nums")
+
+        // Numeric fractions 
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.DiagonalFractions) }).isEqualTo("font-variant-numeric: diagonal-fractions")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.StackedFractions) }).isEqualTo("font-variant-numeric: stacked-fractions")
+
+        assertThat(styleToText {
+            fontVariantNumeric(
+                FontVariantNumeric.of(
+                    FontVariantNumeric.Ordinal,
+                    FontVariantNumeric.SlashedZero
+                )
+            )
+        }).isEqualTo("font-variant-numeric: ordinal slashed-zero")
+
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Inherit) }).isEqualTo("font-variant-numeric: inherit")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Initial) }).isEqualTo("font-variant-numeric: initial")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Revert) }).isEqualTo("font-variant-numeric: revert")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Unset) }).isEqualTo("font-variant-numeric: unset")
+    }
+
+    @Test
+    fun verifyFontVariantPosition() {
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.Normal) }).isEqualTo("font-variant-position: normal")
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.Sub) }).isEqualTo("font-variant-position: sub")
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.Super) }).isEqualTo("font-variant-position: super")
+
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.Inherit) }).isEqualTo("font-variant-position: inherit")
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.Initial) }).isEqualTo("font-variant-position: initial")
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.Revert) }).isEqualTo("font-variant-position: revert")
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.Unset) }).isEqualTo("font-variant-position: unset")
+    }
+
+    @Test
+    fun verifyFontVariant() {
+        // Individual values
+        assertThat(styleToText { fontVariant(alternates = FontVariantAlternates.Normal) })
+            .isEqualTo("font-variant: normal")
+        assertThat(styleToText { fontVariant(caps = FontVariantCaps.SmallCaps) })
+            .isEqualTo("font-variant: small-caps")
+        assertThat(styleToText { fontVariant(eastAsian = FontVariantEastAsian.Ruby) })
+            .isEqualTo("font-variant: ruby")
+        assertThat(styleToText { fontVariant(emoji = FontVariantEmoji.Text) })
+            .isEqualTo("font-variant: text")
+        assertThat(styleToText { fontVariant(ligatures = FontVariantLigatures.CommonLigatures) })
+            .isEqualTo("font-variant: common-ligatures")
+        assertThat(styleToText { fontVariant(numeric = FontVariantNumeric.Ordinal) })
+            .isEqualTo("font-variant: ordinal")
+        assertThat(styleToText { fontVariant(position = FontVariantPosition.Super) })
+            .isEqualTo("font-variant: super")
+
+        // Multiple values
+        assertThat(styleToText {
+            fontVariant(
+                alternates = FontVariantAlternates.Normal,
+                caps = FontVariantCaps.SmallCaps,
+                eastAsian = FontVariantEastAsian.Ruby,
+                emoji = FontVariantEmoji.Text,
+                ligatures = FontVariantLigatures.CommonLigatures,
+                numeric = FontVariantNumeric.Ordinal,
+                position = FontVariantPosition.Super
+            )
+        }).isEqualTo("font-variant: normal small-caps ruby text common-ligatures ordinal super")
+    }
+
+    @Test
+    fun verifyFontVariationSettings() {
+         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Normal) })
+             .isEqualTo("font-variation-settings: normal")
+
+         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Axis("wght", 400)) })
+             .isEqualTo("font-variation-settings: \"wght\" 400")
+
+         assertThat(styleToText { fontVariationSettings(
+             FontVariationSettings.Axes(
+                 FontVariationSettings.Axis("wght", 400),
+                 FontVariationSettings.Axis("slnt", 0)
+             )
+         ) }).isEqualTo("font-variation-settings: \"wght\" 400,\"slnt\" 0")
+
+         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Inherit) })
+             .isEqualTo("font-variation-settings: inherit")
+         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Initial) })
+             .isEqualTo("font-variation-settings: initial")
+         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Revert) })
+             .isEqualTo("font-variation-settings: revert")
+         assertThat(styleToText { fontVariationSettings(FontVariationSettings.Unset) })
+             .isEqualTo("font-variation-settings: unset")
+    }
+
+    @Test
+    fun verifyFontWeight() {
+        // Common value constants
+        assertThat(styleToText { fontWeight(FontWeight.Thin) }).isEqualTo("font-weight: 100")
+        assertThat(styleToText { fontWeight(FontWeight.ExtraLight) }).isEqualTo("font-weight: 200")
+        assertThat(styleToText { fontWeight(FontWeight.Light) }).isEqualTo("font-weight: 300")
+        assertThat(styleToText { fontWeight(FontWeight.Medium) }).isEqualTo("font-weight: 500")
+        assertThat(styleToText { fontWeight(FontWeight.SemiBold) }).isEqualTo("font-weight: 600")
+        assertThat(styleToText { fontWeight(FontWeight.ExtraBold) }).isEqualTo("font-weight: 800")
+        assertThat(styleToText { fontWeight(FontWeight.Black) }).isEqualTo("font-weight: 900")
+        assertThat(styleToText { fontWeight(FontWeight.ExtraBlack) }).isEqualTo("font-weight: 950")
+
+        // Keyword
+        assertThat(styleToText { fontWeight(FontWeight.Normal) }).isEqualTo("font-weight: normal")
+        assertThat(styleToText { fontWeight(FontWeight.Bold) }).isEqualTo("font-weight: bold")
+
+        // Relative
+        assertThat(styleToText { fontWeight(FontWeight.Lighter) }).isEqualTo("font-weight: lighter")
+        assertThat(styleToText { fontWeight(FontWeight.Bolder) }).isEqualTo("font-weight: bolder")
+
+        // Global
+        assertThat(styleToText { fontWeight(FontWeight.Inherit) }).isEqualTo("font-weight: inherit")
+        assertThat(styleToText { fontWeight(FontWeight.Initial) }).isEqualTo("font-weight: initial")
+        assertThat(styleToText { fontWeight(FontWeight.Revert) }).isEqualTo("font-weight: revert")
+        assertThat(styleToText { fontWeight(FontWeight.Unset) }).isEqualTo("font-weight: unset")
+    }
+
+    @Test
+    fun verifyFontSize() {
+        // Absolute keywords
+        assertThat(styleToText { fontSize(FontSize.XXSmall) }).isEqualTo("font-size: xx-small")
+        assertThat(styleToText { fontSize(FontSize.XSmall) }).isEqualTo("font-size: x-small")
+        assertThat(styleToText { fontSize(FontSize.Small) }).isEqualTo("font-size: small")
+        assertThat(styleToText { fontSize(FontSize.Medium) }).isEqualTo("font-size: medium")
+        assertThat(styleToText { fontSize(FontSize.Large) }).isEqualTo("font-size: large")
+        assertThat(styleToText { fontSize(FontSize.XLarge) }).isEqualTo("font-size: x-large")
+        assertThat(styleToText { fontSize(FontSize.XXLarge) }).isEqualTo("font-size: xx-large")
+
+        // Relative keywords
+        assertThat(styleToText { fontSize(FontSize.Smaller) }).isEqualTo("font-size: smaller")
+        assertThat(styleToText { fontSize(FontSize.Larger) }).isEqualTo("font-size: larger")
+
+        // Global values
+        assertThat(styleToText { fontSize(FontSize.Inherit) }).isEqualTo("font-size: inherit")
+        assertThat(styleToText { fontSize(FontSize.Initial) }).isEqualTo("font-size: initial")
+        assertThat(styleToText { fontSize(FontSize.Revert) }).isEqualTo("font-size: revert")
+        assertThat(styleToText { fontSize(FontSize.Unset) }).isEqualTo("font-size: unset")
+    }
+
+    @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
         assertThat(styleToText { justifyContent(JustifyContent.Stretch) }).isEqualTo("justify-content: stretch")
