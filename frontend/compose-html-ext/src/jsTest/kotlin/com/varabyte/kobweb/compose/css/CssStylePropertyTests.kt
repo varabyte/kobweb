@@ -20,6 +20,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyAccentColor() {
+        assertThat(styleToText { accentColor(AccentColor.of(Color.red)) }).isEqualTo("accent-color: red")
+
+        assertThat(styleToText { accentColor(AccentColor.Auto) }).isEqualTo("accent-color: auto")
+
+        assertThat(styleToText { accentColor(AccentColor.Inherit) }).isEqualTo("accent-color: inherit")
+        assertThat(styleToText { accentColor(AccentColor.Initial) }).isEqualTo("accent-color: initial")
+        assertThat(styleToText { accentColor(AccentColor.Revert) }).isEqualTo("accent-color: revert")
+        assertThat(styleToText { accentColor(AccentColor.Unset) }).isEqualTo("accent-color: unset")
+    }
+
+    @Test
     fun verifyAnimation() {
         assertThat(styleToText {
             animation(
@@ -535,6 +547,32 @@ class CssStylePropertyTests {
         assertThat(styleToText { breakInside(BreakInside.Revert) }).isEqualTo("break-inside: revert")
         assertThat(styleToText { breakInside(BreakInside.RevertLayer) }).isEqualTo("break-inside: revert-layer")
         assertThat(styleToText { breakInside(BreakInside.Unset) }).isEqualTo("break-inside: unset")
+    }
+
+    @Test
+    fun verifyColorScheme() {
+        assertThat(styleToText { colorScheme(ColorScheme.Normal) }).isEqualTo("color-scheme: normal")
+        assertThat(styleToText { colorScheme(ColorScheme.Light) }).isEqualTo("color-scheme: light")
+        assertThat(styleToText { colorScheme(ColorScheme.Dark) }).isEqualTo("color-scheme: dark")
+        assertThat(styleToText { colorScheme(ColorScheme.LightDark) }).isEqualTo("color-scheme: light dark")
+        assertThat(styleToText { colorScheme(ColorScheme.DarkLight) }).isEqualTo("color-scheme: dark light")
+        assertThat(styleToText { colorScheme(ColorScheme.OnlyLight) }).isEqualTo("color-scheme: only light")
+        assertThat(styleToText { colorScheme(ColorScheme.OnlyDark) }).isEqualTo("color-scheme: only dark")
+
+        assertThat(styleToText { colorScheme(ColorScheme.Inherit) }).isEqualTo("color-scheme: inherit")
+        assertThat(styleToText { colorScheme(ColorScheme.Initial) }).isEqualTo("color-scheme: initial")
+        assertThat(styleToText { colorScheme(ColorScheme.Revert) }).isEqualTo("color-scheme: revert")
+        assertThat(styleToText { colorScheme(ColorScheme.Unset) }).isEqualTo("color-scheme: unset")
+    }
+
+    @Test
+    fun verifyColor() {
+        assertThat(styleToText { color(CSSColor.CurrentColor) }).isEqualTo("color: currentColor")
+
+        assertThat(styleToText { color(CSSColor.Inherit) }).isEqualTo("color: inherit")
+        assertThat(styleToText { color(CSSColor.Initial) }).isEqualTo("color: initial")
+        assertThat(styleToText { color(CSSColor.Revert) }).isEqualTo("color: revert")
+        assertThat(styleToText { color(CSSColor.Unset) }).isEqualTo("color: unset")
     }
 
     @Test
