@@ -775,6 +775,25 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyFlexBasis() {
+        assertThat(styleToText { flexBasis(FlexBasis.Auto) }).isEqualTo("flex-basis: auto")
+
+        // Intrinsic sizing
+        assertThat(styleToText { flexBasis(FlexBasis.MaxContent) }).isEqualTo("flex-basis: max-content")
+        assertThat(styleToText { flexBasis(FlexBasis.MinContent) }).isEqualTo("flex-basis: min-content")
+        assertThat(styleToText { flexBasis(FlexBasis.FitContent) }).isEqualTo("flex-basis: fit-content")
+
+        // Content sizing
+        assertThat(styleToText { flexBasis(FlexBasis.Content) }).isEqualTo("flex-basis: content")
+
+        // Global
+        assertThat(styleToText { flexBasis(FlexBasis.Inherit) }).isEqualTo("flex-basis: inherit")
+        assertThat(styleToText { flexBasis(FlexBasis.Initial) }).isEqualTo("flex-basis: initial")
+        assertThat(styleToText { flexBasis(FlexBasis.Revert) }).isEqualTo("flex-basis: revert")
+        assertThat(styleToText { flexBasis(FlexBasis.Unset) }).isEqualTo("flex-basis: unset")
+    }
+
+    @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
         assertThat(styleToText { justifyContent(JustifyContent.Stretch) }).isEqualTo("justify-content: stretch")
