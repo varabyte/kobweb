@@ -71,3 +71,11 @@ fun Modifier.writingMode(writingMode: WritingMode) = styleModifier {
 fun Modifier.rubyPosition(rubyPosition: RubyPosition) = styleModifier {
     rubyPosition(rubyPosition)
 }
+
+fun Modifier.wordSpacing(wordSpacing: WordSpacing) = styleModifier {
+    wordSpacing(wordSpacing)
+}
+
+fun Modifier.wordSpacing(length: CSSLengthNumericValue) = styleModifier {
+    wordSpacing(WordSpacing.of(length))
+}

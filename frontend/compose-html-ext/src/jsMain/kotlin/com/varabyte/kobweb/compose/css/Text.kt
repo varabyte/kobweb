@@ -260,3 +260,27 @@ class RubyPosition private constructor(private val value: String) : StylePropert
 fun StyleScope.rubyPosition(rubyPosition: RubyPosition) {
     property("ruby-position", rubyPosition)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing
+class WordSpacing private constructor(private val value: String) : StylePropertyValue {
+
+    companion object {
+
+        /* Keyword value */
+        val Normal get() = WordSpacing("normal")
+
+        /* <length> values */
+        fun of(value: CSSLengthNumericValue) = WordSpacing("$value")
+
+        /* Global values */
+        val Inherit get() = WordSpacing("inherit")
+        val Initial get() = WordSpacing("initial")
+        val Revert get() = WordSpacing("revert")
+        val RevertLayer get() = WordSpacing("revert-layer")
+        val Unset get() = WordSpacing("unset")
+    }
+}
+
+fun StyleScope.wordSpacing(wordSpacing: WordSpacing) {
+    property("word-spacing", wordSpacing)
+}
