@@ -417,6 +417,58 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyBoxDecorationBreak() {
+        assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Slice) }).isEqualTo("box-decoration-break: slice")
+        assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Clone) }).isEqualTo("box-decoration-break: clone")
+
+        assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Inherit) }).isEqualTo("box-decoration-break: inherit")
+        assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Initial) }).isEqualTo("box-decoration-break: initial")
+        assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Revert) }).isEqualTo("box-decoration-break: revert")
+        assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Unset) }).isEqualTo("box-decoration-break: unset")
+    }
+
+    @Test
+    fun verifyBoxShadow() {
+        assertThat(styleToText {
+            boxShadow(
+                BoxShadow.of(
+                    offsetX = 2.px,
+                    offsetY = 3.px,
+                    blurRadius = 4.px,
+                    spreadRadius = 5.px,
+                    color = Color.red,
+                    inset = true
+                )
+            )
+        }).isEqualTo("box-shadow: inset 2px 3px 4px 5px red")
+
+        assertThat(styleToText {
+            boxShadow(
+                BoxShadow.of(2.px, 3.px),
+                BoxShadow.of(4.px, 5.px, blurRadius = 6.px)
+            )
+        }).isEqualTo("box-shadow: 2px 3px, 4px 5px 6px")
+
+        assertThat(styleToText { boxShadow(BoxShadow.None) }).isEqualTo("box-shadow: none")
+
+        assertThat(styleToText { boxShadow(BoxShadow.Inherit) }).isEqualTo("box-shadow: inherit")
+        assertThat(styleToText { boxShadow(BoxShadow.Initial) }).isEqualTo("box-shadow: initial")
+        assertThat(styleToText { boxShadow(BoxShadow.Revert) }).isEqualTo("box-shadow: revert")
+        assertThat(styleToText { boxShadow(BoxShadow.Unset) }).isEqualTo("box-shadow: unset")
+    }
+
+    @Test
+    fun verifyBoxSizing() {
+        assertThat(styleToText { boxSizing(BoxSizing.BorderBox) }).isEqualTo("box-sizing: border-box")
+        assertThat(styleToText { boxSizing(BoxSizing.ContentBox) }).isEqualTo("box-sizing: content-box")
+
+        assertThat(styleToText { boxSizing(BoxSizing.Inherit) }).isEqualTo("box-sizing: inherit")
+        assertThat(styleToText { boxSizing(BoxSizing.Initial) }).isEqualTo("box-sizing: initial")
+        assertThat(styleToText { boxSizing(BoxSizing.Revert) }).isEqualTo("box-sizing: revert")
+        assertThat(styleToText { boxSizing(BoxSizing.Unset) }).isEqualTo("box-sizing: unset")
+    }
+
+    @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
         assertThat(styleToText { justifyContent(JustifyContent.Stretch) }).isEqualTo("justify-content: stretch")
