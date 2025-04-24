@@ -3,14 +3,14 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/page
-class Page private constructor(private val value: String = "auto") : StylePropertyValue {
+class Page private constructor(private val value: String) : StylePropertyValue {
 
     override fun toString() = value
 
     companion object {
 
         /* set a named page */
-        fun of(namedPage: String) = Page(namedPage)
+        fun of(name: String) = Page(name)
 
         /* Use ancestors named page */
         val Auto get() = Page("auto") /* default value */

@@ -8,10 +8,10 @@ fun Modifier.willChange(willChange: WillChange) = styleModifier {
     willChange(willChange)
 }
 
-fun Modifier.willChange(customIndent: String) = styleModifier {
-    willChange(WillChange.of(customIndent))
+fun Modifier.willChange(value: String) = styleModifier {
+    willChange(WillChange.of(value))
 }
 
-fun Modifier.willChange(firstPosition: String, secondPosition: String) = styleModifier {
-    willChange(WillChange.Companion.of(firstPosition, secondPosition))
+fun Modifier.willChange(vararg values: String) = styleModifier {
+    willChange(WillChange.of(*values))
 }

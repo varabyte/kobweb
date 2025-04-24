@@ -8,7 +8,7 @@ class Widows private constructor(private val value: String) : StylePropertyValue
     companion object {
 
         /* <integer> values */
-        fun of(noOfWindows: Int) = Widows("$noOfWindows")
+        fun of(number: Int) = Widows("$number")
 
         /* Global values */
         val Inherit get() = Widows("inherit")

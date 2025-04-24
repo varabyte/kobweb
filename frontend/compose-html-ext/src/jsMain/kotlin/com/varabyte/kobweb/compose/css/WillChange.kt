@@ -13,10 +13,11 @@ class WillChange private constructor(private val value: String) : StylePropertyV
         val Contents get() = WillChange("contents")
 
         /* <custom-ident> */
-        fun of(customIndent: String) = WillChange(customIndent)
-
-        /* two <animatable-feature> */
-        fun of(firstPosition: String, secondPosition: String) = WillChange("$firstPosition, $secondPosition")
+        fun of(vararg values: String) = if (values.size > 1) {
+            WillChange(values.joinToString(" "))
+        } else {
+            WillChange(values.joinToString(""))
+        }
 
         /* Global values */
         val Inherit get() = WillChange("inherit")

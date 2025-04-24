@@ -210,3 +210,25 @@ fun StyleScope.translateZ(tz: CSSLengthOrPercentageNumericValue) {
 }
 
 // endregion
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
+class BackFaceVisibility private constructor(private val value: String) : StylePropertyValue {
+
+    companion object {
+
+        /* Keyword values */
+        val Visible get() = BackFaceVisibility("visible")
+        val Hidden get() = BackFaceVisibility("hidden")
+
+        /* Global values */
+        val Inherit get() = BackFaceVisibility("inherit")
+        val Initial get() = BackFaceVisibility("initial")
+        val Revert get() = BackFaceVisibility("revert")
+        val RevertLayer get() = BackFaceVisibility("revert-layer")
+        val Unset get() = BackFaceVisibility("unset")
+    }
+}
+
+fun StyleScope.backFaceVisibility(backFaceVisibility: BackFaceVisibility) {
+    property("backface-visibility", backFaceVisibility)
+}

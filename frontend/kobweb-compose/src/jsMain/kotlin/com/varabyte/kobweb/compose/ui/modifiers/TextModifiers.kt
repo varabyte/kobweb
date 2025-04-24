@@ -67,3 +67,7 @@ fun Modifier.wordBreak(wordBreak: WordBreak): Modifier = styleModifier {
 fun Modifier.writingMode(writingMode: WritingMode) = styleModifier {
     writingMode(writingMode)
 }
+
+fun Modifier.rubyPosition(rubyPosition: RubyPosition) = styleModifier {
+    rubyPosition(rubyPosition)
+}

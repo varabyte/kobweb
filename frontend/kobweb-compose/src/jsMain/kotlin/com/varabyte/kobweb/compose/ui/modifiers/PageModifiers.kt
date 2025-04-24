@@ -9,6 +9,6 @@ fun Modifier.page(page: Page) = styleModifier {
     page(page)
 }
 
-fun Modifier.page(namedPage: String) = styleModifier {
-    page(Page.of(namedPage))
+fun Modifier.page(name: String) = styleModifier {
+    page(Page.of(name))
 }

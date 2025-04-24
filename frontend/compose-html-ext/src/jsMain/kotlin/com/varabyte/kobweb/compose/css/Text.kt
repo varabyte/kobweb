@@ -235,3 +235,28 @@ class WritingMode private constructor(private val value: String) : StyleProperty
 fun StyleScope.writingMode(writingMode: WritingMode) {
     property("writing-mode", writingMode)
 }
+
+//https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
+class RubyPosition private constructor(private val value: String) : StylePropertyValue {
+
+    override fun toString() = value
+
+    companion object {
+
+        /* Keyword values */
+        val Over get() = RubyPosition("over")
+        val Under get() = RubyPosition("under")
+
+
+        /* Global values */
+        val Inherit get() = RubyPosition("inherit")
+        val Initial get() = RubyPosition("initial")
+        val Revert get() = RubyPosition("revert")
+        val RevertLayer get() = RubyPosition("revert-layer")
+        val Unset get() = RubyPosition("unset")
+    }
+}
+
+fun StyleScope.rubyPosition(rubyPosition: RubyPosition) {
+    property("ruby-position", rubyPosition)
+}
