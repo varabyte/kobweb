@@ -469,6 +469,75 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyBreakAfter() {
+        assertThat(styleToText { breakAfter(BreakAfter.Auto) }).isEqualTo("break-after: auto")
+        assertThat(styleToText { breakAfter(BreakAfter.Avoid) }).isEqualTo("break-after: avoid")
+        assertThat(styleToText { breakAfter(BreakAfter.Always) }).isEqualTo("break-after: always")
+        assertThat(styleToText { breakAfter(BreakAfter.All) }).isEqualTo("break-after: all")
+
+        assertThat(styleToText { breakAfter(BreakAfter.AvoidPage) }).isEqualTo("break-after: avoid-page")
+        assertThat(styleToText { breakAfter(BreakAfter.Page) }).isEqualTo("break-after: page")
+        assertThat(styleToText { breakAfter(BreakAfter.Left) }).isEqualTo("break-after: left")
+        assertThat(styleToText { breakAfter(BreakAfter.Right) }).isEqualTo("break-after: right")
+        assertThat(styleToText { breakAfter(BreakAfter.Recto) }).isEqualTo("break-after: recto")
+        assertThat(styleToText { breakAfter(BreakAfter.Verso) }).isEqualTo("break-after: verso")
+
+        assertThat(styleToText { breakAfter(BreakAfter.Column) }).isEqualTo("break-after: column")
+        assertThat(styleToText { breakAfter(BreakAfter.AvoidColumn) }).isEqualTo("break-after: avoid-column")
+
+        assertThat(styleToText { breakAfter(BreakAfter.Region) }).isEqualTo("break-after: region")
+        assertThat(styleToText { breakAfter(BreakAfter.AvoidRegion) }).isEqualTo("break-after: avoid-region")
+
+        assertThat(styleToText { breakAfter(BreakAfter.Inherit) }).isEqualTo("break-after: inherit")
+        assertThat(styleToText { breakAfter(BreakAfter.Initial) }).isEqualTo("break-after: initial")
+        assertThat(styleToText { breakAfter(BreakAfter.Revert) }).isEqualTo("break-after: revert")
+        assertThat(styleToText { breakAfter(BreakAfter.RevertLayer) }).isEqualTo("break-after: revert-layer")
+        assertThat(styleToText { breakAfter(BreakAfter.Unset) }).isEqualTo("break-after: unset")
+    }
+
+    @Test
+    fun verifyBreakBefore() {
+        assertThat(styleToText { breakBefore(BreakBefore.Auto) }).isEqualTo("break-before: auto")
+        assertThat(styleToText { breakBefore(BreakBefore.Avoid) }).isEqualTo("break-before: avoid")
+        assertThat(styleToText { breakBefore(BreakBefore.Always) }).isEqualTo("break-before: always")
+        assertThat(styleToText { breakBefore(BreakBefore.All) }).isEqualTo("break-before: all")
+
+        assertThat(styleToText { breakBefore(BreakBefore.AvoidPage) }).isEqualTo("break-before: avoid-page")
+        assertThat(styleToText { breakBefore(BreakBefore.Page) }).isEqualTo("break-before: page")
+        assertThat(styleToText { breakBefore(BreakBefore.Left) }).isEqualTo("break-before: left")
+        assertThat(styleToText { breakBefore(BreakBefore.Right) }).isEqualTo("break-before: right")
+        assertThat(styleToText { breakBefore(BreakBefore.Recto) }).isEqualTo("break-before: recto")
+        assertThat(styleToText { breakBefore(BreakBefore.Verso) }).isEqualTo("break-before: verso")
+
+        assertThat(styleToText { breakBefore(BreakBefore.Column) }).isEqualTo("break-before: column")
+        assertThat(styleToText { breakBefore(BreakBefore.AvoidColumn) }).isEqualTo("break-before: avoid-column")
+
+        assertThat(styleToText { breakBefore(BreakBefore.Region) }).isEqualTo("break-before: region")
+        assertThat(styleToText { breakBefore(BreakBefore.AvoidRegion) }).isEqualTo("break-before: avoid-region")
+
+        assertThat(styleToText { breakBefore(BreakBefore.Inherit) }).isEqualTo("break-before: inherit")
+        assertThat(styleToText { breakBefore(BreakBefore.Initial) }).isEqualTo("break-before: initial")
+        assertThat(styleToText { breakBefore(BreakBefore.Revert) }).isEqualTo("break-before: revert")
+        assertThat(styleToText { breakBefore(BreakBefore.RevertLayer) }).isEqualTo("break-before: revert-layer")
+        assertThat(styleToText { breakBefore(BreakBefore.Unset) }).isEqualTo("break-before: unset")
+    }
+
+    @Test
+    fun verifyBreakInside() {
+        assertThat(styleToText { breakInside(BreakInside.Auto) }).isEqualTo("break-inside: auto")
+        assertThat(styleToText { breakInside(BreakInside.Avoid) }).isEqualTo("break-inside: avoid")
+        assertThat(styleToText { breakInside(BreakInside.AvoidPage) }).isEqualTo("break-inside: avoid-page")
+        assertThat(styleToText { breakInside(BreakInside.AvoidColumn) }).isEqualTo("break-inside: avoid-column")
+        assertThat(styleToText { breakInside(BreakInside.AvoidRegion) }).isEqualTo("break-inside: avoid-region")
+
+        assertThat(styleToText { breakInside(BreakInside.Inherit) }).isEqualTo("break-inside: inherit")
+        assertThat(styleToText { breakInside(BreakInside.Initial) }).isEqualTo("break-inside: initial")
+        assertThat(styleToText { breakInside(BreakInside.Revert) }).isEqualTo("break-inside: revert")
+        assertThat(styleToText { breakInside(BreakInside.RevertLayer) }).isEqualTo("break-inside: revert-layer")
+        assertThat(styleToText { breakInside(BreakInside.Unset) }).isEqualTo("break-inside: unset")
+    }
+
+    @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
         assertThat(styleToText { justifyContent(JustifyContent.Stretch) }).isEqualTo("justify-content: stretch")
