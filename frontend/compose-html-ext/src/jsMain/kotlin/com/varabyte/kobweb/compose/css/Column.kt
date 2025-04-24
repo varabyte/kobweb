@@ -4,6 +4,8 @@ import org.jetbrains.compose.web.css.*
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-count
 class ColumnCount private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
     companion object {
 
         /* Keyword value */
@@ -27,6 +29,8 @@ fun StyleScope.columnCount(columnCount: ColumnCount) {
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-fill
 class ColumnFill private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
     companion object {
 
         /* Keyword value */
@@ -67,6 +71,8 @@ fun StyleScope.columnRule(
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/column-span
 class ColumnSpan private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
     companion object {
         /* Keyword value */
         val None get() = ColumnSpan("none")
