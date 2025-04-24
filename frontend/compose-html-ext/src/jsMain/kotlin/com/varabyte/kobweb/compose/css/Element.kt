@@ -72,6 +72,10 @@ sealed class Content private constructor(private val value: String) : StylePrope
     }
 }
 
+fun StyleScope.content(content: Content) {
+    property("content", content)
+}
+
 fun StyleScope.content(content: Content.Restricted) {
     property("content", content)
 }

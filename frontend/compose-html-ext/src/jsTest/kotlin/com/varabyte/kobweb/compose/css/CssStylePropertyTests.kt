@@ -3,6 +3,7 @@ package com.varabyte.kobweb.compose.css
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.blur
 import com.varabyte.kobweb.compose.css.functions.brightness
+import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.auto
@@ -156,6 +157,19 @@ class CssStylePropertyTests {
         assertThat(styleToText { alignSelf(AlignSelf.Initial) }).isEqualTo("align-self: initial")
         assertThat(styleToText { alignSelf(AlignSelf.Revert) }).isEqualTo("align-self: revert")
         assertThat(styleToText { alignSelf(AlignSelf.Unset) }).isEqualTo("align-self: unset")
+    }
+
+    @Test
+    fun verifyAppearance() {
+        assertThat(styleToText { appearance(Appearance.None) }).isEqualTo("appearance: none")
+        assertThat(styleToText { appearance(Appearance.Auto) }).isEqualTo("appearance: auto")
+        assertThat(styleToText { appearance(Appearance.MenuListButton) }).isEqualTo("appearance: menulist-button")
+        assertThat(styleToText { appearance(Appearance.TextField) }).isEqualTo("appearance: textfield")
+
+        assertThat(styleToText { appearance(Appearance.Inherit) }).isEqualTo("appearance: inherit")
+        assertThat(styleToText { appearance(Appearance.Initial) }).isEqualTo("appearance: initial")
+        assertThat(styleToText { appearance(Appearance.Revert) }).isEqualTo("appearance: revert")
+        assertThat(styleToText { appearance(Appearance.Unset) }).isEqualTo("appearance: unset")
     }
 
     @Test
@@ -657,6 +671,36 @@ class CssStylePropertyTests {
         assertThat(styleToText { columnSpan(ColumnSpan.Revert) }).isEqualTo("column-span: revert")
         assertThat(styleToText { columnSpan(ColumnSpan.RevertLayer) }).isEqualTo("column-span: revert-layer")
         assertThat(styleToText { columnSpan(ColumnSpan.Unset) }).isEqualTo("column-span: unset")
+    }
+
+    @Test
+    fun verifyContent() {
+        // Combinable types
+        assertThat(styleToText { content(Content.of("Some text")) }).isEqualTo("content: \"Some text\"")
+        assertThat(styleToText { content(Content.of(CSSUrl("test.png"))) }).isEqualTo("content: url(\"test.png\")")
+        assertThat(styleToText { content(Content.of(linearGradient(Color.red, Color.green))) }).isEqualTo("content: linear-gradient(red, green)")
+        assertThat(styleToText { content(Content.of("Some text"), Content.of(CSSUrl("test.png"))) }).isEqualTo("content: \"Some text\" url(\"test.png\")")
+        assertThat(styleToText { content("alt-text", Content.of(CSSUrl("test.png"))) }).isEqualTo("content: url(\"test.png\") / \"alt-text\"")
+
+        // Non-combinable
+        assertThat(styleToText { content(Content.None) }).isEqualTo("content: none")
+        assertThat(styleToText { content(Content.Normal) }).isEqualTo("content: normal")
+
+        // Language / position-dependent
+        assertThat(styleToText { content(Content.CloseQuote) }).isEqualTo("content: close-quote")
+        assertThat(styleToText { content(Content.NoCloseQuote) }).isEqualTo("content: no-close-quote")
+        assertThat(styleToText { content(Content.NoOpenQuote) }).isEqualTo("content: no-open-quote")
+        assertThat(styleToText { content(Content.OpenQuote) }).isEqualTo("content: open-quote")
+
+        // Global keywords
+        assertThat(styleToText { content(Content.Inherit) }).isEqualTo("content: inherit")
+        assertThat(styleToText { content(Content.Initial) }).isEqualTo("content: initial")
+        assertThat(styleToText { content(Content.Revert) }).isEqualTo("content: revert")
+        assertThat(styleToText { content(Content.Unset) }).isEqualTo("content: unset")
+
+        // Convenience conversion methods
+        assertThat(styleToText { content(CSSUrl("test.png").toContent()) }).isEqualTo("content: url(\"test.png\")")
+        assertThat(styleToText { content(linearGradient(Color.red, Color.blue).toContent()) }).isEqualTo("content: linear-gradient(red, blue)")
     }
 
     @Test

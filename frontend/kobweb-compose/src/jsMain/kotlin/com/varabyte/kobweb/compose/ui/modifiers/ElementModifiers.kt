@@ -13,6 +13,10 @@ fun Modifier.classNames(vararg classes: String) = attrsModifier {
     classes(*classes)
 }
 
+fun Modifier.content(content: Content) = styleModifier {
+    content(content)
+}
+
 fun Modifier.content(content: Content.Restricted) = styleModifier {
     content(content)
 }
