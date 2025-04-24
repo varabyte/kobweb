@@ -272,13 +272,11 @@ class CssStylePropertyTests {
             )
         }).isEqualTo("background: left 0% top 0% / 100px")
 
-
-
         assertThat(styleToText {
             background(
                 Color.magenta,
-                Background.of(image = BackgroundImage.of(CSSUrl("test1.png"))),
-                Background.of(image = BackgroundImage.of(CSSUrl("test2.png")))
+                Background.of(BackgroundImage.of(CSSUrl("test1.png"))),
+                Background.of(BackgroundImage.of(CSSUrl("test2.png")))
             )
         }).isEqualTo("background: url(\"test2.png\"), url(\"test1.png\") magenta")
 
@@ -289,6 +287,135 @@ class CssStylePropertyTests {
         assertThat(styleToText { background(Background.Revert) }).isEqualTo("background: revert")
         assertThat(styleToText { background(Background.Unset) }).isEqualTo("background: unset")
     }
+
+    @Test
+    fun verifyBorderCollapse() {
+        assertThat(styleToText { borderCollapse(BorderCollapse.Separate) }).isEqualTo("border-collapse: separate")
+        assertThat(styleToText { borderCollapse(BorderCollapse.Collapse) }).isEqualTo("border-collapse: collapse")
+
+        assertThat(styleToText { borderCollapse(BorderCollapse.Inherit) }).isEqualTo("border-collapse: inherit")
+        assertThat(styleToText { borderCollapse(BorderCollapse.Initial) }).isEqualTo("border-collapse: initial")
+        assertThat(styleToText { borderCollapse(BorderCollapse.Revert) }).isEqualTo("border-collapse: revert")
+        assertThat(styleToText { borderCollapse(BorderCollapse.Unset) }).isEqualTo("border-collapse: unset")
+    }
+
+    @Test
+    fun verifyBorderImage() {
+        assertThat(styleToText {
+            borderImage(
+                BorderImage.of(
+                    source = BorderImageSource.of(CSSUrl("test.png")),
+                    slice = BorderImageSlice.of(50.percent),
+                    width = BorderImageWidth.of(10.px),
+                    outset = BorderImageOutset.of(5.px),
+                    repeat = BorderImageRepeat.Stretch
+                )
+            )
+        }).isEqualTo("border-image: url(\"test.png\") 50% 50% 50% 50% / 10px 10px 10px 10px / 5px 5px 5px 5px stretch")
+
+        assertThat(styleToText { borderImage(BorderImage.Inherit) }).isEqualTo("border-image: inherit")
+        assertThat(styleToText { borderImage(BorderImage.Initial) }).isEqualTo("border-image: initial")
+        assertThat(styleToText { borderImage(BorderImage.Revert) }).isEqualTo("border-image: revert")
+        assertThat(styleToText { borderImage(BorderImage.Unset) }).isEqualTo("border-image: unset")
+    }
+
+    @Test
+    fun verifyBorderImageOutset() {
+        assertThat(styleToText { borderImageOutset(BorderImageOutset.of(50.px)) })
+            .isEqualTo("border-image-outset: 50px 50px 50px 50px")
+
+        assertThat(styleToText {
+            borderImageOutset(BorderImageOutset.of {
+                top(30.px)
+                right(40.px)
+                bottom(50.px)
+                left(60.px)
+            })
+        }).isEqualTo("border-image-outset: 30px 40px 50px 60px")
+
+        assertThat(styleToText { borderImageOutset(BorderImageOutset.Inherit) }).isEqualTo("border-image-outset: inherit")
+        assertThat(styleToText { borderImageOutset(BorderImageOutset.Initial) }).isEqualTo("border-image-outset: initial")
+        assertThat(styleToText { borderImageOutset(BorderImageOutset.Revert) }).isEqualTo("border-image-outset: revert")
+        assertThat(styleToText { borderImageOutset(BorderImageOutset.Unset) }).isEqualTo("border-image-outset: unset")
+    }
+
+    @Test
+    fun verifyBorderImageRepeat() {
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Stretch) }).isEqualTo("border-image-repeat: stretch")
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Repeat) }).isEqualTo("border-image-repeat: repeat")
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Round) }).isEqualTo("border-image-repeat: round")
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Space) }).isEqualTo("border-image-repeat: space")
+
+        assertThat(styleToText {
+            borderImageRepeat(
+                BorderImageRepeat.of(
+                    BorderImageRepeat.Repeat,
+                    BorderImageRepeat.Round
+                )
+            )
+        }).isEqualTo("border-image-repeat: repeat round")
+
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Inherit) }).isEqualTo("border-image-repeat: inherit")
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Initial) }).isEqualTo("border-image-repeat: initial")
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Revert) }).isEqualTo("border-image-repeat: revert")
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Unset) }).isEqualTo("border-image-repeat: unset")
+    }
+
+    @Test
+    fun verifyBorderImageSource() {
+        assertThat(styleToText { borderImageSource(
+            BorderImageSource.of(CSSUrl("test.png"))
+        ) }).isEqualTo("border-image-source: url(\"test.png\")")
+
+        assertThat(styleToText { borderImageSource(BorderImageSource.None) }).isEqualTo("border-image-source: none")
+
+        assertThat(styleToText { borderImageSource(BorderImageSource.Inherit) }).isEqualTo("border-image-source: inherit")
+        assertThat(styleToText { borderImageSource(BorderImageSource.Initial) }).isEqualTo("border-image-source: initial")
+        assertThat(styleToText { borderImageSource(BorderImageSource.Revert) }).isEqualTo("border-image-source: revert")
+        assertThat(styleToText { borderImageSource(BorderImageSource.Unset) }).isEqualTo("border-image-source: unset")
+    }
+
+    @Test
+    fun verifyBorderImageSlice() {
+        assertThat(styleToText { borderImageSlice(BorderImageSlice.of(50.percent)) })
+            .isEqualTo("border-image-slice: 50% 50% 50% 50%")
+
+        assertThat(styleToText {
+            borderImageSlice(BorderImageSlice.of {
+                top(30.percent)
+                right(40.percent)
+                bottom(50.percent)
+                left(60.percent)
+                fill()
+            })
+        }).isEqualTo("border-image-slice: 30% 40% 50% 60% fill")
+
+        assertThat(styleToText { borderImageSlice(BorderImageSlice.Inherit) }).isEqualTo("border-image-slice: inherit")
+        assertThat(styleToText { borderImageSlice(BorderImageSlice.Initial) }).isEqualTo("border-image-slice: initial")
+        assertThat(styleToText { borderImageSlice(BorderImageSlice.Revert) }).isEqualTo("border-image-slice: revert")
+        assertThat(styleToText { borderImageSlice(BorderImageSlice.Unset) }).isEqualTo("border-image-slice: unset")
+    }
+
+    @Test
+    fun verifyBorderImageWidth() {
+        assertThat(styleToText { borderImageWidth(BorderImageWidth.of(50.percent)) })
+            .isEqualTo("border-image-width: 50% 50% 50% 50%")
+
+        assertThat(styleToText {
+            borderImageWidth(BorderImageWidth.of {
+                top(30.percent)
+                right(40.percent)
+                bottom(50.percent)
+                left(60.percent)
+            })
+        }).isEqualTo("border-image-width: 30% 40% 50% 60%")
+
+        assertThat(styleToText { borderImageWidth(BorderImageWidth.Inherit) }).isEqualTo("border-image-width: inherit")
+        assertThat(styleToText { borderImageWidth(BorderImageWidth.Initial) }).isEqualTo("border-image-width: initial")
+        assertThat(styleToText { borderImageWidth(BorderImageWidth.Revert) }).isEqualTo("border-image-width: revert")
+        assertThat(styleToText { borderImageWidth(BorderImageWidth.Unset) }).isEqualTo("border-image-width: unset")
+    }
+
     @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")

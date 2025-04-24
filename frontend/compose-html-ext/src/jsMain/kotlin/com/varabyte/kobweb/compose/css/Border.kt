@@ -285,7 +285,10 @@ class BorderImageSlice private constructor(private val value: String) : StylePro
         }
 
         internal fun build(): BorderImageSlice =
-            BorderImageSlice("$top $right $bottom $left ${if (fill) "fill" else ""}")
+            BorderImageSlice(
+                listOfNotNull(top, right, bottom, left, if (fill) "fill" else null)
+                    .joinToString(" ")
+            )
     }
 
     companion object {
