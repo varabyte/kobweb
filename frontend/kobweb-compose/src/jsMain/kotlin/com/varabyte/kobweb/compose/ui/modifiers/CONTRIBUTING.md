@@ -114,3 +114,13 @@ Modifier.exampleStyle {
     max(10)
 }
 ```
+
+---
+### Add tests to `StyleModifierTests`
+
+These tests do NOT have to be as rigorous as those in `CssStylePropertyTests` (since those tests already did much of the
+stress testing). However:
+
+* You MUST add an assertion for every single modifier at least once.
+* You MUST test every method in modifier scope classes at least once, as they don't exist as the `StyleScope` layer
+  (e.g. see the `assertMarginInline` test and how it tests `MarginInlineScope`).
