@@ -74,6 +74,39 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyAlignContent() {
+        assertThat(styleToText { alignContent(AlignContent.Normal) }).isEqualTo("align-content: normal")
+
+        // Positional
+        assertThat(styleToText { alignContent(AlignContent.Center) }).isEqualTo("align-content: center")
+        assertThat(styleToText { alignContent(AlignContent.Start) }).isEqualTo("align-content: start")
+        assertThat(styleToText { alignContent(AlignContent.End) }).isEqualTo("align-content: end")
+        assertThat(styleToText { alignContent(AlignContent.FlexStart) }).isEqualTo("align-content: flex-start")
+        assertThat(styleToText { alignContent(AlignContent.FlexEnd) }).isEqualTo("align-content: flex-end")
+
+        // Distributed
+        assertThat(styleToText { alignContent(AlignContent.SpaceBetween) }).isEqualTo("align-content: space-between")
+        assertThat(styleToText { alignContent(AlignContent.SpaceAround) }).isEqualTo("align-content: space-around")
+        assertThat(styleToText { alignContent(AlignContent.SpaceEvenly) }).isEqualTo("align-content: space-evenly")
+        assertThat(styleToText { alignContent(AlignContent.Stretch) }).isEqualTo("align-content: stretch")
+
+        // Baseline 
+        assertThat(styleToText { alignContent(AlignContent.Baseline) }).isEqualTo("align-content: baseline")
+        assertThat(styleToText { alignContent(AlignContent.FirstBaseline) }).isEqualTo("align-content: first baseline")
+        assertThat(styleToText { alignContent(AlignContent.LastBaseline) }).isEqualTo("align-content: last baseline")
+
+        // Overflow
+        assertThat(styleToText { alignContent(AlignContent.Safe(AlignContent.Center)) }).isEqualTo("align-content: safe center")
+        assertThat(styleToText { alignContent(AlignContent.Unsafe(AlignContent.FlexEnd)) }).isEqualTo("align-content: unsafe flex-end")
+
+        // Global 
+        assertThat(styleToText { alignContent(AlignContent.Inherit) }).isEqualTo("align-content: inherit")
+        assertThat(styleToText { alignContent(AlignContent.Initial) }).isEqualTo("align-content: initial")
+        assertThat(styleToText { alignContent(AlignContent.Revert) }).isEqualTo("align-content: revert")
+        assertThat(styleToText { alignContent(AlignContent.Unset) }).isEqualTo("align-content: unset")
+    }
+
+    @Test
     fun verifyAlignItems() {
         assertThat(styleToText { alignItems(AlignItems.Normal) }).isEqualTo("align-items: normal")
         assertThat(styleToText { alignItems(AlignItems.Stretch) }).isEqualTo("align-items: stretch")
