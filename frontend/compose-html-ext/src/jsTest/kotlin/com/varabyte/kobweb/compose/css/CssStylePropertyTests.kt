@@ -612,6 +612,63 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyCursor() {
+        // General
+        assertThat(styleToText { cursor(Cursor.Auto) }).isEqualTo("cursor: auto")
+        assertThat(styleToText { cursor(Cursor.Default) }).isEqualTo("cursor: default")
+        assertThat(styleToText { cursor(Cursor.None) }).isEqualTo("cursor: none")
+
+        // Links and status
+        assertThat(styleToText { cursor(Cursor.ContextMenu) }).isEqualTo("cursor: context-menu")
+        assertThat(styleToText { cursor(Cursor.Help) }).isEqualTo("cursor: help")
+        assertThat(styleToText { cursor(Cursor.Pointer) }).isEqualTo("cursor: pointer")
+        assertThat(styleToText { cursor(Cursor.Progress) }).isEqualTo("cursor: progress")
+        assertThat(styleToText { cursor(Cursor.Wait) }).isEqualTo("cursor: wait")
+
+        // Selection
+        assertThat(styleToText { cursor(Cursor.Cell) }).isEqualTo("cursor: cell")
+        assertThat(styleToText { cursor(Cursor.Crosshair) }).isEqualTo("cursor: crosshair")
+        assertThat(styleToText { cursor(Cursor.Text) }).isEqualTo("cursor: text")
+        assertThat(styleToText { cursor(Cursor.VerticalText) }).isEqualTo("cursor: vertical-text")
+
+        // Drag and drop
+        assertThat(styleToText { cursor(Cursor.Alias) }).isEqualTo("cursor: alias")
+        assertThat(styleToText { cursor(Cursor.Copy) }).isEqualTo("cursor: copy")
+        assertThat(styleToText { cursor(Cursor.Move) }).isEqualTo("cursor: move")
+        assertThat(styleToText { cursor(Cursor.NoDrop) }).isEqualTo("cursor: no-drop")
+        assertThat(styleToText { cursor(Cursor.NotAllowed) }).isEqualTo("cursor: not-allowed")
+        assertThat(styleToText { cursor(Cursor.Grab) }).isEqualTo("cursor: grab")
+        assertThat(styleToText { cursor(Cursor.Grabbing) }).isEqualTo("cursor: grabbing")
+
+        // Resizing and scrolling 
+        assertThat(styleToText { cursor(Cursor.AllScroll) }).isEqualTo("cursor: all-scroll")
+        assertThat(styleToText { cursor(Cursor.ColumnResize) }).isEqualTo("cursor: col-resize")
+        assertThat(styleToText { cursor(Cursor.RowResize) }).isEqualTo("cursor: row-resize")
+        assertThat(styleToText { cursor(Cursor.NResize) }).isEqualTo("cursor: n-resize")
+        assertThat(styleToText { cursor(Cursor.NeResize) }).isEqualTo("cursor: ne-resize")
+        assertThat(styleToText { cursor(Cursor.EResize) }).isEqualTo("cursor: e-resize")
+        assertThat(styleToText { cursor(Cursor.SeResize) }).isEqualTo("cursor: se-resize")
+        assertThat(styleToText { cursor(Cursor.SResize) }).isEqualTo("cursor: s-resize")
+        assertThat(styleToText { cursor(Cursor.SwResize) }).isEqualTo("cursor: sw-resize")
+        assertThat(styleToText { cursor(Cursor.WResize) }).isEqualTo("cursor: w-resize")
+        assertThat(styleToText { cursor(Cursor.NwResize) }).isEqualTo("cursor: nw-resize")
+        assertThat(styleToText { cursor(Cursor.EwResize) }).isEqualTo("cursor: ew-resize")
+        assertThat(styleToText { cursor(Cursor.NsResize) }).isEqualTo("cursor: ns-resize")
+        assertThat(styleToText { cursor(Cursor.NeswResize) }).isEqualTo("cursor: nesw-resize")
+        assertThat(styleToText { cursor(Cursor.NwseResize) }).isEqualTo("cursor: nwse-resize")
+
+        // Zoom
+        assertThat(styleToText { cursor(Cursor.ZoomIn) }).isEqualTo("cursor: zoom-in")
+        assertThat(styleToText { cursor(Cursor.ZoomOut) }).isEqualTo("cursor: zoom-out")
+
+        // Global
+        assertThat(styleToText { cursor(Cursor.Inherit) }).isEqualTo("cursor: inherit")
+        assertThat(styleToText { cursor(Cursor.Initial) }).isEqualTo("cursor: initial")
+        assertThat(styleToText { cursor(Cursor.Revert) }).isEqualTo("cursor: revert")
+        assertThat(styleToText { cursor(Cursor.Unset) }).isEqualTo("cursor: unset")
+    }
+    
+    @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
         assertThat(styleToText { justifyContent(JustifyContent.Stretch) }).isEqualTo("justify-content: stretch")
