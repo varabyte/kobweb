@@ -576,6 +576,42 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyColumnCount() {
+        assertThat(styleToText { columnCount(ColumnCount.Auto) }).isEqualTo("column-count: auto")
+        assertThat(styleToText { columnCount(ColumnCount.of(3)) }).isEqualTo("column-count: 3")
+
+        assertThat(styleToText { columnCount(ColumnCount.Inherit) }).isEqualTo("column-count: inherit")
+        assertThat(styleToText { columnCount(ColumnCount.Initial) }).isEqualTo("column-count: initial")
+        assertThat(styleToText { columnCount(ColumnCount.Revert) }).isEqualTo("column-count: revert")
+        assertThat(styleToText { columnCount(ColumnCount.RevertLayer) }).isEqualTo("column-count: revert-layer")
+        assertThat(styleToText { columnCount(ColumnCount.Unset) }).isEqualTo("column-count: unset")
+    }
+
+    @Test
+    fun verifyColumnFill() {
+        assertThat(styleToText { columnFill(ColumnFill.Auto) }).isEqualTo("column-fill: auto")
+        assertThat(styleToText { columnFill(ColumnFill.Balance) }).isEqualTo("column-fill: balance")
+
+        assertThat(styleToText { columnFill(ColumnFill.Inherit) }).isEqualTo("column-fill: inherit")
+        assertThat(styleToText { columnFill(ColumnFill.Initial) }).isEqualTo("column-fill: initial")
+        assertThat(styleToText { columnFill(ColumnFill.Revert) }).isEqualTo("column-fill: revert")
+        assertThat(styleToText { columnFill(ColumnFill.RevertLayer) }).isEqualTo("column-fill: revert-layer")
+        assertThat(styleToText { columnFill(ColumnFill.Unset) }).isEqualTo("column-fill: unset")
+    }
+
+    @Test
+    fun verifyColumnSpan() {
+        assertThat(styleToText { columnSpan(ColumnSpan.None) }).isEqualTo("column-span: none")
+        assertThat(styleToText { columnSpan(ColumnSpan.All) }).isEqualTo("column-span: all")
+
+        assertThat(styleToText { columnSpan(ColumnSpan.Inherit) }).isEqualTo("column-span: inherit")
+        assertThat(styleToText { columnSpan(ColumnSpan.Initial) }).isEqualTo("column-span: initial")
+        assertThat(styleToText { columnSpan(ColumnSpan.Revert) }).isEqualTo("column-span: revert")
+        assertThat(styleToText { columnSpan(ColumnSpan.RevertLayer) }).isEqualTo("column-span: revert-layer")
+        assertThat(styleToText { columnSpan(ColumnSpan.Unset) }).isEqualTo("column-span: unset")
+    }
+
+    @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
         assertThat(styleToText { justifyContent(JustifyContent.Stretch) }).isEqualTo("justify-content: stretch")
