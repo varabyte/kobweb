@@ -1,9 +1,10 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
+import com.varabyte.kobweb.compose.css.functions.blur
+import com.varabyte.kobweb.compose.css.functions.brightness
 import com.varabyte.truthish.assertThat
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 import org.jetbrains.compose.web.css.keywords.auto
 import kotlin.test.Test
 
@@ -122,6 +123,20 @@ class CssStylePropertyTests {
         assertThat(styleToText { alignSelf(AlignSelf.Initial) }).isEqualTo("align-self: initial")
         assertThat(styleToText { alignSelf(AlignSelf.Revert) }).isEqualTo("align-self: revert")
         assertThat(styleToText { alignSelf(AlignSelf.Unset) }).isEqualTo("align-self: unset")
+    }
+
+    @Test
+    fun verifyBackdropFilter() {
+        assertThat(styleToText { backdropFilter(BackdropFilter.None) }).isEqualTo("backdrop-filter: none; -webkit-backdrop-filter: none")
+
+        assertThat(styleToText {
+            backdropFilter(BackdropFilter.of(blur(10.px), brightness(0.5)))
+        }).isEqualTo("backdrop-filter: blur(10px) brightness(0.5); -webkit-backdrop-filter: blur(10px) brightness(0.5)")
+
+        assertThat(styleToText { backdropFilter(BackdropFilter.Inherit) }).isEqualTo("backdrop-filter: inherit; -webkit-backdrop-filter: inherit")
+        assertThat(styleToText { backdropFilter(BackdropFilter.Initial) }).isEqualTo("backdrop-filter: initial; -webkit-backdrop-filter: initial")
+        assertThat(styleToText { backdropFilter(BackdropFilter.Revert) }).isEqualTo("backdrop-filter: revert; -webkit-backdrop-filter: revert")
+        assertThat(styleToText { backdropFilter(BackdropFilter.Unset) }).isEqualTo("backdrop-filter: unset; -webkit-backdrop-filter: unset")
     }
 
     @Test
@@ -667,7 +682,21 @@ class CssStylePropertyTests {
         assertThat(styleToText { cursor(Cursor.Revert) }).isEqualTo("cursor: revert")
         assertThat(styleToText { cursor(Cursor.Unset) }).isEqualTo("cursor: unset")
     }
-    
+
+    @Test
+    fun verifyFilter() {
+        assertThat(styleToText { filter(Filter.None) }).isEqualTo("filter: none")
+
+        assertThat(styleToText {
+            filter(Filter.of(blur(10.px), brightness(0.5)))
+        }).isEqualTo("filter: blur(10px) brightness(0.5)")
+
+        assertThat(styleToText { filter(Filter.Inherit) }).isEqualTo("filter: inherit")
+        assertThat(styleToText { filter(Filter.Initial) }).isEqualTo("filter: initial")
+        assertThat(styleToText { filter(Filter.Revert) }).isEqualTo("filter: revert")
+        assertThat(styleToText { filter(Filter.Unset) }).isEqualTo("filter: unset")
+    }
+
     @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
