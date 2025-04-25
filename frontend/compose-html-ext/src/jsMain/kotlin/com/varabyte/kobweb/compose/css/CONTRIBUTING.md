@@ -90,7 +90,7 @@ be easy to make a mistake like this:
 ```kotlin
 class SourceStyle {
     companion object {
-        val INHERIT = SourceStyle("inherit")
+        val Inherit = SourceStyle("inherit")
     }
 }
 
@@ -98,7 +98,7 @@ class SourceStyle {
 class CopiedStyle {
     companion object {
         // ❌
-        val INHERIT = SourceStyle("inherit")
+        val Inherit = SourceStyle("inherit")
     }
 }
 ```
@@ -170,7 +170,7 @@ If you think you've run into a case where a single extension method isn't enough
 the Kobweb maintainers to discuss it.
 
 ---
-### Every class should act like a singleton and provide a companion object 
+### Every class should act like a singleton and provide a companion object
 
 #### Example
 
@@ -179,10 +179,10 @@ class StyleExample /*...*/ {
     companion object {
         fun of(value: Int): StyleExample
         fun of(value: String): StyleExample
-        
+
         val FirstValue: StyleExample
         val SecondValue: StyleExample
-            
+
         val Inherit: StyleExample
     }
 }
@@ -232,7 +232,7 @@ the `Repeatable` subclass name for this situation, which we expose publicly:
 sealed class StyleExample {
     private class Keyword(value: String) : StyleExample(value)
     class Repeatable(vararg values: Int) : StyleExample(values.joinToString(" "))
-    
+
     companion object {
         fun of(vararg values: Int) = Repeatable(*values)
         val None: StyleExample = Keyword("none")
