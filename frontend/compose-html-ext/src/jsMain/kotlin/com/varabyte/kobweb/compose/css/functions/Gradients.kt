@@ -1,3 +1,6 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css.functions
 
 import com.varabyte.kobweb.browser.util.titleCamelCaseToKebabCase
@@ -52,7 +55,7 @@ class RepeatingGradient<G : Gradient> internal constructor(private val wrapped: 
 
 // region linear gradient: https://developer.mozilla.org/en-US/docs/Web/CSS/gradient/linear-gradient
 
-sealed class LinearGradient(private val gradientStr: String) : Gradient {
+sealed class LinearGradient private constructor(private val gradientStr: String) : Gradient {
     enum class Direction {
         ToTop,
         ToTopRight,

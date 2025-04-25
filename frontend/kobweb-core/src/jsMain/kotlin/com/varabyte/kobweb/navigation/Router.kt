@@ -203,13 +203,13 @@ class Router {
     }
 
     /**
-     * The ancestor layouts for this page (if any), in order from closet to most distance ancestory.
+     * The ancestor layouts for this page (if any), in order from closet to most distance ancestor.
      */
     val PageMethod.parentLayouts: List<LayoutMethod> get() {
         var layoutMethod: LayoutMethod? = layoutIdForPage[this]?.let { layouts[it] }
         return buildList {
             while (layoutMethod != null) {
-                add(0, layoutMethod)
+                add(layoutMethod)
                 layoutMethod = layoutIdForLayout[layoutMethod]?.let { layouts[it] }
             }
         }
@@ -244,7 +244,8 @@ class Router {
                     key(PageContext.instance.route.path) { pageMethod(ctx) }
                 }
 
-                pageMethod.parentLayouts.foldRight(keyedPageMethod) { layout, accum ->
+                // When rendering a page, composition order starts at the top ancestor and works its way down
+                pageMethod.parentLayouts.asReversed().foldRight(keyedPageMethod) { layout, accum ->
                     { ctx -> layout(ctx, accum) }
                 }.invoke(PageContext.instance)
             }

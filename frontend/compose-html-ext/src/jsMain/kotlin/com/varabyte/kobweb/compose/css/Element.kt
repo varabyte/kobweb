@@ -1,3 +1,6 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
@@ -29,7 +32,7 @@ fun StyleScope.appearance(appearance: Appearance) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/content
-sealed class Content(private val value: String) : StylePropertyValue {
+sealed class Content private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     /** Content keywords that cannot be used in combination with any others. */
@@ -67,6 +70,10 @@ sealed class Content(private val value: String) : StylePropertyValue {
         val Revert get(): Content = Keyword("revert")
         val Unset get(): Content = Keyword("unset")
     }
+}
+
+fun StyleScope.content(content: Content) {
+    property("content", content)
 }
 
 fun StyleScope.content(content: Content.Restricted) {

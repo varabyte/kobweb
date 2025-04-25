@@ -1,11 +1,14 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.browser.util.wrapQuotesIfNecessary
+import com.varabyte.kobweb.compose.css.Animation.Keyword
 import com.varabyte.kobweb.compose.css.functions.CSSImage
 import org.jetbrains.compose.web.css.*
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-image
 typealias ListStyleImage = CSSImage
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type
 class ListStyleType private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
@@ -28,9 +31,10 @@ class ListStyleType private constructor(private val value: String) : StyleProper
         val Disc get() = ListStyleType("disc")
         val DisclosureClosed get() = ListStyleType("disclosure-closed")
         val DisclosureOpen get() = ListStyleType("disclosure-open")
+        val EthiopicNumeric get() = ListStyleType("ethiopic-numeric")
         val Georgian get() = ListStyleType("georgian")
         val Gujarati get() = ListStyleType("gujarati")
-        val Gurumukhi get() = ListStyleType("gurumukhi")
+        val Gurmukhi get() = ListStyleType("gurmukhi")
         val Hebrew get() = ListStyleType("hebrew")
         val Hiragana get() = ListStyleType("hiragana")
         val HiraganaIroha get() = ListStyleType("hiragana-iroha")
@@ -60,11 +64,11 @@ class ListStyleType private constructor(private val value: String) : StyleProper
         val Tamil get() = ListStyleType("tamil")
         val Telugu get() = ListStyleType("telugu")
         val Thai get() = ListStyleType("thai")
+        val Tibetan get() = ListStyleType("tibetan")
         val TradChineseFormal get() = ListStyleType("trad-chinese-formal")
         val TradChineseInformal get() = ListStyleType("trad-chinese-informal")
         val UpperAlpha get() = ListStyleType("upper-alpha")
         val UpperArmenian get() = ListStyleType("upper-armenian")
-        val UpperGreek get() = ListStyleType("upper-greek")
         val UpperLatin get() = ListStyleType("upper-latin")
         val UpperRoman get() = ListStyleType("upper-roman")
 
@@ -79,6 +83,7 @@ class ListStyleType private constructor(private val value: String) : StyleProper
     }
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-position
 class ListStylePosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
@@ -95,12 +100,36 @@ class ListStylePosition private constructor(private val value: String) : StylePr
     }
 }
 
-fun StyleScope.listStyle(
-    type: ListStyleType? = null,
-    position: ListStylePosition? = null,
-    image: ListStyleImage? = null
-) {
-    type?.let { property("list-style-type", it) }
-    position?.let { property("list-style-position", it) }
-    image?.let { property("list-style-image", it) }
+// https://developer.mozilla.org/en-US/docs/Web/CSS/list-style
+class ListStyle private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        fun of(
+            type: ListStyleType? = null,
+            position: ListStylePosition? = null,
+            image: ListStyleImage? = null,
+        ): ListStyle {
+            return ListStyle(
+                listOfNotNull(
+                    type,
+                    position,
+                    image,
+                ).joinToString(" ") { it.toString() }
+            )
+        }
+
+        // Keyword
+        val None get() = ListStyle("none")
+
+        // Global Keywords
+        val Inherit get() = ListStyle("inherit")
+        val Initial get() = ListStyle("initial")
+        val Revert get() = ListStyle("revert")
+        val Unset get() = ListStyle("unset")
+    }
+}
+
+fun StyleScope.listStyle(listStyle: ListStyle) {
+    property("list-style", listStyle)
 }

@@ -1,6 +1,10 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
+import kotlin.collections.emptyList
 
 // region Caret Color, see https://developer.mozilla.org/en-US/docs/Web/CSS/caret-color
 
@@ -39,21 +43,24 @@ sealed class TouchAction private constructor(private val value: String) : StyleP
     private class Keyword(value: String) : TouchAction(value)
     class PanHorizontal internal constructor(value: String) : TouchAction(value)
     class PanVertical internal constructor(value: String) : TouchAction(value)
-    class PanGroup(horiz: PanHorizontal, vert: PanVertical, withPinchZoom: Boolean = false) :
-        TouchAction("$horiz $vert" + if (withPinchZoom) " pinch-zoom" else "")
-
-    class PanHoriz(horiz: PanHorizontal, withPinchZoom: Boolean = false) :
-        TouchAction("$horiz" + if (withPinchZoom) " pinch-zoom" else "")
-
-    class PanVert(vert: PanVertical, withPinchZoom: Boolean = false) :
-        TouchAction("$vert" + if (withPinchZoom) " pinch-zoom" else "")
 
     companion object {
+        @Suppress("FunctionName")
+        private fun _of(vararg touchAction: TouchAction, withPinchZoom: Boolean): TouchAction =
+            Keyword(
+                (touchAction.toList() + if (withPinchZoom) listOf("pinch-zoom") else emptyList())
+                    .joinToString(" ")
+            )
+        fun of(horiz: PanHorizontal, vert: PanVertical, withPinchZoom: Boolean = false) =
+            _of(horiz, vert, withPinchZoom = withPinchZoom)
+        fun of(horiz: PanHorizontal, withPinchZoom: Boolean = false) = _of(horiz, withPinchZoom = withPinchZoom)
+        fun of(vert: PanVertical, withPinchZoom: Boolean = false) = _of(vert, withPinchZoom = withPinchZoom)
+
         // Keyword
         val Auto get(): TouchAction = Keyword("auto")
         val None get(): TouchAction = Keyword("none")
-        val PanX get(): TouchAction = PanHorizontal("pan-x")
-        val PanY get(): TouchAction = PanVertical("pan-y")
+        val PanX get() = PanHorizontal("pan-x")
+        val PanY get() = PanVertical("pan-y")
         val PinchZoom get(): TouchAction = Keyword("pinch-zoom")
 // Still experimental: https://caniuse.com/mdn-css_properties_touch-action_unidirectional-pan
 //        val PanLeft get(): TouchAction = PanHorizontal("pan-left")

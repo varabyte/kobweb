@@ -1,3 +1,6 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSFilter
@@ -5,18 +8,23 @@ import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
 // See also: CSSFilter
-class Filter private constructor(private val value: String) : StylePropertyValue {
+sealed class Filter private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
+
+    private class Keyword(value: String): Filter(value)
+    class Repeatable(first: CSSFilter, vararg rest: CSSFilter) : Filter((listOf(first) + rest).joinToString(" "))
 
     companion object {
         // Keyword
-        val None get() = Filter("none")
+        val None: Filter get() = Keyword("none")
+
+        fun of(first: CSSFilter, vararg rest: CSSFilter): Filter = Repeatable(first, *rest)
 
         // Global
-        val Inherit get() = Filter("inherit")
-        val Initial get() = Filter("initial")
-        val Revert get() = Filter("revert")
-        val Unset get() = Filter("unset")
+        val Inherit: Filter get() = Keyword("inherit")
+        val Initial: Filter get() = Keyword("initial")
+        val Revert: Filter get() = Keyword("revert")
+        val Unset: Filter get() = Keyword("unset")
     }
 }
 
