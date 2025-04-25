@@ -5,6 +5,8 @@ import org.jetbrains.compose.web.css.*
 // https://developer.mozilla.org/en-US/docs/Web/CSS/will-change
 class WillChange private constructor(private val value: String) : StylePropertyValue {
 
+    override fun toString() = value
+
     companion object {
 
         /* Keyword values */

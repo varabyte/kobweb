@@ -264,6 +264,8 @@ fun StyleScope.rubyPosition(rubyPosition: RubyPosition) {
 // https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing
 class WordSpacing private constructor(private val value: String) : StylePropertyValue {
 
+    override fun toString() = value
+
     companion object {
 
         /* Keyword value */

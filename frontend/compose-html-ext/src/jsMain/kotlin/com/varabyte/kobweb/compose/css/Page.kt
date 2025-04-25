@@ -23,7 +23,3 @@ class Page private constructor(private val value: String) : StylePropertyValue {
         val Unset get() = Page("unset")
     }
 }
-
-fun StyleScope.page(page: Page = Page.Auto) {
-    property("page", page)
-}

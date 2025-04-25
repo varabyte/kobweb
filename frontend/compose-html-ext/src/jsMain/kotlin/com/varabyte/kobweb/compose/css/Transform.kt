@@ -214,6 +214,8 @@ fun StyleScope.translateZ(tz: CSSLengthOrPercentageNumericValue) {
 // https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
 class BackFaceVisibility private constructor(private val value: String) : StylePropertyValue {
 
+    override fun toString() = value
+
     companion object {
 
         /* Keyword values */
