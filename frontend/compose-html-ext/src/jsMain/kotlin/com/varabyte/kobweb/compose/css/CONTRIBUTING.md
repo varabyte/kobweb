@@ -13,6 +13,22 @@ to see the list of CSS style properties that are still unimplemented.
 
 ## Rules for contributing new CSS style property classes
 
+### We only support properties and features that are baseline widely available
+
+In the [MDN docs](<https://developer.mozilla.org/en-US/>), confirm in the top right corner of the property's page that
+it is labeled as widely available across all major browsers.
+
+Sometimes, this label will be tagged with an asterix (i.e. "Baseline Widely Available *"), which means that while the
+property is overall safe to use, some parts of the feature are not. In that case, you should check out its
+*Browser Compatibility* section for more information.
+
+As a concrete example, as of 2025, [`touch-action`](https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action) is
+baseline widely available but several of its values (the `pan-` cardinal directions) are not, as listed in its
+[browser compatibility section](<https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action#browser_compatibility>).
+
+You may also wish to refer to https://caniuse.com/ for even more detailed reports about what properties and features are
+actually supported.
+
 ### Every CSS style property should link to its MDN docs page
 
 #### Example
@@ -226,6 +242,105 @@ sealed class StyleExample {
 fun StyleScope.styleExample(styleExample: StyleExample)
 fun StyleScope.styleExample(first: StyleExample.Repeatable, vararg rest: StyleExample.Repeatable)
 ```
+
+---
+### Don't explicitly set default values
+
+According to the docs, you'll often find the default values for certain parts of the property have a default value. When
+you leave this unset, the browser fills it in for you. We don't want to get in the way of that.
+
+#### Example
+
+```kotlin
+// This is a simpler version of the real Animation style property
+class Animation /*...*/ {
+    companion object {
+        fun of(
+            name: String,
+            duration: Duration?,
+            direction: Direction?,
+            count: AnimationCount?,
+        ): Animation {
+           return Animation(
+               buildList {
+                    add(name)
+                    duration?.let { add(it) }
+                    direction?.let { add(it) }
+                    count?.let { add(it) }
+               }.joinToString(" ")
+           )
+        }
+    }
+}
+```
+
+Notice above we omitted the various values that weren't specified by the user. In contrast, we *could* have done this:
+
+```kotlin
+// ❌
+class Animation /*...*/ {
+    companion object {
+        fun of(
+            name: String,
+            duration: Duration?,
+            direction: Direction?,
+            count: AnimationCount?,
+        ): Animation {
+           return Animation(
+               buildList {
+                    add(name)
+                    add(duration ?: 0.s)
+                    add(direction ?: Direction.Normal)
+                    add(count ?: AnimationCount.of(1))
+               }.joinToString(" ")
+           )
+        }
+    }
+}
+```
+
+However, by letting the browser fill in the defaults, we produce CSS that is less chance of having a mistake, easier to
+debug because the text is cleaner, and it generates smaller final HTML snapshot sizes at export time.
+
+#### Exception
+
+Sometimes, however, you have to specify a value explicitly to avoid ambiguity. There is actually a value I did not
+include in the incomplete Animation example above. I'll add it now -- a `delay` duration:
+
+```kotlin
+// ❌
+class Animation /*...*/ {
+    companion object {
+        fun of(
+            name: String,
+            duration: Duration?,
+            delay: Duration?, // <--- New
+            direction: Direction?,
+            count: AnimationCount?,
+        ): Animation {
+           return Animation(
+               buildList {
+                 add(name)
+                 duration?.let { add(it) }
+                 // New:
+                 if (delay != null) {
+                   if (duration == null) {
+                     add("0s") // Needed so parser knows that the next time string is for "delay"
+                   }
+                   add(delay.toString())
+                 }
+                 direction?.let { add(it) }
+                 count?.let { add(it) }
+
+               }.joinToString(" ")
+           )
+        }
+    }
+}
+```
+
+This exception should be pretty rare, because most shorthand CSS properties are a list of uniquely distinguishable
+values.
 
 ---
 ### Add tests to `CssStylePropertyTests`
