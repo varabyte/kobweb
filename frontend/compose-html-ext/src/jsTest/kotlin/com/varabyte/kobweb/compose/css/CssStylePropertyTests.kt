@@ -612,6 +612,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyCaretColor() {
+        assertThat(styleToText { caretColor(CaretColor.Auto) }).isEqualTo("caret-color: auto")
+        assertThat(styleToText { caretColor(CaretColor.Transparent) }).isEqualTo("caret-color: transparent")
+        assertThat(styleToText { caretColor(CaretColor.CurrentColor) }).isEqualTo("caret-color: currentcolor")
+
+        assertThat(styleToText { caretColor(CaretColor.Inherit) }).isEqualTo("caret-color: inherit")
+        assertThat(styleToText { caretColor(CaretColor.Initial) }).isEqualTo("caret-color: initial")
+        assertThat(styleToText { caretColor(CaretColor.Revert) }).isEqualTo("caret-color: revert")
+        assertThat(styleToText { caretColor(CaretColor.Unset) }).isEqualTo("caret-color: unset")
+    }
+    
+    @Test
     fun verifyColorScheme() {
         assertThat(styleToText { colorScheme(ColorScheme.Normal) }).isEqualTo("color-scheme: normal")
         assertThat(styleToText { colorScheme(ColorScheme.Light) }).isEqualTo("color-scheme: light")
@@ -1206,5 +1218,36 @@ class CssStylePropertyTests {
         assertThat(styleToText { mixBlendMode(MixBlendMode.Initial) }).isEqualTo("mix-blend-mode: initial")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Revert) }).isEqualTo("mix-blend-mode: revert")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Unset) }).isEqualTo("mix-blend-mode: unset")
+    }
+
+    @Test
+    fun verifyTouchAction() {
+        assertThat(styleToText { touchAction(TouchAction.Auto) }).isEqualTo("touch-action: auto")
+        assertThat(styleToText { touchAction(TouchAction.None) }).isEqualTo("touch-action: none")
+        assertThat(styleToText { touchAction(TouchAction.PanX) }).isEqualTo("touch-action: pan-x")
+        assertThat(styleToText { touchAction(TouchAction.PanY) }).isEqualTo("touch-action: pan-y")
+        assertThat(styleToText { touchAction(TouchAction.PinchZoom) }).isEqualTo("touch-action: pinch-zoom")
+        assertThat(styleToText { touchAction(TouchAction.Manipulation) }).isEqualTo("touch-action: manipulation")
+
+        assertThat(styleToText {
+            touchAction(TouchAction.of(TouchAction.PanX, TouchAction.PanY))
+        }).isEqualTo("touch-action: pan-x pan-y")
+
+        assertThat(styleToText {
+            touchAction(TouchAction.of(TouchAction.PanX, TouchAction.PanY, withPinchZoom = true))
+        }).isEqualTo("touch-action: pan-x pan-y pinch-zoom")
+
+        assertThat(styleToText {
+            touchAction(TouchAction.of(TouchAction.PanX, withPinchZoom = true))
+        }).isEqualTo("touch-action: pan-x pinch-zoom")
+
+        assertThat(styleToText {
+            touchAction(TouchAction.of(TouchAction.PanY, withPinchZoom = true))
+        }).isEqualTo("touch-action: pan-y pinch-zoom")
+
+        assertThat(styleToText { touchAction(TouchAction.Inherit) }).isEqualTo("touch-action: inherit")
+        assertThat(styleToText { touchAction(TouchAction.Initial) }).isEqualTo("touch-action: initial")
+        assertThat(styleToText { touchAction(TouchAction.Revert) }).isEqualTo("touch-action: revert")
+        assertThat(styleToText { touchAction(TouchAction.Unset) }).isEqualTo("touch-action: unset")
     }
 }
