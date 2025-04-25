@@ -12,7 +12,8 @@ sealed class Filter private constructor(private val value: String) : StyleProper
     override fun toString() = value
 
     private class Keyword(value: String): Filter(value)
-    class Repeatable(first: CSSFilter, vararg rest: CSSFilter) : Filter((listOf(first) + rest).joinToString(" "))
+    class Repeatable internal constructor(first: CSSFilter, vararg rest: CSSFilter) :
+        Filter((listOf(first) + rest).joinToString(" "))
 
     companion object {
         // Keyword
