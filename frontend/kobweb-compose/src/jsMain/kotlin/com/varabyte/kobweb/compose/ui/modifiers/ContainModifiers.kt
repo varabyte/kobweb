@@ -11,41 +11,36 @@ fun Modifier.contain(contain: Contain) = styleModifier {
     contain(contain)
 }
 
-fun Modifier.contain(vararg value: Contain.SingleValue) = styleModifier {
-    contain(*value)
+fun Modifier.contain(vararg values: Contain.SingleValue) = styleModifier {
+    contain(*values)
 }
 
 /**
  * Contain Intrinsic Block Size Modifiers
  */
-fun Modifier.containIntrinsicBlockSize(containIntrinsicBlockSize: Contain.SingleValue) = styleModifier {
+fun Modifier.containIntrinsicBlockSize(containIntrinsicBlockSize: ContainIntrinsicBlockSize) = styleModifier {
     containIntrinsicBlockSize(containIntrinsicBlockSize)
 }
 
-/**
- * Contain Intrinsic Height Modifiers
- */
-fun Modifier.containIntrinsicHeight(containIntrinsicHeight: Contain.SingleValue) = styleModifier {
-    containIntrinsicHeight(containIntrinsicHeight)
+fun Modifier.containIntrinsicBlockSize(length: CSSLengthNumericValue) = styleModifier {
+    containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(length))
+}
+
+fun Modifier.containIntrinsicBlockSize(length: CSSLengthNumericValue, auto: Boolean = false) = styleModifier {
+    containIntrinsicBlockSize(ContainIntrinsicBlockSize.of(length, auto))
 }
 
 /**
  * Contain Intrinsic Inline Size Modifiers
  */
-fun Modifier.containIntrinsicInlineSize(containIntrinsicInlineSize: Contain.SingleValue) = styleModifier {
+fun Modifier.containIntrinsicInlineSize(containIntrinsicInlineSize: ContainIntrinsicInlineSize) = styleModifier {
     containIntrinsicInlineSize(containIntrinsicInlineSize)
 }
 
-/**
- * Contain Intrinsic Size Modifiers
- */
-fun Modifier.containIntrinsicSize(containIntrinsicSize: Contain.SingleValue) = styleModifier {
-    containIntrinsicSize(containIntrinsicSize)
+fun Modifier.containIntrinsicInlineSize(length: CSSLengthNumericValue) = styleModifier {
+    containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(length))
 }
 
-/**
- * Contain Intrinsic Width Modifiers
- */
-fun Modifier.containIntrinsicWidth(containIntrinsicWidth: Contain.SingleValue) = styleModifier {
-    containIntrinsicWidth(containIntrinsicWidth)
+fun Modifier.containIntrinsicInlineSize(length: CSSLengthNumericValue, auto: Boolean = false) = styleModifier {
+    containIntrinsicInlineSize(ContainIntrinsicInlineSize.of(length, auto))
 }
