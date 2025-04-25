@@ -1231,7 +1231,6 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyListStyle() {
-
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.ArabicIndic)) }).isEqualTo("list-style: arabic-indic")
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Armenian)) }).isEqualTo("list-style: armenian")
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Bengali)) }).isEqualTo("list-style: bengali")
@@ -1336,6 +1335,20 @@ class CssStylePropertyTests {
         assertThat(styleToText { mixBlendMode(MixBlendMode.Initial) }).isEqualTo("mix-blend-mode: initial")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Revert) }).isEqualTo("mix-blend-mode: revert")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Unset) }).isEqualTo("mix-blend-mode: unset")
+    }
+
+    @Test
+    fun verifyObjectFit() {
+        assertThat(styleToText { objectFit(ObjectFit.Contain) }).isEqualTo("object-fit: contain")
+        assertThat(styleToText { objectFit(ObjectFit.Cover) }).isEqualTo("object-fit: cover")
+        assertThat(styleToText { objectFit(ObjectFit.Fill) }).isEqualTo("object-fit: fill")
+        assertThat(styleToText { objectFit(ObjectFit.None) }).isEqualTo("object-fit: none")
+        assertThat(styleToText { objectFit(ObjectFit.ScaleDown) }).isEqualTo("object-fit: scale-down")
+
+        assertThat(styleToText { objectFit(ObjectFit.Inherit) }).isEqualTo("object-fit: inherit")
+        assertThat(styleToText { objectFit(ObjectFit.Initial) }).isEqualTo("object-fit: initial")
+        assertThat(styleToText { objectFit(ObjectFit.Revert) }).isEqualTo("object-fit: revert")
+        assertThat(styleToText { objectFit(ObjectFit.Unset) }).isEqualTo("object-fit: unset")
     }
 
     @Test
