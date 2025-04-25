@@ -17,6 +17,7 @@ dependencies {
     dokka(projects.common.frameworkAnnotations)
     dokka(projects.common.kobwebCommon)
     dokka(projects.common.kobwebSerialization)
+    dokka(projects.common.kobwebxFrontmatter)
     dokka(projects.common.kobwebxSerializationKotlinx)
     dokka(projects.frontend.kobwebCore)
     dokka(projects.frontend.kobwebCompose)
