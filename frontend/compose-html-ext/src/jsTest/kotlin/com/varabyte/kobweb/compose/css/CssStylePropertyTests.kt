@@ -1414,4 +1414,76 @@ class CssStylePropertyTests {
         assertThat(styleToText { verticalAlign(VerticalAlign.Revert) }).isEqualTo("vertical-align: revert")
         assertThat(styleToText { verticalAlign(VerticalAlign.Unset) }).isEqualTo("vertical-align: unset")
     }
+
+    @Test
+    fun verifyAll() {
+        assertThat(styleToText { all(All.Inherit) }).isEqualTo("all: inherit")
+        assertThat(styleToText { all(All.Initial) }).isEqualTo("all: initial")
+        assertThat(styleToText { all(All.Revert) }).isEqualTo("all: revert")
+        assertThat(styleToText { all(All.RevertLayer) }).isEqualTo("all: revert-layer")
+        assertThat(styleToText { all(All.Unset) }).isEqualTo("all: unset")
+    }
+
+    @Test
+    fun verifyRubyPosition() {
+        assertThat(styleToText { rubyPosition(RubyPosition.Over) }).isEqualTo("ruby-position: over")
+        assertThat(styleToText { rubyPosition(RubyPosition.Under) }).isEqualTo("ruby-position: under")
+
+        assertThat(styleToText { rubyPosition(RubyPosition.Inherit) }).isEqualTo("ruby-position: inherit")
+        assertThat(styleToText { rubyPosition(RubyPosition.Initial) }).isEqualTo("ruby-position: initial")
+        assertThat(styleToText { rubyPosition(RubyPosition.Revert) }).isEqualTo("ruby-position: revert")
+        assertThat(styleToText { rubyPosition(RubyPosition.RevertLayer) }).isEqualTo("ruby-position: revert-layer")
+        assertThat(styleToText { rubyPosition(RubyPosition.Unset) }).isEqualTo("ruby-position: unset")
+    }
+
+    @Test
+    fun verifyWordSpacing() {
+        assertThat(styleToText { wordSpacing(WordSpacing.Normal) }).isEqualTo("word-spacing: normal")
+        assertThat(styleToText { wordSpacing(WordSpacing.of(12.px)) }).isEqualTo("word-spacing: 12px")
+
+        assertThat(styleToText { wordSpacing(WordSpacing.Inherit) }).isEqualTo("word-spacing: inherit")
+        assertThat(styleToText { wordSpacing(WordSpacing.Initial) }).isEqualTo("word-spacing: initial")
+        assertThat(styleToText { wordSpacing(WordSpacing.Revert) }).isEqualTo("word-spacing: revert")
+        assertThat(styleToText { wordSpacing(WordSpacing.RevertLayer) }).isEqualTo("word-spacing: revert-layer")
+        assertThat(styleToText { wordSpacing(WordSpacing.Unset) }).isEqualTo("word-spacing: unset")
+    }
+
+    @Test
+    fun verifyBackfaceVisibility() {
+        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Visible) }).isEqualTo("backface-visibility: visible")
+        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Hidden) }).isEqualTo("backface-visibility: hidden")
+
+        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Inherit) }).isEqualTo("backface-visibility: inherit")
+        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Initial) }).isEqualTo("backface-visibility: initial")
+        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Revert) }).isEqualTo("backface-visibility: revert")
+        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.RevertLayer) }).isEqualTo("backface-visibility: revert-layer")
+        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Unset) }).isEqualTo("backface-visibility: unset")
+    }
+
+    @Test
+    fun verifyWidows() {
+        assertThat(styleToText { windows(Widows.of(1)) }).isEqualTo("widows: 1")
+
+        assertThat(styleToText { windows(Widows.Inherit) }).isEqualTo("widows: inherit")
+        assertThat(styleToText { windows(Widows.Initial) }).isEqualTo("widows: initial")
+        assertThat(styleToText { windows(Widows.Revert) }).isEqualTo("widows: revert")
+        assertThat(styleToText { windows(Widows.RevertLayer) }).isEqualTo("widows: revert-layer")
+        assertThat(styleToText { windows(Widows.Unset) }).isEqualTo("widows: unset")
+    }
+
+    @Test
+    fun verifyWillChange() {
+        assertThat(styleToText { willChange(WillChange.Auto) }).isEqualTo("will-change: auto")
+        assertThat(styleToText { willChange(WillChange.ScrollPosition) }).isEqualTo("will-change: scroll-position")
+        assertThat(styleToText { willChange(WillChange.Contents) }).isEqualTo("will-change: contents")
+
+        assertThat(styleToText { willChange(WillChange.of("left","top")) }).isEqualTo("will-change: left, top")
+
+        assertThat(styleToText { willChange(WillChange.Inherit) }).isEqualTo("will-change: inherit")
+        assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
+        assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
+        assertThat(styleToText { willChange(WillChange.Revert) }).isEqualTo("will-change: revert")
+        assertThat(styleToText { willChange(WillChange.RevertLayer) }).isEqualTo("will-change: revert-layer")
+        assertThat(styleToText { willChange(WillChange.Unset) }).isEqualTo("will-change: unset")
+    }
 }

@@ -16,7 +16,7 @@ class WillChange private constructor(private val value: String) : StylePropertyV
 
         /* <custom-ident> */
         fun of(vararg values: String) = if (values.size > 1) {
-            WillChange(values.joinToString(" "))
+            WillChange(values.joinToString(", "))
         } else {
             WillChange(values.joinToString(""))
         }
