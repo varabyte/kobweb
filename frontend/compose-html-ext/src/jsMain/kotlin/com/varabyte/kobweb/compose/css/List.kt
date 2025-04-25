@@ -31,9 +31,10 @@ class ListStyleType private constructor(private val value: String) : StyleProper
         val Disc get() = ListStyleType("disc")
         val DisclosureClosed get() = ListStyleType("disclosure-closed")
         val DisclosureOpen get() = ListStyleType("disclosure-open")
+        val EthiopicNumeric get() = ListStyleType("ethiopic-numeric")
         val Georgian get() = ListStyleType("georgian")
         val Gujarati get() = ListStyleType("gujarati")
-        val Gurumukhi get() = ListStyleType("gurumukhi")
+        val Gurmukhi get() = ListStyleType("gurmukhi")
         val Hebrew get() = ListStyleType("hebrew")
         val Hiragana get() = ListStyleType("hiragana")
         val HiraganaIroha get() = ListStyleType("hiragana-iroha")
@@ -63,11 +64,11 @@ class ListStyleType private constructor(private val value: String) : StyleProper
         val Tamil get() = ListStyleType("tamil")
         val Telugu get() = ListStyleType("telugu")
         val Thai get() = ListStyleType("thai")
+        val Tibetan get() = ListStyleType("tibetan")
         val TradChineseFormal get() = ListStyleType("trad-chinese-formal")
         val TradChineseInformal get() = ListStyleType("trad-chinese-informal")
         val UpperAlpha get() = ListStyleType("upper-alpha")
         val UpperArmenian get() = ListStyleType("upper-armenian")
-        val UpperGreek get() = ListStyleType("upper-greek")
         val UpperLatin get() = ListStyleType("upper-latin")
         val UpperRoman get() = ListStyleType("upper-roman")
 
@@ -119,7 +120,7 @@ class ListStyle private constructor(private val value: String) : StylePropertyVa
         }
 
         // Keyword
-        val None  get() = ListStyle("none")
+        val None get() = ListStyle("none")
 
         // Global Keywords
         val Inherit get() = ListStyle("inherit")
