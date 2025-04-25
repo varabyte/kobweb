@@ -78,6 +78,8 @@ fun StyleScope.containIntrinsicBlockSize(containIntrinsicBlockSize: ContainIntri
 // https://developer.mozilla.org/en-US/docs/Web/CSS/contain-intrinsic-inline-size
 class ContainIntrinsicInlineSize private constructor(private val value: String) : StylePropertyValue {
 
+    override fun toString() = value
+
     companion object {
         /* Keyword Values */
         val None get() = ContainIntrinsicInlineSize("none")
