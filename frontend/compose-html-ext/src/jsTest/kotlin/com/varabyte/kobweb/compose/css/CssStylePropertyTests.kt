@@ -173,6 +173,16 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyAspectRatio() {
+        assertThat(styleToText { aspectRatio(AspectRatio.Auto) }).isEqualTo("aspect-ratio: auto")
+
+        assertThat(styleToText { aspectRatio(AspectRatio.Inherit) }).isEqualTo("aspect-ratio: inherit")
+        assertThat(styleToText { aspectRatio(AspectRatio.Initial) }).isEqualTo("aspect-ratio: initial")
+        assertThat(styleToText { aspectRatio(AspectRatio.Revert) }).isEqualTo("aspect-ratio: revert")
+        assertThat(styleToText { aspectRatio(AspectRatio.Unset) }).isEqualTo("aspect-ratio: unset")
+    }
+
+    @Test
     fun verifyBackdropFilter() {
         assertThat(styleToText { backdropFilter(BackdropFilter.None) }).isEqualTo("backdrop-filter: none; -webkit-backdrop-filter: none")
 
@@ -621,6 +631,21 @@ class CssStylePropertyTests {
         assertThat(styleToText { caretColor(CaretColor.Initial) }).isEqualTo("caret-color: initial")
         assertThat(styleToText { caretColor(CaretColor.Revert) }).isEqualTo("caret-color: revert")
         assertThat(styleToText { caretColor(CaretColor.Unset) }).isEqualTo("caret-color: unset")
+    }
+
+    @Test
+    fun verifyClear() {
+        assertThat(styleToText { clear(Clear.None) }).isEqualTo("clear: none")
+        assertThat(styleToText { clear(Clear.Left) }).isEqualTo("clear: left")
+        assertThat(styleToText { clear(Clear.Right) }).isEqualTo("clear: right")
+        assertThat(styleToText { clear(Clear.Both) }).isEqualTo("clear: both")
+        assertThat(styleToText { clear(Clear.InlineStart) }).isEqualTo("clear: inline-start")
+        assertThat(styleToText { clear(Clear.InlineEnd) }).isEqualTo("clear: inline-end")
+
+        assertThat(styleToText { clear(Clear.Inherit) }).isEqualTo("clear: inherit")
+        assertThat(styleToText { clear(Clear.Initial) }).isEqualTo("clear: initial")
+        assertThat(styleToText { clear(Clear.Revert) }).isEqualTo("clear: revert")
+        assertThat(styleToText { clear(Clear.Unset) }).isEqualTo("clear: unset")
     }
     
     @Test
@@ -1192,7 +1217,17 @@ class CssStylePropertyTests {
         assertThat(styleToText { justifySelf(JustifySelf.Revert) }).isEqualTo("justify-self: revert")
         assertThat(styleToText { justifySelf(JustifySelf.Unset) }).isEqualTo("justify-self: unset")
     }
-    
+
+    @Test
+    fun verifyLineHeight() {
+        assertThat(styleToText { lineHeight(LineHeight.Normal) }).isEqualTo("line-height: normal")
+
+        assertThat(styleToText { lineHeight(LineHeight.Inherit) }).isEqualTo("line-height: inherit")
+        assertThat(styleToText { lineHeight(LineHeight.Initial) }).isEqualTo("line-height: initial")
+        assertThat(styleToText { lineHeight(LineHeight.Revert) }).isEqualTo("line-height: revert")
+        assertThat(styleToText { lineHeight(LineHeight.Unset) }).isEqualTo("line-height: unset")
+    }
+
     @Test
     fun verifyMixBlendMode() {
         assertThat(styleToText { mixBlendMode(MixBlendMode.Normal) }).isEqualTo("mix-blend-mode: normal")
@@ -1220,6 +1255,21 @@ class CssStylePropertyTests {
         assertThat(styleToText { mixBlendMode(MixBlendMode.Unset) }).isEqualTo("mix-blend-mode: unset")
     }
 
+    @Test
+    fun verifyResize() {
+        assertThat(styleToText { resize(Resize.None) }).isEqualTo("resize: none")
+        assertThat(styleToText { resize(Resize.Both) }).isEqualTo("resize: both")
+        assertThat(styleToText { resize(Resize.Horizontal) }).isEqualTo("resize: horizontal")
+        assertThat(styleToText { resize(Resize.Vertical) }).isEqualTo("resize: vertical")
+        assertThat(styleToText { resize(Resize.Block) }).isEqualTo("resize: block")
+        assertThat(styleToText { resize(Resize.Inline) }).isEqualTo("resize: inline")
+
+        assertThat(styleToText { resize(Resize.Inherit) }).isEqualTo("resize: inherit")
+        assertThat(styleToText { resize(Resize.Initial) }).isEqualTo("resize: initial")
+        assertThat(styleToText { resize(Resize.Revert) }).isEqualTo("resize: revert")
+        assertThat(styleToText { resize(Resize.Unset) }).isEqualTo("resize: unset")
+    }
+    
     @Test
     fun verifyTouchAction() {
         assertThat(styleToText { touchAction(TouchAction.Auto) }).isEqualTo("touch-action: auto")
@@ -1249,5 +1299,22 @@ class CssStylePropertyTests {
         assertThat(styleToText { touchAction(TouchAction.Initial) }).isEqualTo("touch-action: initial")
         assertThat(styleToText { touchAction(TouchAction.Revert) }).isEqualTo("touch-action: revert")
         assertThat(styleToText { touchAction(TouchAction.Unset) }).isEqualTo("touch-action: unset")
+    }
+
+    @Test
+    fun verifyVerticalAlign() {
+        assertThat(styleToText { verticalAlign(VerticalAlign.Baseline) }).isEqualTo("vertical-align: baseline")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Sub) }).isEqualTo("vertical-align: sub")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Super) }).isEqualTo("vertical-align: super")
+        assertThat(styleToText { verticalAlign(VerticalAlign.TextTop) }).isEqualTo("vertical-align: text-top")
+        assertThat(styleToText { verticalAlign(VerticalAlign.TextBottom) }).isEqualTo("vertical-align: text-bottom")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Middle) }).isEqualTo("vertical-align: middle")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Top) }).isEqualTo("vertical-align: top")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Bottom) }).isEqualTo("vertical-align: bottom")
+
+        assertThat(styleToText { verticalAlign(VerticalAlign.Inherit) }).isEqualTo("vertical-align: inherit")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Initial) }).isEqualTo("vertical-align: initial")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Revert) }).isEqualTo("vertical-align: revert")
+        assertThat(styleToText { verticalAlign(VerticalAlign.Unset) }).isEqualTo("vertical-align: unset")
     }
 }
