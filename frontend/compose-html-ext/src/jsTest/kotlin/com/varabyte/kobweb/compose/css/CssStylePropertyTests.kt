@@ -1353,6 +1353,39 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyOutline() {
+        assertThat(styleToText { outline(Outline.of(OutlineWidth.Thin)) })
+            .isEqualTo("outline: thin")
+        assertThat(styleToText { outline(Outline.of(OutlineWidth.Medium)) })
+            .isEqualTo("outline: medium")
+        assertThat(styleToText { outline(Outline.of(OutlineWidth.Thick)) })
+            .isEqualTo("outline: thick")
+
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.None)) }).isEqualTo("outline: none")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Hidden)) }).isEqualTo("outline: hidden")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Dotted)) }).isEqualTo("outline: dotted")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Dashed)) }).isEqualTo("outline: dashed")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Solid)) }).isEqualTo("outline: solid")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Double)) }).isEqualTo("outline: double")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Groove)) }).isEqualTo("outline: groove")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Ridge)) }).isEqualTo("outline: ridge")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Inset)) }).isEqualTo("outline: inset")
+        assertThat(styleToText { outline(Outline.of(outlineStyle = LineStyle.Outset)) }).isEqualTo("outline: outset")
+
+        assertThat(styleToText { outline(Outline.of(outlineColor = Color.blue)) })
+            .isEqualTo("outline: blue")
+
+
+        assertThat(styleToText { outline(Outline.of(OutlineWidth.Medium, LineStyle.Solid, Color.red)) })
+            .isEqualTo("outline: medium solid red")
+
+        assertThat(styleToText { outline(Outline.Inherit) }).isEqualTo("outline: inherit")
+        assertThat(styleToText { outline(Outline.Initial) }).isEqualTo("outline: initial")
+        assertThat(styleToText { outline(Outline.Revert) }).isEqualTo("outline: revert")
+        assertThat(styleToText { outline(Outline.Unset) }).isEqualTo("outline: unset")
+    }
+
+    @Test
     fun verifyResize() {
         assertThat(styleToText { resize(Resize.None) }).isEqualTo("resize: none")
         assertThat(styleToText { resize(Resize.Both) }).isEqualTo("resize: both")

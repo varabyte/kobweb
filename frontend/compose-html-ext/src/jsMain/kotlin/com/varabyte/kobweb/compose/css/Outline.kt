@@ -3,7 +3,8 @@ package com.varabyte.kobweb.compose.css
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline
-@Suppress("EqualsOrHashCode")
+@Deprecated("Use `Outline` instead. The name `CSSOutline` was chosen to mimic a similar class in Compose HTML but we have since come up with new, broader, consistent standards to apply to these CSS classes, and `Outline` better matches the source CSS property it comes from.", ReplaceWith("Outline"))
+@Suppress("EqualsOrHashCode", "DEPRECATION")
 class CSSOutline internal constructor() : CSSStyleValue {
     var width: CSSLengthNumericValue? = null
     var style: LineStyle? = null
@@ -21,10 +22,19 @@ class CSSOutline internal constructor() : CSSStyleValue {
     }
 }
 
+@Deprecated("Use `outline(Outline.of(...)` instead.")
 fun StyleScope.outline(outlineBuilder: CSSOutline.() -> Unit) {
-    property("outline", CSSOutline().apply(outlineBuilder))
+    val outlineValues = CSSOutline().apply(outlineBuilder)
+    outline(
+        Outline.of(
+            outlineValues.width?.let { OutlineWidth.of(it) },
+            outlineValues.style,
+            outlineValues.color,
+        )
+    )
 }
 
+@Deprecated("Use `outline(Outline.of(...)` instead.")
 fun StyleScope.outline(
     width: CSSLengthNumericValue? = null,
     style: LineStyle? = null,
@@ -37,38 +47,9 @@ fun StyleScope.outline(
     }
 }
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color
-class OutlineColor private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Keyword
-        val Invert get() = OutlineColor("invert")
-
-        // Global
-        val Inherit get() = OutlineColor("inherit")
-        val Initial get() = OutlineColor("initial")
-        val Revert get() = OutlineColor("revert")
-        val Unset get() = OutlineColor("unset")
-    }
-}
-
-fun StyleScope.outlineColor(outlineColor: OutlineColor) {
-    property("outline-color", outlineColor)
-}
-
-fun StyleScope.outlineColor(value: CSSColorValue) {
-    property("outline-color", value)
-}
-
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-offset
 fun StyleScope.outlineOffset(value: CSSLengthNumericValue) {
     property("outline-offset", value)
-}
-
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-style
-fun StyleScope.outlineStyle(value: LineStyle) {
-    property("outline-style", value)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
@@ -76,6 +57,8 @@ class OutlineWidth private constructor(private val value: String) : StylePropert
     override fun toString() = value
 
     companion object {
+        fun of(value: CSSLengthNumericValue) = OutlineWidth(value.toString())
+
         // Keyword
         val Thin get() = OutlineWidth("thin")
         val Medium get() = OutlineWidth("medium")
@@ -95,4 +78,24 @@ fun StyleScope.outlineWidth(outlineWidth: OutlineWidth) {
 
 fun StyleScope.outlineWidth(value: CSSLengthNumericValue) {
     property("outline-width", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/outline
+// Eventually deprecate CSSOutline?
+class Outline private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+    companion object {
+        fun of(outlineWidth: OutlineWidth? = null, outlineStyle: LineStyle? = null, outlineColor: CSSColorValue? = null) =
+            Outline(listOfNotNull(outlineWidth, outlineStyle, outlineColor).joinToString(" "))
+
+        // Global
+        val Inherit get() = Outline("inherit")
+        val Initial get() = Outline("initial")
+        val Revert get() = Outline("revert")
+        val Unset get() = Outline("unset")
+    }
+}
+
+fun StyleScope.outline(outline: Outline) {
+    property("outline", outline)
 }

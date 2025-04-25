@@ -41,4 +41,34 @@ class StyleModifierTests {
             }
         }).isEqualTo("margin-inline-end: 20px")
     }
+
+    @Test
+    fun verifyOutline() {
+        assertThat(modifierToText {
+            Modifier.outline(Outline.of(
+                OutlineWidth.of(2.px),
+                LineStyle.Dotted,
+                Color.green
+            ))
+        }).isEqualTo("outline: 2px dotted green")
+
+        assertThat(modifierToText {
+            Modifier.outline(Outline.Inherit)
+        }).isEqualTo("outline: inherit")
+
+        assertThat(modifierToText {
+            Modifier.outline {
+                color(Color.red)
+                style(LineStyle.Dotted)
+                width(2.px)
+            }
+        }).isEqualTo("outline-color: red; outline-style: dotted; outline-width: 2px")
+
+        assertThat(modifierToText {
+            Modifier.outline {
+                color(Color.blue)
+                width(OutlineWidth.Medium)
+            }
+        }).isEqualTo("outline-color: blue; outline-width: medium")
+    }
 }
