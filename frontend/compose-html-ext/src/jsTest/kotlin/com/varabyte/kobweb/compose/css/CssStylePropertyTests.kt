@@ -1,5 +1,6 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.functions.CSSImage
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.blur
 import com.varabyte.kobweb.compose.css.functions.brightness
@@ -1226,6 +1227,88 @@ class CssStylePropertyTests {
         assertThat(styleToText { lineHeight(LineHeight.Initial) }).isEqualTo("line-height: initial")
         assertThat(styleToText { lineHeight(LineHeight.Revert) }).isEqualTo("line-height: revert")
         assertThat(styleToText { lineHeight(LineHeight.Unset) }).isEqualTo("line-height: unset")
+    }
+
+    @Test
+    fun verifyListStyle() {
+
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.ArabicIndic)) }).isEqualTo("list-style: arabic-indic")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Armenian)) }).isEqualTo("list-style: armenian")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Bengali)) }).isEqualTo("list-style: bengali")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Cambodian)) }).isEqualTo("list-style: cambodian")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Circle)) }).isEqualTo("list-style: circle")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.CjkDecimal)) }).isEqualTo("list-style: cjk-decimal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.CjkEarthlyBranch)) }).isEqualTo("list-style: cjk-earthly-branch")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.CjkHeavenlyStem)) }).isEqualTo("list-style: cjk-heavenly-stem")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.CjkIdeographic)) }).isEqualTo("list-style: cjk-ideographic")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Decimal)) }).isEqualTo("list-style: decimal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.DecimalLeadingZero)) }).isEqualTo("list-style: decimal-leading-zero")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Devanagari)) }).isEqualTo("list-style: devanagari")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Disc)) }).isEqualTo("list-style: disc")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.DisclosureClosed)) }).isEqualTo("list-style: disclosure-closed")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.DisclosureOpen)) }).isEqualTo("list-style: disclosure-open")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Georgian)) }).isEqualTo("list-style: georgian")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Gujarati)) }).isEqualTo("list-style: gujarati")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Gurumukhi)) }).isEqualTo("list-style: gurumukhi")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Hebrew)) }).isEqualTo("list-style: hebrew")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Hiragana)) }).isEqualTo("list-style: hiragana")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.HiraganaIroha)) }).isEqualTo("list-style: hiragana-iroha")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.JapaneseFormal)) }).isEqualTo("list-style: japanese-formal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.JapaneseInformal)) }).isEqualTo("list-style: japanese-informal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Kannada)) }).isEqualTo("list-style: kannada")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Katakana)) }).isEqualTo("list-style: katakana")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.KatakanaIroha)) }).isEqualTo("list-style: katakana-iroha")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Khmer)) }).isEqualTo("list-style: khmer")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.KoreanHangulFormal)) }).isEqualTo("list-style: korean-hangul-formal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.KoreanHanjaFormal)) }).isEqualTo("list-style: korean-hanja-formal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.KoreanHanjaInformal)) }).isEqualTo("list-style: korean-hanja-informal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Lao)) }).isEqualTo("list-style: lao")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.LowerAlpha)) }).isEqualTo("list-style: lower-alpha")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.LowerArmenian)) }).isEqualTo("list-style: lower-armenian")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.LowerGreek)) }).isEqualTo("list-style: lower-greek")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.LowerLatin)) }).isEqualTo("list-style: lower-latin")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.LowerRoman)) }).isEqualTo("list-style: lower-roman")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Malayalam)) }).isEqualTo("list-style: malayalam")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Mongolian)) }).isEqualTo("list-style: mongolian")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Myanmar)) }).isEqualTo("list-style: myanmar")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Oriya)) }).isEqualTo("list-style: oriya")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Persian)) }).isEqualTo("list-style: persian")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.SimpChineseFormal)) }).isEqualTo("list-style: simp-chinese-formal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.SimpChineseInformal)) }).isEqualTo("list-style: simp-chinese-informal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Square)) }).isEqualTo("list-style: square")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Tamil)) }).isEqualTo("list-style: tamil")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Telugu)) }).isEqualTo("list-style: telugu")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Thai)) }).isEqualTo("list-style: thai")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.TradChineseFormal)) }).isEqualTo("list-style: trad-chinese-formal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.TradChineseInformal)) }).isEqualTo("list-style: trad-chinese-informal")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.UpperAlpha)) }).isEqualTo("list-style: upper-alpha")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.UpperArmenian)) }).isEqualTo("list-style: upper-armenian")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.UpperGreek)) }).isEqualTo("list-style: upper-greek")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.UpperLatin)) }).isEqualTo("list-style: upper-latin")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.UpperRoman)) }).isEqualTo("list-style: upper-roman")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.None)) }).isEqualTo("list-style: none")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Inherit)) }).isEqualTo("list-style: inherit")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Initial)) }).isEqualTo("list-style: initial") 
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Revert)) }).isEqualTo("list-style: revert")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Unset)) }).isEqualTo("list-style: unset")
+
+        assertThat(styleToText { listStyle(ListStyle.of(position = ListStylePosition.Inside)) }).isEqualTo("list-style: inside")
+        assertThat(styleToText { listStyle(ListStyle.of(image = ListStyleImage.of(CSSUrl("test.png")))) })
+            .isEqualTo("list-style: url(\"test.png\")")
+
+        assertThat(styleToText {
+            listStyle(ListStyle.of(ListStyleType.Circle, ListStylePosition.Outside))
+        }).isEqualTo("list-style: circle outside")
+        assertThat(styleToText {
+            listStyle(ListStyle.of(ListStyleType.Square, ListStylePosition.Inside, ListStyleImage.of(CSSUrl("test.png"))))
+        }).isEqualTo("list-style: square inside url(\"test.png\")")
+
+        assertThat(styleToText { listStyle(ListStyle.None) }).isEqualTo("list-style: none")
+
+        assertThat(styleToText { listStyle(ListStyle.Inherit) }).isEqualTo("list-style: inherit")
+        assertThat(styleToText { listStyle(ListStyle.Initial) }).isEqualTo("list-style: initial")
+        assertThat(styleToText { listStyle(ListStyle.Revert) }).isEqualTo("list-style: revert")
+        assertThat(styleToText { listStyle(ListStyle.Unset) }).isEqualTo("list-style: unset")
     }
 
     @Test
