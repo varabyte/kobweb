@@ -6,6 +6,10 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.*
 
+fun Modifier.backFaceVisibility(backFaceVisibility: BackfaceVisibility) = styleModifier {
+    backFaceVisibility(backFaceVisibility)
+}
+
 @OptIn(ExperimentalComposeWebApi::class)
 fun Modifier.transform(transformContext: TransformBuilder.() -> Unit) = styleModifier {
     transform(transformContext)
@@ -119,8 +123,4 @@ fun Modifier.translateY(ty: CSSLengthOrPercentageNumericValue) = styleModifier {
 
 fun Modifier.translateZ(tz: CSSLengthOrPercentageNumericValue) = styleModifier {
     translateZ(tz)
-}
-
-fun Modifier.backFaceVisibility(backFaceVisibility: BackfaceVisibility) = styleModifier {
-    backFaceVisibility(backFaceVisibility)
 }

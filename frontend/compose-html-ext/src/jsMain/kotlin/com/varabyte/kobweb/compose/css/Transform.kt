@@ -5,6 +5,30 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
+class BackfaceVisibility private constructor(private val value: String) : StylePropertyValue {
+
+    override fun toString() = value
+
+    companion object {
+
+        /* Keyword values */
+        val Visible get() = BackfaceVisibility("visible")
+        val Hidden get() = BackfaceVisibility("hidden")
+
+        /* Global values */
+        val Inherit get() = BackfaceVisibility("inherit")
+        val Initial get() = BackfaceVisibility("initial")
+        val Revert get() = BackfaceVisibility("revert")
+        val RevertLayer get() = BackfaceVisibility("revert-layer")
+        val Unset get() = BackfaceVisibility("unset")
+    }
+}
+
+fun StyleScope.backFaceVisibility(backFaceVisibility: BackfaceVisibility) {
+    property("backface-visibility", backFaceVisibility)
+}
+
 // region Rotate
 
 fun StyleScope.rotate(a: CSSAngleNumericValue) {
@@ -213,27 +237,3 @@ fun StyleScope.translateZ(tz: CSSLengthOrPercentageNumericValue) {
 }
 
 // endregion
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
-class BackfaceVisibility private constructor(private val value: String) : StylePropertyValue {
-
-    override fun toString() = value
-
-    companion object {
-
-        /* Keyword values */
-        val Visible get() = BackfaceVisibility("visible")
-        val Hidden get() = BackfaceVisibility("hidden")
-
-        /* Global values */
-        val Inherit get() = BackfaceVisibility("inherit")
-        val Initial get() = BackfaceVisibility("initial")
-        val Revert get() = BackfaceVisibility("revert")
-        val RevertLayer get() = BackfaceVisibility("revert-layer")
-        val Unset get() = BackfaceVisibility("unset")
-    }
-}
-
-fun StyleScope.backFaceVisibility(backFaceVisibility: BackfaceVisibility) {
-    property("backface-visibility", backFaceVisibility)
-}
