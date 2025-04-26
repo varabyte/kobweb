@@ -21,6 +21,6 @@ class Widows private constructor(private val value: String) : StylePropertyValue
     }
 }
 
-fun StyleScope.windows(widows: Widows) {
+fun StyleScope.widows(widows: Widows) {
     property("widows", widows)
 }

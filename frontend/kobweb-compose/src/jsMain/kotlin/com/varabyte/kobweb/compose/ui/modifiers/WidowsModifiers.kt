@@ -4,10 +4,10 @@ import com.varabyte.kobweb.compose.css.*
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 
-fun Modifier.widows(windows: Widows) = styleModifier {
-    windows(windows)
+fun Modifier.widows(widows: Widows) = styleModifier {
+    widows(widows)
 }
 
-    fun Modifier.widows(noOfWidows: Int) = styleModifier {
-    windows(Widows.of(noOfWidows))
+fun Modifier.widows(number: Int) = styleModifier {
+    widows(Widows.of(number))
 }

@@ -121,6 +121,6 @@ fun Modifier.translateZ(tz: CSSLengthOrPercentageNumericValue) = styleModifier {
     translateZ(tz)
 }
 
-fun Modifier.backFaceVisibility(backFaceVisibility: BackFaceVisibility) = styleModifier {
+fun Modifier.backFaceVisibility(backFaceVisibility: BackfaceVisibility) = styleModifier {
     backFaceVisibility(backFaceVisibility)
 }

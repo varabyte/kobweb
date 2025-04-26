@@ -1450,25 +1450,25 @@ class CssStylePropertyTests {
 
     @Test
     fun verifyBackfaceVisibility() {
-        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Visible) }).isEqualTo("backface-visibility: visible")
-        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Hidden) }).isEqualTo("backface-visibility: hidden")
+        assertThat(styleToText { backFaceVisibility(BackfaceVisibility.Visible) }).isEqualTo("backface-visibility: visible")
+        assertThat(styleToText { backFaceVisibility(BackfaceVisibility.Hidden) }).isEqualTo("backface-visibility: hidden")
 
-        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Inherit) }).isEqualTo("backface-visibility: inherit")
-        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Initial) }).isEqualTo("backface-visibility: initial")
-        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Revert) }).isEqualTo("backface-visibility: revert")
-        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.RevertLayer) }).isEqualTo("backface-visibility: revert-layer")
-        assertThat(styleToText { backFaceVisibility(BackFaceVisibility.Unset) }).isEqualTo("backface-visibility: unset")
+        assertThat(styleToText { backFaceVisibility(BackfaceVisibility.Inherit) }).isEqualTo("backface-visibility: inherit")
+        assertThat(styleToText { backFaceVisibility(BackfaceVisibility.Initial) }).isEqualTo("backface-visibility: initial")
+        assertThat(styleToText { backFaceVisibility(BackfaceVisibility.Revert) }).isEqualTo("backface-visibility: revert")
+        assertThat(styleToText { backFaceVisibility(BackfaceVisibility.RevertLayer) }).isEqualTo("backface-visibility: revert-layer")
+        assertThat(styleToText { backFaceVisibility(BackfaceVisibility.Unset) }).isEqualTo("backface-visibility: unset")
     }
 
     @Test
     fun verifyWidows() {
-        assertThat(styleToText { windows(Widows.of(1)) }).isEqualTo("widows: 1")
+        assertThat(styleToText { widows(Widows.of(1)) }).isEqualTo("widows: 1")
 
-        assertThat(styleToText { windows(Widows.Inherit) }).isEqualTo("widows: inherit")
-        assertThat(styleToText { windows(Widows.Initial) }).isEqualTo("widows: initial")
-        assertThat(styleToText { windows(Widows.Revert) }).isEqualTo("widows: revert")
-        assertThat(styleToText { windows(Widows.RevertLayer) }).isEqualTo("widows: revert-layer")
-        assertThat(styleToText { windows(Widows.Unset) }).isEqualTo("widows: unset")
+        assertThat(styleToText { widows(Widows.Inherit) }).isEqualTo("widows: inherit")
+        assertThat(styleToText { widows(Widows.Initial) }).isEqualTo("widows: initial")
+        assertThat(styleToText { widows(Widows.Revert) }).isEqualTo("widows: revert")
+        assertThat(styleToText { widows(Widows.RevertLayer) }).isEqualTo("widows: revert-layer")
+        assertThat(styleToText { widows(Widows.Unset) }).isEqualTo("widows: unset")
     }
 
     @Test
