@@ -8,10 +8,6 @@ fun Modifier.willChange(willChange: WillChange) = styleModifier {
     willChange(willChange)
 }
 
-fun Modifier.willChange(value: String) = styleModifier {
-    willChange(WillChange.of(value))
-}
-
 fun Modifier.willChange(vararg values: String) = styleModifier {
     willChange(WillChange.of(*values))
 }
