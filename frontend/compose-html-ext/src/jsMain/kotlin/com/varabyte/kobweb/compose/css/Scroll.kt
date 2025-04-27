@@ -5,6 +5,7 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
 sealed class OverscrollBehavior private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
