@@ -4,69 +4,46 @@ import org.jetbrains.compose.web.css.*
 
 // region horizontal and vertical positions
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/bottom
-class Bottom private constructor(private val value: String) : StylePropertyValue {
+// NOTE: This class is used as a typealias and should not be referenced directly by the end user.
+// TODO: In a future refactoring, this will likely change into an interface instead using unsafe casts; we want to wait until
+//  all tests are done before doing this.
+class CSSElementPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
+        fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementPosition("$value")
+
         // Global
-        val Inherit get() = Bottom("inherit")
-        val Initial get() = Bottom("initial")
-        val Revert get() = Bottom("revert")
-        val Unset get() = Bottom("unset")
+        val Inherit get() = CSSElementPosition("inherit")
+        val Initial get() = CSSElementPosition("initial")
+        val Revert get() = CSSElementPosition("revert")
+        val Unset get() = CSSElementPosition("unset")
     }
 }
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/bottom
+typealias Bottom = CSSElementPosition
 
 fun StyleScope.bottom(bottom: Bottom) {
     property("bottom", bottom)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/top
-class Top private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Global
-        val Inherit get() = Top("inherit")
-        val Initial get() = Top("initial")
-        val Revert get() = Top("revert")
-        val Unset get() = Top("unset")
-    }
-}
+typealias Top = CSSElementPosition
 
 fun StyleScope.top(top: Top) {
     property("top", top)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/left
-class Left private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Global
-        val Inherit get() = Left("inherit")
-        val Initial get() = Left("initial")
-        val Revert get() = Left("revert")
-        val Unset get() = Left("unset")
-    }
-}
+typealias Left = CSSElementPosition
 
 fun StyleScope.left(left: Left) {
     property("left", left)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/right
-class Right private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Global
-        val Inherit get() = Right("inherit")
-        val Initial get() = Right("initial")
-        val Revert get() = Right("revert")
-        val Unset get() = Right("unset")
-    }
-}
+typealias Right = CSSElementPosition
 
 fun StyleScope.right(right: Right) {
     property("right", right)

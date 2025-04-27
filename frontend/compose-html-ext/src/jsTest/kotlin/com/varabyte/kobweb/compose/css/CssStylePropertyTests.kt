@@ -1,6 +1,5 @@
 package com.varabyte.kobweb.compose.css
 
-import com.varabyte.kobweb.compose.css.functions.CSSImage
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.blur
 import com.varabyte.kobweb.compose.css.functions.brightness
@@ -502,6 +501,16 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyBottom() {
+        assertThat(styleToText { bottom(Bottom.of(10.px)) }).isEqualTo("bottom: 10px")
+
+        assertThat(styleToText { bottom(Bottom.Inherit) }).isEqualTo("bottom: inherit")
+        assertThat(styleToText { bottom(Bottom.Initial) }).isEqualTo("bottom: initial")
+        assertThat(styleToText { bottom(Bottom.Revert) }).isEqualTo("bottom: revert")
+        assertThat(styleToText { bottom(Bottom.Unset) }).isEqualTo("bottom: unset")
+    }
+
+    @Test
     fun verifyBoxDecorationBreak() {
         assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Slice) }).isEqualTo("box-decoration-break: slice")
         assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Clone) }).isEqualTo("box-decoration-break: clone")
@@ -831,6 +840,20 @@ class CssStylePropertyTests {
         assertThat(styleToText { flexBasis(FlexBasis.Unset) }).isEqualTo("flex-basis: unset")
     }
 
+    @Test
+    fun verifyFloat() {
+        assertThat(styleToText { float(CSSFloat.Left) }).isEqualTo("float: left")
+        assertThat(styleToText { float(CSSFloat.Right) }).isEqualTo("float: right")
+        assertThat(styleToText { float(CSSFloat.None) }).isEqualTo("float: none")
+        assertThat(styleToText { float(CSSFloat.InlineStart) }).isEqualTo("float: inline-start")
+        assertThat(styleToText { float(CSSFloat.InlineEnd) }).isEqualTo("float: inline-end")
+
+        assertThat(styleToText { float(CSSFloat.Inherit) }).isEqualTo("float: inherit")
+        assertThat(styleToText { float(CSSFloat.Initial) }).isEqualTo("float: initial")
+        assertThat(styleToText { float(CSSFloat.Revert) }).isEqualTo("float: revert")
+        assertThat(styleToText { float(CSSFloat.Unset) }).isEqualTo("float: unset")
+    }
+    
     @Test
     fun verifyFontOpticalSizing() {
         assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Auto) }).isEqualTo("font-optical-sizing: auto")
@@ -1230,6 +1253,16 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyLeft() {
+        assertThat(styleToText { left(Left.of(10.px)) }).isEqualTo("left: 10px")
+
+        assertThat(styleToText { left(Left.Inherit) }).isEqualTo("left: inherit")
+        assertThat(styleToText { left(Left.Initial) }).isEqualTo("left: initial")
+        assertThat(styleToText { left(Left.Revert) }).isEqualTo("left: revert")
+        assertThat(styleToText { left(Left.Unset) }).isEqualTo("left: unset")
+    }
+
+    @Test
     fun verifyListStyle() {
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.ArabicIndic)) }).isEqualTo("list-style: arabic-indic")
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Armenian)) }).isEqualTo("list-style: armenian")
@@ -1436,7 +1469,27 @@ class CssStylePropertyTests {
         assertThat(styleToText { resize(Resize.Revert) }).isEqualTo("resize: revert")
         assertThat(styleToText { resize(Resize.Unset) }).isEqualTo("resize: unset")
     }
-    
+
+    @Test
+    fun verifyRight() {
+        assertThat(styleToText { right(Right.of(10.px)) }).isEqualTo("right: 10px")
+
+        assertThat(styleToText { right(Right.Inherit) }).isEqualTo("right: inherit")
+        assertThat(styleToText { right(Right.Initial) }).isEqualTo("right: initial")
+        assertThat(styleToText { right(Right.Revert) }).isEqualTo("right: revert")
+        assertThat(styleToText { right(Right.Unset) }).isEqualTo("right: unset")
+    }
+
+    @Test
+    fun verifyTop() {
+        assertThat(styleToText { top(Top.of(10.px)) }).isEqualTo("top: 10px")
+
+        assertThat(styleToText { top(Top.Inherit) }).isEqualTo("top: inherit")
+        assertThat(styleToText { top(Top.Initial) }).isEqualTo("top: initial")
+        assertThat(styleToText { top(Top.Revert) }).isEqualTo("top: revert")
+        assertThat(styleToText { top(Top.Unset) }).isEqualTo("top: unset")
+    }
+
     @Test
     fun verifyTouchAction() {
         assertThat(styleToText { touchAction(TouchAction.Auto) }).isEqualTo("touch-action: auto")
