@@ -1445,6 +1445,46 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyOverscrollBehavior() {
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Auto) }).isEqualTo("overscroll-behavior: auto")
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Contain) }).isEqualTo("overscroll-behavior: contain")
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.None) }).isEqualTo("overscroll-behavior: none")
+
+        assertThat(styleToText {
+            overscrollBehavior(OverscrollBehavior.of(OverscrollBehavior.Auto, OverscrollBehavior.Contain))
+        }).isEqualTo("overscroll-behavior: auto contain")
+
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Inherit) }).isEqualTo("overscroll-behavior: inherit")
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Initial) }).isEqualTo("overscroll-behavior: initial")
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Revert) }).isEqualTo("overscroll-behavior: revert")
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Unset) }).isEqualTo("overscroll-behavior: unset")
+    }
+
+    @Test
+    fun verifyOverscrollBehaviorBlock() {
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Auto) }).isEqualTo("overscroll-behavior-block: auto")
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Contain) }).isEqualTo("overscroll-behavior-block: contain")
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.None) }).isEqualTo("overscroll-behavior-block: none")
+
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Inherit) }).isEqualTo("overscroll-behavior-block: inherit")
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Initial) }).isEqualTo("overscroll-behavior-block: initial")
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Revert) }).isEqualTo("overscroll-behavior-block: revert")
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Unset) }).isEqualTo("overscroll-behavior-block: unset")
+    }
+
+    @Test
+    fun verifyOverscrollBehaviorInline() {
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Auto) }).isEqualTo("overscroll-behavior-inline: auto")
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Contain) }).isEqualTo("overscroll-behavior-inline: contain")
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.None) }).isEqualTo("overscroll-behavior-inline: none")
+
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Inherit) }).isEqualTo("overscroll-behavior-inline: inherit")
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Initial) }).isEqualTo("overscroll-behavior-inline: initial")
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Revert) }).isEqualTo("overscroll-behavior-inline: revert")
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Unset) }).isEqualTo("overscroll-behavior-inline: unset")
+    }
+
+    @Test
     fun verifyPointerEvents() {
         assertThat(styleToText { pointerEvents(PointerEvents.Auto) }).isEqualTo("pointer-events: auto")
         assertThat(styleToText { pointerEvents(PointerEvents.None) }).isEqualTo("pointer-events: none")
@@ -1480,6 +1520,92 @@ class CssStylePropertyTests {
         assertThat(styleToText { right(Right.Unset) }).isEqualTo("right: unset")
     }
 
+    @Test
+    fun verifyScrollbarWidth() {
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Auto) }).isEqualTo("scrollbar-width: auto")
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Thin) }).isEqualTo("scrollbar-width: thin")
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.None) }).isEqualTo("scrollbar-width: none")
+
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Inherit) }).isEqualTo("scrollbar-width: inherit")
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Initial) }).isEqualTo("scrollbar-width: initial")
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Revert) }).isEqualTo("scrollbar-width: revert")
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Unset) }).isEqualTo("scrollbar-width: unset")
+    }
+
+    @Test
+    fun verifyScrollBehavior() {
+        assertThat(styleToText { scrollBehavior(ScrollBehavior.Auto) }).isEqualTo("scroll-behavior: auto")
+        assertThat(styleToText { scrollBehavior(ScrollBehavior.Smooth) }).isEqualTo("scroll-behavior: smooth")
+
+        assertThat(styleToText { scrollBehavior(ScrollBehavior.Inherit) }).isEqualTo("scroll-behavior: inherit")
+        assertThat(styleToText { scrollBehavior(ScrollBehavior.Initial) }).isEqualTo("scroll-behavior: initial")
+        assertThat(styleToText { scrollBehavior(ScrollBehavior.Revert) }).isEqualTo("scroll-behavior: revert")
+        assertThat(styleToText { scrollBehavior(ScrollBehavior.Unset) }).isEqualTo("scroll-behavior: unset")
+    }
+
+    @Test
+    fun verifyScrollSnapAlign() {
+        // Keywords
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.None) }).isEqualTo("scroll-snap-align: none")
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Start) }).isEqualTo("scroll-snap-align: start")
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.End) }).isEqualTo("scroll-snap-align: end")
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Center) }).isEqualTo("scroll-snap-align: center")
+
+        // Two axis
+        assertThat(styleToText {
+            scrollSnapAlign(ScrollSnapAlign.of(ScrollSnapAlign.Start, ScrollSnapAlign.Center))
+        }).isEqualTo("scroll-snap-align: start center")
+
+        // Global
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Inherit) }).isEqualTo("scroll-snap-align: inherit")
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Initial) }).isEqualTo("scroll-snap-align: initial")
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Revert) }).isEqualTo("scroll-snap-align: revert")
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Unset) }).isEqualTo("scroll-snap-align: unset")
+    }
+
+    @Test
+    fun verifyScrollSnapStop() {
+        assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Normal) }).isEqualTo("scroll-snap-stop: normal")
+        assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Always) }).isEqualTo("scroll-snap-stop: always")
+
+        assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Inherit) }).isEqualTo("scroll-snap-stop: inherit")
+        assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Initial) }).isEqualTo("scroll-snap-stop: initial")
+        assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Revert) }).isEqualTo("scroll-snap-stop: revert")
+        assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Unset) }).isEqualTo("scroll-snap-stop: unset")
+    }
+
+    @Test
+    fun verifyScrollSnapType() {
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.None) }).isEqualTo("scroll-snap-type: none")
+
+        // Axes
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.X) }).isEqualTo("scroll-snap-type: x")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Y) }).isEqualTo("scroll-snap-type: y")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Block) }).isEqualTo("scroll-snap-type: block")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Inline) }).isEqualTo("scroll-snap-type: inline")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Both) }).isEqualTo("scroll-snap-type: both")
+
+        assertThat(styleToText {
+            scrollSnapType(
+                ScrollSnapType.of(
+                    ScrollSnapType.X, ScrollSnapType.Strictness.Mandatory
+                )
+            )
+        }).isEqualTo("scroll-snap-type: x mandatory")
+        assertThat(styleToText {
+            scrollSnapType(
+                ScrollSnapType.of(
+                    ScrollSnapType.Block, ScrollSnapType.Strictness.Proximity
+                )
+            )
+        }).isEqualTo("scroll-snap-type: block proximity")
+
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Inherit) }).isEqualTo("scroll-snap-type: inherit")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Initial) }).isEqualTo("scroll-snap-type: initial")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Revert) }).isEqualTo("scroll-snap-type: revert")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.Unset) }).isEqualTo("scroll-snap-type: unset")
+    }
+    
     @Test
     fun verifyTop() {
         assertThat(styleToText { top(Top.of(10.px)) }).isEqualTo("top: 10px")

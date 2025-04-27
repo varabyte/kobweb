@@ -34,20 +34,39 @@ fun StyleScope.overscrollBehavior(overscrollBehavior: OverscrollBehavior) {
     property("overscroll-behavior", overscrollBehavior)
 }
 
-fun StyleScope.overscrollBehaviorBlock(overscrollBehavior: OverscrollBehavior.SingleValue) {
-    property("overscroll-behavior-block", overscrollBehavior)
+
+class OverscrollBehaviorKeyword private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword
+        val Auto get() = OverscrollBehaviorKeyword("auto")
+        val Contain get() = OverscrollBehaviorKeyword("contain")
+        val None get() = OverscrollBehaviorKeyword("none")
+
+        // Global
+        val Inherit get() = OverscrollBehaviorKeyword("inherit")
+        val Initial get() = OverscrollBehaviorKeyword("initial")
+        val Revert get() = OverscrollBehaviorKeyword("revert")
+        val Unset get() = OverscrollBehaviorKeyword("unset")
+    }
 }
 
-fun StyleScope.overscrollBehaviorInline(overscrollBehavior: OverscrollBehavior.SingleValue) {
-    property("overscroll-behavior-inline", overscrollBehavior)
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-block
+typealias OverscrollBehaviorBlock = OverscrollBehaviorKeyword
+
+// NOTE: Can't use OverscrollBehaviorBlock.SingleValue here. Nested classes under typealiases are unsupported.
+// See also: https://youtrack.jetbrains.com/issue/KT-34281
+fun StyleScope.overscrollBehaviorBlock(overscrollBehaviorBlock: OverscrollBehaviorBlock) {
+    property("overscroll-behavior-block", overscrollBehaviorBlock)
 }
 
-fun StyleScope.overscrollBehaviorX(overscrollBehavior: OverscrollBehavior.SingleValue) {
-    property("overscroll-behavior-x", overscrollBehavior)
-}
+typealias OverscrollBehaviorInline = OverscrollBehaviorKeyword
 
-fun StyleScope.overscrollBehaviorY(overscrollBehavior: OverscrollBehavior.SingleValue) {
-    property("overscroll-behavior-y", overscrollBehavior)
+// NOTE: Can't use OverscrollBehaviorInline.SingleValue here. Nested classes under typealiases are unsupported.
+// See also: https://youtrack.jetbrains.com/issue/KT-34281
+fun StyleScope.overscrollBehaviorInline(overscrollBehaviorInline: OverscrollBehaviorInline) {
+    property("overscroll-behavior-inline", overscrollBehaviorInline)
 }
 
 class ScrollBehavior private constructor(private val value: String) : StylePropertyValue {
