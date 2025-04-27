@@ -1412,6 +1412,17 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyPointerEvents() {
+        assertThat(styleToText { pointerEvents(PointerEvents.Auto) }).isEqualTo("pointer-events: auto")
+        assertThat(styleToText { pointerEvents(PointerEvents.None) }).isEqualTo("pointer-events: none")
+
+        assertThat(styleToText { pointerEvents(PointerEvents.Inherit) }).isEqualTo("pointer-events: inherit")
+        assertThat(styleToText { pointerEvents(PointerEvents.Initial) }).isEqualTo("pointer-events: initial")
+        assertThat(styleToText { pointerEvents(PointerEvents.Revert) }).isEqualTo("pointer-events: revert")
+        assertThat(styleToText { pointerEvents(PointerEvents.Unset) }).isEqualTo("pointer-events: unset")
+    }
+    
+    @Test
     fun verifyResize() {
         assertThat(styleToText { resize(Resize.None) }).isEqualTo("resize: none")
         assertThat(styleToText { resize(Resize.Both) }).isEqualTo("resize: both")
