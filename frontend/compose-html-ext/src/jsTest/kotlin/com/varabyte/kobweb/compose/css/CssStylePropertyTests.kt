@@ -1386,6 +1386,32 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyOverflow() {
+        assertThat(styleToText { overflow(Overflow.Visible) }).isEqualTo("overflow: visible")
+        assertThat(styleToText { overflow(Overflow.Hidden) }).isEqualTo("overflow: hidden")
+        assertThat(styleToText { overflow(Overflow.Clip) }).isEqualTo("overflow: clip")
+        assertThat(styleToText { overflow(Overflow.Scroll) }).isEqualTo("overflow: scroll")
+        assertThat(styleToText { overflow(Overflow.Auto) }).isEqualTo("overflow: auto")
+
+        assertThat(styleToText { overflow(Overflow.Inherit) }).isEqualTo("overflow: inherit")
+        assertThat(styleToText { overflow(Overflow.Initial) }).isEqualTo("overflow: initial")
+        assertThat(styleToText { overflow(Overflow.Revert) }).isEqualTo("overflow: revert")
+        assertThat(styleToText { overflow(Overflow.Unset) }).isEqualTo("overflow: unset")
+    }
+
+    @Test
+    fun verifyOverflowWrap() {
+        assertThat(styleToText { overflowWrap(OverflowWrap.Normal) }).isEqualTo("overflow-wrap: normal")
+        assertThat(styleToText { overflowWrap(OverflowWrap.BreakWord) }).isEqualTo("overflow-wrap: break-word")
+        assertThat(styleToText { overflowWrap(OverflowWrap.Anywhere) }).isEqualTo("overflow-wrap: anywhere")
+
+        assertThat(styleToText { overflowWrap(OverflowWrap.Inherit) }).isEqualTo("overflow-wrap: inherit")
+        assertThat(styleToText { overflowWrap(OverflowWrap.Initial) }).isEqualTo("overflow-wrap: initial")
+        assertThat(styleToText { overflowWrap(OverflowWrap.Revert) }).isEqualTo("overflow-wrap: revert")
+        assertThat(styleToText { overflowWrap(OverflowWrap.Unset) }).isEqualTo("overflow-wrap: unset")
+    }
+
+    @Test
     fun verifyResize() {
         assertThat(styleToText { resize(Resize.None) }).isEqualTo("resize: none")
         assertThat(styleToText { resize(Resize.Both) }).isEqualTo("resize: both")
