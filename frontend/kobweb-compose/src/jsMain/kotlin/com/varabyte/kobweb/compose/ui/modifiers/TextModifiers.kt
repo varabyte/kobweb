@@ -76,6 +76,6 @@ fun Modifier.wordSpacing(wordSpacing: WordSpacing) = styleModifier {
     wordSpacing(wordSpacing)
 }
 
-fun Modifier.wordSpacing(length: CSSLengthNumericValue) = styleModifier {
-    wordSpacing(WordSpacing.of(length))
+fun Modifier.wordSpacing(value: CSSLengthNumericValue) = styleModifier {
+    wordSpacing(WordSpacing.of(value))
 }
