@@ -1161,6 +1161,23 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyHeight() {
+        assertThat(styleToText { height(Height.of(10.px)) }).isEqualTo("height: 10px")
+        assertThat(styleToText { height(Height.of(10.percent)) }).isEqualTo("height: 10%")
+        assertThat(styleToText { height(Height.of(auto)) }).isEqualTo("height: auto")
+
+        assertThat(styleToText { height(Height.FitContent) }).isEqualTo("height: fit-content")
+        assertThat(styleToText { height(Height.FitContent(20.em)) }).isEqualTo("height: fit-content(20em)")
+        assertThat(styleToText { height(Height.MaxContent) }).isEqualTo("height: max-content")
+        assertThat(styleToText { height(Height.MinContent) }).isEqualTo("height: min-content")
+
+        assertThat(styleToText { height(Height.Inherit) }).isEqualTo("height: inherit")
+        assertThat(styleToText { height(Height.Initial) }).isEqualTo("height: initial")
+        assertThat(styleToText { height(Height.Revert) }).isEqualTo("height: revert")
+        assertThat(styleToText { height(Height.Unset) }).isEqualTo("height: unset")
+    }
+
+    @Test
     fun verifyJustifyContent() {
         assertThat(styleToText { justifyContent(JustifyContent.Normal) }).isEqualTo("justify-content: normal")
         assertThat(styleToText { justifyContent(JustifyContent.Stretch) }).isEqualTo("justify-content: stretch")
@@ -1342,6 +1359,76 @@ class CssStylePropertyTests {
         assertThat(styleToText { listStyle(ListStyle.Initial) }).isEqualTo("list-style: initial")
         assertThat(styleToText { listStyle(ListStyle.Revert) }).isEqualTo("list-style: revert")
         assertThat(styleToText { listStyle(ListStyle.Unset) }).isEqualTo("list-style: unset")
+    }
+
+    @Test
+    fun verifyMaxHeight() {
+        assertThat(styleToText { maxHeight(MaxHeight.of(10.px)) }).isEqualTo("max-height: 10px")
+        assertThat(styleToText { maxHeight(MaxHeight.of(10.percent)) }).isEqualTo("max-height: 10%")
+        assertThat(styleToText { maxHeight(MaxHeight.of(auto)) }).isEqualTo("max-height: auto")
+
+        assertThat(styleToText { maxHeight(MaxHeight.FitContent) }).isEqualTo("max-height: fit-content")
+        assertThat(styleToText { maxHeight(MaxHeight.FitContent(20.em)) }).isEqualTo("max-height: fit-content(20em)")
+        assertThat(styleToText { maxHeight(MaxHeight.MaxContent) }).isEqualTo("max-height: max-content")
+        assertThat(styleToText { maxHeight(MaxHeight.MinContent) }).isEqualTo("max-height: min-content")
+        assertThat(styleToText { maxHeight(MaxHeight.None) }).isEqualTo("max-height: none")
+
+        assertThat(styleToText { maxHeight(MaxHeight.Inherit) }).isEqualTo("max-height: inherit")
+        assertThat(styleToText { maxHeight(MaxHeight.Initial) }).isEqualTo("max-height: initial")
+        assertThat(styleToText { maxHeight(MaxHeight.Revert) }).isEqualTo("max-height: revert")
+        assertThat(styleToText { maxHeight(MaxHeight.Unset) }).isEqualTo("max-height: unset")
+    }
+
+    @Test
+    fun verifyMaxWidth() {
+        assertThat(styleToText { maxWidth(MaxWidth.of(10.px)) }).isEqualTo("max-width: 10px")
+        assertThat(styleToText { maxWidth(MaxWidth.of(10.percent)) }).isEqualTo("max-width: 10%")
+        assertThat(styleToText { maxWidth(MaxWidth.of(auto)) }).isEqualTo("max-width: auto")
+
+        assertThat(styleToText { maxWidth(MaxWidth.FitContent) }).isEqualTo("max-width: fit-content")
+        assertThat(styleToText { maxWidth(MaxWidth.FitContent(20.em)) }).isEqualTo("max-width: fit-content(20em)")
+        assertThat(styleToText { maxWidth(MaxWidth.MaxContent) }).isEqualTo("max-width: max-content")
+        assertThat(styleToText { maxWidth(MaxWidth.MinContent) }).isEqualTo("max-width: min-content")
+        assertThat(styleToText { maxWidth(MaxWidth.None) }).isEqualTo("max-width: none")
+
+        assertThat(styleToText { maxWidth(MaxWidth.Inherit) }).isEqualTo("max-width: inherit")
+        assertThat(styleToText { maxWidth(MaxWidth.Initial) }).isEqualTo("max-width: initial")
+        assertThat(styleToText { maxWidth(MaxWidth.Revert) }).isEqualTo("max-width: revert")
+        assertThat(styleToText { maxWidth(MaxWidth.Unset) }).isEqualTo("max-width: unset")
+    }
+
+    @Test
+    fun verifyMinHeight() {
+        assertThat(styleToText { minHeight(MinHeight.of(10.px)) }).isEqualTo("min-height: 10px")
+        assertThat(styleToText { minHeight(MinHeight.of(10.percent)) }).isEqualTo("min-height: 10%")
+        assertThat(styleToText { minHeight(MinHeight.of(auto)) }).isEqualTo("min-height: auto")
+
+        assertThat(styleToText { minHeight(MinHeight.FitContent) }).isEqualTo("min-height: fit-content")
+        assertThat(styleToText { minHeight(Height.FitContent(20.em)) }).isEqualTo("min-height: fit-content(20em)")
+        assertThat(styleToText { minHeight(MinHeight.MaxContent) }).isEqualTo("min-height: max-content")
+        assertThat(styleToText { minHeight(MinHeight.MinContent) }).isEqualTo("min-height: min-content")
+
+        assertThat(styleToText { minHeight(MinHeight.Inherit) }).isEqualTo("min-height: inherit")
+        assertThat(styleToText { minHeight(MinHeight.Initial) }).isEqualTo("min-height: initial")
+        assertThat(styleToText { minHeight(MinHeight.Revert) }).isEqualTo("min-height: revert")
+        assertThat(styleToText { minHeight(MinHeight.Unset) }).isEqualTo("min-height: unset")
+    }
+
+    @Test
+    fun verifyMinWidth() {
+        assertThat(styleToText { minWidth(MinWidth.of(10.px)) }).isEqualTo("min-width: 10px")
+        assertThat(styleToText { minWidth(MinWidth.of(10.percent)) }).isEqualTo("min-width: 10%")
+        assertThat(styleToText { minWidth(MinWidth.of(auto)) }).isEqualTo("min-width: auto")
+
+        assertThat(styleToText { minWidth(MinWidth.FitContent) }).isEqualTo("min-width: fit-content")
+        assertThat(styleToText { minWidth(Width.FitContent(20.em)) }).isEqualTo("min-width: fit-content(20em)")
+        assertThat(styleToText { minWidth(MinWidth.MaxContent) }).isEqualTo("min-width: max-content")
+        assertThat(styleToText { minWidth(MinWidth.MinContent) }).isEqualTo("min-width: min-content")
+
+        assertThat(styleToText { minWidth(MinWidth.Inherit) }).isEqualTo("min-width: inherit")
+        assertThat(styleToText { minWidth(MinWidth.Initial) }).isEqualTo("min-width: initial")
+        assertThat(styleToText { minWidth(MinWidth.Revert) }).isEqualTo("min-width: revert")
+        assertThat(styleToText { minWidth(MinWidth.Unset) }).isEqualTo("min-width: unset")
     }
 
     @Test
@@ -1666,4 +1753,22 @@ class CssStylePropertyTests {
         assertThat(styleToText { verticalAlign(VerticalAlign.Revert) }).isEqualTo("vertical-align: revert")
         assertThat(styleToText { verticalAlign(VerticalAlign.Unset) }).isEqualTo("vertical-align: unset")
     }
+
+    @Test
+    fun verifyWidth() {
+        assertThat(styleToText { width(Width.of(10.px)) }).isEqualTo("width: 10px")
+        assertThat(styleToText { width(Width.of(10.percent)) }).isEqualTo("width: 10%")
+        assertThat(styleToText { width(Width.of(auto)) }).isEqualTo("width: auto")
+
+        assertThat(styleToText { width(Width.FitContent) }).isEqualTo("width: fit-content")
+        assertThat(styleToText { width(Width.FitContent(20.em)) }).isEqualTo("width: fit-content(20em)")
+        assertThat(styleToText { width(Width.MaxContent) }).isEqualTo("width: max-content")
+        assertThat(styleToText { width(Width.MinContent) }).isEqualTo("width: min-content")
+
+        assertThat(styleToText { width(Width.Inherit) }).isEqualTo("width: inherit")
+        assertThat(styleToText { width(Width.Initial) }).isEqualTo("width: initial")
+        assertThat(styleToText { width(Width.Revert) }).isEqualTo("width: revert")
+        assertThat(styleToText { width(Width.Unset) }).isEqualTo("width: unset")
+    }
 }
+
