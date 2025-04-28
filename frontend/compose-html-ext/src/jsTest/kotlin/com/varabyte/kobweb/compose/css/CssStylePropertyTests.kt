@@ -632,6 +632,22 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyCaptionSide() {
+        assertThat(styleToText { captionSide(CaptionSide.Top) }).isEqualTo("caption-side: top")
+        assertThat(styleToText { captionSide(CaptionSide.Bottom) }).isEqualTo("caption-side: bottom")
+
+        assertThat(styleToText { captionSide(CaptionSide.BlockStart) }).isEqualTo("caption-side: block-start")
+        assertThat(styleToText { captionSide(CaptionSide.BlockEnd) }).isEqualTo("caption-side: block-end")
+        assertThat(styleToText { captionSide(CaptionSide.InlineStart) }).isEqualTo("caption-side: inline-start")
+        assertThat(styleToText { captionSide(CaptionSide.InlineEnd) }).isEqualTo("caption-side: inline-end")
+
+        assertThat(styleToText { captionSide(CaptionSide.Inherit) }).isEqualTo("caption-side: inherit")
+        assertThat(styleToText { captionSide(CaptionSide.Initial) }).isEqualTo("caption-side: initial")
+        assertThat(styleToText { captionSide(CaptionSide.Revert) }).isEqualTo("caption-side: revert")
+        assertThat(styleToText { captionSide(CaptionSide.Unset) }).isEqualTo("caption-side: unset")
+    }
+    
+    @Test
     fun verifyCaretColor() {
         assertThat(styleToText { caretColor(CaretColor.Auto) }).isEqualTo("caret-color: auto")
         assertThat(styleToText { caretColor(CaretColor.Transparent) }).isEqualTo("caret-color: transparent")
@@ -1175,6 +1191,17 @@ class CssStylePropertyTests {
         assertThat(styleToText { height(Height.Initial) }).isEqualTo("height: initial")
         assertThat(styleToText { height(Height.Revert) }).isEqualTo("height: revert")
         assertThat(styleToText { height(Height.Unset) }).isEqualTo("height: unset")
+    }
+
+    @Test
+    fun verifyIsolation() {
+        assertThat(styleToText { isolation(Isolation.Auto) }).isEqualTo("isolation: auto")
+        assertThat(styleToText { isolation(Isolation.Isolate) }).isEqualTo("isolation: isolate")
+
+        assertThat(styleToText { isolation(Isolation.Inherit) }).isEqualTo("isolation: inherit")
+        assertThat(styleToText { isolation(Isolation.Initial) }).isEqualTo("isolation: initial")
+        assertThat(styleToText { isolation(Isolation.Revert) }).isEqualTo("isolation: revert")
+        assertThat(styleToText { isolation(Isolation.Unset) }).isEqualTo("isolation: unset")
     }
 
     @Test
