@@ -1,7 +1,11 @@
+// Sealed class private constructors are useful, actually!
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-align
 class TextAlign private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
@@ -70,17 +74,47 @@ fun StyleScope.textOverflow(textOverflow: TextOverflow) {
 
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow
-class TextShadow private constructor(private val value: String) : StylePropertyValue {
+sealed class TextShadow private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
+    private class Keyword(value: String) : TextShadow(value)
+    class Repeatable internal constructor(
+        offsetX: CSSLengthNumericValue,
+        offsetY: CSSLengthNumericValue,
+        blurRadius: CSSLengthNumericValue?,
+        color: CSSColorValue?,
+    ) : TextShadow(
+        buildString {
+            append(offsetX)
+            append(" ")
+            append(offsetY)
+            if (blurRadius != null) {
+                append(" ")
+                append(blurRadius)
+            }
+            if (color != null) {
+                append(" ")
+                append(color)
+            }
+        }
+    )
+
     companion object {
-        val Inherit get() = TextShadow("inherit")
-        val Initial get() = TextShadow("initial")
-        val Revert get() = TextShadow("revert")
-        val Unset get() = TextShadow("unset")
+        fun of(
+            offsetX: CSSLengthNumericValue,
+            offsetY: CSSLengthNumericValue,
+            blurRadius: CSSLengthNumericValue? = null,
+            color: CSSColorValue? = null,
+        ) = Repeatable(offsetX, offsetY, blurRadius, color)
+
+        val Inherit: TextShadow get() = Keyword("inherit")
+        val Initial: TextShadow get() = Keyword("initial")
+        val Revert: TextShadow get() = Keyword("revert")
+        val Unset: TextShadow get() = Keyword("unset")
     }
 }
 
+@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
 class CSSTextShadow(
     val offsetX: CSSLengthNumericValue,
     val offsetY: CSSLengthNumericValue,
@@ -102,17 +136,18 @@ class CSSTextShadow(
     }
 }
 
+@Deprecated("Use `textShadow(TextShadow.of(...))` instead", ReplaceWith("textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))"))
 fun StyleScope.textShadow(
     offsetX: CSSLengthNumericValue,
     offsetY: CSSLengthNumericValue,
     blurRadius: CSSLengthNumericValue? = null,
     color: CSSColorValue? = null
 ) {
-    textShadow(CSSTextShadow(offsetX, offsetY, blurRadius, color))
+    textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))
 }
 
-fun StyleScope.textShadow(vararg textShadows: CSSTextShadow) {
-    property("text-shadow", textShadows.joinToString())
+fun StyleScope.textShadow(first: TextShadow.Repeatable, vararg rest: TextShadow.Repeatable) {
+    property("text-shadow", (listOf(first) + rest.toList()).joinToString())
 }
 
 fun StyleScope.textShadow(textShadow: TextShadow) {

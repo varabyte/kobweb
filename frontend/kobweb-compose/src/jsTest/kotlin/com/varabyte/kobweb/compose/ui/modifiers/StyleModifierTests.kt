@@ -195,4 +195,47 @@ class StyleModifierTests {
             Modifier.scrollbarWidth(ScrollbarWidth.Thin)
         }).isEqualTo("scrollbar-width: thin")
     }
+
+    @Test
+    fun verifyText() {
+        assertThat(modifierToText {
+            Modifier.textAlign(TextAlign.Center)
+        }).isEqualTo("text-align: center")
+
+        assertThat(modifierToText {
+            Modifier.textDecorationLine(TextDecorationLine.Underline)
+        }).isEqualTo("text-decoration-line: underline")
+
+        assertThat(modifierToText {
+            Modifier.textOverflow(TextOverflow.Ellipsis)
+        }).isEqualTo("text-overflow: ellipsis")
+
+        assertThat(modifierToText {
+            Modifier.textShadow(2.px, 2.px, 2.px, Color.gray)
+        }).isEqualTo("text-shadow: 2px 2px 2px gray")
+
+        assertThat(modifierToText {
+            Modifier.textShadow(TextShadow.of(2.px, 2.px), TextShadow.of(4.px, 4.px, 2.px, Color.red))
+        }).isEqualTo("text-shadow: 2px 2px, 4px 4px 2px red")
+
+        assertThat(modifierToText {
+            Modifier.textShadow(TextShadow.Initial)
+        }).isEqualTo("text-shadow: initial")
+
+        assertThat(modifierToText {
+            Modifier.textTransform(TextTransform.Capitalize)
+        }).isEqualTo("text-transform: capitalize")
+
+        assertThat(modifierToText {
+            Modifier.whiteSpace(WhiteSpace.NoWrap)
+        }).isEqualTo("white-space: nowrap")
+
+        assertThat(modifierToText {
+            Modifier.wordBreak(WordBreak.BreakAll)
+        }).isEqualTo("word-break: break-all")
+
+        assertThat(modifierToText {
+            Modifier.writingMode(WritingMode.VerticalRl)
+        }).isEqualTo("writing-mode: vertical-rl")
+    }
 }

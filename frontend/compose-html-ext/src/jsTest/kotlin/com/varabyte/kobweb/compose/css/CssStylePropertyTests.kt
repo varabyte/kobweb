@@ -1722,6 +1722,76 @@ class CssStylePropertyTests {
         assertThat(styleToText { scrollSnapType(ScrollSnapType.Revert) }).isEqualTo("scroll-snap-type: revert")
         assertThat(styleToText { scrollSnapType(ScrollSnapType.Unset) }).isEqualTo("scroll-snap-type: unset")
     }
+
+    @Test
+    fun verifyTextAlign() {
+        assertThat(styleToText { textAlign(TextAlign.Left) }).isEqualTo("text-align: left")
+        assertThat(styleToText { textAlign(TextAlign.Right) }).isEqualTo("text-align: right")
+        assertThat(styleToText { textAlign(TextAlign.Center) }).isEqualTo("text-align: center")
+        assertThat(styleToText { textAlign(TextAlign.Justify) }).isEqualTo("text-align: justify")
+        assertThat(styleToText { textAlign(TextAlign.JustifyAll) }).isEqualTo("text-align: justify-all")
+        assertThat(styleToText { textAlign(TextAlign.Start) }).isEqualTo("text-align: start")
+        assertThat(styleToText { textAlign(TextAlign.End) }).isEqualTo("text-align: end")
+        assertThat(styleToText { textAlign(TextAlign.MatchParent) }).isEqualTo("text-align: match-parent")
+
+        assertThat(styleToText { textAlign(TextAlign.Inherit) }).isEqualTo("text-align: inherit")
+        assertThat(styleToText { textAlign(TextAlign.Initial) }).isEqualTo("text-align: initial")
+        assertThat(styleToText { textAlign(TextAlign.Revert) }).isEqualTo("text-align: revert")
+        assertThat(styleToText { textAlign(TextAlign.Unset) }).isEqualTo("text-align: unset")
+    }
+
+    @Test
+    fun verifyTextDecorationLine() {
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.Underline) }).isEqualTo("text-decoration-line: underline")
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.Overline) }).isEqualTo("text-decoration-line: overline")
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.LineThrough) }).isEqualTo("text-decoration-line: line-through")
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.None) }).isEqualTo("text-decoration-line: none")
+
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.Inherit) }).isEqualTo("text-decoration-line: inherit")
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.Initial) }).isEqualTo("text-decoration-line: initial")
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.Revert) }).isEqualTo("text-decoration-line: revert")
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.Unset) }).isEqualTo("text-decoration-line: unset")
+    }
+
+    @Test
+    fun verifyTextShadow() {
+        assertThat(styleToText {
+            textShadow(TextShadow.of(2.px, 3.px))
+        }).isEqualTo("text-shadow: 2px 3px")
+
+        assertThat(styleToText {
+            textShadow(TextShadow.of(2.px, 3.px, 4.px))
+        }).isEqualTo("text-shadow: 2px 3px 4px")
+
+        assertThat(styleToText {
+            textShadow(TextShadow.of(2.px, 3.px, 4.px, Color.red))
+        }).isEqualTo("text-shadow: 2px 3px 4px red")
+
+        assertThat(styleToText {
+            textShadow(
+                TextShadow.of(2.px, 3.px, 4.px, Color.red),
+                TextShadow.of(4.px, 5.px, 6.px, Color.blue)
+            )
+        }).isEqualTo("text-shadow: 2px 3px 4px red, 4px 5px 6px blue")
+
+        assertThat(styleToText { textShadow(TextShadow.Inherit) }).isEqualTo("text-shadow: inherit")
+        assertThat(styleToText { textShadow(TextShadow.Initial) }).isEqualTo("text-shadow: initial")
+        assertThat(styleToText { textShadow(TextShadow.Revert) }).isEqualTo("text-shadow: revert")
+        assertThat(styleToText { textShadow(TextShadow.Unset) }).isEqualTo("text-shadow: unset")
+    }
+
+    @Test
+    fun verifyTextTransform() {
+        assertThat(styleToText { textTransform(TextTransform.None) }).isEqualTo("text-transform: none")
+        assertThat(styleToText { textTransform(TextTransform.Capitalize) }).isEqualTo("text-transform: capitalize")
+        assertThat(styleToText { textTransform(TextTransform.Uppercase) }).isEqualTo("text-transform: uppercase")
+        assertThat(styleToText { textTransform(TextTransform.Lowercase) }).isEqualTo("text-transform: lowercase")
+
+        assertThat(styleToText { textTransform(TextTransform.Inherit) }).isEqualTo("text-transform: inherit")
+        assertThat(styleToText { textTransform(TextTransform.Initial) }).isEqualTo("text-transform: initial")
+        assertThat(styleToText { textTransform(TextTransform.Revert) }).isEqualTo("text-transform: revert")
+        assertThat(styleToText { textTransform(TextTransform.Unset) }).isEqualTo("text-transform: unset")
+    }
     
     @Test
     fun verifyTop() {
@@ -1765,6 +1835,21 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyUserSelect() {
+        assertThat(styleToText { userSelect(UserSelect.None) }).isEqualTo("user-select: none")
+        assertThat(styleToText { userSelect(UserSelect.Auto) }).isEqualTo("user-select: auto")
+        assertThat(styleToText { userSelect(UserSelect.Text) }).isEqualTo("user-select: text")
+        assertThat(styleToText { userSelect(UserSelect.Contain) }).isEqualTo("user-select: contain")
+        assertThat(styleToText { userSelect(UserSelect.All) }).isEqualTo("user-select: all")
+
+        assertThat(styleToText { userSelect(UserSelect.Inherit) }).isEqualTo("user-select: inherit")
+        assertThat(styleToText { userSelect(UserSelect.Initial) }).isEqualTo("user-select: initial")
+        assertThat(styleToText { userSelect(UserSelect.Revert) }).isEqualTo("user-select: revert")
+        assertThat(styleToText { userSelect(UserSelect.Unset) }).isEqualTo("user-select: unset")
+    }
+    
+
+    @Test
     fun verifyVerticalAlign() {
         assertThat(styleToText { verticalAlign(VerticalAlign.Baseline) }).isEqualTo("vertical-align: baseline")
         assertThat(styleToText { verticalAlign(VerticalAlign.Sub) }).isEqualTo("vertical-align: sub")
@@ -1782,6 +1867,21 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyWhiteSpace() {
+        assertThat(styleToText { whiteSpace(WhiteSpace.Normal) }).isEqualTo("white-space: normal")
+        assertThat(styleToText { whiteSpace(WhiteSpace.NoWrap) }).isEqualTo("white-space: nowrap")
+        assertThat(styleToText { whiteSpace(WhiteSpace.Pre) }).isEqualTo("white-space: pre")
+        assertThat(styleToText { whiteSpace(WhiteSpace.PreWrap) }).isEqualTo("white-space: pre-wrap")
+        assertThat(styleToText { whiteSpace(WhiteSpace.PreLine) }).isEqualTo("white-space: pre-line")
+        assertThat(styleToText { whiteSpace(WhiteSpace.BreakSpaces) }).isEqualTo("white-space: break-spaces")
+
+        assertThat(styleToText { whiteSpace(WhiteSpace.Inherit) }).isEqualTo("white-space: inherit")
+        assertThat(styleToText { whiteSpace(WhiteSpace.Initial) }).isEqualTo("white-space: initial")
+        assertThat(styleToText { whiteSpace(WhiteSpace.Revert) }).isEqualTo("white-space: revert")
+        assertThat(styleToText { whiteSpace(WhiteSpace.Unset) }).isEqualTo("white-space: unset")
+    }
+    
+    @Test
     fun verifyWidth() {
         assertThat(styleToText { width(Width.of(10.px)) }).isEqualTo("width: 10px")
         assertThat(styleToText { width(Width.of(10.percent)) }).isEqualTo("width: 10%")
@@ -1797,5 +1897,30 @@ class CssStylePropertyTests {
         assertThat(styleToText { width(Width.Revert) }).isEqualTo("width: revert")
         assertThat(styleToText { width(Width.Unset) }).isEqualTo("width: unset")
     }
+
+    @Test
+    fun verifyWordBreak() {
+        assertThat(styleToText { wordBreak(WordBreak.Normal) }).isEqualTo("word-break: normal")
+        assertThat(styleToText { wordBreak(WordBreak.BreakAll) }).isEqualTo("word-break: break-all")
+        assertThat(styleToText { wordBreak(WordBreak.KeepAll) }).isEqualTo("word-break: keep-all")
+
+        assertThat(styleToText { wordBreak(WordBreak.Inherit) }).isEqualTo("word-break: inherit")
+        assertThat(styleToText { wordBreak(WordBreak.Initial) }).isEqualTo("word-break: initial")
+        assertThat(styleToText { wordBreak(WordBreak.Revert) }).isEqualTo("word-break: revert")
+        assertThat(styleToText { wordBreak(WordBreak.Unset) }).isEqualTo("word-break: unset")
+    }
+
+    @Test
+    fun verifyWritingMode() {
+        assertThat(styleToText { writingMode(WritingMode.HorizontalTb) }).isEqualTo("writing-mode: horizontal-tb")
+        assertThat(styleToText { writingMode(WritingMode.VerticalRl) }).isEqualTo("writing-mode: vertical-rl")
+        assertThat(styleToText { writingMode(WritingMode.VerticalLr) }).isEqualTo("writing-mode: vertical-lr")
+
+        assertThat(styleToText { writingMode(WritingMode.Inherit) }).isEqualTo("writing-mode: inherit")
+        assertThat(styleToText { writingMode(WritingMode.Initial) }).isEqualTo("writing-mode: initial")
+        assertThat(styleToText { writingMode(WritingMode.Revert) }).isEqualTo("writing-mode: revert")
+        assertThat(styleToText { writingMode(WritingMode.Unset) }).isEqualTo("writing-mode: unset")
+    }
 }
+
 
