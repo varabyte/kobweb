@@ -7,20 +7,19 @@ sealed class Contain(private val value: String) : StylePropertyValue {
 
     override fun toString() = value
 
-    sealed class SingleValue(value: String) : Contain(value)
-    class RepeatableValue internal constructor(value: String) : SingleValue(value)
-    private class Keyword(value: String) : SingleValue(value)
+    sealed class RepeatableValue(value: String) : Contain(value)
+    private class Keyword(value: String) : RepeatableValue(value)
 
     companion object {
         /* Keyword values */
-        val None get() = RepeatableValue("none")
-        val Strict get() = RepeatableValue("strict")
-        val Content get() = RepeatableValue("content")
-        val Size get() = RepeatableValue("size")
-        val InlineSize get() = RepeatableValue("inline-size")
-        val Layout get() = RepeatableValue("layout")
-        val Style get() = RepeatableValue("style")
-        val Paint get() = RepeatableValue("paint")
+        val None: Contain get() = Keyword("none")
+        val Strict: Contain get() = Keyword("strict")
+        val Content: Contain get() = Keyword("content")
+        val Size: Contain get() = Keyword("size")
+        val InlineSize: Contain get() = Keyword("inline-size")
+        val Layout: Contain get() = Keyword("layout")
+        val Style: Contain get() = Keyword("style")
+        val Paint: Contain get() = Keyword("paint")
 
         /* Multiple keywords */
         fun of(vararg value: RepeatableValue): Contain = Keyword("$value")
@@ -38,7 +37,7 @@ fun StyleScope.contain(contain: Contain) {
     property("contain", contain)
 }
 
-fun StyleScope.contain(vararg values: Contain.SingleValue) {
+fun StyleScope.contain(vararg values: Contain.RepeatableValue) {
     if (values.isNotEmpty()) {
         property("contain", values.joinToString(" "))
     }
@@ -54,10 +53,11 @@ class ContainIntrinsicBlockSize private constructor(private val value: String) :
         val None get() = ContainIntrinsicBlockSize("none")
 
         /* auto <length>  & <length> values */
-        fun of(length: CSSLengthNumericValue, auto: Boolean = false) = if (!auto) {
-            ContainIntrinsicBlockSize("auto $length")
+        fun of(value: CSSLengthNumericValue, auto: Boolean = false) = if (!auto) {
+            ContainIntrinsicBlockSize("$value")
         } else {
-            ContainIntrinsicBlockSize("$length")
+            ContainIntrinsicBlockSize("auto $value")
+
         }
 
         /* Global values */
@@ -85,10 +85,10 @@ class ContainIntrinsicInlineSize private constructor(private val value: String) 
         val None get() = ContainIntrinsicInlineSize("none")
 
         /* auto <length>  & <length> values */
-        fun of(length: CSSLengthNumericValue, isAuto: Boolean = false) = if (!isAuto) {
-            ContainIntrinsicInlineSize("auto $length")
-        } else {
+        fun of(length: CSSLengthNumericValue, auto: Boolean = false) = if (!auto) {
             ContainIntrinsicInlineSize("$length")
+        } else {
+            ContainIntrinsicInlineSize("auto $length")
         }
 
         /* Global values */
