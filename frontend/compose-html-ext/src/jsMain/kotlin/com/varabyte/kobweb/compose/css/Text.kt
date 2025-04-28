@@ -247,7 +247,6 @@ class RubyPosition private constructor(private val value: String) : StylePropert
         val Over get() = RubyPosition("over")
         val Under get() = RubyPosition("under")
 
-
         /* Global values */
         val Inherit get() = RubyPosition("inherit")
         val Initial get() = RubyPosition("initial")
