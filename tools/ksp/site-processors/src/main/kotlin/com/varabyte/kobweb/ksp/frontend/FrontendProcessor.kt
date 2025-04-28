@@ -236,6 +236,19 @@ class FrontendProcessor(
         }
 
         pageDeclarations += resolver.getSymbolsWithAnnotation(PAGE_FQN).map { it as KSFunctionDeclaration }
+            .also { pages ->
+                pages
+                    .filter { page -> page.hasLayoutAnnotation() }
+                    .map { page -> page to page.getAnnotationsByName(LAYOUT_FQN).first() }
+                    .filter { (_, layout) -> layout.arguments.first().value?.toString().orEmpty().isEmpty() }
+                    .forEach { (page, layout) ->
+                        logger.error(
+                            "@Page method \"${page.qualifiedName!!.asString()}\" cannot apply a `@Layout` annotation without specifying a target path. Please add a valid layout path to the layout annotation or remove it.",
+                            layout
+                        )
+                    }
+            }
+
         initRouteDeclarations += resolver.getSymbolsWithAnnotation(INIT_ROUTE_FQN).map { it as KSFunctionDeclaration }
             .also { initRouteDeclarations ->
                 initRouteDeclarations.forEach { initRouteMethod ->

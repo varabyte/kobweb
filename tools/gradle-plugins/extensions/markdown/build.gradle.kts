@@ -16,8 +16,9 @@ dependencies {
     implementation(libs.kaml)
 
     implementation(projects.common.kobwebCommon)
-    // Get the JVM part of this KMP dependency, or else its classes don't end up in the plugin JAR
     implementation(projects.common.kobwebxFrontmatter) {
+        // Dokka interferes with fetching the expected JVM configuration from multiplatform resources
+        //youtrack.jetbrains.com/issue/KT-72019/DGP-v2-Gradle-resolution-uses-dokka-configurations-instead-of-jvmRuntimeElements
         targetConfiguration ="jvmRuntimeElements"
     }
 

@@ -183,18 +183,21 @@ class Router {
         val route = Route.tryCreate(pathQueryAndFragment)
         return if (route != null) {
             val data = routeTree.createPageData(route, errorPageMethod)
+            val previousRoutePath = this.routeState.value?.path
             activePageMethod = data.pageMethod
             this.route = data.routeInfo
-            
-            val initRouteMethods = mutableListOf<InitRouteMethod>()
-            initRouteForPage[activePageMethod]?.let { initRouteMethods.add(it) }
-            data.pageMethod.parentLayouts.forEach { layoutMethod ->
-                initRouteForLayout[layoutMethod]?.let { initRouteMethods.add(it) }
-            }
 
-            this@Router.pageDataStore.clear()
-            val ctx = InitRouteContext(data.routeInfo, this@Router.pageDataStore)
-            initRouteMethods.forEach { it.invoke(ctx) }
+            if (previousRoutePath != route.path) {
+                val initRouteMethods = mutableListOf<InitRouteMethod>()
+                initRouteForPage[activePageMethod]?.let { initRouteMethods.add(it) }
+                data.pageMethod.parentLayouts.forEach { layoutMethod ->
+                    initRouteForLayout[layoutMethod]?.let { initRouteMethods.add(it) }
+                }
+
+                this@Router.pageDataStore.clear()
+                val ctx = InitRouteContext(data.routeInfo, this@Router.pageDataStore)
+                initRouteMethods.forEach { it.invoke(ctx) }
+            }
 
             true
         } else {

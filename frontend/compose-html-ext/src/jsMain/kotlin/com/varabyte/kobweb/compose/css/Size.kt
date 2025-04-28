@@ -1,26 +1,58 @@
 package com.varabyte.kobweb.compose.css
 
+import com.varabyte.kobweb.compose.css.BackgroundSize.Size
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
-class Width private constructor(private val value: String) : StylePropertyValue {
+// NOTE: This class is used as a typealias and should not be referenced directly by the end user.
+class CSSElementSize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
     companion object {
+        fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementSize("$value")
+        fun of(width: CSSAutoKeyword) = CSSElementSize("$width")
+
         // Keyword
-        val FitContent get() = Width("fit-content")
-        val MaxContent get() = Width("max-content")
-        val MinContent get() = Width("min-content")
+        @Suppress("FunctionName")
+        fun FitContent(value: CSSLengthOrPercentageNumericValue) = CSSElementSize("fit-content($value)")
+        val FitContent get() = CSSElementSize("fit-content")
+        val MaxContent get() = CSSElementSize("max-content")
+        val MinContent get() = CSSElementSize("min-content")
 
         // Global
-        val Inherit get() = Width("inherit")
-        val Initial get() = Width("initial")
-        val Revert get() = Width("revert")
-        val Unset get() = Width("unset")
+        val Inherit get() = CSSElementSize("inherit")
+        val Initial get() = CSSElementSize("initial")
+        val Revert get() = CSSElementSize("revert")
+        val Unset get() = CSSElementSize("unset")
     }
 }
-typealias MinWidth = Width
+
+class CSSElementMaxSize private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementMaxSize("$value")
+        fun of(width: CSSAutoKeyword) = CSSElementMaxSize("$width")
+
+        // Keyword
+        val None get() = CSSElementMaxSize("none")
+        @Suppress("FunctionName")
+        fun FitContent(value: CSSLengthOrPercentageNumericValue) = CSSElementMaxSize("fit-content($value)")
+        val FitContent get() = CSSElementMaxSize("fit-content")
+        val MaxContent get() = CSSElementMaxSize("max-content")
+        val MinContent get() = CSSElementMaxSize("min-content")
+
+        // Global
+        val Inherit get() = CSSElementMaxSize("inherit")
+        val Initial get() = CSSElementMaxSize("initial")
+        val Revert get() = CSSElementMaxSize("revert")
+        val Unset get() = CSSElementMaxSize("unset")
+    }
+}
+
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/width
+typealias Width = CSSElementSize
 
 fun AttrsScope<*>.width(width: Int) {
     attr("width", width.toString())
@@ -30,28 +62,15 @@ fun StyleScope.width(width: Width) {
     property("width", width)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/min-width
+typealias MinWidth = CSSElementSize
+
 fun StyleScope.minWidth(minWidth: MinWidth) {
     property("min-width", minWidth)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
-class Height private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Keyword
-        val FitContent get() = Height("fit-content")
-        val MaxContent get() = Height("max-content")
-        val MinContent get() = Height("min-content")
-
-        // Global
-        val Inherit get() = Height("inherit")
-        val Initial get() = Height("initial")
-        val Revert get() = Height("revert")
-        val Unset get() = Height("unset")
-    }
-}
-typealias MinHeight = Height
+typealias Height = CSSElementSize
 
 fun AttrsScope<*>.height(height: Int) {
     attr("height", height.toString())
@@ -61,51 +80,22 @@ fun StyleScope.height(height: Height) {
     property("height", height)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/min-height
+typealias MinHeight = CSSElementSize
+
 fun StyleScope.minHeight(minHeight: MinHeight) {
     property("min-height", minHeight)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
-class MaxWidth private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Keyword
-        val FitContent get() = MaxWidth("fit-content")
-        val MaxContent get() = MaxWidth("max-content")
-        val MinContent get() = MaxWidth("min-content")
-        val None get() = MaxWidth("none")
-
-        // Global
-        val Inherit get() = MaxWidth("inherit")
-        val Initial get() = MaxWidth("initial")
-        val Revert get() = MaxWidth("revert")
-        val Unset get() = MaxWidth("unset")
-    }
-}
+typealias MaxWidth = CSSElementMaxSize
 
 fun StyleScope.maxWidth(maxWidth: MaxWidth) {
     property("max-width", maxWidth)
 }
 
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/height
-class MaxHeight private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Keyword
-        val FitContent get() = MaxHeight("fit-content")
-        val MaxContent get() = MaxHeight("max-content")
-        val MinContent get() = MaxHeight("min-content")
-        val None get() = MaxHeight("none")
-
-        // Global
-        val Inherit get() = MaxHeight("inherit")
-        val Initial get() = MaxHeight("initial")
-        val Revert get() = MaxHeight("revert")
-        val Unset get() = MaxHeight("unset")
-    }
-}
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/max-height
+typealias MaxHeight = CSSElementMaxSize
 
 fun StyleScope.maxHeight(maxHeight: MaxHeight) {
     property("max-height", maxHeight)
