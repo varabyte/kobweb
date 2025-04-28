@@ -1412,6 +1412,9 @@ class CssStylePropertyTests {
         assertThat(styleToText { outline(Outline.of(OutlineWidth.Medium, LineStyle.Solid, Color.red)) })
             .isEqualTo("outline: medium solid red")
 
+        assertThat(styleToText { outline(Outline.of(10.px, LineStyle.Solid, Color.red)) })
+            .isEqualTo("outline: 10px solid red")
+
         assertThat(styleToText { outline(Outline.Inherit) }).isEqualTo("outline: inherit")
         assertThat(styleToText { outline(Outline.Initial) }).isEqualTo("outline: initial")
         assertThat(styleToText { outline(Outline.Revert) }).isEqualTo("outline: revert")

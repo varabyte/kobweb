@@ -40,6 +40,7 @@ fun StyleScope.outline(
     style: LineStyle? = null,
     color: CSSColorValue? = null
 ) {
+    @Suppress("DEPRECATION")
     outline {
         this.width = width
         this.style = style
@@ -92,6 +93,9 @@ class Outline private constructor(private val value: String) : StylePropertyValu
     companion object {
         fun of(outlineWidth: OutlineWidth? = null, outlineStyle: LineStyle? = null, outlineColor: CSSColorValue? = null) =
             Outline(listOfNotNull(outlineWidth, outlineStyle, outlineColor).joinToString(" "))
+
+        fun of(outlineWidth: CSSLengthNumericValue, outlineStyle: LineStyle? = null, outlineColor: CSSColorValue? = null) =
+            of(OutlineWidth.of(outlineWidth), outlineStyle, outlineColor)
 
         // Global
         val Inherit get() = Outline("inherit")
