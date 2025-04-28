@@ -55,6 +55,10 @@ class StyleModifierTests {
         }).isEqualTo("outline: 2px dotted green")
 
         assertThat(modifierToText {
+            Modifier.outline(3.px, LineStyle.Solid, Color.magenta)
+        }).isEqualTo("outline: 3px solid magenta")
+
+        assertThat(modifierToText {
             Modifier.outline(Outline.Inherit)
         }).isEqualTo("outline: inherit")
 

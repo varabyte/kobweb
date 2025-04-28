@@ -15,8 +15,8 @@ fun Modifier.overscrollBehavior(x: OverscrollBehavior.RepeatableValue, y: Oversc
     }
 
 class OverscrollBehaviorScope internal constructor(private val styleScope: StyleScope) {
-    fun x(overscrollBehavior: OverscrollBehavior.SingleValue) = styleScope.property("overscroll-behavior-x", overscrollBehavior)
-    fun y(overscrollBehavior: OverscrollBehavior.SingleValue) = styleScope.property("overscroll-behavior-y", overscrollBehavior)
+    fun x(overscrollBehavior: OverscrollBehavior.SingleValue) = styleScope.overscrollBehaviorX(overscrollBehavior)
+    fun y(overscrollBehavior: OverscrollBehavior.SingleValue) = styleScope.overscrollBehaviorY(overscrollBehavior)
 }
 
 fun Modifier.overscrollBehavior(scope: OverscrollBehaviorScope.() -> Unit) = styleModifier {

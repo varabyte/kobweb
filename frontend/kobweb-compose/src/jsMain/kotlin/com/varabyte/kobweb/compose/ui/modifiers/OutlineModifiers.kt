@@ -6,8 +6,8 @@ import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
 
 class OutlineScope internal constructor(private val styleScope: StyleScope) {
-    fun color(color: CSSColorValue) = styleScope.property("outline-color", color)
-    fun style(style: LineStyle) = styleScope.property("outline-style", style)
+    fun color(color: CSSColorValue) = styleScope.outlineColor(color)
+    fun style(style: LineStyle) = styleScope.outlineStyle(style)
     fun width(width: CSSLengthNumericValue) = styleScope.outlineWidth(width)
     fun width(width: OutlineWidth) = styleScope.outlineWidth(width)
 }
@@ -20,16 +20,12 @@ fun Modifier.outline(scope: OutlineScope.() -> Unit) = styleModifier {
     OutlineScope(this).apply(scope)
 }
 
-@Deprecated("Use `Modifier.outline { ... }` instead.")
-fun Modifier.outline(width: CSSLengthNumericValue? = null, style: LineStyle? = null, color: CSSColorValue? = null) =
-    styleModifier {
-        outline(width, style, color)
-    }
-
+fun Modifier.outline(width: CSSLengthNumericValue? = null, style: LineStyle? = null, color: CSSColorValue? = null) = styleModifier {
+    outline(Outline.of(width?.let { OutlineWidth.of(it) }, style, color))
+}
 
 @Deprecated("Use `Modifier.outline { ... }` instead.", ReplaceWith("outline { color(value) }"))
 fun Modifier.outlineColor(value: CSSColorValue) = outline { color(value) }
-
 
 fun Modifier.outlineOffset(value: CSSLengthNumericValue) = styleModifier {
     outlineOffset(value)

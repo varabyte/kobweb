@@ -52,6 +52,11 @@ fun StyleScope.outlineOffset(value: CSSLengthNumericValue) {
     property("outline-offset", value)
 }
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-style
+fun StyleScope.outlineStyle(value: LineStyle) {
+    property("outline-style", value)
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
 class OutlineWidth private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value

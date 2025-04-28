@@ -34,6 +34,15 @@ fun StyleScope.overscrollBehavior(overscrollBehavior: OverscrollBehavior) {
     property("overscroll-behavior", overscrollBehavior)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-x
+fun StyleScope.overscrollBehaviorX(overscrollBehavior: OverscrollBehavior.SingleValue) {
+    property("overscroll-behavior-x", overscrollBehavior)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior-y
+fun StyleScope.overscrollBehaviorY(overscrollBehavior: OverscrollBehavior.SingleValue) {
+    property("overscroll-behavior-y", overscrollBehavior)
+}
 
 class OverscrollBehaviorKeyword private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value

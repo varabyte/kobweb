@@ -144,7 +144,19 @@ Therefore, we have decided to keep these extensions minimal and provide a richer
 
 > [!IMPORTANT]
 > You may discover there is quite a bit of old code here and there that defies this rule. That's because we added those
-> a long time ago and have grandfathered them in for backwards compatibility purposes.
+> a long time ago and have grandfathered them in for backwards compatibility purposes. We may deprecate and remove these
+> before Kobweb hits 1.0.
+
+Note that, when defining extension methods for longhand properties that don't have classes associated with them (meaning
+they likely represent a primitive, raw value), in that case you should create a `StyleScope` extension which takes in
+that value and not a class:
+
+```kotlin
+// Longhand property that doesn't have a class
+fun StyleScope.outlineStyle(value: LineStyle) {
+  property("outline-style", value)
+}
+```
 
 #### Exception
 

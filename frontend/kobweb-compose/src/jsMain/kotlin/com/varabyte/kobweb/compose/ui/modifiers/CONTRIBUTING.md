@@ -116,6 +116,41 @@ Modifier.exampleStyle {
 ```
 
 ---
+### Avoid using `StyleScope.property`
+
+If you ever find yourself using the `property` method, e.g. something like
+
+```kotlin
+styleModifier {
+    property("example", "value")
+}
+```
+
+this is a sign that we need to add an extension method to the compose-html-ext module.
+
+#### Example
+
+```kotlin
+❌
+class OutlineScope internal constructor(private val styleScope: StyleScope) {
+  fun style(style: LineStyle) = styleScope.property("outline-style", style)
+  /*...*/
+}
+
+✅
+// In compose-html-ext...
+fun StyleScope.outlineStyle(style: LineStyle) {
+  property("outline-style", value)
+}
+
+// Then...
+class OutlineScope internal constructor(private val styleScope: StyleScope) {
+  fun style(style: LineStyle) = styleScope.outlineColor(color)
+  /*...*/
+}
+```
+
+---
 ### Add tests to `StyleModifierTests`
 
 These tests do NOT have to be as rigorous as those in `CssStylePropertyTests` (since those tests already did much of the
