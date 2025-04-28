@@ -2039,6 +2039,18 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyVisibility() {
+        assertThat(styleToText { visibility(Visibility.Visible) }).isEqualTo("visibility: visible")
+        assertThat(styleToText { visibility(Visibility.Hidden) }).isEqualTo("visibility: hidden")
+        assertThat(styleToText { visibility(Visibility.Collapse) }).isEqualTo("visibility: collapse")
+
+        assertThat(styleToText { visibility(Visibility.Inherit) }).isEqualTo("visibility: inherit")
+        assertThat(styleToText { visibility(Visibility.Initial) }).isEqualTo("visibility: initial")
+        assertThat(styleToText { visibility(Visibility.Revert) }).isEqualTo("visibility: revert")
+        assertThat(styleToText { visibility(Visibility.Unset) }).isEqualTo("visibility: unset")
+    }
+
+    @Test
     fun verifyWhiteSpace() {
         assertThat(styleToText { whiteSpace(WhiteSpace.Normal) }).isEqualTo("white-space: normal")
         assertThat(styleToText { whiteSpace(WhiteSpace.NoWrap) }).isEqualTo("white-space: nowrap")
