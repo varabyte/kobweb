@@ -48,7 +48,9 @@ class TextDecorationLine private constructor(private val value: String) : StyleP
 }
 
 fun StyleScope.textDecorationLine(vararg textDecorationLines: TextDecorationLine) {
-    property("text-decoration-line", textDecorationLines.joinToString(" "))
+    if (textDecorationLines.isNotEmpty()) {
+        property("text-decoration-line", textDecorationLines.joinToString(" "))
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow
@@ -146,8 +148,10 @@ fun StyleScope.textShadow(
     textShadow(TextShadow.of(offsetX, offsetY, blurRadius, color))
 }
 
-fun StyleScope.textShadow(first: TextShadow.Repeatable, vararg rest: TextShadow.Repeatable) {
-    property("text-shadow", (listOf(first) + rest.toList()).joinToString())
+fun StyleScope.textShadow(vararg shadows: TextShadow.Repeatable) {
+    if (shadows.isNotEmpty()) {
+        property("text-shadow", shadows.joinToString())
+    }
 }
 
 fun StyleScope.textShadow(textShadow: TextShadow) {

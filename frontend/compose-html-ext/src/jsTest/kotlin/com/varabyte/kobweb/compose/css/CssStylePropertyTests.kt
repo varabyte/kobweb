@@ -188,7 +188,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backdropFilter(BackdropFilter.None) }).isEqualTo("backdrop-filter: none; -webkit-backdrop-filter: none")
 
         assertThat(styleToText {
-            backdropFilter(BackdropFilter.of(blur(10.px), brightness(0.5)))
+            backdropFilter(BackdropFilter.of(blur(10.px)), BackdropFilter.of(brightness(0.5)))
         }).isEqualTo("backdrop-filter: blur(10px) brightness(0.5); -webkit-backdrop-filter: blur(10px) brightness(0.5)")
 
         assertThat(styleToText { backdropFilter(BackdropFilter.Inherit) }).isEqualTo("backdrop-filter: inherit; -webkit-backdrop-filter: inherit")
@@ -829,7 +829,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { filter(Filter.None) }).isEqualTo("filter: none")
 
         assertThat(styleToText {
-            filter(Filter.of(blur(10.px), brightness(0.5)))
+            filter(Filter.of(blur(10.px)), Filter.of(brightness(0.5)))
         }).isEqualTo("filter: blur(10px) brightness(0.5)")
 
         assertThat(styleToText { filter(Filter.Inherit) }).isEqualTo("filter: inherit")

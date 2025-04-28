@@ -66,8 +66,14 @@ fun StyleScope.transitionProperty(property: TransitionProperty) {
     transitionProperty(property.toString())
 }
 
+fun StyleScope.transitionProperty(vararg properties: TransitionProperty.Name) {
+    if (properties.isNotEmpty()) {
+        property("transition-property", properties.joinToString())
+    }
+}
+
 fun StyleScope.transitionProperty(vararg properties: String) {
-    property("transition-property", properties.joinToString())
+    transitionProperty(*properties.map { TransitionProperty.of(it) }.toTypedArray())
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration
@@ -79,18 +85,22 @@ fun StyleScope.transitionDuration(vararg durations: CSSTimeNumericValue) {
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
 fun StyleScope.transitionDelay(vararg delays: CSSTimeNumericValue) {
-    property("transition-delay", delays.joinToString())
+    if (delays.isNotEmpty()) {
+        property("transition-delay", delays.joinToString())
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
 typealias TransitionTimingFunction = AnimationTimingFunction
 
-fun StyleScope.transitionTimingFunction(value: TransitionTimingFunction) {
-    property("transition-timing-function", value)
+fun StyleScope.transitionTimingFunction(timingFunction: TransitionTimingFunction) {
+    property("transition-timing-function", timingFunction)
 }
 
-fun StyleScope.transitionTimingFunction(vararg values: TransitionTimingFunction) {
-    property("transition-timing-function", values.joinToString { it.value })
+fun StyleScope.transitionTimingFunction(vararg timingFunctions: TransitionTimingFunction) {
+    if (timingFunctions.isNotEmpty()) {
+        property("transition-timing-function", timingFunctions.joinToString { it.value })
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition

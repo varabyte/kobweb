@@ -45,16 +45,17 @@ fun Modifier.textShadow(
 }
 
 @Suppress("DEPRECATION")
-fun Modifier.textShadow(first: CSSTextShadow, vararg rest: CSSTextShadow) = styleModifier {
-    fun CSSTextShadow.toTextShadow(): TextShadow.Repeatable {
-        return TextShadow.of(offsetX, offsetY, blurRadius, color)
-    }
-    textShadow(first.toTextShadow(), *rest.map { it.toTextShadow() }.toTypedArray())
+fun Modifier.textShadow(vararg shadows: CSSTextShadow) = styleModifier {
+    textShadow(*shadows.map {
+        TextShadow.of(it.offsetX, it.offsetY, it.blurRadius, it.color)
+    }.toTypedArray())
 }
 
-fun Modifier.textShadow(first: TextShadow.Repeatable, vararg rest: TextShadow.Repeatable) = styleModifier {
-    textShadow(first, *rest)
+fun Modifier.textShadow(vararg shadows: TextShadow.Repeatable) = styleModifier {
+    textShadow(*shadows)
 }
+
+fun Modifier.textShadow(shadows: List<TextShadow.Repeatable>) = textShadow(*shadows.toTypedArray())
 
 fun Modifier.textShadow(textShadow: TextShadow): Modifier = styleModifier {
     textShadow(textShadow)

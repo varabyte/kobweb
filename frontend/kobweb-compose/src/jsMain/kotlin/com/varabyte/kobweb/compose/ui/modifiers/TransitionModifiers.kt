@@ -19,18 +19,29 @@ fun Modifier.transition(vararg transitions: Transition.Repeatable) = styleModifi
     transition(*transitions)
 }
 
+fun Modifier.transition(transitions: List<Transition.Repeatable>) = styleModifier {
+    transition(*transitions.toTypedArray())
+}
+
 // Convenience method for accepting the output of Transition.group(...)
 fun Modifier.transition(transitions: Array<Transition.Repeatable>) = styleModifier {
     transition(*transitions)
 }
 
 class TransitionScope(private val styleScope: StyleScope) {
-    fun property(value: TransitionProperty.Name) = styleScope.transitionProperty(value)
-    fun property(value: String) = styleScope.transitionProperty(value)
-    fun duration(value: CSSTimeNumericValue) = styleScope.transitionDuration(value)
-    fun timingFunction(value: TransitionTimingFunction) = styleScope.transitionTimingFunction(value)
-    fun delay(value: CSSTimeNumericValue) = styleScope.transitionDelay(value)
-    fun behavior(value: TransitionBehavior) = styleScope.transitionBehavior(value)
+    fun property(vararg properties: TransitionProperty.Name) = styleScope.transitionProperty(*properties)
+    fun property(vararg properties: String) = styleScope.transitionProperty(*properties)
+    fun duration(vararg durations: CSSTimeNumericValue) = styleScope.transitionDuration(*durations)
+    fun timingFunction(vararg timingFunctions: TransitionTimingFunction) = styleScope.transitionTimingFunction(*timingFunctions)
+    fun delay(vararg delays: CSSTimeNumericValue) = styleScope.transitionDelay(*delays)
+    fun behavior(vararg behaviors: TransitionBehavior) = styleScope.transitionBehavior(*behaviors)
+
+    fun property(properties: List<TransitionProperty.Name>) = property(*properties.toTypedArray())
+    fun property(properties: List<String>) = property(*properties.toTypedArray())
+    fun duration(durations: List<CSSTimeNumericValue>) = duration(*durations.toTypedArray())
+    fun timingFunction(timingFunctions: List<TransitionTimingFunction>) = timingFunction(*timingFunctions.toTypedArray())
+    fun delay(delays: List<CSSTimeNumericValue>) = delay(*delays.toTypedArray())
+    fun behavior(behaviors: List<TransitionBehavior>) = behavior(*behaviors.toTypedArray())
 }
 
 fun Modifier.transition(scope: TransitionScope.() -> Unit) = styleModifier {

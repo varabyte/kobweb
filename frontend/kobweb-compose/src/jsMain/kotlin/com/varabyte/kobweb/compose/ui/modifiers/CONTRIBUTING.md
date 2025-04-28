@@ -151,6 +151,23 @@ class OutlineScope internal constructor(private val styleScope: StyleScope) {
 ```
 
 ---
+### Vararg modifiers should also accept a List alternate
+
+As stated in the CSS StyleScope contributing doc, we want to support a common, Kotlin-idiomatic pattern where you build
+up a property argument as a list of elements. Therefore, we should support that as a convenience case for users.
+
+#### Example
+
+```kotlin
+fun Modifier.transition(vararg transitions: Transition.Repeatable) = styleModifier {
+    transition(*transitions)
+}
+
+fun Modifier.transition(transitions: List<Transition.Repeatable>) =
+    transition(*transitions.toTypedArray())
+```
+
+---
 ### Add tests to `StyleModifierTests`
 
 These tests do NOT have to be as rigorous as those in `CssStylePropertyTests` (since those tests already did much of the

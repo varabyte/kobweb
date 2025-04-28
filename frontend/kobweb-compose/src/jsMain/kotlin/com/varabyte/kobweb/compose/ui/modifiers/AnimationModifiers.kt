@@ -14,6 +14,8 @@ fun Modifier.animation(vararg animations: Animation.Repeatable) = styleModifier 
     animation(*animations)
 }
 
+fun Modifier.animation(animations: List<Animation.Repeatable>) = animation(*animations.toTypedArray())
+
 fun Modifier.onAnimationEnd(listener: (SyntheticAnimationEvent) -> Unit): Modifier = attrsModifier {
     onAnimationEnd(listener)
 }

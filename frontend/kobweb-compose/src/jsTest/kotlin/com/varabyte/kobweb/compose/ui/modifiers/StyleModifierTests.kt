@@ -253,6 +253,14 @@ class StyleModifierTests {
         }).isEqualTo("transition: color 2s ease-in, transform 500ms")
 
         assertThat(modifierToText {
+            val transitions = listOf(
+                Transition.of("color", 2.s, TransitionTimingFunction.EaseIn),
+                Transition.of("transform", 500.ms)
+            )
+            Modifier.transition(transitions)
+        }).isEqualTo("transition: color 2s ease-in, transform 500ms")
+
+        assertThat(modifierToText {
             Modifier.transition(
                 Transition.group(listOf("width", "height"), 2.s)
             )
@@ -260,12 +268,19 @@ class StyleModifierTests {
 
         assertThat(modifierToText {
             Modifier.transition {
-                property("background")
+                property("color")
                 duration(300.ms)
                 timingFunction(TransitionTimingFunction.Linear)
                 delay(100.ms)
                 behavior(TransitionBehavior.AllowDiscrete)
             }
-        }).isEqualTo("transition-property: background; transition-duration: 300ms; transition-timing-function: linear; transition-delay: 100ms; transition-behavior: allow-discrete")
+        }).isEqualTo("transition-property: color; transition-duration: 300ms; transition-timing-function: linear; transition-delay: 100ms; transition-behavior: allow-discrete")
+
+        assertThat(modifierToText {
+            Modifier.transition {
+                property("margin-right", "color")
+                duration(2.s, 1.s)
+            }
+        }).isEqualTo("transition-property: margin-right, color; transition-duration: 2s, 1s")
     }
 }

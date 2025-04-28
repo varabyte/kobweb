@@ -81,11 +81,17 @@ fun StyleScope.content(content: Content.Restricted) {
 }
 
 fun StyleScope.content(vararg contents: Content.Unrestricted) {
-    property("content", contents.joinToString(" "))
+    if (contents.isNotEmpty()) {
+        property("content", contents.joinToString(" "))
+    }
 }
 
 fun StyleScope.content(altText: String, vararg contents: Content.Unrestricted) {
-    property("content", "${contents.joinToString(" ")} / ${altText.wrapQuotesIfNecessary()}")
+    if (altText.isEmpty()) content(*contents) else {
+        if (contents.isNotEmpty()) {
+            property("content", "${contents.joinToString(" ")} / ${altText.wrapQuotesIfNecessary()}")
+        }
+    }
 }
 
 /** Convenience function for an extremely common case, setting content to text. */

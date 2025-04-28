@@ -112,6 +112,8 @@ fun Modifier.boxShadow(vararg boxShadows: BoxShadow.Repeatable): Modifier = styl
     boxShadow(*boxShadows)
 }
 
+fun Modifier.boxShadow(boxShadows: List<BoxShadow.Repeatable>) = boxShadow(*boxShadows.toTypedArray())
+
 /**
  * Creates a box-shadow property with a single shadow.
  * The property accepts either the [BoxShadow.None] value, the

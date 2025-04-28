@@ -15,6 +15,8 @@ fun Modifier.background(vararg backgrounds: Background.Repeatable) = styleModifi
     background(*backgrounds)
 }
 
+fun Modifier.background(backgrounds: List<Background.Repeatable>) = background(*backgrounds.toTypedArray())
+
 /**
  * Configure an element's background appearance.
  *
@@ -31,6 +33,9 @@ fun Modifier.background(vararg backgrounds: Background.Repeatable) = styleModifi
 fun Modifier.background(color: CSSColorValue?, vararg backgrounds: Background.Repeatable) = styleModifier {
     background(color, *backgrounds)
 }
+
+fun Modifier.background(color: CSSColorValue?, backgrounds: List<Background.Repeatable>) =
+    background(color, *backgrounds.toTypedArray())
 
 fun Modifier.backgroundAttachment(backgroundAttachment: BackgroundAttachment) = styleModifier {
     backgroundAttachment(backgroundAttachment)

@@ -217,7 +217,9 @@ fun StyleScope.gridAutoColumns(gridAutoColumns: GridAuto) {
 }
 
 fun StyleScope.gridAutoColumns(vararg gridAutoColumns: GridEntry) {
-    gridAutoColumns(gridAutoColumns.toTrackListString())
+    if (gridAutoColumns.isNotEmpty()) {
+        gridAutoColumns(gridAutoColumns.toTrackListString())
+    }
 }
 
 fun StyleScope.gridAutoColumns(block: GridTrackBuilder.() -> Unit) {
@@ -229,7 +231,9 @@ fun StyleScope.gridAutoRows(gridAutoRows: GridAuto) {
 }
 
 fun StyleScope.gridAutoRows(vararg gridAutoRows: GridEntry) {
-    gridAutoRows(gridAutoRows.toTrackListString())
+    if (gridAutoRows.isNotEmpty()) {
+        gridAutoRows(gridAutoRows.toTrackListString())
+    }
 }
 
 fun StyleScope.gridAutoRows(block: GridTrackBuilder.() -> Unit) {
@@ -294,7 +298,9 @@ fun StyleScope.gridTemplateColumns(gridTemplateColumns: GridTemplate) {
 }
 
 fun StyleScope.gridTemplateColumns(vararg gridTemplateColumns: GridEntry) {
-    gridTemplateColumns(gridTemplateColumns.toTrackListString())
+    if (gridTemplateColumns.isNotEmpty()) {
+        gridTemplateColumns(gridTemplateColumns.toTrackListString())
+    }
 }
 
 fun StyleScope.gridTemplateColumns(block: GridTrackBuilder.() -> Unit) {
@@ -306,7 +312,9 @@ fun StyleScope.gridTemplateRows(gridTemplateRows: GridTemplate) {
 }
 
 fun StyleScope.gridTemplateRows(vararg gridTemplateRows: GridEntry) {
-    gridTemplateRows(gridTemplateRows.toTrackListString())
+    if (gridTemplateRows.isNotEmpty()) {
+        gridTemplateRows(gridTemplateRows.toTrackListString())
+    }
 }
 
 fun StyleScope.gridTemplateRows(block: GridTrackBuilder.() -> Unit) {

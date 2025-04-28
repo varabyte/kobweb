@@ -164,7 +164,7 @@ fun StyleScope.boxShadow(boxShadow: BoxShadow) {
  */
 fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Repeatable) {
     if (boxShadows.isNotEmpty()) {
-        boxShadow(boxShadows.joinToString(transform = BoxShadow::toString))
+        boxShadow(boxShadows.joinToString())
     }
 }
 

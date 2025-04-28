@@ -173,8 +173,10 @@ fun StyleScope.animation(animation: Animation) {
     property("animation", animation)
 }
 
-fun StyleScope.animation(first: Animation.Repeatable, vararg rest: Animation.Repeatable) {
-    property("animation", (listOf(first) + rest).joinToString(", "))
+fun StyleScope.animation(vararg animations: Animation.Repeatable) {
+    if (animations.isNotEmpty()) {
+        property("animation", animations.joinToString())
+    }
 }
 ```
 
@@ -252,7 +254,7 @@ sealed class StyleExample {
 }
 
 fun StyleScope.styleExample(styleExample: StyleExample)
-fun StyleScope.styleExample(first: StyleExample.Repeatable, vararg rest: StyleExample.Repeatable)
+fun StyleScope.styleExample(vararg styleExamples: StyleExample.Repeatable)
 ```
 
 ---
@@ -353,6 +355,42 @@ class Animation /*...*/ {
 
 This exception should be pretty rare, because most shorthand CSS properties are a list of uniquely distinguishable
 values.
+
+---
+### Repeatable values should take in a vararg parameter and check for the empty case
+
+#### Example
+
+```kotlin
+fun StyleScope.transition(vararg transitions: Transition.Repeatable) {
+    if (transitions.isNotEmpty()) {
+        property("transition", transitions.joinToString())
+    }
+}
+```
+
+For a time, we considered a pattern that would guarantee at least one item:
+
+```kotlin
+❌
+fun StyleScope.transition(first: Transition.Repeatable, vararg rest: Transition.Repeatable) {
+  property("transition", (listOf(first) + rest).joinToString())
+}
+```
+
+and, though tempting, in practice it can be convenient for users to build up lists of arguments and then pass those in:
+
+```kotlin
+var animations = mutableListOf<Animation>()
+if (condX) {
+  animations.add(...)
+}
+if (condY) {
+  animations.add(...)
+}
+
+Modifier.animation(animations)
+```
 
 ---
 ### Add tests to `CssStylePropertyTests`
