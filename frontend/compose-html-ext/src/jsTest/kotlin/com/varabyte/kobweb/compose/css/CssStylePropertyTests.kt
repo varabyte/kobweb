@@ -5,6 +5,7 @@ import com.varabyte.kobweb.compose.css.functions.blur
 import com.varabyte.kobweb.compose.css.functions.brightness
 import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.truthish.assertThat
+import com.varabyte.truthish.assertThrows
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.auto
 import kotlin.test.Test
@@ -1924,6 +1925,86 @@ class CssStylePropertyTests {
         assertThat(styleToText { transformStyle(TransformStyle.Initial) }).isEqualTo("transform-style: initial")
         assertThat(styleToText { transformStyle(TransformStyle.Revert) }).isEqualTo("transform-style: revert")
         assertThat(styleToText { transformStyle(TransformStyle.Unset) }).isEqualTo("transform-style: unset")
+    }
+
+    @Test
+    fun verifyTransition() {
+        assertThat(styleToText { transition(Transition.None) }).isEqualTo("transition: none")
+        assertThat(styleToText { transition(Transition.Inherit) }).isEqualTo("transition: inherit")
+        assertThat(styleToText { transition(Transition.Initial) }).isEqualTo("transition: initial")
+        assertThat(styleToText { transition(Transition.Revert) }).isEqualTo("transition: revert")
+        assertThat(styleToText { transition(Transition.Unset) }).isEqualTo("transition: unset")
+
+        assertThat(styleToText { transition(Transition.of("opacity", 2.s)) })
+            .isEqualTo("transition: opacity 2s")
+        assertThat(styleToText {
+            transition(
+                Transition.of(
+                    TransitionProperty.of("width"),
+                    0.5.s,
+                    TransitionTimingFunction.EaseIn
+                )
+            )
+        })
+            .isEqualTo("transition: width 0.5s ease-in")
+        assertThat(styleToText { transition(Transition.of("height", 1.s, TransitionTimingFunction.EaseOut, 0.5.s)) })
+            .isEqualTo("transition: height 1s ease-out 0.5s")
+        assertThat(styleToText {
+            transition(
+                Transition.of(
+                    "background",
+                    2.s,
+                    behavior = TransitionBehavior.AllowDiscrete
+                )
+            )
+        })
+            .isEqualTo("transition: background 2s allow-discrete")
+        assertThat(styleToText { transition(Transition.of("margin", delay = 1.s)) })
+            .isEqualTo("transition: margin 0s 1s")
+
+        assertThat(styleToText { transition(Transition.all(1.s)) })
+            .isEqualTo("transition: all 1s")
+
+        assertThat(styleToText { transition(*Transition.group(listOf("width", "height"), 2.s)) })
+            .isEqualTo("transition: width 2s, height 2s")
+        assertThat(styleToText {
+            transition(
+                *Transition.group(
+                    listOf(
+                        TransitionProperty.of("opacity"),
+                        TransitionProperty.of("color")
+                    ), 1.s
+                )
+            )
+        })
+            .isEqualTo("transition: opacity 1s, color 1s")
+    }
+
+    @Test
+    fun verifyTransitionBehavior() {
+        assertThat(styleToText { transitionBehavior(TransitionBehavior.AllowDiscrete) }).isEqualTo("transition-behavior: allow-discrete")
+        assertThat(styleToText { transitionBehavior(TransitionBehavior.Normal) }).isEqualTo("transition-behavior: normal")
+
+        assertThat(styleToText { transitionBehavior(TransitionBehavior.Inherit) }).isEqualTo("transition-behavior: inherit")
+        assertThat(styleToText { transitionBehavior(TransitionBehavior.Initial) }).isEqualTo("transition-behavior: initial")
+        assertThat(styleToText { transitionBehavior(TransitionBehavior.Revert) }).isEqualTo("transition-behavior: revert")
+        assertThat(styleToText { transitionBehavior(TransitionBehavior.Unset) }).isEqualTo("transition-behavior: unset")
+    }
+
+    @Test
+    fun verifyTransitionProperty() {
+        assertThat(styleToText { transitionProperty(TransitionProperty.of("opacity")) }).isEqualTo("transition-property: opacity")
+        assertThrows<IllegalArgumentException> {
+            styleToText { transitionProperty(TransitionProperty.of("with spaces")) }
+        }
+
+        assertThat(styleToText { transitionProperty(TransitionProperty.None) }).isEqualTo("transition-property: none")
+        assertThat(styleToText { transitionProperty(TransitionProperty.All) }).isEqualTo("transition-property: all")
+
+        assertThat(styleToText { transitionProperty(TransitionProperty.Inherit) }).isEqualTo("transition-property: inherit")
+        assertThat(styleToText { transitionProperty(TransitionProperty.Initial) }).isEqualTo("transition-property: initial")
+        assertThat(styleToText { transitionProperty(TransitionProperty.Revert) }).isEqualTo("transition-property: revert")
+        assertThat(styleToText { transitionProperty(TransitionProperty.Unset) }).isEqualTo("transition-property: unset")
     }
 
     @Test

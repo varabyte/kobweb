@@ -9,6 +9,7 @@ import com.varabyte.kobweb.compose.events.SyntheticTransitionEvent
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
+import org.jetbrains.compose.web.css.StyleScope
 
 fun Modifier.transition(transition: Transition) = styleModifier {
     transition(transition)
@@ -21,6 +22,19 @@ fun Modifier.transition(vararg transitions: Transition.Repeatable) = styleModifi
 // Convenience method for accepting the output of Transition.group(...)
 fun Modifier.transition(transitions: Array<Transition.Repeatable>) = styleModifier {
     transition(*transitions)
+}
+
+class TransitionScope(private val styleScope: StyleScope) {
+    fun property(value: TransitionProperty.Name) = styleScope.transitionProperty(value)
+    fun property(value: String) = styleScope.transitionProperty(value)
+    fun duration(value: CSSTimeNumericValue) = styleScope.transitionDuration(value)
+    fun timingFunction(value: TransitionTimingFunction) = styleScope.transitionTimingFunction(value)
+    fun delay(value: CSSTimeNumericValue) = styleScope.transitionDelay(value)
+    fun behavior(value: TransitionBehavior) = styleScope.transitionBehavior(value)
+}
+
+fun Modifier.transition(scope: TransitionScope.() -> Unit) = styleModifier {
+    TransitionScope(this).apply(scope)
 }
 
 fun Modifier.onTransitionCancel(listener: (SyntheticTransitionEvent) -> Unit): Modifier = attrsModifier {

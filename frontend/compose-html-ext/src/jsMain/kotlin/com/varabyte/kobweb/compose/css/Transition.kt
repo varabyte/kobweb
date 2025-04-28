@@ -29,7 +29,9 @@ fun StyleScope.transitionBehavior(behavior: TransitionBehavior) {
 }
 
 fun StyleScope.transitionBehavior(vararg behaviors: TransitionBehavior) {
-    property("transition-behavior", behaviors.joinToString())
+    if (behaviors.isNotEmpty()) {
+        property("transition-behavior", behaviors.joinToString())
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
@@ -69,49 +71,13 @@ fun StyleScope.transitionProperty(vararg properties: String) {
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration
-/**
- * Special values for Transition Duration Property.
- */
-class TransitionDuration private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Global values
-        val Inherit get() = TransitionDuration("inherit")
-        val Initial get() = TransitionDuration("initial")
-        val Revert get() = TransitionDuration("revert")
-        val Unset get() = TransitionDuration("unset")
-    }
-}
-
-fun StyleScope.transitionDuration(duration: TransitionDuration) {
-    property("transition-duration", duration)
-}
-
 fun StyleScope.transitionDuration(vararg durations: CSSTimeNumericValue) {
-    property("transition-duration", durations.joinToString())
+    if (durations.isNotEmpty()) {
+        property("transition-duration", durations.joinToString())
+    }
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-delay
-/**
- * Special values for Transition Delay Property.
- */
-class TransitionDelay private constructor(private val value: String) : StylePropertyValue {
-    override fun toString() = value
-
-    companion object {
-        // Global values
-        val Inherit get() = TransitionDelay("inherit")
-        val Initial get() = TransitionDelay("initial")
-        val Revert get() = TransitionDelay("revert")
-        val Unset get() = TransitionDelay("unset")
-    }
-}
-
-fun StyleScope.transitionDelay(delay: TransitionDelay) {
-    property("transition-delay", delay)
-}
-
 fun StyleScope.transitionDelay(vararg delays: CSSTimeNumericValue) {
     property("transition-delay", delays.joinToString())
 }

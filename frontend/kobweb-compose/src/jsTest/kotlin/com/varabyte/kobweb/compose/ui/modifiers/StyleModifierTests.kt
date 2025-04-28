@@ -238,4 +238,34 @@ class StyleModifierTests {
             Modifier.writingMode(WritingMode.VerticalRl)
         }).isEqualTo("writing-mode: vertical-rl")
     }
+
+    @Test
+    fun verifyTransition() {
+        assertThat(modifierToText {
+            Modifier.transition(Transition.of(TransitionProperty.All, 200.ms))
+        }).isEqualTo("transition: all 200ms")
+
+        assertThat(modifierToText {
+            Modifier.transition(
+                Transition.of("color", 2.s, TransitionTimingFunction.EaseIn),
+                Transition.of("transform", 500.ms)
+            )
+        }).isEqualTo("transition: color 2s ease-in, transform 500ms")
+
+        assertThat(modifierToText {
+            Modifier.transition(
+                Transition.group(listOf("width", "height"), 2.s)
+            )
+        }).isEqualTo("transition: width 2s, height 2s")
+
+        assertThat(modifierToText {
+            Modifier.transition {
+                property("background")
+                duration(300.ms)
+                timingFunction(TransitionTimingFunction.Linear)
+                delay(100.ms)
+                behavior(TransitionBehavior.AllowDiscrete)
+            }
+        }).isEqualTo("transition-property: background; transition-duration: 300ms; transition-timing-function: linear; transition-delay: 100ms; transition-behavior: allow-discrete")
+    }
 }
