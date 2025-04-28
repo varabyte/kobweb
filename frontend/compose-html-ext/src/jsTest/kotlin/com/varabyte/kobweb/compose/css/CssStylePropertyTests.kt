@@ -1835,6 +1835,98 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyTransformBox() {
+        assertThat(styleToText { transformBox(TransformBox.BorderBox) }).isEqualTo("transform-box: border-box")
+        assertThat(styleToText { transformBox(TransformBox.ContentBox) }).isEqualTo("transform-box: content-box")
+        assertThat(styleToText { transformBox(TransformBox.FillBox) }).isEqualTo("transform-box: fill-box")
+        assertThat(styleToText { transformBox(TransformBox.StrokeBox) }).isEqualTo("transform-box: stroke-box")
+        assertThat(styleToText { transformBox(TransformBox.ViewBox) }).isEqualTo("transform-box: view-box")
+
+        assertThat(styleToText { transformBox(TransformBox.Inherit) }).isEqualTo("transform-box: inherit")
+        assertThat(styleToText { transformBox(TransformBox.Initial) }).isEqualTo("transform-box: initial")
+        assertThat(styleToText { transformBox(TransformBox.Revert) }).isEqualTo("transform-box: revert")
+        assertThat(styleToText { transformBox(TransformBox.Unset) }).isEqualTo("transform-box: unset")
+    }
+
+    @Test
+    fun verifyTransformOrigin() {
+        assertThat(styleToText { transformOrigin(TransformOrigin.Top) }).isEqualTo("transform-origin: center top")
+        assertThat(styleToText { transformOrigin(TransformOrigin.TopRight) }).isEqualTo("transform-origin: right top")
+        assertThat(styleToText { transformOrigin(TransformOrigin.Right) }).isEqualTo("transform-origin: right center")
+        assertThat(styleToText { transformOrigin(TransformOrigin.BottomRight) }).isEqualTo("transform-origin: right bottom")
+        assertThat(styleToText { transformOrigin(TransformOrigin.Bottom) }).isEqualTo("transform-origin: center bottom")
+        assertThat(styleToText { transformOrigin(TransformOrigin.BottomLeft) }).isEqualTo("transform-origin: left bottom")
+        assertThat(styleToText { transformOrigin(TransformOrigin.Left) }).isEqualTo("transform-origin: left center")
+        assertThat(styleToText { transformOrigin(TransformOrigin.TopLeft) }).isEqualTo("transform-origin: left top")
+        assertThat(styleToText { transformOrigin(TransformOrigin.Center) }).isEqualTo("transform-origin: center center")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Left)) })
+            .isEqualTo("transform-origin: left center")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Right)) })
+            .isEqualTo("transform-origin: right center")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.CenterX)) })
+            .isEqualTo("transform-origin: center center")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Top)) })
+            .isEqualTo("transform-origin: center top")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Bottom)) })
+            .isEqualTo("transform-origin: center bottom")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.CenterY)) })
+            .isEqualTo("transform-origin: center center")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Left, Edge.Top)) })
+            .isEqualTo("transform-origin: left top")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Right, Edge.Bottom)) })
+            .isEqualTo("transform-origin: right bottom")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.CenterX, Edge.CenterY)) })
+            .isEqualTo("transform-origin: center center")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Left, 20.px)) })
+            .isEqualTo("transform-origin: left 20px")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Right, 30.percent)) })
+            .isEqualTo("transform-origin: right 30%")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(10.px, Edge.Top)) })
+            .isEqualTo("transform-origin: 10px top")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(25.percent, Edge.Bottom)) })
+            .isEqualTo("transform-origin: 25% bottom")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(10.px, 20.px)) })
+            .isEqualTo("transform-origin: 10px 20px")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(30.percent, 40.percent)) })
+            .isEqualTo("transform-origin: 30% 40%")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(10.px, 20.percent)) })
+            .isEqualTo("transform-origin: 10px 20%")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Left, Edge.Top, 5.px)) })
+            .isEqualTo("transform-origin: left top 5px")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(Edge.Right, 30.percent, 10.px)) })
+            .isEqualTo("transform-origin: right 30% 10px")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(25.percent, Edge.Bottom, 15.px)) })
+            .isEqualTo("transform-origin: 25% bottom 15px")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(10.px, 20.px, 30.px)) })
+            .isEqualTo("transform-origin: 10px 20px 30px")
+        assertThat(styleToText { transformOrigin(TransformOrigin.of(30.percent, 40.percent, 5.px)) })
+            .isEqualTo("transform-origin: 30% 40% 5px")
+
+        assertThat(styleToText { transformOrigin(TransformOrigin.Inherit) }).isEqualTo("transform-origin: inherit")
+        assertThat(styleToText { transformOrigin(TransformOrigin.Initial) }).isEqualTo("transform-origin: initial")
+        assertThat(styleToText { transformOrigin(TransformOrigin.Revert) }).isEqualTo("transform-origin: revert")
+        assertThat(styleToText { transformOrigin(TransformOrigin.Unset) }).isEqualTo("transform-origin: unset")
+    }
+
+    @Test
+    fun verifyTransformStyle() {
+        assertThat(styleToText { transformStyle(TransformStyle.Flat) }).isEqualTo("transform-style: flat")
+        assertThat(styleToText { transformStyle(TransformStyle.Preserve3d) }).isEqualTo("transform-style: preserve-3d")
+
+        assertThat(styleToText { transformStyle(TransformStyle.Inherit) }).isEqualTo("transform-style: inherit")
+        assertThat(styleToText { transformStyle(TransformStyle.Initial) }).isEqualTo("transform-style: initial")
+        assertThat(styleToText { transformStyle(TransformStyle.Revert) }).isEqualTo("transform-style: revert")
+        assertThat(styleToText { transformStyle(TransformStyle.Unset) }).isEqualTo("transform-style: unset")
+    }
+
+    @Test
     fun verifyUserSelect() {
         assertThat(styleToText { userSelect(UserSelect.None) }).isEqualTo("user-select: none")
         assertThat(styleToText { userSelect(UserSelect.Auto) }).isEqualTo("user-select: auto")
@@ -1847,7 +1939,6 @@ class CssStylePropertyTests {
         assertThat(styleToText { userSelect(UserSelect.Revert) }).isEqualTo("user-select: revert")
         assertThat(styleToText { userSelect(UserSelect.Unset) }).isEqualTo("user-select: unset")
     }
-    
 
     @Test
     fun verifyVerticalAlign() {

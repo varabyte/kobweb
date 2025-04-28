@@ -81,6 +81,7 @@ fun StyleScope.scaleZ(s: CSSPercentageNumericValue) {
 
 // endregion
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transform-box
 class TransformBox private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
@@ -104,6 +105,7 @@ fun StyleScope.transformBox(transformBox: TransformBox) {
     property("transform-box", transformBox.toString())
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin
 sealed class TransformOrigin private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
@@ -113,31 +115,35 @@ sealed class TransformOrigin private constructor(private val value: String) : St
     companion object {
         // We cannot use CssPosition as transform-origin does not support offsets from edges, e.g. Edge.Right(10.px)
 
+        @Suppress("FunctionName")
+        private fun _of(xOffset: Any? = null, yOffset: Any? = null, zOffset: Any? = null): TransformOrigin =
+            Origin(listOfNotNull(xOffset, yOffset, zOffset).joinToString(" "))
+
         // NOTE: the following 2 functions do not take a `zOffset` parameter as `of(Edge.Right, 5.px)` would then apply
         // the `5.px` to the z-axis despite intuitively appearing to refer to the y-axis
         fun of(xOffset: EdgeXOrCenter): TransformOrigin = of(xOffset, Edge.CenterY)
         fun of(yOffset: EdgeYOrCenter): TransformOrigin = of(Edge.CenterX, yOffset)
 
-        fun of(xOffset: EdgeXOrCenter, yOffset: EdgeYOrCenter, zOffset: CSSLengthNumericValue = 0.px): TransformOrigin =
-            Origin("$xOffset $yOffset $zOffset")
+        fun of(xOffset: EdgeXOrCenter, yOffset: EdgeYOrCenter, zOffset: CSSLengthNumericValue? = null): TransformOrigin =
+            _of(xOffset, yOffset, zOffset)
 
         fun of(
             xOffset: EdgeXOrCenter,
             yOffset: CSSLengthOrPercentageNumericValue,
-            zOffset: CSSLengthNumericValue = 0.px
-        ): TransformOrigin = Origin("$xOffset $yOffset $zOffset")
+            zOffset: CSSLengthNumericValue? = null,
+        ): TransformOrigin = _of(xOffset, yOffset, zOffset)
 
         fun of(
             xOffset: CSSLengthOrPercentageNumericValue,
             yOffset: EdgeYOrCenter,
-            zOffset: CSSLengthNumericValue = 0.px
-        ): TransformOrigin = Origin("$xOffset $yOffset $zOffset")
+            zOffset: CSSLengthNumericValue? = null,
+        ): TransformOrigin = _of(xOffset, yOffset, zOffset)
 
         fun of(
-            xOffset: CSSLengthOrPercentageNumericValue = 50.percent,
-            yOffset: CSSLengthOrPercentageNumericValue = 50.percent,
-            zOffset: CSSLengthNumericValue = 0.px
-        ): TransformOrigin = Origin("$xOffset $yOffset $zOffset")
+            xOffset: CSSLengthOrPercentageNumericValue,
+            yOffset: CSSLengthOrPercentageNumericValue,
+            zOffset: CSSLengthNumericValue? = null,
+        ): TransformOrigin = _of(xOffset, yOffset, zOffset)
 
         // Duplicate the values provided by CssPosition
         val Top get() = of(Edge.Top)
@@ -162,6 +168,7 @@ fun StyleScope.transformOrigin(transformOrigin: TransformOrigin) {
     property("transform-origin", transformOrigin.toString())
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transform-style
 class TransformStyle private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
