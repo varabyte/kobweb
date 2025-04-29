@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toStyles
@@ -44,6 +45,10 @@ class StyleModifierTests {
         }).isEqualTo("background-blend-mode: screen, overlay")
 
         assertThat(modifierToText {
+            Modifier.backgroundBlendMode(listOf(BackgroundBlendMode.Multiply, BackgroundBlendMode.ColorDodge))
+        }).isEqualTo("background-blend-mode: multiply, color-dodge")
+
+        assertThat(modifierToText {
             Modifier.backgroundClip(BackgroundClip.ContentBox)
         }).isEqualTo("background-clip: content-box")
 
@@ -62,6 +67,10 @@ class StyleModifierTests {
         assertThat(modifierToText {
             Modifier.backgroundImage(url("test.png"))
         }).isEqualTo("background-image: url(\"test.png\")")
+
+        assertThat(modifierToText {
+            Modifier.backgroundImage(linearGradient(Color.red, Color.green))
+        }).isEqualTo("background-image: linear-gradient(red, green)")
 
         assertThat(modifierToText {
             Modifier.backgroundOrigin(BackgroundOrigin.BorderBox)
