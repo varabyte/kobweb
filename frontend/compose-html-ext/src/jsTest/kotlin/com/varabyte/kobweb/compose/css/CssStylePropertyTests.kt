@@ -1788,7 +1788,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.End) }).isEqualTo("scroll-snap-align: end")
         assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Center) }).isEqualTo("scroll-snap-align: center")
 
-        // Two axis
+        // Two axes
         assertThat(styleToText {
             scrollSnapAlign(ScrollSnapAlign.of(ScrollSnapAlign.Start, ScrollSnapAlign.Center))
         }).isEqualTo("scroll-snap-align: start center")
