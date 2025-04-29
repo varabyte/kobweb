@@ -116,44 +116,13 @@ fun StyleScope.boxShadow(boxShadow: BoxShadow) {
     boxShadow(boxShadow.toString())
 }
 
-/**
- * Creates a box-shadow property with multiple shadow.
- * The property accepts a list of shadows, created by
- * using [BoxShadow.of], ordered from front to back.
- *
- * **The style is not created if no shadows are specified.**
- *
- * Usage:
- * ```kotlin
- * style {
- *     boxShadow(
- *         BoxShadow.of(
- *             offsetX = 0.px,
- *             offsetY = 1.px,
- *             blurRadius = 3.px,
- *             spreadRadius = 1.px,
- *             color = Colors.Black.copyf(alpha = 0.15f),
- *         ),
- *         BoxShadow.of(
- *             offsetX = 5.px,
- *             offsetY = 8.px,
- *             blurRadius = 10.px,
- *             spreadRadius = (-1).px,
- *             color = Colors.Black.copyf(alpha = 0.32f),
- *         ),
- *     )
- * }
- * ```
- * Will generate:
- * ```css
- * box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 3px 1px,
- *             rgba(0, 0, 0, 0.318) 5px 8px 10px -1px;
- * ```
- */
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.boxShadow(boxShadow: BoxShadow.Listable) {
+    boxShadow(boxShadow as BoxShadow)
+}
+@Deprecated("Use `boxShadow(BoxShadow.list(*boxShadows))` instead", ReplaceWith("boxShadow(BoxShadow.list(*boxShadows))"))
 fun StyleScope.boxShadow(vararg boxShadows: BoxShadow.Listable) {
-    if (boxShadows.isNotEmpty()) {
-        boxShadow(boxShadows.joinToString())
-    }
+    boxShadow(BoxShadow.list(*boxShadows))
 }
 
 /**
@@ -249,6 +218,42 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
             inset = inset,
         )
 
+        /**
+         * Creates a box-shadow property with multiple shadow.
+         * The property accepts a list of shadows, created by
+         * using [BoxShadow.of], ordered from front to back.
+         *
+         * **The style is not created if no shadows are specified.**
+         *
+         * Usage:
+         * ```kotlin
+         * style {
+         *    boxShadow(
+         *       BoxShadow.list(
+         *          BoxShadow.of(
+         *             offsetX = 0.px,
+         *             offsetY = 1.px,
+         *             blurRadius = 3.px,
+         *             spreadRadius = 1.px,
+         *             color = Colors.Black.copyf(alpha = 0.15f),
+         *          ),
+         *          BoxShadow.of(
+         *             offsetX = 5.px,
+         *             offsetY = 8.px,
+         *             blurRadius = 10.px,
+         *             spreadRadius = (-1).px,
+         *             color = Colors.Black.copyf(alpha = 0.32f),
+         *          ),
+         *       )
+         *    )
+         * }
+         * ```
+         * Will generate:
+         * ```css
+         * box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 3px 1px,
+         *             rgba(0, 0, 0, 0.318) 5px 8px 10px -1px;
+         * ```
+         */
         fun list(vararg shadows: Listable): BoxShadow = ValueList(shadows.toList())
     }
 }

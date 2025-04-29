@@ -19,6 +19,47 @@ class StyleModifierTests {
 
         return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }
     }
+    
+    @Test
+    fun verifyBox() {
+        assertThat(modifierToText {
+            Modifier.boxDecorationBreak(BoxDecorationBreak.Clone)
+        }).isEqualTo("box-decoration-break: clone")
+
+        assertThat(modifierToText {
+            Modifier.boxSizing(BoxSizing.BorderBox)
+        }).isEqualTo("box-sizing: border-box")
+
+        assertThat(modifierToText {
+            Modifier.boxShadow(
+                offsetX = 0.px,
+                offsetY = 1.px,
+                blurRadius = 3.px,
+                spreadRadius = 1.px,
+                color = Color.gray,
+                inset = true
+            )
+        }).isEqualTo("box-shadow: inset 0px 1px 3px 1px gray")
+
+        assertThat(modifierToText {
+            Modifier.boxShadow(
+                BoxShadow.of(0.px, 1.px, 3.px, 1.px, Color.red),
+                BoxShadow.of(0.px, 1.px, 2.px, 0.px, Color.gray)
+            )
+        }).isEqualTo("box-shadow: 0px 1px 3px 1px red, 0px 1px 2px 0px gray")
+
+        assertThat(modifierToText {
+            Modifier.boxShadow(BoxShadow.None)
+        }).isEqualTo("box-shadow: none")
+
+        assertThat(modifierToText {
+            Modifier.boxShadow(BoxShadow.Unset)
+        }).isEqualTo("box-shadow: unset")
+
+        assertThat(modifierToText {
+            Modifier.boxShadow(BoxShadow.of(0.px, 1.px, 3.px, 1.px, Color.gray))
+        }).isEqualTo("box-shadow: 0px 1px 3px 1px gray")
+    }
 
     @Test
     fun verifyMarginInline() {

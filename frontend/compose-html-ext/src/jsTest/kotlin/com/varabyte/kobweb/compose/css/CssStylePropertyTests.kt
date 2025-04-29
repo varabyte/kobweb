@@ -586,10 +586,10 @@ class CssStylePropertyTests {
         }).isEqualTo("box-shadow: inset 2px 3px 4px 5px red")
 
         assertThat(styleToText {
-            boxShadow(
+            boxShadow(BoxShadow.list(
                 BoxShadow.of(2.px, 3.px),
                 BoxShadow.of(4.px, 5.px, blurRadius = 6.px)
-            )
+            ))
         }).isEqualTo("box-shadow: 2px 3px, 4px 5px 6px")
 
         assertThat(styleToText { boxShadow(BoxShadow.None) }).isEqualTo("box-shadow: none")

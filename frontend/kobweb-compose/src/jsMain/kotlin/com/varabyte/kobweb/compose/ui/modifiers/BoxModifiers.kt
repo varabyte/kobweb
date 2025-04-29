@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.BoxShadow
+import com.varabyte.kobweb.compose.css.boxShadow
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.styleModifier
 import org.jetbrains.compose.web.css.*
@@ -109,7 +111,7 @@ fun Modifier.boxShadow(
  * ```
  */
 fun Modifier.boxShadow(vararg boxShadows: BoxShadow.Listable): Modifier = styleModifier {
-    boxShadow(*boxShadows)
+    boxShadow(BoxShadow.list(*boxShadows))
 }
 
 fun Modifier.boxShadow(boxShadows: List<BoxShadow.Listable>) = boxShadow(*boxShadows.toTypedArray())
