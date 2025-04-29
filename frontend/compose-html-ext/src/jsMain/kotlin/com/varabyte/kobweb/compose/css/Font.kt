@@ -55,32 +55,33 @@ fun StyleScope.fontStyle(style: FontStyle) {
 sealed class FontVariantAlternates private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    private class SingleKeyword(value: String) : FontVariantAlternates(value)
-    sealed class ListableValue(value: String) : FontVariantAlternates(value)
-    private class ListableKeyword(value: String) : ListableValue(value)
-    private class FunctionalNotation(name: String, ident: String) : ListableValue("$name($ident)")
-    private class ValueList(vararg values: ListableValue) : FontVariantAlternates(values.joinToString(" "))
+    private class SingleValue(value: String) : FontVariantAlternates(value)
+    sealed class Repeatable(value: String) : FontVariantAlternates(value)
+    private class RepeatableKeyword(value: String) : Repeatable(value)
+    private class FunctionalNotation(name: String, ident: String) : Repeatable("$name($ident)")
+    private class ValueList(values: List<Repeatable>) : FontVariantAlternates(values.joinToString(" "))
 
     companion object {
         // Keyword
-        val Normal: FontVariantAlternates get() = SingleKeyword("normal")
-        val HistoricalForms: ListableValue get() = ListableKeyword("historical-forms")
+        val Normal: FontVariantAlternates get() = SingleValue("normal")
+        val HistoricalForms: Repeatable get() = RepeatableKeyword("historical-forms")
 
         // Functional notation values
-        fun Stylistic(ident: String): ListableValue = FunctionalNotation("stylistic", ident)
-        fun Styleset(ident: String): ListableValue = FunctionalNotation("styleset", ident)
-        fun CharacterVariant(ident: String): ListableValue = FunctionalNotation("character-variant", ident)
-        fun Swash(ident: String): ListableValue = FunctionalNotation("swash", ident)
-        fun Ornaments(ident: String): ListableValue = FunctionalNotation("ornaments", ident)
-        fun Annotation(ident: String): ListableValue = FunctionalNotation("annotation", ident)
+        fun Stylistic(ident: String): Repeatable = FunctionalNotation("stylistic", ident)
+        fun Styleset(ident: String): Repeatable = FunctionalNotation("styleset", ident)
+        fun CharacterVariant(ident: String): Repeatable = FunctionalNotation("character-variant", ident)
+        fun Swash(ident: String): Repeatable = FunctionalNotation("swash", ident)
+        fun Ornaments(ident: String): Repeatable = FunctionalNotation("ornaments", ident)
+        fun Annotation(ident: String): Repeatable = FunctionalNotation("annotation", ident)
 
-        fun of(vararg values: ListableValue): FontVariantAlternates = ValueList(*values)
+        fun of(value: Repeatable): FontVariantAlternates = SingleValue(value.toString())
+        fun list(vararg values: Repeatable): FontVariantAlternates = ValueList(values.toList())
 
         // Global
-        val Inherit: FontVariantAlternates get() = SingleKeyword("inherit")
-        val Initial: FontVariantAlternates get() = SingleKeyword("initial")
-        val Revert: FontVariantAlternates get() = SingleKeyword("revert")
-        val Unset: FontVariantAlternates get() = SingleKeyword("unset")
+        val Inherit: FontVariantAlternates get() = SingleValue("inherit")
+        val Initial: FontVariantAlternates get() = SingleValue("initial")
+        val Revert: FontVariantAlternates get() = SingleValue("revert")
+        val Unset: FontVariantAlternates get() = SingleValue("unset")
     }
 }
 
@@ -118,36 +119,36 @@ fun StyleScope.fontVariantCaps(caps: FontVariantCaps) {
 sealed class FontVariantEastAsian private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    private class Keyword(value: String) : FontVariantEastAsian(value)
-    class ListableKeyword internal constructor(value: String) : FontVariantEastAsian(value)
-    private class KeywordList(vararg values: ListableKeyword) : FontVariantEastAsian(values.joinToString(" "))
+    private class SingleValue(value: String) : FontVariantEastAsian(value)
+    class Repeatable internal constructor(value: String) : FontVariantEastAsian(value)
+    private class ValueList(vararg values: Repeatable) : FontVariantEastAsian(values.joinToString(" "))
 
     companion object {
         // Keyword
-        val Normal: FontVariantEastAsian get() = Keyword("normal")
+        val Normal: FontVariantEastAsian get() = SingleValue("normal")
 
         // Ruby
-        val Ruby get() = ListableKeyword("ruby")
+        val Ruby get() = Repeatable("ruby")
 
         // East Asian variants
-        val Jis78 get() = ListableKeyword("jis78")
-        val Jis83 get() = ListableKeyword("jis83")
-        val Jis90 get() = ListableKeyword("jis90")
-        val Jis04 get() = ListableKeyword("jis04")
-        val Simplified get() = ListableKeyword("simplified")
-        val Traditional get() = ListableKeyword("traditional")
+        val Jis78 get() = Repeatable("jis78")
+        val Jis83 get() = Repeatable("jis83")
+        val Jis90 get() = Repeatable("jis90")
+        val Jis04 get() = Repeatable("jis04")
+        val Simplified get() = Repeatable("simplified")
+        val Traditional get() = Repeatable("traditional")
 
         // East Asian widths
-        val FullWidth get() = ListableKeyword("full-width")
-        val ProportionalWidth get() = ListableKeyword("proportional-width")
+        val FullWidth get() = Repeatable("full-width")
+        val ProportionalWidth get() = Repeatable("proportional-width")
 
-        fun of(vararg values: ListableKeyword): FontVariantEastAsian = KeywordList(*values)
+        fun list(vararg values: Repeatable): FontVariantEastAsian = ValueList(*values)
 
         // Global
-        val Inherit: FontVariantEastAsian get() = Keyword("inherit")
-        val Initial: FontVariantEastAsian get() = Keyword("initial")
-        val Revert: FontVariantEastAsian get() = Keyword("revert")
-        val Unset: FontVariantEastAsian get() = Keyword("unset")
+        val Inherit: FontVariantEastAsian get() = SingleValue("inherit")
+        val Initial: FontVariantEastAsian get() = SingleValue("initial")
+        val Revert: FontVariantEastAsian get() = SingleValue("revert")
+        val Unset: FontVariantEastAsian get() = SingleValue("unset")
     }
 }
 
@@ -183,8 +184,8 @@ sealed class FontVariantLigatures private constructor(private val value: String)
     override fun toString() = value
 
     private class Keyword(value: String) : FontVariantLigatures(value)
-    class ListableKeyword internal constructor(value: String) : FontVariantLigatures(value)
-    private class KeywordList(vararg values: ListableKeyword) : FontVariantLigatures(values.joinToString(" "))
+    class Repeatable internal constructor(value: String) : FontVariantLigatures(value)
+    private class ValueList(values: List<Repeatable>) : FontVariantLigatures(values.joinToString(" "))
 
     companion object {
         // Keyword
@@ -192,22 +193,22 @@ sealed class FontVariantLigatures private constructor(private val value: String)
         val None: FontVariantLigatures get() = Keyword("none")
 
         // Common ligature values
-        val CommonLigatures get() = ListableKeyword("common-ligatures")
-        val NoCommonLigatures get() = ListableKeyword("no-common-ligatures")
+        val CommonLigatures get() = Repeatable("common-ligatures")
+        val NoCommonLigatures get() = Repeatable("no-common-ligatures")
 
         // Discretionary ligature values
-        val DiscretionaryLigatures get() = ListableKeyword("discretionary-ligatures")
-        val NoDiscretionaryLigatures get() = ListableKeyword("no-discretionary-ligatures")
+        val DiscretionaryLigatures get() = Repeatable("discretionary-ligatures")
+        val NoDiscretionaryLigatures get() = Repeatable("no-discretionary-ligatures")
 
         // Historical ligature values
-        val HistoricalLigatures get() = ListableKeyword("historical-ligatures")
-        val NoHistoricalLigatures get() = ListableKeyword("no-historical-ligatures")
+        val HistoricalLigatures get() = Repeatable("historical-ligatures")
+        val NoHistoricalLigatures get() = Repeatable("no-historical-ligatures")
 
         // Contextual ligature values
-        val Contextual get() = ListableKeyword("contextual")
-        val NoContextual get() = ListableKeyword("no-contextual")
+        val Contextual get() = Repeatable("contextual")
+        val NoContextual get() = Repeatable("no-contextual")
 
-        fun of(vararg values: ListableKeyword): FontVariantLigatures = KeywordList(*values)
+        fun list(vararg values: Repeatable): FontVariantLigatures = ValueList(values.toList())
 
         fun of(
             common: Boolean? = null,
@@ -229,7 +230,7 @@ sealed class FontVariantLigatures private constructor(private val value: String)
                     add(if (contextual) Contextual else NoContextual)
                 }
             }
-            return of(*values.toTypedArray())
+            return ValueList(values)
         }
 
         // Global
@@ -249,28 +250,28 @@ sealed class FontVariantNumeric private constructor(private val value: String) :
     override fun toString() = value
 
     private class Keyword(value: String) : FontVariantNumeric(value)
-    class ListableKeyword internal constructor(value: String) : FontVariantNumeric(value)
-    private class KeywordList(vararg keywords: ListableKeyword) : FontVariantNumeric(keywords.joinToString(" "))
+    class Repeatable internal constructor(value: String) : FontVariantNumeric(value)
+    private class ValueList(keywords: List<Repeatable>) : FontVariantNumeric(keywords.joinToString(" "))
 
     companion object {
         // Keyword
         val Normal: FontVariantNumeric get() = Keyword("normal")
-        val Ordinal: ListableKeyword get() = ListableKeyword("ordinal")
-        val SlashedZero: ListableKeyword get() = ListableKeyword("slashed-zero")
+        val Ordinal: Repeatable get() = Repeatable("ordinal")
+        val SlashedZero: Repeatable get() = Repeatable("slashed-zero")
 
         // Numeric figure
-        val LiningNums: ListableKeyword get() = ListableKeyword("lining-nums")
-        val OldstyleNums: ListableKeyword get() = ListableKeyword("oldstyle-nums")
+        val LiningNums: Repeatable get() = Repeatable("lining-nums")
+        val OldstyleNums: Repeatable get() = Repeatable("oldstyle-nums")
 
         // Numeric spacing
-        val ProportionalNums: ListableKeyword get() = ListableKeyword("proportional-nums")
-        val TabularNums: ListableKeyword get() = ListableKeyword("tabular-nums")
+        val ProportionalNums: Repeatable get() = Repeatable("proportional-nums")
+        val TabularNums: Repeatable get() = Repeatable("tabular-nums")
 
         // Numeric fractions
-        val DiagonalFractions: ListableKeyword get() = ListableKeyword("diagonal-fractions")
-        val StackedFractions: ListableKeyword get() = ListableKeyword("stacked-fractions")
+        val DiagonalFractions: Repeatable get() = Repeatable("diagonal-fractions")
+        val StackedFractions: Repeatable get() = Repeatable("stacked-fractions")
 
-        fun of(vararg keywords: ListableKeyword): FontVariantNumeric = KeywordList(*keywords)
+        fun list(vararg keywords: Repeatable): FontVariantNumeric = ValueList(keywords.toList())
 
         // Global
         val Inherit: FontVariantNumeric get() = Keyword("inherit")
@@ -335,10 +336,13 @@ sealed class FontVariationSettings private constructor(private val value: String
     override fun toString() = value
 
     private class Keyword(value: String) : FontVariationSettings(value)
-    class Axis(name: String, value: Number) : FontVariationSettings("${name.wrapQuotesIfNecessary()} $value")
-    class Axes(vararg axes: Axis) : FontVariationSettings(axes.joinToString(","))
+    class Axis internal constructor(name: String, value: Number) : FontVariationSettings("${name.wrapQuotesIfNecessary()} $value")
+    class Axes internal constructor(vararg axes: Axis) : FontVariationSettings(axes.joinToString())
 
     companion object {
+        fun of(name: String, value: Number): FontVariationSettings = Axis(name, value)
+        fun list(vararg axes: Axis): FontVariationSettings = Axes(*axes)
+
         // Keyword
         val Normal: FontVariationSettings get() = Keyword("normal")
         // We intentionally do not include convenience functions for registered axes, as it is preferred to use

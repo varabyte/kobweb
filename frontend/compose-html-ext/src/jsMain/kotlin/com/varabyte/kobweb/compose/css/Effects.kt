@@ -14,12 +14,15 @@ sealed class BackdropFilter private constructor(private val value: String) : Sty
     private class Keyword(value: String): BackdropFilter(value)
     class Repeatable internal constructor(filter: CSSFilter) :
         BackdropFilter(filter.toString())
+    private class ValueList(values: List<Repeatable>) : BackdropFilter(values.joinToString(" "))
 
     companion object {
         // Keyword
         val None: BackdropFilter get() = Keyword("none")
 
         fun of(filter: CSSFilter) = Repeatable(filter)
+        fun list(vararg filters: CSSFilter): BackdropFilter = ValueList(filters.map { of(it) }.toList())
+        fun list(vararg filters: Repeatable): BackdropFilter = ValueList(filters.toList())
 
         // Global
         val Inherit: BackdropFilter get() = Keyword("inherit")
@@ -34,16 +37,14 @@ fun StyleScope.backdropFilter(backdropFilter: BackdropFilter) {
     property("-webkit-backdrop-filter", backdropFilter) // For safari
 }
 
+@Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("backdropFilter(BackdropFilter.list(*filters))"))
 fun StyleScope.backdropFilter(vararg filters: CSSFilter) {
-    backdropFilter(*filters.map { BackdropFilter.of(it) }.toTypedArray())
+    backdropFilter(BackdropFilter.list(*filters))
 }
 
+@Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("backdropFilter(BackdropFilter.list(*filters))"))
 fun StyleScope.backdropFilter(vararg filters: BackdropFilter.Repeatable) {
-    if (filters.isNotEmpty()) {
-        val backdropFilter = filters.joinToString(" ")
-        property("backdrop-filter", backdropFilter)
-        property("-webkit-backdrop-filter", backdropFilter) // For safari
-    }
+    backdropFilter(BackdropFilter.list(*filters))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/filter
@@ -54,12 +55,15 @@ sealed class Filter private constructor(private val value: String) : StyleProper
     private class Keyword(value: String): Filter(value)
     class Repeatable internal constructor(filter: CSSFilter) :
         Filter(filter.toString())
+    private class ValueList(values: List<Repeatable>) : Filter(values.joinToString(" "))
 
     companion object {
         // Keyword
         val None: Filter get() = Keyword("none")
 
         fun of(filter: CSSFilter) = Repeatable(filter)
+        fun list(vararg filters: CSSFilter): Filter = ValueList(filters.map { of(it) }.toList())
+        fun list(vararg filters: Repeatable): Filter = ValueList(filters.toList())
 
         // Global
         val Inherit: Filter get() = Keyword("inherit")
@@ -73,12 +77,12 @@ fun StyleScope.filter(filter: Filter) {
     property("filter", filter)
 }
 
+@Deprecated("Use filter(Filter.list(...)) instead.", ReplaceWith("filter(Filter.list(*filters))"))
 fun StyleScope.filter(vararg filters: Filter.Repeatable) {
-    if (filters.isNotEmpty()) {
-        property("filter", filters.joinToString(" "))
-    }
+    filter(Filter.list(*filters))
 }
 
+@Deprecated("Use filter(Filter.list(...)) instead.", ReplaceWith("filter(Filter.list(*filters))"))
 fun StyleScope.filter(vararg filters: CSSFilter) {
-    filter(*filters.map { Filter.of(it) }.toTypedArray())
+    filter(Filter.list(*filters))
 }

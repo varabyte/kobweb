@@ -176,6 +176,8 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
 
     private class Keyword(value: String) : BoxShadow(value)
 
+    private class ValueList(shadows: List<Repeatable>) : BoxShadow(shadows.joinToString())
+
     class Repeatable internal constructor(
         offsetX: CSSLengthNumericValue = 0.px,
         offsetY: CSSLengthNumericValue = 0.px,
@@ -264,5 +266,7 @@ sealed class BoxShadow private constructor(private val value: String) : StylePro
             color = color,
             inset = inset,
         )
+
+        fun list(vararg shadows: Repeatable): BoxShadow = ValueList(shadows.toList())
     }
 }

@@ -45,23 +45,23 @@ fun Modifier.fontStyle(value: FontStyle): Modifier = styleModifier {
 
 class FontVariantScope internal constructor(private val styleScope: StyleScope) {
     fun alternates(alternates: FontVariantAlternates) = styleScope.fontVariantAlternates(alternates)
-    fun alternates(vararg alternates: FontVariantAlternates.ListableValue) =
-        styleScope.fontVariantAlternates(FontVariantAlternates.of(*alternates))
-    fun alternates(alternates: List<FontVariantAlternates.ListableValue>) = alternates(*alternates.toTypedArray())
+    fun alternates(vararg alternates: FontVariantAlternates.Repeatable) =
+        styleScope.fontVariantAlternates(FontVariantAlternates.list(*alternates))
+    fun alternates(alternates: List<FontVariantAlternates.Repeatable>) = alternates(*alternates.toTypedArray())
 
     fun caps(caps: FontVariantCaps) = styleScope.fontVariantCaps(caps)
 
     fun eastAsian(eastAsian: FontVariantEastAsian) = styleScope.fontVariantEastAsian(eastAsian)
-    fun eastAsian(vararg eastAsians: FontVariantEastAsian.ListableKeyword) =
-        styleScope.fontVariantEastAsian(FontVariantEastAsian.of(*eastAsians))
-    fun eastAsian(eastAsians: List<FontVariantEastAsian.ListableKeyword>) = eastAsian(*eastAsians.toTypedArray())
+    fun eastAsian(vararg eastAsians: FontVariantEastAsian.Repeatable) =
+        styleScope.fontVariantEastAsian(FontVariantEastAsian.list(*eastAsians))
+    fun eastAsian(eastAsians: List<FontVariantEastAsian.Repeatable>) = eastAsian(*eastAsians.toTypedArray())
 
     fun emoji(emoji: FontVariantEmoji) = styleScope.fontVariantEmoji(emoji)
 
     fun ligatures(ligatures: FontVariantLigatures) = styleScope.fontVariantLigatures(ligatures)
-    fun ligatures(vararg ligatures: FontVariantLigatures.ListableKeyword) =
-        styleScope.fontVariantLigatures(FontVariantLigatures.of(*ligatures))
-    fun ligatures(ligatures: List<FontVariantLigatures.ListableKeyword>) = ligatures(*ligatures.toTypedArray())
+    fun ligatures(vararg ligatures: FontVariantLigatures.Repeatable) =
+        styleScope.fontVariantLigatures(FontVariantLigatures.list(*ligatures))
+    fun ligatures(ligatures: List<FontVariantLigatures.Repeatable>) = ligatures(*ligatures.toTypedArray())
 
     fun ligatures(
         common: Boolean? = null,
@@ -78,9 +78,9 @@ class FontVariantScope internal constructor(private val styleScope: StyleScope) 
     )
 
     fun numeric(numeric: FontVariantNumeric) = styleScope.fontVariantNumeric(numeric)
-    fun numeric(vararg numerics: FontVariantNumeric.ListableKeyword) =
-        styleScope.fontVariantNumeric(FontVariantNumeric.of(*numerics))
-    fun numeric(numerics: List<FontVariantNumeric.ListableKeyword>) = numeric(*numerics.toTypedArray())
+    fun numeric(vararg numerics: FontVariantNumeric.Repeatable) =
+        styleScope.fontVariantNumeric(FontVariantNumeric.list(*numerics))
+    fun numeric(numerics: List<FontVariantNumeric.Repeatable>) = numeric(*numerics.toTypedArray())
 }
 
 fun Modifier.fontVariant(scope: FontVariantScope.() -> Unit) = styleModifier {
@@ -104,7 +104,7 @@ fun Modifier.fontVariationSettings(value: FontVariationSettings): Modifier = sty
 }
 
 fun Modifier.fontVariationSettings(vararg axes: FontVariationSettings.Axis): Modifier = styleModifier {
-    fontVariationSettings(FontVariationSettings.Axes(*axes))
+    fontVariationSettings(FontVariationSettings.list(*axes))
 }
 
 fun Modifier.fontVariationSettings(axes: List<FontVariationSettings.Axis>): Modifier = fontVariationSettings(*axes.toTypedArray())

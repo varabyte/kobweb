@@ -12,6 +12,8 @@ class TransitionBehavior private constructor(private val value: String) : StyleP
     override fun toString() = value
 
     companion object {
+        fun list(vararg behaviors: TransitionBehavior) = TransitionBehavior(behaviors.joinToString())
+
         // Keywords
         val AllowDiscrete get() = TransitionBehavior("allow-discrete")
         val Normal get() = TransitionBehavior("normal")
@@ -28,10 +30,9 @@ fun StyleScope.transitionBehavior(behavior: TransitionBehavior) {
     property("transition-behavior", behavior)
 }
 
+@Deprecated("Use transitionBehavior(TransitionBehavior.list(...)) instead.", ReplaceWith("transitionBehavior(TransitionBehavior.list(*behaviors))"))
 fun StyleScope.transitionBehavior(vararg behaviors: TransitionBehavior) {
-    if (behaviors.isNotEmpty()) {
-        property("transition-behavior", behaviors.joinToString())
-    }
+    transitionBehavior(TransitionBehavior.list(*behaviors))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property
@@ -108,6 +109,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
     override fun toString(): String = value
 
     private class Keyword(value: String) : Transition(value)
+    private class ValueList(values: List<Repeatable>) : Transition(values.joinToString())
 
     class Repeatable internal constructor(
         property: TransitionProperty.Name,
@@ -157,6 +159,8 @@ sealed class Transition private constructor(private val value: String) : StylePr
             behavior: TransitionBehavior? = null,
         ): Repeatable = Repeatable(TransitionProperty.of(property), duration, timingFunction, delay, behavior)
 
+        fun list(vararg transitions: Repeatable): Transition = ValueList(transitions.toList())
+
         /**
          * Specify transition details that should apply to every animatable property on this element.
          */
@@ -183,8 +187,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }
-            .toTypedArray()
+        ): Transition = ValueList(properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) })
 
         /**
          * A convenience method for when you want to animate multiple properties with the same values.
@@ -202,8 +205,7 @@ sealed class Transition private constructor(private val value: String) : StylePr
             timingFunction: TransitionTimingFunction? = null,
             delay: CSSTimeNumericValue? = null,
             behavior: TransitionBehavior? = null,
-        ) = properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) }
-            .toTypedArray()
+        ): Transition = ValueList(properties.map { property -> Transition.of(property, duration, timingFunction, delay, behavior) })
     }
 }
 
@@ -211,8 +213,12 @@ fun StyleScope.transition(transition: Transition) {
     property("transition", transition)
 }
 
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.transition(transition: Transition.Repeatable) {
+    transition(transition as Transition)
+}
+// Remove the previous method too after removing this method
+@Deprecated("Use transition(Transition.list(...)) instead.", ReplaceWith("transition(Transition.list(*transitions))"))
 fun StyleScope.transition(vararg transitions: Transition.Repeatable) {
-    if (transitions.isNotEmpty()) {
-        property("transition", transitions.joinToString())
-    }
+    transition(Transition.list(*transitions))
 }

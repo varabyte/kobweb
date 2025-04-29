@@ -10,13 +10,13 @@ fun Modifier.backdropFilter(backdropFilter: BackdropFilter) = styleModifier {
 }
 
 fun Modifier.backdropFilter(vararg filters: CSSFilter) = styleModifier {
-    backdropFilter(*filters)
+    backdropFilter(BackdropFilter.list(*filters))
 }
 
 fun Modifier.backdropFilter(filters: List<CSSFilter>) = backdropFilter(*filters.toTypedArray())
 
 fun Modifier.backdropFilter(vararg filters: BackdropFilter.Repeatable) = styleModifier {
-    backdropFilter(*filters)
+    backdropFilter(BackdropFilter.list(*filters))
 }
 
 fun Modifier.backdropFilter(filters: List<BackdropFilter.Repeatable>) = backdropFilter(*filters.toTypedArray())
@@ -26,13 +26,13 @@ fun Modifier.filter(filter: Filter) = styleModifier {
 }
 
 fun Modifier.filter(vararg filters: CSSFilter) = styleModifier {
-    filter(*filters)
+    filter(Filter.list(*filters))
 }
 
 fun Modifier.filter(filters: List<CSSFilter>) = filter(*filters.toTypedArray())
 
 fun Modifier.filter(vararg filters: Filter.Repeatable) = styleModifier {
-    filter(*filters)
+    filter(Filter.list(*filters))
 }
 
 fun Modifier.filter(filters: List<Filter.Repeatable>) = filter(*filters.toTypedArray())

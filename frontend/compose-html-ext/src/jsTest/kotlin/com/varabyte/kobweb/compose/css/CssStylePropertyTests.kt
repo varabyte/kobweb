@@ -52,7 +52,7 @@ class CssStylePropertyTests {
         }).isEqualTo("animation: 3s ease-in 1s 2 reverse both paused slide-in")
 
         assertThat(styleToText {
-            animation(
+            animation(Animation.list(
                 Animation.of(
                     "slide-in",
                     duration = 3.s,
@@ -64,7 +64,7 @@ class CssStylePropertyTests {
                     timingFunction = AnimationTimingFunction.EaseOut,
                     delay = 5.s
                 )
-            )
+            ))
         }).isEqualTo("animation: 3s linear slide-in, 3s ease-out 5s slide-out")
 
         assertThat(styleToText { animation(Animation.None) }).isEqualTo("animation: none")
@@ -188,7 +188,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backdropFilter(BackdropFilter.None) }).isEqualTo("backdrop-filter: none; -webkit-backdrop-filter: none")
 
         assertThat(styleToText {
-            backdropFilter(BackdropFilter.of(blur(10.px)), BackdropFilter.of(brightness(0.5)))
+            backdropFilter(BackdropFilter.list(BackdropFilter.of(blur(10.px)), BackdropFilter.of(brightness(0.5))))
         }).isEqualTo("backdrop-filter: blur(10px) brightness(0.5); -webkit-backdrop-filter: blur(10px) brightness(0.5)")
 
         assertThat(styleToText { backdropFilter(BackdropFilter.Inherit) }).isEqualTo("backdrop-filter: inherit; -webkit-backdrop-filter: inherit")
@@ -358,11 +358,11 @@ class CssStylePropertyTests {
         }).isEqualTo("background: left 0% top 0% / 100px")
 
         assertThat(styleToText {
-            background(
+            background(Background.list(
                 Color.magenta,
                 Background.of(BackgroundImage.of(CSSUrl("test1.png"))),
                 Background.of(BackgroundImage.of(CSSUrl("test2.png")))
-            )
+            ))
         }).isEqualTo("background: url(\"test2.png\"), url(\"test1.png\") magenta")
 
         assertThat(styleToText { background(Background.None) }).isEqualTo("background: none")
@@ -743,8 +743,10 @@ class CssStylePropertyTests {
         assertThat(styleToText { content(Content.of("Some text")) }).isEqualTo("content: \"Some text\"")
         assertThat(styleToText { content(Content.of(CSSUrl("test.png"))) }).isEqualTo("content: url(\"test.png\")")
         assertThat(styleToText { content(Content.of(linearGradient(Color.red, Color.green))) }).isEqualTo("content: linear-gradient(red, green)")
-        assertThat(styleToText { content(Content.of("Some text"), Content.of(CSSUrl("test.png"))) }).isEqualTo("content: \"Some text\" url(\"test.png\")")
-        assertThat(styleToText { content("alt-text", Content.of(CSSUrl("test.png"))) }).isEqualTo("content: url(\"test.png\") / \"alt-text\"")
+        assertThat(styleToText {
+            content(Content.list(Content.of("Some text"), Content.of(CSSUrl("test.png"))))
+        }).isEqualTo("content: \"Some text\" url(\"test.png\")")
+        assertThat(styleToText { content(Content.of(CSSUrl("test.png"), "alt-text")) }).isEqualTo("content: url(\"test.png\") / \"alt-text\"")
 
         // Non-combinable
         assertThat(styleToText { content(Content.None) }).isEqualTo("content: none")
@@ -829,7 +831,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { filter(Filter.None) }).isEqualTo("filter: none")
 
         assertThat(styleToText {
-            filter(Filter.of(blur(10.px)), Filter.of(brightness(0.5)))
+            filter(Filter.list(Filter.of(blur(10.px)), Filter.of(brightness(0.5))))
         }).isEqualTo("filter: blur(10px) brightness(0.5)")
 
         assertThat(styleToText { filter(Filter.Inherit) }).isEqualTo("filter: inherit")
@@ -909,7 +911,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText {
             fontVariantAlternates(
-                FontVariantAlternates.of(
+                FontVariantAlternates.list(
                     FontVariantAlternates.Stylistic("ident1"),
                     FontVariantAlternates.Swash("ident2")
                 )
@@ -956,7 +958,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.ProportionalWidth) }).isEqualTo("font-variant-east-asian: proportional-width")
 
         assertThat(styleToText {
-            fontVariantEastAsian(FontVariantEastAsian.of(FontVariantEastAsian.Ruby, FontVariantEastAsian.Jis78))
+            fontVariantEastAsian(FontVariantEastAsian.list(FontVariantEastAsian.Ruby, FontVariantEastAsian.Jis78))
         }).isEqualTo("font-variant-east-asian: ruby jis78")
 
         assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Inherit) }).isEqualTo("font-variant-east-asian: inherit")
@@ -1001,7 +1003,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText {
             fontVariantLigatures(
-                FontVariantLigatures.of(
+                FontVariantLigatures.list(
                     FontVariantLigatures.CommonLigatures,
                     FontVariantLigatures.HistoricalLigatures
                 )
@@ -1046,7 +1048,7 @@ class CssStylePropertyTests {
 
         assertThat(styleToText {
             fontVariantNumeric(
-                FontVariantNumeric.of(
+                FontVariantNumeric.list(
                     FontVariantNumeric.Ordinal,
                     FontVariantNumeric.SlashedZero
                 )
@@ -1116,7 +1118,7 @@ class CssStylePropertyTests {
                  FontVariationSettings.Axis("wght", 400),
                  FontVariationSettings.Axis("slnt", 0)
              )
-         ) }).isEqualTo("font-variation-settings: \"wght\" 400,\"slnt\" 0")
+         ) }).isEqualTo("font-variation-settings: \"wght\" 400, \"slnt\" 0")
 
          assertThat(styleToText { fontVariationSettings(FontVariationSettings.Inherit) })
              .isEqualTo("font-variation-settings: inherit")
@@ -1965,11 +1967,11 @@ class CssStylePropertyTests {
         assertThat(styleToText { transition(Transition.all(1.s)) })
             .isEqualTo("transition: all 1s")
 
-        assertThat(styleToText { transition(*Transition.group(listOf("width", "height"), 2.s)) })
+        assertThat(styleToText { transition(Transition.group(listOf("width", "height"), 2.s)) })
             .isEqualTo("transition: width 2s, height 2s")
         assertThat(styleToText {
             transition(
-                *Transition.group(
+                Transition.group(
                     listOf(
                         TransitionProperty.of("opacity"),
                         TransitionProperty.of("color")

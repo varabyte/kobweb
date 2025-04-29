@@ -38,6 +38,10 @@ fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
     property("background-blend-mode", blendMode)
 }
 
+fun StyleScope.backgroundBlendMode(vararg blendModes: BackgroundBlendMode) {
+    property("background-blend-mode", blendModes.joinToString())
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip
 class BackgroundClip private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
@@ -215,6 +219,19 @@ sealed class Background private constructor(private val value: String) : StylePr
     override fun toString(): String = value
 
     private class Keyword(value: String) : Background(value)
+    internal class ValueList(color: CSSColorValue?, internal val backgrounds: List<Repeatable>) : Background(
+        buildString {
+            if (color == null && backgrounds.isEmpty()) return@buildString
+            // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
+            append(backgrounds.reversed().joinToString())
+            // Backgrounds only allow you to specify a single color. If provided, it must be included with
+            // the final layer.
+            if (color != null) {
+                if (this.isNotEmpty()) append(' ')
+                append(color)
+            }
+        }
+    )
 
     // Note: Color is actually a separate property and intentionally not included here.
     // Note: blend mode *is* specified here but needs to be handled externally, since
@@ -274,51 +291,58 @@ sealed class Background private constructor(private val value: String) : StylePr
             clip: BackgroundClip? = null,
             attachment: BackgroundAttachment? = null,
         ): Repeatable = Repeatable(image, repeat, size, position, blend, origin, clip, attachment)
+
+        fun list(vararg backgrounds: Repeatable): Background = ValueList(null, backgrounds.toList())
+
+        /**
+         * A Kotlin-idiomatic API to configure the `background` CSS property with repeating backgrounds.
+         *
+         * Background layers are specified in bottom-to-top order. Note that this is the *opposite* of how CSS does it,
+         * which for this property expects a top-to-bottom order. However, we decided to deviate from the standard here for
+         * the following reasons:
+         *
+         * * Everything else in HTML uses a bottom-to-top order (e.g. declaring elements on a page).
+         * * This method accepts a color parameter first (in front of the vararg background layers), which renders on the bottom
+         *   of everything else. This sets the expectation that "bottom" values come first.
+         *
+         * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background">background</a>
+         */
+        fun list(color: CSSColorValue, vararg backgrounds: Repeatable): Background = ValueList(color, backgrounds.toList())
     }
 }
 
 
 fun StyleScope.background(background: Background) {
     property("background", background)
-}
-
-fun StyleScope.background(vararg backgrounds: Background.Repeatable) {
-    background(null, *backgrounds)
-}
-
-/**
- * A Kotlin-idiomatic API to configure the `background` CSS property.
- *
- * Background layers are specified in bottom-to-top order. Note that this is the *opposite* of how CSS does it, which
- * for this property expects a top-to-bottom order. However, we decided to deviate from the standard here for the
- * following reasons:
- *
- * * Everything else in HTML uses a bottom-to-top order (e.g. declaring elements on a page).
- * * This method accepts a color parameter first (in front of the vararg background layers), which renders on the bottom
- *   of everything else. This sets the expectation that "bottom" values come first.
- *
- * @see <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/background">background</a>
- */
-fun StyleScope.background(color: CSSColorValue?, vararg backgrounds: Background.Repeatable) {
-    if (color == null && backgrounds.isEmpty()) return
-
-    // CSS order is backwards (IMO). We attempt to fix that in Kobweb.
-    @Suppress("NAME_SHADOWING") val backgrounds = backgrounds.reversed()
-    property("background", buildString {
-        append(backgrounds.joinToString(", "))
-        // backgrounds only allow you to specify a single color. If provided, it must be included with
-        // the final layer.
-        if (color != null) {
-            if (this.isNotEmpty()) append(' ')
-            append(color)
+    when (background) {
+        is Background.Repeatable -> if (background.blend != null) {
+            property("background-blend-mode", background.blend)
         }
-    })
-    val defaultBlendMode = BackgroundBlendMode.Normal
-    val blendModes = backgrounds
-        .map { it.blend ?: defaultBlendMode }
-        // Use toString comparison because otherwise equality checks are against instance
-        .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
-    if (blendModes != null) {
-        property("background-blend-mode", blendModes.joinToString())
+        is Background.ValueList -> {
+            val defaultBlendMode = BackgroundBlendMode.Normal
+            val blendModes = background.backgrounds
+                .map { it.blend ?: defaultBlendMode }
+                // Use toString comparison because otherwise equality checks are against instance
+                .takeIf { blendModes -> blendModes.any { it.toString() != defaultBlendMode.toString() } }
+            if (blendModes != null) {
+                property("background-blend-mode", blendModes.joinToString())
+            }
+        }
+        else -> {} // No other types of background implementations have a blend mode
     }
+}
+
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.background(background: Background.Repeatable) {
+    background(background as Background)
+}
+// Remove the previous method too after removing this method
+@Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(*backgrounds))"))
+fun StyleScope.background(vararg backgrounds: Background.Repeatable) {
+    background(Background.list(*backgrounds))
+}
+
+@Deprecated("Use `background(Background.list(...))` instead.", ReplaceWith("background(Background.list(color, *backgrounds))"))
+fun StyleScope.background(color: CSSColorValue, vararg backgrounds: Background.Repeatable) {
+    background(Background.list(color, *backgrounds))
 }

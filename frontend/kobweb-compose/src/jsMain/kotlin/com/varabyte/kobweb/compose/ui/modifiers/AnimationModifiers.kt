@@ -11,7 +11,7 @@ fun Modifier.animation(animation: Animation) = styleModifier {
 }
 
 fun Modifier.animation(vararg animations: Animation.Repeatable) = styleModifier {
-    animation(*animations)
+    animation(Animation.list(*animations))
 }
 
 fun Modifier.animation(animations: List<Animation.Repeatable>) = animation(*animations.toTypedArray())

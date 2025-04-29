@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.Content
+import com.varabyte.kobweb.compose.css.content
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.attrsModifier
 import com.varabyte.kobweb.compose.ui.styleModifier
@@ -19,21 +21,17 @@ fun Modifier.content(content: Content) = styleModifier {
     content(content)
 }
 
-fun Modifier.content(content: Content.Restricted) = styleModifier {
-    content(content)
+fun Modifier.content(vararg contents: Content.Repeatable) = styleModifier {
+    content(Content.list(*contents))
 }
 
-fun Modifier.content(vararg contents: Content.Unrestricted) = styleModifier {
-    content(*contents)
+fun Modifier.content(contents: List<Content.Repeatable>) = content(*contents.toTypedArray())
+
+fun Modifier.content(altText: String, vararg contents: Content.Repeatable) = styleModifier {
+    content(Content.list(altText, *contents))
 }
 
-fun Modifier.content(contents: List<Content.Unrestricted>) = content(*contents.toTypedArray())
-
-fun Modifier.content(altText: String, vararg contents: Content.Unrestricted) = styleModifier {
-    content(altText, *contents)
-}
-
-fun Modifier.content(altText: String, contents: List<Content.Unrestricted>) = content(altText, *contents.toTypedArray())
+fun Modifier.content(altText: String, contents: List<Content.Repeatable>) = content(altText, *contents.toTypedArray())
 
 fun Modifier.content(value: String) = styleModifier {
     content(value)

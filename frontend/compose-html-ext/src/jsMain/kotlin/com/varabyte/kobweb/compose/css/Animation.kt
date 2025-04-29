@@ -20,6 +20,8 @@ sealed class Animation private constructor(private val value: String) : StylePro
 
     private class Keyword(value: String) : Animation(value)
 
+    private class ValueList(values: List<Repeatable>) : Animation(values.joinToString())
+
     // A replacement for org.jetbrains.compose.web.css.CSSAnimation which is currently implemented incorrectly
     // (it exposes a 1:many relationship between an animation's name and its properties, but
     // it should be 1:1).
@@ -66,6 +68,8 @@ sealed class Animation private constructor(private val value: String) : StylePro
         ): Repeatable =
             Repeatable(name, duration, timingFunction, delay, iterationCount, direction, fillMode, playState)
 
+        fun list(vararg animations: Repeatable): Animation = ValueList(animations.toList())
+
         // Keyword
         val None: Animation get() = Keyword("none")
 
@@ -81,8 +85,12 @@ fun StyleScope.animation(animation: Animation) {
     property("animation", animation)
 }
 
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.animation(animation: Animation.Repeatable) {
+    animation(animation as Animation)
+}
+// Remove the previous method too after removing this method
+@Deprecated("Use `animation(Animation.list(...))` instead.", ReplaceWith("animation(Animation.list(*animations))"))
 fun StyleScope.animation(vararg animations: Animation.Repeatable) {
-    if (animations.isNotEmpty()) {
-        property("animation", animations.joinToString(", "))
-    }
+    animation(Animation.list(*animations))
 }

@@ -160,24 +160,13 @@ fun StyleScope.outlineStyle(value: LineStyle) {
 
 #### Exception
 
-Occasionally, there can be situations where multiple extension methods are required. For example, the `animation`
-property actually supports declaring multiple animations, but this excludes keywords.
+Longhand CSS properties that don't have an associated class and may have multiple variants will still need multiple
+extension methods.
 
-For example, `animation: rotate 1s, spin 3s` is allowed but `animation: none, none` is not.
-
-Therefore, we provide two extension methods, one for the "single argument only" case and the other for the "repeated
-arguments allowed" case:
+For example:
 
 ```kotlin
-fun StyleScope.animation(animation: Animation) {
-    property("animation", animation)
-}
 
-fun StyleScope.animation(vararg animations: Animation.Repeatable) {
-    if (animations.isNotEmpty()) {
-        property("animation", animations.joinToString())
-    }
-}
 ```
 
 If you think you've run into a case where a single extension method isn't enough but aren't sure, please reach out to
@@ -236,25 +225,40 @@ just a simple CSS style class.
 
 #### Exception
 
-However, exceptions can be made if necessary for API reasons.
+Exceptions can be made if necessary for API reasons.
 
-A pattern we've run into is that sometimes we need to distinguish between CSS values that can only ever be passed in
-as a single value, vs. values that can be repeated. As this seems to happen quite often, we've started regularly using
-the `Repeatable` subclass name for this situation, which we expose publicly:
+The `AlignItems` (reproduced below with a handful of properties elided) serves as a useful example, where it exposes
+keywords that have special safe / unsafe semantics:
 
 ```kotlin
-sealed class StyleExample {
-    private class Keyword(value: String) : StyleExample(value)
-    class Repeatable(vararg values: Int) : StyleExample(values.joinToString(" "))
+sealed class AlignItems private constructor(private val value: String) : StylePropertyValue {
+  override fun toString() = value
 
-    companion object {
-        fun of(vararg values: Int) = Repeatable(*values)
-        val None: StyleExample = Keyword("none")
-    }
+  private class AlignItemsKeyword(value: String) : AlignItems(value)
+  class AlignItemsPosition internal constructor(value: String) : AlignItems(value)
+
+  private class BaselineAlignment(baselineSet: BaselineSet?) : AlignItems(baselineSet.toValue())
+  private class OverflowAlignment(strategy: OverflowStrategy, position: AlignItemsPosition) :
+    AlignItems(strategy.toValue(position))
+
+  companion object {
+    // Basic
+    val Normal: AlignItems get() = AlignItemsKeyword("normal")
+    val Stretch: AlignItems get() = AlignItemsKeyword("stretch")
+
+    // Positional
+    val Center get() = AlignItemsPosition("center")
+    val Start get() = AlignItemsPosition("start")
+    val End get() = AlignItemsPosition("end")
+    /*...*/
+
+    // Overflow
+    fun Safe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.SAFE, position)
+    fun Unsafe(position: AlignItemsPosition): AlignItems = OverflowAlignment(OverflowStrategy.UNSAFE, position)
+
+    /*...*/
+  }
 }
-
-fun StyleScope.styleExample(styleExample: StyleExample)
-fun StyleScope.styleExample(vararg styleExamples: StyleExample.Repeatable)
 ```
 
 ---
@@ -357,28 +361,42 @@ This exception should be pretty rare, because most shorthand CSS properties are 
 values.
 
 ---
-### Repeatable values should take in a vararg parameter and check for the empty case
+### How to handle CSS property value lists
+
+Several CSS properties exist that accept lists of values. But not every valid value for that property is accepted -- it
+is a particular subset of them. (For example, you can declare a list of animations, but declaring the word "inherit"
+multiple times is invalid.)
+
+Because this pattern is so common, we've developed a standard for it. You should use a sealed class, expose a subclass
+named `Repeatable`, and provide a `list` companion object method which takes vararg parameters.
 
 #### Example
 
 ```kotlin
-fun StyleScope.transition(vararg transitions: Transition.Repeatable) {
-    if (transitions.isNotEmpty()) {
-        property("transition", transitions.joinToString())
-    }
+sealed class StyleExample /*...*/ {
+  private class Keyword(value: String) : StyleExample(value)
+  private class ValueList(value: List<Any>) : StyleExample(value.joinToString())
+  class Repeatable(value: String) : StyleExample(value)
+  private class OfInt(value: Int) : Repeatable(value.toString())
+
+  companion object {
+    fun of(value: Int): Repeatable = OfInt(value)
+    fun list(vararg examples: StyleExample.Repeatable): StyleExample = ValueList(examples)
+    
+    val None: StyleExample get() = Keyword("none")
+  }
 }
 ```
 
-For a time, we considered a pattern that would guarantee at least one item:
+For a time, we considered a pattern that would guarantee at least one item, because no items is technically invalid:
 
 ```kotlin
 ❌
-fun StyleScope.transition(first: Transition.Repeatable, vararg rest: Transition.Repeatable) {
-  property("transition", (listOf(first) + rest).joinToString())
-}
+fun list(first: StyleExample.Repeatable, vararg rest: StyleExample.Repeatable): StyleExample =
+    ValueList(listOf(first) + rest)
 ```
 
-and, though tempting, in practice it can be convenient for users to build up lists of arguments and then pass those in:
+Though tempting, in practice it can be convenient for users to build up lists of arguments and then pass those in:
 
 ```kotlin
 var animations = mutableListOf<Animation>()
@@ -389,8 +407,10 @@ if (condY) {
   animations.add(...)
 }
 
-Modifier.animation(animations)
+Animation.list(animations)
 ```
+
+so we decided to potentially allow people to pass in empty lists, even if that is technically not valid CSS.
 
 ---
 ### Add tests to `CssStylePropertyTests`
