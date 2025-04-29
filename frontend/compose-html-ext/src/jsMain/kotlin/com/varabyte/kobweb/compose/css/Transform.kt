@@ -81,6 +81,28 @@ fun StyleScope.scaleZ(s: CSSPercentageNumericValue) {
 
 // endregion
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/backface-visibility
+class BackfaceVisibility private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword values
+        val Visible get() = BackfaceVisibility("visible")
+        val Hidden get() = BackfaceVisibility("hidden")
+
+        // Global values
+        val Inherit get() = BackfaceVisibility("inherit")
+        val Initial get() = BackfaceVisibility("initial")
+        val Revert get() = BackfaceVisibility("revert")
+        val Unset get() = BackfaceVisibility("unset")
+    }
+}
+
+fun StyleScope.backfaceVisibility(backFaceVisibility: BackfaceVisibility) {
+    property("backface-visibility", backFaceVisibility)
+}
+
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-box
 class TransformBox private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value

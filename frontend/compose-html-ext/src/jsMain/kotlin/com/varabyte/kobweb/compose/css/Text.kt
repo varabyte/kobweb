@@ -5,6 +5,27 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/ruby-position
+class RubyPosition private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword values
+        val Over get() = RubyPosition("over")
+        val Under get() = RubyPosition("under")
+
+        // Global values
+        val Inherit get() = RubyPosition("inherit")
+        val Initial get() = RubyPosition("initial")
+        val Revert get() = RubyPosition("revert")
+        val Unset get() = RubyPosition("unset")
+    }
+}
+
+fun StyleScope.rubyPosition(rubyPosition: RubyPosition) {
+    property("ruby-position", rubyPosition)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/text-align
 class TextAlign private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
@@ -251,6 +272,29 @@ class WordBreak private constructor(private val value: String) : StylePropertyVa
 
 fun StyleScope.wordBreak(wordBreak: WordBreak) {
     property("word-break", wordBreak)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing
+class WordSpacing private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    companion object {
+        // Keyword value
+        val Normal get() = WordSpacing("normal")
+
+        // <length> values
+        fun of(value: CSSLengthNumericValue) = WordSpacing("$value")
+
+        // Global values
+        val Inherit get() = WordSpacing("inherit")
+        val Initial get() = WordSpacing("initial")
+        val Revert get() = WordSpacing("revert")
+        val Unset get() = WordSpacing("unset")
+    }
+}
+
+fun StyleScope.wordSpacing(wordSpacing: WordSpacing) {
+    property("word-spacing", wordSpacing)
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/writing-mode

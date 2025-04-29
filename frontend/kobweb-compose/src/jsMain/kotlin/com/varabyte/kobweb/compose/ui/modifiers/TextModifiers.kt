@@ -19,6 +19,10 @@ fun Modifier.letterSpacing(value: CSSLengthNumericValue) = styleModifier {
     letterSpacing(value)
 }
 
+fun Modifier.rubyPosition(rubyPosition: RubyPosition) = styleModifier {
+    rubyPosition(rubyPosition)
+}
+
 fun Modifier.spellCheck(enabled: Boolean) = attrsModifier {
     spellCheck(enabled)
 }
@@ -73,6 +77,13 @@ fun Modifier.wordBreak(wordBreak: WordBreak): Modifier = styleModifier {
     wordBreak(wordBreak)
 }
 
+fun Modifier.wordSpacing(wordSpacing: WordSpacing) = styleModifier {
+    wordSpacing(wordSpacing)
+}
+
+fun Modifier.wordSpacing(value: CSSLengthNumericValue) = styleModifier {
+    wordSpacing(WordSpacing.of(value))
+}
 fun Modifier.writingMode(writingMode: WritingMode) = styleModifier {
     writingMode(writingMode)
 }

@@ -79,6 +79,24 @@ class StyleModifierTests {
     }
 
     @Test
+    fun verifyPerformance() {
+        assertThat(modifierToText {
+            Modifier.willChange(WillChange.ScrollPosition)
+        }).isEqualTo("will-change: scroll-position")
+
+        assertThat(modifierToText {
+            Modifier.willChange("top", "left")
+        }).isEqualTo("will-change: top, left")
+    }
+
+    @Test
+    fun verifyReset() {
+        assertThat(modifierToText {
+            Modifier.all(All.Revert)
+        }).isEqualTo("all: revert")
+    }
+
+    @Test
     fun verifyScroll() {
         assertThat(modifierToText {
             Modifier.overscrollBehavior(OverscrollBehavior.Contain)
@@ -199,6 +217,10 @@ class StyleModifierTests {
     @Test
     fun verifyText() {
         assertThat(modifierToText {
+            Modifier.rubyPosition(RubyPosition.Under)
+        }).isEqualTo("ruby-position: under")
+
+        assertThat(modifierToText {
             Modifier.textAlign(TextAlign.Center)
         }).isEqualTo("text-align: center")
 
@@ -235,8 +257,134 @@ class StyleModifierTests {
         }).isEqualTo("word-break: break-all")
 
         assertThat(modifierToText {
+            Modifier.wordSpacing(WordSpacing.Normal)
+        }).isEqualTo("word-spacing: normal")
+
+        assertThat(modifierToText {
+            Modifier.wordSpacing(20.px)
+        }).isEqualTo("word-spacing: 20px")
+
+        assertThat(modifierToText {
             Modifier.writingMode(WritingMode.VerticalRl)
         }).isEqualTo("writing-mode: vertical-rl")
+    }
+    
+    @Test
+    fun verifyTransform() {
+        assertThat(modifierToText {
+            Modifier.backfaceVisibility(BackfaceVisibility.Hidden)
+        }).isEqualTo("backface-visibility: hidden")
+
+        assertThat(modifierToText {
+            Modifier.transform {
+                translateX(10.px)
+                scale(2.0)
+            }
+        }).isEqualTo("transform: translateX(10px) scale(2)")
+
+        assertThat(modifierToText {
+            Modifier.rotate(45.deg)
+        }).isEqualTo("rotate: 45deg")
+
+        assertThat(modifierToText {
+            Modifier.rotate(1, 0, 0, 45.deg)
+        }).isEqualTo("rotate: 1 0 0 45deg")
+
+        assertThat(modifierToText {
+            Modifier.rotateX(90.deg)
+        }).isEqualTo("rotate: x 90deg")
+
+        assertThat(modifierToText {
+            Modifier.rotateY(180.deg)
+        }).isEqualTo("rotate: y 180deg")
+
+        assertThat(modifierToText {
+            Modifier.rotateZ(270.deg)
+        }).isEqualTo("rotate: z 270deg")
+
+        assertThat(modifierToText {
+            Modifier.scale(2)
+        }).isEqualTo("scale: 2")
+
+        assertThat(modifierToText {
+            Modifier.scale(2, 3)
+        }).isEqualTo("scale: 2 3")
+
+        assertThat(modifierToText {
+            Modifier.scale(2, 3, 4)
+        }).isEqualTo("scale: 2 3 4")
+
+        assertThat(modifierToText {
+            Modifier.scaleX(2)
+        }).isEqualTo("scale: 2 1")
+
+        assertThat(modifierToText {
+            Modifier.scaleY(2)
+        }).isEqualTo("scale: 1 2")
+
+        assertThat(modifierToText {
+            Modifier.scaleZ(2)
+        }).isEqualTo("scale: 1 1 2")
+
+        assertThat(modifierToText {
+            Modifier.scale(50.percent)
+        }).isEqualTo("scale: 50%")
+
+        assertThat(modifierToText {
+            Modifier.scale(50.percent, 75.percent)
+        }).isEqualTo("scale: 50% 75%")
+
+        assertThat(modifierToText {
+            Modifier.scale(50.percent, 75.percent, 100.percent)
+        }).isEqualTo("scale: 50% 75% 100%")
+
+        assertThat(modifierToText {
+            Modifier.scaleX(50.percent)
+        }).isEqualTo("scale: 50% 100%")
+
+        assertThat(modifierToText {
+            Modifier.scaleY(60.percent)
+        }).isEqualTo("scale: 100% 60%")
+
+        assertThat(modifierToText {
+            Modifier.scaleZ(70.percent)
+        }).isEqualTo("scale: 100% 100% 70%")
+
+        assertThat(modifierToText {
+            Modifier.transformBox(TransformBox.ContentBox)
+        }).isEqualTo("transform-box: content-box")
+
+        assertThat(modifierToText {
+            Modifier.transformOrigin(TransformOrigin.Center)
+        }).isEqualTo("transform-origin: center center")
+
+        assertThat(modifierToText {
+            Modifier.transformStyle(TransformStyle.Preserve3d)
+        }).isEqualTo("transform-style: preserve-3d")
+
+        assertThat(modifierToText {
+            Modifier.translate(10.px)
+        }).isEqualTo("translate: 10px")
+
+        assertThat(modifierToText {
+            Modifier.translate(10.px, 20.px)
+        }).isEqualTo("translate: 10px 20px")
+
+        assertThat(modifierToText {
+            Modifier.translate(10.px, 20.px, 30.px)
+        }).isEqualTo("translate: 10px 20px 30px")
+
+        assertThat(modifierToText {
+            Modifier.translateX(10.px)
+        }).isEqualTo("translate: 10px")
+
+        assertThat(modifierToText {
+            Modifier.translateY(20.px)
+        }).isEqualTo("translate: 0% 20px")
+
+        assertThat(modifierToText {
+            Modifier.translateZ(30.px)
+        }).isEqualTo("translate: 0% 0% 30px")
     }
 
     @Test

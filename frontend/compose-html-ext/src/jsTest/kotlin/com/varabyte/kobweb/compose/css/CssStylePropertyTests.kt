@@ -35,6 +35,14 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyAll() {
+        assertThat(styleToText { all(All.Inherit) }).isEqualTo("all: inherit")
+        assertThat(styleToText { all(All.Initial) }).isEqualTo("all: initial")
+        assertThat(styleToText { all(All.Revert) }).isEqualTo("all: revert")
+        assertThat(styleToText { all(All.Unset) }).isEqualTo("all: unset")
+    }
+
+    @Test
     fun verifyAnimation() {
         assertThat(styleToText {
             animation(
@@ -195,6 +203,17 @@ class CssStylePropertyTests {
         assertThat(styleToText { backdropFilter(BackdropFilter.Initial) }).isEqualTo("backdrop-filter: initial; -webkit-backdrop-filter: initial")
         assertThat(styleToText { backdropFilter(BackdropFilter.Revert) }).isEqualTo("backdrop-filter: revert; -webkit-backdrop-filter: revert")
         assertThat(styleToText { backdropFilter(BackdropFilter.Unset) }).isEqualTo("backdrop-filter: unset; -webkit-backdrop-filter: unset")
+    }
+
+    @Test
+    fun verifyBackfaceVisibility() {
+        assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Visible) }).isEqualTo("backface-visibility: visible")
+        assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Hidden) }).isEqualTo("backface-visibility: hidden")
+
+        assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Inherit) }).isEqualTo("backface-visibility: inherit")
+        assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Initial) }).isEqualTo("backface-visibility: initial")
+        assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Revert) }).isEqualTo("backface-visibility: revert")
+        assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Unset) }).isEqualTo("backface-visibility: unset")
     }
 
     @Test
@@ -1641,6 +1660,17 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyRubyPosition() {
+        assertThat(styleToText { rubyPosition(RubyPosition.Over) }).isEqualTo("ruby-position: over")
+        assertThat(styleToText { rubyPosition(RubyPosition.Under) }).isEqualTo("ruby-position: under")
+
+        assertThat(styleToText { rubyPosition(RubyPosition.Inherit) }).isEqualTo("ruby-position: inherit")
+        assertThat(styleToText { rubyPosition(RubyPosition.Initial) }).isEqualTo("ruby-position: initial")
+        assertThat(styleToText { rubyPosition(RubyPosition.Revert) }).isEqualTo("ruby-position: revert")
+        assertThat(styleToText { rubyPosition(RubyPosition.Unset) }).isEqualTo("ruby-position: unset")
+    }
+
+    @Test
     fun verifyScrollbarWidth() {
         assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Auto) }).isEqualTo("scrollbar-width: auto")
         assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Thin) }).isEqualTo("scrollbar-width: thin")
@@ -2085,6 +2115,21 @@ class CssStylePropertyTests {
     }
 
     @Test
+    fun verifyWillChange() {
+        assertThat(styleToText { willChange(WillChange.Auto) }).isEqualTo("will-change: auto")
+        assertThat(styleToText { willChange(WillChange.ScrollPosition) }).isEqualTo("will-change: scroll-position")
+        assertThat(styleToText { willChange(WillChange.Contents) }).isEqualTo("will-change: contents")
+
+        assertThat(styleToText { willChange(WillChange.of("left","top")) }).isEqualTo("will-change: left, top")
+
+        assertThat(styleToText { willChange(WillChange.Inherit) }).isEqualTo("will-change: inherit")
+        assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
+        assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
+        assertThat(styleToText { willChange(WillChange.Revert) }).isEqualTo("will-change: revert")
+        assertThat(styleToText { willChange(WillChange.Unset) }).isEqualTo("will-change: unset")
+    }
+
+    @Test
     fun verifyWordBreak() {
         assertThat(styleToText { wordBreak(WordBreak.Normal) }).isEqualTo("word-break: normal")
         assertThat(styleToText { wordBreak(WordBreak.BreakAll) }).isEqualTo("word-break: break-all")
@@ -2094,6 +2139,17 @@ class CssStylePropertyTests {
         assertThat(styleToText { wordBreak(WordBreak.Initial) }).isEqualTo("word-break: initial")
         assertThat(styleToText { wordBreak(WordBreak.Revert) }).isEqualTo("word-break: revert")
         assertThat(styleToText { wordBreak(WordBreak.Unset) }).isEqualTo("word-break: unset")
+    }
+
+    @Test
+    fun verifyWordSpacing() {
+        assertThat(styleToText { wordSpacing(WordSpacing.Normal) }).isEqualTo("word-spacing: normal")
+        assertThat(styleToText { wordSpacing(WordSpacing.of(12.px)) }).isEqualTo("word-spacing: 12px")
+
+        assertThat(styleToText { wordSpacing(WordSpacing.Inherit) }).isEqualTo("word-spacing: inherit")
+        assertThat(styleToText { wordSpacing(WordSpacing.Initial) }).isEqualTo("word-spacing: initial")
+        assertThat(styleToText { wordSpacing(WordSpacing.Revert) }).isEqualTo("word-spacing: revert")
+        assertThat(styleToText { wordSpacing(WordSpacing.Unset) }).isEqualTo("word-spacing: unset")
     }
 
     @Test
