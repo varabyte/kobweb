@@ -10,7 +10,7 @@ fun Modifier.backdropFilter(backdropFilter: BackdropFilter) = styleModifier {
 }
 
 fun Modifier.backdropFilter(vararg filters: CSSFilter) = styleModifier {
-    backdropFilter(BackdropFilter.list(*filters))
+    backdropFilter(BackdropFilter.list(*filters.map { BackdropFilter.of(it) }.toTypedArray()))
 }
 
 fun Modifier.backdropFilter(filters: List<CSSFilter>) = backdropFilter(*filters.toTypedArray())
