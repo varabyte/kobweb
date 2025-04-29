@@ -10,14 +10,8 @@ import org.jetbrains.compose.web.css.*
 class CSSElementPosition private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<CSSElementPosition> {
         fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementPosition("$value")
-
-        // Global
-        val Inherit get() = CSSElementPosition("inherit")
-        val Initial get() = CSSElementPosition("initial")
-        val Revert get() = CSSElementPosition("revert")
-        val Unset get() = CSSElementPosition("unset")
     }
 }
 
@@ -62,19 +56,13 @@ fun StyleScope.right(right: Right) {
 class CSSFloat private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<CSSFloat> {
         // Keyword
         val Left get() = CSSFloat("left")
         val Right get() = CSSFloat("right")
         val None get() = CSSFloat("none")
         val InlineStart get() = CSSFloat("inline-start")
         val InlineEnd get() = CSSFloat("inline-end")
-
-        // Global
-        val Inherit get() = CSSFloat("inherit")
-        val Initial get() = CSSFloat("initial")
-        val Revert get() = CSSFloat("revert")
-        val Unset get() = CSSFloat("unset")
     }
 }
 

@@ -13,17 +13,11 @@ import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 class BackgroundAttachment private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<BackgroundAttachment> {
         // Keywords
         val Scroll get() = BackgroundAttachment("scroll")
         val Fixed get() = BackgroundAttachment("fixed")
         val Local get() = BackgroundAttachment("local")
-
-        // Global values
-        val Inherit get() = BackgroundAttachment("inherit")
-        val Initial get() = BackgroundAttachment("initial")
-        val Revert get() = BackgroundAttachment("revert")
-        val Unset get() = BackgroundAttachment("unset")
     }
 }
 
@@ -46,18 +40,12 @@ fun StyleScope.backgroundBlendMode(vararg blendModes: BackgroundBlendMode) {
 class BackgroundClip private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<BackgroundClip> {
         // Keywords
         val BorderBox get() = BackgroundClip("border-box")
         val PaddingBox get() = BackgroundClip("padding-box")
         val ContentBox get() = BackgroundClip("content-box")
         val Text get() = BackgroundClip("text")
-
-        // Global values
-        val Inherit get() = BackgroundClip("inherit")
-        val Initial get() = BackgroundClip("initial")
-        val Revert get() = BackgroundClip("revert")
-        val Unset get() = BackgroundClip("unset")
     }
 }
 
@@ -69,16 +57,10 @@ fun StyleScope.backgroundClip(backgroundClip: BackgroundClip) {
 class BackgroundColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<BackgroundColor> {
         // Keywords
         val CurrentColor get() = BackgroundColor("currentcolor")
         val Transparent get() = BackgroundColor("transparent")
-
-        // Global values
-        val Inherit get() = BackgroundColor("inherit")
-        val Initial get() = BackgroundColor("initial")
-        val Revert get() = BackgroundColor("revert")
-        val Unset get() = BackgroundColor("unset")
     }
 }
 
@@ -102,17 +84,11 @@ fun StyleScope.backgroundImage(gradient: Gradient) = backgroundImage(BackgroundI
 class BackgroundOrigin private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<BackgroundOrigin> {
         // Keywords
         val BorderBox get() = BackgroundOrigin("border-box")
         val PaddingBox get() = BackgroundOrigin("padding-box")
         val ContentBox get() = BackgroundOrigin("content-box")
-
-        // Global values
-        val Inherit get() = BackgroundOrigin("inherit")
-        val Initial get() = BackgroundOrigin("initial")
-        val Revert get() = BackgroundOrigin("revert")
-        val Unset get() = BackgroundOrigin("unset")
     }
 }
 
@@ -127,14 +103,8 @@ sealed class BackgroundPosition private constructor(private val value: String) :
     private class Keyword(value: String) : BackgroundPosition(value)
     private class Position(position: CSSPosition) : BackgroundPosition("$position")
 
-    companion object {
+    companion object : CssGlobalValues<BackgroundPosition> {
         fun of(position: CSSPosition): BackgroundPosition = Position(position)
-
-        // Global values
-        val Inherit get(): BackgroundPosition = Keyword("inherit")
-        val Initial get(): BackgroundPosition = Keyword("initial")
-        val Revert get(): BackgroundPosition = Keyword("revert")
-        val Unset get(): BackgroundPosition = Keyword("unset")
     }
 }
 
@@ -151,7 +121,7 @@ sealed class BackgroundRepeat private constructor(private val value: String) : S
     private class TwoValue(horizontal: RepeatStyle, vertical: RepeatStyle) :
         BackgroundRepeat("$horizontal $vertical")
 
-    companion object {
+    companion object : CssGlobalValues<BackgroundRepeat> {
         fun of(horizontal: RepeatStyle, vertical: RepeatStyle): BackgroundRepeat = TwoValue(horizontal, vertical)
 
         // Keywords
@@ -162,12 +132,6 @@ sealed class BackgroundRepeat private constructor(private val value: String) : S
         val Space get() = RepeatStyle("space")
         val Round get() = RepeatStyle("round")
         val NoRepeat get() = RepeatStyle("no-repeat")
-
-        // Global values
-        val Inherit get(): BackgroundRepeat = Keyword("inherit")
-        val Initial get(): BackgroundRepeat = Keyword("initial")
-        val Revert get(): BackgroundRepeat = Keyword("revert")
-        val Unset get(): BackgroundRepeat = Keyword("unset")
     }
 }
 
@@ -186,7 +150,7 @@ sealed class BackgroundSize private constructor(private val value: String) : Sty
     private class Keyword(value: String) : BackgroundSize(value)
     private class Size(value: String) : BackgroundSize(value)
 
-    companion object {
+    companion object : CssGlobalValues<BackgroundSize> {
         fun of(width: CSSLengthOrPercentageNumericValue): BackgroundSize = Size("$width")
         fun of(width: CSSAutoKeyword): BackgroundSize = Size("$width")
         fun of(width: CSSLengthOrPercentageNumericValue, height: CSSLengthOrPercentageNumericValue): BackgroundSize =
@@ -201,12 +165,6 @@ sealed class BackgroundSize private constructor(private val value: String) : Sty
         // Keywords
         val Cover get(): BackgroundSize = Keyword("cover")
         val Contain get(): BackgroundSize = Keyword("contain")
-
-        // Global values
-        val Inherit get(): BackgroundSize = Keyword("inherit")
-        val Initial get(): BackgroundSize = Keyword("initial")
-        val Revert get(): BackgroundSize = Keyword("revert")
-        val Unset get(): BackgroundSize = Keyword("unset")
     }
 }
 
@@ -271,15 +229,9 @@ sealed class Background private constructor(private val value: String) : StylePr
         }.joinToString(" ")
     )
 
-    companion object {
+    companion object : CssGlobalValues<Background> {
         // Keyword
         val None: Background get() = Keyword("none")
-
-        // Global Keywords
-        val Inherit: Background get() = Keyword("inherit")
-        val Initial: Background get() = Keyword("initial")
-        val Revert: Background get() = Keyword("revert")
-        val Unset: Background get() = Keyword("unset")
 
         fun of(
             image: BackgroundImage? = null,

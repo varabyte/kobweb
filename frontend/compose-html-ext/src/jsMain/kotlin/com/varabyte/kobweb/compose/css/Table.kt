@@ -6,8 +6,7 @@ import org.jetbrains.compose.web.css.*
 class CaptionSide private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-
+    companion object : CssGlobalValues<CaptionSide> {
         // Directional values
         val Top get() = CaptionSide("top")
         val Bottom get() = CaptionSide("bottom")
@@ -17,12 +16,6 @@ class CaptionSide private constructor(private val value: String) : StyleProperty
         val BlockEnd get() = CaptionSide("block-end")
         val InlineStart get() = CaptionSide("inline-start")
         val InlineEnd get() = CaptionSide("inline-end")
-
-        // Global values
-        val Inherit get() = CaptionSide("inherit")
-        val Initial get() = CaptionSide("initial")
-        val Revert get() = CaptionSide("revert")
-        val Unset get() = CaptionSide("unset")
     }
 }
 

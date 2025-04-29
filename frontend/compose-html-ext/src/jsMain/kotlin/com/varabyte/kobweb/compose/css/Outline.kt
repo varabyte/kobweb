@@ -62,19 +62,13 @@ fun StyleScope.outlineStyle(value: LineStyle) {
 class OutlineWidth private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<OutlineWidth> {
         fun of(value: CSSLengthNumericValue) = OutlineWidth(value.toString())
 
         // Keyword
         val Thin get() = OutlineWidth("thin")
         val Medium get() = OutlineWidth("medium")
         val Thick get() = OutlineWidth("thick")
-
-        // Global
-        val Inherit get() = OutlineWidth("inherit")
-        val Initial get() = OutlineWidth("initial")
-        val Revert get() = OutlineWidth("revert")
-        val Unset get() = OutlineWidth("unset")
     }
 }
 
@@ -90,18 +84,12 @@ fun StyleScope.outlineWidth(value: CSSLengthNumericValue) {
 // Eventually deprecate CSSOutline?
 class Outline private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
-    companion object {
+    companion object : CssGlobalValues<Outline> {
         fun of(outlineWidth: OutlineWidth? = null, outlineStyle: LineStyle? = null, outlineColor: CSSColorValue? = null) =
             Outline(listOfNotNull(outlineWidth, outlineStyle, outlineColor).joinToString(" "))
 
         fun of(outlineWidth: CSSLengthNumericValue, outlineStyle: LineStyle? = null, outlineColor: CSSColorValue? = null) =
             of(OutlineWidth.of(outlineWidth), outlineStyle, outlineColor)
-
-        // Global
-        val Inherit get() = Outline("inherit")
-        val Initial get() = Outline("initial")
-        val Revert get() = Outline("revert")
-        val Unset get() = Outline("unset")
     }
 }
 

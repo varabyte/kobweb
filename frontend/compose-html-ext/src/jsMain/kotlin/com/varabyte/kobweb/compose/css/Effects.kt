@@ -17,18 +17,12 @@ sealed class BackdropFilter private constructor(private val value: String) : Sty
         BackdropFilter(filter.toString())
     private class ValueList(values: List<Listable>) : BackdropFilter(values.joinToString(" "))
 
-    companion object {
+    companion object : CssGlobalValues<BackdropFilter> {
         // Keyword
         val None: BackdropFilter get() = Keyword("none")
 
         fun of(filter: CSSFilter) = Listable(filter)
         fun list(vararg filters: Listable): BackdropFilter = ValueList(filters.toList())
-
-        // Global
-        val Inherit: BackdropFilter get() = Keyword("inherit")
-        val Initial: BackdropFilter get() = Keyword("initial")
-        val Revert: BackdropFilter get() = Keyword("revert")
-        val Unset: BackdropFilter get() = Keyword("unset")
     }
 }
 
@@ -57,19 +51,13 @@ sealed class Filter private constructor(private val value: String) : StyleProper
         Filter(filter.toString())
     private class ValueList(values: List<Listable>) : Filter(values.joinToString(" "))
 
-    companion object {
+    companion object : CssGlobalValues<Filter> {
         // Keyword
         val None: Filter get() = Keyword("none")
 
         fun of(filter: CSSFilter) = Listable(filter)
         fun list(vararg filters: CSSFilter): Filter = ValueList(filters.map { of(it) }.toList())
         fun list(vararg filters: Listable): Filter = ValueList(filters.toList())
-
-        // Global
-        val Inherit: Filter get() = Keyword("inherit")
-        val Initial: Filter get() = Keyword("initial")
-        val Revert: Filter get() = Keyword("revert")
-        val Unset: Filter get() = Keyword("unset")
     }
 }
 

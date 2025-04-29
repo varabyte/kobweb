@@ -6,16 +6,10 @@ import org.jetbrains.compose.web.css.*
 class PointerEvents private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<PointerEvents> {
         // Keyword
         val Auto get() = PointerEvents("auto")
         val None get() = PointerEvents("none")
-
-        // Global
-        val Inherit get() = PointerEvents("inherit")
-        val Initial get() = PointerEvents("initial")
-        val Revert get() = PointerEvents("revert")
-        val Unset get() = PointerEvents("unset")
     }
 }
 

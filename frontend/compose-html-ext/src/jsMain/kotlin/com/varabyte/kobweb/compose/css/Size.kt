@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 class CSSElementSize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<CSSElementSize> {
         fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementSize("$value")
         fun of(width: CSSAutoKeyword) = CSSElementSize("$width")
 
@@ -19,19 +19,13 @@ class CSSElementSize private constructor(private val value: String) : StylePrope
         val FitContent get() = CSSElementSize("fit-content")
         val MaxContent get() = CSSElementSize("max-content")
         val MinContent get() = CSSElementSize("min-content")
-
-        // Global
-        val Inherit get() = CSSElementSize("inherit")
-        val Initial get() = CSSElementSize("initial")
-        val Revert get() = CSSElementSize("revert")
-        val Unset get() = CSSElementSize("unset")
     }
 }
 
 class CSSElementMaxSize private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<CSSElementMaxSize> {
         fun of(value: CSSLengthOrPercentageNumericValue) = CSSElementMaxSize("$value")
         fun of(width: CSSAutoKeyword) = CSSElementMaxSize("$width")
 
@@ -42,12 +36,6 @@ class CSSElementMaxSize private constructor(private val value: String) : StylePr
         val FitContent get() = CSSElementMaxSize("fit-content")
         val MaxContent get() = CSSElementMaxSize("max-content")
         val MinContent get() = CSSElementMaxSize("min-content")
-
-        // Global
-        val Inherit get() = CSSElementMaxSize("inherit")
-        val Initial get() = CSSElementMaxSize("initial")
-        val Revert get() = CSSElementMaxSize("revert")
-        val Unset get() = CSSElementMaxSize("unset")
     }
 }
 

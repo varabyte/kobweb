@@ -90,7 +90,7 @@ be easy to make a mistake like this:
 ```kotlin
 class SourceStyle {
     companion object {
-        val Inherit = SourceStyle("inherit")
+        val None = SourceStyle("none")
     }
 }
 
@@ -98,7 +98,7 @@ class SourceStyle {
 class CopiedStyle {
     companion object {
         // ❌
-        val Inherit = SourceStyle("inherit")
+        val None = SourceStyle("none")
     }
 }
 ```
@@ -118,6 +118,19 @@ class StyleExample private constructor(private val value: String) : StylePropert
 
 This pattern lets us pass these classes into the Compose HTML `property` method, which we will observe in the next
 section.
+
+---
+### Every class should have its companion object inherit from `CssGlobalValues<T>`
+
+#### Example
+
+```kotlin
+class StyleExample /*...*/ : StylePropertyValue {
+    companion object : CssGlobalValues<StyleExample>
+}
+```
+
+This adds the `Inherit`, `Initial`, `Revert`, etc. global keywords to the class's API.
 
 ---
 ### Every CSS style property should have a single StyleScope extension
@@ -185,8 +198,6 @@ class StyleExample /*...*/ {
 
         val FirstValue: StyleExample
         val SecondValue: StyleExample
-
-        val Inherit: StyleExample
     }
 }
 ```
@@ -382,7 +393,7 @@ sealed class StyleExample /*...*/ {
   companion object {
     fun of(value: Int): Listable = OfInt(value)
     fun list(vararg examples: Listable): StyleExample = ValueList(examples)
-    
+
     val None: StyleExample get() = Keyword("none")
   }
 }

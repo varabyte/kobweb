@@ -9,16 +9,10 @@ import org.jetbrains.compose.web.css.*
 class Isolation private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<Isolation> {
         // Keywords
         val Auto get() = Isolation("auto")
         val Isolate get() = Isolation("isolate")
-
-        // Global values
-        val Inherit get() = Isolation("inherit")
-        val Initial get() = Isolation("initial")
-        val Revert get() = Isolation("revert")
-        val Unset get() = Isolation("unset")
     }
 }
 

@@ -31,6 +31,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { accentColor(AccentColor.Inherit) }).isEqualTo("accent-color: inherit")
         assertThat(styleToText { accentColor(AccentColor.Initial) }).isEqualTo("accent-color: initial")
         assertThat(styleToText { accentColor(AccentColor.Revert) }).isEqualTo("accent-color: revert")
+        assertThat(styleToText { accentColor(AccentColor.RevertLayer) }).isEqualTo("accent-color: revert-layer")
         assertThat(styleToText { accentColor(AccentColor.Unset) }).isEqualTo("accent-color: unset")
     }
 
@@ -39,6 +40,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { all(All.Inherit) }).isEqualTo("all: inherit")
         assertThat(styleToText { all(All.Initial) }).isEqualTo("all: initial")
         assertThat(styleToText { all(All.Revert) }).isEqualTo("all: revert")
+        assertThat(styleToText { all(All.RevertLayer) }).isEqualTo("all: revert-layer")
         assertThat(styleToText { all(All.Unset) }).isEqualTo("all: unset")
     }
 
@@ -80,6 +82,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { animation(Animation.Inherit) }).isEqualTo("animation: inherit")
         assertThat(styleToText { animation(Animation.Initial) }).isEqualTo("animation: initial")
         assertThat(styleToText { animation(Animation.Revert) }).isEqualTo("animation: revert")
+        assertThat(styleToText { animation(Animation.RevertLayer) }).isEqualTo("animation: revert-layer")
         assertThat(styleToText { animation(Animation.Unset) }).isEqualTo("animation: unset")
     }
 
@@ -113,6 +116,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { alignContent(AlignContent.Inherit) }).isEqualTo("align-content: inherit")
         assertThat(styleToText { alignContent(AlignContent.Initial) }).isEqualTo("align-content: initial")
         assertThat(styleToText { alignContent(AlignContent.Revert) }).isEqualTo("align-content: revert")
+        assertThat(styleToText { alignContent(AlignContent.RevertLayer) }).isEqualTo("align-content: revert-layer")
         assertThat(styleToText { alignContent(AlignContent.Unset) }).isEqualTo("align-content: unset")
     }
 
@@ -139,6 +143,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { alignItems(AlignItems.Inherit) }).isEqualTo("align-items: inherit")
         assertThat(styleToText { alignItems(AlignItems.Initial) }).isEqualTo("align-items: initial")
         assertThat(styleToText { alignItems(AlignItems.Revert) }).isEqualTo("align-items: revert")
+        assertThat(styleToText { alignItems(AlignItems.RevertLayer) }).isEqualTo("align-items: revert-layer")
         assertThat(styleToText { alignItems(AlignItems.Unset) }).isEqualTo("align-items: unset")
     }
 
@@ -165,6 +170,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { alignSelf(AlignSelf.Inherit) }).isEqualTo("align-self: inherit")
         assertThat(styleToText { alignSelf(AlignSelf.Initial) }).isEqualTo("align-self: initial")
         assertThat(styleToText { alignSelf(AlignSelf.Revert) }).isEqualTo("align-self: revert")
+        assertThat(styleToText { alignSelf(AlignSelf.RevertLayer) }).isEqualTo("align-self: revert-layer")
         assertThat(styleToText { alignSelf(AlignSelf.Unset) }).isEqualTo("align-self: unset")
     }
 
@@ -178,6 +184,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { appearance(Appearance.Inherit) }).isEqualTo("appearance: inherit")
         assertThat(styleToText { appearance(Appearance.Initial) }).isEqualTo("appearance: initial")
         assertThat(styleToText { appearance(Appearance.Revert) }).isEqualTo("appearance: revert")
+        assertThat(styleToText { appearance(Appearance.RevertLayer) }).isEqualTo("appearance: revert-layer")
         assertThat(styleToText { appearance(Appearance.Unset) }).isEqualTo("appearance: unset")
     }
 
@@ -188,6 +195,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { aspectRatio(AspectRatio.Inherit) }).isEqualTo("aspect-ratio: inherit")
         assertThat(styleToText { aspectRatio(AspectRatio.Initial) }).isEqualTo("aspect-ratio: initial")
         assertThat(styleToText { aspectRatio(AspectRatio.Revert) }).isEqualTo("aspect-ratio: revert")
+        assertThat(styleToText { aspectRatio(AspectRatio.RevertLayer) }).isEqualTo("aspect-ratio: revert-layer")
         assertThat(styleToText { aspectRatio(AspectRatio.Unset) }).isEqualTo("aspect-ratio: unset")
     }
 
@@ -202,6 +210,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backdropFilter(BackdropFilter.Inherit) }).isEqualTo("backdrop-filter: inherit; -webkit-backdrop-filter: inherit")
         assertThat(styleToText { backdropFilter(BackdropFilter.Initial) }).isEqualTo("backdrop-filter: initial; -webkit-backdrop-filter: initial")
         assertThat(styleToText { backdropFilter(BackdropFilter.Revert) }).isEqualTo("backdrop-filter: revert; -webkit-backdrop-filter: revert")
+        assertThat(styleToText { backdropFilter(BackdropFilter.RevertLayer) }).isEqualTo("backdrop-filter: revert-layer; -webkit-backdrop-filter: revert-layer")
         assertThat(styleToText { backdropFilter(BackdropFilter.Unset) }).isEqualTo("backdrop-filter: unset; -webkit-backdrop-filter: unset")
     }
 
@@ -213,6 +222,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Inherit) }).isEqualTo("backface-visibility: inherit")
         assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Initial) }).isEqualTo("backface-visibility: initial")
         assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Revert) }).isEqualTo("backface-visibility: revert")
+        assertThat(styleToText { backfaceVisibility(BackfaceVisibility.RevertLayer) }).isEqualTo("backface-visibility: revert-layer")
         assertThat(styleToText { backfaceVisibility(BackfaceVisibility.Unset) }).isEqualTo("backface-visibility: unset")
     }
 
@@ -225,6 +235,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundAttachment(BackgroundAttachment.Inherit) }).isEqualTo("background-attachment: inherit")
         assertThat(styleToText { backgroundAttachment(BackgroundAttachment.Initial) }).isEqualTo("background-attachment: initial")
         assertThat(styleToText { backgroundAttachment(BackgroundAttachment.Revert) }).isEqualTo("background-attachment: revert")
+        assertThat(styleToText { backgroundAttachment(BackgroundAttachment.RevertLayer) }).isEqualTo("background-attachment: revert-layer")
         assertThat(styleToText { backgroundAttachment(BackgroundAttachment.Unset) }).isEqualTo("background-attachment: unset")
     }
     
@@ -252,6 +263,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Inherit) }).isEqualTo("background-blend-mode: inherit")
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Initial) }).isEqualTo("background-blend-mode: initial")
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Revert) }).isEqualTo("background-blend-mode: revert")
+        assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.RevertLayer) }).isEqualTo("background-blend-mode: revert-layer")
         assertThat(styleToText { backgroundBlendMode(BackgroundBlendMode.Unset) }).isEqualTo("background-blend-mode: unset")
     }
 
@@ -265,6 +277,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundClip(BackgroundClip.Inherit) }).isEqualTo("background-clip: inherit")
         assertThat(styleToText { backgroundClip(BackgroundClip.Initial) }).isEqualTo("background-clip: initial")
         assertThat(styleToText { backgroundClip(BackgroundClip.Revert) }).isEqualTo("background-clip: revert")
+        assertThat(styleToText { backgroundClip(BackgroundClip.RevertLayer) }).isEqualTo("background-clip: revert-layer")
         assertThat(styleToText { backgroundClip(BackgroundClip.Unset) }).isEqualTo("background-clip: unset")
     }
 
@@ -276,6 +289,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundColor(BackgroundColor.Inherit) }).isEqualTo("background-color: inherit")
         assertThat(styleToText { backgroundColor(BackgroundColor.Initial) }).isEqualTo("background-color: initial")
         assertThat(styleToText { backgroundColor(BackgroundColor.Revert) }).isEqualTo("background-color: revert")
+        assertThat(styleToText { backgroundColor(BackgroundColor.RevertLayer) }).isEqualTo("background-color: revert-layer")
         assertThat(styleToText { backgroundColor(BackgroundColor.Unset) }).isEqualTo("background-color: unset")
     }
 
@@ -288,6 +302,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundOrigin(BackgroundOrigin.Inherit) }).isEqualTo("background-origin: inherit")
         assertThat(styleToText { backgroundOrigin(BackgroundOrigin.Initial) }).isEqualTo("background-origin: initial")
         assertThat(styleToText { backgroundOrigin(BackgroundOrigin.Revert) }).isEqualTo("background-origin: revert")
+        assertThat(styleToText { backgroundOrigin(BackgroundOrigin.RevertLayer) }).isEqualTo("background-origin: revert-layer")
         assertThat(styleToText { backgroundOrigin(BackgroundOrigin.Unset) }).isEqualTo("background-origin: unset")
     }
 
@@ -304,6 +319,8 @@ class CssStylePropertyTests {
             .isEqualTo("background-position: initial")
         assertThat(styleToText { backgroundPosition(BackgroundPosition.Revert) })
             .isEqualTo("background-position: revert")
+        assertThat(styleToText { backgroundPosition(BackgroundPosition.RevertLayer) })
+            .isEqualTo("background-position: revert-layer")
         assertThat(styleToText { backgroundPosition(BackgroundPosition.Unset) })
             .isEqualTo("background-position: unset")
     }
@@ -325,6 +342,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundRepeat(BackgroundRepeat.Inherit) }).isEqualTo("background-repeat: inherit")
         assertThat(styleToText { backgroundRepeat(BackgroundRepeat.Initial) }).isEqualTo("background-repeat: initial")
         assertThat(styleToText { backgroundRepeat(BackgroundRepeat.Revert) }).isEqualTo("background-repeat: revert")
+        assertThat(styleToText { backgroundRepeat(BackgroundRepeat.RevertLayer) }).isEqualTo("background-repeat: revert-layer")
         assertThat(styleToText { backgroundRepeat(BackgroundRepeat.Unset) }).isEqualTo("background-repeat: unset")
     }
 
@@ -348,6 +366,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { backgroundSize(BackgroundSize.Inherit) }).isEqualTo("background-size: inherit")
         assertThat(styleToText { backgroundSize(BackgroundSize.Initial) }).isEqualTo("background-size: initial")
         assertThat(styleToText { backgroundSize(BackgroundSize.Revert) }).isEqualTo("background-size: revert")
+        assertThat(styleToText { backgroundSize(BackgroundSize.RevertLayer) }).isEqualTo("background-size: revert-layer")
         assertThat(styleToText { backgroundSize(BackgroundSize.Unset) }).isEqualTo("background-size: unset")
     }
 
@@ -389,6 +408,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { background(Background.Inherit) }).isEqualTo("background: inherit")
         assertThat(styleToText { background(Background.Initial) }).isEqualTo("background: initial")
         assertThat(styleToText { background(Background.Revert) }).isEqualTo("background: revert")
+        assertThat(styleToText { background(Background.RevertLayer) }).isEqualTo("background: revert-layer")
         assertThat(styleToText { background(Background.Unset) }).isEqualTo("background: unset")
     }
 
@@ -400,6 +420,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderCollapse(BorderCollapse.Inherit) }).isEqualTo("border-collapse: inherit")
         assertThat(styleToText { borderCollapse(BorderCollapse.Initial) }).isEqualTo("border-collapse: initial")
         assertThat(styleToText { borderCollapse(BorderCollapse.Revert) }).isEqualTo("border-collapse: revert")
+        assertThat(styleToText { borderCollapse(BorderCollapse.RevertLayer) }).isEqualTo("border-collapse: revert-layer")
         assertThat(styleToText { borderCollapse(BorderCollapse.Unset) }).isEqualTo("border-collapse: unset")
     }
 
@@ -420,6 +441,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderImage(BorderImage.Inherit) }).isEqualTo("border-image: inherit")
         assertThat(styleToText { borderImage(BorderImage.Initial) }).isEqualTo("border-image: initial")
         assertThat(styleToText { borderImage(BorderImage.Revert) }).isEqualTo("border-image: revert")
+        assertThat(styleToText { borderImage(BorderImage.RevertLayer) }).isEqualTo("border-image: revert-layer")
         assertThat(styleToText { borderImage(BorderImage.Unset) }).isEqualTo("border-image: unset")
     }
 
@@ -440,6 +462,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderImageOutset(BorderImageOutset.Inherit) }).isEqualTo("border-image-outset: inherit")
         assertThat(styleToText { borderImageOutset(BorderImageOutset.Initial) }).isEqualTo("border-image-outset: initial")
         assertThat(styleToText { borderImageOutset(BorderImageOutset.Revert) }).isEqualTo("border-image-outset: revert")
+        assertThat(styleToText { borderImageOutset(BorderImageOutset.RevertLayer) }).isEqualTo("border-image-outset: revert-layer")
         assertThat(styleToText { borderImageOutset(BorderImageOutset.Unset) }).isEqualTo("border-image-outset: unset")
     }
 
@@ -462,6 +485,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Inherit) }).isEqualTo("border-image-repeat: inherit")
         assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Initial) }).isEqualTo("border-image-repeat: initial")
         assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Revert) }).isEqualTo("border-image-repeat: revert")
+        assertThat(styleToText { borderImageRepeat(BorderImageRepeat.RevertLayer) }).isEqualTo("border-image-repeat: revert-layer")
         assertThat(styleToText { borderImageRepeat(BorderImageRepeat.Unset) }).isEqualTo("border-image-repeat: unset")
     }
 
@@ -476,6 +500,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderImageSource(BorderImageSource.Inherit) }).isEqualTo("border-image-source: inherit")
         assertThat(styleToText { borderImageSource(BorderImageSource.Initial) }).isEqualTo("border-image-source: initial")
         assertThat(styleToText { borderImageSource(BorderImageSource.Revert) }).isEqualTo("border-image-source: revert")
+        assertThat(styleToText { borderImageSource(BorderImageSource.RevertLayer) }).isEqualTo("border-image-source: revert-layer")
         assertThat(styleToText { borderImageSource(BorderImageSource.Unset) }).isEqualTo("border-image-source: unset")
     }
 
@@ -497,6 +522,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderImageSlice(BorderImageSlice.Inherit) }).isEqualTo("border-image-slice: inherit")
         assertThat(styleToText { borderImageSlice(BorderImageSlice.Initial) }).isEqualTo("border-image-slice: initial")
         assertThat(styleToText { borderImageSlice(BorderImageSlice.Revert) }).isEqualTo("border-image-slice: revert")
+        assertThat(styleToText { borderImageSlice(BorderImageSlice.RevertLayer) }).isEqualTo("border-image-slice: revert-layer")
         assertThat(styleToText { borderImageSlice(BorderImageSlice.Unset) }).isEqualTo("border-image-slice: unset")
     }
 
@@ -517,6 +543,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { borderImageWidth(BorderImageWidth.Inherit) }).isEqualTo("border-image-width: inherit")
         assertThat(styleToText { borderImageWidth(BorderImageWidth.Initial) }).isEqualTo("border-image-width: initial")
         assertThat(styleToText { borderImageWidth(BorderImageWidth.Revert) }).isEqualTo("border-image-width: revert")
+        assertThat(styleToText { borderImageWidth(BorderImageWidth.RevertLayer) }).isEqualTo("border-image-width: revert-layer")
         assertThat(styleToText { borderImageWidth(BorderImageWidth.Unset) }).isEqualTo("border-image-width: unset")
     }
 
@@ -527,6 +554,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { bottom(Bottom.Inherit) }).isEqualTo("bottom: inherit")
         assertThat(styleToText { bottom(Bottom.Initial) }).isEqualTo("bottom: initial")
         assertThat(styleToText { bottom(Bottom.Revert) }).isEqualTo("bottom: revert")
+        assertThat(styleToText { bottom(Bottom.RevertLayer) }).isEqualTo("bottom: revert-layer")
         assertThat(styleToText { bottom(Bottom.Unset) }).isEqualTo("bottom: unset")
     }
 
@@ -538,6 +566,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Inherit) }).isEqualTo("box-decoration-break: inherit")
         assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Initial) }).isEqualTo("box-decoration-break: initial")
         assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Revert) }).isEqualTo("box-decoration-break: revert")
+        assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.RevertLayer) }).isEqualTo("box-decoration-break: revert-layer")
         assertThat(styleToText { boxDecorationBreak(BoxDecorationBreak.Unset) }).isEqualTo("box-decoration-break: unset")
     }
 
@@ -568,6 +597,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { boxShadow(BoxShadow.Inherit) }).isEqualTo("box-shadow: inherit")
         assertThat(styleToText { boxShadow(BoxShadow.Initial) }).isEqualTo("box-shadow: initial")
         assertThat(styleToText { boxShadow(BoxShadow.Revert) }).isEqualTo("box-shadow: revert")
+        assertThat(styleToText { boxShadow(BoxShadow.RevertLayer) }).isEqualTo("box-shadow: revert-layer")
         assertThat(styleToText { boxShadow(BoxShadow.Unset) }).isEqualTo("box-shadow: unset")
     }
 
@@ -579,6 +609,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { boxSizing(BoxSizing.Inherit) }).isEqualTo("box-sizing: inherit")
         assertThat(styleToText { boxSizing(BoxSizing.Initial) }).isEqualTo("box-sizing: initial")
         assertThat(styleToText { boxSizing(BoxSizing.Revert) }).isEqualTo("box-sizing: revert")
+        assertThat(styleToText { boxSizing(BoxSizing.RevertLayer) }).isEqualTo("box-sizing: revert-layer")
         assertThat(styleToText { boxSizing(BoxSizing.Unset) }).isEqualTo("box-sizing: unset")
     }
 
@@ -605,6 +636,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { breakAfter(BreakAfter.Inherit) }).isEqualTo("break-after: inherit")
         assertThat(styleToText { breakAfter(BreakAfter.Initial) }).isEqualTo("break-after: initial")
         assertThat(styleToText { breakAfter(BreakAfter.Revert) }).isEqualTo("break-after: revert")
+        assertThat(styleToText { breakAfter(BreakAfter.RevertLayer) }).isEqualTo("break-after: revert-layer")
         assertThat(styleToText { breakAfter(BreakAfter.RevertLayer) }).isEqualTo("break-after: revert-layer")
         assertThat(styleToText { breakAfter(BreakAfter.Unset) }).isEqualTo("break-after: unset")
     }
@@ -633,6 +665,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { breakBefore(BreakBefore.Initial) }).isEqualTo("break-before: initial")
         assertThat(styleToText { breakBefore(BreakBefore.Revert) }).isEqualTo("break-before: revert")
         assertThat(styleToText { breakBefore(BreakBefore.RevertLayer) }).isEqualTo("break-before: revert-layer")
+        assertThat(styleToText { breakBefore(BreakBefore.RevertLayer) }).isEqualTo("break-before: revert-layer")
         assertThat(styleToText { breakBefore(BreakBefore.Unset) }).isEqualTo("break-before: unset")
     }
 
@@ -647,6 +680,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { breakInside(BreakInside.Inherit) }).isEqualTo("break-inside: inherit")
         assertThat(styleToText { breakInside(BreakInside.Initial) }).isEqualTo("break-inside: initial")
         assertThat(styleToText { breakInside(BreakInside.Revert) }).isEqualTo("break-inside: revert")
+        assertThat(styleToText { breakInside(BreakInside.RevertLayer) }).isEqualTo("break-inside: revert-layer")
         assertThat(styleToText { breakInside(BreakInside.RevertLayer) }).isEqualTo("break-inside: revert-layer")
         assertThat(styleToText { breakInside(BreakInside.Unset) }).isEqualTo("break-inside: unset")
     }
@@ -664,6 +698,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { captionSide(CaptionSide.Inherit) }).isEqualTo("caption-side: inherit")
         assertThat(styleToText { captionSide(CaptionSide.Initial) }).isEqualTo("caption-side: initial")
         assertThat(styleToText { captionSide(CaptionSide.Revert) }).isEqualTo("caption-side: revert")
+        assertThat(styleToText { captionSide(CaptionSide.RevertLayer) }).isEqualTo("caption-side: revert-layer")
         assertThat(styleToText { captionSide(CaptionSide.Unset) }).isEqualTo("caption-side: unset")
     }
     
@@ -676,6 +711,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { caretColor(CaretColor.Inherit) }).isEqualTo("caret-color: inherit")
         assertThat(styleToText { caretColor(CaretColor.Initial) }).isEqualTo("caret-color: initial")
         assertThat(styleToText { caretColor(CaretColor.Revert) }).isEqualTo("caret-color: revert")
+        assertThat(styleToText { caretColor(CaretColor.RevertLayer) }).isEqualTo("caret-color: revert-layer")
         assertThat(styleToText { caretColor(CaretColor.Unset) }).isEqualTo("caret-color: unset")
     }
 
@@ -691,6 +727,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { clear(Clear.Inherit) }).isEqualTo("clear: inherit")
         assertThat(styleToText { clear(Clear.Initial) }).isEqualTo("clear: initial")
         assertThat(styleToText { clear(Clear.Revert) }).isEqualTo("clear: revert")
+        assertThat(styleToText { clear(Clear.RevertLayer) }).isEqualTo("clear: revert-layer")
         assertThat(styleToText { clear(Clear.Unset) }).isEqualTo("clear: unset")
     }
     
@@ -707,6 +744,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { colorScheme(ColorScheme.Inherit) }).isEqualTo("color-scheme: inherit")
         assertThat(styleToText { colorScheme(ColorScheme.Initial) }).isEqualTo("color-scheme: initial")
         assertThat(styleToText { colorScheme(ColorScheme.Revert) }).isEqualTo("color-scheme: revert")
+        assertThat(styleToText { colorScheme(ColorScheme.RevertLayer) }).isEqualTo("color-scheme: revert-layer")
         assertThat(styleToText { colorScheme(ColorScheme.Unset) }).isEqualTo("color-scheme: unset")
     }
 
@@ -717,6 +755,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { color(CSSColor.Inherit) }).isEqualTo("color: inherit")
         assertThat(styleToText { color(CSSColor.Initial) }).isEqualTo("color: initial")
         assertThat(styleToText { color(CSSColor.Revert) }).isEqualTo("color: revert")
+        assertThat(styleToText { color(CSSColor.RevertLayer) }).isEqualTo("color: revert-layer")
         assertThat(styleToText { color(CSSColor.Unset) }).isEqualTo("color: unset")
     }
 
@@ -728,6 +767,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { columnCount(ColumnCount.Inherit) }).isEqualTo("column-count: inherit")
         assertThat(styleToText { columnCount(ColumnCount.Initial) }).isEqualTo("column-count: initial")
         assertThat(styleToText { columnCount(ColumnCount.Revert) }).isEqualTo("column-count: revert")
+        assertThat(styleToText { columnCount(ColumnCount.RevertLayer) }).isEqualTo("column-count: revert-layer")
         assertThat(styleToText { columnCount(ColumnCount.RevertLayer) }).isEqualTo("column-count: revert-layer")
         assertThat(styleToText { columnCount(ColumnCount.Unset) }).isEqualTo("column-count: unset")
     }
@@ -741,6 +781,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { columnFill(ColumnFill.Initial) }).isEqualTo("column-fill: initial")
         assertThat(styleToText { columnFill(ColumnFill.Revert) }).isEqualTo("column-fill: revert")
         assertThat(styleToText { columnFill(ColumnFill.RevertLayer) }).isEqualTo("column-fill: revert-layer")
+        assertThat(styleToText { columnFill(ColumnFill.RevertLayer) }).isEqualTo("column-fill: revert-layer")
         assertThat(styleToText { columnFill(ColumnFill.Unset) }).isEqualTo("column-fill: unset")
     }
 
@@ -752,6 +793,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { columnSpan(ColumnSpan.Inherit) }).isEqualTo("column-span: inherit")
         assertThat(styleToText { columnSpan(ColumnSpan.Initial) }).isEqualTo("column-span: initial")
         assertThat(styleToText { columnSpan(ColumnSpan.Revert) }).isEqualTo("column-span: revert")
+        assertThat(styleToText { columnSpan(ColumnSpan.RevertLayer) }).isEqualTo("column-span: revert-layer")
         assertThat(styleToText { columnSpan(ColumnSpan.RevertLayer) }).isEqualTo("column-span: revert-layer")
         assertThat(styleToText { columnSpan(ColumnSpan.Unset) }).isEqualTo("column-span: unset")
     }
@@ -781,6 +823,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { content(Content.Inherit) }).isEqualTo("content: inherit")
         assertThat(styleToText { content(Content.Initial) }).isEqualTo("content: initial")
         assertThat(styleToText { content(Content.Revert) }).isEqualTo("content: revert")
+        assertThat(styleToText { content(Content.RevertLayer) }).isEqualTo("content: revert-layer")
         assertThat(styleToText { content(Content.Unset) }).isEqualTo("content: unset")
 
         // Convenience conversion methods
@@ -842,6 +885,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { cursor(Cursor.Inherit) }).isEqualTo("cursor: inherit")
         assertThat(styleToText { cursor(Cursor.Initial) }).isEqualTo("cursor: initial")
         assertThat(styleToText { cursor(Cursor.Revert) }).isEqualTo("cursor: revert")
+        assertThat(styleToText { cursor(Cursor.RevertLayer) }).isEqualTo("cursor: revert-layer")
         assertThat(styleToText { cursor(Cursor.Unset) }).isEqualTo("cursor: unset")
     }
 
@@ -856,6 +900,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { filter(Filter.Inherit) }).isEqualTo("filter: inherit")
         assertThat(styleToText { filter(Filter.Initial) }).isEqualTo("filter: initial")
         assertThat(styleToText { filter(Filter.Revert) }).isEqualTo("filter: revert")
+        assertThat(styleToText { filter(Filter.RevertLayer) }).isEqualTo("filter: revert-layer")
         assertThat(styleToText { filter(Filter.Unset) }).isEqualTo("filter: unset")
     }
 
@@ -875,6 +920,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { flexBasis(FlexBasis.Inherit) }).isEqualTo("flex-basis: inherit")
         assertThat(styleToText { flexBasis(FlexBasis.Initial) }).isEqualTo("flex-basis: initial")
         assertThat(styleToText { flexBasis(FlexBasis.Revert) }).isEqualTo("flex-basis: revert")
+        assertThat(styleToText { flexBasis(FlexBasis.RevertLayer) }).isEqualTo("flex-basis: revert-layer")
         assertThat(styleToText { flexBasis(FlexBasis.Unset) }).isEqualTo("flex-basis: unset")
     }
 
@@ -889,6 +935,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { float(CSSFloat.Inherit) }).isEqualTo("float: inherit")
         assertThat(styleToText { float(CSSFloat.Initial) }).isEqualTo("float: initial")
         assertThat(styleToText { float(CSSFloat.Revert) }).isEqualTo("float: revert")
+        assertThat(styleToText { float(CSSFloat.RevertLayer) }).isEqualTo("float: revert-layer")
         assertThat(styleToText { float(CSSFloat.Unset) }).isEqualTo("float: unset")
     }
     
@@ -900,6 +947,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Inherit) }).isEqualTo("font-optical-sizing: inherit")
         assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Initial) }).isEqualTo("font-optical-sizing: initial")
         assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Revert) }).isEqualTo("font-optical-sizing: revert")
+        assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.RevertLayer) }).isEqualTo("font-optical-sizing: revert-layer")
         assertThat(styleToText { fontOpticalSizing(FontOpticalSizing.Unset) }).isEqualTo("font-optical-sizing: unset")
     }
 
@@ -913,6 +961,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontStyle(FontStyle.Inherit) }).isEqualTo("font-style: inherit")
         assertThat(styleToText { fontStyle(FontStyle.Initial) }).isEqualTo("font-style: initial")
         assertThat(styleToText { fontStyle(FontStyle.Revert) }).isEqualTo("font-style: revert")
+        assertThat(styleToText { fontStyle(FontStyle.RevertLayer) }).isEqualTo("font-style: revert-layer")
         assertThat(styleToText { fontStyle(FontStyle.Unset) }).isEqualTo("font-style: unset")
     }
 
@@ -940,6 +989,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Inherit) }).isEqualTo("font-variant-alternates: inherit")
         assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Initial) }).isEqualTo("font-variant-alternates: initial")
         assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Revert) }).isEqualTo("font-variant-alternates: revert")
+        assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.RevertLayer) }).isEqualTo("font-variant-alternates: revert-layer")
         assertThat(styleToText { fontVariantAlternates(FontVariantAlternates.Unset) }).isEqualTo("font-variant-alternates: unset")
     }
 
@@ -956,6 +1006,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantCaps(FontVariantCaps.Inherit) }).isEqualTo("font-variant-caps: inherit")
         assertThat(styleToText { fontVariantCaps(FontVariantCaps.Initial) }).isEqualTo("font-variant-caps: initial")
         assertThat(styleToText { fontVariantCaps(FontVariantCaps.Revert) }).isEqualTo("font-variant-caps: revert")
+        assertThat(styleToText { fontVariantCaps(FontVariantCaps.RevertLayer) }).isEqualTo("font-variant-caps: revert-layer")
         assertThat(styleToText { fontVariantCaps(FontVariantCaps.Unset) }).isEqualTo("font-variant-caps: unset")
     }
 
@@ -983,6 +1034,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Inherit) }).isEqualTo("font-variant-east-asian: inherit")
         assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Initial) }).isEqualTo("font-variant-east-asian: initial")
         assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Revert) }).isEqualTo("font-variant-east-asian: revert")
+        assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.RevertLayer) }).isEqualTo("font-variant-east-asian: revert-layer")
         assertThat(styleToText { fontVariantEastAsian(FontVariantEastAsian.Unset) }).isEqualTo("font-variant-east-asian: unset")
     }
 
@@ -996,6 +1048,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Inherit) }).isEqualTo("font-variant-emoji: inherit")
         assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Initial) }).isEqualTo("font-variant-emoji: initial")
         assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Revert) }).isEqualTo("font-variant-emoji: revert")
+        assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.RevertLayer) }).isEqualTo("font-variant-emoji: revert-layer")
         assertThat(styleToText { fontVariantEmoji(FontVariantEmoji.Unset) }).isEqualTo("font-variant-emoji: unset")
     }
 
@@ -1044,6 +1097,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Inherit) }).isEqualTo("font-variant-ligatures: inherit")
         assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Initial) }).isEqualTo("font-variant-ligatures: initial")
         assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Revert) }).isEqualTo("font-variant-ligatures: revert")
+        assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.RevertLayer) }).isEqualTo("font-variant-ligatures: revert-layer")
         assertThat(styleToText { fontVariantLigatures(FontVariantLigatures.Unset) }).isEqualTo("font-variant-ligatures: unset")
     }
 
@@ -1077,6 +1131,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Inherit) }).isEqualTo("font-variant-numeric: inherit")
         assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Initial) }).isEqualTo("font-variant-numeric: initial")
         assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Revert) }).isEqualTo("font-variant-numeric: revert")
+        assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.RevertLayer) }).isEqualTo("font-variant-numeric: revert-layer")
         assertThat(styleToText { fontVariantNumeric(FontVariantNumeric.Unset) }).isEqualTo("font-variant-numeric: unset")
     }
 
@@ -1089,6 +1144,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontVariantPosition(FontVariantPosition.Inherit) }).isEqualTo("font-variant-position: inherit")
         assertThat(styleToText { fontVariantPosition(FontVariantPosition.Initial) }).isEqualTo("font-variant-position: initial")
         assertThat(styleToText { fontVariantPosition(FontVariantPosition.Revert) }).isEqualTo("font-variant-position: revert")
+        assertThat(styleToText { fontVariantPosition(FontVariantPosition.RevertLayer) }).isEqualTo("font-variant-position: revert-layer")
         assertThat(styleToText { fontVariantPosition(FontVariantPosition.Unset) }).isEqualTo("font-variant-position: unset")
     }
 
@@ -1145,6 +1201,8 @@ class CssStylePropertyTests {
              .isEqualTo("font-variation-settings: initial")
          assertThat(styleToText { fontVariationSettings(FontVariationSettings.Revert) })
              .isEqualTo("font-variation-settings: revert")
+         assertThat(styleToText { fontVariationSettings(FontVariationSettings.RevertLayer) })
+             .isEqualTo("font-variation-settings: revert-layer")
          assertThat(styleToText { fontVariationSettings(FontVariationSettings.Unset) })
              .isEqualTo("font-variation-settings: unset")
     }
@@ -1173,6 +1231,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontWeight(FontWeight.Inherit) }).isEqualTo("font-weight: inherit")
         assertThat(styleToText { fontWeight(FontWeight.Initial) }).isEqualTo("font-weight: initial")
         assertThat(styleToText { fontWeight(FontWeight.Revert) }).isEqualTo("font-weight: revert")
+        assertThat(styleToText { fontWeight(FontWeight.RevertLayer) }).isEqualTo("font-weight: revert-layer")
         assertThat(styleToText { fontWeight(FontWeight.Unset) }).isEqualTo("font-weight: unset")
     }
 
@@ -1195,6 +1254,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { fontSize(FontSize.Inherit) }).isEqualTo("font-size: inherit")
         assertThat(styleToText { fontSize(FontSize.Initial) }).isEqualTo("font-size: initial")
         assertThat(styleToText { fontSize(FontSize.Revert) }).isEqualTo("font-size: revert")
+        assertThat(styleToText { fontSize(FontSize.RevertLayer) }).isEqualTo("font-size: revert-layer")
         assertThat(styleToText { fontSize(FontSize.Unset) }).isEqualTo("font-size: unset")
     }
 
@@ -1212,6 +1272,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { height(Height.Inherit) }).isEqualTo("height: inherit")
         assertThat(styleToText { height(Height.Initial) }).isEqualTo("height: initial")
         assertThat(styleToText { height(Height.Revert) }).isEqualTo("height: revert")
+        assertThat(styleToText { height(Height.RevertLayer) }).isEqualTo("height: revert-layer")
         assertThat(styleToText { height(Height.Unset) }).isEqualTo("height: unset")
     }
 
@@ -1223,6 +1284,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { isolation(Isolation.Inherit) }).isEqualTo("isolation: inherit")
         assertThat(styleToText { isolation(Isolation.Initial) }).isEqualTo("isolation: initial")
         assertThat(styleToText { isolation(Isolation.Revert) }).isEqualTo("isolation: revert")
+        assertThat(styleToText { isolation(Isolation.RevertLayer) }).isEqualTo("isolation: revert-layer")
         assertThat(styleToText { isolation(Isolation.Unset) }).isEqualTo("isolation: unset")
     }
 
@@ -1250,6 +1312,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { justifyContent(JustifyContent.Inherit) }).isEqualTo("justify-content: inherit")
         assertThat(styleToText { justifyContent(JustifyContent.Initial) }).isEqualTo("justify-content: initial")
         assertThat(styleToText { justifyContent(JustifyContent.Revert) }).isEqualTo("justify-content: revert")
+        assertThat(styleToText { justifyContent(JustifyContent.RevertLayer) }).isEqualTo("justify-content: revert-layer")
         assertThat(styleToText { justifyContent(JustifyContent.Unset) }).isEqualTo("justify-content: unset")
     }
 
@@ -1276,6 +1339,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { justifyItems(JustifyItems.Inherit) }).isEqualTo("justify-items: inherit")
         assertThat(styleToText { justifyItems(JustifyItems.Initial) }).isEqualTo("justify-items: initial")
         assertThat(styleToText { justifyItems(JustifyItems.Revert) }).isEqualTo("justify-items: revert")
+        assertThat(styleToText { justifyItems(JustifyItems.RevertLayer) }).isEqualTo("justify-items: revert-layer")
         assertThat(styleToText { justifyItems(JustifyItems.Unset) }).isEqualTo("justify-items: unset")
     }
 
@@ -1305,6 +1369,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { justifySelf(JustifySelf.Inherit) }).isEqualTo("justify-self: inherit")
         assertThat(styleToText { justifySelf(JustifySelf.Initial) }).isEqualTo("justify-self: initial")
         assertThat(styleToText { justifySelf(JustifySelf.Revert) }).isEqualTo("justify-self: revert")
+        assertThat(styleToText { justifySelf(JustifySelf.RevertLayer) }).isEqualTo("justify-self: revert-layer")
         assertThat(styleToText { justifySelf(JustifySelf.Unset) }).isEqualTo("justify-self: unset")
     }
 
@@ -1315,6 +1380,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { lineHeight(LineHeight.Inherit) }).isEqualTo("line-height: inherit")
         assertThat(styleToText { lineHeight(LineHeight.Initial) }).isEqualTo("line-height: initial")
         assertThat(styleToText { lineHeight(LineHeight.Revert) }).isEqualTo("line-height: revert")
+        assertThat(styleToText { lineHeight(LineHeight.RevertLayer) }).isEqualTo("line-height: revert-layer")
         assertThat(styleToText { lineHeight(LineHeight.Unset) }).isEqualTo("line-height: unset")
     }
 
@@ -1325,6 +1391,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { left(Left.Inherit) }).isEqualTo("left: inherit")
         assertThat(styleToText { left(Left.Initial) }).isEqualTo("left: initial")
         assertThat(styleToText { left(Left.Revert) }).isEqualTo("left: revert")
+        assertThat(styleToText { left(Left.RevertLayer) }).isEqualTo("left: revert-layer")
         assertThat(styleToText { left(Left.Unset) }).isEqualTo("left: unset")
     }
 
@@ -1389,6 +1456,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Inherit)) }).isEqualTo("list-style: inherit")
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Initial)) }).isEqualTo("list-style: initial")
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Revert)) }).isEqualTo("list-style: revert")
+        assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.RevertLayer)) }).isEqualTo("list-style: revert-layer")
         assertThat(styleToText { listStyle(ListStyle.of(type = ListStyleType.Unset)) }).isEqualTo("list-style: unset")
 
         assertThat(styleToText { listStyle(ListStyle.of(position = ListStylePosition.Inside)) }).isEqualTo("list-style: inside")
@@ -1407,6 +1475,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { listStyle(ListStyle.Inherit) }).isEqualTo("list-style: inherit")
         assertThat(styleToText { listStyle(ListStyle.Initial) }).isEqualTo("list-style: initial")
         assertThat(styleToText { listStyle(ListStyle.Revert) }).isEqualTo("list-style: revert")
+        assertThat(styleToText { listStyle(ListStyle.RevertLayer) }).isEqualTo("list-style: revert-layer")
         assertThat(styleToText { listStyle(ListStyle.Unset) }).isEqualTo("list-style: unset")
     }
 
@@ -1425,6 +1494,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { maxHeight(MaxHeight.Inherit) }).isEqualTo("max-height: inherit")
         assertThat(styleToText { maxHeight(MaxHeight.Initial) }).isEqualTo("max-height: initial")
         assertThat(styleToText { maxHeight(MaxHeight.Revert) }).isEqualTo("max-height: revert")
+        assertThat(styleToText { maxHeight(MaxHeight.RevertLayer) }).isEqualTo("max-height: revert-layer")
         assertThat(styleToText { maxHeight(MaxHeight.Unset) }).isEqualTo("max-height: unset")
     }
 
@@ -1443,6 +1513,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { maxWidth(MaxWidth.Inherit) }).isEqualTo("max-width: inherit")
         assertThat(styleToText { maxWidth(MaxWidth.Initial) }).isEqualTo("max-width: initial")
         assertThat(styleToText { maxWidth(MaxWidth.Revert) }).isEqualTo("max-width: revert")
+        assertThat(styleToText { maxWidth(MaxWidth.RevertLayer) }).isEqualTo("max-width: revert-layer")
         assertThat(styleToText { maxWidth(MaxWidth.Unset) }).isEqualTo("max-width: unset")
     }
 
@@ -1460,6 +1531,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { minHeight(MinHeight.Inherit) }).isEqualTo("min-height: inherit")
         assertThat(styleToText { minHeight(MinHeight.Initial) }).isEqualTo("min-height: initial")
         assertThat(styleToText { minHeight(MinHeight.Revert) }).isEqualTo("min-height: revert")
+        assertThat(styleToText { minHeight(MinHeight.RevertLayer) }).isEqualTo("min-height: revert-layer")
         assertThat(styleToText { minHeight(MinHeight.Unset) }).isEqualTo("min-height: unset")
     }
 
@@ -1477,6 +1549,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { minWidth(MinWidth.Inherit) }).isEqualTo("min-width: inherit")
         assertThat(styleToText { minWidth(MinWidth.Initial) }).isEqualTo("min-width: initial")
         assertThat(styleToText { minWidth(MinWidth.Revert) }).isEqualTo("min-width: revert")
+        assertThat(styleToText { minWidth(MinWidth.RevertLayer) }).isEqualTo("min-width: revert-layer")
         assertThat(styleToText { minWidth(MinWidth.Unset) }).isEqualTo("min-width: unset")
     }
 
@@ -1504,6 +1577,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { mixBlendMode(MixBlendMode.Inherit) }).isEqualTo("mix-blend-mode: inherit")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Initial) }).isEqualTo("mix-blend-mode: initial")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Revert) }).isEqualTo("mix-blend-mode: revert")
+        assertThat(styleToText { mixBlendMode(MixBlendMode.RevertLayer) }).isEqualTo("mix-blend-mode: revert-layer")
         assertThat(styleToText { mixBlendMode(MixBlendMode.Unset) }).isEqualTo("mix-blend-mode: unset")
     }
 
@@ -1518,6 +1592,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { objectFit(ObjectFit.Inherit) }).isEqualTo("object-fit: inherit")
         assertThat(styleToText { objectFit(ObjectFit.Initial) }).isEqualTo("object-fit: initial")
         assertThat(styleToText { objectFit(ObjectFit.Revert) }).isEqualTo("object-fit: revert")
+        assertThat(styleToText { objectFit(ObjectFit.RevertLayer) }).isEqualTo("object-fit: revert-layer")
         assertThat(styleToText { objectFit(ObjectFit.Unset) }).isEqualTo("object-fit: unset")
     }
 
@@ -1554,6 +1629,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { outline(Outline.Inherit) }).isEqualTo("outline: inherit")
         assertThat(styleToText { outline(Outline.Initial) }).isEqualTo("outline: initial")
         assertThat(styleToText { outline(Outline.Revert) }).isEqualTo("outline: revert")
+        assertThat(styleToText { outline(Outline.RevertLayer) }).isEqualTo("outline: revert-layer")
         assertThat(styleToText { outline(Outline.Unset) }).isEqualTo("outline: unset")
     }
 
@@ -1568,6 +1644,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { overflow(Overflow.Inherit) }).isEqualTo("overflow: inherit")
         assertThat(styleToText { overflow(Overflow.Initial) }).isEqualTo("overflow: initial")
         assertThat(styleToText { overflow(Overflow.Revert) }).isEqualTo("overflow: revert")
+        assertThat(styleToText { overflow(Overflow.RevertLayer) }).isEqualTo("overflow: revert-layer")
         assertThat(styleToText { overflow(Overflow.Unset) }).isEqualTo("overflow: unset")
     }
 
@@ -1580,6 +1657,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { overflowWrap(OverflowWrap.Inherit) }).isEqualTo("overflow-wrap: inherit")
         assertThat(styleToText { overflowWrap(OverflowWrap.Initial) }).isEqualTo("overflow-wrap: initial")
         assertThat(styleToText { overflowWrap(OverflowWrap.Revert) }).isEqualTo("overflow-wrap: revert")
+        assertThat(styleToText { overflowWrap(OverflowWrap.RevertLayer) }).isEqualTo("overflow-wrap: revert-layer")
         assertThat(styleToText { overflowWrap(OverflowWrap.Unset) }).isEqualTo("overflow-wrap: unset")
     }
 
@@ -1596,6 +1674,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Inherit) }).isEqualTo("overscroll-behavior: inherit")
         assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Initial) }).isEqualTo("overscroll-behavior: initial")
         assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Revert) }).isEqualTo("overscroll-behavior: revert")
+        assertThat(styleToText { overscrollBehavior(OverscrollBehavior.RevertLayer) }).isEqualTo("overscroll-behavior: revert-layer")
         assertThat(styleToText { overscrollBehavior(OverscrollBehavior.Unset) }).isEqualTo("overscroll-behavior: unset")
     }
 
@@ -1608,6 +1687,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Inherit) }).isEqualTo("overscroll-behavior-block: inherit")
         assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Initial) }).isEqualTo("overscroll-behavior-block: initial")
         assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Revert) }).isEqualTo("overscroll-behavior-block: revert")
+        assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.RevertLayer) }).isEqualTo("overscroll-behavior-block: revert-layer")
         assertThat(styleToText { overscrollBehaviorBlock(OverscrollBehaviorBlock.Unset) }).isEqualTo("overscroll-behavior-block: unset")
     }
 
@@ -1620,6 +1700,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Inherit) }).isEqualTo("overscroll-behavior-inline: inherit")
         assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Initial) }).isEqualTo("overscroll-behavior-inline: initial")
         assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Revert) }).isEqualTo("overscroll-behavior-inline: revert")
+        assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.RevertLayer) }).isEqualTo("overscroll-behavior-inline: revert-layer")
         assertThat(styleToText { overscrollBehaviorInline(OverscrollBehaviorInline.Unset) }).isEqualTo("overscroll-behavior-inline: unset")
     }
 
@@ -1631,6 +1712,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { pointerEvents(PointerEvents.Inherit) }).isEqualTo("pointer-events: inherit")
         assertThat(styleToText { pointerEvents(PointerEvents.Initial) }).isEqualTo("pointer-events: initial")
         assertThat(styleToText { pointerEvents(PointerEvents.Revert) }).isEqualTo("pointer-events: revert")
+        assertThat(styleToText { pointerEvents(PointerEvents.RevertLayer) }).isEqualTo("pointer-events: revert-layer")
         assertThat(styleToText { pointerEvents(PointerEvents.Unset) }).isEqualTo("pointer-events: unset")
     }
     
@@ -1646,6 +1728,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { resize(Resize.Inherit) }).isEqualTo("resize: inherit")
         assertThat(styleToText { resize(Resize.Initial) }).isEqualTo("resize: initial")
         assertThat(styleToText { resize(Resize.Revert) }).isEqualTo("resize: revert")
+        assertThat(styleToText { resize(Resize.RevertLayer) }).isEqualTo("resize: revert-layer")
         assertThat(styleToText { resize(Resize.Unset) }).isEqualTo("resize: unset")
     }
 
@@ -1656,6 +1739,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { right(Right.Inherit) }).isEqualTo("right: inherit")
         assertThat(styleToText { right(Right.Initial) }).isEqualTo("right: initial")
         assertThat(styleToText { right(Right.Revert) }).isEqualTo("right: revert")
+        assertThat(styleToText { right(Right.RevertLayer) }).isEqualTo("right: revert-layer")
         assertThat(styleToText { right(Right.Unset) }).isEqualTo("right: unset")
     }
 
@@ -1667,6 +1751,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { rubyPosition(RubyPosition.Inherit) }).isEqualTo("ruby-position: inherit")
         assertThat(styleToText { rubyPosition(RubyPosition.Initial) }).isEqualTo("ruby-position: initial")
         assertThat(styleToText { rubyPosition(RubyPosition.Revert) }).isEqualTo("ruby-position: revert")
+        assertThat(styleToText { rubyPosition(RubyPosition.RevertLayer) }).isEqualTo("ruby-position: revert-layer")
         assertThat(styleToText { rubyPosition(RubyPosition.Unset) }).isEqualTo("ruby-position: unset")
     }
 
@@ -1679,6 +1764,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Inherit) }).isEqualTo("scrollbar-width: inherit")
         assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Initial) }).isEqualTo("scrollbar-width: initial")
         assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Revert) }).isEqualTo("scrollbar-width: revert")
+        assertThat(styleToText { scrollbarWidth(ScrollbarWidth.RevertLayer) }).isEqualTo("scrollbar-width: revert-layer")
         assertThat(styleToText { scrollbarWidth(ScrollbarWidth.Unset) }).isEqualTo("scrollbar-width: unset")
     }
 
@@ -1690,6 +1776,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { scrollBehavior(ScrollBehavior.Inherit) }).isEqualTo("scroll-behavior: inherit")
         assertThat(styleToText { scrollBehavior(ScrollBehavior.Initial) }).isEqualTo("scroll-behavior: initial")
         assertThat(styleToText { scrollBehavior(ScrollBehavior.Revert) }).isEqualTo("scroll-behavior: revert")
+        assertThat(styleToText { scrollBehavior(ScrollBehavior.RevertLayer) }).isEqualTo("scroll-behavior: revert-layer")
         assertThat(styleToText { scrollBehavior(ScrollBehavior.Unset) }).isEqualTo("scroll-behavior: unset")
     }
 
@@ -1710,6 +1797,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Inherit) }).isEqualTo("scroll-snap-align: inherit")
         assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Initial) }).isEqualTo("scroll-snap-align: initial")
         assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Revert) }).isEqualTo("scroll-snap-align: revert")
+        assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.RevertLayer) }).isEqualTo("scroll-snap-align: revert-layer")
         assertThat(styleToText { scrollSnapAlign(ScrollSnapAlign.Unset) }).isEqualTo("scroll-snap-align: unset")
     }
 
@@ -1721,6 +1809,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Inherit) }).isEqualTo("scroll-snap-stop: inherit")
         assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Initial) }).isEqualTo("scroll-snap-stop: initial")
         assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Revert) }).isEqualTo("scroll-snap-stop: revert")
+        assertThat(styleToText { scrollSnapStop(ScrollSnapStop.RevertLayer) }).isEqualTo("scroll-snap-stop: revert-layer")
         assertThat(styleToText { scrollSnapStop(ScrollSnapStop.Unset) }).isEqualTo("scroll-snap-stop: unset")
     }
 
@@ -1753,6 +1842,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { scrollSnapType(ScrollSnapType.Inherit) }).isEqualTo("scroll-snap-type: inherit")
         assertThat(styleToText { scrollSnapType(ScrollSnapType.Initial) }).isEqualTo("scroll-snap-type: initial")
         assertThat(styleToText { scrollSnapType(ScrollSnapType.Revert) }).isEqualTo("scroll-snap-type: revert")
+        assertThat(styleToText { scrollSnapType(ScrollSnapType.RevertLayer) }).isEqualTo("scroll-snap-type: revert-layer")
         assertThat(styleToText { scrollSnapType(ScrollSnapType.Unset) }).isEqualTo("scroll-snap-type: unset")
     }
 
@@ -1770,6 +1860,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { textAlign(TextAlign.Inherit) }).isEqualTo("text-align: inherit")
         assertThat(styleToText { textAlign(TextAlign.Initial) }).isEqualTo("text-align: initial")
         assertThat(styleToText { textAlign(TextAlign.Revert) }).isEqualTo("text-align: revert")
+        assertThat(styleToText { textAlign(TextAlign.RevertLayer) }).isEqualTo("text-align: revert-layer")
         assertThat(styleToText { textAlign(TextAlign.Unset) }).isEqualTo("text-align: unset")
     }
 
@@ -1783,7 +1874,20 @@ class CssStylePropertyTests {
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Inherit) }).isEqualTo("text-decoration-line: inherit")
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Initial) }).isEqualTo("text-decoration-line: initial")
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Revert) }).isEqualTo("text-decoration-line: revert")
+        assertThat(styleToText { textDecorationLine(TextDecorationLine.RevertLayer) }).isEqualTo("text-decoration-line: revert-layer")
         assertThat(styleToText { textDecorationLine(TextDecorationLine.Unset) }).isEqualTo("text-decoration-line: unset")
+    }
+
+    @Test
+    fun verifyTextOverflow() {
+        assertThat(styleToText { textOverflow(TextOverflow.Clip) }).isEqualTo("text-overflow: clip")
+        assertThat(styleToText { textOverflow(TextOverflow.Ellipsis) }).isEqualTo("text-overflow: ellipsis")
+
+        assertThat(styleToText { textOverflow(TextOverflow.Inherit) }).isEqualTo("text-overflow: inherit")
+        assertThat(styleToText { textOverflow(TextOverflow.Initial) }).isEqualTo("text-overflow: initial")
+        assertThat(styleToText { textOverflow(TextOverflow.Revert) }).isEqualTo("text-overflow: revert")
+        assertThat(styleToText { textOverflow(TextOverflow.RevertLayer) }).isEqualTo("text-overflow: revert-layer")
+        assertThat(styleToText { textOverflow(TextOverflow.Unset) }).isEqualTo("text-overflow: unset")
     }
 
     @Test
@@ -1810,6 +1914,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { textShadow(TextShadow.Inherit) }).isEqualTo("text-shadow: inherit")
         assertThat(styleToText { textShadow(TextShadow.Initial) }).isEqualTo("text-shadow: initial")
         assertThat(styleToText { textShadow(TextShadow.Revert) }).isEqualTo("text-shadow: revert")
+        assertThat(styleToText { textShadow(TextShadow.RevertLayer) }).isEqualTo("text-shadow: revert-layer")
         assertThat(styleToText { textShadow(TextShadow.Unset) }).isEqualTo("text-shadow: unset")
     }
 
@@ -1823,6 +1928,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { textTransform(TextTransform.Inherit) }).isEqualTo("text-transform: inherit")
         assertThat(styleToText { textTransform(TextTransform.Initial) }).isEqualTo("text-transform: initial")
         assertThat(styleToText { textTransform(TextTransform.Revert) }).isEqualTo("text-transform: revert")
+        assertThat(styleToText { textTransform(TextTransform.RevertLayer) }).isEqualTo("text-transform: revert-layer")
         assertThat(styleToText { textTransform(TextTransform.Unset) }).isEqualTo("text-transform: unset")
     }
     
@@ -1833,6 +1939,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { top(Top.Inherit) }).isEqualTo("top: inherit")
         assertThat(styleToText { top(Top.Initial) }).isEqualTo("top: initial")
         assertThat(styleToText { top(Top.Revert) }).isEqualTo("top: revert")
+        assertThat(styleToText { top(Top.RevertLayer) }).isEqualTo("top: revert-layer")
         assertThat(styleToText { top(Top.Unset) }).isEqualTo("top: unset")
     }
 
@@ -1864,6 +1971,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { touchAction(TouchAction.Inherit) }).isEqualTo("touch-action: inherit")
         assertThat(styleToText { touchAction(TouchAction.Initial) }).isEqualTo("touch-action: initial")
         assertThat(styleToText { touchAction(TouchAction.Revert) }).isEqualTo("touch-action: revert")
+        assertThat(styleToText { touchAction(TouchAction.RevertLayer) }).isEqualTo("touch-action: revert-layer")
         assertThat(styleToText { touchAction(TouchAction.Unset) }).isEqualTo("touch-action: unset")
     }
 
@@ -1878,6 +1986,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { transformBox(TransformBox.Inherit) }).isEqualTo("transform-box: inherit")
         assertThat(styleToText { transformBox(TransformBox.Initial) }).isEqualTo("transform-box: initial")
         assertThat(styleToText { transformBox(TransformBox.Revert) }).isEqualTo("transform-box: revert")
+        assertThat(styleToText { transformBox(TransformBox.RevertLayer) }).isEqualTo("transform-box: revert-layer")
         assertThat(styleToText { transformBox(TransformBox.Unset) }).isEqualTo("transform-box: unset")
     }
 
@@ -1945,6 +2054,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { transformOrigin(TransformOrigin.Inherit) }).isEqualTo("transform-origin: inherit")
         assertThat(styleToText { transformOrigin(TransformOrigin.Initial) }).isEqualTo("transform-origin: initial")
         assertThat(styleToText { transformOrigin(TransformOrigin.Revert) }).isEqualTo("transform-origin: revert")
+        assertThat(styleToText { transformOrigin(TransformOrigin.RevertLayer) }).isEqualTo("transform-origin: revert-layer")
         assertThat(styleToText { transformOrigin(TransformOrigin.Unset) }).isEqualTo("transform-origin: unset")
     }
 
@@ -1956,6 +2066,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { transformStyle(TransformStyle.Inherit) }).isEqualTo("transform-style: inherit")
         assertThat(styleToText { transformStyle(TransformStyle.Initial) }).isEqualTo("transform-style: initial")
         assertThat(styleToText { transformStyle(TransformStyle.Revert) }).isEqualTo("transform-style: revert")
+        assertThat(styleToText { transformStyle(TransformStyle.RevertLayer) }).isEqualTo("transform-style: revert-layer")
         assertThat(styleToText { transformStyle(TransformStyle.Unset) }).isEqualTo("transform-style: unset")
     }
 
@@ -1965,6 +2076,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { transition(Transition.Inherit) }).isEqualTo("transition: inherit")
         assertThat(styleToText { transition(Transition.Initial) }).isEqualTo("transition: initial")
         assertThat(styleToText { transition(Transition.Revert) }).isEqualTo("transition: revert")
+        assertThat(styleToText { transition(Transition.RevertLayer) }).isEqualTo("transition: revert-layer")
         assertThat(styleToText { transition(Transition.Unset) }).isEqualTo("transition: unset")
 
         assertThat(styleToText { transition(Transition.of("opacity", 2.s)) })
@@ -2020,6 +2132,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { transitionBehavior(TransitionBehavior.Inherit) }).isEqualTo("transition-behavior: inherit")
         assertThat(styleToText { transitionBehavior(TransitionBehavior.Initial) }).isEqualTo("transition-behavior: initial")
         assertThat(styleToText { transitionBehavior(TransitionBehavior.Revert) }).isEqualTo("transition-behavior: revert")
+        assertThat(styleToText { transitionBehavior(TransitionBehavior.RevertLayer) }).isEqualTo("transition-behavior: revert-layer")
         assertThat(styleToText { transitionBehavior(TransitionBehavior.Unset) }).isEqualTo("transition-behavior: unset")
     }
 
@@ -2036,6 +2149,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { transitionProperty(TransitionProperty.Inherit) }).isEqualTo("transition-property: inherit")
         assertThat(styleToText { transitionProperty(TransitionProperty.Initial) }).isEqualTo("transition-property: initial")
         assertThat(styleToText { transitionProperty(TransitionProperty.Revert) }).isEqualTo("transition-property: revert")
+        assertThat(styleToText { transitionProperty(TransitionProperty.RevertLayer) }).isEqualTo("transition-property: revert-layer")
         assertThat(styleToText { transitionProperty(TransitionProperty.Unset) }).isEqualTo("transition-property: unset")
     }
 
@@ -2050,6 +2164,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { userSelect(UserSelect.Inherit) }).isEqualTo("user-select: inherit")
         assertThat(styleToText { userSelect(UserSelect.Initial) }).isEqualTo("user-select: initial")
         assertThat(styleToText { userSelect(UserSelect.Revert) }).isEqualTo("user-select: revert")
+        assertThat(styleToText { userSelect(UserSelect.RevertLayer) }).isEqualTo("user-select: revert-layer")
         assertThat(styleToText { userSelect(UserSelect.Unset) }).isEqualTo("user-select: unset")
     }
 
@@ -2067,6 +2182,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { verticalAlign(VerticalAlign.Inherit) }).isEqualTo("vertical-align: inherit")
         assertThat(styleToText { verticalAlign(VerticalAlign.Initial) }).isEqualTo("vertical-align: initial")
         assertThat(styleToText { verticalAlign(VerticalAlign.Revert) }).isEqualTo("vertical-align: revert")
+        assertThat(styleToText { verticalAlign(VerticalAlign.RevertLayer) }).isEqualTo("vertical-align: revert-layer")
         assertThat(styleToText { verticalAlign(VerticalAlign.Unset) }).isEqualTo("vertical-align: unset")
     }
 
@@ -2079,6 +2195,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { visibility(Visibility.Inherit) }).isEqualTo("visibility: inherit")
         assertThat(styleToText { visibility(Visibility.Initial) }).isEqualTo("visibility: initial")
         assertThat(styleToText { visibility(Visibility.Revert) }).isEqualTo("visibility: revert")
+        assertThat(styleToText { visibility(Visibility.RevertLayer) }).isEqualTo("visibility: revert-layer")
         assertThat(styleToText { visibility(Visibility.Unset) }).isEqualTo("visibility: unset")
     }
 
@@ -2094,6 +2211,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { whiteSpace(WhiteSpace.Inherit) }).isEqualTo("white-space: inherit")
         assertThat(styleToText { whiteSpace(WhiteSpace.Initial) }).isEqualTo("white-space: initial")
         assertThat(styleToText { whiteSpace(WhiteSpace.Revert) }).isEqualTo("white-space: revert")
+        assertThat(styleToText { whiteSpace(WhiteSpace.RevertLayer) }).isEqualTo("white-space: revert-layer")
         assertThat(styleToText { whiteSpace(WhiteSpace.Unset) }).isEqualTo("white-space: unset")
     }
 
@@ -2104,6 +2222,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { widows(Widows.Inherit) }).isEqualTo("widows: inherit")
         assertThat(styleToText { widows(Widows.Initial) }).isEqualTo("widows: initial")
         assertThat(styleToText { widows(Widows.Revert) }).isEqualTo("widows: revert")
+        assertThat(styleToText { widows(Widows.RevertLayer) }).isEqualTo("widows: revert-layer")
         assertThat(styleToText { widows(Widows.Unset) }).isEqualTo("widows: unset")
     }
 
@@ -2121,6 +2240,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { width(Width.Inherit) }).isEqualTo("width: inherit")
         assertThat(styleToText { width(Width.Initial) }).isEqualTo("width: initial")
         assertThat(styleToText { width(Width.Revert) }).isEqualTo("width: revert")
+        assertThat(styleToText { width(Width.RevertLayer) }).isEqualTo("width: revert-layer")
         assertThat(styleToText { width(Width.Unset) }).isEqualTo("width: unset")
     }
 
@@ -2136,6 +2256,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
         assertThat(styleToText { willChange(WillChange.Initial) }).isEqualTo("will-change: initial")
         assertThat(styleToText { willChange(WillChange.Revert) }).isEqualTo("will-change: revert")
+        assertThat(styleToText { willChange(WillChange.RevertLayer) }).isEqualTo("will-change: revert-layer")
         assertThat(styleToText { willChange(WillChange.Unset) }).isEqualTo("will-change: unset")
     }
 
@@ -2148,6 +2269,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { wordBreak(WordBreak.Inherit) }).isEqualTo("word-break: inherit")
         assertThat(styleToText { wordBreak(WordBreak.Initial) }).isEqualTo("word-break: initial")
         assertThat(styleToText { wordBreak(WordBreak.Revert) }).isEqualTo("word-break: revert")
+        assertThat(styleToText { wordBreak(WordBreak.RevertLayer) }).isEqualTo("word-break: revert-layer")
         assertThat(styleToText { wordBreak(WordBreak.Unset) }).isEqualTo("word-break: unset")
     }
 
@@ -2159,6 +2281,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { wordSpacing(WordSpacing.Inherit) }).isEqualTo("word-spacing: inherit")
         assertThat(styleToText { wordSpacing(WordSpacing.Initial) }).isEqualTo("word-spacing: initial")
         assertThat(styleToText { wordSpacing(WordSpacing.Revert) }).isEqualTo("word-spacing: revert")
+        assertThat(styleToText { wordSpacing(WordSpacing.RevertLayer) }).isEqualTo("word-spacing: revert-layer")
         assertThat(styleToText { wordSpacing(WordSpacing.Unset) }).isEqualTo("word-spacing: unset")
     }
 
@@ -2171,6 +2294,7 @@ class CssStylePropertyTests {
         assertThat(styleToText { writingMode(WritingMode.Inherit) }).isEqualTo("writing-mode: inherit")
         assertThat(styleToText { writingMode(WritingMode.Initial) }).isEqualTo("writing-mode: initial")
         assertThat(styleToText { writingMode(WritingMode.Revert) }).isEqualTo("writing-mode: revert")
+        assertThat(styleToText { writingMode(WritingMode.RevertLayer) }).isEqualTo("writing-mode: revert-layer")
         assertThat(styleToText { writingMode(WritingMode.Unset) }).isEqualTo("writing-mode: unset")
     }
 }

@@ -55,7 +55,7 @@ sealed class Animation private constructor(private val value: String) : StylePro
         }.joinToString(" ")
     )
 
-    companion object {
+    companion object : CssGlobalValues<Animation> {
         fun of(
             name: String,
             duration: CSSTimeNumericValue? = null,
@@ -72,12 +72,6 @@ sealed class Animation private constructor(private val value: String) : StylePro
 
         // Keyword
         val None: Animation get() = Keyword("none")
-
-        // Global Keywords
-        val Inherit: Animation get() = Keyword("inherit")
-        val Initial: Animation get() = Keyword("initial")
-        val Revert: Animation get() = Keyword("revert")
-        val Unset: Animation get() = Keyword("unset")
     }
 }
 

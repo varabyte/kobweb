@@ -39,16 +39,10 @@ fun StyleScope.borderWidth(width: CSSLengthNumericValue) {
 class BorderCollapse private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<BorderCollapse> {
         // Keyword
         val Separate get() = BorderCollapse("separate")
         val Collapse get() = BorderCollapse("collapse")
-
-        // Global
-        val Inherit get() = BorderCollapse("inherit")
-        val Initial get() = BorderCollapse("initial")
-        val Revert get() = BorderCollapse("revert")
-        val Unset get() = BorderCollapse("unset")
     }
 }
 
@@ -291,16 +285,10 @@ class BorderImageSlice private constructor(private val value: String) : StylePro
             )
     }
 
-    companion object {
+    companion object : CssGlobalValues<BorderImageSlice> {
         fun of(all: CSSPercentageValue) = of { all(all) }
         fun of(all: Number) = of { all(all) }
         fun of(block: Builder.() -> Unit): BorderImageSlice = Builder().apply(block).build()
-
-        // Global
-        val Inherit get() = BorderImageSlice("inherit")
-        val Initial get() = BorderImageSlice("initial")
-        val Revert get() = BorderImageSlice("revert")
-        val Unset get() = BorderImageSlice("unset")
     }
 }
 
@@ -316,16 +304,10 @@ class BorderImageWidth private constructor(private val value: String) : StylePro
         internal fun build(): BorderImageWidth = BorderImageWidth("$top $right $bottom $left")
     }
 
-    companion object {
+    companion object : CssGlobalValues<BorderImageWidth> {
         fun of(all: CSSLengthOrPercentageNumericValue) = of { all(all) }
         fun of(all: Number) = of { all(all) }
         fun of(block: Builder.() -> Unit): BorderImageWidth = Builder().apply(block).build()
-
-        // Global
-        val Inherit get() = BorderImageWidth("inherit")
-        val Initial get() = BorderImageWidth("initial")
-        val Revert get() = BorderImageWidth("revert")
-        val Unset get() = BorderImageWidth("unset")
     }
 }
 
@@ -341,16 +323,10 @@ class BorderImageOutset private constructor(private val value: String) : StylePr
         internal fun build(): BorderImageOutset = BorderImageOutset("$top $right $bottom $left")
     }
 
-    companion object {
+    companion object : CssGlobalValues<BorderImageOutset> {
         fun of(all: CSSLengthNumericValue) = of { all(all) }
         fun of(all: Number) = of { all(all) }
         fun of(block: Builder.() -> Unit): BorderImageOutset = Builder().apply(block).build()
-
-        // Global
-        val Inherit get() = BorderImageOutset("inherit")
-        val Initial get() = BorderImageOutset("initial")
-        val Revert get() = BorderImageOutset("revert")
-        val Unset get() = BorderImageOutset("unset")
     }
 }
 
@@ -366,7 +342,7 @@ sealed class BorderImageRepeat private constructor(private val value: String) : 
     class Listable internal constructor(value: String) : BorderImageRepeat(value)
     private class TwoValue(topBottom: Listable, leftRight: Listable) : BorderImageRepeat("$topBottom $leftRight")
 
-    companion object {
+    companion object : CssGlobalValues<BorderImageRepeat> {
         // Keyword
         val Stretch: Listable get() = Listable("stretch")
         val Repeat: Listable get() = Listable("repeat")
@@ -374,12 +350,6 @@ sealed class BorderImageRepeat private constructor(private val value: String) : 
         val Space: Listable get() = Listable("space")
 
         fun of(topBottom: Listable, leftRight: Listable): BorderImageRepeat = TwoValue(topBottom, leftRight)
-
-        // Global
-        val Inherit: BorderImageRepeat get() = Keyword("inherit")
-        val Initial: BorderImageRepeat get() = Keyword("initial")
-        val Revert: BorderImageRepeat get() = Keyword("revert")
-        val Unset: BorderImageRepeat get() = Keyword("unset")
     }
 }
 
@@ -390,7 +360,7 @@ fun StyleScope.borderImageRepeat(repeat: BorderImageRepeat) {
 class BorderImage private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<BorderImage> {
         fun of(
             source: BorderImageSource? = null,
             slice: BorderImageSlice? = null,
@@ -411,12 +381,6 @@ class BorderImage private constructor(private val value: String) : StyleProperty
                 repeat?.let { append(it) }
             })
         }
-
-        // Global
-        val Inherit get() = BorderImage("inherit")
-        val Initial get() = BorderImage("initial")
-        val Revert get() = BorderImage("revert")
-        val Unset get() = BorderImage("unset")
     }
 }
 

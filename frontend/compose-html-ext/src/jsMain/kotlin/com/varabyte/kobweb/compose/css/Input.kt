@@ -11,17 +11,11 @@ import kotlin.collections.emptyList
 class CaretColor private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<CaretColor> {
         // Keyword
         val Auto get() = CaretColor("auto")
         val Transparent get() = CaretColor("transparent")
         val CurrentColor get() = CaretColor("currentcolor")
-
-        // Global
-        val Inherit get() = CaretColor("inherit")
-        val Initial get() = CaretColor("initial")
-        val Revert get() = CaretColor("revert")
-        val Unset get() = CaretColor("unset")
     }
 }
 
@@ -44,7 +38,7 @@ sealed class TouchAction private constructor(private val value: String) : StyleP
     class PanHorizontal internal constructor(value: String) : TouchAction(value)
     class PanVertical internal constructor(value: String) : TouchAction(value)
 
-    companion object {
+    companion object : CssGlobalValues<TouchAction> {
         @Suppress("FunctionName")
         private fun _of(vararg touchAction: TouchAction, withPinchZoom: Boolean): TouchAction =
             Keyword(
@@ -69,12 +63,6 @@ sealed class TouchAction private constructor(private val value: String) : StyleP
 //        val PanDown get(): TouchAction = PanVertical("pan-down")
 
         val Manipulation get(): TouchAction = Keyword("manipulation")
-
-        // Global
-        val Inherit get(): TouchAction = Keyword("inherit")
-        val Initial get(): TouchAction = Keyword("initial")
-        val Revert get(): TouchAction = Keyword("revert")
-        val Unset get(): TouchAction = Keyword("unset")
     }
 }
 

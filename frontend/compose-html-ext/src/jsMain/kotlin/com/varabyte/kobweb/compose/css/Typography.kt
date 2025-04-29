@@ -6,15 +6,9 @@ import org.jetbrains.compose.web.css.*
 class Widows private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<Widows> {
         // <integer> values
         fun of(numLines: Int) = Widows("$numLines")
-
-        // Global values
-        val Inherit get() = Widows("inherit")
-        val Initial get() = Widows("initial")
-        val Revert get() = Widows("revert")
-        val Unset get() = Widows("unset")
     }
 }
 

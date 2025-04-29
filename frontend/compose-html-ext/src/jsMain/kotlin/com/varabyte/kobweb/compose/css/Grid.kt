@@ -200,15 +200,9 @@ class GridTrackBuilder : GridTrackBuilderInRepeat() {
 class GridAuto private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<GridAuto> {
         // Keywords
         val None get() = GridAuto("none")
-
-        // Global values
-        val Inherit get() = GridAuto("inherit")
-        val Initial get() = GridAuto("initial")
-        val Revert get() = GridAuto("revert")
-        val Unset get() = GridAuto("unset")
     }
 }
 
@@ -280,16 +274,10 @@ sealed class GridTemplate private constructor(private val value: String) : Style
         }
     }
 
-    companion object {
+    companion object : CssGlobalValues<GridTemplate> {
         // Keywords
         val None: GridTemplate get() = Keyword("none")
         val Subgrid: GridTemplate get() = Subgrid()
-
-        // Global
-        val Initial: GridTemplate get() = Keyword("initial")
-        val Inherit: GridTemplate get() = Keyword("inherit")
-        val Revert: GridTemplate get() = Keyword("revert")
-        val Unset: GridTemplate get() = Keyword("unset")
     }
 }
 

@@ -6,17 +6,11 @@ import org.jetbrains.compose.web.css.*
 class Visibility private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<Visibility> {
         // Keyword
         val Visible get() = Visibility("visible")
         val Hidden get() = Visibility("hidden")
         val Collapse get() = Visibility("collapse")
-
-        // Global
-        val Inherit get() = Visibility("inherit")
-        val Initial get() = Visibility("initial")
-        val Revert get() = Visibility("revert")
-        val Unset get() = Visibility("unset")
     }
 }
 

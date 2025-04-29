@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.css.*
 class FlexBasis private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<FlexBasis> {
         // Width
         val Auto get() = FlexBasis("auto")
 
@@ -17,12 +17,6 @@ class FlexBasis private constructor(private val value: String) : StylePropertyVa
 
         // Content sizing
         val Content get() = FlexBasis("content")
-
-        // Global
-        val Inherit get() = FlexBasis("inherit")
-        val Initial get() = FlexBasis("initial")
-        val Revert get() = FlexBasis("revert")
-        val Unset get() = FlexBasis("unset")
     }
 }
 

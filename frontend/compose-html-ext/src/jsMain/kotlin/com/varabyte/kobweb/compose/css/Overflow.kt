@@ -6,19 +6,13 @@ import org.jetbrains.compose.web.css.*
 class Overflow private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<Overflow> {
         // General
         val Visible get() = Overflow("visible")
         val Hidden get() = Overflow("hidden")
         val Clip get() = Overflow("clip")
         val Scroll get() = Overflow("scroll")
         val Auto get() = Overflow("auto")
-
-        // Global
-        val Inherit get() = Overflow("inherit")
-        val Initial get() = Overflow("initial")
-        val Revert get() = Overflow("revert")
-        val Unset get() = Overflow("unset")
     }
 }
 
@@ -26,17 +20,11 @@ class Overflow private constructor(private val value: String) : StylePropertyVal
 class OverflowWrap private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<OverflowWrap> {
         // General
         val Normal get() = OverflowWrap("normal")
         val BreakWord get() = OverflowWrap("break-word")
         val Anywhere get() = OverflowWrap("anywhere")
-
-        // Global
-        val Inherit get() = OverflowWrap("inherit")
-        val Initial get() = OverflowWrap("initial")
-        val Revert get() = OverflowWrap("revert")
-        val Unset get() = OverflowWrap("unset")
     }
 }
 

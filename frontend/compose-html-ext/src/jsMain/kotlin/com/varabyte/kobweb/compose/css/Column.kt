@@ -6,20 +6,13 @@ import org.jetbrains.compose.web.css.*
 class ColumnCount private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-
-        /* Keyword value */
+    companion object : CssGlobalValues<ColumnCount> {
+        // Keyword value
         val Auto get() = ColumnCount("auto")
 
-        /* <integer> value */
+        // <integer> value
         fun of(count: Int) = ColumnCount("$count")
 
-        /* Global values */
-        val Inherit get() = ColumnCount("inherit")
-        val Initial get() = ColumnCount("initial")
-        val Revert get() = ColumnCount("revert")
-        val RevertLayer get() = ColumnCount("revert-layer")
-        val Unset get() = ColumnCount("unset")
     }
 }
 
@@ -31,18 +24,10 @@ fun StyleScope.columnCount(columnCount: ColumnCount) {
 class ColumnFill private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-
-        /* Keyword value */
+    companion object : CssGlobalValues<ColumnFill> {
+        // Keyword value
         val Auto get() = ColumnFill("auto")
         val Balance get() = ColumnFill("balance")
-
-        /* Global values */
-        val Inherit get() = ColumnFill("inherit")
-        val Initial get() = ColumnFill("initial")
-        val Revert get() = ColumnFill("revert")
-        val RevertLayer get() = ColumnFill("revert-layer")
-        val Unset get() = ColumnFill("unset")
     }
 }
 
@@ -73,17 +58,10 @@ fun StyleScope.columnRule(
 class ColumnSpan private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
-        /* Keyword value */
+    companion object : CssGlobalValues<ColumnSpan> {
+        // Keyword value
         val None get() = ColumnSpan("none")
         val All get() = ColumnSpan("all")
-
-        /* Global values */
-        val Inherit get() = ColumnSpan("inherit")
-        val Initial get() = ColumnSpan("initial")
-        val Revert get() = ColumnSpan("revert")
-        val RevertLayer get() = ColumnSpan("revert-layer")
-        val Unset get() = ColumnSpan("unset")
     }
 }
 

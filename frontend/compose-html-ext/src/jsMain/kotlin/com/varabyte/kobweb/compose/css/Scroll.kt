@@ -15,19 +15,13 @@ sealed class OverscrollBehavior private constructor(private val value: String) :
     private class ListableKeyword(value: String) : Listable(value)
     private class TwoValue(x: Listable, y: Listable) : OverscrollBehavior("$x $y")
 
-    companion object {
+    companion object : CssGlobalValues<OverscrollBehavior> {
         // Keyword
         val Auto: Listable get() = ListableKeyword("auto")
         val Contain: Listable get() = ListableKeyword("contain")
         val None: Listable get() = ListableKeyword("none")
 
         fun of(x: Listable, y: Listable): OverscrollBehavior = TwoValue(x, y)
-
-        // Global
-        val Inherit: SingleValue get() = Keyword("inherit")
-        val Initial: SingleValue get() = Keyword("initial")
-        val Revert: SingleValue get() = Keyword("revert")
-        val Unset: SingleValue get() = Keyword("unset")
     }
 }
 
@@ -48,17 +42,11 @@ fun StyleScope.overscrollBehaviorY(overscrollBehavior: OverscrollBehavior.Single
 class OverscrollBehaviorKeyword private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<OverscrollBehaviorKeyword> {
         // Keyword
         val Auto get() = OverscrollBehaviorKeyword("auto")
         val Contain get() = OverscrollBehaviorKeyword("contain")
         val None get() = OverscrollBehaviorKeyword("none")
-
-        // Global
-        val Inherit get() = OverscrollBehaviorKeyword("inherit")
-        val Initial get() = OverscrollBehaviorKeyword("initial")
-        val Revert get() = OverscrollBehaviorKeyword("revert")
-        val Unset get() = OverscrollBehaviorKeyword("unset")
     }
 }
 
@@ -82,16 +70,10 @@ fun StyleScope.overscrollBehaviorInline(overscrollBehaviorInline: OverscrollBeha
 class ScrollBehavior private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<ScrollBehavior> {
         // Keyword
         val Auto get() = ScrollBehavior("auto")
         val Smooth get() = ScrollBehavior("smooth")
-
-        // Global
-        val Inherit get() = ScrollBehavior("inherit")
-        val Initial get() = ScrollBehavior("initial")
-        val Revert get() = ScrollBehavior("revert")
-        val Unset get() = ScrollBehavior("unset")
     }
 }
 
@@ -114,7 +96,7 @@ sealed class ScrollSnapType private constructor(private val value: String) : Sty
         override fun toString() = name.lowercase()
     }
 
-    companion object {
+    companion object : CssGlobalValues<ScrollSnapType> {
         // Keyword
         val None: ScrollSnapType get() = Keyword("none")
 
@@ -126,12 +108,6 @@ sealed class ScrollSnapType private constructor(private val value: String) : Sty
         val Both get() = Axis("both")
 
         fun of(axis: Axis, strictness: Strictness): ScrollSnapType = AxisWithStrictness(axis, strictness)
-
-        // Global
-        val Inherit: ScrollSnapType get() = Keyword("inherit")
-        val Initial: ScrollSnapType get() = Keyword("initial")
-        val Revert: ScrollSnapType get() = Keyword("revert")
-        val Unset: ScrollSnapType get() = Keyword("unset")
     }
 }
 
@@ -239,7 +215,7 @@ sealed class ScrollSnapAlign private constructor(private val value: String) : St
     class Alignment internal constructor(value: String) : ScrollSnapAlign(value)
     private class TwoAxis(block: Alignment, inline: Alignment) : ScrollSnapAlign("$block $inline")
 
-    companion object {
+    companion object : CssGlobalValues<ScrollSnapAlign> {
         // Keyword
         val None get() = Alignment("none")
         val Start get() = Alignment("start")
@@ -247,12 +223,6 @@ sealed class ScrollSnapAlign private constructor(private val value: String) : St
         val Center get() = Alignment("center")
 
         fun of(blockAxis: Alignment, inlineAxis: Alignment): ScrollSnapAlign = TwoAxis(blockAxis, inlineAxis)
-
-        // Global
-        val Inherit: ScrollSnapAlign get() = Keyword("inherit")
-        val Initial: ScrollSnapAlign get() = Keyword("initial")
-        val Revert: ScrollSnapAlign get() = Keyword("revert")
-        val Unset: ScrollSnapAlign get() = Keyword("unset")
     }
 }
 
@@ -268,16 +238,10 @@ fun StyleScope.scrollSnapAlign(scrollSnapAlign: ScrollSnapAlign) {
 class ScrollSnapStop private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<ScrollSnapStop> {
         // Keyword
         val Normal get() = ScrollSnapStop("normal")
         val Always get() = ScrollSnapStop("always")
-
-        // Global
-        val Inherit get() = ScrollSnapStop("inherit")
-        val Initial get() = ScrollSnapStop("initial")
-        val Revert get() = ScrollSnapStop("revert")
-        val Unset get() = ScrollSnapStop("unset")
     }
 }
 
@@ -373,17 +337,11 @@ fun StyleScope.scrollMarginBlockEnd(value: CSSLengthNumericValue) {
 class ScrollbarWidth private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<ScrollbarWidth> {
         // Keyword
         val Auto get() = ScrollbarWidth("auto")
         val Thin get() = ScrollbarWidth("thin")
         val None get() = ScrollbarWidth("none")
-
-        // Global
-        val Inherit get() = ScrollbarWidth("inherit")
-        val Initial get() = ScrollbarWidth("initial")
-        val Revert get() = ScrollbarWidth("revert")
-        val Unset get() = ScrollbarWidth("unset")
     }
 }
 

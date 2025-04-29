@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.css.*
 class WillChange private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<WillChange> {
         // Keyword values
         val Auto get() = WillChange("auto")
         val ScrollPosition get() = WillChange("scroll-position")
@@ -14,12 +14,6 @@ class WillChange private constructor(private val value: String) : StylePropertyV
 
         // Custom ident values
         fun of(vararg values: String) = WillChange(values.joinToString())
-
-        // Global values
-        val Inherit get() = WillChange("inherit")
-        val Initial get() = WillChange("initial")
-        val Revert get() = WillChange("revert")
-        val Unset get() = WillChange("unset")
     }
 }
 

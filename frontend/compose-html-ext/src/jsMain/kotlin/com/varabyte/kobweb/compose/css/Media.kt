@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.css.*
 class MixBlendMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<MixBlendMode> {
         // Keywords
         val Normal get() = MixBlendMode("normal")
         val Multiply get() = MixBlendMode("multiply")
@@ -26,12 +26,6 @@ class MixBlendMode private constructor(private val value: String) : StylePropert
         val Luminosity get() = MixBlendMode("luminosity")
         val PlusDarker get() = MixBlendMode("plus-darker")
         val PlusLighter get() = MixBlendMode("plus-lighter")
-
-        // Global values
-        val Inherit get() = MixBlendMode("inherit")
-        val Initial get() = MixBlendMode("initial")
-        val Revert get() = MixBlendMode("revert")
-        val Unset get() = MixBlendMode("unset")
     }
 }
 
@@ -43,19 +37,13 @@ fun StyleScope.mixBlendMode(blendMode: MixBlendMode) {
 class ObjectFit private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object {
+    companion object : CssGlobalValues<ObjectFit> {
         // Keywords
         val Contain get() = ObjectFit("contain")
         val Cover get() = ObjectFit("cover")
         val Fill get() = ObjectFit("fill")
         val None get() = ObjectFit("none")
         val ScaleDown get() = ObjectFit("scale-down")
-
-        // Global values
-        val Inherit get() = ObjectFit("inherit")
-        val Initial get() = ObjectFit("initial")
-        val Revert get() = ObjectFit("revert")
-        val Unset get() = ObjectFit("unset")
     }
 }
 
