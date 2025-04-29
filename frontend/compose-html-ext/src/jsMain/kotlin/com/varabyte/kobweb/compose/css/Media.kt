@@ -2,30 +2,51 @@ package com.varabyte.kobweb.compose.css
 
 import org.jetbrains.compose.web.css.*
 
+interface CssBlendModeValues<T: StylePropertyValue> {
+    val Normal: T
+    val Multiply: T
+    val Screen: T
+    val Overlay: T
+    val Darken: T
+    val Lighten: T
+    val ColorDodge: T
+    val ColorBurn: T
+    val HardLight: T
+    val SoftLight: T
+    val Difference: T
+    val Exclusion: T
+    val Hue: T
+    val Saturation: T
+    val Color: T
+    val Luminosity: T
+    val PlusDarker: T
+    val PlusLighter: T
+}
+
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode
 class MixBlendMode private constructor(private val value: String) : StylePropertyValue {
     override fun toString() = value
 
-    companion object : CssGlobalValues<MixBlendMode> {
+    companion object : CssBlendModeValues<MixBlendMode>, CssGlobalValues<MixBlendMode> {
         // Keywords
-        val Normal get() = MixBlendMode("normal")
-        val Multiply get() = MixBlendMode("multiply")
-        val Screen get() = MixBlendMode("screen")
-        val Overlay get() = MixBlendMode("overlay")
-        val Darken get() = MixBlendMode("darken")
-        val Lighten get() = MixBlendMode("lighten")
-        val ColorDodge get() = MixBlendMode("color-dodge")
-        val ColorBurn get() = MixBlendMode("color-burn")
-        val HardLight get() = MixBlendMode("hard-light")
-        val SoftLight get() = MixBlendMode("soft-light")
-        val Difference get() = MixBlendMode("difference")
-        val Exclusion get() = MixBlendMode("exclusion")
-        val Hue get() = MixBlendMode("hue")
-        val Saturation get() = MixBlendMode("saturation")
-        val Color get() = MixBlendMode("color")
-        val Luminosity get() = MixBlendMode("luminosity")
-        val PlusDarker get() = MixBlendMode("plus-darker")
-        val PlusLighter get() = MixBlendMode("plus-lighter")
+        override val Normal get() = MixBlendMode("normal")
+        override val Multiply get() = MixBlendMode("multiply")
+        override val Screen get() = MixBlendMode("screen")
+        override val Overlay get() = MixBlendMode("overlay")
+        override val Darken get() = MixBlendMode("darken")
+        override val Lighten get() = MixBlendMode("lighten")
+        override val ColorDodge get() = MixBlendMode("color-dodge")
+        override val ColorBurn get() = MixBlendMode("color-burn")
+        override val HardLight get() = MixBlendMode("hard-light")
+        override val SoftLight get() = MixBlendMode("soft-light")
+        override val Difference get() = MixBlendMode("difference")
+        override val Exclusion get() = MixBlendMode("exclusion")
+        override val Hue get() = MixBlendMode("hue")
+        override val Saturation get() = MixBlendMode("saturation")
+        override val Color get() = MixBlendMode("color")
+        override val Luminosity get() = MixBlendMode("luminosity")
+        override val PlusDarker get() = MixBlendMode("plus-darker")
+        override val PlusLighter get() = MixBlendMode("plus-lighter")
     }
 }
 

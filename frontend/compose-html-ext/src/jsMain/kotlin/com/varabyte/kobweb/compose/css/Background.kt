@@ -26,14 +26,48 @@ fun StyleScope.backgroundAttachment(backgroundAttachment: BackgroundAttachment) 
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-blend-mode
-typealias BackgroundBlendMode = MixBlendMode
+sealed class BackgroundBlendMode private constructor(private val value: String) : StylePropertyValue {
+    override fun toString() = value
+
+    class Listable(value: String) : BackgroundBlendMode(value)
+    private class ValueList(values: List<Listable>) : BackgroundBlendMode(values.joinToString())
+
+    companion object : CssBlendModeValues<Listable>, CssGlobalValues<BackgroundBlendMode> {
+        fun list(vararg blendModes: Listable): BackgroundBlendMode = ValueList(blendModes.toList())
+
+        override val Normal get() = Listable("normal")
+        override val Multiply get() = Listable("multiply")
+        override val Screen get() = Listable("screen")
+        override val Overlay get() = Listable("overlay")
+        override val Darken get() = Listable("darken")
+        override val Lighten get() = Listable("lighten")
+        override val ColorDodge get() = Listable("color-dodge")
+        override val ColorBurn get() = Listable("color-burn")
+        override val HardLight get() = Listable("hard-light")
+        override val SoftLight get() = Listable("soft-light")
+        override val Difference get() = Listable("difference")
+        override val Exclusion get() = Listable("exclusion")
+        override val Hue get() = Listable("hue")
+        override val Saturation get() = Listable("saturation")
+        override val Color get() = Listable("color")
+        override val Luminosity get() = Listable("luminosity")
+        override val PlusDarker get() = Listable("plus-darker")
+        override val PlusLighter get() = Listable("plus-lighter")
+    }
+}
 
 fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode) {
     property("background-blend-mode", blendMode)
 }
 
-fun StyleScope.backgroundBlendMode(vararg blendModes: BackgroundBlendMode) {
-    property("background-blend-mode", blendModes.joinToString())
+// Needed temporarily until we can remove the deprecated `vararg` version
+fun StyleScope.backgroundBlendMode(blendMode: BackgroundBlendMode.Listable) {
+    backgroundBlendMode(blendMode as BackgroundBlendMode)
+}
+// Remove the previous method too after removing this method
+@Deprecated("Use `backgroundBlendMode(BackgroundBlendMode.list(...))` instead.", ReplaceWith("backgroundBlendMode(BackgroundBlendMode.list(*blendModes))"))
+fun StyleScope.backgroundBlendMode(vararg blendModes: BackgroundBlendMode.Listable) {
+    backgroundBlendMode(BackgroundBlendMode.list(*blendModes))
 }
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip

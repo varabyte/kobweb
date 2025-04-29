@@ -1,6 +1,7 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.functions.url
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.toStyles
 import com.varabyte.truthish.assertThat
@@ -19,7 +20,70 @@ class StyleModifierTests {
 
         return styleScope.properties.entries.joinToString("; ") { (key, value) -> "$key: $value" }
     }
+
+    @Test
+    fun verifyBackground() {
+        assertThat(modifierToText {
+            Modifier.background(Color.red)
+        }).isEqualTo("background: red")
+
+        assertThat(modifierToText {
+            Modifier.background(Color.blue, Background.of(BackgroundImage.of(url("test.png"))))
+        }).isEqualTo("background: url(\"test.png\") blue")
+
+        assertThat(modifierToText {
+            Modifier.backgroundAttachment(BackgroundAttachment.Fixed)
+        }).isEqualTo("background-attachment: fixed")
+
+        assertThat(modifierToText {
+            Modifier.backgroundBlendMode(BackgroundBlendMode.Multiply)
+        }).isEqualTo("background-blend-mode: multiply")
+
+        assertThat(modifierToText {
+            Modifier.backgroundBlendMode(BackgroundBlendMode.Screen, BackgroundBlendMode.Overlay)
+        }).isEqualTo("background-blend-mode: screen, overlay")
+
+        assertThat(modifierToText {
+            Modifier.backgroundClip(BackgroundClip.ContentBox)
+        }).isEqualTo("background-clip: content-box")
+
+        assertThat(modifierToText {
+            Modifier.backgroundColor(Color.blue)
+        }).isEqualTo("background-color: blue")
+
+        assertThat(modifierToText {
+            Modifier.backgroundColor(BackgroundColor.Inherit)
+        }).isEqualTo("background-color: inherit")
+
+        assertThat(modifierToText {
+            Modifier.backgroundImage(BackgroundImage.None)
+        }).isEqualTo("background-image: none")
+
+        assertThat(modifierToText {
+            Modifier.backgroundImage(url("test.png"))
+        }).isEqualTo("background-image: url(\"test.png\")")
+
+        assertThat(modifierToText {
+            Modifier.backgroundOrigin(BackgroundOrigin.BorderBox)
+        }).isEqualTo("background-origin: border-box")
+
+        assertThat(modifierToText {
+            Modifier.backgroundPosition(BackgroundPosition.of(CSSPosition.Center))
+        }).isEqualTo("background-position: left 50% top 50%")
+
+        assertThat(modifierToText {
+            Modifier.backgroundRepeat(BackgroundRepeat.NoRepeat)
+        }).isEqualTo("background-repeat: no-repeat")
+
+        assertThat(modifierToText {
+            Modifier.backgroundRepeat(BackgroundRepeat.Space, BackgroundRepeat.Round)
+        }).isEqualTo("background-repeat: space round")
     
+        assertThat(modifierToText {
+            Modifier.backgroundSize(BackgroundSize.Contain)
+        }).isEqualTo("background-size: contain")
+    }
+
     @Test
     fun verifyBox() {
         assertThat(modifierToText {

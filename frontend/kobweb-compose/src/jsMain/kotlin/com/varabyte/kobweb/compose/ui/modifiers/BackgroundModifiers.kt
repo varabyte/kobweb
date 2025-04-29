@@ -1,6 +1,8 @@
 package com.varabyte.kobweb.compose.ui.modifiers
 
 import com.varabyte.kobweb.compose.css.*
+import com.varabyte.kobweb.compose.css.BackgroundBlendMode
+import com.varabyte.kobweb.compose.css.backgroundBlendMode
 import com.varabyte.kobweb.compose.css.functions.CSSUrl
 import com.varabyte.kobweb.compose.css.functions.Gradient
 import com.varabyte.kobweb.compose.ui.Modifier
@@ -44,6 +46,12 @@ fun Modifier.backgroundAttachment(backgroundAttachment: BackgroundAttachment) = 
 fun Modifier.backgroundBlendMode(blendMode: BackgroundBlendMode) = styleModifier {
     backgroundBlendMode(blendMode)
 }
+
+fun Modifier.backgroundBlendMode(vararg blendModes: BackgroundBlendMode.Listable) =
+    backgroundBlendMode(BackgroundBlendMode.list(*blendModes))
+
+fun Modifier.backgroundBlendMode(blendModes: List<BackgroundBlendMode.Listable>) =
+    backgroundBlendMode(BackgroundBlendMode.list(*blendModes.toTypedArray()))
 
 fun Modifier.backgroundClip(backgroundClip: BackgroundClip) = styleModifier {
     backgroundClip(backgroundClip)
