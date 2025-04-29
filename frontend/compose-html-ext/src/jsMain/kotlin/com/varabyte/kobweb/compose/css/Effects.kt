@@ -4,6 +4,7 @@
 package com.varabyte.kobweb.compose.css
 
 import com.varabyte.kobweb.compose.css.functions.CSSFilter
+import com.varabyte.kobweb.compose.css.functions.blur
 import org.jetbrains.compose.web.css.*
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
@@ -21,7 +22,6 @@ sealed class BackdropFilter private constructor(private val value: String) : Sty
         val None: BackdropFilter get() = Keyword("none")
 
         fun of(filter: CSSFilter) = Listable(filter)
-        fun list(vararg filters: CSSFilter): BackdropFilter = ValueList(filters.map { of(it) }.toList())
         fun list(vararg filters: Listable): BackdropFilter = ValueList(filters.toList())
 
         // Global
@@ -37,9 +37,9 @@ fun StyleScope.backdropFilter(backdropFilter: BackdropFilter) {
     property("-webkit-backdrop-filter", backdropFilter) // For safari
 }
 
-@Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("backdropFilter(BackdropFilter.list(*filters))"))
+@Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("BackdropFilter.list(*filters.map { BackdropFilter.of(it) }.toTypedArray())"))
 fun StyleScope.backdropFilter(vararg filters: CSSFilter) {
-    backdropFilter(BackdropFilter.list(*filters))
+    backdropFilter(BackdropFilter.list(*filters.map { BackdropFilter.of(it) }.toTypedArray()))
 }
 
 @Deprecated("Use `backdropFilter(BackdropFilter.list(...))` instead.", ReplaceWith("backdropFilter(BackdropFilter.list(*filters))"))

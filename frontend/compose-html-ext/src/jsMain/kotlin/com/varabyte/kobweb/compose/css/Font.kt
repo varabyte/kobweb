@@ -74,7 +74,6 @@ sealed class FontVariantAlternates private constructor(private val value: String
         fun Ornaments(ident: String): Listable = FunctionalNotation("ornaments", ident)
         fun Annotation(ident: String): Listable = FunctionalNotation("annotation", ident)
 
-        fun of(value: Listable): FontVariantAlternates = SingleValue(value.toString())
         fun list(vararg values: Listable): FontVariantAlternates = ValueList(values.toList())
 
         // Global
